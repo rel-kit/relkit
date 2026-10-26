@@ -1,0 +1,193 @@
+{
+  "name": "@relkit/langchain",
+  "version": "0.7.10",
+  "description": "Explicit native LangChain agent execution for RELKIT.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rel-kit/relkit.git",
+    "directory": "integrations/packages/langchain"
+  },
+  "homepage": "https://github.com/rel-kit/relkit#readme",
+  "bugs": {
+    "url": "https://github.com/rel-kit/relkit/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "bun": ">=1.3.10"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime.d.ts",
+      "import": "./dist/runtime.js"
+    },
+    "./continuation-validation": {
+      "types": "./dist/continuation-validation.d.ts",
+      "import": "./dist/continuation-validation.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/agents.d.ts",
+      "import": "./dist/testing/agents.js"
+    }
+  },
+  "dependencies": {
+    "@relkit/agents": "workspace:*",
+    "@cfworker/json-schema": "4.1.1",
+    "@relkit/contracts": "workspace:*",
+    "@relkit/functions": "workspace:*",
+    "@relkit/invocation": "workspace:*",
+    "@relkit/schema": "workspace:*",
+    "@relkit/tools": "workspace:*",
+    "effect": "catalog:"
+  },
+  "peerDependencies": {
+    "deepagents": "catalog:",
+    "@relkit/testing": "workspace:*",
+    "@langchain/core": "catalog:",
+    "@langchain/langgraph": "catalog:",
+    "langchain": "catalog:",
+    "langsmith": "0.10.8"
+  },
+  "peerDependenciesMeta": {
+    "deepagents": {
+      "optional": true
+    },
+    "@relkit/testing": {
+      "optional": true
+    },
+    "@langchain/core": {
+      "optional": true
+    },
+    "@langchain/langgraph": {
+      "optional": true
+    },
+    "langchain": {
+      "optional": true
+    },
+    "langsmith": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@effect/vitest": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@langchain/langgraph-checkpoint-mongodb": "1.4.1",
+    "@langchain/langgraph-checkpoint-postgres": "1.0.5",
+    "@langchain/langgraph-checkpoint-redis": "1.0.11",
+    "@langchain/langgraph-checkpoint-sqlite": "1.0.4",
+    "@relkit/buckets": "workspace:*",
+    "deepagents": "catalog:",
+    "vitest": "catalog:",
+    "@langchain/core": "catalog:",
+    "@langchain/langgraph": "catalog:",
+    "langchain": "catalog:",
+    "langsmith": "0.10.8"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "check": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false",
+    "test": "vitest run --config vitest.config.ts",
+    "test:coverage": "vitest run --coverage --config vitest.config.ts"
+  },
+  "relkit": {
+    "integration": {
+      "id": "langchain",
+      "exports": {
+        "authoring": ".",
+        "runtime": {
+          "export": "./runtime",
+          "registrations": [
+            {
+              "capability": "agent-execution",
+              "adapterId": "langchain",
+              "protocolVersion": 1
+            },
+            {
+              "capability": "agent-deep",
+              "adapterId": "deepagents",
+              "protocolVersion": 1
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        {
+          "package": "@langchain/core",
+          "supportedRange": "1.2.9",
+          "installSection": "dependencies",
+          "capabilities": [
+            "agent-execution"
+          ],
+          "phases": [
+            "check",
+            "build",
+            "runtime"
+          ]
+        },
+        {
+          "package": "@langchain/langgraph",
+          "supportedRange": "1.4.14",
+          "installSection": "dependencies",
+          "capabilities": [
+            "agent-execution"
+          ],
+          "phases": [
+            "check",
+            "build",
+            "runtime"
+          ]
+        },
+        {
+          "package": "langchain",
+          "supportedRange": "1.5.10",
+          "installSection": "dependencies",
+          "capabilities": [
+            "agent-execution"
+          ],
+          "phases": [
+            "check",
+            "build",
+            "runtime"
+          ]
+        },
+        {
+          "package": "langsmith",
+          "supportedRange": "0.10.8",
+          "installSection": "dependencies",
+          "capabilities": [
+            "agent-execution"
+          ],
+          "phases": [
+            "check",
+            "build",
+            "runtime"
+          ]
+        },
+        {
+          "package": "deepagents",
+          "supportedRange": "1.13.3",
+          "installSection": "dependencies",
+          "capabilities": [
+            "agent-deep"
+          ],
+          "phases": [
+            "check",
+            "build",
+            "runtime"
+          ]
+        }
+      ]
+    }
+  }
+}

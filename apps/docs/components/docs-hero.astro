@@ -1,0 +1,44 @@
+---
+/** Frames authored MDX with decorative request paths; native CSS owns animation and pausing. */
+import Icon from "blume/components/Icon.astro";
+import "./docs-hero.css";
+
+const paths = [
+  "M400 42H620Q652 42 652 74V178Q652 210 684 210H830",
+  "M300 126H562Q594 126 594 158V178Q594 210 626 210H830",
+  "M456 354H620Q652 354 652 322V242Q652 210 684 210H830",
+  "M580 430H732Q764 430 764 398V242Q764 210 796 210H830",
+  "M830 210H912Q944 210 944 178V106Q944 74 976 74H1120",
+  "M830 210H944Q976 210 976 242V306Q976 338 1008 338H1120",
+  "M830 210H1120",
+];
+---
+
+<section class="docs-hero not-prose" aria-label="RELKIT documentation">
+  <svg class="docs-hero-art" viewBox="0 0 1080 430" fill="none" aria-hidden="true">
+    <g class="docs-hero-paths" stroke="currentColor" stroke-width="4" stroke-linejoin="round">
+      {paths.map((path, index) => (
+        <g>
+          <path class="docs-hero-track" d={path} />
+          <path
+            class="docs-hero-flow"
+            d={path}
+            pathLength="100"
+            style={`animation-delay: ${index * -1.3}s`}
+          />
+          <path class="docs-hero-track-core" d={path} stroke-width="2" />
+        </g>
+      ))}
+    </g>
+    <g class="docs-hero-mark">
+      <rect class="docs-hero-hub" x="782" y="162" width="96" height="96" rx="26" />
+      <use href="/logo.svg#relkit-mark" x="796" y="176" width="68" height="68" />
+    </g>
+  </svg>
+  <div class="docs-hero-copy"><slot /></div>
+  <label class="docs-hero-motion">
+    <input type="checkbox" aria-label="Pause hero animation" />
+    <Icon name="pause" size={12} />
+    <span>Pause animation</span>
+  </label>
+</section>

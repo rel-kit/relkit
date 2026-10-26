@@ -51,19 +51,20 @@ For streaming responses, scaffold a function and route, then edit the function's
 
 ## Inspect and run the app
 
-| Goal                                    | Command                             |
-| --------------------------------------- | ----------------------------------- |
-| Validate the application graph          | `bun run check`                     |
-| Typecheck and test                      | `bun run typecheck`, `bun run test` |
-| Start app, inspector, and API reference | `bun run dev`                       |
-| Inspect the graph                       | `bun run relkit graph print`        |
-| Inspect environment value status        | `bun run relkit env list`           |
-| Validate active environment values      | `bun run relkit env check`          |
-| Explain one environment declaration     | `bun run relkit env explain NAME`   |
-| Render a safe environment example       | `bun run relkit env example`        |
-| Check local prerequisites               | `bun run relkit doctor`             |
-| Inspect local service status            | `bun run relkit local status`       |
-| Build or start a built app              | `bun run build`, `bun run start`    |
+| Goal                                                       | Command                                               |
+| ---------------------------------------------------------- | ----------------------------------------------------- |
+| Validate the application graph                             | `bun run check`                                       |
+| Typecheck and test                                         | `bun run typecheck`, `bun run test`                   |
+| Start the app and selected development features            | `bun run dev`                                         |
+| Start separately installed Inspector for an enabled bridge | `bunx --no-install relkit-inspector --project-root .` |
+| Inspect the graph                                          | `bun run relkit graph print`                          |
+| Inspect environment value status                           | `bun run relkit env list`                             |
+| Validate active environment values                         | `bun run relkit env check`                            |
+| Explain one environment declaration                        | `bun run relkit env explain NAME`                     |
+| Render a safe environment example                          | `bun run relkit env example`                          |
+| Check local prerequisites                                  | `bun run relkit doctor`                               |
+| Inspect local service status                               | `bun run relkit local status`                         |
+| Build or start a built app                                 | `bun run build`, `bun run start`                      |
 
 Use `bun run relkit --help` to discover additional `graph`, `env`, `local`, `jobs`, `client`, and deployment commands. Start Docker-backed local services with `bun run relkit local up --detach` only when the app actually declares and needs them. Deployment commands require a configured deployment target.
 

@@ -12,9 +12,13 @@ describe.serial("Phase 0 guardrails", () => {
         root,
         540_000,
       );
-      expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain("12 packages loaded without unrelated integrations or SDKs");
+      expect(result.exitCode, `${result.stdout}\n${result.stderr}`).toBe(0);
+      expect(result.stdout).toContain("12 authoring entries loaded without selected SDKs");
+      expect(result.stdout).toContain(
+        "13 integrations' public entries loaded with declared peers and without unrelated integrations",
+      );
       expect(result.stdout).toContain("packed entries resolved; internal paths rejected");
+      expect(result.stdout).toContain("Bun-only public entries resolved");
     },
     { timeout: 600_000 },
   );

@@ -1,0 +1,153 @@
+---
+title: Generated clients
+description: Generate typed RPC callers from checked function routes, configure transport, and test the differences from REST endpoints.
+pagination: false
+sidebar:
+  icon: panels-top-left
+---
+
+Generate a typed client so callers can use your routes without maintaining their own request and response types. Operation names come from route
+IDs; input, output, and declared application errors come from the target functions.
+Raw handlers do not become generated-client operations.
+
+The client uses **RPC over `/rpc`**. Every exposed route has its stable route-ID procedure and a
+deterministic method/path alias. Both execute the original route's authorization, middleware, rate
+limit, timeout, error mapping, and telemetry against its canonical method and path. Use the
+[OpenAPI document](/docs/modules/http/openapi) when you need the native REST request and response shape.
+
+<Steps>
+<Step>
+
+## Install the caller
+
+The backend's minimal starter already supplies check/generation tooling. In a separate caller package,
+install the framework-independent client and its required peer before importing the generated client:
+
+<include>/_snippets/generated/installations/client.mdx</include>
+
+Only a selected React/query leaf needs its additional peers; follow [React setup](/docs/modules/client)
+for that path. A standalone frontend also needs the development CLI for `client pull`/`client check`,
+as shown there. Keep frontend installation and contract output in the frontend root.
+
+</Step>
+<Step>
+
+## Generate the contract
+
+From your application's root:
+
+```sh
+bun run check
+```
+
+This writes `.relkit/generated/contract.ts` and `.relkit/generated/client.ts`, alongside graph,
+OpenAPI, and JSON client-contract artifacts. Never hand-edit them.
+
+Make the generated contract part of the caller's TypeScript program: import the generated client
+entry point, or explicitly include the generated contract when using `@relkit/client` directly.
+The contract augments the default client registry so operation names and inputs are typed. Merely
+installing `@relkit/client` in another app does not teach it your server's operations.
+
+Package or share the generated client and contract together with the dependencies they import.
+Regenerate and review them when route identities, input, output, or errors change.
+
+The same generated contract includes public task-first jobs under `jobs.<name>`. A job trigger returns an
+accepted `runId`; inspect, watch, and control it through the generated `runs` procedures rather than treating
+the trigger response as the task output. Keep the original operation ID and request when an acceptance response
+is unknown.
+
+</Step>
+<Step>
+
+## Configure the transport
+
+This repository example configures a client instance:
+
+<include
+  source="examples/commerce/src/platform/generated-client.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/platform/generated-client.ts"'
+>
+  /_snippets/source/examples/commerce/src/platform/generated-client.ts
+</include>
+
+Set `baseUrl` to the backend origin, without appending `/rpc`; the client adds that transport path.
+The snippet uses port `3000`, the generated-app default. Change it to `4000` when calling the commerce
+app with its default configuration.
+
+`headers` accepts a header collection or a provider, including an asynchronous provider.
+Use request-scoped headers or a provider for credentials; do not mutate one shared instance with
+different users' credentials in a server process. The example's mutable `liveHeaders` is not a
+multi-user session store. Browser credentials default to `include`; cross-origin cookies still
+require appropriate browser, cookie, and server CORS configuration. A custom `fetch` is supported.
+
+</Step>
+<Step>
+
+## Call with domain input
+
+Select the checked route ID with editor completion. For the unmodified Echo tutorial, the operation
+is `route.post.echo` and the input is `{ message: "hello" }`. It resolves to the function's validated
+output, not a native `Response`.
+
+In a separate frontend using `client pull`, select the route ID directly:
+
+<include source="apps/docs/examples/frontend/rpc.ts" lang="ts" meta='title="src/api.ts"'>
+  /_snippets/source/apps/docs/examples/frontend/rpc.ts
+</include>
+
+The base client does not load identity automatically. This browser example performs the identity
+handshake first and includes its scope and session epoch on the mutation, as the React provider does.
+
+See [the route declaration and React button](/docs/modules/http/define#use-from-the-frontend)
+side by side, or follow [Call your API from React](/guides/frontend/connect-react) to connect
+a separate frontend. [Client transports](/docs/modules/client/transports) covers HTTP,
+WebSocket, and automatic transport selection.
+
+| Original REST route                                     | Generated RPC call                                        |
+| ------------------------------------------------------- | --------------------------------------------------------- |
+| Maps path, query, headers, cookies, and body into input | Accepts the target function's input directly              |
+| Uses the route's `request` mappings and transforms      | Does not replay those mappings or transforms              |
+| Returns the selected HTTP success status and body       | Resolves to typed function output                         |
+| Returns an HTTP error envelope                          | Rejects with an RPC error                                 |
+| Handles multipart according to the route                | Does not automatically reconstruct that multipart request |
+
+For example, the Orders REST route obtains `orderId` from `idempotency-key`; an RPC caller supplies
+the function's `orderId` input property. Sending that header alone does not fill the RPC input.
+Likewise, catch-all input is an array supplied to the function, not a REST path the client constructs.
+
+</Step>
+</Steps>
+
+## Handle failures by contract
+
+RPC failures use `ORPCError`. Declared application errors retain their stable error code and data;
+unexpected failures use transport-level codes. Branch on the code and validated data, not a formatted
+message. Do not expect a REST validation `422` body to be the RPC error shape.
+
+A response returned by HTTP middleware is not automatically a declared function error. The RPC
+middleware bridge maps a returned `401` to `UNAUTHORIZED`, a `429` to `TOO_MANY_REQUESTS`, and other
+returned responses to `INTERNAL_SERVER_ERROR`. Test these cases if middleware protects the operation.
+
+## Test security at both entry points
+
+Registered Better Auth protection and route policy run with the operation's canonical method/path.
+If a policy cannot be reproduced safely over RPC, compilation fails until the route is marked
+`client: false`; that opt-out registers neither RPC identity, and direct calls return `NOT_FOUND`.
+
+Point the client at a running local test server. The current `createTestApplication` HTTP helper does
+not serve `/rpc`, so connecting it through a custom `fetch` is not an RPC integration test.
+Cover success, invalid input, a declared error, missing credentials, and any quota policy.
+Keep REST tests too; RPC tests do not exercise request mapping. See [Testing](/docs/modules/operations/testing)
+for the other available test layers.
+
+## Review compatibility changes
+
+Changing an inferred route ID renames the client operation. A required input field, a removed error
+code, or a narrowed output can break consumers even if the server compiles. Compare generated
+artifacts in review and version shared contracts with their callers.
+
+For a complete first endpoint and HTTP integration test, return to
+[Your first HTTP route](/docs/modules/http/first-route).
+
+<include>/_snippets/generated/related/docs-modules-http-generated-clients.mdx</include>

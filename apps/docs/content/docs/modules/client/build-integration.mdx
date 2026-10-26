@@ -1,0 +1,83 @@
+---
+title: Build integration and contract updates
+description: Pull frontend-owned declarations and embed the matching public fingerprint with Vite or Next.js.
+pagination: false
+sidebar:
+  icon: hammer
+---
+
+The [Frontend guide](/guides/frontend/connect-react) establishes installation, contract pull, and
+the first request. Use this page to connect that contract to your frontend build.
+The [Typed Client module](/docs/modules/client) owns shared installation and provider setup.
+
+## Generate before building
+
+From the frontend package root, while the backend is running:
+
+```sh title="Terminal — frontend root"
+bun run relkit client pull http://127.0.0.1:3000 --out .relkit/generated
+bun run relkit client check http://127.0.0.1:3000 --out .relkit/generated
+```
+
+Both build helpers read `.relkit/generated/client-manifest.json` relative to the frontend project
+root. Pulling to another directory does not change that lookup. The optional `root` option selects
+a project root, not an arbitrary manifest filename. Keep the declarations in the frontend's TypeScript
+`include` list; the build plugin embeds the fingerprint but does not load declarations or pull them.
+
+## Select your framework
+
+<Tabs sync={false} hash={false}>
+<Tab title="Vite" icon="zap">
+
+Merge `relkit()` into your existing plugins. This example also adds the development proxy used by
+the Frontend guide; the plugin itself does not configure routing:
+
+<include
+  source="apps/docs/examples/frontend/vite.config.ts"
+  lang="ts"
+  meta='title="vite.config.ts"'
+>
+  /_snippets/source/apps/docs/examples/frontend/vite.config.ts
+</include>
+
+Reference: [`relkit`](/docs/api/client#relkit).
+
+</Tab>
+<Tab title="Next.js" icon="app-window">
+
+Wrap your existing configuration with `withRelkit`. Keep its routes, rewrites, and other options
+inside that configuration. This example also forwards RPC and identity requests to the local backend;
+the helper itself only embeds the fingerprint and supports workspace-linked client resolution:
+
+<include
+  source="apps/docs/examples/frontend/next.config.ts"
+  lang="ts"
+  meta='title="next.config.ts"'
+>
+  /_snippets/source/apps/docs/examples/frontend/next.config.ts
+</include>
+
+Follow the Next.js tabs in the [Frontend guide](/guides/frontend/connect-react) for TypeScript setup,
+the Client Component, and verification. Replace the local rewrite destinations with your backend's
+server URL for production. Rewrites require a Next.js server; static exports need gateway routing or
+a public backend URL with [credentialed CORS](/docs/modules/client/authentication).
+Reference: [`withRelkit`](/docs/api/client#withrelkit).
+
+</Tab>
+</Tabs>
+
+## Coordinate updates
+
+After changing backend routes or public resource policies, regenerate the backend, pull its current
+contract into the frontend, and typecheck the caller. Restart the frontend dev server after a pull;
+build plugins read the fingerprint when configuration loads.
+
+The React provider compares that compiled fingerprint with the server identity response. A mismatch
+produces `application-updated` and blocks new typed work. Update the deployed frontend and backend
+together. Do not clear pending-operation metadata or replay writes to get past a mismatch.
+
+Use [`client check`](/docs/api/cli#relkit-client-check-baseurl---out-directory) before the frontend's production build.
+It checks compatibility without replacing the files. Production routing, credential handling, and
+stream proxy timeouts still belong to your host or gateway.
+
+<include>/_snippets/generated/related/docs-modules-client-build-integration.mdx</include>

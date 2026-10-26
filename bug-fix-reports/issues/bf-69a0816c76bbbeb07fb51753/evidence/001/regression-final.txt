@@ -1,0 +1,16 @@
+bun test v1.3.10 (30e609e0)
+
+tests/generator/local-workspace.test.ts:
+[18:51:17.787] INFO (#59): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.terminal",
+  outcome: "success",
+  duration_ms: 5440.408542,
+}
+(pass) local create installs workspace links after jobs and final confirmation [5497.82ms]
+
+ 1 pass
+ 4 filtered out
+ 0 fail
+ 11 expect() calls
+Ran 1 test across 1 file. [6.01s]

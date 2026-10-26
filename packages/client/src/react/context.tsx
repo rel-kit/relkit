@@ -1,4 +1,5 @@
 "use client";
+/** Owns client/query context, identity isolation and realtime cleanup for one React provider tree. */
 
 import type { ClientIdentityDocument } from "@relkit/contracts";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
@@ -45,6 +46,7 @@ const Context = createContext<RelkitClientRuntime | undefined>(undefined);
  * Provides configured clients, query hydration, identity isolation and realtime ownership.
  * @param props - Existing public React provider properties.
  * @returns Children rendered inside the configured client context.
+ * @see https://relkit.up.railway.app/docs/modules/client#install-the-provider
  */
 export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNode {
   const baseUrl = props.baseUrl ?? browserOrigin();
@@ -187,6 +189,8 @@ export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNod
 /**
  * Reads the required existing React client provider context.
  * @returns The required provider runtime.
+ * @throws Error when called outside RelkitClientProvider.
+ * @see https://relkit.up.railway.app/docs/modules/client#install-the-provider
  */
 export function useRelkitClient(): RelkitClientRuntime {
   const value = useContext(Context);

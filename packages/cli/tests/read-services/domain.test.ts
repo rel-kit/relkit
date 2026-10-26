@@ -118,7 +118,7 @@ it.effect(
         ),
       );
       const loaded = yield* CliEnvironmentProject.use((project) =>
-        project.load({ projectRoot: "/fixture" }),
+        project.load({ projectRoot: "/fixture", envPath: "src/env.ts" }),
       ).pipe(Effect.provide(layer), Effect.provide(Logger.layer([])));
       expect(loaded).toBe(definition);
       const exit = yield* Effect.exit(
@@ -211,7 +211,7 @@ it.effect("standalone methods observe once with safe fixed labels and caller log
     yield* Effect.gen(function* () {
       yield* CliGraphFiles.use((graphs) => graphs.check({ projectRoot: "/synthetic-secret" }));
       yield* CliEnvironmentProject.use((project) =>
-        project.load({ projectRoot: "/synthetic-secret" }),
+        project.load({ projectRoot: "/synthetic-secret", envPath: "src/env.ts" }),
       );
     }).pipe(
       Effect.provide(layer),

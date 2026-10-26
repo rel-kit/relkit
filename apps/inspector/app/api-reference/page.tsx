@@ -16,8 +16,7 @@ export default function ApiReferencePage() {
       </header>
       <section className="panel" aria-label="Scalar API Reference">
         <p className="supporting-copy">
-          Scalar runs from the active backend. Open it in a separate tab to keep the inspector
-          workspace independent.
+          Scalar displays the active backend’s OpenAPI document in a separate tab.
         </p>
       </section>
     </div>

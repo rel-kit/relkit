@@ -1,17 +1,18 @@
+/** Runs the selected native SQLite checkpoint worker against its explicit persistence fixture. */
 import { resolve } from "node:path";
 import {
   END,
   START,
   StateSchema,
-} from "../../../packages/agents/node_modules/@langchain/langgraph/dist/index.js";
-import { SqliteSaver } from "../../../packages/agents/node_modules/@langchain/langgraph-checkpoint-sqlite/dist/index.js";
+} from "../../../integrations/packages/langchain/node_modules/@langchain/langgraph/dist/index.js";
+import { SqliteSaver } from "../../../integrations/packages/langchain/node_modules/@langchain/langgraph-checkpoint-sqlite/dist/index.js";
 import {
   defineCheckpointerDb,
   defineGraph,
   defineGraphNode,
   invokeAgent,
   releaseAgentPersistence,
-} from "../../../packages/agents/src/index.ts";
+} from "../../../integrations/packages/langchain/src/index.ts";
 import { z } from "../../../packages/schema/src/index.ts";
 
 const [borrowedPath, ownedPath] = process.argv.slice(2);

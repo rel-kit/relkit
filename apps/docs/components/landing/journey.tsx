@@ -1,5 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
-import Link from "next/link";
+import { Link } from "fumadocs-core/framework";
 import { SectionHeading } from "./sections";
 import { MotionRegion } from "./motion-region";
 import { WorkflowConnector } from "./workflow-connector";
@@ -41,7 +41,7 @@ export function DeveloperWorkflows() {
                 Start pinned Redis and MinIO recipes for graph-required bindings. Keep local state
                 scoped to your project.
               </p>
-              <Link className={system.textLink} href="/docs/start/local-development">
+              <Link className={system.textLink} href="/docs/learn/local-development">
                 Explore local development <ArrowUpRight size={14} aria-hidden="true" />
               </Link>
             </div>
@@ -69,7 +69,7 @@ export function DeveloperWorkflows() {
                 Combine connected services with infrastructure-owned AWS resources without
                 maintaining parallel environment branches.
               </p>
-              <Link className={system.textLink} href="/docs/integrations">
+              <Link className={system.textLink} href="/docs/modules/integrations">
                 Explore integrations <ArrowUpRight size={14} aria-hidden="true" />
               </Link>
             </div>

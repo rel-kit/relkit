@@ -1,0 +1,18 @@
+After [frontend setup and pulling this API example's contract](/guides/frontend/connect-react),
+render this component under `RelkitClientProvider`:
+
+<include
+  source="apps/docs/examples/frontend/create-order.tsx"
+  lang="tsx"
+  meta='title="src/CreateOrder.tsx — frontend"'
+>
+  /_snippets/source/apps/docs/examples/frontend/create-order.tsx
+</include>
+
+This calls the same `createOrder` function through `POST /orders`: `orderId`, `sku`, and `quantity`
+come from its input schema, and `totalCents` comes from its output schema. The browser calls RPC;
+it never imports the descriptor or calls `.invoke()`. Service membership needs a client-exposed
+route to become a browser operation.
+
+Reference: [`useRouteMutation`](/docs/api/client#useroutemutation).
+Continue with [mutation state and recovery](/docs/modules/client/mutations).

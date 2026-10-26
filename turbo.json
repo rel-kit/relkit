@@ -1,6 +1,12 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "stream",
+  "globalPassThroughEnv": [
+    "CIRCLE_NODE_TOTAL",
+    "RAYON_NUM_THREADS",
+    "NODE_OPTIONS",
+    "RELKIT_DOCGEN_CONCURRENCY"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -15,6 +21,77 @@
         "$TURBO_ROOT$/scripts/package-create-relkit-templates.ts"
       ],
       "outputs": ["dist/**"]
+    },
+    "@relkit/docs#build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/examples/**",
+        "$TURBO_ROOT$/templates/default/v1/**",
+        "$TURBO_ROOT$/tests/**",
+        "$TURBO_ROOT$/packages/*/src/**",
+        "$TURBO_ROOT$/integrations/packages/*/src/**",
+        "$TURBO_ROOT$/docgen.json"
+      ],
+      "outputs": ["dist/**", "content/_snippets/**", "content/**/meta.ts", "content/docs/api/**"]
+    },
+    "@relkit/inspector#build": {
+      "dependsOn": ["^build", "@relkit/inspector-ui#build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/scripts/package-inspector.ts",
+        "$TURBO_ROOT$/turbo.json"
+      ],
+      "outputs": ["dist/**"]
+    },
+    "@relkit/cli#build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/scripts/prune-cli-output.ts",
+        "$TURBO_ROOT$/scripts/package-dev-bootstrap.ts",
+        "$TURBO_ROOT$/scripts/package-editor.ts",
+        "$TURBO_ROOT$/turbo.json"
+      ],
+      "outputs": ["dist/**"]
+    },
+    "@relkit/cli#typecheck": {
+      "dependsOn": ["^typecheck"],
+      "cache": false
+    },
+    "@relkit/testing#build:foundation": {
+      "cache": false,
+      "dependsOn": [
+        "@relkit/engine#build",
+        "@relkit/providers-local#build",
+        "@relkit/buckets#build",
+        "@relkit/cache#build",
+        "@relkit/config#build"
+      ],
+      "outputs": ["dist/**"]
+    },
+    "@relkit/testing#typecheck:foundation": {
+      "cache": false,
+      "dependsOn": [
+        "@relkit/engine#typecheck",
+        "@relkit/providers-local#typecheck",
+        "@relkit/buckets#typecheck",
+        "@relkit/cache#typecheck",
+        "@relkit/config#typecheck"
+      ],
+      "outputs": ["dist/**"]
+    },
+    "@relkit/langchain#build": {
+      "dependsOn": ["^build", "@relkit/testing#build:foundation"],
+      "outputs": ["dist/**"]
+    },
+    "@relkit/langchain#typecheck": {
+      "dependsOn": ["^typecheck", "@relkit/testing#typecheck:foundation"],
+      "outputs": ["dist/**", "*.tsbuildinfo"]
+    },
+    "@relkit/inspector#typecheck": {
+      "dependsOn": ["^typecheck"],
+      "cache": false
     },
     "create-relkit#typecheck": {
       "dependsOn": ["^typecheck"],

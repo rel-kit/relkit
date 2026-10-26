@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { Image } from "fumadocs-core/framework";
 
 export function RelkitLogo({ size = 34 }: { readonly size?: number }) {
   return (

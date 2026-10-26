@@ -5,7 +5,13 @@ import { dirname, resolve } from "node:path";
 
 const templates = ["minimal", "api", "agent", "fullstack", "tasks"];
 const root = resolve(import.meta.dir, "../../templates/default/v1");
-const files = ["SKILL.md", "references/domain-apis.md"];
+const files = [
+  "SKILL.md",
+  "references/domain-apis.md",
+  "references/agent-apis.md",
+  "references/data-apis.md",
+  "references/testing-apis.md",
+];
 
 test("all starters ship consistent domain guidance with usable local references", () => {
   for (const file of files) {

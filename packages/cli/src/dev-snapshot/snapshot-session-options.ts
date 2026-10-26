@@ -3,12 +3,10 @@
  * This pure factory starts no child or support worker. Port resolution occurs at
  * its caller's typed native boundary, and execution remains owned by the engine.
  */
-import { resolveInspectorPort } from "../commands/ports.js";
-import { defaultInspectorOptions } from "../commands/dev-inspector-installation.js";
 import { devLogSinks } from "../commands/dev-logger.js";
 import { snapshotVerificationFetch } from "./snapshot-http-auth.js";
 import type { DevOptions } from "../commands/dev.types.js";
-import type { DevTelemetryRelay } from "../commands/dev-telemetry-relay.types.js";
+import type { DevCapture } from "../commands/dev-capture.types.js";
 import type { PreparedDevSelection } from "./snapshot-command.types.js";
 import type { SnapshotSessionCompiler } from "./snapshot-session-compiler.types.js";
 
@@ -28,7 +26,7 @@ export const preparedSupportStartupDelayMs = 500;
 export function preparedSessionOptions(
   selected: PreparedDevSelection,
   compiler: SnapshotSessionCompiler,
-  telemetry: DevTelemetryRelay,
+  telemetry: DevCapture,
   backendPort: number,
   signal: AbortSignal,
   generatedDirectory: string,
@@ -49,15 +47,7 @@ export function preparedSessionOptions(
     candidateVerificationFetch: snapshotVerificationFetch,
     candidateAdmission: compiler.admission,
     supportStartupDelayMs: preparedSupportStartupDelayMs,
-    inspector: defaultInspectorOptions(
-      resolveInspectorPort({
-        ...(options.inspectorPort === undefined ? {} : { flag: options.inspectorPort }),
-        source: process.env,
-        ...(snapshot.receipt.ports === undefined
-          ? {}
-          : { configured: snapshot.receipt.ports.inspector }),
-      }),
-    ),
+    inspector: snapshot.receipt.inspector?.enabled ? snapshot.receipt.inspector.connection : false,
     logger: {
       minimumLevel: options.logLevel ?? (options.verbose ? "debug" : "info"),
       redact: telemetry.redact,
@@ -65,8 +55,8 @@ export function preparedSessionOptions(
     },
     terminal: { verbose: options.verbose ?? false, color: !options.noColor },
     environment: { RELKIT_DEV_LOGS: "1", ...telemetry.environment },
-    intercept: (request) => telemetry.handle(request) ?? compiler.intercept(request),
-    onStopping: telemetry.closeStream,
+    intercept: compiler.intercept,
+    inspectionRecords: telemetry.records,
     onRecord: telemetry.append,
     observability: { append: telemetry.append },
   };

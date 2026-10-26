@@ -1,0 +1,96 @@
+---
+title: Invocation context
+description: Use invocation metadata, cancellation, time, logging, environment, and declared clients without globals.
+sidebar:
+  icon: workflow
+---
+
+A function's second parameter, `context`, gives that invocation access to logging, time, cancellation, and its declared resources. RELKIT builds it from the checked graph, so a function
+receives common runtime capabilities plus typed clients for only the resources it declares. Never store context
+in a module variable or reuse it after the invocation completes.
+
+## Use declared clients
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  This larger commerce reference assumes its selected cache is installed and bound. When adapting it
+  to a minimal app, complete [cache setup](/guides/caching/cache-product-prices) first. Declaring a
+  context edge does not install an adapter or native SDK.
+</Callout>
+
+<include
+  source="examples/commerce/src/services/orders/functions/create-order.function.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/functions/create-order.function.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/functions/create-order.function.ts
+</include>
+
+This function declares the `prices` cache, so its handler receives `context.cache.prices`. Merely importing a
+cache or putting it in the same domain does not grant access.
+
+Event publication uses an explicit `publishes` list rather than `dependencies`:
+
+<include
+  source="apps/docs/examples/events/create-order.function.ts"
+  lang="ts"
+  meta='title="apps/docs/examples/events/create-order.function.ts"'
+>
+  /_snippets/source/apps/docs/examples/events/create-order.function.ts
+</include>
+
+The exact event ID becomes available under `context.events`; publishing any undeclared ID fails the checked edge.
+
+## Know the common context
+
+| Value                                          | Use it for                                                                      |
+| ---------------------------------------------- | ------------------------------------------------------------------------------- |
+| `invocation`                                   | ID, trace, correlation, source, attempt, timing, deadline, and service metadata |
+| `signal`                                       | Cancelling work and passing cancellation to lower-level calls                   |
+| `env`                                          | Values resolved by the application's typed environment contract                 |
+| `log`                                          | Structured, invocation-correlated records                                       |
+| `trace`                                        | Child spans, point-in-time events, and attributes on the active span            |
+| `time`                                         | Testable `now()` and abort-aware `sleep()` behavior                             |
+| `jobs`, `events`, `buckets`, `cache`, `agents` | Clients authorized by declarations on the function                              |
+| `database`, `auth`, `constants`, `prompts`     | Registered application context supplied by specialized integrations             |
+
+There is no service middleware or `context.service`. A service exposes public functions and events; it does not
+inject handler state. Database and Auth are specialized application context integrations, documented in
+[Database](/docs/modules/database) and [Auth sessions](/docs/modules/auth/sessions).
+
+RELKIT traces routes, functions, declared clients, jobs, events, tools, and agents automatically. Use
+`context.trace` only for application work the runtime cannot infer. See [Observability](/docs/modules/operations/observability#add-application-trace-detail)
+for the three tracing operations and an executable example.
+
+## Add access safely
+
+<Steps>
+<Step>
+
+### Define and bind the capability
+
+Follow its guide and choose the integration profile in `relkit.config.ts`.
+
+</Step>
+<Step>
+
+### Declare the graph edge
+
+Add the descriptor under the matching `dependencies` key. For publication, add the exact event ID to
+`publishes`.
+
+</Step>
+<Step>
+
+### Verify the edge and fake
+
+```sh title="Terminal — relkit-orders"
+bun run check
+bun run test
+```
+
+Provider-backed unit and application tests should receive explicit deterministic fakes.
+
+</Step>
+</Steps>
+
+<include>/_snippets/generated/related/docs-learn-concepts-context.mdx</include>

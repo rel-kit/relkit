@@ -1,3 +1,4 @@
+/** Creates session SDK facades and blocks rich inspection on the public proxy. */
 import { Ref } from "effect";
 import {
   createSupervisorObservability,
@@ -41,7 +42,11 @@ export function createDevNativeSession(
     },
   });
   const proxy = createSupervisorProxy({
-    ...(options.intercept === undefined ? {} : { intercept: options.intercept }),
+    intercept: (request) => {
+      if (isPrivateInspectionPath(new URL(request.url).pathname))
+        return Promise.resolve(new Response("Not found", { status: 404 }));
+      return options.intercept?.(request);
+    },
     ...(options.hostname === undefined ? {} : { hostname: options.hostname }),
     ...(options.stablePort === undefined ? {} : { port: options.stablePort }),
     track: (token) =>
@@ -50,4 +55,17 @@ export function createDevNativeSession(
         ?.track(token),
   });
   return { observability, stateMachine, proxy };
+}
+
+/** Keeps core readiness, identity, jobs RPC and selected public transports independent. */
+function isPrivateInspectionPath(path: string): boolean {
+  if (path === "/_relkit/v1/graph") return false;
+  if (/^\/_relkit\/v1\/jobs(?:\/|$)/.test(path)) return false;
+  if (/^\/_relkit\/v1\/agents\/[^/]+\/ag-ui$/.test(path)) return false;
+  return (
+    path === "/_relkit/v1" ||
+    /^\/_relkit\/v1\/(?:runtime|graph|source|env|diagnostics|requests|logs|traces|stream|storage|actions|jobs|descriptors|routes|middlewares|functions|events|buckets|cache|tools|agents|channels|errors|services|providers)(?:\/|$)/.test(
+      path,
+    )
+  );
 }

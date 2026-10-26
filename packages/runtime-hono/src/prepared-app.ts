@@ -1,7 +1,8 @@
 /**
  * Exposes the prepared-only Bun HTTP boundary. REST uses the canonical eager
- * policy directly; optional transport paths select a generation-owned complete
- * application before middleware runs, avoiding duplicate auth and request logs.
+ * policy directly, with selected SDKs initialized before acquisition returns.
+ * Only legacy inspection selects a separate generation-owned router before
+ * middleware runs, avoiding duplicate auth and request logs.
  * The existing server host must own close() as an application resource.
  */
 import { Context, Effect, Layer, ManagedRuntime, Scope } from "effect";
@@ -15,6 +16,7 @@ import type {
 } from "./prepared-transports.types.js";
 export { createHttpAuthRuntime } from "./auth.js";
 export { createHttpSpanRuntime, instrumentHttpRequest } from "./http-span.js";
+export { HTTP_TRANSPORT_REQUIREMENTS, selectedHttpCapabilities } from "./selected-transports.js";
 
 /** Acquires a prepared generation at the native server-host boundary.
  * @param options - Checked graph/cohort and current environment dependencies.
@@ -40,7 +42,14 @@ export async function createPreparedApp(
     return {
       app: service.app,
       fetch: (request, server) => {
-        if (!requiresDeferredTransport(new URL(request.url).pathname)) {
+        const internal = options.internalEndpoints;
+        const mode = internal?.environment ?? internal?.mode ?? "development";
+        if (
+          initialize === undefined ||
+          internal?.enabled === false ||
+          mode === "production" ||
+          !requiresDeferredTransport(new URL(request.url).pathname)
+        ) {
           return service.app.fetch(request, server);
         }
         return runtime
@@ -57,16 +66,16 @@ export async function createPreparedApp(
   }
 }
 
-/** Selects the canonical full app before any request middleware executes.
+/** Selects only established legacy inspection paths before middleware executes.
  * @param path - Decoded URL pathname, preserving Hono's existing case sensitivity.
  * @returns Whether this path can be handled by an optional transport.
  */
 export function requiresDeferredTransport(path: string): boolean {
-  if (path === "/_relkit/v1/graph" || path.startsWith("/_relkit/v1/health/")) return false;
-  return (
-    path === "/rpc" ||
-    path.startsWith("/rpc/") ||
-    path === "/mcp" ||
-    path.startsWith("/_relkit/v1/")
+  if (path === "/_relkit/v1") return true;
+  if (path === "/_relkit/v1/graph") return false;
+  if (/^\/_relkit\/v1\/jobs(?:\/|$)/.test(path)) return false;
+  if (/^\/_relkit\/v1\/agents\/[^/]+\/ag-ui$/.test(path)) return false;
+  return /^\/_relkit\/v1\/(?:runtime|graph|source|env|diagnostics|requests|logs|traces|stream|actions|jobs|descriptors|routes|middlewares|functions|events|buckets|cache|tools|agents|channels|errors|services|providers)(?:\/|$)/.test(
+    path,
   );
 }

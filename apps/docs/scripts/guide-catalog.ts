@@ -1,9 +1,12 @@
 /** Pure guide metadata joins maintained source examples with the documented learning sequence. */
 import { group, relation, nextGuide } from "./guide-catalog-helpers.js";
-import { startJourney } from "../lib/start-journey.js";
-export { startJourney };
+export { startJourney } from "../lib/start-journey.js";
 import { eventGuideGroup, eventGuideRelations } from "./event-guide-catalog.js";
-import { storageGuideGroup, storageGuideRelations } from "./storage-guide-catalog.js";
+import {
+  storageGuideGroup,
+  storageGuideRelations,
+  uploadGuideRelation,
+} from "./storage-guide-catalog.js";
 import { cachingGuideGroup, cachingGuideRelations } from "./caching-guide-catalog.js";
 import { aiGuideGroup, aiGuideRelations } from "./ai-guide-catalog.js";
 import { serviceGuideGroup, serviceGuideRelations } from "./service-guide-catalog.js";
@@ -11,10 +14,19 @@ import { httpGuideGroup, httpGuideRelations } from "./http-guide-catalog.js";
 import { jobsGuideGroup, jobsGuideRelations } from "./jobs-guide-catalog.js";
 import { databaseGuideGroup, databaseGuideRelations } from "./database-guide-catalog.js";
 import { authGuideGroup, authGuideRelations } from "./auth-guide-catalog.js";
-import { clientGuideGroup, clientGuideRelations } from "./client-guide-catalog.js";
+import {
+  clientGuideGroup,
+  clientGuideRelations,
+  frontendGuideGroup,
+  frontendGuideRelation,
+} from "./client-guide-catalog.js";
 import { realtimeGuideGroup, realtimeGuideRelations } from "./realtime-guide-catalog.js";
+import { operationsGuideRelations } from "./operations-guide-catalog.js";
+import { cliGuideGroup, cliGuideRelations } from "./cli-guide-catalog.js";
+import { deploymentGuideGroup, deploymentGuideRelations } from "./deployment-guide-catalog.js";
 export const guideGroups = [
-  group("start", "Start", "Rocket", [
+  group("docs/learn", "Learn", "Rocket", [
+    "index",
     "create-an-app",
     "first-route",
     "save-orders",
@@ -22,9 +34,9 @@ export const guideGroups = [
     "test-orders",
     "local-development",
     "build-and-run",
-    "add-artifacts",
+    "concepts",
   ]),
-  group("fundamentals", "Core concepts", "Blocks", [
+  group("docs/learn/concepts", "Core concepts", "Blocks", [
     "index",
     "application",
     "functions",
@@ -44,76 +56,125 @@ export const guideGroups = [
   aiGuideGroup,
   clientGuideGroup,
   realtimeGuideGroup,
-  group("integrations", "Integrations", "Plug", ["index", "local-docker"]),
-  group("operations", "Operations", "Wrench", [
+  group("docs/modules/integrations", "Integrations", "Plug", [
+    "index",
+    "local-docker",
+    "provider-authoring",
+    "local-providers",
+  ]),
+  deploymentGuideGroup,
+  group("docs/modules/operations", "Operations", "Wrench", [
     "index",
     "observability",
     "inspector",
     "realtime-agents-streaming",
     "testing",
-    "deployment",
     "troubleshooting",
-    "cli-reference",
   ]),
+  cliGuideGroup,
+  group("docs/modules/jobs/providers", "Job providers", "Plug", [
+    "index",
+    "comparison",
+    "inngest",
+    "trigger",
+    "effect-mq",
+  ]),
+  group("guides/cli", "CLI", "Terminal", ["create-and-build-an-api"]),
+  frontendGuideGroup,
+  group("guides/storage", "Storage", "HardDrive", ["upload-product-images"]),
+  group("guides/caching", "Caching", "Zap", ["cache-product-prices"]),
+  group("guides/events", "Events", "Radio", ["react-to-order-events"]),
+  group("guides/database", "Database", "Database", ["register-users-in-a-transaction"]),
+  group("guides/auth", "Authentication", "ShieldCheck", ["email-password-sign-in"]),
+  group("guides/ai", "AI", "Bot", ["build-an-offline-agent"]),
 ] as const;
 const relations = [
-  relation("index", ["app", "routes", "testing"], ["templates/default/v1/api/README.md"]),
-  relation("start/create-an-app", ["app", "config"], ["templates/default/v1/api/README.md"]),
+  relation("docs/index", ["app", "routes", "testing"], ["templates/default/v1/api/README.md"]),
+  relation("docs/learn/index", ["app"], ["templates/default/v1/minimal/README.md"]),
+  relation("docs/modules/index", ["app"], []),
+  relation("guides/index", ["app"], []),
+  uploadGuideRelation,
+  frontendGuideRelation,
   relation(
-    "start/first-route",
+    "guides/caching/cache-product-prices",
+    ["cache", "functions", "testing", "integrations/redis", "integrations/docker"],
+    ["examples/commerce/tests/fixtures/get-price.function.ts"],
+  ),
+  relation(
+    "guides/ai/build-an-offline-agent",
+    ["agents", "tools", "testing"],
+    ["templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"],
+  ),
+  ...["comparison", "inngest", "trigger", "effect-mq"].map((page) =>
+    relation(
+      `docs/modules/jobs/providers/${page}`,
+      ["jobs"],
+      ["tests/jobs/compatibility/evidence/capability-matrix.json"],
+    ),
+  ),
+  relation("docs/learn/create-an-app", ["app", "config"], ["templates/default/v1/api/README.md"]),
+  relation(
+    "docs/learn/first-route",
     ["functions", "routes"],
     ["templates/default/v1/api/src/routes/orders/route.ts"],
   ),
   relation(
-    "start/save-orders",
+    "docs/learn/save-orders",
     ["drizzle", "functions"],
     ["examples/data-model/src/services/database/service.ts"],
   ),
   relation(
-    "start/protect-orders",
+    "docs/learn/protect-orders",
     ["better-auth", "drizzle"],
     ["examples/auth-drizzle/src/services/auth/service.ts"],
   ),
   relation(
-    "start/test-orders",
+    "docs/learn/test-orders",
     ["testing", "routes"],
     ["templates/default/v1/api/tests/integration/orders.route.test.ts"],
   ),
   relation(
-    "start/local-development",
+    "docs/learn/local-development",
     ["app", "routes"],
     ["templates/default/v1/api/relkit.config.ts"],
   ),
-  relation("start/build-and-run", ["app", "routes"], ["templates/default/v1/api/package.json"]),
   relation(
-    "start/add-artifacts",
-    ["services", "functions", "routes"],
-    ["templates/default/v1/api/src/services/orders/service.ts"],
+    "docs/learn/build-and-run",
+    ["app", "routes"],
+    ["templates/default/v1/api/package.json"],
   ),
   relation(
-    "fundamentals/index",
+    "docs/learn/concepts/index",
     ["app", "functions", "schema"],
     ["templates/default/v1/api/relkit.config.ts"],
   ),
-  relation("fundamentals/application", ["app"], ["templates/default/v1/api/relkit.config.ts"]),
   relation(
-    "fundamentals/functions",
+    "docs/learn/concepts/application",
+    ["app"],
+    ["templates/default/v1/api/relkit.config.ts"],
+  ),
+  relation(
+    "docs/learn/concepts/functions",
     ["functions"],
     ["templates/default/v1/api/src/services/orders/functions/create-order.function.ts"],
   ),
-  relation("fundamentals/schemas", ["schema"], ["examples/commerce/src/platform/schemas.ts"]),
   relation(
-    "fundamentals/errors",
+    "docs/learn/concepts/schemas",
+    ["schema"],
+    ["examples/commerce/src/platform/schemas.ts"],
+  ),
+  relation(
+    "docs/learn/concepts/errors",
     ["functions"],
     ["examples/commerce/src/services/orders/errors/order-not-found.error.ts"],
   ),
   relation(
-    "fundamentals/context",
+    "docs/learn/concepts/context",
     ["functions"],
     ["examples/commerce/src/services/orders/functions/create-order.function.ts"],
   ),
   relation(
-    "fundamentals/environment",
+    "docs/learn/concepts/environment",
     ["config"],
     ["templates/default/v1/api/src/platform/env.ts"],
   ),
@@ -128,45 +189,8 @@ const relations = [
   ...aiGuideRelations,
   ...clientGuideRelations,
   ...realtimeGuideRelations,
-  relation(
-    "integrations/index",
-    ["integrations/docker", "integrations/redis", "integrations/s3"],
-    ["apps/docs/examples/landing/catalog.ts"],
-  ),
-  relation(
-    "integrations/local-docker",
-    ["integrations/docker", "integrations/redis", "integrations/s3"],
-    [
-      "integrations/packages/redis/src/local-recipe/index.ts",
-      "integrations/packages/s3/src/local-recipe/index.ts",
-    ],
-  ),
-  relation("operations/index", ["app", "testing"], ["templates/default/v1/api/package.json"]),
-  relation(
-    "operations/observability",
-    ["functions", "routes"],
-    ["templates/default/v1/api/src/services/hello/functions/hello.function.ts"],
-  ),
-  relation("operations/inspector", ["app", "routes"], ["tests/e2e/inspector-redesign.spec.ts"]),
-  relation(
-    "operations/realtime-agents-streaming",
-    ["realtime", "agents", "client"],
-    ["packages/runtime-hono/tests/realtime-rpc.test.ts"],
-  ),
-  relation(
-    "operations/testing",
-    ["testing"],
-    ["templates/default/v1/api/tests/integration/orders.route.test.ts"],
-  ),
-  relation(
-    "operations/deployment",
-    ["app", "jobs", "events", "buckets", "cache"],
-    ["examples/commerce/relkit.config.ts"],
-  ),
-  relation(
-    "operations/troubleshooting",
-    ["app", "testing"],
-    ["templates/default/v1/api/package.json"],
-  ),
+  ...operationsGuideRelations,
+  ...deploymentGuideRelations,
+  ...cliGuideRelations,
 ] as const;
 export const guideRelations = relations.map((item) => ({ ...item, next: nextGuide(item.path) }));

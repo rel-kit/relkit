@@ -1,0 +1,82 @@
+---
+title: Create and run an API
+description: Create a RELKIT application, start its server, and receive your first HTTP response.
+search:
+  keywords: [create app, quickstart, getting started, installation]
+  boost: 5
+sidebar:
+  icon: rocket
+---
+
+Start a RELKIT application and send it an HTTP request. You'll use this application throughout the Orders tutorial.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  Before you begin, install **Bun 1.3.10 or later**.
+</Callout>
+
+<Steps>
+<Step icon="folder-plus">
+
+## 1. Create the application [#create-the-project]
+
+Run these commands in the directory where you want your project. Choose **Minimal**, keep **None** for jobs, accept the suggested destination, and confirm creation:
+
+```sh title="Terminal — parent directory"
+bunx create-relkit@latest relkit-orders
+cd relkit-orders
+cp .env.example .env
+```
+
+The default is the certified `minimal` template. The generator installs its dependencies and checks the application. Run the remaining commands from `relkit-orders`.
+
+</Step>
+<Step icon="terminal">
+
+## 2. Start the server [#run-it-and-make-a-request]
+
+```sh title="Terminal — relkit-orders"
+bun run dev
+```
+
+Keep this terminal running. The server normally listens on `http://localhost:3000`.
+
+</Step>
+<Step icon="send">
+
+## 3. Send a request
+
+Open a second terminal and send:
+
+```sh title="Second terminal"
+curl -i http://localhost:3000/hello\?name=RELKIT
+```
+
+You should receive HTTP `200` and this response:
+
+```json
+{ "message": "Hello, RELKIT!" }
+```
+
+Your application is responding to HTTP requests. Next, you'll **[add an endpoint that creates an order](/docs/learn/first-route)**.
+
+</Step>
+</Steps>
+
+## What the starter gave you
+
+A **route** connects an HTTP method and path to application behavior. The starter's `GET /hello` route calls a function that creates the greeting.
+
+- `src/routes/hello/route.ts` defines the route.
+- `src/services/hello/functions/` contains the greeting function.
+- `src/services/hello/service.ts` exposes that function through the Hello service.
+- `relkit.config.ts` configures the application.
+
+You edit these TypeScript files. RELKIT writes derived output to `.relkit/generated`.
+
+## If a step fails
+
+Run `bun run check` in the application directory and read its first diagnostic. If port `3000` is already in use, set another `PORT` in `.env` and use that port in your request.
+
+The first application needs no database or cloud credentials. [Creation options](/docs/modules/cli/create-an-app) covers installation controlled by another tool, Git settings, and generator choices. Inspection is disabled by default. The [Inspector](/docs/modules/operations/inspector) is available as a separate, optional tool.
+
+<include>/_snippets/generated/related/docs-learn-create-an-app.mdx</include>

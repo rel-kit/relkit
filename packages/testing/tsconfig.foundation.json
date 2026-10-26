@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "incremental": true,
+    "tsBuildInfoFile": "tsconfig.foundation.tsbuildinfo"
+  },
+  "include": [
+    "src/fakes.ts",
+    "src/jobs-utils.ts",
+    "src/runtime-clock.ts",
+    "src/testing-owner.ts",
+    "src/work-ownership.ts"
+  ]
+}

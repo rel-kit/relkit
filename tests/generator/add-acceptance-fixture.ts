@@ -1,5 +1,5 @@
 /** Owns native temporary app roots and installed dependency borrowing for public scaffold acceptance. */
-import { afterEach } from "bun:test";
+import { afterEach, test as nativeTest } from "bun:test";
 import { cp, lstat, mkdir, mkdtemp, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -11,7 +11,7 @@ import {
   normalizeAddRequest,
   planAdd,
   SCAFFOLD_DEPENDENCIES,
-} from "../../packages/create-relkit/src/index.ts";
+} from "../../packages/cli/src/scaffolding/index.ts";
 import { AddFixtureFailure } from "./add-acceptance-fixture.errors.js";
 
 const repository = resolve(import.meta.dir, "../..");
@@ -31,6 +31,25 @@ class AddFixture extends Context.Service<AddFixture>()("relkit.tests.AddFixture"
 
 const fixtureLayer = Layer.effect(AddFixture, AddFixture.make);
 let owner: ManagedRuntime.ManagedRuntime<AddFixture, never> | undefined;
+let testOutcome = { passed: false };
+
+/** Registers a native case whose fixture roots are removed only on complete success.
+ * @param name - Existing native test name.
+ * @param run - Unchanged asynchronous assertions and SDK operations.
+ * @param timeout - Existing native test deadline.
+ * @returns Native test registration.
+ */
+export function addTest(name: string, run: () => Promise<void>, timeout?: number): void {
+  nativeTest(
+    name,
+    async () => {
+      const outcome = (testOutcome = { passed: false });
+      await run();
+      outcome.passed = true;
+    },
+    timeout,
+  );
+}
 
 /**
  * Registers teardown in each native Bun suite that borrows this shared fixture owner.
@@ -58,10 +77,14 @@ function fixtureOwner() {
  * @returns Absolute test-owned app root after the dependency patch is staged.
  */
 const createProject = Effect.fn("AddFixture.project")(function* (template: string) {
+  const outcome = testOutcome;
   const parent = yield* Effect.acquireRelease(
     native("temporary", () => mkdtemp(join(tmpdir(), "relkit-add-acceptance-"))),
     (root) =>
-      native("release", () => rm(root, { recursive: true, force: true })).pipe(Effect.orDie),
+      native("release", async () => {
+        if (outcome.passed) await rm(root, { recursive: true, force: true });
+        else console.error(`Failed scaffold fixture retained: ${root}`);
+      }).pipe(Effect.orDie),
   );
   const root = join(parent, "app");
   yield* native("copy", () => cp(join(templateRoot, template), root, { recursive: true }));
@@ -116,11 +139,15 @@ const linkInstalledDependencies = Effect.fn("AddFixture.dependencies")(function*
   const relkit = join(root, "node_modules/@relkit");
   for (const name of ["app", "testing", "drizzle", "better-auth"])
     yield* link(join(repository, "packages", name), join(relkit, name));
-  for (const name of ["docker", "local", "redis", "s3"])
+  for (const name of ["docker", "local", "redis", "s3", "langchain"])
     yield* link(join(repository, "integrations/packages", name), join(relkit, name));
   const aliases = [
-    ["packages/agents/node_modules/langchain", "langchain"],
-    ["packages/agents/node_modules/@langchain/langgraph", "@langchain/langgraph"],
+    ["node_modules/effect", "effect"],
+    ["integrations/packages/langchain/node_modules/langchain", "langchain"],
+    ["integrations/packages/langchain/node_modules/langsmith", "langsmith"],
+    ["integrations/packages/langchain/node_modules/@langchain/core", "@langchain/core"],
+    ["packages/runtime-hono/node_modules/@ag-ui/core", "@ag-ui/core"],
+    ["integrations/packages/langchain/node_modules/@langchain/langgraph", "@langchain/langgraph"],
     ["packages/drizzle/node_modules/drizzle-orm", "drizzle-orm"],
     ["packages/better-auth/node_modules/better-auth", "better-auth"],
     ["node_modules/.bun/@types+bun@1.3.10/node_modules/@types/bun", "@types/bun"],

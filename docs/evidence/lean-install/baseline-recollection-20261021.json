@@ -1,0 +1,74 @@
+{
+  "runs": [
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/baseline-recollection-20261021-yYH4HB.json",
+    "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/baseline-recollection-20261021-ReWm9G.json"
+  ],
+  "comparison": [
+    {
+      "fixture": "creator-only",
+      "condition": "cold-owned-cache",
+      "historical": "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/baseline-relkit-consumer-install-z88KwA.json",
+      "historicalSHA256": "cd0bc4a5b6e884d8a0996353760d8ebb8f30ea88db80f9c4aff10c752bacde6f",
+      "sameNameVersionInstanceBytes": true,
+      "sameAccounting": true,
+      "accounting": {
+        "physicalInstances": 18,
+        "archiveBytes": 14554330,
+        "logicalBytes": 79525134,
+        "physicalBytes": 95551488,
+        "nativeFiles": []
+      },
+      "durationMs": 3097.352417
+    },
+    {
+      "fixture": "creator-only",
+      "condition": "warm-owned-cache",
+      "historical": "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/baseline-relkit-consumer-install-z88KwA.json",
+      "historicalSHA256": "cd0bc4a5b6e884d8a0996353760d8ebb8f30ea88db80f9c4aff10c752bacde6f",
+      "sameNameVersionInstanceBytes": true,
+      "sameAccounting": true,
+      "accounting": {
+        "physicalInstances": 18,
+        "archiveBytes": 14554330,
+        "logicalBytes": 79525134,
+        "physicalBytes": 95551488,
+        "nativeFiles": []
+      },
+      "durationMs": 85.016375
+    },
+    {
+      "fixture": "generic-server-client",
+      "condition": "cold-owned-cache",
+      "historical": "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/baseline-relkit-consumer-install-coOZwk.json",
+      "historicalSHA256": "bff1510f9bd527bc927e6f59fc43124ec3ec3613db9f5f482dcee082fdb306dd",
+      "sameNameVersionInstanceBytes": true,
+      "sameAccounting": true,
+      "accounting": {
+        "physicalInstances": 32,
+        "archiveBytes": 10998014,
+        "logicalBytes": 60734255,
+        "physicalBytes": 74510336,
+        "nativeFiles": []
+      },
+      "durationMs": 14153.872959
+    },
+    {
+      "fixture": "generic-server-client",
+      "condition": "warm-owned-cache",
+      "historical": "/Users/mustafaelsayed/Workspace/relkit/docs/evidence/lean-install/baseline-relkit-consumer-install-coOZwk.json",
+      "historicalSHA256": "bff1510f9bd527bc927e6f59fc43124ec3ec3613db9f5f482dcee082fdb306dd",
+      "sameNameVersionInstanceBytes": true,
+      "sameAccounting": true,
+      "accounting": {
+        "physicalInstances": 32,
+        "archiveBytes": 10998014,
+        "logicalBytes": 60734255,
+        "physicalBytes": 74510336,
+        "nativeFiles": []
+      },
+      "durationMs": 84.3815
+    }
+  ],
+  "unmodifiedCurrentCollectorReportSHA256": "24357863514caf0faacbbfced75550269aec7546b755ba67513952534b9afed7",
+  "failedRun": "Owned first attempt interrupted at zero samples after parent HTTP-pool limit deadlocked nested registry fetch; its report is retained."
+}

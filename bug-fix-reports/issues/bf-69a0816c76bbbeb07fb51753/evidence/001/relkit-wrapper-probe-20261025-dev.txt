@@ -1,0 +1,5 @@
+Command: ['bun', 'run', 'dev', '--port', '50986', '--log-level', 'error', '--no-color']
+Working directory: /Users/mustafaelsayed/Workspace/typescripts/relkit-wrapper-probe-20261025
+$ relkit dev --port "50986" --log-level error --no-color
+RELKIT_INTERRUPTED: Received SIGTERM.
+error: script "dev" exited with code 143

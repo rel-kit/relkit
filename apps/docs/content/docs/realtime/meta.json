@@ -1,5 +1,0 @@
-{
-  "title": "Realtime",
-  "icon": "Radio",
-  "pages": ["index", "access", "react", "presence", "recovery", "providers"]
-}

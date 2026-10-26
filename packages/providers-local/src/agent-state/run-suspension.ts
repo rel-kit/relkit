@@ -1,6 +1,8 @@
+/** Validates live execution ownership and persists resumable waiting state with its journal checkpoint. */
+import type { LocalAgentState, LocalAgentThread, LocalStoredRun } from "./state.js";
 import { Clock, Effect } from "effect";
 import { localOperation, localSync } from "../local-effect.js";
-import type { SuspendRunRequest } from "@relkit/agents";
+import type { SuspendRunRequest } from "@relkit/contracts";
 import {
   activeClaim,
   checkpoint,
@@ -39,48 +41,7 @@ export const suspendRun = Effect.fn("AgentState.suspendRun")(
               "Waiting state belongs to another run.",
             );
           }
-          const revision = String(Number(local.thread.revision) + 1);
-          const waiting = { ...request.waiting, revision };
-          const sequence = local.sequence + 1;
-          const point = checkpoint(state, request, request.threadId, sequence);
-          const record = {
-            recordId: request.operationId,
-            runId: request.runId,
-            kind: "interruption" as const,
-            publicValue: waiting,
-            checkpoint: point,
-            encodedBytes: encodedBytes(waiting),
-            createdAt: request.suspendedAt,
-          };
-          assertCapacity(local.journal, Math.max(record.encodedBytes, encodedBytes(record)), run);
-          const { [request.runId]: _claim, ...runClaims } = local.runClaims;
-          const next = replaceThread(state, request.threadId, {
-            ...local,
-            sequence,
-            waiting,
-            journal: [...local.journal, record],
-            runClaims,
-            runs: {
-              ...local.runs,
-              [request.runId]: { ...run, status: "waiting" },
-            },
-            thread: {
-              ...local.thread,
-              status: "waiting",
-              updatedAt: request.suspendedAt,
-              revision,
-            },
-          });
-          return [
-            next,
-            {
-              threadId: request.threadId,
-              runId: request.runId,
-              status: "waiting",
-              checkpoint: point,
-              waiting,
-            },
-          ] as const;
+          return commitSuspension(state, local, run, request);
         });
       }),
     );
@@ -111,4 +72,62 @@ function assertCapacity(
   if (used + recordBytes > run.maxJournalBytes - run.terminalReserveBytes) {
     throw new LocalAgentStateError("AGENT_JOURNAL_OVERLOADED", "Agent journal capacity is full.");
   }
+}
+
+/**
+ * Projects waiting state after validating the live claim and run.
+ * @param state - Snapshot supplied by the owning atomic store update.
+ * @param local - Owned thread projected from the same snapshot.
+ * @param run - Existing persisted run whose execution ownership was checked by the caller.
+ * @param request - Validated scoped request, including operation identity and capacity policy.
+ * @returns The next snapshot and waiting receipt, after checking retained journal capacity.
+ */
+export function commitSuspension(
+  state: LocalAgentState,
+  local: LocalAgentThread,
+  run: LocalStoredRun,
+  request: SuspendRunRequest,
+) {
+  const revision = String(Number(local.thread.revision) + 1);
+  const waiting = { ...request.waiting, revision };
+  const sequence = local.sequence + 1;
+  const point = checkpoint(state, request, request.threadId, sequence);
+  const record = {
+    recordId: request.operationId,
+    runId: request.runId,
+    kind: "interruption" as const,
+    publicValue: waiting,
+    checkpoint: point,
+    encodedBytes: encodedBytes(waiting),
+    createdAt: request.suspendedAt,
+  };
+  assertCapacity(local.journal, Math.max(record.encodedBytes, encodedBytes(record)), run);
+  const { [request.runId]: _claim, ...runClaims } = local.runClaims;
+  const next = replaceThread(state, request.threadId, {
+    ...local,
+    sequence,
+    waiting,
+    journal: [...local.journal, record],
+    runClaims,
+    runs: {
+      ...local.runs,
+      [request.runId]: { ...run, status: "waiting" },
+    },
+    thread: {
+      ...local.thread,
+      status: "waiting",
+      updatedAt: request.suspendedAt,
+      revision,
+    },
+  });
+  return [
+    next,
+    {
+      threadId: request.threadId,
+      runId: request.runId,
+      status: "waiting",
+      checkpoint: point,
+      waiting,
+    },
+  ] as const;
 }

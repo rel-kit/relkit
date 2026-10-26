@@ -1,3 +1,4 @@
+/** Verifies candidate registry metadata, archive integrity and host-origin restrictions. */
 import { expect, spyOn, test } from "bun:test";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -8,29 +9,7 @@ test("smoke registry serves verified tarball metadata instead of workspace metad
   const fixture = await mkdtemp(join(tmpdir(), "relkit-packed-registry-"));
   let server: Awaited<ReturnType<typeof startRegistry>> | undefined;
   try {
-    const root = JSON.parse(await readFile(resolve(import.meta.dir, "../../package.json"), "utf8"));
-    const source = {
-      name: "fixture-package",
-      version: "1.0.0",
-      description: "workspace description",
-      dependencies: { effect: "catalog:" },
-      peerDependencies: { react: "catalog:peer" },
-    };
-    const packed = {
-      ...source,
-      description: "packed description",
-      dependencies: { effect: root.catalog.effect },
-      peerDependencies: { react: root.catalogs.peer.react },
-    };
-    await mkdir(join(fixture, "package"));
-    await writeFile(join(fixture, "package/package.json"), JSON.stringify(packed));
-    const artifact = join(fixture, "package.tgz");
-    const child = Bun.spawn(["tar", "-czf", artifact, "-C", fixture, "package"], {
-      stdout: "pipe",
-      stderr: "pipe",
-    });
-    expect(await new Response(child.stderr).text()).toBe("");
-    expect(await child.exited).toBe(0);
+    const { source, packed, artifact } = await packedFixture(fixture);
     server = await startRegistry(
       fixture,
       new Map([[source.name, artifact]]),
@@ -43,6 +22,23 @@ test("smoke registry serves verified tarball metadata instead of workspace metad
     expect(metadata.versions["1.0.0"]?.description).toBe("packed description");
     expect(metadata.versions["1.0.0"]?.dependencies).toEqual(packed.dependencies);
     expect(metadata.versions["1.0.0"]?.peerDependencies).toEqual(packed.peerDependencies);
+    const docker = await fetch(`http://127.0.0.1:${server.port}/${source.name}`, {
+      headers: { host: `host.docker.internal:${server.port}` },
+    });
+    expect(await docker.json()).toMatchObject({
+      versions: {
+        "1.0.0": {
+          dist: { tarball: `http://host.docker.internal:${server.port}/_tar/${source.name}` },
+        },
+      },
+    });
+    for (const host of [`untrusted.invalid:${server.port}`, "host.docker.internal:1"]) {
+      const rejected = await fetch(`http://127.0.0.1:${server.port}/${source.name}`, {
+        headers: { host },
+      });
+      expect(rejected.status).toBe(400);
+      await rejected.text();
+    }
     expect(
       await fetch(`http://127.0.0.1:${server.port}/_tar/${source.name}`).then((result) =>
         result.arrayBuffer(),
@@ -98,3 +94,35 @@ test("upstream proxy requests compact metadata and releases completed response b
     await rm(fixture, { recursive: true, force: true });
   }
 });
+
+/**
+ * Constructs real candidate bytes without borrowing workspace metadata.
+ * @param fixture - Owned registry fixture root receiving the generated candidate archive.
+ * @returns The generated tarball map and matching fixture package metadata.
+ */
+async function packedFixture(fixture: string) {
+  const root = JSON.parse(await readFile(resolve(import.meta.dir, "../../package.json"), "utf8"));
+  const source = {
+    name: "fixture-package",
+    version: "1.0.0",
+    description: "workspace description",
+    dependencies: { effect: "catalog:" },
+    peerDependencies: { react: "catalog:peer" },
+  };
+  const packed = {
+    ...source,
+    description: "packed description",
+    dependencies: { effect: root.catalog.effect },
+    peerDependencies: { react: root.catalogs.peer.react },
+  };
+  await mkdir(join(fixture, "package"));
+  await writeFile(join(fixture, "package/package.json"), JSON.stringify(packed));
+  const artifact = join(fixture, "package.tgz");
+  const child = Bun.spawn(["tar", "-czf", artifact, "-C", fixture, "package"], {
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  expect(await new Response(child.stderr).text()).toBe("");
+  expect(await child.exited).toBe(0);
+  return { source, packed, artifact };
+}

@@ -1,0 +1,23 @@
+{
+  "key": "scalar api reference returns 404 for a default app",
+  "matches": {
+    "bf-fc1a68391ae8da6a1c79e661": {
+      "id": "bf-fc1a68391ae8da6a1c79e661",
+      "status": "verified",
+      "what": "Inspector Scalar link returns 404 for default applications.",
+      "root_cause": "apps/inspector/lib/api-reference.ts linked to the backend Scalar endpoint even though default applications do not select apiDocs.ui=scalar.",
+      "fixed_by": "Host Scalar at the inspector /scalar route, load the same-origin OpenAPI proxy, and update the shared navigation URL and browser regression. Rebuilt and restarted the local standalone inspector.",
+      "files": [
+        "apps/inspector/app/scalar/route.ts",
+        "apps/inspector/lib/api-reference.ts",
+        "apps/inspector/app/api-reference/page.tsx",
+        "apps/inspector/tests/api-reference.test.ts",
+        "tests/e2e/inspector-redesign.spec.ts",
+        "tests/e2e/inspector-redesign.spec.ts-snapshots/api-reference-darwin.png"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-25T19:12:50+00:00",
+      "report": "bug-fix-reports/issues/bf-fc1a68391ae8da6a1c79e661/report.md"
+    }
+  }
+}

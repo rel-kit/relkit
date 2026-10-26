@@ -1,3 +1,5 @@
+/** Defines the prompt driver's text, choice and cancellation contract shared by creator workflows and CLI scaffolding adapters. */
+
 import * as prompts from "@clack/prompts";
 import type { ChoicePromptOptions, PromptDriver, PromptOption } from "./prompt-driver.types.js";
 export type {
@@ -13,37 +15,7 @@ export type {
  * @returns The unchanged public prompt driver with optional cancellation forwarding.
  */
 export function createClackPromptDriver(cancellationCode = "RELKIT_ADD_CANCELLED"): PromptDriver {
-  const select = async <Value extends string>(
-    options: ChoicePromptOptions<Value>,
-    signal?: AbortSignal,
-  ): Promise<Value> =>
-    answer(
-      await prompts.select({
-        message: options.message,
-        ...(signal === undefined ? {} : { signal }),
-        options: options.options.map(promptOption) as Parameters<
-          typeof prompts.select<Value>
-        >[0]["options"],
-        ...(options.initialValue === undefined ? {} : { initialValue: options.initialValue }),
-      }),
-      cancellationCode,
-    );
-  const multiselect = async <Value extends string>(
-    options: ChoicePromptOptions<Value> & { readonly required?: boolean },
-    signal?: AbortSignal,
-  ): Promise<readonly Value[]> =>
-    answer(
-      await prompts.multiselect({
-        message: options.message,
-        ...(signal === undefined ? {} : { signal }),
-        options: options.options.map(promptOption) as Parameters<
-          typeof prompts.multiselect<Value>
-        >[0]["options"],
-        ...(options.initialValue === undefined ? {} : { initialValue: options.initialValue }),
-        ...(options.required === undefined ? {} : { required: options.required }),
-      }),
-      cancellationCode,
-    );
+  const { select, multiselect } = clackChoicePrompts(cancellationCode);
   return {
     text: async (options, signal) =>
       answer(
@@ -94,4 +66,39 @@ function answer<Value>(value: Value | symbol, code: string): Value {
   if (!prompts.isCancel(value)) return value;
   prompts.cancel("Cancelled.");
   throw Object.assign(new Error("Scaffolding was cancelled."), { code, exitCode: 130 });
+}
+
+function clackChoicePrompts(cancellationCode: string) {
+  const select = async <Value extends string>(
+    options: ChoicePromptOptions<Value>,
+    signal?: AbortSignal,
+  ): Promise<Value> =>
+    answer(
+      await prompts.select({
+        message: options.message,
+        ...(signal === undefined ? {} : { signal }),
+        options: options.options.map(promptOption) as Parameters<
+          typeof prompts.select<Value>
+        >[0]["options"],
+        ...(options.initialValue === undefined ? {} : { initialValue: options.initialValue }),
+      }),
+      cancellationCode,
+    );
+  const multiselect = async <Value extends string>(
+    options: ChoicePromptOptions<Value> & { readonly required?: boolean },
+    signal?: AbortSignal,
+  ): Promise<readonly Value[]> =>
+    answer(
+      await prompts.multiselect({
+        message: options.message,
+        ...(signal === undefined ? {} : { signal }),
+        options: options.options.map(promptOption) as Parameters<
+          typeof prompts.multiselect<Value>
+        >[0]["options"],
+        ...(options.initialValue === undefined ? {} : { initialValue: options.initialValue }),
+        ...(options.required === undefined ? {} : { required: options.required }),
+      }),
+      cancellationCode,
+    );
+  return { select, multiselect };
 }

@@ -1,0 +1,49 @@
+---
+title: Configure local storage
+description: Connect a bucket profile to local MinIO with the S3 integration and Docker.
+pagination: false
+sidebar:
+  icon: container
+---
+
+Use MinIO when you want S3-compatible file storage on your development machine. You'll need an existing RELKIT application and a running Docker daemon.
+
+<Steps>
+<Step>
+
+## Install the integration
+
+Run the installation commands from your application directory:
+
+<include>/_snippets/generated/installations/s3.mdx</include>
+
+</Step>
+<Step>
+
+## Add the provider profile
+
+In `relkit.config.ts`, import `s3` from `@relkit/s3`, `docker` from `@relkit/docker`, and `env as binding` from `@relkit/app/config`. Add this `assets` entry to the `bucket` configuration inside `defineApp()`:
+
+<include
+  source="examples/commerce/relkit.config.ts#storage-local-profile"
+  lang="ts"
+  meta='title="relkit.config.ts — bucket configuration"'
+>
+  /_snippets/source/examples/commerce/relkit.config--storage-local-profile.ts
+</include>
+
+A **provider profile** is a named connection to the service that stores your files. A bucket with `profile: "assets"` uses this connection.
+
+In development, `docker(s3(...))` starts the local MinIO recipe when the application needs this profile. It supplies binding-only credentials and loopback ports. Run `bun run check`, then `bun run dev`.
+
+With `--local=off`, recipes stay disabled and the configured connection values must exist. For connected S3 or Cloudflare R2, follow [provider selection](/docs/modules/storage/define).
+
+</Step>
+<Step>
+
+## Use the bucket
+
+Follow [Upload product images](/guides/storage/upload-product-images) to connect the profile to a bucket, function, service, and HTTP endpoint.
+
+</Step>
+</Steps>

@@ -1,7 +1,10 @@
+/** Substitutes SDK construction at the production AuthService Layer boundary.
+ * Test scopes own managed auth runtimes and database leases; callable metadata remains native-shaped.
+ */
 import { activateDrizzleService, defineDrizzleService } from "@relkit/drizzle";
 import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
 import type { Auth } from "better-auth";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, ManagedRuntime } from "effect";
 import { AuthFactory, makeAuthFactory } from "../../src/auth.factory.js";
 import { authServiceLayer } from "../../src/auth.service.js";
 import type { AuthConfiguration } from "../../src/auth.types.js";
@@ -59,5 +62,17 @@ export function authTestDatabase(dispose: () => void = () => undefined) {
   return Effect.acquireRelease(
     Effect.promise(() => activateDrizzleService(declaration, {}, { isolated: true })),
     (database) => Effect.promise(() => database.close()),
+  );
+}
+
+/** Owns the substituted Auth Layer until the enclosing test scope closes.
+ * @param configuration - Database and route borrowed by the real auth service.
+ * @param outcome - Controlled native SDK acquisition.
+ * @returns Scoped managed runtime with the production AuthService boundary.
+ */
+export function managedTestAuth(configuration: AuthConfiguration, outcome: AuthFactoryOutcome) {
+  return Effect.acquireRelease(
+    Effect.sync(() => ManagedRuntime.make(authTestLayer(configuration, outcome))),
+    (runtime) => Effect.promise(() => runtime.dispose()),
   );
 }

@@ -1,0 +1,133 @@
+---
+title: Integration catalog
+description: Choose the standalone adapters, local runtimes, exporters, hosts, and deployment engines your application needs.
+pagination: false
+sidebar:
+  icon: plug
+---
+
+An integration connects a RELKIT capability to a provider, such as S3 for files or Redis for cached values. Services, functions, routes, and events
+depend on checked capability contracts; integrations connect those contracts to Redis, S3,
+telemetry exporters, local Docker services, and deployment platforms.
+
+<Callout type="tip" title="Start here" icon="route">
+  For your first local integration, follow [Cache product
+  prices](/guides/caching/cache-product-prices) for Redis or [Upload product
+  images](/guides/storage/upload-product-images) for MinIO. Both include installation,
+  configuration, and verification. The [integration references](/docs/api#integrations) list each
+  package's exact APIs.
+</Callout>
+
+## Pre-setup
+
+Start with a working minimal app and Docker. Install the owner of each selected adapter,
+then bind it in `relkit.config.ts` through `defineApp`. Use `docker(adapter())` when it has
+a local recipe; the wrapper supplies development connection values. Follow the module's
+setup before adding its first resource:
+
+<CardGroup cols={2}>
+  <Card title="Buckets and MinIO" href="/docs/modules/storage#pre-setup" icon="hard-drive" arrow />
+  <Card title="Cache and Redis" href="/docs/modules/caching#pre-setup" icon="zap" arrow />
+  <Card title="Realtime and Redis" href="/docs/modules/realtime#pre-setup" icon="radio" arrow />
+  <Card title="Native task providers" href="/docs/modules/jobs#pre-setup" icon="list-todo" arrow />
+  <Card
+    title="PostgreSQL and auth"
+    href="/docs/modules/database/local-docker"
+    icon="database"
+    arrow
+  />
+  <Card title="Agent state" href="/docs/modules/ai#pre-setup" icon="bot" arrow />
+</CardGroup>
+
+Named connection bindings such as `binding.secret(...)` select provider values; `defineEnv`
+declares application values available to functions. Keep the distinction when configuring
+[environment contracts](/docs/learn/concepts/environment). Run `bun run check` before
+`bun run dev`; a package installation alone creates no profile or running resource.
+The [Docker coverage table](/docs/modules/integrations/local-docker#supported-local-services)
+identifies providers without a recipe.
+
+## Choose packages by role
+
+| Package               | Role                                                                             | Continue with                                                 |
+| --------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `@relkit/redis`       | Redis cache adapter and pinned local recipe                                      | [Caching](/docs/modules/caching)                              |
+| `@relkit/s3`          | S3-compatible bucket adapter and pinned MinIO recipe                             | [Storage](/docs/modules/storage)                              |
+| `@relkit/sentry`      | Error telemetry exporter                                                         | [Observability](/docs/modules/operations/observability)       |
+| `@relkit/otlp`        | OTLP trace exporter                                                              | [Observability](/docs/modules/operations/observability)       |
+| `@relkit/docker`      | Local-recipe selector and Docker materializer                                    | [Local Docker](/docs/modules/integrations/local-docker)       |
+| `@relkit/local`       | Filesystem event/job, realtime and agent-state profiles; local lifecycle support | [Local providers](/docs/modules/integrations/local-providers) |
+| `@relkit/aws`         | AWS host, infrastructure ownership, and access materialization                   | [AWS deployment](/docs/modules/deployment/aws)                |
+| `@relkit/pulumi`      | Pulumi deployment engine                                                         | [Deployment](/docs/modules/deployment)                        |
+| `@relkit/cloudflare`  | R2/KV runtime adapters; no application host                                      | [Connected providers](/docs/modules/deployment/providers)     |
+| `@relkit/inngest`     | Native durable-task adapter and account-free Docker recipe                       | [Jobs](/docs/modules/jobs/providers/inngest)                  |
+| `@relkit/trigger`     | Trigger.dev task adapter and worker publication                                  | [Jobs](/docs/modules/jobs/providers/trigger)                  |
+| `@relkit/effect-mq`   | PostgreSQL-backed retryable task adapter                                         | [Jobs](/docs/modules/jobs/providers/effect-mq)                |
+| `@relkit/drizzle`     | Optional database integration and selected native ORM                            | [Database installation](/docs/modules/database/define)        |
+| `@relkit/better-auth` | Optional auth bridge; native SDK and React leaf selected separately              | [Auth installation](/docs/modules/auth/better-auth)           |
+| `@relkit/langchain`   | Optional native agent engine and selected SDK cohort                             | [Agent installation](/guides/ai/build-an-offline-agent)       |
+| `@relkit/inspector`   | Separately installed UI and history tool                                         | [Inspector setup](/docs/modules/operations/inspector)         |
+
+Install standalone packages when you want the smallest dependency surface:
+
+<Tabs sync={false} hash={false}>
+<Tab title="Docker Redis" icon="database">
+
+For Docker Redis, the selected recipe is:
+
+<include>/_snippets/generated/installations/redis.mdx</include>
+
+</Tab>
+<Tab title="Cloudflare KV/R2" icon="cloud">
+
+For connected Cloudflare KV/R2 instead, install its owner and supply that adapter's named connection
+values. This does not select AWS/Pulumi or a Docker recipe:
+
+<include>/_snippets/generated/installations/cloudflare.mdx</include>
+
+</Tab>
+</Tabs>
+
+The optional `@relkit/integrations` catalog contains package metadata and installs no adapters.
+Import executable capabilities directly from the selected standalone packages. The following source
+illustrates separate choices; install only the owners you actually import, using their linked setup:
+
+<include
+  source="apps/docs/examples/landing/catalog.ts"
+  lang="ts"
+  meta='title="Standalone integration imports"'
+>
+  /_snippets/source/apps/docs/examples/landing/catalog.ts
+</include>
+
+Native agents use `@relkit/langchain` together with its documented LangChain SDK requirements.
+Install the model provider package selected by your application directly.
+
+## Understand ownership
+
+Connected adapters wire a resource that already exists. `docker(adapter)` selects the adapter's local recipe
+for development only. Infrastructure wrappers such as `aws(adapter)` let the deployment stack own a resource.
+The deployment engine and host are separate roles, so selecting AWS hosting does not claim every connected
+Redis, S3-compatible, Cloudflare, or model resource.
+
+Run `bun run check` to validate package registration, source wrappers, profile selection, and deployment-role
+compatibility before starting a runtime or previewing infrastructure.
+
+## Declare authoring entrypoints
+
+If you are implementing an adapter, begin with [Provider authoring](/docs/modules/integrations/provider-authoring) for a maintained example and validation steps. Use [Local providers](/docs/modules/integrations/local-providers) when explicitly owning local runtime state.
+
+Integration package authors list their application authoring entrypoints in
+`package.json` under `relkit.integration.exports.authoring`. Use a string for one exact export,
+such as `"."`, or an explicit list when multiple authoring leaves are public:
+
+```json
+{ "authoring": [".", "./sqlite", "./pg", "./mysql"] }
+```
+
+Every listed leaf must also exist in the package's `exports` map. The compiler accepts only those
+exact imports; listing a parent does not permit its children. Wildcards and path traversal are
+rejected. Drizzle declares its three dialect model entrypoints, and Better Auth declares its root
+and `./drizzle` bridge. Runtime internals, React adapters, and testing helpers do not become
+application authoring entrypoints through this declaration.
+
+<include>/_snippets/generated/related/docs-modules-integrations-index.mdx</include>

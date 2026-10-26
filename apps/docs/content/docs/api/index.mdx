@@ -1,0 +1,34 @@
+---
+title: Reference
+description: Look up RELKIT API signatures, types, errors, examples, and CLI commands generated from source.
+pagination: false
+search:
+  exclude: true
+sidebar:
+  icon: braces
+---
+
+Use this section when you know which API or command you need. Package pages contain signatures, types, source links, and checked examples. The CLI page comes from the same command model as terminal help.
+
+## Application configuration
+
+- [defineApp](/docs/api/app#defineapp) connects your environment, server settings, and providers in `relkit.config.ts`. This is RELKIT's current application configuration API; `defineConfig` is no longer exported.
+- [defineEnv](/docs/api/config#defineenv) declares typed environment values. Use the [env builders](/docs/api/config#env) to select their types, defaults, and secret handling.
+
+For a walkthrough, read [Application configuration](/docs/learn/concepts/application) and [Environment contracts](/docs/learn/concepts/environment).
+
+## API reference
+
+Browse [all public APIs and import paths](/docs/api/public), including React hooks, testing helpers,
+provider authoring, integration runtimes, and CLI automation. Each package has an **All exported APIs**
+table linking values, types, and aliases to their complete contracts.
+
+<include>/_snippets/generated/api-overview.mdx</include>
+
+## CLI reference
+
+Look up commands, arguments, options, and examples in the [CLI reference](/docs/api/cli).
+
+New to the commands? Start with the [CLI module](/docs/modules/cli) and its [create-to-build walkthrough](/guides/cli/create-and-build-an-api).
+
+For configuration and explanations, choose a [module](/docs/modules). For a complete workflow, choose a [guide](/guides).

@@ -1,0 +1,100 @@
+---
+title: Local Docker services
+description: Run graph-required Redis and MinIO recipes with immutable image versions and project-scoped lifecycle commands.
+pagination: false
+sidebar:
+  icon: container
+---
+
+Run selected providers locally with Docker recipes while keeping their configuration in your application. `check` writes a deterministic plan
+without contacting Docker. `dev` then starts only the recipes required by the checked graph, waits for their
+health checks, and supplies their outputs to the matching binding.
+
+## Pre-setup
+
+Start Docker and complete the selected capability's installation and `defineApp` configuration
+from the table below. Docker recipes supply their own connection values; application-specific
+fields still belong in `defineEnv`. Keep all existing profiles and state when adding a recipe.
+
+## Supported local services
+
+| Capability                  | Default local setup                                  | Configuration and environment                                                             |
+| --------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Buckets                     | MinIO through `docker(s3())`                         | [Storage pre-setup](/docs/modules/storage#pre-setup); generated local credentials         |
+| Caches                      | Redis through `docker(redis())`                      | [Caching pre-setup](/docs/modules/caching#pre-setup); generated connection                |
+| Realtime                    | Redis through `docker(redisRealtime())`              | [Realtime pre-setup](/docs/modules/realtime#pre-setup)                                    |
+| Agent state                 | Redis through `docker(redisAgentState())`            | [AI pre-setup](/docs/modules/ai#pre-setup); model secrets are separate                    |
+| Native jobs                 | Docker Inngest, Trigger.dev, or Effect MQ            | [Jobs pre-setup](/docs/modules/jobs#pre-setup); provider-specific composite recipes       |
+| Application database        | PostgreSQL through an application-owned Compose file | [Database pre-setup](/docs/modules/database/local-docker); `DATABASE_URL`                 |
+| Application events          | Filesystem provider; no Docker recipe                | [Events pre-setup](/docs/modules/events#pre-setup); preserve `.relkit/state`              |
+| HTTP, local logs, Inspector | No external service required                         | [HTTP](/docs/modules/http#pre-setup) and [Operations](/docs/modules/operations#pre-setup) |
+
+The database Compose service is managed with `docker compose`, not `relkit local`.
+Connected Cloudflare KV/R2, hosted models, Sentry, and OTLP have no bundled local Docker recipe.
+
+## Current bundled images
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  First complete the selected [Redis cache](/guides/caching/cache-product-prices) or [S3/MinIO
+  bucket](/guides/storage/upload-product-images) installation. Each selects its adapter plus
+  `@relkit/docker`; installing the materializer alone supplies no Redis/S3 adapter or binding.
+</Callout>
+
+The integration packages pin an immutable digest. A RELKIT package release therefore
+selects an exact local-service image rather than whatever a mutable tag points to later.
+
+| Adapter    | Image reference          | Immutable digest                                                          |
+| ---------- | ------------------------ | ------------------------------------------------------------------------- |
+| Redis      | `redis:7.4.2-alpine`     | `sha256:02419de7eddf55aa5bcf49efb74e88fa8d931b4d77c07eff8a6b2144472b6952` |
+| S3 / MinIO | `ghcr.io/teableio/minio` | `sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e` |
+
+The MinIO reference uses a public mirror of `RELEASE.2025-04-22T22-12-26Z` with the same digest as the
+original image.
+
+RELKIT discovers the Docker server version at startup but does not currently enforce a minimum engine
+version. Use a maintained Docker Engine or Docker Desktop release with the `docker` CLI available on `PATH`:
+
+```sh
+docker version
+bun run relkit local status
+```
+
+## Select local recipes
+
+Use `docker(redis())` or `docker(s3())` for a local-only binding. Wrap a configured connected adapter when
+development should use Docker while release builds resolve named binding values. The Redis and storage guides
+show both forms in the commerce application.
+
+Docker starts Redis with a persistent `/data` volume and waits for `redis-cli PING`. MinIO receives generated
+project-local credentials, persists `/data`, waits for its readiness endpoint, and initializes the `relkit`
+bucket. Both publish random loopback ports instead of claiming fixed host ports.
+
+## Optional file-backed events and legacy jobs
+
+The filesystem event and legacy job profiles do not use Docker. `localEvent()` and `localJob()` from `@relkit/local` register
+the existing durable filesystem runtimes and store their state under `.relkit/state` by default. The `event`,
+`event-function`, and `job` add commands reuse compatible profiles; a full service bundle creates these local
+profiles when no configured defaults exist. See the [Local API](/docs/api/integrations/local) for direct
+authoring. Use a different `root` only when the application needs an isolated local state directory.
+New task-first jobs use a native Docker provider from the table above; `localJob()` is not that provider.
+
+The corresponding scaffold normally installs the owner. For manual file-backed configuration,
+select this installation before importing those profiles:
+
+<include>/_snippets/generated/installations/local.mdx</include>
+
+## Control the project lifecycle
+
+```sh
+bun run relkit local up --detach
+bun run relkit local status
+bun run dev --local=off
+bun run relkit local stop
+bun run relkit local reset --yes
+```
+
+Healthy services and volumes survive source reloads. `stop` stops this project's labelled services; `reset`
+also removes its validated volumes and override state. It refuses a live attached lease and never targets
+another checkout. Docker is not contacted by `build`, deployment preview, or deployment apply.
+
+<include>/_snippets/generated/related/docs-modules-integrations-local-docker.mdx</include>

@@ -39,7 +39,9 @@ export function forwardProxyRequest(
       ...(ownedSignal === undefined ? [] : [ownedSignal]),
     ]),
   };
-  if (request.method !== "GET" && request.method !== "HEAD") init.body = request.body;
+  // Re-stream decoded bytes: Bun 1.3.10's native chunked passthrough can produce empty 400s.
+  if (request.method !== "GET" && request.method !== "HEAD")
+    init.body = request.body?.pipeThrough(new TransformStream()) ?? null;
   return fetcher(url, init);
 }
 

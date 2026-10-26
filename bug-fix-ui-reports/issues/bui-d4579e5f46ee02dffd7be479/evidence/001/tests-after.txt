@@ -1,0 +1,203 @@
+$ bun test tests/*.test.ts
+bun test v1.3.10 (30e609e0)
+
+tests/documentation-catalog.test.ts:
+(pass) derives capability and related-guide content from the typed catalogs [776.99ms]
+(pass) keeps learning guides focused and actionable [18.55ms]
+
+tests/event-learning.test.ts:
+(pass) preserves navigation ordering and emits Blume-compatible section icons [857.94ms]
+(pass) keeps section headings for the Events guides' right-side table of contents [3.33ms]
+(pass) introduces the Events API and shows subscribers before the existing-app tutorial [1.32ms]
+
+tests/navigation.test.ts:
+(pass) sidebar links every documentation page exactly once [25.95ms]
+
+tests/installation-coverage.test.ts:
+(pass) every authored page is navigable and has a reviewed installation disposition [25.18ms]
+
+tests/topology-lifecycle.test.ts:
+(pass) defers imports until visible in a foreground tab and imports only once [2.51ms]
+(pass) caps rendering at 24fps and freezes time through pause and hidden tabs [0.49ms]
+(pass) reduced motion never loads WebGL and changes suspend an existing scene [0.18ms]
+(pass) disposes a late import after unmount without drawing or scheduling frames [0.18ms]
+(pass) context loss returns to the fallback and does not retry or restart [0.06ms]
+(pass) render failures cancel even the currently executing frame [0.21ms]
+(pass) import failures remain static; cleanup removes event listeners and frames [0.42ms]
+
+tests/examples.test.ts:
+(pass) documentation examples are executable descriptors [0.83ms]
+
+tests/hero-examples.test.ts:
+(pass) hero examples render all design states as escaped, highlighted code [654.82ms]
+(pass) hero excerpts omit framework imports and remain valid TSX [215.72ms]
+
+tests/service-learning.test.ts:
+(pass) introduces Service after Core concepts with source-backed, connected guides [3.46ms]
+(pass) routes code-placement questions into existing capability and HTTP guides [0.32ms]
+(pass) walks through the Orders service using the executable API starter [0.05ms]
+
+tests/cli-scaffolding.test.ts:
+(pass) every add command has a guide and complete CLI reference without inline option tables [15.63ms]
+
+tests/auth-learning.test.ts:
+(pass) connects Auth after Database with source-backed guides and API reference [4.31ms]
+(pass) separates identity, integration, transport protection, and business authorization [0.35ms]
+(pass) teaches a migrated existing-app flow without hard-coded server secrets [0.26ms]
+
+tests/source-snippets.test.ts:
+(pass) extracts one complete named region and preserves its code [0.77ms]
+(pass) ignores include examples inside native Markdown fences [0.26ms]
+(pass) materializes one owned copy and rejects missing or conflicting sources [8.63ms]
+
+tests/installation-guidance.test.ts:
+(pass) database installs its current adapter and ORM with development-only Kit and owned patch [4.24ms]
+(pass) native agents install the execution owner and full SDK cohort without deep agents [0.30ms]
+(pass) provider recipes install selected native SDKs rather than wrappers alone [0.14ms]
+(pass) deployment requirements remain in development dependencies [0.10ms]
+(pass) tool-only MCP and independently selected HTTP transports do not acquire a native agent [0.27ms]
+(pass) frontend recipes select required OTel and only the peers used by their public leaf [0.12ms]
+(pass) Inspector installation belongs to a separate tool process [0.12ms]
+
+tests/documentation.test.ts:
+(pass) publishes authored, CLI, and application-facing API documentation [49.48ms]
+(pass) leads with the five product concepts and separates guides from API reference [1.12ms]
+(pass) keeps Core concepts near Start and retires the duplicate Async section [0.28ms]
+(pass) documents current Docker-backed service versions from integration source [0.49ms]
+
+tests/installation-ai-client.test.ts:
+(pass) native agent entry points install the selected owner before native source [0.31ms]
+(pass) first-agent extends explicit runtime bindings and keeps inspection separately optional [0.11ms]
+(pass) React onboarding installs frontend runtime peers and development CLI before pulling [0.03ms]
+(pass) frontend continuations link their selected setup before examples [0.12ms]
+(pass) optional protocols use shared selected-only installation recipes [0.18ms]
+
+tests/hero-snippet-behavior.test.ts:
+(pass) database excerpt returns exactly the declared output fields [15.46ms]
+(pass) realtime excerpt appends chat messages without refetching [7.12ms]
+(pass) service excerpt exposes its members through real service routes [29.08ms]
+(pass) order creation excerpt validates quantity and returns a price in cents [13.52ms]
+(pass) order events connect a schema-valid publication to a durable subscriber [19.45ms]
+(pass) scheduled export uses the current job API and valid task input [33.57ms]
+(pass) checkout invokes order hooks through the shared runtime [88.68ms]
+
+tests/database-learning.test.ts:
+(pass) connects Database guides and the generated Drizzle reference [12.79ms]
+(pass) uses application workflows and Drizzle Kit rather than SQL bootstrap or test snippets [0.84ms]
+(pass) states validation, override, transaction, and lifecycle boundaries [0.49ms]
+(pass) explains generated data shapes and Better Auth's native-client boundary [0.02ms]
+
+tests/ai-learning.test.ts:
+(pass) places AI beside Caching and keeps practical table-of-contents headings [1.88ms]
+(pass) documents an existing-app tutorial and MCP's exposure and approval boundaries [3.74ms]
+(pass) explains native agent foundations, inherited schemas, callbacks, and streaming [1.03ms]
+(pass) documents native compatibility, typed state, graphs, persistence, and resume [0.30ms]
+
+tests/installation-entrypoints.test.ts:
+(pass) manual database/auth entry points establish complete installs before feature source [0.39ms]
+(pass) database and auth scaffolds explain deferred install without requiring duplicate manual setup [0.40ms]
+(pass) database continuations link setup before their first feature-dependent example [0.85ms]
+(pass) auth continuations establish backend setup before consuming its service [0.71ms]
+(pass) adding native services updates existing application test fixtures as well as new tests [0.40ms]
+
+tests/start-learning.test.ts:
+(pass) keeps a single ordered Orders journey with optional scaffolding last [0.96ms]
+(pass) extends the certified minimal app into the same Orders journey [0.22ms]
+(pass) redirects retired Start URLs directly to current guidance [0.19ms]
+
+tests/http-learning.test.ts:
+(pass) connects Service to HTTP Routes without changing existing HTTP guide URLs [4.57ms]
+(pass) teaches the Orders HTTP boundary with executable starter source and tests [0.30ms]
+(pass) documents raw and RPC boundaries without promising REST-only policies on RPC [0.54ms]
+
+tests/docgen-examples.test.ts:
+(pass) restores source-relative imports while keeping example names and expressions intact [0.91ms]
+../../../../../../var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-docgen-context-8jbay1/examples/0--var-folders-54-3l8wd4hj6c36slgt3rl572sr0000gp-T-relkit-docgen-context-8jbay1-source-owner.ts-function-run-0.ts(2,7): error TS2322: Type 'number' is not assignable to type 'string'.
+(pass) the real compiler accepts restored imports and still rejects invalid examples [1393.00ms]
+
+tests/generation-files.test.ts:
+(pass) reports obsolete MDX during a check without deleting it or authored neighbors [2.35ms]
+
+tests/installation-metadata.test.ts:
+(pass) a changed owner release and SDK pin flow into commands without changing neighbors [1.06ms]
+(pass) named peer catalog ranges stay quoted and unselected peers stay absent [0.44ms]
+(pass) runtime phase does not silently include a development-only authentication peer [0.11ms]
+(pass) missing owners, peers and capabilities fail generation instead of omitting an install [0.18ms]
+(pass) conflicting manifest sections cannot generate contradictory install commands [0.03ms]
+(pass) HTTP requirement and optional peer drift fails before publishing commands [0.13ms]
+
+tests/jobs-learning.test.ts:
+(pass) connects Jobs between Events and Database with source-backed guides [6.65ms]
+(pass) teaches task admission and completion using executable documentation sources
+(pass) states current retry, overlap, and provider limits without exactly-once promises [0.23ms]
+(pass) provider guides show configuration, real input, registration, and native run evidence [0.33ms]
+
+tests/installation-providers.test.ts:
+(pass) each job provider establishes its selected SDK recipe before configuration [0.72ms]
+(pass) deployment starts from an existing configured app with development-only SDK setup [0.14ms]
+(pass) observability assigns persistent history and its directory override to the standalone tool [0.06ms]
+(pass) cache and upload tutorials select their adapter and establish separate Inspector setup [0.17ms]
+
+tests/public-api-coverage.test.ts:
+(pass) indexes duplicate native names by declaration, ignoring code-fence headings [3.48ms]
+(pass) finds React TSX and explicit source targets, and fails on unresolved manifest exports [2.13ms]
+(pass) keeps the nested source location for React and integration runtime APIs [3.40ms]
+(pass) audits actual star exports, aliases, types, named defaults and JSX beyond the feature catalog [1664.00ms]
+
+tests/repository-links.test.ts:
+(pass) active repository documentation links target existing content [4.06ms]
+
+tests/landing-motion.test.ts:
+(pass) landing CSS motion lifecycle > suspends offscreen, in hidden tabs, and for reduced motion [1.43ms]
+(pass) landing CSS motion lifecycle > keeps the pause choice across remounts and cleans up listeners [0.38ms]
+(pass) landing CSS motion lifecycle > works when storage access is blocked [0.13ms]
+
+tests/storage-learning.test.ts:
+(pass) places Storage beside Auth with focused pages and right-side TOC headings [6.97ms]
+(pass) teaches an existing-app upload with source-backed examples and local verification [1.15ms]
+
+tests/documentation-layout.test.ts:
+(pass) keeps guides backed by executable examples and self-hosted discovery [89.40ms]
+(pass) documents grouped service roots and rejects removed layer-first advice [48.73ms]
+(pass) builds and starts from the repository root on Railway [0.93ms]
+
+tests/api-markdown.test.ts:
+(pass) composes module headings without adding document titles or duplicate tables of contents [0.19ms]
+(pass) keeps blank lines and heading-like text inside documentation code fences [0.11ms]
+(pass) connects bucket contracts to configuration and the complete upload workflow [0.69ms]
+(pass) surfaces configuration symbols before readers enter the generated source sections [0.37ms]
+(pass) the reference overview includes every cataloged package and configuration entrypoints [0.36ms]
+(pass) common API links reach documented symbols in their defining package [5.13ms]
+
+tests/installation-workflows.test.ts:
+(pass) agent closure rejects DuckDB history packages while allowing its lightweight bridge [0.41ms]
+(pass) guide steps retain command/repair order and reject synthesized dependency blocks [1.42ms]
+(pass) selected repairs merge without replacing unrelated application settings [0.77ms]
+(pass) a complete selected install passes without unrelated optional SDKs [0.72ms]
+(pass) missing selected SDKs and undeclared broad example dependencies are refused [2.62ms]
+(pass) whole-example replacement and incompatible authored declarations cannot establish proof [0.33ms]
+(pass) workspace node_modules links cannot establish an isolated installation [2.30ms]
+(pass) packed journeys build before imports and block both CI and the local merge gate [0.22ms]
+
+tests/public-api-examples.test.ts:
+(pass) the provider example declares a sensitive connection and immutable capability metadata [0.06ms]
+(pass) the shared context example resolves environment references and preserves prompt ordering [2.61ms]
+(pass) the local provider example stores exact bytes and leaves its caller-owned directory intact [12.17ms]
+(pass) tooling previews include starter files and do not create the destination [17.91ms]
+
+tests/installation-inspector.test.ts:
+(pass) minimal onboarding advertises a backend with explicitly optional inspection [0.21ms]
+(pass) local development establishes standalone setup before the first UI action [0.07ms]
+(pass) canonical Inspector setup installs the tool before configuring and launching it [0.03ms]
+(pass) event walkthrough installs an explicit local runtime before using optional Inspector views [0.12ms]
+(pass) core application model follows the minimal configuration without an automatic UI listener [0.13ms]
+(pass) shipped realtime references do not teach the retired Inspector UI port setting [1.15ms]
+
+tests/caching-learning.test.ts:
+(pass) places Caching beside Storage and preserves useful TOC headings [4.57ms]
+(pass) teaches caching in an existing app with a tested lookup and local Inspector steps [0.29ms]
+
+ 125 pass
+ 0 fail
+ 3561 expect() calls
+Ran 125 tests across 35 files. [7.41s]

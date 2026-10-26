@@ -1,3 +1,4 @@
+/** Typed IPC failures shared with tooling; no worker or database is acquired here. */
 import { Schema } from "effect";
 import { ObservabilityQueryError } from "../query-types.js";
 
@@ -31,8 +32,8 @@ export class WorkerTransportError extends Error {
 }
 
 /** Maps an IPC failure to a tagged worker error without losing query codes. */
-export const workerFailure = (
-  error: unknown,
+export const workerFailure = <Failure>(
+  error: Failure,
   reason: LocalWorkerError["reason"],
 ): LocalWorkerError =>
   new LocalWorkerError({

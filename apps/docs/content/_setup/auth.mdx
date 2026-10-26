@@ -1,0 +1,73 @@
+## Pre-setup
+
+For a new app, first complete [PostgreSQL in local Docker](/docs/modules/database/local-docker).
+Authentication shares that database. If your app already uses another supported dialect,
+keep it and pass the matching `--database-dialect` below.
+
+<Steps>
+<Step title="Scaffold the authentication service" icon="terminal">
+
+Run once in the backend root when it has no auth service:
+
+```sh title="Terminal — application root"
+bun run relkit add auth --adapter better-auth --database-dialect postgresql
+```
+
+The command installs the selected packages, adds auth tables to the existing Drizzle schema,
+creates the auth service and `/api/auth` mount, and merges environment declarations. It does
+not generate a secret, apply migrations, or protect your business endpoints.
+
+</Step>
+<Step title="Configure environment values" icon="key-round">
+
+Keep these fields in `src/platform/env.ts` and its existing import in `relkit.config.ts`.
+This minimal inline configuration shows the required contract; merge rather than replacing
+your application's other fields and settings:
+
+<include
+  source="apps/docs/examples/setup/auth.ts"
+  lang="ts"
+  meta='title="relkit.config.ts — equivalent inline environment"'
+>
+  /_snippets/source/apps/docs/examples/setup/auth.ts
+</include>
+
+Retain `DATABASE_URL` from the Docker setup. Generate a secret once:
+
+```sh title="Terminal — application root"
+openssl rand -base64 32
+```
+
+Add `BETTER_AUTH_URL=http://127.0.0.1:3000` and `BETTER_AUTH_SECRET=<generated value>` to your
+untracked `.env.local`, using your actual backend origin and generated secret. Keep the same
+secret across restarts. Better Auth reads it from the backend process environment; `defineEnv`
+validates it but does not inject parsed values into native auth options. Never expose it to the frontend.
+
+</Step>
+<Step title="Apply auth tables and verify" icon="clipboard-check">
+
+```sh title="Terminal — application root"
+bun run relkit env check
+bun --bun drizzle-kit generate --name=add-auth
+```
+
+Review the generated changes, preserving existing tables and applied migrations. Then run:
+
+```sh title="Terminal — application root"
+bun run relkit db migrate
+bun run check
+bun run typecheck
+bun run dev
+```
+
+Continue with [Better Auth options](/docs/modules/auth/better-auth) and
+[protecting application routes](/docs/modules/auth/protect-routes). Verify sign-up and cookies
+using the [sign-in guide](/guides/auth/email-password-sign-in); its standalone SQLite sample is
+an alternative, so keep your PostgreSQL service and migrations when adapting its requests.
+
+Update application HTTP fixtures to use `@relkit/testing/better-auth`, including fixtures for
+public routes. Supply explicit test environment values and an isolated, migrated database;
+the harness does not inherit `.env.local`. See [testing authentication](/docs/modules/auth/testing).
+
+</Step>
+</Steps>

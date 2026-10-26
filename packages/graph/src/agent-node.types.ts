@@ -1,3 +1,4 @@
+/** Defines serialized agent graph metadata and the explicit marker for selected DeepAgents execution. */
 import type { JsonValue } from "@relkit/contracts";
 import type { AgentClientContractMetadata } from "./agent-client-contract.types.js";
 import type { GeneratedAgentMarker } from "./foundation-nodes.types.js";
@@ -23,6 +24,8 @@ export interface AgentNode extends GraphNodeBase<"agent"> {
   readonly chat?: JsonValue;
   readonly controls?: JsonValue;
   readonly execution?: "graph";
+  /** Native DeepAgents-only capabilities selected by the authored descriptor. */
+  readonly requiresDeepAgents?: true;
   readonly workflow?: JsonValue;
   readonly workflowTopology?: AgentWorkflowTopology;
   readonly subagents?: readonly AgentSubagentTopology[];

@@ -29,7 +29,6 @@
     }
   },
   "dependencies": {
-    "@relkit/agents": "workspace:*",
     "@relkit/buckets": "workspace:*",
     "@relkit/cache": "workspace:*",
     "@relkit/contracts": "workspace:*",

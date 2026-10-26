@@ -1,7 +1,7 @@
 /** Builds isolated initial-validation command Layers; all session resources are forbidden before the barrier completes. */
 import { loadConfig } from "@relkit/compiler";
 import { Effect, Layer } from "effect";
-import { CliTelemetryNative } from "../../src/commands/dev-telemetry-native.service.js";
+import { CliDevCapture } from "../../src/commands/dev-capture.service.js";
 import { CliPortProbe } from "../../src/commands/port-availability.service.js";
 import { CliDevSupervisor } from "../../src/services/dev-supervisor.service.js";
 import { CliSourceWatch } from "../../src/services/source-watch.service.js";
@@ -14,7 +14,7 @@ import type { CheckResult } from "../../src/commands/check-result.types.js";
 import type { CliCommandContext } from "../../src/main-support-types.js";
 
 const root = "/relkit-initial-check";
-export const args = ["--project-root", root, "--port", "12345", "--inspector-port", "12346"];
+export const args = ["--project-root", root, "--port", "12345"];
 export const context: CliCommandContext = {
   command: "dev",
   args,
@@ -80,11 +80,8 @@ export function initialCheckTestLayer(
 }
 
 /** Telemetry acquisition must stay behind the initial validation barrier. */
-const telemetryForbiddenLayer = Layer.succeed(CliTelemetryNative, {
-  worker: () => Effect.die(new Error("Unexpected telemetry acquisition")),
-  stream: () => Effect.die(new Error("Unexpected telemetry acquisition")),
-  listen: () => Effect.die(new Error("Unexpected telemetry acquisition")),
-  closeWorker: () => Effect.die(new Error("Unexpected telemetry acquisition")),
+const telemetryForbiddenLayer = Layer.succeed(CliDevCapture, {
+  acquire: () => Effect.die(new Error("Unexpected capture acquisition")),
 });
 
 /** Failed diagnostics need no generated artifact paths because admission ends before reading them. */

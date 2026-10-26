@@ -6,7 +6,7 @@
 import { expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { CREATE_TEMPLATES, generateProject } from "../../packages/create-relkit/src/index.ts";
+import { CREATE_TEMPLATES, generateProject } from "../../packages/cli/src/scaffolding/index.ts";
 import {
   makeRoot,
   contextFor,

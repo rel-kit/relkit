@@ -31,7 +31,9 @@ it.effect("counts the immutable producer envelope after redaction and preserves 
       expect(entry.identity).toEqual(identity);
       expect(Object.isFrozen(entry.identity)).toBe(true);
       expect(entry.bytes).toBe(
-        Buffer.byteLength(JSON.stringify({ record: entry.record, identity })),
+        Buffer.byteLength(
+          JSON.stringify({ sequence: entry.sequence, record: entry.record, identity }),
+        ),
       );
     }
     expect(JSON.stringify(entries)).not.toContain("SYNTHETIC_SECRET");

@@ -49,8 +49,13 @@ Application code can import the root API or focused typed paths:
 - `@relkit/app/services`
 
 Optional integrations such as `@relkit/client`, `@relkit/drizzle`,
-`@relkit/better-auth`, providers, testing, and the CLI remain separate so the
+`@relkit/better-auth`, `@relkit/langchain`, providers, testing, the Inspector and CLI remain separate so the
 core API does not install the full AWS, Pulumi, Next.js, or testing stack.
+
+Follow the selected capability's [installation guide](apps/docs/content/docs/modules/integrations/index.mdx)
+before copying source. Native SDKs and declaration repairs remain application-owned;
+`relkit add` normally installs the requirements it selects, while `--no-install`
+leaves explicit install/check next steps. Public packages have independent versions.
 
 ## AI agent skills
 
@@ -119,10 +124,10 @@ bun run relkit:local -- create my-app --cloud none --deploy none
 
 ## Repository layout
 
-- `apps/docs` is the searchable Next.js/Fumadocs documentation application on
+- `apps/docs` is the searchable Blume/Astro documentation application on
   port `3001`.
-- `apps/inspector` is the Next.js inspector served on port `3210` by a project
-  development session.
+- `apps/inspector` is the private Next.js UI packaged by the independently installed
+  `@relkit/inspector` tool, whose UI defaults to port `3210`.
 - `examples/commerce` is the canonical executable, cross-feature example.
 - `integrations/catalog` contains the optional side-effect-free integration
   catalog; `integrations/packages` contains independently publishable
@@ -151,14 +156,16 @@ bun run dev
 ```
 
 Cloud and deployment both default to `none`. `bun run dev` starts the generated
-backend on `http://localhost:3000` and the real Next inspector on
-`http://localhost:3210`; source saves keep the last-known-good backend active.
-The CLI uses the packaged production inspector, including when linked from this
-checkout. Set `RELKIT_INSPECTOR_ROOT` explicitly to develop inspector source.
+backend on `http://localhost:3000`; source saves keep the last-known-good backend active.
+Inspection is disabled unless the application selects `inspector: { enabled: true }`.
+That selection starts an authenticated development bridge on `127.0.0.1` with an
+automatically allocated port. Install and run `@relkit/inspector` separately for
+the UI and persistent local history. See [the standalone launch guide](packages/inspector/README.md)
+for runtime requirements, current candidate availability and separate process commands.
 The example route is:
 
 ```sh
-curl 'http://localhost:3000/hello?name=RelKit'
+curl http://localhost:3000/hello\?name=RelKit
 ```
 
 AWS/Pulumi creation flags remain parsed for precise diagnostics but are rejected until that tuple
@@ -174,13 +181,13 @@ observability files live under `.relkit/` and should not be edited by hand.
 
 AWS deployment uses Pulumi as its engine and requires explicit credentials and
 authorization; local deployment tests use mocks. Production internal runtime
-endpoints are disabled unless `RELKIT_INTERNAL_ENDPOINTS=1` is set. The CLI ships
-the inspector; `RELKIT_INSPECTOR_ROOT` remains available when a different source
-checkout must be selected explicitly.
+endpoints are disabled unless `RELKIT_INTERNAL_ENDPOINTS=1` is set. Rich Inspector
+registration is excluded from production even when inspection was selected for
+development. The CLI owns no Inspector UI, history database or database worker.
 
 ## Releases and support
 
-All public packages ship together on one fixed version. Repository pull
+Public packages retain independent versions. Repository pull
 requests that change publishable paths receive an automatic patch Changeset;
 forks and minor or major releases use `bun run changeset`. Automation opens the
 release pull request, auto-merges it after `CI Gate`, and publishes through a

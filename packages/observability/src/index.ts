@@ -1,3 +1,4 @@
+/** Exports observability records, collection, query, streams and telemetry policy APIs with explicit runtime storage authority. */
 export * from "./model.js";
 export * from "./redaction.js";
 export * from "./record-admission.js";
@@ -12,6 +13,7 @@ export * from "./query.js";
 export * from "./execution-assembly.js";
 export * from "./stream.js";
 export * from "./runtime.js";
+export type { ObservabilityRuntimeStorage } from "./runtime-storage.types.js";
 export * from "./telemetry-config.js";
 export * from "./telemetry-sampling.js";
 export * from "./telemetry-export-queue.js";

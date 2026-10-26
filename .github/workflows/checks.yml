@@ -151,6 +151,8 @@ jobs:
           bun x prettier --check AGENTS.md README.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md RELEASE_NOTES.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .changeset .github apps examples integrations packages scripts templates tests docs/testing.md
           bun run lint
           bun run check
+          bun x turbo run build --filter=@relkit/contracts --output-logs=errors-only
+          bun test ./tests/phase0-docs-imports.ts
           bun run konsistent -- validate
           bun run scripts/check-observability-sinks.ts
 
@@ -188,6 +190,62 @@ jobs:
           bun run test:contracts
           bun run test:security
 
+  inspector-container:
+    name: Standalone inspector container
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    env:
+      TURBO_CONCURRENCY: "1"
+      VITEST_MAX_WORKERS: "1"
+      NODE_OPTIONS: --max-old-space-size=2048
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Build candidate image and prove native container behavior
+        run: bun run test:container
+
+  docs-installations:
+    name: Documentation installation journeys
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      TURBO_CONCURRENCY: "1"
+      VITEST_MAX_WORKERS: "1"
+      NODE_OPTIONS: --max-old-space-size=2048
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Verify fresh packed installations and native documented behavior
+        run: |
+          bun x --bun vitest run packages/inspector/tests/platform-cohort.test.ts
+          bun --cwd=apps/docs run test:installations
+      - name: Verify documentation generation, examples, links and search
+        run: |
+          bun run test:docs
+          bun --cwd=apps/docs run build
+
   dependency-review:
     name: Dependency review
     if: github.event_name == 'pull_request' && github.event.repository.visibility == 'public'
@@ -206,13 +264,23 @@ jobs:
   ci-gate:
     name: CI Gate
     if: always()
-    needs: [auto-changeset, static, types-and-tests, dependency-review]
+    needs:
+      [
+        auto-changeset,
+        static,
+        types-and-tests,
+        inspector-container,
+        docs-installations,
+        dependency-review,
+      ]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions: {}
     env:
       STATIC_RESULT: ${{ needs.static.result }}
       TYPES_RESULT: ${{ needs.types-and-tests.result }}
+      INSPECTOR_CONTAINER_RESULT: ${{ needs.inspector-container.result }}
+      DOCS_INSTALLATIONS_RESULT: ${{ needs.docs-installations.result }}
       DEPENDENCY_REVIEW_RESULT: ${{ needs.dependency-review.result }}
       AUTO_CHANGESET_RESULT: ${{ needs.auto-changeset.result }}
     steps:
@@ -220,6 +288,8 @@ jobs:
         run: |
           test "$STATIC_RESULT" = success
           test "$TYPES_RESULT" = success
+          test "$INSPECTOR_CONTAINER_RESULT" = success
+          test "$DOCS_INSTALLATIONS_RESULT" = success
           test "$DEPENDENCY_REVIEW_RESULT" = success || test "$DEPENDENCY_REVIEW_RESULT" = skipped
           test "$AUTO_CHANGESET_RESULT" = success || test "$AUTO_CHANGESET_RESULT" = skipped
 

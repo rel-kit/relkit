@@ -1,0 +1,14 @@
+The interactive shell defines relkit in ~/.zshrc as:
+relkit() { bun "/Users/mustafaelsayed/Workspace/relkit/scripts/relkit-local.ts" "$@"; }
+
+The plain global relkit executable succeeds. The contributor launcher installs link: dependencies and fails during finite dev --prepare.
+
+Reproduction in a retained minimal project:
+1. packages/cli/src/local.ts create --no-install --no-git
+2. prepareWorkspaceLinks(project), then bun install
+3. prepareGeneratedDevSnapshot({ projectRoot, tools: await Effect.runPromise(readSnapshotTools(projectRoot)), probe: "auto" })
+
+Actual rejection (exit 1):
+{ reason: "escaped", _tag: "TypecheckInputError" }
+
+packages/compiler/src/typecheck-inputs-native.ts:55-60 explicitly excludes physically external linked declarations from portable TypeScript input evidence and requires ordinary checking. The contributor runner previously forwarded dev --prepare unchanged, requiring that unsupported evidence. The fix selects ordinary check only for that generator-owned contributor preparation command.

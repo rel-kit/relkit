@@ -1,7 +1,9 @@
-/** Validates public backend, packaged Inspector and documentation responses from the owned dev child. */
+/** Validates core transports and omitted-disabled inspection in installed development. */
 import { strict as assert } from "node:assert";
 import { Effect, Schema } from "effect";
 import { scaffoldRequest } from "./scaffold-http.js";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 
 const greeting = Schema.Struct({ message: Schema.String });
 const health = Schema.Struct({ ok: Schema.Boolean });
@@ -9,13 +11,13 @@ const health = Schema.Struct({ ok: Schema.Boolean });
 /**
  * Exercises the original public contracts through native HTTP.
  * @param port - Backend listener.
- * @param inspector - Packaged Inspector listener.
+ * @param root - Installed project with default inspection omitted.
  * @param taskProject - Whether the maintained internal task fixture exposes health.
  * @returns Completion after all response assertions.
  */
 export const verifyScaffoldDevContracts = Effect.fn("ScaffoldDev.contracts")(function* (
   port: number,
-  inspector: number,
+  root: string,
   taskProject: boolean,
 ) {
   const base = `http://127.0.0.1:${port}`;
@@ -30,9 +32,7 @@ export const verifyScaffoldDevContracts = Effect.fn("ScaffoldDev.contracts")(fun
     );
   const endpoints = [
     [`${base}/_relkit/v1/graph`, '"graphHash"'],
-    [`http://127.0.0.1:${inspector}/_relkit/backend/_relkit/v1/graph`, '"graphHash"'],
     [`${base}/_relkit/v1/openapi.json`, '"openapi":"3.1.0"'],
-    [`${base}/_relkit/v1/api-reference`, "scalar"],
   ] as const;
   for (const [url, expected] of endpoints) {
     const result = yield* scaffoldRequest(url);
@@ -42,4 +42,12 @@ export const verifyScaffoldDevContracts = Effect.fn("ScaffoldDev.contracts")(fun
       url,
     );
   }
+  const reference = yield* scaffoldRequest(`${base}/_relkit/v1/api-reference`);
+  assert.equal(reference.status, 404, "Default scaffolds do not select the Scalar UI");
+  assert.doesNotMatch(yield* Effect.promise(() => reference.text()), /scalar/i);
+  const rich = yield* scaffoldRequest(`${base}/_relkit/v1/runtime`);
+  assert.equal(rich.status, 404);
+  yield* Effect.promise(() => rich.arrayBuffer());
+  assert.equal(existsSync(join(root, ".relkit/connections")), false);
+  assert.equal(existsSync(join(root, ".relkit/observability/observability.duckdb")), false);
 });

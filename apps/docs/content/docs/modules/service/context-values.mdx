@@ -1,0 +1,72 @@
+---
+title: Constants and prompts
+description: Declare shared values with defineConstants and definePrompt, and understand how context resolution works.
+pagination: false
+sidebar:
+  icon: braces
+---
+
+Use `defineConstants` for named JSON values, environment references, or resolver functions.
+Use `definePrompt` for nonempty text or an ordered list of text fragments. Both APIs create
+immutable descriptors; they do not read the environment or call a model during construction.
+
+## Scaffold shared values
+
+From an installed application's root, with an existing `orders` service, create the values you need:
+
+```sh title="Terminal — application root"
+bun run relkit add constants receipt-settings --service orders
+bun run relkit add prompt receipt-policy --service orders \
+  --text "Summarize the receipt."
+```
+
+The commands create `src/services/orders/constants/receipt-settings.constants.ts` and
+`src/services/orders/prompts/receipt-policy.prompt.ts`. Constants start with a domain-qualified
+key and a `"replace-me"` value; edit that value in source. Repeated `--text` flags preserve
+separate prompt segments. Neither artifact becomes a public service member.
+
+Use `--create-service orders` instead of `--service orders` if the service does not exist.
+To create both artifacts, create the service with the first command and use `--service orders`
+for the second. For manual setup, define the same descriptors in source as shown below.
+
+See the [constants command](/docs/api/cli#relkit-add-constants-name) and
+[prompt command](/docs/api/cli#relkit-add-prompt-name) for all flags, then
+[use a prompt in an agent](/docs/modules/ai/agents#scaffold-a-reusable-prompt).
+
+## Define shared values
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  Start with an [existing RELKIT application](/docs/learn/create-an-app), which already has
+  `@relkit/app`. Declare these values alongside its service code:
+</Callout>
+
+<include
+  source="apps/docs/examples/public-api/context.ts"
+  lang="ts"
+  meta='title="src/services/orders/context-values.ts"'
+>
+  /_snippets/source/apps/docs/examples/public-api/context.ts
+</include>
+
+`limits` declares `maxItems` and a typed environment reference. `supportPrompt` keeps its
+two text fragments in order. The explicit IDs remain stable if you move or rename the file.
+For environment parsing and defaults, read [Environment contracts](/docs/learn/concepts/environment).
+
+## Resolve the context
+
+The example also constructs `createApplicationContextResolver` for a caller that owns context
+resolution. Call its `resolve` method with a logger and cancellation signal. It returns
+`constants.maxItems` as `20`, `constants.region` as `"eu-west-1"`, and
+`prompts.support` as the two text fragments.
+
+Static values are prepared when the resolver is created. Function-valued constants run on
+each resolution and receive the environment, logger, and cancellation signal. Duplicate
+constant names across registered descriptors are rejected. These are context-resolution APIs;
+`defineApp` does not accept `constants` or `prompts` configuration properties.
+
+See [`defineConstants`](/docs/api/app#defineconstants), [`definePrompt`](/docs/api/app#defineprompt),
+and [`createApplicationContextResolver`](/docs/api/app#createapplicationcontextresolver) for
+their exact contracts. Continue with [Invocation context](/docs/learn/concepts/context) or
+[Build an offline agent](/guides/ai/build-an-offline-agent).
+
+<include>/_snippets/generated/related/docs-modules-service-context-values.mdx</include>

@@ -1,5 +1,0 @@
-{
-  "title": "Integrations",
-  "icon": "Plug",
-  "pages": ["index", "local-docker"]
-}

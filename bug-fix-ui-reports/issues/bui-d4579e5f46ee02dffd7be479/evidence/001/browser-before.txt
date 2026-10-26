@@ -1,0 +1,47 @@
+$ playwright test --config=playwright.config.ts browser/navigation.spec.ts --grep "common links"
+[WebServer] (node:85636) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:85817) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 browser/navigation.spec.ts:4:1 › common links and section sublinks remain available without duplicate destinations (15.0s)
+
+
+  1) browser/navigation.spec.ts:4:1 › common links and section sublinks remain available without duplicate destinations 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('complementary', { name: 'Primary', exact: true }).getByRole('link', { name: 'Home', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('complementary', { name: 'Primary', exact: true }).getByRole('link', { name: 'Home', exact: true }) with timeout 5000ms
+      - waiting for getByRole('complementary', { name: 'Primary', exact: true }).getByRole('link', { name: 'Home', exact: true })
+
+
+      23 |       "Reference",
+      24 |     ]) {
+    > 25 |       await expect(sidebar.getByRole("link", { name, exact: true })).toBeVisible();
+         |                                                                      ^
+      26 |     }
+      27 |     await expect(
+      28 |       sidebar.getByRole("link", { name: "Create and run an API", exact: true }),
+        at /Users/mustafaelsayed/Workspace/relkit/apps/docs/browser/navigation.spec.ts:25:70
+
+    Error Context: test-results/navigation-common-links-an-c7f9d-hout-duplicate-destinations/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/navigation-common-links-an-c7f9d-hout-duplicate-destinations/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/navigation-common-links-an-c7f9d-hout-duplicate-destinations/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    browser/navigation.spec.ts:4:1 › common links and section sublinks remain available without duplicate destinations 
+error: script "test:browser" exited with code 1

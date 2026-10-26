@@ -1,4 +1,5 @@
-import { defineAgent } from "@relkit/app";
+/** Declares the full compiler fixture support agent using the explicit native integration owner. */
+import { defineAgent } from "@relkit/langchain";
 import lookupOrder from "../tools/lookup-order.tool.js";
 import { agentInput, agentOutput } from "../../platform/schemas.js";
 

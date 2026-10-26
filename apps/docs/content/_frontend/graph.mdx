@@ -1,0 +1,18 @@
+After [frontend setup and pulling the commerce contract](/guides/frontend/connect-react), render
+this component under the provider with your application's stable business `threadId`:
+
+<include
+  source="apps/docs/examples/frontend/order-review.tsx"
+  lang="tsx"
+  meta='title="src/OrderReview.tsx"'
+>
+  /_snippets/source/apps/docs/examples/frontend/order-review.tsx
+</include>
+
+`defineGraph` generates an agent client too. The initial `run` receives `{ orderId }`; the review
+node's `resume: z.boolean()` makes the continuation accept a boolean. Resume the same thread with
+`{ resume: true }`, and show the final `output.result`. Do not send a replacement initial run to
+answer an interrupt or replay an uncertain submission.
+
+Reference: [`useAgent`](/docs/api/client#useagent).
+Continue with [threads and recovery](/docs/modules/ai/threads-recovery).

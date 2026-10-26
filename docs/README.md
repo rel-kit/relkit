@@ -8,9 +8,9 @@ POC baseline and is retained as historical design evidence.
 
 1. Read `getting-started.md` for the current generated application layout and local workflow.
 2. Read `architecture.md`, `testing.md`, and `deployment.md` for current contributor guidance.
-3. Use `apps/docs/content/docs/service/organization.mdx` for source placement and repairing
+3. Use `apps/docs/content/docs/modules/service/organization.mdx` for source placement and repairing
    unsupported layer-first roots. Valid flat apps can optionally use
-   `apps/docs/content/docs/service/migration.mdx` for preview/write/guarded rollback.
+   `apps/docs/content/docs/modules/service/migration.mdx` for preview/write/guarded rollback.
 4. Consult `relkit-typescript-poc-technical-spec-v3.md` and its review gates only for the historical POC baseline.
 
 ## Final architecture at a glance

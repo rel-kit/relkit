@@ -1,5 +1,6 @@
+/** Exercises the complete auth tutorial application through its selected native test owner. */
 import { afterAll, expect, test } from "bun:test";
-import { createTestApplication } from "@relkit/testing";
+import { createTestApplication } from "@relkit/testing/better-auth";
 import config from "../../relkit.config.js";
 
 const testApp = await createTestApplication(config, {

@@ -1,4 +1,5 @@
-import { defineAgent } from "@relkit/app";
+/** Declares the native support agent whose stable identity is inferred from its fixture source. */
+import { defineAgent } from "@relkit/langchain";
 import lookupOrder from "../tools/lookup-order.tool.js";
 import { emptyInput, orderOutput } from "../../platform/schemas.js";
 

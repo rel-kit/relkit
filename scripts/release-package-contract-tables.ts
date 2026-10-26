@@ -38,19 +38,3 @@ export const integrationSubpaths: Readonly<Record<string, readonly string[]>> = 
   "@relkit/trigger": ["runtime", "local-recipe", "deployment"],
   "@relkit/effect-mq": ["runtime", "local-recipe", "deployment"],
 };
-
-/** Side-effect-free catalog entry points map directly to named dist files. */
-export const catalogSubpaths = [
-  "redis",
-  "s3",
-  "docker",
-  "local",
-  "cloudflare",
-  "sentry",
-  "otlp",
-  "aws",
-  "pulumi",
-  "inngest",
-  "trigger",
-  "effect-mq",
-] as const;

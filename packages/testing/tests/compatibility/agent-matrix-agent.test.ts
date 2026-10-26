@@ -1,8 +1,15 @@
+/** Covers agent identity privacy, output validity, and independent native execution limits. */
 import { describe, expect, test } from "bun:test";
-import { generatedAgentFunctionId } from "@relkit/agents";
+import { generatedAgentFunctionId } from "@relkit/langchain";
 import { harness, makeFixture, scriptedToolCall } from "./agent-matrix-helpers.ts";
 
 describe("agent limit and privacy matrix", () => {
+  privacyIdentity();
+  outputAndCallLimits();
+  contentTimeoutAndCancellation();
+});
+
+function privacyIdentity() {
   test("keeps generated identity and capture disabled by default", async () => {
     const fixture = makeFixture();
     const agent = harness(fixture, scriptedToolCall(fixture.tool.id));
@@ -18,7 +25,9 @@ describe("agent limit and privacy matrix", () => {
     expect(JSON.stringify(trace)).not.toContain("matrix-secret");
     expect(JSON.stringify(trace)).not.toContain("Answer order questions");
   });
+}
 
+function outputAndCallLimits() {
   test("validates final output and enforces step and tool-call limits", async () => {
     const invalid = makeFixture();
     const invalidAgent = harness(invalid, [{ type: "final", output: { wrong: true } }]);
@@ -45,7 +54,9 @@ describe("agent limit and privacy matrix", () => {
     expect(tools.invocations).toHaveLength(1);
     expect(toolAgent.model.calls).toHaveLength(2);
   });
+}
 
+function contentTimeoutAndCancellation() {
   test("enforces content-size, timeout, and cancellation limits", async () => {
     const size = makeFixture();
     const inputAgent = harness(size, [{ type: "final", output: { answer: "ok" } }], {
@@ -76,4 +87,4 @@ describe("agent limit and privacy matrix", () => {
     ).rejects.toMatchObject({ code: "RELKIT_AGENT_CANCELLED" });
     expect(cancelledAgent.model.calls).toHaveLength(0);
   });
-});
+}

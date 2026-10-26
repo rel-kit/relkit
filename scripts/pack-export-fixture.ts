@@ -1,14 +1,14 @@
-/** Materializes the outside-workspace public resolver fixture and invokes only its scoped native Node verifier. */
+/** Materializes the outside-workspace public resolver fixture and invokes its scoped native Node and Bun verifiers. */
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect } from "effect";
 import {
-  copyExternalDependencies,
   smokeMinimalIntegrationInstalls,
   unpackTarball,
 } from "./pack-and-smoke-integration-minimal.js";
 import { exportNative } from "./pack-export-native.js";
 import type { ExportCommand, ExportInventory } from "./pack-export.types.js";
+import { makeExportInstaller } from "./pack-export-install.js";
 
 /**
  * Validates isolated integration installs and then resolves all intentional public entrypoints.
@@ -26,6 +26,7 @@ export const verifyExportFixture = Effect.fn("ExportSmoke.verify")(function* (
   inventory: ExportInventory,
   tarballs: Map<string, string>,
 ) {
+  const install = yield* makeExportInstaller(run, temporary, repository, tarballs);
   const count = yield* exportNative("minimal.install", () =>
     smokeMinimalIntegrationInstalls(
       join(temporary, "minimal"),
@@ -34,10 +35,11 @@ export const verifyExportFixture = Effect.fn("ExportSmoke.verify")(function* (
       inventory.integrationNames,
       inventory.manifests,
       tarballs,
+      (root, names) => Effect.runPromise(install(root, names)),
     ),
   );
   console.log(
-    `Minimal integration installs passed: ${count} packages loaded without unrelated integrations or SDKs.`,
+    `Minimal integration installs passed: ${count - Number(inventory.integrationNames.has("@relkit/langchain"))} authoring entries loaded without selected SDKs; ${count} integrations' public entries loaded with declared peers and without unrelated integrations.`,
   );
   const fixture = join(temporary, "fixture");
   for (const [name, tarball] of tarballs)
@@ -52,13 +54,8 @@ export const verifyExportFixture = Effect.fn("ExportSmoke.verify")(function* (
   yield* exportNative("fixture.exports", () =>
     writeFile(join(fixture, "expected-exports.json"), JSON.stringify(exports)),
   );
-  const external = new Set<string>();
-  for (const name of inventory.requiredNames)
-    for (const dependency of Object.keys(inventory.manifests.get(name)?.dependencies ?? {}))
-      if (!inventory.manifests.has(dependency)) external.add(dependency);
-  yield* exportNative("fixture.dependencies", () =>
-    copyExternalDependencies(fixture, external, repository, [...inventory.directories]),
-  );
+  yield* install(fixture, [...inventory.requiredNames]);
   const output = yield* run({ executable: "node", args: ["resolve.mjs"], cwd: fixture });
   process.stdout.write(output);
+  process.stdout.write(yield* run({ args: ["resolve.mjs", "--bun-only"], cwd: fixture }));
 });

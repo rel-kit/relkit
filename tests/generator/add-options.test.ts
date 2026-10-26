@@ -1,104 +1,145 @@
+/** Checks normalized add requests, selected capability dependencies and invalid option diagnostics. */
 import { describe, expect, test } from "bun:test";
 import {
   ADD_FAILURE_CODES,
   normalizeAddRequest,
   normalizeArtifactName,
-} from "../../packages/create-relkit/src/index.ts";
+} from "../../packages/cli/src/scaffolding/index.ts";
 
 describe("add option resolution", () => {
-  test("normalizes friendly names and common defaults", () => {
-    expect(normalizeArtifactName(" Send Receipt ")).toEqual({
-      input: "Send Receipt",
-      fileStem: "send-receipt",
-      identifier: "sendReceipt",
-      idSegment: "send-receipt",
-    });
-    expect(
-      normalizeAddRequest(["function", "Send Receipt", "--service", "orders"], { cwd: "/tmp/app" }),
-    ).toMatchObject({
-      kind: "function",
-      name: "Send Receipt",
-      projectRoot: "/tmp/app",
-      service: "orders",
-      install: true,
-      internal: false,
-    });
-  });
+  test(
+    "normalizes friendly names and common defaults",
+    caseNormalizesFriendlyNamesAndCommonDefaults,
+  );
 
-  test("resolves command defaults and repeatable values", () => {
-    expect(normalizeAddRequest(["cache", "Sessions"], { cwd: "/tmp/app" })).toMatchObject({
-      kind: "cache",
-      name: "Sessions",
-    });
-    expect(
-      normalizeAddRequest(
-        ["service", "Billing", "--include", "function", "--include=event", "--no-install"],
-        { cwd: "/tmp/app" },
-      ),
-    ).toMatchObject({ include: ["function", "event"], full: false, install: false });
-    expect(
-      normalizeAddRequest(
-        ["route", "/users/:id", "--mode", "service-route", "--map", "GET=getUser"],
-        { cwd: "/tmp/app" },
-      ),
-    ).toMatchObject({ mode: "service-route", maps: { GET: "getUser" } });
-  });
+  test(
+    "resolves command defaults and repeatable values",
+    caseResolvesCommandDefaultsAndRepeatableValues,
+  );
 
-  test("requires unambiguous headless agent and route choices", () => {
-    for (const args of [
-      ["agent", "Support", "--model", "openai:gpt-5-mini"],
-      ["route", "/users"],
-      ["service", "Orders", "--full", "--include", "function"],
-      ["route", "/users", "--mode", "service-route", "--map", "ALL=list"],
-      ["cache", "Sessions", "--profile", "shared", "--provider", "redis"],
-    ]) {
-      expect(() => normalizeAddRequest(args, { cwd: "/tmp/app" })).toThrow();
-    }
-    try {
-      normalizeAddRequest(["job", "Send"], { cwd: "/tmp/app" });
-    } catch (error) {
-      expect(error).toMatchObject({ code: ADD_FAILURE_CODES.usage, exitCode: 2 });
-    }
-  });
+  test(
+    "requires unambiguous headless agent and route choices",
+    caseRequiresUnambiguousHeadlessAgentAndRouteChoices,
+  );
 
-  test("supports creating a tool function and rejects conflicting targets", () => {
-    expect(
-      normalizeAddRequest(["tool", "Lookup", "--create-function", "Find Order"]),
-    ).toMatchObject({
-      kind: "tool",
-      target: "Find Order",
-      createFunction: true,
-    });
-    for (const args of [
-      ["tool", "Lookup"],
-      ["tool", "Lookup", "--create-function", " "],
-      ["tool", "Lookup", "--target", "findOrder", "--create-function", "Find Order"],
-    ])
-      expect(() => normalizeAddRequest(args)).toThrow();
-  });
+  test(
+    "supports creating a tool function and rejects conflicting targets",
+    caseSupportsCreatingAToolFunctionAndRejects,
+  );
 
-  test("accepts an existing model selector or the offline default", () => {
-    expect(
-      normalizeAddRequest(
-        [
-          "agent",
-          "Support",
-          "--model",
-          "anthropic:claude-sonnet-4-5",
-          "--instructions",
-          "Be concise",
-          "--tool",
-          "lookup",
-        ],
-        { cwd: "/tmp/app" },
-      ),
-    ).toMatchObject({
-      model: "anthropic:claude-sonnet-4-5",
-      tools: ["lookup"],
-      instructions: "Be concise",
-    });
-    expect(
-      normalizeAddRequest(["agent", "Offline", "--instructions", "Be concise"]),
-    ).not.toHaveProperty("model");
-  });
+  test(
+    "accepts an existing model selector or the offline default",
+    caseAcceptsAnExistingModelSelectorOrThe,
+  );
 });
+
+/** Verifies that normalizes friendly names and common defaults.
+ * @returns Completion after fixture assertions and owned cleanup settle.
+ */
+function caseNormalizesFriendlyNamesAndCommonDefaults() {
+  expect(normalizeArtifactName(" Send Receipt ")).toEqual({
+    input: "Send Receipt",
+    fileStem: "send-receipt",
+    identifier: "sendReceipt",
+    idSegment: "send-receipt",
+  });
+  expect(
+    normalizeAddRequest(["function", "Send Receipt", "--service", "orders"], {
+      cwd: "/tmp/app",
+    }),
+  ).toMatchObject({
+    kind: "function",
+    name: "Send Receipt",
+    projectRoot: "/tmp/app",
+    service: "orders",
+    install: true,
+    internal: false,
+  });
+}
+
+/** Verifies that resolves command defaults and repeatable values.
+ * @returns Completion after fixture assertions and owned cleanup settle.
+ */
+function caseResolvesCommandDefaultsAndRepeatableValues() {
+  expect(normalizeAddRequest(["cache", "Sessions"], { cwd: "/tmp/app" })).toMatchObject({
+    kind: "cache",
+    name: "Sessions",
+  });
+  expect(
+    normalizeAddRequest(
+      ["service", "Billing", "--include", "function", "--include=event", "--no-install"],
+      { cwd: "/tmp/app" },
+    ),
+  ).toMatchObject({ include: ["function", "event"], full: false, install: false });
+  expect(
+    normalizeAddRequest(
+      ["route", "/users/:id", "--mode", "service-route", "--map", "GET=getUser"],
+      { cwd: "/tmp/app" },
+    ),
+  ).toMatchObject({ mode: "service-route", maps: { GET: "getUser" } });
+}
+
+/** Verifies that requires unambiguous headless agent and route choices.
+ * @returns Completion after fixture assertions and owned cleanup settle.
+ */
+function caseRequiresUnambiguousHeadlessAgentAndRouteChoices() {
+  for (const args of [
+    ["agent", "Support", "--model", "openai:gpt-5-mini"],
+    ["route", "/users"],
+    ["service", "Orders", "--full", "--include", "function"],
+    ["route", "/users", "--mode", "service-route", "--map", "ALL=list"],
+    ["cache", "Sessions", "--profile", "shared", "--provider", "redis"],
+  ]) {
+    expect(() => normalizeAddRequest(args, { cwd: "/tmp/app" })).toThrow();
+  }
+  try {
+    normalizeAddRequest(["job", "Send"], { cwd: "/tmp/app" });
+  } catch (error) {
+    expect(error).toMatchObject({ code: ADD_FAILURE_CODES.usage, exitCode: 2 });
+  }
+}
+
+/** Verifies that supports creating a tool function and rejects conflicting targets.
+ * @returns Completion after fixture assertions and owned cleanup settle.
+ */
+function caseSupportsCreatingAToolFunctionAndRejects() {
+  expect(normalizeAddRequest(["tool", "Lookup", "--create-function", "Find Order"])).toMatchObject({
+    kind: "tool",
+    target: "Find Order",
+    createFunction: true,
+  });
+  for (const args of [
+    ["tool", "Lookup"],
+    ["tool", "Lookup", "--create-function", " "],
+    ["tool", "Lookup", "--target", "findOrder", "--create-function", "Find Order"],
+  ])
+    expect(() => normalizeAddRequest(args)).toThrow();
+}
+
+/** Verifies that accepts an existing model selector or the offline default.
+ * @returns Completion after fixture assertions and owned cleanup settle.
+ */
+function caseAcceptsAnExistingModelSelectorOrThe() {
+  expect(
+    normalizeAddRequest(
+      [
+        "agent",
+        "Support",
+        "--model",
+        "anthropic:claude-sonnet-4-5",
+        "--instructions",
+        "Be concise",
+        "--tool",
+        "lookup",
+      ],
+      { cwd: "/tmp/app" },
+    ),
+  ).toMatchObject({
+    model: "anthropic:claude-sonnet-4-5",
+    tools: ["lookup"],
+    instructions: "Be concise",
+  });
+  expect(
+    normalizeAddRequest(["agent", "Offline", "--instructions", "Be concise"]),
+  ).not.toHaveProperty("model");
+}

@@ -1,7 +1,7 @@
 /** Authored native SDK acceptance callback; resource ownership is explicit and native lease context is retained. */
 export const probeNestedAuthSource = `/** Native nested auth callback preserves the current database admission lease without starting a second Effect runtime. */
 import { activateDrizzleService } from "@relkit/drizzle";
-import { activateBetterAuthService, defineBetterAuthService } from "@relkit/better-auth";
+import { activateBetterAuthService, defineBetterAuthService } from "@relkit/better-auth/drizzle";
 import database from "./service.js";
 /**
  * Acquires nested auth inside native admitted work while borrowing the host's owner.

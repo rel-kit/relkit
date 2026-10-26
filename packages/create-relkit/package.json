@@ -28,24 +28,126 @@
     "create-relkit": "./dist/bin.js"
   },
   "exports": {
-    "./catalog-resolution": {
-      "types": "./src/catalog-resolution.ts",
-      "default": "./src/catalog-resolution.ts"
-    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.js"
+    },
+    "./launcher": {
+      "types": "./dist/launcher.d.ts",
+      "import": "./dist/launcher.js"
+    },
+    "./internal/add-transaction-files": {
+      "types": "./dist/add-transaction-files.d.ts",
+      "import": "./dist/add-transaction-files.js"
+    },
+    "./internal/add-types": {
+      "types": "./dist/add-types.d.ts",
+      "import": "./dist/add-types.js"
+    },
+    "./internal/build-catalog": {
+      "types": "./dist/build-catalog.d.ts",
+      "import": "./dist/build-catalog.js"
+    },
+    "./internal/catalog-resolution": {
+      "types": "./dist/catalog-resolution.d.ts",
+      "import": "./dist/catalog-resolution.js"
+    },
+    "./internal/dependency-patch-installation": {
+      "types": "./dist/dependency-patch-installation.d.ts",
+      "import": "./dist/dependency-patch-installation.js"
+    },
+    "./internal/dependency-patches": {
+      "types": "./dist/dependency-patches.d.ts",
+      "import": "./dist/dependency-patches.js"
+    },
+    "./internal/generate": {
+      "types": "./dist/generate.d.ts",
+      "import": "./dist/generate.js"
+    },
+    "./internal/generate-process": {
+      "types": "./dist/generate-process.d.ts",
+      "import": "./dist/generate-process.js"
+    },
+    "./internal/generator-cleanup": {
+      "types": "./dist/generator-cleanup.d.ts",
+      "import": "./dist/generator-cleanup.js"
+    },
+    "./internal/generator-errors": {
+      "types": "./dist/generator-errors.d.ts",
+      "import": "./dist/generator-errors.js"
+    },
+    "./internal/generator-filesystem": {
+      "types": "./dist/generator-filesystem.d.ts",
+      "import": "./dist/generator-filesystem.js"
+    },
+    "./internal/generator-filesystem.types": {
+      "types": "./dist/generator-filesystem.types.d.ts",
+      "import": "./dist/generator-filesystem.types.js"
+    },
+    "./internal/generator-paths": {
+      "types": "./dist/generator-paths.d.ts",
+      "import": "./dist/generator-paths.js"
+    },
+    "./internal/generator-process": {
+      "types": "./dist/generator-process.d.ts",
+      "import": "./dist/generator-process.js"
+    },
+    "./internal/generator-process.types": {
+      "types": "./dist/generator-process.types.d.ts",
+      "import": "./dist/generator-process.types.js"
+    },
+    "./internal/generator-prompt": {
+      "types": "./dist/generator-prompt.d.ts",
+      "import": "./dist/generator-prompt.js"
+    },
+    "./internal/generator-runtime": {
+      "types": "./dist/generator-runtime.d.ts",
+      "import": "./dist/generator-runtime.js"
+    },
+    "./internal/options": {
+      "types": "./dist/options.d.ts",
+      "import": "./dist/options.js"
+    },
+    "./internal/project-manifest.schemas": {
+      "types": "./dist/project-manifest.schemas.d.ts",
+      "import": "./dist/project-manifest.schemas.js"
+    },
+    "./internal/prompt-driver": {
+      "types": "./dist/prompt-driver.d.ts",
+      "import": "./dist/prompt-driver.js"
+    },
+    "./internal/prompt-driver.types": {
+      "types": "./dist/prompt-driver.types.d.ts",
+      "import": "./dist/prompt-driver.types.js"
+    },
+    "./internal/scaffold-catalog": {
+      "types": "./dist/scaffold-catalog.d.ts",
+      "import": "./dist/scaffold-catalog.js"
+    },
+    "./internal/scaffold-catalog.types": {
+      "types": "./dist/scaffold-catalog.types.d.ts",
+      "import": "./dist/scaffold-catalog.types.js"
+    },
+    "./internal/validate-paths": {
+      "types": "./dist/validate-paths.d.ts",
+      "import": "./dist/validate-paths.js"
+    },
+    "./catalog-resolution": {
+      "types": "./src/catalog-resolution.ts",
+      "default": "./src/catalog-resolution.ts"
     }
   },
   "scripts": {
-    "build": "tsc -b && bun ../../scripts/package-create-relkit-templates.ts",
+    "build": "tsc -b && bun run ../../scripts/prune-moved-authoring-artifacts.ts creator && bun ../../scripts/package-create-relkit-templates.ts",
     "check": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false && bun ../../scripts/package-create-relkit-templates.ts"
   },
   "dependencies": {
     "@clack/prompts": "catalog:",
-    "@relkit/compiler": "workspace:*",
-    "typescript": "catalog:",
     "effect": "catalog:",
     "@relkit/contracts": "workspace:*"
   },
@@ -56,7 +158,9 @@
   "relkit": {
     "buildCatalog": {
       "dependencies": {
+        "@better-fetch/fetch": "1.3.2",
         "@clack/prompts": "1.7.0",
+        "@cloudflare/workers-types": "4.20250121.0",
         "@effect/docgen": "4.0.1",
         "@effect/platform-bun": "4.0.1",
         "@effect/platform-node-shared": "4.0.1",
@@ -83,6 +187,7 @@
         "hono": "4.13.7",
         "inngest": "4.20.0",
         "langchain": "1.5.10",
+        "langsmith": "0.10.8",
         "lucide-react": "1.34.0",
         "next": "16.3.8",
         "prettier": "3.9.6",
@@ -107,6 +212,7 @@
       "@relkit/pulumi": "0.7.10",
       "@relkit/docker": "0.7.10",
       "@relkit/local": "0.7.10",
+      "@relkit/langchain": "0.7.10",
       "@relkit/inngest": "0.7.10",
       "@relkit/trigger": "0.7.10",
       "@relkit/effect-mq": "0.7.10",

@@ -1,9 +1,18 @@
+/** Verifies emitted native-agent execution, live redaction, and correlated observability history. */
 import { afterEach, expect, test } from "bun:test";
 import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { Schema } from "effect";
 import { buildProject } from "./src/commands/build.js";
-import { startProject } from "./src/commands/start.js";
+import { openProductInspection } from "../../tests/fixtures/cli/product-inspection.js";
 import { linkWorkspacePackages } from "./test-workspace.js";
+import {
+  eventually,
+  invoke,
+  page,
+  readChunk,
+  requestDetailSchema,
+} from "./product-runtime.fixture.js";
 
 const roots: string[] = [];
 
@@ -12,136 +21,141 @@ test("the emitted full-graph server runs agents and correlated observability", a
   await configureProductFixture(root);
   const built = await buildProject({ projectRoot: root });
   expect(built).toMatchObject({ ok: true });
-  const started = await startProject({
-    projectRoot: root,
-    port: 0,
-    healthTimeoutMs: 3_000,
-    spawn: (command, options) => Bun.spawn(command, { ...options, stderr: "inherit" }),
-  });
-  const base = `http://${started.hostname}:${started.port}`;
+  if (built.graphHash === undefined) throw new Error("Built graph hash is unavailable.");
+  const started = await openProductInspection(root);
+  const base = started.inspection;
   const streamController = new AbortController();
   const streamResponse = fetch(`${base}/_relkit/v1/stream`, { signal: streamController.signal });
+  void streamResponse.catch(() => undefined);
   try {
-    const route = await fetch(`${base}/orders/order-1`, {
-      headers: { authorization: "allowed" },
-    });
-    expect(route.status).toBe(200);
-    const requestId = route.headers.get("x-request-id");
-    expect(requestId).toBeTruthy();
-
-    const created = await invoke(base, built.graphHash, "orders.create", {
-      orderId: "order-1",
-      sku: "pre-sink-secret",
-    });
-    expect(created.status).toBe(200);
-    expect(await created.json()).toMatchObject({ output: { orderId: "order-1" } });
-
-    const live = await streamResponse;
-    expect(live.headers.get("content-type")).toContain("text/event-stream");
-    const chunk = await readChunk(live);
-    expect(chunk).toContain("event:");
-    expect(chunk).not.toContain("pre-sink-secret");
-    streamController.abort();
-
-    const agent = await invoke(base, built.graphHash, "relkit.agent.orders.support-agent.invoke", {
-      question: "Where is order-1?",
-    });
-    const agentBody = await agent.json();
-    if (agent.status !== 200) throw new Error(JSON.stringify(agentBody));
-    expect(agentBody).toMatchObject({ output: { answer: "local answer" } });
-
-    const detail = await fetch(`${base}/_relkit/v1/requests/${requestId}`);
-    expect(detail.status).toBe(200);
-    expect(await detail.json()).toMatchObject({
-      request: {
-        requestId,
-        functionId: "orders.get",
-      },
-      spans: expect.arrayContaining([
-        expect.objectContaining({ functionId: "orders.get", status: "completed" }),
-      ]),
-    });
-
-    await invoke(base, built.graphHash, "orders.create", {
-      orderId: "order-2",
-      sku: "second-secret",
-    });
-    const logs = await page(base, "/logs?functionId=orders.create&limit=1");
-    expect(logs.items[0]).toMatchObject({ fields: {} });
-    expect(JSON.stringify(logs)).not.toContain("pre-sink-secret");
-    expect(logs.nextCursor).toBeDefined();
-    const continued = await page(
-      base,
-      `/logs?functionId=orders.create&limit=1&cursor=${logs.nextCursor}`,
+    expect((await page(base, "/routes")).items).toContainEqual(
+      expect.objectContaining({ id: "orders.get-route" }),
     );
-    expect(continued.items).toHaveLength(1);
-
-    await expect(
-      eventually(async () => {
-        const traces = await page(
-          base,
-          "/traces?functionId=relkit.agent.orders.support-agent.invoke&limit=20",
-        );
-        return traces.items.length > 0;
-      }),
-    ).resolves.toBe(true);
-    const requests = await page(base, "/requests?limit=100");
-    expect(requests.items).toHaveLength(1);
-    expect(requests.items[0]).toMatchObject({ requestId });
+    expect((await page(base, "/functions")).items).toContainEqual(
+      expect.objectContaining({ id: "orders.create" }),
+    );
+    const requestId = await verifyRouteStream(base, built.graphHash, streamResponse);
+    streamController.abort();
+    await verifyAgentDetail(base, built.graphHash, requestId);
+    await verifyHistory(base, built.graphHash, requestId);
   } finally {
     streamController.abort();
-    await started.stop();
-    await started.exited;
+    await started.close();
   }
-});
+}, 60_000);
 
-async function invoke(base: string, graphHash: string, functionId: string, input: unknown) {
-  return fetch(`${base}/_relkit/v1/actions/functions/${functionId}/invoke`, {
-    method: "POST",
-    headers: { "content-type": "application/json", "idempotency-key": crypto.randomUUID() },
-    body: JSON.stringify({ generationId: "generation.runtime", graphHash, input }),
+async function verifyRouteStream(
+  base: string,
+  graphHash: string,
+  streamResponse: Promise<Response>,
+) {
+  const route = await fetch(`${base}/orders/order-1`, {
+    headers: { authorization: "allowed" },
   });
+  expect(route.status).toBe(200);
+  const requestId = route.headers.get("x-request-id");
+  expect(requestId).toBeTruthy();
+
+  const created = await invoke(base, graphHash, "orders.create", {
+    orderId: "order-1",
+    sku: "pre-sink-secret",
+  });
+  expect(created.status).toBe(200);
+  expect(await created.json()).toMatchObject({ output: { orderId: "order-1" } });
+
+  const live = await streamResponse;
+  expect(live.headers.get("content-type")).toContain("text/event-stream");
+  const chunk = await readChunk(live);
+  expect(chunk).toContain("event:");
+  expect(chunk).not.toContain("pre-sink-secret");
+  return requestId;
 }
 
-async function page(base: string, path: string) {
-  return (await (await fetch(`${base}/_relkit/v1${path}`)).json()) as {
-    items: unknown[];
-    nextCursor?: string;
+async function verifyAgentDetail(base: string, graphHash: string, requestId: string | null) {
+  const agent = await invoke(base, graphHash, "relkit.agent.orders.support-agent.invoke", {
+    question: "Where is order-1?",
+  });
+  const agentBody = await agent.json();
+  if (agent.status !== 200) throw new Error(JSON.stringify(agentBody));
+  expect(agentBody).toMatchObject({ output: { answer: "local answer" } });
+
+  const expected = {
+    request: {
+      requestId,
+      functionId: "orders.get",
+    },
+    spans: expect.arrayContaining([
+      expect.objectContaining({ functionId: "orders.get", status: "completed" }),
+    ]),
   };
-}
-
-async function readChunk(response: Response): Promise<string> {
-  const reader = response.body!.getReader();
-  const timeout = Bun.sleep(2_000).then<never>(() => {
-    throw new Error("SSE timeout");
+  let detail: typeof requestDetailSchema.Type | undefined;
+  await eventually(async () => {
+    const response = await fetch(`${base}/_relkit/v1/requests/${requestId}`);
+    if (response.status !== 200) return false;
+    detail = Schema.decodeUnknownSync(requestDetailSchema)(await response.json());
+    return (
+      detail.request.requestId === requestId &&
+      detail.request.functionId === "orders.get" &&
+      detail.spans.some((span) => span.functionId === "orders.get" && span.status === "completed")
+    );
   });
-  const decoder = new TextDecoder();
-  let text = "";
-  while (!text.includes("event:")) {
-    const result = await Promise.race([reader.read(), timeout]);
-    if (result.done) break;
-    text += decoder.decode(result.value, { stream: true });
-  }
-  return text;
+  expect(detail).toMatchObject(expected);
 }
 
-async function eventually(check: () => Promise<boolean>): Promise<boolean> {
-  for (let attempt = 0; attempt < 30; attempt += 1) {
-    if (await check()) return true;
-    await Bun.sleep(50);
-  }
-  return false;
+async function verifyHistory(base: string, graphHash: string, requestId: string | null) {
+  await invoke(base, graphHash, "orders.create", {
+    orderId: "order-2",
+    sku: "second-secret",
+  });
+  expect(
+    await eventually(
+      async () => (await page(base, "/logs?functionId=orders.create&limit=2")).items.length === 2,
+    ),
+  ).toBe(true);
+  const logs = await page(base, "/logs?functionId=orders.create&limit=1");
+  expect(logs.items[0]).toMatchObject({ fields: {} });
+  expect(JSON.stringify(logs)).not.toContain("pre-sink-secret");
+  expect(logs.nextCursor).toBeDefined();
+  const continued = await page(
+    base,
+    `/logs?functionId=orders.create&limit=1&cursor=${logs.nextCursor}`,
+  );
+  expect(continued.items).toHaveLength(1);
+  expect(logs.items[0]?.invocationId).toBeString();
+  expect(continued.items[0]?.invocationId).toBeString();
+  expect(continued.items[0]?.invocationId).not.toBe(logs.items[0]?.invocationId);
+
+  await expect(
+    eventually(async () => {
+      const traces = await page(
+        base,
+        "/traces?functionId=relkit.agent.orders.support-agent.invoke&limit=20",
+      );
+      return traces.items.length > 0;
+    }),
+  ).resolves.toBe(true);
+  const requests = await page(base, "/requests?limit=100");
+  expect(requests.items).toHaveLength(1);
+  expect(requests.items[0]).toMatchObject({ requestId });
 }
 
 async function configureProductFixture(root: string): Promise<void> {
+  const configPath = join(root, "relkit.config.ts");
+  await writeFile(
+    configPath,
+    (await readFile(configPath, "utf8")).replace(
+      "defineApp({",
+      "defineApp({ inspector: { enabled: true },",
+    ),
+  );
   const agentPath = join(root, "src/orders/agents/order-support.agent.ts");
   const agent = await readFile(agentPath, "utf8");
   await writeFile(
     agentPath,
     agent
       .replace(
-        'import { defineAgent } from "@relkit/app";',
-        'import { defineAgent } from "@relkit/app";\nimport { createTestModel } from "@relkit/testing";',
+        'import { defineAgent } from "@relkit/langchain";',
+        'import { defineAgent } from "@relkit/langchain";\nimport { createTestModel } from "@relkit/langchain/testing";',
       )
       .replace(
         /const fixtureModel = \{[\s\S]*?\} as never;/,

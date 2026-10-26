@@ -10,7 +10,7 @@ import {
   generateProject,
   isValidPackageName,
   type GenerateFailurePoint,
-} from "../../packages/create-relkit/src/index.ts";
+} from "../../packages/cli/src/scaffolding/index.ts";
 import { makeRoot, contextFor, createOptions } from "./option-matrix-fixture.js";
 
 test("accepts valid names and rejects invalid names without mutation", async () => {

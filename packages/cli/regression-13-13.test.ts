@@ -133,14 +133,14 @@ test("atomically switches traffic and drains the old request before cleanup", as
   }
 });
 
-test("shutdown cleans the active backend, inspector child, and generation directory", async () => {
+test("shutdown cleans the active backend, session bridge, and generation directory", async () => {
   const root = await makeRoot();
   let session: DevSession | undefined;
   try {
     session = await startDev({
       ...baseOptions(root),
       activationFingerprint: fingerprint("sha256:shutdown"),
-      inspector: { command: [process.execPath, "-e", "setTimeout(() => {}, 10000)"], port: 0 },
+      inspector: { host: "127.0.0.1", port: 0 },
       compile: async ({ outputDirectory, token }) => {
         const entrypoint = join(outputDirectory, "server.ts");
         await writeFile(
@@ -151,12 +151,17 @@ test("shutdown cleans the active backend, inspector child, and generation direct
       },
     });
     const backend = session.active;
-    await waitFor(() => session?.inspectorChild !== undefined, "owned Inspector child");
-    const inspector = session.inspectorChild;
+    await waitFor(() => session?.inspectionConnection !== undefined, "owned inspection bridge");
+    const endpoint = session.inspectionConnection!.descriptor.endpoint;
     await session.stop(new Error("test shutdown"));
     await session.waitForShutdown();
     expect(typeof (await backend?.process.exited)).toBe("number");
-    expect(typeof (await inspector?.process.exited)).toBe("number");
+    expect(
+      await fetch(endpoint).then(
+        () => true,
+        () => false,
+      ),
+    ).toBe(false);
     expect(session.activeTarget).toBeUndefined();
     expect(await readdir(join(root, ".relkit", "generated"))).toEqual([]);
   } finally {

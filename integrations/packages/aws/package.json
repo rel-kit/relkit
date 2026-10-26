@@ -48,7 +48,22 @@
         "host": "./host",
         "infrastructure": "./infrastructure",
         "access": "./access"
-      }
+      },
+      "dependencies": [
+        {
+          "package": "@pulumi/aws",
+          "supportedRange": "7.43.0",
+          "installSection": "devDependencies",
+          "capabilities": [
+            "host",
+            "infrastructure",
+            "access"
+          ],
+          "phases": [
+            "deploy"
+          ]
+        }
+      ]
     }
   },
   "scripts": {
@@ -57,8 +72,18 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@pulumi/aws": "catalog:",
     "@relkit/deploy": "workspace:*",
     "@relkit/provider": "workspace:*"
+  },
+  "peerDependencies": {
+    "@pulumi/aws": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "@pulumi/aws": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@pulumi/aws": "catalog:"
   }
 }

@@ -11,7 +11,7 @@ import { runCliEffect } from "../cli-runtime.js";
 import { parseProjectArgs } from "../commands/project-args.js";
 import { resolveApplicationPort } from "../commands/ports.js";
 import { telemetryConfigurationSchema } from "../commands/dev-telemetry-config.schemas.js";
-import { CliTelemetryRelays } from "../commands/dev-telemetry-relay.service.js";
+import { CliDevCapture } from "../commands/dev-capture.service.js";
 import { preparedSessionOptions } from "./snapshot-session-options.js";
 import { activatePreparedSession } from "./snapshot-command-activation.js";
 import { acquireSnapshotSessionDirectory } from "./snapshot-session-directory.js";
@@ -25,6 +25,7 @@ import { readSnapshotTools } from "./snapshot-tools.js";
 import { preparedDevRuntime } from "./snapshot-command-runtime.js";
 import type { PreparedDevSelection } from "./snapshot-command.types.js";
 import type { SnapshotCommandPreflight } from "./snapshot-preflight.types.js";
+import { snapshotCurrentMemberProof } from "./snapshot-current-proof.js";
 
 /**
  * Runs a prepared dev command at the native Promise edge, or reports a safe-path miss.
@@ -70,32 +71,7 @@ const selectPreparedDev = Effect.fn("DevSnapshot.select")(function* (
   const epoch = yield* epochs.begin(projectRoot, matching?.epoch);
   const token = yield* epoch.current;
   const tools = yield* readSnapshotTools(projectRoot);
-  const currentMembers =
-    matching !== undefined && matching.startRevision === token.revision
-      ? {
-          generation: matching.generation,
-          verification: Effect.tryPromise({
-            try: () => matching.mismatch,
-            catch: (cause) =>
-              new DevSnapshotIoError({
-                operation: "members.preflight",
-                cause: new Error("Snapshot integrity preflight failed", { cause }),
-              }),
-          }).pipe(
-            Effect.flatMap((mismatch) =>
-              mismatch === undefined
-                ? Effect.void
-                : Effect.fail(
-                    new DevSnapshotRejected({
-                      reason: "stale",
-                      operation: "members.preflight",
-                    }),
-                  ),
-            ),
-            Effect.andThen(epoch.verify(token)),
-          ),
-        }
-      : undefined;
+  const currentMembers = snapshotCurrentMemberProof(matching, token, epoch);
   const staged = yield* snapshots.stage(projectRoot, tools, currentMembers);
   if (matching !== undefined && staged.snapshot.generation !== matching.generation)
     return yield* new DevSnapshotRejected({ reason: "stale", operation: "epoch.generation" });
@@ -113,7 +89,7 @@ const selectPreparedDev = Effect.fn("DevSnapshot.select")(function* (
 });
 
 /** Recognizes only one expected snapshot failure after restoring adapter causes. */
-function isSnapshotMiss(cause: Cause.Cause<unknown>): boolean {
+function isSnapshotMiss<Failure>(cause: Cause.Cause<Failure>): boolean {
   const reason = cause.reasons[0];
   const error = reason?._tag === "Fail" ? cliOriginalError(reason.error) : undefined;
   return (
@@ -147,8 +123,8 @@ const runPreparedSession = Effect.fn("DevSnapshot.runSession")(function* (
     snapshot.graph.nodes.find((node) => node.kind === "app")?.telemetry ?? {},
     { onExcessProperty: "error" },
   ).pipe(mapErrorCause((error) => cliAdapterError("dev.snapshot.telemetry", error)));
-  const telemetry = yield* CliTelemetryRelays.use((service) =>
-    service.acquire(projectRoot, configuration),
+  const telemetry = yield* CliDevCapture.use((service) =>
+    service.acquire(snapshot.receipt.inspector?.enabled === true, configuration),
   );
   const compilers = yield* SnapshotSessionCompilers;
   const compiler = yield* compilers.acquire({
@@ -170,7 +146,7 @@ const runPreparedSession = Effect.fn("DevSnapshot.runSession")(function* (
     generatedDirectory,
   );
   const session = yield* cliTry("dev.snapshot.session", () => new DevSession(sessionOptions));
-  const engine = yield* activatePreparedSession(session, telemetry);
+  const engine = yield* activatePreparedSession(session);
   yield* watchPreparedSession(selected, session);
   yield* engine.wait;
 });

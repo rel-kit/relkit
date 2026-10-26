@@ -1,0 +1,51 @@
+diff --git a/node_modules/@effect/docgen/.bun-tag-fa187c8de2f0e86 b/.bun-tag-fa187c8de2f0e86
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/dist/Core.js b/dist/Core.js
+index 1799bd2987f68de790128c30e36a2a85261c9779..78304176b0af969f3ade7baddb3cbde668afd3a4 100644
+--- a/dist/Core.js
++++ b/dist/Core.js
+@@ -52,8 +52,8 @@ const readSourceFiles = /*#__PURE__*/Effect.gen(function* () {
+   const config = yield* Configuration.Configuration;
+   const fs = yield* FileSystem.FileSystem;
+   const path = yield* Path.Path.pipe(Effect.provide(NodePath.layerPosix));
+-  const pattern = path.normalize(path.join(config.srcDir, "**", "*.ts"));
+-  const paths = yield* glob(pattern, config.exclude);
++  const pattern = path.normalize(path.join(config.srcDir, "**", "*.{ts,tsx,mts,cts}"));
++  const paths = (yield* glob(pattern, config.exclude)).sort();
+   yield* Effect.logInfo(chalk.bold(`${paths.length} module(s) found`));
+   return yield* Effect.forEach(paths, path => Effect.map(fs.readFileString(path), content => new Domain.File(path, content, false)), {
+     concurrency: "unbounded"
+@@ -387,7 +387,7 @@ const writeMarkdown = files => Effect.gen(function* () {
+   const config = yield* Configuration.Configuration;
+   const fileSystem = yield* FileSystem.FileSystem;
+   const path = yield* Path.Path.pipe(Effect.provide(NodePath.layerPosix));
+-  const pattern = path.normalize(path.join(config.outDir, "**/*.ts.md"));
++  const pattern = path.normalize(path.join(config.outDir, "**/*.{ts,tsx,mts,cts}.md"));
+   yield* Effect.logDebug(`Deleting ${chalk.black(pattern)}...`);
+   const paths = yield* glob(pattern);
+   yield* Effect.forEach(paths, path => fileSystem.remove(path, {
+diff --git a/src/Core.ts b/src/Core.ts
+index 89fd4e86af3ce2dd4c167f7a1ae52b376e22775c..0ac5fd2b0735f8f430f0f036bde45d00895b02af 100644
+--- a/src/Core.ts
++++ b/src/Core.ts
+@@ -64,8 +64,8 @@ const readSourceFiles = Effect.gen(function*() {
+   const config = yield* Configuration.Configuration
+   const fs = yield* FileSystem.FileSystem
+   const path = yield* Path.Path.pipe(Effect.provide(NodePath.layerPosix))
+-  const pattern = path.normalize(path.join(config.srcDir, "**", "*.ts"))
+-  const paths = yield* glob(pattern, config.exclude)
++  const pattern = path.normalize(path.join(config.srcDir, "**", "*.{ts,tsx,mts,cts}"))
++  const paths = (yield* glob(pattern, config.exclude)).sort()
+   yield* Effect.logInfo(chalk.bold(`${paths.length} module(s) found`))
+   return yield* Effect.forEach(paths, (path) =>
+     Effect.map(
+@@ -585,7 +585,7 @@ const writeMarkdown = (files: ReadonlyArray<Domain.File>) =>
+     const config = yield* Configuration.Configuration
+     const fileSystem = yield* FileSystem.FileSystem
+     const path = yield* Path.Path.pipe(Effect.provide(NodePath.layerPosix))
+-    const pattern = path.normalize(path.join(config.outDir, "**/*.ts.md"))
++    const pattern = path.normalize(path.join(config.outDir, "**/*.{ts,tsx,mts,cts}.md"))
+     yield* Effect.logDebug(`Deleting ${chalk.black(pattern)}...`)
+     const paths = yield* glob(pattern)
+     yield* Effect.forEach(paths, (path) => fileSystem.remove(path, { recursive: true }), {

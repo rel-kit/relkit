@@ -5,6 +5,7 @@
  */
 import { RUNTIME_INTEGRATION_PLAN_FILE } from "@relkit/contracts";
 import { SERVER_BOOTSTRAP_SOURCE } from "./build-server-bootstrap.js";
+import { serverEngineImports } from "./build-server-engine-imports.js";
 import type { ServerSourceEmission } from "./build-server.types.js";
 
 /**
@@ -16,50 +17,25 @@ export function serverImportsSource(input: ServerSourceEmission): string {
   const { agentSource, options } = input;
   const { providerOverridesImport, specializedImports, localServicesImport, jobsManifestImport } =
     options;
-  let httpImport = `import { createApp, createHttpAuthRuntime, createHttpSpanRuntime, instrumentHttpRequest } from "@relkit/runtime-hono";`;
+  const httpImport = `import { createPreparedApp, createHttpAuthRuntime, createHttpSpanRuntime, instrumentHttpRequest } from "@relkit/runtime-hono/internal/prepared";`;
   let planImport = `import { createRegistrationPlan } from "@relkit/graph";`;
-  let inspectorImport = `import { installInspectorEndpoints, InspectorQueryError } from "@relkit/inspector-api";`;
   if (input.configuration.httpApplication === "prepared") {
-    httpImport = `import { createPreparedApp, createHttpAuthRuntime, createHttpSpanRuntime, instrumentHttpRequest } from "@relkit/runtime-hono/internal/prepared";`;
     planImport = `import { deepFreeze } from "@relkit/contracts";`;
-    inspectorImport = "let InspectorQueryError;";
   }
-  const hasJobs = input.graph.nodes.some(
-    (node) =>
-      node.kind === "job" ||
-      node.kind === "task" ||
-      (node.kind === "trigger" &&
-        node.config !== null &&
-        typeof node.config === "object" &&
-        "kind" in node.config &&
-        node.config.kind === "queue"),
-  );
-  const hasEvents = input.graph.nodes.some((node) => node.kind === "event");
-  const engineImports = [
-    "assertRuntimeIntegrationModules",
-    "createFunctionRegistry",
-    "createProviderRegistry",
-    ...(hasJobs ? ["createTaskExecutor"] : []),
-    "invoke",
-    ...(hasEvents ? ["materializeEvents"] : []),
-    ...(hasJobs ? ["materializeJobs"] : []),
-    "parseInfrastructureBindingValues",
-  ].join(", ");
-  const optionalEngineStubs = `${hasJobs ? "" : "const createTaskExecutor = () => undefined;\nconst materializeJobs = async () => undefined;"}
-${hasEvents ? "" : "const materializeEvents = async () => undefined;"}`;
+  const engine = serverEngineImports(input.graph);
   return `import { AsyncLocalStorage } from "node:async_hooks";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { Effect } from "effect";
-import { createServerRuntimeHost } from "@relkit/cli/internal/server-runtime";
+import { createServerRuntimeHost } from "@relkit/engine/internal/server-runtime";
 ${providerOverridesImport}
 ${agentSource.imports}
 import { createApplicationContextResolver } from "@relkit/app/internal/runtime";
 import { resolveEnv } from "@relkit/config";
 ${specializedImports}
-import { ${engineImports} } from "@relkit/engine";
+import { ${engine.imports} } from "@relkit/engine";
 ${planImport}
-${inspectorImport}
+let InspectorQueryError;
 import { currentExecutionContext, publicTrace } from "@relkit/invocation";
 import { createObservabilityRuntime, createTelemetryExporterFanout } from "@relkit/observability";
 import { consoleHumanSink, createLoggerLayer, formatHumanLog, stdoutJsonSink, redactFailureDetail } from "@relkit/runtime-effect";
@@ -71,7 +47,7 @@ ${localServicesImport}
 ${jobsManifestImport}
 import { runtimeManifest } from "./runtime.manifest.ts";
 ${SERVER_BOOTSTRAP_SOURCE}
-${optionalEngineStubs}
+${engine.stubs}
 
 `;
 }

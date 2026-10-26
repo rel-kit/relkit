@@ -1,0 +1,23 @@
+{
+  "owner": {
+    "builder": "relkit-production-3244c8cb-2beb-4fb7-b52d-e9ecf53ab98b",
+    "image": "relkit-production-3244c8cb-2beb-4fb7-b52d-e9ecf53ab98b:auth",
+    "container": "relkit-production-3244c8cb-2beb-4fb7-b52d-e9ecf53ab98b-auth",
+    "builderCreated": false
+  },
+  "docker": {
+    "repairedAuth": true,
+    "ready": true,
+    "signupSessionSignoutSignin": true,
+    "jobsAlongsideAuth": {
+      "doubled": 42
+    },
+    "shutdown": 0,
+    "builderMemory": 805306368,
+    "builderCpu": 1,
+    "runtimeMemory": 536870912,
+    "runtimeCpu": 1
+  },
+  "commandExit": 0,
+  "rawLog": "/tmp/relkit-s1-resume-b21-packed-production.log"
+}

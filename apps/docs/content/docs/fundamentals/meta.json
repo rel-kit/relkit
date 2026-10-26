@@ -1,5 +1,0 @@
-{
-  "title": "Core concepts",
-  "icon": "Blocks",
-  "pages": ["index", "application", "functions", "schemas", "errors", "context", "environment"]
-}

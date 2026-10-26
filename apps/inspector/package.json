@@ -1,14 +1,15 @@
 {
-  "name": "@relkit/inspector",
+  "name": "@relkit/inspector-ui",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build",
+    "build": "next build --webpack",
     "check": "tsc --noEmit",
     "dev": "next dev --hostname 127.0.0.1",
     "test": "bun test lib"
   },
   "dependencies": {
+    "@opentelemetry/api": "1.9.1",
     "@orpc/client": "catalog:",
     "@relkit/contracts": "workspace:*",
     "@swc/helpers": "0.5.23",

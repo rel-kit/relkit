@@ -95,7 +95,7 @@ though the source file is TypeScript.
 Existing flat `src/<name>/service.ts` apps remain supported; add preserves their layout.
 Do not mix roots or put an aggregate boundary at `src/services/service.ts`. For an optional
 move, use the preview/write/guarded rollback workflow in the
-[layout migration guide](../apps/docs/content/docs/service/migration.mdx).
+[layout migration guide](../apps/docs/content/docs/modules/service/migration.mdx).
 
 Run diagnostics before starting development:
 
@@ -116,16 +116,18 @@ and diagnostics output under `.relkit/generated`.
 bun run dev
 ```
 
-The backend starts on `http://localhost:3000` and the inspector starts on
-`http://localhost:3210`. In another terminal:
+The backend starts on `http://localhost:3000`. In another terminal:
 
 ```sh
-curl "http://localhost:3000/hello?name=RELKIT"
+curl http://localhost:3000/hello\?name=RELKIT
 ```
 
-The CLI includes the prebuilt inspector. Framework contributors testing inspector
-source can set `RELKIT_INSPECTOR_ROOT` to `apps/inspector`; generated applications
-do not need that override.
+The generated application keeps inspection disabled. To inspect development work,
+select `inspector: { enabled: true }` in `defineApp`, then run the separately
+installed `relkit-inspector --project-root .` in another terminal. The bridge uses
+`127.0.0.1:0`; the tool UI defaults to `127.0.0.1:3210` and owns local history.
+See the [standalone guide](../packages/inspector/README.md) for runtime requirements
+and current candidate availability. Stopping the tool leaves the backend running.
 
 Expected response:
 
@@ -133,11 +135,20 @@ Expected response:
 { "message": "Hello, RELKIT!" }
 ```
 
-The same process serves OpenAPI at
-`http://localhost:3000/_relkit/v1/openapi.json` and Scalar at
-`http://localhost:3000/_relkit/v1/api-reference`.
+The same process serves OpenAPI JSON at
+`http://localhost:3000/_relkit/v1/openapi.json`. The Scalar UI is a separate
+opt-in through `server.apiDocs.ui: "scalar"`; its route is absent by default.
+Follow the [OpenAPI guide](../apps/docs/content/docs/modules/http/openapi.mdx) to install
+and configure the selected UI.
 
 ## 5. Apply a source change
+
+The minimal app does not include optional database/auth adapters, native model engines or Inspector
+history. Before manually adding one, follow its [database](../apps/docs/content/docs/modules/database/define.mdx),
+[auth](../apps/docs/content/docs/modules/auth/better-auth.mdx), [agent](../apps/docs/content/guides/ai/build-an-offline-agent.mdx)
+or [integration](../apps/docs/content/docs/modules/integrations/index.mdx) installation and configuration guide.
+The corresponding `relkit add` command normally installs its selected requirements; with `--no-install`,
+complete the printed installation/check steps. Preserve existing dependency declarations and repairs.
 
 Reuse the checked hello function through a second filesystem route:
 
@@ -153,7 +164,7 @@ The CLI previews the new file, applies the edit as one transaction, and runs
 existing public hello function. Verify the activated generation:
 
 ```sh
-curl -i "http://localhost:3000/status?name=RELKIT"
+curl -i http://localhost:3000/status\?name=RELKIT
 bun run check
 ```
 
@@ -181,8 +192,8 @@ bun run start
 In another terminal, verify both application and readiness:
 
 ```sh
-curl -i "http://localhost:3000/status"
-curl -i "http://localhost:3000/_relkit/v1/health/ready"
+curl -i http://localhost:3000/status
+curl -i http://localhost:3000/_relkit/v1/health/ready
 ```
 
 `start` refuses a stale or hash-mismatched build. If either request fails, fix
@@ -208,5 +219,5 @@ Keep secrets out of source and generated artifacts. Provider-backed tests pass
 explicit profile replacements; normal runtimes resolve only graph-required
 binding sources.
 
-Continue with `apps/docs/content/docs/fundamentals/application.mdx` for the
+Continue with `apps/docs/content/docs/learn/concepts/application.mdx` for the
 authoring model or `docs/deployment.md` for the separately authorized AWS path.

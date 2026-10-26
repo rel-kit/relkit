@@ -1,7 +1,10 @@
-/** Project root and authoring imports whose package metadata must be resolved. */
+/** Project root and role-separated imports whose package metadata must be resolved. */
 export interface ResolveRuntimeIntegrationPackagesOptions {
   readonly projectRoot: string;
+  /** Configuration/definition imports admit only declared authoring exports. */
   readonly imports: readonly string[];
+  /** Ordinary source imports also admit the package's exact public testing export. */
+  readonly applicationImports?: readonly string[];
 }
 
 /** Canonical package root and untrusted parsed package manifest. */
@@ -35,4 +38,6 @@ export interface ResolvedIntegrationPackageRole {
   readonly integrationId: string;
   readonly exportName: string;
   readonly resolvedPath: string;
+  readonly packageRoot?: string;
+  readonly requirements?: readonly import("@relkit/contracts").IntegrationDependencyRequirement[];
 }

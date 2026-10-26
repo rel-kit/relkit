@@ -1,0 +1,117 @@
+/**
+ * Elects one shutdown leader, stops admission, drains physical work and releases
+ * worker/application/telemetry scopes in order before sharing completion.
+ */
+import { Deferred, Effect, Exit, Ref, Scope } from "effect";
+import { observeExecution } from "@relkit/contracts/operation";
+import { boundedCleanup } from "./runtime-cleanup.js";
+import type { RuntimeGenerationOwner } from "./server-runtime.types.js";
+import type { ServerRuntimeFailure } from "./server-runtime.schemas.js";
+
+/**
+ * Elects one shutdown leader and always publishes completion to subsequent callers.
+ * @param owner - Generation-owned state, physical receipts, child scopes and deadlines.
+ * @param beforeRelease - Span and persistence cleanup while application resources remain open.
+ * @param beforeTelemetry - Final flush after application producers have stopped.
+ * @returns Final bounded evidence, retaining primary failures independently of cleanup.
+ * @remarks Masking covers only this finite finalization protocol. Each native release
+ * restores interruptibility and has its own deadline; caller interruption cannot strand
+ * the completion Deferred after leader election.
+ */
+export const closeRuntimeGeneration = Effect.fn("ServerRuntime.shutdown")(
+  function* (
+    owner: RuntimeGenerationOwner,
+    beforeRelease: Effect.Effect<void, ServerRuntimeFailure>,
+    beforeTelemetry: Effect.Effect<void, ServerRuntimeFailure> = Effect.void,
+  ) {
+    const { state, active, completion } = owner;
+    const alreadyStopping = yield* Ref.modify(state, (current) => [
+      current.stopping,
+      { ...current, stopping: true },
+    ]);
+    if (alreadyStopping) return yield* Deferred.await(completion);
+    yield* stopRuntimeProducers(owner);
+    yield* releaseRuntimeResources(owner, beforeRelease, beforeTelemetry);
+    yield* Ref.set(active, new Set());
+    const result = yield* Ref.get(state);
+    yield* Deferred.succeed(completion, result);
+    return result;
+  },
+  (effect) => observeExecution("runtime", "server.shutdown", effect.pipe(Effect.uninterruptible)),
+);
+
+/** @param owner - Generation scopes and physical completions. @returns After owner cancellation, worker stop, native drain and worker-handle release. */
+const stopRuntimeProducers = Effect.fn("ServerRuntime.stopProducers")(function* (
+  owner: RuntimeGenerationOwner,
+) {
+  const { environment, state, active, workers, workerResources } = owner;
+  yield* Effect.sync(() => environment.controller.abort(new Error("Runtime is stopping.")));
+  yield* boundedCleanup(
+    environment,
+    state,
+    "workers.stop",
+    Scope.close(workers, Exit.void),
+    environment.drainTimeoutMs,
+  );
+  yield* boundedCleanup(
+    environment,
+    state,
+    "invocations.drain",
+    Effect.forEach(
+      yield* Ref.get(active),
+      (task) =>
+        Effect.promise(() =>
+          task.then(
+            () => undefined,
+            () => undefined,
+          ),
+        ),
+      { concurrency: 16, discard: true },
+    ),
+    environment.drainTimeoutMs,
+  );
+  yield* boundedCleanup(
+    environment,
+    state,
+    "workers.release",
+    Scope.close(workerResources, Exit.void),
+    environment.drainTimeoutMs,
+  );
+});
+
+/** @param owner - Application and telemetry scope owner. @param beforeRelease - Persistence while resources remain open. @param beforeTelemetry - Final flush after producers stop. @returns Ordered release with original bounded evidence. */
+const releaseRuntimeResources = Effect.fn("ServerRuntime.releaseResources")(function* (
+  owner: RuntimeGenerationOwner,
+  beforeRelease: Effect.Effect<void, ServerRuntimeFailure>,
+  beforeTelemetry: Effect.Effect<void, ServerRuntimeFailure>,
+) {
+  const { environment, state, resources, telemetryResources } = owner;
+  yield* boundedCleanup(
+    environment,
+    state,
+    "runtime.before-release",
+    beforeRelease,
+    environment.drainTimeoutMs,
+  );
+  yield* boundedCleanup(
+    environment,
+    state,
+    "resources.release",
+    Scope.close(resources, Exit.void),
+    environment.drainTimeoutMs,
+  );
+  yield* boundedCleanup(
+    environment,
+    state,
+    "runtime.before-telemetry",
+    beforeTelemetry,
+    environment.telemetryTimeoutMs,
+  );
+  yield* boundedCleanup(
+    environment,
+    state,
+    "telemetry.resources.release",
+    Scope.close(telemetryResources, Exit.void),
+    environment.telemetryTimeoutMs,
+  );
+});

@@ -1,16 +1,17 @@
+/** Builds the native agent runtime used by the inspector acceptance fixture. */
 import {
   END,
   MemorySaver,
   START,
   StateSchema,
   interrupt,
-} from "../../packages/agents/node_modules/@langchain/langgraph/dist/index.js";
+} from "../../integrations/packages/langchain/node_modules/@langchain/langgraph/dist/index.js";
 import {
   defineGraph,
   defineGraphNode,
   invokeAgent,
   type AgentContentSink,
-} from "../../packages/agents/src/index.ts";
+} from "../../integrations/packages/langchain/src/index.ts";
 import type { RegistrationPlan } from "../../packages/graph/src/index.ts";
 import { createLocalAgentStateProvider } from "../../packages/providers-local/src/index.ts";
 import { z } from "../../packages/schema/src/index.ts";

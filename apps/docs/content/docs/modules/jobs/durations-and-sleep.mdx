@@ -1,0 +1,36 @@
+---
+title: Durations and sleep
+description: Bound task duration and use provider-backed durable sleep.
+pagination: false
+sidebar:
+  icon: timer
+---
+
+Pause task execution through the provider's durable sleep capability when the selected provider supports it.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  Use an existing [task/job with its selected provider installed and
+  bound](/docs/modules/jobs/quickstart) before running this example. Core task declarations do not
+  install the provider's native SDK.
+</Callout>
+
+Set `maxDuration` or `maxElapsed` on the task. Duration values are enforced by the runtime and should be
+shorter than the provider's own request timeout.
+
+<include
+  source="examples/commerce/src/services/orders/tasks/export-orders.task.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/tasks/export-orders.task.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/tasks/export-orders.task.ts
+</include>
+
+Durable sleep records a continuation with the provider. A durable task calls
+`context.sleep("1 hour", { key: "wait-before-notifying" })`; it must not use `setTimeout` in a worker
+process because a restart would lose the continuation.
+
+Providers differ. Inngest currently supports durable sleep for its supported path. Effect MQ does not advertise durable sleep. Trigger Docker does not claim checkpointed sleep. Check capabilities before relying on a long pause.
+
+Use UTC for provider-native schedules. A task that needs a local business timezone should calculate the next instant explicitly and persist the business timezone in its input.
+
+<include>/_snippets/generated/related/docs-modules-jobs-durations-and-sleep.mdx</include>

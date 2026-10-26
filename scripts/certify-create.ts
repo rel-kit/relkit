@@ -111,7 +111,7 @@ async function main(): Promise<void> {
   assert.equal(
     process.env.RELKIT_INSPECTOR_ROOT,
     undefined,
-    "Certification requires the packaged inspector",
+    "Certification forbids a contributor inspector source override",
   );
   const root = resolve(import.meta.dir, "..");
   const manifest = JSON.parse(await readFile(join(root, "package.json"), "utf8"));

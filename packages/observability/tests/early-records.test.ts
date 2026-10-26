@@ -41,7 +41,11 @@ it.effect("redacts before count/byte admission and evicts the oldest records", (
     expect(status.bufferedRecords).toBe(2);
     expect(status.bufferedBytes).toBe(entries.reduce((sum, entry) => sum + entry.bytes, 0));
     expect(
-      entries.every((entry) => entry.bytes === Buffer.byteLength(JSON.stringify(entry.record))),
+      entries.every(
+        (entry) =>
+          entry.bytes ===
+          Buffer.byteLength(JSON.stringify({ sequence: entry.sequence, record: entry.record })),
+      ),
     ).toBe(true);
     expect(status.droppedRecords).toBe(1);
     expect(status.incomplete).toBe(true);
@@ -57,7 +61,9 @@ it.effect("counts an oversized record as loss without retaining it", () =>
     expect(status.bufferedRecords).toBe(0);
     expect(status.bufferedBytes).toBe(0);
     expect(status.droppedRecords).toBe(1);
-    expect(status.droppedBytes).toBe(Buffer.byteLength(JSON.stringify(admitted)));
+    expect(status.droppedBytes).toBe(
+      Buffer.byteLength(JSON.stringify({ sequence: 1, record: admitted })),
+    );
   }).pipe(Effect.provide(earlyRetentionLive({ maxBytes: 512 }))),
 );
 

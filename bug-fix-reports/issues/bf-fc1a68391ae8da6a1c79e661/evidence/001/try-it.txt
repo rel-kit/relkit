@@ -1,0 +1,1 @@
+Scalar rendered relkit-demo-77, sent GET through the local inspector proxy, and received HTTP 200: Hello, world!

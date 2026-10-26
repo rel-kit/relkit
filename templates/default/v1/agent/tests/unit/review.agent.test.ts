@@ -1,6 +1,6 @@
 /** Checks review.agent through the supported public RELKIT APIs. */
 import { expect, test } from "bun:test";
-import { GraphInterruptedError, invokeAgent } from "@relkit/app/agents";
+import { GraphInterruptedError, invokeAgent } from "@relkit/langchain";
 import review from "@app/services/hello/agents/review.agent.js";
 
 const runtime = {

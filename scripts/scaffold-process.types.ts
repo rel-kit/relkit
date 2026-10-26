@@ -4,8 +4,8 @@ import type { ScaffoldProcessFailure } from "./scaffold-process.errors.js";
 
 /** Exact finite child authority; registry/cache/environment overrides belong only to this child. */
 export interface ScaffoldCommand {
-  /** Native executable; Bun is the default, and read-only Git probes share the same child owner. */
-  readonly executable?: "bun" | "node" | "git";
+  /** Closed native executable selection; Bun is default, with scoped Node, Git and browser commands. */
+  readonly executable?: "bun" | "node" | "git" | "agent-browser";
   /** Literal argument vector passed without shell interpolation. */
   readonly args: readonly string[];
   /** Caller-owned working directory. */
@@ -44,8 +44,14 @@ export type Manifest = Readonly<Record<string, Schema.Json>> & {
   readonly name: string;
   /** Exact first-party candidate version. */
   readonly version: string;
-  /** Native runtime dependency specifiers used to compute the packed closure. */
+  /** Native runtime dependency specifiers preserved in the packed manifest. */
   readonly dependencies?: Record<string, string>;
+  /** Development workspace owners required by isolated native packing. */
+  readonly devDependencies?: Record<string, string>;
+  /** Optional workspace declarations preserved during packing. */
+  readonly optionalDependencies?: Record<string, string>;
+  /** Native peer declarations, including workspace peers resolved before packing. */
+  readonly peerDependencies?: Record<string, string>;
 };
 /** Sorted portable file paths mapped to exact permission bits and normalized text or base64 binary bytes. */
 export type ProjectSnapshot = Record<string, { readonly mode: number; readonly content: string }>;

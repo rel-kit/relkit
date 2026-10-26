@@ -5,14 +5,14 @@ export const authFeature = feature(
   "auth",
   "Authentication",
   "Configure authentication, read request sessions, and protect application entry points.",
-  "auth/index",
+  "docs/modules/auth/index",
   "better-auth",
   [["packages/better-auth/src/index.ts", "defineBetterAuthService"]],
   ["examples/auth-drizzle/src/services/auth/service.ts"],
 );
 
 export const authGuideGroup = {
-  directory: "auth",
+  directory: "docs/modules/auth",
   title: "Auth",
   icon: "ShieldCheck",
   pages: [
@@ -23,33 +23,32 @@ export const authGuideGroup = {
     "clients",
     "customization",
     "testing",
-    "first-auth",
   ],
 } as const;
 
 export const authGuideRelations = [
   {
-    path: "auth/index",
+    path: "docs/modules/auth/index",
     api: ["better-auth", "services"],
     examples: ["examples/auth-drizzle/src/services/auth/service.ts"],
   },
   {
-    path: "auth/better-auth",
+    path: "docs/modules/auth/better-auth",
     api: ["better-auth", "drizzle", "config"],
     examples: ["examples/auth-drizzle/src/services/auth/service.ts"],
   },
   {
-    path: "auth/sessions",
+    path: "docs/modules/auth/sessions",
     api: ["better-auth", "functions"],
     examples: ["examples/auth-drizzle/src/services/account/functions/session.function.ts"],
   },
   {
-    path: "auth/protect-routes",
+    path: "docs/modules/auth/protect-routes",
     api: ["better-auth", "routes"],
     examples: ["examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"],
   },
   {
-    path: "auth/clients",
+    path: "docs/modules/auth/clients",
     api: ["better-auth", "client"],
     examples: [
       "examples/auth-drizzle/src/platform/auth-client.ts",
@@ -57,7 +56,7 @@ export const authGuideRelations = [
     ],
   },
   {
-    path: "auth/customization",
+    path: "docs/modules/auth/customization",
     api: ["better-auth", "drizzle"],
     examples: [
       "examples/auth-drizzle/src/services/auth/service.ts",
@@ -65,12 +64,12 @@ export const authGuideRelations = [
     ],
   },
   {
-    path: "auth/testing",
+    path: "docs/modules/auth/testing",
     api: ["testing", "better-auth"],
     examples: ["examples/auth-drizzle/tests/auth.test.ts"],
   },
   {
-    path: "auth/first-auth",
+    path: "guides/auth/email-password-sign-in",
     api: ["better-auth", "drizzle", "routes"],
     examples: ["examples/auth-drizzle/README.md"],
   },

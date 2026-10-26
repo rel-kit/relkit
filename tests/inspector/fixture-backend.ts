@@ -1,4 +1,6 @@
 import { Hono } from "../../packages/inspector-api/node_modules/hono";
+import { Schema } from "effect";
+import { telemetryRecordSchema } from "@relkit/observability/local/protocol";
 // @ts-expect-error The workspace package exposes this runtime subpath without a relative declaration path.
 import { cors } from "../../packages/inspector-api/node_modules/hono/dist/middleware/cors/index.js";
 import { PROTOCOL_VERSION } from "../../packages/contracts/src/index.ts";
@@ -8,6 +10,7 @@ import {
   type ObservabilityQuery,
   type ObservabilityQueryRequest,
   type ObservabilityStream,
+  type ObservabilityRecord,
 } from "../../packages/observability/src/index.ts";
 import {
   installInspectorEndpoints,
@@ -34,7 +37,7 @@ export const FIXTURE_IDS = Object.freeze({
   agent: "support.order",
 });
 
-const now = "2026-01-01T00:00:00.000Z";
+const now = new Date(process.env.RELKIT_FIXTURE_TIME ?? "2026-01-01T00:00:00.000Z").toISOString();
 const source = (file: string, line: number) => ({ file, line, column: 1 });
 const schema = (type: string): Record<string, unknown> => ({ type });
 const bucketFixtures = [
@@ -458,6 +461,7 @@ const initialTraces = [
 export interface InspectorFixture {
   readonly app: Hono;
   readonly stream: ObservabilityStream;
+  readonly records: () => readonly ObservabilityRecord[];
   readonly baseUrl: string;
   readonly reset: () => void;
   readonly setInvalidCandidate: (enabled: boolean) => void;
@@ -877,6 +881,8 @@ export function createInspectorFixture(): InspectorFixture {
   return {
     app,
     stream,
+    records: () =>
+      [...requests, ...logs, ...traces].map(Schema.decodeUnknownSync(telemetryRecordSchema)),
     baseUrl: FIXTURE_BASE_URL,
     reset,
     setInvalidCandidate: (enabled) => {

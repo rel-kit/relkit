@@ -1,0 +1,41 @@
+---
+title: Publish an event
+description: Send event data from your application code.
+pagination: false
+sidebar:
+  icon: send
+---
+
+Publish an event from the function that performs the operation, so other functions can react to its result.
+
+## Publish from a function
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  Complete the [event runtime installation and
+  binding](/guides/events/react-to-order-events#install-and-bind-the-selected-event-runtime) before
+  publishing. Acceptance requires the selected profile; a function's `publishes` list grants a
+  checked capability but does not install its runtime package.
+</Callout>
+
+First, [define `orders.created`](/docs/modules/events/define). Then publish it from the `defineFunction` that creates the order:
+
+<include
+  source="apps/docs/examples/events/create-order.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/create-order.function.ts"'
+>
+  /_snippets/source/apps/docs/examples/events/create-order.function.ts
+</include>
+
+This function uses the [Orders example's](/guides/events/react-to-order-events) `priceOrder` helper. To publish the event:
+
+1. Add `publishes: ["orders.created"]` to allow this function to publish the event.
+2. Call `await context.events["orders.created"].publish(order)` to send the order data.
+
+Use the exact event ID in both places. The data must match the event's `input` schema. Only events listed in `publishes` are available through `context.events`.
+
+Publishing waits for the event to be accepted, not for its consumers to finish. Your function can return the order while confirmation runs separately.
+
+## Publish from an event function
+
+A `defineEventFunction` can publish events the same way: list each ID in `publishes`, then call `.publish()`.

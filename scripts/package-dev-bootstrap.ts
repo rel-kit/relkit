@@ -28,7 +28,6 @@ export const packageDevBootstrap = Effect.fn("Packaging.devBootstrap")(function*
       target: "bun",
       format: "esm",
       minify: true,
-      external: ["@duckdb/node-api"],
       plugins: [lazyImports(external), narrowEffectImportPlugin()],
     }),
   );
@@ -62,8 +61,8 @@ function lazyImports(external: readonly string[]): Bun.BunPlugin {
 }
 
 /**
- * Packages prepared policy and delayed support with a single shared Effect identity.
- * @returns Joined chunk publication; storage entries remain dynamic imports until support runs.
+ * Packages prepared policy and lightweight capture with a single shared Effect identity.
+ * @returns Joined chunk publication without native storage or UI entries.
  */
 const packagePreparedCohort = Effect.fn("Packaging.preparedCohort")(function* () {
   const root = resolve(import.meta.dir, "..");
@@ -75,8 +74,6 @@ const packagePreparedCohort = Effect.fn("Packaging.preparedCohort")(function* ()
     [
       "packages/cli/src/dev-snapshot/snapshot-command-entry.ts",
       "packages/cli/src/dev-snapshot/snapshot-hash-worker.ts",
-      "packages/cli/src/commands/dev-telemetry-operation.ts",
-      "packages/cli/src/commands/dev-telemetry-native.service.ts",
     ],
     "prepared-hit-[hash].js",
   );
@@ -86,7 +83,13 @@ const packagePreparedCohort = Effect.fn("Packaging.preparedCohort")(function* ()
     ["packages/cli/src/dev-snapshot/snapshot-preparation-entry.ts"],
     "prepared-prepare-[hash].js",
   );
-  if (!hit.success || !preparation.success || hit.outputs.length < 4)
+  if (
+    !hit.success ||
+    !preparation.success ||
+    !["snapshot-command-entry.js", "snapshot-hash-worker.js"].every((name) =>
+      hit.outputs.some((output) => output.path.endsWith(`/${name}`)),
+    )
+  )
     return yield* Effect.die(new Error("Prepared development cohort packaging failed."));
   const outputs = new Map(
     [...hit.outputs, ...preparation.outputs].map((output) => [output.path, output]),
@@ -103,12 +106,6 @@ const packagePreparedCohort = Effect.fn("Packaging.preparedCohort")(function* ()
       rm(output.path + ".map", { force: true }),
     );
   }
-  yield* ownedNativePromise("package.dev.worker-entry", () =>
-    Bun.write(
-      resolve(destination, "duckdb-worker.js"),
-      'import "@relkit/observability/internal/local-worker";\n',
-    ),
-  );
 });
 
 /** Builds one dependency-isolated prepared graph so preparation-only TypeScript stays off hits. */
@@ -123,14 +120,9 @@ const buildPreparedEntries = Effect.fn("Packaging.preparedEntries")(
         splitting: true,
         naming: { entry: "[name].js", chunk },
         minify: true,
-        external: ["@duckdb/node-api", "@relkit/compiler"],
+        external: ["@relkit/compiler"],
         plugins: [
-          lazyImports([
-            "../services/local-capabilities.js",
-            "../commands/dev-local-compiler.js",
-            "./dev-telemetry-operation.js",
-            "./dev-telemetry-native.service.js",
-          ]),
+          lazyImports(["../services/local-capabilities.js", "../commands/dev-local-compiler.js"]),
           narrowEffectImportPlugin(),
         ],
       }),

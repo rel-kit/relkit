@@ -1,91 +1,17 @@
-import { trackFixtureRun, trackFixtureProvider, joinFixtureRuns } from "./fixture-lifetime.js";
-import { createFixtureClient, appFetch } from "./fixture-client.js";
-import { setTimeout as sleep } from "node:timers/promises";
-import { afterEach, expect, test } from "vitest";
-import { mkdtemp, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { defineAgent, type PendingApproval } from "@relkit/agents";
-import type { RegistrationPlan } from "@relkit/graph";
+/** Verifies two interrupted tool approvals admit one continuation, deduplicate concurrent control requests and preserve progress without replaying the original agent execution. */
+import { expect, test } from "vitest";
 import { createOperationId } from "@relkit/realtime";
-import { z } from "@relkit/schema";
-
-import { createLocalAgentStateProvider } from "@relkit/providers-local";
-import { createApp, type RuntimeManifest } from "../src/index.ts";
 import { waitForAgentRun } from "../src/agent-run-tasks.ts";
-import { runtimeCohort } from "./test-cohort.ts";
+import { createApprovalFixture } from "./agent-approval.fixture.js";
+import { waitForStatus } from "./agent-approval-plan.fixture.js";
+import type { ApprovalFixture, AgentRpcRun } from "./agent-rpc-fixture.types.js";
 
-const roots: string[] = [];
-afterEach(async () => {
-  await joinFixtureRuns();
-  await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true })));
-});
-
-test("approval interruption admits one continuation without replaying agent execution", async () => {
-  const root = await mkdtemp(join(tmpdir(), "relkit-agent-approval-"));
-  roots.push(root);
-  const provider = trackFixtureProvider(createLocalAgentStateProvider(root, { pollingMs: 50 }));
-  const agent = defineAgent({
-    id: "support.approval",
-    input: z.string(),
-    output: z.string(),
-    instructions: "Require approval.",
-    tools: [],
-    limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 2_000 },
-    stateProfile: "default",
-    client: { authorize: () => true },
-    chat: { input: "message", output: "answer" },
-    controls: ["approve"],
-  });
-  const plan = approvalPlan();
-  let executions = 0;
-  const engine = {
-    invoke: async (request: { readonly trigger?: unknown }) => {
-      executions += 1;
-      const trigger = request.trigger as {
-        approval?: (value: PendingApproval) => Promise<string>;
-        progressSink?: { emit(value: unknown, signal: AbortSignal): Promise<void> };
-      };
-      await trigger.progressSink!.emit({ stage: "waiting" }, new AbortController().signal);
-      const approval = trigger.approval;
-      return Promise.all(
-        ["tool-call-1", "tool-call-2"].map((toolCallId) =>
-          approval!({
-            invocationId: "invocation-1",
-            toolCallId,
-            toolId: "orders.cancel",
-            sideEffect: "write",
-            policy: "always",
-            required: true,
-            state: "pending",
-          }),
-        ),
-      ).then((decisions) => decisions.join(","));
-    },
-  };
-  const app = createApp({
-    plan,
-    manifest: manifest(plan, agent),
-    engine,
-    clientIdentity: {
-      applicationId: "fixture",
-      publicFingerprint: "sha256:public",
-      resolve: () => ({ identityScope: "viewer", sessionEpoch: "session" }),
-    },
-    agentRuntime: {
-      track: trackFixtureRun,
-      applicationId: "fixture",
-      environment: "test",
-      generationId: "generation-a",
-      publicFingerprint: "sha256:public",
-      provider: () => provider,
-    },
-  });
-  const client = createFixtureClient({
-    baseUrl: "http://relkit.test",
-    headers: { "x-relkit-identity-scope": "viewer", "x-relkit-session-epoch": "session" },
-    fetch: appFetch(app),
-  });
+/** Accepts the original run and checks its two pending approvals and progress message.
+ * @param fixture - Native scenario context with live execution and cleanup observations.
+ * @returns The accepted receipt and both persisted pending approval identities.
+ */
+async function beginApproval(fixture: ApprovalFixture) {
+  const { client, agent } = fixture;
   const accepted = await client["relkit.agent.run"]({
     agentId: agent.id,
     threadId: "conversation:approval",
@@ -111,20 +37,44 @@ test("approval interruption admits one continuation without replaying agent exec
   const approvalIds = interrupted.approvals.map(
     (approval: { approvalId: string }) => approval.approvalId,
   );
+  return { accepted, approvalIds };
+}
+
+/** Builds one idempotency identity for both concurrent approval submissions.
+ * @param agentId - Registered agent identity selected by the scenario.
+ * @param threadId - Durable conversation identity reused across RPC requests.
+ * @param approvalIds - Persisted approval identities returned by the interrupted run.
+ * @returns One shared operation identity and its approval decision payload.
+ */
+function approvalControl(agentId: string, threadId: string, approvalIds: readonly string[]) {
   const operationId = createOperationId();
   const control = {
-    agentId: agent.id,
-    threadId: accepted.threadId,
+    agentId,
+    threadId,
     operationId,
     kind: "approve",
     payload: { decisions: Object.fromEntries(approvalIds.map((id: string) => [id, "approve"])) },
   };
-  const receipts = await Promise.all([
-    client["relkit.agent.control"](control),
-    client["relkit.agent.control"](control),
-  ]);
-  expect(receipts.map((receipt) => receipt.duplicate).sort()).toEqual([false, true]);
+  return { control, operationId };
+}
+
+/** Checks the settled continuation and durable deduplicated control receipt.
+ * @param fixture - Native scenario context with live execution and cleanup observations.
+ * @param accepted - Receipt identifying the original accepted native run.
+ * @param approvalIds - Persisted approval identities returned by the interrupted run.
+ * @param decision - Shared control payload and operation identity used for deduplication.
+ * @returns Completion after durable approval/control assertions and tracked run settlement.
+ */
+async function verifyApprovalSettlement(
+  fixture: ApprovalFixture,
+  accepted: AgentRpcRun,
+  approvalIds: readonly string[],
+  decision: ReturnType<typeof approvalControl>,
+) {
+  const { client, agent } = fixture;
+  const { control, operationId } = decision;
   const settled = await waitForStatus(client, agent.id, accepted.threadId, "idle");
+  const { executions } = fixture;
   expect(executions).toBe(1);
   expect(settled.currentRuns).toMatchObject([
     { runId: accepted.runId, status: "approval-interrupted" },
@@ -142,67 +92,18 @@ test("approval interruption admits one continuation without replaying agent exec
     duplicate: true,
   });
   await waitForAgentRun(accepted.runId);
+}
+
+test("approval interruption admits one continuation without replaying agent execution", async () => {
+  const fixture = await createApprovalFixture();
+  const { client, agent } = fixture;
+  const { accepted, approvalIds } = await beginApproval(fixture);
+  const decision = approvalControl(agent.id, accepted.threadId, approvalIds);
+  const { control } = decision;
+  const receipts = await Promise.all([
+    client["relkit.agent.control"](control),
+    client["relkit.agent.control"](control),
+  ]);
+  expect(receipts.map((receipt) => receipt.duplicate).sort()).toEqual([false, true]);
+  await verifyApprovalSettlement(fixture, accepted, approvalIds, decision);
 });
-
-async function waitForStatus(
-  client: any,
-  agentId: string,
-  threadId: string,
-  status: string,
-): Promise<any> {
-  for (let attempt = 0; attempt < 100; attempt += 1) {
-    const snapshot = await client["relkit.agent.load"]({ agentId, threadId });
-    if (snapshot.thread.status === status) return snapshot;
-    await sleep(10);
-  }
-  throw new Error(`Agent did not reach ${status}.`);
-}
-
-function approvalPlan(): RegistrationPlan {
-  return {
-    graphHash: "sha256:agent",
-    functions: [],
-    httpTriggers: [],
-    queues: [],
-    schedules: [],
-    eventTriggers: [],
-    buckets: [],
-    caches: [],
-    tools: [],
-    channels: [],
-    agents: [
-      {
-        kind: "agent",
-        id: "support.approval",
-        source: { file: "agent.ts", line: 1, column: 1 },
-        input: {},
-        output: {},
-        instructions: "redacted",
-        toolIds: [],
-        limits: {},
-        generatedFunction: {
-          functionId: "relkit.agent.support.approval.invoke",
-          generated: true,
-          generatedBy: "agent",
-          agentId: "support.approval",
-        },
-        profile: "default",
-        stateProfile: "default",
-        client: "protected",
-        chat: { input: "message", output: "answer" },
-        controls: ["approve"],
-      },
-    ],
-    middlewares: [],
-  };
-}
-
-function manifest(plan: RegistrationPlan, agent: unknown): RuntimeManifest {
-  return {
-    ...runtimeCohort(plan.graphHash),
-    functions: {},
-    agents: { "support.approval": agent },
-    middleware: {},
-    requestTransforms: {},
-  };
-}

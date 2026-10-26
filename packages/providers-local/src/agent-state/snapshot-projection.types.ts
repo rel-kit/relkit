@@ -1,4 +1,5 @@
-import type { AgentExecutionSnapshot, ThreadSnapshot } from "@relkit/agents";
+/** Defines projected public messages and the indexed tool slots used during journal replay. */
+import type { AgentExecutionSnapshot, ThreadSnapshot } from "@relkit/contracts";
 
 /** Browser-visible messages, approvals and execution summary derived from the journal. */
 export type Projection = Pick<ThreadSnapshot, "values" | "output" | "executions">;

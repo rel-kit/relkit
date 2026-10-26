@@ -50,6 +50,7 @@ export interface ObservabilityStreamSubscriptionOptions {
 /** Queue and cursor state of one subscriber. */
 export interface ObservabilityStreamSubscriptionStats {
   readonly queued: number;
+  readonly queuedBytes: number;
   readonly dropped: number;
   readonly cursor: string;
   readonly closed: boolean;
@@ -71,6 +72,7 @@ export interface ObservabilityStreamCounters {
 /** Retention and subscriber state for the stream. */
 export interface ObservabilityStreamStats extends ObservabilityStreamCounters {
   readonly retained: number;
+  readonly backlogBytes: number;
   readonly subscribers: number;
   readonly cursor: string;
   readonly earliestCursor?: string;

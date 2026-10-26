@@ -55,8 +55,8 @@ export const startGeneratedHost = Effect.fn("GeneratedHost.start")(
       writeGeneratedHostFixture(root, repository),
     );
     if (protection) yield* prepareGeneratedProtection(root, repository);
-    if (!grouped) yield* flattenGeneratedHost(root);
     yield* seedDatabase(root);
+    if (!grouped) yield* flattenGeneratedHost(root);
     const built = yield* scaffoldNative("generated.host.build", () =>
       buildProject({ projectRoot: root }),
     );
@@ -107,7 +107,10 @@ const seedDatabase = Effect.fn("GeneratedHost.seed")(
       (database) => Effect.sync(() => database.close()),
     );
     const sql = yield* scaffoldNative("generated.host.sql", () =>
-      readFile(join(root, "drizzle/20260831094750_auth/migration.sql"), "utf8"),
+      readFile(
+        join(root, "src/services/database/migrations/20260831094750_auth/migration.sql"),
+        "utf8",
+      ),
     );
     yield* Effect.sync(() => {
       database.exec(sql);

@@ -1,0 +1,56 @@
+{
+  "kind": "operator-cancelled-duplicate",
+  "reason": "All 92 original selected samples were already complete; disposable controller unnecessarily restarted pnpm. SIGTERM was sent to the controller and actual producer; after the producer did not settle, only owned producer PID 55110 was killed. No accepted sample comes from this attempt.",
+  "pids": {
+    "controller": 47953,
+    "producer": 55110
+  },
+  "nativeListeners": [
+    59342,
+    59343
+  ],
+  "log": "/tmp/relkit-s2-config-20261023-01a1663e/final-install-pnpm-2.log",
+  "logSHA256": "565236d33ce775ad2c314c82b2b89341f89fac392cb0d3c98b678df0a305a633",
+  "temporary": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU",
+  "checkpoints": [
+    {
+      "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/production-only-cold-owned-cache.json",
+      "sha256": "0fe75e1e3570e41694f02e35f99b0beb265e26261daaeb114f65ab9d103e9952"
+    },
+    {
+      "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only-warm-owned-cache.json",
+      "sha256": "609f17147876a548738f341b25f255223b359b969898a36f9672d2360daa542b"
+    },
+    {
+      "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/minimal-development-cold-owned-cache.json",
+      "sha256": "310e262ec7002c0e1d2949ec0f3423fb487baac82f791a28b3329ba1f2cb4fc7"
+    },
+    {
+      "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/wrapper-only-cold-owned-cache.json",
+      "sha256": "b4df3777d24da46f6cc7200054c0d82df2594124a71f7f62e46a691648e35d10"
+    },
+    {
+      "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/production-only-warm-owned-cache.json",
+      "sha256": "4973fa66a8864c46d588e301167c161fb4415748b7438586894c72cf259f4f50"
+    },
+    {
+      "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/api-development-cold-owned-cache.json",
+      "sha256": "f2de8f387adf375bab5010a2d97841e2c3aae07ff77617b11eac3f7940851a13"
+    },
+    {
+      "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/creator-only-cold-owned-cache.json",
+      "sha256": "33ce652c51fc9434141a00f87d541d71f17bee4fdd0625df7b4c98d12ee4c2e7"
+    },
+    {
+      "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/minimal-development-warm-owned-cache.json",
+      "sha256": "6fe0af3a9837a2813511e5326f05308eed6aa80d35480c6b24a5125d07bb6cc4"
+    },
+    {
+      "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-consumer-install-gagiyU/wrapper-only-warm-owned-cache.json",
+      "sha256": "f5dc1a70a5aed8cea2dcdf275ca12760840b7bf83c6675465a50b85db356bd32"
+    }
+  ],
+  "acceptedSamples": 0,
+  "stageGatePassed": false,
+  "performanceCertified": false
+}

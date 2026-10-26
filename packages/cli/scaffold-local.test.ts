@@ -1,10 +1,11 @@
+/** Checks project-local contributor scaffold execution and the existing native workspace link behavior. */
 import { expect, test } from "bun:test";
 import {
   formatScaffoldPlan,
   type AddResult,
   type PromptDriver,
   type ScaffoldPlan,
-} from "create-relkit";
+} from "./src/scaffolding/index.js";
 import { finishScaffoldLocal } from "./src/scaffold-local.js";
 import type { CliCommandContext } from "./src/main-support.js";
 

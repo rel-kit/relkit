@@ -1,5 +1,5 @@
 /**
- * Checks finite post-install preparation is printed before the first dev launch.
+ * Checks finite preparation precedes dev and onboarding advertises only available API endpoints.
  * These pure presentation tests acquire no filesystem or process; installation
  * state controls the displayed commands without changing later manual checks.
  */
@@ -25,5 +25,32 @@ it.effect("does not repeat preparation in an installed project's onboarding", ()
     expect(nextSteps.commands.prepare).toBeUndefined();
     expect(formatGenerateResult({ nextSteps })).not.toContain("relkit dev --prepare");
     expect(formatGenerateResult({ unexpected: "result" })).toBe('{"unexpected":"result"}');
+  }),
+);
+
+it.effect("advertises OpenAPI without an unselected reference UI", () =>
+  Effect.sync(() => {
+    const nextSteps = createGenerateNextSteps({ examples: true, install: true }, "/project", "/");
+    expect(nextSteps.endpoints).not.toHaveProperty("apiReference");
+    const output = formatGenerateResult({ nextSteps });
+    expect(output).toContain("openapi:   http://localhost:3000/_relkit/v1/openapi.json");
+    expect(output).not.toContain("api docs:");
+    expect(output).not.toContain("/_relkit/v1/api-reference");
+  }),
+);
+
+it.effect("preserves an explicitly supplied reference endpoint in presentation metadata", () =>
+  Effect.sync(() => {
+    const core = createGenerateNextSteps({ examples: false, install: true }, "/project", "/");
+    const nextSteps = {
+      ...core,
+      endpoints: {
+        ...core.endpoints,
+        apiReference: "http://localhost:3000/_relkit/v1/api-reference" as const,
+      },
+    };
+    expect(formatGenerateResult({ nextSteps })).toContain(
+      "api docs:  http://localhost:3000/_relkit/v1/api-reference",
+    );
   }),
 );

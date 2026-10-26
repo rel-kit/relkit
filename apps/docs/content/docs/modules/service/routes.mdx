@@ -1,0 +1,171 @@
+---
+title: Expose a service through routes
+description: Keep HTTP separate from domain behavior and map explicit URL methods to public service functions.
+pagination: false
+sidebar:
+  icon: route
+---
+
+Use a service to expose application operations and a route to give an operation an HTTP method and URL. A route says which operation is
+reachable at a particular URL and HTTP method. Adding a function to `service.ts` does not create a URL;
+adding a domain does not create a server or a route prefix.
+
+Keep the route files under `src/routes/`, outside the domains. This page covers the service-to-HTTP
+boundary; [HTTP Routes getting started](/docs/modules/http) introduces request parsing, middleware, responses,
+and client contracts.
+
+## Assign each responsibility once
+
+| Concern                                                     | Owner                                      |
+| ----------------------------------------------------------- | ------------------------------------------ |
+| Business input, output, errors, and behavior                | The domain function.                       |
+| Which domain functions callers may use                      | The domain's `service.ts`.                 |
+| URL path and HTTP method                                    | The route file path and its named exports. |
+| Headers, cookies, query/body mapping, response status       | The route's transport configuration.       |
+| HTTP middleware and request authentication                  | The Routes layer.                          |
+| Rules that must also apply to jobs, tools, and direct calls | The function, not only HTTP middleware.    |
+
+Routes import `@app/services/orders/service.js`, never Orders' private function files. Domain functions do not
+import routes. That direction lets you add another transport without pulling HTTP concerns into the
+business operation.
+
+## Map methods to public functions
+
+With an existing Orders service exposing `searchOrders` and `createOrder`, scaffold a new route:
+
+```sh title="Terminal — application root"
+bun run relkit add route /orders --mode service-route --service orders \
+  --map GET=searchOrders --map POST=createOrder
+```
+
+This creates `src/routes/orders/route.ts` and maps both methods. If that file already exists,
+edit it instead. The command uses inferred mapping and HTTP `200`; add the explicit request
+mapping and `201` status in source as shown below. See the
+[route command reference](/docs/api/cli#relkit-add-route-path) for all flags.
+
+Use `defineServiceRoutes` when the methods in a route file belong to one service:
+
+<include
+  source="examples/commerce/src/routes/orders/route.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/routes/orders/route.ts"'
+>
+  /_snippets/source/examples/commerce/src/routes/orders/route.ts
+</include>
+
+The file supplies `/orders`. The exported `GET` and `POST` names supply the methods. `GET` selects the
+public `searchOrders` function by member name. `POST` selects `createOrder`, explicitly maps headers
+and body fields into its domain input, and sets the successful response status to `201`.
+
+### Use the service routes from the frontend
+
+<include>/_frontend/orders.mdx</include>
+
+Use a string member name when inferred request/response mapping fits. Use an object with `member` when
+you need explicit mapping, status, limits, or other function-route options. Explicit request mappings
+replace inference rather than partially extending it. See [request mapping](/docs/modules/http/requests).
+
+Keep the exported destructuring form shown above. `defineServiceRoutes` does not support renamed
+method bindings, rest bindings, a default export, or methods named after business operations. Supported
+methods are `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, and `OPTIONS`.
+
+## Choose the URL independently of the domain
+
+| Route file                             | URL                | What it decides                                                    |
+| -------------------------------------- | ------------------ | ------------------------------------------------------------------ |
+| `src/routes/orders/route.ts`           | `/orders`          | Collection operations.                                             |
+| `src/routes/orders/[orderId]/route.ts` | `/orders/:orderId` | Operations on a particular order.                                  |
+| `src/routes/uploads/route.ts`          | `/uploads`         | A URL that calls the Assets service without using its domain name. |
+
+The service does not own these URL prefixes. Several route files can use the same service, and a route
+module can import multiple public services if necessary. Keep reusable cross-domain business
+orchestration in a function instead of spreading it across HTTP handlers.
+
+Follow [file-system routes](/docs/modules/http/routes) for dynamic segments, catch-all paths, matching precedence,
+and route identities. Do not add `path` or `method` to a function-backed `defineRoute` descriptor.
+
+## When to use defineRoute
+
+For an individual mapping, use `defineRoute` with a public function as its `target`:
+
+<include
+  source="templates/default/v1/minimal/src/routes/hello/route.ts"
+  lang="ts"
+  meta='title="templates/default/v1/minimal/src/routes/hello/route.ts"'
+>
+  /_snippets/source/templates/default/v1/minimal/src/routes/hello/route.ts
+</include>
+
+Both factories produce route descriptors for the same routing pipeline. Neither can target an event
+contract, an event-only subscriber, a tool, or an agent directly. To expose agent behavior, route to the
+[ordinary function that calls it](/docs/modules/service/organization#tools-and-agents-stay-with-their-business-domain).
+
+`defineRoute({ handler: ... })` also supports raw HTTP integrations. Keep business operations on the
+function-backed path. Better Auth is a specialized raw-handler integration mounted on an `ALL`
+catch-all route; `ALL` is not a method accepted by `defineServiceRoutes`.
+
+## Use from the frontend
+
+<include>/_frontend/hello.mdx</include>
+
+`defineServiceRoutes` produces the same client contracts per exported method: `GET /orders` uses
+[`useRoute`](/docs/modules/client/routes), while `POST /orders` uses
+[`useRouteMutation`](/docs/modules/client/mutations). The input remains the target function's input;
+explicit HTTP header or body mappings do not construct RPC input. Only exposing a service member
+does not make it a browser operation: it needs a client-exposed route.
+
+## Continue with the Routes topics
+
+Choose the topic that matches the HTTP work you need to do:
+
+<CardGroup cols={2}>
+  <Card icon="rocket">
+    [Your first HTTP route](/docs/modules/http/first-route): add a validated endpoint and
+    integration test.
+  </Card>
+  <Card icon="route">
+    [Define a route](/docs/modules/http/define): choose `defineRoute` or `defineServiceRoutes`.
+  </Card>
+  <Card icon="folder-tree">
+    [File-system routes](/docs/modules/http/routes): choose paths and methods.
+  </Card>
+  <Card icon="arrow-down-to-line">
+    [Requests](/docs/modules/http/requests) and [uploads](/docs/modules/http/uploads): map transport
+    values into input.
+  </Card>
+  <Card icon="shield-check">
+    [Middleware](/docs/modules/http/middleware) and [rate limits](/docs/modules/http/rate-limits):
+    apply HTTP policy.
+  </Card>
+  <Card icon="arrow-up-from-line">
+    [Responses](/docs/modules/http/responses): map results and declared errors into HTTP responses.
+  </Card>
+  <Card icon="code-xml">
+    [Raw handlers](/docs/modules/http/raw-handlers): mount adapters that own their HTTP protocol.
+  </Card>
+  <Card icon="file-json">
+    [OpenAPI](/docs/modules/http/openapi) and [generated
+    clients](/docs/modules/http/generated-clients): use the checked contracts outside the server,
+    with REST and RPC behavior distinguished.
+  </Card>
+</CardGroup>
+
+These transport guides build on the same domain organization; they do not introduce a second place
+for business handlers.
+
+## Verify routing separately from behavior
+
+From your application's root, run `bun run check` after adding a method. Expect the route to appear in
+the checked graph and OpenAPI output. Test the function directly for its domain behavior, then use an
+HTTP integration test for mapping, authentication, and status codes.
+
+For a running app containing the Hello route above:
+
+```sh
+curl -i http://localhost:3000/hello\?name=RELKIT
+```
+
+Expect HTTP `200` and `{ "message": "Hello, RELKIT!" }`. Use your configured backend port if it differs.
+The [first-service example](/docs/modules/service/first-service) includes the source and test steps.
+
+<include>/_snippets/generated/related/docs-modules-service-routes.mdx</include>

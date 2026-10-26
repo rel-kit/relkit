@@ -1,16 +1,10 @@
+/** Presents CLI output, help and terminal failures while keeping command cancellation scoped to its invocation; optional scaffold loading has a separate lazy owner. */
+
 import { canonicalJson } from "@relkit/contracts";
-import type {
-  CliFailure,
-  CliIo,
-  CliReporter,
-  CreateRelkitGeneratorApi,
-} from "./main-support-types.js";
+import type { CliFailure, CliIo, CliReporter } from "./main-support-types.js";
 import manifest from "../package.json" with { type: "json" };
 import { findCliHelp, getCliHelpModel } from "./cli-help-model.js";
 import { CliFailureError, cliOriginalError } from "./cli-errors.js";
-import { Effect, Layer } from "effect";
-import { cliPromise, cliAdapterError } from "./cli-errors.js";
-import { runCliEffect } from "./cli-runtime.js";
 
 export type * from "./main-support-types.js";
 
@@ -25,41 +19,6 @@ export const CLI_EXIT_CODES = Object.freeze({
   sigterm: 143,
   sighup: 129,
 });
-/**
- * Imports the optional generator using the existing public Promise contract.
- * @returns The original module API identity.
- * @throws The established unavailable-API failure.
- */
-export function loadCreateRelkit(): Promise<CreateRelkitGeneratorApi> {
-  return runCliEffect(loadCreateRelkitEffect, Layer.empty);
-}
-
-/** Imports one foreign namespace lazily without creating a nested command runtime. */
-export const loadCreateRelkitEffect = cliPromise(
-  "generator.import",
-  () => import("create-relkit"),
-).pipe(
-  Effect.mapError(() =>
-    cliAdapterError(
-      "generator.import",
-      fail("RELKIT_CREATE_API_UNAVAILABLE", "The create-relkit generator API is unavailable."),
-    ),
-  ),
-  Effect.flatMap((loaded) => {
-    const value = "default" in loaded ? (loaded.default ?? loaded) : loaded;
-    return isGeneratorApi(value)
-      ? Effect.succeed(value)
-      : Effect.fail(
-          cliAdapterError(
-            "generator.import",
-            fail(
-              "RELKIT_CREATE_API_UNAVAILABLE",
-              "The create-relkit generator API is unavailable.",
-            ),
-          ),
-        );
-  }),
-);
 
 /**
  * Builds the existing result/error presentation policy.
@@ -197,20 +156,6 @@ export function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 /**
- * Validates the minimal foreign facade while preserving its original identity.
- * @param value - Untrusted imported namespace or caller substitute.
- * @returns Whether the existing required operations are present.
- */
-export function isGeneratorApi(value: unknown): value is CreateRelkitGeneratorApi {
-  if (value === null || typeof value !== "object") return false;
-  return (
-    "normalizeCreateOptions" in value &&
-    typeof value.normalizeCreateOptions === "function" &&
-    "generateProject" in value &&
-    typeof value.generateProject === "function"
-  );
-}
-/**
  * Narrows public error fields without trusting a tagged string or casting authority.
  * @param value - Terminal thrown value or cancellation reason.
  * @returns Whether the existing failure contract is satisfied.
@@ -229,3 +174,5 @@ function isFailure(value: unknown): value is CliFailure {
       value.signal === "SIGHUP")
   );
 }
+
+export { loadCreateRelkit, loadCreateRelkitEffect, isGeneratorApi } from "./main-generator.js";

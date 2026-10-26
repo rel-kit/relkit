@@ -1,3 +1,4 @@
+/** Validates diagnostic transport envelopes before any queue, IPC, or storage boundary. */
 import { OBSERVABILITY_MODEL_VERSION, type ObservabilityRecord } from "../model.js";
 import { Effect, Schema } from "effect";
 import type { LocalRecord } from "./types.types.js";
@@ -50,12 +51,13 @@ function invalid(
  * @example
  * Effect.runSync(validateLocalRecordEffect(envelope));
  */
-export const validateLocalRecordEffect = Effect.fn("ObservabilityLocal.validateRecord")(function* (
-  value: unknown,
-) {
+export const validateLocalRecordEffect = Effect.fn("ObservabilityLocal.validateRecord")(function* <
+  Input,
+>(value: Input) {
   if (value === null || typeof value !== "object")
     return yield* Effect.fail(invalid("envelope", "Invalid telemetry envelope"));
-  const item = value as LocalRecord;
+  // Envelope fields are checked below before this value is returned as a LocalRecord.
+  const item = value as Input & LocalRecord;
   if (
     typeof item.key !== "string" ||
     item.key.length === 0 ||
@@ -94,10 +96,11 @@ export const validateLocalRecordEffect = Effect.fn("ObservabilityLocal.validateR
 export const recordTimeEffect = Effect.fn("ObservabilityLocal.recordTime")(function* (
   record: ObservabilityRecord,
 ) {
-  const value = record as unknown as Record<string, unknown>;
-  return Date.parse(
-    String(value.timestamp ?? value.startedAt ?? value.occurredAt ?? value.acceptedAt),
-  );
+  if ("timestamp" in record) return Date.parse(record.timestamp);
+  if ("startedAt" in record) return Date.parse(record.startedAt);
+  if ("occurredAt" in record) return Date.parse(record.occurredAt);
+  if ("acceptedAt" in record) return Date.parse(record.acceptedAt);
+  return Number.NaN;
 });
 
 /**
@@ -109,7 +112,7 @@ export const recordTimeEffect = Effect.fn("ObservabilityLocal.recordTime")(funct
  * @example
  * validateLocalRecord(envelope);
  */
-export function validateLocalRecord(value: unknown): asserts value is LocalRecord {
+export function validateLocalRecord<Input>(value: Input): asserts value is Input & LocalRecord {
   Effect.runSync(
     validateLocalRecordEffect(value).pipe(
       Effect.catchTag("LocalRecordValidationError", (error) =>

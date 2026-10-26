@@ -1,8 +1,17 @@
+/**
+ * Runs contributor commands with captured workspace/process authority. Generated
+ * apps retain live workspace links and pass a full check before publication;
+ * those mutable external declarations cannot produce portable dev snapshots.
+ */
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Effect, Schema, type Context } from "effect";
 import { runExecutionPromiseWith } from "@relkit/contracts/operation";
-import { applyScaffoldPlan, generateProject, type GenerateCommandResult } from "create-relkit";
+import {
+  applyScaffoldPlan,
+  generateProject,
+  type GenerateCommandResult,
+} from "./scaffolding/index.js";
 import { runCli } from "./main.js";
 import { loadCreateRelkitEffect, type CliCommandContext } from "./main-support.js";
 import {
@@ -52,7 +61,7 @@ export function prepareWorkspaceLinks(
  * Runs one generator-owned command through captured contributor authorities.
  * @param command - Literal executable vector.
  * @param cwd - Command working directory.
- * @returns Captured output; installs register links before running.
+ * @returns Captured output; installs register links and preparation runs a full check.
  */
 const localCommandEffect = Effect.fn("Contributor.command")(
   function* (command: readonly string[], cwd: string) {
@@ -62,7 +71,15 @@ const localCommandEffect = Effect.fn("Contributor.command")(
       const prepared = yield* workspaces.prepare(cwd);
       if (prepared.exitCode !== 0) return prepared;
     }
-    const actual = command[0] === cli ? [process.execPath, ...command] : command;
+    let actual = command;
+    if (command[0] === cli) {
+      // Mutable workspace links require ordinary checking instead of snapshot certification.
+      const args =
+        command[1] === "dev" && command[2] === "--prepare"
+          ? ["check", ...command.slice(3)]
+          : command.slice(1);
+      actual = [process.execPath, cli, ...args];
+    }
     return yield* processes.run({
       command: actual[0]!,
       args: actual.slice(1),
@@ -111,23 +128,7 @@ export function main(argv: readonly string[] = process.argv.slice(2)): Promise<n
                 },
               }
             : {}),
-          loadCreateRelkit: async () => ({
-            ...(await runExecutionPromiseWith(owner, loadCreateRelkitEffect)),
-            generateProject: (options: unknown, context: CliCommandContext) =>
-              generateProject(Schema.decodeUnknownSync(ContributorCreateOptions)(options), {
-                ...context,
-                bunExecutable: process.execPath,
-                relkitExecutable: cli,
-                commandRunner: runner,
-              }),
-            applyScaffoldPlan: (plan, context) =>
-              applyScaffoldPlan(plan, {
-                ...context,
-                bunExecutable: process.execPath,
-                relkitExecutable: cli,
-                commandRunner: runner,
-              }),
-          }),
+          loadCreateRelkit: contributorGenerator(owner, runner),
         }),
       );
     }).pipe((effect) => observeCli("contributor.main", effect)),
@@ -141,6 +142,35 @@ export function main(argv: readonly string[] = process.argv.slice(2)): Promise<n
       },
     },
   );
+}
+
+/**
+ * Captures one command runner for creation and add without another service graph.
+ * @param owner - Authorities owned by the contributor invocation.
+ * @param runner - Scoped command callback preserving process failures and cancellation.
+ * @returns The generator loader with contributor dependency and verification policy.
+ */
+function contributorGenerator(
+  owner: Context.Context<ContributorWorkspace | CliProcess>,
+  runner: ReturnType<typeof commandRunner>,
+): NonNullable<NonNullable<Parameters<typeof runCli>[1]>["loadCreateRelkit"]> {
+  return async () => ({
+    ...(await runExecutionPromiseWith(owner, loadCreateRelkitEffect)),
+    generateProject: (options, context: CliCommandContext) =>
+      generateProject(Schema.decodeUnknownSync(ContributorCreateOptions)(options), {
+        ...context,
+        bunExecutable: process.execPath,
+        relkitExecutable: cli,
+        commandRunner: runner,
+      }),
+    applyScaffoldPlan: (plan, context) =>
+      applyScaffoldPlan(plan, {
+        ...context,
+        bunExecutable: process.execPath,
+        relkitExecutable: cli,
+        commandRunner: runner,
+      }),
+  });
 }
 
 if (import.meta.main) process.exitCode = await main();

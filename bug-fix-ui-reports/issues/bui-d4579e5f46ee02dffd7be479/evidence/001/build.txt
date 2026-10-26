@@ -1,0 +1,1377 @@
+$ bun run generate && blume build --strict --isolated
+$ bun run scripts/generate.ts
+generated apps/docs/content/_snippets/generated/capabilities.mdx
+generated apps/docs/content/_snippets/generated/create-options.mdx
+generated apps/docs/content/_snippets/generated/add-service-options.mdx
+generated apps/docs/content/_snippets/generated/add-function-options.mdx
+generated apps/docs/content/_snippets/generated/add-task-options.mdx
+generated apps/docs/content/_snippets/generated/add-error-options.mdx
+generated apps/docs/content/_snippets/generated/add-event-options.mdx
+generated apps/docs/content/_snippets/generated/add-event-function-options.mdx
+generated apps/docs/content/_snippets/generated/add-job-options.mdx
+generated apps/docs/content/_snippets/generated/add-cache-options.mdx
+generated apps/docs/content/_snippets/generated/add-bucket-options.mdx
+generated apps/docs/content/_snippets/generated/add-tool-options.mdx
+generated apps/docs/content/_snippets/generated/add-prompt-options.mdx
+generated apps/docs/content/_snippets/generated/add-agent-options.mdx
+generated apps/docs/content/_snippets/generated/add-constants-options.mdx
+generated apps/docs/content/_snippets/generated/add-route-options.mdx
+generated apps/docs/content/_snippets/generated/add-middleware-options.mdx
+generated apps/docs/content/_snippets/generated/add-transform-options.mdx
+generated apps/docs/content/_snippets/generated/add-database-options.mdx
+generated apps/docs/content/_snippets/generated/add-auth-options.mdx
+generated apps/docs/content/_snippets/generated/coverage.json
+generated apps/docs/content/_snippets/generated/related/docs-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-index.mdx
+generated apps/docs/content/_snippets/generated/related/guides-index.mdx
+generated apps/docs/content/_snippets/generated/related/guides-storage-upload-product-images.mdx
+generated apps/docs/content/_snippets/generated/related/guides-caching-cache-product-prices.mdx
+generated apps/docs/content/_snippets/generated/related/guides-ai-build-an-offline-agent.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-providers-comparison.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-providers-inngest.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-providers-trigger.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-providers-effect-mq.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-create-an-app.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-first-route.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-save-orders.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-protect-orders.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-test-orders.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-local-development.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-build-and-run.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-concepts-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-concepts-application.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-concepts-functions.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-concepts-schemas.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-concepts-errors.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-concepts-context.mdx
+generated apps/docs/content/_snippets/generated/related/docs-learn-concepts-environment.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-service-migration.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-service-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-service-domains.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-service-organization.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-service-define.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-service-routes.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-service-first-service.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-http-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-http-define.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-http-routes.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-http-requests.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-http-uploads.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-http-middleware.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-http-rate-limits.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-http-responses.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-http-streaming.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-http-raw-handlers.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-http-openapi.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-http-generated-clients.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-http-first-route.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-events-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-events-define.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-events-publish.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-events-consume.mdx
+generated apps/docs/content/_snippets/generated/related/guides-events-react-to-order-events.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-quickstart.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-tasks.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-bindings.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-durations-and-sleep.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-execution-policy.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-retries-and-idempotency.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-clients.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-progress-and-streams.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-security.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-schedules.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-inspector.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-docker.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-providers-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-deployment.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-testing.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-migration.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-jobs-troubleshooting.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-database-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-database-drizzle.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-database-define.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-database-schema.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-database-queries.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-database-generated-schemas.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-database-models.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-database-overrides.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-database-transactions.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-database-migrations.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-database-better-auth.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-database-testing.mdx
+generated apps/docs/content/_snippets/generated/related/guides-database-register-users-in-a-transaction.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-auth-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-auth-better-auth.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-auth-sessions.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-auth-protect-routes.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-auth-clients.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-auth-customization.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-auth-testing.mdx
+generated apps/docs/content/_snippets/generated/related/guides-auth-email-password-sign-in.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-storage-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-storage-define.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-storage-local-storage.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-storage-upload.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-storage-read-delete.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-caching-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-caching-define.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-caching-read-write.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-caching-expiration.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-ai-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-ai-agents.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-ai-native-runtime.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-ai-graphs-persistence.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-ai-streaming.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-ai-threads-recovery.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-ai-approvals.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-ai-tools.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-ai-function-tools.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-ai-mcp.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-client-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-client-routes.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-client-mutations.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-client-streams.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-client-ssr.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-client-authentication.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-client-offline.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-realtime-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-realtime-access.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-realtime-react.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-realtime-presence.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-realtime-recovery.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-realtime-providers.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-integrations-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-integrations-local-docker.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-operations-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-operations-observability.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-operations-inspector.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-operations-realtime-agents-streaming.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-operations-testing.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-operations-deployment.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-operations-troubleshooting.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-integrations-provider-authoring.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-integrations-local-providers.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-service-context-values.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-cli-index.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-cli-create-an-app.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-cli-add-artifacts.mdx
+generated apps/docs/content/_snippets/generated/related/docs-modules-cli-automation.mdx
+generated apps/docs/content/_snippets/generated/related/guides-cli-create-and-build-an-api.mdx
+generated apps/docs/content/_snippets/generated/installations/native-drivers.mdx
+generated apps/docs/content/_snippets/generated/installations/auth-client.mdx
+generated apps/docs/content/_snippets/generated/installations/database-mysql.mdx
+generated apps/docs/content/_snippets/generated/installations/database.mdx
+generated apps/docs/content/_snippets/generated/installations/auth.mdx
+generated apps/docs/content/_snippets/generated/installations/agent.mdx
+generated apps/docs/content/_snippets/generated/installations/tools.mdx
+generated apps/docs/content/_snippets/generated/installations/mcp.mdx
+generated apps/docs/content/_snippets/generated/installations/deep-agent.mdx
+generated apps/docs/content/_snippets/generated/installations/client.mdx
+generated apps/docs/content/_snippets/generated/installations/ag-ui.mdx
+generated apps/docs/content/_snippets/generated/installations/scalar.mdx
+generated apps/docs/content/_snippets/generated/installations/client-query.mdx
+generated apps/docs/content/_snippets/generated/installations/client-react.mdx
+generated apps/docs/content/_snippets/generated/installations/auth-react.mdx
+generated apps/docs/content/_snippets/generated/installations/client-cli.mdx
+generated apps/docs/content/_snippets/generated/installations/testing.mdx
+generated apps/docs/content/_snippets/generated/installations/redis-connected.mdx
+generated apps/docs/content/_snippets/generated/installations/s3.mdx
+generated apps/docs/content/_snippets/generated/installations/redis.mdx
+generated apps/docs/content/_snippets/generated/installations/s3-connected.mdx
+generated apps/docs/content/_snippets/generated/installations/docker.mdx
+generated apps/docs/content/_snippets/generated/installations/cloudflare.mdx
+generated apps/docs/content/_snippets/generated/installations/inngest.mdx
+generated apps/docs/content/_snippets/generated/installations/local.mdx
+generated apps/docs/content/_snippets/generated/installations/effect-mq.mdx
+generated apps/docs/content/_snippets/generated/installations/trigger.mdx
+generated apps/docs/content/_snippets/generated/installations/sentry.mdx
+generated apps/docs/content/_snippets/generated/installations/otlp.mdx
+generated apps/docs/content/_snippets/generated/installations/deployment.mdx
+generated apps/docs/content/_snippets/generated/installations/inspector.mdx
+generated apps/docs/content/_snippets/generated/api-overview.mdx
+generated apps/docs/content/docs/api/cli.mdx
+generated apps/docs/content/_snippets/source/templates/default/v1/minimal/relkit.config.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/platform/server.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/functions/create-order.function.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/events/create-order.function.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/api/src/platform/env.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/errors/order-not-found.error.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/functions/get-order.function.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/api/src/services/orders/functions/create-order.function.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/api/tests/unit/orders.function.test.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/platform/schemas.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/api/src/services/orders/functions/price-order.function.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/api/src/services/orders/service.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/api/src/routes/orders/route.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/endpoint/src/services/orders/functions/price-order.function.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/auth/src/services/database/schema/index.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/auth/src/platform/env.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/auth/src/services/auth/service.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/auth/src/routes/api/auth/[[...auth]]/route.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/auth/src/services/orders/functions/create-order.function.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/auth/src/services/orders/functions/get-order.function.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/services/database/schema/index.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/services/database/service.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/platform/env.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/database/tsconfig.json
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/services/orders/functions/create-order.function.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/services/orders/functions/get-order.function.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/services/orders/service.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/routes/orders/[orderId]/route.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/database/tests/integration/hello.route.test.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/database/drizzle.config.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/tests/tests/unit/orders-pricing.test.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/database/tests/unit/orders.function.test.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/tests/tests/integration/hello.route.test.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/orders-tutorial/steps/tests/tests/integration/orders.route.test.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts
+generated apps/docs/content/_snippets/source/examples/commerce/tests/fixtures/cancel-order-with-approval--approval-tool.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/tools/cancel-order.tool.ts
+generated apps/docs/content/_snippets/source/examples/commerce/tests/fixtures/cancel-order-with-approval--approval-callback.ts
+generated apps/docs/content/_snippets/source/examples/commerce/tests/tool-approvals.test--sync-approvals.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/agent/src/services/hello/functions/hello.function.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/agents/order-review.agent--review-graph.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/agents/order-agent-persistence.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/agent/tests/fixtures/mcp-options--private-tool.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/agent/tests/fixtures/mcp-options--disable-mcp.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/agents/order-support.agent.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/agents/order-deep.agent.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/agent/tests/fixtures/lookup.tool.ts
+generated apps/docs/content/_snippets/source/examples/auth-drizzle/src/services/auth/service.ts
+generated apps/docs/content/_snippets/source/examples/auth-drizzle/relkit.config.ts
+generated apps/docs/content/_snippets/source/examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts
+generated apps/docs/content/_snippets/source/examples/auth-drizzle/src/platform/auth-client.ts
+generated apps/docs/content/_snippets/source/examples/auth-drizzle/src/platform/browser-client.ts
+generated apps/docs/content/_snippets/source/examples/auth-drizzle/src/services/database/schema/index.ts
+generated apps/docs/content/_snippets/source/examples/auth-drizzle/src/routes/account/profile/route.ts
+generated apps/docs/content/_snippets/source/examples/auth-drizzle/src/services/account/functions/session.function.ts
+generated apps/docs/content/_snippets/source/examples/auth-drizzle/src/services/account/service.ts
+generated apps/docs/content/_snippets/source/examples/auth-drizzle/src/routes/session/route.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/cache/prices.cache.ts
+generated apps/docs/content/_snippets/source/examples/commerce/tests/fixtures/get-price.function.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/public-api/tooling.ts
+generated apps/docs/content/_snippets/source/packages/better-auth/src/react.ts
+generated apps/docs/content/_snippets/source/examples/commerce-web/app/providers.tsx
+generated apps/docs/content/_snippets/source/examples/commerce-web/app/page.tsx
+generated apps/docs/content/_snippets/source/apps/docs/examples/jobs/reconcile-unknown.ts
+generated apps/docs/content/_snippets/source/packages/client/src/server-context.ts
+generated apps/docs/content/_snippets/source/examples/data-model/src/platform/env.ts
+generated apps/docs/content/_snippets/source/examples/data-model/src/services/database/service.ts
+generated apps/docs/content/_snippets/source/examples/data-model/src/services/database/schema/index--users-table.ts
+generated apps/docs/content/_snippets/source/examples/data-model/src/services/users/functions/register-member.function.ts
+generated apps/docs/content/_snippets/source/examples/data-model/src/services/users/functions/update-user-email.function.ts
+generated apps/docs/content/_snippets/source/examples/data-model/drizzle.config.ts
+generated apps/docs/content/_snippets/source/examples/data-model/src/services/database/models/users.model.ts
+generated apps/docs/content/_snippets/source/examples/data-model/src/services/users/functions/list-users.function.ts
+generated apps/docs/content/_snippets/source/examples/data-model/src/services/database/service--user-overrides.ts
+generated apps/docs/content/_snippets/source/examples/data-model/src/services/database/schema/index--memberships-table.ts
+generated apps/docs/content/_snippets/source/examples/data-model/tests/migrations.test.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/events/order-confirmation.function.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/events/order-created.event.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/api/src/routes/echo/route.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/routes/orders/route.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/api/tests/integration/orders.route.test.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/platform/generated-client.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/routes/middleware/order-auth.middleware.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/routes/orders/[orderId]/route.ts
+generated apps/docs/content/_snippets/source/tests/compiler/rate-limit.test--local-rate-limit.ts
+generated apps/docs/content/_snippets/source/tests/compiler/rate-limit.test--shared-rate-limit.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/routes/api/auth/[[...auth]]/route.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/routes/transforms/orders/normalize-id.transform.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/functions/stream-order-report.function.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/assets/functions/upload-assets.function.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/routes/uploads/route.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/landing/catalog.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/public-api/local.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/public-api/provider.ts
+generated apps/docs/content/_snippets/source/examples/commerce/relkit.config--jobs-profile.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/jobs/watch-run.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/tasks/export-orders.task.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/jobs/export-orders.job.ts
+generated apps/docs/content/_snippets/source/packages/jobs/tests/migration.test.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/jobs/providers/effect-mq-config.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/tasks/src/services/orders/service.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/tasks/src/services/orders/functions/health.function.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/tasks/src/services/orders/jobs/export-orders.job.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/jobs/providers/effect-mq-task.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/jobs/providers/export-orders.json
+generated apps/docs/content/_snippets/source/tests/jobs/compatibility/evidence/capability-matrix.json
+generated apps/docs/content/_snippets/source/apps/docs/examples/jobs/providers/inngest-config.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/jobs/providers/inngest-task.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/jobs/providers/trigger-config.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/jobs/providers/trigger-task.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/routes/orders/export/route.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts
+generated apps/docs/content/_snippets/source/examples/commerce/relkit.config--deployment-profile.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/minimal/package.json
+generated apps/docs/content/_snippets/source/apps/docs/examples/inspector/config.ts
+generated apps/docs/content/_snippets/source/examples/commerce/relkit.config--telemetry.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/functions/create-order.function--explicit-tracing.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/channels/order-updates.channel.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/announcements/channels/announcements.channel.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/announcements/functions/post-announcement.function.ts
+generated apps/docs/content/_snippets/source/examples/commerce/relkit.config--realtime-profiles.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/public-api/context.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/orders/service.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/events/order-confirmation.service.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/minimal/src/routes/hello/route.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/assets/buckets/assets.bucket.ts
+generated apps/docs/content/_snippets/source/examples/commerce/relkit.config--storage-local-profile.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/agent/relkit.config.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/agent/tests/unit/assistant.agent.test.ts
+generated apps/docs/content/_snippets/source/templates/default/v1/fullstack/web/app/agent-config.ts
+generated apps/docs/content/_snippets/source/examples/auth-drizzle/src/services/database/service.ts
+generated apps/docs/content/_snippets/source/examples/auth-drizzle/drizzle.config.ts
+generated apps/docs/content/_snippets/source/examples/commerce/relkit.config--cache-local-profile.ts
+generated apps/docs/content/_snippets/source/examples/data-model/src/services/database/schema/index.ts
+generated apps/docs/content/_snippets/source/examples/data-model/src/services/users/service.ts
+generated apps/docs/content/_snippets/source/examples/data-model/src/routes/users/route.ts
+generated apps/docs/content/_snippets/source/examples/data-model/tests/registration.test.ts
+generated apps/docs/content/_snippets/source/apps/docs/examples/events/profile.ts
+generated apps/docs/content/_snippets/source/examples/commerce/src/services/assets/service.ts
+generated apps/docs/content/docs/api/provider.mdx
+generated apps/docs/content/docs/api/config.mdx
+generated apps/docs/content/docs/api/observability-local.mdx
+generated apps/docs/content/docs/api/app.mdx
+generated apps/docs/content/docs/api/providers-local.mdx
+generated apps/docs/content/docs/api/cli-api.mdx
+generated apps/docs/content/docs/api/relkit.mdx
+generated apps/docs/content/docs/api/schema.mdx
+generated apps/docs/content/docs/api/create-relkit.mdx
+generated apps/docs/content/docs/api/services.mdx
+generated apps/docs/content/docs/api/drizzle.mdx
+generated apps/docs/content/docs/api/functions.mdx
+generated apps/docs/content/docs/api/buckets.mdx
+generated apps/docs/content/docs/api/cache.mdx
+generated apps/docs/content/docs/api/events.mdx
+generated apps/docs/content/docs/api/routes.mdx
+generated apps/docs/content/docs/api/jobs.mdx
+generated apps/docs/content/docs/api/better-auth.mdx
+generated apps/docs/content/docs/api/realtime.mdx
+generated apps/docs/content/docs/api/tools.mdx
+generated apps/docs/content/docs/api/agents.mdx
+generated apps/docs/content/docs/api/client.mdx
+generated apps/docs/content/docs/api/integrations/langchain.mdx
+generated apps/docs/content/docs/api/testing.mdx
+generated apps/docs/content/docs/api/integrations/catalog.mdx
+generated apps/docs/content/docs/api/integrations/cloudflare.mdx
+generated apps/docs/content/docs/api/inspector.mdx
+generated apps/docs/content/docs/api/integrations/docker.mdx
+generated apps/docs/content/docs/api/integrations/aws.mdx
+generated apps/docs/content/docs/api/integrations/local.mdx
+generated apps/docs/content/docs/api/integrations/otlp.mdx
+generated apps/docs/content/docs/api/integrations/sentry.mdx
+generated apps/docs/content/docs/api/integrations/inngest.mdx
+generated apps/docs/content/docs/api/integrations/s3.mdx
+generated apps/docs/content/docs/api/integrations/pulumi.mdx
+generated apps/docs/content/docs/api/integrations/redis.mdx
+generated apps/docs/content/docs/api/integrations/trigger.mdx
+generated apps/docs/content/docs/api/integrations/effect-mq.mdx
+generated apps/docs/content/_snippets/generated/exports/app.mdx
+generated apps/docs/content/_snippets/generated/exports/config.mdx
+generated apps/docs/content/_snippets/generated/exports/provider.mdx
+generated apps/docs/content/_snippets/generated/exports/providers-local.mdx
+generated apps/docs/content/_snippets/generated/exports/observability-local.mdx
+generated apps/docs/content/_snippets/generated/exports/cli-api.mdx
+generated apps/docs/content/_snippets/generated/exports/create-relkit.mdx
+generated apps/docs/content/_snippets/generated/exports/relkit.mdx
+generated apps/docs/content/_snippets/generated/exports/schema.mdx
+generated apps/docs/content/_snippets/generated/exports/functions.mdx
+generated apps/docs/content/_snippets/generated/exports/services.mdx
+generated apps/docs/content/_snippets/generated/exports/drizzle.mdx
+generated apps/docs/content/_snippets/generated/exports/better-auth.mdx
+generated apps/docs/content/_snippets/generated/exports/routes.mdx
+generated apps/docs/content/_snippets/generated/exports/events.mdx
+generated apps/docs/content/_snippets/generated/exports/jobs.mdx
+generated apps/docs/content/_snippets/generated/exports/buckets.mdx
+generated apps/docs/content/_snippets/generated/exports/cache.mdx
+generated apps/docs/content/_snippets/generated/exports/tools.mdx
+generated apps/docs/content/_snippets/generated/exports/agents.mdx
+generated apps/docs/content/_snippets/generated/exports/integrations/langchain.mdx
+generated apps/docs/content/_snippets/generated/exports/client.mdx
+generated apps/docs/content/_snippets/generated/exports/realtime.mdx
+generated apps/docs/content/_snippets/generated/exports/testing.mdx
+generated apps/docs/content/_snippets/generated/exports/inspector.mdx
+generated apps/docs/content/_snippets/generated/exports/integrations/aws.mdx
+generated apps/docs/content/_snippets/generated/exports/integrations/catalog.mdx
+generated apps/docs/content/_snippets/generated/exports/integrations/cloudflare.mdx
+generated apps/docs/content/_snippets/generated/exports/integrations/docker.mdx
+generated apps/docs/content/_snippets/generated/exports/integrations/local.mdx
+generated apps/docs/content/_snippets/generated/exports/integrations/otlp.mdx
+generated apps/docs/content/_snippets/generated/exports/integrations/pulumi.mdx
+generated apps/docs/content/_snippets/generated/exports/integrations/redis.mdx
+generated apps/docs/content/_snippets/generated/exports/integrations/s3.mdx
+generated apps/docs/content/_snippets/generated/exports/integrations/sentry.mdx
+generated apps/docs/content/_snippets/generated/exports/integrations/inngest.mdx
+generated apps/docs/content/_snippets/generated/exports/integrations/trigger.mdx
+generated apps/docs/content/_snippets/generated/exports/integrations/effect-mq.mdx
+generated apps/docs/content/docs/api/public.mdx
+Generated documentation updated.
+[blume] ◐ Building 179 page(s) (server output)
+15:48:44 [@astrojs/node] Enabling sessions with filesystem storage
+15:48:55 [content] Syncing content
+15:48:55 [content] Synced content
+15:48:55 [types] Generated 9.68s
+15:48:55 [build] output: "server"
+15:48:55 [build] mode: "server"
+15:48:55 [build] directory: /Users/mustafaelsayed/Workspace/relkit/apps/docs/.blume-verify/dist/
+15:48:55 [build] adapter: @astrojs/node
+15:48:55 [build] Collecting build info...
+15:48:55 [build] ✓ Completed in 10.75s.
+15:48:55 [build] Building server entrypoints...
+15:49:47 [assets] Copying fonts (2 files)...
+15:49:52 [vite] ✓ built in 56.82s
+15:49:53 [vite] ✓ built in 774ms
+15:49:55 [WARN] [vite] [plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+15:49:55 [vite] ✓ built in 2.21s
+
+ prerendering static routes 
+15:49:57   ├─ /404.html15:49:57   ├─ /404.json15:49:57   ├─ /404.md15:49:57   ├─ /api/docs/navigation.json15:49:57   ├─ /api/docs/pages/docs.json15:49:57   ├─ /api/docs/pages/docs/api.json15:49:57   ├─ /api/docs/pages/docs/api/agents.json15:49:57   ├─ /api/docs/pages/docs/api/app.json (+177ms) 
+15:49:57   ├─ /api/docs/pages/docs/api/better-auth.json (+192ms) 
+15:49:57   ├─ /api/docs/pages/docs/api/buckets.json (+184ms) 
+15:49:57   ├─ /api/docs/pages/docs/api/cache.json (+15ms) 
+15:49:57   ├─ /api/docs/pages/docs/api/cli.json (+199ms) 
+15:49:57   ├─ /api/docs/pages/docs/api/cli-api.json (+17ms) 
+15:49:57   ├─ /api/docs/pages/docs/api/client.json (+223ms) 
+15:49:57   ├─ /api/docs/pages/docs/api/config.json (+235ms) 
+15:49:57   ├─ /api/docs/pages/docs/api/create-relkit.json (+62ms) 
+15:49:57   ├─ /api/docs/pages/docs/api/drizzle.json (+238ms) 
+15:49:57   ├─ /api/docs/pages/docs/api/events.json (+240ms) 
+15:49:57   ├─ /api/docs/pages/docs/api/functions.json (+61ms) 
+15:49:57   ├─ /api/docs/pages/docs/api/inspector.json (+58ms) 
+15:49:57   ├─ /api/docs/pages/docs/api/integrations/aws.json (+30ms) 
+15:49:57   ├─ /api/docs/pages/docs/api/integrations/catalog.json (+57ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/integrations/cloudflare.json (+18ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/integrations/docker.json (+23ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/integrations/effect-mq.json (+17ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/integrations/inngest.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/integrations/langchain.json (+42ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/integrations/local.json (+42ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/integrations/otlp.json (+42ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/integrations/pulumi.json (+49ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/integrations/redis.json (+59ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/integrations/s3.json (+63ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/integrations/sentry.json (+64ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/integrations/trigger.json (+38ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/jobs.json (+73ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/observability-local.json (+111ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/provider.json (+73ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/providers-local.json (+70ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/public.json (+56ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/realtime.json (+61ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/relkit.json (+55ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/routes.json (+11ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/schema.json (+15ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/services.json (+10ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/testing.json (+18ms) 
+15:49:58   ├─ /api/docs/pages/docs/api/tools.json (+68ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn.json (+15ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn/build-and-run.json (+17ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn/concepts.json (+20ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn/concepts/application.json (+15ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn/concepts/context.json (+8ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn/concepts/environment.json (+11ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn/concepts/errors.json (+13ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn/concepts/functions.json (+18ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn/concepts/schemas.json (+19ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn/create-an-app.json (+36ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn/first-route.json (+22ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn/local-development.json (+18ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn/protect-orders.json (+26ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn/save-orders.json (+34ms) 
+15:49:58   ├─ /api/docs/pages/docs/learn/test-orders.json (+43ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules.json (+38ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/ai.json (+53ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/ai/agents.json (+43ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/ai/approvals.json (+59ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/ai/function-tools.json (+59ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/ai/graphs-persistence.json (+71ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/ai/mcp.json (+71ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/ai/native-runtime.json (+65ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/ai/streaming.json (+68ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/ai/threads-recovery.json (+71ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/ai/tools.json (+68ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/auth.json (+83ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/auth/better-auth.json (+76ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/auth/clients.json (+74ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/auth/customization.json (+61ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/auth/protect-routes.json (+54ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/auth/sessions.json (+43ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/auth/testing.json (+53ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/caching.json (+22ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/caching/define.json (+47ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/caching/expiration.json (+19ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/caching/read-write.json (+15ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/cli.json (+16ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/cli/add-artifacts.json (+16ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/cli/automation.json (+14ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/cli/create-an-app.json (+21ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/client.json (+14ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/client/authentication.json (+13ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/client/mutations.json (+11ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/client/offline.json (+13ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/client/routes.json (+14ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/client/ssr.json (+5ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/client/streams.json (+22ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/database.json (+18ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/database/better-auth.json (+21ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/database/define.json (+18ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/database/drizzle.json (+25ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/database/generated-schemas.json (+28ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/database/migrations.json (+13ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/database/models.json (+26ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/database/overrides.json (+19ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/database/queries.json (+30ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/database/schema.json (+15ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/database/testing.json (+15ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/database/transactions.json (+5ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/events.json (+9ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/events/consume.json (+9ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/events/define.json (+9ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/events/publish.json (+8ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/http.json (+9ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/http/define.json (+12ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/http/first-route.json (+10ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/http/generated-clients.json (+10ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/http/middleware.json (+11ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/http/openapi.json (+4ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/http/rate-limits.json (+6ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/http/raw-handlers.json (+6ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/http/requests.json (+6ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/http/responses.json (+7ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/http/routes.json (+10ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/http/streaming.json (+13ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/http/uploads.json (+11ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/integrations.json (+10ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/integrations/local-docker.json (+11ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/integrations/local-providers.json (+11ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/integrations/provider-authoring.json (+14ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs.json (+15ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/bindings.json (+79ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/clients.json (+81ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/deployment.json (+81ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/docker.json (+81ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/durations-and-sleep.json (+81ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/execution-policy.json (+74ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/inspector.json (+79ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/migration.json (+82ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/progress-and-streams.json (+5ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/providers.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/providers/comparison.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/providers/effect-mq.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/providers/inngest.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/providers/trigger.json (+4ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/quickstart.json (+4ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/retries-and-idempotency.json (+4ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/schedules.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/security.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/tasks.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/testing.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/jobs/troubleshooting.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/operations.json (+6ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/operations/deployment.json (+7ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/operations/inspector.json (+8ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/operations/observability.json (+8ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/operations/realtime-agents-streaming.json (+9ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/operations/testing.json (+10ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/operations/troubleshooting.json (+6ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/realtime.json (+9ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/realtime/access.json (+10ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/realtime/presence.json (+5ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/realtime/providers.json (+5ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/realtime/react.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/realtime/recovery.json (+5ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/service.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/service/context-values.json (+4ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/service/define.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/service/domains.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/service/first-service.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/service/migration.json (+3ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/service/organization.json (+4ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/service/routes.json (+4ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/storage.json (+4ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/storage/define.json (+7ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/storage/local-storage.json (+10ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/storage/read-delete.json (+11ms) 
+15:49:58   ├─ /api/docs/pages/docs/modules/storage/upload.json (+13ms) 
+15:49:58   ├─ /api/docs/pages/guides.json (+13ms) 
+15:49:58   ├─ /api/docs/pages/guides/ai/build-an-offline-agent.json (+11ms) 
+15:49:58   ├─ /api/docs/pages/guides/auth/email-password-sign-in.json (+11ms) 
+15:49:58   ├─ /api/docs/pages/guides/caching/cache-product-prices.json (+12ms) 
+15:49:58   ├─ /api/docs/pages/guides/cli/create-and-build-an-api.json (+9ms) 
+15:49:58   ├─ /api/docs/pages/guides/database/register-users-in-a-transaction.json (+9ms) 
+15:49:58   ├─ /api/docs/pages/guides/events/react-to-order-events.json (+9ms) 
+15:49:58   ├─ /api/docs/pages/guides/storage/upload-product-images.json (+8ms) 
+15:49:58   ├─ /api/docs/pages.json (+17ms) 
+15:49:58   ├─ /blume-nav/current/default/g0/index.html (+34ms) 
+15:49:58   ├─ /blume-nav/current/default/g1/index.html (+34ms) 
+15:49:58   ├─ /blume-nav/current/default/g2/index.html (+45ms) 
+15:49:58   ├─ /blume-nav/current/default/g3/index.html (+52ms) 
+15:49:58   ├─ /blume-nav/current/default/g4/index.html (+57ms) 
+15:49:58   ├─ /blume-nav/current/default/g5/index.html (+52ms) 
+15:49:58   ├─ /blume-nav/current/default/g6/index.html (+62ms) 
+15:49:58   ├─ /blume-nav/current/default/g7/index.html (+8ms) 
+15:49:58   ├─ /blume-nav/current/default/g8/index.html (+12ms) 
+15:49:58   ├─ /blume-nav/current/default/g9/index.html (+23ms) 
+15:49:58   ├─ /blume-nav/current/default/g10/index.html (+70ms) 
+15:49:58   ├─ /blume-nav/current/default/g11/index.html (+41ms) 
+15:49:58   ├─ /blume-nav/current/default/g12/index.html (+53ms) 
+15:49:58   ├─ /blume-nav/current/default/g13/index.html (+40ms) 
+15:49:58   ├─ /blume-nav/current/default/g14/index.html (+63ms) 
+15:49:58   ├─ /blume-nav/current/default/g15/index.html (+32ms) 
+15:49:58   ├─ /blume-nav/current/default/g16/index.html (+38ms) 
+15:49:58   ├─ /blume-nav/current/default/g17/index.html (+23ms) 
+15:49:58   ├─ /blume-nav/current/default/g18/index.html (+42ms) 
+15:49:58   ├─ /blume-nav/current/default/g19/index.html (+33ms) 
+15:49:58   ├─ /blume-nav/current/default/g20/index.html (+30ms) 
+15:49:58   ├─ /blume-nav/current/default/g21/index.html (+34ms) 
+15:49:58   ├─ /blume-nav/current/default/g22/index.html (+44ms) 
+15:49:58   ├─ /blume-nav/current/default/g23/index.html (+44ms) 
+15:49:58   ├─ /blume-nav/current/default/g24/index.html (+38ms) 
+15:49:58   ├─ /blume-nav/current/default/g25/index.html (+37ms) 
+15:49:58   ├─ /blume-nav/current/default/g26/index.html (+34ms) 
+15:49:58   ├─ /blume-nav/current/default/g27/index.html (+25ms) 
+15:49:58   ├─ /blume-search.json (+117ms) 
+15:49:58   ├─ /og/index.png (+106ms) 
+15:49:58   ├─ /og/docs.png (+124ms) 
+15:49:58   ├─ /og/docs/api.png (+107ms) 
+15:49:58   ├─ /og/docs/api/agents.png (+105ms) 
+15:49:58   ├─ /og/docs/api/app.png (+108ms) 
+15:49:58   ├─ /og/docs/api/better-auth.png (+107ms) 
+15:49:58   ├─ /og/docs/api/buckets.png (+378ms) 
+15:49:59   ├─ /og/docs/api/cache.png (+339ms) 
+15:49:59   ├─ /og/docs/api/cli.png (+332ms) 
+15:49:59   ├─ /og/docs/api/cli-api.png (+333ms) 
+15:49:59   ├─ /og/docs/api/client.png (+332ms) 
+15:49:59   ├─ /og/docs/api/config.png (+330ms) 
+15:49:59   ├─ /og/docs/api/create-relkit.png (+327ms) 
+15:49:59   ├─ /og/docs/api/drizzle.png (+335ms) 
+15:49:59   ├─ /og/docs/api/events.png (+59ms) 
+15:49:59   ├─ /og/docs/api/functions.png (+16ms) 
+15:49:59   ├─ /og/docs/api/inspector.png (+19ms) 
+15:49:59   ├─ /og/docs/api/integrations/aws.png (+19ms) 
+15:49:59   ├─ /og/docs/api/integrations/catalog.png (+17ms) 
+15:49:59   ├─ /og/docs/api/integrations/cloudflare.png (+17ms) 
+15:49:59   ├─ /og/docs/api/integrations/docker.png (+18ms) 
+15:49:59   ├─ /og/docs/api/integrations/effect-mq.png (+21ms) 
+15:49:59   ├─ /og/docs/api/integrations/inngest.png (+23ms) 
+15:49:59   ├─ /og/docs/api/integrations/langchain.png (+19ms) 
+15:49:59   ├─ /og/docs/api/integrations/local.png (+21ms) 
+15:49:59   ├─ /og/docs/api/integrations/otlp.png (+22ms) 
+15:49:59   ├─ /og/docs/api/integrations/pulumi.png (+22ms) 
+15:49:59   ├─ /og/docs/api/integrations/redis.png (+23ms) 
+15:49:59   ├─ /og/docs/api/integrations/s3.png (+24ms) 
+15:49:59   ├─ /og/docs/api/integrations/sentry.png (+27ms) 
+15:49:59   ├─ /og/docs/api/integrations/trigger.png (+34ms) 
+15:49:59   ├─ /og/docs/api/jobs.png (+33ms) 
+15:49:59   ├─ /og/docs/api/observability-local.png (+36ms) 
+15:49:59   ├─ /og/docs/api/provider.png (+38ms) 
+15:49:59   ├─ /og/docs/api/providers-local.png (+39ms) 
+15:49:59   ├─ /og/docs/api/public.png (+41ms) 
+15:49:59   ├─ /og/docs/api/realtime.png (+50ms) 
+15:49:59   ├─ /og/docs/api/relkit.png (+1.17s) 
+15:50:00   ├─ /og/docs/api/routes.png (+1.16s) 
+15:50:00   ├─ /og/docs/api/schema.png (+1.15s) 
+15:50:00   ├─ /og/docs/api/services.png (+1.15s) 
+15:50:00   ├─ /og/docs/api/testing.png (+1.15s) 
+15:50:00   ├─ /og/docs/api/tools.png (+1.14s) 
+15:50:00   ├─ /og/docs/learn.png (+1.14s) 
+15:50:00   ├─ /og/docs/learn/build-and-run.png (+1.16s) 
+15:50:00   ├─ /og/docs/learn/concepts.png (+31ms) 
+15:50:00   ├─ /og/docs/learn/concepts/application.png (+18ms) 
+15:50:00   ├─ /og/docs/learn/concepts/context.png (+22ms) 
+15:50:00   ├─ /og/docs/learn/concepts/environment.png (+28ms) 
+15:50:00   ├─ /og/docs/learn/concepts/errors.png (+28ms) 
+15:50:00   ├─ /og/docs/learn/concepts/functions.png (+19ms) 
+15:50:00   ├─ /og/docs/learn/concepts/schemas.png (+26ms) 
+15:50:00   ├─ /og/docs/learn/create-an-app.png (+28ms) 
+15:50:00   ├─ /og/docs/learn/first-route.png (+16ms) 
+15:50:00   ├─ /og/docs/learn/local-development.png (+18ms) 
+15:50:00   ├─ /og/docs/learn/protect-orders.png (+18ms) 
+15:50:00   ├─ /og/docs/learn/save-orders.png (+19ms) 
+15:50:00   ├─ /og/docs/learn/test-orders.png (+24ms) 
+15:50:00   ├─ /og/docs/modules.png (+20ms) 
+15:50:00   ├─ /og/docs/modules/ai.png (+26ms) 
+15:50:00   ├─ /og/docs/modules/ai/agents.png (+26ms) 
+15:50:00   ├─ /og/docs/modules/ai/approvals.png (+18ms) 
+15:50:00   ├─ /og/docs/modules/ai/function-tools.png (+19ms) 
+15:50:00   ├─ /og/docs/modules/ai/graphs-persistence.png (+23ms) 
+15:50:00   ├─ /og/docs/modules/ai/mcp.png (+22ms) 
+15:50:00   ├─ /og/docs/modules/ai/native-runtime.png (+21ms) 
+15:50:00   ├─ /og/docs/modules/ai/streaming.png (+28ms) 
+15:50:00   ├─ /og/docs/modules/ai/threads-recovery.png (+27ms) 
+15:50:00   ├─ /og/docs/modules/ai/tools.png (+20ms) 
+15:50:00   ├─ /og/docs/modules/auth.png (+23ms) 
+15:50:00   ├─ /og/docs/modules/auth/better-auth.png (+30ms) 
+15:50:00   ├─ /og/docs/modules/auth/clients.png (+30ms) 
+15:50:00   ├─ /og/docs/modules/auth/customization.png (+25ms) 
+15:50:00   ├─ /og/docs/modules/auth/protect-routes.png (+32ms) 
+15:50:00   ├─ /og/docs/modules/auth/sessions.png (+27ms) 
+15:50:00   ├─ /og/docs/modules/auth/testing.png (+33ms) 
+15:50:00   ├─ /og/docs/modules/caching.png (+37ms) 
+15:50:00   ├─ /og/docs/modules/caching/define.png (+36ms) 
+15:50:00   ├─ /og/docs/modules/caching/expiration.png (+34ms) 
+15:50:00   ├─ /og/docs/modules/caching/read-write.png (+31ms) 
+15:50:00   ├─ /og/docs/modules/cli.png (+35ms) 
+15:50:00   ├─ /og/docs/modules/cli/add-artifacts.png (+38ms) 
+15:50:00   ├─ /og/docs/modules/cli/automation.png (+19ms) 
+15:50:00   ├─ /og/docs/modules/cli/create-an-app.png (+33ms) 
+15:50:00   ├─ /og/docs/modules/client.png (+26ms) 
+15:50:00   ├─ /og/docs/modules/client/authentication.png (+30ms) 
+15:50:00   ├─ /og/docs/modules/client/mutations.png (+24ms) 
+15:50:00   ├─ /og/docs/modules/client/offline.png (+27ms) 
+15:50:00   ├─ /og/docs/modules/client/routes.png (+30ms) 
+15:50:00   ├─ /og/docs/modules/client/ssr.png (+27ms) 
+15:50:00   ├─ /og/docs/modules/client/streams.png (+31ms) 
+15:50:00   ├─ /og/docs/modules/database.png (+21ms) 
+15:50:00   ├─ /og/docs/modules/database/better-auth.png (+25ms) 
+15:50:00   ├─ /og/docs/modules/database/define.png (+28ms) 
+15:50:00   ├─ /og/docs/modules/database/drizzle.png (+23ms) 
+15:50:00   ├─ /og/docs/modules/database/generated-schemas.png (+21ms) 
+15:50:00   ├─ /og/docs/modules/database/migrations.png (+21ms) 
+15:50:00   ├─ /og/docs/modules/database/models.png (+17ms) 
+15:50:00   ├─ /og/docs/modules/database/overrides.png (+18ms) 
+15:50:00   ├─ /og/docs/modules/database/queries.png (+23ms) 
+15:50:00   ├─ /og/docs/modules/database/schema.png (+24ms) 
+15:50:00   ├─ /og/docs/modules/database/testing.png (+32ms) 
+15:50:00   ├─ /og/docs/modules/database/transactions.png (+28ms) 
+15:50:00   ├─ /og/docs/modules/events.png (+28ms) 
+15:50:00   ├─ /og/docs/modules/events/consume.png (+28ms) 
+15:50:00   ├─ /og/docs/modules/events/define.png (+30ms) 
+15:50:00   ├─ /og/docs/modules/events/publish.png (+25ms) 
+15:50:00   ├─ /og/docs/modules/http.png (+34ms) 
+15:50:00   ├─ /og/docs/modules/http/define.png (+25ms) 
+15:50:00   ├─ /og/docs/modules/http/first-route.png (+19ms) 
+15:50:00   ├─ /og/docs/modules/http/generated-clients.png (+16ms) 
+15:50:00   ├─ /og/docs/modules/http/middleware.png (+16ms) 
+15:50:00   ├─ /og/docs/modules/http/openapi.png (+22ms) 
+15:50:00   ├─ /og/docs/modules/http/rate-limits.png (+20ms) 
+15:50:00   ├─ /og/docs/modules/http/raw-handlers.png (+17ms) 
+15:50:00   ├─ /og/docs/modules/http/requests.png (+26ms) 
+15:50:00   ├─ /og/docs/modules/http/responses.png (+24ms) 
+15:50:00   ├─ /og/docs/modules/http/routes.png (+26ms) 
+15:50:00   ├─ /og/docs/modules/http/streaming.png (+32ms) 
+15:50:00   ├─ /og/docs/modules/http/uploads.png (+28ms) 
+15:50:00   ├─ /og/docs/modules/integrations.png (+33ms) 
+15:50:00   ├─ /og/docs/modules/integrations/local-docker.png (+24ms) 
+15:50:00   ├─ /og/docs/modules/integrations/local-providers.png (+33ms) 
+15:50:00   ├─ /og/docs/modules/integrations/provider-authoring.png (+20ms) 
+15:50:00   ├─ /og/docs/modules/jobs.png (+17ms) 
+15:50:00   ├─ /og/docs/modules/jobs/bindings.png (+18ms) 
+15:50:00   ├─ /og/docs/modules/jobs/clients.png (+34ms) 
+15:50:00   ├─ /og/docs/modules/jobs/deployment.png (+18ms) 
+15:50:00   ├─ /og/docs/modules/jobs/docker.png (+17ms) 
+15:50:00   ├─ /og/docs/modules/jobs/durations-and-sleep.png (+11ms) 
+15:50:00   ├─ /og/docs/modules/jobs/execution-policy.png (+11ms) 
+15:50:00   ├─ /og/docs/modules/jobs/inspector.png (+12ms) 
+15:50:00   ├─ /og/docs/modules/jobs/migration.png (+12ms) 
+15:50:00   ├─ /og/docs/modules/jobs/progress-and-streams.png (+15ms) 
+15:50:00   ├─ /og/docs/modules/jobs/providers.png (+16ms) 
+15:50:00   ├─ /og/docs/modules/jobs/providers/comparison.png (+17ms) 
+15:50:00   ├─ /og/docs/modules/jobs/providers/effect-mq.png (+15ms) 
+15:50:00   ├─ /og/docs/modules/jobs/providers/inngest.png (+11ms) 
+15:50:00   ├─ /og/docs/modules/jobs/providers/trigger.png (+12ms) 
+15:50:00   ├─ /og/docs/modules/jobs/quickstart.png (+11ms) 
+15:50:00   ├─ /og/docs/modules/jobs/retries-and-idempotency.png (+12ms) 
+15:50:00   ├─ /og/docs/modules/jobs/schedules.png (+13ms) 
+15:50:00   ├─ /og/docs/modules/jobs/security.png (+14ms) 
+15:50:00   ├─ /og/docs/modules/jobs/tasks.png (+15ms) 
+15:50:00   ├─ /og/docs/modules/jobs/testing.png (+13ms) 
+15:50:00   ├─ /og/docs/modules/jobs/troubleshooting.png (+14ms) 
+15:50:00   ├─ /og/docs/modules/operations.png (+14ms) 
+15:50:00   ├─ /og/docs/modules/operations/deployment.png (+14ms) 
+15:50:00   ├─ /og/docs/modules/operations/inspector.png (+27ms) 
+15:50:00   ├─ /og/docs/modules/operations/observability.png (+27ms) 
+15:50:00   ├─ /og/docs/modules/operations/realtime-agents-streaming.png (+29ms) 
+15:50:00   ├─ /og/docs/modules/operations/testing.png (+29ms) 
+15:50:00   ├─ /og/docs/modules/operations/troubleshooting.png (+32ms) 
+15:50:00   ├─ /og/docs/modules/realtime.png (+31ms) 
+15:50:00   ├─ /og/docs/modules/realtime/access.png (+32ms) 
+15:50:00   ├─ /og/docs/modules/realtime/presence.png (+37ms) 
+15:50:00   ├─ /og/docs/modules/realtime/providers.png (+32ms) 
+15:50:00   ├─ /og/docs/modules/realtime/react.png (+27ms) 
+15:50:00   ├─ /og/docs/modules/realtime/recovery.png (+25ms) 
+15:50:00   ├─ /og/docs/modules/service.png (+32ms) 
+15:50:00   ├─ /og/docs/modules/service/context-values.png (+25ms) 
+15:50:00   ├─ /og/docs/modules/service/define.png (+33ms) 
+15:50:00   ├─ /og/docs/modules/service/domains.png (+28ms) 
+15:50:00   ├─ /og/docs/modules/service/first-service.png (+29ms) 
+15:50:00   ├─ /og/docs/modules/service/migration.png (+27ms) 
+15:50:00   ├─ /og/docs/modules/service/organization.png (+22ms) 
+15:50:00   ├─ /og/docs/modules/service/routes.png (+22ms) 
+15:50:00   ├─ /og/docs/modules/storage.png (+29ms) 
+15:50:00   ├─ /og/docs/modules/storage/define.png (+28ms) 
+15:50:00   ├─ /og/docs/modules/storage/local-storage.png (+27ms) 
+15:50:00   ├─ /og/docs/modules/storage/read-delete.png (+33ms) 
+15:50:00   ├─ /og/docs/modules/storage/upload.png (+28ms) 
+15:50:00   ├─ /og/guides.png (+22ms) 
+15:50:00   ├─ /og/guides/ai/build-an-offline-agent.png (+18ms) 
+15:50:00   ├─ /og/guides/auth/email-password-sign-in.png (+21ms) 
+15:50:00   ├─ /og/guides/caching/cache-product-prices.png (+22ms) 
+15:50:00   ├─ /og/guides/cli/create-and-build-an-api.png (+14ms) 
+15:50:00   ├─ /og/guides/database/register-users-in-a-transaction.png (+20ms) 
+15:50:00   ├─ /og/guides/events/react-to-order-events.png (+17ms) 
+15:50:00   ├─ /og/guides/storage/upload-product-images.png (+17ms) 
+15:50:00   ├─ /openapi.json (+30ms) 
+15:50:00   ├─ /index.html (+845ms) 
+15:50:01   ├─ /docs.md (+861ms) 
+15:50:01   ├─ /docs/api.md (+859ms) 
+15:50:01   ├─ /docs/api/agents.md (+860ms) 
+15:50:01   ├─ /docs/api/app.md (+1.69s) 
+15:50:02   ├─ /docs/api/better-auth.md (+1.70s) 
+15:50:02   ├─ /docs/api/buckets.md (+1.70s) 
+15:50:02   ├─ /docs/api/cache.md (+850ms) 
+15:50:02   ├─ /docs/api/cli.md (+851ms) 
+15:50:02   ├─ /docs/api/cli-api.md (+855ms) 
+15:50:02   ├─ /docs/api/client.md (+861ms) 
+15:50:02   ├─ /docs/api/config.md (+1.70s) 
+15:50:02   ├─ /docs/api/create-relkit.md (+37ms) 
+15:50:02   ├─ /docs/api/drizzle.md (+46ms) 
+15:50:02   ├─ /docs/api/events.md (+61ms) 
+15:50:02   ├─ /docs/api/functions.md (+66ms) 
+15:50:02   ├─ /docs/api/inspector.md (+72ms) 
+15:50:02   ├─ /docs/api/integrations/aws.md (+75ms) 
+15:50:02   ├─ /docs/api/integrations/catalog.md (+67ms) 
+15:50:02   ├─ /docs/api/integrations/cloudflare.md (+66ms) 
+15:50:02   ├─ /docs/api/integrations/docker.md (+57ms) 
+15:50:02   ├─ /docs/api/integrations/effect-mq.md (+25ms) 
+15:50:02   ├─ /docs/api/integrations/inngest.md (+19ms) 
+15:50:02   ├─ /docs/api/integrations/langchain.md (+53ms) 
+15:50:02   ├─ /docs/api/integrations/local.md (+88ms) 
+15:50:02   ├─ /docs/api/integrations/otlp.md (+52ms) 
+15:50:02   ├─ /docs/api/integrations/pulumi.md (+49ms) 
+15:50:02   ├─ /docs/api/integrations/redis.md (+49ms) 
+15:50:02   ├─ /docs/api/integrations/s3.md (+65ms) 
+15:50:02   ├─ /docs/api/integrations/sentry.md (+72ms) 
+15:50:02   ├─ /docs/api/integrations/trigger.md (+75ms) 
+15:50:02   ├─ /docs/api/jobs.md (+71ms) 
+15:50:02   ├─ /docs/api/observability-local.md (+67ms) 
+15:50:02   ├─ /docs/api/provider.md (+68ms) 
+15:50:02   ├─ /docs/api/providers-local.md (+102ms) 
+15:50:02   ├─ /docs/api/public.md (+109ms) 
+15:50:02   ├─ /docs/api/realtime.md (+132ms) 
+15:50:02   ├─ /docs/api/relkit.md (+123ms) 
+15:50:02   ├─ /docs/api/routes.md (+99ms) 
+15:50:02   ├─ /docs/api/schema.md (+95ms) 
+15:50:02   ├─ /docs/api/services.md (+143ms) 
+15:50:02   ├─ /docs/api/testing.md (+71ms) 
+15:50:02   ├─ /docs/api/tools.md (+80ms) 
+15:50:02   ├─ /docs/learn.md (+118ms) 
+15:50:02   ├─ /docs/learn/build-and-run.md (+38ms) 
+15:50:02   ├─ /docs/learn/concepts.md (+37ms) 
+15:50:02   ├─ /docs/learn/concepts/application.md (+34ms) 
+15:50:02   ├─ /docs/learn/concepts/context.md (+9ms) 
+15:50:02   ├─ /docs/learn/concepts/environment.md (+34ms) 
+15:50:02   ├─ /docs/learn/concepts/errors.md (+19ms) 
+15:50:02   ├─ /docs/learn/concepts/functions.md (+26ms) 
+15:50:02   ├─ /docs/learn/concepts/schemas.md (+19ms) 
+15:50:02   ├─ /docs/learn/create-an-app.md (+18ms) 
+15:50:02   ├─ /docs/learn/first-route.md (+19ms) 
+15:50:02   ├─ /docs/learn/local-development.md (+27ms) 
+15:50:02   ├─ /docs/learn/protect-orders.md (+28ms) 
+15:50:02   ├─ /docs/learn/save-orders.md (+24ms) 
+15:50:02   ├─ /docs/learn/test-orders.md (+35ms) 
+15:50:02   ├─ /docs/modules.md (+39ms) 
+15:50:02   ├─ /docs/modules/ai.md (+48ms) 
+15:50:02   ├─ /docs/modules/ai/agents.md (+45ms) 
+15:50:02   ├─ /docs/modules/ai/approvals.md (+48ms) 
+15:50:02   ├─ /docs/modules/ai/function-tools.md (+39ms) 
+15:50:02   ├─ /docs/modules/ai/graphs-persistence.md (+45ms) 
+15:50:02   ├─ /docs/modules/ai/mcp.md (+22ms) 
+15:50:02   ├─ /docs/modules/ai/native-runtime.md (+18ms) 
+15:50:02   ├─ /docs/modules/ai/streaming.md (+51ms) 
+15:50:02   ├─ /docs/modules/ai/threads-recovery.md (+25ms) 
+15:50:02   ├─ /docs/modules/ai/tools.md (+53ms) 
+15:50:02   ├─ /docs/modules/auth.md (+53ms) 
+15:50:02   ├─ /docs/modules/auth/better-auth.md (+33ms) 
+15:50:02   ├─ /docs/modules/auth/clients.md (+26ms) 
+15:50:02   ├─ /docs/modules/auth/customization.md (+23ms) 
+15:50:02   ├─ /docs/modules/auth/protect-routes.md (+5ms) 
+15:50:02   ├─ /docs/modules/auth/sessions.md (+20ms) 
+15:50:02   ├─ /docs/modules/auth/testing.md (+19ms) 
+15:50:02   ├─ /docs/modules/caching.md (+11ms) 
+15:50:02   ├─ /docs/modules/caching/define.md (+19ms) 
+15:50:02   ├─ /docs/modules/caching/expiration.md (+4ms) 
+15:50:02   ├─ /docs/modules/caching/read-write.md (+5ms) 
+15:50:02   ├─ /docs/modules/cli.md (+5ms) 
+15:50:02   ├─ /docs/modules/cli/add-artifacts.md (+6ms) 
+15:50:02   ├─ /docs/modules/cli/automation.md (+7ms) 
+15:50:02   ├─ /docs/modules/cli/create-an-app.md (+6ms) 
+15:50:02   ├─ /docs/modules/client.md (+7ms) 
+15:50:02   ├─ /docs/modules/client/authentication.md (+6ms) 
+15:50:02   ├─ /docs/modules/client/mutations.md (+5ms) 
+15:50:02   ├─ /docs/modules/client/offline.md (+3ms) 
+15:50:02   ├─ /docs/modules/client/routes.md (+15ms) 
+15:50:02   ├─ /docs/modules/client/ssr.md (+21ms) 
+15:50:02   ├─ /docs/modules/client/streams.md (+22ms) 
+15:50:02   ├─ /docs/modules/database.md (+40ms) 
+15:50:02   ├─ /docs/modules/database/better-auth.md (+41ms) 
+15:50:02   ├─ /docs/modules/database/define.md (+41ms) 
+15:50:02   ├─ /docs/modules/database/drizzle.md (+41ms) 
+15:50:02   ├─ /docs/modules/database/generated-schemas.md (+51ms) 
+15:50:02   ├─ /docs/modules/database/migrations.md (+40ms) 
+15:50:02   ├─ /docs/modules/database/models.md (+14ms) 
+15:50:02   ├─ /docs/modules/database/overrides.md (+38ms) 
+15:50:02   ├─ /docs/modules/database/queries.md (+40ms) 
+15:50:02   ├─ /docs/modules/database/schema.md (+31ms) 
+15:50:02   ├─ /docs/modules/database/testing.md (+33ms) 
+15:50:02   ├─ /docs/modules/database/transactions.md (+35ms) 
+15:50:02   ├─ /docs/modules/events.md (+25ms) 
+15:50:02   ├─ /docs/modules/events/consume.md (+35ms) 
+15:50:02   ├─ /docs/modules/events/define.md (+34ms) 
+15:50:02   ├─ /docs/modules/events/publish.md (+48ms) 
+15:50:02   ├─ /docs/modules/http.md (+56ms) 
+15:50:02   ├─ /docs/modules/http/define.md (+65ms) 
+15:50:02   ├─ /docs/modules/http/first-route.md (+91ms) 
+15:50:03   ├─ /docs/modules/http/generated-clients.md (+108ms) 
+15:50:03   ├─ /docs/modules/http/middleware.md (+111ms) 
+15:50:03   ├─ /docs/modules/http/openapi.md (+101ms) 
+15:50:03   ├─ /docs/modules/http/rate-limits.md (+73ms) 
+15:50:03   ├─ /docs/modules/http/raw-handlers.md (+85ms) 
+15:50:03   ├─ /docs/modules/http/requests.md (+76ms) 
+15:50:03   ├─ /docs/modules/http/responses.md (+151ms) 
+15:50:03   ├─ /docs/modules/http/routes.md (+80ms) 
+15:50:03   ├─ /docs/modules/http/streaming.md (+62ms) 
+15:50:03   ├─ /docs/modules/http/uploads.md (+69ms) 
+15:50:03   ├─ /docs/modules/integrations.md (+66ms) 
+15:50:03   ├─ /docs/modules/integrations/local-docker.md (+66ms) 
+15:50:03   ├─ /docs/modules/integrations/local-providers.md (+62ms) 
+15:50:03   ├─ /docs/modules/integrations/provider-authoring.md (+55ms) 
+15:50:03   ├─ /docs/modules/jobs.md (+28ms) 
+15:50:03   ├─ /docs/modules/jobs/bindings.md (+22ms) 
+15:50:03   ├─ /docs/modules/jobs/clients.md (+25ms) 
+15:50:03   ├─ /docs/modules/jobs/deployment.md (+49ms) 
+15:50:03   ├─ /docs/modules/jobs/docker.md (+74ms) 
+15:50:03   ├─ /docs/modules/jobs/durations-and-sleep.md (+96ms) 
+15:50:03   ├─ /docs/modules/jobs/execution-policy.md (+108ms) 
+15:50:03   ├─ /docs/modules/jobs/inspector.md (+108ms) 
+15:50:03   ├─ /docs/modules/jobs/migration.md (+120ms) 
+15:50:03   ├─ /docs/modules/jobs/progress-and-streams.md (+127ms) 
+15:50:03   ├─ /docs/modules/jobs/providers.md (+118ms) 
+15:50:03   ├─ /docs/modules/jobs/providers/comparison.md (+89ms) 
+15:50:03   ├─ /docs/modules/jobs/providers/effect-mq.md (+136ms) 
+15:50:03   ├─ /docs/modules/jobs/providers/inngest.md (+95ms) 
+15:50:03   ├─ /docs/modules/jobs/providers/trigger.md (+85ms) 
+15:50:03   ├─ /docs/modules/jobs/quickstart.md (+67ms) 
+15:50:03   ├─ /docs/modules/jobs/retries-and-idempotency.md (+52ms) 
+15:50:03   ├─ /docs/modules/jobs/schedules.md (+79ms) 
+15:50:03   ├─ /docs/modules/jobs/security.md (+69ms) 
+15:50:03   ├─ /docs/modules/jobs/tasks.md (+29ms) 
+15:50:03   ├─ /docs/modules/jobs/testing.md (+32ms) 
+15:50:03   ├─ /docs/modules/jobs/troubleshooting.md (+61ms) 
+15:50:03   ├─ /docs/modules/operations.md (+25ms) 
+15:50:03   ├─ /docs/modules/operations/deployment.md (+32ms) 
+15:50:03   ├─ /docs/modules/operations/inspector.md (+37ms) 
+15:50:03   ├─ /docs/modules/operations/observability.md (+38ms) 
+15:50:03   ├─ /docs/modules/operations/realtime-agents-streaming.md (+29ms) 
+15:50:03   ├─ /docs/modules/operations/testing.md (+29ms) 
+15:50:03   ├─ /docs/modules/operations/troubleshooting.md (+30ms) 
+15:50:03   ├─ /docs/modules/realtime.md (+39ms) 
+15:50:03   ├─ /docs/modules/realtime/access.md (+30ms) 
+15:50:03   ├─ /docs/modules/realtime/presence.md (+19ms) 
+15:50:03   ├─ /docs/modules/realtime/providers.md (+38ms) 
+15:50:03   ├─ /docs/modules/realtime/react.md (+26ms) 
+15:50:03   ├─ /docs/modules/realtime/recovery.md (+39ms) 
+15:50:03   ├─ /docs/modules/service.md (+27ms) 
+15:50:03   ├─ /docs/modules/service/context-values.md (+28ms) 
+15:50:03   ├─ /docs/modules/service/define.md (+27ms) 
+15:50:03   ├─ /docs/modules/service/domains.md (+31ms) 
+15:50:03   ├─ /docs/modules/service/first-service.md (+30ms) 
+15:50:03   ├─ /docs/modules/service/migration.md (+25ms) 
+15:50:03   ├─ /docs/modules/service/organization.md (+24ms) 
+15:50:03   ├─ /docs/modules/service/routes.md (+9ms) 
+15:50:03   ├─ /docs/modules/storage.md (+13ms) 
+15:50:03   ├─ /docs/modules/storage/define.md (+10ms) 
+15:50:03   ├─ /docs/modules/storage/local-storage.md (+10ms) 
+15:50:03   ├─ /docs/modules/storage/read-delete.md (+4ms) 
+15:50:03   ├─ /docs/modules/storage/upload.md (+7ms) 
+15:50:03   ├─ /guides.md (+5ms) 
+15:50:03   ├─ /guides/ai/build-an-offline-agent.md (+5ms) 
+15:50:03   ├─ /guides/auth/email-password-sign-in.md (+3ms) 
+15:50:03   ├─ /guides/caching/cache-product-prices.md (+2ms) 
+15:50:03   ├─ /guides/cli/create-and-build-an-api.md (+7ms) 
+15:50:03   ├─ /guides/database/register-users-in-a-transaction.md (+8ms) 
+15:50:03   ├─ /guides/events/react-to-order-events.md (+8ms) 
+15:50:03   ├─ /guides/storage/upload-product-images.md (+8ms) 
+15:50:03   ├─ /index.md (+10ms) 
+15:50:03   ├─ /docs.mdx (+11ms) 
+15:50:03   ├─ /docs/api.mdx (+18ms) 
+15:50:03   ├─ /docs/api/agents.mdx (+12ms) 
+15:50:03   ├─ /docs/api/app.mdx (+13ms) 
+15:50:03   ├─ /docs/api/better-auth.mdx (+26ms) 
+15:50:03   ├─ /docs/api/buckets.mdx (+32ms) 
+15:50:03   ├─ /docs/api/cache.mdx (+32ms) 
+15:50:03   ├─ /docs/api/cli.mdx (+17ms) 
+15:50:03   ├─ /docs/api/cli-api.mdx (+16ms) 
+15:50:03   ├─ /docs/api/client.mdx (+17ms) 
+15:50:03   ├─ /docs/api/config.mdx (+38ms) 
+15:50:03   ├─ /docs/api/create-relkit.mdx (+41ms) 
+15:50:03   ├─ /docs/api/drizzle.mdx (+28ms) 
+15:50:03   ├─ /docs/api/events.mdx (+28ms) 
+15:50:03   ├─ /docs/api/functions.mdx (+35ms) 
+15:50:03   ├─ /docs/api/inspector.mdx (+35ms) 
+15:50:03   ├─ /docs/api/integrations/aws.mdx (+35ms) 
+15:50:03   ├─ /docs/api/integrations/catalog.mdx (+34ms) 
+15:50:03   ├─ /docs/api/integrations/cloudflare.mdx (+9ms) 
+15:50:03   ├─ /docs/api/integrations/docker.mdx (+9ms) 
+15:50:03   ├─ /docs/api/integrations/effect-mq.mdx (+19ms) 
+15:50:03   ├─ /docs/api/integrations/inngest.mdx (+18ms) 
+15:50:03   ├─ /docs/api/integrations/langchain.mdx (+18ms) 
+15:50:03   ├─ /docs/api/integrations/local.mdx (+82ms) 
+15:50:03   ├─ /docs/api/integrations/otlp.mdx (+83ms) 
+15:50:03   ├─ /docs/api/integrations/pulumi.mdx (+94ms) 
+15:50:03   ├─ /docs/api/integrations/redis.mdx (+103ms) 
+15:50:03   ├─ /docs/api/integrations/s3.mdx (+95ms) 
+15:50:03   ├─ /docs/api/integrations/sentry.mdx (+103ms) 
+15:50:03   ├─ /docs/api/integrations/trigger.mdx (+94ms) 
+15:50:03   ├─ /docs/api/jobs.mdx (+98ms) 
+15:50:03   ├─ /docs/api/observability-local.mdx (+36ms) 
+15:50:03   ├─ /docs/api/provider.mdx (+34ms) 
+15:50:03   ├─ /docs/api/providers-local.mdx (+16ms) 
+15:50:03   ├─ /docs/api/public.mdx (+35ms) 
+15:50:03   ├─ /docs/api/realtime.mdx (+29ms) 
+15:50:03   ├─ /docs/api/relkit.mdx (+26ms) 
+15:50:03   ├─ /docs/api/routes.mdx (+17ms) 
+15:50:03   ├─ /docs/api/schema.mdx (+30ms) 
+15:50:03   ├─ /docs/api/services.mdx (+22ms) 
+15:50:03   ├─ /docs/api/testing.mdx (+36ms) 
+15:50:03   ├─ /docs/api/tools.mdx (+21ms) 
+15:50:03   ├─ /docs/learn.mdx (+12ms) 
+15:50:03   ├─ /docs/learn/build-and-run.mdx (+9ms) 
+15:50:03   ├─ /docs/learn/concepts.mdx (+9ms) 
+15:50:03   ├─ /docs/learn/concepts/application.mdx (+10ms) 
+15:50:03   ├─ /docs/learn/concepts/context.mdx (+10ms) 
+15:50:03   ├─ /docs/learn/concepts/environment.mdx (+4ms) 
+15:50:03   ├─ /docs/learn/concepts/errors.mdx (+5ms) 
+15:50:03   ├─ /docs/learn/concepts/functions.mdx (+5ms) 
+15:50:03   ├─ /docs/learn/concepts/schemas.mdx (+15ms) 
+15:50:03   ├─ /docs/learn/create-an-app.mdx (+14ms) 
+15:50:03   ├─ /docs/learn/first-route.mdx (+13ms) 
+15:50:03   ├─ /docs/learn/local-development.mdx (+13ms) 
+15:50:03   ├─ /docs/learn/protect-orders.mdx (+13ms) 
+15:50:03   ├─ /docs/learn/save-orders.mdx (+20ms) 
+15:50:03   ├─ /docs/learn/test-orders.mdx (+25ms) 
+15:50:03   ├─ /docs/modules.mdx (+16ms) 
+15:50:03   ├─ /docs/modules/ai.mdx (+17ms) 
+15:50:03   ├─ /docs/modules/ai/agents.mdx (+17ms) 
+15:50:03   ├─ /docs/modules/ai/approvals.mdx (+27ms) 
+15:50:03   ├─ /docs/modules/ai/function-tools.mdx (+17ms) 
+15:50:03   ├─ /docs/modules/ai/graphs-persistence.mdx (+10ms) 
+15:50:03   ├─ /docs/modules/ai/mcp.mdx (+17ms) 
+15:50:03   ├─ /docs/modules/ai/native-runtime.mdx (+3ms) 
+15:50:03   ├─ /docs/modules/ai/streaming.mdx (+3ms) 
+15:50:03   ├─ /docs/modules/ai/threads-recovery.mdx (+2ms) 
+15:50:03   ├─ /docs/modules/ai/tools.mdx (+18ms) 
+15:50:03   ├─ /docs/modules/auth.mdx (+19ms) 
+15:50:03   ├─ /docs/modules/auth/better-auth.mdx (+20ms) 
+15:50:03   ├─ /docs/modules/auth/clients.mdx (+25ms) 
+15:50:03   ├─ /docs/modules/auth/customization.mdx (+26ms) 
+15:50:03   ├─ /docs/modules/auth/protect-routes.mdx (+26ms) 
+15:50:03   ├─ /docs/modules/auth/sessions.mdx (+26ms) 
+15:50:03   ├─ /docs/modules/auth/testing.mdx (+26ms) 
+15:50:03   ├─ /docs/modules/caching.mdx (+10ms) 
+15:50:03   ├─ /docs/modules/caching/define.mdx (+9ms) 
+15:50:03   ├─ /docs/modules/caching/expiration.mdx (+8ms) 
+15:50:03   ├─ /docs/modules/caching/read-write.mdx (+3ms) 
+15:50:03   ├─ /docs/modules/cli.mdx (+2ms) 
+15:50:03   ├─ /docs/modules/cli/add-artifacts.mdx (+3ms) 
+15:50:03   ├─ /docs/modules/cli/automation.mdx (+4ms) 
+15:50:03   ├─ /docs/modules/cli/create-an-app.mdx (+6ms) 
+15:50:03   ├─ /docs/modules/client.mdx (+7ms) 
+15:50:03   ├─ /docs/modules/client/authentication.mdx (+7ms) 
+15:50:03   ├─ /docs/modules/client/mutations.mdx (+8ms) 
+15:50:03   ├─ /docs/modules/client/offline.mdx (+20ms) 
+15:50:03   ├─ /docs/modules/client/routes.mdx (+21ms) 
+15:50:03   ├─ /docs/modules/client/ssr.mdx (+21ms) 
+15:50:03   ├─ /docs/modules/client/streams.mdx (+17ms) 
+15:50:03   ├─ /docs/modules/database.mdx (+19ms) 
+15:50:03   ├─ /docs/modules/database/better-auth.mdx (+17ms) 
+15:50:03   ├─ /docs/modules/database/define.mdx (+15ms) 
+15:50:03   ├─ /docs/modules/database/drizzle.mdx (+7ms) 
+15:50:03   ├─ /docs/modules/database/generated-schemas.mdx (+30ms) 
+15:50:03   ├─ /docs/modules/database/migrations.mdx (+28ms) 
+15:50:03   ├─ /docs/modules/database/models.mdx (+28ms) 
+15:50:03   ├─ /docs/modules/database/overrides.mdx (+28ms) 
+15:50:03   ├─ /docs/modules/database/queries.mdx (+28ms) 
+15:50:03   ├─ /docs/modules/database/schema.mdx (+27ms) 
+15:50:03   ├─ /docs/modules/database/testing.mdx (+27ms) 
+15:50:03   ├─ /docs/modules/database/transactions.mdx (+16ms) 
+15:50:03   ├─ /docs/modules/events.mdx (+26ms) 
+15:50:03   ├─ /docs/modules/events/consume.mdx (+6ms) 
+15:50:03   ├─ /docs/modules/events/define.mdx (+5ms) 
+15:50:03   ├─ /docs/modules/events/publish.mdx (+6ms) 
+15:50:03   ├─ /docs/modules/http.mdx (+6ms) 
+15:50:03   ├─ /docs/modules/http/define.mdx (+7ms) 
+15:50:03   ├─ /docs/modules/http/first-route.mdx (+4ms) 
+15:50:03   ├─ /docs/modules/http/generated-clients.mdx (+7ms) 
+15:50:03   ├─ /docs/modules/http/middleware.mdx (+4ms) 
+15:50:03   ├─ /docs/modules/http/openapi.mdx (+10ms) 
+15:50:03   ├─ /docs/modules/http/rate-limits.mdx (+16ms) 
+15:50:03   ├─ /docs/modules/http/raw-handlers.mdx (+17ms) 
+15:50:03   ├─ /docs/modules/http/requests.mdx (+17ms) 
+15:50:03   ├─ /docs/modules/http/responses.mdx (+15ms) 
+15:50:03   ├─ /docs/modules/http/routes.mdx (+17ms) 
+15:50:03   ├─ /docs/modules/http/streaming.mdx (+16ms) 
+15:50:03   ├─ /docs/modules/http/uploads.mdx (+20ms) 
+15:50:03   ├─ /docs/modules/integrations.mdx (+20ms) 
+15:50:03   ├─ /docs/modules/integrations/local-docker.mdx (+17ms) 
+15:50:03   ├─ /docs/modules/integrations/local-providers.mdx (+16ms) 
+15:50:03   ├─ /docs/modules/integrations/provider-authoring.mdx (+22ms) 
+15:50:03   ├─ /docs/modules/jobs.mdx (+24ms) 
+15:50:03   ├─ /docs/modules/jobs/bindings.mdx (+24ms) 
+15:50:03   ├─ /docs/modules/jobs/clients.mdx (+27ms) 
+15:50:03   ├─ /docs/modules/jobs/deployment.mdx (+29ms) 
+15:50:03   ├─ /docs/modules/jobs/docker.mdx (+26ms) 
+15:50:03   ├─ /docs/modules/jobs/durations-and-sleep.mdx (+30ms) 
+15:50:03   ├─ /docs/modules/jobs/execution-policy.mdx (+38ms) 
+15:50:03   ├─ /docs/modules/jobs/inspector.mdx (+38ms) 
+15:50:03   ├─ /docs/modules/jobs/migration.mdx (+37ms) 
+15:50:03   ├─ /docs/modules/jobs/progress-and-streams.mdx (+37ms) 
+15:50:03   ├─ /docs/modules/jobs/providers.mdx (+26ms) 
+15:50:03   ├─ /docs/modules/jobs/providers/comparison.mdx (+45ms) 
+15:50:03   ├─ /docs/modules/jobs/providers/effect-mq.mdx (+29ms) 
+15:50:03   ├─ /docs/modules/jobs/providers/inngest.mdx (+46ms) 
+15:50:03   ├─ /docs/modules/jobs/providers/trigger.mdx (+25ms) 
+15:50:03   ├─ /docs/modules/jobs/quickstart.mdx (+32ms) 
+15:50:03   ├─ /docs/modules/jobs/retries-and-idempotency.mdx (+28ms) 
+15:50:03   ├─ /docs/modules/jobs/schedules.mdx (+26ms) 
+15:50:03   ├─ /docs/modules/jobs/security.mdx (+25ms) 
+15:50:03   ├─ /docs/modules/jobs/tasks.mdx (+22ms) 
+15:50:03   ├─ /docs/modules/jobs/testing.mdx (+18ms) 
+15:50:03   ├─ /docs/modules/jobs/troubleshooting.mdx (+28ms) 
+15:50:03   ├─ /docs/modules/operations.mdx (+14ms) 
+15:50:03   ├─ /docs/modules/operations/deployment.mdx (+16ms) 
+15:50:03   ├─ /docs/modules/operations/inspector.mdx (+21ms) 
+15:50:03   ├─ /docs/modules/operations/observability.mdx (+30ms) 
+15:50:03   ├─ /docs/modules/operations/realtime-agents-streaming.mdx (+33ms) 
+15:50:03   ├─ /docs/modules/operations/testing.mdx (+32ms) 
+15:50:03   ├─ /docs/modules/operations/troubleshooting.mdx (+30ms) 
+15:50:03   ├─ /docs/modules/realtime.mdx (+31ms) 
+15:50:03   ├─ /docs/modules/realtime/access.mdx (+31ms) 
+15:50:03   ├─ /docs/modules/realtime/presence.mdx (+31ms) 
+15:50:03   ├─ /docs/modules/realtime/providers.mdx (+30ms) 
+15:50:03   ├─ /docs/modules/realtime/react.mdx (+27ms) 
+15:50:03   ├─ /docs/modules/realtime/recovery.mdx (+34ms) 
+15:50:03   ├─ /docs/modules/service.mdx (+38ms) 
+15:50:03   ├─ /docs/modules/service/context-values.mdx (+39ms) 
+15:50:03   ├─ /docs/modules/service/define.mdx (+45ms) 
+15:50:03   ├─ /docs/modules/service/domains.mdx (+53ms) 
+15:50:03   ├─ /docs/modules/service/first-service.mdx (+54ms) 
+15:50:03   ├─ /docs/modules/service/migration.mdx (+53ms) 
+15:50:03   ├─ /docs/modules/service/organization.mdx (+39ms) 
+15:50:03   ├─ /docs/modules/service/routes.mdx (+34ms) 
+15:50:03   ├─ /docs/modules/storage.mdx (+38ms) 
+15:50:03   ├─ /docs/modules/storage/define.mdx (+19ms) 
+15:50:03   ├─ /docs/modules/storage/local-storage.mdx (+19ms) 
+15:50:03   ├─ /docs/modules/storage/read-delete.mdx (+43ms) 
+15:50:03   ├─ /docs/modules/storage/upload.mdx (+62ms) 
+15:50:03   ├─ /guides.mdx (+41ms) 
+15:50:03   ├─ /guides/ai/build-an-offline-agent.mdx (+43ms) 
+15:50:03   ├─ /guides/auth/email-password-sign-in.mdx (+87ms) 
+15:50:04   ├─ /guides/caching/cache-product-prices.mdx (+90ms) 
+15:50:04   ├─ /guides/cli/create-and-build-an-api.mdx (+92ms) 
+15:50:04   ├─ /guides/database/register-users-in-a-transaction.mdx (+100ms) 
+15:50:04   ├─ /guides/events/react-to-order-events.mdx (+92ms) 
+15:50:04   ├─ /guides/storage/upload-product-images.mdx (+87ms) 
+15:50:04   ├─ /index.mdx (+52ms) 
+15:50:04   ├─ /docs/index.html (+476ms) 
+15:50:04   ├─ /docs/api/index.html (+539ms) 
+15:50:04   ├─ /docs/api/agents/index.html (+2.61s) 
+15:50:06   ├─ /docs/api/app/index.html (+6.89s) 
+15:50:10   ├─ /docs/api/better-auth/index.html (+7.14s) 
+15:50:11   ├─ /docs/api/buckets/index.html (+7.53s) 
+15:50:11   ├─ /docs/api/cache/index.html (+7.71s) 
+15:50:11   ├─ /docs/api/cli/index.html (+7.79s) 
+15:50:11   ├─ /docs/api/cli-api/index.html (+7.95s) 
+15:50:12   ├─ /docs/api/client/index.html (+9.57s) 
+15:50:14   ├─ /docs/api/config/index.html (+3.32s) 
+15:50:14   ├─ /docs/api/create-relkit/index.html (+3.95s) 
+15:50:14   ├─ /docs/api/drizzle/index.html (+3.98s) 
+15:50:15   ├─ /docs/api/events/index.html (+10.21s) 
+15:50:16   ├─ /docs/api/functions/index.html (+8.22s) 
+15:50:19   ├─ /docs/api/inspector/index.html (+9.85s) 
+15:50:21   ├─ /docs/api/integrations/aws/index.html (+2.39s) 
+15:50:22   ├─ /docs/api/integrations/catalog/index.html (+6.52s) 
+15:50:22   ├─ /docs/api/integrations/cloudflare/index.html (+8.62s) 
+15:50:22   ├─ /docs/api/integrations/docker/index.html (+8.67s) 
+15:50:23   ├─ /docs/api/integrations/effect-mq/index.html (+2.14s) 
+15:50:23   ├─ /docs/api/integrations/inngest/index.html (+9.73s) 
+15:50:24   ├─ /docs/api/integrations/langchain/index.html (+12.45s) 
+15:50:29   ├─ /docs/api/integrations/local/index.html (+17.10s) 
+15:50:29   ├─ /docs/api/integrations/otlp/index.html (+7.33s) 
+15:50:29   ├─ /docs/api/integrations/pulumi/index.html (+6.86s) 
+15:50:29   ├─ /docs/api/integrations/redis/index.html (+7.33s) 
+15:50:29   ├─ /docs/api/integrations/s3/index.html (+6.43s) 
+15:50:29   ├─ /docs/api/integrations/sentry/index.html (+115ms) 
+15:50:29   ├─ /docs/api/integrations/trigger/index.html (+372ms) 
+15:50:29   ├─ /docs/api/jobs/index.html (+6.92s) 
+15:50:30   ├─ /docs/api/observability-local/index.html (+1.25s) 
+15:50:30   ├─ /docs/api/provider/index.html (+1.34s) 
+15:50:30   ├─ /docs/api/providers-local/index.html (+1.75s) 
+15:50:31   ├─ /docs/api/public/index.html (+1.70s) 
+15:50:31   ├─ /docs/api/realtime/index.html (+1.84s) 
+15:50:31   ├─ /docs/api/relkit/index.html (+698ms) 
+15:50:31   ├─ /docs/api/routes/index.html (+410ms) 
+15:50:31   ├─ /docs/api/schema/index.html (+1.00s) 
+15:50:31   ├─ /docs/api/services/index.html (+7.22s) 
+15:50:31   ├─ /docs/api/testing/index.html (+665ms) 
+15:50:31   ├─ /docs/api/tools/index.html (+1.32s) 
+15:50:32   ├─ /docs/learn/index.html (+854ms) 
+15:50:32   ├─ /docs/learn/build-and-run/index.html (+510ms) 
+15:50:32   ├─ /docs/learn/concepts/index.html (+867ms) 
+15:50:32   ├─ /docs/learn/concepts/application/index.html (+650ms) 
+15:50:32   ├─ /docs/learn/concepts/context/index.html (+48ms) 
+15:50:32   ├─ /docs/learn/concepts/environment/index.html (+404ms) 
+15:50:32   ├─ /docs/learn/concepts/errors/index.html (+548ms) 
+15:50:32   ├─ /docs/learn/concepts/functions/index.html (+156ms) 
+15:50:32   ├─ /docs/learn/concepts/schemas/index.html (+76ms) 
+15:50:32   ├─ /docs/learn/create-an-app/index.html (+92ms) 
+15:50:32   ├─ /docs/learn/first-route/index.html (+90ms) 
+15:50:32   ├─ /docs/learn/local-development/index.html (+2.77s) 
+15:50:32   ├─ /docs/learn/protect-orders/index.html (+93ms) 
+15:50:32   ├─ /docs/learn/save-orders/index.html (+90ms) 
+15:50:32   ├─ /docs/learn/test-orders/index.html (+92ms) 
+15:50:32   ├─ /docs/modules/index.html (+82ms) 
+15:50:32   ├─ /docs/modules/ai/index.html (+82ms) 
+15:50:32   ├─ /docs/modules/ai/agents/index.html (+82ms) 
+15:50:32   ├─ /docs/modules/ai/approvals/index.html (+77ms) 
+15:50:32   ├─ /docs/modules/ai/function-tools/index.html (+84ms) 
+15:50:32   ├─ /docs/modules/ai/graphs-persistence/index.html (+66ms) 
+15:50:32   ├─ /docs/modules/ai/mcp/index.html (+85ms) 
+15:50:32   ├─ /docs/modules/ai/native-runtime/index.html (+68ms) 
+15:50:32   ├─ /docs/modules/ai/streaming/index.html (+70ms) 
+15:50:32   ├─ /docs/modules/ai/threads-recovery/index.html (+67ms) 
+15:50:32   ├─ /docs/modules/ai/tools/index.html (+61ms) 
+15:50:32   ├─ /docs/modules/auth/index.html (+76ms) 
+15:50:32   ├─ /docs/modules/auth/better-auth/index.html (+62ms) 
+15:50:32   ├─ /docs/modules/auth/clients/index.html (+60ms) 
+15:50:32   ├─ /docs/modules/auth/customization/index.html (+59ms) 
+15:50:32   ├─ /docs/modules/auth/protect-routes/index.html (+57ms) 
+15:50:32   ├─ /docs/modules/auth/sessions/index.html (+54ms) 
+15:50:32   ├─ /docs/modules/auth/testing/index.html (+52ms) 
+15:50:32   ├─ /docs/modules/caching/index.html (+44ms) 
+15:50:32   ├─ /docs/modules/caching/define/index.html (+61ms) 
+15:50:32   ├─ /docs/modules/caching/expiration/index.html (+55ms) 
+15:50:32   ├─ /docs/modules/caching/read-write/index.html (+56ms) 
+15:50:32   ├─ /docs/modules/cli/index.html (+56ms) 
+15:50:32   ├─ /docs/modules/cli/add-artifacts/index.html (+60ms) 
+15:50:32   ├─ /docs/modules/cli/automation/index.html (+58ms) 
+15:50:32   ├─ /docs/modules/cli/create-an-app/index.html (+54ms) 
+15:50:32   ├─ /docs/modules/client/index.html (+68ms) 
+15:50:32   ├─ /docs/modules/client/authentication/index.html (+55ms) 
+15:50:32   ├─ /docs/modules/client/mutations/index.html (+54ms) 
+15:50:32   ├─ /docs/modules/client/offline/index.html (+55ms) 
+15:50:32   ├─ /docs/modules/client/routes/index.html (+45ms) 
+15:50:32   ├─ /docs/modules/client/ssr/index.html (+64ms) 
+15:50:32   ├─ /docs/modules/client/streams/index.html (+58ms) 
+15:50:32   ├─ /docs/modules/database/index.html (+51ms) 
+15:50:32   ├─ /docs/modules/database/better-auth/index.html (+57ms) 
+15:50:32   ├─ /docs/modules/database/define/index.html (+56ms) 
+15:50:32   ├─ /docs/modules/database/drizzle/index.html (+81ms) 
+15:50:32   ├─ /docs/modules/database/generated-schemas/index.html (+59ms) 
+15:50:32   ├─ /docs/modules/database/migrations/index.html (+59ms) 
+15:50:32   ├─ /docs/modules/database/models/index.html (+54ms) 
+15:50:32   ├─ /docs/modules/database/overrides/index.html (+44ms) 
+15:50:32   ├─ /docs/modules/database/queries/index.html (+55ms) 
+15:50:32   ├─ /docs/modules/database/schema/index.html (+43ms) 
+15:50:32   ├─ /docs/modules/database/testing/index.html (+47ms) 
+15:50:32   ├─ /docs/modules/database/transactions/index.html (+53ms) 
+15:50:32   ├─ /docs/modules/events/index.html (+55ms) 
+15:50:32   ├─ /docs/modules/events/consume/index.html (+58ms) 
+15:50:32   ├─ /docs/modules/events/define/index.html (+61ms) 
+15:50:32   ├─ /docs/modules/events/publish/index.html (+63ms) 
+15:50:32   ├─ /docs/modules/http/index.html (+66ms) 
+15:50:32   ├─ /docs/modules/http/define/index.html (+68ms) 
+15:50:32   ├─ /docs/modules/http/first-route/index.html (+67ms) 
+15:50:32   ├─ /docs/modules/http/generated-clients/index.html (+55ms) 
+15:50:32   ├─ /docs/modules/http/middleware/index.html (+68ms) 
+15:50:32   ├─ /docs/modules/http/openapi/index.html (+58ms) 
+15:50:32   ├─ /docs/modules/http/rate-limits/index.html (+54ms) 
+15:50:32   ├─ /docs/modules/http/raw-handlers/index.html (+46ms) 
+15:50:32   ├─ /docs/modules/http/requests/index.html (+61ms) 
+15:50:32   ├─ /docs/modules/http/responses/index.html (+49ms) 
+15:50:32   ├─ /docs/modules/http/routes/index.html (+36ms) 
+15:50:32   ├─ /docs/modules/http/streaming/index.html (+49ms) 
+15:50:32   ├─ /docs/modules/http/uploads/index.html (+72ms) 
+15:50:32   ├─ /docs/modules/integrations/index.html (+62ms) 
+15:50:32   ├─ /docs/modules/integrations/local-docker/index.html (+62ms) 
+15:50:32   ├─ /docs/modules/integrations/local-providers/index.html (+54ms) 
+15:50:32   ├─ /docs/modules/integrations/provider-authoring/index.html (+69ms) 
+15:50:32   ├─ /docs/modules/jobs/index.html (+65ms) 
+15:50:32   ├─ /docs/modules/jobs/bindings/index.html (+65ms) 
+15:50:32   ├─ /docs/modules/jobs/clients/index.html (+63ms) 
+15:50:32   ├─ /docs/modules/jobs/deployment/index.html (+44ms) 
+15:50:32   ├─ /docs/modules/jobs/docker/index.html (+57ms) 
+15:50:33   ├─ /docs/modules/jobs/durations-and-sleep/index.html (+46ms) 
+15:50:33   ├─ /docs/modules/jobs/execution-policy/index.html (+60ms) 
+15:50:33   ├─ /docs/modules/jobs/inspector/index.html (+52ms) 
+15:50:33   ├─ /docs/modules/jobs/migration/index.html (+49ms) 
+15:50:33   ├─ /docs/modules/jobs/progress-and-streams/index.html (+50ms) 
+15:50:33   ├─ /docs/modules/jobs/providers/index.html (+48ms) 
+15:50:33   ├─ /docs/modules/jobs/providers/comparison/index.html (+62ms) 
+15:50:33   ├─ /docs/modules/jobs/providers/effect-mq/index.html (+58ms) 
+15:50:33   ├─ /docs/modules/jobs/providers/inngest/index.html (+63ms) 
+15:50:33   ├─ /docs/modules/jobs/providers/trigger/index.html (+65ms) 
+15:50:33   ├─ /docs/modules/jobs/quickstart/index.html (+70ms) 
+15:50:33   ├─ /docs/modules/jobs/retries-and-idempotency/index.html (+69ms) 
+15:50:33   ├─ /docs/modules/jobs/schedules/index.html (+59ms) 
+15:50:33   ├─ /docs/modules/jobs/security/index.html (+59ms) 
+15:50:33   ├─ /docs/modules/jobs/tasks/index.html (+81ms) 
+15:50:33   ├─ /docs/modules/jobs/testing/index.html (+70ms) 
+15:50:33   ├─ /docs/modules/jobs/troubleshooting/index.html (+65ms) 
+15:50:33   ├─ /docs/modules/operations/index.html (+66ms) 
+15:50:33   ├─ /docs/modules/operations/deployment/index.html (+65ms) 
+15:50:33   ├─ /docs/modules/operations/inspector/index.html (+47ms) 
+15:50:33   ├─ /docs/modules/operations/observability/index.html (+75ms) 
+15:50:33   ├─ /docs/modules/operations/realtime-agents-streaming/index.html (+74ms) 
+15:50:33   ├─ /docs/modules/operations/testing/index.html (+72ms) 
+15:50:33   ├─ /docs/modules/operations/troubleshooting/index.html (+59ms) 
+15:50:33   ├─ /docs/modules/realtime/index.html (+61ms) 
+15:50:33   ├─ /docs/modules/realtime/access/index.html (+58ms) 
+15:50:33   ├─ /docs/modules/realtime/presence/index.html (+56ms) 
+15:50:33   ├─ /docs/modules/realtime/providers/index.html (+54ms) 
+15:50:33   ├─ /docs/modules/realtime/react/index.html (+54ms) 
+15:50:33   ├─ /docs/modules/realtime/recovery/index.html (+56ms) 
+15:50:33   ├─ /docs/modules/service/index.html (+58ms) 
+15:50:33   ├─ /docs/modules/service/context-values/index.html (+50ms) 
+15:50:33   ├─ /docs/modules/service/define/index.html (+64ms) 
+15:50:33   ├─ /docs/modules/service/domains/index.html (+41ms) 
+15:50:33   ├─ /docs/modules/service/first-service/index.html (+54ms) 
+15:50:33   ├─ /docs/modules/service/migration/index.html (+67ms) 
+15:50:33   ├─ /docs/modules/service/organization/index.html (+54ms) 
+15:50:33   ├─ /docs/modules/service/routes/index.html (+44ms) 
+15:50:33   ├─ /docs/modules/storage/index.html (+56ms) 
+15:50:33   ├─ /docs/modules/storage/define/index.html (+50ms) 
+15:50:33   ├─ /docs/modules/storage/local-storage/index.html (+51ms) 
+15:50:33   ├─ /docs/modules/storage/read-delete/index.html (+50ms) 
+15:50:33   ├─ /docs/modules/storage/upload/index.html (+47ms) 
+15:50:33   ├─ /guides/index.html (+46ms) 
+15:50:33   ├─ /guides/ai/build-an-offline-agent/index.html (+67ms) 
+15:50:33   ├─ /guides/auth/email-password-sign-in/index.html (+55ms) 
+15:50:33   ├─ /guides/caching/cache-product-prices/index.html (+55ms) 
+15:50:33   ├─ /guides/cli/create-and-build-an-api/index.html (+77ms) 
+15:50:33   ├─ /guides/database/register-users-in-a-transaction/index.html (+73ms) 
+15:50:33   ├─ /guides/events/react-to-order-events/index.html (+78ms) 
+15:50:33   ├─ /guides/storage/upload-product-images/index.html (+71ms) 
+ (+76ms) 
+ (+62ms) 
+ (+52ms) 
+ (+34ms) 
+ (+42ms) 
+ (+19ms) 
+ (+9ms) 
+15:50:33 ✓ Completed in 37.52s.
+
+15:50:33 [build] Rearranging server assets...
+15:50:33 [build] ✓ Completed in 1m 38s.
+15:50:33 [build] Server built in 1m 49s
+15:50:33 [build] Complete!
+[blume] ℹ OG cards: 0 reused from the cache, 180 rendered
+[blume] ✔ Isolated build OK — output at /Users/mustafaelsayed/Workspace/relkit/apps/docs/.blume-verify/dist (not published).

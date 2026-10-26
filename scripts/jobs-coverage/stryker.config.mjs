@@ -1,3 +1,4 @@
+/** Keeps the required jobs mutation gate serial without changing mutation targets or acceptance. */
 export default {
   plugins: ["@stryker-mutator/vitest-runner"],
   testRunner: "vitest",
@@ -23,7 +24,7 @@ export default {
     "packages/client/src/jobs/watch-feed-polling.ts:16-82",
     "packages/client/src/jobs/watch-feed-recovery.ts:19-35",
   ],
-  concurrency: 6,
+  concurrency: 1,
   symlinkNodeModules: false,
   maxTestRunnerReuse: 50,
   tempDirName: ".stryker-tmp",

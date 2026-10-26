@@ -1,56 +1,28 @@
-import type { createDescriptorBase } from "@relkit/contracts";
+/** Describes the selected Drizzle authentication bridge using actual native SDK contracts.
+ * Portable lazy declarations remain in declaration.types so backend root consumers avoid this adapter closure.
+ */
 import type {
   DrizzleActivation,
   DrizzleServiceDescriptor,
   DrizzleFailure,
 } from "@relkit/drizzle/internal";
-import type { RawHttpHandler } from "@relkit/routes";
 import type { Auth, BetterAuthOptions } from "better-auth";
 import type { DrizzleAdapterConfig } from "better-auth/adapters/drizzle";
 import type { Effect, ManagedRuntime } from "effect";
 import type { AuthFailure } from "./auth.errors.js";
 import type { AuthService } from "./auth.service.js";
-import { BETTER_AUTH_HANDLER } from "./symbols.js";
+import type { BetterAuthServiceOptions as DeclarationOptions } from "./declaration.types.js";
+export type {
+  BetterAuthHandler,
+  BetterAuthRegistration,
+  BetterAuthServiceDescriptor,
+  InferBetterAuthSession,
+} from "./declaration.types.js";
 
 /** Native options; RELKIT supplies database and the route-derived base path. */
-export type BetterAuthServiceOptions = Omit<BetterAuthOptions, "database" | "basePath"> & {
-  readonly database?: never;
-  readonly basePath?: never;
+export type BetterAuthServiceOptions = DeclarationOptions & {
   readonly drizzle?: Omit<DrizzleAdapterConfig, "provider">;
 };
-
-/** Frozen handler registration used by route discovery without acquisition. */
-export interface BetterAuthRegistration {
-  readonly kind: "better-auth";
-  readonly service: BetterAuthServiceDescriptor<any>;
-}
-
-/**
- * Route handler carrying native session inference without a live SDK object.
- * @typeParam Session - Native session and user result inferred from auth options.
- */
-export type BetterAuthHandler<Session = unknown> = RawHttpHandler & {
-  readonly [BETTER_AUTH_HANDLER]: BetterAuthRegistration;
-  readonly __session?: Session;
-};
-
-/**
- * Extracts native session and user types from an authored auth handler.
- * @typeParam Handler - Branded handler whose phantom session inference is read.
- */
-export type InferBetterAuthSession<Handler> =
-  Handler extends BetterAuthHandler<infer Session> ? Session : never;
-
-/**
- * Lazy declaration whose handler identity survives activation and isolation.
- * @typeParam Options - Native auth configuration retaining plugin/session inference.
- */
-export interface BetterAuthServiceDescriptor<
-  Options extends BetterAuthServiceOptions,
-> extends ReturnType<typeof createDescriptorBase<"service", string>> {
-  readonly capability: { readonly kind: "better-auth" };
-  readonly handler: BetterAuthHandler<Auth<Options>["$Infer"]["Session"]>;
-}
 
 /** Borrowed database; its Drizzle owner remains solely responsible for disposal. */
 export type AuthDatabase = DrizzleActivation<DrizzleServiceDescriptor<any, any, any, any>>;
@@ -100,4 +72,5 @@ export interface AuthServiceInterface {
 export interface BetterAuthRuntime<Options extends BetterAuthServiceOptions> {
   readonly options: Options;
   activation: ManagedRuntime.ManagedRuntime<AuthService, AuthFailure | DrizzleFailure> | undefined;
+  handle: ((request: Request) => Promise<Response>) | undefined;
 }

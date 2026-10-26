@@ -1,0 +1,15 @@
+After [frontend setup and pulling this backend's contract](/guides/frontend/connect-react),
+render this component under `RelkitClientProvider`. Each exported service-route method produces
+its own typed operation: `GET /orders` reads the search count, while `POST /orders` creates an order.
+
+<include source="apps/docs/examples/frontend/orders.tsx" lang="tsx" meta='title="src/Orders.tsx"'>
+  /_snippets/source/apps/docs/examples/frontend/orders.tsx
+</include>
+
+`status`, `count`, and the creation input come from the selected functions' schemas. RPC receives
+`orderId` and `customerEmail` as input fields even though REST maps them from headers. A service's
+public member alone is not a browser endpoint: the client-exposed route supplies that boundary.
+
+Reference: [`useRoute`](/docs/api/client#useroute), [`useRouteMutation`](/docs/api/client#useroutemutation).
+See [request mapping](/docs/modules/http/requests) for the REST side and
+[mutations](/docs/modules/client/mutations) for submission and recovery behavior.

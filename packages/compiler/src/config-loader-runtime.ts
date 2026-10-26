@@ -1,3 +1,8 @@
+/**
+ * Validates data-only server and development bridge configuration before generation.
+ * Optional protocols and documentation UI are selected explicitly; invalid values
+ * accumulate diagnostics without loading SDKs or acquiring listeners/tools.
+ */
 import {
   CONFIG_CODES,
   ConfigPort,
@@ -5,65 +10,45 @@ import {
   DEFAULT_TOOLING_CONFIG,
   type ConfigIssue,
 } from "./config-loader-types.js";
-import { Schema } from "effect";
+import { Result, Schema } from "effect";
+import { normalizeInspectorConfiguration } from "@relkit/contracts";
 import { readRecord } from "./config-loader-utils.js";
+import { readBoolean, rejectUnknown } from "./config-loader-fields.js";
 
 /**
  * Validates inspector settings and applies tooling defaults.
+ * @typeParam Value - Untrusted metadata retained until shared schema decoding.
  * @param value - Declared metadata inspected without coercion.
  * @param issues - Caller-owned ordered configuration issues.
  * @returns Normalized inspector settings after issues are collected.
  */
-export function readInspector(value: unknown, issues: ConfigIssue[]) {
-  if (value === undefined) return DEFAULT_TOOLING_CONFIG.inspector;
-  const record = readRecord(value, "inspector", issues);
-  if (record === undefined) return DEFAULT_TOOLING_CONFIG.inspector;
-  for (const key of Object.keys(record)) {
-    if (!["port", "enabledInProduction", "maxPreviewBytes"].includes(key)) {
-      issues.push({
-        code: CONFIG_CODES.inspector,
-        path: `inspector.${key}`,
-        message: `Unknown inspector setting "${key}".`,
-      });
-    }
-  }
-  const port = record.port;
-  if (port !== undefined && !Schema.is(ConfigPort)(port)) {
-    issues.push({
-      code: CONFIG_CODES.port,
-      path: "inspector.port",
-      message: "inspector.port must be an integer from 1 through 65535.",
-    });
-  }
-  const enabledInProduction = readBoolean(
-    record.enabledInProduction,
-    "inspector.enabledInProduction",
-    false,
-    issues,
-  );
-  const maxPreviewBytes = readPositive(
-    record.maxPreviewBytes,
-    "inspector.maxPreviewBytes",
-    DEFAULT_TOOLING_CONFIG.inspector.maxPreviewBytes,
-    issues,
-  );
-  return { port: typeof port === "number" ? port : 3210, enabledInProduction, maxPreviewBytes };
+export function readInspector<Value>(value: Value, issues: ConfigIssue[]) {
+  const result = normalizeInspectorConfiguration(value);
+  if (Result.isSuccess(result)) return result.success;
+  const legacyPort = value !== null && typeof value === "object" && "port" in value;
+  issues.push({
+    code: CONFIG_CODES.inspector,
+    path: legacyPort ? "inspector.port" : "inspector",
+    message: result.failure.message,
+  });
+  return DEFAULT_TOOLING_CONFIG.inspector;
 }
 
 /**
  * Validates server settings and applies tooling defaults.
+ * @typeParam Value - Configured server metadata decoded before field access.
  * @param value - Declared metadata inspected without coercion.
  * @param issues - Caller-owned ordered configuration issues.
  * @returns Normalized server settings after issues are collected.
  */
-export function readServer(value: unknown, issues: ConfigIssue[]) {
+export function readServer<Value>(value: Value, issues: ConfigIssue[]) {
   if (value === undefined) return DEFAULT_TOOLING_CONFIG.server;
   const record = readRecord(value, "server", issues);
   if (record === undefined) return DEFAULT_TOOLING_CONFIG.server;
   rejectUnknown(
     record,
     "server",
-    ["port", "maxBodyBytes", "apiDocs", "clientContract", "mcp"],
+    ["port", "maxBodyBytes", "apiDocs", "clientContract", "mcp", "agUi"],
     issues,
   );
   const port = readPort(record.port, "server.port", DEFAULT_TOOLING_CONFIG.server.port, issues);
@@ -75,43 +60,29 @@ export function readServer(value: unknown, issues: ConfigIssue[]) {
   );
   const apiDocs = readApiDocs(record.apiDocs, issues);
   const clientContract = readBoolean(record.clientContract, "server.clientContract", true, issues);
-  const mcp = readBoolean(record.mcp, "server.mcp", true, issues);
-  return { port, maxBodyBytes, apiDocs, clientContract, mcp };
-}
-
-/**
- * Checks a boolean option while retaining its fallback and diagnostic path.
- * @param value - Declared metadata inspected without coercion.
- * @param path - Portable source, property, or runtime path.
- * @param fallback - Value retained when metadata is absent.
- * @param issues - Caller-owned ordered configuration issues.
- * @returns The validated boolean or its default, with invalid settings recorded as issues.
- */
-function readBoolean(
-  value: unknown,
-  path: string,
-  fallback: boolean,
-  issues: ConfigIssue[],
-): boolean {
-  if (value === undefined) return fallback;
-  if (typeof value !== "boolean") {
-    issues.push({ code: CONFIG_CODES.behavior, path, message: `${path} must be a boolean.` });
-    return fallback;
-  }
-  return value;
+  const mcp = readBoolean(record.mcp, "server.mcp", false, issues);
+  const agUi = readBoolean(record.agUi, "server.agUi", false, issues);
+  return { port, maxBodyBytes, apiDocs, clientContract, mcp, agUi };
 }
 
 /**
  * Validates API documentation exposure settings.
+ * @typeParam Value - Configured documentation metadata decoded before field access.
  * @param value - Declared metadata inspected without coercion.
  * @param issues - Caller-owned ordered configuration issues.
  * @returns Normalized API documentation exposure settings.
  */
-function readApiDocs(value: unknown, issues: ConfigIssue[]) {
+function readApiDocs<Value>(value: Value, issues: ConfigIssue[]) {
   if (value === undefined) return DEFAULT_TOOLING_CONFIG.server.apiDocs;
   const record = readRecord(value, "server.apiDocs", issues);
   if (record === undefined) return DEFAULT_TOOLING_CONFIG.server.apiDocs;
-  rejectUnknown(record, "server.apiDocs", ["enabledInProduction", "excludeDomains"], issues);
+  rejectUnknown(record, "server.apiDocs", ["enabledInProduction", "excludeDomains", "ui"], issues);
+  if (record.ui !== undefined && record.ui !== false && record.ui !== "scalar")
+    issues.push({
+      code: CONFIG_CODES.behavior,
+      path: "server.apiDocs.ui",
+      message: 'server.apiDocs.ui must be "scalar" or false.',
+    });
   if (record.enabledInProduction !== undefined && typeof record.enabledInProduction !== "boolean") {
     issues.push({
       code: CONFIG_CODES.behavior,
@@ -133,6 +104,7 @@ function readApiDocs(value: unknown, issues: ConfigIssue[]) {
     });
   }
   return {
+    ui: record.ui === "scalar" ? ("scalar" as const) : (false as const),
     enabledInProduction:
       typeof record.enabledInProduction === "boolean" ? record.enabledInProduction : false,
     ...(validDomains
@@ -147,13 +119,19 @@ function readApiDocs(value: unknown, issues: ConfigIssue[]) {
 
 /**
  * Checks a valid TCP port and retains the configured fallback.
+ * @typeParam Value - Configured port decoded as an integer before use.
  * @param value - Declared metadata inspected without coercion.
  * @param path - Portable source, property, or runtime path.
  * @param fallback - Value retained when metadata is absent.
  * @param issues - Caller-owned ordered configuration issues.
  * @returns The validated TCP port, or its fallback after recording an issue.
  */
-function readPort(value: unknown, path: string, fallback: number, issues: ConfigIssue[]): number {
+function readPort<Value>(
+  value: Value,
+  path: string,
+  fallback: number,
+  issues: ConfigIssue[],
+): number {
   if (value === undefined) return fallback;
   if (!Schema.is(ConfigPort)(value)) {
     issues.push({
@@ -168,14 +146,15 @@ function readPort(value: unknown, path: string, fallback: number, issues: Config
 
 /**
  * Checks a positive integer tooling limit and retains its fallback.
+ * @typeParam Value - Configured byte limit decoded before use.
  * @param value - Declared metadata inspected without coercion.
  * @param path - Portable source, property, or runtime path.
  * @param fallback - Value retained when metadata is absent.
  * @param issues - Caller-owned ordered configuration issues.
  * @returns The positive integer limit, or its fallback after recording an issue.
  */
-function readPositive(
-  value: unknown,
+function readPositive<Value>(
+  value: Value,
   path: string,
   fallback: number,
   issues: ConfigIssue[],
@@ -186,29 +165,4 @@ function readPositive(
     return fallback;
   }
   return Number(value);
-}
-
-/**
- * Records unsupported nested configuration keys.
- * @param record - Validated configuration record whose keys are inspected.
- * @param path - Portable source, property, or runtime path.
- * @param allowed - Supported nested configuration keys.
- * @param issues - Caller-owned ordered configuration issues.
- * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
- */
-function rejectUnknown(
-  record: Record<string, unknown>,
-  path: string,
-  allowed: readonly string[],
-  issues: ConfigIssue[],
-): void {
-  for (const key of Object.keys(record)) {
-    if (!allowed.includes(key)) {
-      issues.push({
-        code: CONFIG_CODES.key,
-        path: `${path}.${key}`,
-        message: `Unknown ${path} setting "${key}".`,
-      });
-    }
-  }
 }

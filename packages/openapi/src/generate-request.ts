@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { observeOpenApi } from "./generate-observability.js";
+import { requestExamples } from "./request-examples.js";
 import type {
   BodyEntry,
   JsonValue,
@@ -56,7 +57,9 @@ export const buildRequestEffect = Effect.fn("OpenApi.buildRequest")(
           const whole = entries.length === 1 && entries[0]?.kind === "whole-body";
           const first = entries[0];
           content[media] = {
-            schema: whole && first !== undefined ? first.schema : objectSchema(entries),
+            schema: requestExamples(
+              whole && first !== undefined ? first.schema : objectSchema(entries),
+            ),
           };
         }
         return { parameters: matching, body: { required, content } };

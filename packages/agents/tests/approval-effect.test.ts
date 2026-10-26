@@ -1,3 +1,4 @@
+/** Checks approval decisions through substituted Effect services and unchanged typed failure paths. */
 import { Effect } from "effect";
 import { expect, test } from "vitest";
 import {
@@ -10,7 +11,7 @@ import {
   isApprovalRecordEffect,
   requiresApproval,
   requiresApprovalEffect,
-} from "../src/approval.js";
+} from "@relkit/agents/internal/approval";
 
 const options = {
   invocationId: "run-1",

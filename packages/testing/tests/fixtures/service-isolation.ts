@@ -1,9 +1,12 @@
+/** Exercises sibling auth applications with independent SQLite owners and native handler identities.
+ * The fixture closes every acquired application and removes only its owned temporary project.
+ */
 import assert from "node:assert/strict";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { defineEnv } from "@relkit/config";
-import { createTestApplication, type TestApplication } from "../../src/application.js";
+import { createTestApplication, type TestApplication } from "../../src/better-auth.js";
 import { auth, clients, releases } from "./service-isolation-resource.js";
 
 const root = await mkdtemp(join(tmpdir(), "relkit-testing-service-isolation-"));

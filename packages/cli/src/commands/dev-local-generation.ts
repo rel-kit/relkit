@@ -4,7 +4,7 @@ import type { CandidateCompile, CandidateCompileRequest } from "@relkit/supervis
 import { cliTry } from "../cli-errors.js";
 import { CliProject } from "../services/project.service.js";
 import { formatDevDiagnostics } from "./dev-local-diagnostics.js";
-import { telemetryConfigurationFromGraphEffect } from "./dev-telemetry.js";
+import { telemetryConfigurationFromGraphEffect } from "./dev-telemetry-config.js";
 import {
   reconcileGenerationServices,
   activateGenerationWorkers,

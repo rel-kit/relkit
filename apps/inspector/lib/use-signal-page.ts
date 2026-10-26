@@ -8,6 +8,7 @@ import {
   INSPECTOR_BACKEND_CONNECTED_EVENT,
 } from "./client";
 import { logQuery } from "./log-query";
+import { signalEventTypes } from "./signal-events";
 
 export function useSignalPage(
   kind: "logs" | "traces",
@@ -110,12 +111,7 @@ export function useSignalPage(
         }
       },
       onEvent: (event) => {
-        if (
-          kind === "logs"
-            ? event.type === "log.emitted"
-            : ["span.started", "span.completed", "request.completed"].includes(event.type)
-        )
-          notify();
+        if (signalEventTypes(kind).includes(event.type)) notify();
       },
     });
     window.addEventListener(INSPECTOR_BACKEND_CONNECTED_EVENT, notify);

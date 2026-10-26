@@ -11,7 +11,7 @@
     "test:unit": "bun test tests/unit",
     "test:integration": "bun test tests/integration",
     "build": "relkit build",
-    "start": "relkit start",
+    "start": "NODE_ENV=production bun run --no-env-file .relkit/build/server/index.js",
     "graph": "relkit graph print"
   },
   "dependencies": {

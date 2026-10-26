@@ -1,20 +1,11 @@
-import { join } from "node:path";
-import { Effect } from "effect";
-import { canonicalJson } from "@relkit/contracts";
-import {
-  createOutputReport,
-  serializePulumiReport,
-  type PulumiReport,
-} from "@relkit/deploy-pulumi";
+/** Formats deployment outcomes using the selected engine and captured file authority. */
+import { Effect, Schema } from "effect";
+import type { createOutputReport, PulumiReport } from "@relkit/deploy-pulumi";
+import { base, saveReportEffect } from "./deploy-report-storage.js";
 import { cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
-import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.js";
-import type {
-  DeployExecutionResult,
-  ParsedDeployArgs,
-  Prepared,
-  WorkspaceHandle,
-} from "./deploy-support.types.js";
+import { fileSystemLayer } from "../services/filesystem.service.js";
+import type { ParsedDeployArgs, Prepared, WorkspaceHandle } from "./deploy-support.types.js";
 
 /**
  * Publishes an initialization report through explicit filesystem authority.
@@ -56,8 +47,10 @@ export const operationResultEffect = Effect.fn("Deployment.operationResult")(
     report: PulumiReport,
     human: string,
   ) {
-    const portable: unknown = yield* cliTry("deployment.serializeReport", () =>
-      JSON.parse(serializePulumiReport(report)),
+    const portable = yield* cliTry("deployment.serializeReport", () =>
+      Schema.decodeUnknownSync(Schema.fromJsonString(Schema.Json))(
+        prepared.engine.serializePulumiReport(report),
+      ),
     );
     const reportPath = yield* saveReportEffect(prepared, handle, command, portable);
     return {
@@ -122,9 +115,9 @@ export function declined(
   handle: WorkspaceHandle,
   parsed: ParsedDeployArgs,
   human: string,
-): { readonly ok: false; readonly value: Record<string, unknown>; readonly human: string } {
+) {
   return {
-    ok: false,
+    ok: false as const,
     value: { ...base(prepared, handle, parsed.command), ok: false, status: "declined" },
     human,
   };
@@ -161,74 +154,4 @@ export function formatOutputs(report: ReturnType<typeof createOutputReport>): st
   return names.length === 0
     ? "Pulumi outputs: none."
     : `Pulumi outputs:\n${names.map((name) => `  ${name}`).join("\n")}`;
-}
-
-/**
- * Owns report file publication without recording credentials in observer attributes.
- * @param prepared - Accepted plan/program location.
- * @param handle - Selected native workspace.
- * @param command - Bounded operation label.
- * @param report - Secret-safe serialized report.
- * @returns The published report path.
- */
-const saveReportEffect = Effect.fn("Deployment.saveReport")(
-  function* (
-    prepared: Prepared,
-    handle: WorkspaceHandle,
-    command: ParsedDeployArgs["command"],
-    report: unknown,
-  ) {
-    const files = yield* CliFileSystem;
-    const path = join(prepared.files.directory, `${command}.report.json`);
-    const text = yield* cliTry(
-      "deployment.reportJson",
-      () =>
-        `${canonicalJson({
-          protocol: "relkit.deployment-report",
-          version: 1,
-          command,
-          stack: handle.stackName,
-          backend: handle.backend,
-          graphHash: prepared.plan.graphHash,
-          report,
-        })}\n`,
-    );
-    yield* files.mkdir(prepared.files.directory);
-    yield* files.writeText(path, text);
-    return path;
-  },
-  (
-    effect,
-    _prepared: Prepared,
-    _handle: WorkspaceHandle,
-    _command: ParsedDeployArgs["command"],
-    _report: unknown,
-  ) => observeCli("deployment.saveReport", effect),
-);
-
-/**
- * Projects the common public deployment metadata without private configuration.
- * @param prepared - Accepted plan and program paths.
- * @param handle - Selected workspace/backend metadata.
- * @param command - Public operation.
- * @param reportPath - Optional published report.
- * @returns The existing portable result envelope.
- */
-function base(
-  prepared: Prepared,
-  handle: WorkspaceHandle,
-  command: ParsedDeployArgs["command"],
-  reportPath?: string,
-): Record<string, unknown> {
-  return {
-    ok: true,
-    command,
-    projectRoot: prepared.root,
-    projectName: handle.projectName,
-    stack: handle.stackName,
-    backend: handle.backend,
-    graphHash: prepared.plan.graphHash,
-    planPath: join(prepared.files.directory, "plan.json"),
-    ...(reportPath === undefined ? {} : { reportPath }),
-  };
 }

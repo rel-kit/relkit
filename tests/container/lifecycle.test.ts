@@ -1,37 +1,26 @@
+/** Checks reproducible production artifacts, provider readiness and bounded drain/flush through the real CLI runtime. */
 import { afterEach, expect, test } from "bun:test";
-import {
-  access,
-  cp,
-  mkdir,
-  mkdtemp,
-  readFile,
-  readdir,
-  rm,
-  symlink,
-  writeFile,
-} from "node:fs/promises";
-import { join, relative } from "node:path";
+import { mkdir, rm, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { buildProject } from "../../packages/cli/src/commands/build.ts";
 import { startProject } from "../../packages/cli/src/commands/start.ts";
-
+import {
+  ARTIFACTS,
+  roots,
+  copyProject,
+  readArtifacts,
+  filesIn,
+  waitForFile,
+  within,
+  handlerSource,
+} from "./lifecycle.fixture.ts";
 const API = "/_relkit/v1";
-const ARTIFACTS = [
-  ".dockerignore",
-  "Dockerfile",
-  "application.graph.json",
-  "manifest.json",
-  "openapi.json",
-  "server/index.js",
-  "server/index.ts",
-  "server/runtime-activation.json",
-  "server/runtime-integrations.plan.json",
-  "server/runtime-integrations.ts",
-  "server/runtime.manifest.ts",
-] as const;
-const roots: string[] = [];
-
+const successful = new Set<string>();
 afterEach(async () => {
-  await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
+  for (const root of roots.splice(0)) {
+    if (successful.delete(root)) await rm(root, { recursive: true, force: true });
+    else console.error(`Failed container lifecycle fixture retained: ${root}`);
+  }
 });
 
 test("builds reproducible production context without local env or state", async () => {
@@ -67,6 +56,7 @@ test("builds reproducible production context without local env or state", async 
   expect(dockerignore).toContain(".relkit/state");
   expect(dockerignore).toContain(".relkit/observability");
   expect([...firstBytes.values()].join("\n")).not.toContain("container-secret");
+  for (const root of [firstRoot, secondRoot]) successful.add(root);
 });
 
 test("keeps liveness available while provider readiness is pending", async () => {
@@ -106,6 +96,7 @@ test("keeps liveness available while provider readiness is pending", async () =>
   } finally {
     await started.stop();
   }
+  successful.add(root);
 });
 
 test("stops admission, cancels in-flight work, flushes telemetry, and exits on time", async () => {
@@ -113,6 +104,8 @@ test("stops admission, cancels in-flight work, flushes telemetry, and exits on t
   const startedFile = join(root, "in-flight.started");
   const cancelledFile = join(root, "in-flight.cancelled");
   const flushedFile = join(root, "telemetry.flushed");
+  const rejectedFile = join(root, "admission.rejected");
+  const rejectionUrlFile = join(root, "admission.url");
   await writeFile(join(root, "src", "hello", "functions", "hello.function.ts"), handlerSource());
   await buildProject({ projectRoot: root });
   const started = await startProject({
@@ -123,6 +116,8 @@ test("stops admission, cancels in-flight work, flushes telemetry, and exits on t
       RELKIT_TEST_INFLIGHT_FILE: startedFile,
       RELKIT_TEST_CANCEL_FILE: cancelledFile,
       RELKIT_TEST_FLUSH_FILE: flushedFile,
+      RELKIT_TEST_ADMISSION_FILE: rejectedFile,
+      RELKIT_TEST_ADMISSION_URL_FILE: rejectionUrlFile,
       RELKIT_DRAIN_TIMEOUT_MS: "50",
       RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS: "100",
     },
@@ -134,14 +129,14 @@ test("stops admission, cancels in-flight work, flushes telemetry, and exits on t
       .then(async (response) => ({ status: response.status, body: await response.text() }))
       .catch(() => ({ status: undefined, body: "" }));
     await waitForFile(startedFile);
+    await writeFile(rejectionUrlFile, `http://${started.hostname}:${started.port}/hello/new`);
 
     const shutdownAt = Date.now();
     started.process.kill("SIGTERM");
-    const rejected = await fetch(`http://${started.hostname}:${started.port}/hello/new`);
     const result = await inFlight;
     const exitCode = await within(started.exited, 1_000);
 
-    expect(rejected.status).toBe(503);
+    expect(await Bun.file(rejectedFile).text()).toBe('503:{"error":"draining"}');
     expect([200, 499, undefined]).toContain(result.status);
     await waitForFile(cancelledFile);
     await waitForFile(flushedFile);
@@ -150,129 +145,5 @@ test("stops admission, cancels in-flight work, flushes telemetry, and exits on t
   } finally {
     if (started.process.exitCode === null) await started.stop();
   }
+  successful.add(root);
 });
-
-async function copyProject(): Promise<string> {
-  const root = await mkdtemp(join("/tmp", "relkit-container-test-"));
-  roots.push(root);
-  await cp(join(process.cwd(), "tests/compiler/fixtures/valid-minimal"), root, { recursive: true });
-  await cp(join(process.cwd(), "examples/commerce/package.json"), join(root, "package.json"));
-  await linkWorkspacePackages(root);
-  return root;
-}
-
-async function linkWorkspacePackages(root: string): Promise<void> {
-  const scope = join(root, "node_modules", "@relkit");
-  await mkdir(scope, { recursive: true });
-  for (const name of [
-    "agents",
-    "app",
-    "buckets",
-    "cache",
-    "cloud-aws",
-    "cli",
-    "compiler",
-    "config",
-    "contracts",
-    "diagnostics",
-    "engine",
-    "events",
-    "functions",
-    "graph",
-    "inspector-api",
-    "invocation",
-    "jobs",
-    "observability",
-    "providers-local",
-    "providers-standard",
-    "routes",
-    "runtime-effect",
-    "runtime-hono",
-    "schema",
-    "services",
-    "supervisor",
-    "testing",
-    "tools",
-  ])
-    await symlink(join(process.cwd(), "packages", name), join(scope, name));
-}
-
-async function readArtifacts(buildDirectory: string): Promise<Map<string, string>> {
-  return new Map(
-    await Promise.all(
-      ARTIFACTS.map(
-        async (path) => [path, await readFile(join(buildDirectory, path), "utf8")] as const,
-      ),
-    ),
-  );
-}
-
-async function filesIn(root: string, current = root): Promise<string[]> {
-  const entries = await readdir(current, { withFileTypes: true });
-  const files: string[] = [];
-  for (const entry of entries) {
-    const path = join(current, entry.name);
-    if (entry.isDirectory()) files.push(...(await filesIn(root, path)));
-    else files.push(relative(root, path).replaceAll("\\", "/"));
-  }
-  return files.sort();
-}
-
-async function waitForFile(path: string): Promise<void> {
-  const deadline = Date.now() + 1_000;
-  while (Date.now() < deadline) {
-    try {
-      await access(path);
-      return;
-    } catch {
-      await new Promise((resolve) => setTimeout(resolve, 10));
-    }
-  }
-  throw new Error(`Timed out waiting for ${path}.`);
-}
-
-async function within<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  try {
-    return await Promise.race([
-      promise,
-      new Promise<T>((_, reject) => {
-        timer = setTimeout(
-          () => reject(new Error(`Operation exceeded ${timeoutMs} ms.`)),
-          timeoutMs,
-        );
-      }),
-    ]);
-  } finally {
-    if (timer !== undefined) clearTimeout(timer);
-  }
-}
-
-function handlerSource(): string {
-  return `import { defineFunction } from "@relkit/app";
-import { z } from "@relkit/schema";
-
-const hello = defineFunction({
-  id: "hello.say-hello",
-  input: z.object({ name: z.string() }),
-  output: z.object({ message: z.string() }),
-  handler: async (input, context) => {
-    const started = process.env.RELKIT_TEST_INFLIGHT_FILE;
-    if (started !== undefined) await Bun.write(started, "started");
-    const flushed = process.env.RELKIT_TEST_FLUSH_FILE;
-    (globalThis as Record<string, unknown>)["__relkit_flush_telemetry"] = async () => {
-      if (flushed !== undefined) await Bun.write(flushed, "flushed");
-    };
-    await new Promise<void>((resolve) => {
-      if (context.signal.aborted) return resolve();
-      context.signal.addEventListener("abort", () => resolve(), { once: true });
-    });
-    const cancelled = process.env.RELKIT_TEST_CANCEL_FILE;
-    if (context.signal.aborted && cancelled !== undefined) await Bun.write(cancelled, "cancelled");
-    return { message: \`Hello, \${input.name}\` };
-  },
-});
-
-export default hello;
-`;
-}

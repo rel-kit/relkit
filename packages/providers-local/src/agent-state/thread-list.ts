@@ -1,6 +1,7 @@
+/** Lists only caller-owned threads with bounded, authenticated cursor pagination. */
 import { Clock, Effect } from "effect";
 import { localOperation, localSync } from "../local-effect.js";
-import type { BrowserMessage, ListThreadsRequest, ThreadListItem } from "@relkit/agents";
+import type { BrowserMessage, ListThreadsRequest, ThreadListItem } from "@relkit/contracts";
 import { LocalAgentStateError, scopeKey } from "./common.js";
 import type { AgentStateStoreEffects as AgentStateStore } from "./storage.js";
 

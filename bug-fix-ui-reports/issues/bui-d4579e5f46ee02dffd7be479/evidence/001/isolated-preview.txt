@@ -1,0 +1,2 @@
+15:51:08 [@astrojs/node] Server listening on http://127.0.0.1:3003
+[rtk] env: process terminated by signal 15

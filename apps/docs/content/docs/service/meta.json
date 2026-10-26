@@ -1,5 +1,0 @@
-{
-  "title": "Service",
-  "icon": "Boxes",
-  "pages": ["index", "domains", "organization", "define", "routes", "first-service", "migration"]
-}

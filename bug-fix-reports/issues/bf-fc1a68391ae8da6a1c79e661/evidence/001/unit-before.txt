@@ -1,0 +1,22 @@
+bun test v1.3.10 (30e609e0)
+
+apps/inspector/tests/api-reference.test.ts:
+1 | /** Verifies the inspector reference works independently of optional backend UI routes. */
+2 | import { expect, test } from "bun:test";
+3 | import { SCALAR_API_REFERENCE_URL } from "../lib/api-reference";
+4 | 
+5 | test("Scalar links point to an inspector-owned page", () => {
+6 |   expect(SCALAR_API_REFERENCE_URL).toBe("/scalar");
+                                       ^
+error: expect(received).toBe(expected)
+
+Expected: "/scalar"
+Received: "/_relkit/backend/_relkit/v1/api-reference"
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/apps/inspector/tests/api-reference.test.ts:6:36)
+(fail) Scalar links point to an inspector-owned page [4.65ms]
+
+ 0 pass
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [181.00ms]

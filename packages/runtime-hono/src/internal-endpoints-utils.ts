@@ -1,3 +1,4 @@
+/** Shared authorization, pagination and encoding helpers retain the versioned core/inspection response contract without loading optional transports. */
 import { canonicalJson, isJsonValue, type JsonValue, type MaybePromise } from "@relkit/contracts";
 import type { Context } from "hono";
 import { InternalQueryError, queryPage } from "./internal-endpoint-query.js";
@@ -115,7 +116,7 @@ export function toPage(value: JsonValue | InternalPage): InternalPage {
       ...(typeof value.nextCursor === "string" ? { nextCursor: value.nextCursor } : {}),
     };
   }
-  return { items: [value] };
+  return { items: isJsonValue(value) ? [value] : value.items };
 }
 
 /** Encode supported inspector events as versioned SSE blocks.

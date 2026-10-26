@@ -1,0 +1,72 @@
+---
+title: Declared errors
+description: Give expected failures stable data, HTTP behavior, and retry guidance without exposing internal defects.
+sidebar:
+  icon: circle-alert
+---
+
+Declare an error when callers need to handle an expected failure, such as an order that does not exist. An unexpected exception is a defect: RELKIT records it internally and returns a safe boundary failure
+instead of exposing a stack or provider detail.
+
+## Scaffold a typed error
+
+From the application root, with an existing `orders` service:
+
+```sh
+bun run relkit add error receipt-rejected --service orders
+```
+
+Creates `src/services/orders/errors/receipt-rejected.error.ts` with `{ message: string }` data and
+`retry: "never"`. It stays internal. Add it to the relevant function's `errors` list yourself;
+a service bundle containing an error wires it to the bundle's example function automatically.
+
+For every scaffolding flag, see the [error command reference](/docs/api/cli#relkit-add-error-name).
+
+## Define a stable failure
+
+<include
+  source="examples/commerce/src/services/orders/errors/order-not-found.error.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/errors/order-not-found.error.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/errors/order-not-found.error.ts
+</include>
+
+The `id` is the durable contract used by graphs, clients, traces, and matching. `data` limits the details callers
+may receive. `http.status` contributes a typed HTTP response, while `retry` tells durable delivery whether another
+attempt could help.
+
+Register the descriptor in a function's `errors` list and throw the constructed declared value. Do not convert
+every caught exception into a declared error; callers should depend only on failures the domain promises.
+
+## Verify the public contract
+
+The order lookup function uses the declared error when no record exists:
+
+<include
+  source="examples/commerce/src/services/orders/functions/get-order.function.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/functions/get-order.function.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/functions/get-order.function.ts
+</include>
+
+```sh title="Terminal — relkit-orders"
+bun run check
+curl -i http://localhost:3000/orders/missing
+```
+
+Expect HTTP `404` with the stable error code and validated data. Tests should assert those fields and the status,
+not a complete internal message or stack trace.
+
+## Treat retry as bounded guidance
+
+- `"never"` means the same operation should not be retried automatically.
+- `"later"` allows a durable transport to use its normal backoff.
+- `{ kind: "later", afterMs }` supplies a minimum delay; the integration may wait longer.
+
+HTTP and direct invocation do not automatically retry. Jobs and event delivery apply their own bounded policies,
+so a retryable error never means an unbounded loop. See [task retries](/docs/modules/jobs/retries-and-idempotency) and
+[Event delivery](/docs/modules/events/consume) for transport behavior.
+
+<include>/_snippets/generated/related/docs-learn-concepts-errors.mdx</include>

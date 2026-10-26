@@ -1,0 +1,149 @@
+---
+title: Add an Orders endpoint
+description: Add POST /orders to the certified minimal starter, then change pricing and verify validation.
+sidebar:
+  icon: route
+---
+
+Add `POST /orders` to the application from [Create and run an API](/docs/learn/create-an-app).
+You'll calculate an order's price, change the bulk-price rule, and check that invalid quantities are rejected.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  Keep `bun run dev` running in the same `relkit-orders` directory. Use a second terminal for
+  requests.
+</Callout>
+
+<Steps>
+<Step icon="boxes">
+
+## 1. Add the Orders domain [#add-the-orders-domain]
+
+From the application root, scaffold the two functions and their service:
+
+```sh title="Second terminal — relkit-orders"
+bun run relkit add function price-order --create-service orders
+bun run relkit add function create-order --service orders
+```
+
+The first command creates `src/services/orders/service.ts` and
+`functions/price-order.function.ts` beneath that service. The second adds
+`functions/create-order.function.ts` and exposes `createOrder` through `service.ts`.
+Both functions start with placeholder schemas and handlers.
+
+Replace the generated files with the examples below. If you prefer to create files manually,
+add the same paths and contents instead of running these commands. If a file already exists,
+edit it; `relkit add` does not overwrite it.
+
+A **function** contains application behavior. Its input and output **schemas** describe which values
+the function accepts and returns. Start with the function that calculates a price:
+
+<include
+  source="templates/default/v1/api/src/services/orders/functions/price-order.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/price-order.function.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/services/orders/functions/price-order.function.ts
+</include>
+
+<include
+  source="templates/default/v1/api/src/services/orders/functions/create-order.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/create-order.function.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/services/orders/functions/create-order.function.ts
+</include>
+
+A **service** exposes the functions other parts of your application can call. Check that the
+generated Orders service matches this source:
+
+<include
+  source="templates/default/v1/api/src/services/orders/service.ts"
+  lang="ts"
+  meta='title="src/services/orders/service.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/services/orders/service.ts
+</include>
+
+Now scaffold the HTTP route. `--map POST=createOrder` selects the public service member:
+
+```sh title="Second terminal — relkit-orders"
+bun run relkit add route /orders \
+  --mode service-route --service orders --map POST=createOrder
+```
+
+This creates `src/routes/orders/route.ts` with `defineServiceRoutes`. Replace it with the source
+below to return HTTP `201` when an order is created; the scaffold's shorthand uses HTTP `200`.
+
+<include
+  source="templates/default/v1/api/src/routes/orders/route.ts"
+  lang="ts"
+  meta='title="src/routes/orders/route.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/routes/orders/route.ts
+</include>
+
+The running development session validates the new source and activates it only after the generated
+route returns the expected response.
+
+The [CLI module](/docs/modules/cli/add-artifacts) explains service selection and other artifacts.
+Use the [function command reference](/docs/api/cli#relkit-add-function-name) and
+[route command reference](/docs/api/cli#relkit-add-route-path) for all options.
+
+</Step>
+<Step icon="route">
+
+## 2. Follow the request [#follow-the-request]
+
+The path and HTTP method come from `src/routes/orders/route.ts`. The route selects the public
+`createOrder` operation and returns `201` after it succeeds. The service exposes `createOrder` and
+`priceOrder` from the Orders domain.
+
+`createOrder` validates `orderId`, `sku`, and a positive integer `quantity`, then invokes `priceOrder`.
+That function owns the price rule. The route stays small so the same behavior can serve other callers.
+
+```text
+POST /orders → route → Orders service → createOrder → priceOrder → validated JSON
+```
+
+</Step>
+<Step icon="pencil">
+
+## 3. Change one rule [#change-one-rule]
+
+Open `src/services/orders/functions/price-order.function.ts`. Replace its handler with the
+source below. Orders of 10 or more units now cost 90 cents each; smaller orders still cost 100 cents
+each. The input and output schemas remain unchanged.
+
+<include
+  source="apps/docs/examples/orders-tutorial/steps/endpoint/src/services/orders/functions/price-order.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/price-order.function.ts"'
+>
+  /_snippets/source/apps/docs/examples/orders-tutorial/steps/endpoint/src/services/orders/functions/price-order.function.ts
+</include>
+
+The development server checks and reloads this source. Verify the changed price:
+
+```sh title="Second terminal — relkit-orders"
+curl -i -X POST http://localhost:3000/orders \
+  -H 'content-type: application/json' \
+  -d '{"orderId":"bulk-1","sku":"book","quantity":10}'
+```
+
+Expect HTTP `201` and `totalCents: 900`. Then send an invalid quantity:
+
+```sh title="Second terminal — relkit-orders"
+curl -i -X POST http://localhost:3000/orders \
+  -H 'content-type: application/json' \
+  -d '{"orderId":"bad-1","sku":"book","quantity":0}'
+```
+
+Expect a validation response, not an order. Run `bun run check` and `bun run typecheck` after the
+change. `check` verifies the discovered route and function contracts; typecheck verifies TypeScript.
+
+The response still disappears after each request because this chapter has no database.
+
+</Step>
+</Steps>
+
+<include>/_snippets/generated/related/docs-learn-first-route.mdx</include>

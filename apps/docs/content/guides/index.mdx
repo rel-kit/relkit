@@ -1,0 +1,68 @@
+---
+title: Guides
+description: Complete practical tasks in an existing RELKIT application, with setup, runnable examples, and a way to verify the result.
+pagination: false
+sidebar:
+  icon: book-open
+---
+
+Choose the task you want to complete. Each guide names its prerequisites, shows the files to change, and gives you a command or test to verify the result.
+
+If you haven't created an application yet, start with [Build your first API](/docs/learn).
+
+<CardGroup>
+  <Card
+    title="Call your API from React"
+    href="/guides/frontend/connect-react"
+    icon="panels-top-left"
+    arrow
+  >
+    Pull backend types, connect the client provider, and display your first response.
+  </Card>
+  <Card
+    title="Create and build an API"
+    href="/guides/cli/create-and-build-an-api"
+    icon="terminal"
+    arrow
+  >
+    Use the CLI to add an endpoint, verify its response, and run a production build.
+  </Card>
+  <Card
+    title="Upload product images"
+    href="/guides/storage/upload-product-images"
+    icon="upload"
+    arrow
+  >
+    Accept multipart uploads, store two images, and verify their object keys.
+  </Card>
+  <Card title="Cache product prices" href="/guides/caching/cache-product-prices" icon="zap" arrow>
+    Reuse a price lookup with a typed cache and a local Redis provider.
+  </Card>
+  <Card
+    title="React to order events"
+    href="/guides/events/react-to-order-events"
+    icon="radio"
+    arrow
+  >
+    Publish an order event and run an independent listener.
+  </Card>
+  <Card
+    title="Register users in a transaction"
+    href="/guides/database/register-users-in-a-transaction"
+    icon="database"
+    arrow
+  >
+    Validate input and write related records as one operation.
+  </Card>
+  <Card
+    title="Add email and password sign-in"
+    href="/guides/auth/email-password-sign-in"
+    icon="shield-check"
+    arrow
+  >
+    Register a user, sign in, and check a protected endpoint.
+  </Card>
+  <Card title="Build an offline agent" href="/guides/ai/build-an-offline-agent" icon="bot" arrow>
+    Add tools and test an agent without a model API key.
+  </Card>
+</CardGroup>

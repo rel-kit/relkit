@@ -18,6 +18,8 @@ export * from "./events-runtime.js";
 export * from "./environment.js";
 export * from "./diagnostics.js";
 export { streamResponse } from "./observability-stream.js";
+export { installJobsAdministrationEndpoints } from "./jobs-administration.js";
+export { InspectorEndpointError, negotiateHeaders } from "./router-utils.js";
 export * from "./actions.js";
 export * from "./resource-explorer.js";
 export * from "./jobs/types.js";

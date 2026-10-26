@@ -17,7 +17,7 @@ export function serverAgentSource(graph: ApplicationGraph): ServerAgentSource {
     return { imports: "", startup: "", registration: "", release: "" };
   return {
     imports:
-      'import { assertAgentRuntimeDependencies, createGeneratedAgentFunction, invokeAgent, releaseAgentPersistence } from "@relkit/agents";',
+      'const { assertAgentRuntimeDependencies, createGeneratedAgentFunction, invokeAgentFunction: invokeAgent, releaseAgentPersistence } = await import("@relkit/langchain/runtime");',
     startup:
       "bindAgents();\nawait assertAgentRuntimeDependencies(Object.values(runtimeManifest.agents ?? {}));",
     registration: SERVER_AGENT_REGISTRATION_SOURCE,

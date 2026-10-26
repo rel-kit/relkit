@@ -11,6 +11,24 @@ import { ownedNativePromise } from "./src/services/owned-promise.js";
 import { CliProcess } from "./src/services/process.service.js";
 import type { BuildSupportFixture } from "./build-support-fixture.types.js";
 
+const FRAMEWORK_PEERS = [
+  "effect",
+  "@relkit/app",
+  "@relkit/config",
+  "@relkit/contracts",
+  "@relkit/engine",
+  "@relkit/graph",
+  "@relkit/inspector-api",
+  "@relkit/invocation",
+  "@relkit/jobs",
+  "@relkit/local-service",
+  "@relkit/observability",
+  "@relkit/provider",
+  "@relkit/realtime",
+  "@relkit/runtime-effect",
+  "@relkit/runtime-hono",
+];
+
 /**
  * Captures one real Bun process through owned process-group and bounded pipe authority.
  * @param args - Fixture-owned Bun arguments; no shell interpolation occurs.
@@ -59,11 +77,12 @@ export const createBuildSupportFixture = Effect.fn("BuildSupportTest.create")(fu
           "-e",
           `
 import { Effect, Layer } from "effect";
+import { DependencySourceLive } from "@relkit/provider/internal/dependencies";
 import { bundleServerEffect } from ${JSON.stringify(helper)};
 import { fileSystemLayer } from ${JSON.stringify(join(root, "cli/src/services/filesystem.service.ts"))};
 import { processLayer } from ${JSON.stringify(join(root, "cli/src/services/process.service.ts"))};
 import { cleanupLayer } from ${JSON.stringify(join(root, "cli/src/services/cleanup.service.ts"))};
-await Effect.runPromise(bundleServerEffect(${JSON.stringify(server)}, ${JSON.stringify(root)}, false, "bun.inputs.json").pipe(Effect.provide(Layer.mergeAll(fileSystemLayer, processLayer, cleanupLayer))));
+await Effect.runPromise(bundleServerEffect(${JSON.stringify(server)}, ${JSON.stringify(root)}, false, "bun.inputs.json").pipe(Effect.provide(Layer.mergeAll(fileSystemLayer, processLayer, cleanupLayer, DependencySourceLive))));
 `,
         ],
         modules,
@@ -80,7 +99,9 @@ function copyHelperFiles(root: string) {
   return ownedNativePromise("test.helper", async (signal) => {
     for (const relative of [
       "commands/build-support.ts",
+      "commands/build-bundle-process.ts",
       "commands/build-container.ts",
+      "commands/build-module-links.ts",
       "cli-errors.ts",
       "cli-runtime.ts",
       "cli-runtime.types.ts",
@@ -90,6 +111,8 @@ function copyHelperFiles(root: string) {
       "services/filesystem.types.ts",
       "services/filesystem-exclusive.ts",
       "services/filesystem-exclusive.types.ts",
+      "services/runtime-module-links.ts",
+      "services/production-dependency-source.ts",
       "services/process.service.ts",
       "services/process.types.ts",
       "services/cleanup.service.ts",
@@ -113,19 +136,25 @@ function seedRuntime(modules: string, server: string) {
   return ownedNativePromise("test.runtime", async (signal) => {
     await mkdir(join(modules, "@relkit/agents"), { recursive: true });
     await mkdir(server);
-    for (const name of ["effect", "@relkit/contracts", "@relkit/runtime-effect"]) {
+    for (const name of FRAMEWORK_PEERS) {
       const target = join(modules, name);
       await mkdir(dirname(target), { recursive: true });
       await symlink(await realpath(join(import.meta.dir, "node_modules", name)), target, "dir");
     }
     await writeFile(
       join(modules, "@relkit/agents/package.json"),
-      JSON.stringify({ name: "@relkit/agents", type: "module", exports: "./index.js" }),
+      JSON.stringify({
+        name: "@relkit/agents",
+        version: "0.0.0",
+        type: "module",
+        exports: "./index.js",
+      }),
       { signal },
     );
+    // Bun recognizes missing imports as optional at the import's own catch boundary.
     await writeFile(
       join(modules, "@relkit/agents/index.js"),
-      'export const load = () => import("deepagents");',
+      'export const load = async () => { try { return await import("deepagents"); } catch (error) { throw error; } };',
       { signal },
     );
     await writeFile(

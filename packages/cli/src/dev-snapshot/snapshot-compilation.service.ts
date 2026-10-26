@@ -16,6 +16,7 @@ import type { SnapshotCompilationOperations } from "./snapshot-compilation.types
 import { SnapshotFiles } from "./snapshot-files.service.js";
 import { checkSnapshotProjectEffect } from "./snapshot-check-execution.js";
 import { readSnapshotCheckReceipt } from "./snapshot-check-receipt.js";
+import { DependencySource, SelectedDependencies } from "@relkit/provider/internal/dependencies";
 
 /** Preparation-only compiler authority, replaceable through the same test Layer contract. */
 export class SnapshotCompilation extends Context.Service<
@@ -29,12 +30,16 @@ export class SnapshotCompilation extends Context.Service<
     const processes = yield* CliProcess;
     const cleanup = yield* CliCleanup;
     const snapshotFiles = yield* SnapshotFiles;
+    const dependencies = yield* SelectedDependencies;
+    const dependencySource = yield* DependencySource;
     const authorities = Context.make(CliCompiler, compiler).pipe(
       Context.add(CliFileSystem, files),
       Context.add(CliModules, modules),
       Context.add(CliProcess, processes),
       Context.add(CliCleanup, cleanup),
       Context.add(SnapshotFiles, snapshotFiles),
+      Context.add(SelectedDependencies, dependencies),
+      Context.add(DependencySource, dependencySource),
     );
     const check = Effect.fn("SnapshotCompilation.check")(function* (root, inputs, tools) {
       const current = yield* readSnapshotCheckReceipt(root, inputs, tools).pipe(

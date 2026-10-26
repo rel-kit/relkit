@@ -1,0 +1,58 @@
+---
+title: Runtime schemas
+description: Validate values at every application boundary and reuse the same contracts for runtime behavior, OpenAPI, and clients.
+sidebar:
+  icon: shapes
+---
+
+A schema checks whether a value has the shape your application accepts, including when that value arrives over HTTP. RELKIT schemas stay executable, so functions, routes, jobs, events,
+caches, tools, generated OpenAPI, and clients can share one contract. Treat values arriving from a caller,
+transport, persisted payload, or provider as unknown until a schema accepts them.
+
+## Model domain values
+
+<include
+  source="examples/commerce/src/platform/schemas.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/platform/schemas.ts"'
+>
+  /_snippets/source/examples/commerce/src/platform/schemas.ts
+</include>
+
+Describe what the domain accepts: non-empty identifiers, integer and range constraints, closed literals, and
+named object fields. Optional means a caller may omit a value; a default means omission resolves to a value.
+Those contracts are different.
+
+Keep a schema beside one descriptor when it is private. Move it into the owning domain only when several
+descriptors intentionally share the same value.
+
+## Let descriptors enforce the boundary
+
+A function validates `input` before its handler and validates `output` before completion. An invalid caller value
+is a boundary error; an invalid function result is an application defect because the handler broke its declared
+contract. Routes map safe input failures to HTTP responses without running business side effects.
+
+```sh title="Terminal — relkit-orders"
+curl -i -X POST http://localhost:3000/orders \
+  -H "content-type: application/json" \
+  -d '{"orderId":"order-1","sku":"book","quantity":0}'
+```
+
+Expect HTTP `422` for the invalid positive quantity. Do not parse the same value again inside the handler;
+duplicate validation creates extra work and can produce different errors for the same contract.
+
+## Evolve persisted contracts carefully
+
+Adding an optional input is often compatible; making it required is not. Removing an output field can break a
+generated client. Event and durable-job payloads may outlive the release that wrote them, so test a representative
+older payload and version a contract when producers and consumers cannot change together.
+
+Run the graph and behavior checks after a schema change:
+
+```sh title="Terminal — relkit-orders"
+bun run check
+bun run typecheck
+bun run test
+```
+
+<include>/_snippets/generated/related/docs-learn-concepts-schemas.mdx</include>

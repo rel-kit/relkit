@@ -59,6 +59,16 @@ test("GET /hello", async () => {
 afterAll(() => testApp.close());
 ```
 
+The general harness has no native auth, database, or agent SDK dependency. For a database application,
+import `createTestApplication` from `@relkit/testing/drizzle`; database-backed authentication uses
+`@relkit/testing/better-auth`. Install the selected integration and native SDK packages explicitly.
+Native agent helpers come from `@relkit/langchain/testing` alongside the selected agent integration.
+
+Tests run in Bun. Keep matching Bun typings in the application's development
+dependencies (`@types/bun@1.3.10` for the pinned runtime); generated starters already
+include them. The real-listener helper exposes its native `Bun.Server` handle, so
+strict consumers need those typings even when no optional provider SDK is selected.
+
 Provider-backed applications must replace every graph-required capability/profile
 explicitly through the `providers` option. For example, the commerce suite supplies
 separate fakes for cache profiles `requests` and `timeline`, bucket profiles

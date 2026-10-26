@@ -32,9 +32,10 @@ export function serverSource(
   clientContract: JsonValue = {},
   configuration: ServerSourceConfiguration = {
     maxBodyBytes: 1_048_576,
-    apiDocs: { enabledInProduction: false },
+    apiDocs: { enabledInProduction: false, ui: false },
     clientContract: true,
-    mcp: true,
+    mcp: false,
+    agUi: false,
     maxPreviewBytes: 1_048_576,
   },
 ): string {

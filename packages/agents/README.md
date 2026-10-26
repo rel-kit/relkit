@@ -1,37 +1,21 @@
 # @relkit/agents
 
-Agents accept native LangChain models, tools, and middleware with finite execution limits. RelKit
-function-backed tools preserve validation, authorization, and policy while participating in the same native
-execution. Adding subagents, skills, memory files, or a backend selects DeepAgents behavior through the
-same declaration.
+Generic agent declarations, public client events and durable state contracts do not install or evaluate an agent SDK. Applications can use `defineAgent` from `@relkit/app/agents` with RELKIT tool references and a model selector:
 
 ```ts
 import { defineAgent } from "@relkit/app/agents";
 import { z } from "@relkit/app/schema";
-import { FakeToolCallingModel, todoListMiddleware } from "langchain";
-import lookupOrder from "./lookup-order.tool.js";
 
-export default defineAgent({
-  id: "orders.support-agent",
-  input: z.object({ question: z.string().min(1) }),
+export const assistant = defineAgent({
+  input: z.object({ message: z.string() }),
   output: z.object({ answer: z.string() }),
-  model: new FakeToolCallingModel(),
-  instructions: "Answer order questions with the read-only lookup tool.",
-  tools: [lookupOrder],
-  middleware: [todoListMiddleware()],
-  limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 10_000 },
-  stateProfile: "default",
-  client: { public: true, state: ["todos"] },
+  model: "test:default",
+  instructions: "Answer briefly.",
+  tools: [],
+  limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 10_000 },
 });
 ```
 
-Production applications install their LangChain model package and provide a compatible instance or lazy
-factory from server code. Credentials and native provider instances never enter generated browser
-contracts. Tests can use native fake models without network access or paid services.
+Selected agents execute through the explicitly installed [@relkit/langchain](../../integrations/packages/langchain/README.md) integration. Import native models, middleware, tools, graph authoring, persistence resources and execution helpers there. Generic declarations preserve schema and RELKIT tool tuple inference; native middleware and graph state inference remain in the native facade.
 
-Client-exposed agents require an agent-state profile. Every run, observation, control, and continuation
-also requires an application-owned thread ID; RelKit never derives or invents that business identity.
-
-Only allowlisted tools execute, and RELKIT approval remains authoritative. Runtime hooks expose safe
-agent, model, and tool span metadata; prompts, results, secrets, and full tool content remain omitted
-unless bounded development-redacted capture is selected.
+State-provider interfaces, requests, receipts and stored state live below execution implementations in `@relkit/contracts`. Local and Redis state providers preserve their existing durable identities and storage versions without depending on an execution SDK.

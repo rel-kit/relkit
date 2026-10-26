@@ -1,0 +1,43 @@
+---
+title: Local runtime providers
+description: Choose local profiles for an application or own a local provider directly in tooling and tests.
+pagination: false
+sidebar:
+  icon: hard-drive
+---
+
+Use `@relkit/local` to select local event, job, realtime, and agent-state profiles in
+application configuration. `@relkit/providers-local` contains lower-level implementations
+for runtime authors and tests. Creating one directly makes you responsible for its state
+directory and lifetime.
+
+## Read and write a local object
+
+In a tooling or test package, install `@relkit/providers-local` at the version used by the
+application. Pass a dedicated directory to this helper:
+
+<include source="apps/docs/examples/public-api/local.ts" lang="ts" meta='title="local-object.ts"'>
+  /_snippets/source/apps/docs/examples/public-api/local.ts
+</include>
+
+The result decodes to `Hello, RELKIT!`. The helper closes the provider after reading;
+closing does not delete the directory. The caller owns directory creation and removal.
+Local filesystem buckets do not create signed download or upload URLs. Use the
+[S3-compatible storage setup](/docs/modules/storage/local-storage) when you need those capabilities.
+
+## Choose a capability
+
+| Capability  | Runtime APIs                                                    | Application workflow                                           |
+| ----------- | --------------------------------------------------------------- | -------------------------------------------------------------- |
+| Buckets     | `createLocalBucketProvider`, `createLocalBucketProviderForTest` | [Upload product images](/guides/storage/upload-product-images) |
+| Cache       | `createLocalCacheProviderForTest`                               | [Cache product prices](/guides/caching/cache-product-prices)   |
+| Events      | `createLocalEventProvider`                                      | [React to order events](/guides/events/react-to-order-events)  |
+| Jobs        | `createLocalJobProvider` and queue/store helpers                | [Choose a job provider](/docs/modules/jobs/providers)          |
+| Realtime    | `createLocalRealtimeProvider`                                   | [Realtime providers](/docs/modules/realtime/providers)         |
+| Agent state | `createLocalAgentStateProvider`                                 | [Build an offline agent](/guides/ai/build-an-offline-agent)    |
+
+See the [complete local provider API](/docs/api/providers-local#all-exported-apis) for
+options, errors, state protocols, and helper types. For ordinary function tests, prefer
+the smaller [testing fakes](/docs/modules/operations/testing#replace-provider-profiles-explicitly).
+
+<include>/_snippets/generated/related/docs-modules-integrations-local-providers.mdx</include>

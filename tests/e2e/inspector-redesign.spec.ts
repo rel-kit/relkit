@@ -1,6 +1,10 @@
+/** Preserves visual/accessibility Inspector assertions while borrowing only the
+ * exact fixture origin selected for this native browser invocation.
+ */
 import { expect, test } from "@playwright/test";
+import { playwrightSelection } from "../../scripts/playwright-selection.js";
 
-const backend = "http://127.0.0.1:3212";
+const { backend } = playwrightSelection("inspector");
 
 test.beforeEach(async ({ page, request }) => {
   await request.post(`${backend}/__fixture__/reset`);
@@ -61,7 +65,7 @@ test("supports keyboard search and accessible route table quick views", async ({
   await expect(details).toHaveScreenshot("route-quick-view.png", { animations: "disabled" });
 });
 
-test("renders the interactive graph, trace waterfall, and Scalar reference", async ({ page }) => {
+test("renders the interactive graph", async ({ page }) => {
   await page.goto("/graph");
   const graph = page.getByRole("region", { name: "Interactive capability graph" });
   await expect(graph).toBeVisible();
@@ -70,7 +74,9 @@ test("renders the interactive graph, trace waterfall, and Scalar reference", asy
   await expect(page.locator(".graph-panel")).toHaveScreenshot("graph-canvas.png", {
     animations: "disabled",
   });
+});
 
+test("renders the interactive trace waterfall", async ({ page }) => {
   await page.goto("/traces/11111111111111111111111111111111");
   const waterfall = page.getByRole("list", { name: "Ordered trace timeline" });
   await expect(waterfall).toBeVisible();
@@ -81,12 +87,14 @@ test("renders the interactive graph, trace waterfall, and Scalar reference", asy
   await expect(page.locator(".trace-panel")).toHaveScreenshot("trace-waterfall.png", {
     animations: "disabled",
   });
+});
 
+test("renders the Scalar reference", async ({ page }) => {
   await page.goto("/api-reference");
   await expect(page.getByRole("heading", { name: "API Reference" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open Scalar API Reference" })).toHaveAttribute(
     "href",
-    "/_relkit/backend/_relkit/v1/api-reference",
+    "/scalar",
   );
   await expect(page.getByRole("link", { name: "Open Scalar API Reference" })).toHaveAttribute(
     "rel",
@@ -95,6 +103,15 @@ test("renders the interactive graph, trace waterfall, and Scalar reference", asy
   await expect(page.locator(".api-reference-page")).toHaveScreenshot("api-reference.png", {
     animations: "disabled",
   });
+  const reference = await page.request.get("/scalar");
+  expect(reference.status()).toBe(200);
+  const html = await reference.text();
+  const document = await page.request.get("/_relkit/backend/_relkit/v1/openapi.json");
+  const generation = document.headers()["x-relkit-generation-id"];
+  expect(generation).toBeTruthy();
+  expect(html).toContain("Scalar.createApiReference");
+  expect(html).toContain(`"generation":${JSON.stringify(generation)}`);
+  expect(html).toContain('"url":"/_relkit/backend"');
 });
 
 test("keeps the shell usable in dark mode and on mobile", async ({ page }) => {

@@ -1,0 +1,6 @@
+Command: bun /Users/mustafaelsayed/Workspace/relkit/scripts/relkit-local.ts create relkit-wrapper-probe-20261025 --template minimal --cloud none --deploy none --no-git --json
+Working directory: /Users/mustafaelsayed/Workspace/typescripts
+Exit code: 1
+{"error":{"code":"RELKIT_CREATE_PREPARE_FAILED","message":"prepare failed with exit code 1.\nRELKIT_INTERNAL_ERROR: Temporary directory cleaned: /Users/mustafaelsayed/Workspace/typescripts/.relkit-wrapper-probe-20261025-relkit-uuRz58."},"ok":false}
+
+The interactive shell function in ~/.zshrc dispatches relkit through scripts/relkit-local.ts. The plain global executable succeeds with npm-installed packages; the contributor launcher fails after installing workspace links.

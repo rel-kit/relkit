@@ -1,3 +1,4 @@
+/** Reads contained project configuration and source snapshots before compiler discovery. */
 import { join, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { normalizeId } from "@relkit/contracts";
@@ -10,6 +11,7 @@ import { isInside } from "./check-support.js";
 import type { CheckOptions, CheckSource } from "./check.types.js";
 
 import { projectPackageSchema } from "./check.schemas.js";
+import { preflightSourceImports } from "./check-dependencies.js";
 
 /**
  * Loads only a project-contained configuration, with one generation-owned import identity.
@@ -32,6 +34,16 @@ export const readConfigEffect = Effect.fn("Project.readConfig")(
       return yield* cliTry("project.config", () => {
         throw new Error("relkit.config.ts was not found.");
       });
+    yield* preflightSourceImports(
+      projectRoot,
+      [
+        {
+          fileName: relative(projectRoot, configPath).replaceAll("\\", "/"),
+          text: yield* files.readText(configPath),
+        },
+      ],
+      options.configPath,
+    );
     const loaded = yield* modules.load(
       `${pathToFileURL(configPath).href}?relkit_check=${encodeURIComponent(generationId)}`,
     );

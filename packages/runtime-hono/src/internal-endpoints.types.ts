@@ -1,3 +1,8 @@
+/**
+ * Describes core probe and legacy inspection data without runtime SDK imports.
+ * Page metadata can be absent; public declarations remain valid with either
+ * TypeScript optional-property mode while encoded responses omit absent fields.
+ */
 import type * as contracts from "@relkit/contracts";
 
 /** Contract for internal endpoint mode used by internal endpoints. */
@@ -19,7 +24,7 @@ export interface InternalQuery {
 
 /** Contract for internal page used by internal endpoints. */
 export interface InternalPage {
-  readonly [key: string]: contracts.JsonValue;
+  readonly [key: string]: contracts.JsonValue | undefined;
   readonly items: readonly contracts.JsonValue[];
   readonly nextCursor?: string;
 }

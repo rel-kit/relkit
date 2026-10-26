@@ -1,0 +1,19 @@
+After [frontend setup and pulling the greeting agent's contract](/guides/frontend/connect-react),
+render this component under the provider. Supply a stable business `threadId` owned by your
+application, such as the ID of the conversation the user opened:
+
+<include
+  source="apps/docs/examples/frontend/assistant.tsx"
+  lang="tsx"
+  meta='title="src/Assistant.tsx"'
+>
+  /_snippets/source/apps/docs/examples/frontend/assistant.tsx
+</include>
+
+This is the same `hello.assistant` declaration: `client.public` exposes it, `chat.input: "message"`
+makes `send` accept a string, and `chat.output: "answer"` selects its typed answer. Mounting
+`useAgent` does not start a run. The backend owns models, credentials, tools, and authorization.
+
+Reference: [`useAgent`](/docs/api/client#useagent).
+Continue with [streaming and controls](/docs/modules/ai/streaming) or
+[thread recovery](/docs/modules/ai/threads-recovery).

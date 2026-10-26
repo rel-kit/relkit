@@ -1,0 +1,17 @@
+After [frontend setup and pulling the commerce contract](/guides/frontend/connect-react), render
+this component under the provider. It subscribes to this declaration's `announcements.feed` channel:
+
+<include
+  source="apps/docs/examples/frontend/announcements.tsx"
+  lang="tsx"
+  meta='title="src/Announcements.tsx"'
+>
+  /_snippets/source/apps/docs/examples/frontend/announcements.tsx
+</include>
+
+`params: {}` selects the channel's empty partition schema. `posted` is a declared event, so its
+callback is checked against the event map. The route query restores the authoritative messages
+after updates, catch-up, or replay gaps. Backend `trigger()` publishes; the browser subscribes.
+
+Reference: [`useChannel`](/docs/api/client#usechannel), [`useRealtime`](/docs/api/client#userealtime).
+Continue with [subscription and recovery](/docs/modules/realtime/react).

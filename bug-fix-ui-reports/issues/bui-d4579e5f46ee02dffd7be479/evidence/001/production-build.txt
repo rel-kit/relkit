@@ -1,0 +1,24 @@
+[blume] ◐ Building 179 page(s) (server output)
+15:51:07 [@astrojs/node] Enabling sessions with filesystem storage
+15:51:12 [content] Syncing content
+15:51:12 [content] Synced content
+15:51:12 [types] Generated 5.38s
+15:51:12 [build] output: "server"
+15:51:12 [build] mode: "server"
+15:51:12 [build] directory: /Users/mustafaelsayed/Workspace/relkit/apps/docs/dist/
+15:51:12 [build] adapter: @astrojs/node
+15:51:12 [build] Collecting build info...
+15:51:12 [build] ✓ Completed in 5.50s.
+15:51:12 [build] Building server entrypoints...
+15:51:42 [assets] Copying fonts (2 files)...
+15:51:46 [vite] ✓ built in 33.22s
+15:51:49 [vite] ✓ built in 2.73s
+15:51:56 [WARN] [vite] [plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+15:51:56 [vite] ✓ built in 6.75s
+BLUME_BUILD_FAILED Cannot find module '/Users/mustafaelsayed/Workspace/relkit/apps/docs/dist/server/.prerender/chunks/jsx-runtime_CdNZfZDk.mjs' imported from /Users/mustafaelsayed/Workspace/relkit/apps/docs/dist/server/.prerender/prerender-entry.DMBE_TYS.mjs
+
+1 error(s)

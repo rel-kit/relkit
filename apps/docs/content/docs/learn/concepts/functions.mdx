@@ -1,0 +1,102 @@
+---
+title: Functions
+description: Define reusable behavior once, invoke it through the common engine, and test it without a transport.
+sidebar:
+  icon: braces
+---
+
+A function contains a piece of application behavior, such as calculating a price or creating an order. It declares runtime input and output schemas,
+expected errors, provider-backed dependencies, optional publication access, and one handler. Routes, jobs,
+event consumers, tools, agents, and direct calls all enter the same invocation engine.
+
+Functions remain request- or event-scoped operations. When work must outlive the initiating request, define a
+[task](/docs/modules/jobs/tasks) and expose it through a [task-first job](/docs/modules/jobs/quickstart); do not turn a
+function target into a durable worker by adding queue fields.
+
+## Scaffold a callable function
+
+With an existing `orders` service, run from the application root:
+
+```sh
+bun run relkit add function send-receipt --service orders
+```
+
+This creates `src/services/orders/functions/send-receipt.function.ts` and exposes `sendReceipt` through
+`src/services/orders/service.ts`. The placeholder accepts and returns a string `value`; replace its schemas
+and handler with your domain behavior. Its stable ID is `orders.send-receipt`.
+
+Pass `--internal` to omit public service exposure. Use `--create-service orders` instead of
+`--service orders` only if the domain does not exist. No test files are generated.
+
+For every scaffolding flag, see the [function command reference](/docs/api/cli#relkit-add-function-name).
+
+## Read a complete function
+
+<include
+  source="templates/default/v1/api/src/services/orders/functions/create-order.function.ts"
+  lang="ts"
+  meta='title="templates/default/v1/api/src/services/orders/functions/create-order.function.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/services/orders/functions/create-order.function.ts
+</include>
+
+The handler receives validated input. Its return value is validated before the invocation succeeds. The example
+calls `priceOrder.invoke(...)`, so the nested operation keeps validation, deadlines, cancellation, tracing, and
+causation. Calling another descriptor's handler directly bypasses that contract.
+
+### Use this function from the frontend
+
+Expose `createOrder` through its Orders service and a route. The API example maps that public
+member to `POST /orders`:
+
+<include
+  source="templates/default/v1/api/src/routes/orders/route.ts"
+  lang="ts"
+  meta='title="src/routes/orders/route.ts — backend"'
+>
+  /_snippets/source/templates/default/v1/api/src/routes/orders/route.ts
+</include>
+
+<include>/_frontend/create-order.mdx</include>
+
+## Define the boundary
+
+### Start with input and output
+
+Put a schema beside its only consumer, or in the owning domain when several descriptors share it. Keep
+transport fields such as cookies and raw headers in the route unless they are genuine domain input.
+
+### Declare failures and capabilities
+
+List only errors callers are expected to handle. Declare only the jobs, buckets, caches, and agents the
+handler uses. Event publication is separate: list exact event IDs in `publishes`.
+
+### Implement transport-independent behavior
+
+Use the supplied context, honor its abort signal, and return the declared output. Let unexpected defects
+cross RELKIT's safe boundary rather than converting them into unstable public errors.
+
+### Hooks and transport policy
+
+`onBefore` transforms validated input before the handler. `onAfter` transforms successful output before final
+output validation. Use hooks only for function policy that must apply to every invocation source; use HTTP
+middleware for request-native policy.
+
+## Test the operation directly
+
+<include
+  source="templates/default/v1/api/tests/unit/orders.function.test.ts"
+  lang="ts"
+  meta='title="templates/default/v1/api/tests/unit/orders.function.test.ts"'
+>
+  /_snippets/source/templates/default/v1/api/tests/unit/orders.function.test.ts
+</include>
+
+```sh title="Terminal — relkit-orders"
+bun test tests/unit/orders.function.test.ts
+```
+
+`invokeFunction` runs the descriptor through an isolated engine. A function that needs provider clients receives
+explicit test fakes; tests do not infer production replacements from `RELKIT_ENV`.
+
+<include>/_snippets/generated/related/docs-learn-concepts-functions.mdx</include>

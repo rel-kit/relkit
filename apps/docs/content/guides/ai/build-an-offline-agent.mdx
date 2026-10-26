@@ -1,0 +1,170 @@
+---
+title: Build an offline agent
+description: Add a native LangChain agent and reusable tool, test offline, then observe a typed thread.
+pagination: false
+sidebar:
+  icon: bot
+---
+
+Add a greeting assistant to your existing RELKIT app. It combines a native LangChain model, native
+middleware and tool, and a RELKIT function-backed tool. The small example runs without a database,
+network request, or paid model call.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  You'll need an existing RELKIT application and Bun 1.3.10 or later. The example uses an offline
+  model; no model API key is required.
+</Callout>
+
+Create the files below, or update them if they already exist. Run commands from your app's root.
+The minimal app does not include the optional native execution packages. Install `@relkit/langchain`
+and its selected SDK peers first; `@relkit/local` supplies the explicit profiles used below.
+
+<Steps>
+<Step icon="package-plus">
+
+## 1. Install the native packages [#install-the-native-packages]
+
+<include>/_snippets/generated/installations/agent.mdx</include>
+
+The minimal starter already has development-only `@relkit/testing`; its generic harness does not
+provide the native engine. The offline test below imports `invokeAgent` from `@relkit/langchain`.
+
+</Step>
+<Step icon="settings">
+
+## 2. Configure the runtime [#configure-the-runtime]
+
+Extend the existing `relkit.config.ts` with the `localRealtime`/`localAgentState` imports, `realtime`
+and `agent-state` profiles, and matching entries in `defaults`. This small maintained example shows
+the required bindings. Preserve your existing environment, server settings, defaults and other
+provider profiles when merging it:
+
+<include
+  source="templates/default/v1/agent/relkit.config.ts"
+  lang="ts"
+  meta='title="relkit.config.ts — merge native agent bindings"'
+>
+  /_snippets/source/templates/default/v1/agent/relkit.config.ts
+</include>
+
+The two `default` profiles are explicit local choices for this exercise. They do not install or
+enable an Inspector, and they are not a production persistence/deployment selection.
+
+</Step>
+<Step icon="braces">
+
+## 3. Add the greeting function [#add-the-greeting-function]
+
+<include
+  source="templates/default/v1/agent/src/services/hello/functions/hello.function.ts"
+  lang="ts"
+  meta='title="src/services/hello/functions/hello.function.ts"'
+>
+  /_snippets/source/templates/default/v1/agent/src/services/hello/functions/hello.function.ts
+</include>
+
+</Step>
+<Step icon="wrench">
+
+## 4. Make it a tool [#make-it-a-tool]
+
+<include
+  source="templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
+  lang="ts"
+  meta='title="src/services/hello/tools/lookup.tool.ts"'
+>
+  /_snippets/source/templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts
+</include>
+
+The tool tells the model what the function does. Its input and output come from the function.
+
+</Step>
+<Step icon="bot">
+
+## 5. Add the agent [#add-the-agent]
+
+<include
+  source="templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"
+  lang="ts"
+  meta='title="src/services/hello/agents/assistant.agent.ts"'
+>
+  /_snippets/source/templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts
+</include>
+
+The agent can use the RELKIT `hello.lookup` tool and native `uppercase` tool. Its real
+`todoListMiddleware()` state is selected for the typed client, and each run has limits on steps, calls,
+and time.
+
+</Step>
+<Step icon="flask-conical">
+
+## 6. Test without a model key [#test-without-a-model-key]
+
+The test scripts a tool call and a final answer, while running the real greeting function:
+
+<include
+  source="templates/default/v1/agent/tests/unit/assistant.agent.test.ts"
+  lang="ts"
+  meta='title="tests/unit/assistant.agent.test.ts"'
+>
+  /_snippets/source/templates/default/v1/agent/tests/unit/assistant.agent.test.ts
+</include>
+
+```sh
+bun test ./tests/unit/assistant.agent.test.ts
+```
+
+Expect a passing test with the answer `Hello from the offline LangChain model.` This checks native model
+execution, todo middleware, and RELKIT tool registration; it does not measure how a production model
+interprets questions.
+
+</Step>
+</Steps>
+
+## Optional: call it from a typed client [#call-it-from-a-typed-client]
+
+This frontend is optional. Complete [React client installation](/docs/modules/client) in a separate frontend
+package before copying its code. The fullstack sources are a maintained reference, not an offered
+creation tuple; the backend tutorial continues to use your existing app.
+
+Keep caller-owned thread IDs separate from internal execution IDs:
+
+<include
+  source="templates/default/v1/fullstack/web/app/agent-config.ts"
+  lang="ts"
+  meta='title="web/app/agent-config.ts"'
+>
+  /_snippets/source/templates/default/v1/fullstack/web/app/agent-config.ts
+</include>
+
+The fullstack example uses that identity for every run, reconnect, stop, and resume call:
+
+[Complete typed-agent UI](https://github.com/rel-kit/relkit/blob/main/templates/default/v1/fullstack/web/app/page.tsx)
+
+## Optional: use a production model [#use-a-production-model]
+
+Skip this step if you only want the offline example. Install the LangChain model package for your
+provider, construct its compatible chat model in server code, and pass that instance or a lazy factory to
+`model`. Provider credentials remain server-only and live calls may cost money. For
+[MCP only](/docs/modules/ai/mcp), use the function-backed tool without adding an agent.
+
+Do not put a key in the agent's instructions or commit it to source control. Tests should continue to
+inject or declare deterministic native models explicitly; no environment name silently selects a paid
+provider.
+
+```sh
+bun run check
+bun run dev
+```
+
+Optionally follow the separate [Inspector installation and bridge setup](/docs/modules/operations/inspector).
+After starting that tool independently, open its UI, normally at `http://localhost:3210`. Under **Agents**, select
+`hello.assistant` to inspect its tools, middleware state, and execution. To let an external AI client call
+the greeting function directly, follow [Tools over MCP](/docs/modules/ai/mcp).
+
+## Related tasks
+
+<Card icon="arrow-right">
+  [Expose a tool over MCP](/docs/modules/ai/mcp), or [require approval for sensitive
+  actions](/docs/modules/ai/approvals).
+</Card>

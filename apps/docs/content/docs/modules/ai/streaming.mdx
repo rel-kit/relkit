@@ -1,0 +1,70 @@
+---
+title: Agent streaming and controls
+description: Observe durable content parts, tool progress, approvals, and terminal outcomes.
+pagination: false
+sidebar:
+  icon: radio
+---
+
+Stream agent updates to a client while keeping cancellation and other controls available.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  Complete the [native agent installation and runtime bindings](/guides/ai/build-an-offline-agent)
+  first. For a browser caller, also complete [frontend client setup](/docs/modules/client) in its
+  own package.
+</Callout>
+
+## Expose the declared controls
+
+Client-exposed agents require an agent-state profile. `useAgent` exposes only controls declared by the
+agent: steer, follow-up, stop, and approval/denial. An agent with a reachable approval-requiring tool
+must declare the approve capability.
+
+<include
+  source="examples/commerce/src/services/orders/agents/order-support.agent.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/agents/order-support.agent.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/agents/order-support.agent.ts
+</include>
+
+## Use from the frontend
+
+After [frontend setup and contract pull](/guides/frontend/connect-react), use
+[`useAgent`](/docs/api/client#useagent) under `RelkitClientProvider`. This component selects
+`orders.order-support`, the agent above, and reads its typed `answer`:
+
+<include
+  source="apps/docs/examples/frontend/order-support.tsx"
+  lang="tsx"
+  meta='title="src/OrderSupport.tsx"'
+>
+  /_snippets/source/apps/docs/examples/frontend/order-support.tsx
+</include>
+
+Pass an application-owned thread ID, for example `<OrderSupport threadId="support:order-demo-1" />`,
+and retain it when reopening the same conversation. The hook does not create a thread on mount.
+The selected backend declaration determines the available client operations:
+
+| Backend declaration                               | Typed frontend behavior                                                     |
+| ------------------------------------------------- | --------------------------------------------------------------------------- |
+| `chat` mapping                                    | `send(message, { threadId })`; other agents use `run(input, { threadId })`. |
+| Input and output schemas                          | Typed initial input and `output`.                                           |
+| `client.state`, tool contracts, and custom events | Selected `values`, `toolCalls`, `timeline`, and event payloads.             |
+| Declared controls                                 | Stop, steer, follow-up, approval, and denial methods only when supported.   |
+| A graph continuation schema                       | `run(reply, { threadId, resume: true })` for the same waiting thread.       |
+
+`observe({ threadId })` reconnects to an existing authorized thread. Never replace an uncertain run
+by choosing a new thread ID. See [threads and recovery](/docs/modules/ai/threads-recovery) and
+[approvals](/docs/modules/ai/approvals) for those flows. Generic HTTP streams use
+[`useStream`](/docs/modules/http/streaming#use-from-the-frontend) instead.
+
+## Observe without blocking execution
+
+Persistent journal acceptance is separate from browser delivery. Slow observers detach with
+`SLOW_CONSUMER` and recover from the journal; they never backpressure model or tool execution.
+Browser projections contain validated public messages, parts, progress, tool data, and results—not
+provider payloads, internal prompts, credentials, private context, or private reasoning.
+
+Agent content streams and task progress/streams are separate contracts. Use a task job's run ID and generated
+job client for background work; do not treat an agent graph state or realtime channel as a task run.

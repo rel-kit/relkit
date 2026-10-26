@@ -1,6 +1,8 @@
+/** Loads fresh generated modules with their original native import ancestry and guarded SDK resolution. */
 import type { TestApplicationArtifacts } from "./application-registry.types.js";
 export type { TestApplicationArtifacts } from "./application-registry.types.js";
 import { dirname, join } from "node:path";
+import { isBuiltin } from "node:module";
 import { pathToFileURL } from "node:url";
 import {
   createFunctionRegistry,
@@ -50,22 +52,30 @@ export async function loadTestApplicationArtifacts(
 }
 
 /**
- * Imports a generated local module while treating missing output as unavailable.
+ * Imports fresh generated source while retaining native ancestry and late dynamic resolution.
  * @param path - Native module path or route path being resolved.
- * @returns The module exports, or undefined for missing generated output.
+ * @returns The module exports, preserving original evaluation and resolution failures.
  */
 async function importGenerated(path: string): Promise<Record<string, unknown>> {
-  const source = (await Bun.file(path).text()).replace(
-    /from ("(?:[^"\\]|\\.)*")/g,
-    (_match, literal: string) => {
-      const specifier = JSON.parse(literal) as string;
-      const url = specifier.startsWith(".")
-        ? new URL(specifier, pathToFileURL(path)).href
-        : pathToFileURL(Bun.resolveSync(specifier, dirname(path))).href;
-      return `from ${JSON.stringify(url)}`;
-    },
-  );
-  const code = new Bun.Transpiler({ loader: "ts" }).transformSync(source);
+  const transformed = new Bun.Transpiler({
+    loader: "ts",
+    define: { "import.meta.url": JSON.stringify(pathToFileURL(path).href) },
+  }).transformSync(await Bun.file(path).text());
+  const source = transformed.replace(/from ("(?:[^"\\]|\\.)*")/g, (_match, literal: string) => {
+    const specifier = JSON.parse(literal) as string;
+    if (isBuiltin(specifier)) return `from ${literal}`;
+    const url = specifier.startsWith(".")
+      ? new URL(specifier, pathToFileURL(path)).href
+      : pathToFileURL(Bun.resolveSync(specifier, dirname(path))).href;
+    return `from ${JSON.stringify(url)}`;
+  });
+  const code = source.replace(/\bimport\(("(?:[^"\\]|\\.)*")\)/g, (match, literal: string) => {
+    const specifier = JSON.parse(literal) as string;
+    if (isBuiltin(specifier)) return match;
+    return specifier.startsWith(".")
+      ? `import(${JSON.stringify(new URL(specifier, pathToFileURL(path)).href)})`
+      : `import(Bun.resolveSync(${literal}, ${JSON.stringify(dirname(path))}))`;
+  });
   const url = URL.createObjectURL(new Blob([code], { type: "text/javascript" }));
   try {
     return (await import(url)) as Record<string, unknown>;

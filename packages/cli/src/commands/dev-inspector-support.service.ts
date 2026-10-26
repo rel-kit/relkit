@@ -1,135 +1,99 @@
 /**
- * Owns independent inspector acquisition, HTTP readiness and process termination.
- * Dependencies are captured by make; the executing session supplies its Scope,
- * logger and cancellation. Backend activation never awaits this support worker.
+ * Owns the development bridge independently of backend readiness. The active
+ * callback reads only the committed generation; UI and history have no owner
+ * in this process. Closing the support fiber joins the listener and descriptor.
  */
-import { Context, Effect, Layer, Ref, Schedule } from "effect";
-import { CliCleanup } from "../services/cleanup.service.js";
-import { CliHttp, httpLayer } from "../services/http.service.js";
-import { CliPortProbe } from "./port-availability.service.js";
-import { startInspectorEffect } from "./dev-process.js";
-import { cliPromise, cliTry, CliAdapterError } from "../cli-errors.js";
+import { Context, Effect, Layer, Ref, Scope } from "effect";
+import {
+  InspectionBridge,
+  InspectionBridgeLive,
+  InspectionFilesLive,
+  InspectionNativeLive,
+} from "@relkit/inspector-api/connection";
+import type { InspectionBridgeOperations } from "@relkit/inspector-api/connection";
+import { CliAdapterError } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import type { DevInspectorSupportOperations } from "./dev-inspector-support.types.js";
-import type { HttpCapabilities } from "../services/http.types.js";
 import type { DevSession } from "./dev-session.js";
+import { forwardDevInspection } from "./dev-inspection-forward.js";
 
-/** Inspector support with shared native dependencies acquired at its Layer boundary. */
+/** Captures bridge authority without starting support until explicitly enabled. */
 export class CliInspectorSupport extends Context.Service<
   CliInspectorSupport,
   DevInspectorSupportOperations
 >()("relkit/cli/InspectorSupport", {
   make: Effect.gen(function* () {
-    const cleanup = yield* CliCleanup;
-    const ports = yield* CliPortProbe;
-    const http = yield* CliHttp;
+    const bridge = yield* InspectionBridge;
     return {
-      run: Effect.fn("Dev.inspectorSupport")((session: DevSession) =>
-        observeCli(
-          "dev.inspector.support",
-          runInspectorSupport(session, http).pipe(
-            Effect.provideService(CliCleanup, cleanup),
-            Effect.provideService(CliPortProbe, ports),
-          ),
-        ),
-      ),
+      run: (session) => observeCli("dev.inspector.support", runSupport(session, bridge)),
     } satisfies DevInspectorSupportOperations;
   }),
 }) {}
 
-/** Supplies support policy without acquiring any child before its run operation. */
+/** Live support has no Node, Next, package installation or local-store dependency. */
 export const inspectorSupportLayer = Layer.effect(
   CliInspectorSupport,
   CliInspectorSupport.make,
-).pipe(Layer.provide(httpLayer));
+).pipe(
+  Layer.provide(
+    InspectionBridgeLive.pipe(
+      Layer.provide(Layer.merge(InspectionFilesLive, InspectionNativeLive)),
+    ),
+  ),
+);
 
 /**
- * Holds the acquired child until exit or owner cancellation and joins its finalizers.
- * @param session - Support policy, state and independent presentation callback.
- * @param http - Captured bounded HTTP authority.
- * @returns Owned inspector lifetime; expected failures retain E and mixed Causes propagate.
+ * Holds one bridge until session stop, preserving its credentials across reloads.
+ * @param session - Session identity, committed target and authored bind policy.
+ * @param bridge - Captured transport and metadata authority.
+ * @returns Joined support lifetime; acquisition failure degrades independently.
  */
-const runInspectorSupport = Effect.fn("Dev.inspectorLifetime")(function* (
+const runSupport = Effect.fn("Dev.inspectionLifetime")(function* (
   session: DevSession,
-  http: HttpCapabilities,
+  bridge: InspectionBridgeOperations,
 ) {
   const options = session.options.inspector;
-  if (options === undefined || options === false) return;
+  const identity = session.inspectionIdentity;
+  if (!options || !identity) return;
   yield* Effect.scoped(
     Effect.gen(function* () {
-      const inspector = yield* startInspectorEffect(
-        options,
-        session.backendPort,
-        session.log,
-        session.options.spawn,
-      );
+      const parent = yield* Scope.Scope;
+      const requests = yield* Scope.fork(parent);
+      const inspector = yield* bridge.start({
+        ...options,
+        forward: forwardDevInspection(session, requests),
+        root: session.projectRoot,
+        identity,
+        active: () => {
+          const candidate = session.active;
+          if (!candidate) return undefined;
+          return {
+            endpoint: `http://127.0.0.1:${candidate.port}`,
+            generationId: `generation-${candidate.token.generationToken}`,
+            capabilities: ["graph", "functions", "providers", "records"],
+          };
+        },
+        ...(session.options.inspectionRecords === undefined
+          ? {}
+          : { records: session.options.inspectionRecords }),
+      });
       yield* Ref.update(session.state, (state) => ({ ...state, inspector }));
       yield* Effect.addFinalizer(() =>
         Ref.update(session.state, (state) => ({ ...state, inspector: undefined })),
       );
-      const exited = cliPromise("dev.inspector.exit", () => inspector.process.exited).pipe(
-        Effect.flatMap((code) =>
-          cliTry("dev.inspector.exit", () => {
-            throw new Error(`Inspector exited with code ${code}.`);
-          }),
-        ),
-      );
-      yield* Effect.raceFirst(
-        waitInspectorReady(http, inspector.port).pipe(
-          Effect.andThen(
-            cliTry("dev.inspector.ready", () =>
-              session.log({
-                level: "info",
-                event: "dev.inspector.ready",
-                fields: { inspector: `http://127.0.0.1:${inspector.port}` },
-              }),
-            ),
-          ),
-          Effect.andThen(Effect.never),
-        ),
-        exited,
-      );
-    }),
-  );
-});
-
-/**
- * Allows cold source compilation within a bounded minute, independently of backend readiness.
- * @param http - Acquired bounded HTTP authority.
- * @param port - Actual owned listener port.
- * @returns Completion after successful response bytes; failures cannot advertise readiness.
- */
-export const waitInspectorReady = Effect.fn("Dev.inspectorReady")(function* (
-  http: HttpCapabilities,
-  port: number,
-) {
-  const ready = Effect.scoped(
-    Effect.gen(function* () {
-      const response = yield* http.request(`http://127.0.0.1:${port}/`, { redirect: "manual" });
-      if (response.status !== 200) return false;
-      yield* http.text(response, 4_194_304);
-      return true;
+      session.log({
+        level: "info",
+        event: "dev.inspector.ready",
+        fields: { bridge: inspector.descriptor.endpoint },
+      });
+      yield* Effect.never;
     }),
   ).pipe(
-    Effect.catchCause((cause) => {
-      const reason = cause.reasons[0];
-      if (
-        cause.reasons.length === 1 &&
-        reason?._tag === "Fail" &&
-        reason.error instanceof CliAdapterError
-      )
-        return Effect.succeed(false);
-      return Effect.failCause(cause);
-    }),
-  );
-  yield* ready.pipe(
-    Effect.repeat({ schedule: Schedule.spaced(25), until: (value) => value }),
-    Effect.timeout(60_000),
     Effect.mapError(
       (cause) =>
         new CliAdapterError({
-          operation: "dev.inspector.readiness",
-          message: "Inspector did not become ready within 60 seconds. Review its startup output.",
+          operation: "dev.inspector.bridge",
+          message: "Inspection bridge unavailable",
           cause,
         }),
     ),

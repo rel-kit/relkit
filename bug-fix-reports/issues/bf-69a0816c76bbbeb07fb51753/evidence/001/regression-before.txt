@@ -1,0 +1,47 @@
+bun test v1.3.10 (30e609e0)
+
+tests/generator/local-workspace.test.ts:
+[18:48:51.047] INFO (#59): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.terminal",
+  outcome: "success",
+  duration_ms: 4571.391208,
+}
+36 |     [
+37 |       ["Jobs service", "\r"],
+38 |       ["Create this project?", "\r"],
+39 |     ],
+40 |   );
+41 |   expect(result.code, result.output).toBe(0);
+                                          ^
+error: [?25l[90m│[39m
+[36m◆[39m  Jobs service
+[36m│[39m  [32m●[39m None
+[36m│[39m  [2m↑/↓[22m to navigate • [2mEnter:[22m confirm
+[36m└[39m
+[999D[5A[1B[J[32m◇[39m  Jobs service
+[90m│[39m  [2mNone[22m
+[?25h[?25l[90m│[39m
+[36m◆[39m  Create this project?
+[36m│[39m  [32m●[39m Yes [2m/[22m [2m○[22m [2mNo[22m
+[36m└[39m
+[999D[4A[1B[J[32m◇[39m  Create this project?
+[90m│[39m  [2mYes[22m
+[?25h[?25l[90m│[39m
+[35m◒[39m  Installing dependencies[1G[J[35m◐[39m  Installing dependencies[1G[J[35m◓[39m  Installing dependencies[1G[J[35m◑[39m  Checking prerequisites[1G[J[35m◒[39m  Checking prerequisites[1G[J[35m◐[39m  Checking prerequisites[1G[J[35m◓[39m  Checking prerequisites[1G[J[35m◑[39m  Checking prerequisites[1G[J[35m◒[39m  Checking prerequisites.[1G[J[35m◐[39m  Checking and preparing development snapshot.[1G[J[35m◓[39m  Checking and preparing development snapshot.[1G[J[35m◑[39m  Checking and preparing development snapshot.[1G[J[35m◒[39m  Checking and preparing development snapshot.[1G[J[35m◐[39m  Checking and preparing development snapshot.[1G[J[35m◓[39m  Checking and preparing development snapshot.[1G[J[35m◑[39m  Checking and preparing development snapshot.[1G[J[35m◒[39m  Checking and preparing development snapshot..[1G[J[35m◐[39m  Checking and preparing development snapshot..[1G[J[35m◓[39m  Checking and preparing development snapshot..[1G[J[35m◑[39m  Checking and preparing development snapshot..[1G[J[35m◒[39m  Checking and preparing development snapshot..[1G[J[35m◐[39m  Checking and preparing development snapshot..[1G[J[35m◓[39m  Checking and preparing development snapshot..[1G[J[35m◑[39m  Checking and preparing development snapshot..[1G[J[35m◒[39m  Checking and preparing development snapshot...[1G[J[35m◐[39m  Checking and preparing development snapshot...[1G[J[35m◓[39m  Checking and preparing development snapshot...[1G[J[35m◑[39m  Checking and preparing development snapshot...[1G[J[35m◒[39m  Checking and preparing development snapshot...[1G[J[35m◐[39m  Checking and preparing development snapshot...[1G[J[35m◓[39m  Checking and preparing development snapshot...[1G[J[35m◑[39m  Checking and preparing development snapshot...[1G[J[35m◒[39m  Checking and preparing development snapshot...[1G[J[35m◐[39m  Checking and preparing development snapshot[1G[J[35m◓[39m  Checking and preparing development snapshot[1G[J[35m◑[39m  Checking and preparing development snapshot[1G[J[35m◒[39m  Checking and preparing development snapshot[1G[J[35m◐[39m  Checking and preparing development snapshot[1G[J[35m◓[39m  Checking and preparing development snapshot[1G[J[35m◑[39m  Checking and preparing development snapshot[1G[J[35m◒[39m  Checking and preparing development snapshot[1G[J[35m◐[39m  Checking and preparing development snapshot.[1G[J[35m◓[39m  Checking and preparing development snapshot.[1G[J[35m◑[39m  Checking and preparing development snapshot.[1G[J[35m◒[39m  Checking and preparing development snapshot.[1G[J[35m◐[39m  Checking and preparing development snapshot.[1G[J[35m◓[39m  Checking and preparing development snapshot.[1G[J[35m◑[39m  Checking and preparing development snapshot.[1G[J[31m▲[39m  Project creation failed.
+[?25hRELKIT_CREATE_PREPARE_FAILED: prepare failed with exit code 1.
+RELKIT_INTERNAL_ERROR: Temporary directory cleaned: /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-local-create-terminal-ykMvul/.app-relkit-nFfx4n.
+
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/tests/generator/local-workspace.test.ts:41:38)
+Failed local workspace fixture retained: /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-local-create-terminal-ykMvul
+(fail) local create installs workspace links after jobs and final confirmation [4586.13ms]
+
+ 0 pass
+ 4 filtered out
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [5.19s]

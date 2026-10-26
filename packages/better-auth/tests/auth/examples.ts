@@ -10,7 +10,7 @@ import {
   authServiceLayer,
   authFactoryLiveLayer,
   type AuthConfiguration,
-} from "../../src/index.js";
+} from "../../src/drizzle.js";
 import { BetterAuthRelkitClientProvider } from "../../src/react.js";
 
 const declaration = defineBetterAuthService({

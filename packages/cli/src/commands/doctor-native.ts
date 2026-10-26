@@ -1,3 +1,8 @@
+/**
+ * Owns finite doctor command and listener probes. Injected callbacks retain
+ * cancellation/settlement ownership, and every acquired probe listener closes
+ * before the caller receives an availability result.
+ */
 import { Effect } from "effect";
 import { cliPromise } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
@@ -70,15 +75,16 @@ export function doctorPromise<A>(
 /**
  * Probes a finite native listener with acquisition before cleanup ownership.
  * @param port - Port to probe, including the dynamic zero value.
+ * @param hostname - Selected listener bind host, loopback unless explicitly configured.
  * @returns Availability only after the acquired listener has physically stopped.
  */
 export const availablePortEffect = Effect.fn("Doctor.port")(
-  function* (port: number) {
+  function* (port: number, hostname = "127.0.0.1") {
     const cleanup = yield* CliCleanup;
     return yield* Effect.scoped(
       Effect.acquireRelease(
         Effect.try({
-          try: () => Bun.serve({ hostname: "127.0.0.1", port, fetch: () => new Response() }),
+          try: () => Bun.serve({ hostname, port, fetch: () => new Response() }),
           catch: () => false,
         }),
         (server) =>

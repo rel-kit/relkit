@@ -1,0 +1,22 @@
+diff --git a/src/components/layout/Search.astro b/src/components/layout/Search.astro
+index a95c8951b0a961b6f23750ce7c8ef578298c499d..b49288357b4f95495eab2b3ef434ca797279f1ce 100644
+--- a/src/components/layout/Search.astro
++++ b/src/components/layout/Search.astro
+@@ -806,6 +806,9 @@ const kbd = "rounded border border-border bg-muted px-1 py-0.5 font-mono";
+         const excerpt = hit.excerpt
+           ? `<span class="mt-0.5 line-clamp-2 text-muted-foreground text-xs">${hit.excerpt}</span>`
+           : "";
++        const breadcrumb = hit.breadcrumb?.length
++          ? `<span class="block text-xs text-muted-foreground">${hit.breadcrumb.map(escapeHtml).join(" / ")}</span>`
++          : "";
+         // A cross-version hit (all-versions search) names its version so the
+         // reader knows they're about to leave the docs they're viewing.
+         const versionTag =
+@@ -815,6 +818,7 @@ const kbd = "rounded border border-border bg-muted px-1 py-0.5 font-mono";
+         el.innerHTML = `
+           <span class="mt-0.5 shrink-0 text-muted-foreground">${svg("file")}</span>
+           <span class="flex-1">
++            ${breadcrumb}
+             <span class="block truncate font-normal text-foreground text-sm">${hit.title}${versionTag}</span>
+             ${excerpt}
+           </span>`;

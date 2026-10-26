@@ -1,0 +1,63 @@
+{
+  "root": "/tmp/relkit-stage2-final-20261023-0PpISL",
+  "artifacts": "/tmp/relkit-stage2-final-20261023-0PpISL/artifacts",
+  "manifestSHA256": "c686611dc7024d2f1a813736de19d5cf087678da376f912b1b9475593d3fd461",
+  "packages": 56,
+  "tool": {
+    "name": "@relkit/inspector",
+    "version": "0.1.0",
+    "file": "relkit-inspector-0.1.0.tgz",
+    "sha256": "f96a472677f98c17d498beba87f6443e049b0885f33bf9c68d18e50c1b250601",
+    "sha512": "61fb98cc769fc04b293efb82346b67b01db52155d87196175d86999b3c46b65efb8be9e67ef073ef3668ef538da4e3d5618607087f9383af6cf99dbdae034934",
+    "integrity": "sha512-YfuYzHafwEspPvuCNGtnsB21IVXYcZYXXYaZmzxGtl77i+nmfvBz7zZo71ONpOPVYYYHCH+Tg69s+Z29rgNJNA==",
+    "dependencies": {
+      "@relkit/contracts": "0.7.10",
+      "@relkit/inspector-api": "0.7.10",
+      "@relkit/observability": "0.7.10",
+      "@relkit/observability-local": "0.1.0"
+    }
+  },
+  "cli": {
+    "name": "@relkit/cli",
+    "version": "0.7.11",
+    "file": "relkit-cli-0.7.11.tgz",
+    "sha256": "34d5226010a363c83e3889f0d6ac5dc021dff6142a8b7985357c421399550969",
+    "sha512": "2b21d2e8609cbc286c2b5096af0797e2d3b27940a328d26a5e9d8e001f34f9dc0e87a9c685281e303b139107cf94064abd5218a8bb3681bfd8f8d1d661b5fb5d",
+    "integrity": "sha512-KyHS6GCcvChsK1CWrweX4tOyeUCjKNJqXp2OAB80+dwOh6nGhSgeMDsTkQfPlAZKvVIYqLs2gb/Y+NHWYbX7XQ==",
+    "dependencies": {
+      "@relkit/agents": "0.7.10",
+      "@relkit/app": "0.7.10",
+      "@relkit/client": "0.7.10",
+      "@relkit/config": "0.7.10",
+      "@relkit/compiler": "0.7.10",
+      "@relkit/client-generator": "0.7.10",
+      "@relkit/contracts": "0.7.10",
+      "@relkit/deploy": "0.7.10",
+      "@relkit/diagnostics": "0.7.10",
+      "create-relkit": "0.7.11",
+      "@relkit/graph": "0.7.10",
+      "@relkit/engine": "0.7.10",
+      "@relkit/inspector-api": "0.7.10",
+      "@relkit/invocation": "0.7.10",
+      "@relkit/jobs": "0.7.10",
+      "@relkit/local-service": "0.7.10",
+      "@relkit/observability": "0.7.10",
+      "@relkit/provider": "0.7.10",
+      "@relkit/runtime-effect": "0.7.10",
+      "@relkit/runtime-hono": "0.7.10",
+      "@relkit/realtime": "0.7.10",
+      "@relkit/supervisor": "0.7.10"
+    }
+  },
+  "sourceBase": "4867ab27d2d66684bebc0673ac4018316adedb1f",
+  "sourceReviewLedgerSHA256": "0e25131e72fe1466fd4d55721d3d53e192bc5e885aacffb48af17f9e8e814b51",
+  "environment": {
+    "os": "darwin",
+    "release": "24.6.0",
+    "architecture": "arm64",
+    "bun": "1.3.10",
+    "node": "v24.12.0",
+    "npm": "11.19.0",
+    "pnpm": "11.9.0"
+  }
+}

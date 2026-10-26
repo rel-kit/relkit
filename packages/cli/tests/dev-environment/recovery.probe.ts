@@ -89,10 +89,9 @@ async function prepare(root: string, log: string) {
  * @returns Completion after HTTP assertions and joined process cleanup.
  */
 async function replay(mode: "ordinary" | "prepared") {
-  const publicPort = port(),
-    inspectorPort = port();
+  const publicPort = port();
   const manifest = JSON.parse(originals.get("package.json") ?? "null");
-  manifest.scripts.dev = `bun ${join(cliRoot, "src/bin.ts")} dev --port ${publicPort} --inspector-port ${inspectorPort} --local off --no-color --verbose`;
+  manifest.scripts.dev = `bun ${join(cliRoot, "src/bin.ts")} dev --port ${publicPort} --local off --no-color --verbose`;
   await writeFile(join(root, "package.json"), JSON.stringify(manifest));
   await writeFile(join(root, "src/platform/env.ts"), environmentSource(false));
   await writeFile(join(root, "src/services/hello/functions/hello.function.ts"), handlerSource());

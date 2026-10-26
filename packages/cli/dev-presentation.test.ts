@@ -3,7 +3,6 @@
 import { expect, test } from "bun:test";
 
 import { type DevOptions } from "./src/commands/dev.js";
-import { defaultInspectorOptions } from "./src/commands/dev-inspector.js";
 import { createDevLogger } from "./src/commands/dev-logger.js";
 
 import { options } from "../../tests/fixtures/cli/dev-fixture.js";
@@ -82,11 +81,20 @@ test("hides internal child operations while retaining request logs, evidence and
   }
 });
 
-test("uses the production inspector and configured port by default", () => {
-  const options = defaultInspectorOptions(3217);
-  expect(options.command).toEqual(["node", "server.js"]);
-  expect(options.cwd?.endsWith("/dist/inspector")).toBe(true);
-  expect(options.port).toBe(3217);
+test("reports the private bridge separately from the standalone UI", () => {
+  const events: Parameters<NonNullable<DevOptions["onLog"]>>[0][] = [];
+  const log = createDevLogger({
+    compile: async () => {
+      throw new Error("unused");
+    },
+    onLog: (event) => events.push(event),
+  });
+  log({
+    level: "info",
+    event: "dev.inspector.ready",
+    fields: { bridge: "http://127.0.0.1:43100" },
+  });
+  expect(events[0]?.fields).toEqual({ bridge: "http://127.0.0.1:43100" });
 });
 
 test("keeps inspector disconnect output out of normal shutdown while retaining cleanup failures", () => {

@@ -1,3 +1,4 @@
+/** Checks real packed PostgreSQL declarations and preserves failed external consumers. */
 import { createHash } from "node:crypto";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -30,53 +31,18 @@ export async function verifyPackedPostgresConsumer(
     throw new Error("Packed generator patch hash does not match its manifest.");
   const fixture = await mkdtemp(join(tmpdir(), "relkit-packed-postgres-"));
   let server: Awaited<ReturnType<typeof startRegistry>> | undefined;
+  let successful = false;
   try {
     const patchPath = `patches/${patch.key}.patch`;
     await mkdir(join(fixture, "patches"));
     await writeFile(join(fixture, patchPath), asset);
     await writeFile(
       join(fixture, "package.json"),
-      JSON.stringify(
-        {
-          name: "relkit-packed-postgres-consumer",
-          private: true,
-          type: "module",
-          dependencies: {
-            "@relkit/effect-mq": native.version,
-            effect: native.dependencies?.effect,
-            "@effect/sql-pg": native.dependencies?.["@effect/sql-pg"],
-            "drizzle-orm": native.dependencies?.["drizzle-orm"],
-          },
-          devDependencies: {
-            typescript: catalog.dependencies.typescript,
-            "@types/bun": catalog.dependencies["@types/bun"],
-          },
-          patchedDependencies: { [patch.key]: patchPath },
-        },
-        null,
-        2,
-      ) + "\n",
+      JSON.stringify(postgresManifest(native, catalog, patch, patchPath), null, 2) + "\n",
     );
     await writeFile(
       join(fixture, "tsconfig.json"),
-      JSON.stringify(
-        {
-          compilerOptions: {
-            target: "ES2022",
-            module: "ESNext",
-            moduleResolution: "Bundler",
-            strict: true,
-            skipLibCheck: false,
-            noEmit: true,
-            noUncheckedIndexedAccess: true,
-            exactOptionalPropertyTypes: true,
-            types: ["bun"],
-          },
-          files: ["postgres.ts"],
-        },
-        null,
-        2,
-      ) + "\n",
+      JSON.stringify(postgresTypeScriptProject, null, 2) + "\n",
     );
     await writeFile(join(fixture, "postgres.ts"), postgresProbe(catalog.effectVersion));
     server = await startRegistry(fixture, tarballs, manifests);
@@ -94,11 +60,53 @@ export async function verifyPackedPostgresConsumer(
     console.log(
       `Packed PostgreSQL consumer passed (Effect ${catalog.effectVersion}, strict dependency declarations).`,
     );
+    successful = true;
   } finally {
     await server?.stop(true);
-    await rm(fixture, { recursive: true, force: true });
+    if (successful) await rm(fixture, { recursive: true, force: true });
+    else console.error(`Retained failed PostgreSQL consumer: ${fixture}`);
   }
 }
+
+/** Uses the exact selected SDK and portable repair identity from the packed catalog. */
+function postgresManifest(
+  native: Manifest,
+  catalog: BuildCatalog,
+  patch: BuildCatalog["patches"][string],
+  patchPath: string,
+) {
+  return {
+    name: "relkit-packed-postgres-consumer",
+    private: true,
+    type: "module",
+    dependencies: {
+      "@relkit/effect-mq": native.version,
+      effect: native.dependencies?.effect,
+      "@effect/sql-pg": native.dependencies?.["@effect/sql-pg"],
+      "drizzle-orm": patch.version,
+    },
+    devDependencies: {
+      typescript: catalog.dependencies.typescript,
+      "@types/bun": catalog.dependencies["@types/bun"],
+    },
+    patchedDependencies: { [patch.key]: patchPath },
+  };
+}
+
+const postgresTypeScriptProject = {
+  compilerOptions: {
+    target: "ES2022",
+    module: "ESNext",
+    moduleResolution: "Bundler",
+    strict: true,
+    skipLibCheck: false,
+    noEmit: true,
+    noUncheckedIndexedAccess: true,
+    exactOptionalPropertyTypes: true,
+    types: ["bun"],
+  },
+  files: ["postgres.ts"],
+};
 
 /**
  * Requires an artifact before creating a consumer fixture.

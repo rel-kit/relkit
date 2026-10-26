@@ -3,7 +3,7 @@
  * writes graph/server/container bytes without publishing; only an absent public
  * directory is optional, and mixed failure Causes remain intact for rollback.
  */
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { Effect, Schema } from "effect";
 import {
   canonicalJson,
@@ -16,7 +16,7 @@ import { CliFileSystem } from "../services/filesystem.service.js";
 import { stageJobsEffect } from "./build-jobs.js";
 import { serverSource } from "./build-server.js";
 import { dockerfile, dockerignore } from "./build-container.js";
-import { buildManifest } from "./build-manifest.js";
+import { buildManifest, buildProductionManifest } from "./build-manifest.js";
 import type { BuildStageCohort, BuildStageInputs } from "./build.types.js";
 
 /**
@@ -63,6 +63,8 @@ export const writeBuildServer = Effect.fn("Project.buildServer")(function* (
 ) {
   const files = yield* CliFileSystem;
   const outputs = input.checked.outputs;
+  const development =
+    input.options.mode === "development" || input.options.bundleInputInventory !== undefined;
   const entrypoint = yield* cliTry("build.serverSource", () =>
     serverSource(
       cohort.graph,
@@ -73,6 +75,8 @@ export const writeBuildServer = Effect.fn("Project.buildServer")(function* (
       {
         ...cohort.tooling.server,
         maxPreviewBytes: cohort.tooling.inspector.maxPreviewBytes,
+        inspectorEnabled: development && cohort.tooling.inspector.enabled,
+        jobsAdministration: development && cohort.jobsManifest !== undefined,
         ...(input.options.bundleInputInventory === undefined
           ? {}
           : { httpApplication: "prepared" }),
@@ -108,6 +112,17 @@ export const writeBuildMetadata = Effect.fn("Project.buildMetadata")(function* (
 ) {
   const files = yield* CliFileSystem;
   yield* files.writeText(
+    join(input.stage, "package.json"),
+    buildProductionManifest(
+      cohort.productionDependencies,
+      cohort.productionRepairs.patchedDependencies,
+    ),
+  );
+  for (const asset of cohort.productionRepairs.assets) {
+    yield* files.mkdir(dirname(join(input.stage, asset.path)));
+    yield* files.writeText(join(input.stage, asset.path), asset.content);
+  }
+  yield* files.writeText(
     join(input.stage, "manifest.json"),
     buildManifest({
       graphHash: cohort.graphHash,
@@ -119,11 +134,11 @@ export const writeBuildMetadata = Effect.fn("Project.buildMetadata")(function* (
   );
   yield* files.writeText(
     join(input.stage, "Dockerfile"),
-    dockerfile(cohort.jobsManifest !== undefined),
+    dockerfile(cohort.jobsManifest !== undefined, cohort.productionRepairs.assets.length > 0),
   );
   yield* files.writeText(
     join(input.stage, ".dockerignore"),
-    dockerignore(cohort.jobsManifest !== undefined),
+    dockerignore(cohort.jobsManifest !== undefined, cohort.productionRepairs.assets.length > 0),
   );
 });
 

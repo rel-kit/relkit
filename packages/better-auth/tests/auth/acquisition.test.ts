@@ -1,12 +1,39 @@
+/** Checks native acquisition failure eviction, cancellation isolation and route validation.
+ * Controlled initialization gates establish settlement order while scoped owners release borrowed test databases.
+ */
 import { expect, it } from "@effect/vitest";
 import { activateDrizzleService, defineDrizzleService } from "@relkit/drizzle";
 import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
 import { Cause, Deferred, Effect, Exit, ManagedRuntime } from "effect";
-import { activateBetterAuthService, defineBetterAuthService } from "../../src/index.js";
+import { activateBetterAuthService, defineBetterAuthService } from "../../src/drizzle.js";
 import { AuthService, authNativeOf } from "../../src/auth.service.js";
 import { authTestLayer, nativeAuthStub } from "./auth-test-layer.js";
 
 const user = sqliteTable("user", { id: integer().primaryKey() });
+
+/** Fails only the first initialization after the test releases its settlement gate. */
+function retryingAuth(
+  attempt: () => number,
+  initialized: Deferred.Deferred<void>,
+  finish: Deferred.Deferred<void>,
+  failure: Error,
+) {
+  return defineBetterAuthService({
+    baseURL: "http://localhost",
+    plugins: [
+      {
+        id: "controlled-test-init",
+        async init() {
+          if (attempt() === 1) {
+            Effect.runSync(Deferred.succeed(initialized, undefined));
+            await Effect.runPromise(Deferred.await(finish));
+            throw failure;
+          }
+        },
+      },
+    ],
+  });
+}
 
 it.effect(
   "evicts failing shared native initialization and retries without disposing the borrowed DB",
@@ -28,22 +55,7 @@ it.effect(
         Effect.promise(() => activateDrizzleService(declaration, {}, { isolated: true })),
         (active) => Effect.promise(() => active.close()),
       );
-      const descriptor = defineBetterAuthService({
-        baseURL: "http://localhost",
-        plugins: [
-          {
-            id: "controlled-test-init",
-            async init() {
-              attempts++;
-              if (attempts === 1) {
-                Effect.runSync(Deferred.succeed(initialized, undefined));
-                await Effect.runPromise(Deferred.await(finish));
-                throw failure;
-              }
-            },
-          },
-        ],
-      });
+      const descriptor = retryingAuth(() => ++attempts, initialized, finish, failure);
       const first = activateBetterAuthService(descriptor, database, "/api/auth");
       const second = activateBetterAuthService(descriptor, database, "/api/auth");
       const outcomes = Promise.allSettled([first, second]);

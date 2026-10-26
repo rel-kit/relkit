@@ -9,7 +9,10 @@ the AWS/Pulumi generator tuple because it does not have current reference-host r
 This restriction applies to new-project generation, not to deployment commands for an existing
 configured project.
 
-For an existing project, install `@relkit/aws` and `@relkit/pulumi`, load them from
+For an existing project, install `@relkit/aws` and `@relkit/pulumi` with their selected
+deploy-only `@pulumi/aws`/`@pulumi/pulumi` SDK requirements as development dependencies. Use the
+[metadata-derived installation recipe](../apps/docs/content/_snippets/generated/installations/deployment.mdx)
+and keep runtime integrations in their runtime section. Load the role packages from
 `relkit.config.ts`, and select `deployment: { engine: "pulumi", host: "aws" }` in
 `defineApp`.
 
@@ -28,7 +31,7 @@ generated program, and logs.
 
 ## Lifecycle
 
-Run from the generated project:
+Run from that existing configured project:
 
 ```sh
 relkit deploy init --stack development

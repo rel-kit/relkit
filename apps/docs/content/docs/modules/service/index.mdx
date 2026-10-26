@@ -1,0 +1,118 @@
+---
+title: Services and domains
+description: Understand the service layer that organizes your app's functions, events, resources, tools, and agents by domain.
+pagination: false
+sidebar:
+  icon: boxes
+---
+
+A service groups related application behavior and exposes the operations other parts of the application can call. Start with the part of the product
+you are building—orders, receipts, accounts—not with the technology you will use to build it. Give that
+area a domain folder, keep its behavior and resources together, and expose its public operations through
+one `service.ts`.
+
+<Callout type="tip" title="Start here" icon="route">
+  For a working example, start with [Your first service](/docs/modules/service/first-service). Use
+  this overview to understand ownership, or open the [`defineService`
+  reference](/docs/api/services#defineservice) for its exact options.
+</Callout>
+
+## Pre-setup
+
+Start with a [minimal app](/docs/learn/create-an-app) and retain its `defineApp` configuration
+and `defineEnv` contract. A plain service needs no provider profile or Docker service. When
+adding a database, bucket, cache, job, event, or agent to the domain, complete that capability's
+[provider setup](/docs/modules/integrations#pre-setup) first. Local Docker is the default for
+capabilities that require an external service; registering a service does not configure them automatically.
+
+## Domain, service, and function
+
+These three terms describe different things:
+
+| Term     | Meaning                                                                              | Example                                                                                     |
+| -------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Domain   | A cohesive area of application responsibility, including its private implementation. | `src/services/orders/` owns order creation, pricing, order events, and order-support tools. |
+| Service  | The domain's public boundary, assembled in one `service.ts`.                         | `orders.createOrder` and `orders.orderCreated` are selected public members.                 |
+| Function | A validated operation that does the work.                                            | `create-order.function.ts` calculates a total and publishes an event.                       |
+
+When we say a service contains tools, agents, caches, tasks, or jobs, we mean they belong to its **domain**.
+`defineService` accepts public `functions`, `events`, `tasks`, and `jobs`; it is not a registry of every file
+or a container that injects resources. A function remains the immediate execution unit, while a task owns
+durable execution.
+
+## The application architecture
+
+```text
+relkit.config.ts              application settings and provider bindings
+src/
+├── platform/                 shared environment and infrastructure support
+├── services/
+│   ├── orders/               an application domain
+│   │   ├── service.ts        public functions, events, tasks, and jobs
+│   │   ├── functions/        business operations and event subscribers
+│   │   ├── events/           facts this domain publishes
+│   │   ├── tools/            model-callable operations
+│   │   ├── agents/           bounded model workflows
+│   │   └── cache/            domain-owned cached data
+│   └── receipts/             another domain, with its own service.ts
+│       ├── service.ts
+│       ├── functions/
+│       ├── tasks/
+│       └── jobs/
+└── routes/                   URL paths, HTTP methods, and request policy
+```
+
+This is an ownership map, not a checklist of folders to create. Start with a service and one useful
+function. Add the other directories only when the domain needs those capabilities. `routes` and
+`platform` are special layers, not application domains, and do not need a domain `service.ts`.
+
+The compiler discovers exported descriptors, checks their relationships, and produces an application
+graph and runtime manifest. The runtime, Inspector, and deployment tooling use that checked model.
+Application authors use ordinary TypeScript descriptors; no Effect imports are required.
+
+Existing flat `src/<name>/service.ts` apps remain supported. Scaffolding preserves their detected
+layout, while empty projects default to grouped. Keep one boundary shape throughout the app;
+`src/services/service.ts` is not an aggregate boundary. See [optional migration](/docs/modules/service/migration).
+
+## Follow an operation through the layers
+
+In the commerce example, an HTTP route selects `orders.createOrder`. The function validates domain input
+and reads the Orders price cache. The [event examples](/docs/modules/events) show how a producing service can
+publish a fact and a receiving service can own its reaction; [jobs](/docs/modules/jobs) describe durable work.
+
+Each part has a different job:
+
+- The route handles HTTP input and response mapping.
+- The service makes selected domain operations available to callers.
+- The function owns business behavior and declares the resources it needs.
+- The event contract describes what happened; subscriber functions own the reactions.
+- Tools and agents reuse domain behavior without relocating it into an AI-specific application layer.
+
+A service does not create an HTTP endpoint automatically. Nor does adding a member grant a user
+permission to call it. Transport exposure and authorization remain explicit.
+
+## Read a real public boundary
+
+This is the larger commerce reference, whose resource/provider packages are already selected. For a
+lean first app, use [Your first service](/docs/modules/service/first-service); install a capability from its
+linked guide before copying that capability's members into your own domain.
+
+<include
+  source="examples/commerce/src/services/orders/service.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/service.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/service.ts
+</include>
+
+Notice what is absent: the Orders cache, support agent, tools, and event subscribers. They still belong
+to Orders and are discovered from their own files. They are not public service members.
+
+## Choose your next step
+
+Read [what a domain is and when to split one](/docs/modules/service/domains), then use
+[where to put your code](/docs/modules/service/organization) as the map for each capability.
+For implementation, follow [define a service](/docs/modules/service/define),
+[expose it through routes](/docs/modules/service/routes), or the [first-service example](/docs/modules/service/first-service).
+
+<include>/_snippets/generated/related/docs-modules-service-index.mdx</include>

@@ -1,0 +1,40 @@
+---
+title: Stream hooks
+description: Start and cancel typed generic streams without treating them as finite queries.
+pagination: false
+sidebar:
+  icon: radio
+---
+
+Use a stream hook to receive a sequence of updates and cancel it when the reader no longer needs them.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  Complete [frontend installation and contract pull](/docs/modules/client) before using this guide.
+  Keep its selected React/query peers and generated declarations in the frontend package.
+</Callout>
+
+## Start a stream
+
+`useStream` exposes `start`, `cancel`, and `reset`. Query-classified streams may opt into `autoStart`;
+mutation streams always require an explicit start. Classification controls start/retry policy only.
+It does not make a stream a finite cache query.
+
+The low-level client returns a single-consumer `AsyncIterable`. Work starts on the first `next()`, and
+breaking iteration cancels upstream work and releases its pinned invocation generation.
+
+## Use the typed hook
+
+<include source="apps/docs/examples/frontend/report.tsx" lang="tsx" meta='title="src/Report.tsx"'>
+  /_snippets/source/apps/docs/examples/frontend/report.tsx
+</include>
+
+This selector belongs to the commerce [streaming route](/docs/modules/http/streaming). Its
+`streamOf` item schema determines `report.items`, so do not copy a stream selector into an app
+that has not declared that route and pulled its contract.
+
+Use [`useAgent`](/docs/modules/ai/streaming#use-from-the-frontend) for durable agent threads,
+[`useJobRun`](/docs/modules/jobs/clients#use-from-react) for accepted jobs, and
+[`useChannel`](/docs/modules/realtime/react) for shared application updates. Those have separate
+identity and recovery contracts. Reference: [`useStream`](/docs/api/client#usestream).
+
+<include>/_snippets/generated/related/docs-modules-client-streams.mdx</include>

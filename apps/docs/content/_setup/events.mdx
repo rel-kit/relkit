@@ -1,0 +1,33 @@
+## Pre-setup
+
+Application events currently use the filesystem provider. It has no Docker recipe; Redis's
+cache/realtime adapters do not provide application events. Other configured capabilities
+can still use local Docker in this same application.
+
+<Steps>
+<Step title="Install the event provider" icon="package">
+
+<include>/_snippets/generated/installations/local.mdx</include>
+
+</Step>
+<Step title="Configure event delivery" icon="settings">
+
+<include>/_setup/local-config.mdx</include>
+
+<include source="apps/docs/examples/setup/events.ts" lang="ts" meta='title="relkit.config.ts"'>
+  /_snippets/source/apps/docs/examples/setup/events.ts
+</include>
+
+This path requires no credentials or new `defineEnv` fields. The `default` profile stores
+state under `.relkit/state`; preserve that directory across restarts. A scaffold may already
+have added this binding—reuse it instead of creating a second profile.
+
+</Step>
+<Step title="Validate the event and consumer" icon="terminal">
+
+After registering the event and listener, run `bun run check`, `bun run typecheck`, and
+`bun run dev`. Follow [Handle order events](/guides/events/react-to-order-events) to publish
+an event and verify its consumer. Defining an event alone does not run a listener.
+
+</Step>
+</Steps>

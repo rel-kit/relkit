@@ -3,7 +3,7 @@ export const capabilityExamples = [
   {
     id: "function",
     title: "Function",
-    guide: "/docs/fundamentals/functions",
+    guide: "/docs/learn/concepts/functions",
     panels: [
       {
         label: "Backend",
@@ -20,7 +20,7 @@ export const capabilityExamples = [
   {
     id: "service",
     title: "Service",
-    guide: "/docs/service/define",
+    guide: "/docs/modules/service/define",
     panels: [
       {
         label: "Backend",
@@ -31,14 +31,14 @@ export const capabilityExamples = [
         label: "Routes",
         file: "src/routes/orders/route.ts",
         source: "service-routes",
-        guide: "/docs/service/routes",
+        guide: "/docs/modules/service/routes",
       },
     ],
   },
   {
     id: "event",
     title: "Event",
-    guide: "/docs/events/define",
+    guide: "/docs/modules/events/define",
     panels: [
       {
         label: "Backend",
@@ -55,7 +55,7 @@ export const capabilityExamples = [
   {
     id: "cache",
     title: "Cache",
-    guide: "/docs/caching/first-cache",
+    guide: "/guides/caching/cache-product-prices",
     panels: [
       {
         label: "Backend",
@@ -72,7 +72,7 @@ export const capabilityExamples = [
   {
     id: "buckets",
     title: "Bucket",
-    guide: "/docs/storage/define",
+    guide: "/docs/modules/storage/define",
     panels: [
       {
         label: "Backend",
@@ -89,7 +89,7 @@ export const capabilityExamples = [
   {
     id: "database",
     title: "Database",
-    guide: "/docs/database/define",
+    guide: "/docs/modules/database/define",
     panels: [
       {
         label: "Backend",
@@ -106,7 +106,7 @@ export const capabilityExamples = [
   {
     id: "background-job",
     title: "Jobs",
-    guide: "/docs/jobs/clients",
+    guide: "/docs/modules/jobs/clients",
     panels: [
       {
         label: "Backend",
@@ -123,7 +123,7 @@ export const capabilityExamples = [
   {
     id: "observability",
     title: "Observability",
-    guide: "/docs/operations/observability",
+    guide: "/docs/modules/operations/observability",
     panels: [
       {
         label: "Backend",

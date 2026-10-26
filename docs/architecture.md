@@ -76,29 +76,33 @@ cohort, installed dependency bytes, and runtime environment before using it.
 Any missing, stale, corrupt, incompatible, or dynamically ineligible input
 returns to the ordinary full validation path.
 
-The backend owns early bounded, redacted observation before canonical telemetry
-storage is ready. Persistence and Inspector acquisition run as session-scoped
-support work with independent readiness; their delay or failure does not turn a
-healthy backend into a false failure, and no Inspector URL is announced before
-its listener is ready.
+With inspection enabled, the development session owns a private live bridge and
+bounded, redacted observation in memory. The separate Inspector tool owns durable
+history, retention, storage workers and the UI. Bridge or tool failure leaves
+backend readiness independent; stopping the tool preserves the backend and its
+committed diagnostic history. Disabled inspection acquires neither the bridge
+nor capture buffering.
 
 Compilation writes local recipe data without probing Docker. Development
 reconciles only graph-required recipes, scopes containers and volumes to the
 canonical project identity, and waits for health before readiness. `--local=off`
 disables recipes and requires normal binding values instead.
 
-The backend serves the versioned inspector protocol under `/_relkit/v1`. The
+The backend preserves its core versioned protocol under `/_relkit/v1`. Its
 graph endpoint is:
 
 ```text
 GET /_relkit/v1/graph
 ```
 
-Inspector views must read the active graph, runtime state, requests, logs,
-traces, jobs, events, and actions through that protocol. They must not infer
-resources from source files or maintain a competing graph. The generated
-configuration reserves port `3210` for inspector connectivity; the active
-backend port is the source of truth for a running development session.
+Explicitly enabled development inspection adds an authenticated session bridge
+on `127.0.0.1:0`, configured through `inspector.connection`. The bridge follows
+only committed generations and publishes private session descriptors under
+`.relkit/connections`. The standalone tool owns the UI (default `3210`), collector
+and DuckDB history; it reads live graph, runtime, jobs and actions through the
+bridge and historical records from its own store. Views must not infer resources
+from source files or maintain a competing graph. Production emits no rich
+Inspector registration, while core and business transports remain independent.
 
 ## Build and start
 

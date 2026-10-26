@@ -1,0 +1,61 @@
+---
+title: Server calls and rendering
+description: Hydrate only data produced for the same backend, identity, session, and contract.
+pagination: false
+sidebar:
+  icon: server
+---
+
+Fetch backend data during server rendering, then hydrate the matching frontend client.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  Complete [frontend installation and contract pull](/docs/modules/client) before using this guide.
+  Keep its selected React/query peers and generated declarations in the frontend package.
+</Callout>
+
+## Select the server entry point
+
+[`createClient`](/docs/api/client#createclient) from `@relkit/client` works in a server runtime with
+`fetch`. For Bun servers, [`createServerClient`](/docs/api/client#createserverclient) from
+`@relkit/client/server` adds operation-time trace propagation, and
+[`createRelkitServerContext`](/docs/api/client#createrelkitservercontext) from
+`@relkit/client/server/tanstack-query` prepares identity-bound query hydration. The two `/server`
+leaves are Bun-only package exports; a Node-based Next.js server should use the base client.
+
+Create clients and caches per incoming request when forwarding user credentials. A browser cookie
+jar is not inherited by server-side fetch, and one user's headers must not be shared with another.
+`createServerClient` adds tracing, while `createRelkitServerContext` also loads identity. With the
+base client or tracing-only client, [load identity and supply its headers](/docs/modules/client/transports)
+before a mutation, forwarding the incoming credentials to both requests.
+
+## Create request scope
+
+In a Bun server, prefetch the same `GET /hello` selector and input used by the
+[React example](/guides/frontend/connect-react). The query key includes the server-derived identity
+scope so it matches the managed hook during hydration:
+
+This example assumes the incoming request already carries the backend's session or anonymous
+identity cookie. For a first visit without that cookie, let the browser provider establish identity
+before loading private data. The server context does not forward new `Set-Cookie` headers to your
+framework's response; custom server-side identity bootstrapping must handle that separately.
+
+<include
+  source="apps/docs/examples/frontend/ssr.ts"
+  lang="ts"
+  meta='title="server/prefetch-greeting.ts — Bun only"'
+>
+  /_snippets/source/apps/docs/examples/frontend/ssr.ts
+</include>
+
+Pass the returned state to `RelkitClientProvider` through its `hydratedState` prop, using the same
+`baseUrl` and any `identityKey` partition on both sides. Give the browser's Hello query a matching
+`staleTime: 30_000` when you want to reuse this prefetched value for 30 seconds.
+Hydration installs only when backend, opaque identity scope, session epoch, public fingerprint,
+operation, and canonical key match. A fresh hydrated query avoids unintended duplicate requests
+within its configured `staleTime`; stale-query revalidation remains intentional.
+
+The generated client supplies the typed query function; `relkitKey` adds the managed hook's cache
+identity. Using an unrelated query key can make a successful prefetch invisible to the browser
+hook. Keep framework serialization and response-cookie handling in the server layer.
+
+<include>/_snippets/generated/related/docs-modules-client-ssr.mdx</include>

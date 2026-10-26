@@ -1,3 +1,4 @@
+/** Checks approval policy transitions and pending tool decision behavior through the generic API. */
 import { describe, expect, test } from "vitest";
 import {
   ApprovalDeniedError,
@@ -7,7 +8,7 @@ import {
   createApproval,
   denyApproval,
   requiresApproval,
-} from "../src/index.ts";
+} from "../src/index.js";
 
 describe("tool approval policy", () => {
   test("enforces all policies and operation classes", () => {

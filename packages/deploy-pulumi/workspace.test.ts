@@ -16,6 +16,26 @@ afterEach(async () => {
 });
 
 describe("Pulumi workspace setup", () => {
+  test("project normalization handles long hyphen runs within a bounded native call", () => {
+    const result = Bun.spawnSync(
+      [
+        process.execPath,
+        "-e",
+        `
+      import { createPulumiWorkspace } from "./packages/deploy-pulumi/src/workspace.ts";
+      try {
+        await createPulumiWorkspace({ projectName: "orders" + "-".repeat(100_000) + "app", stackName: "!" });
+      } catch (error) {
+        console.log(error.message);
+      }
+    `,
+      ],
+      { cwd: resolve(import.meta.dir, "../.."), timeout: 3000, stdout: "pipe", stderr: "pipe" },
+    );
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout.toString()).toContain("stackName contains unsupported characters");
+  });
+
   test("accepts Pulumi Cloud, object storage, and isolated local backends", () => {
     const root = resolve("tmp/pulumi-workspace");
     expect(resolvePulumiBackend()).toEqual({ kind: "cloud", url: PULUMI_CLOUD_BACKEND_URL });

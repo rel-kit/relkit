@@ -1,4 +1,5 @@
-import type { AgentStateProvider } from "@relkit/agents";
+/** Defines the Effect operation contract and bounded polling options for local agent state. */
+import type { AgentStateProvider } from "@relkit/contracts";
 import type { Effect } from "effect";
 import type { LocalOperationError } from "../local-effect.js";
 

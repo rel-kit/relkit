@@ -1,0 +1,52 @@
+---
+title: Author a provider
+description: Define an adapter's capability, connection contract, behavior, and runtime responsibilities.
+pagination: false
+sidebar:
+  icon: code-xml
+---
+
+A provider adapter describes how an application connects a capability to an integration.
+Use the existing [integration catalog](/docs/modules/integrations) when you need Redis, S3,
+or another supported provider. This page is for authors adding an integration.
+
+## Define the connection and behavior
+
+Install `@relkit/provider` in the integration package. Keep its version aligned with the
+RELKIT packages you test against. The following descriptor declares a cache connection:
+
+<include
+  source="apps/docs/examples/public-api/provider.ts"
+  lang="ts"
+  meta='title="src/provider.ts"'
+>
+  /_snippets/source/apps/docs/examples/public-api/provider.ts
+</include>
+
+`defineProviderCapability` identifies the capability. `defineConnectionContract` declares
+allowed connection fields; fields are required by default. Mark credentials and connection
+URLs as sensitive. `defineProviderBehavior` holds serializable settings, and
+`defineProviderAdapter` checks the field names and produces an immutable descriptor.
+
+This example produces metadata; it does not connect to Redis. The runtime integration owns
+connection acquisition, capability operations, cancellation, readiness, and cleanup.
+Follow the [Redis implementation](https://github.com/rel-kit/relkit/tree/main/integrations/packages/redis/src)
+for an existing implementation of these separate responsibilities.
+
+## Publish the correct entrypoints
+
+Declare the authoring import in `relkit.integration.exports.authoring`, as explained in
+[integration registration](/docs/modules/integrations#declare-authoring-entrypoints).
+Expose runtime and local-recipe entrypoints only for the roles your integration implements.
+Application configuration imports the authoring descriptor; runtime acquisition remains
+outside descriptor construction.
+
+The [provider API index](/docs/api/provider#all-exported-apis) includes bindings, features,
+local recipes, connection validation, and their companion types. APIs ending in `Effect`
+are the lazy forms for integration authors already composing Effect programs; application
+configuration can use the synchronous builders shown above.
+
+Continue with [local Docker recipes](/docs/modules/integrations/local-docker), or see an adapter
+in an application in [Cache product prices](/guides/caching/cache-product-prices).
+
+<include>/_snippets/generated/related/docs-modules-integrations-provider-authoring.mdx</include>

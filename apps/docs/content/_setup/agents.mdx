@@ -1,0 +1,41 @@
+## Pre-setup
+
+Use local Docker Redis for agent checkpoints and live updates. Model execution is a separate
+choice: begin with the deterministic model in the [offline agent guide](/guides/ai/build-an-offline-agent).
+Docker does not supply a hosted model or an API key.
+
+<Steps>
+<Step title="Install agent execution and Redis support" icon="package">
+
+<include>/_snippets/generated/installations/agent.mdx</include>
+
+<include>/_snippets/generated/installations/redis.mdx</include>
+
+The agent cohort also installs the filesystem provider used by the offline tutorial. This
+configuration selects Docker Redis for the running application instead.
+
+</Step>
+<Step title="Configure checkpoint and realtime profiles" icon="settings">
+
+<include>/_setup/local-config.mdx</include>
+
+<include source="apps/docs/examples/setup/agents.ts" lang="ts" meta='title="relkit.config.ts"'>
+  /_snippets/source/apps/docs/examples/setup/agents.ts
+</include>
+
+Use `stateProfile: "default"` in the agent, or omit it to select this default. Redis credentials
+come from Docker. The deterministic model needs no environment key. When selecting a hosted model,
+declare its required key as `env.secret()` in your existing `defineEnv`, supply it to the backend
+process, and follow that model's [native configuration](/docs/modules/ai/agents).
+The declaration validates the key; it does not configure the model automatically.
+
+Tools exposed only through MCP do not need checkpoint storage. Workspace files use a separate
+[bucket profile](/docs/modules/storage#pre-setup) when selected.
+
+</Step>
+<Step title="Check and start after registering the agent" icon="terminal">
+
+<include>/_setup/docker-run.mdx</include>
+
+</Step>
+</Steps>

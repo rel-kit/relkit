@@ -1,3 +1,4 @@
+/** Checks installed dependency directions between core protocols, selected integrations and the metadata catalog. */
 import { relative, resolve } from "node:path";
 import { discoverScopes, readManifest, type Scope } from "./boundary-imports";
 
@@ -24,6 +25,11 @@ const coreProtocols = new Set([
 const integrationImplementations = new Map([
   ["@relkit/local", new Set(["@relkit/providers-local"])],
   ["@relkit/redis", new Set(["@relkit/providers-local"])],
+  ["@relkit/pulumi", new Set(["@relkit/deploy-pulumi"])],
+  [
+    "@relkit/langchain",
+    new Set(["@relkit/functions", "@relkit/invocation", "@relkit/schema", "@relkit/tools"]),
+  ],
 ]);
 
 export function integrationPackageNames(scopes: readonly Scope[]): Set<string> {
@@ -48,7 +54,16 @@ export function dependencyDirectionViolations(
   const integrations = integrationPackageNames(scopes);
   const violations: DirectionViolation[] = [];
   for (const owner of scopes) {
-    for (const dependency of owner.declaredDependencies) {
+    // Development fixtures and optional peers do not create an installed runtime edge.
+    const manifest = owner.manifest;
+    const runtimeDependencies = new Set([
+      ...Object.keys(manifest?.dependencies ?? {}),
+      ...Object.keys(manifest?.optionalDependencies ?? {}),
+      ...Object.keys(manifest?.peerDependencies ?? {}).filter(
+        (name) => manifest?.peerDependenciesMeta?.[name]?.optional !== true,
+      ),
+    ]);
+    for (const dependency of runtimeDependencies) {
       let rule: string | undefined;
       let message: string | undefined;
       if (owner.manifest?.name === "@relkit/engine" && dependency === "@relkit/providers-local") {

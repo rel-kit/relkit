@@ -1,5 +1,6 @@
+/** Checks deterministic manifest merging, selected dependency compatibility and retained authored fields. */
 import { expect, test } from "bun:test";
-import { mergeScaffoldManifest } from "../../packages/create-relkit/src/plan-manifest.ts";
+import { mergeScaffoldManifest } from "../../packages/cli/src/scaffolding/plan-manifest.ts";
 import {
   SCAFFOLD_DEPENDENCIES,
   type ScaffoldDependencyName,

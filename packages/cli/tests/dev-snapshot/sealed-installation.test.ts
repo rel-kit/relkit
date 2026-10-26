@@ -48,13 +48,18 @@ function request(
 /**
  * Substitutes candidate output and unused HTTP probing without any read authority.
  * @param written - Explicit test-owned content sink.
+ * @param linked - Records selected runtime ownership requests without native mutation.
  * @returns The service Layer; requiring SnapshotFiles would fail its acquisition.
  */
-function candidateLayer(written: Map<string, string>) {
+function candidateLayer(written: Map<string, string>, linked: string[][] = []) {
   return snapshotCandidatesLive.pipe(
     Layer.provide(
       Layer.merge(
         Layer.succeed(SnapshotCandidateFiles, {
+          linkRuntime: (directory, root, dependencies) =>
+            Effect.sync(() => {
+              linked.push([directory, root, ...dependencies]);
+            }),
           write: (directory, path, bytes) =>
             Effect.sync(() => {
               expect(directory).toBe("/candidate");
@@ -95,6 +100,31 @@ it.effect("copies the original sealed content after every cached artifact is rep
     expect(JSON.parse(written.get("deferred-integrity.json")!)).toMatchObject({
       "deferred.js": { hash: deferred.hash, bytes: deferred.bytes },
     });
+  }),
+);
+
+it.effect("restores selected runtime ownership from sealed manifest bytes", () =>
+  Effect.gen(function* () {
+    const fixture = validationFixture();
+    const snapshot = yield* DevSnapshots.use((service) =>
+      service.validate(fixture.root, tools),
+    ).pipe(Effect.provide(devSnapshotsLive.pipe(Layer.provide(fixture.layer))));
+    const bytes = Buffer.from(
+      JSON.stringify({ dependencies: { "@relkit/runtime-hono": "0.7.10" } }),
+    );
+    const member = { path: "package.json", bytes: bytes.length, hash: snapshotDigest(bytes) };
+    const selected = {
+      ...snapshot,
+      artifacts: [...snapshot.artifacts, { ...member, content: bytes.toString("base64") }],
+      receipt: { ...snapshot.receipt, artifacts: [...snapshot.receipt.artifacts, member] },
+    };
+    const linked: string[][] = [];
+    const written = new Map<string, string>();
+    yield* SnapshotCandidates.use((service) =>
+      service.install(request(selected, () => Effect.void)),
+    ).pipe(Effect.provide(candidateLayer(written, linked)));
+    expect(linked).toEqual([["/candidate", "/project", "@relkit/runtime-hono"]]);
+    expect(written.get("package.json")).toBe(bytes.toString("utf8"));
   }),
 );
 

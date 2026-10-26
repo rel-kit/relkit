@@ -1,0 +1,103 @@
+---
+title: HTTP routes overview
+description: Understand HTTP Routes as the transport layer around domain services, then choose the guide for your endpoint.
+pagination: false
+sidebar:
+  icon: globe
+---
+
+An HTTP route connects a method and URL to an operation exposed by a service. A domain owns the business behavior;
+its [service](/docs/modules/service) exposes public functions; a route connects a URL and method to one of those
+functions. Adding a public function alone does not publish an endpoint.
+
+<Callout type="tip" title="Start here" icon="route">
+  Start with [Your first HTTP route](/docs/modules/http/first-route) to expose and call a service
+  operation. Use the [Routes reference](/docs/api/routes) for exact descriptor options and types.
+</Callout>
+
+Keep these responsibilities separate so the same operation can serve an HTTP request, a scheduled job,
+or an AI tool without copying its validation and business rules into each entry point.
+
+<include>/_setup/http.mdx</include>
+
+## Follow a request through the application
+
+For a function-backed route, the normal request flow is:
+
+```text
+HTTP request
+  ↓ URL + method
+Route (src/routes/)
+  ↓ policy + input mapping
+Public function (src/services/<domain>/)
+  ↓ validated output
+HTTP response
+```
+
+The route does not contain another business handler. It selects a public function and describes how
+HTTP values become that function's input. RELKIT checks the descriptors, generates transport artifacts,
+and registers the checked routes with the runtime.
+
+Core HTTP, RPC and JSON OpenAPI are available in the minimal app without optional protocol/UI SDKs.
+[MCP](/docs/modules/ai/mcp), [AG-UI](/docs/modules/ai#observe-durable-execution) and
+[Scalar](/docs/modules/http/openapi) each have an independent installation and explicit selection.
+
+The [Orders extension](/docs/learn/first-route) to the minimal app uses the same layers:
+
+<include
+  source="templates/default/v1/api/src/routes/orders/route.ts"
+  lang="ts"
+  meta='title="src/routes/orders/route.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/routes/orders/route.ts
+</include>
+
+The directory supplies `/orders`, the named export supplies `POST`, and the service member selects
+the public `createOrder` function. Its object input comes from JSON; its validated output becomes a
+JSON `201` response. Follow [your first HTTP route](/docs/modules/http/first-route) to trace and verify it.
+
+## Know where each change belongs
+
+| You want to change…                             | Edit…                                                         | Continue with…                                                                                    |
+| ----------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Business behavior, schemas, or declared errors  | `src/services/<domain>/functions/` and domain-local contracts | [Functions](/docs/learn/concepts/functions)                                                       |
+| Which functions other code may call             | `src/services/<domain>/service.ts`                            | [Define a service](/docs/modules/service/define)                                                  |
+| Which function a method invokes                 | `src/routes/**/route.ts`                                      | [Define a route](/docs/modules/http/define)                                                       |
+| A URL or path parameter                         | Directories underneath `src/routes/`                          | [File-system routes](/docs/modules/http/routes)                                                   |
+| Headers, cookies, query fields, or body mapping | The route's `request` descriptor                              | [Requests](/docs/modules/http/requests)                                                           |
+| Multipart parsing and upload limits             | The route plus the domain's file schema                       | [Uploads](/docs/modules/http/uploads)                                                             |
+| HTTP authentication, CORS, or response headers  | `src/routes/middleware/`                                      | [Middleware](/docs/modules/http/middleware)                                                       |
+| Request frequency limits                        | The function-backed route's `rateLimit`                       | [Rate limits](/docs/modules/http/rate-limits)                                                     |
+| Success status or error-to-HTTP mapping         | The route and declared domain errors                          | [Responses](/docs/modules/http/responses)                                                         |
+| A native HTTP adapter                           | An `ALL` raw route                                            | [Raw handlers](/docs/modules/http/raw-handlers)                                                   |
+| Public API documentation or a typed caller      | Checked artifacts, generated from source                      | [OpenAPI](/docs/modules/http/openapi) · [Generated clients](/docs/modules/http/generated-clients) |
+
+Business rules that must apply to every caller belong in the function, not only in HTTP middleware.
+For agents, tools, jobs, events, caching, and storage, use the [domain organization guide](/docs/modules/service/organization)
+to choose an owner and continue into that capability's getting-started guide.
+
+## Choose a starting point
+
+<CardGroup cols={2}>
+  <Card icon="boxes">
+    New to the application layout? Start with [Service](/docs/modules/service).
+  </Card>
+  <Card icon="rocket">
+    Ready to ship an endpoint? Follow [your first HTTP route](/docs/modules/http/first-route).
+  </Card>
+  <Card icon="route">
+    Already have a public function? Go directly to [defining a route](/docs/modules/http/define).
+  </Card>
+  <Card icon="radio">
+    Returning incremental results? Choose [managed or native
+    streaming](/docs/modules/http/streaming).
+  </Card>
+  <Card icon="braces">
+    Need the exact descriptor types and helpers? Open the [Routes API reference](/docs/api/routes).
+  </Card>
+</CardGroup>
+
+These guides describe function-backed HTTP endpoints first. Raw handlers opt out of that typed pipeline;
+generated clients use a separate RPC transport. Their dedicated guides explain those boundaries.
+
+<include>/_snippets/generated/related/docs-modules-http-index.mdx</include>

@@ -1,3 +1,4 @@
+/** Checks generic agent chat mappings and controls without loading a native execution SDK. */
 import { Effect, Metric, Tracer } from "effect";
 import { expect, test } from "vitest";
 import {
@@ -5,7 +6,7 @@ import {
   copyAgentChatEffect,
   copyAgentControls,
   copyAgentControlsEffect,
-} from "../src/agent-client.ts";
+} from "@relkit/agents/internal/agent-client";
 
 test("copies canonical controls and chat mappings", () => {
   expect(Effect.runSync(copyAgentControlsEffect(undefined))).toBeUndefined();

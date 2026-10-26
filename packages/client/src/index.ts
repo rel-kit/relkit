@@ -1,3 +1,8 @@
+/**
+ * Exposes transport clients and the generated contract augmentation authority.
+ * Install @relkit/client for HTTP/WebSocket clients; React and TanStack peers
+ * are needed only by their explicit integration entrypoints.
+ */
 import type { RouterContract } from "@orpc/contract";
 export { ORPCError } from "@orpc/client";
 export { createClient, createAutoClient, createWebSocketClient } from "./transport.js";

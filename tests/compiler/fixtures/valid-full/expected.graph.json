@@ -169,7 +169,7 @@
       "source": {
         "column": 22,
         "file": "src/orders/agents/order-support.agent.ts",
-        "line": 11
+        "line": 12
       },
       "toolIds": [
         "orders.lookup-tool"
@@ -534,7 +534,7 @@
       "source": {
         "column": 22,
         "file": "src/orders/agents/order-support.agent.ts",
-        "line": 11
+        "line": 12
       }
     },
     {

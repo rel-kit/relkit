@@ -57,7 +57,22 @@
         },
         "localRecipe": "./local-recipe",
         "deploymentEngine": "./deployment"
-      }
+      },
+      "dependencies": [
+        {
+          "package": "@trigger.dev/sdk",
+          "supportedRange": "4.7.2",
+          "installSection": "dependencies",
+          "capabilities": [
+            "job"
+          ],
+          "phases": [
+            "check",
+            "build",
+            "runtime"
+          ]
+        }
+      ]
     }
   },
   "scripts": {
@@ -71,7 +86,15 @@
     "@relkit/local-service": "workspace:*",
     "@relkit/provider": "workspace:*"
   },
-  "optionalDependencies": {
+  "peerDependencies": {
+    "@trigger.dev/sdk": "4.7.2"
+  },
+  "peerDependenciesMeta": {
+    "@trigger.dev/sdk": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
     "@trigger.dev/sdk": "4.7.2"
   }
 }

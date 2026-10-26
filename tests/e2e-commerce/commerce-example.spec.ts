@@ -1,4 +1,10 @@
+/** Exercises the unchanged commerce realtime and streamed-agent UI contracts
+ * using the exact same selected origins as native server transport security.
+ */
 import { expect, test } from "@playwright/test";
+import { playwrightSelection } from "../../scripts/playwright-selection.js";
+
+const selected = playwrightSelection("commerce");
 
 test("announcements synchronize connected tabs and restore a late tab", async ({ browser }) => {
   const senderContext = await browser.newContext();
@@ -6,10 +12,7 @@ test("announcements synchronize connected tabs and restore a late tab", async ({
   const sender = await senderContext.newPage();
   const receiver = await receiverContext.newPage();
   try {
-    await Promise.all([
-      sender.goto("http://127.0.0.1:3010"),
-      receiver.goto("http://127.0.0.1:3010"),
-    ]);
+    await Promise.all([sender.goto(selected.ui), receiver.goto(selected.ui)]);
     await expect(sender.getByText("Channel: connected; caught up: true")).toBeVisible();
     await expect(receiver.getByText("Channel: connected; caught up: true")).toBeVisible();
 
@@ -22,7 +25,7 @@ test("announcements synchronize connected tabs and restore a late tab", async ({
     const lateContext = await browser.newContext();
     try {
       const late = await lateContext.newPage();
-      await late.goto("http://127.0.0.1:3010");
+      await late.goto(selected.ui);
       await expect(late.getByText(message!, { exact: true })).toBeVisible();
     } finally {
       await lateContext.close();
@@ -37,7 +40,7 @@ test("commerce support agent negotiates capabilities and settles its streamed ru
 }) => {
   const identity = page.waitForResponse(
     (response) =>
-      response.url() === "http://127.0.0.1:4010/_relkit/v1/client/identity" &&
+      response.url() === `${selected.backend}/_relkit/v1/client/identity` &&
       response.status() === 200,
   );
   await page.goto("/");

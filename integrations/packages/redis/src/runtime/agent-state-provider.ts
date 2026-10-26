@@ -1,8 +1,9 @@
+/** Binds the native Redis transaction adapter to the generic agent-state provider contract. */
 import type {
   AgentStateProvider,
   WaitForControlsRequest,
   WaitForJournalRequest,
-} from "@relkit/agents";
+} from "@relkit/contracts";
 import {
   createAgentStateProviderFromStore,
   emptyAgentState,

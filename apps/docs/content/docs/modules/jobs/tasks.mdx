@@ -1,0 +1,57 @@
+---
+title: Tasks
+description: The typed, durable unit of job execution.
+pagination: false
+sidebar:
+  icon: list-checks
+---
+
+A task defines the input, result, and behavior of work that a job can run durably.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  Install and bind a [compatible job provider](/docs/modules/jobs/quickstart) before scaffolding the
+  task. `relkit add task` checks the application, so it needs a configured `jobs` profile and
+  `defaults.jobs`. The task command does not configure the provider or install its native SDK.
+</Callout>
+
+## Scaffold a task
+
+From the application root, with an existing `orders` service:
+
+```sh
+bun run relkit add task export-orders --service orders
+```
+
+This creates `src/services/orders/tasks/export-orders.task.ts` with the stable ID
+`orders.export-orders-task`, version `1`, and a durable execution model. It registers the
+task on the service. Replace the placeholder schemas and handler with your operation; keep
+its identity and version stable. Expose it through a
+[task-first job](/docs/modules/jobs/quickstart) when callers need admission, run handles, and observation.
+
+For every task scaffolding flag, see the [task command reference](/docs/api/cli#relkit-add-task-name).
+
+## Define the task
+
+A task contains the code and schemas for one durable operation. A task is not a request handler: it may be resumed, retried, observed, or run after the original process exits.
+
+<include
+  source="examples/commerce/src/services/orders/tasks/export-orders.task.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/tasks/export-orders.task.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/tasks/export-orders.task.ts
+</include>
+
+Use a stable task ID. The version identifies a compatible task definition, not a deployment build. Schema hashes and the client fingerprint are recorded with each job definition so migration checks can reject accidental contract changes.
+
+Tasks can emit typed progress, return a bounded output, sleep when their provider supports durable sleep, and throw declared errors for retry or terminal failure. Keep business side effects idempotent and put provider-specific code behind the integration boundary. A retryable task does not expose durable sleep.
+
+See [durations and sleep](/docs/modules/jobs/durations-and-sleep), [execution policy](/docs/modules/jobs/execution-policy), and [retries and idempotency](/docs/modules/jobs/retries-and-idempotency).
+
+## Use from the frontend
+
+A task does not become a browser endpoint by itself. Give it a job with a client policy, then use
+the [typed job client](/docs/modules/jobs/clients#use-from-react) to trigger and observe it. The task's
+schemas determine input and output; the job's policy determines permitted operations and visible fields.
+
+<include>/_snippets/generated/related/docs-modules-jobs-tasks.mdx</include>

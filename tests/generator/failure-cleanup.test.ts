@@ -1,12 +1,13 @@
+/** Checks scaffold failure rollback while preserving unrelated files and owned process cleanup. */
 import { afterEach, expect, test } from "bun:test";
 import { access, mkdir, mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { GenerateProjectError, generateProject } from "../../packages/create-relkit/src/index.ts";
+import { GenerateProjectError, generateProject } from "../../packages/cli/src/scaffolding/index.ts";
 import type {
   GenerateFailurePoint,
   GenerateProjectContext,
-} from "../../packages/create-relkit/src/index.ts";
+} from "../../packages/cli/src/scaffolding/index.ts";
 import { cleanupStagedProject } from "../../packages/create-relkit/src/generate-files.ts";
 
 const roots: string[] = [];

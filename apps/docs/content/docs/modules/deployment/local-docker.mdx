@@ -1,0 +1,95 @@
+---
+title: Verify locally with Docker
+description: Run development dependencies in Docker and verify the generated production image before choosing a host.
+pagination: false
+sidebar:
+  icon: container
+---
+
+Use local Docker first. RELKIT can manage development provider recipes while Bun runs your
+application, and its build can produce a server image for a separate container smoke check.
+
+## Pre-setup
+
+Start with the [minimal app](/docs/learn/create-an-app), a running Docker daemon, and a free
+port `3000`. For optional capabilities, complete their [provider setup](/docs/modules/integrations#pre-setup)
+and environment contracts first. The image check below uses the unchanged minimal app's Hello
+route and no external resources or secrets.
+
+<Steps>
+<Step title="Run development dependencies" icon="container">
+
+After configuring the app's required Docker profiles, run:
+
+```sh title="Terminal — application root"
+docker version
+bun run check
+bun run relkit local up --detach
+bun run relkit local status
+bun run dev --local=off
+```
+
+Expect required providers to become healthy and the backend to report readiness. A minimal app
+with no selected providers has no containers to start. PostgreSQL from the
+[database walkthrough](/docs/modules/database/local-docker) uses its own Compose commands.
+`--local=off` reuses the services you started explicitly.
+
+</Step>
+<Step title="Build the minimal app's server image" icon="package">
+
+Stop the development server with Ctrl+C so port `3000` is free, then run:
+
+```sh title="Terminal — application root"
+bun run check
+bun run typecheck
+bun run test
+bun run build
+docker build -t relkit-local:docs .relkit/build
+```
+
+Use the complete `.relkit/build` directory as the context. Its Dockerfile installs the generated
+production manifest and copies the server, assets, graph, and selected worker history. Keep
+generated patches and overrides; do not copy only `server/index.js`.
+
+</Step>
+<Step title="Start and verify the image" icon="clipboard-check">
+
+```sh title="Terminal — application root"
+docker run --rm --name relkit-docs-preview -p 127.0.0.1:3000:3000 -e PORT=3000 relkit-local:docs
+```
+
+In another terminal:
+
+```sh title="Second terminal"
+curl -i http://127.0.0.1:3000/hello\?name=RELKIT
+```
+
+Expect HTTP `200` and `{"message":"Hello, RELKIT!"}`. Stop this temporary container with Ctrl+C.
+It has no application data. Apps with file-backed state need an explicitly mounted persistent
+volume before accepting data; do not rely on a disposable container's writable layer.
+
+</Step>
+</Steps>
+
+## Add providers to a container deployment
+
+Supply every required environment value at runtime through your host's secret/environment
+mechanism. For a local smoke check, Docker supports an explicit `--env-file` containing
+non-committed test values; the image itself does not load your project's dotenv files.
+Do not reuse a host-loopback URL inside a container: it addresses the container itself.
+Configure reachable connected resources using [production provider setup](/docs/modules/deployment/providers).
+
+`relkit local` recipes serve development and publish loopback endpoints. The production image
+does not start Docker recipes. Its external services need their own lifecycle, network, credentials,
+and persistent volumes. Keep database migration tooling outside normal application startup.
+
+## Stop development services
+
+```sh title="Terminal — application root"
+bun run relkit local stop
+```
+
+This retains project volumes. Resume with `local up --detach`. Once the image responds correctly,
+continue to [AWS/Pulumi](/docs/modules/deployment/aws) or run the built server on your own host.
+
+<include>/_snippets/generated/related/docs-modules-deployment-local-docker.mdx</include>

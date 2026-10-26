@@ -1,3 +1,4 @@
+/** Defines the resumable native restart graph and bounded public-status observation helpers. */
 import { appendFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
@@ -6,9 +7,9 @@ import {
   START,
   StateSchema,
   interrupt,
-} from "../../packages/agents/node_modules/@langchain/langgraph/dist/index.js";
-import type { SqliteSaver } from "../../packages/agents/node_modules/@langchain/langgraph-checkpoint-sqlite/dist/index.js";
-import { defineGraph, defineGraphNode } from "../../packages/agents/src/index.ts";
+} from "../../integrations/packages/langchain/node_modules/@langchain/langgraph/dist/index.js";
+import type { SqliteSaver } from "../../integrations/packages/langchain/node_modules/@langchain/langgraph-checkpoint-sqlite/dist/index.js";
+import { defineGraph, defineGraphNode } from "../../integrations/packages/langchain/src/index.ts";
 import { z } from "../../packages/schema/src/index.ts";
 
 export function createRestartGraph(root: string, saver: SqliteSaver) {

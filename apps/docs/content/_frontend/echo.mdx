@@ -1,0 +1,34 @@
+After [frontend installation, contract pull, and provider setup](/guides/frontend/connect-react),
+call this `POST /echo` operation with its domain input. The route produces both the React selector
+`POST /echo` and the TypeScript operation `route.post.echo`.
+
+<Tabs sync={false} hash={false}>
+<Tab title="React" icon="panels-top-left">
+
+Render this component under `RelkitClientProvider`. Clicking the button sends `{ message }` and
+displays the inferred `{ message: string }` result:
+
+<include source="apps/docs/examples/frontend/echo.tsx" lang="tsx" meta='title="src/EchoButton.tsx"'>
+  /_snippets/source/apps/docs/examples/frontend/echo.tsx
+</include>
+
+</Tab>
+<Tab title="TypeScript" icon="code-xml">
+
+Without React, load the browser identity before the mutation and call the generated operation:
+
+<include source="apps/docs/examples/frontend/rpc.ts" lang="ts" meta='title="src/echo-client.ts"'>
+  /_snippets/source/apps/docs/examples/frontend/rpc.ts
+</include>
+
+The React provider performs this identity step for hooks.
+
+</Tab>
+</Tabs>
+
+These calls use RPC over `/rpc`, with the same authorization and policy. Pass domain input rather
+than assembling the route's REST mapping. Raw handlers and routes with `client: false` do not
+generate these operations. Never import the backend descriptor into the browser.
+
+Reference: [`useRouteMutation`](/docs/api/client#useroutemutation),
+[`createClient`](/docs/api/client#createclient). Continue with [mutations](/docs/modules/client/mutations).

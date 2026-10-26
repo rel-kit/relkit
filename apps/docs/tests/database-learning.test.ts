@@ -6,39 +6,52 @@ import { apiPackages } from "../scripts/documentation-catalog.js";
 import { databaseGuideGroup } from "../scripts/database-guide-catalog.js";
 import { features } from "../scripts/feature-catalog.js";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
-const content = resolve(import.meta.dir, "../content/docs");
+const content = resolve(import.meta.dir, "../content");
 /** Reads one owned database guide at the native synchronous test boundary.
  * @param page - Database guide path selected by this suite.
  * @returns Original guide text; missing input fails the native test.
  */
-const read = (page: string) => readFileSync(resolve(content, `database/${page}.mdx`), "utf8");
-test("connects Database guides and the generated Drizzle reference", () => {
+const read = (page: string) =>
+  readFileSync(
+    resolve(
+      content,
+      page === "first-database"
+        ? "guides/database/register-users-in-a-transaction.mdx"
+        : `docs/modules/database/${page}.mdx`,
+    ),
+    "utf8",
+  );
+test("connects Database guides and the generated Drizzle reference", async () => {
   const groups = guideGroups.map(({ directory }) => directory);
-  expect(groups.slice(groups.indexOf("jobs"), groups.indexOf("storage") + 1)).toEqual([
-    "jobs",
-    "database",
-    "auth",
-    "storage",
+  expect(
+    groups.slice(groups.indexOf("docs/modules/jobs"), groups.indexOf("docs/modules/storage") + 1),
+  ).toEqual([
+    "docs/modules/jobs",
+    "docs/modules/database",
+    "docs/modules/auth",
+    "docs/modules/storage",
   ]);
-  expect(JSON.parse(readFileSync(resolve(content, "database/meta.json"), "utf8"))).toEqual({
+  expect((await import("../content/docs/modules/database/meta.js")).default).toMatchObject({
     title: "Database",
-    icon: "Database",
     pages: databaseGuideGroup.pages,
   });
   expect(apiPackages).toContain("drizzle");
-  expect(features.find(({ id }) => id === "database")?.guide).toBe("database/index");
-  expect(guideRelations.find(({ path }) => path === "jobs/troubleshooting")?.next).toBeUndefined();
+  expect(features.find(({ id }) => id === "database")?.guide).toBe("docs/modules/database/index");
   expect(
-    guideRelations.find(({ path }) => path === "database/first-database")?.next,
+    guideRelations.find(({ path }) => path === "docs/modules/jobs/troubleshooting")?.next,
+  ).toBeUndefined();
+  expect(
+    guideRelations.find(({ path }) => path === "guides/database/register-users-in-a-transaction")
+      ?.next,
   ).toBeUndefined();
   for (const page of databaseGuideGroup.pages) {
     const source = read(page);
     expect((source.match(/^## .+$/gm) ?? []).length).toBeGreaterThanOrEqual(2);
-    expect(source).toContain(`content/generated/related/database-${page}.mdx`);
-    if (page !== "index") expect(read("index")).toContain(`](/docs/database/${page})`);
+    expect(source).toContain(`/_snippets/generated/related/docs-modules-database-${page}.mdx`);
+    if (page !== "index") expect(read("index")).toContain(`](/docs/modules/database/${page})`);
   }
 });
-test("uses application workflows and Drizzle Kit rather than SQL bootstrap or test snippets", () => {
+test("uses application workflows and Drizzle Kit rather than SQL bootstrap or test snippets", async () => {
   const tutorial = read("first-database");
   expect(tutorial).toContain("existing RELKIT app");
   for (const path of [
@@ -53,26 +66,26 @@ test("uses application workflows and Drizzle Kit rather than SQL bootstrap or te
     "src/services/users/functions/update-user-email.function.ts",
     "drizzle.config.ts",
   ])
-    expect(tutorial).toContain(`../../examples/data-model/${path}`);
+    expect(tutorial).toContain(`examples/data-model/${path}`);
   expect(tutorial).toContain("bun run check");
   expect(tutorial).toContain("bun run typecheck");
-  expect(tutorial).toContain("bun test tests/data-model.test.ts");
-  expect(read("migrations")).toContain("../../examples/data-model/drizzle.config.ts");
+  expect(tutorial).toContain("bun test tests/registration.test.ts");
+  expect(read("migrations")).toContain("examples/data-model/drizzle.config.ts");
   expect(read("migrations")).toContain("drizzle-kit generate");
   expect(read("migrations")).toContain("relkit db migrate");
-  expect(read("testing")).toContain("../../examples/data-model/tests/migrations.test.ts");
+  expect(read("testing")).toContain("examples/data-model/tests/migrations.test.ts");
   for (const page of databaseGuideGroup.pages) {
     const source = read(page);
     expect(source).not.toMatch(/lang="sql"|```sql|\bCREATE TABLE\b|sqlite\.exec/i);
     if (page !== "testing") expect(source).not.toMatch(/\.\.\/\.\.\/examples\/[^\n]+\.test\.ts/);
   }
   const service = readFileSync(
-    resolve(content, "../../../../examples/data-model/src/services/database/service.ts"),
+    resolve(import.meta.dir, "../../../examples/data-model/src/services/database/service.ts"),
     "utf8",
   );
   expect(service).not.toMatch(/\.exec\(|create table/i);
 });
-test("states validation, override, transaction, and lifecycle boundaries", () => {
+test("states validation, override, transaction, and lifecycle boundaries", async () => {
   expect(read("index")).toContain("MongoDB and Prisma integrations are planned");
   expect(read("index")).not.toContain("defineDrizzleService");
   expect(read("drizzle")).toContain("Only one Drizzle service");
@@ -84,7 +97,7 @@ test("states validation, override, transaction, and lifecycle boundaries", () =>
   expect(read("transactions")).toContain("ordinary operations outside the helper are not gated");
   expect(read("testing")).toContain("closing it does not currently remove the cache");
 });
-test("explains generated data shapes and Better Auth's native-client boundary", () => {
+test("explains generated data shapes and Better Auth's native-client boundary", async () => {
   const schemas = read("generated-schemas");
   for (const name of [
     "createSelectSchema",

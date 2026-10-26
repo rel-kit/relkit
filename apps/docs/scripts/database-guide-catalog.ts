@@ -5,7 +5,7 @@ export const databaseFeature = feature(
   "database",
   "Database",
   "Organize application data, choose a database service, and customize persistence.",
-  "database/index",
+  "docs/modules/database/index",
   "drizzle",
   [
     ["packages/drizzle/src/service.ts", "defineDrizzleService"],
@@ -16,79 +16,84 @@ export const databaseFeature = feature(
 );
 
 export const databaseGuideGroup = {
-  directory: "database",
+  directory: "docs/modules/database",
   title: "Database",
   icon: "Database",
   pages: [
     "index",
+    "local-docker",
     "drizzle",
     "define",
     "schema",
+    "migrations",
     "generated-schemas",
     "queries",
     "models",
     "overrides",
     "transactions",
-    "migrations",
     "better-auth",
     "testing",
-    "first-database",
   ],
 } as const;
 
 export const databaseGuideRelations = [
   {
-    path: "database/index",
+    path: "docs/modules/database/local-docker",
+    api: ["drizzle", "config", "app"],
+    examples: ["apps/docs/examples/setup/postgresql.ts", "apps/docs/examples/setup/compose.yaml"],
+  },
+  {
+    path: "docs/modules/database/index",
     api: ["services"],
     examples: ["examples/data-model/src/services/users/service.ts"],
   },
   {
-    path: "database/drizzle",
+    path: "docs/modules/database/drizzle",
     api: ["drizzle", "services"],
     examples: ["examples/data-model/src/services/database/service.ts"],
   },
   {
-    path: "database/define",
+    path: "docs/modules/database/define",
     api: ["drizzle", "config"],
     examples: ["examples/data-model/src/services/database/service.ts"],
   },
   {
-    path: "database/schema",
+    path: "docs/modules/database/schema",
     api: ["drizzle", "schema"],
     examples: ["examples/data-model/src/services/database/schema/index.ts"],
   },
   {
-    path: "database/queries",
+    path: "docs/modules/database/queries",
     api: ["drizzle", "functions"],
     examples: ["examples/data-model/src/services/users/functions/update-user-email.function.ts"],
   },
   {
-    path: "database/generated-schemas",
+    path: "docs/modules/database/generated-schemas",
     api: ["drizzle", "schema"],
     examples: ["examples/data-model/src/services/users/functions/register-member.function.ts"],
   },
   {
-    path: "database/models",
+    path: "docs/modules/database/models",
     api: ["drizzle"],
     examples: ["examples/data-model/src/services/database/models/users.model.ts"],
   },
   {
-    path: "database/overrides",
+    path: "docs/modules/database/overrides",
     api: ["drizzle"],
     examples: ["examples/data-model/src/services/database/service.ts"],
   },
   {
-    path: "database/transactions",
+    path: "docs/modules/database/transactions",
     api: ["drizzle"],
     examples: ["examples/data-model/src/services/users/functions/register-member.function.ts"],
   },
   {
-    path: "database/migrations",
+    path: "docs/modules/database/migrations",
     api: ["drizzle"],
     examples: ["examples/data-model/drizzle.config.ts"],
   },
   {
-    path: "database/better-auth",
+    path: "docs/modules/database/better-auth",
     api: ["drizzle", "routes"],
     examples: [
       "examples/auth-drizzle/src/services/auth/service.ts",
@@ -96,12 +101,12 @@ export const databaseGuideRelations = [
     ],
   },
   {
-    path: "database/testing",
+    path: "docs/modules/database/testing",
     api: ["drizzle", "testing"],
     examples: ["examples/data-model/tests/data-model.test.ts"],
   },
   {
-    path: "database/first-database",
+    path: "guides/database/register-users-in-a-transaction",
     api: ["drizzle", "functions", "routes"],
     examples: ["examples/data-model/src/services/users/functions/register-member.function.ts"],
   },

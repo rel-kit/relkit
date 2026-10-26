@@ -1,5 +1,6 @@
+/** Defines prompt, root-menu, and progress presentation contracts for CLI invocations. */
 import type { Effect } from "effect";
-import type { ChoicePromptOptions, PromptDriver } from "create-relkit";
+import type { ChoicePromptOptions, PromptDriver } from "./scaffolding/index.js";
 import type { CliAdapterError } from "./cli-errors.js";
 
 /** Explicit interactive authority; native prompt callbacks consume fiber cancellation. */

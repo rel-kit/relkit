@@ -1,46 +1,23 @@
+/** Scans authored paths and text using the finite repository scope policy, retaining exact violation positions. */
 import { existsSync, readFileSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import { isTypeScriptPluginSetting } from "./scope-typescript-settings.js";
-export type ScopeViolation = {
-  file: string;
-  line: number;
-  column: number;
-  rule: string;
-  message: string;
-};
-const approvedPackages = new Set(
-  "agents app better-auth buckets cache cli client client-generator cloud-aws compiler config contracts create-relkit deploy deploy-pulumi diagnostics drizzle engine events functions graph inspector-api invocation jobs local-service observability openapi provider providers-local providers-standard realtime relkit routes runtime-effect runtime-hono schema services supervisor testing tools".split(
-    " ",
-  ),
-);
-const approvedApps = new Set(["docs", "inspector"]);
-const approvedExamples = new Set(
-  "README.md auth-drizzle commerce commerce-web data-model".split(" "),
-);
-const approvedTemplates = new Set(["default"]);
-const integrationPath = /^integrations\/(?:catalog(?:\/|$)|packages\/[^/]+(?:\/|$))/;
-const forbiddenNames =
-  "persistence|identity|workflow|knowledge(?:-store)?|plugin|marketplace|subscription|entity|relation";
-const proseAllowlist = [
-  /^AGENTS\.md$/,
-  /^docs\/(?:README\.md|briefs\/|records\/|relkit-typescript-poc-(?:technical-spec|review-gates)-v3\.md)/,
-  /^openspec\/changes\/implement-relkit-typescript-poc-v3\//,
-  /^tests\/jobs\/compatibility\/evidence\//,
-];
-const implementationFiles = new Set([
-  "apps/docs/tsconfig.json",
-  "scripts/scope-scan.ts",
-  "scripts/scope-typescript-settings.ts",
-  "scripts/scope-typescript-settings.test.ts",
-]);
-const contentExtensions = /\.(?:c|m)?(?:ts|tsx|js|jsx)|\.json$|\.toml$|\.ya?ml$|\.md$/i;
-// Test runners emit these workspace-root directories; authored src/coverage stays in scope.
-const generatedCoverage =
-  /^(?:(?:apps|examples|packages|templates)\/[^/]+|integrations\/(?:catalog|packages\/[^/]+))\/coverage\//;
-const alternateIac =
-  /\b(?:terraform|opentofu|cloudformation|(?:aws-)?cdk|sst|alchemy|serverless|bicep)\b|@cdktf|aws-cdk-lib|arm[-_ ]?template/i;
-const isAllowlistedProse = (path: string): boolean =>
-  proseAllowlist.some((pattern) => pattern.test(path));
+import type { ScopeViolation } from "./scope-scan.types.js";
+export type { ScopeViolation } from "./scope-scan.types.js";
+import {
+  approvedPackages,
+  approvedApps,
+  approvedExamples,
+  approvedTemplates,
+  integrationPath,
+  forbiddenNames,
+  implementationFiles,
+  contentExtensions,
+  generatedCoverage,
+  alternateIac,
+  isAllowlistedProse,
+  contentPatterns,
+} from "./scope-policy.js";
 function position(text: string, offset: number): { line: number; column: number } {
   const before = text.slice(0, offset);
   const line = before.split("\n").length;
@@ -93,6 +70,16 @@ function pathViolations(root: string, file: string): ScopeViolation[] {
   ) {
     add("alternate-iac", `alternate infrastructure-engine path or file is forbidden: ${path}`);
   }
+  findings.push(...navigationViolations(root, file, parts));
+  return findings;
+}
+/** Checks each authored navigation segment independently of package and infrastructure paths. */
+function navigationViolations(
+  root: string,
+  file: string,
+  parts: readonly string[],
+): ScopeViolation[] {
+  const findings: ScopeViolation[] = [];
   if (["apps", "examples", "templates", "tests"].includes(parts[0] ?? "")) {
     for (const part of parts.slice(1)) {
       const name = part
@@ -100,9 +87,15 @@ function pathViolations(root: string, file: string): ScopeViolation[] {
         .replace(/[^a-z0-9-]/gi, "")
         .toLowerCase();
       if (new RegExp(`^(?:${forbiddenNames})s?$`, "i").test(name)) {
-        add(
-          parts[0] === "templates" ? "out-of-scope-template-name" : "out-of-scope-navigation-name",
-          `out-of-scope name in ${parts[0]} path: ${part}`,
+        findings.push(
+          violation(
+            root,
+            file,
+            parts[0] === "templates"
+              ? "out-of-scope-template-name"
+              : "out-of-scope-navigation-name",
+            `out-of-scope name in ${parts[0]} path: ${part}`,
+          ),
         );
       }
     }
@@ -116,45 +109,7 @@ function contentViolations(root: string, file: string): ScopeViolation[] {
   }
   const text = readFileSync(file, "utf8");
   const findings: ScopeViolation[] = [];
-  const patterns: Array<[string, RegExp, string]> = [
-    [
-      "subscription-primitive",
-      /\bdefineSubscription\b/g,
-      "defineSubscription is not part of the public API",
-    ],
-    [
-      "out-of-scope-api",
-      /\b(?:define|create)(?:Persistence|Identity|Workflow|KnowledgeStore|Plugin|Marketplace)\b/g,
-      "out-of-scope public API name",
-    ],
-    [
-      "out-of-scope-package",
-      new RegExp(`@relkit/(?:${forbiddenNames})(?=[/"'\`]|$)`, "gi"),
-      "out-of-scope package name",
-    ],
-    [
-      "out-of-scope-graph-name",
-      new RegExp(
-        `\\b(?:kind|nodeKind|graphKind|nodeType|resourceType)\\s*[:=]\\s*[\\"'\\x60](?:${forbiddenNames})[\\"'\\x60]`,
-        "gi",
-      ),
-      "out-of-scope graph node name",
-    ],
-    [
-      "out-of-scope-navigation-name",
-      new RegExp(`[\\"'\\x60]\\/?(?:${forbiddenNames})s?(?:[/?#][^\\"'\\x60]*)?[\\"'\\x60]`, "gi"),
-      "out-of-scope navigation or route name",
-    ],
-    [
-      "out-of-scope-template-name",
-      new RegExp(
-        `\\b(?:template|templates|preset|variant)\\s*[:=]\\s*[\\"'\\x60](?:${forbiddenNames})[\\"'\\x60]`,
-        "gi",
-      ),
-      "out-of-scope template name",
-    ],
-  ];
-  for (const [rule, pattern, message] of patterns) {
+  for (const [rule, pattern, message] of contentPatterns) {
     for (const match of text.matchAll(pattern)) {
       if (rule === "out-of-scope-navigation-name" && /^["'`][A-Z][A-Z0-9_]*["'`]$/.test(match[0]))
         continue;

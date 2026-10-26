@@ -36,7 +36,7 @@ Mark credentials with `env.secret()`; keep actual values outside source control.
 
 ## `defineApp`: topology and policy
 
-In `relkit.config.ts`, the baseline application contains the environment contract, telemetry redaction, backend settings, and Inspector settings:
+In `relkit.config.ts`, the baseline application contains the environment contract, telemetry redaction and backend settings. Inspection is omitted and disabled:
 
 ```ts
 import { defineApp } from "@relkit/app/config";
@@ -46,7 +46,6 @@ export default defineApp({
   env,
   telemetry: { redaction: { mode: "development-redacted", maxBytes: 65_536 } },
   server: { port: 3000, maxBodyBytes: 1_048_576 },
-  inspector: { port: 3210 },
 });
 ```
 
@@ -70,7 +69,6 @@ export default defineApp({
   defaults: { cache: "requests", realtime: "default" },
   telemetry: { redaction: { mode: "development-redacted", maxBytes: 65_536 } },
   server: { port: 3000, maxBodyBytes: 1_048_576 },
-  inspector: { port: 3210 },
 });
 ```
 
@@ -79,6 +77,14 @@ Merge only the needed capabilities into the existing `defineApp`, preserving its
 Platform fragments may explicitly export server, Inspector, telemetry, deployment, or provider settings and be imported by `relkit.config.ts`. Unimported files are not autoloaded. Keep provider acquisition in supported lazy factories and compose one `defineApp`.
 
 CLI `--environment` selects provider configuration; `RELKIT_ENV` selects the application environment. `.env` and `.env.local` supply runtime values according to existing CLI loading; `.env.example` is informational and is not loaded as credentials.
+
+Enable development inspection only when requested with `inspector: { enabled: true }`.
+Its authenticated bridge defaults to `127.0.0.1:0`; optional fixed binding uses
+`inspector.connection.host/port`. The separately installed `@relkit/inspector`
+owns its UI (default 3210, selected with its own `--port`) and local history.
+The obsolete `inspector.port` setting is rejected. Installing the tool does not
+enable the application bridge; production excludes rich inspection regardless
+of this development selection. See [inspection and history](observability-apis.md).
 
 ## Inspect and verify environment values
 

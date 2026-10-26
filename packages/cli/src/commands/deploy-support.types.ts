@@ -1,3 +1,4 @@
+/** Defines deployment command inputs, confirmation/reporting seams and selected native program/workspace contracts. */
 import type {
   createPulumiWorkspace,
   writePulumiProgram,
@@ -13,6 +14,7 @@ import type {
   loadDeploymentIntegrations,
 } from "./deployment-integrations.js";
 import type { deployOperationSchema } from "./deploy.schemas.js";
+import type { PulumiImplementation } from "./deployment-engine.schemas.js";
 
 /** Schema-validated selected operation. */
 export type DeployOperation = typeof deployOperationSchema.Type;
@@ -32,6 +34,7 @@ export interface Prepared {
   readonly previousPlan?: DeploymentPlan;
   readonly files: ProgramFiles;
   readonly integrations: LoadedDeploymentIntegrations;
+  readonly engine: PulumiImplementation;
 }
 /** Public compatibility overrides; native callers consume cancellation where supported. */
 export interface DeployCommandOptions {

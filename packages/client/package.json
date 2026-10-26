@@ -31,6 +31,10 @@
       "types": "./dist/server.d.ts",
       "bun": "./dist/server.js"
     },
+    "./server/tanstack-query": {
+      "types": "./dist/server-context.d.ts",
+      "bun": "./dist/server-context.js"
+    },
     "./tanstack-query": {
       "types": "./dist/tanstack-query.d.ts",
       "import": "./dist/tanstack-query.js"
@@ -60,18 +64,36 @@
     "@relkit/realtime": "workspace:*",
     "@orpc/client": "catalog:",
     "@orpc/contract": "catalog:",
-    "@orpc/tanstack-query": "2.0.0-beta.31",
     "effect": "catalog:"
   },
   "peerDependencies": {
+    "@opentelemetry/api": "1.9.1",
+    "@orpc/tanstack-query": "2.0.0-beta.31",
     "@tanstack/query-core": "catalog:peer",
     "@tanstack/react-query": "catalog:peer",
     "react": "catalog:peer"
   },
+  "peerDependenciesMeta": {
+    "@orpc/tanstack-query": {
+      "optional": true
+    },
+    "@tanstack/query-core": {
+      "optional": true
+    },
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@opentelemetry/api": "1.9.1",
     "@effect/vitest": "catalog:",
     "vitest": "catalog:",
     "@types/react": "catalog:",
+    "@orpc/tanstack-query": "2.0.0-beta.31",
+    "@tanstack/query-core": "5.102.3",
     "@tanstack/react-query": "catalog:",
     "react": "catalog:"
   },

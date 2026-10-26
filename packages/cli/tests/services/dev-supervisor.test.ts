@@ -115,7 +115,7 @@ it.live(
           yield* Deferred.succeed(released, undefined);
           expect(Exit.isFailure(yield* Fiber.await(starting))).toBe(true);
           yield* Fiber.join(stopping);
-          expect(session.inspectorChild).toBeUndefined();
+          expect(session.inspectionConnection).toBeUndefined();
           expect(session.fingerprints.size).toBe(0);
           expect(stops).toBe(1);
         }),

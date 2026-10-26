@@ -1,6 +1,11 @@
 import { secureApplicationProxyHeaders } from "../../../../lib/backend-proxy-security";
+import {
+  InspectorProxyBodyError,
+  readInspectorProxyBody,
+} from "../../../../lib/backend-proxy-body";
+import type { JsonValue } from "@relkit/contracts";
 
-const requestHeadersToDrop = ["connection", "content-length", "host"];
+const requestHeadersToDrop = ["connection", "host", "transfer-encoding"];
 const responseHeadersToDrop = ["connection", "content-encoding", "content-length"];
 const OPENAPI_PATH = "_relkit/v1/openapi.json";
 const INSPECTOR_BACKEND_PATH = "/_relkit/backend";
@@ -23,19 +28,29 @@ async function proxy(request: Request, context: RouteContext): Promise<Response>
     return Response.json({ error: "Application proxy request origin denied." }, { status: 403 });
   }
   for (const name of requestHeadersToDrop) headers.delete(name);
+  headers.delete("origin");
+  headers.delete("referer");
+  const token = process.env.RELKIT_INSPECTOR_API_TOKEN;
+  if (token !== undefined) headers.set("x-relkit-inspector-token", token);
   const hasBody = request.method !== "GET" && request.method !== "HEAD";
   let response: Response;
   try {
     response = await fetch(target, {
       method: request.method,
       headers,
-      body: hasBody ? await request.arrayBuffer() : undefined,
+      body: hasBody ? await readInspectorProxyBody(request) : undefined,
+      duplex: "half",
       redirect: "manual",
       signal: request.signal,
     });
   } catch (error) {
+    if (error instanceof InspectorProxyBodyError)
+      return Response.json({ error: "Request body exceeds one MiB" }, { status: 413 });
     if (request.signal.aborted) return new Response(null, { status: 499 });
-    throw error;
+    return Response.json(
+      { error: "RELKIT inspector backend is unavailable." },
+      { status: 503, headers: { "cache-control": "no-store" } },
+    );
   }
   const responseHeaders = new Headers(response.headers);
   for (const name of responseHeadersToDrop) responseHeaders.delete(name);
@@ -74,7 +89,7 @@ function localBackend(value: string | undefined): URL | undefined {
 
 async function addProxyServer(response: Response): Promise<BodyInit | null> {
   try {
-    const document = await response.clone().json();
+    const document: JsonValue = await response.clone().json();
     if (!isRecord(document) || document.servers !== undefined) return response.body;
     return JSON.stringify({ ...document, servers: [{ url: INSPECTOR_BACKEND_PATH }] });
   } catch {
@@ -82,7 +97,7 @@ async function addProxyServer(response: Response): Promise<BodyInit | null> {
   }
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+function isRecord(value: JsonValue): value is Record<string, JsonValue> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 

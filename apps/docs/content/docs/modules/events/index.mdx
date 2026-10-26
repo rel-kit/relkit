@@ -1,0 +1,45 @@
+---
+title: Events overview
+description: Publish what happened in your app and let other functions react.
+pagination: false
+sidebar:
+  icon: radio
+---
+
+An event records that something happened in your application, such as an order being created. Other functions can subscribe and react—for example, sending a confirmation and recording analytics after an order is created.
+
+The original operation does not wait for these reactions to finish. Use events for follow-up work; use a normal function call when you need the result before continuing.
+
+<Callout type="tip" title="Start here" icon="route">
+  Start with [React to order events](/guides/events/react-to-order-events) to install the runtime,
+  publish an event, and verify its subscriber. Use [Define an event](/docs/modules/events/define)
+  for configuration and the [Events reference](/docs/api/events) for exact contracts.
+</Callout>
+
+An event consumer may submit a [task-first job](/docs/modules/jobs/quickstart) when the follow-up needs durable
+execution. Publishing an event is not an atomic database write plus task admission.
+
+<include>/_setup/events.mdx</include>
+
+## The Events API
+
+| API                                                           | What you use it for                                                                                             |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| [`defineEvent`](/docs/api/events#defineevent)                 | Name the event and define the data it carries.                                                                  |
+| [`defineFunction`](/docs/api/functions#definefunction)        | Perform an operation, then publish with `context.events[eventId].publish(data)`. List the event in `publishes`. |
+| [`defineEventFunction`](/docs/api/events#defineeventfunction) | Subscribe with `event: "orders.created"` and run your handler when it is published.                             |
+
+## See your subscribers
+
+After [installing and binding the event runtime](/guides/events/react-to-order-events#install-and-bind-the-selected-event-runtime),
+start the app. If you choose inspection, complete the separate [Inspector setup](/docs/modules/operations/inspector)
+and open its UI at `http://localhost:3210`. Select **Events & listeners**, then open an event.
+**Publishers** shows which functions send it; **Consumer functions** shows its subscribers.
+
+<img
+  src="/inspector-event-subscribers.jpg"
+  alt="Inspector showing orders.created, its publisher, and its subscribing functions"
+/>
+
+Follow the [order confirmation example](/guides/events/react-to-order-events) to publish and consume an event
+in your existing app. Use [Define an event](/docs/modules/events/define) for the descriptor details.

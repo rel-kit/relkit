@@ -1,0 +1,80 @@
+[22:11:43.630] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.browser.mkdir",
+  outcome: "success",
+  duration_ms: 1.701917,
+}
+[22:11:43.632] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.browser.evidence",
+  outcome: "success",
+  duration_ms: 0.437416,
+}
+[22:11:43.633] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.browser.source.snapshot",
+  outcome: "success",
+  duration_ms: 0.6145,
+}
+[22:11:43.634] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.browser.source.snapshot",
+  outcome: "success",
+  duration_ms: 0.349375,
+}
+/Users/mustafaelsayed/Workspace/relkit/.relkit/playwright-inspector-ImrP9q
+[WebServer] ▲ Next.js 16.3.8 (webpack)
+[WebServer] - Local:         http://127.0.0.1:52857
+[WebServer] - Network:       http://127.0.0.1:52857
+[WebServer] ✓ Ready in 367ms
+[WebServer] ✓ Running next.config.ts took 101ms
+[WebServer] - Experiments (use with caution):
+[WebServer]   · cpus: 1
+[WebServer]   ✓ webpackBuildWorker
+[WebServer]   ✓ webpackMemoryOptimizations
+[WebServer] 
+[WebServer] ○ Compiling /graph ...
+[WebServer]  GET /graph 200 in 10.1s (next.js: 9.8s, application-code: 329ms)
+
+Running 1 test using 1 worker
+
+[WebServer] ○ Compiling /api-reference ...
+[WebServer]  GET /api-reference 200 in 3.9s (next.js: 3.4s, application-code: 475ms)
+[WebServer]  GET /scalar 200 in 1159ms (next.js: 1141ms, application-code: 18ms)
+[WebServer]  GET /_relkit/backend/_relkit/v1/stream 200 in 1367ms
+[WebServer]  GET /_relkit/backend/_relkit/v1/graph 200 in 1470ms
+[WebServer]  GET /_relkit/backend/_relkit/v1/logs?source=relkit&search=dev.generation.&order=desc&limit=20 200 in 1474ms
+  ✓  1 tests/e2e/inspector-redesign.spec.ts:92:1 › renders the Scalar reference (7.3s)
+[WebServer] 
+
+  1 passed (21.9s)
+[WebServer] (node:38767) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:38769) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+(node:39077) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 144 |   for (const reason of self.reasons) {
+[WebServer] 145 |     if (reason._tag === "Fail") return reason.error;
+[WebServer] 146 |     if (reason._tag === "Die") die ??= reason;
+[WebServer] 147 |   }
+[WebServer] 148 |   if (die !== undefined) return die.defect;
+[WebServer] 149 |   if (self.reasons.length > 0) return new globalThis.Error("All fibers interrupted without error");
+[WebServer]                                             ^
+[WebServer] error: All fibers interrupted without error
+[WebServer]       at causeSquash (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:149:39)
+[WebServer]       at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:2525:13)
+[WebServer] 
+[WebServer] Bun v1.3.10 (macOS arm64)
+[22:12:05.897] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.browser.source.restore",
+  outcome: "success",
+  duration_ms: 2.03125,
+}
+[22:12:05.898] INFO (#1): Execution operation completed {
+  domain: "testing",
+  operation: "scaffold.browser.source.restore",
+  outcome: "success",
+  duration_ms: 0.383583,
+}

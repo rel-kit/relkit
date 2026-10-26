@@ -1,0 +1,44 @@
+/* Preserve the landing's bundled typefaces independently of the documentation theme. */
+@font-face {
+  font-family: "Relkit Geist";
+  src: url("/fonts/geist-latin.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Relkit Geist Mono";
+  src: url("/fonts/geist-mono-latin.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Relkit Fira Code";
+  src: url("/fonts/fira-code.ttf") format("truetype");
+  font-weight: 300 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Relkit Monaspace Neon";
+  src: url("/fonts/monaspace-neon-regular.otf") format("opentype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Relkit Monaspace Neon";
+  src: url("/fonts/monaspace-neon-italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+.hero-font-sans {
+  --hero-sans: "Relkit Geist";
+}
+.hero-font-mono {
+  --hero-mono: "Relkit Geist Mono";
+}
+.hero-font-code {
+  --hero-code: "Relkit Fira Code";
+}
+.hero-font-neon {
+  --hero-neon: "Relkit Monaspace Neon";
+}

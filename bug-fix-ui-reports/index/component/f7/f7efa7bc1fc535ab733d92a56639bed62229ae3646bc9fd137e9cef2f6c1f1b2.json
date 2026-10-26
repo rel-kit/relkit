@@ -1,0 +1,22 @@
+{
+  "key": "Sidebar",
+  "matches": {
+    "bui-d4579e5f46ee02dffd7be479": {
+      "id": "bui-d4579e5f46ee02dffd7be479",
+      "status": "verified",
+      "what": "The documentation sidebar repeats the overview and hides common sections; the docs brand lacks the landing logo.",
+      "root_cause": "apps/docs/blume.config.ts used navigation.tabs, which scopes Blume's sidebar to the current section. The generated tree linked folder index pages through both group headings and child rows. The configuration omitted logo.",
+      "fixed_by": "Use the existing catalogs to build one explicit nested Blume sidebar, linking each overview only from its group heading. Configure persistent Home, Documentation and GitHub links, and reuse /logo.svg.",
+      "files": [
+        "apps/docs/blume.config.ts",
+        "apps/docs/scripts/generate-navigation.ts",
+        "apps/docs/browser/docs.spec.ts",
+        "apps/docs/browser/navigation.spec.ts",
+        "apps/docs/tests/navigation.test.ts"
+      ],
+      "attempt": 1,
+      "updated_at": "2026-10-25T12:58:25+00:00",
+      "report": "bug-fix-ui-reports/issues/bui-d4579e5f46ee02dffd7be479/report.md"
+    }
+  }
+}

@@ -47,7 +47,7 @@ import { z } from "@relkit/app/schema";
 export default defineChannel({ id: "ownership.internal", params: z.object({}), events: { changed: z.string() } });
 `,
   "src/services/ownership/agents/assistant.agent.ts": `/** Protected offline native agent keeps browser thread state scoped to its actual authenticated identity. */
-import { defineAgent } from "@relkit/app/agents";
+import { defineAgent } from "@relkit/langchain";
 import { z } from "@relkit/app/schema";
 import { FakeToolCallingModel } from "langchain";
 import { nativeSession } from "@app/platform/ownership.js";

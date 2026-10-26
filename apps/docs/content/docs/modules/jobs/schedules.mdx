@@ -1,0 +1,37 @@
+---
+title: Schedules
+description: Run jobs on provider-backed schedules.
+pagination: false
+sidebar:
+  icon: calendar-clock
+---
+
+Start a job on a schedule by declaring its cron rule and timezone.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  Use an existing [task/job with its selected provider installed and
+  bound](/docs/modules/jobs/quickstart) before running this example. Core task declarations do not
+  install the provider's native SDK.
+</Callout>
+
+Schedules belong to jobs and use the same task input and admission rules as an on-demand trigger.
+
+<include
+  source="examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts
+</include>
+
+Use `schedules`, an array of definitions with an explicit `id`, canonical `input`, and either a cron/timezone
+pair or an interval. Schedule operations return a receipt with an operation ID; they do not pretend that a
+provider accepted a write when its outcome is unknown.
+
+Use an explicit job ID and keep schedule ownership in source control. `relkit jobs schedules list|get|upsert|pause|resume|delete` manages the registered definition; each write returns an operation ID that can be audited.
+
+Schedules are provider-backed. Do not run a second process-local scheduler as a fallback: it can double-trigger work after a restart. Check `relkit jobs capabilities` for the selected provider's cron, interval, timezone, overlap, and misfire support. The current Inngest path supports UTC cron schedules; interval and richer misfire policies are not silently emulated.
+
+Pausing a schedule prevents new admissions and does not cancel runs already accepted. Delete or change a schedule only after checking in-flight runs and the migration impact on dedupe keys.
+
+<include>/_snippets/generated/related/docs-modules-jobs-schedules.mdx</include>

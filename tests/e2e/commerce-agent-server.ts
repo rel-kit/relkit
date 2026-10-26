@@ -13,7 +13,8 @@ import {
   createLocalRealtimeProvider,
 } from "../../packages/providers-local/src/index.ts";
 import { createProviderRealtimeDispatcher } from "../../packages/realtime/src/index.ts";
-import { createApp, type RuntimeManifest } from "../../packages/runtime-hono/src/index.ts";
+import type { RuntimeManifest } from "../../packages/runtime-hono/src/index.ts";
+import { createPreparedApp } from "../../packages/runtime-hono/src/prepared-app.ts";
 import { runtimeCohort } from "../../packages/runtime-hono/tests/test-cohort.ts";
 import { AGENT_ID, commerceAgentPlan } from "./commerce-agent-plan.js";
 import { commerceAgentEngine } from "./commerce-agent-engine.js";
@@ -31,7 +32,9 @@ class CommerceAgentServer extends Context.Service<CommerceAgentServer>()(
         (root) => Effect.promise(() => rm(root, { recursive: true, force: true })),
       );
       const closing = new AbortController();
-      const app = yield* fixtureApp(stateRoot);
+      const app = yield* Effect.acquireRelease(fixtureApp(stateRoot), (app) =>
+        Effect.promise(() => app.close()),
+      );
       const server = yield* Effect.acquireRelease(
         Effect.sync(() =>
           Bun.serve({
@@ -81,22 +84,31 @@ const fixtureApp = Effect.fn("CommerceAgentServer.app")(function* (stateRoot: st
     publicFingerprint: clientManifest.publicFingerprint,
     provider: () => realtimeProvider,
   });
-  return createApp({
-    plan,
-    manifest: {
-      ...runtimeCohort(plan.graphHash),
-      functions: {
-        "announcements.get-announcements": getAnnouncements,
-        "announcements.post-announcement": postAnnouncement,
-      },
-      agents: { [AGENT_ID]: agent },
-      channels: { "announcements.feed": announcements },
-      middleware: {},
-      requestTransforms: {},
-    } satisfies RuntimeManifest,
+  return yield* Effect.tryPromise({
+    try: () =>
+      createPreparedApp({
+        plan,
+        manifest: {
+          ...runtimeCohort(plan.graphHash),
+          functions: {
+            "announcements.get-announcements": getAnnouncements,
+            "announcements.post-announcement": postAnnouncement,
+          },
+          agents: { [AGENT_ID]: agent },
+          channels: { "announcements.feed": announcements },
+          middleware: {},
+          requestTransforms: {},
+        } satisfies RuntimeManifest,
 
-    engine: commerceAgentEngine(agent, dispatcher),
-    ...commerceAgentRuntimeSettings(provider, realtimeProvider, clientManifest.publicFingerprint),
+        engine: commerceAgentEngine(agent, dispatcher),
+        ...commerceAgentRuntimeSettings(
+          provider,
+          realtimeProvider,
+          clientManifest.publicFingerprint,
+        ),
+      }),
+    catch: (cause) =>
+      cause instanceof Error ? cause : new Error("Commerce app preparation failed", { cause }),
   });
 });
 

@@ -1,5 +1,6 @@
+/** Replaces owned thread state and requires existing run identities without changing persisted format. */
 import { nativeNow } from "../native-services.js";
-import type { AgentRequestScope } from "@relkit/agents";
+import type { AgentRequestScope } from "@relkit/contracts";
 import { LocalAgentStateError, ownedThread, storedThreadKey } from "./common.js";
 import type { LocalAgentState, LocalAgentThread } from "./state.js";
 

@@ -1,0 +1,18 @@
+## Pre-setup
+
+Start with local logging and bounded capture; neither requires a telemetry account, exporter,
+new `defineEnv` fields, or a Docker service. Merge these settings into your existing `defineApp`
+configuration, retaining its environment contract:
+
+<include source="apps/docs/examples/setup/telemetry.ts" lang="ts" meta='title="relkit.config.ts"'>
+  /_snippets/source/apps/docs/examples/setup/telemetry.ts
+</include>
+
+Run `bun run check` and `bun run dev`, then send a request to an existing route to produce
+correlated logs. For a UI, complete the separate [Inspector setup](/docs/modules/operations/inspector):
+installation alone does not enable its bridge. Keep your application's Redis, MinIO, database,
+and job providers in [local Docker](/docs/modules/integrations/local-docker).
+
+Remote Sentry/OTLP export is optional. Their integrations have no bundled Docker collector
+recipe; configure a reachable service and supply its named endpoint/secret bindings only when
+selecting that exporter. Those binding references are distinct from application `context.env` fields.

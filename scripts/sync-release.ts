@@ -1,3 +1,4 @@
+/** Synchronizes owning manifests, selected dependency metadata and starter catalogs through the release producers. */
 import { readFile, writeFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { workspacePackageDirectories } from "./workspace-packages.js";
@@ -5,68 +6,11 @@ import { packedTemplates } from "./release-templates.js";
 import { buildCatalog, nativeBuildCatalogSource, patchRegistrations } from "./build-catalog.js";
 import { dependencyFields, resolveCatalogVersion } from "./catalog-manifest.js";
 import { generatorProviders } from "./release-plan.js";
+import { synchronizeIntegrationDependencies } from "./integration-dependency-metadata.js";
 
 const root = resolve(import.meta.dir, "..");
 const repository = "https://github.com/rel-kit/relkit";
-const descriptions: Record<string, string> = {
-  "@relkit/agents": "RELKIT agent authoring API; prefer @relkit/app/agents in applications.",
-  "@relkit/app": "The primary typed application-authoring API for RELKIT.",
-  "@relkit/better-auth": "Better Auth integration for RELKIT routes.",
-  "@relkit/buckets": "RELKIT bucket authoring API; prefer @relkit/app/buckets in applications.",
-  "@relkit/cache": "RELKIT cache authoring API; prefer @relkit/app/cache in applications.",
-  "@relkit/cli": "The RELKIT development, build, inspection, and deployment CLI.",
-  "@relkit/client-generator": "Unsupported internal RELKIT client generator; use @relkit/app.",
-  "@relkit/client": "Typed RELKIT client helpers, including TanStack Query integration.",
-  "@relkit/cloud-aws":
-    "Unsupported internal AWS deployment components for RELKIT; use @relkit/cli.",
-  "@relkit/compiler": "Unsupported internal RELKIT source compiler; use @relkit/cli.",
-  "@relkit/config":
-    "RELKIT environment configuration API; prefer @relkit/app/config in applications.",
-  "@relkit/contracts": "Unsupported internal RELKIT contracts; use @relkit/app.",
-  "@relkit/deploy-pulumi":
-    "Unsupported internal Pulumi deployment engine for RELKIT; use @relkit/cli.",
-  "@relkit/deploy": "Unsupported internal RELKIT deployment contracts; use @relkit/cli.",
-  "@relkit/diagnostics": "Unsupported internal RELKIT diagnostics; use @relkit/cli.",
-  "@relkit/drizzle": "Drizzle ORM integration for RELKIT functions.",
-  "@relkit/engine": "Unsupported internal RELKIT execution engine; use @relkit/app.",
-  "@relkit/events": "RELKIT event authoring API; prefer @relkit/app/events in applications.",
-  "@relkit/functions":
-    "RELKIT function authoring API; prefer @relkit/app/functions in applications.",
-  "@relkit/graph": "Unsupported internal RELKIT graph model; use @relkit/app.",
-  "@relkit/inspector-api": "Unsupported internal API for the RELKIT inspector; use @relkit/cli.",
-  "@relkit/integrations": "Optional catalog of standalone RELKIT integrations.",
-  "@relkit/invocation": "Unsupported internal RELKIT invocation contracts; use @relkit/app.",
-  "@relkit/jobs": "RELKIT job authoring API; prefer @relkit/app/jobs in applications.",
-  "@relkit/local-service": "Unsupported internal RELKIT local-service protocol; use @relkit/cli.",
-  "@relkit/observability": "Unsupported internal RELKIT observability contracts; use @relkit/app.",
-  "@relkit/openapi": "Unsupported internal OpenAPI generator for RELKIT; use @relkit/cli.",
-  "@relkit/provider": "Portable provider authoring and binding protocol for RELKIT.",
-  "@relkit/providers-local": "Local runtime providers for RELKIT development and testing.",
-  "@relkit/providers-standard": "Empty compatibility package retained for RELKIT tooling.",
-  "@relkit/realtime": "Typed realtime channels and provider contracts for RELKIT.",
-  "@relkit/routes": "RELKIT route authoring API; prefer @relkit/app/routes in applications.",
-  "@relkit/runtime-effect": "Unsupported internal Effect runtime for RELKIT; use @relkit/app.",
-  "@relkit/runtime-hono": "Unsupported internal Hono runtime for RELKIT; use @relkit/app.",
-  "@relkit/schema": "RELKIT schema API; prefer @relkit/app/schema in applications.",
-  "@relkit/services": "RELKIT service authoring API; prefer @relkit/app/services in applications.",
-  "@relkit/supervisor": "Unsupported internal RELKIT process supervisor; use @relkit/cli.",
-  "@relkit/testing": "Testing utilities and local providers for RELKIT applications.",
-  "@relkit/tools": "RELKIT tool authoring API; prefer @relkit/app/tools in applications.",
-  "@relkit/aws": "AWS host and infrastructure integration for RELKIT.",
-  "@relkit/cloudflare": "Cloudflare integration for RELKIT.",
-  "@relkit/docker": "Docker local-service integration for RELKIT.",
-  "@relkit/local": "Local-service orchestration integration for RELKIT.",
-  "@relkit/otlp": "OTLP telemetry integration for RELKIT.",
-  "@relkit/pulumi": "Pulumi deployment-engine integration for RELKIT.",
-  "@relkit/redis": "Redis integration for RELKIT.",
-  "@relkit/s3": "S3-compatible storage integration for RELKIT.",
-  "@relkit/sentry": "Sentry telemetry integration for RELKIT.",
-  "@relkit/inngest": "Inngest durable-jobs integration for RELKIT.",
-  "@relkit/trigger": "Trigger.dev jobs integration for RELKIT.",
-  "@relkit/effect-mq": "Effect MQ retryable-jobs integration for RELKIT.",
-  "create-relkit": "Create a RELKIT application from a supported project template.",
-  relkit: "The RELKIT CLI for bunx relkit and global installation.",
-};
+import { descriptions } from "./release-package-descriptions.js";
 type TemplateManifest = Record<string, unknown> &
   Partial<Record<(typeof dependencyFields)[number], Record<string, string>>>;
 const write = process.argv.includes("--write");
@@ -103,6 +47,7 @@ for (const directory of workspacePackageDirectories(root)) {
   const path = join(directory, "package.json");
   const manifest = JSON.parse(await readFile(path, "utf8")) as Record<string, unknown>;
   const name = String(manifest.name);
+  const relkitMetadata = synchronizeIntegrationDependencies(manifest, rootManifest);
   const description = descriptions[name];
   if (description === undefined) throw new Error(`Missing release description for ${name}`);
   const {
@@ -137,12 +82,13 @@ for (const directory of workspacePackageDirectories(root)) {
           ? ["dist", "src/catalog-resolution.ts", "src/catalog-resolution.types.ts"]
           : ["dist"],
     publishConfig: { access: "public" },
-    engines: { bun: ">=1.3.10" },
+    engines: { bun: ">=1.3.10", ...(name === "@relkit/inspector" ? { node: ">=20.9.0" } : {}) },
     ...rest,
+    ...(relkitMetadata === undefined ? {} : { relkit: relkitMetadata }),
     ...(metadataPackages.has(name)
       ? {
           relkit: {
-            ...(manifest.relkit as Record<string, unknown> | undefined),
+            ...relkitMetadata,
             buildCatalog: catalog,
             ...(name === "create-relkit"
               ? {

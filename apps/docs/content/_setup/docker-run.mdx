@@ -1,0 +1,14 @@
+Check Docker before continuing. After adding the resource and its service registration, run from the app root:
+
+```sh title="Terminal — application root"
+docker version
+bun run check
+bun run typecheck
+bun run dev
+```
+
+`check` validates the graph; it starts no containers. `dev` starts only Docker recipes used by
+that graph, waits for readiness, and binds their generated connection values. An unused profile
+alone does not start a container. Keep the server running and use `bun run relkit local status`
+in another terminal to inspect the services. [Local Docker](/docs/modules/integrations/local-docker)
+covers detached startup and stopping services while retaining their volumes.

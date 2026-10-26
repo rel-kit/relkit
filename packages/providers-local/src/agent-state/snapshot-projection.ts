@@ -1,5 +1,6 @@
+/** Projects retained journal records into public messages, execution status and tool call views. */
 import type { Projection, MutableExecution } from "./snapshot-projection.types.js";
-import type { AgentExecutionEvent, AgentExecutionSnapshot } from "@relkit/agents";
+import type { AgentExecutionEvent, AgentExecutionSnapshot } from "@relkit/contracts";
 import type { LocalAgentThread } from "./state.js";
 
 /**

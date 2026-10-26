@@ -17,7 +17,6 @@ export { doctorProject } from "./doctor-project.service.js";
 export function parseDoctorArgs(args: readonly string[]): ParsedDoctorArgs {
   let projectRoot: string | undefined;
   let backendPort: number | undefined;
-  let inspectorPort: number | undefined;
   let skipPorts: boolean | undefined;
   let deploymentEnabled: boolean | undefined;
   for (let index = 0; index < args.length; index += 1) {
@@ -26,7 +25,10 @@ export function parseDoctorArgs(args: readonly string[]): ParsedDoctorArgs {
     else if (arg === "--port")
       backendPort = parsePort(requiredValue(args, ++index, arg), arg, true);
     else if (arg === "--inspector-port")
-      inspectorPort = parsePort(requiredValue(args, ++index, arg), arg, false);
+      throw new DoctorCommandError(
+        "RELKIT_DOCTOR_USAGE",
+        "--inspector-port is retired; configure inspector.connection.port for the application bridge and pass --port to the standalone inspector.",
+      );
     else if (arg === "--no-ports") skipPorts = true;
     else if (arg === "--pulumi") deploymentEnabled = true;
     else if (arg === "--no-pulumi") deploymentEnabled = false;
@@ -35,7 +37,6 @@ export function parseDoctorArgs(args: readonly string[]): ParsedDoctorArgs {
   return {
     ...(projectRoot === undefined ? {} : { projectRoot }),
     ...(backendPort === undefined ? {} : { backendPort }),
-    ...(inspectorPort === undefined ? {} : { inspectorPort }),
     ...(skipPorts === undefined ? {} : { skipPorts }),
     ...(deploymentEnabled === undefined ? {} : { deploymentEnabled }),
   };

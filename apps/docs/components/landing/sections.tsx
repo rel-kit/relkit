@@ -1,5 +1,5 @@
 import { Activity, ArrowUpRight, Boxes, Braces, RadioTower, Route } from "lucide-react";
-import Link from "next/link";
+import { Link } from "fumadocs-core/framework";
 import { Topology } from "./topology";
 import system from "./landing-system.module.css";
 import styles from "./landing-sections.module.css";
@@ -79,7 +79,7 @@ export function Statistics() {
             <p className={system.description}>
               Development, tests, inspection, and deployment all start from that same model.
             </p>
-            <Link className={system.textLink} href="/docs/service/organization">
+            <Link className={system.textLink} href="/docs/modules/service/organization">
               Explore the application model <ArrowUpRight size={14} aria-hidden="true" />
             </Link>
           </div>

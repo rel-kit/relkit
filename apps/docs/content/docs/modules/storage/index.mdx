@@ -1,0 +1,60 @@
+---
+title: Buckets
+description: Define file storage, select a provider profile, and control object size, media types, and visibility.
+pagination: false
+sidebar:
+  icon: hard-drive
+---
+
+A bucket stores files such as product images and invoices. Its definition gives the bucket a stable identity and sets its storage rules.
+
+<Callout type="tip" title="Start here" icon="route">
+  Start with **[Upload product images](/guides/storage/upload-product-images)** for installation, an
+  HTTP endpoint, and verification. For the complete option contract, see
+  [`defineBucket`](/docs/api/buckets#definebucket).
+</Callout>
+
+<include>/_setup/storage.mdx</include>
+
+<span id="the-storage-api"></span>
+
+This bucket accepts images and JSON files, with a maximum size of 5 MB per object:
+
+<include
+  source="examples/commerce/src/services/assets/buckets/assets.bucket.ts"
+  lang="ts"
+  meta='title="src/services/assets/buckets/assets.bucket.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/assets/buckets/assets.bucket.ts
+</include>
+
+`id` identifies this bucket in RELKIT. Keep it stable when moving or renaming the file.
+
+`profile` selects the storage connection named `assets` in your application configuration. That configuration determines which provider stores the files.
+
+`visibility` controls object visibility. Authentication for an upload endpoint is configured separately.
+
+## Configure storage
+
+<CardGroup cols={2}>
+  <Card icon="settings">
+    [Define or scaffold a bucket](/docs/modules/storage/define): provider selection, limits, and
+    validation.
+  </Card>
+  <Card icon="container">
+    [Configure local storage](/docs/modules/storage/local-storage): install the S3 integration and
+    run MinIO through Docker.
+  </Card>
+  <Card icon="upload">
+    [Write objects](/docs/modules/storage/upload): dependencies, file validation, and storage
+    operations.
+  </Card>
+  <Card icon="download">
+    [Read files and create download links](/docs/modules/storage/read-delete): reads, listing,
+    deletion, and signed URLs.
+  </Card>
+</CardGroup>
+
+<span id="try-it-in-your-app"></span>
+
+Ready to configure your own provider? Continue with [Configure local storage](/docs/modules/storage/local-storage).

@@ -9,22 +9,21 @@ import {
 } from "../scripts/generate-guides.js";
 import { markdownFiles, sourceFiles } from "./documentation-fixture.js";
 import type { DocumentationManifest, DeploymentConfiguration } from "./documentation.types.js";
-const content = resolve(import.meta.dir, "../content/docs");
+const content = resolve(import.meta.dir, "../content");
 
 test("keeps guides backed by executable examples and self-hosted discovery", async () => {
   const files = await markdownFiles(content);
-  const routes = await readFile(resolve(content, "http/routes.mdx"), "utf8");
-  const events = await readFile(resolve(content, "events/define.mdx"), "utf8");
-  const listeners = await readFile(resolve(content, "events/consume.mdx"), "utf8");
+  const routes = await readFile(resolve(content, "docs/modules/http/routes.mdx"), "utf8");
+  const events = await readFile(resolve(content, "docs/modules/events/define.mdx"), "utf8");
+  const listeners = await readFile(resolve(content, "docs/modules/events/consume.mdx"), "utf8");
   expect(routes).toContain("examples/commerce/src/routes/orders/[orderId]/route.ts");
   expect(events).toContain("apps/docs/examples/events/order-created.event.ts");
   expect(listeners).toContain("apps/docs/examples/events/order-confirmation.function.ts");
-  expect(await Bun.file(resolve(import.meta.dir, "../app/api/search/route.ts")).text()).toContain(
-    "createFromSource(source)",
-  );
-  expect(await Bun.file(resolve(import.meta.dir, "../app/llms.txt/route.ts")).text()).toContain(
-    "llms(source).index()",
-  );
+  const config = (await import("../blume.config.js")).default;
+  expect(config.content?.root).toBe("content");
+  expect(
+    config.search && "indexing" in config.search && config.search.indexing?.includeCodeBlocks,
+  ).toBe(true);
 
   for (const file of files.filter((file) => !file.includes("/api/"))) {
     const contents = await readFile(file, "utf8");
@@ -34,26 +33,26 @@ test("keeps guides backed by executable examples and self-hosted discovery", asy
   }
 
   for (const removedBundle of [
-    "start/check-build-deploy.mdx",
-    "fundamentals/schemas-errors-context.mdx",
-    "http/uploads-middleware-rate-limits.mdx",
-    "http/responses-openapi-clients.mdx",
+    "docs/learn/check-build-deploy.mdx",
+    "docs/learn/concepts/schemas-errors-context.mdx",
+    "docs/modules/http/uploads-middleware-rate-limits.mdx",
+    "docs/modules/http/responses-openapi-clients.mdx",
     "resources-ai/buckets-cache.mdx",
     "resources-ai/tools-agents.mdx",
     "async/events.mdx",
     "async/jobs.mdx",
     "async/listeners.mdx",
     "async/schedules.mdx",
-    "fundamentals/providers.mdx",
-    "fundamentals/services.mdx",
-    "fundamentals/domain-first-migration.mdx",
+    "docs/learn/concepts/providers.mdx",
+    "docs/learn/concepts/services.mdx",
+    "docs/learn/concepts/domain-first-migration.mdx",
   ]) {
     expect(files).not.toContain(resolve(content, removedBundle));
   }
 });
 
 test("documents grouped service roots and rejects removed layer-first advice", async () => {
-  const createPage = resolve(content, "start/create-an-app.mdx");
+  const createPage = resolve(content, "docs/learn/create-an-app.mdx");
   const currentSources = [
     ...(await markdownFiles(content)).filter((file) => !file.includes("/api/")),
     ...(await sourceFiles(resolve(import.meta.dir, "../examples/landing"))),
@@ -81,7 +80,7 @@ test("builds and starts from the repository root on Railway", async () => {
     resolve(import.meta.dir, "../../../railway.json"),
   ).json()) as DeploymentConfiguration;
 
-  expect(manifest.scripts.start).toBe("next start --hostname 0.0.0.0");
+  expect(manifest.scripts.start).toBe("HOST=0.0.0.0 node dist/server/entry.mjs");
   expect(railway.build).toEqual({
     builder: "DOCKERFILE",
     dockerfilePath: "Dockerfile.docs",
