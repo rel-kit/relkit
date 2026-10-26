@@ -191,6 +191,7 @@ jobs:
         run: |
           bun run test:types
           bun run test:certification
+          bun x vitest run --maxWorkers=1 --no-file-parallelism scripts/tests/consumer-resources.test.ts
           bun run test:unit
           bun test tests/compiler/manifest.test.ts tests/compiler/graph-construction.test.ts tests/compiler/job-names.test.ts
           bun run test:graph
