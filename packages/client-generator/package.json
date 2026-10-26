@@ -1,6 +1,6 @@
 {
   "name": "@relkit/client-generator",
-  "version": "0.7.10",
+  "version": "0.7.11",
   "description": "Unsupported internal RELKIT client generator; use @relkit/app.",
   "license": "MIT",
   "repository": {
