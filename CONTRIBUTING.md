@@ -88,6 +88,9 @@ fresh checkout, which installs frozen and runs `release:pack --ci-pack` without
 publication credentials. The jobs share no compiled output or build cache.
 Already versioned release PRs check their existing batch and run the same pack
 validation. A green lint/typecheck run alone does not satisfy this gate.
+The pack job also checks public npm registration for every candidate package.
+Missing packages or failed registry lookups block merge. This read-only check
+cannot inspect npm's private trusted-publisher configuration.
 
 Publishing validates the complete local packed closure, then saves and publishes
 only the packages in the reviewed batch, in dependency order. First-party
@@ -193,22 +196,29 @@ changed. Changesets includes required dependents; unrelated packages keep their
 versions. For example, a generator-only change releases `create-relkit`,
 `@relkit/cli`, and `relkit`, rather than the entire workspace.
 
-## Bootstrap the unscoped CLI package
+## Register new npm packages
 
-The first `relkit` publication requires an authenticated maintainer. Publish
-the validated `relkit-<version>.tgz` archive from the release artifact directory
-with `npm publish`, then configure the same trusted publisher used by the other
-packages:
+Every new public package, including `relkit`, requires one authenticated
+maintainer publication before npm can accept its trusted-publisher configuration.
+Before merging it, build and validate its bootstrap archive with the repository's
+release tooling. Choose a bootstrap version strictly lower than the upcoming
+package version in the Changesets batch. A higher bootstrap version would prevent
+the automated publisher from promoting the real release to `latest`.
+Publish only the new package archives in dependency order with the `bootstrap`
+tag, then configure the same trusted publisher used by the other packages:
 
 ```sh
-npm trust github relkit --repository rel-kit/relkit \
+npm publish path/to/new-package-0.1.0.tgz --access public --tag bootstrap
+npm trust github @relkit/new-package --repository rel-kit/relkit \
   --file ci.yml --environment npm --allow-publish
 ```
 
-The package must exist and the account must have write access and 2FA enabled
-before configuring [npm trusted publishing](https://docs.npmjs.com/cli/v11/commands/npm-trust/).
-Subsequent releases publish the wrapper after its exact `@relkit/cli` dependency
-through the existing release workflow.
+Substitute the new package name and validated archive path. The account must have
+write access and 2FA enabled; complete npm's browser authorization when prompted.
+See [npm trusted publishing](https://docs.npmjs.com/cli/v11/commands/npm-trust/).
+After the first automated release succeeds, deprecate the bootstrap version and
+remove its `bootstrap` tag. Subsequent releases use the existing workflow,
+including publishing the wrapper after its exact `@relkit/cli` dependency.
 
 ## Pull requests
 

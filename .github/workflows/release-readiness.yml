@@ -86,5 +86,17 @@ jobs:
       - run: bun install --frozen-lockfile
       - name: Build and validate using the publishing command without publication credentials
         run: bun run release:pack --ci-pack --allow-dirty --output "$RUNNER_TEMP/rehearsal-pack"
+      - name: Verify npm package registration
+        env:
+          NPM_CONFIG_FETCH_RETRIES: "1"
+          NPM_CONFIG_FETCH_TIMEOUT: "15000"
+        run: |
+          package_names="$(jq -er '.packages[].name' "$RUNNER_TEMP/rehearsal-pack/manifest.json")"
+          while IFS= read -r package_name; do
+            if ! npm view "$package_name@*" name --registry=https://registry.npmjs.org > /dev/null; then
+              echo "::error::Cannot verify npm package $package_name. Before merging a new package, publish its bootstrap archive and configure trusted publishing for ci.yml / environment npm. For existing packages, check registry availability."
+              exit 1
+            fi
+          done <<< "$package_names"
       - name: Verify generated source remained stable during packaging
         run: git diff --exit-code
