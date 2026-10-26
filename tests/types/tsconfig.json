@@ -67,5 +67,5 @@
     },
     "types": ["bun"]
   },
-  "include": ["./*.ts"]
+  "include": ["./*.ts", "../../integrations/packages/langchain/tests/middleware-state.types.ts"]
 }
