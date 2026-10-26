@@ -49,11 +49,11 @@
     "@relkit/invocation": "workspace:*",
     "@relkit/provider": "workspace:*",
     "effect": "catalog:",
-    "zod": "4.6.5"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "drizzle-orm": "catalog:",
-    "mysql2": "3.14.1",
+    "mysql2": "3.23.1",
     "@effect/vitest": "catalog:",
     "vitest": "catalog:"
   },
