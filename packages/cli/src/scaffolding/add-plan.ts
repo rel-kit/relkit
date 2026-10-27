@@ -13,6 +13,7 @@ import { ProjectDiscoveryServiceTag, projectDiscoveryLive } from "./project-disc
 import { renderAgentEffect, renderToolEffect } from "./render-ai.js";
 import { renderAuthEffect } from "./render-auth.js";
 import { renderDatabaseEffect } from "./render-database.js";
+import { renderInspectorEffect } from "./render-inspector.js";
 import {
   renderConstantsEffect,
   renderErrorEffect,
@@ -108,6 +109,7 @@ const planDiscoveredRequest = Effect.fn("ScaffoldPlanning.planDiscovered")(funct
   else if (request.kind === "transform") yield* renderTransformEffect(builder, request);
   else if (request.kind === "database") yield* renderDatabaseEffect(builder, request);
   else if (request.kind === "auth") yield* renderAuthEffect(builder, request);
+  else if (request.kind === "inspector") yield* renderInspectorEffect(builder, request);
   else {
     const target = yield* resolveDomainEffect(builder);
     if (request.kind === "function")

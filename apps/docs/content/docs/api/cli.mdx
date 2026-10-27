@@ -429,6 +429,19 @@ Create Better Auth and its catch-all route
 
 `relkit add auth` — Create Better Auth and its catch-all route
 
+#### `relkit add inspector`
+
+Enable the inspector bridge and its local UI
+
+| Option         | Value   | Description                             |
+| -------------- | ------- | --------------------------------------- |
+| --project-root | string  | Application directory (defaults to cwd) |
+| --no-install   | boolean | Do not install @relkit/inspector        |
+
+##### Examples
+
+`relkit add inspector` — Enable the inspector bridge and its local UI
+
 ### `relkit migrate <command>`
 
 Preview and apply source layout migrations
@@ -475,20 +488,34 @@ Apply pending migrations using the application's installed tools
 
 Run the app and its selected development features
 
-| Option           | Value                                             | Description                                                                                |
-| ---------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| --project-root   | string                                            | Application directory (defaults to cwd)                                                    |
-| --prepare        | boolean                                           | Prepare a validated dev snapshot and exit without a server                                 |
-| --port           | integer                                           | Application port                                                                           |
-| --inspector-port | integer                                           | Retired; configure inspector.connection.port, or launch relkit-inspector --port separately |
-| --local          | on, off                                           | Start required local services                                                              |
-| --log-level      | all, trace, debug, info, warn, error, fatal, none | Minimum terminal severity (default: info)                                                  |
-| --verbose        | boolean                                           | Show debug events and full retained diagnostics                                            |
-| --no-color       | boolean                                           | Disable terminal colors                                                                    |
+| Option           | Value                                             | Description                                                                  |
+| ---------------- | ------------------------------------------------- | ---------------------------------------------------------------------------- |
+| --project-root   | string                                            | Application directory (defaults to cwd)                                      |
+| --prepare        | boolean                                           | Prepare a validated dev snapshot and exit without a server                   |
+| --port           | integer                                           | Application port                                                             |
+| --inspector-port | integer                                           | Retired; configure inspector.connection.port, or run relkit inspector --port |
+| --local          | on, off                                           | Start required local services                                                |
+| --log-level      | all, trace, debug, info, warn, error, fatal, none | Minimum terminal severity (default: info)                                    |
+| --verbose        | boolean                                           | Show debug events and full retained diagnostics                              |
+| --no-color       | boolean                                           | Disable terminal colors                                                      |
 
 #### Examples
 
 `relkit dev` — Run the app and its selected development features
+
+### `relkit inspector`
+
+Run the project-local development inspector UI
+
+| Option         | Value   | Description                                 |
+| -------------- | ------- | ------------------------------------------- |
+| --project-root | string  | Application directory (defaults to cwd)     |
+| --port         | integer | Inspector UI port (default: 3210)           |
+| --hostname     | string  | Inspector UI bind host (default: 127.0.0.1) |
+
+#### Examples
+
+`relkit inspector` — Run the project-local development inspector UI
 
 ### `relkit check`
 

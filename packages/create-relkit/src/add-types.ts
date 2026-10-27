@@ -18,13 +18,14 @@ export const ADD_KINDS = [
   "transform",
   "database",
   "auth",
+  "inspector",
 ] as const;
 /** Supported relkit add artifact discriminant. */
 export type AddKind = (typeof ADD_KINDS)[number];
 /** Artifact kinds that can be included in a generic service scaffold. */
 export type ServiceInclude = Exclude<
   AddKind,
-  "service" | "database" | "auth" | "middleware" | "transform"
+  "service" | "database" | "auth" | "inspector" | "middleware" | "transform"
 >;
 /** Supported HTTP method used by generated route mappings. */
 export type RouteMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
@@ -112,7 +113,9 @@ export type AddRequest =
       readonly adapter: "better-auth";
       readonly databaseDialect: DatabaseDialect;
       readonly basePath: string;
-    });
+    })
+  /** Enables the development bridge and installs the project-local inspector UI. */
+  | (AddRequestBase & { readonly kind: "inspector" });
 /** Stable warning category and user-facing message retained in plans and results. */
 export interface ScaffoldWarning {
   readonly code: string;

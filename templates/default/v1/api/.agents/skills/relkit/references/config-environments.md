@@ -80,8 +80,8 @@ CLI `--environment` selects provider configuration; `RELKIT_ENV` selects the app
 
 Enable development inspection only when requested with `inspector: { enabled: true }`.
 Its authenticated bridge defaults to `127.0.0.1:0`; optional fixed binding uses
-`inspector.connection.host/port`. The separately installed `@relkit/inspector`
-owns its UI (default 3210, selected with its own `--port`) and local history.
+`inspector.connection.host/port`. `relkit add inspector` sets this flag and installs
+`@relkit/inspector`, which owns its UI (default 3210, `relkit inspector --port`) and local history.
 The obsolete `inspector.port` setting is rejected. Installing the tool does not
 enable the application bridge; production excludes rich inspection regardless
 of this development selection. See [inspection and history](observability-apis.md).

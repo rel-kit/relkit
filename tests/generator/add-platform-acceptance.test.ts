@@ -9,6 +9,7 @@ import {
   planAdd,
 } from "../../packages/cli/src/scaffolding/index.ts";
 import { project, add, linkDependencies, releaseVersion } from "./add-acceptance-fixture.js";
+import { SCAFFOLD_DEPENDENCIES } from "../../packages/create-relkit/src/scaffold-catalog.ts";
 import { registerAddCleanup, addTest as test } from "./add-acceptance-fixture.js";
 
 registerAddCleanup();
@@ -48,4 +49,28 @@ test("database and auth-chained schemas compile for all Bun-native dialects", as
       expect((await checkProject({ projectRoot: root })).diagnostics).toEqual([]);
     }
   }
+}, 30_000);
+
+test("inspector enables the bridge, installs the local UI and keeps the app compiling", async () => {
+  const root = await project("minimal");
+  await add(root, ["inspector", "--no-install"]);
+  const config = await Bun.file(join(root, "relkit.config.ts")).text();
+  expect(config).toContain("inspector: { enabled: true }");
+  const manifest = await Bun.file(join(root, "package.json")).json();
+  expect(manifest.devDependencies["@relkit/inspector"]).toBe(
+    SCAFFOLD_DEPENDENCIES["@relkit/inspector"].version,
+  );
+  expect(manifest.dependencies).not.toHaveProperty("@relkit/inspector");
+  expect(manifest.scripts.inspector).toBe("relkit inspector");
+  await linkDependencies(root);
+  expect((await checkProject({ projectRoot: root })).diagnostics).toEqual([]);
+}, 30_000);
+
+test("inspector never overwrites an authored opt-out", async () => {
+  const root = await project("minimal");
+  const path = join(root, "relkit.config.ts");
+  const source = await Bun.file(path).text();
+  await Bun.write(path, source.replace("  env,\n", "  env,\n  inspector: { enabled: false },\n"));
+  const request = normalizeAddRequest(["inspector", "--no-install", "--project-root", root]);
+  await expect(planAdd(request)).rejects.toMatchObject({ code: ADD_FAILURE_CODES.collision });
 }, 30_000);

@@ -37,7 +37,8 @@ test("canonical Inspector setup installs the tool before configuring and launchi
   expect(install).toBeGreaterThan(0);
   expect(install).toBeLessThan(source.indexOf("apps/docs/examples/inspector/config.ts"));
   expect(source).toContain("Node.js 20.9.0");
-  expect(source).toContain("relkit-inspector --project-root .");
+  expect(source).toContain("relkit add inspector");
+  expect(source).toContain("bun run inspector");
   expect(source).toContain("--history-directory");
   expect(source).toContain("--connection-file");
 });

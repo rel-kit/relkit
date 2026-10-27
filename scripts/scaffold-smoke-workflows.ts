@@ -93,8 +93,8 @@ const exerciseRoutes = Effect.fn("ScaffoldWorkflows.routes")(function* (
   assert.ok(document.paths["/billing"]);
   assert.ok(document.paths["/live/{id}/details"]);
   const scalar = yield* scaffoldRequest(base + "/_relkit/v1/api-reference");
-  assert.equal(scalar.status, 404, "Adding routes does not select the Scalar UI");
-  assert.doesNotMatch(yield* Effect.promise(() => scalar.text()), /scalar/i);
+  assert.equal(scalar.status, 200, "Adding routes keeps the default Scalar UI");
+  assert.match(yield* Effect.promise(() => scalar.text()), /scalar/i);
   if (existsSync(join(root, "src/services/shipping/service.ts")))
     assert.deepEqual(yield* requestBody(base, "/shipping?value=second"), { value: "second" });
 });

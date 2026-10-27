@@ -165,6 +165,7 @@ export async function assertInstalledManifest(fixture: InstalledCliFixture) {
   const manifest = JSON.parse(await readFile(join(fixture.project, "package.json"), "utf8"));
   expect(manifest.dependencies).toEqual({
     "@relkit/app": fixture.appVersion,
+    "@scalar/hono-api-reference": "0.12.9",
     effect: fixture.packedCli.dependencies?.effect,
   });
   expect(manifest.devDependencies["@relkit/cli"]).toBe(fixture.packedCli.version);
@@ -173,5 +174,5 @@ export async function assertInstalledManifest(fixture: InstalledCliFixture) {
     Object.keys(manifest.devDependencies).filter((name) => name.startsWith("@relkit/")),
   ).toHaveLength(2);
   expect(await readFile(join(fixture.project, "bun.lock"), "utf8")).not.toContain("link:");
-  expect(() => Bun.resolveSync("@scalar/hono-api-reference", fixture.project)).toThrow();
+  expect(() => Bun.resolveSync("@scalar/hono-api-reference", fixture.project)).not.toThrow();
 }

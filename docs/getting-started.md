@@ -123,8 +123,8 @@ curl http://localhost:3000/hello\?name=RELKIT
 ```
 
 The generated application keeps inspection disabled. To inspect development work,
-select `inspector: { enabled: true }` in `defineApp`, then run the separately
-installed `relkit-inspector --project-root .` in another terminal. The bridge uses
+run `bunx relkit add inspector` (it enables `inspector: { enabled: true }` and installs
+`@relkit/inspector` locally), then run `bun run inspector` in another terminal. The bridge uses
 `127.0.0.1:0`; the tool UI defaults to `127.0.0.1:3210` and owns local history.
 See the [standalone guide](../packages/inspector/README.md) for runtime requirements
 and current candidate availability. Stopping the tool leaves the backend running.

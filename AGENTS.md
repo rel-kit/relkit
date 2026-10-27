@@ -86,8 +86,9 @@ real AWS acceptance is opt-in locally and is not run by CI.
 Generated-project commands are `bun run dev`, `bun run test`, `bun run check`,
 `bun run typecheck`, `bun run build`, and `bun run start`. Cloud and deployment
 default to `none`; use `--cloud aws --deploy pulumi` when AWS deployment is
-required. Run the standalone `relkit-inspector` separately when inspection is
-selected; configure its UI port through its own `--port` flag. The application
+required. Generated projects select the Scalar API reference in development.
+`relkit add inspector` enables the bridge and installs `@relkit/inspector` as a
+project devDependency; `relkit inspector [--port]` runs that local UI. The application
 uses `inspector.connection.host/port` for bridge settings. Neither installing the
 tool nor legacy environment flags enables rich inspection in production.
 
@@ -144,3 +145,14 @@ In repositories indexed by CodeGraph (a `.codegraph/` directory exists at the re
 If there is no `.codegraph/` directory, skip CodeGraph entirely — indexing is the user's decision.
 
 <!-- CODEGRAPH_END -->
+
+<!-- BEGIN:turborepo-agent-rules -->
+
+# This is NOT the Turborepo you know
+
+Turborepo configuration, task behavior, and CLI commands can vary between installed versions and may differ from your training data. Resolve the `turbo` package from this file's directory or relevant workspace; in monorepos, it may not be visible from the repository root. For example, run `node -p "require.resolve('turbo/package.json')"` from a workspace that depends on `turbo`.
+
+Read `docs/README.md` inside that installed package first, then read the relevant pages from its `docs/` directory before changing Turborepo configuration or commands. Heed deprecation notices. These bundled docs match the installed package version and are available without network access.
+
+This block is written and re-added by `turbo` before repository-scoped commands when an AI agent is detected. In the Turborepo source repository, its template is defined in `crates/turborepo-cli/src/cli/agent_guidance.rs`. Removing the managed block while updates are enabled means a later qualifying invocation will add it again. Set `"agentGuidance": false` in the root `turbo.json` or `turbo.jsonc` to opt out; this does not remove an existing block. Keep the block committed with your work to avoid an uncommitted change on the next agent invocation.
+<!-- END:turborepo-agent-rules -->

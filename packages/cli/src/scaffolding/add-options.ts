@@ -18,10 +18,6 @@ import {
   usage,
 } from "./add-options-parser.js";
 import { resourceRequest } from "./add-options-resource.js";
-/** Supported event delivery guarantees. */
-
-/** Supported task execution guarantees. */
-undefined;
 /** Supported tool side-effect classifications. */
 const SIDE_EFFECTS = ["none", "read", "write", "external"] as const;
 /** Supported tool approval policies. */
@@ -131,6 +127,9 @@ function platformRequest(
         )!,
         basePath: one(values, "base-path") ?? "/api/auth",
       };
+    case "inspector":
+      if (parsed.positional !== undefined) usage("inspector does not accept a name.");
+      return { ...common, kind: "inspector" };
   }
 }
 

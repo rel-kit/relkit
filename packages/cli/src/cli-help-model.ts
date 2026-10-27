@@ -9,6 +9,7 @@ import { jobs } from "./cli-help-jobs.js";
 import { projectRoot } from "./cli-help-options.js";
 import { migrateHelp } from "./cli-help-migrate.js";
 import { dbHelp } from "./cli-help-db.js";
+import { inspectorHelp } from "./cli-help-inspector.js";
 
 export type * from "./cli-help-model.types.js";
 
@@ -72,12 +73,13 @@ const root = command(
           option(
             "inspector-port",
             "integer",
-            "Retired; configure inspector.connection.port, or launch relkit-inspector --port separately",
+            "Retired; configure inspector.connection.port, or run relkit inspector --port",
           ),
           option("local", "choice", "Start required local services", [], ["on", "off"]),
           ...devLogOptions,
         ],
       }),
+      inspectorHelp,
       command(
         "check",
         "Compile descriptors, infer eligible IDs, and validate the application",

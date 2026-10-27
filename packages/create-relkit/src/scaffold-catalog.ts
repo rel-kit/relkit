@@ -28,6 +28,10 @@ export const SCAFFOLD_DEPENDENCIES = Object.freeze({
     version: buildCatalogProvider("@relkit/effect-mq"),
     section: "dependencies",
   },
+  "@relkit/inspector": {
+    version: buildCatalogProvider("@relkit/inspector"),
+    section: "devDependencies",
+  },
   "@relkit/inngest": { version: buildCatalogProvider("@relkit/inngest"), section: "dependencies" },
   "@relkit/drizzle": { version: buildCatalogProvider("@relkit/drizzle"), section: "dependencies" },
   "@relkit/local": { version: buildCatalogProvider("@relkit/local"), section: "dependencies" },

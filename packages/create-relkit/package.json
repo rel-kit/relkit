@@ -220,7 +220,8 @@
       "@relkit/cloudflare": "0.7.12",
       "@relkit/drizzle": "0.8.1",
       "@relkit/redis": "0.8.1",
-      "@relkit/s3": "0.7.12"
+      "@relkit/s3": "0.7.12",
+      "@relkit/inspector": "0.1.2"
     }
   }
 }

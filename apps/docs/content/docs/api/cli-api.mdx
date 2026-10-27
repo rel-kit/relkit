@@ -27,7 +27,7 @@ Re-exports all named exports from the "./cli-help-model.types.js" module.
 export * from "./cli-help-model.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L14)
 
 ### findCliHelp
 
@@ -39,7 +39,7 @@ Resolves a command path in the static tree without executing the command.
 declare const findCliHelp: (path: readonly string[]) => CliHelpCommand | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L132)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L134)
 
 ### getCliHelpModel
 
@@ -51,7 +51,7 @@ Returns a frozen static help tree without acquiring command services.
 declare const getCliHelpModel: (version: string) => CliHelpModel;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L124)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L126)
 
 ## `cli-help-model.types.ts`
 
@@ -1424,7 +1424,7 @@ declare const normalizeAddRequest: (
 ) => AddRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-options.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-options.ts#L35)
 
 ## `add-output.ts`
 
@@ -1468,7 +1468,7 @@ Cohesive discovery and planning authority, with isolated Ref state per request.
 declare class ScaffoldPlanning
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-plan.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-plan.ts#L38)
 
 ### planAdd
 
@@ -1480,7 +1480,7 @@ Preserves the existing public Promise API and stable rejection constructors.
 declare const planAdd: (request: AddRequest) => Promise<ScaffoldPlan>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-plan.ts#L83)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-plan.ts#L84)
 
 ### planAddEffect
 
@@ -1494,7 +1494,7 @@ declare const planAddEffect: (
 ) => Effect.Effect<ScaffoldPlan, GeneratorIoError | GeneratorDomainError, ScaffoldPlanning>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-plan.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-plan.ts#L72)
 
 ### scaffoldPlanningLive
 
@@ -1510,7 +1510,7 @@ declare const scaffoldPlanningLive: Layer.Layer<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-plan.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-plan.ts#L46)
 
 ## `add-resolver.ts`
 

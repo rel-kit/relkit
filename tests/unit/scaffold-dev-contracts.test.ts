@@ -1,4 +1,4 @@
-/** Checks the real HTTP contract for SDK-free default scaffolds and rejects accidental UI exposure. */
+/** Checks the real HTTP contract for default scaffolds, which must serve the selected Scalar reference UI. */
 import { expect, test } from "bun:test";
 import { Effect } from "effect";
 import { mkdtemp, rm } from "node:fs/promises";
@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { verifyScaffoldDevContracts } from "../../scripts/scaffold-dev-contracts.js";
 
 for (const scalar of [false, true]) {
-  test(`default scaffold ${scalar ? "rejects exposed" : "accepts absent"} Scalar UI`, async () => {
+  test(`default scaffold ${scalar ? "accepts served" : "rejects absent"} Scalar UI`, async () => {
     const requested: string[] = [];
     const root = await mkdtemp(join(tmpdir(), "relkit-default-contract-"));
     const server = Bun.serve({
@@ -26,14 +26,14 @@ for (const scalar of [false, true]) {
     });
     try {
       const result = Effect.runPromise(verifyScaffoldDevContracts(server.port, root, false));
-      if (scalar) await expect(result).rejects.toThrow();
-      else await result;
+      if (scalar) await result;
+      else await expect(result).rejects.toThrow();
       expect(requested).toEqual([
         "/hello",
         "/_relkit/v1/graph",
         "/_relkit/v1/openapi.json",
         "/_relkit/v1/api-reference",
-        ...(scalar ? [] : ["/_relkit/v1/runtime"]),
+        ...(scalar ? ["/_relkit/v1/runtime"] : []),
       ]);
     } finally {
       await server.stop(true);
