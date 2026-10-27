@@ -1,6 +1,6 @@
 /** Exercises tool-only MCP and independently selected HTTP transports, then pulls a contract into a separate React consumer without backend source imports. */
 import assert from "node:assert/strict";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect, Exit } from "effect";
 import { inspectionNative } from "../../../scripts/consumer-installation-native.js";
@@ -26,6 +26,48 @@ export const selectWorkflowServer = (app: string, fields: string) =>
     assert(source.includes("server: {"), "Creator server region changed");
     await writeFile(path, source.replace("server: {", `server: { ${fields},`));
   });
+
+/** Extends the starter's default Scalar selection to production builds.
+ * @param app - Created starter whose relkit.config.ts selects `apiDocs: { ui: "scalar" }`.
+ * @returns Completion after the existing selection is replaced in place, without a duplicate key.
+ */
+const exposeStarterApiDocsInProduction = (app: string) =>
+  inspectionNative("docs.api-docs-selection", async () => {
+    const path = join(app, "relkit.config.ts");
+    const source = await readFile(path, "utf8");
+    const selection = 'apiDocs: { ui: "scalar" }';
+    assert(source.includes(selection), "Creator Scalar selection changed");
+    await writeFile(
+      path,
+      source.replace(selection, 'apiDocs: { ui: "scalar", enabledInProduction: true }'),
+    );
+  });
+
+/** Reinstalls the starter without its Scalar SDK, as an app created before Scalar was default.
+ * @param context - Candidate command owner and registry.
+ * @param app - Created starter declaring `@scalar/hono-api-reference`.
+ * @returns Completion after a clean install without the SDK. `bun remove` alone can keep it
+ * installed as `@relkit/runtime-hono`'s satisfied optional peer, so the lockfile and
+ * node_modules are discarded instead.
+ */
+const uninstallStarterScalar = Effect.fn("DocsInstallation.uninstall-scalar")(function* (
+  context: InstallationWorkflow,
+  app: string,
+) {
+  yield* inspectionNative("docs.scalar-removal", async () => {
+    const path = join(app, "package.json");
+    const manifest = JSON.parse(await readFile(path, "utf8"));
+    assert(
+      manifest.dependencies?.["@scalar/hono-api-reference"],
+      "Creator Scalar dependency changed",
+    );
+    delete manifest.dependencies["@scalar/hono-api-reference"];
+    await writeFile(path, JSON.stringify(manifest, null, 2) + "\n");
+    await rm(join(app, "node_modules"), { recursive: true, force: true });
+    await rm(join(app, "bun.lock"), { force: true });
+  });
+  yield* workflowCommand(context, app, ["install"]);
+});
 
 /** Requires the native build's selected-dependency diagnostic before installing the missing SDK.
  * @param context - Candidate command owner.
@@ -69,7 +111,7 @@ export const transportsWorkflow = Effect.fn("DocsInstallation.transports")(funct
   yield* verifyWorkflowClosure(
     context,
     app,
-    /^(?:langchain|deepagents|@langchain\/.*|@ag-ui\/core|@scalar\/hono-api-reference|@relkit\/(?:langchain|drizzle|better-auth|inspector))$/,
+    /^(?:langchain|deepagents|@langchain\/.*|@ag-ui\/core|@relkit\/(?:langchain|drizzle|better-auth|inspector))$/,
   );
   yield* Effect.scoped(
     Effect.gen(function* () {
@@ -77,7 +119,10 @@ export const transportsWorkflow = Effect.fn("DocsInstallation.transports")(funct
       yield* verifyMcp(server.origin);
     }),
   );
-  yield* selectWorkflowServer(app, 'apiDocs: { ui: "scalar", enabledInProduction: true }');
+  // Starters select Scalar by default; removing its SDK reproduces an existing app that
+  // must follow the Scalar installation guide before production docs can build.
+  yield* exposeStarterApiDocsInProduction(app);
+  yield* uninstallStarterScalar(context, app);
   yield* missingTransport(context, app, "@scalar/hono-api-reference");
   yield* installWorkflowGuide(context, app, "scalar");
   yield* workflowCommand(context, app, ["run", "build"]);
