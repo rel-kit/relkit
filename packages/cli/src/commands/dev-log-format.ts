@@ -63,6 +63,9 @@ export function formatDevLog(record: LogRecord, options: DevLogFormatOptions = {
     else if (event === "dev.local-services.cleanup-failed") {
       message = "Local service cleanup failed";
       details = [String(f.message)];
+    } else if (event === "dev.inspector.restart-required") {
+      message = "Inspector configuration changed; restart dev to apply it";
+      details = [String(f.message)];
     } else if (event === "dev.storage.failed") {
       message = "Telemetry storage unavailable; restart dev to recover";
       details = [String(f.message)];

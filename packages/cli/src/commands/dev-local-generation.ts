@@ -1,6 +1,7 @@
 /** Executes one serialized generation with initial-check reuse, typed diagnostics and local worker activation. */
 import { Effect, Ref } from "effect";
 import type { CandidateCompile, CandidateCompileRequest } from "@relkit/supervisor";
+import { DEFAULT_TOOLING_CONFIG } from "@relkit/compiler";
 import { cliTry } from "../cli-errors.js";
 import { CliProject } from "../services/project.service.js";
 import { formatDevDiagnostics } from "./dev-local-diagnostics.js";
@@ -32,6 +33,8 @@ export const compileDevGenerationEffect = Effect.fn("Dev.compileGeneration")(fun
     yield* telemetryConfigurationFromGraphEffect(checked.outputs.graph).pipe(
       Effect.flatMap((configuration) => configure(configuration)),
     );
+  if (options.configureInspector !== undefined)
+    yield* options.configureInspector((checked.config ?? DEFAULT_TOOLING_CONFIG).inspector);
   let local = yield* reconcileGenerationServices(options, state, checked);
   const built = yield* project.build({
     projectRoot: options.projectRoot,

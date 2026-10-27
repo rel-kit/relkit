@@ -1,5 +1,6 @@
 import type { CandidateCompile, CandidateCompileRequest } from "@relkit/supervisor";
 import type { TelemetryConfiguration } from "@relkit/observability";
+import type { InspectorConfiguration } from "@relkit/contracts";
 import type { Effect } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { CheckResult } from "./check-result.types.js";
@@ -54,6 +55,14 @@ export interface DevCompilerOptions {
    */
   readonly configureTelemetry?: (
     configuration: TelemetryConfiguration,
+  ) => Effect.Effect<void, CliAdapterError>;
+  /**
+   * Observes accepted generation inspector policy; session-owned bridge resources do not reload.
+   * @param configuration - Defaulted inspector settings from the accepted check.
+   * @returns Lazy observation completion before candidate publication.
+   */
+  readonly configureInspector?: (
+    configuration: InspectorConfiguration,
   ) => Effect.Effect<void, CliAdapterError>;
   readonly color?: boolean;
   readonly backendPort?: number;
