@@ -146,5 +146,6 @@ test("an installed manifest without the bin fails as invalid instead of missing"
   );
   expect(calls).toEqual([]);
   expect(Exit.isFailure(exit)).toBe(true);
-  if (Exit.isFailure(exit)) expect(JSON.stringify(exit.cause)).toContain("RELKIT_INSPECTOR_INVALID");
+  if (Exit.isFailure(exit))
+    expect(JSON.stringify(exit.cause)).toContain("RELKIT_INSPECTOR_INVALID");
 });
