@@ -41,11 +41,12 @@ export class DevSession {
   constructor(options: DevOptions) {
     this.options = options;
     this.inspectionIdentity =
-      (options.inspector && {
+      options.inspectionIdentity ??
+      ((options.inspector && {
         sessionId: randomUUID(),
         token: randomBytes(32).toString("base64url"),
       }) ||
-      undefined;
+        undefined);
     this.projectRoot = resolve(options.projectRoot ?? process.cwd());
     this.log = createDevLogger(options);
     const native = createDevNativeSession(options, this.state, this.log);

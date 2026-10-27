@@ -57,13 +57,15 @@ export interface DevCompilerOptions {
     configuration: TelemetryConfiguration,
   ) => Effect.Effect<void, CliAdapterError>;
   /**
-   * Observes accepted generation inspector policy; session-owned bridge resources do not reload.
+   * Prepares accepted generation inspector policy before its backend starts.
    * @param configuration - Defaulted inspector settings from the accepted check.
-   * @returns Lazy observation completion before candidate publication.
+   * @param request - Generation whose promotion later applies this policy to the bridge.
+   * @returns Inspector credentials for this generation's environment.
    */
   readonly configureInspector?: (
     configuration: InspectorConfiguration,
-  ) => Effect.Effect<void, CliAdapterError>;
+    request: CandidateCompileRequest,
+  ) => Effect.Effect<Readonly<Record<string, string | undefined>>, CliAdapterError>;
   readonly color?: boolean;
   readonly backendPort?: number;
 }

@@ -16,7 +16,7 @@ import { ownedNativePromise } from "../services/owned-promise.js";
 import { inspectorSupportLayer } from "./dev-inspector-support.service.js";
 import { acquireDevEngineState, provideDevEngine } from "./dev-engine-state.js";
 import { admitDevActivation, devActivationWorker } from "./dev-engine-activation.js";
-import { startDevEngine } from "./dev-engine-start.js";
+import { reconfigureInspector, startDevEngine } from "./dev-engine-start.js";
 import { stopDevEngine } from "./dev-engine-stop.js";
 import type { DevSession } from "./dev-session.js";
 import type { DevSessionEngine } from "./dev-session.types.js";
@@ -42,7 +42,7 @@ export const devSessionCapabilitiesLayer = Layer.merge(
  */
 export const makeDevSessionEngineEffect = Effect.fn("Dev.acquireSession")(
   function* (session: DevSession) {
-    const owner = yield* acquireDevEngineState();
+    const owner = yield* acquireDevEngineState(session.options.inspector ?? false);
     const worker = yield* Effect.forkIn(devActivationWorker(owner, session), owner.scope);
     const stop = <Reason>(reason?: Reason) => stopDevEngine(owner, session, worker, reason);
     const activate = (version?: number, changedFiles: readonly string[] = []) =>
@@ -75,6 +75,7 @@ export const makeDevSessionEngineEffect = Effect.fn("Dev.acquireSession")(
       },
       drain: (previous, active) =>
         provideDevEngine(owner, drainCandidateEffect(session, previous, active)),
+      inspect: (policy) => provideDevEngine(owner, reconfigureInspector(owner, session, policy)),
     };
     session.attach(engine);
     yield* Effect.addFinalizer(() => stop());

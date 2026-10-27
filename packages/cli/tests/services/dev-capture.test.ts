@@ -120,3 +120,25 @@ it.effect("closing the session joins its exact producer listener once", () => {
     expect(f.stops()).toBe(1);
   }).pipe(Effect.provide(f.layer));
 });
+
+it.effect("enabling mid-session opens ingress once and disabling releases it", () => {
+  const f = fixture();
+  return Effect.scoped(
+    Effect.gen(function* () {
+      const capture = yield* CliDevCapture.use((service) => service.acquire(false, {}));
+      const enabled = yield* capture.enableEffect;
+      expect(enabled.RELKIT_TELEMETRY_URL).toBe("http://127.0.0.1:43210");
+      expect(yield* capture.enableEffect).toEqual(enabled);
+      expect(f.starts()).toBe(1);
+      const records = new Request("http://localhost/_relkit/bridge/v1/records");
+      expect((yield* capture.records(records)).status).toBe(200);
+      yield* capture.disableEffect;
+      expect(f.stops()).toBe(1);
+      expect((yield* capture.records(records)).status).toBe(503);
+      expect((yield* capture.enableEffect).RELKIT_TELEMETRY_TOKEN).not.toBe(
+        enabled.RELKIT_TELEMETRY_TOKEN,
+      );
+      expect(f.starts()).toBe(2);
+    }),
+  ).pipe(Effect.provide(f.layer));
+});

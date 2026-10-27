@@ -12,6 +12,7 @@ import type { CliPortProbe } from "./port-availability.service.js";
 import type { CleanupCapabilities } from "../services/cleanup.types.js";
 import type { DevActivationRequest } from "./dev-session.types.js";
 import type { CliInspectorSupport } from "./dev-inspector-support.service.js";
+import type { DevInspectorPolicy } from "./dev-inspector-support.types.js";
 
 /** Exact capabilities fulfilled by this owner, excluding invocation context. */
 export type DevEngineAuthorities =
@@ -33,4 +34,7 @@ export interface DevEngineState {
   readonly closing: Ref.Ref<boolean>;
   readonly startup: Semaphore.Semaphore;
   readonly inspector: Ref.Ref<Fiber.Fiber<void> | undefined>;
+  /** Bridge policy the support worker was last started with; serialized by inspectorSwitch. */
+  readonly inspectorPolicy: Ref.Ref<DevInspectorPolicy>;
+  readonly inspectorSwitch: Semaphore.Semaphore;
 }

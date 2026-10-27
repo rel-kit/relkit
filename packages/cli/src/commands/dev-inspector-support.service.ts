@@ -13,7 +13,10 @@ import {
 import type { InspectionBridgeOperations } from "@relkit/inspector-api/connection";
 import { CliAdapterError } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
-import type { DevInspectorSupportOperations } from "./dev-inspector-support.types.js";
+import type {
+  DevInspectorPolicy,
+  DevInspectorSupportOperations,
+} from "./dev-inspector-support.types.js";
 import type { DevSession } from "./dev-session.js";
 import { forwardDevInspection } from "./dev-inspection-forward.js";
 
@@ -25,7 +28,8 @@ export class CliInspectorSupport extends Context.Service<
   make: Effect.gen(function* () {
     const bridge = yield* InspectionBridge;
     return {
-      run: (session) => observeCli("dev.inspector.support", runSupport(session, bridge)),
+      run: (session, policy) =>
+        observeCli("dev.inspector.support", runSupport(session, policy, bridge)),
     } satisfies DevInspectorSupportOperations;
   }),
 }) {}
@@ -44,15 +48,16 @@ export const inspectorSupportLayer = Layer.effect(
 
 /**
  * Holds one bridge until session stop, preserving its credentials across reloads.
- * @param session - Session identity, committed target and authored bind policy.
+ * @param session - Session identity and committed target.
+ * @param options - Bind policy selected by the session's current generation.
  * @param bridge - Captured transport and metadata authority.
  * @returns Joined support lifetime; acquisition failure degrades independently.
  */
 const runSupport = Effect.fn("Dev.inspectionLifetime")(function* (
   session: DevSession,
+  options: DevInspectorPolicy,
   bridge: InspectionBridgeOperations,
 ) {
-  const options = session.options.inspector;
   const identity = session.inspectionIdentity;
   if (!options || !identity) return;
   yield* Effect.scoped(

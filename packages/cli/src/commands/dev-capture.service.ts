@@ -1,21 +1,38 @@
 /**
  * Provides dev diagnostics without persistent storage. Disabled inspection
- * acquires no listener or retention. Enabled producers use a private bounded
- * loopback ingress while the session bridge serves authenticated replay.
+ * holds no listener or retention; enabling it mid-session opens both on demand.
+ * Enabled producers use a private bounded loopback ingress while the session
+ * bridge serves authenticated replay.
  */
 import { randomBytes, randomUUID } from "node:crypto";
-import { Context, Effect, Layer, Ref } from "effect";
+import { Context, Effect, Exit, Layer, Ref, Scope, Semaphore } from "effect";
 import { admitObservabilityRecord } from "@relkit/observability";
 import {
   InspectionCapture,
   InspectionNative,
   InspectionNativeLive,
 } from "@relkit/inspector-api/connection";
-import type { InspectionNativeOperations } from "@relkit/inspector-api/connection";
+import type {
+  InspectionCaptureOperations,
+  InspectionNativeOperations,
+} from "@relkit/inspector-api/connection";
 import type { TelemetryConfiguration } from "@relkit/observability";
 import { runExecutionSyncWith } from "@relkit/contracts/operation";
 import { cliAdapterError } from "../cli-errors.js";
 import type { DevCapture, DevCaptureOperations } from "./dev-capture.types.js";
+
+/** Removes inherited producer credentials from generations built without inspection. */
+export const DISABLED_CAPTURE_ENVIRONMENT = Object.freeze({
+  RELKIT_TELEMETRY_URL: undefined,
+  RELKIT_TELEMETRY_TOKEN: undefined,
+});
+
+/** One enabled capture and the child Scope that releases its retention and ingress. */
+interface OwnedCapture {
+  readonly capture: InspectionCaptureOperations;
+  readonly environment: DevCapture["environment"];
+  readonly scope: Scope.Closeable;
+}
 
 /** Live/test transport is captured once; make performs no persistent I/O. */
 export class CliDevCapture extends Context.Service<CliDevCapture, DevCaptureOperations>()(
@@ -35,7 +52,7 @@ export const devCaptureLayer = Layer.effect(CliDevCapture, CliDevCapture.make).p
   Layer.provide(InspectionNativeLive),
 );
 
-/** Creates callback projections, binding producer ingress only for explicit inspection. */
+/** Creates callback projections; producer ingress is bound only while inspection is enabled. */
 const acquireCapture = Effect.fn("Dev.capture")(function* (
   native: InspectionNativeOperations,
   enabled: boolean,
@@ -43,18 +60,36 @@ const acquireCapture = Effect.fn("Dev.capture")(function* (
 ) {
   const policy = yield* Ref.make(configuration);
   const captured = yield* Effect.context<never>();
-  const capture = enabled
-    ? yield* InspectionCapture.make(configuration).pipe(
-        Effect.mapError((error) => cliAdapterError("dev.capture", error)),
-      )
-    : undefined;
-  if (capture) yield* Effect.addFinalizer(() => capture.close);
+  const parent = yield* Scope.Scope;
+  const owned = yield* Ref.make<OwnedCapture | undefined>(undefined);
+  const serial = yield* Semaphore.make(1);
   const source = randomUUID();
   let sequence = 0;
-  const endpoint = capture ? yield* optionalIngress(native, capture) : undefined;
+  const enableEffect = serial.withPermits(1)(
+    Effect.gen(function* () {
+      const current = yield* Ref.get(owned);
+      if (current) return current.environment;
+      const scope = yield* Scope.fork(parent);
+      const opened = yield* openCapture(native, yield* Ref.get(policy)).pipe(
+        Effect.provideService(Scope.Scope, scope),
+        Effect.onError(() => Scope.close(scope, Exit.void)),
+      );
+      yield* Ref.set(owned, { ...opened, scope });
+      return opened.environment;
+    }),
+  );
+  const disableEffect = serial.withPermits(1)(
+    Ref.getAndSet(owned, undefined).pipe(
+      Effect.flatMap((current) =>
+        current === undefined ? Effect.void : Scope.close(current.scope, Exit.void),
+      ),
+    ),
+  );
+  const environment = enabled ? yield* enableEffect : DISABLED_CAPTURE_ENVIRONMENT;
   return {
-    environment: { RELKIT_TELEMETRY_URL: endpoint?.url, RELKIT_TELEMETRY_TOKEN: endpoint?.token },
+    environment,
     append: (record, origin = "relkit") => {
+      const capture = Ref.getUnsafe(owned)?.capture;
       if (!capture) return;
       runExecutionSyncWith(
         captured,
@@ -69,14 +104,32 @@ const acquireCapture = Effect.fn("Dev.capture")(function* (
     },
     redact: (record) => redactCapturedLog(record, Ref.getUnsafe(policy)),
     configureEffect: (next) =>
-      (capture?.configure(next) ?? Effect.void).pipe(
+      Effect.suspend(() => Ref.getUnsafe(owned)?.capture.configure(next) ?? Effect.void).pipe(
         Effect.mapError((error) => cliAdapterError("dev.capture.configure", error)),
         Effect.andThen(Ref.set(policy, next)),
       ),
     records: (request) =>
-      capture?.records(request) ??
+      Ref.getUnsafe(owned)?.capture.records(request) ??
       Effect.succeed(new Response("Inspection disabled", { status: 503 })),
+    enableEffect,
+    disableEffect,
   } satisfies DevCapture;
+});
+
+/** Opens one bounded capture and its optional producer ingress in the caller's Scope. */
+const openCapture = Effect.fn("Dev.openCapture")(function* (
+  native: InspectionNativeOperations,
+  configuration: TelemetryConfiguration,
+) {
+  const capture = yield* InspectionCapture.make(configuration).pipe(
+    Effect.mapError((error) => cliAdapterError("dev.capture", error)),
+  );
+  yield* Effect.addFinalizer(() => capture.close);
+  const endpoint = yield* optionalIngress(native, capture);
+  return {
+    capture,
+    environment: { RELKIT_TELEMETRY_URL: endpoint?.url, RELKIT_TELEMETRY_TOKEN: endpoint?.token },
+  };
 });
 
 /** Transport failure is diagnostic degradation; invalid configuration remains a startup error. */

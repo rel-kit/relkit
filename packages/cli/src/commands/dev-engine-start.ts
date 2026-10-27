@@ -3,7 +3,7 @@
  * Signal admission and background-worker registration are session-owned; the
  * backend Ready event contains only serving backend links, never a pending URL.
  */
-import { Cause, Effect, Ref } from "effect";
+import { Cause, Effect, Fiber, Ref } from "effect";
 import { cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { CliDevSupervisor } from "../services/dev-supervisor.service.js";
@@ -15,6 +15,7 @@ import { provideDevEngine } from "./dev-engine-state.js";
 import type { DevEngineState } from "./dev-engine-state.types.js";
 import type { DevSession } from "./dev-session.js";
 import type { DevSessionEngine } from "./dev-session.types.js";
+import type { DevInspectorPolicy } from "./dev-inspector-support.types.js";
 
 /**
  * Opens backend admission and joins the first verified candidate.
@@ -79,44 +80,119 @@ const startBackend = Effect.fn("Dev.startBackend")(function* (
 
 /**
  * Registers support atomically so explicit stop always sees its owned worker.
- * @param owner - Session Scope and worker reference.
- * @param session - Inspector policy and presentation sink.
+ * @param owner - Session Scope, worker reference and selected bridge policy.
+ * @param session - Inspector identity and presentation sink.
  * @returns Registration completion; acquisition/HTTP readiness continue in the child.
  */
 const startBackgroundInspector = Effect.fn("Dev.startSupport")(function* (
   owner: DevEngineState,
   session: DevSession,
 ) {
-  if (session.options.inspector === undefined || session.options.inspector === false) return;
-  const support = yield* CliInspectorSupport;
-  const running = Effect.sleep(session.options.supportStartupDelayMs ?? 0).pipe(
-    Effect.andThen(support.run(session)),
-    Effect.catchCause((cause) => {
-      if (Cause.hasInterruptsOnly(cause)) return Effect.void;
-      return owner.cleanup.record("dev.inspector.support", cause).pipe(
-        Effect.andThen(
-          cliTry("dev.inspector.failed", () =>
-            session.log({
-              level: "error",
-              event: "dev.inspector.failed",
-              fields: { message: "Inspector unavailable; backend remains serving." },
-            }),
-          ).pipe(
-            Effect.catchCause((logCause) =>
-              owner.cleanup.record("dev.inspector.diagnostic", logCause),
-            ),
-          ),
-        ),
+  yield* owner.inspectorSwitch.withPermits(1)(
+    Effect.gen(function* () {
+      if ((yield* Ref.get(owner.inspector)) !== undefined) return;
+      yield* forkInspectorSupport(
+        owner,
+        session,
+        yield* Ref.get(owner.inspectorPolicy),
+        session.options.supportStartupDelayMs ?? 0,
       );
     }),
   );
-  yield* Effect.uninterruptibleMask((restore) =>
+});
+
+/**
+ * Replaces the bridge after a promoted generation changed its inspector policy.
+ * @param owner - Session Scope, worker reference and current bridge policy.
+ * @param session - Inspector identity, policy observer and presentation sink.
+ * @param policy - Bind policy selected by the promoted generation; false closes the bridge.
+ * @returns Completion after the previous bridge released and the replacement registered.
+ */
+export const reconfigureInspector = Effect.fn("Dev.reconfigureSupport")(function* (
+  owner: DevEngineState,
+  session: DevSession,
+  policy: DevInspectorPolicy,
+) {
+  const changed = yield* owner.inspectorSwitch.withPermits(1)(
     Effect.gen(function* () {
-      const fiber = yield* Effect.forkIn(restore(running), owner.scope);
-      yield* Ref.set(owner.inspector, fiber);
+      if (
+        (yield* Ref.get(owner.closing)) ||
+        sameInspectorPolicy(yield* Ref.get(owner.inspectorPolicy), policy)
+      )
+        return false;
+      const previous = yield* Ref.getAndSet(owner.inspector, undefined);
+      if (previous !== undefined) yield* Fiber.interrupt(previous);
+      yield* Ref.set(owner.inspectorPolicy, policy);
+      if (policy === false)
+        yield* cliTry("dev.inspector.stopped", () =>
+          session.log({ level: "info", event: "dev.inspector.stopped" }),
+        ).pipe(
+          Effect.catchCause((cause) => owner.cleanup.record("dev.inspector.diagnostic", cause)),
+        );
+      else yield* forkInspectorSupport(owner, session, policy, 0);
+      return true;
     }),
   );
+  if (changed) yield* session.options.inspectionApplied?.(policy) ?? Effect.void;
 });
+
+/**
+ * Forks one bridge lifetime into the session Scope and records it for stop/replacement.
+ * @param owner - Session Scope, cleanup receipts and worker reference.
+ * @param session - Inspector identity and presentation sink.
+ * @param policy - Bind policy; false registers no worker.
+ * @param delayMs - Grace period before acquisition.
+ * @returns Registration completion; failures degrade without stopping backend traffic.
+ */
+function forkInspectorSupport(
+  owner: DevEngineState,
+  session: DevSession,
+  policy: DevInspectorPolicy,
+  delayMs: number,
+) {
+  return Effect.gen(function* () {
+    if (policy === false) return;
+    const support = yield* CliInspectorSupport;
+    const running = Effect.sleep(delayMs).pipe(
+      Effect.andThen(support.run(session, policy)),
+      Effect.catchCause((cause) => {
+        if (Cause.hasInterruptsOnly(cause)) return Effect.void;
+        return owner.cleanup.record("dev.inspector.support", cause).pipe(
+          Effect.andThen(
+            cliTry("dev.inspector.failed", () =>
+              session.log({
+                level: "error",
+                event: "dev.inspector.failed",
+                fields: { message: "Inspector unavailable; backend remains serving." },
+              }),
+            ).pipe(
+              Effect.catchCause((logCause) =>
+                owner.cleanup.record("dev.inspector.diagnostic", logCause),
+              ),
+            ),
+          ),
+        );
+      }),
+    );
+    yield* Effect.uninterruptibleMask((restore) =>
+      Effect.gen(function* () {
+        const fiber = yield* Effect.forkIn(restore(running), owner.scope);
+        yield* Ref.set(owner.inspector, fiber);
+      }),
+    );
+  });
+}
+
+/**
+ * Compares bind policies by their effective listener address.
+ * @param left - Current policy.
+ * @param right - Requested policy.
+ * @returns Whether both close the bridge or bind the same host and port.
+ */
+function sameInspectorPolicy(left: DevInspectorPolicy, right: DevInspectorPolicy): boolean {
+  if (left === false || right === false) return left === right;
+  return left.host === right.host && left.port === right.port;
+}
 
 /**
  * Checks synchronous cancellation immediately before native startup mutations.

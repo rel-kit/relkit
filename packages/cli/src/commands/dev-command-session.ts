@@ -38,7 +38,7 @@ const acquireCommandSession = Effect.fn("Dev.acquireCommandSession")(function* (
   support: DevCommandSupport,
 ) {
   const { projectRoot, context, ports, terminal } = state;
-  const { compiler, logger, telemetry } = support;
+  const { compiler, logger, telemetry, inspection } = support;
   const files = yield* CliFileSystem;
   const generatedRoot = join(projectRoot, ".relkit", "generated");
   yield* files.mkdir(generatedRoot);
@@ -65,6 +65,9 @@ const acquireCommandSession = Effect.fn("Dev.acquireCommandSession")(function* (
       ...telemetry.environment,
     },
     inspectionRecords: telemetry.records,
+    inspectionIdentity: inspection.identity,
+    inspectionPolicy: inspection.policyFor,
+    inspectionApplied: inspection.applied,
     onRecord: telemetry.append,
     observability: { append: telemetry.append },
   });

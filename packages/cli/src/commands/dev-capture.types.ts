@@ -17,6 +17,13 @@ export interface DevCapture {
     configuration: TelemetryConfiguration,
   ) => Effect.Effect<void, CliAdapterError>;
   readonly records: InspectionCaptureOperations["records"];
+  /** Opens capture and ingress once; later calls return the same producer environment. */
+  readonly enableEffect: Effect.Effect<
+    Readonly<Record<string, string | undefined>>,
+    CliAdapterError
+  >;
+  /** Releases retained records and ingress; producers built afterwards receive no credentials. */
+  readonly disableEffect: Effect.Effect<void>;
 }
 
 /** Captured native authority; each acquisition owns fresh capture state. */

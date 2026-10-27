@@ -116,6 +116,9 @@ const runActivation = Effect.fn("Dev.activation.protocol")(function* (
       durationMs: performance.now() - startedAt,
     },
   });
+  // The bridge follows only promoted generations, so a failed rebuild keeps the current bridge.
+  const inspector = session.options.inspectionPolicy?.(token.generationToken);
+  if (inspector !== undefined) yield* session.nativeEngine.inspect(inspector);
   return true;
 });
 

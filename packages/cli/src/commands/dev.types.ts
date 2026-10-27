@@ -88,6 +88,20 @@ export interface DevOptions {
   readonly drainTimeoutMs?: number;
   readonly inspector?: Pick<InspectionBridgeOptions, "host" | "port"> | false;
   readonly inspectionRecords?: InspectionBridgeOptions["records"];
+  /** Bridge credentials shared by every generation; generated when inspection starts enabled. */
+  readonly inspectionIdentity?: { readonly sessionId: string; readonly token: string };
+  /**
+   * Reads the bridge policy an accepted generation was built with.
+   * @param generationToken - Promoted generation.
+   * @returns Its policy, or undefined when the session keeps its current bridge.
+   */
+  readonly inspectionPolicy?: (generationToken: number) => DevOptions["inspector"] | undefined;
+  /**
+   * Observes a bridge policy after the session switched its bridge to it.
+   * @param policy - Newly applied bridge policy.
+   * @returns Completion after policy-owned resources are released or retained.
+   */
+  readonly inspectionApplied?: (policy: DevOptions["inspector"]) => Effect.Effect<void>;
   /** Grace period after backend activation before optional inspector acquisition. */
   readonly supportStartupDelayMs?: number;
   readonly spawn?: typeof Bun.spawn;
