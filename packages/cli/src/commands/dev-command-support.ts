@@ -37,7 +37,7 @@ export const acquireDevCommandSupport = Effect.fn("Dev.commandSupport")(function
   const { configuration, projectRoot, options, terminal, initial, ports } = state;
   const logger = commandLogger(state);
   const configured = yield* Ref.make<DevCapture | undefined>(undefined);
-  const inspection = makeDevInspectionControl(configured);
+  const inspection = makeDevInspectionControl(configured, ports.inspector);
   const compiler = yield* makeDevLocalCompilerEffect({
     projectRoot,
     initialCheck: initial.take,

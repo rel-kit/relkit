@@ -186,7 +186,7 @@ it.effect("promoted policy changes start, move and stop the bridge without a res
       yield* engine.inspect(false);
       expect(runs.every((run) => run.released)).toBe(true);
       expect(events.some((event) => event.event === "dev.inspector.stopped")).toBe(true);
-      expect(applied).toEqual([enabled, moved, false]);
+      expect(applied).toEqual([enabled, enabled, moved, false]);
       yield* engine.stop();
       yield* engine.inspect(enabled);
       expect(runs).toHaveLength(2);

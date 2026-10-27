@@ -106,20 +106,18 @@ const startBackgroundInspector = Effect.fn("Dev.startSupport")(function* (
  * @param owner - Session Scope, worker reference and current bridge policy.
  * @param session - Inspector identity, policy observer and presentation sink.
  * @param policy - Bind policy selected by the promoted generation; false closes the bridge.
- * @returns Completion after the previous bridge released and the replacement registered.
+ * @returns Completion after the previous bridge released, the replacement registered and
+ * the applied policy was reported.
  */
 export const reconfigureInspector = Effect.fn("Dev.reconfigureSupport")(function* (
   owner: DevEngineState,
   session: DevSession,
   policy: DevInspectorPolicy,
 ) {
-  const changed = yield* owner.inspectorSwitch.withPermits(1)(
+  const applied = yield* owner.inspectorSwitch.withPermits(1)(
     Effect.gen(function* () {
-      if (
-        (yield* Ref.get(owner.closing)) ||
-        sameInspectorPolicy(yield* Ref.get(owner.inspectorPolicy), policy)
-      )
-        return false;
+      if (yield* Ref.get(owner.closing)) return false;
+      if (sameInspectorPolicy(yield* Ref.get(owner.inspectorPolicy), policy)) return true;
       const previous = yield* Ref.getAndSet(owner.inspector, undefined);
       if (previous !== undefined) yield* Fiber.interrupt(previous);
       yield* Ref.set(owner.inspectorPolicy, policy);
@@ -133,7 +131,8 @@ export const reconfigureInspector = Effect.fn("Dev.reconfigureSupport")(function
       return true;
     }),
   );
-  if (changed) yield* session.options.inspectionApplied?.(policy) ?? Effect.void;
+  // Reported for every promotion so policy-owned resources follow the serving generation.
+  if (applied) yield* session.options.inspectionApplied?.(policy) ?? Effect.void;
 });
 
 /**

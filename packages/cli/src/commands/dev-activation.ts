@@ -32,7 +32,12 @@ export const activateCandidateEffect = Effect.fn("Dev.activate")(
       Effect.scoped(
         Effect.gen(function* () {
           const attempt = yield* acquireActivationAttempt(session, version, changedFiles);
+          const rejected = session.options.inspectionRejected?.(attempt.token.generationToken);
           return yield* runActivation(attempt).pipe(
+            // Any outcome other than promotion rolls back inspection resources prepared for it.
+            Effect.onExit((exit) =>
+              Exit.isSuccess(exit) && exit.value ? Effect.void : (rejected ?? Effect.void),
+            ),
             Effect.catchCause((cause) => {
               const reason = cause.reasons[0];
               if (

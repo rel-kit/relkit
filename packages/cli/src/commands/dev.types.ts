@@ -97,11 +97,19 @@ export interface DevOptions {
    */
   readonly inspectionPolicy?: (generationToken: number) => DevOptions["inspector"] | undefined;
   /**
-   * Observes a bridge policy after the session switched its bridge to it.
-   * @param policy - Newly applied bridge policy.
+   * Observes the bridge policy of every promoted generation, changed or not.
+   * @param policy - Bridge policy the session now serves.
    * @returns Completion after policy-owned resources are released or retained.
    */
-  readonly inspectionApplied?: (policy: DevOptions["inspector"]) => Effect.Effect<void>;
+  readonly inspectionApplied?: (
+    policy: NonNullable<DevOptions["inspector"]>,
+  ) => Effect.Effect<void>;
+  /**
+   * Observes a generation that was not promoted.
+   * @param generationToken - Rejected, failed or superseded generation.
+   * @returns Completion after resources prepared for it are rolled back.
+   */
+  readonly inspectionRejected?: (generationToken: number) => Effect.Effect<void>;
   /** Grace period after backend activation before optional inspector acquisition. */
   readonly supportStartupDelayMs?: number;
   readonly spawn?: typeof Bun.spawn;

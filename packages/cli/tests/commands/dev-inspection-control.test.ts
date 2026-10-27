@@ -29,7 +29,7 @@ test("enabled generations open capture and carry the stable session token", asyn
     }),
     disableEffect: Effect.sync(() => void (disables += 1)),
   } as unknown as DevCapture;
-  const control = makeDevInspectionControl(Ref.makeUnsafe<DevCapture | undefined>(capture));
+  const control = makeDevInspectionControl(Ref.makeUnsafe<DevCapture | undefined>(capture), false);
 
   const on = await Effect.runPromise(control.prepare(enabled, request(1)));
   expect(on).toEqual({
@@ -56,9 +56,54 @@ test("enabled generations open capture and carry the stable session token", asyn
 });
 
 test("promoting a newer generation forgets superseded policies", async () => {
-  const control = makeDevInspectionControl(Ref.makeUnsafe<DevCapture | undefined>(undefined));
+  const control = makeDevInspectionControl(
+    Ref.makeUnsafe<DevCapture | undefined>(undefined),
+    false,
+  );
   await Effect.runPromise(control.prepare(enabled, request(3)));
   await Effect.runPromise(control.prepare(disabled, request(4)));
   expect(control.policyFor(4)).toBe(false);
   expect(control.policyFor(3)).toBeUndefined();
+});
+
+/** Counts capture acquisitions and releases without opening a listener. */
+function countingCapture() {
+  const counts = { enables: 0, disables: 0 };
+  const capture = {
+    enableEffect: Effect.sync(() => {
+      counts.enables += 1;
+      return { RELKIT_TELEMETRY_URL: "http://127.0.0.1:1", RELKIT_TELEMETRY_TOKEN: "producer" };
+    }),
+    disableEffect: Effect.sync(() => void (counts.disables += 1)),
+  } as unknown as DevCapture;
+  return { counts, ref: Ref.makeUnsafe<DevCapture | undefined>(capture) };
+}
+
+test("a rejected enabled generation releases capture while inspection stays off", async () => {
+  const { counts, ref } = countingCapture();
+  const control = makeDevInspectionControl(ref, false);
+  await Effect.runPromise(control.prepare(enabled, request(1)));
+  expect(counts.enables).toBe(1);
+  await Effect.runPromise(control.rejected(1));
+  expect(counts.disables).toBe(1);
+  expect(control.policyFor(1)).toBeUndefined();
+});
+
+test("a rejected generation keeps capture while the serving bridge is enabled", async () => {
+  const { counts, ref } = countingCapture();
+  const control = makeDevInspectionControl(ref, enabled.connection);
+  await Effect.runPromise(control.prepare(enabled, request(1)));
+  await Effect.runPromise(control.rejected(1));
+  await Effect.runPromise(control.prepare(disabled, request(2)));
+  await Effect.runPromise(control.rejected(2));
+  expect(counts.disables).toBe(0);
+});
+
+test("every disabled promotion reconciles capture even without a bridge change", async () => {
+  const { counts, ref } = countingCapture();
+  const control = makeDevInspectionControl(ref, false);
+  await Effect.runPromise(control.prepare(enabled, request(1)));
+  await Effect.runPromise(control.prepare(disabled, request(2)));
+  await Effect.runPromise(control.applied(control.policyFor(2)!));
+  expect(counts.disables).toBe(1);
 });

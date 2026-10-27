@@ -68,6 +68,7 @@ const acquireCommandSession = Effect.fn("Dev.acquireCommandSession")(function* (
     inspectionIdentity: inspection.identity,
     inspectionPolicy: inspection.policyFor,
     inspectionApplied: inspection.applied,
+    inspectionRejected: inspection.rejected,
     onRecord: telemetry.append,
     observability: { append: telemetry.append },
   });
