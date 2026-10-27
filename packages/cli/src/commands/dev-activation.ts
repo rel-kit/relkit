@@ -32,7 +32,16 @@ export const activateCandidateEffect = Effect.fn("Dev.activate")(
       Effect.scoped(
         Effect.gen(function* () {
           const attempt = yield* acquireActivationAttempt(session, version, changedFiles);
+          const { generationToken } = attempt.token;
+          const rejected = session.options.inspectionRejected?.(generationToken);
           return yield* runActivation(attempt).pipe(
+            // A generation that never became the serving target rolls back inspection resources
+            // prepared for it; one published before a later failure keeps them.
+            Effect.onExit(() =>
+              session.active?.token.generationToken === generationToken
+                ? Effect.void
+                : (rejected ?? Effect.void),
+            ),
             Effect.catchCause((cause) => {
               const reason = cause.reasons[0];
               if (
@@ -104,8 +113,19 @@ const runActivation = Effect.fn("Dev.activation.protocol")(function* (
     return false;
   }
   session.options.candidateVerificationPublished?.(candidate);
+  // The bridge follows the serving generation, so it switches at promotion rather than after
+  // the retired generation drains; a failed rebuild never reaches this point.
+  const inspector = session.options.inspectionPolicy?.(token.generationToken);
+  if (inspector !== undefined) yield* session.nativeEngine.inspect(inspector);
   yield* observeActivatedChild(attempt, candidate);
-  if (previous !== undefined) yield* drainCandidateEffect(session, previous, token);
+  const drained =
+    previous === undefined ? Effect.void : drainCandidateEffect(session, previous, token);
+  // Capture outlives the switch until the retired generation stops producing records.
+  const applied =
+    inspector === undefined
+      ? Effect.void
+      : (session.options.inspectionApplied?.(inspector) ?? Effect.void);
+  yield* drained.pipe(Effect.ensuring(applied));
   session.log({
     level: "info",
     event: "dev.generation.active",

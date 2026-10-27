@@ -5,6 +5,7 @@ import { makeDevLocalCompilerEffect } from "./dev-local-compiler.js";
 import { createDevLogger, devLogSinks } from "./dev-logger.js";
 import { CliDevCapture } from "./dev-capture.service.js";
 import type { DevCapture } from "./dev-capture.types.js";
+import { makeDevInspectionControl } from "./dev-inspection-control.js";
 import type { DevOptions } from "./dev.types.js";
 import type { DevCommandSessionState } from "./dev-command-session.types.js";
 
@@ -36,6 +37,7 @@ export const acquireDevCommandSupport = Effect.fn("Dev.commandSupport")(function
   const { configuration, projectRoot, options, terminal, initial, ports } = state;
   const logger = commandLogger(state);
   const configured = yield* Ref.make<DevCapture | undefined>(undefined);
+  const inspection = makeDevInspectionControl(configured, ports.inspector);
   const compiler = yield* makeDevLocalCompilerEffect({
     projectRoot,
     initialCheck: initial.take,
@@ -49,11 +51,12 @@ export const acquireDevCommandSupport = Effect.fn("Dev.commandSupport")(function
           Effect.suspend(() => Ref.getUnsafe(configured)?.configureEffect(next) ?? Effect.void),
         ),
       ),
+    configureInspector: (next, request) => inspection.prepare(next, request),
   });
   const log = createDevLogger({ compile: compiler.compile, logger, terminal });
   const telemetry = yield* CliDevCapture.use((capture) =>
     capture.acquire(ports.inspector !== false, Ref.getUnsafe(configuration)),
   );
   yield* Ref.set(configured, telemetry);
-  return { compiler, logger, log, telemetry };
+  return { compiler, logger, log, telemetry, inspection };
 });

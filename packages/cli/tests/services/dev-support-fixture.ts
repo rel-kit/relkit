@@ -10,7 +10,7 @@ import { cleanupLayer } from "../../src/services/cleanup.service.js";
 import { CliPortProbe } from "../../src/commands/port-availability.service.js";
 import { CliInspectorSupport } from "../../src/commands/dev-inspector-support.service.js";
 import { acquireDevEngineState } from "../../src/commands/dev-engine-state.js";
-import { startDevEngine } from "../../src/commands/dev-engine-start.js";
+import { reconfigureInspector, startDevEngine } from "../../src/commands/dev-engine-start.js";
 import { stopDevEngine } from "../../src/commands/dev-engine-stop.js";
 import { filesystemTestLayer } from "./test-layers.js";
 import type { DevSession } from "../../src/commands/dev-session.js";
@@ -49,7 +49,7 @@ export function devSupportTestLayer(run: DevInspectorSupportOperations["run"]) {
 export const devSupportFixture = Effect.fn("Test.devSupportFixture")(function* (
   session: DevSession,
 ) {
-  const owner = yield* acquireDevEngineState();
+  const owner = yield* acquireDevEngineState(session.options.inspector ?? false);
   const worker = yield* Effect.forkIn(Effect.never, owner.scope);
   const activate = () => Effect.succeed(true);
   const stop = <Reason>(reason?: Reason) => stopDevEngine(owner, session, worker, reason);
@@ -69,6 +69,8 @@ export const devSupportFixture = Effect.fn("Test.devSupportFixture")(function* (
     watch: Effect.never,
     watchWith: () => Effect.never,
     drain: () => Effect.void,
+    inspect: (policy) =>
+      reconfigureInspector(owner, session, policy).pipe(Effect.provideContext(owner.context)),
     finish: () => {
       Deferred.doneUnsafe(owner.closed, Effect.void);
     },

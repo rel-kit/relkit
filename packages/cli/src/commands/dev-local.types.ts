@@ -1,5 +1,6 @@
 import type { CandidateCompile, CandidateCompileRequest } from "@relkit/supervisor";
 import type { TelemetryConfiguration } from "@relkit/observability";
+import type { InspectorConfiguration } from "@relkit/contracts";
 import type { Effect } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { CheckResult } from "./check-result.types.js";
@@ -55,6 +56,16 @@ export interface DevCompilerOptions {
   readonly configureTelemetry?: (
     configuration: TelemetryConfiguration,
   ) => Effect.Effect<void, CliAdapterError>;
+  /**
+   * Prepares accepted generation inspector policy before its backend starts.
+   * @param configuration - Defaulted inspector settings from the accepted check.
+   * @param request - Generation whose promotion later applies this policy to the bridge.
+   * @returns Inspector credentials for this generation's environment.
+   */
+  readonly configureInspector?: (
+    configuration: InspectorConfiguration,
+    request: CandidateCompileRequest,
+  ) => Effect.Effect<Readonly<Record<string, string | undefined>>, CliAdapterError>;
   readonly color?: boolean;
   readonly backendPort?: number;
 }

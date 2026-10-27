@@ -14,7 +14,7 @@ import { ManualDevSessionOwner, ManualSessionEngine } from "./dev-session-owner.
 export class DevSession {
   readonly projectRoot: string;
   readonly options: DevOptions;
-  readonly inspectionIdentity: { readonly sessionId: string; readonly token: string } | undefined;
+  readonly inspectionIdentity: { readonly sessionId: string; readonly token: string };
   readonly abortController = new AbortController();
   readonly state = Ref.makeUnsafe<DevSessionState>({
     latestVersion: -1,
@@ -40,12 +40,11 @@ export class DevSession {
    */
   constructor(options: DevOptions) {
     this.options = options;
-    this.inspectionIdentity =
-      (options.inspector && {
-        sessionId: randomUUID(),
-        token: randomBytes(32).toString("base64url"),
-      }) ||
-      undefined;
+    // Created even while inspection is off so a later promoted policy can start the bridge.
+    this.inspectionIdentity = options.inspectionIdentity ?? {
+      sessionId: randomUUID(),
+      token: randomBytes(32).toString("base64url"),
+    };
     this.projectRoot = resolve(options.projectRoot ?? process.cwd());
     this.log = createDevLogger(options);
     const native = createDevNativeSession(options, this.state, this.log);

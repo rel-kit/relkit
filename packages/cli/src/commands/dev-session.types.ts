@@ -12,6 +12,7 @@ import type { EffectDevSourceWatcher } from "./dev-watch.types.js";
 import type { CleanupCapabilities } from "../services/cleanup.types.js";
 import type { SupervisorCandidateToken } from "@relkit/supervisor";
 import type { DevEngineAuthorities } from "./dev-engine-state.types.js";
+import type { DevInspectorPolicy } from "./dev-inspector-support.types.js";
 
 /** One caller waiting for an admitted source version. */
 export interface DevActivationRequest {
@@ -90,4 +91,10 @@ export interface DevSessionEngine {
     previous: StartedCandidate,
     active: SupervisorCandidateToken,
   ) => Effect.Effect<void, CliAdapterError>;
+  /**
+   * Switches the session-owned bridge to a promoted generation's policy.
+   * @param policy - Bind policy, or false to close the bridge.
+   * @returns Completion after the previous bridge released and any new one was registered.
+   */
+  readonly inspect: (policy: DevInspectorPolicy) => Effect.Effect<void>;
 }

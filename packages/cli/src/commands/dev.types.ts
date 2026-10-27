@@ -9,6 +9,7 @@ import type {
 } from "@relkit/supervisor";
 import type { InspectionBridgeOptions } from "@relkit/inspector-api/connection";
 import type { CliAdapterError } from "../cli-errors.js";
+import type { DevInspectorPolicy } from "./dev-inspector-support.types.js";
 
 /** One admitted development log, rendered by the existing terminal policy. */
 export interface DevLogEvent {
@@ -88,6 +89,27 @@ export interface DevOptions {
   readonly drainTimeoutMs?: number;
   readonly inspector?: Pick<InspectionBridgeOptions, "host" | "port"> | false;
   readonly inspectionRecords?: InspectionBridgeOptions["records"];
+  /** Bridge credentials shared by every generation; generated per session when omitted. */
+  readonly inspectionIdentity?: { readonly sessionId: string; readonly token: string };
+  /**
+   * Reads the bridge policy an accepted generation was built with.
+   * @param generationToken - Promoted generation.
+   * @returns Its policy, or undefined when the session keeps its current bridge.
+   */
+  readonly inspectionPolicy?: (generationToken: number) => DevInspectorPolicy | undefined;
+  /**
+   * Observes the bridge policy of every promoted generation, changed or not, once the
+   * retired generation has drained.
+   * @param policy - Bridge policy the session now serves.
+   * @returns Completion after policy-owned resources are released or retained.
+   */
+  readonly inspectionApplied?: (policy: DevInspectorPolicy) => Effect.Effect<void>;
+  /**
+   * Observes a generation that was not promoted.
+   * @param generationToken - Rejected, failed or superseded generation.
+   * @returns Completion after resources prepared for it are rolled back.
+   */
+  readonly inspectionRejected?: (generationToken: number) => Effect.Effect<void>;
   /** Grace period after backend activation before optional inspector acquisition. */
   readonly supportStartupDelayMs?: number;
   readonly spawn?: typeof Bun.spawn;

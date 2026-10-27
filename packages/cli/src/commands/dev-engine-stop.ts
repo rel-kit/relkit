@@ -33,7 +33,10 @@ export function stopDevEngine<Reason>(
         if (!(yield* Ref.getAndSet(owner.closing, true))) {
           session.markStopping();
           session.abortController.abort(stoppingReason);
-          const support = yield* Ref.get(owner.inspector);
+          // Serialized with reconfiguration; closing already rejects later bridge switches.
+          const support = yield* owner.inspectorSwitch.withPermits(1)(
+            Ref.getAndSet(owner.inspector, undefined),
+          );
           if (support !== undefined) yield* Fiber.interrupt(support);
           yield* Deferred.complete(
             owner.closed,

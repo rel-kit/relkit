@@ -107,7 +107,10 @@ function candidateOptions(attempt: DevActivationAttempt): CandidateOptions {
       : { generatedDirectory: options.generatedDirectory }),
     environment: {
       ...options.environment,
-      RELKIT_INSPECTOR_SESSION_TOKEN: session.inspectionIdentity?.token,
+      // Compiled generations may replace this when their accepted inspector policy changed.
+      RELKIT_INSPECTOR_SESSION_TOKEN: options.inspector
+        ? session.inspectionIdentity?.token
+        : undefined,
       RELKIT_GENERATION_ID: `generation-${token.generationToken}`,
     },
     ...(options.maxStartupOutputBytes === undefined

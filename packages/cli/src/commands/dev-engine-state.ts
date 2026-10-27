@@ -12,12 +12,16 @@ import { CliPortProbe } from "./port-availability.service.js";
 import { CliInspectorSupport } from "./dev-inspector-support.service.js";
 import type { DevActivationRequest } from "./dev-session.types.js";
 import type { DevEngineAuthorities, DevEngineState } from "./dev-engine-state.types.js";
+import type { DevInspectorPolicy } from "./dev-inspector-support.types.js";
 
 /**
  * Creates synchronization primitives and captures the five native capabilities.
+ * @param inspector - Bridge policy selected when the session starts.
  * @returns Fresh state requiring the caller's session Scope and explicit authorities.
  */
-export const acquireDevEngineState = Effect.fn("Dev.acquireState")(function* () {
+export const acquireDevEngineState = Effect.fn("Dev.acquireState")(function* (
+  inspector: DevInspectorPolicy,
+) {
   const scope = yield* Scope.Scope;
   const sdk = yield* CliDevSupervisor;
   const files = yield* CliFileSystem;
@@ -42,6 +46,8 @@ export const acquireDevEngineState = Effect.fn("Dev.acquireState")(function* () 
     closing: yield* Ref.make(false),
     startup: yield* Semaphore.make(1),
     inspector: yield* Ref.make<import("effect").Fiber.Fiber<void> | undefined>(undefined),
+    inspectorPolicy: yield* Ref.make(inspector),
+    inspectorSwitch: yield* Semaphore.make(1),
   } satisfies DevEngineState;
 });
 

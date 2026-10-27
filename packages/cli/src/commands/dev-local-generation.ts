@@ -1,6 +1,7 @@
 /** Executes one serialized generation with initial-check reuse, typed diagnostics and local worker activation. */
 import { Effect, Ref } from "effect";
 import type { CandidateCompile, CandidateCompileRequest } from "@relkit/supervisor";
+import { DEFAULT_TOOLING_CONFIG } from "@relkit/compiler";
 import { cliTry } from "../cli-errors.js";
 import { CliProject } from "../services/project.service.js";
 import { formatDevDiagnostics } from "./dev-local-diagnostics.js";
@@ -32,6 +33,13 @@ export const compileDevGenerationEffect = Effect.fn("Dev.compileGeneration")(fun
     yield* telemetryConfigurationFromGraphEffect(checked.outputs.graph).pipe(
       Effect.flatMap((configuration) => configure(configuration)),
     );
+  const inspection =
+    options.configureInspector === undefined
+      ? undefined
+      : yield* options.configureInspector(
+          (checked.config ?? DEFAULT_TOOLING_CONFIG).inspector,
+          request,
+        );
   let local = yield* reconcileGenerationServices(options, state, checked);
   const built = yield* project.build({
     projectRoot: options.projectRoot,
@@ -47,7 +55,7 @@ export const compileDevGenerationEffect = Effect.fn("Dev.compileGeneration")(fun
       throw new Error(formatDevDiagnostics(options.projectRoot, built.diagnostics, options.color));
     });
   local = yield* activateGenerationWorkers(options, state, checked, request, local);
-  return generationReceipt(local);
+  return generationReceipt(local, inspection);
 });
 
 /**
@@ -85,25 +93,32 @@ const selectGenerationCheck = Effect.fn("Dev.selectGenerationCheck")(function* (
 });
 
 /**
- * Projects local reconciliation evidence into the supervisor's build receipt.
+ * Projects local reconciliation and inspection evidence into the supervisor's build receipt.
  * @param local - Optional accepted local services and worker environment.
- * @returns Backend entrypoint and only the environment selected by reconciliation.
+ * @param inspection - Optional inspector credentials selected by this generation's policy.
+ * @returns Backend entrypoint and only the environment selected by this generation.
  */
 function generationReceipt(
   local: DevLocalReconcileResult | undefined,
+  inspection: Readonly<Record<string, string | undefined>> | undefined,
 ): Awaited<ReturnType<CandidateCompile>> {
   return {
     entrypoint: "server/index.js",
-    ...(local === undefined
+    ...(local === undefined && inspection === undefined
       ? {}
       : {
           environment: {
-            RELKIT_LOCAL_SERVICE_INSPECTOR_STATE: local.inspectorState,
-            ...(local.generationId === undefined
+            ...inspection,
+            ...(local === undefined
               ? {}
               : {
-                  RELKIT_PROVIDER_OVERRIDES_FILE: local.owner.overrideFile,
-                  ...(local.workerBindings.length ? { RELKIT_WORKER_ROLE: "api" } : {}),
+                  RELKIT_LOCAL_SERVICE_INSPECTOR_STATE: local.inspectorState,
+                  ...(local.generationId === undefined
+                    ? {}
+                    : {
+                        RELKIT_PROVIDER_OVERRIDES_FILE: local.owner.overrideFile,
+                        ...(local.workerBindings.length ? { RELKIT_WORKER_ROLE: "api" } : {}),
+                      }),
                 }),
           },
         }),

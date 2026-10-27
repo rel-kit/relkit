@@ -141,3 +141,91 @@ it.effect("stop joins inspector acquisition release before completing shutdown",
     }),
   ).pipe(Effect.provide(Logger.layer([]))),
 );
+
+it.effect("promoted policy changes start, move and stop the bridge without a restart", () =>
+  Effect.scoped(
+    Effect.gen(function* () {
+      const events: DevLogEvent[] = [];
+      const runs: { policy: unknown; released: boolean }[] = [];
+      const facade = new DevSession({
+        projectRoot: "/deterministic-dev-support",
+        stablePort: 12345,
+        compile: () => Promise.reject(new Error("Unexpected compiler call")),
+        inspector: false,
+        installSignalHandlers: false,
+        logger: { human: false, json: false },
+        onLog: (event) => events.push(event),
+      });
+      const { engine } = yield* devSupportFixture(facade).pipe(
+        Effect.provide(
+          devSupportTestLayer((_session, policy) =>
+            Effect.suspend(() => {
+              const run = { policy, released: false };
+              runs.push(run);
+              return Effect.never.pipe(Effect.ensuring(Effect.sync(() => (run.released = true))));
+            }),
+          ),
+        ),
+      );
+      yield* engine.start;
+      expect(runs).toEqual([]);
+      const enabled = { host: "127.0.0.1", port: 0 };
+      yield* engine.inspect(enabled);
+      yield* engine.inspect({ ...enabled });
+      yield* Effect.yieldNow;
+      expect(runs).toEqual([{ policy: enabled, released: false }]);
+      const moved = { host: "127.0.0.1", port: 4555 };
+      yield* engine.inspect(moved);
+      yield* Effect.yieldNow;
+      expect(runs.map((run) => [run.policy, run.released])).toEqual([
+        [enabled, true],
+        [moved, false],
+      ]);
+      yield* engine.inspect(false);
+      expect(runs.every((run) => run.released)).toBe(true);
+      expect(events.some((event) => event.event === "dev.inspector.stopped")).toBe(true);
+      yield* engine.stop();
+      yield* engine.inspect(enabled);
+      expect(runs).toHaveLength(2);
+    }),
+  ).pipe(Effect.provide(Logger.layer([]))),
+);
+
+it.effect("an unchanged policy restarts a bridge that failed to bind", () =>
+  Effect.scoped(
+    Effect.gen(function* () {
+      const facade = new DevSession({
+        projectRoot: "/deterministic-dev-support",
+        stablePort: 12345,
+        compile: () => Promise.reject(new Error("Unexpected compiler call")),
+        inspector: false,
+        installSignalHandlers: false,
+        logger: { human: false, json: false },
+      });
+      let attempts = 0;
+      const { engine } = yield* devSupportFixture(facade).pipe(
+        Effect.provide(
+          devSupportTestLayer(() =>
+            Effect.suspend(() =>
+              ++attempts === 1
+                ? Effect.fail(cliAdapterError("dev.inspector.bind", new Error("in use")))
+                : Effect.never,
+            ),
+          ),
+        ),
+      );
+      yield* engine.start;
+      const enabled = { host: "127.0.0.1", port: 4555 };
+      yield* engine.inspect(enabled);
+      yield* Effect.yieldNow;
+      expect(attempts).toBe(1);
+      yield* engine.inspect({ ...enabled });
+      yield* Effect.yieldNow;
+      expect(attempts).toBe(2);
+      yield* engine.inspect({ ...enabled });
+      yield* Effect.yieldNow;
+      expect(attempts).toBe(2);
+      yield* engine.stop();
+    }),
+  ).pipe(Effect.provide(Logger.layer([]))),
+);
