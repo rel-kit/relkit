@@ -131,3 +131,20 @@ test("a missing package fails with install guidance and launches nothing", async
     expect(message).toContain("relkit add inspector");
   }
 });
+
+test("an installed manifest without the bin fails as invalid instead of missing", async () => {
+  const root = await application(true);
+  await writeFile(
+    join(root, "node_modules/@relkit/inspector/package.json"),
+    JSON.stringify({ name: "@relkit/inspector", type: "module" }),
+  );
+  const calls: Array<readonly [readonly string[], string]> = [];
+  const exit = await Effect.runPromiseExit(
+    runInspectorEffect([], context(root)).pipe(
+      Effect.provide(Layer.merge(recordingTerminal(calls), fileSystemLayer)),
+    ),
+  );
+  expect(calls).toEqual([]);
+  expect(Exit.isFailure(exit)).toBe(true);
+  if (Exit.isFailure(exit)) expect(JSON.stringify(exit.cause)).toContain("RELKIT_INSPECTOR_INVALID");
+});

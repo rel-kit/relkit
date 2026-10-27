@@ -80,7 +80,10 @@ export function formatGenerateResult<T>(value: T): string {
     `backend:   ${endpoints.backend}`,
     `inspector: ${endpoints.inspector} (enable with: bunx relkit add inspector)`,
     `openapi:   ${endpoints.openapi}`,
-    ...(endpoints.apiReference === undefined ? [] : [`api docs:  ${endpoints.apiReference}`]),
+    // Without examples the backend link already is the reference, so it is not repeated.
+    ...(endpoints.apiReference === undefined || endpoints.apiReference === endpoints.backend
+      ? []
+      : [`api docs:  ${endpoints.apiReference}`]),
     ...(endpoints.route === undefined ? [] : [`route:     ${endpoints.route}`]),
     ...(warnings.length ? ["", ...warnings.map((warning) => `warning:   ${warning}`)] : []),
     "",

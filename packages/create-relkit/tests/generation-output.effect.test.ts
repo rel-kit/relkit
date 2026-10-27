@@ -46,12 +46,15 @@ it.effect("falls back to the reference UI when examples, and their routes, are o
     const nextSteps = createGenerateNextSteps({ examples: false, install: true }, "/project", "/");
     expect(nextSteps.endpoints.backend).toBe("http://localhost:3000/_relkit/v1/api-reference");
     expect(nextSteps.endpoints).not.toHaveProperty("route");
+    const output = formatGenerateResult({ nextSteps });
+    expect(output).toContain("backend:   http://localhost:3000/_relkit/v1/api-reference");
+    expect(output).not.toContain("api docs:");
   }),
 );
 
 it.effect("preserves an explicitly supplied reference endpoint in presentation metadata", () =>
   Effect.sync(() => {
-    const core = createGenerateNextSteps({ examples: false, install: true }, "/project", "/");
+    const core = createGenerateNextSteps({ examples: true, install: true }, "/project", "/");
     const nextSteps = {
       ...core,
       endpoints: {

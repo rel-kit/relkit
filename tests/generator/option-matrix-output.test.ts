@@ -70,7 +70,10 @@ test("normalizes JSON options and keeps generated results JSON-safe", async () =
     apiReference: "http://localhost:3000/_relkit/v1/api-reference",
   });
   expect(formatGenerateResult(json)).toContain("openapi:");
-  expect(formatGenerateResult(json)).toContain("api docs:");
+  expect(formatGenerateResult(json)).toContain(
+    "backend:   http://localhost:3000/_relkit/v1/api-reference",
+  );
+  expect(formatGenerateResult(json)).not.toContain("api docs:");
   expect(formatGenerateResult(json)).toContain(
     `Success! Created @scope/json-app at ${result.destination}.`,
   );
