@@ -110,6 +110,10 @@ const runActivation = Effect.fn("Dev.activation.protocol")(function* (
   }
   session.options.candidateVerificationPublished?.(candidate);
   yield* observeActivatedChild(attempt, candidate);
+  // The bridge follows the serving generation, so it switches at promotion rather than after
+  // the retired generation drains; a failed rebuild never reaches this point.
+  const inspector = session.options.inspectionPolicy?.(token.generationToken);
+  if (inspector !== undefined) yield* session.nativeEngine.inspect(inspector);
   if (previous !== undefined) yield* drainCandidateEffect(session, previous, token);
   session.log({
     level: "info",
@@ -121,9 +125,6 @@ const runActivation = Effect.fn("Dev.activation.protocol")(function* (
       durationMs: performance.now() - startedAt,
     },
   });
-  // The bridge follows only promoted generations, so a failed rebuild keeps the current bridge.
-  const inspector = session.options.inspectionPolicy?.(token.generationToken);
-  if (inspector !== undefined) yield* session.nativeEngine.inspect(inspector);
   return true;
 });
 
