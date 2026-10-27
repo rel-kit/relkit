@@ -22,6 +22,10 @@ import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
 import { AddResolutionState } from "./add-resolution-state.js";
 
 import type { ProjectDiscovery } from "./project-discovery-types.js";
+import type { AddKind } from "create-relkit/internal/add-types";
+
+/** Platform kinds identified by their project, path, or singleton role instead of a name. */
+const NAMELESS_KINDS: ReadonlySet<AddKind> = new Set(["database", "auth", "route", "inspector"]);
 
 /**
  * Resolves resolve domain options through explicit prompt and filesystem authority.
@@ -39,7 +43,7 @@ export const resolveDomainOptionsEffect = Effect.fn("AddResolution.resolveDomain
     GeneratorPrompt | GeneratorFileSystem
   > {
     const kind = state.parsed.kind;
-    if (kind !== "database" && kind !== "auth" && kind !== "route") {
+    if (!NAMELESS_KINDS.has(kind)) {
       yield* ensureNameEffect(state);
     }
     if (kind === "service") yield* serviceOptionsEffect(state);

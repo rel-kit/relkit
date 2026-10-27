@@ -13,9 +13,9 @@ import type {
 } from "./installation-workflows.types.js";
 import type { InstallationDeclarations } from "./installation-catalog.types.js";
 
-/** Native agents do not select a rich Inspector, history store or unrelated integrations. */
+/** Native agents do not select a rich Inspector, history store or unrelated integrations; the starter's own Scalar reference is selected. */
 export const agentForbiddenPackages =
-  /^(?:next|@duckdb\/.*|deepagents|@modelcontextprotocol\/server|@scalar\/hono-api-reference|@relkit\/(?:inspector|drizzle|better-auth))$/;
+  /^(?:next|@duckdb\/.*|deepagents|@modelcontextprotocol\/server|@relkit\/(?:inspector|drizzle|better-auth))$/;
 
 /** Reads runnable blocks in their actual documentation order, rejecting arbitrary manifest replacement.
  * @param source - Generated installation fragment.

@@ -86,8 +86,9 @@ real AWS acceptance is opt-in locally and is not run by CI.
 Generated-project commands are `bun run dev`, `bun run test`, `bun run check`,
 `bun run typecheck`, `bun run build`, and `bun run start`. Cloud and deployment
 default to `none`; use `--cloud aws --deploy pulumi` when AWS deployment is
-required. Run the standalone `relkit-inspector` separately when inspection is
-selected; configure its UI port through its own `--port` flag. The application
+required. Generated projects select the Scalar API reference in development.
+`relkit add inspector` enables the bridge and installs `@relkit/inspector` as a
+project devDependency; `relkit inspector [--port]` runs that local UI. The application
 uses `inspector.connection.host/port` for bridge settings. Neither installing the
 tool nor legacy environment flags enables rich inspection in production.
 

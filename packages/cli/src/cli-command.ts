@@ -2,6 +2,7 @@
 import { Command } from "effect/cli";
 import { migrateCommand } from "./cli-command-migrate.js";
 import { dbCommand } from "./cli-command-db.js";
+import { inspectorCommand } from "./cli-command-inspector.js";
 import { basicCommands } from "./cli-command-basic.js";
 import { addCommand } from "./cli-command-add.js";
 import { groupCommands } from "./cli-command-groups.js";
@@ -24,6 +25,7 @@ export function createCliCommand(select: SelectInvocation) {
         migrateCommand(select),
         dbCommand(select),
         dev,
+        inspectorCommand(select),
         check,
         build,
         start,

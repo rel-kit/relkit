@@ -1,4 +1,4 @@
-/** Validates core transports and omitted-disabled inspection in installed development. */
+/** Validates core transports, the default Scalar reference and omitted-disabled inspection in installed development. */
 import { strict as assert } from "node:assert";
 import { Effect, Schema } from "effect";
 import { scaffoldRequest } from "./scaffold-http.js";
@@ -43,8 +43,8 @@ export const verifyScaffoldDevContracts = Effect.fn("ScaffoldDev.contracts")(fun
     );
   }
   const reference = yield* scaffoldRequest(`${base}/_relkit/v1/api-reference`);
-  assert.equal(reference.status, 404, "Default scaffolds do not select the Scalar UI");
-  assert.doesNotMatch(yield* Effect.promise(() => reference.text()), /scalar/i);
+  assert.equal(reference.status, 200, "Default scaffolds select the Scalar UI");
+  assert.match(yield* Effect.promise(() => reference.text()), /scalar/i);
   const rich = yield* scaffoldRequest(`${base}/_relkit/v1/runtime`);
   assert.equal(rich.status, 404);
   yield* Effect.promise(() => rich.arrayBuffer());

@@ -1,6 +1,7 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "stream",
+  "agentGuidance": false,
   "globalPassThroughEnv": [
     "CIRCLE_NODE_TOTAL",
     "RAYON_NUM_THREADS",

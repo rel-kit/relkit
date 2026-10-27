@@ -5,7 +5,7 @@ import env from "@app/platform/env.js";
 
 export default defineApp({
   env,
-  server: { port: 3000, maxBodyBytes: 1_048_576 },
+  server: { port: 3000, maxBodyBytes: 1_048_576, apiDocs: { ui: "scalar" } },
   telemetry: { redaction: { mode: "development-redacted", maxBytes: 65_536 } },
   // relkit:create:deployment
 });

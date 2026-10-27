@@ -57,14 +57,11 @@ shutdown expiry are reported as incomplete history. Add named Sentry or OTLP
 exporters only when selected integrations and secret bindings are configured.
 Redact before storage or export. No `relkit add observability` kind exists.
 
-Run `bun run dev` and make an identifiable HTTP request. Install the separately
-available `@relkit/inspector` tool in the consumer project, then run
-`bunx --no-install relkit-inspector --project-root .` or
-`npx --no-install relkit-inspector --project-root .` in another terminal. These
-installed runner forms were tested; consult the installed package and release
-availability before assuming a new version has been published. The tool needs
-Bun 1.3.10 or newer and Node 20.9 or newer, and its UI defaults to 3210. Use
-`--port 3211` on that tool for a different UI port. App bridge binding defaults
+Run `bun run relkit add inspector` once to enable the bridge and install
+`@relkit/inspector` as a project devDependency. Run `bun run dev`, then
+`bun run inspector` (which runs `relkit inspector`) in another terminal, and make an
+identifiable HTTP request. The tool needs Bun 1.3.10 or newer and Node 20.9 or newer,
+and its UI defaults to 3210. Use `relkit inspector --port 3211` for a different UI port. App bridge binding defaults
 to `127.0.0.1:0` and uses `inspector.connection.host/port` when explicitly configured.
 
 The tool reads private `.relkit/connections` metadata without executing app config.

@@ -9,8 +9,9 @@ sidebar:
 import inspectorShell from "../../../../../../tests/e2e/inspector-redesign.spec.ts-snapshots/shell-dark-darwin.png";
 
 The Inspector is an optional tool for browsing your running application's routes, resources, traces, and history. Inspection is optional and disabled by default.
-The separate `@relkit/inspector` tool owns the UI and diagnostic history; enabling the application bridge
-does not launch or install it. The tool requires Bun 1.3.10 or newer and Node.js 20.9.0 or newer.
+The separate `@relkit/inspector` package owns the UI and diagnostic history. `relkit add inspector`
+enables the application bridge and installs that package as a project devDependency; `relkit inspector`
+launches it. The tool requires Bun 1.3.10 or newer and Node.js 20.9.0 or newer.
 The backend-only development workflow needs no Node.js installation.
 
 `relkit jobs` reads and controls live provider state on the application backend;
@@ -21,23 +22,31 @@ the jobs CLI. Logs, request history and traces belong to the separate inspector.
 
 ## Pre-setup
 
-Start from a running local backend. The steps below install the separate tool and enable its
+Start from a running local backend. The steps below install the inspector package and enable its
 bridge through `defineApp`. No new `defineEnv` values or Docker service are required for the
 Inspector itself; retain the backend's environment and local provider configuration.
 
 <Steps>
 <Step>
 
-## Install the separate tool
+## Add the inspector
 
-The following command uses this checkout's tool version. Use the compatible published release
+```sh title="Terminal — relkit-orders"
+bun run relkit add inspector --project-root .
+```
+
+See the [`relkit add inspector` reference](/docs/api/cli#relkit-add-inspector) for its options. This sets `inspector: { enabled: true }` in `relkit.config.ts`, adds `@relkit/inspector` to
+`devDependencies`, installs it, and adds an `inspector` script that runs `relkit inspector`. Nothing is
+installed globally. An authored `inspector.enabled: false` is reported as a conflict, not overwritten.
+
+To install the tool globally instead, the following command uses this checkout's tool version. Use the compatible published release
 containing the standalone Inspector; a successful local candidate check does not publish it. For an
 unpublished candidate, install its built `.tgz` artifact into an isolated tool environment instead of
 assuming that version is already on the registry. The backend keeps its lean installation.
 
 <include>/_snippets/generated/installations/inspector.mdx</include>
 
-Keep Bun's global binary directory on `PATH` for the command below. This tool installation does not
+A global installation needs Bun's global binary directory on `PATH` and does not
 enable inspection. Node is required by the tool's Next UI/history worker, not by the backend-only app.
 
 </Step>
@@ -45,7 +54,8 @@ enable inspection. Node is required by the tool's Next UI/history worker, not by
 
 ## Enable the application bridge
 
-Merge the explicit `inspector` setting into the existing `relkit.config.ts`, preserving its other options:
+`relkit add inspector` already did this. To enable the bridge by hand, merge the explicit `inspector`
+setting into the existing `relkit.config.ts`, preserving its other options:
 
 <include source="apps/docs/examples/inspector/config.ts" lang="ts" meta='title="relkit.config.ts"'>
   /_snippets/source/apps/docs/examples/inspector/config.ts
@@ -71,10 +81,10 @@ UI port, which defaults to 3210. Obsolete `inspector.port` configuration is reje
 bun run dev
 ```
 
-Keep the backend running. In a second terminal, launch the independently installed tool:
+Keep the backend running. In a second terminal, launch the project-local tool (`--port` changes the UI port):
 
 ```sh title="Second terminal — relkit-orders"
-relkit-inspector --project-root .
+bun run inspector
 ```
 
 Open `http://127.0.0.1:3210`. The tool discovers and authenticates the
@@ -96,9 +106,9 @@ correlation ID, logs, and trace. Follow the route and function links to their de
 
 In **Graph**, find the route-to-function edge. The relationship table provides the keyboard and screen-reader
 equivalent of the canvas. Inspect the HTTP contract at
-`http://localhost:3000/_relkit/v1/openapi.json`. To use **API Reference** in Scalar,
-follow the [OpenAPI guide](/docs/modules/http/openapi) to install the selected UI and set
-`server.apiDocs.ui` to `"scalar"`; enabling the Inspector alone leaves that UI disabled.
+`http://localhost:3000/_relkit/v1/openapi.json`. New applications select the Scalar
+**API Reference** (`server.apiDocs.ui: "scalar"`) at `http://localhost:3000/_relkit/v1/api-reference`;
+for older applications, follow the [OpenAPI guide](/docs/modules/http/openapi) to install and select it.
 
 </Step>
 </Steps>

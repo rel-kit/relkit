@@ -24,6 +24,7 @@ export const generatorProviders = [
   "@relkit/drizzle",
   "@relkit/redis",
   "@relkit/s3",
+  "@relkit/inspector",
 ] as const;
 
 /** The root release number identifies a batch independently of individual package versions. */

@@ -15,6 +15,8 @@ import { runGraphEffect } from "./commands/graph.js";
 import { runLocalEffect } from "./commands/local.js";
 import { runClientEffect } from "./commands/client.js";
 import { runJobsEffect } from "./commands/jobs.js";
+import { runInspectorEffect } from "./commands/inspector.js";
+import { contributorTerminalLayer } from "./contributor-process.service.js";
 import { projectLiveLayer } from "./services/project.service.js";
 import { clientLiveLayer } from "./services/client.service.js";
 import { deploymentLiveLayer } from "./services/deployment.service.js";
@@ -114,6 +116,10 @@ function selectCommandEffect(invocation: CliInvocation, context: CliCommandConte
       return runClientEffect(args, context).pipe(Effect.provide(clientLiveLayer));
     case "jobs":
       return runJobsEffect(args, context).pipe(Effect.provide(jobsLiveLayer()));
+    case "inspector":
+      return runInspectorEffect(args, context).pipe(
+        Effect.provide(Layer.merge(contributorTerminalLayer, fileSystemLayer)),
+      );
     case "migrate":
       return runMigrateEffect(args, context).pipe(Effect.provide(layoutMigrationLayer));
     case "db":

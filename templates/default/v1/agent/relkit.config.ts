@@ -10,6 +10,6 @@ export default defineApp({
   "agent-state": localAgentState(),
   defaults: { realtime: "default", "agent-state": "default" },
   telemetry: { redaction: { mode: "development-redacted", maxBytes: 65_536 } },
-  server: { port: 3000, maxBodyBytes: 1_048_576 },
+  server: { port: 3000, maxBodyBytes: 1_048_576, apiDocs: { ui: "scalar" } },
   // relkit:create:deployment
 });

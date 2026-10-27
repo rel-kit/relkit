@@ -16,13 +16,16 @@ import { resolveCatalogVersion } from "./catalog-manifest.js";
  * @param versions - Exact first-party package versions.
  * @param rootManifest - Root manifest owning tooling catalogs.
  * @returns Deterministic template file counts and hashes.
- * @throws When scripts, versions, or application import boundaries diverge.
+ * @throws When scripts, versions (including the Scalar peer pinned by runtime-hono), or
+ * application import boundaries diverge.
  */
 export async function templateInputs(
   versions: ReadonlyMap<string, string>,
   rootManifest: RecordValue,
 ): Promise<RecordValue[]> {
   const result: RecordValue[] = [];
+  const scalar = (await readJson(join(root, "packages/runtime-hono/package.json")))
+    .peerDependencies?.["@scalar/hono-api-reference"];
   const forbidden =
     /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/|@aws-sdk\/|@relkit\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
   const fullstackForbidden =
@@ -34,6 +37,8 @@ export async function templateInputs(
       for (const [dependency, spec] of Object.entries(manifest[field] ?? {}))
         if (dependency.startsWith("@relkit/") && spec !== versions.get(dependency))
           throw new Error(`Template ${name} has incompatible ${dependency}@${spec}`);
+    if (manifest.dependencies?.["@scalar/hono-api-reference"] !== scalar)
+      throw new Error(`Template ${name} Scalar version differs from @relkit/runtime-hono`);
     if (
       manifest.packageManager !== rootManifest.packageManager ||
       manifest.devDependencies?.typescript !==

@@ -21,11 +21,12 @@ Recommend optional modules only when they solve a concrete part of this task: fo
 
 Default to backend work. Do not introduce frontend pages, app.js, assets.css or demo interfaces unless requested. Preserve existing frontend files, explicitly selected fullstack functionality and the framework Inspector. For users and orders, define separate resource endpoints with explicit input/output contracts, validation and applicable authorization; avoid a public table dispatcher controlled by an entity parameter. Internal tables and infrastructure services need no public endpoint. Preserve intentional protocol handlers such as the Better Auth mount and shared internal helpers.
 
-Inspection is disabled when omitted. To inspect development work, select
-`inspector: { enabled: true }`; this starts a private bridge on `127.0.0.1:0`,
-configured through `inspector.connection.host/port`. Install `@relkit/inspector`
-separately and run `relkit-inspector --project-root . --port 3211` in another
-terminal when UI port 3211 is wanted (the tool default is 3210). Keep dev and
+Inspection is disabled when omitted. To inspect development work, run
+`bunx relkit add inspector`: it selects `inspector: { enabled: true }` (a private
+bridge on `127.0.0.1:0`, configured through `inspector.connection.host/port`) and
+installs `@relkit/inspector` as a devDependency. Then run `bun run inspector` (or
+`bun run relkit inspector --port 3211` for UI port 3211; the default is 3210) in another
+terminal. Keep dev and
 Inspector as separate processes. Preserve `.relkit/observability`; the tool owns
 its diagnostic DuckDB history. Production builds exclude rich inspection and do
 not require UI/storage packages in the backend closure. See the observability

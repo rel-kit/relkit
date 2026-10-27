@@ -147,6 +147,7 @@ const linkInstalledDependencies = Effect.fn("AddFixture.dependencies")(function*
     ["integrations/packages/langchain/node_modules/langsmith", "langsmith"],
     ["integrations/packages/langchain/node_modules/@langchain/core", "@langchain/core"],
     ["packages/runtime-hono/node_modules/@ag-ui/core", "@ag-ui/core"],
+    ["packages/runtime-hono/node_modules/@scalar/hono-api-reference", "@scalar/hono-api-reference"],
     ["integrations/packages/langchain/node_modules/@langchain/langgraph", "@langchain/langgraph"],
     ["packages/drizzle/node_modules/drizzle-orm", "drizzle-orm"],
     ["packages/better-auth/node_modules/better-auth", "better-auth"],

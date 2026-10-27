@@ -37,7 +37,7 @@ export const developmentPortsEffect = Effect.fn("Dev.ports")(
     return yield* cliTry("dev.ports.resolve", (): DevelopmentPorts => {
       if (inspectorPort !== undefined)
         throw new TypeError(
-          "--inspector-port moved to the standalone inspector; configure inspector.connection.port for the bridge.",
+          "--inspector-port moved to the standalone inspector; run relkit inspector --port, and configure inspector.connection.port for the bridge.",
         );
       return {
         backend: resolveApplicationPort({

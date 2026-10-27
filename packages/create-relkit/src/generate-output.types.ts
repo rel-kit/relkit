@@ -13,10 +13,12 @@ export interface GenerateNextSteps {
     readonly build: "bun run build";
   }>;
   readonly endpoints: Readonly<{
-    readonly backend: "http://localhost:3000";
+    /** A served backend URL: the example route, or the API reference without examples. */
+    readonly backend:
+      "http://localhost:3000/hello?name=RelKit" | "http://localhost:3000/_relkit/v1/api-reference";
     readonly inspector: "http://localhost:3210";
     readonly openapi: "http://localhost:3000/_relkit/v1/openapi.json";
-    /** Present only when the generated application selects a reference UI. */
+    /** Present when the generated application selects the Scalar reference UI (the template default). */
     readonly apiReference?: "http://localhost:3000/_relkit/v1/api-reference";
     readonly route?: "GET http://localhost:3000/hello?name=RelKit";
   }>;

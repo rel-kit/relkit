@@ -19,7 +19,10 @@ const Commands = Schema.Struct({
 
 /** Only an example-bearing project advertises the generated hello route. */
 const Endpoints = Schema.Struct({
-  backend: Schema.Literal("http://localhost:3000"),
+  backend: Schema.Literals([
+    "http://localhost:3000/hello?name=RelKit",
+    "http://localhost:3000/_relkit/v1/api-reference",
+  ]),
   inspector: Schema.Literal("http://localhost:3210"),
   openapi: Schema.Literal("http://localhost:3000/_relkit/v1/openapi.json"),
   apiReference: Schema.optionalKey(

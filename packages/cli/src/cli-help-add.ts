@@ -189,5 +189,8 @@ export const addHelp = command("add", "Add a compile-ready artifact", "relkit ad
         option("base-path", "string", "Auth base path (default: /api/auth)"),
       ],
     }),
+    command("inspector", "Enable the inspector bridge and its local UI", "relkit add inspector", {
+      options: [projectRoot, option("no-install", "boolean", "Do not install @relkit/inspector")],
+    }),
   ],
 });

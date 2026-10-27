@@ -63,8 +63,8 @@ async function expectDevelopmentSurfaces(
   expect(openapi.status).toBe(200);
   expect(document.paths).toHaveProperty("/hello");
   const reference = await fetch(`http://127.0.0.1:${port}/_relkit/v1/api-reference`);
-  expect(reference.status).toBe(404);
-  expect(await reference.text()).not.toContain("RELKIT API Reference");
+  expect(reference.status).toBe(200);
+  expect(await reference.text()).toContain("RELKIT API Reference");
   await expect(
     fetch(`http://127.0.0.1:${inspectorPort}`, {
       signal: AbortSignal.timeout(250),
@@ -126,7 +126,7 @@ async function waitPreparedProject(
         if (script === "dev") {
           await expectDevelopmentSurfaces(port, inspectorPort, project);
           expect(output()).toMatch(/\bReady\b/);
-          expect(output()).not.toMatch(/Reference\s+http:\/\/\S+\/_relkit\/v1\/api-reference/);
+          expect(output()).toMatch(/Reference\s+http:\/\/\S+\/_relkit\/v1\/api-reference/);
         }
         return { body, durationMs: performance.now() - startedAt };
       }

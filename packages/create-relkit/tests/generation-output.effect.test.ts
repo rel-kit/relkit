@@ -1,5 +1,5 @@
 /**
- * Checks finite preparation precedes dev and onboarding advertises only available API endpoints.
+ * Checks finite preparation precedes dev and onboarding advertises only served endpoints.
  * These pure presentation tests acquire no filesystem or process; installation
  * state controls the displayed commands without changing later manual checks.
  */
@@ -28,20 +28,33 @@ it.effect("does not repeat preparation in an installed project's onboarding", ()
   }),
 );
 
-it.effect("advertises OpenAPI without an unselected reference UI", () =>
+it.effect("advertises served backend and default Scalar reference endpoints", () =>
   Effect.sync(() => {
     const nextSteps = createGenerateNextSteps({ examples: true, install: true }, "/project", "/");
-    expect(nextSteps.endpoints).not.toHaveProperty("apiReference");
+    expect(nextSteps.endpoints.backend).toBe("http://localhost:3000/hello?name=RelKit");
+    expect(nextSteps.endpoints.apiReference).toBe("http://localhost:3000/_relkit/v1/api-reference");
     const output = formatGenerateResult({ nextSteps });
+    expect(output).toContain("backend:   http://localhost:3000/hello?name=RelKit");
     expect(output).toContain("openapi:   http://localhost:3000/_relkit/v1/openapi.json");
+    expect(output).toContain("api docs:  http://localhost:3000/_relkit/v1/api-reference");
+    expect(output).toContain("bunx relkit add inspector");
+  }),
+);
+
+it.effect("falls back to the reference UI when examples, and their routes, are omitted", () =>
+  Effect.sync(() => {
+    const nextSteps = createGenerateNextSteps({ examples: false, install: true }, "/project", "/");
+    expect(nextSteps.endpoints.backend).toBe("http://localhost:3000/_relkit/v1/api-reference");
+    expect(nextSteps.endpoints).not.toHaveProperty("route");
+    const output = formatGenerateResult({ nextSteps });
+    expect(output).toContain("backend:   http://localhost:3000/_relkit/v1/api-reference");
     expect(output).not.toContain("api docs:");
-    expect(output).not.toContain("/_relkit/v1/api-reference");
   }),
 );
 
 it.effect("preserves an explicitly supplied reference endpoint in presentation metadata", () =>
   Effect.sync(() => {
-    const core = createGenerateNextSteps({ examples: false, install: true }, "/project", "/");
+    const core = createGenerateNextSteps({ examples: true, install: true }, "/project", "/");
     const nextSteps = {
       ...core,
       endpoints: {
