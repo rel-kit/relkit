@@ -106,18 +106,20 @@ const startBackgroundInspector = Effect.fn("Dev.startSupport")(function* (
  * @param owner - Session Scope, worker reference and current bridge policy.
  * @param session - Inspector identity, policy observer and presentation sink.
  * @param policy - Bind policy selected by the promoted generation; false closes the bridge.
- * @returns Completion after the previous bridge released, the replacement registered and
- * the applied policy was reported.
+ * @returns Completion after the previous bridge released and the replacement registered.
  */
 export const reconfigureInspector = Effect.fn("Dev.reconfigureSupport")(function* (
   owner: DevEngineState,
   session: DevSession,
   policy: DevInspectorPolicy,
 ) {
-  const applied = yield* owner.inspectorSwitch.withPermits(1)(
+  yield* owner.inspectorSwitch.withPermits(1)(
     Effect.gen(function* () {
-      if (yield* Ref.get(owner.closing)) return false;
-      if (sameInspectorPolicy(yield* Ref.get(owner.inspectorPolicy), policy)) return true;
+      if (yield* Ref.get(owner.closing)) return;
+      const current = yield* Ref.get(owner.inspector);
+      // A bridge that ended (for example on a bind failure) is retried for an unchanged address.
+      const serving = policy === false || (current !== undefined && !current.pollUnsafe());
+      if (serving && sameInspectorPolicy(yield* Ref.get(owner.inspectorPolicy), policy)) return;
       const previous = yield* Ref.getAndSet(owner.inspector, undefined);
       if (previous !== undefined) yield* Fiber.interrupt(previous);
       yield* Ref.set(owner.inspectorPolicy, policy);
@@ -128,11 +130,8 @@ export const reconfigureInspector = Effect.fn("Dev.reconfigureSupport")(function
           Effect.catchCause((cause) => owner.cleanup.record("dev.inspector.diagnostic", cause)),
         );
       else yield* forkInspectorSupport(owner, session, policy, 0);
-      return true;
     }),
   );
-  // Reported for every promotion so policy-owned resources follow the serving generation.
-  if (applied) yield* session.options.inspectionApplied?.(policy) ?? Effect.void;
 });
 
 /**

@@ -9,6 +9,7 @@ import type {
 } from "@relkit/supervisor";
 import type { InspectionBridgeOptions } from "@relkit/inspector-api/connection";
 import type { CliAdapterError } from "../cli-errors.js";
+import type { DevInspectorPolicy } from "./dev-inspector-support.types.js";
 
 /** One admitted development log, rendered by the existing terminal policy. */
 export interface DevLogEvent {
@@ -88,22 +89,21 @@ export interface DevOptions {
   readonly drainTimeoutMs?: number;
   readonly inspector?: Pick<InspectionBridgeOptions, "host" | "port"> | false;
   readonly inspectionRecords?: InspectionBridgeOptions["records"];
-  /** Bridge credentials shared by every generation; generated when inspection starts enabled. */
+  /** Bridge credentials shared by every generation; generated per session when omitted. */
   readonly inspectionIdentity?: { readonly sessionId: string; readonly token: string };
   /**
    * Reads the bridge policy an accepted generation was built with.
    * @param generationToken - Promoted generation.
    * @returns Its policy, or undefined when the session keeps its current bridge.
    */
-  readonly inspectionPolicy?: (generationToken: number) => DevOptions["inspector"] | undefined;
+  readonly inspectionPolicy?: (generationToken: number) => DevInspectorPolicy | undefined;
   /**
-   * Observes the bridge policy of every promoted generation, changed or not.
+   * Observes the bridge policy of every promoted generation, changed or not, once the
+   * retired generation has drained.
    * @param policy - Bridge policy the session now serves.
    * @returns Completion after policy-owned resources are released or retained.
    */
-  readonly inspectionApplied?: (
-    policy: NonNullable<DevOptions["inspector"]>,
-  ) => Effect.Effect<void>;
+  readonly inspectionApplied?: (policy: DevInspectorPolicy) => Effect.Effect<void>;
   /**
    * Observes a generation that was not promoted.
    * @param generationToken - Rejected, failed or superseded generation.

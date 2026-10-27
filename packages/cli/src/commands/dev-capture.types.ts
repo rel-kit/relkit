@@ -22,7 +22,7 @@ export interface DevCapture {
     Readonly<Record<string, string | undefined>>,
     CliAdapterError
   >;
-  /** Releases retained records and ingress; producers built afterwards receive no credentials. */
+  /** Closes producer ingress and stops admission/replay; producers built afterwards receive no credentials. */
   readonly disableEffect: Effect.Effect<void>;
 }
 

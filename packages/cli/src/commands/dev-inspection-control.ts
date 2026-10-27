@@ -6,7 +6,7 @@
  * generation still needs it, including after a rejected enabled generation.
  */
 import { randomBytes, randomUUID } from "node:crypto";
-import { Effect, Ref } from "effect";
+import { Effect, Ref, Semaphore } from "effect";
 import type { InspectorConfiguration } from "@relkit/contracts";
 import type { CandidateCompileRequest } from "@relkit/supervisor";
 import { DISABLED_CAPTURE_ENVIRONMENT } from "./dev-capture.service.js";
@@ -26,11 +26,15 @@ export function makeDevInspectionControl(
   const identity = { sessionId: randomUUID(), token: randomBytes(32).toString("base64url") };
   const policies = new Map<number, DevInspectorPolicy>();
   let serving = initial;
+  // Orders each capture decision with the enable or release it selects.
+  const serial = Semaphore.makeUnsafe(1);
   // Releases capture unless the serving bridge or a pending generation still needs it.
-  const release = Effect.suspend(() =>
-    serving !== false || [...policies.values()].some((policy) => policy !== false)
-      ? Effect.void
-      : (Ref.getUnsafe(capture)?.disableEffect ?? Effect.void),
+  const release = serial.withPermits(1)(
+    Effect.suspend(() =>
+      serving !== false || [...policies.values()].some((policy) => policy !== false)
+        ? Effect.void
+        : (Ref.getUnsafe(capture)?.disableEffect ?? Effect.void),
+    ),
   );
   return {
     identity,
@@ -41,15 +45,17 @@ export function makeDevInspectionControl(
      * @returns Credentials for enabled inspection, or explicit removals otherwise.
      */
     prepare: (configuration: InspectorConfiguration, request: CandidateCompileRequest) =>
-      Effect.gen(function* () {
-        const policy = configuration.enabled ? configuration.connection : false;
-        policies.set(request.token.generationToken, policy);
-        if (policy === false)
-          return { ...DISABLED_CAPTURE_ENVIRONMENT, RELKIT_INSPECTOR_SESSION_TOKEN: undefined };
-        const owned = yield* Ref.get(capture);
-        const producer = owned === undefined ? {} : yield* owned.enableEffect;
-        return { ...producer, RELKIT_INSPECTOR_SESSION_TOKEN: identity.token };
-      }),
+      serial.withPermits(1)(
+        Effect.gen(function* () {
+          const policy = configuration.enabled ? configuration.connection : false;
+          policies.set(request.token.generationToken, policy);
+          if (policy === false)
+            return { ...DISABLED_CAPTURE_ENVIRONMENT, RELKIT_INSPECTOR_SESSION_TOKEN: undefined };
+          const owned = yield* Ref.get(capture);
+          const producer = owned === undefined ? {} : yield* owned.enableEffect;
+          return { ...producer, RELKIT_INSPECTOR_SESSION_TOKEN: identity.token };
+        }),
+      ),
     /**
      * Takes a promoted generation's policy and forgets it and every older generation.
      * @param generationToken - Promoted generation.

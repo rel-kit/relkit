@@ -154,7 +154,7 @@ Captures the acquired engine for the public compatibility facade. @param engine 
 declare const attach: (engine: DevSessionEngine) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L75)
 
 ### start (method)
 
@@ -166,7 +166,7 @@ Acquires the manual public owner once; concurrent callers share startup.
 declare const start: () => Promise<this>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L83)
 
 ### activate (method)
 
@@ -178,7 +178,7 @@ Joins one requested source activation through the captured engine.
 declare const activate: (version?: number, files?: readonly string[]) => Promise<boolean>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L91)
 
 ### notifySourceChange (method)
 
@@ -190,7 +190,7 @@ Forwards an explicit source version to the serialized activation owner.
 declare const notifySourceChange: (version: number, files?: readonly string[]) => Promise<boolean>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L100)
 
 ### waitForShutdown (method)
 
@@ -202,7 +202,7 @@ Joins the captured session's shared shutdown completion.
 declare const waitForShutdown: () => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L106)
 
 ### stop (method)
 
@@ -214,7 +214,7 @@ Closes the manual public owner and joins its shared release.
 declare const stop: <Reason>(reason?: Reason | Error) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L117)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L115)
 
 ### drain (method)
 
@@ -229,7 +229,7 @@ declare const drain: (
 ) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L165)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L163)
 
 ### resolveShutdownPromise (method)
 
@@ -241,7 +241,7 @@ Completes the retained synchronous compatibility shutdown latch.
 declare const resolveShutdownPromise: () => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L169)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L167)
 
 ### clearSignals (method)
 
@@ -253,7 +253,7 @@ Closes the captured signal registration and its synchronous facade.
 declare const clearSignals: () => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L183)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L181)
 
 ### markStopping (method)
 
@@ -265,7 +265,7 @@ Closes synchronous startup and activation admission.
 declare const markStopping: () => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L188)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L186)
 
 ### runSynchronous (method)
 
@@ -277,7 +277,7 @@ Executes the retained synchronous watcher edge.
 declare const runSynchronous: <A, E>(effect: Effect.Effect<A, E>) => A;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L198)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L196)
 
 ### projectRoot (property)
 
@@ -304,7 +304,7 @@ readonly options: DevOptions
 **Signature**
 
 ```ts
-readonly inspectionIdentity: { readonly sessionId: string; readonly token: string; } | undefined
+readonly inspectionIdentity: { readonly sessionId: string; readonly token: string; }
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev-session.ts#L17)
@@ -497,7 +497,7 @@ type DevActivationFingerprint =
     ) => RuntimeActivationFingerprint | PromiseLike<RuntimeActivationFingerprint>);
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L31)
 
 ### DevLocalServices (interface)
 
@@ -515,7 +515,7 @@ export interface DevLocalServices {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L37)
 
 ### DevLog (type alias)
 
@@ -527,7 +527,7 @@ Synchronous native logging callback; failures cannot change session lifecycle.
 type DevLog = (event: DevLogEvent) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L25)
 
 ### DevLogEvent (interface)
 
@@ -543,7 +543,7 @@ export interface DevLogEvent {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L15)
 
 ### DevOptions (interface)
 
@@ -599,22 +599,21 @@ export interface DevOptions {
   readonly drainTimeoutMs?: number;
   readonly inspector?: Pick<InspectionBridgeOptions, "host" | "port"> | false;
   readonly inspectionRecords?: InspectionBridgeOptions["records"];
-  /** Bridge credentials shared by every generation; generated when inspection starts enabled. */
+  /** Bridge credentials shared by every generation; generated per session when omitted. */
   readonly inspectionIdentity?: { readonly sessionId: string; readonly token: string };
   /**
    * Reads the bridge policy an accepted generation was built with.
    * @param generationToken - Promoted generation.
    * @returns Its policy, or undefined when the session keeps its current bridge.
    */
-  readonly inspectionPolicy?: (generationToken: number) => DevOptions["inspector"] | undefined;
+  readonly inspectionPolicy?: (generationToken: number) => DevInspectorPolicy | undefined;
   /**
-   * Observes the bridge policy of every promoted generation, changed or not.
+   * Observes the bridge policy of every promoted generation, changed or not, once the
+   * retired generation has drained.
    * @param policy - Bridge policy the session now serves.
    * @returns Completion after policy-owned resources are released or retained.
    */
-  readonly inspectionApplied?: (
-    policy: NonNullable<DevOptions["inspector"]>,
-  ) => Effect.Effect<void>;
+  readonly inspectionApplied?: (policy: DevInspectorPolicy) => Effect.Effect<void>;
   /**
    * Observes a generation that was not promoted.
    * @param generationToken - Rejected, failed or superseded generation.
@@ -664,7 +663,7 @@ export interface DevOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L45)
 
 ## `editor.ts`
 

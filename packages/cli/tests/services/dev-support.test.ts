@@ -146,7 +146,6 @@ it.effect("promoted policy changes start, move and stop the bridge without a res
   Effect.scoped(
     Effect.gen(function* () {
       const events: DevLogEvent[] = [];
-      const applied: unknown[] = [];
       const runs: { policy: unknown; released: boolean }[] = [];
       const facade = new DevSession({
         projectRoot: "/deterministic-dev-support",
@@ -156,7 +155,6 @@ it.effect("promoted policy changes start, move and stop the bridge without a res
         installSignalHandlers: false,
         logger: { human: false, json: false },
         onLog: (event) => events.push(event),
-        inspectionApplied: (policy) => Effect.sync(() => void applied.push(policy)),
       });
       const { engine } = yield* devSupportFixture(facade).pipe(
         Effect.provide(
@@ -186,10 +184,48 @@ it.effect("promoted policy changes start, move and stop the bridge without a res
       yield* engine.inspect(false);
       expect(runs.every((run) => run.released)).toBe(true);
       expect(events.some((event) => event.event === "dev.inspector.stopped")).toBe(true);
-      expect(applied).toEqual([enabled, enabled, moved, false]);
       yield* engine.stop();
       yield* engine.inspect(enabled);
       expect(runs).toHaveLength(2);
+    }),
+  ).pipe(Effect.provide(Logger.layer([]))),
+);
+
+it.effect("an unchanged policy restarts a bridge that failed to bind", () =>
+  Effect.scoped(
+    Effect.gen(function* () {
+      const facade = new DevSession({
+        projectRoot: "/deterministic-dev-support",
+        stablePort: 12345,
+        compile: () => Promise.reject(new Error("Unexpected compiler call")),
+        inspector: false,
+        installSignalHandlers: false,
+        logger: { human: false, json: false },
+      });
+      let attempts = 0;
+      const { engine } = yield* devSupportFixture(facade).pipe(
+        Effect.provide(
+          devSupportTestLayer(() =>
+            Effect.suspend(() =>
+              ++attempts === 1
+                ? Effect.fail(cliAdapterError("dev.inspector.bind", new Error("in use")))
+                : Effect.never,
+            ),
+          ),
+        ),
+      );
+      yield* engine.start;
+      const enabled = { host: "127.0.0.1", port: 4555 };
+      yield* engine.inspect(enabled);
+      yield* Effect.yieldNow;
+      expect(attempts).toBe(1);
+      yield* engine.inspect({ ...enabled });
+      yield* Effect.yieldNow;
+      expect(attempts).toBe(2);
+      yield* engine.inspect({ ...enabled });
+      yield* Effect.yieldNow;
+      expect(attempts).toBe(2);
+      yield* engine.stop();
     }),
   ).pipe(Effect.provide(Logger.layer([]))),
 );

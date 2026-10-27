@@ -142,3 +142,41 @@ it.effect("enabling mid-session opens ingress once and disabling releases it", (
     }),
   ).pipe(Effect.provide(f.layer));
 });
+
+it.effect("re-enabled capture continues the session's record sequence", () => {
+  const f = fixture();
+  return Effect.scoped(
+    Effect.gen(function* () {
+      const capture = yield* CliDevCapture.use((service) => service.acquire(false, {}));
+      const record = (message: string) => ({
+        version: 2 as const,
+        signal: "log" as const,
+        timestamp: new Date().toISOString(),
+        level: "info" as const,
+        component: "relkit",
+        message,
+        fields: {},
+      });
+      const sequences = Effect.fn(function* () {
+        const response = yield* capture.records(
+          new Request("http://localhost/_relkit/bridge/v1/records?after=0"),
+        );
+        const body = (yield* Effect.promise(() => response.json())) as {
+          records: { sequence: number }[];
+        };
+        return body.records.map((entry) => entry.sequence);
+      });
+      yield* capture.enableEffect;
+      capture.append(record("first"));
+      const before = yield* sequences();
+      yield* capture.disableEffect;
+      capture.append(record("while disabled"));
+      yield* capture.enableEffect;
+      capture.append(record("second"));
+      const after = yield* sequences();
+      expect(before).toHaveLength(1);
+      expect(after).toHaveLength(2);
+      expect(after[1]!).toBeGreaterThan(before[0]!);
+    }),
+  ).pipe(Effect.provide(f.layer));
+});
