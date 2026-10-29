@@ -2,7 +2,6 @@
 import { Container } from "fumadocs-ui/layouts/home/slots/container";
 import { RootProvider } from "fumadocs-ui/provider/base";
 import { LandingExamples } from "./examples";
-import { LandingHeader } from "./header";
 import { LandingFooter } from "./footer";
 import { LandingHero } from "./hero";
 import { DeveloperWorkflows } from "./journey";
@@ -21,12 +20,12 @@ import styles from "./landing-system.module.css";
  */
 export function LandingPage({ examples }: { readonly examples: readonly HeroExample[] }) {
   return (
-    <RootProvider theme={{ defaultTheme: "dark", enableSystem: true }} search={{ enabled: false }}>
+    // The landing is light-only; forcing it keeps the shared docs header on the same tokens.
+    <RootProvider theme={{ forcedTheme: "light" }} search={{ enabled: false }}>
       <Container className="landing-root">
         <HeroDesign
           className={`${heroSans.variable} ${heroMono.variable} ${heroNeon.variable} ${heroCode.variable}`}
         >
-          <LandingHeader />
           <LandingHero />
           <LandingExamples examples={examples} />
         </HeroDesign>

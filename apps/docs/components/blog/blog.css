@@ -25,7 +25,8 @@
   --blog-mono: "Relkit Geist Mono", ui-monospace, monospace;
   --blog-frame: min(calc(100% - 48px), 1120px);
   --blog-gutter: 48px;
-  --blog-header: 72px;
+  /* Matches Blume's docs header (h-16), which the blog now renders. */
+  --blog-header: 64px;
 }
 
 :root[data-theme="dark"] {
@@ -90,38 +91,6 @@
   left: 8px;
 }
 
-/* Search is Blume's modal; only its dialog is used, opened from the header icon. */
-.blog-search {
-  display: contents;
-}
-
-.blog-search [data-blume-search-open] {
-  display: none;
-}
-
-/* Header */
-.blog-header {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  height: var(--blog-header);
-  border-bottom: 1px solid var(--blog-line);
-  background: color-mix(in srgb, var(--blog-page) 86%, transparent);
-  backdrop-filter: saturate(1.4) blur(12px);
-}
-
-.blog-header-inner {
-  display: flex;
-  width: var(--blog-frame);
-  height: 100%;
-  margin-inline: auto;
-  padding-inline: 24px;
-  box-sizing: border-box;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
 .blog-brand {
   display: inline-flex;
   align-items: center;
@@ -135,72 +104,6 @@
   flex: none;
   background: var(--blog-ink);
   stroke: var(--blog-page);
-}
-
-.blog-nav {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  font-size: 14px;
-}
-
-.blog-nav > a {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-  color: var(--blog-muted);
-  transition: color 150ms ease;
-}
-
-.blog-nav > a:hover,
-.blog-nav > a[aria-current="page"] {
-  color: var(--blog-ink);
-}
-
-.blog-nav > a[aria-current="page"] {
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 6px;
-}
-
-.blog-nav > .blog-icon-button {
-  margin-inline: -14px;
-}
-
-.blog-nav > .blog-icon-button + .blog-icon-button {
-  margin-left: -6px;
-}
-
-.blog-icon-button {
-  display: inline-flex;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  border-radius: 6px;
-  color: var(--blog-muted);
-  background: transparent;
-  cursor: pointer;
-  transition:
-    color 150ms ease,
-    background-color 150ms ease;
-}
-
-.blog-icon-button:hover {
-  color: var(--blog-ink);
-  background: var(--blog-soft);
-}
-
-.blog-theme-sun,
-:root[data-theme="dark"] .blog-theme-moon {
-  display: none;
-}
-
-:root[data-theme="dark"] .blog-theme-sun {
-  display: block;
 }
 
 .blog-button {
@@ -249,25 +152,6 @@
 
 .blog-text-link:hover span {
   transform: translateX(3px);
-}
-
-@media (max-width: 760px) {
-  .blog-nav {
-    gap: 20px;
-    font-size: 13px;
-  }
-  .blog-nav-hide-sm {
-    display: none !important;
-  }
-  .blog-header-inner {
-    padding-inline: 16px;
-  }
-}
-
-@media (max-width: 420px) {
-  .blog-nav > .blog-button {
-    display: none;
-  }
 }
 
 /* Frame */
