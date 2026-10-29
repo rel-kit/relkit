@@ -64,7 +64,7 @@ test("landing and docs retain canonical and social metadata", async ({ page, req
     );
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       "href",
-      `https://relkit.up.railway.app${path}`,
+      `https://relkit.dev${path}`,
     );
     const image = await page.locator('meta[property="og:image"]').getAttribute("content");
     expect(image).toBeTruthy();

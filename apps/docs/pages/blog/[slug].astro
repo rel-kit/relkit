@@ -49,7 +49,7 @@ const { post, newer, older, related } = Astro.props;
 const entry = await getEntry("docs", post.entryId);
 const headings = entry ? (await render(entry)).headings.filter((h) => h.depth === 2 || h.depth === 3) : [];
 const category = blogCategories[post.category];
-const site = (data.config.site ?? "https://relkit.up.railway.app").replace(/\/$/, "");
+const site = (data.config.site ?? "https://relkit.dev").replace(/\/$/, "");
 const url = `${site}${post.href}`;
 const shareOnX = `https://x.com/intent/post?${new URLSearchParams({ text: post.title, url })}`;
 const jsonLd = {

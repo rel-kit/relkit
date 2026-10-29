@@ -123,8 +123,8 @@ Replay the original bug through its failing boundary. A direct function test alo
 
 New database scaffolds keep one tracked SQL/metadata history beside their database service at `src/services/database/migrations`, shared by auth and business tables. Configure the target and output explicitly in root `drizzle.config.ts`, set the required environment, run `bun run db:generate`, review history, then explicitly run `bun run db:migrate` (`relkit db migrate`, or `--config <path>`). Runner implementation belongs to installed tooling, not copied scripts. Scaffolding opens no database and applies no SQL. Preserve existing schema/history/data, current flat layout support and any required dependency patch; do not split histories by business service or reset migration logs.
 
-Follow the [Orders tutorial](https://relkit.up.railway.app/docs/start/create-an-app) for a
-continuous first app, [Service](https://relkit.up.railway.app/docs/service) for code placement,
-and [HTTP routes](https://relkit.up.railway.app/docs/http) for transport behavior. Use the
-[API reference](https://relkit.up.railway.app/docs/api/app) for exact signatures. If the
+Follow the [Orders tutorial](https://relkit.dev/docs/start/create-an-app) for a
+continuous first app, [Service](https://relkit.dev/docs/service) for code placement,
+and [HTTP routes](https://relkit.dev/docs/http) for transport behavior. Use the
+[API reference](https://relkit.dev/docs/api/app) for exact signatures. If the
 installed version differs from the published docs, inspect its CLI help and package types.

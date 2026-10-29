@@ -64,7 +64,7 @@ export const defineConstantsEffect = Effect.fn("App.defineConstants")(
  * const limits = defineConstants({ maxItems: 20, region: environment.REGION });
  * // Literal values are immutable; the environment reference resolves with the context.
  * ```
- * @see https://relkit.up.railway.app/docs/modules/service/context-values
+ * @see https://relkit.dev/docs/modules/service/context-values
  */
 export function defineConstants<const Values extends ConstantsShape>(
   values: Values,
@@ -116,7 +116,7 @@ export const definePromptEffect = Effect.fn("App.definePrompt")(
  * const support = definePrompt(["Use the order details.", "Do not invent delivery dates."]);
  * // support.value preserves the two fragments in order.
  * ```
- * @see https://relkit.up.railway.app/docs/modules/service/context-values
+ * @see https://relkit.dev/docs/modules/service/context-values
  */
 export function definePrompt<const Value extends PromptValue>(
   value: Value,

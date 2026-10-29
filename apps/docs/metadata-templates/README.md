@@ -15,5 +15,5 @@ Version 0.2.2 renders PNG/ICO icons from the logo but always writes a lettermark
 SVG. This refinement derives the SVG from the same mark and adds light/dark
 contrast. Keep `public/metadata/mark.svg` as the editable source.
 
-The canonical website URL is `https://relkit.up.railway.app`; update the config,
+The canonical website URL is `https://relkit.dev`; update the config,
 layout footer, and Next.js `metadataBase` together if the public domain changes.

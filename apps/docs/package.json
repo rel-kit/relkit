@@ -12,7 +12,6 @@
     "dev": "bun run generate && NODE_OPTIONS=--max-old-space-size=8192 blume dev --host=127.0.0.1 --port=3001",
     "generate": "bun run scripts/generate.ts",
     "generate:check": "bun run scripts/generate.ts --check",
-    "start": "HOST=0.0.0.0 node dist/server/entry.mjs",
     "test": "bun test tests/*.test.ts",
     "test:browser": "playwright test --config=playwright.config.ts",
     "test:installations": "bun x turbo run build --cwd=../.. --filter='./packages/*' --filter='./integrations/*' --filter='./integrations/packages/*' --output-logs=errors-only && bun run scripts/check-installation-workflows.ts",
