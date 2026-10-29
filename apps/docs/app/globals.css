@@ -1,8 +1,9 @@
-/* Aligns the landing utilities and embedded Blume search with the neutral landing theme. */
+/* Aligns the landing utilities and the shared Blume docs header with the neutral landing theme. */
 @import "tailwindcss";
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
-@source "../node_modules/blume/src/components/layout/Search.astro";
+@source "../node_modules/blume/src/components/layout";
+@source "../node_modules/blume/src/components/Icon.astro";
 
 @theme inline {
   --color-background: var(--color-fd-background);

@@ -9,7 +9,7 @@
     "check:jsdoc": "bun run scripts/check-jsdoc.ts",
     "check:links": "blume validate --strict",
     "check:search": "bun run scripts/check-search.ts",
-    "dev": "bun run generate && blume dev --host=127.0.0.1 --port=3001",
+    "dev": "bun run generate && NODE_OPTIONS=--max-old-space-size=8192 blume dev --host=127.0.0.1 --port=3001",
     "generate": "bun run scripts/generate.ts",
     "generate:check": "bun run scripts/generate.ts --check",
     "start": "HOST=0.0.0.0 node dist/server/entry.mjs",

@@ -41,3 +41,8 @@
 .docs-home > p {
   color: var(--blume-muted-foreground);
 }
+
+/* Backstop: no wide element (a long code line, a table) may give the page a horizontal scroll. */
+body {
+  overflow-x: clip;
+}

@@ -23,7 +23,7 @@ test("sidebar links every documentation page exactly once", async () => {
         .replace(/\.mdx?$/, "")
         .replace(/\/index$/, ""),
     )
-    .filter((path) => path.startsWith("docs/") || path.startsWith("guides"))
+    .filter((path) => path === "docs" || path.startsWith("docs/") || path.startsWith("guides"))
     .map((path) => `/${path}`);
   const actual = routes(documentationSidebar);
   expect(new Set(actual).size).toBe(actual.length);

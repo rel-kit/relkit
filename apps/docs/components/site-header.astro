@@ -1,0 +1,81 @@
+---
+/**
+ * The docs header for pages that own their document shell (landing, blog): Blume's own
+ * `Header`, plus the tabs-only mobile drawer Blume's `PageLayout` would otherwise render,
+ * so the menu button opens the same Docs, Guides, Reference and Blog tabs as the docs.
+ */
+import data from "blume:data";
+import Icon from "blume/components/Icon.astro";
+import Header from "blume/components/layout/Header.astro";
+import NavTabMenu from "blume/components/layout/NavTabMenu.astro";
+import { currentTabForRoute } from "blume/components/layout/nav-utils.ts";
+import { withMountedBase } from "blume/components/islands/base-path.ts";
+import { EN_UI } from "blume/core/i18n-ui.ts";
+import { NEW_TAB_HINT_ID } from "blume/core/new-tab.ts";
+
+interface Props {
+  /** Base-less route of the page, which picks the highlighted tab. */
+  readonly route: string;
+}
+
+const { route } = Astro.props;
+const { navigation } = data;
+const strings = EN_UI.nav;
+const activeTab = currentTabForRoute(navigation.tabs, route, navigation.root);
+---
+
+{/* The header's new-tab links (GitHub) describe themselves through this hint. */}
+<span hidden id={NEW_TAB_HINT_ID}>{strings.opensInNewTab}</span>
+<Header
+  hasSidebar={false}
+  logo={data.config.logo}
+  navigation={navigation}
+  route={route}
+  searchEnabled={data.config.search.enabled}
+  site={{ title: data.config.title }}
+/>
+{
+  navigation.tabs.length > 0 && (
+    <>
+      <aside
+        aria-label={strings.navigation}
+        class="fixed top-[var(--blume-drawer-top,4rem)] start-0 z-[35] h-[calc(100dvh-var(--blume-drawer-top,4rem))] w-64 max-w-[80vw] -translate-x-[105%] overflow-y-auto border-border border-e bg-background px-5 pt-4 pb-6 transition-transform rtl:translate-x-[105%] [:where([data-blume-nav-open])_&]:translate-x-0! lg:hidden"
+        data-blume-nav-drawer
+        id="blume-nav-drawer"
+      >
+        <nav aria-label={strings.sections}>
+          <ul class="m-0 list-none p-0">
+            {navigation.tabs.map((tab) => (
+              <li>
+                {tab.items && tab.items.length > 0 ? (
+                  <NavTabMenu active={tab === activeTab} route={route} tab={tab} variant="drawer" />
+                ) : (
+                  <a
+                    aria-current={tab === activeTab ? "page" : undefined}
+                    class="flex items-center gap-2 rounded-[0.65rem] px-2.5 py-1.5 font-medium text-muted-foreground text-sm transition-colors hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground"
+                    href={withMountedBase(tab.href ?? tab.path)}
+                  >
+                    {tab.icon && <Icon class="shrink-0" name={tab.icon} size={14} />}
+                    <span class="flex-1 truncate">{tab.label}</span>
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+      <button
+        aria-label={strings.closeNavigation}
+        class="fixed inset-0 z-[30] hidden cursor-pointer border-0 bg-black/40 [:where([data-blume-nav-open])_&]:block lg:hidden"
+        data-blume-nav-toggle
+        type="button"
+      />
+    </>
+  )
+}
+
+<script>
+  import { syncDrawerInert } from "blume/components/layout/drawer-inert.ts";
+
+  syncDrawerInert();
+</script>

@@ -47,16 +47,15 @@ export default defineConfig({
     fonts: { display: sans, body: sans, mono },
   },
   navigation: {
-    sidebar: {
-      display: "group",
-      items: [
-        { label: "Home", href: "/", icon: "house" },
-        { label: "Documentation", root: "/docs", icon: "book-open" },
-        { label: "Blog", href: "/blog", icon: "newspaper" },
-        { label: "GitHub", href: "https://github.com/rel-kit/relkit", icon: "github" },
-        ...documentationSidebar,
-      ],
-    },
+    // The root tab owns every group the other tabs do not: Learn, Core concepts and Modules.
+    tabs: [
+      { label: "Docs", path: "/", href: "/docs" },
+      { label: "Guides", path: "/guides" },
+      { label: "Reference", path: "/docs/api" },
+      { label: "Blog", path: "/blog" },
+    ],
+    actions: [{ label: "GitHub", href: "https://github.com/rel-kit/relkit" }],
+    sidebar: { display: "flat", items: documentationSidebar },
   },
   search: {
     indexing: { includeCodeBlocks: true },

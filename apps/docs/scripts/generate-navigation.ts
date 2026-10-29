@@ -1,5 +1,5 @@
 /** Shares catalog ordering between generated metadata and the site-wide Blume sidebar. */
-import type { SidebarItemConfig } from "blume/schema";
+import type { SidebarDisplay, SidebarItemConfig } from "blume/schema";
 import { apiPackageDefinitions } from "./documentation-catalog.js";
 import { guideGroups } from "./guide-catalog.js";
 import type { Emit } from "./generation.types.js";
@@ -84,17 +84,59 @@ function sidebarItem(directory: string): SidebarItemConfig {
     label: group.title,
     icon: group.icon,
     ...(group.pages.some((page) => page === "index") ? { root: `/${directory}` } : {}),
-    ...(directory === "docs/learn" ? { collapsed: false } : {}),
+    display: group.display as SidebarDisplay,
     items: group.pages
       .filter((page) => page !== "index")
       .map((page) => sidebarItem(`${directory}/${page}`)),
   };
 }
 
-/** Keeps every section available while Blume expands the current page's ancestors. */
-export const documentationSidebar = ["docs/learn", "docs/modules", "guides", "docs/api"].map(
-  (directory) => sidebarItem(directory),
+type SidebarGroup = Exclude<SidebarItemConfig, string>;
+
+/** Reads one catalog group's rows, which always exist for a known directory.
+ * @param directory - Content directory owning the group. @returns Its configured rows. */
+function groupItems(directory: string): SidebarItemConfig[] {
+  return (sidebarItem(directory) as SidebarGroup).items ?? [];
+}
+
+/** Builds a top-level section that renders as an always-open heading, like the ew docs.
+ * @param directory - Content directory owning the section.
+ * @param items - Section rows; defaults to the catalog order. @returns A flat Blume group. */
+function section(directory: string, items = groupItems(directory)): SidebarGroup {
+  return { ...(sidebarItem(directory) as SidebarGroup), display: "flat", items };
+}
+
+const coreReference = new Set(
+  apiPackageDefinitions
+    .filter(({ group }) => group === "core")
+    .map(({ slug }) => `/docs/api/${slug}`),
 );
+const referencePages = groupItems("docs/api").filter((item) => typeof item === "string");
+
+/**
+ * Header tabs scope this tree: the root "Docs" tab shows the groups no other tab owns, while
+ * the Guides and Reference tabs match their section's `root` and show only its rows.
+ */
+export const documentationSidebar: SidebarItemConfig[] = [
+  "/docs",
+  section(
+    "docs/learn",
+    groupItems("docs/learn").filter((item) => typeof item === "string"),
+  ),
+  section("docs/learn/concepts"),
+  section("docs/modules"),
+  section("guides"),
+  section("docs/api", [
+    ...referencePages.filter((page) => !coreReference.has(page)),
+    {
+      label: "Core packages",
+      icon: "package",
+      display: "flat",
+      items: referencePages.filter((page) => coreReference.has(page)),
+    },
+    section("docs/api/integrations"),
+  ]),
+];
 
 /** Emits ordered section and module navigation without maintaining a second tree.
  * @param emit - Owned output writer/checker. @returns Completion after all metadata. */
