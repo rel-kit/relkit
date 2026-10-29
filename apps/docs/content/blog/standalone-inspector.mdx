@@ -1,0 +1,41 @@
+---
+title: The Inspector is now a standalone tool
+description: The Inspector moves into its own package, so backends stay lean and inspection becomes something you add on purpose.
+type: blog
+date: 2026-10-26
+category: release
+illustration: trace
+authors:
+  - name: RELKIT Team
+---
+
+The Inspector lets you browse a running application's routes, resources, traces, and request history. Until now it shipped alongside the rest of the toolkit. Starting with this release it lives in its own package, `@relkit/inspector`, and every backend installation leaves it out unless you ask for it.
+
+## Why we split it out
+
+Most of the time a backend only needs its runtime. The Inspector carries a UI and a diagnostic history worker, and those pulled Node.js and a web toolchain into installs that never opened them. Moving it out keeps the default installation lean: the backend-only development workflow needs no Node.js at all.
+
+## Adding it to a project
+
+One command enables the application bridge and installs the tool as a project dev dependency:
+
+```sh title="Terminal"
+bun run relkit add inspector --project-root .
+```
+
+It sets `inspector: { enabled: true }` in `relkit.config.ts`, adds `@relkit/inspector` to `devDependencies`, and adds an `inspector` script that runs `relkit inspector`. Nothing is installed globally, and an `inspector.enabled: false` you wrote yourself is reported as a conflict instead of being overwritten.
+
+The bridge listens on `127.0.0.1` with an ephemeral port by default, separate from the Inspector UI, which defaults to port 3210.
+
+## What stays the same
+
+`relkit jobs` still reads and controls live provider state on the backend, with or without the Inspector. Logs, request history, and traces belong to the Inspector, and since this release dev reloads pick up Inspector config changes without a restart.
+
+<CardGroup cols={2}>
+  <Card title="Inspector" href="/docs/modules/operations/inspector" icon="scan-eye">
+    Set up the bridge and follow a request end to end.
+  </Card>
+  <Card title="Observability" href="/docs/modules/operations/observability" icon="activity">
+    Logs, traces, and diagnostics for running apps.
+  </Card>
+</CardGroup>

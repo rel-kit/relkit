@@ -16,6 +16,7 @@ export function LandingFooter() {
           <Link href="/docs">Docs</Link>
           <Link href="/docs/api/cli">CLI</Link>
           <Link href="/docs/api/app">API</Link>
+          <Link href="/blog">Blog</Link>
           <a href="https://github.com/rel-kit/relkit">
             GitHub <ArrowUpRight size={12} aria-hidden="true" />
           </a>

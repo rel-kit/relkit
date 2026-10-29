@@ -1,0 +1,12 @@
+---
+/** The RELKIT mark from the landing: an ink square split into four by page-coloured lines. */
+interface Props {
+  readonly size?: number;
+}
+
+const { size = 28 } = Astro.props;
+---
+
+<svg class="blog-logo" width={size} height={size} viewBox="3 3 18 18" fill="none" stroke-width="2" aria-hidden="true">
+  <path d="M12 3v18M3 12h18"></path>
+</svg>

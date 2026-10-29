@@ -1,0 +1,20 @@
+---
+/** A quiet RSS strip; with a single post it doubles as "more soon". */
+import { blogFeed } from "./posts";
+
+interface Props {
+  readonly single?: boolean;
+}
+
+const { single = false } = Astro.props;
+---
+
+<section class="blog-row blog-subscribe" aria-label="Subscribe">
+  <p>{single ? "More posts soon. Get them in your feed reader." : "Get new posts in your feed reader."}</p>
+  <a class="blog-button" href={blogFeed}>
+    <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
+      <path fill="currentColor" d="M5 3a16 16 0 0 1 16 16h-3A13 13 0 0 0 5 6zm0 6a10 10 0 0 1 10 10h-3a7 7 0 0 0-7-7zm2 7a2 2 0 1 1 0 4 2 2 0 0 1 0-4"></path>
+    </svg>
+    Subscribe via RSS
+  </a>
+</section>
