@@ -1,0 +1,11 @@
+// Serves the static `blume build` output on Cloudflare Workers static assets.
+{
+  "name": "relkit-docs",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    // Blume writes `<route>/index.html` and links without a trailing slash.
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "404-page",
+  },
+}
