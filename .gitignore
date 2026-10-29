@@ -56,3 +56,4 @@ examples/commerce/.relkit/generated/application.graph.json
 examples/commerce/.relkit/generated/client.ts
 examples/commerce/.relkit/generated/openapi.json
 examples/commerce/.relkit/generated/runtime.manifest.ts
+.claude/launch.json
