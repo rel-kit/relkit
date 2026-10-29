@@ -1,0 +1,38 @@
+---
+title: One migration history, run by RELKIT
+description: Database migrations now live beside the service that owns them, and installed RELKIT tooling runs them for every dialect.
+type: blog
+date: 2026-10-18
+category: engineering
+illustration: bars
+authors:
+  - name: RELKIT Team
+---
+
+A migration applies a reviewed schema change to a database. RELKIT has always generated those migrations from your TypeScript tables with Drizzle Kit. What changed is where the history lives and who runs it.
+
+## Migrations beside their service
+
+Generated SQL and its metadata now stay in `src/services/database/migrations`, next to the service and schema that own them. Auth tables and business tables share that one ordered history. The `.relkit/` folder only holds ignored runtime and build output, never migration source.
+
+## One command to apply them
+
+Shared migration execution moved into installed RELKIT tooling:
+
+```sh title="Terminal"
+bun --bun drizzle-kit generate --name=initial
+bun run db:migrate
+```
+
+`db:migrate` runs `relkit db migrate`. SQLite uses the Bun-native driver with no copied runner, while PostgreSQL and MySQL delegate to the Drizzle Kit your application already installs.
+
+`check`, `build`, and `dev` still never apply migrations for you. Migrate first, then start code that depends on the new shape.
+
+<CardGroup cols={2}>
+  <Card title="Migrations" href="/docs/modules/database/migrations" icon="git-branch">
+    Configure Drizzle Kit, then generate, review, and apply.
+  </Card>
+  <Card title="Define a database" href="/docs/modules/database/define" icon="database">
+    Add a database service to an application.
+  </Card>
+</CardGroup>

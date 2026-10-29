@@ -9,3 +9,5 @@ openspec/changes/archive/**
 tests/compiler/fixtures/**/expected*.json
 tests/deployment/golden/**
 docs/*technical-spec*.md
+# Mirrors the author-formatted Medium article; keep its code snippets byte-for-byte.
+apps/docs/content/blog/introducing-relkit.mdx
