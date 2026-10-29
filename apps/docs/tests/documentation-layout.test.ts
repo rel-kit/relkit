@@ -8,7 +8,6 @@ import {
   renderRelated,
 } from "../scripts/generate-guides.js";
 import { markdownFiles, sourceFiles } from "./documentation-fixture.js";
-import type { DocumentationManifest, DeploymentConfiguration } from "./documentation.types.js";
 const content = resolve(import.meta.dir, "../content");
 
 test("keeps guides backed by executable examples and self-hosted discovery", async () => {
@@ -70,23 +69,4 @@ test("documents grouped service roots and rejects removed layer-first advice", a
   expect(createSource).toContain("src/services/hello/service.ts");
   expect(createSource).toContain("src/routes/hello/route.ts");
   expect(createSource).not.toContain("src/services/service.ts");
-});
-
-test("builds and starts from the repository root on Railway", async () => {
-  const manifest = (await Bun.file(
-    resolve(import.meta.dir, "../package.json"),
-  ).json()) as DocumentationManifest;
-  const railway = (await Bun.file(
-    resolve(import.meta.dir, "../../../railway.json"),
-  ).json()) as DeploymentConfiguration;
-
-  expect(manifest.scripts.start).toBe("HOST=0.0.0.0 node dist/server/entry.mjs");
-  expect(railway.build).toEqual({
-    builder: "DOCKERFILE",
-    dockerfilePath: "Dockerfile.docs",
-  });
-  expect(railway.deploy).toMatchObject({
-    startCommand: "bun --cwd=apps/docs run start",
-    healthcheckPath: "/docs",
-  });
 });

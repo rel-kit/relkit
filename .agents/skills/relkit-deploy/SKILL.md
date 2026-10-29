@@ -1,6 +1,6 @@
 ---
 name: relkit-deploy
-description: Prepare, preview, and deploy a RELKIT application to AWS with Pulumi. Use for RELKIT cloud stack operations; not for local development or the docs site's Railway deployment.
+description: Prepare, preview, and deploy a RELKIT application to AWS with Pulumi. Use for RELKIT cloud stack operations; not for local development.
 ---
 
 # Deploy a RELKIT application
@@ -45,6 +45,6 @@ the deployed application with a relevant health check and request flow. Report t
 resource changes, endpoint, and any failed verification. `refresh` and `destroy` are
 separate operations; do not run them merely to complete a deployment.
 
-See the [deployment guide](https://relkit.up.railway.app/docs/operations/deployment) for
-ownership and lifecycle details and the [CLI reference](https://relkit.up.railway.app/docs/operations/cli-reference)
+See the [deployment guide](https://relkit.dev/docs/operations/deployment) for
+ownership and lifecycle details and the [CLI reference](https://relkit.dev/docs/operations/cli-reference)
 for current flags. Match commands to the application's installed CLI version.

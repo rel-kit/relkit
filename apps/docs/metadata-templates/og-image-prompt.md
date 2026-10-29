@@ -13,7 +13,7 @@ subtle thin neutral-gray border rails, crisp Geist-like sans typography, origina
 four-square black logo next to RELKIT. Retain the exact hero headline centered on
 two lines: 'The TypeScript' / 'Kit Framework' in bold, tight tracking, large highly
 legible type approximately 78px. Top brand row 86px tall: four-square mark and
-RELKIT wordmark at left, small gray text 'relkit.up.railway.app' at right. Thin
+RELKIT wordmark at left, small gray text 'relkit.dev' at right. Thin
 border underneath and vertical rails at x=40 and x=1160. Main editorial area below
 with balanced white space: centered mono eyebrow 'THE TYPESCRIPT APPLICATION KIT',
 then the large two-line headline, then two centered lines of restrained gray

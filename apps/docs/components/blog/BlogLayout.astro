@@ -24,7 +24,7 @@ interface Props {
 }
 
 const { title, description, path, ogImage, ogType = "website", jsonLd, published } = Astro.props;
-const site = (data.config.site ?? "https://relkit.up.railway.app").replace(/\/$/, "");
+const site = (data.config.site ?? "https://relkit.dev").replace(/\/$/, "");
 const canonical = `${site}${path}`;
 const image = `${site}${ogImage}`;
 const hasFeed = data.feeds.some((feed) => feed.href === blogFeed);

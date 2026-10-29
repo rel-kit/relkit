@@ -72,8 +72,8 @@ The deployment skill covers AWS/Pulumi checks, preview, apply, and post-deploy
 verification. Both skills are also available directly in this repository under
 `.agents/skills/`.
 
-Agents can read the Fumadocs-generated [documentation index](https://relkit.up.railway.app/llms.txt)
-or [full processed documentation](https://relkit.up.railway.app/llms-full.txt).
+Agents can read the Fumadocs-generated [documentation index](https://relkit.dev/llms.txt)
+or [full processed documentation](https://relkit.dev/llms-full.txt).
 
 ## Develop the repository
 

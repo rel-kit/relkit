@@ -1,6 +1,6 @@
 /** Configures the documentation shell; the custom homepage owns its existing React layout. */
 import { defineConfig } from "blume";
-import { cloudflare, node } from "blume/deploy";
+import { cloudflare } from "blume/deploy";
 import { Schema } from "effect";
 import { blogCategories, blogIllustrations } from "./components/blog/posts.js";
 import redirects from "./redirects.json";
@@ -8,7 +8,7 @@ import { documentationSidebar } from "./scripts/generate-navigation.js";
 
 const sans = { name: "Geist", variants: [{ src: "./public/fonts/geist-latin.woff2" }] };
 const mono = { name: "Geist Mono", variants: [{ src: "./public/fonts/geist-mono-latin.woff2" }] };
-const site = process.env.RELKIT_DOCS_SITE ?? "https://relkit.up.railway.app";
+const site = process.env.RELKIT_DOCS_SITE ?? "https://relkit.dev";
 
 export default defineConfig({
   title: "RELKIT",
@@ -68,6 +68,6 @@ export default defineConfig({
   },
   feedback: false,
   redirects: redirects.map(({ from, to }) => ({ from, to, status: 301 })),
-  // Cloudflare Workers Builds sets WORKERS_CI and serves a static build; Railway runs the Node server.
-  deployment: process.env.WORKERS_CI ? cloudflare({ site, output: "static" }) : node({ site }),
+  // Cloudflare Workers serves the static build.
+  deployment: cloudflare({ site, output: "static" }),
 });

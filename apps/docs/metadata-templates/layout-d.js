@@ -69,7 +69,7 @@ export function layoutD({ headline, tagline, colors, logoBase64 }) {
           },
           [
             box({}, "TypeScript / Local to cloud / Open source"),
-            box({ color: colors.foreground }, "relkit.up.railway.app ↗"),
+            box({ color: colors.foreground }, "relkit.dev ↗"),
           ],
         ),
       ],
