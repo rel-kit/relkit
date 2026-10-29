@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.7.16
+
+### Changes
+
+- Refresh bundled dependency versions.
+- Point the TSDoc `@see` links for `defineConstants`, `definePrompt`, `RelkitClientProvider` and `useRelkitClient` at the documentation on relkit.dev instead of the retired Railway host.
+
 ## 0.7.15
 
 ### Changes
