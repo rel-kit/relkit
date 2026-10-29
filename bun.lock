@@ -293,7 +293,7 @@
     },
     "integrations/packages/langchain": {
       "name": "@relkit/langchain",
-      "version": "0.7.12",
+      "version": "0.7.13",
       "dependencies": {
         "@cfworker/json-schema": "4.1.1",
         "@relkit/agents": "workspace:*",
@@ -453,7 +453,7 @@
     },
     "packages/app": {
       "name": "@relkit/app",
-      "version": "0.8.1",
+      "version": "0.8.2",
       "dependencies": {
         "@relkit/agents": "workspace:*",
         "@relkit/buckets": "workspace:*",
@@ -480,7 +480,7 @@
     },
     "packages/better-auth": {
       "name": "@relkit/better-auth",
-      "version": "0.8.1",
+      "version": "0.8.2",
       "dependencies": {
         "@relkit/client": "workspace:*",
         "@relkit/contracts": "workspace:*",
@@ -539,7 +539,7 @@
     },
     "packages/cli": {
       "name": "@relkit/cli",
-      "version": "0.8.3",
+      "version": "0.8.4",
       "bin": {
         "relkit": "./dist/bin.js",
       },
@@ -581,7 +581,7 @@
     },
     "packages/client": {
       "name": "@relkit/client",
-      "version": "0.8.1",
+      "version": "0.8.2",
       "dependencies": {
         "@orpc/client": "catalog:",
         "@orpc/contract": "catalog:",
@@ -628,7 +628,7 @@
     },
     "packages/cloud-aws": {
       "name": "@relkit/cloud-aws",
-      "version": "0.7.12",
+      "version": "0.7.13",
       "dependencies": {
         "@pulumi/aws": "catalog:",
         "@pulumi/awsx": "3.10.0",
@@ -690,7 +690,7 @@
     },
     "packages/create-relkit": {
       "name": "create-relkit",
-      "version": "0.8.3",
+      "version": "0.8.4",
       "bin": {
         "create-relkit": "./dist/bin.js",
       },
@@ -771,7 +771,7 @@
     },
     "packages/engine": {
       "name": "@relkit/engine",
-      "version": "0.8.1",
+      "version": "0.8.2",
       "dependencies": {
         "@relkit/app": "workspace:*",
         "@relkit/buckets": "workspace:*",
@@ -1010,7 +1010,7 @@
     },
     "packages/relkit": {
       "name": "relkit",
-      "version": "0.8.3",
+      "version": "0.8.4",
       "bin": {
         "relkit": "./dist/bin.js",
       },
@@ -1056,7 +1056,7 @@
     },
     "packages/runtime-hono": {
       "name": "@relkit/runtime-hono",
-      "version": "0.8.1",
+      "version": "0.8.2",
       "dependencies": {
         "@opentelemetry/api": "1.9.1",
         "@orpc/contract": "catalog:",
@@ -1151,7 +1151,7 @@
     },
     "packages/testing": {
       "name": "@relkit/testing",
-      "version": "0.8.1",
+      "version": "0.8.2",
       "dependencies": {
         "@relkit/buckets": "workspace:*",
         "@relkit/cache": "workspace:*",

@@ -1,18 +1,50 @@
 {
   "protocol": "relkit.release-plan.v1",
-  "version": "0.7.15",
+  "version": "0.7.16",
   "packages": [
     {
-      "name": "@relkit/cli",
-      "version": "0.8.3"
+      "name": "create-relkit",
+      "version": "0.8.4"
     },
     {
-      "name": "create-relkit",
-      "version": "0.8.3"
+      "name": "@relkit/app",
+      "version": "0.8.2"
+    },
+    {
+      "name": "@relkit/client",
+      "version": "0.8.2"
+    },
+    {
+      "name": "@relkit/cli",
+      "version": "0.8.4"
     },
     {
       "name": "relkit",
-      "version": "0.8.3"
+      "version": "0.8.4"
+    },
+    {
+      "name": "@relkit/engine",
+      "version": "0.8.2"
+    },
+    {
+      "name": "@relkit/better-auth",
+      "version": "0.8.2"
+    },
+    {
+      "name": "@relkit/runtime-hono",
+      "version": "0.8.2"
+    },
+    {
+      "name": "@relkit/cloud-aws",
+      "version": "0.7.13"
+    },
+    {
+      "name": "@relkit/testing",
+      "version": "0.8.2"
+    },
+    {
+      "name": "@relkit/langchain",
+      "version": "0.7.13"
     }
   ]
 }
