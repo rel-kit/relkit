@@ -34,6 +34,7 @@
         "$TURBO_ROOT$/integrations/packages/*/src/**",
         "$TURBO_ROOT$/docgen.json"
       ],
+      "env": ["WORKERS_CI", "RELKIT_DOCS_SITE"],
       "outputs": ["dist/**", "content/_snippets/**", "content/**/meta.ts", "content/docs/api/**"]
     },
     "@relkit/inspector#build": {
