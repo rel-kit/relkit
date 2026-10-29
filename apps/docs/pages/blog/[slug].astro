@@ -109,46 +109,48 @@ const jsonLd = {
         <BlumePage id={post.entryId} />
       </div>
       <aside class="blog-post-aside" aria-label="Post tools">
-        {
-          headings.length > 1 && (
-            <nav class="blog-toc" aria-labelledby="blog-toc-title">
-              <h2 id="blog-toc-title" class="blog-label">
-                On this page
-              </h2>
-              <ol>
-                {headings.map((heading) => (
-                  <li data-depth={heading.depth}>
-                    <a href={`#${heading.slug}`} data-blog-toc-link={heading.slug}>
-                      {heading.text}
-                    </a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          )
-        }
-        <div class="blog-share">
-          <h2 class="blog-label">Share</h2>
-          <div>
-            <button class="blog-icon-button" type="button" data-blog-copy={url} aria-label="Copy link">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-                <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path>
-                <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path>
-              </svg>
-            </button>
-            <a class="blog-icon-button" href={shareOnX} aria-label="Share on X">
-              <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-                <path fill="currentColor" d="M17.8 3h3.1l-6.7 7.6L22 21h-6.2l-4.8-6.3L5.5 21H2.4l7.2-8.2L2 3h6.3l4.4 5.8zm-1.1 16.2h1.7L7.4 4.7H5.6z"></path>
-              </svg>
-            </a>
-            <button class="blog-icon-button" type="button" data-blog-markdown={`${post.href}.md`} aria-label="Copy as Markdown">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-                <rect x="2.5" y="5.5" width="19" height="13" rx="2"></rect>
-                <path d="M6 15V9l2.5 3L11 9v6M15.5 9v6m0 0-2-2m2 2 2-2"></path>
-              </svg>
-            </button>
+        <div class="blog-post-aside-inner">
+          {
+            headings.length > 1 && (
+              <nav class="blog-toc" aria-labelledby="blog-toc-title">
+                <h2 id="blog-toc-title" class="blog-label">
+                  On this page
+                </h2>
+                <ol>
+                  {headings.map((heading) => (
+                    <li data-depth={heading.depth}>
+                      <a href={`#${heading.slug}`} data-blog-toc-link={heading.slug}>
+                        {heading.text}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            )
+          }
+          <div class="blog-share">
+            <h2 class="blog-label">Share</h2>
+            <div>
+              <button class="blog-icon-button" type="button" data-blog-copy={url} aria-label="Copy link">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                  <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path>
+                  <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path>
+                </svg>
+              </button>
+              <a class="blog-icon-button" href={shareOnX} aria-label="Share on X">
+                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                  <path fill="currentColor" d="M17.8 3h3.1l-6.7 7.6L22 21h-6.2l-4.8-6.3L5.5 21H2.4l7.2-8.2L2 3h6.3l4.4 5.8zm-1.1 16.2h1.7L7.4 4.7H5.6z"></path>
+                </svg>
+              </a>
+              <button class="blog-icon-button" type="button" data-blog-markdown={`${post.href}.md`} aria-label="Copy as Markdown">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                  <rect x="2.5" y="5.5" width="19" height="13" rx="2"></rect>
+                  <path d="M6 15V9l2.5 3L11 9v6M15.5 9v6m0 0-2-2m2 2 2-2"></path>
+                </svg>
+              </button>
+            </div>
+            <p class="blog-share-status" role="status" data-blog-share-status></p>
           </div>
-          <p class="blog-share-status" role="status" data-blog-share-status></p>
         </div>
       </aside>
     </div>
