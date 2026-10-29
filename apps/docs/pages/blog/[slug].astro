@@ -1,0 +1,258 @@
+---
+/**
+ * A blog post in the landing frame. Blume still owns each post's content route for
+ * the sitemap, Markdown mirror, OG card, and feed; this page replaces only its HTML.
+ */
+import { getCollection, getEntry, render } from "astro:content";
+import data from "blume:data";
+import BlumePage from "blume/components/BlumePage.astro";
+import { getBlumeCollection } from "blume/runtime";
+import BlogLayout from "../../components/blog/BlogLayout.astro";
+import Byline from "../../components/blog/Byline.astro";
+import Cta from "../../components/blog/Cta.astro";
+import Illustration from "../../components/blog/Illustration.astro";
+import PostCard from "../../components/blog/PostCard.astro";
+import {
+  blogCategories,
+  relatedPosts,
+  toPosts,
+  type BlogPost,
+} from "../../components/blog/posts";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const routes = getBlumeCollection(data, { locale: data.config.i18n?.defaultLocale });
+  const posts = toPosts(
+    await getCollection("docs"),
+    new Map(routes.map((route) => [route.entryId, route.path])),
+  );
+  return posts.map((post, index) => ({
+    params: { slug: post.slug },
+    props: {
+      post,
+      newer: posts[index - 1],
+      older: posts[index + 1],
+      related: relatedPosts(post, posts),
+    },
+  }));
+}
+
+interface Props {
+  readonly post: BlogPost;
+  readonly newer?: BlogPost;
+  readonly older?: BlogPost;
+  readonly related: readonly BlogPost[];
+}
+
+const { post, newer, older, related } = Astro.props;
+const entry = await getEntry("docs", post.entryId);
+const headings = entry ? (await render(entry)).headings.filter((h) => h.depth === 2 || h.depth === 3) : [];
+const category = blogCategories[post.category];
+const site = (data.config.site ?? "https://relkit.up.railway.app").replace(/\/$/, "");
+const url = `${site}${post.href}`;
+const shareOnX = `https://x.com/intent/post?${new URLSearchParams({ text: post.title, url })}`;
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.title,
+  description: post.description,
+  datePublished: post.date.toISOString(),
+  url,
+  image: `${site}/og${post.href}.png`,
+  author: post.authors.map((author) => ({ "@type": "Person", name: author.name, url: author.url })),
+  publisher: { "@type": "Organization", name: "RELKIT", url: site },
+};
+---
+
+<BlogLayout
+  title={`${post.title} — RELKIT Blog`}
+  description={post.description}
+  path={post.href}
+  ogImage={`/og${post.href}.png`}
+  ogType="article"
+  published={post.date}
+  jsonLd={jsonLd}
+>
+  <article class="blog-post">
+    <header class="blog-post-head">
+      <nav class="blog-label blog-breadcrumbs" aria-label="Breadcrumb">
+        <a href="/blog">Blog</a>
+        <span aria-hidden="true">/</span>
+        <a href={`/blog?category=${post.category}`}>{category.label}</a>
+      </nav>
+      <h1>{post.title}</h1>
+      <p class="blog-post-summary">{post.description}</p>
+      <Byline post={post} minutes month="long" />
+    </header>
+
+    <div class="blog-row blog-post-hero" aria-hidden="true">
+      <Illustration name={post.illustration} />
+    </div>
+
+    <div class="blog-post-layout">
+      {
+        headings.length > 1 && (
+          <details class="blog-toc-mobile">
+            <summary>On this page</summary>
+            <ol>
+              {headings.map((heading) => (
+                <li data-depth={heading.depth}>
+                  <a href={`#${heading.slug}`}>{heading.text}</a>
+                </li>
+              ))}
+            </ol>
+          </details>
+        )
+      }
+      <div class="prose blog-prose">
+        <BlumePage id={post.entryId} />
+      </div>
+      <aside class="blog-post-aside" aria-label="Post tools">
+        {
+          headings.length > 1 && (
+            <nav class="blog-toc" aria-labelledby="blog-toc-title">
+              <h2 id="blog-toc-title" class="blog-label">
+                On this page
+              </h2>
+              <ol>
+                {headings.map((heading) => (
+                  <li data-depth={heading.depth}>
+                    <a href={`#${heading.slug}`} data-blog-toc-link={heading.slug}>
+                      {heading.text}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )
+        }
+        <div class="blog-share">
+          <h2 class="blog-label">Share</h2>
+          <div>
+            <button class="blog-icon-button" type="button" data-blog-copy={url} aria-label="Copy link">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path>
+                <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path>
+              </svg>
+            </button>
+            <a class="blog-icon-button" href={shareOnX} aria-label="Share on X">
+              <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                <path fill="currentColor" d="M17.8 3h3.1l-6.7 7.6L22 21h-6.2l-4.8-6.3L5.5 21H2.4l7.2-8.2L2 3h6.3l4.4 5.8zm-1.1 16.2h1.7L7.4 4.7H5.6z"></path>
+              </svg>
+            </a>
+            <button class="blog-icon-button" type="button" data-blog-markdown={`${post.href}.md`} aria-label="Copy as Markdown">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                <rect x="2.5" y="5.5" width="19" height="13" rx="2"></rect>
+                <path d="M6 15V9l2.5 3L11 9v6M15.5 9v6m0 0-2-2m2 2 2-2"></path>
+              </svg>
+            </button>
+          </div>
+          <p class="blog-share-status" role="status" data-blog-share-status></p>
+        </div>
+      </aside>
+    </div>
+  </article>
+
+  {
+    (older || newer) && (
+      <nav class="blog-row blog-pager" aria-label="More posts">
+        {older ? (
+          <a href={older.href} rel="prev">
+            <span class="blog-label">
+              <span aria-hidden="true">←</span> Previous
+            </span>
+            <span class="blog-pager-title">{older.title}</span>
+          </a>
+        ) : (
+          <span />
+        )}
+        {newer ? (
+          <a href={newer.href} rel="next" class="blog-pager-next">
+            <span class="blog-label">
+              Next <span aria-hidden="true">→</span>
+            </span>
+            <span class="blog-pager-title">{newer.title}</span>
+          </a>
+        ) : (
+          <span />
+        )}
+      </nav>
+    )
+  }
+
+  {
+    related.length > 0 && (
+      <section class="blog-row" aria-labelledby="blog-related-title">
+        <div class="blog-row-head">
+          <h2 id="blog-related-title" class="blog-label">
+            More from the blog
+          </h2>
+          <a class="blog-label blog-label-link" href="/blog">
+            All posts <span aria-hidden="true">→</span>
+          </a>
+        </div>
+        <div class="blog-grid">
+          {related.map((other) => (
+            <PostCard post={other} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  <Cta />
+</BlogLayout>
+
+<script>
+  const status = document.querySelector<HTMLElement>("[data-blog-share-status]");
+  const announce = (message: string) => {
+    if (!status) return;
+    status.textContent = message;
+    setTimeout(() => (status.textContent = ""), 2000);
+  };
+
+  document.querySelector<HTMLElement>("[data-blog-copy]")?.addEventListener("click", async (event) => {
+    const url = (event.currentTarget as HTMLElement).dataset.blogCopy ?? location.href;
+    await navigator.clipboard.writeText(url).then(
+      () => announce("Link copied"),
+      () => announce("Couldn't copy. Copy the address bar instead."),
+    );
+  });
+
+  document.querySelector<HTMLElement>("[data-blog-markdown]")?.addEventListener("click", async (event) => {
+    const source = (event.currentTarget as HTMLElement).dataset.blogMarkdown!;
+    try {
+      const response = await fetch(source);
+      if (!response.ok) throw new Error(String(response.status));
+      await navigator.clipboard.writeText(await response.text());
+      announce("Markdown copied");
+    } catch {
+      announce("Couldn't copy the Markdown.");
+    }
+  });
+
+  // Highlight the section being read: the last heading above the top third of the viewport.
+  const links = new Map(
+    [...document.querySelectorAll<HTMLAnchorElement>("[data-blog-toc-link]")].map((link) => [
+      link.dataset.blogTocLink!,
+      link,
+    ]),
+  );
+  const headings = [...links.keys()].flatMap((id) => document.getElementById(id) ?? []);
+  const highlight = () => {
+    const line = innerHeight / 3;
+    const atBottom = innerHeight + scrollY >= document.documentElement.scrollHeight - 4;
+    const current = atBottom
+      ? headings.at(-1)
+      : (headings.filter((heading) => heading.getBoundingClientRect().top < line).at(-1) ?? headings[0]);
+    for (const [id, link] of links) {
+      if (id === current?.id) link.setAttribute("aria-current", "location");
+      else link.removeAttribute("aria-current");
+    }
+  };
+  if (headings.length > 0) {
+    highlight();
+    addEventListener("scroll", highlight, { passive: true });
+  }
+</script>

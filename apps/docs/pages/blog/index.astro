@@ -1,0 +1,288 @@
+---
+/**
+ * Blog index. Sections appear only when there are posts to fill them:
+ * none → an invitation to subscribe; one → a full-width hero; more → featured,
+ * a latest list, then earlier posts, so no post is listed twice.
+ */
+import { getCollection } from "astro:content";
+import data from "blume:data";
+import { getBlumeCollection } from "blume/runtime";
+import BlogLayout from "../../components/blog/BlogLayout.astro";
+import Byline from "../../components/blog/Byline.astro";
+import Cta from "../../components/blog/Cta.astro";
+import Illustration from "../../components/blog/Illustration.astro";
+import PostCard from "../../components/blog/PostCard.astro";
+import Subscribe from "../../components/blog/Subscribe.astro";
+import {
+  blogCategories,
+  blogFeed,
+  categoryTabs,
+  formatDate,
+  layoutIndex,
+  toPosts,
+} from "../../components/blog/posts";
+
+export const prerender = true;
+
+const routes = getBlumeCollection(data, { locale: data.config.i18n?.defaultLocale });
+const posts = toPosts(
+  await getCollection("docs"),
+  new Map(routes.map((route) => [route.entryId, route.path])),
+);
+const index = layoutIndex(posts);
+const tabs = categoryTabs(posts);
+const { featured } = index;
+
+if (index.ignoredFeatured.length > 0) {
+  console.warn(
+    `[blog] Several posts set featured: true; showing "${featured?.title}". Unset it on: ${index.ignoredFeatured
+      .map((post) => post.entryId)
+      .join(", ")}`,
+  );
+}
+
+const emptyFilterLinks = {
+  guide: { href: "/guides", label: "Browse guides" },
+  release: { href: "/docs", label: "Read the docs" },
+  engineering: { href: "/docs/learn/concepts", label: "Read the concepts" },
+  company: { href: "/docs", label: "Read the docs" },
+} as const;
+---
+
+<BlogLayout
+  title="Blog — RELKIT"
+  description="Releases, design decisions, and engineering notes from the team building RELKIT."
+  path="/blog"
+  ogImage="/og/blog.png"
+>
+  <section class="blog-intro" aria-labelledby="blog-title">
+    <p class="blog-label">Blog</p>
+    <div class="blog-intro-row">
+      <div>
+        <h1 id="blog-title">Notes from building RELKIT</h1>
+        <p class="blog-intro-copy">
+          Releases, design decisions, and engineering deep-dives on one application model for
+          TypeScript backends.
+        </p>
+      </div>
+      {
+        index.kind !== "empty" && (
+          <a class="blog-rss-link" href={blogFeed}>
+            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+              <path fill="currentColor" d="M5 3a16 16 0 0 1 16 16h-3A13 13 0 0 0 5 6zm0 6a10 10 0 0 1 10 10h-3a7 7 0 0 0-7-7zm2 7a2 2 0 1 1 0 4 2 2 0 0 1 0-4" />
+            </svg>
+            RSS
+          </a>
+        )
+      }
+    </div>
+    {
+      tabs.length > 0 && (
+        <nav class="blog-tabs" aria-label="Filter posts by category" data-blog-tabs>
+          <a href="/blog" aria-current="page" data-blog-tab="">
+            All
+          </a>
+          {tabs.map((tab) => (
+            <a href={`/blog?category=${tab.category}`} data-blog-tab={tab.category}>
+              {tab.label}
+            </a>
+          ))}
+        </nav>
+      )
+    }
+  </section>
+
+  {
+    index.kind === "empty" && (
+      <section class="blog-row blog-dots blog-empty" aria-labelledby="blog-empty-title">
+        <span class="blog-art blog-empty-art" aria-hidden="true">
+          <svg viewBox="0 0 160 90" fill="none" stroke="currentColor" stroke-width="1">
+            <rect x="24" y="16" width="112" height="58" rx="3" stroke-dasharray="3 3" />
+            <path d="M40 34h56M40 44h80M40 54h40" stroke-opacity="0.5" />
+          </svg>
+        </span>
+        <h2 id="blog-empty-title">The first post is on its way</h2>
+        <p>Until it lands, the docs cover what's new and GitHub shows what's in progress.</p>
+        <div class="blog-actions">
+          <a class="blog-button" href="/docs">Read the docs</a>
+          <a class="blog-text-link" href="https://github.com/rel-kit/relkit">
+            Follow on GitHub <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    index.kind === "single" && featured && (
+      <section class="blog-row blog-dots blog-single" aria-label="Latest post">
+        <a class="blog-art blog-single-art" href={featured.href} tabindex="-1" aria-hidden="true">
+          <Illustration name={featured.illustration} />
+        </a>
+        <div class="blog-single-body">
+          <p class="blog-label">
+            {blogCategories[featured.category].label} · {formatDate(featured.date)}
+          </p>
+          <h2 class="blog-display-title">
+            <a href={featured.href}>{featured.title}</a>
+          </h2>
+          <p class="blog-lead-summary">{featured.description}</p>
+          <Byline post={featured} date={false} minutes />
+          <a class="blog-text-link" href={featured.href}>
+            Read post <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    index.kind === "featured" && featured && (
+      <>
+        <div data-blog-default>
+          <section class="blog-row blog-split" aria-label="Featured and latest posts">
+            <article class="blog-featured blog-dots">
+              <a class="blog-art blog-featured-art" href={featured.href} tabindex="-1" aria-hidden="true">
+                <Illustration name={featured.illustration} />
+              </a>
+              <p class="blog-label">
+                Featured · {blogCategories[featured.category].label} · {formatDate(featured.date)}
+              </p>
+              <h2 class="blog-display-title">
+                <a href={featured.href}>{featured.title}</a>
+              </h2>
+              <p class="blog-lead-summary">{featured.description}</p>
+              <Byline post={featured} date={false} minutes />
+            </article>
+            <section class="blog-latest" aria-labelledby="blog-latest-title">
+              <h2 id="blog-latest-title" class="blog-label">
+                Latest
+              </h2>
+              <ol>
+                {index.latest.map((post) => (
+                  <li>
+                    <a href={post.href}>
+                      <time class="blog-label" datetime={post.date.toISOString()}>
+                        {formatDate(post.date)}
+                      </time>
+                      <span class="blog-latest-title">{post.title}</span>
+                      <span class="blog-latest-summary">{post.description}</span>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+              {index.earlier.length > 0 && (
+                <a class="blog-text-link" href="#blog-earlier">
+                  Earlier posts <span aria-hidden="true">↓</span>
+                </a>
+              )}
+            </section>
+          </section>
+
+          {index.earlier.length > 0 && (
+            <section class="blog-row" id="blog-earlier" aria-labelledby="blog-earlier-title">
+              <div class="blog-row-head">
+                <h2 id="blog-earlier-title" class="blog-label">
+                  Earlier posts
+                </h2>
+                <span class="blog-label">{index.earlier.length} posts</span>
+              </div>
+              <div class="blog-grid">
+                {index.earlier.map((post) => (
+                  <PostCard post={post} />
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+
+        {tabs.length > 0 && (
+          <section
+            class="blog-row"
+            data-blog-filtered
+            data-blog-labels={JSON.stringify(
+              Object.fromEntries(Object.entries(blogCategories).map(([key, value]) => [key, value.tab])),
+            )}
+            hidden
+            aria-live="polite"
+          >
+            <div class="blog-row-head">
+              <h2 class="blog-label" data-blog-filter-title />
+              <span class="blog-label" data-blog-filter-count />
+            </div>
+            <div class="blog-grid">
+              {posts.map((post) => (
+                <PostCard post={post} />
+              ))}
+            </div>
+            <div class="blog-filter-empty" data-blog-filter-empty hidden>
+              <h3 data-blog-filter-empty-title>No posts here yet</h3>
+              <p>Pick another category, or read what's already out.</p>
+              <div class="blog-actions">
+                <a class="blog-button" href="/blog" data-blog-tab="">
+                  Show all posts
+                </a>
+                {Object.entries(emptyFilterLinks).map(([category, link]) => (
+                  <a class="blog-text-link" href={link.href} data-blog-filter-link={category} hidden>
+                    {link.label} <span aria-hidden="true">→</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+      </>
+    )
+  }
+
+  {index.kind !== "empty" && <Subscribe single={index.kind === "single"} />}
+  <Cta />
+</BlogLayout>
+
+<script>
+  /** Applies `?category=` client-side: the page is static, so tabs swap sections instead of routes. */
+  const tabs = document.querySelector<HTMLElement>("[data-blog-tabs]");
+  const filtered = document.querySelector<HTMLElement>("[data-blog-filtered]");
+  const fallback = document.querySelector<HTMLElement>("[data-blog-default]");
+
+  const labels: Record<string, string> = JSON.parse(filtered?.dataset.blogLabels ?? "{}");
+
+  const apply = (requested: string) => {
+    if (!tabs || !filtered || !fallback) return;
+    const category = Object.hasOwn(labels, requested) ? requested : "";
+    const tab = tabs.querySelector<HTMLAnchorElement>(`[data-blog-tab="${CSS.escape(category)}"]`);
+    const active = tab ?? tabs.querySelector('[data-blog-tab=""]');
+    for (const link of tabs.querySelectorAll<HTMLAnchorElement>("[data-blog-tab]")) {
+      if (link === active) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    }
+    fallback.hidden = category !== "";
+    filtered.hidden = category === "";
+    if (category === "") return;
+    let shown = 0;
+    for (const card of filtered.querySelectorAll<HTMLElement>(".blog-card")) {
+      card.hidden = card.dataset.category !== category;
+      if (!card.hidden) shown += 1;
+    }
+    const label = labels[category] ?? category;
+    filtered.querySelector("[data-blog-filter-title]")!.textContent = label;
+    filtered.querySelector("[data-blog-filter-count]")!.textContent = shown === 1 ? "1 post" : `${shown} posts`;
+    filtered.querySelector<HTMLElement>("[data-blog-filter-empty]")!.hidden = shown > 0;
+    filtered.querySelector("[data-blog-filter-empty-title]")!.textContent = `No ${label.toLowerCase()} yet`;
+    for (const link of filtered.querySelectorAll<HTMLElement>("[data-blog-filter-link]")) {
+      link.hidden = link.dataset.blogFilterLink !== category;
+    }
+  };
+
+  apply(new URLSearchParams(location.search).get("category") ?? "");
+
+  document.addEventListener("click", (event) => {
+    const link = (event.target as Element).closest<HTMLAnchorElement>("[data-blog-tab]");
+    if (!link || event.metaKey || event.ctrlKey || event.shiftKey) return;
+    event.preventDefault();
+    const category = link.dataset.blogTab ?? "";
+    history.pushState(null, "", category ? `/blog?category=${category}` : "/blog");
+    apply(category);
+  });
+  addEventListener("popstate", () => apply(new URLSearchParams(location.search).get("category") ?? ""));
+</script>

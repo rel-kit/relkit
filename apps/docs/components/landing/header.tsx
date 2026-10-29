@@ -23,6 +23,7 @@ export function LandingHeader() {
         </Link>
         <motion.nav className="hero-navigation-links" aria-label="Main navigation">
           <Link href="/docs">Documentation</Link>
+          <Link href="/blog">Blog</Link>
           <Link href="https://github.com/rel-kit/relkit">
             GitHub <ArrowUpRight size={12} aria-hidden="true" />
           </Link>
