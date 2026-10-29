@@ -1,6 +1,8 @@
 /** Configures the documentation shell; the custom homepage owns its existing React layout. */
 import { defineConfig } from "blume";
 import { node } from "blume/deploy";
+import { Schema } from "effect";
+import { blogCategories, blogIllustrations } from "./components/blog/posts.js";
 import redirects from "./redirects.json";
 import { documentationSidebar } from "./scripts/generate-navigation.js";
 
@@ -15,7 +17,25 @@ export default defineConfig({
   },
   description:
     "Build TypeScript backends with guided examples, module documentation, and API reference.",
-  content: { root: "content", exclude: ["generated/**"] },
+  content: {
+    root: "content",
+    exclude: ["generated/**"],
+    types: {
+      // `featured` leads /blog, `category` drives its tabs, `illustration` picks the line art.
+      blog: {
+        facets: ["category"],
+        frontmatter: {
+          featured: Schema.toStandardSchemaV1(Schema.UndefinedOr(Schema.Boolean)),
+          category: Schema.toStandardSchemaV1(
+            Schema.Literals(Object.keys(blogCategories) as [keyof typeof blogCategories]),
+          ),
+          illustration: Schema.toStandardSchemaV1(
+            Schema.UndefinedOr(Schema.Literals(blogIllustrations)),
+          ),
+        },
+      },
+    },
+  },
   // Backend-dependent source snippets must not become standalone live previews.
   examples: "examples/**/*.preview.*",
   github: { owner: "rel-kit", repo: "relkit", dir: "apps/docs" },
@@ -32,6 +52,7 @@ export default defineConfig({
       items: [
         { label: "Home", href: "/", icon: "house" },
         { label: "Documentation", root: "/docs", icon: "book-open" },
+        { label: "Blog", href: "/blog", icon: "newspaper" },
         { label: "GitHub", href: "https://github.com/rel-kit/relkit", icon: "github" },
         ...documentationSidebar,
       ],
