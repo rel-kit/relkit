@@ -1,0 +1,25 @@
+---
+/** A grid cell: framed illustration above an unbordered title, summary, and byline. */
+import Byline from "./Byline.astro";
+import Illustration from "./Illustration.astro";
+import { blogCategories, type BlogPost } from "./posts";
+
+interface Props {
+  readonly post: BlogPost;
+  readonly heading?: "h2" | "h3";
+}
+
+const { post, heading: Heading = "h3" } = Astro.props;
+---
+
+<article class="blog-card" data-category={post.category}>
+  <a class="blog-card-link" href={post.href}>
+    <span class="blog-art">
+      <Illustration name={post.illustration} />
+    </span>
+    <span class="blog-label">{blogCategories[post.category].label}</span>
+    <Heading class="blog-card-title">{post.title}</Heading>
+    <p class="blog-card-summary">{post.description}</p>
+  </a>
+  <Byline post={post} />
+</article>

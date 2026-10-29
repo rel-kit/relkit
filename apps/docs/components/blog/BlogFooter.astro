@@ -1,0 +1,33 @@
+---
+/** The landing footer for blog pages, adding the RSS feed beside the blog link once it exists. */
+import Logo from "./Logo.astro";
+import { blogFeed } from "./posts";
+
+interface Props {
+  readonly feed: boolean;
+}
+
+const { feed } = Astro.props;
+---
+
+<footer class="blog-footer">
+  <div class="blog-footer-top">
+    <a class="blog-brand" href="/" aria-label="RELKIT home">
+      <Logo size={28} />
+      RELKIT
+    </a>
+    <p>The TypeScript application kit.</p>
+    <nav aria-label="Footer navigation">
+      <a href="/docs">Docs</a>
+      <a href="/docs/api/cli">CLI</a>
+      <a href="/docs/api/app">API</a>
+      <a href="/blog">Blog</a>
+      {feed && <a href={blogFeed}>RSS</a>}
+      <a href="https://github.com/rel-kit/relkit">GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <div class="blog-footer-bottom">
+    <span>Built in the open. Built with TypeScript.</span>
+    <a href="#">Back to top <span aria-hidden="true">↑</span></a>
+  </div>
+</footer>

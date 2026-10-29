@@ -1,0 +1,45 @@
+---
+/** Author avatars (or initials), names, and optional date and reading time in the mono meta style. */
+import { formatDate, initials, type BlogPost } from "./posts";
+
+interface Props {
+  readonly post: BlogPost;
+  readonly date?: boolean;
+  readonly minutes?: boolean;
+  readonly month?: "short" | "long";
+}
+
+const { post, date = true, minutes = false, month = "short" } = Astro.props;
+const names = post.authors.map((author) => author.name).join(", ");
+---
+
+<span class="blog-byline">
+  <span class="blog-avatars" aria-hidden="true">
+    {
+      post.authors.slice(0, 3).map((author) =>
+        author.avatar ? (
+          <img class="blog-avatar" src={author.avatar} alt="" width="20" height="20" loading="lazy" />
+        ) : (
+          <span class="blog-avatar">{initials(author.name)}</span>
+        ),
+      )
+    }
+  </span>
+  <span>{names}</span>
+  {
+    date && (
+      <>
+        <span aria-hidden="true">·</span>
+        <time datetime={post.date.toISOString()}>{formatDate(post.date, month)}</time>
+      </>
+    )
+  }
+  {
+    minutes && (
+      <>
+        <span aria-hidden="true">·</span>
+        <span>{post.minutes} min read</span>
+      </>
+    )
+  }
+</span>

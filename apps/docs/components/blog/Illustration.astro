@@ -1,0 +1,154 @@
+---
+/** Draws a post's line illustration in currentColor so it follows the page theme. */
+import type { BlogIllustration } from "./posts";
+
+interface Props {
+  readonly name: BlogIllustration;
+  readonly class?: string;
+}
+
+const { name, class: className } = Astro.props;
+
+// Trace spans: [x, row, width, emphasised]
+const spans: readonly (readonly [number, number, number, boolean])[] = [
+  [24, 0, 268, false],
+  [44, 1, 136, false],
+  [64, 2, 52, false],
+  [124, 2, 96, true],
+  [188, 3, 72, false],
+  [228, 4, 44, false],
+];
+const ticks = Array.from({ length: 15 }, (_, i) => 24 + i * 19.2);
+const bars = Array.from({ length: 46 }, (_, i) => {
+  const x = 30 + i * 5.8;
+  const dense = Math.abs(i - 30) < 6;
+  return { x, height: dense ? 80 : 40 + ((i * 37) % 44), opacity: dense ? 0.9 : 0.45 };
+});
+const graphNodes: readonly (readonly [number, number])[] = [
+  [64, 52],
+  [160, 40],
+  [256, 58],
+  [104, 128],
+  [208, 132],
+];
+const graphEdges: readonly (readonly [number, number])[] = [
+  [0, 1],
+  [1, 2],
+  [0, 3],
+  [1, 3],
+  [1, 4],
+  [2, 4],
+  [3, 4],
+];
+const loops = Array.from({ length: 5 }, (_, i) => 72 + i * 44);
+---
+
+<svg
+  class={className}
+  viewBox="0 0 320 180"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1"
+  aria-hidden="true"
+  focusable="false"
+>
+  {
+    name === "trace" && (
+      <g>
+        <line x1="24" y1="30" x2="292" y2="30" stroke-dasharray="1 5" stroke-opacity="0.5" />
+        {ticks.map((x) => (
+          <line x1={x} y1="26" x2={x} y2="34" stroke-opacity="0.35" />
+        ))}
+        {spans.map(([x, row, width, emphasised]) => (
+          <rect
+            x={x}
+            y={46 + row * 20}
+            width={width}
+            height="10"
+            rx="1.5"
+            fill={emphasised ? "currentColor" : "none"}
+            fill-opacity={emphasised ? 0.14 : 0}
+          />
+        ))}
+        <line x1="24" y1="156" x2="292" y2="156" />
+        <circle cx="124" cy="156" r="3" fill="currentColor" />
+        <circle cx="220" cy="156" r="3" />
+        <line x1="124" y1="96" x2="124" y2="156" stroke-dasharray="2 3" stroke-opacity="0.5" />
+      </g>
+    )
+  }
+  {
+    name === "bars" && (
+      <g>
+        <line x1="24" y1="90" x2="296" y2="90" stroke-opacity="0.25" />
+        {bars.map(({ x, height, opacity }) => (
+          <line x1={x} y1={90 - height / 2} x2={x} y2={90 + height / 2} stroke-opacity={opacity} />
+        ))}
+      </g>
+    )
+  }
+  {
+    name === "graph" && (
+      <g>
+        {graphEdges.map(([from, to]) => {
+          const [x1, y1] = graphNodes[from]!;
+          const [x2, y2] = graphNodes[to]!;
+          return <line x1={x1} y1={y1} x2={x2} y2={y2} stroke-opacity="0.45" />;
+        })}
+        {graphNodes.map(([x, y], index) => (
+          <rect
+            x={x - 14}
+            y={y - 14}
+            width="28"
+            height="28"
+            rx="3"
+            fill={index === 1 ? "currentColor" : "var(--blog-page)"}
+            fill-opacity={index === 1 ? 0.14 : 1}
+          />
+        ))}
+        <rect x="16" y="16" width="288" height="148" rx="4" stroke-dasharray="2 4" stroke-opacity="0.3" />
+      </g>
+    )
+  }
+  {
+    name === "timeline" && (
+      <g>
+        <line x1="24" y1="90" x2="296" y2="90" />
+        <path d="M96 90 C 120 90, 120 50, 148 50 L 228 50 C 252 50, 252 90, 276 90" stroke-dasharray="3 3" stroke-opacity="0.6" />
+        {[40, 96, 160, 212, 276].map((x, index) => (
+          <circle cx={x} cy="90" r="4" fill={index === 4 ? "currentColor" : "var(--blog-page)"} />
+        ))}
+        <circle cx="188" cy="50" r="4" fill="var(--blog-page)" />
+        {[40, 96, 160, 212, 276].map((x) => (
+          <line x1={x} y1="104" x2={x} y2="132" stroke-opacity="0.3" />
+        ))}
+      </g>
+    )
+  }
+  {
+    name === "rings" && (
+      <g>
+        {[10, 26, 44, 64, 86].map((r, index) => (
+          <circle cx="160" cy="90" r={r} stroke-opacity={1 - index * 0.17} stroke-dasharray={index > 2 ? "2 4" : undefined} />
+        ))}
+        <circle cx="160" cy="90" r="3" fill="currentColor" />
+        <line x1="24" y1="90" x2="74" y2="90" />
+        <line x1="246" y1="90" x2="296" y2="90" />
+      </g>
+    )
+  }
+  {
+    name === "loop" && (
+      <g>
+        <line x1="24" y1="96" x2="296" y2="96" stroke-opacity="0.35" />
+        {loops.map((x) => (
+          <>
+            <path d={`M${x - 22} 96 C ${x - 22} 150, ${x + 22} 150, ${x + 22} 96`} />
+            <path d={`M${x + 22} 96 C ${x + 22} 42, ${x - 22} 42, ${x - 22} 96`} stroke-dasharray="3 3" stroke-opacity="0.55" />
+          </>
+        ))}
+        <circle cx="50" cy="96" r="2.5" fill="currentColor" />
+      </g>
+    )
+  }
+</svg>
