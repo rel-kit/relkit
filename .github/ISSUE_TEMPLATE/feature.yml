@@ -1,7 +1,24 @@
 name: Feature request
 description: Propose a focused RELKIT capability or API improvement.
 title: "feature: "
+labels: [enhancement]
 body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - CLI and dev server
+        - Editor and TypeScript plugin
+        - Application API (routes, functions, events, agents, jobs)
+        - Providers and integrations
+        - Inspector
+        - Deployment
+        - create-relkit and templates
+        - Documentation site
+        - Other
+    validations:
+      required: true
   - type: textarea
     id: problem
     attributes:
@@ -22,3 +39,9 @@ body:
       label: Alternatives considered
     validations:
       required: true
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to open a pull request for this.
