@@ -26,19 +26,18 @@ export const navigationGroups = [
     label: "Workspace",
     items: [
       { href: "/", label: "Overview", icon: LayoutDashboard },
-      { href: "/graphs", label: "Graphs", icon: Workflow },
       { href: "/graph", label: "Application graph", icon: Network },
       { href: "/domains", label: "Domains", icon: Layers3 },
       { href: "/routes", label: "Routes", icon: Route },
       { href: "/middlewares", label: "Middleware", icon: ShieldCheck },
+      { href: "/functions", label: "Functions", icon: SquareFunction },
+      { href: "/errors", label: "Errors", icon: ShieldCheck },
       {
         href: SCALAR_API_REFERENCE_URL,
         label: "API Reference",
         icon: BookOpen,
         external: true,
       },
-      { href: "/functions", label: "Functions", icon: SquareFunction },
-      { href: "/errors", label: "Errors", icon: ShieldCheck },
     ],
   },
   {
@@ -46,12 +45,18 @@ export const navigationGroups = [
     items: [
       { href: "/jobs", label: "Jobs", icon: Clock3 },
       { href: "/events", label: "Events & listeners", icon: Radio },
+      { href: "/channels", label: "Channels", icon: Radio },
       { href: "/buckets", label: "Buckets", icon: Database },
       { href: "/cache", label: "Cache", icon: Layers3 },
       { href: "/providers", label: "Providers", icon: Globe2 },
-      { href: "/tools", label: "Tools", icon: Wrench },
+    ],
+  },
+  {
+    label: "AI",
+    items: [
       { href: "/agents", label: "Agents", icon: Bot },
-      { href: "/channels", label: "Channels", icon: Radio },
+      { href: "/graphs", label: "Agent graphs", icon: Workflow },
+      { href: "/tools", label: "Tools", icon: Wrench },
     ],
   },
   {

@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { graphHref } from "../../lib/graph-url-state";
 import type { InspectorObject } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
 import { invokeFunction, type FunctionInvocationResult } from "../../lib/function-invocation";
@@ -95,7 +97,19 @@ export function FunctionDetailClient() {
           <h1>Function detail</h1>
           <p className="lede">Contracts and telemetry are read from one active graph identity.</p>
         </div>
-        <span className="badge">{text(snapshot.node.id) || id}</span>
+        <div className="page-heading__aside">
+          <span className="badge">{text(snapshot.node.id) || id}</span>
+          <Link
+            className="text-link"
+            href={graphHref({
+              view: "flow",
+              scope: text(snapshot.node.id) || id,
+              node: text(snapshot.node.id) || id,
+            })}
+          >
+            Follow in graph →
+          </Link>
+        </div>
       </header>
       <FunctionContract {...snapshot} />
       {snapshot.node.invocationMode === "event-only" ? (
