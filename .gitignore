@@ -28,6 +28,7 @@ reports/mutation/
 # Build Outputs
 .next/
 apps/inspector/.next-packaged/
+apps/inspector/.next-dev/
 apps/docs/.source/
 apps/docs/.blume/
 out/
@@ -57,3 +58,4 @@ examples/commerce/.relkit/generated/client.ts
 examples/commerce/.relkit/generated/openapi.json
 examples/commerce/.relkit/generated/runtime.manifest.ts
 .claude/launch.json
+apps/inspector/.next-dev2/
