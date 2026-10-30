@@ -6,8 +6,12 @@ import {
   type IntegrationProvenance,
 } from "./graph-topology-model";
 import { readAgentTopology } from "./graph-agent-topology";
+import { nodeMeta } from "./graph-model-meta";
 
 export type GraphRelationship = "declared" | "observed";
+
+/** Public metadata the API projects for a node (schemas, source, transport config, capability). */
+export type GraphNodeMeta = Readonly<Record<string, unknown>>;
 
 export interface GraphNode {
   readonly id: string;
@@ -18,6 +22,8 @@ export interface GraphNode {
   readonly label?: string;
   readonly status?: string;
   readonly observed?: boolean;
+  /** Raw projected metadata; read through the accessors in `graph-node-meta.ts`. */
+  readonly meta?: GraphNodeMeta;
 }
 
 export interface GraphEdge {
@@ -28,6 +34,9 @@ export interface GraphEdge {
   readonly role?: string;
   readonly member?: string;
   readonly order?: number;
+  /** `uses-table` edges: the table accessed and how. */
+  readonly table?: string;
+  readonly access?: "read" | "write";
 }
 
 export interface GraphSnapshot {
@@ -114,18 +123,22 @@ function readNodes(value: readonly unknown[]): readonly GraphNode[] {
       const id = text(node?.id);
       const kind = text(node?.kind);
       const domainId = text(node?.domainId);
-      const exposure =
-        node?.exposure === "public" || node?.exposure === "internal" ? node.exposure : undefined;
-      return id === undefined || kind === undefined
-        ? []
-        : [
-            {
-              id,
-              kind: node?.execution === "graph" ? "graph" : kind,
-              ...(domainId === undefined ? {} : { domainId }),
-              ...(exposure === undefined ? {} : { exposure }),
-            },
-          ];
+      const exposure: "public" | "internal" | undefined =
+        node?.exposure === "public"
+          ? "public"
+          : node?.exposure === "internal"
+            ? "internal"
+            : undefined;
+      if (id === undefined || kind === undefined || node === undefined) return [];
+      const meta = nodeMeta(node);
+      const result: GraphNode = {
+        id,
+        kind: node.execution === "graph" ? "graph" : kind,
+        ...(domainId === undefined ? {} : { domainId }),
+        ...(exposure === undefined ? {} : { exposure }),
+        ...(meta === undefined ? {} : { meta }),
+      };
+      return [result];
     })
     .sort(compareNodes);
 }
@@ -142,17 +155,21 @@ function readEdges(value: unknown, relationship: GraphRelationship): readonly Gr
       const role = text(edge?.role);
       const member = text(edge?.member);
       const order = typeof edge?.order === "number" ? edge.order : undefined;
-      return [
-        {
-          relationship,
-          kind,
-          from,
-          to,
-          ...(role === undefined ? {} : { role }),
-          ...(member === undefined ? {} : { member }),
-          ...(order === undefined ? {} : { order }),
-        },
-      ];
+      const table = text(edge?.table);
+      const access: "read" | "write" | undefined =
+        edge?.access === "read" ? "read" : edge?.access === "write" ? "write" : undefined;
+      const result: GraphEdge = {
+        relationship,
+        kind,
+        from,
+        to,
+        ...(role === undefined ? {} : { role }),
+        ...(member === undefined ? {} : { member }),
+        ...(order === undefined ? {} : { order }),
+        ...(table === undefined ? {} : { table }),
+        ...(access === undefined ? {} : { access }),
+      };
+      return [result];
     })
     .sort(compareEdges);
 }
