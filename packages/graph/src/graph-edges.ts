@@ -8,6 +8,7 @@ export type {
   TargetsTaskEdge,
   UsesMiddlewareEdge,
   UsesHookEdge,
+  UsesTableEdge,
   GraphEdge,
 } from "./graph-edges.types.js";
 export const GRAPH_EDGE_KINDS = [
@@ -34,6 +35,8 @@ export const GRAPH_EDGE_KINDS = [
   "declares-error",
   "uses-middleware",
   "uses-hook",
+  "uses-table",
+  "triggers-channel",
 ] as const;
 /**
  * Checks whether a value names a supported declared graph edge.

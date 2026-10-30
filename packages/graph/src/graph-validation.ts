@@ -110,6 +110,25 @@ function validateEdge(value: unknown, index: number, nodes: readonly unknown[]):
     fail(`Graph edges[${index}].phase is invalid.`);
   }
   if (value.kind === "uses-hook") validateHookEdge(value, index, nodes);
+  if (value.kind === "uses-table") validateTableEdge(value, index, nodes);
+  if (value.kind === "triggers-channel" && nodeFor(nodes, value.to)?.kind !== "channel")
+    fail(`Graph edges[${index}].to must reference a channel node.`);
+}
+function validateTableEdge(
+  value: Record<string, unknown>,
+  index: number,
+  nodes: readonly unknown[],
+): void {
+  if (!nonEmpty(value.table)) fail(`Graph edges[${index}].table is invalid.`);
+  if (value.access !== "read" && value.access !== "write")
+    fail(`Graph edges[${index}].access is invalid.`);
+  const target = nodeFor(nodes, value.to);
+  if (
+    target?.kind !== "service" ||
+    !isRecord(target.capability) ||
+    target.capability.kind !== "drizzle"
+  )
+    fail(`Graph edges[${index}].to must reference a drizzle service node.`);
 }
 function validateHookEdge(
   value: Record<string, unknown>,

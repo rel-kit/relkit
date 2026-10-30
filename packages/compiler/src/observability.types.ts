@@ -55,6 +55,7 @@ export type CompilerOperation =
   | "buildGraphEdges"
   | "buildGraphNodes"
   | "checkConventions"
+  | "collectSourceUsage"
   | "createEvaluatorRequest"
   | "createRuntimeActivationFingerprint"
   | "createWatchDependencyIndex"

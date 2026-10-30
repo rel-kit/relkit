@@ -134,6 +134,7 @@ export const graph = {
       order: 0,
     },
     { kind: "declares-error", from: "orders.create", to: "orders.invalid" },
+    { kind: "uses-table", from: "orders.create", to: "database", table: "orders", access: "write" },
   ],
 };
 

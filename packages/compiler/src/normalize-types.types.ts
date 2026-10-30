@@ -116,6 +116,22 @@ export interface NormalizationResult {
   readonly activatable: boolean;
 }
 
+/** Statically collected request-lifecycle evidence for one service-owned source file. */
+export interface SourceUsage {
+  /** Project-relative authored module that owns this evidence. */
+  readonly file: string;
+  /** Logical service name owning the file under the selected layout. */
+  readonly service: string;
+  /** `.invoke(` receivers: a service boundary file plus member, or a function module. */
+  readonly calls: readonly { readonly file: string; readonly member?: string }[];
+  /** `context.database.<property>.<method>(` operations, unresolved against declared tables. */
+  readonly tables: readonly { readonly property: string; readonly method: string }[];
+  /** `.trigger(` receivers resolved to imported modules that may own a channel. */
+  readonly channels: readonly { readonly file: string }[];
+  /** Same-service imports other than the boundary whose usage is attributed to importers. */
+  readonly helpers: readonly { readonly file: string }[];
+}
+
 /** Mutable execution-local state shared by ordered compiler validation stages. */
 export interface NormalizationWork {
   readonly input: NormalizeInput;
@@ -130,6 +146,7 @@ export interface NormalizationWork {
   edges: GraphEdge[];
   observedEdges: ObservedEdge[];
   serviceDependencies: { readonly from: string; readonly to: string }[];
+  sourceUsage: Map<string, SourceUsage>;
   diagnostics: Diagnostic[];
   passOrder: ValidationPass[];
   graph?: NormalizedGraph;

@@ -183,7 +183,7 @@ __relkit_bindDescriptorIdentity(__relkit_module_55["default"]["databaseUsers"], 
 
 export const manifestContractVersion = 10 as const;
 export const manifestGeneratorVersion = 7 as const;
-export const manifestGraphHash = "sha256:162ccf0cbd6b2e05385c8e84511448a43ac039dc796bf5a6ab88890942199ceb" as const;
+export const manifestGraphHash = "sha256:1d57f0b12072b9d76e74bde04dcdd1b140920e60e2b1fe1a6386fb974459a3b2" as const;
 export const runtimeIntegrationsPlanReference = { version: 1, fileName: "runtime-integrations.plan.json", graphHash: manifestGraphHash } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,

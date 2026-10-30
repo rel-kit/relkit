@@ -7,6 +7,7 @@ export type {
   GeneratedOutputs,
   NormalizationResult,
   NormalizationWork,
+  SourceUsage,
 } from "./normalize-types.types.js";
 
 export type {

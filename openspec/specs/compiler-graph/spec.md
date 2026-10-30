@@ -160,7 +160,36 @@ The canonical graph SHALL contain declared managed-resource and structural relat
 #### Scenario: Function invokes another function
 
 - **WHEN** a running function calls another descriptor through `invoke`
-- **THEN** the inspector can show an observed `calls-function` edge even though no declared function edge was required
+- **THEN** the inspector can show an observed `calls-function` edge alongside any statically declared `calls-function` edge, and the observed edge never changes the graph hash
+
+### Requirement: Request lifecycle edges are declared statically
+
+For every source file owned by a service, the compiler SHALL collect import-resolved usage evidence without executing the module and SHALL emit deterministic declared edges from the owning function: `calls-function` for `<serviceImport>.<member>.invoke(` resolved through the imported service's `functions` map and for `<functionImport>.invoke(` resolved to the function descriptor owned by the imported module; `uses-table` with `table` and `access` fields from the function to the Drizzle database service for `context.database.<table>.<method>(` and for `<tx>.<table>.<method>(` where `<tx>` is the callback parameter of `context.database.transaction(...)`; and `triggers-channel` for `<channelImport>.trigger(` resolved to the channel descriptor owned by the imported module. `insert`, `update`, `delete`, `upsert`, and `create` SHALL be recorded as `write`; `findOne`, `findMany`, `find`, `count`, `list`, and `select` SHALL be recorded as `read`; other methods, unknown tables, unknown service members, computed imports, non-import receivers, and self-calls SHALL emit no edge. Files outside a service root, including routes-layer middleware, SHALL contribute no lifecycle edges.
+
+#### Scenario: Function calls a public service member
+
+- **WHEN** `src/services/trips/functions/create-trip.function.ts` imports `companies/service.ts` and calls `companies.describe.invoke(...)`
+- **THEN** the graph contains a declared `calls-function` edge from `trips.create-trip` to the function bound to the `describe` member
+
+#### Scenario: Function writes through a transaction
+
+- **WHEN** a function handler calls `context.database.transaction(async (db) => { await db.trips.insert(...) })`
+- **THEN** the graph contains a `uses-table` edge from the function to the Drizzle database service with `table: "trips"` and `access: "write"`
+
+#### Scenario: Function triggers a channel
+
+- **WHEN** a function module imports a channel descriptor module and calls `<channel>.trigger(...)`
+- **THEN** the graph contains a `triggers-channel` edge from the function to the channel
+
+#### Scenario: Helper module usage is attributed to importing functions
+
+- **WHEN** a same-service module that owns no descriptor (for example `trips.realtime.ts`) triggers a channel, reads a table, or invokes a function, and one or more functions in that service import it directly or through other such helpers
+- **THEN** the graph attributes that usage to every importing function as an explicit over-approximation; a function that imports the helper without reaching the triggering branch still receives the edge
+
+#### Scenario: Lifecycle usage without supporting declarations
+
+- **WHEN** a function calls `context.database.zodSchemas.users.insert.parse(...)`, invokes an unknown service member, triggers an import that owns no channel, or there is no Drizzle service in the application
+- **THEN** no `uses-table`, `calls-function`, or `triggers-channel` edge is emitted for that usage and compilation stays activatable
 
 ### Requirement: Deterministic route-file discovery and lowering
 
@@ -268,7 +297,7 @@ The graph SHALL represent public function/event exposure, service dependencies, 
 #### Scenario: Domain imports another service
 
 - **WHEN** one or more files in `billing` import `orders/service.ts`
-- **THEN** the graph contains one deterministic `billing` to `orders` service dependency edge without inventing exact function-call edges
+- **THEN** the graph contains one deterministic `billing` to `orders` service dependency edge; function-call edges are declared only from statically visible `.invoke(` calls, never from the import alone
 
 ### Requirement: Errors are first-class graph nodes
 

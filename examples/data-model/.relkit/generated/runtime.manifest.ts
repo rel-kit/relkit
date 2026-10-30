@@ -22,7 +22,7 @@ __relkit_bindDescriptorIdentity(__relkit_module_6["default"]["updateUserEmail"],
 
 export const manifestContractVersion = 10 as const;
 export const manifestGeneratorVersion = 7 as const;
-export const manifestGraphHash = "sha256:66cf0b512302d8ee5dab07f890736e3e295caea926e8709a520df1620a753fb9" as const;
+export const manifestGraphHash = "sha256:2576815a41873d688b708cd63bc179a4f17377ecbdbc1cab09ebae5a50435ac5" as const;
 export const runtimeIntegrationsPlanReference = { version: 1, fileName: "runtime-integrations.plan.json", graphHash: manifestGraphHash } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,

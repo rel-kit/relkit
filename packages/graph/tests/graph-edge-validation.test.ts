@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { Effect } from "effect";
 import { GraphValidationError, validateGraphShapeEffect } from "../src/index.js";
-import { functionNode, graph, httpTrigger, source } from "./graph-fixtures.js";
+import { functionNode, graph, httpTrigger, serviceNode, source } from "./graph-fixtures.js";
 const hook = {
   kind: "hook",
   id: "orders.before",
@@ -16,6 +16,34 @@ const validHookEdge = {
   to: "orders.before",
   phase: "before",
 };
+const database = serviceNode({
+  id: "database",
+  functions: [],
+  capability: {
+    kind: "drizzle",
+    dialect: "sqlite",
+    tables: [
+      { name: "orders", databaseName: "orders", columns: [], selectors: [], customMethods: [] },
+    ],
+  },
+});
+const channel = {
+  kind: "channel",
+  id: "orders.updates",
+  source,
+  params: {},
+  events: {},
+  profile: "default",
+  client: "internal",
+};
+const validTableEdge = {
+  kind: "uses-table",
+  from: "orders.create",
+  to: "database",
+  table: "orders",
+  access: "write",
+};
+const validChannelEdge = { kind: "triggers-channel", from: "orders.create", to: "orders.updates" };
 function message(
   edge: Record<string, unknown>,
   nodes: readonly unknown[] = [functionNode(), hook],
@@ -88,6 +116,24 @@ describe("declared graph edge validation", () => {
     [{ ...validHookEdge, phase: "after" }, ".phase does not match"],
   ])("rejects malformed edge %#", (edge, expected) => {
     expect(message(edge)).toContain(expected);
+  });
+  test("accepts table and channel edges that target drizzle and channel nodes", () => {
+    expect(
+      Effect.runSync(
+        validateGraphShapeEffect(
+          graph([functionNode(), database, channel], [validTableEdge, validChannelEdge]),
+        ),
+      ),
+    ).toBeUndefined();
+  });
+  test.each([
+    [{ ...validTableEdge, table: "" }, ".table is invalid"],
+    [{ ...validTableEdge, access: "append" }, ".access is invalid"],
+    [{ ...validTableEdge, to: "orders.create" }, ".to must reference a drizzle service node"],
+    [{ ...validTableEdge, to: "orders.service" }, ".to must reference a drizzle service node"],
+    [{ ...validChannelEdge, to: "orders.create" }, ".to must reference a channel node"],
+  ])("rejects malformed lifecycle edge %#", (edge, expected) => {
+    expect(message(edge, [functionNode(), serviceNode(), database, channel])).toContain(expected);
   });
   test("rejects hook owner kind mismatches and unbound nested identities", () => {
     const taskHook = { ...hook, ownerKind: "task", phase: "start" };

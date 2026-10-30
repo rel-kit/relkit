@@ -24,7 +24,20 @@ export function graphData(value: unknown): GraphData | undefined {
     )
       return [];
     return [
-      safeJson(pick(edge, ["kind", "from", "to", "role", "member", "order", "match", "phase"])),
+      safeJson(
+        pick(edge, [
+          "kind",
+          "from",
+          "to",
+          "role",
+          "member",
+          "order",
+          "match",
+          "phase",
+          "table",
+          "access",
+        ]),
+      ),
     ];
   });
   return {

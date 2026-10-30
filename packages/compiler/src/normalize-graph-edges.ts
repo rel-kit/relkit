@@ -4,6 +4,7 @@ import { observeCompiler } from "./observability.js";
 import { generatedAgentMarker } from "./normalize-generated-function.js";
 import { isRecord, refId, refKind } from "./normalize-utils.js";
 import type { GraphEdge, NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
+import { addSourceUsageEdges } from "./normalize-graph-source-usage.js";
 import {
   addDependencyEdges,
   addEventEdges,
@@ -95,6 +96,7 @@ export const buildGraphEdgesEffect = Effect.fn("Compiler.buildGraphEdges")(
       (node) =>
         node.kind === "service" && isRecord(node.capability) && node.capability.kind === "drizzle",
     );
+    addSourceUsageEdges(add, work, database);
     for (const service of work.nodes) {
       if (
         service.kind === "service" &&

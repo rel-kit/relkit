@@ -60,6 +60,16 @@ describe("inspector read-only contract matrix", () => {
       await json(app, API_BASE_PATH + "/runtime/" + collection);
       await json(app, API_BASE_PATH + "/runtime/" + collection + "/" + graphIds[collection]);
     }
+    const graph = await json(app, API_BASE_PATH + "/graph");
+    expect(
+      (graph.edges as readonly Record<string, unknown>[]).find(({ kind }) => kind === "uses-table"),
+    ).toEqual({
+      kind: "uses-table",
+      from: "orders.create",
+      to: "database",
+      table: "orders",
+      access: "write",
+    });
     expect(await json(app, API_BASE_PATH + "/services/orders")).toMatchObject({
       descriptor: {
         kind: "service",

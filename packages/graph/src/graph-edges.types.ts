@@ -49,6 +49,14 @@ export interface UsesHookEdge extends GraphEdgeBase<"uses-hook"> {
   readonly phase: "before" | "after" | "start" | "success" | "failure";
 }
 
+/** Statically declared table access from a function to its Drizzle database service.
+ * @example const edge: UsesTableEdge = { kind: "uses-table", from: "orders.create", to: "database", table: "orders", access: "write" };
+ */
+export interface UsesTableEdge extends GraphEdgeBase<"uses-table"> {
+  readonly table: string;
+  readonly access: "read" | "write";
+}
+
 /** All supported declared graph edge shapes.
  * @example const edge: GraphEdge = { kind: "calls-function", from: "a", to: "b" };
  */
@@ -75,4 +83,6 @@ export type GraphEdge =
   | GraphEdgeBase<"mounts-service">
   | GraphEdgeBase<"declares-error">
   | UsesMiddlewareEdge
-  | UsesHookEdge;
+  | UsesHookEdge
+  | UsesTableEdge
+  | GraphEdgeBase<"triggers-channel">;

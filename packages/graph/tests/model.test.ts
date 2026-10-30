@@ -59,6 +59,8 @@ describe("graph model", () => {
       "declares-error",
       "uses-middleware",
       "uses-hook",
+      "uses-table",
+      "triggers-channel",
     ]);
     expect(isGraphNodeKind("route")).toBe(false);
     expect(isGraphNodeKind("event-trigger")).toBe(false);

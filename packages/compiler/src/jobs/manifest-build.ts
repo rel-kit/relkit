@@ -153,6 +153,7 @@ export function inputWork(input: JobsManifestInput): NormalizationWork {
     edges: [],
     observedEdges: [],
     serviceDependencies: [],
+    sourceUsage: new Map(),
     diagnostics: [],
     passOrder: [],
     outputs: EMPTY_OUTPUTS,

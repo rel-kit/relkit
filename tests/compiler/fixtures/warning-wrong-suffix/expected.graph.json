@@ -1,6 +1,6 @@
 {
   "appId": "warning-suffix-app",
-  "contractVersion": 10,
+  "contractVersion": 11,
   "edges": [
     {
       "from": "warning",

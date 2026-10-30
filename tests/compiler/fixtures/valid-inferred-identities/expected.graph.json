@@ -1,6 +1,6 @@
 {
   "appId": "inferred-app",
-  "contractVersion": 10,
+  "contractVersion": 11,
   "edges": [
     {
       "from": "orders.get-order",

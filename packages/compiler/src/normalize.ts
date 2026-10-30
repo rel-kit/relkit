@@ -72,6 +72,7 @@ export const normalizeCompilationWithSourcesEffect = Effect.fn("Compiler.normali
       edges: [],
       observedEdges: [...(input.observedEdges ?? [])],
       serviceDependencies: [],
+      sourceUsage: new Map(),
       diagnostics: [],
       passOrder: [],
       outputs: EMPTY_OUTPUTS,

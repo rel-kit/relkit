@@ -11,6 +11,7 @@ import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
 import { sourceResolutionLayer } from "./source-resolution.service.js";
 import { validateBoundarySourceEffect } from "./normalize-boundary-source.js";
+import { collectSourceUsageEffect } from "./normalize-source-usage.js";
 import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 
 /**
@@ -41,12 +42,11 @@ export const validateBoundariesEffect = Effect.fn("Compiler.validateBoundaries")
     const validation = Effect.forEach(
       [...sources],
       ([file, text]) =>
-        validateBoundarySourceEffect(
-          work,
-          layout,
-          ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true),
-          services,
-        ),
+        Effect.gen(function* () {
+          const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true);
+          yield* validateBoundarySourceEffect(work, layout, source, services);
+          yield* collectSourceUsageEffect(work, layout, source);
+        }),
       { discard: true },
     );
     yield* validation.pipe(

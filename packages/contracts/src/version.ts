@@ -5,7 +5,7 @@ export const CONTRACT_VERSION = 7 as const;
 export const GENERATOR_VERSION = 7 as const;
 
 /** Current version of the canonical application graph. */
-export const GRAPH_VERSION = 10 as const;
+export const GRAPH_VERSION = 11 as const;
 
 /** Current version of the executable runtime manifest. */
 export const MANIFEST_VERSION = 10 as const;

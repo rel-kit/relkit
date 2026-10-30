@@ -140,4 +140,5 @@ export type {
   TargetsFunctionEdge,
   UsesHookEdge,
   UsesMiddlewareEdge,
+  UsesTableEdge,
 } from "./graph-edges.js";
