@@ -1,0 +1,31 @@
+name: Documentation
+description: Report missing, unclear, or incorrect documentation.
+title: "docs: "
+labels: [documentation]
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Page or file
+      description: URL on relkit.dev, or a README or skill path in the repository.
+      placeholder: https://relkit.dev/docs/...
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Problem
+      options:
+        - Incorrect or outdated
+        - Unclear
+        - Missing
+        - Broken link or example
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: What is wrong, and what should it say instead?
+    validations:
+      required: true

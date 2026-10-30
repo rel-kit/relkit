@@ -3,3 +3,6 @@ contact_links:
   - name: Security vulnerability
     url: https://github.com/rel-kit/relkit/security/advisories/new
     about: Report vulnerabilities privately to the maintainers.
+  - name: Documentation
+    url: https://relkit.dev
+    about: Guides and API reference for RELKIT.

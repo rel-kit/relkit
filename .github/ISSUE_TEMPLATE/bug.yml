@@ -1,15 +1,33 @@
 name: Bug report
 description: Report a reproducible RELKIT defect.
 title: "bug: "
+labels: [bug]
 body:
   - type: markdown
     attributes:
       value: Do not report security vulnerabilities here; use private vulnerability reporting.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - CLI and dev server
+        - Editor and TypeScript plugin
+        - Application API (routes, functions, events, agents, jobs)
+        - Providers and integrations
+        - Inspector
+        - Deployment
+        - create-relkit and templates
+        - Documentation site
+        - Other
+    validations:
+      required: true
   - type: input
     id: version
     attributes:
       label: RELKIT version
-      placeholder: 0.0.1
+      description: Output of `relkit --version` or the installed `@relkit/*` package versions.
+      placeholder: "@relkit/cli 0.8.4"
     validations:
       required: true
   - type: textarea
@@ -29,12 +47,20 @@ body:
     id: actual
     attributes:
       label: Actual behavior and logs
+      description: Paste error output and stack traces. Redact credentials and private data.
+      render: shell
     validations:
       required: true
   - type: input
     id: environment
     attributes:
       label: Environment
-      placeholder: Bun 1.3.10, operating system, architecture
+      placeholder: Bun 1.3.10, operating system, architecture, editor
     validations:
       required: true
+  - type: checkboxes
+    id: regression
+    attributes:
+      label: Regression
+      options:
+        - label: This worked in an earlier RELKIT version.
