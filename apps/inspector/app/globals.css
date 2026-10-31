@@ -38,6 +38,30 @@
   --sidebar-accent-foreground: #18181b;
   --sidebar-border: #e4e4e7;
   --sidebar-ring: #a1a1aa;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --kind-service: #3f3f46;
+  --kind-route: #1d4ed8;
+  --kind-function: #0f766e;
+  --kind-event: #7e22ce;
+  --kind-channel: #c2410c;
+  --kind-table: #a16207;
+  --kind-agent: #be185d;
+  --kind-tool: #4d7c0f;
+  --kind-error: #b91c1c;
+  --kind-platform: #52525b;
+  --kind-auth: #b45309;
+  --kind-middleware: #9333ea;
+  --kind-stream: #0369a1;
+  --edge-auth: #b45309;
+  --edge-structure: #a1a1aa;
+  --edge-invoke: #3f3f46;
+  --edge-data: #a16207;
+  --edge-event: #7e22ce;
+  --edge-realtime: #c2410c;
+  --edge-ai: #be185d;
+  --edge-platform: #a1a1aa;
 }
 
 html[data-theme="dark"] {
@@ -64,6 +88,27 @@ html[data-theme="dark"] {
   --sidebar-accent-foreground: #fafafa;
   --sidebar-border: #3f3f46;
   --sidebar-ring: #a1a1aa;
+  --kind-service: #d4d4d8;
+  --kind-route: #93c5fd;
+  --kind-function: #5eead4;
+  --kind-event: #d8b4fe;
+  --kind-channel: #fdba74;
+  --kind-table: #fde047;
+  --kind-agent: #f9a8d4;
+  --kind-tool: #bef264;
+  --kind-error: #fca5a5;
+  --kind-platform: #a1a1aa;
+  --kind-auth: #fcd34d;
+  --kind-middleware: #e9d5ff;
+  --kind-stream: #7dd3fc;
+  --edge-auth: #fbbf24;
+  --edge-structure: #52525b;
+  --edge-invoke: #d4d4d8;
+  --edge-data: #fde047;
+  --edge-event: #d8b4fe;
+  --edge-realtime: #fdba74;
+  --edge-ai: #f9a8d4;
+  --edge-platform: #52525b;
 }
 
 * {
@@ -2906,4 +2951,1395 @@ tbody tr:hover td {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* ---------------------------------------------------------------------------
+ * Application graph explorer
+ * ------------------------------------------------------------------------ */
+
+/* The graph is a workspace, not a document: it takes the whole content area below the shell chrome. */
+.inspector-shell .main-content:has(> .graph-workspace) {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* The shell header already names the page; the generation bar repeats what the explorer shows. */
+.inspector-shell:has(.graph-workspace) .generation-bar {
+  display: none;
+}
+
+.graph-workspace {
+  /* Shell header only; the generation bar is hidden on this page. */
+  --shell-chrome: 4rem;
+  display: grid;
+  height: calc(100dvh - var(--shell-chrome));
+  min-height: 30rem;
+}
+
+.graph-workspace__state {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.explorer {
+  display: grid;
+  grid-template-areas:
+    "bar bar bar"
+    "outline canvas inspector"
+    "relationships relationships relationships";
+  grid-template-columns: 15rem minmax(0, 1fr) 20.5rem;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+.explorer[data-outline="closed"] {
+  grid-template-columns: 0 minmax(0, 1fr) 20.5rem;
+}
+
+.explorer[data-inspector="closed"] {
+  grid-template-columns: 15rem minmax(0, 1fr) 0;
+}
+
+.explorer[data-outline="closed"][data-inspector="closed"] {
+  grid-template-columns: 0 minmax(0, 1fr) 0;
+}
+
+.explorer[data-outline="closed"] .explorer__outline,
+.explorer[data-inspector="closed"] .explorer__inspector {
+  visibility: hidden;
+}
+
+.explorer__bar {
+  grid-area: bar;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.explorer__title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.explorer__title-text {
+  min-width: 0;
+}
+
+.explorer__title-context {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.explorer__crumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.explorer__crumbs ol {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+}
+
+.explorer__crumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--muted);
+}
+
+.explorer__crumbs [aria-current="page"] {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.explorer__title h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.explorer__title p {
+  margin: 0.1rem 0 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.explorer__tools {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.explorer__search {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2rem;
+  padding: 0 0.5rem 0 0.6rem;
+  color: var(--muted);
+  background: var(--panel-muted);
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.explorer__search:focus-within {
+  border-color: var(--accent);
+}
+
+.explorer__search input {
+  width: 13rem;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.explorer__search input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.explorer__search kbd,
+.explorer__kbd {
+  padding: 0.05rem 0.3rem;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 0.3rem;
+  font-family: inherit;
+  font-size: 0.65rem;
+}
+
+.explorer__direction {
+  display: inline-flex;
+  padding: 0.15rem;
+  background: var(--panel-muted);
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+}
+
+.explorer__direction button {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.6rem;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 0.35rem;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.explorer__direction button[aria-pressed="true"] {
+  color: var(--ink);
+  background: var(--panel);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+@media (hover: hover) {
+  .explorer__direction button:not([aria-pressed="true"]):hover {
+    color: var(--ink);
+  }
+}
+
+.explorer__direction button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.explorer__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.explorer__toggle input {
+  accent-color: var(--accent);
+}
+
+.explorer__outline {
+  grid-area: outline;
+  min-height: 0;
+  overflow: auto;
+  border-right: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel-muted) 55%, var(--panel));
+}
+
+.explorer__canvas {
+  grid-area: canvas;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+
+.explorer__inspector {
+  grid-area: inspector;
+  min-height: 0;
+  overflow: auto;
+  border-left: 1px solid var(--line);
+}
+
+.explorer__relationships {
+  grid-area: relationships;
+  border-top: 1px solid var(--line);
+}
+
+.explorer__relationships > summary {
+  padding: 0.55rem 0.9rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.explorer__relationships > summary::-webkit-details-marker {
+  display: none;
+}
+
+.explorer__relationships-title {
+  display: inline;
+  margin: 0;
+  font: inherit;
+}
+
+.explorer__relationships[open] > summary {
+  border-bottom: 1px solid var(--line);
+}
+
+.explorer__relationships .relationship-panel {
+  max-height: 20rem;
+  margin: 0;
+  padding: 0.5rem 0.9rem;
+  overflow: auto;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Outline tree */
+
+.explorer-tree {
+  padding: 0.5rem 0.4rem;
+  outline: 0;
+}
+
+.explorer-tree__empty {
+  margin: 1rem 0.6rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.explorer-tree__item {
+  outline: 0;
+}
+
+.explorer-tree__row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 1.85rem;
+  padding-left: calc(0.25rem + (var(--level, 1) - 1) * 0.85rem);
+  padding-right: 0.5rem;
+  color: var(--ink);
+  border-radius: 0.4rem;
+  font-size: 0.78rem;
+  cursor: default;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.explorer-tree__row[data-kind="group"] {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.explorer-tree__row[data-kind="group"][data-level="1"] {
+  margin-top: 0.4rem;
+}
+
+.explorer-tree__item[data-selected] > .explorer-tree__row {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--node-color, var(--accent)) 16%, var(--panel));
+}
+
+.explorer-tree__item[data-focus-visible] > .explorer-tree__row {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+@media (hover: hover) {
+  .explorer-tree__item:not([data-selected]) > .explorer-tree__row:hover {
+    background: color-mix(in srgb, var(--panel-muted) 80%, var(--ink) 4%);
+  }
+}
+
+.explorer-tree__chevron {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 0.25rem;
+}
+
+.explorer-tree__chevron svg {
+  width: 0.8rem;
+  height: 0.8rem;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.explorer-tree__chevron svg[data-expanded="true"] {
+  transform: rotate(90deg);
+}
+
+.explorer-tree__icon {
+  flex: none;
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--node-color, var(--muted));
+}
+
+.explorer-tree__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.explorer-tree__hint {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Canvas */
+
+.explorer-canvas {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--panel-muted) 40%, var(--panel));
+}
+
+.explorer-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.explorer-arrow path {
+  fill: var(--edge-structure);
+}
+
+.explorer-arrow--invoke path {
+  fill: var(--edge-invoke);
+}
+
+.explorer-arrow--auth path {
+  fill: var(--edge-auth);
+}
+
+.explorer-arrow--data path {
+  fill: var(--edge-data);
+}
+
+.explorer-arrow--event path {
+  fill: var(--edge-event);
+}
+
+.explorer-arrow--realtime path {
+  fill: var(--edge-realtime);
+}
+
+.explorer-arrow--ai path {
+  fill: var(--edge-ai);
+}
+
+.explorer-canvas__status {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  z-index: 5;
+  padding: 0.35rem 0.7rem;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  transform: translateX(-50%);
+}
+
+.explorer-canvas .react-flow__node {
+  cursor: pointer;
+}
+
+.explorer-canvas .react-flow__node:focus-visible {
+  outline: 0;
+}
+
+.explorer-canvas .react-flow__node:focus-visible .explorer-card,
+.explorer-canvas .react-flow__node:focus-visible .explorer-group {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.explorer-canvas .react-flow__node.selected .explorer-card {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--node-color, var(--accent)) 60%, transparent);
+}
+
+.explorer-port {
+  width: 1px !important;
+  height: 1px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  opacity: 0;
+}
+
+.explorer-card {
+  display: flex;
+  gap: 0.6rem;
+  width: 100%;
+  height: 100%;
+  padding: 0.7rem 0.8rem;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--node-color, var(--line));
+  border-radius: 0.6rem;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
+  transition:
+    opacity var(--dur) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+html[data-theme="dark"] .explorer-card {
+  box-shadow: none;
+}
+
+.explorer-card[data-type="service"] {
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.85rem 0.95rem;
+  border-left-width: 1px;
+}
+
+.explorer-card[data-type="stub"] {
+  background: color-mix(in srgb, var(--panel) 70%, var(--panel-muted));
+  border-style: dashed;
+  border-left-style: solid;
+}
+
+.explorer-card[data-type="response"] {
+  border-left-width: 1px;
+}
+
+.explorer-card[data-dimmed="true"],
+.explorer-group[data-dimmed="true"] {
+  opacity: 0.28;
+}
+
+@media (hover: hover) {
+  .explorer-canvas .react-flow__node:hover .explorer-card {
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+  }
+}
+
+.explorer-canvas .react-flow__node:active .explorer-card {
+  transform: scale(0.985);
+}
+
+.explorer-card__head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.explorer-card__icon {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  color: var(--node-color, var(--muted));
+}
+
+/* Item cards: the icon lives in the title row; the block sits on the card's centre line. */
+.explorer-card:not([data-type="service"]) {
+  align-items: center;
+}
+
+.explorer-card__text {
+  flex: 1;
+  align-content: center;
+}
+
+.explorer-card:not([data-type="service"]) .explorer-card__subtitle {
+  padding-left: calc(1rem + 0.45rem);
+}
+
+.explorer-card__text {
+  display: grid;
+  min-width: 0;
+  gap: 0.15rem;
+}
+
+.explorer-card__row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.explorer-card__title {
+  min-width: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.explorer-card[data-type="service"] .explorer-card__title {
+  font-size: 0.92rem;
+}
+
+.explorer-card__subtitle {
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.explorer-card__counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.8rem;
+  margin: 0;
+  padding: 0.5rem 0 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.explorer-card__counts b {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.explorer-chip {
+  flex: none;
+  padding: 0.05rem 0.35rem;
+  color: var(--node-color, var(--muted));
+  background: color-mix(in srgb, var(--node-color, var(--muted)) 12%, var(--panel));
+  border-radius: 0.3rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* React Flow centres text in nodes by default; every explorer card reads left-aligned. */
+.explorer-canvas .react-flow__node {
+  text-align: left;
+}
+
+.explorer-group {
+  width: 100%;
+  height: 100%;
+  background: color-mix(in srgb, var(--panel-muted) 30%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  transition: opacity var(--dur) var(--ease-out);
+}
+
+.explorer-group[data-selected="true"] {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--node-color, var(--accent)) 60%, transparent);
+}
+
+.explorer-group__eyebrow {
+  color: var(--node-color, var(--muted));
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Same anatomy as a service card's header, pinned to the top of the container. */
+.explorer-group__head {
+  padding: 0.85rem 0.95rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.explorer-stage {
+  display: grid;
+  gap: 0.1rem;
+  height: 100%;
+  padding: 0.2rem 0.2rem 0.45rem;
+  border-bottom: 1px solid var(--line);
+  pointer-events: none;
+}
+
+.explorer-stage[data-orientation="row"] {
+  align-content: center;
+  padding: 0 0.75rem 0 0;
+  border-bottom: 0;
+  border-right: 1px solid var(--line);
+  text-align: right;
+}
+
+.explorer-stage__label {
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.explorer-stage__note {
+  color: var(--muted);
+  font-size: 0.66rem;
+  line-height: 1.3;
+  white-space: normal;
+}
+
+.explorer-canvas .explorer-edge {
+  stroke: var(--edge-structure);
+  stroke-width: 1.4;
+  transition:
+    opacity var(--dur) var(--ease-out),
+    stroke-width var(--dur-fast) var(--ease-out);
+}
+
+.explorer-canvas .explorer-edge--invoke {
+  stroke: var(--edge-invoke);
+}
+
+.explorer-canvas .explorer-edge--auth {
+  stroke: var(--edge-auth);
+  stroke-dasharray: 5 4;
+}
+
+.explorer-canvas .explorer-edge--data {
+  stroke: var(--edge-data);
+}
+
+.explorer-canvas .explorer-edge--event {
+  stroke: var(--edge-event);
+}
+
+.explorer-canvas .explorer-edge--realtime {
+  stroke: var(--edge-realtime);
+}
+
+.explorer-canvas .explorer-edge--ai {
+  stroke: var(--edge-ai);
+}
+
+.explorer-canvas .explorer-edge--platform {
+  stroke: var(--edge-platform);
+  stroke-dasharray: 3 4;
+}
+
+.explorer-canvas .explorer-edge[data-state="active"] {
+  stroke-width: 2.2;
+}
+
+.explorer-canvas .explorer-edge[data-state="dimmed"] {
+  opacity: 0.18;
+}
+
+/* Labels sit above every edge; edges carry no z-index of their own. */
+.explorer-canvas .react-flow__edgelabel-renderer {
+  z-index: 4;
+}
+
+.explorer-edge-label {
+  position: absolute;
+  padding: 0.2rem 0.55rem;
+  color: var(--muted);
+  background: var(--panel);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--panel-muted) 40%, var(--panel));
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease-out);
+}
+
+.explorer-edge-label[data-state="active"] {
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--ink) 30%, var(--line));
+}
+
+.explorer-edge-label[data-state="dimmed"] {
+  opacity: 0.15;
+}
+
+.explorer-canvas .react-flow__controls,
+.explorer-canvas .react-flow__minimap {
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 0.55rem;
+  box-shadow: var(--shadow);
+}
+
+.explorer-canvas .react-flow__controls-button {
+  color: var(--ink);
+  background: var(--panel);
+  border-color: var(--line);
+}
+
+.explorer-canvas .react-flow__controls-button svg {
+  fill: currentColor;
+}
+
+.explorer-canvas .react-flow__minimap-mask {
+  fill: color-mix(in srgb, var(--panel-muted) 70%, transparent);
+}
+
+.explorer-canvas .react-flow__background {
+  color: var(--line);
+}
+
+/* Inspector */
+
+.explorer-inspector__body {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+  padding: 0.9rem 1rem 1.25rem;
+  overflow-wrap: anywhere;
+}
+
+.explorer-inspector__body > *,
+.explorer-section > * {
+  min-width: 0;
+}
+
+.explorer-inspector__head {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.explorer-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: fit-content;
+  color: var(--node-color, var(--muted));
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.explorer-kind svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.explorer-inspector__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.explorer-inspector__id {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+}
+
+.explorer-inspector__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  font-size: 0.72rem;
+}
+
+.explorer-inspector__description {
+  margin: 0.25rem 0 0;
+  color: var(--ink);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.explorer-inspector__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.explorer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .explorer-link:hover {
+    color: var(--ink);
+    text-decoration-color: currentColor;
+  }
+}
+
+.explorer-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 0.2rem;
+}
+
+.explorer-section {
+  display: grid;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.explorer-section__title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.explorer-section__hint {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.explorer-facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.3rem 0.9rem;
+  margin: 0;
+  font-size: 0.78rem;
+}
+
+.explorer-facts div {
+  display: contents;
+}
+
+.explorer-facts dt {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.explorer-facts dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.explorer-relations {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.explorer-relation {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  min-height: 1.9rem;
+  padding: 0.25rem 0.45rem;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-radius: 0.4rem;
+  font: inherit;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.explorer-relation svg {
+  flex: none;
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--node-color, var(--muted));
+}
+
+.explorer-relation__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.explorer-relation__hint {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .explorer-relation:hover {
+    background: var(--panel-muted);
+  }
+}
+
+.explorer-relation:active {
+  transform: scale(0.99);
+}
+
+.explorer-relation:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.explorer-schema {
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+}
+
+.explorer-schema + .explorer-schema {
+  margin-top: 0.4rem;
+}
+
+.explorer-schema summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.explorer-schema summary::-webkit-details-marker {
+  display: none;
+}
+
+.explorer-schema summary::before {
+  content: "▸";
+  margin-right: 0.4rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.explorer-schema[open] summary::before {
+  content: "▾";
+}
+
+.explorer-schema__body {
+  padding: 0 0.6rem 0.6rem;
+  font-size: 0.75rem;
+}
+
+.explorer-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.explorer-table th {
+  padding: 0.2rem 0.4rem 0.3rem 0;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  font-weight: 600;
+  text-align: left;
+}
+
+.explorer-table td {
+  padding: 0.3rem 0.4rem 0.3rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.explorer-table code {
+  font-size: 0.72rem;
+}
+
+.explorer-responses,
+.explorer-runs {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.explorer-runs li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.explorer-counts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.3rem 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.explorer-counts b {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.explorer-stages {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  font-size: 0.78rem;
+}
+
+.explorer-stages li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.explorer-stages span {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1100px) {
+  .graph-workspace {
+    height: auto;
+  }
+
+  .explorer,
+  .explorer[data-outline="closed"],
+  .explorer[data-inspector="closed"] {
+    grid-template-areas:
+      "bar bar"
+      "outline canvas"
+      "inspector inspector"
+      "relationships relationships";
+    grid-template-columns: 15rem minmax(0, 1fr);
+    grid-template-rows: auto minmax(22rem, 1fr) auto auto;
+    height: auto;
+  }
+
+  .explorer[data-outline="closed"] {
+    grid-template-columns: 0 minmax(0, 1fr);
+  }
+
+  .explorer__canvas {
+    min-height: 24rem;
+  }
+
+  .explorer__inspector {
+    max-height: 26rem;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .explorer__bar {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .explorer,
+  .explorer[data-outline="closed"],
+  .explorer[data-inspector="closed"] {
+    grid-template-areas:
+      "bar"
+      "outline"
+      "canvas"
+      "inspector"
+      "relationships";
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(20rem, 60vh) auto auto;
+  }
+
+  .explorer__outline {
+    max-height: 14rem;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .explorer[data-outline="closed"] .explorer__outline {
+    display: none;
+  }
+
+  .explorer__search input {
+    width: 8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explorer-card,
+  .explorer-group,
+  .explorer-edge,
+  .explorer-edge-label,
+  .explorer-tree__row,
+  .explorer-tree__chevron svg,
+  .explorer-relation,
+  .explorer-link,
+  .explorer__search {
+    transition: none;
+  }
+}
+
+.page-heading__aside {
+  display: grid;
+  justify-items: end;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+}
+
+/* Filter bar floated at the top of the canvas: icon-only toggles in small groups. */
+.explorer-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.3rem;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  box-shadow: var(--shadow);
+}
+
+.explorer-filters__group {
+  display: inline-flex;
+  gap: 0.15rem;
+}
+
+.explorer-filters__group + .explorer-filters__group {
+  padding-left: 0.35rem;
+  border-left: 1px solid var(--line);
+}
+
+.explorer-filter {
+  display: inline-grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.45rem;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.explorer-filter svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.explorer-filter[aria-pressed="true"] {
+  color: var(--node-color, var(--ink));
+  background: color-mix(in srgb, var(--node-color, var(--accent)) 14%, var(--panel));
+  border-color: color-mix(in srgb, var(--node-color, var(--line)) 35%, var(--line));
+}
+
+.explorer-filters__clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  height: 1.9rem;
+  padding: 0 0.55rem;
+  color: var(--ink);
+  background: var(--panel-muted);
+  border: 1px solid var(--line);
+  border-radius: 0.45rem;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.explorer-filters__clear svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+@media (hover: hover) {
+  .explorer-filters__clear:hover {
+    background: color-mix(in srgb, var(--panel-muted) 70%, var(--ink) 8%);
+  }
+}
+
+.explorer-filters__clear:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.explorer-filter:disabled {
+  cursor: default;
+  opacity: 0.3;
+}
+
+/* Icons stay gray until selected; a selected kind takes its own colour. */
+@media (hover: hover) {
+  .explorer-filter:not(:disabled):hover {
+    color: var(--ink);
+    background: var(--panel-muted);
+  }
+
+  .explorer-filter[aria-pressed="true"]:hover {
+    color: var(--node-color, var(--ink));
+    background: color-mix(in srgb, var(--node-color, var(--accent)) 20%, var(--panel));
+  }
+}
+
+.explorer-filter:not(:disabled):active {
+  transform: scale(0.94);
+}
+
+.explorer-filter:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Lock on protected routes and route groups. */
+.explorer-lock {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  margin-left: auto;
+  color: var(--kind-auth);
+}
+
+.explorer-lock svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explorer-filter,
+  .explorer__direction button {
+    transition: none;
+  }
+}
+
+/* A centred React Flow panel shrinks to half the canvas; let the filter bar keep one row. */
+.explorer-canvas .react-flow__panel.top.center {
+  width: max-content;
+  max-width: calc(100% - 1.5rem);
+}
+
+.explorer-lock__count {
+  margin-left: 0.1rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Edges carrying requests through middleware: a lock leads the label. */
+.explorer-edge-label[data-guarded="true"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--kind-auth) 55%, var(--line));
+  pointer-events: auto;
+  cursor: help;
+}
+
+.explorer-edge-label__lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  color: var(--kind-auth);
+  font-variant-numeric: tabular-nums;
+}
+
+.explorer-edge-label__lock svg {
+  width: 0.7rem;
+  height: 0.7rem;
 }

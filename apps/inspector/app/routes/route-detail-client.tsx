@@ -1,8 +1,10 @@
 "use client";
 
 /** Keeps route metadata and composer calls on one observed browser generation across rerenders. */
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { graphHref } from "../../lib/graph-url-state";
 import type { InspectorObject, ObservabilityPage } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
 import { RouteComposer } from "./route-composer";
@@ -74,7 +76,19 @@ export function RouteDetailClient() {
             graph identity.
           </p>
         </div>
-        <span className="badge">{text(route.id) || id}</span>
+        <div className="page-heading__aside">
+          <span className="badge">{text(route.id) || id}</span>
+          <Link
+            className="text-link"
+            href={graphHref({
+              view: "flow",
+              scope: text(route.id) || id,
+              node: text(route.id) || id,
+            })}
+          >
+            Follow in graph →
+          </Link>
+        </div>
       </header>
       <RouteContract route={route} target={target} requests={requests} />
       <RouteComposer

@@ -13,8 +13,8 @@ export function GraphsClient() {
     <div className="route-page">
       <header className="page-heading">
         <div>
-          <p className="eyebrow">WORKFLOW DEFINITIONS</p>
-          <h1>Graphs</h1>
+          <p className="eyebrow">AGENT WORKFLOWS</p>
+          <h1>Agent graphs</h1>
           <p className="lede">
             Registered `defineGraph` state, nodes, branches, joins, loops, and destinations.
           </p>

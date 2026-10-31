@@ -48,11 +48,12 @@ async function resumeConversation(page: Page): Promise<string | null> {
 async function inspectWorkflow(page: Page): Promise<void> {
   await expect(page.getByRole("tab", { name: "Graph" })).toHaveCount(0);
 
-  await page.getByRole("link", { name: "Graphs" }).click();
-  await expect(page.getByRole("heading", { name: "Graphs" })).toBeVisible();
+  await page.getByRole("link", { name: "Agent graphs" }).click();
+  await expect(page.getByRole("heading", { name: "Agent graphs" })).toBeVisible();
   await page.getByRole("link", { name: "Open graph" }).click();
   const workflow = page.getByRole("region", { name: "orders.review node graph" });
-  await expect(workflow).toBeVisible();
+  // First visit compiles the page in `next dev`; give the layout time to settle.
+  await expect(workflow).toBeVisible({ timeout: 15_000 });
   await expect(workflow.locator(".flow-node--agent,.flow-node--tool")).toHaveCount(0);
   await expect(workflow.getByText("START", { exact: true })).toBeVisible();
   await expect(workflow.getByText("END", { exact: true })).toBeVisible();
@@ -65,16 +66,17 @@ async function inspectWorkflow(page: Page): Promise<void> {
 
 /** Keeps the original selected-thread overlay, secret and narrow viewport checks. */
 async function inspectObservedGraph(page: Page, threadId: string | null): Promise<void> {
-  await page.goto("/graph");
+  await page.goto("/graph?node=support.order");
   const graph = page.getByRole("region", { name: "Interactive capability graph" });
   await expect(graph).toBeVisible();
-  for (const kind of ["graph-start", "graph-end", "subgraph", "subagent", "resource-memory"])
-    await expect(graph.locator(`.flow-node--${kind}`)).toHaveCount(1);
-  await page.getByLabel("Thread ID").fill(threadId!);
-  await page.getByRole("combobox", { name: "Agent", exact: true }).selectOption("support.order");
-  await page.getByLabel("Runs").selectOption("history");
-  await page.getByRole("button", { name: "Show execution" }).click();
-  await expect(graph.locator(".flow-node--observed").first()).toBeVisible();
+  const details = page.getByRole("complementary", { name: "Details" });
+  await expect(details.getByRole("heading", { name: "support.order" })).toBeVisible();
+  await expect(details.getByRole("heading", { name: "Live execution" })).toBeVisible();
+  await details.getByLabel("Thread ID").fill(threadId!);
+  await details.getByRole("combobox", { name: "Agent", exact: true }).selectOption("support.order");
+  await details.getByLabel("Runs").selectOption("history");
+  await details.getByRole("button", { name: "Show execution" }).click();
+  await expect(details.locator(".explorer-runs li").first()).toBeVisible();
   await expect(page.locator("body")).not.toContainText("sk-live-fixture-secret");
 
   await page.setViewportSize({ width: 390, height: 844 });

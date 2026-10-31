@@ -34,18 +34,8 @@ export async function layoutGraph(
 ): Promise<GraphLayout> {
   const sourceNodes = [...graph.nodes].sort((left, right) => left.id.localeCompare(right.id));
   const sourceEdges = [...graph.declaredEdges, ...graph.observedEdges].sort(compareEdges);
-  const usesWorker = typeof window === "undefined";
-  const elk = new ELK(
-    usesWorker
-      ? {
-          workerFactory: () =>
-            new Worker(new URL("../node_modules/elkjs/lib/elk-worker.min.js", import.meta.url), {
-              type: "module",
-            }),
-        }
-      : {},
-  );
-  const result = await elk
+  const { elk, usesWorker } = createElk();
+  const result: ElkNode = await elk
     .layout({
       id: "relkit",
       layoutOptions: {
@@ -104,6 +94,25 @@ export async function layoutGraph(
     nodes,
     edges,
   };
+}
+
+/** ELK instance; a worker is used only off the main thread (tests), inline in the browser. */
+export function createElk(): {
+  readonly elk: InstanceType<typeof ELK>;
+  readonly usesWorker: boolean;
+} {
+  const usesWorker = typeof window === "undefined";
+  const elk = new ELK(
+    usesWorker
+      ? {
+          workerFactory: () =>
+            new Worker(new URL("../node_modules/elkjs/lib/elk-worker.min.js", import.meta.url), {
+              type: "module",
+            }),
+        }
+      : {},
+  );
+  return { elk, usesWorker };
 }
 
 function edgeKey(edge: GraphEdge, index: number): string {

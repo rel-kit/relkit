@@ -40,19 +40,13 @@ export async function runAgentGraphAcceptance(driver: BrowserAcceptanceDriver): 
     "true",
   );
 
-  await run("open", `${baseUrl}/graph`);
+  await run("open", `${baseUrl}/graph?node=support.order`);
   await run("wait", '[aria-label="Interactive capability graph"]');
+  await run("wait", "--text", "Live execution");
   includes(
     await run(
       "eval",
-      "['graph-start','graph-end','subgraph','subagent','resource-memory'].every(kind => document.querySelector('.flow-node--' + kind))",
-    ),
-    "true",
-  );
-  includes(
-    await run(
-      "eval",
-      "['delegates to','provides resource'].every(label => document.body.innerText.includes(label))",
+      "Boolean(document.querySelector('.explorer-card[data-category=\"service\"]') && document.querySelector('.explorer-tree'))",
     ),
     "true",
   );
