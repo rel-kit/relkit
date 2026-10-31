@@ -82,10 +82,11 @@ const runTool = Effect.fn("Inspector.run")(function* (
     });
     const token = randomBytes(32).toString("base64url");
     const events = yield* acquireLiveEvents;
-    const backend = yield* native.listen(
-      { host: "127.0.0.1", port: 0 },
-      inspectorBackend(state, remote, token, options, events),
-    );
+    // The listener captures this context for every UI poll and its response cleanup,
+    // so routine successful requests stay out of the terminal like the inspection loop.
+    const backend = yield* native
+      .listen({ host: "127.0.0.1", port: 0 }, inspectorBackend(state, remote, token, options, events))
+      .pipe(Effect.provideService(ExecutionSuccessLogs, false));
     yield* Effect.addFinalizer(() =>
       Ref.get(state).pipe(
         Effect.flatMap((value) =>
