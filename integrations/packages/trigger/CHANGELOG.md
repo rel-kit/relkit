@@ -1,5 +1,5 @@
 # @relkit/trigger
 
-## 0.8.1
+## 0.8.2
 
 See the root CHANGELOG.md for this release batch.
