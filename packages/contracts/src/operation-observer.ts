@@ -132,6 +132,7 @@ export function observeExecution<A, E, R>(
             ...attributes,
             outcome,
             ...(elapsed === undefined ? {} : { duration_ms: elapsed }),
+            ...(Exit.isFailure(exit) && outcome !== "interrupted" ? causeSummary(exit.cause) : {}),
           });
         }),
       ),
@@ -150,6 +151,37 @@ function operationOutcome<A, E>(exit: Exit.Exit<A, E>): ExecutionOutcome {
   if (Exit.isSuccess(exit)) return "success";
   if (Cause.hasDies(exit.cause)) return "defect";
   return Cause.hasInterruptsOnly(exit.cause) ? "interrupted" : "failure";
+}
+
+/**
+ * Identifies why an operation failed without logging native messages, which may hold
+ * paths, URLs or credentials.
+ * @param cause - Failed operation cause.
+ * @returns Bounded error tag, safe operation label, native code and HTTP status when present.
+ */
+function causeSummary(cause: Cause.Cause<unknown>): Record<string, string | number> {
+  const error = Cause.squash(cause);
+  if (typeof error !== "object" || error === null) return { error: typeof error };
+  const field = (value: unknown, key: string) =>
+    typeof value === "object" && value !== null && key in value
+      ? (value as Record<string, unknown>)[key]
+      : undefined;
+  const label = (value: unknown) =>
+    (typeof value === "string" && /^[\w.:-]{1,80}$/.test(value)) ||
+    (typeof value === "number" && Number.isInteger(value))
+      ? value
+      : undefined;
+  const nested = field(error, "cause");
+  const summary: Record<string, string | number> = {};
+  const tag = label(field(error, "_tag")) ?? label(field(error, "name"));
+  const operation = label(field(error, "operation"));
+  const code = label(field(error, "code")) ?? label(field(nested, "code"));
+  const status = label(field(error, "status")) ?? label(field(nested, "status"));
+  if (tag !== undefined) summary.error = tag;
+  if (operation !== undefined) summary.error_operation = operation;
+  if (code !== undefined) summary.error_code = code;
+  if (status !== undefined) summary.error_status = status;
+  return summary;
 }
 
 /**

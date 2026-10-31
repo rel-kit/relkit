@@ -1,5 +1,5 @@
 import { expect, it } from "@effect/vitest";
-import { Cause, Context, Effect, Exit, Fiber, Logger, Metric } from "effect";
+import { Cause, Context, Data, Effect, Exit, Fiber, Logger, Metric, References } from "effect";
 import { ExecutionSuccessLogs, observeExecution } from "../src/operation.js";
 
 it.effect("retains successful completion logs by default", () =>
@@ -70,4 +70,37 @@ it.effect(
       // A local override never changes the default of another invocation.
       expect(yield* ExecutionSuccessLogs).toBe(true);
     }),
+);
+
+it.effect("names the failure cause in failure logs without native messages", () =>
+  Effect.gen(function* () {
+    const records: Record<string, unknown>[] = [];
+    const logger = Logger.make((event) => {
+      records.push({ ...event.fiber.getRef(References.CurrentLogAnnotations) });
+    });
+    class ConnectionError extends Data.TaggedError("ConnectionError")<{
+      readonly operation: string;
+      readonly cause: Error;
+    }> {}
+    const native = Object.assign(new Error("connect ECONNREFUSED http://secret@127.0.0.1:3000"), {
+      code: "ECONNREFUSED",
+    });
+    yield* Effect.exit(
+      observeExecution(
+        "inspector",
+        "remote.request",
+        Effect.fail(new ConnectionError({ operation: "remote.request", cause: native })),
+      ).pipe(Effect.provide(Logger.layer([logger]))),
+    );
+    expect(records).toEqual([
+      expect.objectContaining({
+        operation: "remote.request",
+        outcome: "failure",
+        error: "ConnectionError",
+        error_operation: "remote.request",
+        error_code: "ECONNREFUSED",
+      }),
+    ]);
+    expect(JSON.stringify(records)).not.toContain("secret");
+  }),
 );

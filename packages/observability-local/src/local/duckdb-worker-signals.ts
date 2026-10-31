@@ -3,15 +3,19 @@ import { Effect, Exit, Scope } from "effect";
 /** @param scope - Physical process owner. @returns Scoped signal/disconnect registrations. */
 export const installDuckdbWorkerSignals = Effect.fn("ObservabilityDuckdb.worker.signals")(
   function* (scope: Scope.Closeable) {
-    const sigint = (): void => undefined;
+    // Terminal and group signals reach the worker alongside its parent; the parent's
+    // ordered close (or IPC disconnect when it dies) owns the final flush instead.
+    const ignore = (): void => undefined;
     yield* Effect.acquireRelease(
       Effect.sync(() => {
-        process.on("SIGINT", sigint);
-        return sigint;
+        process.on("SIGINT", ignore);
+        process.on("SIGTERM", ignore);
+        return ignore;
       }),
       (owned) =>
         Effect.sync(() => {
           process.off("SIGINT", owned);
+          process.off("SIGTERM", owned);
         }),
     );
     const disconnect = (): void => {
