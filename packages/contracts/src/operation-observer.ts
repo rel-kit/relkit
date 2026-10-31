@@ -1,4 +1,4 @@
-import { Cause, Clock, Context, Effect, Exit, Metric } from "effect";
+import { Cause, Clock, Context, Effect, Exit, Metric, Result } from "effect";
 import type {
   ExecutionDomain,
   ExecutionOutcome,
@@ -158,29 +158,39 @@ function operationOutcome<A, E>(exit: Exit.Exit<A, E>): ExecutionOutcome {
  * paths, URLs or credentials.
  * @param cause - Failed operation cause.
  * @returns Bounded error tag, safe operation label, native code and HTTP status when present.
+ * @remarks Mixed causes are classified as defects, so the first defect is named in
+ * preference to a typed failure. Codes must be constant-case (`ENOENT`,
+ * `RELKIT_TIMEOUT`) or errno integers, which excludes IDs and token-shaped values.
  */
 function causeSummary(cause: Cause.Cause<unknown>): Record<string, string | number> {
-  const error = Cause.squash(cause);
+  const defect = Cause.findDefect(cause);
+  const error = Result.isSuccess(defect) ? defect.success : Cause.squash(cause);
   if (typeof error !== "object" || error === null) return { error: typeof error };
   const field = (value: unknown, key: string) =>
     typeof value === "object" && value !== null && key in value
       ? (value as Record<string, unknown>)[key]
       : undefined;
-  const label = (value: unknown) =>
-    (typeof value === "string" && /^[\w.:-]{1,80}$/.test(value)) ||
-    (typeof value === "number" && Number.isInteger(value))
+  const matching = (pattern: RegExp) => (value: unknown) =>
+    typeof value === "string" && pattern.test(value) ? value : undefined;
+  const tag = matching(/^[A-Za-z_$][\w$]{0,79}$/);
+  const label = matching(/^[\w.:-]{1,80}$/);
+  const constant = matching(/^[A-Z][A-Z0-9_]{1,79}$/);
+  const code = (value: unknown) =>
+    typeof value === "number" && Number.isInteger(value) ? value : constant(value);
+  const status = (value: unknown) =>
+    typeof value === "number" && Number.isInteger(value) && value >= 100 && value <= 599
       ? value
       : undefined;
   const nested = field(error, "cause");
   const summary: Record<string, string | number> = {};
-  const tag = label(field(error, "_tag")) ?? label(field(error, "name"));
+  const name = tag(field(error, "_tag")) ?? tag(field(error, "name"));
   const operation = label(field(error, "operation"));
-  const code = label(field(error, "code")) ?? label(field(nested, "code"));
-  const status = label(field(error, "status")) ?? label(field(nested, "status"));
-  if (tag !== undefined) summary.error = tag;
+  const errorCode = code(field(error, "code")) ?? code(field(nested, "code"));
+  const errorStatus = status(field(error, "status")) ?? status(field(nested, "status"));
+  if (name !== undefined) summary.error = name;
   if (operation !== undefined) summary.error_operation = operation;
-  if (code !== undefined) summary.error_code = code;
-  if (status !== undefined) summary.error_status = status;
+  if (errorCode !== undefined) summary.error_code = errorCode;
+  if (errorStatus !== undefined) summary.error_status = errorStatus;
   return summary;
 }
 
