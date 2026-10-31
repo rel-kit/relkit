@@ -12,6 +12,7 @@ import type { InspectorToolState, InspectorToolStateRef } from "./tool-state.typ
 import type { InspectorOptions } from "./options.types.js";
 import { historyResponse, backendError } from "./backend-history.js";
 import { forwardBackend } from "./backend-forward.js";
+import { ExecutionSuccessLogs } from "@relkit/contracts/operation";
 
 /** The packaged Next server alone receives credentials for this local hop. */
 export function inspectorBackend(
@@ -21,8 +22,8 @@ export function inspectorBackend(
   options: InspectorOptions,
   stream: ObservabilityStream,
 ) {
-  return (request: Request) =>
-    serveBackend(state, remote, token, options, stream, request).pipe(
+  return (request: Request) => {
+    const served = serveBackend(state, remote, token, options, stream, request).pipe(
       Effect.catchTag("InspectionConnectionError", (error) =>
         Effect.succeed(
           backendError(
@@ -37,7 +38,16 @@ export function inspectorBackend(
         ),
       ),
     );
+    // The listener silences routine success logs for UI polling; actions and mutations
+    // sent with an unsafe method keep their completion record.
+    return safeMethods.has(request.method)
+      ? served
+      : served.pipe(Effect.provideService(ExecutionSuccessLogs, true));
+  };
 }
+
+/** Read-only methods the UI uses for polling and history. */
+const safeMethods = new Set(["GET", "HEAD", "OPTIONS"]);
 
 /** A browser can neither choose a target/path on disk nor provide bridge credentials. */
 const serveBackend = Effect.fn("Inspector.backend")(function* (
