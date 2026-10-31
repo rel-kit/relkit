@@ -1,6 +1,6 @@
 {
   "name": "create-relkit",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "description": "Create a RELKIT application from a supported project template.",
   "license": "MIT",
   "repository": {
@@ -221,7 +221,7 @@
       "@relkit/drizzle": "0.8.1",
       "@relkit/redis": "0.8.1",
       "@relkit/s3": "0.7.12",
-      "@relkit/inspector": "0.1.2"
+      "@relkit/inspector": "0.1.3"
     }
   }
 }
