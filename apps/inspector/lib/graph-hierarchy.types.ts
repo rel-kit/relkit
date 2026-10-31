@@ -43,7 +43,7 @@ export interface AppHierarchy {
   readonly edges: readonly GraphEdge[];
   readonly outgoing: ReadonlyMap<string, readonly GraphEdge[]>;
   readonly incoming: ReadonlyMap<string, readonly GraphEdge[]>;
-  /** Owning group id (domain service id, or "platform") per node. */
+  /** Owning group id (domain service id, or `PLATFORM_OWNER`) per node. */
   readonly ownerOf: ReadonlyMap<string, string>;
   /** True when the generation records function → table access. */
   readonly hasTableUsage: boolean;

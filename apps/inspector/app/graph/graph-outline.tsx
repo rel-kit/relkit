@@ -19,6 +19,9 @@ export interface OutlineEntry {
   readonly children?: readonly OutlineEntry[];
 }
 
+/** Top-level group keys; `@` keeps them apart from node ids, which start with a letter. */
+export const OUTLINE_ROOTS = ["@domains", "@platform"] as const;
+
 export function buildOutline(hierarchy: AppHierarchy, query: string): readonly OutlineEntry[] {
   const needle = query.trim().toLowerCase();
   const matches = (node: GraphNode) =>
@@ -88,19 +91,19 @@ export function buildOutline(hierarchy: AppHierarchy, query: string): readonly O
       children: routes.filter(matches).map(leaf),
     });
   for (const [key, label, nodes] of [
-    ["platform/providers", "Providers", providers],
-    ["platform/env", "Environment", env],
-    ["platform/errors", "Errors", errors],
-    ["platform/middleware", "Middleware", middleware],
+    ["@platform/providers", "Providers", providers],
+    ["@platform/env", "Environment", env],
+    ["@platform/errors", "Errors", errors],
+    ["@platform/middleware", "Middleware", middleware],
   ] as const) {
     const entry = group(key, label, nodes);
     if (entry !== undefined) platformChildren.push(entry);
   }
   const result: OutlineEntry[] = [
-    { key: "domains", label: "Domains", hint: String(domains.length), children: domains },
+    { key: OUTLINE_ROOTS[0], label: "Domains", hint: String(domains.length), children: domains },
   ];
   if (platformChildren.length > 0)
-    result.push({ key: "platform", label: "Platform", children: platformChildren });
+    result.push({ key: OUTLINE_ROOTS[1], label: "Platform", children: platformChildren });
   return result;
 }
 

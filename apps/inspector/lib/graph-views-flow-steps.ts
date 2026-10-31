@@ -1,6 +1,6 @@
 /** Stage builders for the request flow view: access checks, calls, listeners and responses. */
 import type { GraphEdge, GraphNode } from "./graph-model";
-import { type AppHierarchy, functionAccess, routeAccess } from "./graph-hierarchy";
+import { type Access, type AppHierarchy, functionAccess, routeAccess } from "./graph-hierarchy";
 import {
   functionErrors,
   functionOutput,
@@ -36,18 +36,31 @@ export function placeAccess(
 ): string[] {
   const { hierarchy, edges, place } = build;
   const accessNotes: string[] = [];
+  const auth = hierarchy.platform.auth;
+  const placeAuth = (service: GraphNode, access: Access) => {
+    const checks = [access.session ? "session required" : "", access.role ? "role checked" : ""]
+      .filter((part) => part !== "")
+      .join(" · ");
+    place(service, "access", { subtitle: checks, badges: access.role ? ["401", "403"] : ["401"] });
+  };
+  // A function nothing triggers still declares its checks: show them ahead of the handler.
+  if (requests.length === 0) {
+    const access = functionAccess(handler);
+    if ((access.session || access.role) && auth !== undefined) {
+      placeAuth(auth, access);
+      edges.push(syntheticEdge(auth.id, handler.id, "allows", "auth"));
+      accessNotes.push("Checked inside the handler through context.auth.");
+    }
+    return accessNotes;
+  }
   for (const request of requests) {
     const access = isRoute(request) ? routeAccess(hierarchy, request) : functionAccess(handler);
     const names = guardNames(hierarchy, access.middleware);
     const guarded = (edge: ViewEdge): ViewEdge =>
       names.length === 0 ? edge : { ...edge, guards: names, guardNote: guardSentence(names, 1, 1) };
     let previous = request.id;
-    const auth = hierarchy.platform.auth;
     if ((access.session || access.role) && auth !== undefined) {
-      const checks = [access.session ? "session required" : "", access.role ? "role checked" : ""]
-        .filter((part) => part !== "")
-        .join(" · ");
-      place(auth, "access", { subtitle: checks, badges: access.role ? ["401", "403"] : ["401"] });
+      placeAuth(auth, access);
       edges.push(guarded(syntheticEdge(previous, auth.id, "checks session", "auth")));
       previous = auth.id;
       accessNotes.push(
@@ -57,15 +70,32 @@ export function placeAccess(
       );
     }
     if (previous === request.id) {
-      const edge = hierarchy.outgoing
-        .get(request.id)
-        ?.find((item) => item.kind === "targets-function" && item.to === handler.id);
-      if (edge !== undefined) edges.push(guarded({ ...viewEdge(edge), label: "handled by" }));
+      const edge = entryEdge(hierarchy, request, handler);
+      if (edge !== undefined) edges.push(guarded(edge));
     } else {
       edges.push(syntheticEdge(previous, handler.id, "allows", "auth"));
     }
   }
   return accessNotes;
+}
+
+/** The arrow from a request to its handler: a trigger's target, or the function a tool runs. */
+function entryEdge(
+  hierarchy: AppHierarchy,
+  request: GraphNode,
+  handler: GraphNode,
+): ViewEdge | undefined {
+  const target = hierarchy.outgoing
+    .get(request.id)
+    ?.find((item) => item.kind === "targets-function" && item.to === handler.id);
+  if (target !== undefined) return { ...viewEdge(target), label: "handled by" };
+  // Tools are declared from the function side (function exposes-as-tool tool); read it reversed.
+  const exposed = hierarchy.incoming
+    .get(request.id)
+    ?.find((item) => item.kind === "exposes-as-tool" && item.from === handler.id);
+  if (exposed !== undefined)
+    return { ...viewEdge({ ...exposed, from: request.id, to: handler.id }), label: "runs" };
+  return undefined;
 }
 
 /** Follows calls, agents and tools from the handler; returns every function reached. */

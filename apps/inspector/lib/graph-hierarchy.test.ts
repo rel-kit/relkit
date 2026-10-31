@@ -2,7 +2,12 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { InspectorGraph } from "./api-types";
-import { normalizeGraphResponse } from "./graph-model";
+import {
+  type GraphEdge,
+  type GraphNode,
+  type GraphSnapshot,
+  normalizeGraphResponse,
+} from "./graph-model";
 import { buildHierarchy, domainOf, isProtected, routeAccess, tableNodeId } from "./graph-hierarchy";
 import { architectureView, domainView, flowView, labelEdge } from "./graph-views";
 import { highlightFor } from "./graph-highlight";
@@ -219,7 +224,7 @@ describe("graph views", () => {
     expect(label("trips.created->notifications:event")).toBe("wakes");
     expect(label("group:trips->auth:session")).toBe("2 session checks");
     const toTable = view.edges.find(
-      (edge) => edge.id === "trips.create-trip->table:trips:uses-table:trips",
+      (edge) => edge.id === "trips.create-trip->table:trips:uses-table:trips:write",
     )!;
     expect(toTable.label).toBe("writes trips");
     expect(labelEdge(view, toTable)).toBe(false);
@@ -515,5 +520,104 @@ describe("filter selection", () => {
       "routes",
       "services",
     ]);
+  });
+});
+
+describe("flow and ownership edge cases", () => {
+  const declared = (kind: string, from: string, to: string, extra: Partial<GraphEdge> = {}) =>
+    ({ relationship: "declared", kind, from, to, ...extra }) satisfies GraphEdge;
+  const small = (nodes: readonly GraphNode[], edges: readonly GraphEdge[]): GraphSnapshot => ({
+    generationId: "g",
+    graphHash: "h",
+    integrations: [],
+    nodes,
+    declaredEdges: edges,
+    observedEdges: [],
+  });
+
+  test("a tool's flow links the tool to the function it runs", () => {
+    const graph = buildHierarchy(
+      small(
+        [
+          { id: "support", kind: "service" },
+          { id: "support.lookup", kind: "function", domainId: "support" },
+          {
+            id: "support.lookup-tool",
+            kind: "tool",
+            domainId: "support",
+            meta: { targetFunctionId: "support.lookup" },
+          },
+        ],
+        [
+          declared("exposes-function", "support", "support.lookup"),
+          declared("exposes-as-tool", "support.lookup", "support.lookup-tool"),
+        ],
+      ),
+    );
+    const view = flowView(graph, "support.lookup-tool")!;
+    const edge = view.edges.find((item) => item.from === "support.lookup-tool");
+    expect(edge?.to).toBe("support.lookup");
+    expect(edge?.label).toBe("runs");
+  });
+
+  test("a function nothing triggers still shows its session check", () => {
+    const graph = buildHierarchy(
+      small(
+        [
+          { id: "auth", kind: "service", meta: { capability: { kind: "better-auth" } } },
+          { id: "jobs", kind: "service" },
+          {
+            id: "jobs.sweep",
+            kind: "function",
+            domainId: "jobs",
+            meta: { errors: [{ id: "auth.unauthenticated", http: { status: 401 } }] },
+          },
+        ],
+        [declared("exposes-function", "jobs", "jobs.sweep")],
+      ),
+    );
+    const view = flowView(graph, "jobs.sweep")!;
+    expect(view.nodes.filter((node) => node.stage === "access").map((node) => node.id)).toEqual([
+      "auth",
+    ]);
+    expect(view.edges.find((edge) => edge.from === "auth")?.to).toBe("jobs.sweep");
+    expect(view.stages!.find((stage) => stage.id === "access")?.note).toContain("context.auth");
+  });
+
+  test("reading and writing one table keeps both arrows", () => {
+    const graph = buildHierarchy(
+      small(
+        [
+          { id: "trips", kind: "service" },
+          { id: "trips.sync", kind: "function", domainId: "trips" },
+          { id: "trips.store", kind: "event", domainId: "trips" },
+        ],
+        [
+          declared("exposes-function", "trips", "trips.sync"),
+          declared("uses-table", "trips.sync", "trips.store", { table: "trips", access: "read" }),
+          declared("uses-table", "trips.sync", "trips.store", { table: "trips", access: "write" }),
+        ],
+      ),
+    );
+    const labels = domainView(graph, "trips")!
+      .edges.filter((edge) => edge.from === "trips.sync")
+      .map((edge) => edge.label)
+      .sort();
+    expect(labels).toEqual(["reads trips", "writes trips"]);
+  });
+
+  test("a domain named platform stays a domain", () => {
+    const graph = buildHierarchy(
+      small(
+        [
+          { id: "platform", kind: "service" },
+          { id: "platform.ping", kind: "function", domainId: "platform" },
+        ],
+        [declared("exposes-function", "platform", "platform.ping")],
+      ),
+    );
+    expect(graph.domains.map((domain) => domain.id)).toEqual(["platform"]);
+    expect(domainOf(graph, "platform.ping")?.id).toBe("platform");
+    expect(graph.platform.other.map((node) => node.id)).not.toContain("platform.ping");
   });
 });

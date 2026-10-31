@@ -13,7 +13,7 @@ import {
   Search,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
-import type { buildHierarchy } from "../../lib/graph-hierarchy";
+import { type buildHierarchy, PLATFORM_OWNER } from "../../lib/graph-hierarchy";
 import { nodeTitle } from "../../lib/graph-node-meta";
 import { domainLocation, type GraphLocation, type resolveView } from "../../lib/graph-url-state";
 
@@ -155,7 +155,7 @@ function breadcrumbs(
   const scope = location.scope === undefined ? undefined : hierarchy.nodes.get(location.scope);
   const owner = location.scope === undefined ? undefined : hierarchy.ownerOf.get(location.scope);
   const crumbs: Crumb[] = [root];
-  if (owner !== undefined && owner !== "platform")
+  if (owner !== undefined && owner !== PLATFORM_OWNER)
     crumbs.push({ label: owner, location: domainLocation(owner, location) });
   crumbs.push({ label: scope === undefined ? view.title : nodeTitle(scope) });
   return crumbs;

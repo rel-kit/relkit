@@ -23,7 +23,13 @@ import { GraphCanvas } from "./graph-canvas";
 import { ExplorerBar } from "./graph-explorer-bar";
 import { useViewLayout } from "./graph-explorer-layout";
 import { GraphInspector } from "./graph-inspector";
-import { allGroupKeys, buildOutline, GraphOutline, outlinePathTo } from "./graph-outline";
+import {
+  allGroupKeys,
+  buildOutline,
+  GraphOutline,
+  OUTLINE_ROOTS,
+  outlinePathTo,
+} from "./graph-outline";
 import { GraphRelationships } from "./graph-relationships";
 
 export function GraphExplorer({ graph }: { readonly graph: GraphSnapshot }) {
@@ -96,9 +102,7 @@ export function GraphExplorer({ graph }: { readonly graph: GraphSnapshot }) {
 
   const [query, setQuery] = useState("");
   const outline = useMemo(() => buildOutline(hierarchy, query), [hierarchy, query]);
-  const [expanded, setExpanded] = useState<ReadonlySet<string>>(
-    () => new Set(["domains", "platform"]),
-  );
+  const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set(OUTLINE_ROOTS));
   useEffect(() => {
     if (query.trim() !== "") {
       setExpanded(new Set(allGroupKeys(outline)));

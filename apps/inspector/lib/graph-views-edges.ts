@@ -86,7 +86,8 @@ export function labelEdge(view: GraphView, edge: ViewEdge): boolean {
 
 export function viewEdge(edge: GraphEdge): ViewEdge {
   return {
-    id: `${edge.from}->${edge.to}:${edge.kind}${edge.table === undefined ? "" : `:${edge.table}`}`,
+    // A function may both read and write one table: access keeps those two arrows apart.
+    id: `${edge.from}->${edge.to}:${edge.kind}${edge.table === undefined ? "" : `:${edge.table}`}${edge.access === undefined ? "" : `:${edge.access}`}`,
     from: edge.from,
     to: edge.to,
     group: edgeGroup(edge),

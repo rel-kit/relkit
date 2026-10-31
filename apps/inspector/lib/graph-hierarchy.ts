@@ -15,7 +15,8 @@ export type { AppHierarchy, DomainGroup, PlatformGroup } from "./graph-hierarchy
 export { functionAccess, isProtected, routeAccess, type Access } from "./graph-hierarchy-access";
 export { routeGroupId, routeGroupLabel } from "./graph-hierarchy-route-groups";
 
-export const PLATFORM_OWNER = "platform";
+/** Owner id for platform nodes; declared ids start with a letter, so no domain can be named this. */
+export const PLATFORM_OWNER = "@platform";
 
 export function tableNodeId(name: string): string {
   return `table:${name}`;
