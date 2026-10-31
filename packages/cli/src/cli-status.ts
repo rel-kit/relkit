@@ -12,7 +12,9 @@ import type { CliStatus, ScaffoldStatus } from "./cli-interaction.types.js";
  * @remarks The Effect owner below closes this facade on interruption.
  */
 export function createCliStatus(runtime: CliRuntime, json: boolean, command: string): CliStatus {
-  const enabled = !["create", "add", "dev", "start"].includes(command);
+  // Long-running commands own the terminal: a spinner would put stdin in raw mode and
+  // turn Ctrl+C into @clack's process.exit(0), skipping child-process cleanup.
+  const enabled = !["create", "add", "dev", "start", "inspector"].includes(command);
   const status = createScaffoldStatus(runtime, json, enabled);
   return {
     start: () => status.start(`relkit ${command}`),
