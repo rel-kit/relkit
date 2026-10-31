@@ -21,12 +21,15 @@ export default function initialize(modules: EditorModules): ts.server.PluginModu
       const service = info.languageService;
       // The host LanguageService contract consists of methods. Fill its own method
       // keys before overriding the two hooks, preserving `this` on forwarded calls.
+      // Keys stay enumerable so plugins chained after this one can wrap it with spread.
       const proxy = Object.create(null) as ts.LanguageService;
       for (const key of Object.keys(service) as (keyof ts.LanguageService)[]) {
         Object.defineProperty(proxy, key, {
           value: (...args: unknown[]) =>
             (service[key] as (...args: unknown[]) => unknown).apply(service, args),
           writable: true,
+          enumerable: true,
+          configurable: true,
         });
       }
       /** Reads current host snapshots and appends route findings.
