@@ -4,17 +4,34 @@ import type { CliRuntime } from "./main-support.js";
 import type { CliStatus, ScaffoldStatus } from "./cli-interaction.types.js";
 
 /**
+ * Identifies invocations that run until interrupted.
+ * @param command - Declared command label.
+ * @param args - Serialized invocation arguments; subcommands lead.
+ * @returns True when the invocation owns the terminal until Ctrl+C.
+ * @remarks A spinner would put stdin in raw mode and turn Ctrl+C into @clack's
+ * process.exit(0), skipping scoped cleanup of child processes and streams.
+ */
+function ownsTerminal(command: string, args: readonly string[]): boolean {
+  if (["create", "add", "dev", "start", "inspector"].includes(command)) return true;
+  return command === "jobs" && args[0] === "runs" && args[1] === "watch";
+}
+
+/**
  * Creates the existing synchronous presentation facade.
  * @param runtime - Invocation presentation settings.
  * @param json - Whether output must remain machine-readable.
  * @param command - Declared command label.
+ * @param args - Serialized invocation arguments.
  * @returns An idempotent native callback facade.
  * @remarks The Effect owner below closes this facade on interruption.
  */
-export function createCliStatus(runtime: CliRuntime, json: boolean, command: string): CliStatus {
-  // Long-running commands own the terminal: a spinner would put stdin in raw mode and
-  // turn Ctrl+C into @clack's process.exit(0), skipping child-process cleanup.
-  const enabled = !["create", "add", "dev", "start", "inspector"].includes(command);
+export function createCliStatus(
+  runtime: CliRuntime,
+  json: boolean,
+  command: string,
+  args: readonly string[] = [],
+): CliStatus {
+  const enabled = !ownsTerminal(command, args);
   const status = createScaffoldStatus(runtime, json, enabled);
   return {
     start: () => status.start(`relkit ${command}`),
@@ -28,11 +45,17 @@ export function createCliStatus(runtime: CliRuntime, json: boolean, command: str
  * @param runtime - Invocation presentation settings.
  * @param json - Machine-readable output selection.
  * @param command - Declared command label.
+ * @param args - Serialized invocation arguments.
  * @returns A scoped status facade; cleanup finishes an outstanding spinner once.
  */
-export function createCliStatusEffect(runtime: CliRuntime, json: boolean, command: string) {
+export function createCliStatusEffect(
+  runtime: CliRuntime,
+  json: boolean,
+  command: string,
+  args: readonly string[] = [],
+) {
   return Effect.acquireRelease(
-    Effect.sync(() => createCliStatus(runtime, json, command)),
+    Effect.sync(() => createCliStatus(runtime, json, command, args)),
     (status) => Effect.sync(() => status.finish(false)),
   );
 }

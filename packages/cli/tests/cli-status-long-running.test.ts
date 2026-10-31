@@ -17,7 +17,15 @@ test.each(["create", "add", "dev", "start", "inspector"])(
   },
 );
 
-test("finite commands still show a spinner", () => {
-  createCliStatus(interactive, false, "build").start();
+test("jobs runs watch owns the terminal without a spinner", () => {
+  createCliStatus(interactive, false, "jobs", ["runs", "watch", "--run-id", "run_1"]).start();
+  expect(spinner).not.toHaveBeenCalled();
+});
+
+test.each([
+  ["build", []],
+  ["jobs", ["runs", "list"]],
+])("finite command %s %j still shows a spinner", (command, args) => {
+  createCliStatus(interactive, false, command, args).start();
   expect(spinner).toHaveBeenCalledOnce();
 });
