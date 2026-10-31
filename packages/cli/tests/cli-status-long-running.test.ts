@@ -9,10 +9,13 @@ const interactive = { tty: true, ci: false };
 
 beforeEach(() => spinner.mockClear());
 
-test.each(["create", "add", "dev", "start", "inspector"])("%s owns the terminal without a spinner", (command) => {
-  createCliStatus(interactive, false, command).start();
-  expect(spinner).not.toHaveBeenCalled();
-});
+test.each(["create", "add", "dev", "start", "inspector"])(
+  "%s owns the terminal without a spinner",
+  (command) => {
+    createCliStatus(interactive, false, command).start();
+    expect(spinner).not.toHaveBeenCalled();
+  },
+);
 
 test("finite commands still show a spinner", () => {
   createCliStatus(interactive, false, "build").start();
