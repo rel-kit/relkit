@@ -108,7 +108,7 @@ const executeInvocationEffect = Effect.fn("Cli.command")(
     signal: AbortSignal,
   ) {
     const log = yield* createCliLoggerEffect(json, io);
-    const status = yield* createCliStatusEffect(runtime, json, invocation.command);
+    const status = yield* createCliStatusEffect(runtime, json, invocation.command, invocation.args);
     status.start();
     const context: CliCommandContext = {
       command: invocation.command,

@@ -59,7 +59,7 @@ test("Effect worker maps response codes and closed calls to tagged errors", asyn
   await Effect.runPromise(worker.close());
   const closed = await Effect.runPromise(Effect.flip(worker.call({ type: "flush" })));
   expect(closed.reason).toBe("closed");
-  expect(child.kill).toHaveBeenCalledOnce();
+  expect(child.kill).toHaveBeenCalledExactlyOnceWith("SIGKILL");
 });
 
 test("interrupting one call preserves the shared worker and unrelated replies", async () => {

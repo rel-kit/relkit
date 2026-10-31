@@ -1,4 +1,4 @@
-import { Cause, Clock, Context, Effect, Exit, Metric } from "effect";
+import { Cause, Clock, Context, Effect, Exit, Metric, Result } from "effect";
 import type {
   ExecutionDomain,
   ExecutionOutcome,
@@ -132,6 +132,7 @@ export function observeExecution<A, E, R>(
             ...attributes,
             outcome,
             ...(elapsed === undefined ? {} : { duration_ms: elapsed }),
+            ...(Exit.isFailure(exit) && outcome !== "interrupted" ? causeSummary(exit.cause) : {}),
           });
         }),
       ),
@@ -150,6 +151,47 @@ function operationOutcome<A, E>(exit: Exit.Exit<A, E>): ExecutionOutcome {
   if (Exit.isSuccess(exit)) return "success";
   if (Cause.hasDies(exit.cause)) return "defect";
   return Cause.hasInterruptsOnly(exit.cause) ? "interrupted" : "failure";
+}
+
+/**
+ * Identifies why an operation failed without logging native messages, which may hold
+ * paths, URLs or credentials.
+ * @param cause - Failed operation cause.
+ * @returns Bounded error tag, safe operation label, native code and HTTP status when present.
+ * @remarks Mixed causes are classified as defects, so the first defect is named in
+ * preference to a typed failure. Codes must be constant-case (`ENOENT`,
+ * `RELKIT_TIMEOUT`) or errno integers, which excludes IDs and token-shaped values.
+ */
+function causeSummary(cause: Cause.Cause<unknown>): Record<string, string | number> {
+  const defect = Cause.findDefect(cause);
+  const error = Result.isSuccess(defect) ? defect.success : Cause.squash(cause);
+  if (typeof error !== "object" || error === null) return { error: typeof error };
+  const field = (value: unknown, key: string) =>
+    typeof value === "object" && value !== null && key in value
+      ? (value as Record<string, unknown>)[key]
+      : undefined;
+  const matching = (pattern: RegExp) => (value: unknown) =>
+    typeof value === "string" && pattern.test(value) ? value : undefined;
+  const tag = matching(/^[A-Za-z_$][\w$]{0,79}$/);
+  const label = matching(/^[\w.:-]{1,80}$/);
+  const constant = matching(/^[A-Z][A-Z0-9_]{1,79}$/);
+  const code = (value: unknown) =>
+    typeof value === "number" && Number.isInteger(value) ? value : constant(value);
+  const status = (value: unknown) =>
+    typeof value === "number" && Number.isInteger(value) && value >= 100 && value <= 599
+      ? value
+      : undefined;
+  const nested = field(error, "cause");
+  const summary: Record<string, string | number> = {};
+  const name = tag(field(error, "_tag")) ?? tag(field(error, "name"));
+  const operation = label(field(error, "operation"));
+  const errorCode = code(field(error, "code")) ?? code(field(nested, "code"));
+  const errorStatus = status(field(error, "status")) ?? status(field(nested, "status"));
+  if (name !== undefined) summary.error = name;
+  if (operation !== undefined) summary.error_operation = operation;
+  if (errorCode !== undefined) summary.error_code = errorCode;
+  if (errorStatus !== undefined) summary.error_status = errorStatus;
+  return summary;
 }
 
 /**

@@ -5,7 +5,7 @@ import { join } from "node:path";
 import type { LocalWorkerCommand, LocalWorkerResponse } from "@relkit/observability/local/record";
 test("worker message entrypoint opens, writes, queries, and closes a database", async () => {
   const root = await mkdtemp(join("/tmp", "relkit-worker-entry-"));
-  const events = ["message", "disconnect", "SIGINT"] as const;
+  const events = ["message", "disconnect", "SIGINT", "SIGTERM"] as const;
   const previous = new Map(events.map((event) => [event, new Set(process.listeners(event))]));
   const sendDescriptor = Object.getOwnPropertyDescriptor(process, "send");
   const disconnectDescriptor = Object.getOwnPropertyDescriptor(process, "disconnect");
