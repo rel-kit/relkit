@@ -61,7 +61,9 @@ export function createWorkerClientState(
 export function stopWorkerClient(state: WorkerClientState): void {
   if (state.closed) return;
   state.closed = true;
-  state.child.kill();
+  // The worker ignores SIGTERM so group signals leave the flush to this owner; the
+  // owner's own stop must still terminate it, including when it is hung.
+  state.child.kill("SIGKILL");
 }
 
 /** @param state - Owned IPC state. @param error - Terminal diagnostic. @returns Nothing after settling pending calls and stopping the child. */
