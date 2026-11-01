@@ -1,6 +1,6 @@
 {
   "name": "@relkit/langchain",
-  "version": "0.7.14",
+  "version": "0.7.15",
   "description": "Explicit native LangChain agent execution for RELKIT.",
   "license": "MIT",
   "repository": {

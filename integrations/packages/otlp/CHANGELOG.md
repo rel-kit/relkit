@@ -1,5 +1,5 @@
 # @relkit/otlp
 
-## 0.7.13
+## 0.7.14
 
 See the root CHANGELOG.md for this release batch.

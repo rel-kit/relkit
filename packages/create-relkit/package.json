@@ -1,6 +1,6 @@
 {
   "name": "create-relkit",
-  "version": "0.8.7",
+  "version": "0.8.8",
   "description": "Create a RELKIT application from a supported project template.",
   "license": "MIT",
   "repository": {
@@ -209,19 +209,19 @@
     },
     "providerVersions": {
       "@relkit/aws": "0.8.2",
-      "@relkit/pulumi": "0.8.2",
+      "@relkit/pulumi": "0.8.3",
       "@relkit/docker": "0.7.13",
-      "@relkit/local": "0.7.13",
-      "@relkit/langchain": "0.7.14",
-      "@relkit/inngest": "0.8.2",
-      "@relkit/trigger": "0.8.2",
-      "@relkit/effect-mq": "0.8.2",
-      "@relkit/better-auth": "0.8.3",
-      "@relkit/cloudflare": "0.7.13",
-      "@relkit/drizzle": "0.8.2",
-      "@relkit/redis": "0.8.2",
+      "@relkit/local": "0.7.14",
+      "@relkit/langchain": "0.7.15",
+      "@relkit/inngest": "0.8.3",
+      "@relkit/trigger": "0.8.3",
+      "@relkit/effect-mq": "0.8.3",
+      "@relkit/better-auth": "0.8.4",
+      "@relkit/cloudflare": "0.7.14",
+      "@relkit/drizzle": "0.8.3",
+      "@relkit/redis": "0.8.3",
       "@relkit/s3": "0.7.13",
-      "@relkit/inspector": "0.2.0"
+      "@relkit/inspector": "0.2.1"
     }
   }
 }
