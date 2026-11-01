@@ -3,12 +3,13 @@
 /** "2.4 ms", "184 ms", "1.32 s", "2m 05s". Undefined or invalid input reads as "—". */
 export function formatDuration(ms: number | undefined): string {
   if (ms === undefined || !Number.isFinite(ms) || ms < 0) return "—";
-  if (ms < 10) return `${ms.toFixed(1)} ms`;
-  if (ms < 1000) return `${Math.round(ms)} ms`;
-  if (ms < 60_000) return `${(ms / 1000).toFixed(ms < 10_000 ? 2 : 1)} s`;
-  const minutes = Math.floor(ms / 60_000);
-  const seconds = Math.round((ms % 60_000) / 1000);
-  return `${minutes}m ${String(seconds).padStart(2, "0")}s`;
+  // Thresholds compare the rounded value, so 999.6 ms reads "1.00 s" and 59.99 s reads "1m 00s".
+  if (ms < 9.95) return `${ms.toFixed(1)} ms`;
+  if (ms < 999.5) return `${Math.round(ms)} ms`;
+  if (ms < 9_995) return `${(ms / 1000).toFixed(2)} s`;
+  if (ms < 59_950) return `${(ms / 1000).toFixed(1)} s`;
+  const total = Math.round(ms / 1000);
+  return `${Math.floor(total / 60)}m ${String(total % 60).padStart(2, "0")}s`;
 }
 
 /** "just now", "42s ago", "3m ago", "5h ago", "2d ago"; future times read as "just now". */

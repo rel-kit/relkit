@@ -52,18 +52,33 @@ export function JobsClient() {
       setAbsent(false);
       return rows(jobs, runs.items, status, false);
     } catch (error) {
-      if (jobsNotMounted(error)) {
+      // An unmounted task-first API can still mean an older runtime that serves legacy jobs,
+      // so "no jobs" is only concluded once the legacy collection is empty or unavailable too.
+      const notMounted = jobsNotMounted(error);
+      const none = (): InspectorPage<JobItem> => {
         setAbsent(true);
         return { protocol: INSPECTOR_API_PROTOCOL, version: INSPECTOR_API_VERSION, items: [] };
+      };
+      try {
+        const [jobs, runtime] = await Promise.all([
+          api.list<InspectorObject>("jobs", definitionQuery),
+          api.runtimeList<InspectorObject>("jobs", {
+            ...runQuery,
+            limit: Math.min(query.limit ?? 25, 100),
+          }),
+        ]);
+        if (
+          notMounted &&
+          jobs.items.length === 0 &&
+          (await api.list<InspectorObject>("jobs", { limit: 1 })).items.length === 0
+        )
+          return none();
+        setAbsent(false);
+        return rows(jobs, runtime.items, status, true);
+      } catch (legacyError) {
+        if (notMounted) return none();
+        throw legacyError;
       }
-      const [jobs, runtime] = await Promise.all([
-        api.list<InspectorObject>("jobs", definitionQuery),
-        api.runtimeList<InspectorObject>("jobs", {
-          ...runQuery,
-          limit: Math.min(query.limit ?? 25, 100),
-        }),
-      ]);
-      return rows(jobs, runtime.items, status, true);
     }
   }, []);
 

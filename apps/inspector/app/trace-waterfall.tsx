@@ -45,7 +45,11 @@ export function TraceWaterfall({
   const [errorsOnly, setErrorsOnly] = useState(false);
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(() => new Set());
   const [selectedId, setSelectedId] = useState<string>();
-  const allRows = useMemo(() => traceRows(items, collapsed), [items, collapsed]);
+  const fullRows = useMemo(() => traceRows(items), [items]);
+  const allRows = useMemo(
+    () => (collapsed.size === 0 ? fullRows : traceRows(items, collapsed)),
+    [collapsed, fullRows, items],
+  );
   const rows = useMemo(
     () => allRows.filter((row) => matches(row, query, errorsOnly)),
     [allRows, errorsOnly, query],
@@ -54,11 +58,11 @@ export function TraceWaterfall({
   const fallbackId = highlighted ?? summary.root?.id;
   const selected =
     rows.find((row) => row.id === selectedId) ??
-    traceRows(items).find((row) => row.id === (selectedId ?? fallbackId)) ??
+    fullRows.find((row) => row.id === (selectedId ?? fallbackId)) ??
     rows[0];
   const expandable = useMemo(
-    () => new Set(traceRows(items).flatMap((row) => (row.expandable ? [row.span.id] : []))),
-    [items],
+    () => new Set(fullRows.flatMap((row) => (row.expandable ? [row.span.id] : []))),
+    [fullRows],
   );
   const total = traceStepTotal(items);
   const select = (row: TraceRow) => setSelectedId(row.id);
@@ -70,7 +74,10 @@ export function TraceWaterfall({
     setCollapsed((current) => {
       const next = new Set(current);
       let parent = id.includes(":event:") ? spanId : parents.get(spanId);
-      while (parent) {
+      // A malformed trace can have cyclic parents; stop once the walk revisits a span.
+      const seen = new Set<string>();
+      while (parent && !seen.has(parent)) {
+        seen.add(parent);
         next.delete(parent);
         parent = parents.get(parent);
       }

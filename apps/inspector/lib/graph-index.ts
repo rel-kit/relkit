@@ -1,6 +1,13 @@
 /** Graph-derived navigation data: sidebar counts and the command palette's entity index. */
 import type { GraphNode, GraphSnapshot } from "./graph-model";
-import { isListener, isRoute, nodeTitle, routeMethod, routePath } from "./graph-node-meta";
+import {
+  isListener,
+  isRoute,
+  listenedEventId,
+  nodeTitle,
+  routeMethod,
+  routePath,
+} from "./graph-node-meta";
 
 /** Count of graph entities behind each sidebar destination; absent when the kind is not graph-backed. */
 export function navigationCounts(
@@ -14,7 +21,8 @@ export function navigationCounts(
   const domains = new Set<string>();
   for (const node of graph.nodes) {
     if (node.domainId) domains.add(node.domainId);
-    const href = destination(node);
+    // Listeners are reached from the Events page but are not events themselves.
+    const href = isListener(node) ? undefined : destination(node);
     if (href) add(href);
   }
   counts["/domains"] = domains.size;
@@ -45,8 +53,7 @@ export function entityIndex(graph: GraphSnapshot | undefined): readonly EntityEn
       kind,
       label: nodeTitle(node),
       detail: method && path ? `${method} ${path}` : (node.domainId ?? node.id),
-      // Listeners have no detail page of their own; they are listed with their events.
-      href: isListener(node) ? href : `${href}/${encodeURIComponent(node.id)}`,
+      href: detailHref(node, href),
     });
   }
   return entries.sort(
@@ -69,6 +76,20 @@ export function searchEntities(
     if (result.length >= limit) break;
   }
   return result;
+}
+
+/**
+ * Listeners have no page of their own, so they open the event they listen to. Nodes the agent
+ * topology synthesizes (`<agentId>::tool::…`) are not API resources and open their agent.
+ */
+function detailHref(node: GraphNode, list: string): string {
+  if (isListener(node)) {
+    const event = listenedEventId(node);
+    return event === undefined ? list : `/events/${encodeURIComponent(event)}`;
+  }
+  if (node.parentId !== undefined && node.id.startsWith(`${node.parentId}::`))
+    return `/agents/${encodeURIComponent(node.parentId)}`;
+  return `${list}/${encodeURIComponent(node.id)}`;
 }
 
 function destination(node: GraphNode): string | undefined {

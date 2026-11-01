@@ -11,7 +11,9 @@ import type { GraphSnapshot } from "../lib/graph-model";
 import { navigation } from "./navigation-data";
 
 interface PaletteResult {
+  /** Unique per result; several entities (e.g. listeners of one event) can share an href. */
   readonly id: string;
+  readonly href: string;
   readonly label: string;
   readonly description: string;
   readonly group: string;
@@ -35,13 +37,15 @@ export function CommandPalette({
       .filter((item) => !item.external)
       .filter((item) => `${item.label} ${item.group}`.toLowerCase().includes(needle))
       .map((item) => ({
-        id: item.href,
+        id: `page:${item.href}`,
+        href: item.href,
         label: item.label,
         description: item.group,
         group: "Pages",
       }));
     const found = searchEntities(entities, query).map((entry) => ({
-      id: entry.href,
+      id: `entity:${entry.id}`,
+      href: entry.href,
       label: entry.label,
       description: entry.detail,
       group: entry.kind,
@@ -53,7 +57,9 @@ export function CommandPalette({
     for (const result of results) map.set(result.group, [...(map.get(result.group) ?? []), result]);
     return [...map.entries()];
   }, [results]);
-  const navigate = (href: string): void => {
+  const navigate = (id: string): void => {
+    const href = results.find((result) => result.id === id)?.href;
+    if (href === undefined) return;
     onOpenChange(false);
     setQuery("");
     router.push(href);
@@ -91,7 +97,7 @@ export function CommandPalette({
               {items.map((item) => (
                 <button
                   className="command-result group flex items-center gap-3 rounded-md px-2 py-1.5 text-left outline-none hover:bg-muted focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50"
-                  key={`${item.group}:${item.id}`}
+                  key={item.id}
                   type="button"
                   onClick={() => navigate(item.id)}
                 >

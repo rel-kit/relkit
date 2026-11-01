@@ -101,6 +101,17 @@ describe("trace view", () => {
     expect(rows.map((row) => [row.id, row.depth])).toEqual([["lost", 0]]);
   });
 
+  test("spans in a parent cycle still get rows instead of disappearing", () => {
+    const cyclic = [
+      span({ id: "a", name: "a", parentId: "b", startedAt: at(1) }),
+      span({ id: "b", name: "b", parentId: "a", startedAt: at(2) }),
+      span({ id: "self", name: "self", parentId: "self", startedAt: at(3) }),
+    ];
+    const rows = traceRows(cyclic);
+    expect(rows.map((row) => row.id)).toEqual(["a", "b", "self"]);
+    expect(rows).toHaveLength(traceStepTotal(cyclic));
+  });
+
   test("summary, clock and lifecycle describe the request", () => {
     const summary = traceSummary(items);
     expect(summary.root?.id).toBe("route");

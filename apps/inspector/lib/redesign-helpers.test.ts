@@ -16,6 +16,14 @@ describe("format", () => {
     expect(formatDuration(125_000)).toBe("2m 05s");
   });
 
+  test("durations carry rounding into the next unit", () => {
+    expect(formatDuration(9.97)).toBe("10 ms");
+    expect(formatDuration(999.6)).toBe("1.00 s");
+    expect(formatDuration(9_996)).toBe("10.0 s");
+    expect(formatDuration(59_990)).toBe("1m 00s");
+    expect(formatDuration(119_700)).toBe("2m 00s");
+  });
+
   test("relative time counts back from now and never goes negative", () => {
     const now = Date.parse("2026-11-01T12:00:00.000Z");
     expect(relativeTime(undefined, now)).toBe("—");
@@ -94,6 +102,18 @@ describe("tree filter", () => {
     ]);
     expect(highlightParts("plain", "")).toEqual([{ text: "plain", match: false }]);
   });
+
+  test("highlight keeps offsets when lowercasing would change the text length", () => {
+    expect(highlightParts("İstanbul cars", "cars")).toEqual([
+      { text: "İstanbul ", match: false },
+      { text: "cars", match: true },
+    ]);
+    expect(highlightParts("a.b axb", ".")).toEqual([
+      { text: "a", match: false },
+      { text: ".", match: true },
+      { text: "b axb", match: false },
+    ]);
+  });
 });
 
 describe("graph index", () => {
@@ -117,6 +137,19 @@ describe("graph index", () => {
         domainId: "fleet",
         meta: { triggerType: "event" },
       }),
+      node({
+        id: "listener.on-car-booked",
+        kind: "trigger",
+        domainId: "fleet",
+        meta: { triggerType: "event", config: { eventId: "fleet.car-booked" } },
+      }),
+      node({ id: "fleet.car-booked", kind: "event", domainId: "fleet" }),
+      node({
+        id: "support.assistant::tool::lookup",
+        kind: "tool",
+        parentId: "support.assistant",
+        label: "lookup",
+      }),
       node({ id: "fleet.list-cars", kind: "function", domainId: "fleet" }),
       node({ id: "billing.charge", kind: "function", domainId: "billing" }),
       node({ id: "support.assistant", kind: "agent", domainId: "support" }),
@@ -128,9 +161,11 @@ describe("graph index", () => {
     expect(navigationCounts(undefined)).toEqual({});
     expect(navigationCounts(graph)).toEqual({
       "/routes": 1,
+      // Listeners open from the Events page but are not counted as events.
       "/events": 1,
       "/functions": 2,
       "/agents": 1,
+      "/tools": 1,
       "/domains": 3,
     });
   });
@@ -141,6 +176,12 @@ describe("graph index", () => {
       "/functions/fleet.list-cars",
     );
     expect(index.find((entry) => entry.id === "listener.on-car")?.href).toBe("/events");
+    expect(index.find((entry) => entry.id === "listener.on-car-booked")?.href).toBe(
+      "/events/fleet.car-booked",
+    );
+    expect(index.find((entry) => entry.id === "support.assistant::tool::lookup")?.href).toBe(
+      "/agents/support.assistant",
+    );
     expect(index.some((entry) => entry.id === "app")).toBe(false);
   });
 

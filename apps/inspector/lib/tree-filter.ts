@@ -48,19 +48,16 @@ export function highlightParts(
 ): readonly { readonly text: string; readonly match: boolean }[] {
   const needle = query.trim();
   if (!needle) return [{ text, match: false }];
-  const lower = text.toLocaleLowerCase();
-  const target = needle.toLocaleLowerCase();
+  // Matching on the original text keeps indices valid; lowercasing can change a string's length.
+  const pattern = new RegExp(needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "giu");
   const parts: { text: string; match: boolean }[] = [];
   let index = 0;
-  while (index < text.length) {
-    const found = lower.indexOf(target, index);
-    if (found < 0) {
-      parts.push({ text: text.slice(index), match: false });
-      break;
-    }
-    if (found > index) parts.push({ text: text.slice(index, found), match: false });
-    parts.push({ text: text.slice(found, found + target.length), match: true });
-    index = found + target.length;
+  for (const found of text.matchAll(pattern)) {
+    if (found.index > index) parts.push({ text: text.slice(index, found.index), match: false });
+    parts.push({ text: found[0], match: true });
+    index = found.index + found[0].length;
   }
+  if (index < text.length || parts.length === 0)
+    parts.push({ text: text.slice(index), match: false });
   return parts;
 }

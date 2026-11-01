@@ -56,8 +56,11 @@ export function traceRows(
     children.set(parent, [...(children.get(parent) ?? []), span]);
   }
   const rows: TraceRow[] = [];
+  const visited = new Set<string>();
   let order = 0;
   const visit = (span: WaterfallSpan, depth: number, hidden: boolean): void => {
+    if (visited.has(span.id)) return;
+    visited.add(span.id);
     order += 1;
     const kids = children.get(span.id) ?? [];
     if (!hidden)
@@ -103,6 +106,9 @@ export function traceRows(
     for (const entry of entries) entry.run();
   };
   for (const root of sortByStart(children.get(undefined) ?? [])) visit(root, 0, false);
+  // Spans whose parents form a cycle (or point at themselves) are reachable from no root; they
+  // still get rows so the view never shows fewer steps than `traceStepTotal` counts.
+  for (const span of sortByStart(items)) visit(span, 0, false);
   return rows;
 }
 
