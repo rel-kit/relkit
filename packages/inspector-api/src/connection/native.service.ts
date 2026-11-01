@@ -22,6 +22,9 @@ export class InspectionNative extends Context.Service<
   ),
 }) {}
 
+/** How long listener retirement waits for Bun to confirm a forced stop. */
+const LISTENER_CLOSE_CONFIRMATION = "2 seconds";
+
 /** Supplies native adapters without binding until the bridge is explicitly started. */
 export const InspectionNativeLive = Layer.effect(InspectionNative, InspectionNative.make);
 
@@ -59,7 +62,18 @@ const listenInspection: InspectionNativeOperations["listen"] = (options, handler
       ),
       (server) =>
         Scope.close(responses, Exit.void).pipe(
-          Effect.andThen(connectionAttempt("listener.close", () => server.stop(true))),
+          Effect.andThen(
+            connectionAttempt("listener.close", () => server.stop(true)).pipe(
+              // stop(true) closes the socket and every connection at once, but Bun can leave
+              // its promise pending when a peer was killed mid-stream (a force-stopped UI
+              // holding a browser's live feed). Waiting on it forever hung tool shutdown.
+              Effect.timeoutOrElse({
+                duration: LISTENER_CLOSE_CONFIRMATION,
+                orElse: () =>
+                  Effect.logWarning("Inspection listener close was not confirmed; continuing"),
+              }),
+            ),
+          ),
           Effect.catchTag("InspectionConnectionError", () =>
             Effect.logWarning("Inspection listener cleanup failed"),
           ),
