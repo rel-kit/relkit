@@ -54,7 +54,7 @@ export const persistCollectionGap = Effect.fn("Inspector.persistGap")(function* 
   sessionId: string,
   after: number,
   next: number,
-  evicted = 0,
+  evicted: number = 0,
 ) {
   const skipped = next - after - 1;
   if (skipped <= evicted) return;

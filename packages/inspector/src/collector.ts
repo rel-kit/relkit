@@ -28,7 +28,7 @@ export const collectInspectionBatch = Effect.fn("Inspector.collectBatch")(
     after: number,
     target?: string,
     previousLossKey?: string,
-    previousDropped = 0,
+    previousDropped: number = 0,
   ) {
     const response = yield* remote.request(
       connection,
