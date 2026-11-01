@@ -38,6 +38,28 @@ export function createRouteHandler(
     );
 }
 
+/** Names the matched route on the request record and trace, for function and raw routes alike.
+ * @param context - Hono request context carrying framework state and trace ownership.
+ * @param trigger - Matched route declaration; a raw route is its own target.
+ * @returns The request's record builder, when the request is being recorded.
+ */
+export function announceRoute(context: Context, trigger: HttpTriggerRegistration) {
+  const builder = getRequestState(context)?.requestRecord;
+  builder?.setRoute(trigger.id, trigger.targetFunctionId);
+  builder?.setServiceId(trigger.serviceId);
+  frameworkTrace.rename(`${context.req.method} ${trigger.config.path}`);
+  frameworkTrace.setAttributes({
+    "http.route": trigger.config.path,
+    "relkit.route.id": trigger.id,
+    "relkit.function.id": trigger.targetFunctionId,
+    "code.function.name": trigger.targetFunctionId,
+    ...(trigger.serviceId === undefined ? {} : { "relkit.service.id": trigger.serviceId }),
+  });
+  frameworkTrace.event("http.route.matched", { "http.route": trigger.config.path });
+  recordDetail(builder, { kind: "match", targetId: trigger.id, outcome: "success" });
+  return builder;
+}
+
 /** Map route input, invoke its target and construct the public HTTP response.
  * @param context - Hono request context carrying framework state and trace ownership.
  * @param trigger - Compiled route input, target and response declarations.
@@ -51,19 +73,7 @@ const handleRoute = Effect.fn("HttpRoutes.handle")(function* (
 ) {
   const state = getRequestState(context);
   const request = requestFromContext(context, trigger.config.path);
-  const builder = state?.requestRecord;
-  builder?.setRoute(trigger.id, trigger.targetFunctionId);
-  builder?.setServiceId(trigger.serviceId);
-  frameworkTrace.rename(`${context.req.method} ${trigger.config.path}`);
-  frameworkTrace.setAttributes({
-    "http.route": trigger.config.path,
-    "relkit.route.id": trigger.id,
-    "relkit.function.id": trigger.targetFunctionId,
-    "code.function.name": trigger.targetFunctionId,
-    ...(trigger.serviceId === undefined ? {} : { "relkit.service.id": trigger.serviceId }),
-  });
-  frameworkTrace.event("http.route.matched", { "http.route": trigger.config.path });
-  recordDetail(builder, { kind: "match", targetId: trigger.id, outcome: "success" });
+  const builder = announceRoute(context, trigger);
   const responseOptions = responseOptionsFor(options, state?.signal);
   const target =
     options.resolveTarget === undefined
