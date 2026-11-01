@@ -119,6 +119,7 @@ const collectCurrent = Effect.fn("Inspector.collectCurrent")(function* (
     after,
     options.target,
     current.lossKey,
+    sessionId === current.sessionId ? current.droppedRecords : 0,
   );
   publishCollection(stream, batch.changes);
   yield* Ref.update(state, (value) => ({
