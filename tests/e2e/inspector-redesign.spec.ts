@@ -54,6 +54,8 @@ test("supports keyboard search and accessible route table quick views", async ({
 
   const table = page.getByRole("table");
   await expect(table.getByRole("columnheader", { name: "Transport" })).toBeVisible();
+  await page.getByRole("button", { name: "Use light theme" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await expect(page).toHaveScreenshot("routes-table-light.png", {
     animations: "disabled",
     fullPage: true,
@@ -116,6 +118,12 @@ test("renders the Scalar reference", async ({ page }) => {
 
 test("keeps the shell usable in dark mode and on mobile", async ({ page }) => {
   await page.goto("/routes");
+  // Dark is the default; the toggle round-trips and the choice survives a reload.
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.getByRole("button", { name: "Use light theme" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await page.getByRole("button", { name: "Use dark theme" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(page.locator(".shell-workspace")).toHaveScreenshot("shell-dark.png", {
@@ -126,7 +134,7 @@ test("keeps the shell usable in dark mode and on mobile", async ({ page }) => {
   await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
   await page.getByRole("button", { name: "Toggle navigation" }).click();
   await expect(page.locator('[data-mobile="true"]')).toBeVisible();
-  const routes = page.getByRole("link", { name: "Routes" });
+  const routes = page.getByRole("link", { name: "Routes", exact: true });
   await routes.focus();
   await expect(routes).toBeFocused();
   await expect(page).toHaveScreenshot("shell-mobile.png", {

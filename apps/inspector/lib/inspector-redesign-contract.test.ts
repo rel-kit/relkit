@@ -4,19 +4,25 @@ const app = (path: string): Promise<string> => Bun.file(`${import.meta.dir}/../a
 
 describe("inspector redesign contracts", () => {
   test("uses the shared accessible shell and resource pattern", async () => {
-    const [shell, table, filters, packageJson] = await Promise.all([
+    const [shell, layout, table, filters, packageJson] = await Promise.all([
       app("inspector-shell.tsx"),
+      app("layout.tsx"),
       app("resource-table.tsx"),
       app("signals-filters.tsx"),
       Bun.file(`${import.meta.dir}/../package.json`).text(),
     ]);
     expect(shell).toContain("CommandPalette");
-    expect(shell).toContain("prefers-color-scheme: dark");
+    // Dark-first: rendered dark on the server, a stored "light" preference applied before paint.
+    expect(layout).toContain('data-theme="dark"');
+    expect(layout).toContain("INSPECTOR_THEME_KEY");
+    expect(layout).toContain("suppressHydrationWarning");
+    expect(shell).toContain("applyInspectorTheme");
     expect(shell).toContain("SidebarProvider");
     expect(shell).toContain("AppSidebar");
     expect(table).toContain("ResourceTableBody");
     expect(table).toContain("Pagination");
     expect(table).toContain("OverlayDialog");
+    expect(table).toContain("PageHeader");
     expect(filters).toContain("Filters are applied by the versioned backend");
     expect(packageJson).toContain('"react-aria-components"');
     expect(packageJson).toContain('"tailwindcss"');
@@ -28,6 +34,8 @@ describe("inspector redesign contracts", () => {
       relationships,
       trace,
       rows,
+      details,
+      traceStyles,
       traceList,
       logTrace,
       traceSummary,
@@ -39,6 +47,8 @@ describe("inspector redesign contracts", () => {
       app("graph/graph-relationships.tsx"),
       app("trace-waterfall.tsx"),
       app("trace-waterfall-rows.tsx"),
+      app("trace-waterfall-detail.tsx"),
+      app("traces/traces.css"),
       app("traces/traces-client.tsx"),
       app("logs/log-trace.tsx"),
       app("logs/log-trace-summary.tsx"),
@@ -53,15 +63,21 @@ describe("inspector redesign contracts", () => {
     expect(trace).toContain("Collapse all");
     expect(trace).toContain("Numbered by recorded time");
     expect(trace).not.toContain("Timeline zoom");
-    expect(rows).toContain('data-branch={event ? "true" : "false"}');
-    expect(rows).not.toContain("trace-step-summary");
-    expect(rows).not.toContain("waterfall-track");
-    expect(rows).toContain("valuePreview(stepInput(step))");
-    expect(rows).toContain("valuePreview(stepOutput(step))");
-    expect(rows).toContain('className="trace-step-meta"');
-    expect(rows).not.toContain("timeline-event-icon");
-    expect(rows).not.toContain("span.depth * 1.1");
-    expect(rows).not.toContain("onToggle");
+    // Trace view: whole-request summary, lifecycle strip, and details always visible beside the
+    // waterfall instead of behind a drawer of tabs.
+    expect(trace).toContain('aria-label="Lifecycle"');
+    expect(trace).toContain("TraceStepDetails");
+    expect(trace).not.toContain("OverlayDialog");
+    expect(details).toContain('aria-label="Step details"');
+    for (const section of ["Input", "Output", "Error", "Events", "Attributes", "Identity"])
+      expect(details).toContain(`title="${section}"`);
+    // Tree waterfall on the trace clock: nesting, collapsible parents, bars and event points.
+    expect(rows).toContain('aria-label="Ordered trace timeline"');
+    expect(rows).toContain("data-record-type={row.type}");
+    expect(rows).toContain("row.depth * 14");
+    expect(rows).toContain("onToggle(span.id)");
+    expect(rows).toContain('className="waterfall-bar"');
+    expect(rows).toContain('className="waterfall-point"');
     expect(traceList).toContain('placement="right"');
     expect(traceList).toContain("100 traces per page");
     expect(signalPage).toContain('kind === "traces" ? 100 : 50');
@@ -72,9 +88,9 @@ describe("inspector redesign contracts", () => {
     expect(traceSummary).toContain("/routes/${encodeURIComponent(routeId)}");
     expect(traceSummary).toContain("/functions/${encodeURIComponent(functionId)}");
     expect(traceSummary).toContain('outcome === "success"');
-    expect(styles).toContain('.timeline-sequence[data-branch="true"]::before');
-    expect(styles).toContain(".trace-panel .waterfall-row:last-child::before");
     expect(styles).toContain('.overlay-dialog-panel[data-placement="right"][data-entering]');
+    expect(traceStyles).toContain("container-type: inline-size");
+    expect(traceStyles).toContain(".trace-lifecycle");
     expect(model).toContain('return "[redacted]"');
   });
 
