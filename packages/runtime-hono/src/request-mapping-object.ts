@@ -32,7 +32,7 @@ export const mapObjectEffect = Effect.fn("RequestMapping.object")(function* (
         const valuePath = [...path, name];
         const value = yield* visit(node, state, valuePath);
         if (value === MISSING) {
-          if (!state.issues.some((issue) => samePath(issue.path, valuePath)))
+          if (!state.issues.some((issue) => explains(issue, valuePath, node)))
             report("missing", `Missing request value "${name}"`, valuePath);
         } else result[name] = value;
       }),
@@ -65,6 +65,40 @@ export function mapObject(
       report,
     ),
   );
+}
+
+const BODY_ISSUES: readonly string[] = [
+  "content-type",
+  "body-too-large",
+  "malformed-json",
+  "malformed-multipart",
+];
+const BODY_SOURCES: readonly string[] = ["body", "whole-body", "multipart", "multipart-all"];
+
+/** Whether a recorded issue already explains why a field has no value: one at the field itself,
+ * or an unreadable body when the field is read from the body.
+ * @param issue - Recorded mapping issue.
+ * @param path - Path of the field without a value.
+ * @param node - The field's serialized mapping node.
+ * @returns True when reporting the field as missing would repeat a known problem.
+ */
+function explains(
+  issue: { readonly code: string; readonly path: Path },
+  path: Path,
+  node: unknown,
+) {
+  if (samePath(issue.path, path)) return true;
+  return issue.path.length === 0 && BODY_ISSUES.includes(issue.code) && readsBody(node);
+}
+
+/** Follows optional, default and transform wrappers to the field's request source.
+ * @param node - Serialized mapping node.
+ * @returns Whether the value comes from the request body.
+ */
+function readsBody(node: unknown): boolean {
+  if (!isRecord(node)) return false;
+  if (typeof node.kind === "string" && BODY_SOURCES.includes(node.kind)) return true;
+  return "value" in node && readsBody(node.value);
 }
 
 /** Compares validation issue paths by their ordered segments.

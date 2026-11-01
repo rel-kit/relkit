@@ -31,8 +31,9 @@ export async function jsonValue(
   const validated = validatedTarget(state, "json");
   if (validated !== undefined) return validated;
   const result = await parseJson(state.body);
+  // A body that cannot be read or decoded is one problem with the body, not one per field.
   if (result.issue !== undefined)
-    addMappingIssue(state, result.issue.code, result.issue.message, path);
+    addMappingIssue(state, result.issue.code, result.issue.message, []);
   return result.value;
 }
 
@@ -70,7 +71,7 @@ export async function formField(
   }
   const result = await parseForm(state.body);
   if (result.issue !== undefined)
-    addMappingIssue(state, result.issue.code, result.issue.message, path);
+    addMappingIssue(state, result.issue.code, result.issue.message, []);
   if (result.value === MISSING) return MISSING;
   const values = result.value.getAll(name);
   if (all) return values.length === 0 ? MISSING : Object.freeze([...values]);
