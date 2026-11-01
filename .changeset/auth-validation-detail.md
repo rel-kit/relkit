@@ -1,5 +1,0 @@
----
-"@relkit/better-auth": patch
----
-
-Better Auth validation errors now say which fields are wrong. Better Auth reports only each issue's top-level message, so a request that matched none of an endpoint's accepted query shapes answered `[query] Invalid input`. When Better Auth answers `400 VALIDATION_ERROR`, RELKIT re-runs that endpoint's own schema on the same input and returns a message that names each missing or invalid field, for example `[query] Must match one of 2 shapes: (accountId: required, expected string) or (useAccountCookie: required, expected true)`, plus an `issues` list with each field's path. A field that belongs to a different accepted shape is named, for example `[query.useAccountCookie] Cannot be combined with the other fields sent; send one of: accountId, userId? | useAccountCookie, userId?`. A value of the wrong type shows what was received, such as `expected true, received the text "true"`. The `code` and status are unchanged, and any other response is returned as is.
