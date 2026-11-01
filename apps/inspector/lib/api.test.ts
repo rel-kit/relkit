@@ -5,6 +5,7 @@ import {
   InspectorApiError,
   createInspectorApiClient,
 } from "./api";
+import { jobsNotMounted } from "./api-request-utils";
 
 const envelope = (value: Record<string, unknown>, status = 200) =>
   new Response(
@@ -64,6 +65,28 @@ describe("inspector API client", () => {
 
     await expect(client.list("routes")).resolves.toMatchObject({ items: [] });
     expect(attempts).toBe(2);
+  });
+
+  test("an unmounted jobs route keeps its 404 instead of retrying as invalid JSON", async () => {
+    let attempts = 0;
+    const client = createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () => {
+        attempts += 1;
+        return new Response("404 Not Found", {
+          status: 404,
+          headers: { "content-type": "text/plain; charset=UTF-8" },
+        });
+      },
+    });
+
+    const error = await client.jobDefinitions().catch((cause: unknown) => cause);
+    expect(error).toMatchObject({ code: "HTTP_404", status: 404 });
+    expect(jobsNotMounted(error)).toBe(true);
+    expect(attempts).toBe(1);
+    expect(
+      jobsNotMounted(new InspectorApiError("x", "RELKIT_INSPECTOR_JOBS_UNAVAILABLE", 503)),
+    ).toBe(false);
   });
 
   test("falls back immediately when task-first job APIs are unavailable", async () => {
