@@ -4,11 +4,23 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { graphHref } from "../../lib/graph-url-state";
 import type { InspectorObject, ObservabilityPage } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
+import { CodeBlock } from "../../components/blocks/code-block";
+import { Section } from "../../components/blocks/section";
+import { StatusBadge } from "../../components/neon/status-badge";
+import { Badge } from "../../components/ui/badge";
+import { DetailLayout } from "../detail-layout";
+import { SourceLink } from "../source-link";
+import {
+  DetailPending,
+  ExposureBadge,
+  GraphAction,
+  MetaItem,
+  MethodChip,
+} from "../domains/catalog-kit";
 import { RouteComposer } from "./route-composer";
-import { RouteContract } from "./route-contract";
+import { RecentRequests, RouteContract, RouteFacts, statusCodeTone } from "./route-contract";
 
 export function RouteDetailClient() {
   const [api] = useState(createInspectorClient);
@@ -61,36 +73,70 @@ export function RouteDetailClient() {
 
   if (error || route === undefined)
     return (
-      <section className="panel route-state" role={error ? "alert" : "status"}>
-        {error ? "The route API is unavailable." : "Loading route contract…"}
-      </section>
+      <DetailPending
+        failed={error}
+        failedTitle="The route API is unavailable."
+        loadingLabel="Loading route contract…"
+      />
     );
+  const config = record(route.config);
+  const routeId = text(route.id) || id;
+  const method = text(config?.method) || "HTTP";
+  const path = text(config?.path) || "/";
+  const raw = config?.rawHandler === true;
+  const targetId = text(route.targetFunctionId);
+  const domainId = text(target?.domainId);
   return (
-    <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">ACTIVE WORKSPACE</p>
-          <h1>Route detail</h1>
-          <p className="lede">
-            The contract, generated operation, and recent active-backend requests stay tied to one
-            graph identity.
-          </p>
-        </div>
-        <div className="page-heading__aside">
-          <span className="badge">{text(route.id) || id}</span>
-          <Link
-            className="text-link"
-            href={graphHref({
-              view: "flow",
-              scope: text(route.id) || id,
-              node: text(route.id) || id,
-            })}
-          >
-            Follow in graph →
-          </Link>
-        </div>
-      </header>
-      <RouteContract route={route} target={target} requests={requests} />
+    <DetailLayout
+      header={{
+        kicker: "Route",
+        title: (
+          <span className="inline-flex min-w-0 items-center gap-2">
+            <MethodChip method={method} className="mr-0!" />
+            <span className="truncate font-mono">{path}</span>
+          </span>
+        ),
+        badges: (
+          <>
+            {raw ? <Badge>raw handler</Badge> : null}
+            {config?.stream ? <StatusBadge tone="info" label="streaming" /> : null}
+            <ExposureBadge exposure={target?.exposure} />
+          </>
+        ),
+        meta: (
+          <>
+            <MetaItem label="id" copy={routeId}>
+              {routeId}
+            </MetaItem>
+            <MetaItem label="handler">
+              {raw || targetId === "" ? (
+                "Raw HTTP handler"
+              ) : (
+                <Link
+                  href={`/functions/${encodeURIComponent(targetId)}`}
+                  className="underline-offset-2 hover:underline"
+                >
+                  {targetId}
+                </Link>
+              )}
+            </MetaItem>
+            {domainId ? (
+              <MetaItem label="domain">
+                <Link
+                  href={`/domains/${encodeURIComponent(domainId)}`}
+                  className="underline-offset-2 hover:underline"
+                >
+                  {domainId}
+                </Link>
+              </MetaItem>
+            ) : null}
+            <SourceLink source={record(route.source)} />
+          </>
+        ),
+        actions: <GraphAction id={routeId} />,
+      }}
+      aside={<RouteFacts route={route} target={target} />}
+    >
       <RouteComposer
         route={route}
         target={target}
@@ -102,7 +148,9 @@ export function RouteDetailClient() {
         }}
       />
       {result !== undefined && <InvocationResult result={result} />}
-    </div>
+      <RecentRequests requests={requests} />
+      <RouteContract route={route} target={target} />
+    </DetailLayout>
   );
 }
 
@@ -111,39 +159,48 @@ function InvocationResult({
 }: {
   readonly result: { status: number; body: unknown; requestId?: string; traceId?: string };
 }) {
-  const headingRef = useRef<HTMLHeadingElement>(null);
+  const headingRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     headingRef.current?.focus();
   }, [result]);
 
   return (
-    <section className="panel invocation-result" aria-live="polite" aria-atomic="true">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">RESPONSE</p>
-          <h2 ref={headingRef} tabIndex={-1}>
-            Active backend result
-          </h2>
-        </div>
-        <span className="badge">HTTP {result.status}</span>
-      </div>
-      <pre>{format(result.body)}</pre>
-      <div className="request-links">
-        {result.requestId === undefined ? (
-          <span>Request ID unavailable</span>
-        ) : (
-          <a className="text-link" href={`/requests/${encodeURIComponent(result.requestId)}`}>
-            Open request record
-          </a>
-        )}
-        {result.traceId === undefined ? null : (
-          <a className="text-link" href={`/traces/${encodeURIComponent(result.traceId)}`}>
-            Open trace
-          </a>
-        )}
-      </div>
-    </section>
+    <Section
+      id="route-result"
+      aria-live="polite"
+      aria-atomic="true"
+      title={
+        <span ref={headingRef} tabIndex={-1} className="outline-none">
+          Active backend result
+        </span>
+      }
+      actions={
+        <>
+          <StatusBadge tone={statusCodeTone(result.status)} label={`HTTP ${result.status}`} />
+          {result.requestId === undefined ? (
+            <span className="text-[11px] text-muted-foreground">Request ID unavailable</span>
+          ) : (
+            <Link
+              className="inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs text-muted-foreground no-underline hover:bg-muted hover:text-foreground"
+              href={`/requests/${encodeURIComponent(result.requestId)}`}
+            >
+              Open request record
+            </Link>
+          )}
+          {result.traceId === undefined ? null : (
+            <Link
+              className="inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs text-muted-foreground no-underline hover:bg-muted hover:text-foreground"
+              href={`/traces/${encodeURIComponent(result.traceId)}`}
+            >
+              Open trace
+            </Link>
+          )}
+        </>
+      }
+    >
+      <CodeBlock value={format(result.body)} label="response body" maxHeight="28rem" />
+    </Section>
   );
 }
 

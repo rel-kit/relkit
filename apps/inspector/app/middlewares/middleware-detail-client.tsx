@@ -2,9 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import type { InspectorObject } from "../../lib/api-types";
+import type { InspectorGraph, InspectorObject } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
+import { DetailList } from "../../components/blocks/details";
+import { Section } from "../../components/blocks/section";
+import { Badge } from "../../components/ui/badge";
+import { DetailLayout } from "../detail-layout";
 import { SourceLink } from "../source-link";
+import {
+  Count,
+  DetailPending,
+  EntityList,
+  GraphAction,
+  MetaItem,
+  MethodChip,
+} from "../domains/catalog-kit";
 
 export function MiddlewareDetailClient() {
   const params = useParams<{ id: string }>();
@@ -21,7 +33,7 @@ export function MiddlewareDetailClient() {
         const node = record(detail.node) ?? record(detail.descriptor);
         if (node === undefined) throw new Error("Middleware unavailable");
         const routeIds = new Map(
-          (graph.edges ?? []).flatMap((edge) =>
+          graphPart(graph, "edges").flatMap((edge) =>
             edge.kind === "uses-middleware" && edge.to === id
               ? [[text(edge.from), text(edge.match)] as const]
               : [],
@@ -29,7 +41,7 @@ export function MiddlewareDetailClient() {
         );
         setMiddleware(node);
         setRoutes(
-          (graph.nodes ?? [])
+          graphPart(graph, "nodes")
             .filter((candidate) => routeIds.has(text(candidate.id)))
             .map((candidate) => ({ ...candidate, match: routeIds.get(text(candidate.id)) })),
         );
@@ -39,61 +51,68 @@ export function MiddlewareDetailClient() {
 
   if (error || middleware === undefined) {
     return (
-      <section className="panel route-state" role={error ? "alert" : "status"}>
-        {error ? "The middleware API is unavailable." : "Loading middleware…"}
-      </section>
+      <DetailPending
+        failed={error}
+        failedTitle="The middleware API is unavailable."
+        loadingLabel="Loading middleware…"
+      />
     );
   }
+  const middlewareId = text(middleware.id) || id;
+  const order = number(middleware.order) + 1;
+  const path = text(middleware.path) || "*";
   return (
-    <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">HTTP MIDDLEWARE</p>
-          <h1>{text(middleware.id) || id}</h1>
-          <p className="lede">Path scope, execution order, and linked route coverage.</p>
-        </div>
-        <span className="badge">Order {number(middleware.order) + 1}</span>
-      </header>
-      <section className="panel">
-        <dl className="route-meta">
-          <div>
-            <dt>Path</dt>
-            <dd>
-              <code>{text(middleware.path) || "*"}</code>
-            </dd>
-          </div>
-          <div>
-            <dt>Source</dt>
-            <dd>
-              <SourceLink source={record(middleware.source)} />
-            </dd>
-          </div>
-        </dl>
-      </section>
-      <section className="panel">
-        <div className="section-heading">
-          <h2>Matching routes</h2>
-          <span className="badge">{routes.length}</span>
-        </div>
-        {routes.length === 0 ? (
-          <p className="supporting-copy">No routes match this path.</p>
-        ) : (
-          <ul className="request-list">
-            {routes.map((route) => {
-              const config = record(route.config);
-              return (
-                <li className="request-row" key={text(route.id)}>
-                  <a className="text-link" href={`/routes/${encodeURIComponent(text(route.id))}`}>
-                    {text(config?.method)} {text(config?.path)}
-                  </a>
-                  <span className="badge">{text(route.match)}</span>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
-    </div>
+    <DetailLayout
+      header={{
+        kicker: "Middleware",
+        title: <span className="font-mono">{middlewareId}</span>,
+        badges: <Badge>order {order}</Badge>,
+        description: "Path scope, execution order, and linked route coverage.",
+        meta: (
+          <>
+            <MetaItem label="path">{path}</MetaItem>
+            <SourceLink source={record(middleware.source)} />
+          </>
+        ),
+        actions: <GraphAction id={middlewareId} />,
+      }}
+      aside={
+        <Section id="middleware-facts" title="Middleware detail">
+          <DetailList
+            items={[
+              { label: "Middleware ID", value: middlewareId, mono: true, copy: middlewareId },
+              { label: "Path scope", value: path, mono: true, copy: path },
+              { label: "Execution order", value: String(order), mono: true },
+              { label: "Matching routes", value: String(routes.length), mono: true },
+            ]}
+          />
+        </Section>
+      }
+    >
+      <Section
+        id="middleware-routes"
+        title="Matching routes"
+        description="Routes that run this middleware before their handler"
+        actions={<Count value={routes.length} />}
+        flush
+      >
+        <EntityList
+          empty="No routes match this path."
+          rows={routes.map((route) => {
+            const config = record(route.config);
+            const method = text(config?.method) || "HTTP";
+            return {
+              key: text(route.id),
+              href: `/routes/${encodeURIComponent(text(route.id))}`,
+              lead: <MethodChip method={method} className="mr-0!" />,
+              title: text(config?.path) || text(route.id),
+              detail: text(route.targetFunctionId) || undefined,
+              trailing: text(route.match) ? <Badge>{text(route.match)}</Badge> : undefined,
+            };
+          })}
+        />
+      </Section>
+    </DetailLayout>
   );
 }
 
@@ -107,4 +126,15 @@ function text(value: unknown): string {
 }
 function number(value: unknown): number {
   return typeof value === "number" ? value : 0;
+}
+
+/** The graph payload nests nodes and edges under `graph`; older payloads keep them at the root. */
+function graphPart(payload: InspectorGraph, key: "nodes" | "edges"): readonly InspectorObject[] {
+  const value = payload.graph?.[key] ?? payload[key];
+  return Array.isArray(value)
+    ? value.filter(
+        (item): item is InspectorObject =>
+          item !== null && typeof item === "object" && !Array.isArray(item),
+      )
+    : [];
 }

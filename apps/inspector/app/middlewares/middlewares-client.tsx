@@ -1,8 +1,14 @@
 "use client";
 
 import { useCallback } from "react";
-import type { InspectorObject, InspectorPage, InspectorQuery } from "../../lib/api-types";
+import type {
+  InspectorGraph,
+  InspectorObject,
+  InspectorPage,
+  InspectorQuery,
+} from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
+import { DetailList } from "../../components/blocks/details";
 import { ResourceTable, type ResourceTableItem } from "../resource-table";
 
 interface MiddlewareItem extends ResourceTableItem {
@@ -19,7 +25,7 @@ export function MiddlewaresClient() {
         api.list<InspectorObject>("middlewares", query),
         api.graph(),
       ]);
-      const edges = graph.edges ?? [];
+      const edges = graphPart(graph, "edges");
       return {
         ...page,
         items: page.items.map((item) => ({
@@ -40,12 +46,46 @@ export function MiddlewaresClient() {
       noun="middleware"
       load={load}
       columns={[
-        { key: "path", label: "Path", render: (item) => <code>{item.path}</code> },
-        { key: "order", label: "Order", render: (item) => item.order + 1 },
-        { key: "routes", label: "Routes", render: (item) => item.routes },
+        {
+          key: "path",
+          label: "Path",
+          render: (item) => (
+            <code className="bg-transparent p-0 font-mono text-xs whitespace-nowrap text-foreground">
+              {item.path}
+            </code>
+          ),
+        },
+        {
+          key: "order",
+          label: "Order",
+          render: (item) => (
+            <span className="font-mono text-xs text-muted-foreground tabular-nums">
+              {String(item.order + 1).padStart(2, "0")}
+            </span>
+          ),
+        },
+        {
+          key: "routes",
+          label: "Routes",
+          render: (item) => (
+            <span className="font-mono text-[11px] whitespace-nowrap text-muted-foreground tabular-nums">
+              {item.routes} {item.routes === 1 ? "route" : "routes"}
+            </span>
+          ),
+        },
       ]}
       href={(item) => `/middlewares/${encodeURIComponent(item.id)}`}
       openLabel="Open middleware"
+      details={(item) => (
+        <DetailList
+          items={[
+            { label: "Middleware ID", value: item.id, mono: true, copy: item.id },
+            { label: "Path scope", value: item.path, mono: true },
+            { label: "Execution order", value: String(item.order + 1), mono: true },
+            { label: "Matching routes", value: String(item.routes), mono: true },
+          ]}
+        />
+      )}
     />
   );
 }
@@ -56,4 +96,15 @@ function text(value: unknown): string {
 
 function number(value: unknown): number {
   return typeof value === "number" ? value : 0;
+}
+
+/** The graph payload nests nodes and edges under `graph`; older payloads keep them at the root. */
+function graphPart(payload: InspectorGraph, key: "nodes" | "edges"): readonly InspectorObject[] {
+  const value = payload.graph?.[key] ?? payload[key];
+  return Array.isArray(value)
+    ? value.filter(
+        (item): item is InspectorObject =>
+          item !== null && typeof item === "object" && !Array.isArray(item),
+      )
+    : [];
 }
