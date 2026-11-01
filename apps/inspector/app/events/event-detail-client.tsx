@@ -5,7 +5,13 @@ import { useEffect, useState } from "react";
 import type { InspectorEventRuntime, InspectorGraph } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
 import { eventView, type EventView } from "../../lib/events-model";
-import { EventContract } from "./event-contract";
+import Link from "next/link";
+import { StatusBadge } from "../../components/neon/status-badge";
+import { Badge } from "../../components/ui/badge";
+import { DetailLayout } from "../detail-layout";
+import { SourceLink } from "../source-link";
+import { DetailPending, ExposureBadge, GraphAction, MetaItem } from "../domains/catalog-kit";
+import { EventContract, EventFacts, eventRecord } from "./event-contract";
 
 export function EventDetailClient() {
   const params = useParams<{ id: string }>();
@@ -28,29 +34,56 @@ export function EventDetailClient() {
 
   if (state !== "ready" || view === undefined) {
     return (
-      <section className="panel route-state" role={state === "error" ? "alert" : "status"}>
-        {state === "error" ? "The event API is unavailable." : "Loading event contract…"}
-      </section>
+      <DetailPending
+        failed={state === "error"}
+        failedTitle="The event API is unavailable."
+        loadingLabel="Loading event contract…"
+      />
     );
   }
 
+  const event = view.event;
+  const eventId = text(event.id) || id;
+  const domainId = text(event.domainId);
+  const dead = view.deadLetters.length;
   return (
-    <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">ACTIVE WORKSPACE</p>
-          <h1>Event detail</h1>
-          <p className="lede">
-            Event consumers are authored event-only functions connected through exact-event
-            triggers.
-          </p>
-        </div>
-        <span className="badge">
-          {text(view.event.id)}@{String(view.event.version ?? "?")}
-        </span>
-      </header>
+    <DetailLayout
+      header={{
+        kicker: "Event",
+        title: <span className="font-mono">{eventId}</span>,
+        badges: (
+          <>
+            <Badge>v{String(event.version ?? "?")}</Badge>
+            <ExposureBadge exposure={event.exposure} />
+            {dead > 0 ? <StatusBadge tone="danger" label={`${dead} dead`} /> : null}
+          </>
+        ),
+        description:
+          "Event consumers are authored event-only functions connected through exact-event triggers.",
+        meta: (
+          <>
+            <MetaItem label="id" copy={eventId}>
+              {eventId}@{String(event.version ?? "?")}
+            </MetaItem>
+            {domainId ? (
+              <MetaItem label="domain">
+                <Link
+                  href={`/domains/${encodeURIComponent(domainId)}`}
+                  className="underline-offset-2 hover:underline"
+                >
+                  {domainId}
+                </Link>
+              </MetaItem>
+            ) : null}
+            <SourceLink source={eventRecord(event.source)} />
+          </>
+        ),
+        actions: <GraphAction id={eventId} />,
+      }}
+      aside={<EventFacts view={view} />}
+    >
       <EventContract view={view} />
-    </div>
+    </DetailLayout>
   );
 }
 

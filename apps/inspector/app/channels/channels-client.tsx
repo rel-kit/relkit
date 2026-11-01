@@ -3,6 +3,9 @@
 import { useCallback } from "react";
 import type { InspectorObject, InspectorPage, InspectorQuery } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
+import { DetailList } from "../../components/blocks/details";
+import { StatusBadge } from "../../components/neon/status-badge";
+import { Badge } from "../../components/ui/badge";
 import { ResourceTable, type ResourceTableItem } from "../resource-table";
 
 interface ChannelItem extends ResourceTableItem {
@@ -24,13 +27,66 @@ export function ChannelsClient() {
       noun="channels"
       load={load}
       columns={[
-        { key: "access", label: "Access", render: (item) => item.access },
-        { key: "events", label: "Events", render: (item) => item.events },
-        { key: "presence", label: "Presence", render: (item) => item.presence },
-        { key: "replay", label: "Replay", render: (item) => item.replay },
+        {
+          key: "access",
+          label: "Access",
+          render: (item) => (
+            <Badge
+              variant={
+                item.access === "public"
+                  ? "info"
+                  : item.access === "protected"
+                    ? "warning"
+                    : "default"
+              }
+            >
+              {item.access}
+            </Badge>
+          ),
+        },
+        {
+          key: "events",
+          label: "Events",
+          render: (item) => (
+            <span className="font-mono text-xs text-muted-foreground tabular-nums">
+              {item.events}
+            </span>
+          ),
+        },
+        {
+          key: "presence",
+          label: "Presence",
+          render: (item) => (
+            <StatusBadge
+              tone={item.presence === "none" ? "neutral" : "info"}
+              label={item.presence}
+            />
+          ),
+        },
+        {
+          key: "replay",
+          label: "Replay",
+          render: (item) => (
+            <span className="font-mono text-[11px] whitespace-nowrap text-muted-foreground tabular-nums">
+              {item.replay}
+            </span>
+          ),
+        },
       ]}
       href={(item) => `/channels/${encodeURIComponent(item.id)}`}
       openLabel="Open channel"
+      details={(item) => (
+        <DetailList
+          columns={2}
+          items={[
+            { label: "Channel ID", value: item.id, mono: true, copy: item.id },
+            { label: "Access", value: item.access, mono: true },
+            { label: "Events", value: String(item.events), mono: true },
+            { label: "Presence", value: item.presence, mono: true },
+            { label: "Replay", value: item.replay, mono: true },
+          ]}
+        />
+      )}
     />
   );
 }
@@ -43,7 +99,7 @@ function channelItem(value: InspectorObject): ChannelItem {
     access: text(value.client) || "internal",
     events: Object.keys(events ?? {}).length,
     presence: value.presence === "count" ? "count" : record(value.presence) ? "members" : "none",
-    replay: replay ? `${number(replay.retentionMs)} ms` : "live only",
+    replay: replay ? `${number(replay.retentionMs).toLocaleString("en-US")} ms` : "live only",
   };
 }
 

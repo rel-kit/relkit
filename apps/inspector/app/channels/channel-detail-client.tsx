@@ -1,12 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { ReactNode } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { InspectorObject } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
 import { SchemaPanel } from "../schema-panel";
 import { SourceLink } from "../source-link";
+import { DetailList } from "../../components/blocks/details";
+import { Section } from "../../components/blocks/section";
+import { Badge } from "../../components/ui/badge";
+import { DetailLayout } from "../detail-layout";
+import { DetailPending, GraphAction, MetaItem } from "../domains/catalog-kit";
 import { ChannelLiveConsole } from "./channel-live-console";
 
 export function ChannelDetailClient() {
@@ -26,46 +31,92 @@ export function ChannelDetailClient() {
   }, [id]);
   if (error || !channel) {
     return (
-      <section className="panel route-state" role={error ? "alert" : "status"}>
-        {error ? "The channel API is unavailable." : "Loading channel…"}
-      </section>
+      <DetailPending
+        failed={error}
+        failedTitle="The channel API is unavailable."
+        loadingLabel="Loading channel…"
+      />
     );
   }
+  const channelId = text(channel.id) || id;
+  const access = text(channel.client) || "internal";
+  const domainId = text(channel.domainId);
+  const replay = record(channel.replay);
+  const events = Object.keys(record(channel.events) ?? {});
   return (
-    <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">REALTIME CHANNEL</p>
-          <h1>{text(channel.id) || id}</h1>
-          <p className="lede">Typed event, replay, presence, and exposure metadata.</p>
-        </div>
-        <span className="badge">{text(channel.client) || "internal"}</span>
-      </header>
-      <section className="panel">
-        <dl className="route-meta">
-          <Meta label="Profile" value={text(channel.profile) || "default"} />
-          <Meta label="Presence" value={presence(channel.presence)} />
-          <Meta label="Source" value={<SourceLink source={record(channel.source)} />} />
-        </dl>
-      </section>
-      <div className="route-contract-grid">
-        <SchemaPanel eyebrow="VALIDATED INPUT" title="Partition params" value={channel.params} />
-        <SchemaPanel eyebrow="PUBLIC EVENTS" title="Event schemas" value={channel.events} />
-      </div>
-      <SchemaPanel eyebrow="RECOVERY POLICY" title="Replay" value={channel.replay ?? null} />
+    <DetailLayout
+      header={{
+        kicker: "Channel",
+        title: <span className="font-mono">{channelId}</span>,
+        badges: (
+          <>
+            <Badge
+              variant={
+                access === "public" ? "info" : access === "protected" ? "warning" : "default"
+              }
+            >
+              {access}
+            </Badge>
+            {channel.presence === undefined ? null : <Badge>presence</Badge>}
+            {replay ? <Badge>replay</Badge> : null}
+          </>
+        ),
+        description: "Typed event, replay, presence, and exposure metadata.",
+        meta: (
+          <>
+            <MetaItem label="id" copy={channelId}>
+              {channelId}
+            </MetaItem>
+            {domainId ? (
+              <MetaItem label="domain">
+                <Link
+                  href={`/domains/${encodeURIComponent(domainId)}`}
+                  className="underline-offset-2 hover:underline"
+                >
+                  {domainId}
+                </Link>
+              </MetaItem>
+            ) : null}
+            <SourceLink source={record(channel.source)} />
+          </>
+        ),
+        actions: <GraphAction id={channelId} />,
+      }}
+      aside={
+        <Section id="channel-facts" title="Channel detail">
+          <DetailList
+            items={[
+              { label: "Channel ID", value: channelId, mono: true, copy: channelId },
+              { label: "Access", value: access, mono: true },
+              { label: "Profile", value: text(channel.profile) || "default", mono: true },
+              { label: "Presence", value: presence(channel.presence), mono: true },
+              {
+                label: "Replay",
+                value: replay
+                  ? `${typeof replay.retentionMs === "number" ? replay.retentionMs.toLocaleString("en-US") : "?"} ms retention`
+                  : "live only",
+                mono: true,
+              },
+              {
+                label: "Events",
+                value: events.length === 0 ? "none" : events.join(", "),
+                mono: true,
+              },
+            ]}
+          />
+        </Section>
+      }
+    >
       <ChannelLiveConsole channel={channel} />
-    </div>
+      <SchemaPanel title="Event schemas" value={channel.events} />
+      <div className={replay ? "grid min-w-0 gap-4 2xl:grid-cols-2" : "grid min-w-0 gap-4"}>
+        <SchemaPanel title="Partition params" value={channel.params} />
+        {replay ? <SchemaPanel title="Replay" value={replay} /> : null}
+      </div>
+    </DetailLayout>
   );
 }
 
-function Meta({ label, value }: { readonly label: string; readonly value: ReactNode }) {
-  return (
-    <div>
-      <dt>{label}</dt>
-      <dd>{value}</dd>
-    </div>
-  );
-}
 function presence(value: unknown): string {
   return value === "count" ? "Connection count" : record(value) ? "Typed members" : "Disabled";
 }
