@@ -65,6 +65,7 @@ export function collectResults<T, U>(
  * Selects the first successful union member in declaration order.
  * @param tasks - Deferred union member validators.
  * @param path - Path for a union mismatch issue.
+ * @param mismatch - Message for a value no member accepts.
  * @returns A synchronous result when possible, otherwise a promise.
  * @throws The first rejected validator in input order.
  * @example collectUnion([() => ({ value: "ok" })], []);
@@ -72,10 +73,11 @@ export function collectResults<T, U>(
 export function collectUnion<T>(
   tasks: readonly SchemaTask<T>[],
   path: readonly StandardPathSegment[],
+  mismatch: () => string = () => "Value did not match any union member",
 ): StandardResult<T> | Promise<StandardResult<T>> {
   const results = startTasks(tasks);
   const select = (items: readonly StandardResult<T>[]): StandardResult<T> =>
-    items.find(isSuccess) ?? issue("Value did not match any union member", path);
+    items.find(isSuccess) ?? issue(mismatch(), path);
   return isPromiseLike(results) ? Promise.resolve(results).then(select) : select(results);
 }
 

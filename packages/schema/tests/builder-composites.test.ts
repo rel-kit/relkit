@@ -14,6 +14,28 @@ describe("composite schema builders", () => {
     expect(z.union([z.literal("one"), z.number()]).safeParse(false)).toMatchObject({
       issues: [{ message: "Value did not match any union member" }],
     });
+    expect(
+      z.union([z.literal("on"), z.literal(1), z.literal(null)]).safeParse("off"),
+    ).toMatchObject({
+      issues: [{ message: 'Expected one of: "on", 1, null' }],
+    });
+    const unprojectable = {
+      "~standard": {
+        version: 1,
+        vendor: "foreign",
+        validate: (value: unknown) =>
+          value instanceof Date ? { value } : { issues: [{ message: "Expected a date" }] },
+        jsonSchema: {
+          input: () => {
+            throw new Error("Date cannot be represented in JSON Schema");
+          },
+          output: () => ({}),
+        },
+      },
+    } as const;
+    expect(z.union([z.literal("now"), unprojectable as never]).safeParse(1)).toMatchObject({
+      issues: [{ message: "Value did not match any union member" }],
+    });
     expect(z.object({ optional: z.string().optional() }).parse({})).toEqual({});
     expect(z.object({ optional: z.string().optional() }).parse({ optional: undefined })).toEqual({
       optional: undefined,
@@ -78,7 +100,7 @@ describe("composite schema builders", () => {
     expect(validateSync(schema, { names: [""], choice: "c" as never })).toEqual({
       issues: [
         { message: "Must contain at least 1 characters", path: ["names", 0] },
-        { message: "Value did not match any union member", path: ["choice"] },
+        { message: 'Expected one of: "a", "b"', path: ["choice"] },
       ],
     });
   });
