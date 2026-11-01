@@ -194,3 +194,71 @@ test("near-full multi-record pulls fit persistence envelopes and make progress w
     }),
   );
 });
+
+test("a gap is persisted as an incomplete-inspection diagnostic and every request names the collector", async () => {
+  const appended: { key: string; record: { signal: string; message?: string } }[] = [];
+  const consumers = new Set<string | null>();
+  const transport: InspectorRemoteOperations = {
+    request: (_connection, path, options) =>
+      Effect.sync(() => {
+        consumers.add(new Headers(options?.headers).get("x-relkit-inspection-consumer"));
+        if (path === "/_relkit/bridge/v1/ack") return Response.json({ acknowledged: 7 });
+        return Response.json({
+          records: [{ sequence: 7, record }],
+          gap: true,
+          droppedRecords: 0,
+          incomplete: false,
+        });
+      }),
+    json: (response) => Effect.promise(() => response.text()),
+  };
+  const history: InspectorHistoryOperations = {
+    call: (command) =>
+      Effect.sync(() => {
+        if (command.type === "append") appended.push(...(command.records as typeof appended));
+        return [];
+      }),
+  };
+
+  await Effect.runPromise(collectInspectionBatch(transport, history, connection, 3));
+
+  const gap = appended.find((entry) => entry.record.signal === "diagnostic");
+  expect(gap?.key).toBe(`${connection.descriptor.sessionId}:gap:3:7`);
+  expect(gap?.record.message).toContain("3 records (sequences 4-6)");
+  expect(consumers.size).toBe(1);
+  expect([...consumers][0]).toMatch(/^[0-9a-f-]{36}$/);
+});
+
+test("a gap the buffer's own eviction explains is reported once, as retained loss", async () => {
+  const appended: { key: string; record: { signal: string } }[] = [];
+  const transport: InspectorRemoteOperations = {
+    request: (_connection, path) =>
+      Effect.sync(() =>
+        path === "/_relkit/bridge/v1/ack"
+          ? Response.json({ acknowledged: 7 })
+          : Response.json({
+              records: [{ sequence: 7, record }],
+              gap: true,
+              droppedRecords: 5,
+              incomplete: true,
+            }),
+      ),
+    json: (response) => Effect.promise(() => response.text()),
+  };
+  const history: InspectorHistoryOperations = {
+    call: (command) =>
+      Effect.sync(() => {
+        if (command.type === "append") appended.push(...(command.records as typeof appended));
+        return [];
+      }),
+  };
+
+  await Effect.runPromise(
+    collectInspectionBatch(transport, history, connection, 3, undefined, undefined, 2),
+  );
+
+  const diagnostics = appended.filter((entry) => entry.record.signal === "diagnostic");
+  expect(diagnostics.map((entry) => entry.key)).toEqual([
+    `${connection.descriptor.sessionId}:loss:5:0:0:0`,
+  ]);
+});

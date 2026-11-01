@@ -5,10 +5,15 @@
  * their result is checked before returning it to Hono.
  */
 import type { HttpTriggerRegistration } from "@relkit/graph";
-import type { Hono } from "hono";
+import type { Context, Hono } from "hono";
 import { registerAuthMiddleware } from "./auth.js";
 import { installHttpLogging } from "./http-logging.js";
-import { createRouteHandler, getEntry, isRecord } from "./materialize-routes-utils.js";
+import {
+  announceRoute,
+  createRouteHandler,
+  getEntry,
+  isRecord,
+} from "./materialize-routes-utils.js";
 import { assertHttpManifest } from "./materialize-routes-validation.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.types.js";
 import { withRateLimit } from "./rate-limit.js";
@@ -63,7 +68,8 @@ function registerRawRoute(
    * @param context - Request supplied by Hono.
    * @returns The native response; incompatible output throws at this boundary.
    */
-  const run = async (context: { readonly req: { readonly raw: Request } }): Promise<Response> => {
+  const run = async (context: Context): Promise<Response> => {
+    announceRoute(context, trigger);
     const response = await handler(context.req.raw);
     if (!(response instanceof Response))
       throw new TypeError("Raw HTTP handler must return a Response.");

@@ -6,6 +6,71 @@ import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "src/request-record.test.ts", line: 1, column: 1 } as const;
 
+test("records an error status returned without a thrown failure as a failed outcome", async () => {
+  const collector = createObservabilityCollector();
+  const app = createApp({
+    plan: plan(),
+    manifest: manifest(),
+    generationId: "generation.test",
+    observability: collector,
+    middleware: { requestId: () => "request.missing" },
+    engine: { invoke: async () => ({ ok: true }) },
+  });
+
+  const response = await app.request("http://localhost/missing");
+  await response.text();
+  const record = collector
+    .read()
+    .find(
+      (value): value is Extract<typeof value, { signal: "request" }> =>
+        value.signal === "request" && value.phase === "completed",
+    );
+  const span = collector
+    .read()
+    .find(
+      (value): value is Extract<typeof value, { signal: "span" }> =>
+        value.signal === "span" && value.status === "completed",
+    );
+
+  expect(response.status).toBe(404);
+  expect(record).toMatchObject({ status: 404, outcome: "declared-error" });
+  expect(span?.events?.map((event) => event.name)).toContain("http.declared-error");
+  expect(span?.events?.map((event) => event.name)).not.toContain("http.success");
+});
+
+test("records a raw route's identity instead of an unknown route", async () => {
+  const collector = createObservabilityCollector();
+  const raw = plan();
+  const { serviceId: _serviceId, ...trigger } = raw.httpTriggers[0]!;
+  const app = createApp({
+    plan: {
+      ...raw,
+      httpTriggers: [
+        {
+          ...trigger,
+          id: "health.raw",
+          targetFunctionId: "health.raw",
+          config: { ...trigger.config, rawHandler: true },
+        },
+      ],
+    },
+    manifest: { ...manifest(), routes: { "health.raw": { handler: () => new Response("ok") } } },
+    observability: collector,
+    engine: { invoke: async () => undefined },
+  });
+
+  const response = await app.request("http://localhost/hello");
+  await response.text();
+  const record = collector
+    .read()
+    .find(
+      (value): value is Extract<typeof value, { signal: "request" }> =>
+        value.signal === "request" && value.phase === "completed",
+    );
+
+  expect(record).toMatchObject({ routeId: "health.raw", status: 200, outcome: "success" });
+});
+
 test("records a correlated HTTP timeline without request values", async () => {
   const collector = createObservabilityCollector();
   const app = createApp({
@@ -127,3 +192,21 @@ function manifest(): RuntimeManifest {
     requestTransforms: {},
   };
 }
+
+test("answers unmatched paths with JSON 404 and wrong methods with 405 and Allow", async () => {
+  const app = createApp({
+    plan: plan(),
+    manifest: manifest(),
+    engine: { invoke: async () => ({ ok: true }) },
+  });
+
+  const missing = await app.request("http://localhost/missing");
+  expect(missing.status).toBe(404);
+  expect(missing.headers.get("content-type")).toContain("application/json");
+  expect(await missing.json()).toEqual({ error: "not-found" });
+
+  const wrongMethod = await app.request("http://localhost/hello", { method: "DELETE" });
+  expect(wrongMethod.status).toBe(405);
+  expect(wrongMethod.headers.get("allow")).toBe("GET, HEAD");
+  expect(await wrongMethod.json()).toEqual({ error: "method-not-allowed" });
+});

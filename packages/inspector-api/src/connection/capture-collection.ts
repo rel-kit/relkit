@@ -4,6 +4,12 @@ import type { EarlyRetentionOperations, EarlyRetainedRecord } from "@relkit/obse
 import { InspectionConnectionError, rejectConnection } from "./connection-error.js";
 import { readInspectionBody } from "./bridge-body.js";
 import { inspectionReplayRecord } from "./replay-record.js";
+import {
+  captureConsumer,
+  recordCaptureAcknowledgement,
+  recordCaptureRead,
+  type CaptureConsumers,
+} from "./capture-consumers.js";
 
 const ack = Schema.fromJsonString(
   Schema.Struct({
@@ -15,9 +21,11 @@ const ack = Schema.fromJsonString(
   }),
 );
 
-/** Returns at most 256 records/1 MiB; cursors never imply durable persistence. */
+/** Returns at most 256 records/1 MiB; cursors never imply durable persistence.
+ * An acknowledgement retires only what every active collector has persisted. */
 export const collectCapture = Effect.fn("Inspection.collect")(function* (
   buffer: EarlyRetentionOperations,
+  consumers: CaptureConsumers,
   request: Request,
   incomplete = false,
   producer = { producerFailed: 0, producerDropped: 0, producerSourcesExceeded: false },
@@ -28,8 +36,15 @@ export const collectCapture = Effect.fn("Inspection.collect")(function* (
     const value = yield* Schema.decodeUnknownEffect(ack)(new TextDecoder().decode(body)).pipe(
       Effect.mapError((cause) => new InspectionConnectionError({ operation: "body.ack", cause })),
     );
+    if (value.through > (yield* buffer.status()).sequence)
+      return yield* rejectConnection("body.cursor");
+    const release = yield* recordCaptureAcknowledgement(
+      consumers,
+      captureConsumer(request),
+      value.through,
+    );
     yield* buffer
-      .acknowledge(value.through)
+      .acknowledge(release)
       .pipe(
         Effect.mapError(
           (cause) => new InspectionConnectionError({ operation: "body.cursor", cause }),
@@ -43,8 +58,9 @@ export const collectCapture = Effect.fn("Inspection.collect")(function* (
   if (!/^\d+$/.test(cursor) || !Number.isSafeInteger(Number(cursor)))
     return yield* rejectConnection("body.cursor");
   const after = Number(cursor);
+  yield* recordCaptureRead(consumers, captureConsumer(request), after);
   const entries = yield* buffer.snapshot();
-  const status = yield* buffer.status();
+  const { sequence: _sequence, ...status } = yield* buffer.status();
   const records = captureRecords(entries, after);
   return Response.json(
     {

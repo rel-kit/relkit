@@ -2,6 +2,7 @@ import { createSchema, issue, runSchema, type Schema } from "./standard-schema.j
 import { buildSchema } from "./builder-effect.js";
 import { collectResults, collectUnion } from "./schema-collection.js";
 import { getSchemaProjection, isSchemaOptional } from "./json-schema.js";
+import type { JsonSchemaFactory } from "./json-schema.types.js";
 import type { SchemaMetadata } from "./schema-metadata.js";
 import type {
   AnySchema,
@@ -103,13 +104,19 @@ export function unionSchema<S extends SchemaTuple>(
     const legacyProjections = schemas.map((schema) => getSchemaProjection(schema));
     const inputProjections = schemas.map((schema) => getSchemaProjection(schema, "input"));
     const outputProjections = schemas.map((schema) => getSchemaProjection(schema, "output"));
+    let accepted: string | undefined;
+    // A union of literals (an enum) names the values it accepts instead of a generic mismatch.
+    const mismatch = () =>
+      (accepted ??= literalValues(inputProjections) ?? "") === ""
+        ? "Value did not match any union member"
+        : `Expected one of: ${accepted}`;
     return createSchema(
       (value, path) => {
         const tasks = schemas.map(
           (schema) => () =>
             runSchema(schema as StandardSchemaV1<unknown, OutputOf<S[number]>>, value, path),
         );
-        return collectUnion(tasks, path);
+        return collectUnion(tasks, path, mismatch);
       },
       {
         ...(legacyProjections.every((projection) => projection)
@@ -164,4 +171,28 @@ function objectProjection(
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Lists a literal union's values from its members' JSON Schema projections.
+ * @param projections - Member input projections, in declaration order.
+ * @returns The quoted values joined with commas, or undefined when any member is not a literal.
+ */
+function literalValues(
+  projections: readonly (JsonSchemaFactory | undefined)[],
+): string | undefined {
+  const values: string[] = [];
+  for (const projection of projections) {
+    let schema: JsonValue | undefined;
+    try {
+      schema = projection?.();
+    } catch {
+      // A member without a JSON Schema form (a foreign z.date(), say) is not a literal.
+      return undefined;
+    }
+    if (schema === null || typeof schema !== "object" || Array.isArray(schema)) return undefined;
+    if (!("const" in schema)) return undefined;
+    values.push(JSON.stringify(schema.const));
+  }
+  return values.join(", ");
 }

@@ -267,3 +267,28 @@ function routePlan(): RegistrationPlan {
     middlewares: [],
   };
 }
+
+test("reports an unreadable JSON body once for the body instead of once per field", async () => {
+  const result = await mapRequest(
+    request(
+      new Request("http://localhost/orders", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{not json",
+      }),
+    ),
+    {
+      kind: "input",
+      fields: {
+        sku: { kind: "body", name: "sku" },
+        quantity: { kind: "body", name: "quantity" },
+        note: { kind: "body", name: "note" },
+      },
+    },
+  );
+
+  expect(result).toEqual({
+    ok: false,
+    issues: [{ code: "malformed-json", message: "Request body is not valid JSON", path: [] }],
+  });
+});

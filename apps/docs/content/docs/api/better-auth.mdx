@@ -259,7 +259,7 @@ Native auth service; each method admits DB work and retains SDK completion.
 declare class AuthService
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.service.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.service.ts#L24)
 
 ### authLiveLayer
 
@@ -277,7 +277,7 @@ declare const authLiveLayer: (
 ) => Layer.Layer<AuthService, AuthFailure | DrizzleFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.service.ts#L146)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.service.ts#L147)
 
 ### authServiceLayer
 
@@ -304,7 +304,7 @@ declare const authServiceLayer: (
 ) => Layer.Layer<AuthService, AuthFailure | DrizzleFailure, AuthFactory>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.service.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.service.ts#L44)
 
 ## `auth.types.ts`
 
@@ -942,6 +942,58 @@ declare const projectAuthOpenApi: <Input>(document: Input, basePath?: string) =>
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-projection.ts#L16)
 
+## `openapi-query.ts`
+
+Documents each endpoint's real query contract. Better Auth's generator only reads
+a top-level object schema and never marks a query field required, so wrapped
+(`optional`, `default`) and union schemas publish no parameters at all.
+
+### QueryEndpoint (interface)
+
+The native endpoint fields this projection reads.
+
+**Signature**
+
+```ts
+export interface QueryEndpoint {
+  readonly path?: string;
+  readonly options?: {
+    readonly method?: string | readonly string[];
+    readonly query?: unknown;
+    readonly metadata?: object;
+  };
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-query.ts#L9)
+
+### acceptedShapes
+
+Lists the object shapes a union schema accepts, marking optional fields with `?`.
+
+**Signature**
+
+```ts
+declare const acceptedShapes: (schema: unknown) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-query.ts#L71)
+
+### documentQueryParameters
+
+Adds missing query parameters and required flags to Better Auth's generated paths.
+
+**Signature**
+
+```ts
+declare const documentQueryParameters: (
+  document: JsonValue,
+  endpoints: Iterable<QueryEndpoint>,
+) => JsonValue;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-query.ts#L30)
+
 ## `openapi.ts`
 
 Generates native authentication documentation through a typed, observable
@@ -959,7 +1011,7 @@ Native metadata projection with no request identity or database ownership.
 declare class AuthOpenApi
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi.ts#L20)
 
 ### generateBetterAuthOpenApi
 
@@ -980,7 +1032,7 @@ declare const generateBetterAuthOpenApi: (
 ) => Promise<JsonValue>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi.ts#L74)
 
 ## `react.ts`
 
@@ -1093,3 +1145,56 @@ declare const BETTER_AUTH_RUNTIME: unique symbol;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/symbols.ts#L5)
+
+## `validation-detail.ts`
+
+Explains Better Auth input validation failures. better-call formats each Standard
+Schema issue as `[location] message`, which reduces a union failure to
+`[query] Invalid input` and drops why each accepted shape was rejected.
+
+### ValidatedAuth (interface)
+
+The native SDK fields this explanation reads.
+
+**Signature**
+
+```ts
+export interface ValidatedAuth {
+  readonly handler: (request: Request) => Promise<Response>;
+  readonly api: object;
+  readonly options: { readonly basePath?: string };
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/validation-detail.ts#L9)
+
+### ValidationDetail (interface)
+
+One failing field; `option` numbers the accepted shape it belongs to, from 1.
+
+**Signature**
+
+```ts
+export interface ValidationDetail {
+  readonly path: string;
+  readonly message: string;
+  readonly option?: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/validation-detail.ts#L33)
+
+### handleWithValidationDetail
+
+Runs the native handler and, for a validation failure, names every failing field.
+
+**Signature**
+
+```ts
+declare const handleWithValidationDetail: (
+  auth: ValidatedAuth,
+  request: Request,
+) => Promise<Response>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/validation-detail.ts#L47)

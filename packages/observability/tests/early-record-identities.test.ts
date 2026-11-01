@@ -51,6 +51,7 @@ it.effect("rejects empty and oversized keys without consuming memory or reportin
         Exit.isFailure(yield* Effect.exit(buffer.admit(record, { key, origin: "application" }))),
       ).toBe(true);
     expect(yield* buffer.status()).toEqual({
+      sequence: 0,
       bufferedRecords: 0,
       bufferedBytes: 0,
       droppedRecords: 0,

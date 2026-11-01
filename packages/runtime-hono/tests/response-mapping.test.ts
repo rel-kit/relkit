@@ -1,5 +1,6 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { InvocationValidationError } from "@relkit/engine";
+import { RuntimeFailure } from "@relkit/invocation";
 import type { HttpTriggerRegistration, RegistrationPlan } from "@relkit/graph";
 import {
   applicationFailure,
@@ -169,6 +170,55 @@ describe("HTTP response mapping", () => {
 
     const production = await mapFailureResponse(trigger([]), failure, { mode: "production" });
     expect(await production.json()).toEqual({ error: "provider-failure" });
+  });
+
+  test("names the redacted defect cause in development only", async () => {
+    const failure = unexpectedDefect(new Error("no such table: user; password=defect-secret"));
+
+    const development = await mapFailureResponse(trigger([]), failure, { mode: "development" });
+    expect(development.status).toBe(500);
+    expect(await development.json()).toEqual({
+      error: "internal-error",
+      message: "no such table: user; password=[REDACTED]",
+    });
+
+    const production = await mapFailureResponse(trigger([]), failure, { mode: "production" });
+    expect(await production.json()).toEqual({ error: "internal-error" });
+  });
+
+  // A bundled server and an external runtime-hono each load their own @relkit/invocation.
+  test("maps failures created by another package copy to their declared responses", async () => {
+    vi.resetModules();
+    const copy = await import("@relkit/invocation");
+    expect(copy.RuntimeFailure).not.toBe(RuntimeFailure);
+    const route = trigger([
+      {
+        kind: "error",
+        id: "error.auth.unauthenticated.401",
+        errorId: "auth.unauthenticated",
+        status: 401,
+      },
+      { kind: "validation-error", id: "validation.422", status: 422 },
+    ]);
+
+    const declared = await mapFailureResponse(
+      route,
+      copy.applicationFailure({
+        id: "auth.unauthenticated",
+        message: "Sign in to continue",
+        data: {},
+      }),
+      { mode: "development" },
+    );
+    expect(declared.status).toBe(401);
+    expect(await declared.json()).toMatchObject({ code: "auth.unauthenticated" });
+
+    const invalid = await mapFailureResponse(
+      route,
+      new copy.InvocationValidationError("input", [{ message: "Too large", path: ["limit"] }]),
+      { mode: "development" },
+    );
+    expect(invalid.status).toBe(422);
   });
 
   test("maps engine failures through the materialized route", async () => {

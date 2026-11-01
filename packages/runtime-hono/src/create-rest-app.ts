@@ -17,6 +17,7 @@ import { createFrameworkMiddleware, FRAMEWORK_MIDDLEWARE_ORDER } from "./middlew
 import { installStaticFiles } from "./static-files.js";
 import { installTransportSecurity } from "./transport-security.js";
 import { installCoreEndpoints } from "./core-endpoints.js";
+import { installUnmatchedRoute } from "./unmatched-route.js";
 
 /** Constructs only eagerly required HTTP behavior.
  * @param options - Complete checked cohort and runtime dependencies.
@@ -49,6 +50,7 @@ export function createApplicationShell(options: CreateAppOptions): Hono {
     options.frameworkMiddleware ?? createFrameworkMiddleware(middlewareOptions),
   );
   installTransportSecurity(app, options.transportSecurity);
+  installUnmatchedRoute(app);
   const internal = {
     graph: graphSnapshot(options.plan),
     ...(options.internalEndpoints ?? {}),

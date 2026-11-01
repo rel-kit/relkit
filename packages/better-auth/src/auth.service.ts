@@ -15,6 +15,7 @@ import { AuthBasePath } from "./auth.schemas.js";
 import type { AuthConfiguration, AuthDatabase, AuthServiceInterface } from "./auth.types.js";
 import { checkNativeAuthDependencies } from "./dependencies.js";
 import { databaseServiceOf, withAuthWork } from "./auth-database.js";
+import { handleWithValidationDetail } from "./validation-detail.js";
 
 /**
  * Native auth service; each method admits DB work and retains SDK completion.
@@ -94,7 +95,7 @@ function createService(native: Auth<any>, database: AuthDatabase): AuthServiceIn
         "auth.handler",
         withAuthWork(
           database,
-          nativePromise("auth.handler", () => native.handler(request)),
+          nativePromise("auth.handler", () => handleWithValidationDetail(native, request)),
         ),
       ),
     ),

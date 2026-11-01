@@ -14,3 +14,4 @@ export { createInspectionHandler } from "./connection/bridge-handler.js";
 export * from "./connection/capture.service.js";
 export type * from "./connection/capture.types.js";
 export { inspectionReplayRecord } from "./connection/replay-record.js";
+export { CAPTURE_CONSUMER_HEADER } from "./connection/capture-consumers.js";

@@ -38,7 +38,7 @@ arraySchema(z.number());
 declare const arraySchema: <S extends AnySchema>(schema: S) => Schema<InputOf<S>[], OutputOf<S>[]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/builder-composites.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/builder-composites.ts#L65)
 
 ### objectSchema
 
@@ -56,7 +56,7 @@ objectSchema({ id: z.string() });
 declare const objectSchema: <S extends Shape>(shape: S) => Schema<ObjectInput<S>, ObjectOutput<S>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/builder-composites.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/builder-composites.ts#L25)
 
 ### unionSchema
 
@@ -76,7 +76,7 @@ declare const unionSchema: <S extends SchemaTuple>(
 ) => Schema<InputOf<S[number]>, OutputOf<S[number]>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/builder-composites.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/builder-composites.ts#L100)
 
 ## `builder-composites.types.ts`
 
@@ -2114,10 +2114,11 @@ collectUnion([() => ({ value: "ok" })], []);
 declare const collectUnion: <T>(
   tasks: readonly SchemaTask<T>[],
   path: readonly StandardPathSegment[],
+  mismatch?: () => string,
 ) => StandardResult<T> | Promise<StandardResult<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-collection.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-collection.ts#L73)
 
 ### resolveTasksEffect
 

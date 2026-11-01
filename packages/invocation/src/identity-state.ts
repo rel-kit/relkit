@@ -1,5 +1,6 @@
 import { Context, Data, Effect, Layer, Option } from "effect";
 import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
+import { brandAcrossCopies, sharedAcrossCopies } from "./package-identity.js";
 import type { IdentityStoreService } from "./identity.types.js";
 
 /** Public compatibility error for descriptor identity conflicts.
@@ -12,6 +13,7 @@ export class DescriptorIdentityError extends TypeError {
     this.name = "DescriptorIdentityError";
   }
 }
+brandAcrossCopies(DescriptorIdentityError, "@relkit/invocation/DescriptorIdentityError");
 
 /** Tagged identity operation failure with its compatibility cause.
  * @example Effect.catchTag(bindDescriptorIdentityEffect(descriptor, id), "DescriptorIdentityFailure", () => Effect.void);
@@ -28,12 +30,13 @@ export class IdentityStore extends Context.Service<IdentityStore, IdentityStoreS
   "relkit/invocation/IdentityStore",
 ) {}
 
-const liveStore: IdentityStoreService = {
+// Shared so a descriptor bound by one package copy resolves to the same identity in another.
+const liveStore: IdentityStoreService = sharedAcrossCopies("descriptor-identity@1", () => ({
   canonical: new WeakMap(),
   unbound: new WeakMap(),
   services: new WeakMap(),
   nextUnboundId: () => crypto.randomUUID(),
-};
+}));
 
 /** Live identity registry shared by compatibility callers.
  * @example Effect.runSync(Effect.provide(createUnboundIdentityEffect(), IdentityStoreLive));

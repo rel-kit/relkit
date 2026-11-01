@@ -1,6 +1,7 @@
 import type { StandardIssue } from "@relkit/schema";
 import { Effect } from "effect";
 import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
+import { brandAcrossCopies } from "./package-identity.js";
 
 export type * from "./contracts.types.js";
 
@@ -25,6 +26,7 @@ export class InvocationValidationError extends TypeError {
     );
   }
 }
+brandAcrossCopies(InvocationValidationError, "@relkit/invocation/InvocationValidationError");
 
 /** Constructs a public validation error through Effect.
  * @param phase - Input or output phase.

@@ -32,7 +32,7 @@ declare const forwardBackend: (
 ) => Effect.Effect<Response, InspectionConnectionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-forward.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-forward.ts#L8)
 
 ## `backend-history.ts`
 
@@ -127,6 +127,24 @@ declare const collectionChange: (record: ObservabilityRecord) => ObservabilitySt
 
 Cumulative loss has an independent durable identity, outside the saturated application's buffer.
 
+### persistCollectionGap
+
+Records skipped sequences, such as records retired before this Inspector read them, as loss.
+
+**Signature**
+
+```ts
+declare const persistCollectionGap: (
+  history: InspectorHistoryOperations,
+  sessionId: string,
+  after: number,
+  next: number,
+  evicted?: number | undefined,
+) => Effect.Effect<void, InspectionConnectionError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector-loss.ts#L52)
+
 ### persistCollectionLoss
 
 One tiny transaction follows record persistence; a lost ACK reuses the same receipt key.
@@ -177,6 +195,7 @@ declare const collectInspectionBatch: (
   after: number,
   target?: string | undefined,
   previousLossKey?: string | undefined,
+  previousDropped?: number | undefined,
 ) => Effect.Effect<
   {
     through: number;
@@ -206,7 +225,7 @@ declare const collectInspectionBatch: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector.ts#L23)
 
 ## `container-bin.ts`
 

@@ -1,7 +1,9 @@
 /** Commits a finite replay batch before ACK; lost ACKs replay stable keys without duplicate writes. */
+import { randomUUID } from "node:crypto";
 import { Effect, Schema } from "effect";
 import { admitObservabilityRecordEffect } from "@relkit/observability";
 import {
+  CAPTURE_CONSUMER_HEADER,
   InspectionConnectionError,
   inspectionReplayRecord,
 } from "@relkit/inspector-api/connection";
@@ -10,8 +12,12 @@ import type { InspectorRemoteOperations } from "./remote.types.js";
 import type { InspectorHistoryOperations } from "./history.types.js";
 import { InspectionCollectionBatch } from "./collection.schemas.js";
 import { collectionChange } from "./collector-changes.js";
-import { persistCollectionLoss } from "./collector-loss.js";
+import { persistCollectionGap, persistCollectionLoss } from "./collector-loss.js";
 import { observeExecution } from "@relkit/contracts/operation";
+
+// Names this Inspector to the bridge, so another Inspector collecting the same session cannot
+// retire records this one has not persisted.
+const consumer = { [CAPTURE_CONSUMER_HEADER]: randomUUID() };
 
 /** One bounded pull needs no independent pending queue or in-memory history copy. */
 export const collectInspectionBatch = Effect.fn("Inspector.collectBatch")(
@@ -22,11 +28,12 @@ export const collectInspectionBatch = Effect.fn("Inspector.collectBatch")(
     after: number,
     target?: string,
     previousLossKey?: string,
+    previousDropped: number = 0,
   ) {
     const response = yield* remote.request(
       connection,
       `/_relkit/bridge/v1/records?after=${after}`,
-      {},
+      { headers: consumer },
       target,
     );
     const batch = yield* remote.json(response).pipe(
@@ -55,6 +62,11 @@ export const collectInspectionBatch = Effect.fn("Inspector.collectBatch")(
     if (records.length > 0) {
       yield* history.call({ type: "append", records });
     }
+    const next = batch.records[0]?.sequence;
+    // Records the buffer evicted are already reported as loss below; only the rest is a gap.
+    const evicted = Math.max(0, batch.droppedRecords - previousDropped);
+    if (batch.gap && next !== undefined)
+      yield* persistCollectionGap(history, connection.descriptor.sessionId, after, next, evicted);
     const lossKey = yield* persistCollectionLoss(
       history,
       batch,
@@ -115,7 +127,7 @@ const acknowledgeCollection = Effect.fn("Inspector.acknowledge")(function* (
     "/_relkit/bridge/v1/ack",
     {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", ...consumer },
       body: JSON.stringify({ through }),
     },
     target,
