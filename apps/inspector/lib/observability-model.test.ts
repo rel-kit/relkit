@@ -8,13 +8,8 @@ import {
 } from "./observability-model";
 import { defaultSignalFilters } from "./signal-defaults";
 import { attachLogs, attachSources } from "../app/signal-detail-live";
-import {
-  stepDescription,
-  stepInput,
-  stepOutcome,
-  stepOutput,
-  traceTimeline,
-} from "./trace-timeline";
+import { eventData } from "./trace-io";
+import { traceRows } from "./trace-view";
 
 describe("inspector observability model", () => {
   test("defaults logs to the previous 24 hours", () => {
@@ -250,35 +245,29 @@ describe("inspector observability model", () => {
         },
       ],
     );
-    const steps = traceTimeline(items);
-    expect(steps.map((step) => step.name)).toEqual([
+    const steps = traceRows(items);
+    expect(steps.map((step) => step.event?.name ?? step.span.name)).toEqual([
       "HTTP POST /orders",
       "http.request.received",
       "relkit.invoke.orders.create",
       "http.response.headers",
       "http.success",
     ]);
-    expect(stepInput(steps[0]!)).toMatchObject({
-      method: "POST",
-      route: "/orders",
-      bytes: 42,
-    });
-    expect(stepOutput(steps[0]!)).toMatchObject({
-      statusCode: 201,
-      bytes: 12,
-    });
-    expect(stepInput(steps[0]!)).not.toHaveProperty("id");
-    expect(steps[0]?.span.details.metadata).toMatchObject({
-      "relkit.request.id": "request-1",
-    });
-    expect(stepOutcome(steps[0]!)).toMatchObject({ outcome: "success" });
-    expect(stepDescription(steps[1]!)).toBe("HTTP POST /orders");
-    expect(steps[2]?.span.operationType).toBe("function");
-    expect(stepInput(steps[2]!)).toEqual({ orderId: "order-1" });
-    expect(stepOutput(steps[2]!)).toEqual({ ok: true });
-    expect(stepInput(steps[3]!)).toMatchObject({
+    expect(steps.map((step) => step.depth)).toEqual([0, 1, 1, 1, 1]);
+    const root = steps[0]!.span;
+    expect(root.details.input).toMatchObject({ method: "POST", route: "/orders", bytes: 42 });
+    expect(root.details.output).toMatchObject({ statusCode: 201, bytes: 12 });
+    expect(root.details.input).not.toHaveProperty("id");
+    expect(root.details.metadata).toMatchObject({ "relkit.request.id": "request-1" });
+    expect(root.outcome).toBe("success");
+    expect(steps[1]!.span.name).toBe("HTTP POST /orders");
+    const child = steps[2]!.span;
+    expect(child.operationType).toBe("function");
+    expect(child.details.input).toEqual({ orderId: "order-1" });
+    expect(child.details.output).toEqual({ ok: true });
+    expect(eventData(steps[3]!.event!.attributes)).toMatchObject({
       "http.response.status_code": 201,
     });
-    expect(stepOutput(steps[4]!)).toEqual({ statusCode: 201, bytes: 12 });
+    expect(steps[4]!.offsetMs).toBe(10);
   });
 });
