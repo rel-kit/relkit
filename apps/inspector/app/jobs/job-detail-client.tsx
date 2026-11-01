@@ -5,7 +5,12 @@ import { useParams } from "next/navigation";
 import type { InspectorObject } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
 import { invokeJobAction, jobActionCapabilities, type JobAction } from "../../lib/job-actions";
-import { JobContract } from "./job-contract";
+import { Briefcase } from "lucide-react";
+import { FailedState, LoadingRows } from "../../components/blocks/block-state";
+import { StatusBadge } from "../../components/neon/status-badge";
+import { middleTruncate } from "../../lib/format";
+import { DetailLayout } from "../detail-layout";
+import { JobContract, JobContractAside } from "./job-contract";
 import { ModernJobDetail } from "./modern-job-detail";
 
 interface JobSnapshot {
@@ -108,31 +113,45 @@ export function JobDetailClient() {
         pending={pending}
       />
     );
-  if (error || snapshot === undefined)
+  if (error)
     return (
-      <section className="panel route-state" role={error ? "alert" : "status"}>
-        {error ? "The job API is unavailable." : "Loading job contract…"}
-      </section>
+      <div className="route-page">
+        <FailedState
+          title="The job API is unavailable."
+          description="The job definition could not be read from the active generation."
+          onRetry={() => void load().catch(() => setError(true))}
+        />
+      </div>
+    );
+  if (snapshot === undefined)
+    return (
+      <div className="route-page rounded-lg border border-border bg-card">
+        <LoadingRows label="Loading job contract…" rows={6} />
+      </div>
     );
 
   const jobId = text(snapshot.node.id) || id;
   return (
-    <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">ACTIVE WORKSPACE</p>
-          <h1>Job detail</h1>
-          <p className="lede">
-            Queue state and local administrative actions stay tied to one active graph identity.
-          </p>
-        </div>
-        <span className="badge">{jobId}</span>
-      </header>
-      {actionError !== "" && (
-        <p className="field-errors" role="alert">
-          {actionError}
-        </p>
-      )}
+    <DetailLayout
+      header={{
+        kicker: "Job detail",
+        title: jobId,
+        icon: <Briefcase />,
+        description:
+          "Queue state and local administrative actions stay tied to one active graph identity.",
+        badges: <StatusBadge tone="neutral" label={text(snapshot.node.profile) || "default"} />,
+        meta: (
+          <>
+            <span>{snapshot.generationId}</span>
+            <span title={snapshot.graphHash}>{middleTruncate(snapshot.graphHash, 28)}</span>
+          </>
+        ),
+      }}
+      aside={
+        <JobContractAside node={snapshot.node} instances={snapshot.runtime} knownJobIds={[jobId]} />
+      }
+    >
+      {actionError !== "" && <FailedState title={actionError} />}
       <JobContract
         node={snapshot.node}
         instances={snapshot.runtime}
@@ -141,7 +160,7 @@ export function JobDetailClient() {
         pending={pending}
         onAction={action}
       />
-    </div>
+    </DetailLayout>
   );
 }
 

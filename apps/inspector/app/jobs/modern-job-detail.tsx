@@ -1,8 +1,19 @@
 "use client";
 
+import { Briefcase, History, RotateCcw, X } from "lucide-react";
 import Link from "next/link";
+import { CodeBlock } from "../../components/blocks/code-block";
+import { DetailList } from "../../components/blocks/details";
+import { FailedState } from "../../components/blocks/block-state";
+import { Section } from "../../components/blocks/section";
+import { EmptyState } from "../../components/neon/empty-state";
+import { HistoryList, type HistoryEntry } from "../../components/neon/history-list";
+import { StatusBadge, statusTone } from "../../components/neon/status-badge";
+import { Button } from "../../components/ui/button";
 import type { InspectorObject } from "../../lib/api-types";
 import type { JobAction } from "../../lib/job-actions";
+import { DetailLayout } from "../detail-layout";
+import { Count, elapsed, text } from "./job-format";
 
 export function ModernJobDetail({
   actionError,
@@ -18,147 +29,167 @@ export function ModernJobDetail({
   readonly pending: boolean;
 }) {
   const taskId = text(definition.taskId);
+  const jobId = text(definition.jobId) || text(definition.id);
   const schedules = Array.isArray(definition.schedules) ? definition.schedules : [];
+  const health = text(definition.health) || "unknown";
+  const binding =
+    definition.implicit === true
+      ? "implicit"
+      : definition.default === true
+        ? "default"
+        : "explicit";
+  const entries: HistoryEntry[] = runs.map((run, index) => {
+    const id = text(run.runId);
+    const status = text(run.status) || "unknown";
+    const accepted = text(run.acceptedAt);
+    const durationMs = elapsed(run.startedAt, run.completedAt);
+    return {
+      id: id || `run-${index}`,
+      tone: statusTone(status),
+      statusLabel: `Status ${status}`,
+      title: id || "unknown",
+      meta: [
+        status,
+        ...(typeof run.attempt === "number" ? [`attempt ${run.attempt}`] : []),
+        ...(text(run.service) === "" ? [] : [text(run.service)]),
+      ],
+      ...(accepted === "" ? {} : { at: accepted }),
+      ...(durationMs === undefined ? {} : { durationMs }),
+      ...(id === "" ? {} : { href: `/jobs/runs/${encodeURIComponent(id)}` }),
+      attributes: { "data-status": status },
+    };
+  });
+  const runStatus = new Map(runs.map((run) => [text(run.runId), text(run.status)]));
   return (
-    <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">JOB DEFINITION</p>
-          <h1>{text(definition.name) || text(definition.jobId) || "Job"}</h1>
-          <p className="lede">
-            Durable definition identity stays separate from retained run history.
-          </p>
-        </div>
-        <span className="badge">{text(definition.jobId) || text(definition.id)}</span>
-      </header>
-      {actionError !== "" && (
-        <p className="field-errors" role="alert">
-          {actionError}
-        </p>
-      )}
-      <section className="panel">
-        <dl className="identity-grid">
-          <Meta
-            label="Binding"
-            value={
-              definition.implicit === true
-                ? "implicit"
-                : definition.default === true
-                  ? "default"
-                  : "explicit"
-            }
+    <DetailLayout
+      header={{
+        kicker: "Job definition",
+        title: text(definition.name) || jobId || "Job",
+        icon: <Briefcase />,
+        description: "Durable definition identity stays separate from retained run history.",
+        badges: (
+          <>
+            <StatusBadge tone={statusTone(health)} label={health} />
+            {definition.retired === true ? <StatusBadge tone="warning" label="retired" /> : null}
+          </>
+        ),
+        meta: <span>{jobId}</span>,
+      }}
+      aside={
+        <>
+          <Section title="Definition">
+            <DetailList
+              items={[
+                { label: "Binding", value: binding },
+                {
+                  label: "Task",
+                  mono: true,
+                  value:
+                    taskId === "" ? (
+                      "—"
+                    ) : (
+                      <Link href={`/tasks/${encodeURIComponent(taskId)}`}>{taskId}</Link>
+                    ),
+                },
+                {
+                  label: "Version / build",
+                  mono: true,
+                  value: `${text(definition.taskVersion) || "—"} / ${text(definition.buildId) || "—"}`,
+                },
+                {
+                  label: "Service",
+                  mono: true,
+                  value: `${text(definition.service) || "—"} (${text(definition.serviceGeneration) || "current"})`,
+                },
+                { label: "Execution", value: text(definition.execution) || "unknown" },
+                { label: "Retired", value: definition.retired === true ? "yes" : "no" },
+                {
+                  label: "Schedules",
+                  value: <span className="tabular-nums">{schedules.length}</span>,
+                },
+              ]}
+            />
+          </Section>
+          {taskId !== "" && (
+            <Link
+              href={`/tasks/${encodeURIComponent(taskId)}`}
+              className="text-xs text-muted-foreground no-underline hover:text-foreground hover:underline"
+            >
+              Open task detail →
+            </Link>
+          )}
+        </>
+      }
+    >
+      {actionError !== "" && <FailedState title={actionError} />}
+      <Section
+        title={<span id="job-runs-heading">Recent runs</span>}
+        aria-labelledby="job-runs-heading"
+        flush
+        actions={<Count value={runs.length} />}
+      >
+        {entries.length === 0 ? (
+          <EmptyState
+            variant="bare"
+            size="sm"
+            icon={<History />}
+            title="No history exists for this definition."
           />
-          <Meta label="Task" value={taskId === "" ? "—" : taskId} />
-          <Meta
-            label="Version / build"
-            value={`${text(definition.taskVersion) || "—"} / ${text(definition.buildId) || "—"}`}
-          />
-          <Meta
-            label="Service"
-            value={`${text(definition.service) || "—"} (${text(definition.serviceGeneration) || "current"})`}
-          />
-          <Meta label="Execution" value={text(definition.execution) || "unknown"} />
-          <Meta label="Health" value={text(definition.health) || "unknown"} />
-          <Meta label="Retired" value={definition.retired === true ? "yes" : "no"} />
-          <Meta label="Schedules" value={String(schedules.length)} />
-        </dl>
-      </section>
-      <section className="route-contract-grid">
-        <JsonPanel title="Task schema" value={definition.schema} />
-        <JsonPanel
-          title="Policy, resources & capabilities"
-          value={{
-            policy: definition.policy,
-            resources: definition.resources,
-            capabilities: definition.capabilities,
-            worker: definition.worker,
-          }}
-        />
-      </section>
-      {taskId !== "" && (
-        <p className="supporting-copy">
-          <Link href={`/tasks/${encodeURIComponent(taskId)}`}>Open task detail</Link>
-        </p>
-      )}
-      <section className="panel" aria-labelledby="job-runs-heading">
-        <div className="section-heading">
-          <h2 id="job-runs-heading">Recent runs</h2>
-          <span className="badge">{runs.length}</span>
-        </div>
-        {runs.length === 0 ? (
-          <p className="supporting-copy">No history exists for this definition.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="resource-table">
-              <caption className="sr-only">Recent runs</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Run ID</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Accepted</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {runs.map((run) => {
-                  const id = text(run.runId);
-                  const active = isActive(text(run.status));
-                  return (
-                    <tr key={id}>
-                      <th scope="row">
-                        <Link href={`/jobs/runs/${encodeURIComponent(id)}`}>{id || "unknown"}</Link>
-                      </th>
-                      <td>{text(run.status) || "unknown"}</td>
-                      <td>{text(run.acceptedAt) || "—"}</td>
-                      <td className="flex gap-2">
-                        <button
-                          className="button button-secondary"
-                          disabled={pending || !active}
-                          onClick={() => void onAction("cancel", id)}
-                          type="button"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          className="button button-secondary"
-                          disabled={pending || active}
-                          onClick={() => void onAction("retry", id)}
-                          type="button"
-                        >
-                          Retry
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <HistoryList
+            label="Recent runs"
+            entries={entries}
+            actions={(entry) => {
+              const id = entry.href === undefined ? "" : entry.title;
+              const active = isActive(runStatus.get(String(id)) ?? "");
+              return (
+                <div
+                  role="group"
+                  aria-label={`Actions for run ${String(id)}`}
+                  className="flex gap-1"
+                >
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    isDisabled={pending || !active || id === ""}
+                    onPress={() => void onAction("cancel", String(id))}
+                  >
+                    <X aria-hidden="true" /> Cancel
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    isDisabled={pending || active || id === ""}
+                    onPress={() => void onAction("retry", String(id))}
+                  >
+                    <RotateCcw aria-hidden="true" /> Retry
+                  </Button>
+                </div>
+              );
+            }}
+          />
         )}
-      </section>
-    </div>
+      </Section>
+      <div className="grid min-w-0 gap-4 lg:grid-cols-2">
+        <Section title="Task schema">
+          <CodeBlock value={definition.schema} label="task schema" />
+        </Section>
+        <Section title="Policy, resources & capabilities">
+          <CodeBlock
+            label="policy"
+            value={{
+              policy: definition.policy,
+              resources: definition.resources,
+              capabilities: definition.capabilities,
+              worker: definition.worker,
+            }}
+          />
+        </Section>
+      </div>
+    </DetailLayout>
   );
 }
 
-function JsonPanel({ title, value }: { readonly title: string; readonly value: unknown }) {
-  return (
-    <section className="panel">
-      <h2>{title}</h2>
-      <pre className="safe-json">{JSON.stringify(value ?? null, null, 2)}</pre>
-    </section>
-  );
-}
-function Meta({ label, value }: { readonly label: string; readonly value: string }) {
-  return (
-    <div>
-      <dt>{label}</dt>
-      <dd>{value}</dd>
-    </div>
-  );
-}
 function isActive(value: string): boolean {
   return ["queued", "delayed", "running", "sleeping", "retrying"].includes(value);
-}
-function text(value: unknown): string {
-  return typeof value === "string" ? value : "";
 }
