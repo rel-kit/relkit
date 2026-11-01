@@ -194,3 +194,24 @@ test("a network-path reference cannot escape the selected target with its creden
     vi.unstubAllGlobals();
   }
 });
+
+test("empty or non-JSON application errors keep their status instead of becoming bridge failures", async () => {
+  const request = new Request("http://localhost/api/auth/callback/github?code=x");
+  for (const native of [
+    new Response(null, {
+      status: 302,
+      headers: { "content-type": "application/json", location: "/api/auth/error" },
+    }),
+    new Response(null, { status: 404, headers: { "content-type": "application/json" } }),
+    new Response("not json", { status: 400, headers: { "content-type": "application/json" } }),
+  ]) {
+    const remote: InspectorRemoteOperations = {
+      request: () => Effect.succeed(native.clone()),
+      json: (response) => Effect.promise(() => response.text()),
+    };
+    const response = await Effect.runPromise(forwardBackend(remote, connection, request));
+    expect(response.status).toBe(native.status);
+    expect(response.headers.get("location")).toBe(native.headers.get("location"));
+    expect(await response.text()).toBe(await native.clone().text());
+  }
+});

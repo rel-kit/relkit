@@ -3,12 +3,11 @@ import {
   InspectorProxyBodyError,
   readInspectorProxyBody,
 } from "../../../../lib/backend-proxy-body";
+import { INSPECTOR_BACKEND_PATH, OPENAPI_PATH } from "../../../../lib/backend-proxy-paths";
 import type { JsonValue } from "@relkit/contracts";
 
 const requestHeadersToDrop = ["connection", "host", "transfer-encoding"];
 const responseHeadersToDrop = ["connection", "content-encoding", "content-length"];
-const OPENAPI_PATH = "_relkit/v1/openapi.json";
-const INSPECTOR_BACKEND_PATH = "/_relkit/backend";
 
 type RouteContext = { readonly params: Promise<{ readonly path: readonly string[] }> };
 
@@ -55,7 +54,9 @@ async function proxy(request: Request, context: RouteContext): Promise<Response>
   const responseHeaders = new Headers(response.headers);
   for (const name of responseHeadersToDrop) responseHeaders.delete(name);
   const body =
-    response.ok && path.join("/") === OPENAPI_PATH ? await addProxyServer(response) : response.body;
+    response.ok && request.method === "GET" && path.join("/") === OPENAPI_PATH
+      ? await addProxyServer(response)
+      : response.body;
   return new Response(body, {
     status: response.status,
     statusText: response.statusText,

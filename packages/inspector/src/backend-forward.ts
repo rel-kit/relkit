@@ -1,6 +1,5 @@
 /** Live operations are forwarded once; bridge rejections retain their HTTP status in the UI protocol. */
-import { Effect, Schema } from "effect";
-import { InspectionConnectionError } from "@relkit/inspector-api/connection";
+import { Effect, Option, Schema } from "effect";
 import type { InspectionConnectionFile } from "@relkit/inspector-api/connection";
 import type { InspectorRemoteOperations } from "./remote.types.js";
 import { backendError } from "./backend-history.js";
@@ -34,23 +33,28 @@ export const forwardBackend = Effect.fn("Inspector.forwardBackend")(function* (
   if (response.ok || !response.headers.get("content-type")?.includes("application/json"))
     return response;
   const bytes = yield* remote.json(new Response(response.body, { headers: response.headers }));
+  // An empty or non-JSON body (Better Auth redirects and bodiless 404s say application/json)
+  // is the application's own response, not a bridge rejection.
   const payload = yield* Schema.decodeUnknownEffect(Schema.fromJsonString(Schema.Json))(bytes).pipe(
-    Effect.mapError(
-      (cause) => new InspectionConnectionError({ operation: "remote.error-invalid", cause }),
-    ),
+    Effect.option,
   );
   if (
-    payload !== null &&
-    typeof payload === "object" &&
-    !Array.isArray(payload) &&
-    "protocol" in payload &&
-    payload.protocol === 1
+    Option.isSome(payload) &&
+    payload.value !== null &&
+    typeof payload.value === "object" &&
+    !Array.isArray(payload.value) &&
+    "protocol" in payload.value &&
+    payload.value.protocol === 1
   )
     return backendError(
-      "error" in payload && typeof payload.error === "string"
-        ? payload.error
+      "error" in payload.value && typeof payload.value.error === "string"
+        ? payload.value.error
         : "Inspection request rejected",
       response.status,
     );
-  return new Response(bytes, { status: response.status, headers: response.headers });
+  return new Response(bytes === "" ? null : bytes, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+  });
 });
