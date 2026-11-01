@@ -14,6 +14,7 @@ import type { Auth } from "better-auth";
 import { Cause, Context, Effect, Exit, Layer } from "effect";
 import { AuthFailure } from "./auth.errors.js";
 import { projectAuthOpenApi } from "./openapi-projection.js";
+import { documentQueryParameters } from "./openapi-query.js";
 
 /** Native metadata projection with no request identity or database ownership. */
 export class AuthOpenApi extends Context.Service<
@@ -37,13 +38,21 @@ export class AuthOpenApi extends Context.Service<
         observeSpecializedOperation(
           "auth.openapi",
           nativeCall("auth.openapi", async () => {
-            const { openAPI } = await import("better-auth/plugins");
+            const [{ openAPI }, { getEndpoints }] = await Promise.all([
+              import("better-auth/plugins"),
+              import("better-auth/api"),
+            ]);
             const context = await auth.$context;
             const response = await openAPI().endpoints.generateOpenAPISchema({
               context,
               asResponse: true,
             });
-            return projectAuthOpenApi(await response.json(), context.options.basePath);
+            const { api } = getEndpoints(context, context.options);
+            return projectAuthOpenApi(
+              // Projection asserts the JSON shape before publishing.
+              documentQueryParameters((await response.json()) as JsonValue, Object.values(api)),
+              context.options.basePath,
+            );
           }).pipe(
             Effect.mapError(
               (failure) => new AuthFailure({ operation: "auth.openapi", cause: failure.cause }),
