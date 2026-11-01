@@ -27,6 +27,8 @@ export const inspectionLoop = Effect.fn("Inspector.collectLoop")(function* (
   let nextDiscovery = 0;
   let historyFailures = 0;
   let nextHistoryRetry = 0;
+  /** Lock conflicts in the current episode; an opened history starts a new one. */
+  let lockNotices = 0;
   while (true) {
     const now = yield* Clock.currentTimeMillis;
     const cycle = Effect.gen(function* () {
@@ -34,8 +36,10 @@ export const inspectionLoop = Effect.fn("Inspector.collectLoop")(function* (
         yield* selectConnection(state, discovery, options, stream);
         nextDiscovery = now + 1000;
       }
-      if (historyFailures < HISTORY_FAST_RETRIES || now >= nextHistoryRetry)
+      if (historyFailures < HISTORY_FAST_RETRIES || now >= nextHistoryRetry) {
         yield* acquireHistory(state, files, options);
+        if ((yield* Ref.get(state)).history) lockNotices = 0;
+      }
       if (yield* collectCurrent(state, remote, options, stream)) historyFailures = 0;
     });
     yield* cycle.pipe(
@@ -49,10 +53,14 @@ export const inspectionLoop = Effect.fn("Inspector.collectLoop")(function* (
           if (historyFailures >= HISTORY_FAST_RETRIES)
             nextHistoryRetry = now + HISTORY_SLOW_RETRY_MS;
           const hint = historyFailureHint(error);
-          if (hint && (historyFailures === 1 || historyFailures === HISTORY_FAST_RETRIES))
+          // Counted per episode, not per historyFailures: that only resets once collection
+          // succeeds, so a later conflict while disconnected would otherwise never be named.
+          if (hint && ++lockNotices === 1)
             notice = Effect.logWarning(
-              historyFailures === 1 ? hint : `${hint}; retrying every 30s`,
+              historyFailures >= HISTORY_FAST_RETRIES ? `${hint}; retrying every 30s` : hint,
             );
+          else if (hint && historyFailures === HISTORY_FAST_RETRIES)
+            notice = Effect.logWarning(`${hint}; retrying every 30s`);
         }
         return notice.pipe(
           Effect.andThen(recoverInspection(state, error)),
