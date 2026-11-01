@@ -1,171 +1,92 @@
-import { Badge } from "../components/ui/badge";
-import { DataTable, DataTableCell, DataTableEmpty, DataTableHead } from "../components/ui/table";
+import { Inbox } from "lucide-react";
+import { EmptyState } from "../components/neon/empty-state";
+import { HistoryList, type HistoryEntry } from "../components/neon/history-list";
+import "./requests/requests.css";
+import type { StatusTone } from "../components/neon/status-badge";
 import type { InspectorObject } from "../lib/api-types";
-import { traceGroups, signalKey, type SignalKind, text, number } from "../lib/observability-model";
+import { middleTruncate } from "../lib/format";
+import { signalKey, text, number } from "../lib/observability-model";
 
-export function SignalRows({
-  kind,
-  items,
-}: {
-  readonly kind: SignalKind;
-  readonly items: readonly InspectorObject[];
-}) {
-  if (kind === "requests") return <RequestTable items={items} />;
-  if (kind === "logs") return <LogTable items={items} />;
-  return <TraceTable items={items} />;
-}
-
-function RequestTable({ items }: { readonly items: readonly InspectorObject[] }) {
+/** Retained HTTP requests as Neon QueryHistory rows; each row opens its request detail. */
+export function SignalRows({ items }: { readonly items: readonly InspectorObject[] }) {
+  if (items.length === 0)
+    return (
+      <EmptyState
+        size="sm"
+        variant="bare"
+        icon={<Inbox />}
+        title="No retained requests match the active filters."
+        description="Requests appear here as the application serves them."
+      />
+    );
   return (
-    <DataTable>
-      <caption className="sr-only">Request results</caption>
-      <thead>
-        <tr>
-          <DataTableHead>Request</DataTableHead>
-          <DataTableHead>Route</DataTableHead>
-          <DataTableHead>Outcome</DataTableHead>
-          <DataTableHead>Time</DataTableHead>
-          <DataTableHead>Action</DataTableHead>
-        </tr>
-      </thead>
-      <tbody>
-        {items.length === 0 ? (
-          <tr>
-            <DataTableEmpty>No retained requests match the active filters.</DataTableEmpty>
-          </tr>
-        ) : (
-          items.map((item) => {
-            const id = text(item.requestId);
-            return (
-              <tr key={signalKey(item)}>
-                <DataTableCell>
-                  <code>{bounded(id || "unavailable")}</code>
-                </DataTableCell>
-                <DataTableCell>
-                  <strong>{text(item.method) || "HTTP"}</strong>{" "}
-                  {text(item.normalizedRoute) || text(item.rawPath) || "request"}
-                </DataTableCell>
-                <DataTableCell>
-                  <Badge>{text(item.outcome) || "unknown"}</Badge> HTTP {number(item.status) ?? "—"}
-                </DataTableCell>
-                <DataTableCell>
-                  {bounded(text(item.completedAt) || text(item.startedAt) || "unavailable")}
-                </DataTableCell>
-                <DataTableCell>
-                  {id === "" ? (
-                    "Unavailable"
-                  ) : (
-                    <a className="text-link" href={`/requests/${encodeURIComponent(id)}`}>
-                      Open request
-                    </a>
-                  )}
-                </DataTableCell>
-              </tr>
-            );
-          })
-        )}
-      </tbody>
-    </DataTable>
+    <HistoryList
+      label="Request results"
+      className="request-history"
+      entries={items.map(requestEntry)}
+    />
   );
 }
 
-function LogTable({ items }: { readonly items: readonly InspectorObject[] }) {
-  return (
-    <DataTable>
-      <caption className="sr-only">Log results</caption>
-      <thead>
-        <tr>
-          <DataTableHead>Message</DataTableHead>
-          <DataTableHead>Context</DataTableHead>
-          <DataTableHead>Time</DataTableHead>
-          <DataTableHead>Links</DataTableHead>
-        </tr>
-      </thead>
-      <tbody>
-        {items.length === 0 ? (
-          <tr>
-            <DataTableEmpty>No retained logs match the active filters.</DataTableEmpty>
-          </tr>
-        ) : (
-          items.map((item) => {
-            const requestId = text(item.requestId) || text(item.correlationId);
-            const traceId = text(item.traceId);
-            return (
-              <tr key={signalKey(item)}>
-                <DataTableCell>
-                  <strong>{bounded(text(item.message) || "Structured log")}</strong>
-                </DataTableCell>
-                <DataTableCell>
-                  <Badge>{text(item.level) || "unknown"}</Badge>{" "}
-                  {text(item.component) || "component unavailable"}
-                </DataTableCell>
-                <DataTableCell>{bounded(text(item.timestamp) || "unavailable")}</DataTableCell>
-                <DataTableCell>
-                  <span className="request-links">
-                    {requestId && (
-                      <a className="text-link" href={`/requests/${encodeURIComponent(requestId)}`}>
-                        Request
-                      </a>
-                    )}
-                    {traceId && (
-                      <a className="text-link" href={`/traces/${encodeURIComponent(traceId)}`}>
-                        Trace
-                      </a>
-                    )}
-                  </span>
-                </DataTableCell>
-              </tr>
-            );
-          })
-        )}
-      </tbody>
-    </DataTable>
-  );
+/** One retained request as a history row linking to its detail page. */
+export function requestEntry(item: InspectorObject): HistoryEntry {
+  const id = text(item.requestId);
+  const method = text(item.method) || "HTTP";
+  const status = number(item.status);
+  const outcome = text(item.outcome);
+  const tone = requestTone(outcome, status, text(item.phase));
+  const traceId = text(item.traceId);
+  const owner = known(text(item.routeId)) || known(text(item.functionId));
+  const at = text(item.completedAt) || text(item.startedAt);
+  const durationMs = number(item.durationMs);
+  const statusWord = [outcome || (tone === "live" ? "in progress" : "unknown"), status]
+    .filter((part) => part !== undefined && part !== "")
+    .join(" ");
+  return {
+    id: signalKey(item),
+    tone,
+    statusLabel: id ? `Open request, ${statusWord}` : statusWord,
+    lead: (
+      <span className="route-method" data-method={method}>
+        {method}
+      </span>
+    ),
+    title: bounded(requestPath(item) || "request"),
+    meta: [
+      ...(status === undefined ? [] : [<span key="status">{status}</span>]),
+      <span key="id" title={id || undefined}>
+        {id ? middleTruncate(id, 36) : "id unavailable"}
+      </span>,
+      ...(owner ? [<span key="owner">{middleTruncate(owner, 32)}</span>] : []),
+      ...(traceId
+        ? [
+            <span key="trace" title={traceId}>
+              trace {traceId.slice(0, 8)}
+            </span>,
+          ]
+        : []),
+    ],
+    ...(at ? { at } : {}),
+    ...(durationMs === undefined ? {} : { durationMs }),
+    ...(id ? { href: `/requests/${encodeURIComponent(id)}` } : {}),
+  };
 }
 
-function TraceTable({ items }: { readonly items: readonly InspectorObject[] }) {
-  const groups = traceGroups(items);
-  return (
-    <DataTable>
-      <caption className="sr-only">Trace results</caption>
-      <thead>
-        <tr>
-          <DataTableHead>Trace</DataTableHead>
-          <DataTableHead>Outcome</DataTableHead>
-          <DataTableHead>Duration</DataTableHead>
-          <DataTableHead>Started</DataTableHead>
-          <DataTableHead>Action</DataTableHead>
-        </tr>
-      </thead>
-      <tbody>
-        {groups.length === 0 ? (
-          <tr>
-            <DataTableEmpty>No retained traces match the active filters.</DataTableEmpty>
-          </tr>
-        ) : (
-          groups.map((group) => (
-            <tr key={group.traceId}>
-              <DataTableCell>
-                <code>{bounded(group.traceId)}</code>
-              </DataTableCell>
-              <DataTableCell>
-                <Badge>{group.outcome || "unknown"}</Badge> · {group.spans.length} spans
-              </DataTableCell>
-              <DataTableCell>
-                {group.durationMs === undefined ? "Unavailable" : `${group.durationMs} ms`}
-              </DataTableCell>
-              <DataTableCell>{bounded(group.startedAt || "unavailable")}</DataTableCell>
-              <DataTableCell>
-                <a className="text-link" href={`/traces/${encodeURIComponent(group.traceId)}`}>
-                  Open trace
-                </a>
-              </DataTableCell>
-            </tr>
-          ))
-        )}
-      </tbody>
-    </DataTable>
-  );
+function requestTone(outcome: string, status: number | undefined, phase: string): StatusTone {
+  if (outcome === "success") return status !== undefined && status >= 400 ? "warning" : "success";
+  if (outcome === "timeout" || outcome === "cancelled") return "warning";
+  if (outcome !== "") return "danger";
+  if (status !== undefined) return status >= 500 ? "danger" : status >= 400 ? "warning" : "success";
+  return phase === "completed" ? "neutral" : "live";
+}
+
+/** The path people recognise: the raw path, else the normalized route when it is known. */
+export function requestPath(item: InspectorObject): string {
+  return text(item.rawPath) || known(text(item.normalizedRoute));
+}
+
+function known(value: string): string {
+  return value === "unknown" ? "" : value;
 }
 
 function bounded(value: string): string {

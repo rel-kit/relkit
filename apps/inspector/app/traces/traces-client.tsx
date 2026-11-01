@@ -2,17 +2,22 @@
 
 import { useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { OverlayDialog } from "../../components/ui/dialog";
+import { LoadingRows } from "../../components/blocks/block-state";
+import { CopyButton } from "../../components/blocks/copy-button";
+import { middleTruncate } from "../../lib/format";
 import { logQueryKey } from "../../lib/log-query";
 import { traceGroups } from "../../lib/observability-model";
 import { useSignalPage } from "../../lib/use-signal-page";
 import { LogToolbar } from "../logs/log-toolbar";
 import { LogTrace } from "../logs/log-trace";
+import { StreamState } from "../logs/stream-state";
 import { TraceTable } from "./trace-table";
 import { HistoryStatus } from "../history-status";
 import "../logs/logs.css";
+import "./traces.css";
 
 export function TracesClient() {
   const router = useRouter();
@@ -54,8 +59,13 @@ export function TracesClient() {
   const detail = selected && (
     <div className="log-details trace-details">
       <header className="log-detail-heading">
-        <strong>Trace {selected}</strong>
-        <div>
+        <div className="flex min-w-0 items-center gap-1 font-mono text-[11px] text-muted-foreground">
+          <strong className="truncate font-normal" title={selected}>
+            {middleTruncate(selected, 24)}
+          </strong>
+          <CopyButton value={selected} label="Copy trace ID" />
+        </div>
+        <div className="flex shrink-0 items-center">
           <Button
             variant="ghost"
             size="icon"
@@ -63,7 +73,7 @@ export function TracesClient() {
             isDisabled={index <= 0}
             onPress={() => update({ trace: groups[index - 1]!.traceId })}
           >
-            <ArrowUp size={16} />
+            <ArrowUp aria-hidden="true" />
           </Button>
           <Button
             variant="ghost"
@@ -72,7 +82,7 @@ export function TracesClient() {
             isDisabled={index < 0 || index === groups.length - 1}
             onPress={() => update({ trace: groups[index + 1]!.traceId })}
           >
-            <ArrowDown size={16} />
+            <ArrowDown aria-hidden="true" />
           </Button>
         </div>
       </header>
@@ -81,64 +91,78 @@ export function TracesClient() {
   );
   return (
     <div className="logs-workspace traces-workspace">
-      <header className="logs-heading">
-        <h1>Traces</h1>
-        <span role="status">
-          {blocked ? "Paused" : page.live} · {groups.length} traces
-        </span>
-      </header>
-      <LogToolbar
-        kind="traces"
-        params={params}
-        paused={blocked}
-        onPause={() => (blocked ? resume() : setPaused(true))}
-        onChange={(values) => {
-          update({ ...values, cursor: "", trace: "" });
-          scroll.current?.scrollTo({ top: 0 });
-          setScrolled(false);
-        }}
-      />
       <HistoryStatus value={page.storage} />
       <div className="log-split">
         <section className="log-list-panel" aria-label="Traces">
-          <div
-            className="log-scroll"
-            ref={scroll}
-            onScroll={(event) => setScrolled(event.currentTarget.scrollTop > 8)}
-          >
-            {page.state === "loading" && (
-              <p className="log-list-state" role="status">
-                Loading traces…
-              </p>
-            )}
-            {page.state === "error" && (
-              <p className="log-list-state" role="alert">
-                Traces could not be loaded.{" "}
-                <Button variant="ghost" onPress={() => setRevision((value) => value + 1)}>
-                  Retry
-                </Button>
-              </p>
-            )}
-            {page.state === "ready" && groups.length === 0 && (
-              <p className="log-list-state">No retained traces match these filters.</p>
-            )}
-            <TraceTable
-              groups={groups}
-              selected={selected}
-              onSelect={(trace) => update({ trace })}
-            />
+          <header className="log-panel-header">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <h1 className="text-sm font-semibold text-foreground">Traces</h1>
+              <StreamState blocked={blocked} live={page.live} />
+            </div>
+            <span role="status" className="text-[11px] text-muted-foreground tabular-nums">
+              {groups.length.toLocaleString()} {groups.length === 1 ? "trace" : "traces"}
+              {cursor ? " · older page" : ""}
+            </span>
+          </header>
+          <LogToolbar
+            kind="traces"
+            params={params}
+            paused={blocked}
+            onPause={() => (blocked ? resume() : setPaused(true))}
+            onChange={(values) => {
+              update({ ...values, cursor: "", trace: "" });
+              scroll.current?.scrollTo({ top: 0 });
+              setScrolled(false);
+            }}
+          />
+          <div className="log-viewport">
+            <div
+              className="log-scroll neon-scroll-fade"
+              ref={scroll}
+              onScroll={(event) => setScrolled(event.currentTarget.scrollTop > 8)}
+            >
+              {page.state === "loading" && <LoadingRows label="Loading traces…" rows={8} />}
+              {page.state === "error" && (
+                <div className="log-list-state text-danger" role="alert">
+                  Traces could not be loaded.{" "}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onPress={() => setRevision((value) => value + 1)}
+                  >
+                    Retry
+                  </Button>
+                </div>
+              )}
+              {page.state === "ready" && groups.length === 0 && (
+                <div className="log-list-state">
+                  <p className="text-[13px] font-medium text-foreground">
+                    No retained traces match these filters.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Traces appear as requests, jobs and events run.
+                  </p>
+                </div>
+              )}
+              <TraceTable
+                groups={groups}
+                selected={selected}
+                onSelect={(trace) => update({ trace })}
+              />
+            </div>
+            {page.pending && blocked ? (
+              <Button className="log-new" variant="secondary" size="sm" onPress={resume}>
+                <ArrowUp aria-hidden="true" />
+                New traces available
+              </Button>
+            ) : null}
           </div>
           <footer className="log-pagination">
             <Button variant="ghost" size="sm" isDisabled={!cursor} onPress={resume}>
+              <ChevronLeft aria-hidden="true" />
               Newest
             </Button>
-            {page.pending && blocked ? (
-              <Button variant="secondary" size="sm" onPress={resume}>
-                New traces available
-              </Button>
-            ) : (
-              <span>100 traces per page</span>
-            )}
+            <span>100 traces per page</span>
             <Button
               variant="ghost"
               size="sm"
@@ -149,6 +173,7 @@ export function TracesClient() {
               }}
             >
               Older
+              <ChevronRight aria-hidden="true" />
             </Button>
           </footer>
         </section>

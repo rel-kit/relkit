@@ -8,6 +8,8 @@ import { requestDetail, traceDetail } from "../lib/observability-api";
 import { eventRecord, records, text } from "../lib/observability-model";
 import { SignalDetailView } from "./signal-detail-view";
 import { Button } from "../components/ui/button";
+import { FailedState, LoadingRows } from "../components/blocks/block-state";
+import { PageHeader } from "../components/blocks/page-header";
 import { attachLogs, attachSources, isSignalDetailEvent } from "./signal-detail-live";
 
 interface SignalDetailData {
@@ -101,37 +103,54 @@ export function SignalDetailClient({ kind }: { readonly kind: "requests" | "trac
     };
   }, [id, kind]);
 
+  const title = kind === "requests" ? "Request detail" : "Trace detail";
   if (state === "loading" && data === undefined)
     return (
-      <p className="panel route-state" role="status">
-        Loading {kind === "requests" ? "request" : "trace"}…
-      </p>
+      <div className="route-page">
+        <PageHeader title={title} />
+        <LoadingRows label={`Loading ${kind === "requests" ? "request" : "trace"}…`} rows={8} />
+      </div>
     );
   if (state === "error" || data === undefined)
     return (
-      <p className="panel route-state" role="alert">
-        The {kind === "requests" ? "request" : "trace"} API is unavailable.
-      </p>
+      <div className="route-page">
+        <PageHeader title={title} />
+        <FailedState
+          title={`The ${kind === "requests" ? "request" : "trace"} API is unavailable.`}
+          description="It may have expired from retained history, or the active backend is not reachable."
+        />
+      </div>
     );
   return (
-    <>
-      {data.nextCursor && (
-        <div className="panel supporting-copy" role="status">
-          Partial trace: more records are retained.{" "}
-          <Button
-            variant="secondary"
-            isDisabled={paging === "loading"}
-            onPress={() => void loadMore()}
+    <SignalDetailView
+      kind={kind}
+      id={id}
+      {...data}
+      liveState={liveState}
+      notice={
+        data.nextCursor ? (
+          <div
+            className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-warning/30 bg-warning-soft px-4 py-2.5 text-xs text-foreground"
+            role="status"
           >
-            Load more trace records
-          </Button>
-          {paging === "error" && (
-            <p role="alert">More records could not be loaded. Retry when connected.</p>
-          )}
-        </div>
-      )}
-      <SignalDetailView kind={kind} id={id} {...data} liveState={liveState} />
-    </>
+            <span>Partial trace: more records are retained.</span>
+            <Button
+              variant="secondary"
+              size="sm"
+              isDisabled={paging === "loading"}
+              onPress={() => void loadMore()}
+            >
+              Load more trace records
+            </Button>
+            {paging === "error" && (
+              <p role="alert" className="m-0 w-full text-danger">
+                More records could not be loaded. Retry when connected.
+              </p>
+            )}
+          </div>
+        ) : undefined
+      }
+    />
   );
 }
 

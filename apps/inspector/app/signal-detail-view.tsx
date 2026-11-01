@@ -1,6 +1,15 @@
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { Section } from "../components/blocks/section";
+import { DetailList, type DetailItem } from "../components/blocks/details";
+import { StatusBadge, statusTone } from "../components/neon/status-badge";
+import { Badge } from "../components/ui/badge";
 import type { InspectorObject } from "../lib/api-types";
+import { formatDuration, middleTruncate, relativeTime } from "../lib/format";
 import { text, number, type SignalKind } from "../lib/observability-model";
+import { DetailLayout } from "./detail-layout";
 import {
+  ContinuationsPanel,
   LogsPanel,
   RequestsPanel,
   RequestExchangePanel,
@@ -8,6 +17,7 @@ import {
   WaterfallPanel,
 } from "./signal-detail-sections";
 import { RuntimeStatus } from "./runtime-status";
+import { requestPath } from "./signal-rows";
 
 interface SignalDetailViewProps {
   readonly kind: SignalKind;
@@ -21,150 +31,196 @@ interface SignalDetailViewProps {
   readonly liveState: string;
   readonly continuations?: readonly InspectorObject[];
   readonly incomplete?: readonly string[];
+  /** Paging notice shown above the main column, e.g. a partial trace with more records. */
+  readonly notice?: ReactNode;
 }
 
 export function SignalDetailView(props: SignalDetailViewProps) {
   const isRequest = props.kind === "requests";
   const request = props.request;
   const trace = props.trace ?? props.requests[0];
+  const identity = request ?? trace ?? {};
   const traceId = text(request?.traceId) || text(trace?.traceId);
   const title = isRequest ? "Request detail" : "Trace detail";
+  const method = text(identity.method);
+  const route = requestPath(identity);
+  const name = route || text(trace?.name) || text(props.spans[0]?.name);
+  const outcome = text(identity.outcome);
+  const status = number(identity.status);
+  const durationMs = number(identity.durationMs);
+  const startedAt = text(identity.startedAt);
   return (
-    <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">ACTIVE WORKSPACE</p>
-          <h1>{title}</h1>
-          <p className="lede">
-            Retained telemetry is rendered from redacted versioned records. Collection gaps and
-            unavailable history are reported separately from external sampling.
-          </p>
-        </div>
-        <div className="signal-status" role="status" aria-live="polite">
-          <span className="badge">Live: {props.liveState}</span>
-        </div>
-      </header>
-      <RuntimeStatus telemetryOnly />
-      <IdentityPanel
-        kind={props.kind}
-        id={props.id}
-        {...(request === undefined ? {} : { request })}
-        {...(trace === undefined ? {} : { trace })}
-      />
+    <DetailLayout
+      header={{
+        title,
+        description: name ? (
+          <span className="flex min-w-0 items-center gap-0 font-mono text-[13px] text-foreground">
+            {method ? (
+              <span className="route-method" data-method={method}>
+                {method}
+              </span>
+            ) : null}
+            <span className="truncate">{name}</span>
+          </span>
+        ) : undefined,
+        badges: (
+          <>
+            {outcome ? <StatusBadge tone={statusTone(outcome)} label={outcome} /> : null}
+            {status !== undefined ? (
+              <Badge variant={status >= 500 ? "error" : status >= 400 ? "warning" : "default"}>
+                HTTP {status}
+              </Badge>
+            ) : null}
+          </>
+        ),
+        meta: (
+          <>
+            <span title={props.id}>{middleTruncate(props.id, 40)}</span>
+            {durationMs !== undefined ? <span>{formatDuration(durationMs)}</span> : null}
+            {startedAt ? (
+              <time dateTime={startedAt} title={startedAt}>
+                {relativeTime(startedAt)}
+              </time>
+            ) : null}
+          </>
+        ),
+        actions: (
+          <span role="status" aria-live="polite">
+            <StatusBadge
+              tone={props.liveState === "connected" ? "live" : statusTone(props.liveState)}
+              label={`Live: ${props.liveState}`}
+            />
+          </span>
+        ),
+      }}
+      lead={
+        <>
+          {props.notice}
+          {isRequest && request !== undefined && (
+            <TimelinePanel request={request} spans={props.spans} />
+          )}
+          {!isRequest && <WaterfallPanel spans={props.spans} requests={props.requests} />}
+        </>
+      }
+      aside={
+        <IdentityPanel
+          kind={props.kind}
+          id={props.id}
+          value={identity}
+          traceId={isRequest ? traceId : ""}
+          spanCount={props.spans.length}
+        />
+      }
+    >
       {isRequest && request !== undefined && <RequestExchangePanel request={request} />}
-      {isRequest && request !== undefined && (
-        <TimelinePanel request={request} spans={props.spans} />
-      )}
       {isRequest && (
         <ContinuationsPanel items={props.continuations ?? []} incomplete={props.incomplete ?? []} />
       )}
-      {!isRequest && <WaterfallPanel spans={props.spans} requests={props.requests} />}
-      {isRequest && traceId !== "" && (
-        <p className="panel supporting-copy">
-          Correlated trace:{" "}
-          <a className="text-link" href={`/traces/${encodeURIComponent(traceId)}`}>
-            {bounded(traceId)}
-          </a>
-        </p>
-      )}
       {!isRequest && props.requests.length > 0 && <RequestsPanel items={props.requests} />}
       <LogsPanel items={props.logs} />
-    </div>
-  );
-}
-
-function ContinuationsPanel({
-  items,
-  incomplete,
-}: {
-  readonly items: readonly InspectorObject[];
-  readonly incomplete: readonly string[];
-}) {
-  return (
-    <section className="panel" aria-labelledby="continuations-heading">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">LINKED ASYNC WORK</p>
-          <h2 id="continuations-heading">Continuations</h2>
-        </div>
-        <span className="badge">{items.length}</span>
-      </div>
-      {items.length === 0 ? (
-        <p className="supporting-copy">No linked event or job traces are retained.</p>
-      ) : (
-        <ul className="request-list">
-          {items.map((item) => {
-            const traceId = text(item.traceId);
-            return (
-              <li className="request-row" key={traceId}>
-                <span>
-                  <strong>{item.active === true ? "Running" : "Recorded"}</strong> ·{" "}
-                  {bounded(traceId)}
-                </span>
-                <a className="text-link" href={`/traces/${encodeURIComponent(traceId)}`}>
-                  Open trace →
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-      {incomplete.length > 0 && (
-        <p className="supporting-copy" role="status">
-          Incomplete telemetry: {incomplete.join(", ")}.
-        </p>
-      )}
-    </section>
+      <RuntimeStatus telemetryOnly />
+    </DetailLayout>
   );
 }
 
 function IdentityPanel({
   kind,
   id,
-  request,
-  trace,
+  value,
+  traceId,
+  spanCount,
 }: {
   readonly kind: SignalKind;
   readonly id: string;
-  readonly request?: InspectorObject;
-  readonly trace?: InspectorObject;
+  readonly value: InspectorObject;
+  readonly traceId: string;
+  readonly spanCount: number;
 }) {
-  const value = request ?? trace ?? {};
-  const label = kind === "requests" ? "REQUEST RECORD" : "TRACE RECORD";
+  const recordTraceId = text(value.traceId);
+  const routeId = known(text(value.routeId));
+  const functionId = known(text(value.functionId));
+  const items: DetailItem[] = [
+    {
+      label: kind === "requests" ? "Request ID" : "Trace ID",
+      value: id,
+      mono: true,
+      copy: id,
+    },
+    ...(kind === "requests"
+      ? [
+          {
+            label: "Trace ID",
+            value: recordTraceId || "Unavailable",
+            mono: true,
+            ...(recordTraceId ? { copy: recordTraceId } : {}),
+          },
+        ]
+      : []),
+    ...(routeId
+      ? [
+          {
+            label: "Route",
+            mono: true,
+            value: (
+              <Link className="text-link" href={`/routes/${encodeURIComponent(routeId)}`}>
+                {routeId}
+              </Link>
+            ),
+          },
+        ]
+      : []),
+    ...(functionId
+      ? [
+          {
+            label: "Function",
+            mono: true,
+            value: (
+              <Link className="text-link" href={`/functions/${encodeURIComponent(functionId)}`}>
+                {functionId}
+              </Link>
+            ),
+          },
+        ]
+      : []),
+    { label: "Outcome", value: text(value.outcome) || "Unavailable" },
+    {
+      label: "Status",
+      value: number(value.status) === undefined ? "Unavailable" : String(value.status),
+      mono: true,
+    },
+    { label: "Started", value: text(value.startedAt) || "Unavailable", mono: true },
+    { label: "Completed", value: text(value.completedAt) || "In progress", mono: true },
+    {
+      label: "Duration",
+      value: number(value.durationMs) === undefined ? "Unavailable" : `${value.durationMs} ms`,
+      mono: true,
+    },
+    { label: "Spans", value: String(spanCount), mono: true },
+  ];
   return (
-    <section className="panel identity-panel" aria-labelledby="signal-identity-heading">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">{label}</p>
-          <h2 id="signal-identity-heading">{bounded(id)}</h2>
-        </div>
-        <span className="badge">Redaction-first</span>
-      </div>
-      <dl className="route-meta">
-        <Meta label="Trace ID" value={text(value.traceId) || "Unavailable"} />
-        <Meta label="Outcome" value={text(value.outcome) || "Unavailable"} />
-        <Meta
-          label="Status"
-          value={number(value.status) === undefined ? "Unavailable" : String(value.status)}
-        />
-        <Meta label="Started" value={text(value.startedAt) || "Unavailable"} />
-        <Meta label="Completed" value={text(value.completedAt) || "In progress"} />
-        <Meta
-          label="Duration"
-          value={number(value.durationMs) === undefined ? "Unavailable" : `${value.durationMs} ms`}
-        />
-      </dl>
-    </section>
+    <Section
+      id="signal-identity"
+      title={kind === "requests" ? "Request record" : "Trace record"}
+      description="Redaction-first"
+    >
+      <DetailList items={items} />
+      {traceId !== "" && (
+        <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
+          Correlated trace:{" "}
+          <Link
+            className="text-link font-mono break-all"
+            href={`/traces/${encodeURIComponent(traceId)}`}
+          >
+            {bounded(traceId)}
+          </Link>
+        </p>
+      )}
+    </Section>
   );
 }
 
-function Meta({ label, value }: { readonly label: string; readonly value: string }) {
-  return (
-    <div>
-      <dt>{label}</dt>
-      <dd>{bounded(value)}</dd>
-    </div>
-  );
+function known(value: string): string {
+  return value === "unknown" ? "" : value;
 }
 
 function bounded(value: string): string {

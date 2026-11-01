@@ -1,5 +1,16 @@
+import Link from "next/link";
+import { CodeBlock } from "../components/blocks/code-block";
+import { Section } from "../components/blocks/section";
+import { EmptyState } from "../components/neon/empty-state";
+import { HistoryList } from "../components/neon/history-list";
+import { StatusBadge } from "../components/neon/status-badge";
 import type { InspectorObject } from "../lib/api-types";
+import { middleTruncate } from "../lib/format";
 import { signalKey, text } from "../lib/observability-model";
+import { cn } from "../lib/utils";
+import { AnsiText, stripAnsi } from "./logs/ansi-text";
+import { levelClass, logClock } from "./logs/log-format";
+import { requestEntry } from "./signal-rows";
 import { TraceWaterfall } from "./trace-waterfall";
 
 export function TimelinePanel({
@@ -24,15 +35,12 @@ export function WaterfallPanel({
 
 export function RequestExchangePanel({ request }: { readonly request: InspectorObject }) {
   return (
-    <section className="panel" aria-labelledby="request-exchange-heading">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">REQUEST / RESPONSE</p>
-          <h2 id="request-exchange-heading">Payload and headers</h2>
-        </div>
-        <span className="badge">Redaction-first</span>
-      </div>
-      <div className="exchange-grid">
+    <Section
+      id="request-exchange"
+      title="Payload and headers"
+      description="Redaction-first capture"
+    >
+      <div className="grid gap-4 md:grid-cols-2">
         <CapturePanel title="Request headers" value={first(request, "requestHeaders", "headers")} />
         <CapturePanel
           title="Request payload"
@@ -44,43 +52,105 @@ export function RequestExchangePanel({ request }: { readonly request: InspectorO
           value={first(request, "responseBody", "responsePayload")}
         />
       </div>
-      <p className="supporting-copy">
+      <p className="mt-3 text-xs text-muted-foreground">
         Bodies and protected headers appear only when the active backend explicitly enables bounded,
         redacted development capture. Otherwise they are intentionally not retained.
       </p>
-    </section>
+    </Section>
   );
 }
 
 function CapturePanel({ title, value }: { readonly title: string; readonly value: unknown }) {
   return (
-    <div className="capture-panel">
-      <h3>{title}</h3>
+    <div className="grid min-w-0 content-start gap-1.5">
+      <h3 className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+        {title}
+      </h3>
       {value === undefined ? (
-        <p className="schema-empty">Not retained by the active backend.</p>
+        <p className="schema-empty m-0 rounded-md border border-dashed border-border px-3 py-2.5 text-xs text-muted-foreground">
+          Not retained by the active backend.
+        </p>
+      ) : value === null || typeof value !== "object" ? (
+        <code className="schema-value rounded-md border border-border bg-muted/40 px-3 py-2 font-mono text-xs break-all">
+          {String(value)}
+        </code>
       ) : (
-        <DataValue value={value} />
+        <CodeBlock value={safeValue(value)} label={title.toLowerCase()} maxHeight="14rem" />
       )}
     </div>
   );
-}
-
-function DataValue({ value }: { readonly value: unknown }) {
-  if (value === null || typeof value !== "object")
-    return <code className="schema-value">{String(value)}</code>;
-  return <pre className="safe-json">{safeJson(value)}</pre>;
 }
 
 function first(value: InspectorObject, ...keys: readonly string[]): unknown {
   return keys.map((key) => value[key]).find((item) => item !== undefined);
 }
 
-function safeJson(value: unknown): string {
+function safeValue(value: unknown): unknown {
   try {
-    return JSON.stringify(value, null, 2);
+    JSON.stringify(value);
+    return value;
   } catch {
     return "Unavailable";
   }
+}
+
+export function ContinuationsPanel({
+  items,
+  incomplete,
+}: {
+  readonly items: readonly InspectorObject[];
+  readonly incomplete: readonly string[];
+}) {
+  return (
+    <Section
+      id="continuations"
+      title="Continuations"
+      description="Linked async work: event and job traces started by this request."
+      actions={<span className="font-mono text-[11px] text-muted-foreground">{items.length}</span>}
+      flush
+    >
+      {items.length === 0 ? (
+        <EmptyState size="sm" variant="bare" title="No linked event or job traces are retained." />
+      ) : (
+        <ul className="m-0 list-none p-0">
+          {items.map((item) => {
+            const traceId = text(item.traceId);
+            const running = item.active === true;
+            return (
+              <li
+                key={traceId}
+                className="flex min-w-0 items-center justify-between gap-3 border-b border-border/60 px-4 py-2 last:border-b-0"
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <StatusBadge
+                    tone={running ? "live" : "neutral"}
+                    label={running ? "Running" : "Recorded"}
+                  />
+                  <code className="truncate font-mono text-xs text-foreground" title={traceId}>
+                    {middleTruncate(traceId, 40)}
+                  </code>
+                </span>
+                <Link
+                  className="text-link shrink-0 text-xs"
+                  href={`/traces/${encodeURIComponent(traceId)}`}
+                >
+                  Open trace <span aria-hidden="true">→</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {incomplete.length > 0 && (
+        <div
+          className="border-t border-border bg-warning-soft px-4 py-2 text-xs text-foreground"
+          role="status"
+        >
+          Incomplete telemetry: {incomplete.join(", ")}.
+        </div>
+      )}
+    </Section>
+  );
 }
 
 export function RequestsPanel({ items }: { readonly items: readonly InspectorObject[] }) {
@@ -92,71 +162,88 @@ export function RequestsPanel({ items }: { readonly items: readonly InspectorObj
       current.set(id, item);
   }
   return (
-    <section className="panel" aria-labelledby="trace-requests-heading">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">CORRELATED REQUESTS</p>
-          <h2 id="trace-requests-heading">HTTP records</h2>
-        </div>
-        <span className="badge">{current.size}</span>
-      </div>
-      <ul className="request-list">
-        {[...current.values()].map((item) => {
-          const id = text(item.requestId);
-          return (
-            <li className="request-row" key={signalKey(item)}>
-              <span>
-                <strong>{text(item.method) || "HTTP"}</strong>{" "}
-                {bounded(text(item.normalizedRoute) || text(item.rawPath))}
-              </span>
-              {id === "" ? (
-                <span>Request ID unavailable</span>
-              ) : (
-                <a className="text-link" href={`/requests/${encodeURIComponent(id)}`}>
-                  Open request <span aria-hidden="true">→</span>
-                </a>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    </section>
+    <Section
+      id="trace-requests"
+      title="HTTP records"
+      description="Requests correlated with this trace."
+      actions={<span className="font-mono text-[11px] text-muted-foreground">{current.size}</span>}
+      flush
+    >
+      <HistoryList
+        label="Correlated HTTP records"
+        className="request-history"
+        entries={[...current.values()].map(requestEntry)}
+      />
+    </Section>
   );
 }
 
 export function LogsPanel({ items }: { readonly items: readonly InspectorObject[] }) {
   return (
-    <section className="panel" aria-labelledby="correlated-logs-heading">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">CORRELATED LOGS</p>
-          <h2 id="correlated-logs-heading">Structured messages</h2>
-        </div>
-        <span className="badge">{items.length}</span>
-      </div>
+    <Section
+      id="correlated-logs"
+      title="Correlated logs"
+      description="Structured messages emitted while this work ran."
+      actions={<span className="font-mono text-[11px] text-muted-foreground">{items.length}</span>}
+      flush
+    >
       {items.length === 0 ? (
-        <p className="supporting-copy">No correlated logs are retained.</p>
+        <EmptyState size="sm" variant="bare" title="No correlated logs are retained." />
       ) : (
-        <ul className="request-list">
-          {items.map((item) => (
-            <li className="request-row" key={signalKey(item)}>
-              <span>
-                <strong>{bounded(text(item.message) || "Structured log")}</strong>
-                <br />
-                <small>
-                  {text(item.level) || "level unavailable"} ·{" "}
-                  {bounded(text(item.timestamp) || "time unavailable")}
-                </small>
-              </span>
-              <span>{bounded(text(item.component) || "component unavailable")}</span>
-            </li>
-          ))}
+        <ul className="neon-scroll-fade m-0 max-h-[28rem] list-none overflow-auto p-0 font-mono text-[11.5px] leading-5">
+          {items.map((item) => {
+            const cursor = text(item.cursor);
+            const level = text(item.level);
+            const timestamp = text(item.timestamp);
+            const clock = logClock(timestamp);
+            const message = text(item.message);
+            const row = (
+              <>
+                <span
+                  className="w-[6.5rem] shrink-0 text-muted-foreground/80 tabular-nums"
+                  title={timestamp}
+                >
+                  {clock.day ? `${clock.day} ` : ""}
+                  {clock.time}
+                </span>
+                <span
+                  className={cn(
+                    "w-11 shrink-0 text-[10.5px] font-semibold uppercase",
+                    levelClass(level),
+                  )}
+                >
+                  {level || "—"}
+                </span>
+                <span
+                  className="hidden w-40 shrink-0 truncate text-muted-foreground sm:block"
+                  title={text(item.component)}
+                >
+                  {text(item.component) || "—"}
+                </span>
+                <span
+                  className="min-w-0 flex-1 truncate text-foreground"
+                  title={stripAnsi(message)}
+                >
+                  {message ? <AnsiText value={message} /> : "Structured log"}
+                </span>
+              </>
+            );
+            const rowClass =
+              "flex min-w-0 items-center gap-3 px-4 py-1 no-underline transition-colors hover:bg-muted/40";
+            return (
+              <li key={signalKey(item)} className="border-b border-border/50 last:border-b-0">
+                {cursor ? (
+                  <Link className={rowClass} href={`/logs?log=${encodeURIComponent(cursor)}`}>
+                    {row}
+                  </Link>
+                ) : (
+                  <div className={rowClass}>{row}</div>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
-    </section>
+    </Section>
   );
-}
-
-function bounded(value: string): string {
-  return value.length <= 96 ? value : `${value.slice(0, 68)}…${value.slice(-20)}`;
 }

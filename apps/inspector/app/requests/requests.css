@@ -1,0 +1,5 @@
+/* Method chips in request histories sit flush in the row's lead slot. */
+.request-history .route-method {
+  min-width: 2.75rem;
+  margin-right: 0;
+}
