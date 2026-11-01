@@ -3,17 +3,22 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
-import { Badge } from "../components/ui/badge";
+import { ArrowLeft, Workflow } from "lucide-react";
+import { FailedState, LoadingRows } from "../components/blocks/block-state";
+import { CodeBlock } from "../components/blocks/code-block";
+import { Section } from "../components/blocks/section";
+import { Stat, StatGroup } from "../components/blocks/stat";
+import { EmptyState } from "../components/neon/empty-state";
 import { Button } from "../components/ui/button";
 import { OverlayDialog } from "../components/ui/dialog";
 import { filterGraph } from "../lib/graph-filter";
 import type { GraphNode } from "../lib/graph-model";
 import { useInspectorGraph } from "../lib/use-graph";
 import { workflowDefinition } from "../lib/workflow-definition-model";
+import { DetailLayout } from "./detail-layout";
 import { GraphFlow } from "./graph/graph-flow";
 import { GraphRelationships } from "./graph/graph-relationships";
-import { SchemaPanel } from "./schema-panel";
+import { SourceLink } from "./source-link";
 
 export function GraphDefinitionClient() {
   const params = useParams<{ id: string }>();
@@ -32,56 +37,94 @@ export function GraphDefinitionClient() {
 
   if (state.error && state.source === undefined)
     return (
-      <section className="panel graph-state" role="alert">
-        The graph API is unavailable.
-      </section>
+      <div className="route-page">
+        <FailedState title="The graph API is unavailable." />
+      </div>
     );
   if (definition === undefined || filtered === undefined)
-    return (
-      <section className="panel graph-state" role="status">
-        {state.loading ? "Loading graph definition…" : "Graph definition not found."}
-      </section>
+    return state.loading ? (
+      <div className="route-page rounded-lg border border-border bg-card">
+        <LoadingRows label="Loading graph definition…" rows={6} />
+      </div>
+    ) : (
+      <div className="route-page">
+        <EmptyState
+          icon={<Workflow />}
+          title="Graph definition not found."
+          description={`No defineGraph definition named “${id}” is registered in the active generation.`}
+          action={
+            <Link href="/graphs" className="text-xs text-foreground">
+              All graphs
+            </Link>
+          }
+        />
+      </div>
     );
   return (
-    <div className="graph-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">GRAPH DEFINITION</p>
-          <h1>{definition.id}</h1>
-          <p className="lede">Top-to-bottom control flow from START to END.</p>
-        </div>
-        <Link className="button-link" href="/graphs">
-          <ArrowLeft aria-hidden="true" /> All graphs
-        </Link>
-      </header>
-      <section className="graph-summary" aria-label="Graph definition summary">
-        <Summary label="Nodes" value={definition.nodeCount} />
-        <Summary label="Parallel branches" value={definition.parallelCount} />
-        <Summary label="Joins" value={definition.joinCount} />
-        <Summary label="Conditional routes" value={definition.conditionalCount} />
-        <Summary label="Loops" value={definition.loopCount} />
+    <DetailLayout
+      header={{
+        kicker: "Graph definition",
+        title: definition.id,
+        icon: <Workflow />,
+        description: "Top-to-bottom control flow from START to END.",
+        meta: (
+          <>
+            {definition.domainId ? <span>{definition.domainId}</span> : null}
+            {definition.source ? <SourceLink source={definition.source} /> : null}
+          </>
+        ),
+        actions: (
+          <Link
+            className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card px-3 text-[13px] font-medium text-foreground no-underline hover:bg-muted"
+            href="/graphs"
+          >
+            <ArrowLeft aria-hidden="true" className="size-3.5" /> All graphs
+          </Link>
+        ),
+      }}
+    >
+      <section aria-label="Graph definition summary">
+        <StatGroup>
+          <Stat label="Nodes" value={definition.nodeCount} />
+          <Stat label="Parallel branches" value={definition.parallelCount} />
+          <Stat label="Joins" value={definition.joinCount} />
+          <Stat label="Conditional routes" value={definition.conditionalCount} />
+          <Stat label="Loops" value={definition.loopCount} />
+        </StatGroup>
       </section>
-      <section className="panel graph-panel" aria-labelledby="workflow-canvas-heading">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">REACT FLOW</p>
-            <h2 id="workflow-canvas-heading">Node graph</h2>
-          </div>
-          <Badge>START → END</Badge>
+      <Section
+        title={<span id="workflow-canvas-heading">Node graph</span>}
+        aria-labelledby="workflow-canvas-heading"
+        className="graph-panel"
+        description="Select a node to inspect its safe definition"
+        actions={
+          <span className="rounded-sm border border-border px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground">
+            START → END
+          </span>
+        }
+        flush
+      >
+        <div className="p-2 [&_.react-flow-panel]:mt-0">
+          <GraphFlow
+            graph={definition.graph}
+            filtered={filtered}
+            direction="DOWN"
+            ariaLabel={`${definition.id} node graph`}
+            onSelect={setSelected}
+          />
         </div>
-        <GraphFlow
-          graph={definition.graph}
-          filtered={filtered}
-          direction="DOWN"
-          ariaLabel={`${definition.id} node graph`}
-          onSelect={setSelected}
-        />
-      </section>
-      <div className="route-contract-grid">
-        <SchemaPanel title="Graph input" value={definition.input ?? {}} eyebrow="SAFE SCHEMA" />
-        <SchemaPanel title="Graph output" value={definition.output ?? {}} eyebrow="SAFE SCHEMA" />
+      </Section>
+      <div className="grid min-w-0 gap-4 lg:grid-cols-2">
+        <Section title="Graph input">
+          <CodeBlock value={definition.input ?? {}} label="graph input" maxHeight="18rem" />
+        </Section>
+        <Section title="Graph output">
+          <CodeBlock value={definition.output ?? {}} label="graph output" maxHeight="18rem" />
+        </Section>
       </div>
-      <SchemaPanel title="Public graph state" value={definition.state} eyebrow="STATE CHANNELS" />
+      <Section title="Public graph state" description="State channels">
+        <CodeBlock value={definition.state} label="graph state" maxHeight="18rem" />
+      </Section>
       <GraphRelationships edges={filtered.edges} />
       <OverlayDialog
         placement="right"
@@ -90,22 +133,13 @@ export function GraphDefinitionClient() {
         isOpen={selected !== undefined}
         onOpenChange={(open) => !open && setSelected(undefined)}
         trigger={
-          <Button className="sr-only" tabIndex={-1}>
+          <Button className="sr-only" isDisabled>
             Open node details
           </Button>
         }
       >
-        <pre className="safe-json">{JSON.stringify(node ?? selected ?? {}, null, 2)}</pre>
+        <CodeBlock value={node ?? selected ?? {}} label="node definition" maxHeight="70vh" />
       </OverlayDialog>
-    </div>
-  );
-}
-
-function Summary({ label, value }: { readonly label: string; readonly value: number }) {
-  return (
-    <div className="panel summary-card">
-      <dt>{label}</dt>
-      <dd>{value}</dd>
-    </div>
+    </DetailLayout>
   );
 }

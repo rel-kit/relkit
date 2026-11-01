@@ -13,7 +13,7 @@ import {
 } from "@xyflow/react";
 import type { FilteredGraph } from "../../lib/graph-filter";
 import { layoutGraph, type GraphDirection, type GraphLayout } from "../../lib/graph-layout";
-import { graphKindColor, type GraphNode, type GraphSnapshot } from "../../lib/graph-model";
+import type { GraphNode, GraphSnapshot } from "../../lib/graph-model";
 
 type FlowNode = Node<{ node: GraphNode; label: ReactNode }>;
 
@@ -82,7 +82,10 @@ export function GraphFlow({
                 style: {
                   width: position.width,
                   minHeight: position.height,
-                  "--node-color": graphKindColor(node.kind),
+                  "--node-color": nodeToken(node.kind),
+                  background: "color-mix(in oklch, var(--node-color) 12%, var(--panel))",
+                  borderColor: "color-mix(in oklch, var(--node-color) 45%, var(--line))",
+                  boxShadow: "none",
                 } as CSSProperties,
               },
             ];
@@ -130,7 +133,9 @@ export function GraphFlow({
         <MiniMap
           pannable
           zoomable
-          nodeColor={(node) => graphKindColor(String(node.data?.node?.kind ?? ""))}
+          nodeColor={(node) => nodeToken(String((node as FlowNode).data?.node?.kind ?? ""))}
+          maskColor="color-mix(in oklch, var(--paper) 70%, transparent)"
+          bgColor="var(--panel)"
           ariaLabel="Graph minimap"
         />
         <Controls showInteractive={false} />
@@ -138,6 +143,32 @@ export function GraphFlow({
       </ReactFlow>
     </div>
   );
+}
+
+/* Node colours come from the theme tokens so the canvas follows light and dark themes. */
+const KIND_TOKENS: Readonly<Record<string, string>> = {
+  "graph-start": "var(--success)",
+  "graph-end": "var(--muted)",
+  "graph-node": "var(--chart-2)",
+  subgraph: "var(--chart-3)",
+  agent: "var(--chart-4)",
+  tool: "var(--chart-5)",
+  function: "var(--chart-1)",
+};
+const CHART_TOKENS = [
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
+];
+
+function nodeToken(kind: string): string {
+  const known = KIND_TOKENS[kind];
+  if (known !== undefined) return known;
+  let hash = 0;
+  for (const character of kind) hash = (hash * 31 + character.charCodeAt(0)) | 0;
+  return CHART_TOKENS[Math.abs(hash) % CHART_TOKENS.length]!;
 }
 
 function safeClass(value: string): string {
