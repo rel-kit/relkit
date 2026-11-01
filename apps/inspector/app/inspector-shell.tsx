@@ -2,39 +2,34 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { Activity, ExternalLink, Moon, MoreHorizontal, Sun } from "lucide-react";
+import { GitCommitHorizontal, Moon, MoreHorizontal, Sun } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { Badge } from "../components/ui/badge";
 import { Breadcrumbs } from "../components/ui/breadcrumb";
 import { Button } from "../components/ui/button";
 import { DropdownMenu } from "../components/ui/dropdown-menu";
 import { Tooltip } from "../components/ui/tooltip";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
+import { StatusBadge, statusTone } from "../components/neon/status-badge";
+import { CopyButton } from "../components/blocks/copy-button";
 import { useInspectorGraph } from "../lib/use-graph";
 import { SCALAR_API_REFERENCE_URL } from "../lib/api-reference";
+import { navigationCounts } from "../lib/graph-index";
+import { middleTruncate } from "../lib/format";
 import { AppSidebar } from "../components/app-sidebar";
 import { CommandPalette } from "./command-palette";
 import { navigation } from "./navigation-data";
 import { DevelopmentFailureBanner } from "./development-failure-banner";
+import { applyInspectorTheme, readInspectorTheme, type InspectorTheme } from "./theme-storage";
 
 export function InspectorShell({ children }: { readonly children: ReactNode }) {
   const pathname = usePathname() ?? "/";
   const graph = useInspectorGraph();
   const [searchOpen, setSearchOpen] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  // Dark is rendered on the server and corrected before paint by the script in layout.tsx;
+  // this state only mirrors what is already applied.
+  const [theme, setTheme] = useState<InspectorTheme>("dark");
 
-  useEffect(() => {
-    const stored = localStorage.getItem("relkit.inspector.theme");
-    const initial =
-      stored === "dark" || stored === "light"
-        ? stored
-        : matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light";
-    setTheme(initial);
-    document.documentElement.dataset.theme = initial;
-    document.documentElement.classList.toggle("dark", initial === "dark");
-  }, []);
+  useEffect(() => setTheme(readInspectorTheme()), []);
   useEffect(() => {
     const openSearch = (event: KeyboardEvent): void => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
@@ -49,27 +44,46 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
   const toggleTheme = (): void => {
     const next = theme === "light" ? "dark" : "light";
     setTheme(next);
-    localStorage.setItem("relkit.inspector.theme", next);
-    document.documentElement.dataset.theme = next;
-    document.documentElement.classList.toggle("dark", next === "dark");
+    applyInspectorTheme(next);
   };
   const status = graph.error ? "offline" : graph.connection;
+  const generationId = graph.graph?.generationId;
+  const graphHash = graph.graph?.graphHash;
 
   return (
     <SidebarProvider className="inspector-shell">
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
-      <AppSidebar status={status} />
+      <AppSidebar status={status} counts={navigationCounts(graph.graph)} />
       <SidebarInset className="shell-workspace">
         <header className="shell-header">
           <SidebarTrigger aria-label="Toggle navigation" />
+          <span aria-hidden="true" className="h-4 w-px bg-border" />
           <Breadcrumbs items={breadcrumbs(pathname)} />
           <div className="header-actions">
-            <CommandPalette isOpen={searchOpen} onOpenChange={setSearchOpen} />
-            <Badge className="health-badge" data-state={status}>
-              <Activity aria-hidden="true" className="size-3.5" /> {status}
-            </Badge>
+            <div className="generation-bar" aria-label="Active generation">
+              <GitCommitHorizontal aria-hidden="true" className="size-3.5 text-muted-foreground" />
+              <code title={generationId}>{generationId ?? "awaiting"}</code>
+              {graphHash ? (
+                <>
+                  <span aria-hidden="true" className="text-border">
+                    /
+                  </span>
+                  <code title={graphHash}>
+                    {middleTruncate(graphHash.replace(/^sha256:/, ""), 12)}
+                  </code>
+                  <CopyButton value={graphHash} label="Copy graph hash" />
+                </>
+              ) : null}
+            </div>
+            <CommandPalette isOpen={searchOpen} onOpenChange={setSearchOpen} graph={graph.graph} />
+            <StatusBadge
+              className="health-badge"
+              data-state={status}
+              tone={status === "connected" ? "live" : statusTone(status)}
+              label={status}
+            />
             <Tooltip
               trigger={
                 <Button
@@ -78,11 +92,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
                   aria-label={`Use ${theme === "light" ? "dark" : "light"} theme`}
                   onPress={toggleTheme}
                 >
-                  {theme === "light" ? (
-                    <Moon aria-hidden="true" className="size-4" />
-                  ) : (
-                    <Sun aria-hidden="true" className="size-4" />
-                  )}
+                  {theme === "light" ? <Moon aria-hidden="true" /> : <Sun aria-hidden="true" />}
                 </Button>
               }
             >
@@ -91,7 +101,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
             <DropdownMenu
               trigger={
                 <Button variant="ghost" size="icon" aria-label="Open resources">
-                  <MoreHorizontal aria-hidden="true" className="size-4" />
+                  <MoreHorizontal aria-hidden="true" />
                 </Button>
               }
               items={[
@@ -102,18 +112,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
             />
           </div>
         </header>
-        <div className="generation-bar">
-          <span>
-            Generation <code>{bounded(graph.graph?.generationId, "awaiting")}</code>
-          </span>
-          <span>
-            Graph <code>{bounded(graph.graph?.graphHash, "unavailable")}</code>
-          </span>
-          <a href={SCALAR_API_REFERENCE_URL} target="_blank" rel="noreferrer">
-            API reference <ExternalLink aria-hidden="true" className="size-3" />
-          </a>
-        </div>
-        <DevelopmentFailureBanner generationId={graph.graph?.generationId} />
+        <DevelopmentFailureBanner {...(generationId === undefined ? {} : { generationId })} />
         <div id="main-content" className="main-content" tabIndex={-1}>
           {children}
         </div>
@@ -143,9 +142,4 @@ function breadcrumbs(pathname: string): readonly { label: string; href?: string 
   );
   if (parts.length > 1) result.push({ label: decodeURIComponent(parts.slice(1).join(" / ")) });
   return result;
-}
-
-function bounded(value: string | undefined, fallback: string): string {
-  if (!value) return fallback;
-  return value.length <= 24 ? value : `${value.slice(0, 12)}…${value.slice(-8)}`;
 }
