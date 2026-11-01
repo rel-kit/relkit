@@ -10,8 +10,11 @@ const allowedPackages = new Set([
   "@orpc/client",
   "@relkit/contracts",
   "@xyflow/react",
+  "anser",
   "class-variance-authority",
+  "clsx",
   "elkjs",
+  "geist",
   "lucide-react",
   "next",
   "radix-ui",
@@ -19,6 +22,7 @@ const allowedPackages = new Set([
   "react-aria-components",
   "react-dom",
   "streamdown",
+  "tailwind-merge",
   "uuid",
 ]);
 const sourceDirectories = [
