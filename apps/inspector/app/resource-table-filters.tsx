@@ -1,6 +1,5 @@
-import { RotateCcw, SlidersHorizontal } from "lucide-react";
+import { RotateCcw, Search } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Card } from "../components/ui/card";
 import { Field } from "../components/ui/field";
 import { SelectField } from "../components/ui/select";
 
@@ -28,38 +27,52 @@ interface ResourceTableFiltersProps {
   readonly clear: () => void;
 }
 
+/** One-line toolbar: search first, narrowing fields after, reset at the end. */
 export function ResourceTableFilters(props: ResourceTableFiltersProps) {
   const update = (setter: (value: string) => void) => (value: string) => {
     setter(value);
     props.resetPage();
   };
+  const active =
+    props.search !== "" ||
+    props.domain !== "" ||
+    props.layer !== "" ||
+    props.kind !== "all" ||
+    props.status !== "all";
   return (
-    <Card className="resource-toolbar" aria-label={`${props.title} filters`}>
-      <div className="resource-filter-heading">
-        <SlidersHorizontal aria-hidden="true" className="size-4" />
-        <strong>Filters</strong>
-        <span>Search and narrow the active collection.</span>
-      </div>
+    <div
+      role="search"
+      className="resource-toolbar flex flex-wrap items-center gap-2"
+      aria-label={`${props.title} filters`}
+    >
       <Field
+        compact
+        className="min-w-56 flex-1"
+        icon={<Search />}
         label={`Search ${props.noun}`}
         value={props.search}
         onChange={update(props.setSearch)}
-        placeholder={`Search ${props.noun} IDs and metadata`}
+        placeholder={`Search ${props.noun} by ID or metadata…`}
       />
       <Field
+        compact
+        className="w-40"
         label="Domain"
         value={props.domain}
         onChange={update(props.setDomain)}
-        placeholder="Filter by domain ID"
+        placeholder="Domain"
       />
       <Field
+        compact
+        className="w-36"
         label="Layer"
         value={props.layer}
         onChange={update(props.setLayer)}
-        placeholder="Filter by graph layer"
+        placeholder="Layer"
       />
       {props.kindOptions.length > 0 && (
         <SelectField
+          compact
           label="Kind"
           items={[allChoice, ...props.kindOptions]}
           value={props.kind}
@@ -68,18 +81,17 @@ export function ResourceTableFilters(props: ResourceTableFiltersProps) {
       )}
       {props.statusOptions.length > 0 && (
         <SelectField
+          compact
           label="Status"
           items={[allChoice, ...props.statusOptions]}
           value={props.status}
           onChange={update(props.setStatus)}
         />
       )}
-      <div className="resource-filter-footer">
-        <Button variant="ghost" size="sm" onPress={props.clear}>
-          <RotateCcw aria-hidden="true" className="size-3.5" /> Reset filters
-        </Button>
-      </div>
-    </Card>
+      <Button variant="ghost" size="sm" isDisabled={!active} onPress={props.clear}>
+        <RotateCcw aria-hidden="true" /> Reset filters
+      </Button>
+    </div>
   );
 }
 

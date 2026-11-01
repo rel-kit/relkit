@@ -24,4 +24,6 @@ export interface ResourceTableProps<Item extends ResourceTableItem> {
   readonly kindOptions?: readonly Choice[];
   readonly statusOptions?: readonly Choice[];
   readonly details?: (item: Item) => ReactNode;
+  /** Replaces the filter-oriented empty row when the collection itself is known to be empty. */
+  readonly emptyMessage?: string;
 }

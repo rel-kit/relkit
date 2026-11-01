@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Badge } from "../components/ui/badge";
+import { RefreshCw } from "lucide-react";
 import { Button } from "../components/ui/button";
+import { PageHeader } from "../components/blocks/page-header";
+import { CodeBlock } from "../components/blocks/code-block";
 import { OverlayDialog } from "../components/ui/dialog";
 import { Pagination } from "../components/ui/pagination";
 import { ContentTabs } from "../components/ui/tabs";
@@ -23,6 +25,7 @@ export function ResourceTable<Item extends ResourceTableItem>({
   kindOptions = [],
   statusOptions = [],
   details,
+  emptyMessage,
 }: ResourceTableProps<Item>) {
   const [search, setSearch] = useState("");
   const [kind, setKind] = useState("all");
@@ -84,14 +87,26 @@ export function ResourceTable<Item extends ResourceTableItem>({
 
   return (
     <div className="route-page resource-table-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">ACTIVE WORKSPACE</p>
-          <h1>{title}</h1>
-          <p className="lede">{description}</p>
-        </div>
-        <Badge>{items.length} visible</Badge>
-      </header>
+      <PageHeader
+        title={title}
+        description={description}
+        badges={
+          <span className="rounded-sm border border-border px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground tabular-nums">
+            {state === "loading" && items.length === 0 ? "…" : `${items.length} shown`}
+          </span>
+        }
+        actions={
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-label={`Refresh ${noun}`}
+            onPress={() => setRefresh((value) => value + 1)}
+          >
+            <RefreshCw aria-hidden="true" />
+            Refresh
+          </Button>
+        }
+      />
       <ResourceTableFilters
         {...{
           title,
@@ -119,6 +134,7 @@ export function ResourceTable<Item extends ResourceTableItem>({
         columns={columns}
         {...(href === undefined ? {} : { href })}
         {...(openLabel === undefined ? {} : { openLabel })}
+        {...(emptyMessage === undefined ? {} : { emptyMessage })}
         onSelect={setSelected}
       />
       <Pagination
@@ -157,13 +173,15 @@ export function ResourceTable<Item extends ResourceTableItem>({
                 id: "summary",
                 label: "Summary",
                 content: details?.(selected) ?? (
-                  <p className="supporting-copy">No additional summary is available.</p>
+                  <p className="text-[13px] text-muted-foreground">
+                    No additional summary is available.
+                  </p>
                 ),
               },
               {
                 id: "raw",
                 label: "Safe metadata",
-                content: <pre className="safe-json">{JSON.stringify(selected, null, 2)}</pre>,
+                content: <CodeBlock value={selected} label={`${noun} metadata`} maxHeight="60vh" />,
               },
             ]}
           />
