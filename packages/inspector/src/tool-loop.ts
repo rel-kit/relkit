@@ -9,7 +9,11 @@ import type { InspectorToolStateRef } from "./tool-state.types.js";
 import { collectInspectionBatch } from "./collector.js";
 import type { ObservabilityStream } from "@relkit/observability";
 import { publishSelection, publishCollection } from "./live-events.js";
-import { acquireHistory, recoverInspection } from "./tool-history.js";
+import { acquireHistory, historyFailureHint, recoverInspection } from "./tool-history.js";
+
+/** Fast history retries before backing off; a released lock is still picked up later. */
+const HISTORY_FAST_RETRIES = 3;
+const HISTORY_SLOW_RETRY_MS = 30_000;
 
 /** Only one poll/batch can be pending; support failure uses a finite recovery interval. */
 export const inspectionLoop = Effect.fn("Inspector.collectLoop")(function* (
@@ -22,6 +26,7 @@ export const inspectionLoop = Effect.fn("Inspector.collectLoop")(function* (
 ) {
   let nextDiscovery = 0;
   let historyFailures = 0;
+  let nextHistoryRetry = 0;
   while (true) {
     const now = yield* Clock.currentTimeMillis;
     const cycle = Effect.gen(function* () {
@@ -29,15 +34,28 @@ export const inspectionLoop = Effect.fn("Inspector.collectLoop")(function* (
         yield* selectConnection(state, discovery, options, stream);
         nextDiscovery = now + 1000;
       }
-      if (historyFailures < 3) yield* acquireHistory(state, files, options);
+      if (historyFailures < HISTORY_FAST_RETRIES || now >= nextHistoryRetry)
+        yield* acquireHistory(state, files, options);
       if (yield* collectCurrent(state, remote, options, stream)) historyFailures = 0;
     });
     yield* cycle.pipe(
       Effect.catchCause((cause) => {
         const reason = cause.reasons[0];
         if (cause.reasons.length !== 1 || reason?._tag !== "Fail") return Effect.failCause(cause);
-        if (reason.error.operation.startsWith("history.")) historyFailures++;
-        return recoverInspection(state, reason.error).pipe(
+        const error = reason.error;
+        let notice: Effect.Effect<void> = Effect.void;
+        if (error.operation.startsWith("history.")) {
+          historyFailures++;
+          if (historyFailures >= HISTORY_FAST_RETRIES)
+            nextHistoryRetry = now + HISTORY_SLOW_RETRY_MS;
+          const hint = historyFailureHint(error);
+          if (hint && (historyFailures === 1 || historyFailures === HISTORY_FAST_RETRIES))
+            notice = Effect.logWarning(
+              historyFailures === 1 ? hint : `${hint}; retrying every 30s`,
+            );
+        }
+        return notice.pipe(
+          Effect.andThen(recoverInspection(state, error)),
           Effect.catchCause((cleanup) => Effect.failCause(Cause.combine(cause, cleanup))),
         );
       }),

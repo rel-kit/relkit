@@ -2,6 +2,7 @@
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
 import { access } from "node:fs/promises";
+import { createServer } from "node:net";
 import { Context, Effect, Layer } from "effect";
 import { connectionAttempt, InspectionConnectionError } from "@relkit/inspector-api/connection";
 import type { InspectorOptions } from "./options.types.js";
@@ -34,6 +35,7 @@ export const acquireInspectorUi = Effect.fn("Inspector.startUi")(function* (
   token: string,
 ) {
   yield* connectionAttempt("ui.assets", () => access(entry));
+  yield* ensureUiPortFree(options);
   const child = yield* Effect.acquireRelease(
     connectionAttempt("ui.spawn", () =>
       Promise.resolve(
@@ -60,6 +62,33 @@ export const acquireInspectorUi = Effect.fn("Inspector.startUi")(function* (
   yield* Effect.logInfo(`RELKIT Inspector listening at http://${options.hostname}:${options.port}`);
   return uiExit(child);
 });
+
+/**
+ * Readiness only proves that something answers on the port, so an occupied port
+ * (often a stale inspector) would otherwise be reported as listening.
+ */
+function ensureUiPortFree(options: InspectorOptions) {
+  return Effect.tryPromise({
+    try: () =>
+      new Promise<void>((resolve, reject) => {
+        const server = createServer();
+        server.once("error", reject);
+        server.listen({ host: options.hostname, port: options.port, exclusive: true }, () =>
+          server.close(() => resolve()),
+        );
+      }),
+    catch: (cause) =>
+      cause instanceof Error && "code" in cause && cause.code === "EADDRINUSE"
+        ? new InspectionConnectionError({
+            operation: "ui.port-in-use",
+            cause: new Error(`${options.hostname}:${options.port} is already in use`, { cause }),
+          })
+        : new InspectionConnectionError({
+            operation: "ui.port",
+            cause: cause instanceof Error ? cause : new Error("UI port check failed", { cause }),
+          }),
+  });
+}
 
 /** Retains the UI's actual terminal outcome independently from readiness polling. */
 function uiExit(child: Bun.Subprocess) {

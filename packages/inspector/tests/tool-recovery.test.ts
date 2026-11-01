@@ -71,42 +71,46 @@ it.effect("a mixed discovery failure and defect never becomes a recoverable retr
   ),
 );
 
-it.effect(
-  "three failed openings release every partial lease and stop automatic history retries",
-  () =>
-    Effect.scoped(
-      Effect.gen(function* () {
-        const counts = { attempts: 0, released: 0 };
-        const entered = yield* Deferred.make<void>();
-        const native = failedOpenings(entered, counts);
-        const current = yield* state();
-        const events = yield* acquireLiveEvents;
-        const fiber = yield* Effect.forkChild(
-          Effect.scoped(
-            inspectionLoop(
-              current,
-              { select: () => Effect.succeed({ state: "disconnected", rejected: 0 }) },
-              remote,
-              files,
-              options,
-              events,
-            ),
-          ).pipe(Effect.provide(native)),
-        );
-        yield* Deferred.await(entered);
-        yield* TestClock.adjust(5000);
-        expect(counts.attempts).toBe(3);
-        expect(counts.released).toBe(3);
-        expect(yield* Ref.get(current)).toMatchObject({
-          history: undefined,
-          error: "history.writer-conflict",
-          incomplete: true,
-        });
-        yield* TestClock.adjust(5000);
-        expect(counts.attempts).toBe(3);
-        yield* Fiber.interrupt(fiber);
-      }),
-    ),
+it.effect("three failed openings release every partial lease and back off history retries", () =>
+  Effect.scoped(
+    Effect.gen(function* () {
+      const counts = { attempts: 0, released: 0 };
+      const entered = yield* Deferred.make<void>();
+      const native = failedOpenings(entered, counts);
+      const current = yield* state();
+      const events = yield* acquireLiveEvents;
+      const fiber = yield* Effect.forkChild(
+        Effect.scoped(
+          inspectionLoop(
+            current,
+            { select: () => Effect.succeed({ state: "disconnected", rejected: 0 }) },
+            remote,
+            files,
+            options,
+            events,
+          ),
+        ).pipe(Effect.provide(native)),
+      );
+      yield* Deferred.await(entered);
+      yield* TestClock.adjust(5000);
+      expect(counts.attempts).toBe(3);
+      expect(counts.released).toBe(3);
+      expect(yield* Ref.get(current)).toMatchObject({
+        history: undefined,
+        error: "history.writer-conflict",
+        incomplete: true,
+      });
+      yield* TestClock.adjust(5000);
+      expect(counts.attempts).toBe(3);
+      // A released lock (for example a stopped stale inspector) is picked up without a restart.
+      yield* TestClock.adjust(25_000);
+      expect(counts.attempts).toBe(4);
+      expect(counts.released).toBe(4);
+      yield* TestClock.adjust(5000);
+      expect(counts.attempts).toBe(4);
+      yield* Fiber.interrupt(fiber);
+    }),
+  ),
 );
 
 it.effect("cancellation during opening joins its partial native resource", () =>

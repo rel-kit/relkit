@@ -93,3 +93,22 @@ test("the UI child does not inherit an application's bridge token", async () => 
     await f.close();
   }
 });
+
+test("an occupied UI port fails before spawning instead of trusting the other server", async () => {
+  const f = await fixture("setInterval(() => {}, 1000);");
+  const occupant = Bun.serve({ ...f.options, fetch: () => new Response("stale inspector") });
+  try {
+    await expect(
+      Effect.runPromise(
+        Effect.scoped(acquireInspectorUi(f.entry, f.options, "http://127.0.0.1:1", "private")),
+      ),
+    ).rejects.toMatchObject({
+      operation: "ui.port-in-use",
+      cause: { message: `127.0.0.1:${f.options.port} is already in use` },
+    });
+    expect(await Bun.file(f.marker).exists()).toBe(false);
+  } finally {
+    await occupant.stop(true);
+    await f.close();
+  }
+});
