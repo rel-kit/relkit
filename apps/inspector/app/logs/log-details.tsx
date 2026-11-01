@@ -75,7 +75,7 @@ export function LogDetails({
   const timestamp = text(log?.timestamp);
   const clock = logClock(timestamp);
   const identities: DetailItem[] = [
-    ...(entityId ? [{ label: "Entity", value: entityId, mono: true }] : []),
+    ...(entityId ? [{ label: "Emitted by", value: entityId, mono: true }] : []),
     ...(
       [
         ["Entity type", entity?.kind],

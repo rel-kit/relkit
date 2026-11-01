@@ -175,7 +175,7 @@ function SpanDetails({
         </Block>
       ) : null}
 
-      <Block title="Identity">
+      <Block title="IDs">
         <dl className="trace-kv">
           <Fact label="Trace ID" value={span.traceId} copy />
           <Fact

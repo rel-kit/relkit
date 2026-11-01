@@ -69,7 +69,7 @@ describe("inspector redesign contracts", () => {
     expect(trace).toContain("TraceStepDetails");
     expect(trace).not.toContain("OverlayDialog");
     expect(details).toContain('aria-label="Step details"');
-    for (const section of ["Input", "Output", "Error", "Events", "Attributes", "Identity"])
+    for (const section of ["Input", "Output", "Error", "Events", "Attributes", "IDs"])
       expect(details).toContain(`title="${section}"`);
     // Tree waterfall on the trace clock: nesting, collapsible parents, bars and event points.
     expect(rows).toContain('aria-label="Ordered trace timeline"');

@@ -65,7 +65,7 @@ export function TaskDetailClient() {
         ),
       }}
       aside={
-        <Section title="Identity">
+        <Section title="IDs">
           <DetailList
             items={[
               {
