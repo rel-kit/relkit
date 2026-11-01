@@ -1,4 +1,10 @@
+import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import type { InspectorObject } from "../../lib/api-types";
+import { Section } from "../../components/blocks/section";
+import { HistoryList, type HistoryEntry } from "../../components/neon/history-list";
+import type { StatusTone } from "../../components/neon/status-badge";
+import { Count } from "../domains/catalog-kit";
 
 export function FunctionSignals({
   logs,
@@ -8,9 +14,9 @@ export function FunctionSignals({
   readonly traces: readonly InspectorObject[];
 }) {
   return (
-    <div className="route-contract-grid">
-      <SignalPanel title="Recent logs" items={logs} kind="log" />
+    <div className="grid min-w-0 gap-4 2xl:grid-cols-2">
       <SignalPanel title="Recent traces" items={traces} kind="trace" />
+      <SignalPanel title="Recent logs" items={logs} kind="log" />
     </div>
   );
 }
@@ -24,75 +30,106 @@ function SignalPanel({
   readonly items: readonly InspectorObject[];
   readonly kind: "log" | "trace";
 }) {
+  const entries = items.map((item, index) => entry(item, kind, index));
   return (
-    <section className="panel" aria-labelledby={`${kind}-signals-heading`}>
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">OBSERVABILITY</p>
-          <h2 id={`${kind}-signals-heading`}>{title}</h2>
-        </div>
-        <span className="badge">{items.length}</span>
-      </div>
-      {items.length === 0 ? (
-        <p className="supporting-copy">No correlated {kind}s are retained.</p>
+    <Section
+      id={`${kind}-signals`}
+      aria-labelledby={`${kind}-signals-heading`}
+      title={<span id={`${kind}-signals-heading`}>{title}</span>}
+      description={
+        kind === "trace"
+          ? "Invocations correlated with this function"
+          : "Structured logs it emitted"
+      }
+      actions={<Count value={items.length} />}
+      flush
+    >
+      {entries.length === 0 ? (
+        <p className="m-0 px-4 py-3 text-xs text-muted-foreground">
+          No correlated {kind}s are retained.
+        </p>
       ) : (
-        <ul className="request-list">
-          {items.map((item, index) => (
-            <SignalRow
-              key={`${text(item.traceId)}:${text(item.spanId)}:${index}`}
-              item={item}
-              kind={kind}
-            />
-          ))}
-        </ul>
+        <HistoryList
+          label={title}
+          entries={entries}
+          showDurationBars={kind === "trace"}
+          actions={(row) => {
+            const requestId = row.attributes?.["data-request-id"];
+            return requestId ? (
+              <Link
+                href={`/requests/${encodeURIComponent(requestId)}`}
+                aria-label="Open request"
+                title="Open request"
+                className="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground no-underline hover:bg-muted hover:text-foreground"
+              >
+                <ArrowUpRight aria-hidden="true" className="size-3.5" />
+              </Link>
+            ) : null;
+          }}
+        />
       )}
-    </section>
+    </Section>
   );
 }
 
-function SignalRow({
-  item,
-  kind,
-}: {
-  readonly item: InspectorObject;
-  readonly kind: "log" | "trace";
-}) {
+function entry(item: InspectorObject, kind: "log" | "trace", index: number): HistoryEntry {
   const requestId = text(item.requestId) || text(item.correlationId);
   const traceId = text(item.traceId);
-  const label =
-    kind === "log"
-      ? text(item.message) || "Structured log"
-      : text(item.name) || text(item.operation) || "Trace span";
-  const detail =
-    kind === "log"
-      ? text(item.level) || text(item.severity)
-      : text(item.outcome) || text(item.status);
-  return (
-    <li className="request-row">
-      <span>
-        <strong>{bounded(label)}</strong>
-        {detail === "" ? null : ` · ${bounded(detail)}`}
-        <br />
-        <small>
-          {bounded(text(item.occurredAt) || text(item.startedAt) || "time unavailable")}
-        </small>
-      </span>
-      <span className="request-links">
-        {requestId === "" ? null : (
-          <a className="text-link" href={`/requests/${encodeURIComponent(requestId)}`}>
-            request
-          </a>
-        )}
-        {traceId === "" ? (
-          <span>trace unavailable</span>
-        ) : (
-          <a className="text-link" href={`/traces/${encodeURIComponent(traceId)}`}>
-            trace
-          </a>
-        )}
-      </span>
-    </li>
-  );
+  const at = text(item.timestamp) || text(item.occurredAt) || text(item.startedAt);
+  if (kind === "log") {
+    const level = text(item.level) || text(item.severity);
+    return {
+      id: `${traceId}:${text(item.spanId)}:${index}`,
+      tone: logTone(level),
+      statusLabel: level || "log",
+      lead: level ? level.toUpperCase().slice(0, 5) : undefined,
+      title: bounded(text(item.message) || "Structured log"),
+      meta: [
+        ...(text(item.component) ? [text(item.component)] : []),
+        ...(traceId ? [`trace ${traceId.slice(0, 8)}`] : ["trace unavailable"]),
+      ],
+      ...(at ? { at } : {}),
+      ...(traceId ? { href: `/traces/${encodeURIComponent(traceId)}` } : {}),
+      ...(requestId ? { attributes: { "data-request-id": requestId } } : {}),
+    };
+  }
+  const outcome = text(item.outcome) || text(item.status);
+  const method = text(item.method);
+  return {
+    id: `${traceId}:${text(item.spanId)}:${index}`,
+    tone: traceTone(outcome, text(item.phase), item.status),
+    statusLabel: outcome || "trace",
+    ...(method ? { lead: method } : {}),
+    title: bounded(
+      text(item.rawPath) || text(item.name) || text(item.operation) || traceId || "Trace span",
+    ),
+    meta: [
+      ...(outcome ? [outcome] : []),
+      ...(typeof item.status === "number" ? [String(item.status)] : []),
+      ...(traceId ? [traceId.slice(0, 8)] : []),
+    ],
+    ...(typeof item.durationMs === "number" ? { durationMs: item.durationMs } : {}),
+    ...(at ? { at } : {}),
+    ...(traceId ? { href: `/traces/${encodeURIComponent(traceId)}` } : {}),
+    ...(requestId ? { attributes: { "data-request-id": requestId } } : {}),
+  };
+}
+
+function logTone(level: string): StatusTone {
+  const word = level.toLowerCase();
+  if (word === "error" || word === "fatal") return "danger";
+  if (word === "warn" || word === "warning") return "warning";
+  if (word === "debug" || word === "trace") return "neutral";
+  return "info";
+}
+
+function traceTone(outcome: string, phase: string, status: unknown): StatusTone {
+  if (phase && phase !== "completed") return "live";
+  if (typeof status === "number")
+    return status >= 500 ? "danger" : status >= 400 ? "warning" : "success";
+  if (outcome === "") return "neutral";
+  if (outcome === "success" || outcome === "ok") return "success";
+  return /(error|defect|fail|timeout|cancel)/.test(outcome) ? "danger" : "warning";
 }
 
 function bounded(value: string): string {
