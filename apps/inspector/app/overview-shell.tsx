@@ -1,7 +1,20 @@
-import type { GraphSummary } from "../lib/graph-model";
+import { Network } from "lucide-react";
+import Link from "next/link";
 import type { ReactNode } from "react";
+import { PageHeader } from "../components/blocks/page-header";
+import { StatusBadge, type StatusTone } from "../components/neon/status-badge";
+import type { InspectorObject } from "../lib/api-types";
+import type { GraphSummary } from "../lib/graph-model";
 import type { ActivationFingerprint } from "../lib/graph-topology-model";
 import { ActivationCohort } from "./activation-cohort";
+import {
+  GenerationHistory,
+  HealthStrip,
+  KpiRow,
+  linkButtonClass,
+  RecentRequests,
+} from "./overview/overview-panels";
+import type { SampleState } from "./overview/use-overview-signals";
 
 export type ConnectionState = "connecting" | "connected" | "reconnecting" | "offline";
 
@@ -12,9 +25,23 @@ export interface OverviewSnapshot {
   readonly droppedEvents?: number;
   readonly graphSummary?: GraphSummary;
   readonly activationFingerprint?: ActivationFingerprint;
+  /** Graph entity counts per destination href (`navigationCounts`). */
+  readonly counts?: Readonly<Record<string, number>>;
+}
+
+export interface OverviewSignalsSnapshot {
+  readonly requests: SampleState;
+  readonly generations: SampleState;
+  readonly storage: InspectorObject | undefined;
 }
 
 const EMPTY_SNAPSHOT: OverviewSnapshot = Object.freeze({ connection: "connecting" });
+const EMPTY_SAMPLE: SampleState = Object.freeze({ items: [], truncated: false, state: "loading" });
+const EMPTY_SIGNALS: OverviewSignalsSnapshot = Object.freeze({
+  requests: EMPTY_SAMPLE,
+  generations: EMPTY_SAMPLE,
+  storage: undefined,
+});
 
 const connectionLabels: Record<ConnectionState, string> = {
   connecting: "Connecting",
@@ -23,8 +50,15 @@ const connectionLabels: Record<ConnectionState, string> = {
   offline: "Offline",
 };
 
-function boundedLabel(value: string | undefined, fallback: string): string {
-  if (value === undefined || value.trim() === "") return fallback;
+const connectionTones: Record<ConnectionState, StatusTone> = {
+  connecting: "live",
+  connected: "success",
+  reconnecting: "warning",
+  offline: "danger",
+};
+
+function boundedLabel(value: string | undefined): string | undefined {
+  if (value === undefined || value.trim() === "") return undefined;
   const label = value.trim();
   return label.length <= 96 ? label : `${label.slice(0, 48)}…${label.slice(-24)}`;
 }
@@ -35,146 +69,92 @@ function droppedEventLabel(value: number | undefined): string {
   return `${Math.min(value, 999_999)} dropped event${value === 1 ? "" : "s"}`;
 }
 
+/** Live stream state as a status badge plus the dropped-event count. */
 export function ConnectionStatus({
   state = "connecting",
   droppedEvents,
 }: {
-  readonly state?: ConnectionState;
-  readonly droppedEvents?: number;
+  readonly state?: ConnectionState | undefined;
+  readonly droppedEvents?: number | undefined;
 }) {
   return (
-    <div className="connection-status" data-state={state} role="status" aria-live="polite">
-      <span className="status-dot" aria-hidden="true" />
-      <span>{connectionLabels[state]}</span>
-      <span className="status-detail">{droppedEventLabel(droppedEvents)}</span>
-    </div>
+    <span
+      className="inline-flex min-w-0 items-center gap-2"
+      data-state={state}
+      role="status"
+      aria-live="polite"
+    >
+      <StatusBadge tone={connectionTones[state]} label={connectionLabels[state]} />
+      <span className="truncate text-[11px] text-muted-foreground">
+        {droppedEventLabel(droppedEvents)}
+      </span>
+    </span>
   );
 }
 
 export function OverviewShell({
   snapshot = EMPTY_SNAPSHOT,
+  signals = EMPTY_SIGNALS,
   runtime,
 }: {
   readonly snapshot?: OverviewSnapshot;
+  readonly signals?: OverviewSignalsSnapshot;
   readonly runtime?: ReactNode;
 }) {
-  const generationId = boundedLabel(snapshot.generationId, "Awaiting active generation");
-  const graphHash = boundedLabel(snapshot.graphHash, "Graph hash unavailable");
-  const summary = snapshot.graphSummary;
+  const generationId = boundedLabel(snapshot.generationId);
+  const graphHash = boundedLabel(snapshot.graphHash);
+  const appId = snapshot.graphSummary?.appId;
 
   return (
-    <div className="overview-shell">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">ACTIVE WORKSPACE</p>
-          <h1>Overview</h1>
-          <p className="lede">
-            Follow the active generation through the versioned inspector protocol.
-          </p>
-        </div>
-        <ConnectionStatus state={snapshot.connection} droppedEvents={snapshot.droppedEvents} />
-      </header>
-
-      <section className="panel identity-panel" aria-labelledby="identity-heading">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">LAST KNOWN GOOD</p>
-            <h2 id="identity-heading">Active generation</h2>
-          </div>
-          <span className="badge">Protocol API</span>
-        </div>
-        <dl className="identity-grid">
-          <div>
-            <dt>Generation ID</dt>
-            <dd data-testid="active-generation">{generationId}</dd>
-          </div>
-          <div>
-            <dt>Graph hash</dt>
-            <dd data-testid="graph-hash">{graphHash}</dd>
-          </div>
-        </dl>
-        <p className="supporting-copy">
-          Candidate failures remain diagnostics; they do not replace the active generation.
-        </p>
-      </section>
-
-      <ActivationCohort
-        graphHash={snapshot.graphHash ?? ""}
-        {...(snapshot.activationFingerprint === undefined
-          ? {}
-          : { fingerprint: snapshot.activationFingerprint })}
+    <div className="overview-shell route-page">
+      <PageHeader
+        title="Overview"
+        description={
+          appId === undefined
+            ? "The active generation, its capabilities and recent traffic."
+            : `The active generation of ${appId}, its capabilities and recent traffic.`
+        }
+        badges={
+          <ConnectionStatus state={snapshot.connection} droppedEvents={snapshot.droppedEvents} />
+        }
+        actions={
+          <Link href="/graph" className={linkButtonClass}>
+            <Network aria-hidden="true" /> Open graph
+          </Link>
+        }
       />
-      {runtime}
 
-      <section className="panel graph-overview" aria-labelledby="graph-overview-heading">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">CANONICAL GRAPH</p>
-            <h2 id="graph-overview-heading">Active capabilities</h2>
-          </div>
-          <span className="badge">Protocol data</span>
-        </div>
-        {summary === undefined ? (
-          <p className="supporting-copy">Waiting for the versioned graph response.</p>
-        ) : (
-          <div className="overview-metrics">
-            <div>
-              <dt>Nodes</dt>
-              <dd data-testid="graph-node-count">{summary.nodeCount.toLocaleString("en-US")}</dd>
-            </div>
-            <div>
-              <dt>Declared edges</dt>
-              <dd data-testid="graph-declared-edge-count">
-                {summary.declaredEdgeCount.toLocaleString("en-US")}
-              </dd>
-            </div>
-            <div>
-              <dt>Observed edges</dt>
-              <dd data-testid="graph-observed-edge-count">
-                {summary.observedEdgeCount.toLocaleString("en-US")}
-              </dd>
-            </div>
-          </div>
-        )}
-        <a className="text-link" href="/graph">
-          Inspect relationships <span aria-hidden="true">→</span>
-        </a>
-      </section>
+      <HealthStrip
+        {...(snapshot.connection === undefined ? {} : { connection: snapshot.connection })}
+        {...(generationId === undefined ? {} : { generationId })}
+        {...(graphHash === undefined ? {} : { graphHash })}
+        {...(snapshot.droppedEvents === undefined ? {} : { droppedEvents: snapshot.droppedEvents })}
+        storage={signals.storage}
+      />
 
-      <div className="overview-grid">
-        <section className="panel" aria-labelledby="signals-heading">
-          <p className="eyebrow">OBSERVABILITY</p>
-          <h2 id="signals-heading">Signals stay correlated</h2>
-          <p className="supporting-copy">
-            Complete redacted requests, logs, traces, and generation changes are retained before
-            external sampling.
-          </p>
-          <a className="text-link" href="/requests">
-            View recent requests <span aria-hidden="true">→</span>
-          </a>
-        </section>
-        <section className="panel" aria-labelledby="payload-heading">
-          <p className="eyebrow">PAYLOAD SAFETY</p>
-          <h2 id="payload-heading">Sensitive content stays hidden</h2>
-          <p className="supporting-copy">
-            Request and response bodies, cookies, authorization values, secrets, and provider
-            clients are not rendered by default.
-          </p>
-          <span className="safe-mark">Redaction-first view</span>
-        </section>
+      <KpiRow
+        counts={snapshot.counts}
+        summary={snapshot.graphSummary}
+        requests={signals.requests}
+      />
+
+      <div className="grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+        <RecentRequests requests={signals.requests} />
+        <GenerationHistory
+          generations={signals.generations}
+          {...(generationId === undefined ? {} : { generationId })}
+        />
       </div>
 
-      <section className="panel next-panel" aria-labelledby="next-heading">
-        <p className="eyebrow">START HERE</p>
-        <h2 id="next-heading">Explore the active graph</h2>
-        <p className="supporting-copy">
-          Use the navigation to inspect declared capabilities and their observed relationships. The
-          shell remains usable while a candidate is compiling or reconnecting.
-        </p>
-        <a className="button-link" href="/graph">
-          Open graph <span aria-hidden="true">↗</span>
-        </a>
-      </section>
+      <div className="grid min-w-0 items-start gap-4 lg:grid-cols-2 xl:grid-cols-3">
+        {runtime}
+        <ActivationCohort
+          graphHash={snapshot.graphHash ?? ""}
+          {...(snapshot.activationFingerprint === undefined
+            ? {}
+            : { fingerprint: snapshot.activationFingerprint })}
+        />
+      </div>
     </div>
   );
 }
