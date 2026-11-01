@@ -1,10 +1,14 @@
 "use client";
 
-import Link from "next/link";
+import { RefreshCw } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { InspectorJobRunQuery, InspectorObject } from "../../../lib/api-types";
+import { jobsNotMounted } from "../../../lib/api-request-utils";
 import { createInspectorClient } from "../../../lib/client";
+import { PageHeader } from "../../../components/blocks/page-header";
+import { Button } from "../../../components/ui/button";
+import { Notice, text } from "../job-format";
 import { JobsTabs } from "../jobs-tabs";
 import { RunsFilters } from "./runs-filters";
 import { RunsPagination } from "./runs-pagination";
@@ -30,7 +34,7 @@ export function JobsRunsClient() {
   const [nextCursor, setNextCursor] = useState<string>();
   const [live, setLive] = useState(true);
   const [newRuns, setNewRuns] = useState(false);
-  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
+  const [state, setState] = useState<"loading" | "ready" | "error" | "absent">("loading");
   const [refresh, setRefresh] = useState(0);
   const request = useRef(0);
   const latest = useRef("");
@@ -79,11 +83,14 @@ export function JobsRunsClient() {
         if (page === 0) latest.current = text(result.items[0]?.runId);
         setState("ready");
       })
-      .catch(() => current === request.current && setState("error"));
+      .catch(
+        (error: unknown) =>
+          current === request.current && setState(jobsNotMounted(error) ? "absent" : "error"),
+      );
   }, [api, query, refresh]);
 
   useEffect(() => {
-    if (!live || page !== 0) return;
+    if (!live || page !== 0 || state === "absent") return;
     const timer = window.setInterval(() => {
       const { cursor: _cursor, ...firstPage } = query;
       void api
@@ -95,7 +102,7 @@ export function JobsRunsClient() {
         .catch(() => undefined);
     }, 10_000);
     return () => window.clearInterval(timer);
-  }, [api, live, page, query]);
+  }, [api, live, page, query, state]);
 
   const reset = (): void => {
     setHistory([undefined]);
@@ -106,89 +113,97 @@ export function JobsRunsClient() {
   return (
     <>
       <JobsTabs />
-      <main className="route-page">
-        <header className="page-heading">
-          <div>
-            <p className="eyebrow">JOBS / RUNS</p>
-            <h1>Runs</h1>
-            <p className="lede">Bounded native history with explicit service availability.</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <label>
-              <input
-                checked={live}
-                onChange={(event) => setLive(event.target.checked)}
-                type="checkbox"
-              />{" "}
-              Live refresh
-            </label>
-            <button
-              className="button button-secondary"
-              onClick={() => {
-                if (newRuns) reset();
-                setRefresh((value) => value + 1);
-              }}
-              type="button"
-            >
-              {newRuns ? "Show new runs" : "Refresh"}
-            </button>
-          </div>
-        </header>
-        <RunsFilters
-          status={status}
-          service={service}
-          jobId={jobId}
-          runId={runId}
-          acceptedFrom={acceptedFrom}
-          acceptedTo={acceptedTo}
-          setStatus={setStatus}
-          setService={setService}
-          setJobId={setJobId}
-          setRunId={setRunId}
-          setAcceptedFrom={setAcceptedFrom}
-          setAcceptedTo={setAcceptedTo}
-          reset={reset}
+      <div className="route-page">
+        <PageHeader
+          title="Runs"
+          description="Bounded native run history with explicit jobs service availability."
+          badges={
+            state === "ready" ? (
+              <span className="rounded-sm border border-border px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground tabular-nums">
+                {items.length} shown
+              </span>
+            ) : null
+          }
+          actions={
+            <>
+              <label className="inline-flex h-8 cursor-default items-center gap-2 rounded-md border border-border bg-card px-2.5 text-xs text-muted-foreground select-none">
+                <input
+                  checked={live}
+                  className="size-3.5 accent-[var(--live)]"
+                  onChange={(event) => setLive(event.target.checked)}
+                  type="checkbox"
+                />
+                <span
+                  aria-hidden="true"
+                  className={
+                    live && state !== "absent"
+                      ? "neon-status-breathe size-1.5 rounded-[1px] bg-live text-live"
+                      : "size-1.5 rounded-[1px] bg-muted-foreground/50"
+                  }
+                />
+                Live refresh
+              </label>
+              <Button
+                variant={newRuns ? "default" : "secondary"}
+                size="sm"
+                onPress={() => {
+                  if (newRuns) reset();
+                  setRefresh((value) => value + 1);
+                }}
+              >
+                <RefreshCw aria-hidden="true" />
+                {newRuns ? "Show new runs" : "Refresh"}
+              </Button>
+            </>
+          }
         />
+        {state === "absent" ? null : (
+          <RunsFilters
+            status={status}
+            service={service}
+            jobId={jobId}
+            runId={runId}
+            acceptedFrom={acceptedFrom}
+            acceptedTo={acceptedTo}
+            setStatus={setStatus}
+            setService={setService}
+            setJobId={setJobId}
+            setRunId={setRunId}
+            setAcceptedFrom={setAcceptedFrom}
+            setAcceptedTo={setAcceptedTo}
+            reset={reset}
+          />
+        )}
         {(partial || availability.some((item) => item.state === "unavailable")) && (
-          <p className="field-errors" role="status">
-            Some jobs services are unavailable; this page is partial.
-          </p>
+          <Notice>Some jobs services are unavailable; this page is partial.</Notice>
         )}
         {newRuns && (
-          <p className="field-errors" role="status">
+          <Notice>
             New runs are available. Refresh to update this page without changing your selected
             history.
-          </p>
+          </Notice>
         )}
-        {state === "loading" && (
-          <p className="panel route-state" role="status">
-            Loading runs…
-          </p>
+        <RunsTable items={items} state={state} />
+        {state === "absent" ? null : (
+          <RunsPagination
+            page={page}
+            hasMore={hasMore}
+            nextCursor={nextCursor}
+            loading={state === "loading"}
+            onPrevious={() => {
+              const previous = Math.max(0, page - 1);
+              setPage(previous);
+              setCursor(history[previous]);
+            }}
+            onNext={() => {
+              if (nextCursor === undefined) return;
+              setHistory((value) => [...value.slice(0, page + 1), nextCursor]);
+              setPage((value) => value + 1);
+              setCursor(nextCursor);
+            }}
+          />
         )}
-        {state === "error" && (
-          <p className="panel route-state" role="alert">
-            The run history is unavailable.
-          </p>
-        )}
-        {state === "ready" && <RunsTable items={items} />}
-        <RunsPagination
-          page={page}
-          hasMore={hasMore}
-          nextCursor={nextCursor}
-          loading={state === "loading"}
-          onPrevious={() => {
-            const previous = Math.max(0, page - 1);
-            setPage(previous);
-            setCursor(history[previous]);
-          }}
-          onNext={() => {
-            if (nextCursor === undefined) return;
-            setHistory((value) => [...value.slice(0, page + 1), nextCursor]);
-            setPage((value) => value + 1);
-            setCursor(nextCursor);
-          }}
-        />
-      </main>
+      </div>
     </>
   );
 }

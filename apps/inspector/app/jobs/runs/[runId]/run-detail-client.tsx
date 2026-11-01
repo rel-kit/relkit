@@ -2,10 +2,25 @@
 
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Ban, History, RotateCcw } from "lucide-react";
+import { FailedState, LoadingRows } from "../../../../components/blocks/block-state";
+import { CodeBlock } from "../../../../components/blocks/code-block";
+import { Section } from "../../../../components/blocks/section";
+import { StatusBadge, statusTone } from "../../../../components/neon/status-badge";
+import { Button } from "../../../../components/ui/button";
 import { ContentTabs } from "../../../../components/ui/tabs";
+import { DetailLayout } from "../../../detail-layout";
+import { JobsTabs } from "../../jobs-tabs";
 import type { InspectorObject } from "../../../../lib/api-types";
 import { createInspectorClient } from "../../../../lib/client";
-import { isActive, record, RunJsonPanel, RunOverview, text } from "./run-detail-sections";
+import {
+  isActive,
+  record,
+  RunJsonPanel,
+  RunLifecycle,
+  RunOverview,
+  text,
+} from "./run-detail-sections";
 
 export function RunDetailClient() {
   const params = useParams<{ runId: string }>();
@@ -54,138 +69,167 @@ export function RunDetailClient() {
 
   if (state === "loading")
     return (
-      <main className="route-page">
-        <p className="panel route-state" role="status">
-          Loading run…
-        </p>
-      </main>
+      <>
+        <JobsTabs />
+        <div className="route-page rounded-lg border border-border bg-card">
+          <LoadingRows label="Loading run…" rows={6} />
+        </div>
+      </>
     );
   if (state === "error" || run === undefined)
     return (
-      <main className="route-page">
-        <p className="panel route-state" role="alert">
-          The run is unavailable or expired.
-        </p>
-      </main>
+      <>
+        <JobsTabs />
+        <div className="route-page">
+          <FailedState
+            title="The run is unavailable or expired."
+            description="Retained run history is bounded; older runs are dropped by the jobs service."
+          />
+        </div>
+      </>
     );
   const jobId = text(run.jobId);
   const taskId = text(run.taskId);
   const status = text(run.status) || "unknown";
   return (
-    <main className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">JOBS / RUN</p>
-          <h1>Run detail</h1>
-          <p className="lede">
-            Native evidence, normalized status, and retained output are shown separately.
-          </p>
-        </div>
-        <span className="badge" aria-label={`Run ID ${id}`}>
-          {id}
-        </span>
-      </header>
-      <section className="panel flex flex-wrap items-center gap-2" aria-label="Run controls">
-        <label>
-          <input
-            checked={live}
-            onChange={(event) => setLive(event.target.checked)}
-            type="checkbox"
-          />{" "}
-          Live refresh
-        </label>
-        <button
-          className="button button-secondary"
-          disabled={pending !== "" || !isActive(status)}
-          onClick={() => void control("cancel")}
-          type="button"
-        >
-          {pending === "cancel" ? "Requesting cancellation…" : "Cancel run"}
-        </button>
-        <button
-          className="button button-secondary"
-          disabled={pending !== "" || isActive(status)}
-          onClick={() => void control("retry")}
-          type="button"
-        >
-          {pending === "retry" ? "Requesting retry…" : "Retry as new run"}
-        </button>
-        <span aria-live="polite">
-          {receipt === undefined
-            ? ""
-            : "Request receipt recorded; waiting for native confirmation."}
-        </span>
-      </section>
-      {receipt !== undefined && (
-        <pre className="safe-json" role="status">
-          {JSON.stringify(receipt, null, 2)}
-        </pre>
-      )}
-      <ContentTabs
-        label="Run detail sections"
-        items={[
-          {
-            id: "overview",
-            label: "Overview",
-            content: (
-              <RunOverview
-                run={run}
-                evidence={evidence}
-                jobId={jobId}
-                taskId={taskId}
-                status={status}
-              />
-            ),
-          },
-          {
-            id: "attempts",
-            label: "Attempts & waits",
-            content: (
-              <RunJsonPanel
-                value={{
-                  attempt: run.attempt,
-                  nextEligibleAt: run.nextEligibleAt,
-                  scheduledFor: run.scheduledFor,
-                  cancellation: run.cancellation,
-                }}
-              />
-            ),
-          },
-          {
-            id: "io",
-            label: "Input/output",
-            content: (
-              <RunJsonPanel
-                value={{
-                  input: run.input,
-                  output: run.output,
-                  resultAvailability: run.resultAvailability,
-                  inputHash: run.inputHash,
-                  inputSchemaHash: run.inputSchemaHash,
-                }}
-              />
-            ),
-          },
-          {
-            id: "progress",
-            label: "Progress & streams",
-            content: (
-              <RunJsonPanel
-                value={{ progress: run.progress, nativeDiagnosticCode: run.nativeDiagnosticCode }}
-              />
-            ),
-          },
-          {
-            id: "related",
-            label: "Related runs/agents",
-            content: (
-              <RunJsonPanel
-                value={{ parentRunId: run.parentRunId, retryOfRunId: run.retryOfRunId }}
-              />
-            ),
-          },
-        ]}
-      />
-    </main>
+    <>
+      <JobsTabs />
+      <DetailLayout
+        header={{
+          kicker: "Run detail",
+          title: <span className="font-mono text-lg">{id}</span>,
+          icon: <History />,
+          description:
+            "Native evidence, normalized status, and retained output are shown separately.",
+          badges: <StatusBadge tone={statusTone(status)} label={status} />,
+          meta: (
+            <>
+              <span aria-label={`Run ID ${id}`}>{id}</span>
+              {jobId === "" ? null : <span>job {jobId}</span>}
+              {text(run.service) === "" ? null : <span>{text(run.service)}</span>}
+            </>
+          ),
+          actions: (
+            <div
+              className="flex flex-wrap items-center gap-2"
+              role="group"
+              aria-label="Run controls"
+            >
+              <label className="inline-flex h-8 items-center gap-2 rounded-md border border-border bg-card px-2.5 text-xs text-muted-foreground select-none">
+                <input
+                  checked={live}
+                  className="size-3.5 accent-[var(--live)]"
+                  onChange={(event) => setLive(event.target.checked)}
+                  type="checkbox"
+                />
+                Live refresh
+              </label>
+              <Button
+                variant="secondary"
+                size="sm"
+                isDisabled={pending !== "" || !isActive(status)}
+                onPress={() => void control("cancel")}
+              >
+                <Ban aria-hidden="true" />
+                {pending === "cancel" ? "Requesting cancellation…" : "Cancel run"}
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                isDisabled={pending !== "" || isActive(status)}
+                onPress={() => void control("retry")}
+              >
+                <RotateCcw aria-hidden="true" />
+                {pending === "retry" ? "Requesting retry…" : "Retry as new run"}
+              </Button>
+              <span aria-live="polite" className="sr-only">
+                {receipt === undefined
+                  ? ""
+                  : "Request receipt recorded; waiting for native confirmation."}
+              </span>
+            </div>
+          ),
+        }}
+        aside={
+          <Section title="Lifecycle" description="Attempts, waits and transitions">
+            <RunLifecycle run={run} status={status} />
+          </Section>
+        }
+      >
+        {receipt !== undefined && (
+          <Section title="Request receipt" description="Recorded; waiting for native confirmation.">
+            <div role="status">
+              <CodeBlock value={receipt} label="request receipt" maxHeight="12rem" />
+            </div>
+          </Section>
+        )}
+        <Section title="Overview">
+          <RunOverview
+            run={run}
+            evidence={evidence}
+            jobId={jobId}
+            taskId={taskId}
+            status={status}
+          />
+        </Section>
+        <Section title="Run record">
+          <ContentTabs
+            label="Run detail sections"
+            items={[
+              {
+                id: "io",
+                label: "Input/output",
+                content: (
+                  <RunJsonPanel
+                    value={{
+                      input: run.input,
+                      output: run.output,
+                      resultAvailability: run.resultAvailability,
+                      inputHash: run.inputHash,
+                      inputSchemaHash: run.inputSchemaHash,
+                    }}
+                  />
+                ),
+              },
+              {
+                id: "attempts",
+                label: "Attempts & waits",
+                content: (
+                  <RunJsonPanel
+                    value={{
+                      attempt: run.attempt,
+                      nextEligibleAt: run.nextEligibleAt,
+                      scheduledFor: run.scheduledFor,
+                      cancellation: run.cancellation,
+                    }}
+                  />
+                ),
+              },
+              {
+                id: "progress",
+                label: "Progress & streams",
+                content: (
+                  <RunJsonPanel
+                    value={{
+                      progress: run.progress,
+                      nativeDiagnosticCode: run.nativeDiagnosticCode,
+                    }}
+                  />
+                ),
+              },
+              {
+                id: "related",
+                label: "Related runs/agents",
+                content: (
+                  <RunJsonPanel
+                    value={{ parentRunId: run.parentRunId, retryOfRunId: run.retryOfRunId }}
+                  />
+                ),
+              },
+            ]}
+          />
+        </Section>
+      </DetailLayout>
+    </>
   );
 }
