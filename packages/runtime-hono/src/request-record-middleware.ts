@@ -5,6 +5,7 @@ import {
   type HttpMiddlewareOptions,
   type HttpRequestState,
 } from "./middleware-utils.js";
+import { responseOutcome } from "./response-outcome.js";
 
 /** Creates one request record when the outer boundary has not already supplied it.
  * @param context - Trusted Hono or oRPC request context containing request state and authentication.
@@ -54,9 +55,7 @@ export function finishRequestRecord(
   const sink = options.observability;
   if (builder === undefined || sink === undefined) return undefined;
   const responseStatus = context.res.status;
-  const effectiveOutcome = builder.setOutcome(
-    outcome === "success" && responseStatus >= 500 ? "defect" : outcome,
-  );
+  const effectiveOutcome = builder.setOutcome(responseOutcome(outcome, responseStatus));
   const status =
     responseStatus >= 400 ? responseStatus : fallbackStatus(effectiveOutcome, responseStatus);
   builder.add({ kind: "response", status, outcome: effectiveOutcome });

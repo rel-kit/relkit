@@ -7,6 +7,7 @@ import {
   type RequestLifecycleEvent,
   type RequestLifecycleType,
 } from "./middleware-utils.js";
+import { responseOutcome } from "./response-outcome.js";
 
 const completedStates = new WeakSet<HttpRequestState>();
 
@@ -46,10 +47,9 @@ export function observeHttpResponse(
     span.attribute("http.response.status_code", response.status);
     span.attribute("http.response.body.size", bytes);
     const prior = state.requestRecord?.setOutcome(outcome) ?? outcome;
+    const derived = responseOutcome(prior, response.status);
     const effective =
-      prior === "success" && response.status >= 500
-        ? (state.requestRecord?.setOutcome("defect") ?? "defect")
-        : prior;
+      derived === prior ? prior : (state.requestRecord?.setOutcome(derived) ?? derived);
     span.event(`http.${effective}`, BigInt(Date.now()) * 1_000_000n);
     const status =
       response.status >= 400 ? response.status : fallbackStatus(effective, response.status);
