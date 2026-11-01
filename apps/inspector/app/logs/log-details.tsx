@@ -1,14 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowDown, ArrowUp, Copy, X } from "lucide-react";
+import { ArrowDown, ArrowUp, X } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import { CodeBlock } from "../../components/blocks/code-block";
+import { CopyButton } from "../../components/blocks/copy-button";
+import { DetailList, type DetailItem } from "../../components/blocks/details";
+import { LoadingRows } from "../../components/blocks/block-state";
 import type { InspectorObject } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
 import { logDetail } from "../../lib/observability-api";
 import { record, text } from "../../lib/observability-model";
 import type { GraphSnapshot } from "../../lib/graph-model";
+import { cn } from "../../lib/utils";
+import { AnsiText } from "./ansi-text";
+import { levelClass, logClock } from "./log-format";
 import { LogTrace } from "./log-trace";
+
+const CORRELATION_IDS = [
+  ["traceId", "Trace ID"],
+  ["spanId", "Span ID"],
+  ["requestId", "Request ID"],
+  ["correlationId", "Correlation ID"],
+  ["generationId", "Generation ID"],
+] as const;
 
 export function LogDetails({
   cursor,
@@ -48,7 +63,7 @@ export function LogDetails({
   const copy = async (value: string) => {
     try {
       await navigator.clipboard.writeText(value);
-      setCopyState("Copied");
+      setCopyState("Record copied.");
     } catch {
       setCopyState("Copy unavailable. Select the value to copy it manually.");
     }
@@ -56,11 +71,51 @@ export function LogDetails({
   const fields = record(log?.fields) ?? {};
   const entityId = text(log?.functionId) || text(log?.serviceId);
   const entity = graph?.nodes.find((node) => node.id === entityId);
+  const level = text(log?.level);
+  const timestamp = text(log?.timestamp);
+  const clock = logClock(timestamp);
+  const identities: DetailItem[] = [
+    ...(entityId ? [{ label: "Entity", value: entityId, mono: true }] : []),
+    ...(
+      [
+        ["Entity type", entity?.kind],
+        ["Service", text(log?.serviceId)],
+        ["Component", text(log?.component)],
+        ["Source", text(log?.origin)],
+      ] as const
+    )
+      .filter(([, value]) => value)
+      .map(([label, value]) => ({ label, value, mono: label !== "Entity type" })),
+    ...CORRELATION_IDS.flatMap(([key, label]) => {
+      const value = text(log?.[key]);
+      return value
+        ? [
+            {
+              label,
+              mono: true,
+              value: (
+                <span className="flex min-w-0 items-center gap-1">
+                  <code className="min-w-0 break-all">{value}</code>
+                  <CopyButton value={value} label={`Copy ${key}`} />
+                </span>
+              ),
+            },
+          ]
+        : [];
+    }),
+  ];
   return (
     <div className="log-details">
       <header className="log-detail-heading">
-        <strong>Log {text(log?.timestamp)}</strong>
-        <div>
+        <div className="flex min-w-0 items-center gap-2 font-mono text-[11px]">
+          {state === "ready" && (
+            <span className={cn("font-semibold uppercase", levelClass(level))}>{level || "—"}</span>
+          )}
+          <strong className="truncate font-normal text-muted-foreground" title={timestamp}>
+            {state === "ready" ? `${clock.day ? `${clock.day} ` : ""}${clock.time}` : "Log"}
+          </strong>
+        </div>
+        <div className="flex shrink-0 items-center">
           <Button
             variant="ghost"
             size="icon"
@@ -68,7 +123,7 @@ export function LogDetails({
             isDisabled={!previous}
             onPress={() => onSelect(previous)}
           >
-            <ArrowUp size={16} />
+            <ArrowUp aria-hidden="true" />
           </Button>
           <Button
             variant="ghost"
@@ -77,84 +132,56 @@ export function LogDetails({
             isDisabled={!next}
             onPress={() => onSelect(next)}
           >
-            <ArrowDown size={16} />
+            <ArrowDown aria-hidden="true" />
           </Button>
           <Button variant="ghost" size="icon" aria-label="Close log details" onPress={onClose}>
-            <X size={16} />
+            <X aria-hidden="true" />
           </Button>
         </div>
       </header>
-      {state === "loading" && <p role="status">Loading log…</p>}
+      {state === "loading" && <LoadingRows label="Loading log…" rows={4} />}
       {state === "missing" && (
-        <p role="status">This log is no longer retained. It may have expired.</p>
+        <p className="log-detail-state" role="status">
+          This log is no longer retained. It may have expired.
+        </p>
       )}
-      {state === "error" && <p role="alert">Log details could not be loaded.</p>}
+      {state === "error" && (
+        <p className="log-detail-state text-danger" role="alert">
+          Log details could not be loaded.
+        </p>
+      )}
       {state === "ready" && log && (
-        <>
-          <pre className="log-message">{text(log.message)}</pre>
-          <dl className="log-identities">
-            {entityId && (
-              <div>
-                <dt>Entity</dt>
-                <dd>{entityId}</dd>
-              </div>
-            )}
-            {[
-              ["Level", text(log.level).toUpperCase()],
-              ["Entity type", entity?.kind],
-              ["Service", text(log.serviceId)],
-              ["Component", text(log.component)],
-              ["Source", text(log.origin)],
-            ]
-              .filter(([, value]) => value)
-              .map(([label, value]) => (
-                <div key={label}>
-                  <dt>{label}</dt>
-                  <dd>{value}</dd>
-                </div>
-              ))}
-            {["traceId", "spanId", "requestId", "correlationId", "generationId"].map(
-              (key) =>
-                text(log[key]) && (
-                  <div key={key}>
-                    <dt>{key}</dt>
-                    <dd>
-                      <code>{text(log[key])}</code>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label={`Copy ${key}`}
-                        onPress={() => void copy(text(log[key]))}
-                      >
-                        <Copy size={14} />
-                      </Button>
-                    </dd>
-                  </div>
-                ),
-            )}
-          </dl>
-          <span role="status" className="supporting-copy">
-            {copyState}
-          </span>
+        <div className="grid gap-4 py-4">
+          <pre className="log-message">
+            <AnsiText value={text(log.message)} />
+          </pre>
+          <DetailList items={identities} columns={2} />
           {fields.error !== undefined && (
-            <section aria-label="Structured error">
-              <h3>Error</h3>
-              <pre className="log-message">{JSON.stringify(fields.error, null, 2)}</pre>
+            <section aria-label="Structured error" className="grid gap-2">
+              <h3 className="text-[11px] font-medium tracking-wide text-danger uppercase">Error</h3>
+              <CodeBlock value={fields.error} label="error" maxHeight="16rem" />
             </section>
           )}
-          <details className="log-metadata">
-            <summary>Metadata</summary>
-            <pre className="log-message">{JSON.stringify(fields, null, 2)}</pre>
-            <Button
-              variant="secondary"
-              size="sm"
-              onPress={() => void copy(JSON.stringify(log, null, 2))}
-            >
-              Copy record
-            </Button>
-          </details>
+          <section aria-label="Fields" className="grid gap-2">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                Fields
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onPress={() => void copy(JSON.stringify(log, null, 2))}
+              >
+                Copy record
+              </Button>
+            </div>
+            <CodeBlock value={fields} label="fields" maxHeight="18rem" />
+            <span role="status" className="text-xs text-muted-foreground">
+              {copyState}
+            </span>
+          </section>
           <LogTrace traceId={text(log.traceId)} spanId={text(log.spanId)} />
-        </>
+        </div>
       )}
     </div>
   );
