@@ -16,6 +16,7 @@ import { readInspectionBody } from "./bridge-body.js";
 import { InspectionConnectionError } from "./connection-error.js";
 import { observeExecution } from "@relkit/contracts/operation";
 import { collectCapture } from "./capture-collection.js";
+import { makeCaptureConsumers } from "./capture-consumers.js";
 import { makeCaptureLoss } from "./capture-loss.js";
 
 const envelope = Schema.declare<LocalRecord>((value): value is LocalRecord => {
@@ -45,6 +46,7 @@ export class InspectionCapture extends Context.Service<
       const buffer = yield* EarlyRetention.make(retentionOptions(policy)).pipe(
         Effect.mapError(failure),
       );
+      const consumers = yield* makeCaptureConsumers();
       const closed = yield* Ref.make(false);
       const incomplete = yield* Ref.make(false);
       const append = captureAppender(Ref.get(current), Ref.get(closed), buffer);
@@ -55,7 +57,7 @@ export class InspectionCapture extends Context.Service<
           Effect.gen(function* () {
             const failed = yield* Ref.get(incomplete);
             const counters = yield* loss.status;
-            return yield* collectCapture(buffer, request, failed, counters);
+            return yield* collectCapture(buffer, consumers, request, failed, counters);
           }),
         producer: (request) =>
           observeExecution(

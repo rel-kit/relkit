@@ -64,6 +64,7 @@ export function earlyRetentionOperations(
         Ref.get(state).pipe(
           Effect.map((value) =>
             Object.freeze({
+              sequence: value.sequence,
               bufferedRecords: value.entries.length,
               bufferedBytes: value.bytes,
               droppedRecords: value.droppedRecords,

@@ -33,6 +33,8 @@ export interface EarlyRecordIdentity {
 
 /** Independent loss evidence survives eviction and successful handoff. */
 export interface EarlyRetentionStatus {
+  /** Latest admitted sequence; acknowledgements beyond it are invalid. */
+  readonly sequence: number;
   readonly bufferedRecords: number;
   readonly bufferedBytes: number;
   readonly droppedRecords: number;
