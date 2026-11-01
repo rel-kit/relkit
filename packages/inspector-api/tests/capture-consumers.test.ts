@@ -27,10 +27,10 @@ const read = (capture: InspectionCaptureOperations, consumer: string, after: num
       }),
     )
     .pipe(
-      Effect.flatMap((response) => Effect.promise(() => response.json())),
-      Effect.map((batch: { records: { sequence: number }[] }) =>
-        batch.records.map((entry) => entry.sequence),
+      Effect.flatMap((response) =>
+        Effect.promise(() => response.json() as Promise<{ records: { sequence: number }[] }>),
       ),
+      Effect.map((batch) => batch.records.map((entry) => entry.sequence)),
     );
 
 const ack = (capture: InspectionCaptureOperations, consumer: string, through: number) =>
