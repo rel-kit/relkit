@@ -1,6 +1,7 @@
-import { Bot } from "lucide-react";
+import { Bot, ShieldAlert } from "lucide-react";
 import { Streamdown } from "streamdown";
 import { Button } from "../components/ui/button";
+import { EmptyState } from "../components/neon/empty-state";
 import { Bubble, Message, MessageScroller } from "../components/ui/message";
 import type { AgentConversationState } from "./agent-observation";
 import { AgentResumeForm } from "./agent-resume-form";
@@ -19,7 +20,7 @@ export function AgentLiveState({
 }: {
   readonly state: AgentConversationState;
   readonly status: string;
-  readonly optimisticMessage?: string;
+  readonly optimisticMessage?: string | undefined;
   readonly error: string;
   readonly pending: boolean;
   readonly onApproval: (approvalId: string, decision: "approve" | "deny") => void;
@@ -36,20 +37,36 @@ export function AgentLiveState({
     latestAssistant.parts.some((part) => part.kind === "text" && part.text.length > 0);
   const thinking = status === "running" && !hasCurrentAssistantText;
   return (
-    <section className="agent-conversation" aria-label="Conversation">
+    <section
+      className="grid min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden"
+      aria-label="Conversation"
+    >
+      <header className="flex h-9 items-center justify-between gap-2 border-b border-border/70 px-4">
+        <h2 className="m-0 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+          Conversation
+        </h2>
+        <span className="font-mono text-[10.5px] text-muted-foreground tabular-nums">
+          {messages.length} message{messages.length === 1 ? "" : "s"}
+        </span>
+      </header>
       <MessageScroller aria-live="polite">
         {error === "" ? null : (
-          <p className="agent-chat-error" role="alert">
+          <p
+            className="m-0 rounded-md border border-danger/30 bg-danger-soft px-3 py-2 text-xs text-danger"
+            role="alert"
+          >
             {error}
           </p>
         )}
         <AgentPublicState values={snapshot?.values} />
         {messages.length === 0 && optimisticMessage === undefined ? (
-          <div className="agent-empty-state">
-            <Bot aria-hidden="true" />
-            <h3>Start a conversation</h3>
-            <p>Messages, tool activity, progress, and approvals will appear here in order.</p>
-          </div>
+          <EmptyState
+            variant="bare"
+            size="md"
+            icon={<Bot />}
+            title="Start a conversation"
+            description="Messages, tool activity, progress, and approvals will appear here in order."
+          />
         ) : (
           messages.map((message) => (
             <AgentMessage
@@ -72,19 +89,36 @@ export function AgentLiveState({
           </Message>
         )}
         {status === "stopping" || thinking ? (
-          <div className="agent-response-pending" role="status">
+          <div
+            className="flex items-center gap-2 font-mono text-[11px] text-muted-foreground"
+            role="status"
+          >
+            <span
+              aria-hidden="true"
+              className="neon-status-breathe size-1.5 rounded-[1px] bg-live text-live"
+            />
             <span>{status === "stopping" ? "Stopping…" : "Thinking..."}</span>
           </div>
         ) : null}
         {snapshot?.approvals
           .filter((approval) => approval.status === "open")
           .map((approval) => (
-            <article className="agent-approval" key={approval.approvalId}>
-              <div>
-                <strong>Approval required</strong>
-                <p>{summary(approval.publicRequest)}</p>
+            <article
+              className="flex w-full max-w-xl flex-wrap items-center justify-between gap-3 rounded-md border border-warning/40 bg-warning-soft/40 px-3 py-2.5"
+              key={approval.approvalId}
+            >
+              <div className="flex min-w-0 items-start gap-2">
+                <ShieldAlert aria-hidden="true" className="mt-0.5 size-3.5 shrink-0 text-warning" />
+                <div className="min-w-0">
+                  <strong className="text-xs font-semibold text-foreground">
+                    Approval required
+                  </strong>
+                  <p className="m-0 truncate font-mono text-[11px] text-muted-foreground">
+                    {summary(approval.publicRequest)}
+                  </p>
+                </div>
               </div>
-              <div>
+              <div className="flex gap-1.5">
                 <Button
                   variant="secondary"
                   size="sm"
@@ -125,7 +159,7 @@ function AgentMessage({
     if (tools.length === 0) return null;
     const progress = state.messages.flatMap((item) => item.parts).filter(isProgress);
     return (
-      <div className="agent-tool-message">
+      <div className="grid w-full gap-1.5" aria-label="Tool calls" role="group">
         {tools.map((tool) => (
           <AgentToolAccordion
             key={tool.toolCallId}

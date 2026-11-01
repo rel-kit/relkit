@@ -20,9 +20,9 @@ export function executionUpdate(
   const prior = index < 0 ? undefined : snapshot.executions[index];
   const next: AgentExecutionSnapshot = {
     scope: event.scope,
-    ...((event.agent ?? prior?.agent) ? { agent: event.agent ?? prior?.agent } : {}),
-    ...((event.parent ?? prior?.parent) ? { parent: event.parent ?? prior?.parent } : {}),
-    ...((event.node ?? prior?.node) ? { node: event.node ?? prior?.node } : {}),
+    ...((event.agent ?? prior?.agent) ? { agent: (event.agent ?? prior?.agent)! } : {}),
+    ...((event.parent ?? prior?.parent) ? { parent: (event.parent ?? prior?.parent)! } : {}),
+    ...((event.node ?? prior?.node) ? { node: (event.node ?? prior?.node)! } : {}),
     ...(event.kind === "values"
       ? { values: mergeValues(prior?.values, event.value) }
       : prior?.values === undefined

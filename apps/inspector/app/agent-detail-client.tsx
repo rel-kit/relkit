@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
+import { FailedState, LoadingRows } from "../components/blocks/block-state";
 import type { InspectorObject } from "../lib/api-types";
 import { agentView, type AgentView } from "../lib/agents-model";
 import { createInspectorClient } from "../lib/client";
@@ -40,10 +41,17 @@ export function AgentDetailClient({ chat = false }: { readonly chat?: boolean })
   }, [load]);
 
   if (error || view === undefined) {
-    return (
-      <section className="panel route-state" role={error ? "alert" : "status"}>
-        {error ? "The agent API is unavailable." : "Loading agent contract…"}
-      </section>
+    return error ? (
+      <div className="route-page">
+        <FailedState
+          title="The agent API is unavailable."
+          onRetry={() => void load().catch(() => setError(true))}
+        />
+      </div>
+    ) : (
+      <div className="route-page rounded-lg border border-border bg-card">
+        <LoadingRows label="Loading agent contract…" rows={6} />
+      </div>
     );
   }
   return chat ? <AgentLiveConsole view={view} /> : <AgentDetailView view={view} />;

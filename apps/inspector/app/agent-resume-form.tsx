@@ -41,12 +41,22 @@ export function AgentResumeForm({
   }
 
   return (
-    <form className="agent-resume-form" onSubmit={submit} aria-label="Human input required">
-      <div>
-        <strong>Human input required</strong>
+    <form
+      className="grid w-full max-w-xl gap-3 rounded-md border border-warning/40 bg-warning-soft/40 p-3"
+      onSubmit={submit}
+      aria-label="Human input required"
+    >
+      <div className="grid gap-1">
+        <strong className="flex items-center gap-2 text-xs font-semibold text-foreground">
+          <span aria-hidden="true" className="size-1.5 rounded-[1px] bg-warning" />
+          Human input required
+        </strong>
         {waiting.requests.map((request, index) => (
-          <p key={`${request.node}:${index}`}>
-            {requestSummary(request.value)} <small>at {request.node}</small>
+          <p key={`${request.node}:${index}`} className="m-0 text-[13px] text-foreground/90">
+            {requestSummary(request.value)}{" "}
+            <small className="font-mono text-[10.5px] text-muted-foreground">
+              at {request.node}
+            </small>
           </p>
         ))}
       </div>
@@ -62,18 +72,24 @@ export function AgentResumeForm({
           }}
         />
       ) : type === "boolean" ? (
-        <label>
+        <label className="grid gap-1 text-xs font-medium text-foreground">
           <span>Decision</span>
-          <select value={value} onChange={(event) => setValue(event.target.value)} required>
+          <select
+            className={control}
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            required
+          >
             <option value="">Choose a reply</option>
             <option value="true">Yes</option>
             <option value="false">No</option>
           </select>
         </label>
       ) : (
-        <label>
+        <label className="grid gap-1 text-xs font-medium text-foreground">
           <span>Reply</span>
           <textarea
+            className={`${control} h-auto py-2`}
             rows={type === "string" ? 2 : 4}
             value={value}
             onChange={(event) => {
@@ -85,13 +101,20 @@ export function AgentResumeForm({
           />
         </label>
       )}
-      {error === "" ? null : <p role="alert">{error}</p>}
-      <Button type="submit" isDisabled={pending}>
+      {error === "" ? null : (
+        <p role="alert" className="m-0 text-xs text-danger">
+          {error}
+        </p>
+      )}
+      <Button type="submit" size="sm" className="justify-self-start" isDisabled={pending}>
         {pending ? "Resuming…" : "Resume"}
       </Button>
     </form>
   );
 }
+
+const control =
+  "h-8 w-full min-w-0 rounded-md border border-input bg-background px-2.5 text-[13px] font-normal text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/25";
 
 function primitiveValue(type: string, input: string): unknown {
   if (input === "") throw new Error("A reply is required.");

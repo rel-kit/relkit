@@ -30,8 +30,8 @@ export function useAgentLiveRuntime(view: AgentView) {
   const [pending, setPending] = useState(false);
   const [runStarting, setRunStarting] = useState(false);
   const [error, setError] = useState("");
-  const observer = useRef<AbortController>();
-  const previousStorageKey = useRef<string>();
+  const observer = useRef<AbortController | undefined>(undefined);
+  const previousStorageKey = useRef<string | undefined>(undefined);
   const status = runStarting ? "running" : (conversation.snapshot?.thread.status ?? "idle");
   const restore = useCallback(
     async (nextThreadId: string) => {
@@ -129,7 +129,10 @@ export function useAgentLiveRuntime(view: AgentView) {
           ...continuation,
         })) as { readonly threadId?: string };
         if (receipt.threadId !== undefined) {
-          if (receipt.threadId !== nextThreadId || observer.current?.signal.aborted !== false)
+          if (
+            receipt.threadId !== nextThreadId ||
+            (observer.current as AbortController | undefined)?.signal.aborted !== false
+          )
             void restore(receipt.threadId);
         } else if (kind === "run") setRunStarting(false);
       } catch (cause) {
