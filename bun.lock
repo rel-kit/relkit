@@ -543,7 +543,7 @@
     },
     "packages/cli": {
       "name": "@relkit/cli",
-      "version": "0.8.6",
+      "version": "0.8.7",
       "bin": {
         "relkit": "./dist/bin.js",
       },
@@ -694,7 +694,7 @@
     },
     "packages/create-relkit": {
       "name": "create-relkit",
-      "version": "0.8.6",
+      "version": "0.8.7",
       "bin": {
         "create-relkit": "./dist/bin.js",
       },
@@ -844,7 +844,7 @@
     },
     "packages/inspector": {
       "name": "@relkit/inspector",
-      "version": "0.1.4",
+      "version": "0.2.0",
       "bin": {
         "relkit-inspector": "./dist/bin.js",
       },
@@ -868,7 +868,7 @@
     },
     "packages/inspector-api": {
       "name": "@relkit/inspector-api",
-      "version": "0.8.2",
+      "version": "0.8.3",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/observability": "workspace:*",
@@ -1014,7 +1014,7 @@
     },
     "packages/relkit": {
       "name": "relkit",
-      "version": "0.8.6",
+      "version": "0.8.7",
       "bin": {
         "relkit": "./dist/bin.js",
       },

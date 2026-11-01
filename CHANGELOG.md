@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 0.7.19
+
+### Changes
+
+- Stopping the inspector no longer hangs when a browser is attached. Bun can leave a forced listener stop unconfirmed when a peer was killed mid-stream (the UI holding a browser's live feed), and the inspector waited on it forever, leaving the process running after Ctrl+C, `kill` or a closed terminal. Listener retirement now waits at most two seconds for that confirmation, logs a warning, and finishes shutting down.
+- Refresh bundled dependency versions.
+- Redesign the Inspector UI as a dense, dark-first developer tool. Dark is the default theme (light is still one click away and remembered), with Geist Sans/Mono, OKLCH design tokens and no theme flash on load. The shell gains per-page entity counts in the sidebar, a compact generation pill, and a command palette (⌘K) that searches routes, functions, jobs, events, agents and tools as well as pages. Every list page uses a one-line filter bar and a compact table; every detail page shares one layout with an identity header, copyable ids and a contract rail. Logs, requests and trace lists follow Neon UI's logs viewer and query-history patterns (level chips, ANSI colours, duration bars). Traces open as a full view: a summary of the request, its lifecycle phases in time order, a tree waterfall on the trace's own clock (nested spans as bars, events as points, collapsible parents, arrow-key navigation) and the selected step's timing, input, output, error, events and attributes always visible beside it; domains, environment and bucket/cache browsers become searchable trees, and the overview becomes a dashboard of health, counts, recent requests and generation history. Components adapted from Neon UI and dashboardblocks are MIT-licensed; their notices ship in `THIRD_PARTY_NOTICES.txt`.
+- The Jobs pages no longer report "The jobs API is unavailable" for applications that define no jobs. Jobs routes are mounted only when an application declares jobs, so the inspector now shows "This application defines no jobs." on Definitions, Runs, Schedules and Services. A plain-text error reply keeps its HTTP status instead of being treated as invalid JSON, which also stops the burst of retried 404 requests.
+- Recover from a stale inspector that is still running. The inspector now checks that its UI port is free before starting the UI, and fails with a clear "port is already in use" message that names the address, instead of reporting "listening" while another server answers on that port. When project history is locked by another process, a warning names the lock holder's PID and suggests `--history-directory`. After three quick attempts the inspector keeps retrying every 30 seconds, so history resumes without a restart once the other process exits. Closing the terminal (SIGHUP) now shuts the inspector down like Ctrl+C, so its UI and history worker no longer outlive it.
+- feat(inspector): dark-first UI redesign, clearer traces, and shutdown fixes
+
 ## 0.7.18
 
 ### Changes
