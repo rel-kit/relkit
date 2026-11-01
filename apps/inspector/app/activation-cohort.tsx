@@ -1,5 +1,9 @@
+import { DetailList } from "../components/blocks/details";
+import { StatusBadge } from "../components/neon/status-badge";
 import type { ActivationFingerprint } from "../lib/graph-topology-model";
+import { HeadedSection } from "./overview/headed-section";
 
+/** Artifact identity hashes the active generation was activated with, as copyable mono values. */
 export function ActivationCohort({
   graphHash,
   fingerprint,
@@ -8,7 +12,7 @@ export function ActivationCohort({
   readonly fingerprint?: ActivationFingerprint;
 }) {
   const mismatch = fingerprint !== undefined && fingerprint.graphHash !== graphHash;
-  const members =
+  const members: readonly (readonly [string, string])[] =
     fingerprint === undefined
       ? []
       : [
@@ -16,46 +20,50 @@ export function ActivationCohort({
           ["Manifest", fingerprint.manifestHash],
           ["Runtime integrations", fingerprint.runtimeIntegrationsPlanHash],
           ...(fingerprint.localServicesPlanHash
-            ? [["Local services", fingerprint.localServicesPlanHash]]
+            ? [["Local services", fingerprint.localServicesPlanHash] as const]
             : []),
           ...(fingerprint.providerOverridesGeneration
-            ? [["Provider overrides", fingerprint.providerOverridesGeneration]]
+            ? [["Provider overrides", fingerprint.providerOverridesGeneration] as const]
             : []),
         ];
   return (
-    <section className="panel" aria-labelledby="activation-cohort-heading">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">ACTIVATION COHORT</p>
-          <h2 id="activation-cohort-heading">Verified artifact identity</h2>
-        </div>
-        <span className="badge">
-          {mismatch ? "Mismatch" : fingerprint ? "Verified" : "Unavailable"}
-        </span>
-      </div>
+    <HeadedSection
+      aria-labelledby="activation-cohort-heading"
+      kicker="ACTIVATION COHORT"
+      title="Verified artifact identity"
+      actions={
+        <StatusBadge
+          tone={mismatch ? "danger" : fingerprint ? "success" : "neutral"}
+          label={mismatch ? "mismatch" : fingerprint ? "verified" : "unavailable"}
+        />
+      }
+    >
       {mismatch && (
-        <p role="alert" className="supporting-copy">
+        <p
+          role="alert"
+          className="m-0 mb-3 rounded-md border border-danger/30 bg-danger-soft px-3 py-2 text-xs text-danger"
+        >
           The active graph differs from its fingerprint. Rebuild before activation.
         </p>
       )}
       {fingerprint === undefined ? (
-        <p role="status" className="supporting-copy">
+        <p role="status" className="m-0 text-xs text-muted-foreground">
           Composite activation fingerprint is unavailable.
         </p>
       ) : (
-        <dl className="route-meta">
-          {members.map(([label, value]) => (
-            <div key={label}>
-              <dt>{label}</dt>
-              <dd>{bounded(value)}</dd>
-            </div>
-          ))}
-        </dl>
+        <DetailList
+          items={members.map(([label, value]) => ({
+            label,
+            value: (
+              <span className="block truncate" title={value}>
+                {value}
+              </span>
+            ),
+            mono: true,
+            copy: value,
+          }))}
+        />
       )}
-    </section>
+    </HeadedSection>
   );
-}
-
-function bounded(value: string): string {
-  return value.length <= 72 ? value : `${value.slice(0, 42)}…${value.slice(-18)}`;
 }

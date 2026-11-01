@@ -1,141 +1,188 @@
+import { Database, HardDrive } from "lucide-react";
+import { CodeBlock } from "../components/blocks/code-block";
+import { DetailList } from "../components/blocks/details";
+import { Section } from "../components/blocks/section";
+import { StatusBadge, statusTone, type StatusTone } from "../components/neon/status-badge";
 import type { OperationStatus, ResourceOperationView, ResourceView } from "../lib/resources-model";
-import type { ReactNode } from "react";
-import { SourceLink } from "./source-link";
-import { SchemaPanel } from "./schema-panel";
+import { DetailLayout } from "./detail-layout";
 import { ResourceExplorer } from "./resource-explorer";
+import { SourceLink } from "./source-link";
 
 export function ResourceDetailView({ view }: { readonly view: ResourceView }) {
   const label = view.kind === "bucket" ? "Bucket" : "Cache";
+  const runtime = view.runtimeState ?? "not reported";
   return (
-    <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">ACTIVE WORKSPACE</p>
-          <h1>{label} detail</h1>
-          <p className="lede">
-            Provider storage remains behind the versioned API; this page is read-only metadata.
-          </p>
-        </div>
-        <span className="badge">{view.id}</span>
-      </header>
-      <IdentityPanel view={view} />
+    <DetailLayout
+      header={{
+        kicker: label,
+        title: view.id,
+        icon: view.kind === "bucket" ? <HardDrive /> : <Database />,
+        description:
+          "Provider storage remains behind the versioned API; this page is read-only metadata.",
+        badges: (
+          <>
+            <StatusBadge tone={statusTone(runtime)} label={runtime} />
+            <StatusBadge tone="neutral" label={view.profile} />
+          </>
+        ),
+        meta: <SourceLink source={view.descriptor.source} />,
+      }}
+      aside={
+        <>
+          <OperationPanel operations={view.operations} />
+          {Object.keys(view.stats).length > 0 && <StatsPanel stats={view.stats} />}
+        </>
+      }
+    >
+      <Section title={`${label} detail`} id="resource-identity">
+        <DetailList
+          columns={3}
+          items={[
+            { label: "Profile", value: view.profile, mono: true },
+            {
+              label: "Capabilities",
+              value:
+                view.capabilities.length === 0 ? (
+                  "None advertised"
+                ) : (
+                  <span className="flex flex-wrap gap-1">
+                    {view.capabilities.map((capability) => (
+                      <span
+                        key={capability}
+                        className="rounded-sm bg-muted px-1.5 py-px font-mono text-[10.5px]"
+                      >
+                        {capability}
+                      </span>
+                    ))}
+                  </span>
+                ),
+            },
+            { label: "Source", value: <SourceLink source={view.descriptor.source} /> },
+          ]}
+        />
+      </Section>
       <ResourceExplorer kind={view.kind} id={view.id} />
-      <OperationPanel operations={view.operations} />
-      <MetadataPanel view={view} />
-      {Object.keys(view.stats).length > 0 && <StatsPanel stats={view.stats} />}
-    </div>
-  );
-}
-
-function IdentityPanel({ view }: { readonly view: ResourceView }) {
-  const source = view.descriptor.source;
-  return (
-    <section className="panel route-identity" aria-labelledby="resource-identity-heading">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">RESOURCE IDENTITY</p>
-          <h2 id="resource-identity-heading">{view.id}</h2>
-        </div>
-        <span className="badge">{view.profile}</span>
-      </div>
-      <dl className="route-meta">
-        <Meta label="Profile" value={view.profile} />
-        <Meta label="Capabilities" value={view.capabilities.join(", ") || "None advertised"} />
-        <Meta label="Source" value={<SourceLink source={source} />} />
-      </dl>
-    </section>
+      <PolicyPanel view={view} />
+    </DetailLayout>
   );
 }
 
 function OperationPanel({ operations }: { readonly operations: readonly ResourceOperationView[] }) {
   return (
-    <section className="panel relationship-panel" aria-labelledby="resource-operations-heading">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">SAFE OPERATIONS</p>
-          <h2 id="resource-operations-heading">Provider operation metadata</h2>
-        </div>
-        <span className="badge">{operations.length}</span>
-      </div>
-      <ul className="request-list">
-        {operations.map((operation) => (
-          <li className="request-row" key={operation.name}>
-            <code>{operation.name}</code>
-            <span>{statusLabel(operation.status)}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <Section
+      title="Provider operations"
+      id="resource-operations"
+      description="Safe operation metadata"
+      flush
+      actions={
+        <span className="rounded-sm border border-border px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground tabular-nums">
+          {operations.length}
+        </span>
+      }
+    >
+      {operations.length === 0 ? (
+        <p className="m-0 px-4 py-6 text-center text-xs text-muted-foreground">
+          No operations are declared.
+        </p>
+      ) : (
+        <ul className="m-0 list-none p-0">
+          {operations.map((operation) => (
+            <li
+              className="flex h-9 items-center justify-between gap-3 border-b border-border/60 px-4 last:border-b-0"
+              key={operation.name}
+            >
+              <code className="truncate font-mono text-xs">{operation.name}</code>
+              <StatusBadge
+                tone={operationTone(operation.status)}
+                label={statusLabel(operation.status)}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+    </Section>
   );
 }
 
-function MetadataPanel({ view }: { readonly view: ResourceView }) {
+function PolicyPanel({ view }: { readonly view: ResourceView }) {
   const descriptor = view.descriptor;
   const cache = view.kind === "cache";
   return (
-    <section className="panel json-panel" aria-labelledby="resource-policy-heading">
-      <p className="eyebrow">DECLARED POLICY</p>
-      <h2 id="resource-policy-heading">
-        {cache ? "Cache schema and TTL" : "Bucket object policy"}
-      </h2>
+    <Section
+      title={cache ? "Cache schema and TTL" : "Bucket object policy"}
+      id="resource-policy"
+      description={cache ? "Cache inspection is bounded and read-only." : "Declared policy"}
+    >
       {cache ? (
-        <div className="route-contract-grid">
-          <JsonPanel title="Key schema" value={descriptor.keySchema} />
-          <JsonPanel title="Value schema" value={descriptor.valueSchema} />
+        <div className="grid gap-4">
+          <DetailList
+            columns={2}
+            items={[
+              { label: "Default TTL", value: formatMs(descriptor.defaultTtlMs), mono: true },
+              { label: "Maximum TTL", value: formatMs(descriptor.maxTtlMs), mono: true },
+            ]}
+          />
+          <div className="grid min-w-0 gap-3 lg:grid-cols-2">
+            <div className="grid min-w-0 gap-1.5">
+              <h3 className="m-0 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                Key schema
+              </h3>
+              <CodeBlock value={descriptor.keySchema} label="key schema" maxHeight="18rem" />
+            </div>
+            <div className="grid min-w-0 gap-1.5">
+              <h3 className="m-0 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                Value schema
+              </h3>
+              <CodeBlock value={descriptor.valueSchema} label="value schema" maxHeight="18rem" />
+            </div>
+          </div>
         </div>
       ) : (
-        <dl className="route-meta">
-          <Meta label="Visibility" value={descriptor.visibility || "Unavailable"} />
-          <Meta label="Maximum object bytes" value={formatNumber(descriptor.maxObjectBytes)} />
-          <Meta
-            label="Allowed content types"
-            value={descriptor.allowedContentTypes?.join(", ") || "Provider default"}
-          />
-        </dl>
+        <DetailList
+          columns={3}
+          items={[
+            { label: "Visibility", value: descriptor.visibility || "Unavailable" },
+            {
+              label: "Maximum object bytes",
+              value: formatNumber(descriptor.maxObjectBytes),
+              mono: true,
+            },
+            {
+              label: "Allowed content types",
+              value: descriptor.allowedContentTypes?.join(", ") || "Provider default",
+              mono: true,
+            },
+          ]}
+        />
       )}
-      {cache && (
-        <dl className="route-meta">
-          <Meta label="Default TTL" value={formatNumber(descriptor.defaultTtlMs)} />
-          <Meta label="Maximum TTL" value={formatNumber(descriptor.maxTtlMs)} />
-        </dl>
-      )}
-      {cache && <p className="supporting-copy">Cache inspection is bounded and read-only.</p>}
-    </section>
+    </Section>
   );
 }
 
 function StatsPanel({ stats }: { readonly stats: Readonly<Record<string, number>> }) {
   return (
-    <section className="panel" aria-labelledby="resource-stats-heading">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">SAFE RUNTIME STATE</p>
-          <h2 id="resource-stats-heading">Counters</h2>
-        </div>
-      </div>
-      <dl className="overview-metrics">
-        {Object.entries(stats).map(([key, value]) => (
-          <div key={key}>
-            <dt>{key}</dt>
-            <dd>{value.toLocaleString("en-US")}</dd>
-          </div>
-        ))}
-      </dl>
-    </section>
+    <Section title="Counters" id="resource-stats" description="Safe runtime state">
+      <DetailList
+        columns={2}
+        items={Object.entries(stats).map(([key, value]) => ({
+          label: key,
+          value: (
+            <span className="font-mono text-sm font-medium tabular-nums">
+              {value.toLocaleString("en-US")}
+            </span>
+          ),
+        }))}
+      />
+    </Section>
   );
 }
 
-function JsonPanel({ title, value }: { readonly title: string; readonly value: unknown }) {
-  return <SchemaPanel title={title} value={value} eyebrow="SAFE SCHEMA" />;
-}
-
-function Meta({ label, value }: { readonly label: string; readonly value: ReactNode }) {
-  return (
-    <div>
-      <dt>{label}</dt>
-      <dd>{value}</dd>
-    </div>
-  );
+function operationTone(status: OperationStatus): StatusTone {
+  return status === "declared" || status === "supported"
+    ? "success"
+    : status === "unsupported"
+      ? "danger"
+      : "neutral";
 }
 
 function statusLabel(status: OperationStatus): string {
@@ -150,4 +197,8 @@ function statusLabel(status: OperationStatus): string {
 
 function formatNumber(value: number | undefined): string {
   return value === undefined ? "Provider default" : value.toLocaleString("en-US");
+}
+
+function formatMs(value: number | undefined): string {
+  return value === undefined ? "Provider default" : `${value.toLocaleString("en-US")} ms`;
 }

@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import type { InspectorObject, InspectorPage } from "../lib/api-types";
 import { createInspectorClient } from "../lib/client";
 import { resourceView, type ResourceKind, type ResourceView } from "../lib/resources-model";
+import { FailedState, LoadingRows } from "../components/blocks/block-state";
 import { ResourceDetailView } from "./resource-detail-view";
 
 export function ResourceDetail({ kind }: { readonly kind: ResourceKind }) {
@@ -33,12 +34,17 @@ export function ResourceDetail({ kind }: { readonly kind: ResourceKind }) {
 
   const label = kind === "bucket" ? "Bucket" : "Cache";
   if (state !== "ready" || view === undefined) {
-    return (
-      <section className="panel route-state" role={state === "error" ? "alert" : "status"}>
-        {state === "error"
-          ? `The ${label.toLowerCase()} API is unavailable.`
-          : `Loading ${label.toLowerCase()} metadata…`}
-      </section>
+    return state === "error" ? (
+      <div className="route-page">
+        <FailedState
+          title={`The ${label.toLowerCase()} API is unavailable.`}
+          description={`“${id}” could not be read from the active generation.`}
+        />
+      </div>
+    ) : (
+      <div className="route-page rounded-lg border border-border bg-card">
+        <LoadingRows label={`Loading ${label.toLowerCase()} metadata…`} rows={6} />
+      </div>
     );
   }
 

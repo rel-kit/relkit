@@ -6,6 +6,11 @@ import { collectRouteFields, composeRouteRequest, type RouteField } from "../../
 import type { RouteInvocationResult } from "../../lib/route-request";
 import type { RouteStreamFrame } from "../../lib/route-request";
 import type { FormEvent } from "react";
+import { Send } from "lucide-react";
+import { Section } from "../../components/blocks/section";
+import { StatusBadge } from "../../components/neon/status-badge";
+import { Button } from "../../components/ui/button";
+import { MethodChip } from "../domains/catalog-kit";
 import { RouteFieldInput } from "./route-field";
 
 export function RouteComposer({
@@ -16,13 +21,15 @@ export function RouteComposer({
   onComplete,
 }: {
   readonly route: InspectorObject;
-  readonly target?: InspectorObject;
+  readonly target?: InspectorObject | undefined;
   readonly invoke: (input: { path: string; init: RequestInit }) => Promise<RouteInvocationResult>;
-  readonly invokeStream?: (
-    input: { path: string; init: RequestInit },
-    onFrame: (frame: RouteStreamFrame) => void,
-    signal: AbortSignal,
-  ) => Promise<RouteInvocationResult>;
+  readonly invokeStream?:
+    | ((
+        input: { path: string; init: RequestInit },
+        onFrame: (frame: RouteStreamFrame) => void,
+        signal: AbortSignal,
+      ) => Promise<RouteInvocationResult>)
+    | undefined;
   readonly onComplete: (result: RouteInvocationResult) => void;
 }) {
   const config = record(route.config);
@@ -36,7 +43,7 @@ export function RouteComposer({
   >([]);
   const fieldRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const summaryRef = useRef<HTMLUListElement>(null);
-  const streamController = useRef<AbortController>();
+  const streamController = useRef<AbortController | undefined>(undefined);
   const nextFrameId = useRef(0);
   useEffect(() => () => streamController.current?.abort(), []);
 
@@ -100,45 +107,82 @@ export function RouteComposer({
     }
   };
 
+  const method = text(config?.method) || "GET";
+  const path = text(config?.path) || "/";
+  const groups = groupFields(fields);
   return (
-    <section className="panel composer-panel" aria-labelledby="composer-heading">
-      <p className="eyebrow">ACTIVE BACKEND</p>
-      <h2 id="composer-heading">Compose a request</h2>
-      <p className="supporting-copy">
-        Fields are generated from the route mapping and target schema. Values are sent only when you
-        submit.
-      </p>
+    <Section
+      className="composer-panel"
+      aria-labelledby="composer-heading"
+      title={<span id="composer-heading">Compose a request</span>}
+      description="Fields come from the route mapping and target schema; nothing is sent until you submit."
+      actions={invokeStream === undefined ? null : <StatusBadge tone="info" label="streaming" />}
+    >
       <form
         aria-labelledby="composer-heading"
         aria-describedby="composer-description"
         aria-busy={pending}
         onSubmit={submit}
         noValidate
+        className="grid min-w-0 gap-4"
+        style={{ marginTop: 0 }}
       >
         <p id="composer-description" className="sr-only">
           Enter values for the route contract, then submit to the active development backend.
         </p>
+        <div className="flex min-w-0 items-center gap-2 rounded-md border border-border bg-muted/40 px-2.5 py-1.5">
+          <MethodChip method={method} />
+          <code className="min-w-0 flex-1 truncate bg-transparent p-0 font-mono text-xs text-foreground">
+            {path}
+          </code>
+          <span className="hidden shrink-0 font-mono text-[11px] text-muted-foreground sm:inline">
+            active backend
+          </span>
+        </div>
         {fields.length === 0 ? (
-          <p className="supporting-copy">This route has no editable mapped inputs.</p>
+          <p className="m-0 text-xs text-muted-foreground">
+            This route has no editable mapped inputs.
+          </p>
         ) : (
-          fields.map((field) => (
-            <RouteFieldInput
-              key={field.key}
-              field={field}
-              value={values[field.key]}
-              onChange={(value) => setValues((current) => ({ ...current, [field.key]: value }))}
-              inputRef={(element) => {
-                fieldRefs.current[field.key] = element;
-              }}
-              error={errors.find((item) => item.key === field.key)?.message}
-            />
+          groups.map((group) => (
+            <fieldset key={group.source} className="m-0 grid min-w-0 gap-3 border-0 p-0">
+              <legend className="mb-2 flex items-center gap-2 p-0 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                {sourceLabel(group.source)}
+                <span className="font-mono tracking-normal normal-case tabular-nums">
+                  {group.fields.length}
+                </span>
+              </legend>
+              <div className="@container min-w-0">
+                <div className="grid min-w-0 gap-x-4 gap-y-3 @xl:grid-cols-2">
+                  {group.fields.map((field) => (
+                    <RouteFieldInput
+                      key={field.key}
+                      field={field}
+                      value={values[field.key]}
+                      onChange={(value) =>
+                        setValues((current) => ({ ...current, [field.key]: value }))
+                      }
+                      inputRef={(element) => {
+                        fieldRefs.current[field.key] = element;
+                      }}
+                      error={errors.find((item) => item.key === field.key)?.message}
+                    />
+                  ))}
+                </div>
+              </div>
+            </fieldset>
           ))
         )}
         {errors.length > 0 && (
-          <ul ref={summaryRef} className="field-errors" role="alert" tabIndex={-1}>
+          <ul
+            ref={summaryRef}
+            className="m-0 grid list-none gap-1 rounded-md border border-danger/30 bg-danger-soft px-3 py-2 text-xs text-danger outline-none"
+            role="alert"
+            tabIndex={-1}
+          >
             {errors.map((error) => (
               <li key={`${error.key}:${error.message}`}>
-                <span>{error.key}:</span> {error.message}
+                <span className="font-mono font-medium">{error.key}:</span> {error.message}
               </li>
             ))}
           </ul>
@@ -146,31 +190,102 @@ export function RouteComposer({
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {status}
         </p>
-        <button className="button-link" type="submit" disabled={pending}>
-          {pending ? "Sending…" : "Send request"}
-        </button>
-        {invokeStream === undefined || !pending ? null : (
-          <button
-            className="button-link button-link--quiet"
-            type="button"
-            onClick={() => streamController.current?.abort()}
-          >
-            Cancel stream
-          </button>
-        )}
+        <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
+          <Button type="submit" isDisabled={pending}>
+            <Send aria-hidden="true" />
+            {pending ? "Sending…" : "Send request"}
+          </Button>
+          {invokeStream === undefined || !pending ? null : (
+            <Button variant="secondary" onPress={() => streamController.current?.abort()}>
+              Cancel stream
+            </Button>
+          )}
+          <span className="ml-auto font-mono text-[11px] text-muted-foreground" aria-hidden="true">
+            {status}
+          </span>
+        </div>
       </form>
       {streamFrames.length === 0 ? null : (
-        <ul className="request-list" aria-label="Stream frames">
-          {streamFrames.map(({ id, frame }) => (
-            <li className="request-row" key={id}>
-              <strong>{frame.kind === "sse" ? frame.event : frame.kind}</strong>
-              <pre className="safe-json">{JSON.stringify(frame, null, 2)}</pre>
-            </li>
-          ))}
-        </ul>
+        <div className="mt-4 overflow-hidden rounded-md border border-border bg-background">
+          <div className="flex h-8 items-center justify-between border-b border-border px-3 text-[11px] text-muted-foreground">
+            <span className="font-medium tracking-wide uppercase">Stream</span>
+            <span className="font-mono tabular-nums">{streamFrames.length} frames</span>
+          </div>
+          <ul
+            className="neon-scroll-fade m-0 max-h-80 list-none overflow-y-auto p-0 font-mono text-[11px] leading-5"
+            aria-label="Stream frames"
+          >
+            {streamFrames.map(({ id, frame }) => (
+              <li
+                className="grid grid-cols-[3rem_6rem_minmax(0,1fr)] gap-2 border-b border-border/50 px-3 py-1 last:border-b-0"
+                key={id}
+              >
+                <span className="text-muted-foreground/70 tabular-nums">#{id + 1}</span>
+                <strong className="truncate font-medium text-info">
+                  {frame.kind === "sse" ? frame.event : frame.kind}
+                </strong>
+                <span className="min-w-0 break-all whitespace-pre-wrap text-foreground/90">
+                  {framePreview(frame)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
-    </section>
+    </Section>
   );
+}
+
+const SOURCE_ORDER = ["path", "query", "header", "cookie", "body", "whole-body", "multipart"];
+
+function groupFields(
+  fields: readonly RouteField[],
+): readonly { source: string; fields: readonly RouteField[] }[] {
+  const groups = new Map<string, RouteField[]>();
+  for (const field of fields) {
+    const list = groups.get(field.source) ?? [];
+    list.push(field);
+    groups.set(field.source, list);
+  }
+  return [...groups.entries()]
+    .sort(([left], [right]) => rank(left) - rank(right))
+    .map(([source, list]) => ({ source, fields: list }));
+}
+
+function rank(source: string): number {
+  const index = SOURCE_ORDER.indexOf(source);
+  return index === -1 ? SOURCE_ORDER.length : index;
+}
+
+function sourceLabel(source: string): string {
+  switch (source) {
+    case "path":
+      return "Path params";
+    case "query":
+      return "Query";
+    case "header":
+      return "Headers";
+    case "cookie":
+      return "Cookies";
+    case "body":
+      return "Body";
+    case "whole-body":
+      return "Raw body";
+    case "multipart":
+      return "Multipart";
+    default:
+      return source;
+  }
+}
+
+function framePreview(frame: RouteStreamFrame): string {
+  if (frame.kind === "text") return frame.value;
+  if (frame.kind === "bytes") return `${frame.byteLength} bytes`;
+  try {
+    return typeof frame.data === "string" ? frame.data : JSON.stringify(frame.data);
+  } catch {
+    return "unavailable";
+  }
 }
 
 function defaults(fields: readonly RouteField[]): Record<string, unknown> {

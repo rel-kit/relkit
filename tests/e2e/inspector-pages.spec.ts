@@ -83,7 +83,7 @@ test("shows candidate diagnostics beside the active generation", async ({ page }
 test("keeps agent tools available after candidate rejection", async ({ page }) => {
   await page.goto("/diagnostics");
   await page.request.post(`${backend}/__fixture__/candidate`, { data: { invalid: true } });
-  await page.getByRole("link", { name: "Agents" }).click();
+  await page.getByRole("link", { name: "Agents", exact: true }).click();
   await page.getByRole("link", { name: "Open agent" }).first().click();
   await expect(page.getByRole("heading", { name: "Model and tool spans" })).toBeVisible();
   await expect(page.getByText("tool").first()).toBeVisible();
@@ -93,7 +93,7 @@ test("keeps agent tools available after candidate rejection", async ({ page }) =
 test("keeps route source links available after candidate rejection", async ({ page }) => {
   await page.goto("/agents");
   await page.request.post(`${backend}/__fixture__/candidate`, { data: { invalid: true } });
-  await page.getByRole("link", { name: "Routes" }).click();
+  await page.getByRole("link", { name: "Routes", exact: true }).click();
   await page.getByRole("link", { name: "Open route" }).first().click();
   const source = page.getByRole("link", { name: "src/routes/create-order.route.ts:3:1" });
   await expect(source).toHaveAttribute(

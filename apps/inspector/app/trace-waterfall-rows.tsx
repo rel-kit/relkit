@@ -1,89 +1,145 @@
 "use client";
 
-import { Eye } from "lucide-react";
-import { Button } from "../components/ui/button";
-import type { WaterfallSpan } from "../lib/observability-model";
+import { ChevronRight } from "lucide-react";
+import type { KeyboardEvent } from "react";
+import { formatDuration } from "../lib/format";
+import { cn } from "../lib/utils";
 import {
-  formatTraceTimestamp,
-  stepDescription,
-  stepInput,
-  stepOutput,
-  stepType,
-  traceTimeline,
-} from "../lib/trace-timeline";
+  barGeometry,
+  rulerLabel,
+  rulerTicks,
+  type TraceClock,
+  type TraceRow,
+} from "../lib/trace-view";
 
+/**
+ * Tree waterfall: each row is a step (span or lifecycle event) with its nesting, its kind, its
+ * duration and its place on the trace's own clock. Selecting a row shows its details beside it.
+ */
 export function TraceWaterfallRows({
-  items,
+  rows,
+  clock,
   collapsed,
-  onSelect,
+  selectedId,
   highlightedSpanId,
+  onSelect,
+  onToggle,
 }: {
-  readonly items: readonly WaterfallSpan[];
+  readonly rows: readonly TraceRow[];
+  readonly clock: TraceClock;
   readonly collapsed: ReadonlySet<string>;
+  readonly selectedId: string | undefined;
   readonly highlightedSpanId?: string;
-  readonly onSelect: (span: WaterfallSpan) => void;
+  readonly onSelect: (row: TraceRow) => void;
+  readonly onToggle: (spanId: string) => void;
 }) {
-  const steps = traceTimeline(items, collapsed);
+  const ticks = rulerTicks(clock.totalMs);
+  const step = ticks.length > 1 ? ((ticks[1]! - ticks[0]!) / clock.totalMs) * 100 : 100;
+  const grid = { backgroundSize: `${step}% 100%` };
+  const move = (event: KeyboardEvent<HTMLOListElement>) => {
+    if (!["ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const index = rows.findIndex((row) => row.id === selectedId);
+    const next =
+      event.key === "Home"
+        ? 0
+        : event.key === "End"
+          ? rows.length - 1
+          : Math.max(0, Math.min(rows.length - 1, index + (event.key === "ArrowDown" ? 1 : -1)));
+    const row = rows[next];
+    if (!row) return;
+    onSelect(row);
+    event.currentTarget
+      .querySelector<HTMLButtonElement>(`[data-row-id="${CSS.escape(row.id)}"]`)
+      ?.focus();
+  };
   return (
-    <div className="trace-waterfall-scroll">
-      <ol className="waterfall-list" aria-label="Ordered trace timeline">
-        {steps.map((step, index) => {
-          const { span } = step;
-          const event = step.event;
-          const isSpan = step.type === "span";
-          const input = valuePreview(stepInput(step));
-          const output = valuePreview(stepOutput(step));
+    <div className="trace-waterfall">
+      <div className="trace-ruler" aria-hidden="true">
+        <span className="trace-ruler-label">Step</span>
+        <span className="trace-ruler-scale">
+          {ticks.map((tick) => (
+            <span key={tick} style={{ left: `${(tick / clock.totalMs) * 100}%` }}>
+              {rulerLabel(tick)}
+            </span>
+          ))}
+        </span>
+      </div>
+      <ol className="waterfall-list" aria-label="Ordered trace timeline" onKeyDown={move}>
+        {rows.map((row) => {
+          const { span, event } = row;
+          const isSpan = row.type === "span";
+          const geometry = barGeometry(row, clock);
+          const open = isSpan && !collapsed.has(span.id);
+          const running = isSpan && span.durationMs === undefined && !span.completedAt;
           return (
             <li
+              key={row.id}
               className="waterfall-row"
-              data-error={isSpan && span.error}
-              data-highlighted={span.spanId === highlightedSpanId}
-              key={step.id}
-              data-record-type={step.type}
+              data-record-type={row.type}
+              data-error={isSpan ? span.error : undefined}
+              data-selected={row.id === selectedId}
+              data-highlighted={isSpan && span.spanId === highlightedSpanId}
             >
-              <div
-                className="timeline-sequence"
-                data-branch={event ? "true" : "false"}
-                aria-label={`Step ${index + 1}`}
-              >
-                <strong>{index + 1}</strong>
-              </div>
-              <div className="waterfall-main">
-                <div className="waterfall-label">
-                  <span className="span-title">
-                    <span className="trace-step-type">{stepType(step)}</span>
-                    <strong title={step.name}>{bounded(step.name)}</strong>
-                  </span>
-                </div>
-                <div className="trace-step-meta">
-                  <time dateTime={step.timestamp}>{formatTraceTimestamp(step.timestamp)}</time>
-                  <small>{stepDescription(step)}</small>
-                </div>
-                {input && (
-                  <span className="trace-step-io">
-                    <b>Input</b>
-                    <code title={input}>{input}</code>
-                  </span>
+              <div className="waterfall-step" style={{ paddingLeft: `${row.depth * 14}px` }}>
+                <span className="waterfall-order">{row.order}</span>
+                {isSpan && row.expandable ? (
+                  <button
+                    type="button"
+                    className="waterfall-caret"
+                    aria-label={`${open ? "Collapse" : "Expand"} ${span.name}`}
+                    aria-expanded={open}
+                    onClick={() => onToggle(span.id)}
+                  >
+                    <ChevronRight aria-hidden="true" className={cn(open && "rotate-90")} />
+                  </button>
+                ) : (
+                  <span className="waterfall-caret" aria-hidden="true" />
                 )}
-                {output && (
-                  <span className="trace-step-io">
-                    <b>Output</b>
-                    <code title={output}>{output}</code>
-                  </span>
-                )}
-              </div>
-              {isSpan ? (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={`Inspect ${span.name}`}
-                  onPress={() => onSelect(span)}
+                <button
+                  type="button"
+                  className="waterfall-select"
+                  data-row-id={row.id}
+                  aria-pressed={row.id === selectedId}
+                  aria-label={isSpan ? `Inspect ${span.name}` : `Inspect event ${event?.name}`}
+                  onClick={() => onSelect(row)}
                 >
-                  <Eye aria-hidden="true" className="size-4" />
-                </Button>
-              ) : (
-                <span aria-hidden="true" />
-              )}
+                  <span className="waterfall-kind" data-kind={isSpan ? "span" : "event"}>
+                    {isSpan ? span.operationType : "event"}
+                  </span>
+                  <span className="waterfall-name" title={isSpan ? span.name : event?.name}>
+                    {isSpan ? span.name : event?.name}
+                  </span>
+                </button>
+                <span className="waterfall-time">
+                  {isSpan
+                    ? running
+                      ? "running"
+                      : formatDuration(span.durationMs)
+                    : `+${formatDuration(row.offsetMs)}`}
+                </span>
+              </div>
+              <div className="waterfall-track-cell" style={grid} aria-hidden="true">
+                {isSpan ? (
+                  <span
+                    className="waterfall-bar"
+                    data-running={running}
+                    style={{ left: `${geometry.left}%`, width: `${geometry.width}%` }}
+                  >
+                    {span.events.map((item, index) => (
+                      <span
+                        key={index}
+                        className="waterfall-tick"
+                        style={{
+                          left: `${Math.max(0, Math.min(100, ((offsetIn(item.timestamp, clock) - (row.offsetMs ?? 0)) / Math.max(span.durationMs ?? 1, 0.001)) * 100))}%`,
+                        }}
+                      />
+                    ))}
+                  </span>
+                ) : (
+                  <span className="waterfall-point" style={{ left: `${geometry.left}%` }} />
+                )}
+              </div>
             </li>
           );
         })}
@@ -92,13 +148,7 @@ export function TraceWaterfallRows({
   );
 }
 
-function valuePreview(value: unknown): string {
-  if (value === undefined) return "";
-  if (Array.isArray(value) && value.length === 0) return "";
-  if (value !== null && typeof value === "object" && Object.keys(value).length === 0) return "";
-  return JSON.stringify(value) ?? String(value);
-}
-
-function bounded(value: string): string {
-  return value.length <= 72 ? value : `${value.slice(0, 48)}…${value.slice(-16)}`;
+function offsetIn(timestamp: string, clock: TraceClock): number {
+  const at = Date.parse(timestamp);
+  return Number.isFinite(at) ? at - clock.origin : 0;
 }

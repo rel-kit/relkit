@@ -3,6 +3,8 @@
 import { useCallback } from "react";
 import type { InspectorObject, InspectorPage, InspectorQuery } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
+import { graphPart } from "../../lib/graph-payload";
+import { DetailList } from "../../components/blocks/details";
 import { ResourceTable, type ResourceTableItem } from "../resource-table";
 
 interface MiddlewareItem extends ResourceTableItem {
@@ -19,7 +21,7 @@ export function MiddlewaresClient() {
         api.list<InspectorObject>("middlewares", query),
         api.graph(),
       ]);
-      const edges = graph.edges ?? [];
+      const edges = graphPart(graph, "edges");
       return {
         ...page,
         items: page.items.map((item) => ({
@@ -40,12 +42,46 @@ export function MiddlewaresClient() {
       noun="middleware"
       load={load}
       columns={[
-        { key: "path", label: "Path", render: (item) => <code>{item.path}</code> },
-        { key: "order", label: "Order", render: (item) => item.order + 1 },
-        { key: "routes", label: "Routes", render: (item) => item.routes },
+        {
+          key: "path",
+          label: "Path",
+          render: (item) => (
+            <code className="bg-transparent p-0 font-mono text-xs whitespace-nowrap text-foreground">
+              {item.path}
+            </code>
+          ),
+        },
+        {
+          key: "order",
+          label: "Order",
+          render: (item) => (
+            <span className="font-mono text-xs text-muted-foreground tabular-nums">
+              {String(item.order + 1).padStart(2, "0")}
+            </span>
+          ),
+        },
+        {
+          key: "routes",
+          label: "Routes",
+          render: (item) => (
+            <span className="font-mono text-[11px] whitespace-nowrap text-muted-foreground tabular-nums">
+              {item.routes} {item.routes === 1 ? "route" : "routes"}
+            </span>
+          ),
+        },
       ]}
       href={(item) => `/middlewares/${encodeURIComponent(item.id)}`}
       openLabel="Open middleware"
+      details={(item) => (
+        <DetailList
+          items={[
+            { label: "Middleware ID", value: item.id, mono: true, copy: item.id },
+            { label: "Path scope", value: item.path, mono: true },
+            { label: "Execution order", value: String(item.order + 1), mono: true },
+            { label: "Matching routes", value: String(item.routes), mono: true },
+          ]}
+        />
+      )}
     />
   );
 }

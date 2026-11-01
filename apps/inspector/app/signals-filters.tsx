@@ -11,6 +11,7 @@ import {
   GitBranch,
   ListFilter,
   Route,
+  RotateCcw,
 } from "lucide-react";
 
 interface SignalsFiltersProps {
@@ -22,6 +23,9 @@ interface SignalsFiltersProps {
   readonly onSubmit: () => void;
   readonly onReset: () => void;
 }
+
+const control =
+  "h-8 w-full min-w-0 rounded-md border border-input bg-background px-2.5 text-xs text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/25";
 
 export function SignalsFilters({
   kind,
@@ -38,7 +42,7 @@ export function SignalsFilters({
     kind === "requests" ? "Request filters" : kind === "logs" ? "Log filters" : "Trace filters";
   return (
     <form
-      className="panel signal-filters"
+      className="min-w-0 overflow-hidden rounded-lg border border-border bg-card"
       aria-labelledby="signal-filter-heading"
       aria-describedby="signal-filter-description"
       onSubmit={(event) => {
@@ -46,20 +50,21 @@ export function SignalsFilters({
         onSubmit();
       }}
     >
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">BOUNDED QUERY</p>
-          <h2 id="signal-filter-heading">{title}</h2>
+      <header className="flex min-h-10 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-border px-4 py-2">
+        <div className="min-w-0">
+          <h2 id="signal-filter-heading" className="text-[13px] font-semibold text-foreground">
+            {title}
+          </h2>
+          <p id="signal-filter-description" className="text-xs text-muted-foreground">
+            Filters are applied by the versioned backend. Bodies, cookies, secrets, and provider
+            data are never requested.
+          </p>
         </div>
-        <span className="badge">Redacted API</span>
-      </div>
-      <p className="supporting-copy">
-        <span id="signal-filter-description">
-          Filters are applied by the versioned backend. Bodies, cookies, secrets, and provider data
-          are never requested.
+        <span className="rounded-sm border border-border/70 px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground">
+          Redacted API
         </span>
-      </p>
-      <div className="signal-filter-grid">
+      </header>
+      <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
         <Field
           label="From"
           icon={<CalendarClock aria-hidden="true" />}
@@ -119,14 +124,15 @@ export function SignalsFilters({
           onChange={update}
         />
         {kind === "logs" && (
-          <label className="signal-filter-field">
-            <span id="signal-filter-severity-label" className="signal-filter-label">
+          <label className="grid min-w-0 gap-1">
+            <span id="signal-filter-severity-label" className={labelClass}>
               <ListFilter aria-hidden="true" /> Severity
             </span>
             <select
               id="signal-filter-severity"
               name="severity"
               aria-labelledby="signal-filter-severity-label"
+              className={control}
               value={value.severity}
               onChange={(event) => update("severity", event.target.value)}
             >
@@ -140,14 +146,17 @@ export function SignalsFilters({
             </select>
           </label>
         )}
-        <label className="signal-filter-field">
-          <span id="signal-filter-limit-label" className="signal-filter-label">
+      </div>
+      <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-2.5">
+        <label className="flex items-center gap-2">
+          <span id="signal-filter-limit-label" className={labelClass}>
             <ListFilter aria-hidden="true" /> Page size
           </span>
           <select
             id="signal-filter-limit"
             name="limit"
             aria-labelledby="signal-filter-limit-label"
+            className={`${control} w-20`}
             value={limit}
             onChange={(event) => onLimitChange(Number(event.target.value))}
           >
@@ -156,16 +165,22 @@ export function SignalsFilters({
             <option value={100}>100</option>
           </select>
         </label>
-      </div>
-      <div className="request-links">
-        <Button type="submit">Apply filters</Button>
-        <Button variant="secondary" type="button" onPress={onReset}>
-          Reset
-        </Button>
-      </div>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" type="button" onPress={onReset}>
+            <RotateCcw aria-hidden="true" />
+            Reset
+          </Button>
+          <Button type="submit" size="sm">
+            Apply filters
+          </Button>
+        </div>
+      </footer>
     </form>
   );
 }
+
+const labelClass =
+  "flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium tracking-wide text-muted-foreground uppercase [&_svg]:size-3";
 
 function Field({
   label,
@@ -183,8 +198,8 @@ function Field({
   readonly onChange: (name: keyof SignalFilters, value: string) => void;
 }) {
   return (
-    <label className="signal-filter-field">
-      <span id={`signal-filter-${name}-label`} className="signal-filter-label">
+    <label className="grid min-w-0 gap-1">
+      <span id={`signal-filter-${name}-label`} className={labelClass}>
         {icon} {label}
       </span>
       <input
@@ -192,6 +207,9 @@ function Field({
         name={name}
         type={type}
         value={value}
+        autoComplete="off"
+        spellCheck={false}
+        className={`${control} ${type === "text" ? "font-mono" : ""}`}
         aria-labelledby={`signal-filter-${name}-label`}
         onChange={(event) => onChange(name, event.target.value)}
       />

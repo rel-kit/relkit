@@ -2,8 +2,23 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { InspectorObject } from "../../../lib/api-types";
+import { jobsNotMounted, NO_JOBS_MESSAGE } from "../../../lib/api-request-utils";
 import { createInspectorClient } from "../../../lib/client";
+import { CalendarClock, Pause, Play, Trash2 } from "lucide-react";
+import { FailedState, LoadingRows } from "../../../components/blocks/block-state";
+import { PageHeader } from "../../../components/blocks/page-header";
+import { EmptyState } from "../../../components/neon/empty-state";
+import { StatusBadge, statusTone } from "../../../components/neon/status-badge";
+import { Button } from "../../../components/ui/button";
+import {
+  DataTable,
+  DataTableCell,
+  DataTableEmpty,
+  DataTableHead,
+} from "../../../components/ui/table";
+import { Notice, record, text } from "../job-format";
 import { JobsTabs } from "../jobs-tabs";
+import { RunsPagination } from "../runs/runs-pagination";
 
 export function JobsSchedulesClient() {
   const api = useMemo(() => createInspectorClient(), []);
@@ -14,7 +29,7 @@ export function JobsSchedulesClient() {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [nextCursor, setNextCursor] = useState<string>();
-  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
+  const [state, setState] = useState<"loading" | "ready" | "error" | "absent">("loading");
   const [pending, setPending] = useState("");
   const load = useCallback(async (): Promise<void> => {
     setState("loading");
@@ -27,8 +42,8 @@ export function JobsSchedulesClient() {
       setHasMore(result.hasMore);
       setNextCursor(result.nextCursor);
       setState("ready");
-    } catch {
-      setState("error");
+    } catch (error) {
+      setState(jobsNotMounted(error) ? "absent" : "error");
     }
   }, [api, cursor]);
   useEffect(() => {
@@ -50,59 +65,51 @@ export function JobsSchedulesClient() {
   return (
     <>
       <JobsTabs />
-      <main className="route-page">
-        <header className="page-heading">
-          <div>
-            <p className="eyebrow">JOBS / SCHEDULES</p>
-            <h1>Schedules</h1>
-            <p className="lede">Native schedules and their provider-reported state.</p>
-          </div>
-        </header>
+      <div className="route-page">
+        <PageHeader
+          title="Schedules"
+          description="Native schedules and their provider-reported state."
+        />
         {availability.some((item) => item.state === "unavailable") && (
-          <p className="field-errors" role="status">
-            Some jobs services are unavailable.
-          </p>
+          <Notice>Some jobs services are unavailable.</Notice>
         )}
         {state === "loading" && (
-          <p className="panel route-state" role="status">
-            Loading schedules…
-          </p>
+          <div className="rounded-lg border border-border bg-card">
+            <LoadingRows label="Loading schedules…" rows={5} />
+          </div>
         )}
         {state === "error" && (
-          <p className="panel route-state" role="alert">
-            Schedules are unavailable.
-          </p>
+          <FailedState title="Schedules are unavailable." onRetry={() => void load()} />
+        )}
+        {state === "absent" && (
+          <EmptyState
+            icon={<CalendarClock />}
+            title={<span role="status">{NO_JOBS_MESSAGE}</span>}
+            description="Schedules belong to job definitions; none are declared."
+          />
         )}
         {state === "ready" && <ScheduleTable items={items} pending={pending} onAction={action} />}
-        <nav aria-label="Schedule pagination" className="flex items-center justify-between gap-3">
-          <button
-            className="button button-secondary"
-            disabled={page === 0 || state === "loading"}
-            onClick={() => {
+        {state === "absent" ? null : (
+          <RunsPagination
+            label="Schedule pagination"
+            page={page}
+            hasMore={hasMore}
+            nextCursor={nextCursor}
+            loading={state === "loading"}
+            onPrevious={() => {
               const previous = Math.max(0, page - 1);
               setPage(previous);
               setCursor(history[previous]);
             }}
-            type="button"
-          >
-            Previous
-          </button>
-          <span aria-live="polite">Page {page + 1}</span>
-          <button
-            className="button button-secondary"
-            disabled={!hasMore || nextCursor === undefined || state === "loading"}
-            onClick={() => {
+            onNext={() => {
               if (nextCursor === undefined) return;
               setHistory((value) => [...value.slice(0, page + 1), nextCursor]);
               setPage((value) => value + 1);
               setCursor(nextCursor);
             }}
-            type="button"
-          >
-            Next
-          </button>
-        </nav>
-      </main>
+          />
+        )}
+      </div>
     </>
   );
 }
@@ -120,70 +127,89 @@ function ScheduleTable({
     service: string,
   ) => Promise<void>;
 }) {
-  return items.length === 0 ? (
-    <p className="panel route-state">No schedules are available.</p>
-  ) : (
-    <div className="panel overflow-x-auto">
-      <table className="resource-table">
-        <caption className="sr-only">Job schedules</caption>
-        <thead>
+  return (
+    <DataTable>
+      <caption className="sr-only">Job schedules</caption>
+      <thead>
+        <tr>
+          <DataTableHead>Schedule</DataTableHead>
+          <DataTableHead>Job</DataTableHead>
+          <DataTableHead>Cadence</DataTableHead>
+          <DataTableHead>State</DataTableHead>
+          <DataTableHead>Service</DataTableHead>
+          <DataTableHead className="text-right">Controls</DataTableHead>
+        </tr>
+      </thead>
+      <tbody>
+        {items.length === 0 ? (
           <tr>
-            <th scope="col">Schedule</th>
-            <th scope="col">Job</th>
-            <th scope="col">State</th>
-            <th scope="col">Service</th>
-            <th scope="col">Controls</th>
+            <DataTableEmpty>No schedules are available.</DataTableEmpty>
           </tr>
-        </thead>
-        <tbody>
-          {items.map((item, index) => {
+        ) : (
+          items.map((item, index) => {
             const schedule = record(item.schedule);
             const id = text(schedule?.id);
             const service = text(item.service);
             const state = text(schedule?.state);
+            const cadence = [text(schedule?.cron), text(schedule?.timezone)]
+              .filter((part) => part !== "")
+              .join(" · ");
             return (
-              <tr key={`${id}-${index}`}>
-                <th scope="row">{id || "unknown"}</th>
-                <td>{text(schedule?.jobId) || "—"}</td>
-                <td>{state || "unknown"}</td>
-                <td>{service || "—"}</td>
-                <td className="flex gap-2">
-                  <button
-                    className="button button-secondary"
-                    disabled={pending !== "" || id === ""}
-                    onClick={() =>
-                      void onAction(state === "paused" ? "resume" : "pause", id, service)
-                    }
-                    type="button"
-                  >
-                    {pending === `pause:${id}` || pending === `resume:${id}`
-                      ? "Requesting…"
-                      : state === "paused"
-                        ? "Resume"
-                        : "Pause"}
-                  </button>
-                  <button
-                    className="button button-secondary"
-                    disabled={pending !== "" || id === ""}
-                    onClick={() => void onAction("delete", id, service)}
-                    type="button"
-                  >
-                    Delete
-                  </button>
-                </td>
+              <tr key={`${id}-${index}`} className="transition-colors hover:bg-muted/40">
+                <th
+                  scope="row"
+                  className="border-b border-border/70 px-3 py-2 text-left font-mono text-xs font-medium"
+                >
+                  {id || "unknown"}
+                </th>
+                <DataTableCell className="font-mono text-xs">
+                  {text(schedule?.jobId) || "—"}
+                </DataTableCell>
+                <DataTableCell className="font-mono text-xs text-muted-foreground">
+                  {cadence || "—"}
+                </DataTableCell>
+                <DataTableCell>
+                  <StatusBadge tone={statusTone(state)} label={state || "unknown"} />
+                </DataTableCell>
+                <DataTableCell className="font-mono text-xs text-muted-foreground">
+                  {service || "—"}
+                </DataTableCell>
+                <DataTableCell>
+                  <div className="flex justify-end gap-1">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      isDisabled={pending !== "" || id === ""}
+                      onPress={() =>
+                        void onAction(state === "paused" ? "resume" : "pause", id, service)
+                      }
+                    >
+                      {state === "paused" ? (
+                        <Play aria-hidden="true" />
+                      ) : (
+                        <Pause aria-hidden="true" />
+                      )}
+                      {pending === `pause:${id}` || pending === `resume:${id}`
+                        ? "Requesting…"
+                        : state === "paused"
+                          ? "Resume"
+                          : "Pause"}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      isDisabled={pending !== "" || id === ""}
+                      onPress={() => void onAction("delete", id, service)}
+                    >
+                      <Trash2 aria-hidden="true" /> Delete
+                    </Button>
+                  </div>
+                </DataTableCell>
               </tr>
             );
-          })}
-        </tbody>
-      </table>
-    </div>
+          })
+        )}
+      </tbody>
+    </DataTable>
   );
-}
-function record(value: unknown): InspectorObject | undefined {
-  return value !== null && typeof value === "object" && !Array.isArray(value)
-    ? (value as InspectorObject)
-    : undefined;
-}
-function text(value: unknown): string {
-  return typeof value === "string" ? value : "";
 }

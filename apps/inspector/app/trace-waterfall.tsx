@@ -1,19 +1,31 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronsDownUp, ChevronsUpDown, TriangleAlert } from "lucide-react";
-import { Badge } from "../components/ui/badge";
+import { ChevronsDownUp, ChevronsUpDown, Search, TriangleAlert } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Card } from "../components/ui/card";
-import { OverlayDialog } from "../components/ui/dialog";
-import { Field } from "../components/ui/field";
-import { ContentTabs } from "../components/ui/tabs";
+import { EmptyState } from "../components/neon/empty-state";
+import { StatusBadge, statusTone } from "../components/neon/status-badge";
 import type { InspectorObject } from "../lib/api-types";
-import { waterfall, type WaterfallSpan } from "../lib/observability-model";
-import { visibleTraceStepCount } from "../lib/trace-timeline";
+import { clockTime, formatDuration } from "../lib/format";
+import { waterfall } from "../lib/observability-model";
+import {
+  lifecyclePhases,
+  traceClock,
+  traceRows,
+  traceStepTotal,
+  traceSummary,
+  type TraceRow,
+} from "../lib/trace-view";
+import { cn } from "../lib/utils";
 import { TraceWaterfallRows } from "./trace-waterfall-rows";
-import { detailTabs, duration } from "./trace-waterfall-detail";
+import { TraceStepDetails } from "./trace-waterfall-detail";
+import "./traces/traces.css";
 
+/*
+ * Trace view: a summary of the whole request, its lifecycle in order, a tree waterfall on the
+ * trace's own clock, and the selected step's full details beside it (stacked in narrow drawers).
+ * Patterns adapted from Neon UI CheckpointTimeline (MIT; see public/THIRD_PARTY_NOTICES.txt).
+ */
 export function TraceWaterfall({
   spans,
   requests,
@@ -26,123 +38,206 @@ export function TraceWaterfall({
   readonly highlightedSpanId?: string;
 }) {
   const items = useMemo(() => waterfall(spans, requests), [spans, requests]);
+  const clock = useMemo(() => traceClock(items), [items]);
+  const summary = useMemo(() => traceSummary(items), [items]);
+  const phases = useMemo(() => lifecyclePhases(items), [items]);
   const [query, setQuery] = useState("");
   const [errorsOnly, setErrorsOnly] = useState(false);
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(() => new Set());
   const [selectedId, setSelectedId] = useState<string>();
-  const selected = items.find((item) => item.id === selectedId);
-  const parentIds = useMemo(() => new Set(items.flatMap((item) => item.parentId ?? [])), [items]);
-  const visible = useMemo(
-    () =>
-      items.filter((item) => matches(item, query, errorsOnly) && !hidden(item, items, collapsed)),
-    [collapsed, errorsOnly, items, query],
+  const fullRows = useMemo(() => traceRows(items), [items]);
+  const allRows = useMemo(
+    () => (collapsed.size === 0 ? fullRows : traceRows(items, collapsed)),
+    [collapsed, fullRows, items],
   );
-  const visibleSteps = visibleTraceStepCount(visible, collapsed);
-  const totalSteps = visibleTraceStepCount(items);
+  const rows = useMemo(
+    () => allRows.filter((row) => matches(row, query, errorsOnly)),
+    [allRows, errorsOnly, query],
+  );
+  const highlighted = items.find((item) => item.spanId === highlightedSpanId)?.id;
+  const fallbackId = highlighted ?? summary.root?.id;
+  const selected =
+    rows.find((row) => row.id === selectedId) ??
+    fullRows.find((row) => row.id === (selectedId ?? fallbackId)) ??
+    rows[0];
+  const expandable = useMemo(
+    () => new Set(fullRows.flatMap((row) => (row.expandable ? [row.span.id] : []))),
+    [fullRows],
+  );
+  const total = traceStepTotal(items);
+  const select = (row: TraceRow) => setSelectedId(row.id);
+  const selectId = (id: string) => {
+    setSelectedId(id);
+    // Selecting a step hidden under a collapsed parent opens the path to it.
+    const parents = new Map(items.map((item) => [item.id, item.parentId]));
+    const spanId = id.split(":event:")[0]!;
+    setCollapsed((current) => {
+      const next = new Set(current);
+      let parent = id.includes(":event:") ? spanId : parents.get(spanId);
+      // A malformed trace can have cyclic parents; stop once the walk revisits a span.
+      const seen = new Set<string>();
+      while (parent && !seen.has(parent)) {
+        seen.add(parent);
+        next.delete(parent);
+        parent = parents.get(parent);
+      }
+      return next;
+    });
+  };
+  const toggle = (spanId: string) =>
+    setCollapsed((current) => {
+      const next = new Set(current);
+      if (next.has(spanId)) next.delete(spanId);
+      else next.add(spanId);
+      return next;
+    });
+
   return (
     <section
-      className={`panel trace-panel${compact ? " trace-compact" : ""}`}
-      aria-label="Ordered trace timeline"
+      className={cn("trace-panel trace-view", compact && "trace-compact")}
+      aria-labelledby={compact ? undefined : "trace-waterfall-heading"}
+      aria-label={compact ? "Trace" : undefined}
     >
-      <div className="section-heading">
-        <div>
+      {!compact && (
+        <header className="trace-view-header">
           <h2 id="trace-waterfall-heading">
             {requests?.length ? "Request timeline" : "Trace timeline"}
           </h2>
-          <p className="supporting-copy">
-            Numbered by recorded time. Events branch from operations.
-          </p>
+          <p>Numbered by recorded time. Events branch from operations.</p>
+        </header>
+      )}
+
+      {summary.root ? (
+        <div className="trace-summary">
+          <StatusBadge
+            tone={
+              summary.running
+                ? "live"
+                : summary.errors > 0
+                  ? "danger"
+                  : statusTone(summary.root.outcome || summary.root.status || "success")
+            }
+            label={
+              summary.running
+                ? "running"
+                : summary.root.outcome || summary.root.status || "recorded"
+            }
+          />
+          <strong className="trace-summary-name" title={summary.root.name}>
+            {summary.root.name}
+          </strong>
+          <span className="trace-summary-facts">
+            {summary.root.status && summary.root.outcome ? (
+              <span>{summary.root.status}</span>
+            ) : null}
+            <span>{summary.running ? "in progress" : formatDuration(summary.totalMs)}</span>
+            {summary.startedAt ? <span>started {clockTime(summary.startedAt)}</span> : null}
+            <span>
+              {summary.spans} span{summary.spans === 1 ? "" : "s"}
+            </span>
+            <span>
+              {summary.events} event{summary.events === 1 ? "" : "s"}
+            </span>
+            <span className={summary.errors > 0 ? "text-danger" : undefined}>
+              {summary.errors} error{summary.errors === 1 ? "" : "s"}
+            </span>
+          </span>
         </div>
-        <Badge>
-          {visibleSteps} of {totalSteps} steps
-        </Badge>
-      </div>
-      <Card className="trace-toolbar" aria-label="Trace filters">
-        {compact ? (
+      ) : null}
+
+      {phases.length > 0 ? (
+        <nav className="trace-lifecycle" aria-label="Lifecycle">
+          <ol>
+            {phases.map((phase) => (
+              <li key={phase.id} data-type={phase.type} data-error={phase.error}>
+                <button
+                  type="button"
+                  aria-pressed={selected?.id === phase.id}
+                  onClick={() => selectId(phase.id)}
+                  title={phase.label}
+                >
+                  <span className="trace-lifecycle-marker" aria-hidden="true" />
+                  <span className="trace-lifecycle-label">{phase.label}</span>
+                  <span className="trace-lifecycle-time">
+                    +{formatDuration(phase.offsetMs)}
+                    {phase.durationMs !== undefined ? ` · ${formatDuration(phase.durationMs)}` : ""}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      ) : null}
+
+      <div className="trace-toolbar" role="group" aria-label="Trace filters">
+        <label className="trace-search">
+          <span className="sr-only">Search steps</span>
+          <Search aria-hidden="true" />
           <input
-            aria-label="Search steps"
-            placeholder="Search lifecycle…"
+            type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search steps, events, IDs or status"
+            autoComplete="off"
+            spellCheck={false}
           />
-        ) : (
-          <Field
-            label="Search steps"
-            value={query}
-            onChange={setQuery}
-            placeholder="Step, event, ID, kind, or status"
-          />
-        )}
-        {!compact && (
-          <Button
-            variant={errorsOnly ? "default" : "secondary"}
-            size="sm"
-            aria-pressed={errorsOnly}
-            onPress={() => setErrorsOnly((value) => !value)}
-          >
-            <TriangleAlert aria-hidden="true" className="size-3.5" /> Errors only
-          </Button>
-        )}
+        </label>
+        <Button
+          variant={errorsOnly ? "default" : "secondary"}
+          size="sm"
+          aria-pressed={errorsOnly}
+          isDisabled={summary.errors === 0 && !errorsOnly}
+          onPress={() => setErrorsOnly((value) => !value)}
+        >
+          <TriangleAlert aria-hidden="true" />
+          <span className={compact ? "sr-only" : undefined}>Errors only</span>
+          {summary.errors > 0 ? (
+            <span className="font-mono tabular-nums">{summary.errors}</span>
+          ) : null}
+        </Button>
         <Button variant="ghost" size="sm" onPress={() => setCollapsed(new Set())}>
-          <ChevronsUpDown aria-hidden="true" className="size-3.5" />{" "}
+          <ChevronsUpDown aria-hidden="true" />
           <span className={compact ? "sr-only" : undefined}>Expand all</span>
         </Button>
-        <Button variant="ghost" size="sm" onPress={() => setCollapsed(new Set(parentIds))}>
-          <ChevronsDownUp aria-hidden="true" className="size-3.5" />{" "}
+        <Button variant="ghost" size="sm" onPress={() => setCollapsed(new Set(expandable))}>
+          <ChevronsDownUp aria-hidden="true" />
           <span className={compact ? "sr-only" : undefined}>Collapse all</span>
         </Button>
-      </Card>
+        <span className="trace-step-count">
+          {rows.length} of {total} steps
+        </span>
+      </div>
+
       {items.length === 0 ? (
-        <p className="supporting-copy">No steps are retained for this trace.</p>
-      ) : visible.length === 0 ? (
-        <p className="supporting-copy">No steps match the active filters.</p>
+        <EmptyState size="sm" variant="bare" title="No steps are retained for this trace." />
       ) : (
-        <TraceWaterfallRows
-          items={visible}
-          collapsed={collapsed}
-          onSelect={(span) => setSelectedId(span.id)}
-          {...(highlightedSpanId ? { highlightedSpanId } : {})}
-        />
+        <div className="trace-body">
+          {rows.length === 0 ? (
+            <EmptyState size="sm" variant="bare" title="No steps match the active filters." />
+          ) : (
+            <TraceWaterfallRows
+              rows={rows}
+              clock={clock}
+              collapsed={collapsed}
+              selectedId={selected?.id}
+              onSelect={select}
+              onToggle={toggle}
+              {...(highlightedSpanId ? { highlightedSpanId } : {})}
+            />
+          )}
+          <TraceStepDetails row={selected} clock={clock} onSelectSpan={selectId} />
+        </div>
       )}
-      <OverlayDialog
-        placement="right"
-        title={selected?.name ?? "Span"}
-        {...(selected
-          ? { description: `${selected.kind} · ${duration(selected.durationMs)}` }
-          : {})}
-        isOpen={selected !== undefined}
-        onOpenChange={(open) => !open && setSelectedId(undefined)}
-        trigger={<Button style={{ display: "none" }}>Inspect span</Button>}
-      >
-        {selected && <ContentTabs label="Span details" items={detailTabs(selected)} />}
-      </OverlayDialog>
     </section>
   );
 }
 
-function matches(span: WaterfallSpan, query: string, errorsOnly: boolean): boolean {
-  if (errorsOnly && !span.error) return false;
+function matches(row: TraceRow, query: string, errorsOnly: boolean): boolean {
+  if (errorsOnly && !row.span.error) return false;
   const value = query.trim().toLowerCase();
-  return (
-    value === "" ||
-    `${span.name} ${span.spanId} ${span.kind} ${span.status ?? ""} ${span.outcome ?? ""} ${span.events.map((event) => event.name).join(" ")}`
-      .toLowerCase()
-      .includes(value)
-  );
-}
-
-function hidden(
-  span: WaterfallSpan,
-  items: readonly WaterfallSpan[],
-  collapsed: ReadonlySet<string>,
-): boolean {
-  const parents = new Map(items.map((item) => [item.id, item.parentId]));
-  const seen = new Set<string>();
-  let parent = span.parentId;
-  while (parent && !seen.has(parent)) {
-    seen.add(parent);
-    if (collapsed.has(parent)) return true;
-    parent = parents.get(parent);
-  }
-  return false;
+  if (value === "") return true;
+  const { span, event } = row;
+  return `${event?.name ?? ""} ${span.name} ${span.spanId} ${span.kind} ${span.operationType} ${span.status ?? ""} ${span.outcome ?? ""}`
+    .toLowerCase()
+    .includes(value);
 }

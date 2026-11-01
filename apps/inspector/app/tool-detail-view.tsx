@@ -1,7 +1,25 @@
+import { ShieldCheck, Wrench } from "lucide-react";
+import Link from "next/link";
+import { CodeBlock } from "../components/blocks/code-block";
+import { DetailList } from "../components/blocks/details";
+import { Section } from "../components/blocks/section";
+import { EmptyState } from "../components/neon/empty-state";
+import { StatusBadge, statusTone, type StatusTone } from "../components/neon/status-badge";
+import { Timeline } from "../components/neon/timeline";
+import { ContentTabs } from "../components/ui/tabs";
 import type { InspectorApiClient } from "../lib/api";
 import type { ToolApprovalView, ToolView } from "../lib/agents-model";
+import { formatDuration } from "../lib/format";
+import { DetailLayout } from "./detail-layout";
 import { ToolApprovalActions } from "./tool-approval-actions";
-import { SchemaPanel } from "./schema-panel";
+
+/** Side effects read from calm to loud: reads are quiet, writes warn, the rest are dangerous. */
+export function sideEffectTone(value: string): StatusTone {
+  const word = value.toLowerCase();
+  if (word === "" || word === "none" || word === "read" || word === "pure") return "neutral";
+  if (word === "write" || word === "idempotent" || word === "mutation") return "warning";
+  return "danger";
+}
 
 export function ToolDetailView({
   api,
@@ -18,48 +36,100 @@ export function ToolDetailView({
   readonly graphHash: string;
   readonly onComplete: () => Promise<void>;
 }) {
+  const approvalRequired = view.approvalPolicy !== "never" && view.approvalPolicy !== "none";
   return (
-    <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">ACTIVE WORKSPACE</p>
-          <h1>Tool detail</h1>
-          <p className="lede">A tool exposes one function contract and never owns a handler.</p>
-        </div>
-        <span className="badge">{view.id}</span>
-      </header>
-      <section className="panel route-identity" aria-labelledby="tool-identity-heading">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">TOOL POLICY</p>
-            <h2 id="tool-identity-heading">{view.description || view.id}</h2>
-          </div>
-          <span className="badge">{view.sideEffect}</span>
-        </div>
-        <dl className="route-meta">
-          <Meta label="Target function" value={view.targetFunctionId || "Unavailable"} />
-          <Meta label="Approval" value={view.approvalPolicy} />
-          <Meta
-            label="Timeout"
-            value={view.timeoutMs === undefined ? "Provider default" : `${view.timeoutMs} ms`}
-          />
-        </dl>
-      </section>
-      <div className="route-contract-grid">
-        <JsonPanel title="Inherited input schema" value={view.input} />
-        <JsonPanel title="Inherited output schema" value={view.output} />
-        <JsonPanel title="Inherited errors" value={view.errors} />
-      </div>
+    <DetailLayout
+      header={{
+        kicker: "Tool",
+        title: view.id,
+        icon: <Wrench />,
+        description:
+          view.description || "A tool exposes one function contract and never owns a handler.",
+        badges: (
+          <>
+            <StatusBadge tone={sideEffectTone(view.sideEffect)} label={view.sideEffect} />
+            <StatusBadge
+              tone={approvalRequired ? "warning" : "neutral"}
+              label={`approval ${view.approvalPolicy}`}
+            />
+          </>
+        ),
+        ...(view.targetFunctionId === "" ? {} : { meta: <span>→ {view.targetFunctionId}</span> }),
+      }}
+      aside={<TimelinePanel view={view} />}
+    >
+      <Section title="Tool detail" id="tool-identity" description="Contract and approval policy">
+        <DetailList
+          columns={2}
+          items={[
+            {
+              label: "Target function",
+              mono: true,
+              value:
+                view.targetFunctionId === "" ? (
+                  "Unavailable"
+                ) : (
+                  <Link href={`/functions/${encodeURIComponent(view.targetFunctionId)}`}>
+                    {view.targetFunctionId}
+                  </Link>
+                ),
+            },
+            {
+              label: "Timeout",
+              value:
+                view.timeoutMs === undefined ? "Provider default" : formatDuration(view.timeoutMs),
+              mono: true,
+            },
+            {
+              label: "Side effect",
+              value: <StatusBadge tone={sideEffectTone(view.sideEffect)} label={view.sideEffect} />,
+            },
+            {
+              label: "Approval",
+              value: (
+                <StatusBadge
+                  tone={approvalRequired ? "warning" : "neutral"}
+                  label={view.approvalPolicy}
+                />
+              ),
+            },
+          ]}
+        />
+      </Section>
       <ApprovalPanel
         approvals={view.pendingApprovals}
-        api={api}
+        client={api}
         capabilities={capabilities}
         generationId={generationId}
         graphHash={graphHash}
         onComplete={onComplete}
       />
-      <TimelinePanel view={view} />
-    </div>
+      <Section
+        title="Inherited contract"
+        description="Input, output and errors come from the target function"
+      >
+        <ContentTabs
+          label="Tool schemas"
+          items={[
+            {
+              id: "input",
+              label: "Input schema",
+              content: <CodeBlock value={view.input} label="input schema" />,
+            },
+            {
+              id: "output",
+              label: "Output schema",
+              content: <CodeBlock value={view.output} label="output schema" />,
+            },
+            {
+              id: "errors",
+              label: "Errors",
+              content: <CodeBlock value={view.errors} label="errors" />,
+            },
+          ]}
+        />
+      </Section>
+    </DetailLayout>
   );
 }
 
@@ -71,79 +141,90 @@ function ApprovalPanel({
   "approval"
 >) {
   return (
-    <section className="panel" aria-labelledby="tool-approvals-heading">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">PROTECTED ACTIONS</p>
-          <h2 id="tool-approvals-heading">Pending approvals</h2>
-        </div>
-        <span className="badge">{approvals.length}</span>
-      </div>
+    <Section
+      title="Pending approvals"
+      id="tool-approvals"
+      description="Protected actions"
+      flush
+      actions={<Count value={approvals.length} />}
+    >
       {approvals.length === 0 ? (
-        <p className="supporting-copy">No pending approval metadata is available.</p>
+        <EmptyState
+          variant="bare"
+          size="sm"
+          icon={<ShieldCheck />}
+          title="No pending approval metadata is available."
+          description="Calls that need approval wait here until someone approves or denies them."
+        />
       ) : (
-        <ul className="request-list">
+        <ul className="m-0 list-none p-0">
           {approvals.map((approval) => (
-            <li className="request-row" key={`${approval.invocationId}:${approval.toolCallId}`}>
-              <span>
-                <strong>{approval.toolCallId}</strong>
-                <br />
-                <small>
-                  Invocation {approval.invocationId} ·{" "}
+            <li
+              className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 px-4 py-2.5 last:border-b-0"
+              key={`${approval.invocationId}:${approval.toolCallId}`}
+            >
+              <span className="grid min-w-0 gap-0.5">
+                <span className="flex items-center gap-2">
+                  <StatusBadge tone="warning" label={approval.state} />
+                  <code className="truncate font-mono text-xs font-medium">
+                    {approval.toolCallId}
+                  </code>
+                </span>
+                <span className="truncate font-mono text-[11px] text-muted-foreground">
+                  invocation {approval.invocationId} ·{" "}
                   {approval.sideEffect || "side effect unavailable"}
-                </small>
+                </span>
               </span>
               <ToolApprovalActions {...props} approval={approval} />
             </li>
           ))}
         </ul>
       )}
-    </section>
+    </Section>
   );
 }
 
 function TimelinePanel({ view }: { readonly view: ToolView }) {
   return (
-    <section className="panel" aria-labelledby="tool-timeline-heading">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">INVOCATION TIMELINE</p>
-          <h2 id="tool-timeline-heading">Safe execution metadata</h2>
-        </div>
-        <span className="badge">{view.timeline.length}</span>
-      </div>
-      {view.timeline.length === 0 ? (
-        <p className="supporting-copy">No invocation or span metadata is available.</p>
-      ) : (
-        <ul className="request-list">
-          {view.timeline.map((entry) => (
-            <li className="request-row" key={`${entry.kind}:${entry.id}`}>
-              <span>
-                <strong>{entry.kind}</strong> <code>{entry.id}</code>
+    <Section
+      title="Safe execution metadata"
+      id="tool-timeline"
+      description="Arguments and results are not rendered"
+      actions={<Count value={view.timeline.length} />}
+    >
+      <Timeline
+        label="Tool invocation timeline"
+        empty={
+          <p className="m-0 text-xs text-muted-foreground">
+            No invocation or span metadata is available.
+          </p>
+        }
+        items={view.timeline.map((entry) => {
+          const word = entry.outcome || entry.status || "recorded";
+          return {
+            id: `${entry.kind}:${entry.id}`,
+            title: (
+              <span className="flex min-w-0 items-center gap-2">
+                <span className="shrink-0 rounded-sm bg-muted px-1.5 py-px font-mono text-[10.5px] font-semibold">
+                  {entry.kind}
+                </span>
+                <code className="truncate font-mono text-xs">{entry.id}</code>
               </span>
-              <span>
-                {entry.status || "recorded"}
-                {entry.outcome ? ` · ${entry.outcome}` : ""}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-      <p className="supporting-copy">
-        Prompt, tool arguments, and model results are not rendered by default.
-      </p>
-    </section>
+            ),
+            tone: statusTone(word),
+            at: entry.at,
+            meta: [entry.status || "recorded", ...(entry.outcome ? [entry.outcome] : [])],
+          };
+        })}
+      />
+    </Section>
   );
 }
 
-function JsonPanel({ title, value }: { readonly title: string; readonly value: unknown }) {
-  return <SchemaPanel title={title} value={value} eyebrow="SAFE SCHEMA" />;
-}
-function Meta({ label, value }: { readonly label: string; readonly value: string }) {
+function Count({ value }: { readonly value: number }) {
   return (
-    <div>
-      <dt>{label}</dt>
-      <dd>{value}</dd>
-    </div>
+    <span className="rounded-sm border border-border px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground tabular-nums">
+      {value}
+    </span>
   );
 }

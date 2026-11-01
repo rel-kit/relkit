@@ -23,7 +23,7 @@ test("loads the active graph and follows route/detail/composer flows", async ({ 
   await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
   await expect(page.getByText(graphHash).first()).toBeVisible();
 
-  await page.getByRole("link", { name: "Routes" }).click();
+  await page.getByRole("link", { name: "Routes", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Routes" })).toBeVisible();
   await page.goto("/routes/orders.create.http");
   await expect(page.getByRole("heading", { name: "Route detail" })).toBeVisible();
@@ -35,7 +35,7 @@ test("loads the active graph and follows route/detail/composer flows", async ({ 
   await page.getByRole("button", { name: "Send request" }).click();
   await expect(page.getByRole("heading", { name: "Active backend result" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open request record" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Open trace" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Open trace", exact: true })).toHaveCount(0);
 });
 
 test("keeps contracts available when observability is unavailable", async ({ page }) => {

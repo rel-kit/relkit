@@ -20,11 +20,29 @@ export async function readPayload(response: Response): Promise<unknown> {
   try {
     return await response.json();
   } catch {
+    // A non-JSON error (e.g. a router's plain-text 404 for an unmounted route) keeps its status
+    // so callers can tell "not mounted" apart from a corrupt reply, and 4xx stays non-retryable.
+    if (!response.ok)
+      throw new InspectorApiError(
+        `HTTP_${response.status}`,
+        `HTTP_${response.status}`,
+        response.status,
+      );
     throw new InspectorApiError(
       "Inspector returned invalid JSON",
       "RELKIT_INSPECTOR_INVALID_RESPONSE",
     );
   }
+}
+
+export const NO_JOBS_MESSAGE = "This application defines no jobs.";
+
+/**
+ * Jobs routes are mounted only when the application declares jobs, so a list
+ * endpoint answering with a bare 404 means "no jobs", not an outage.
+ */
+export function jobsNotMounted(error: unknown): boolean {
+  return error instanceof InspectorApiError && error.code === "HTTP_404";
 }
 
 export function errorCode(value: unknown): string | undefined {

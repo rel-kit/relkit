@@ -3,6 +3,8 @@
 import { useState } from "react";
 import type { InspectorObject } from "../../lib/api-types";
 import { type JobAction, supportsJobAction } from "../../lib/job-actions";
+import { RotateCcw, X } from "lucide-react";
+import { Button } from "../../components/ui/button";
 import { ConfirmationDialog } from "../confirmation-dialog";
 
 export function JobActionButtons({
@@ -51,25 +53,33 @@ export function JobActionButtons({
   const actionBusy = pending || actionPending;
 
   return (
-    <div className="route-row-detail" role="group" aria-label={`Local actions for ${label}`}>
-      <button
-        className="button-link"
-        type="button"
-        disabled={!retryEnabled || actionBusy || confirming !== undefined}
-        onClick={() => request("retry")}
+    <div
+      className="flex flex-wrap items-center gap-1.5"
+      role="group"
+      aria-label={`Local actions for ${label}`}
+    >
+      <Button
+        variant="secondary"
+        size="sm"
+        isDisabled={!retryEnabled || actionBusy || confirming !== undefined}
+        onPress={() => request("retry")}
       >
+        <RotateCcw aria-hidden="true" />
         Retry dead letter
-      </button>
-      <button
-        className="button-link"
-        type="button"
-        disabled={!cancelEnabled || actionBusy || confirming !== undefined}
-        onClick={() => request("cancel")}
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        isDisabled={!cancelEnabled || actionBusy || confirming !== undefined}
+        onPress={() => request("cancel")}
       >
+        <X aria-hidden="true" />
         Cancel
-      </button>
+      </Button>
       {!supportsJobAction(capabilities, "retry") && !supportsJobAction(capabilities, "cancel") && (
-        <small className="supporting-copy">Local actions are not advertised by this API.</small>
+        <small className="text-[11px] text-muted-foreground">
+          Local actions are not advertised by this API.
+        </small>
       )}
       <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {status}

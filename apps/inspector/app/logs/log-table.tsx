@@ -2,7 +2,14 @@
 
 import type { InspectorObject } from "../../lib/api-types";
 import { text } from "../../lib/observability-model";
+import { cn } from "../../lib/utils";
+import { AnsiText, stripAnsi } from "./ansi-text";
+import { fieldsPreview, levelClass, logClock, logEntity } from "./log-format";
 
+/*
+ * Dense mono log rows in the Neon LogsViewer style, kept as a real table so each line stays a
+ * row with named columns. The message cell holds the row's one focusable control.
+ */
 export function LogTable({
   items,
   selected,
@@ -15,61 +22,58 @@ export function LogTable({
   return (
     <table className="log-table">
       <caption className="sr-only">Log results. Use arrow keys to inspect adjacent logs.</caption>
-      <colgroup>
-        <col className="log-date" />
-        <col className="log-time" />
-        <col className="log-level" />
-        <col className="log-entity" />
-        <col />
-        <col className="log-data" />
-      </colgroup>
       <thead>
         <tr>
-          <th scope="col">Date</th>
-          <th scope="col">Time</th>
-          <th scope="col">Level</th>
-          <th scope="col">Entity</th>
+          <th scope="col" className="log-col-time">
+            Time
+          </th>
+          <th scope="col" className="log-col-level">
+            Level
+          </th>
+          <th scope="col" className="log-col-entity">
+            Entity
+          </th>
           <th scope="col">Message</th>
-          <th scope="col">Data</th>
+          <th scope="col" className="log-col-fields">
+            Fields
+          </th>
         </tr>
       </thead>
       <tbody>
         {items.map((item, index) => {
           const cursor = text(item.cursor);
-          const date = new Date(text(item.timestamp));
-          const valid = Number.isFinite(date.getTime());
+          const timestamp = text(item.timestamp);
+          const clock = logClock(timestamp);
+          const level = text(item.level);
           const message = text(item.message);
+          const plain = stripAnsi(message);
+          const entity = logEntity(item);
+          const fields = fieldsPreview(item);
+          const isSelected = selected === cursor;
           return (
-            <tr key={cursor} data-selected={selected === cursor} onClick={() => onSelect(cursor)}>
-              <td>
-                {valid
-                  ? date.toLocaleDateString(undefined, { month: "short", day: "numeric" })
-                  : "—"}
+            <tr
+              key={cursor}
+              data-selected={isSelected}
+              data-level={level}
+              onClick={() => onSelect(cursor)}
+            >
+              <td className="log-col-time" title={timestamp || undefined}>
+                {clock.day ? <span className="log-day">{clock.day} </span> : null}
+                {clock.time}
               </td>
-              <td className="log-mono">
-                {valid
-                  ? date.toLocaleTimeString(undefined, {
-                      hour12: false,
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      second: "2-digit",
-                      fractionalSecondDigits: 3,
-                    })
-                  : "—"}
-              </td>
-              <td>
-                <span className="log-severity" data-level={text(item.level)}>
-                  {text(item.level).toUpperCase()}
+              <td className="log-col-level">
+                <span className={cn("log-severity", levelClass(level))} data-level={level}>
+                  {level.toUpperCase() || "—"}
                 </span>
               </td>
-              <td title={text(item.functionId) || text(item.component)}>
-                {text(item.functionId) || text(item.component) || "—"}
+              <td className="log-col-entity" title={entity || undefined}>
+                {entity || "—"}
               </td>
-              <td className="log-mono">
+              <td className="log-col-message">
                 <button
                   type="button"
                   data-log-cursor={cursor}
-                  aria-pressed={selected === cursor}
+                  aria-pressed={isSelected}
                   onKeyDown={(event) => {
                     if (!["ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
                     event.preventDefault();
@@ -88,13 +92,13 @@ export function LogTable({
                         ?.focus();
                     }
                   }}
-                  title={message}
+                  title={plain}
                 >
-                  {message || "(empty message)"}
+                  {message ? <AnsiText value={message} /> : "(empty message)"}
                 </button>
               </td>
-              <td className="log-mono" title={JSON.stringify(item.fields)}>
-                {JSON.stringify(item.fields ?? {})}
+              <td className="log-col-fields" title={fields || undefined}>
+                {fields}
               </td>
             </tr>
           );

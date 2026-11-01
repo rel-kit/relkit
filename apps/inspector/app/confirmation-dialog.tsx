@@ -42,7 +42,7 @@ export function ConfirmationDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="confirmation-dialog"
+      className="confirmation-dialog rounded-lg border border-border bg-popover text-foreground"
       aria-modal="true"
       aria-labelledby={`${id}-title`}
       aria-describedby={`${id}-description`}
@@ -51,25 +51,42 @@ export function ConfirmationDialog({
         if (!busy) onCancel();
       }}
     >
-      <div className="confirmation-dialog-content">
-        <h2 id={`${id}-title`}>{title}</h2>
-        <p id={`${id}-description`}>{description}</p>
+      <div className="confirmation-dialog-content grid gap-3 p-5">
+        <h2 id={`${id}-title`} className="text-[15px] font-semibold text-foreground">
+          {title}
+        </h2>
+        <p id={`${id}-description`} className="m-0 text-[13px] leading-5 text-muted-foreground">
+          {description}
+        </p>
         {busy && (
-          <p className="supporting-copy" role="status" aria-live="polite">
+          <p
+            className="m-0 flex items-center gap-2 font-mono text-[11px] text-muted-foreground"
+            role="status"
+            aria-live="polite"
+          >
+            <span
+              aria-hidden="true"
+              className="neon-status-breathe size-1.5 rounded-[1px] bg-live text-live"
+            />
             Applying action…
           </p>
         )}
-        <div className="dialog-actions">
+        <div className="dialog-actions mt-2 flex justify-end gap-2">
           <button
             ref={cancelRef}
-            className="button-link button-link--quiet"
+            className={`${buttonBase} border border-border bg-card text-foreground hover:bg-muted`}
             type="button"
             disabled={busy}
             onClick={onCancel}
           >
             Cancel
           </button>
-          <button className="button-link" type="button" disabled={busy} onClick={onConfirm}>
+          <button
+            className={`${buttonBase} bg-primary text-primary-foreground hover:bg-primary/90`}
+            type="button"
+            disabled={busy}
+            onClick={onConfirm}
+          >
             {busy ? "Applying…" : confirmLabel}
           </button>
         </div>
@@ -77,3 +94,6 @@ export function ConfirmationDialog({
     </dialog>
   );
 }
+
+const buttonBase =
+  "inline-flex h-8 items-center justify-center gap-1.5 rounded-md px-3 text-[13px] font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/60 disabled:pointer-events-none disabled:opacity-50";

@@ -5,10 +5,13 @@ import type { InspectorObject, InspectorPage, InspectorQuery } from "../lib/api-
 import { createInspectorClient } from "../lib/client";
 import { unpagedQuery } from "../lib/list-query";
 import { agentViews } from "../lib/agents-model";
+import { StatusBadge } from "../components/neon/status-badge";
 import { ResourceTable, type ResourceTableItem } from "./resource-table";
 
 interface AgentItem extends ResourceTableItem {
   readonly model: string;
+  readonly client: string;
+  readonly chat: boolean;
   readonly tools: number;
   readonly generatedFunction: string;
   readonly invocations: number;
@@ -32,6 +35,8 @@ export function AgentsClient() {
             {
               id: view.id,
               model: view.model || "unavailable",
+              client: view.client,
+              chat: view.chat,
               tools: view.toolIds.length,
               generatedFunction: view.generatedFunctionId,
               invocations: view.runtime.length,
@@ -49,12 +54,48 @@ export function AgentsClient() {
       load={load}
       statusOptions={statuses}
       columns={[
-        { key: "model", label: "Model", render: (item) => item.model },
-        { key: "tools", label: "Allowed tools", render: (item) => item.tools },
+        {
+          key: "model",
+          label: "Model",
+          render: (item) => <code className="font-mono text-xs">{item.model}</code>,
+        },
+        {
+          key: "client",
+          label: "Client",
+          render: (item) => (
+            <StatusBadge
+              tone={item.client === "internal" ? "neutral" : "info"}
+              label={item.chat ? `${item.client} · chat` : item.client}
+            />
+          ),
+        },
+        {
+          key: "tools",
+          label: "Tools",
+          render: (item) => (
+            <span className="font-mono text-xs tabular-nums">
+              {item.tools}
+              <span className="text-muted-foreground"> allowed</span>
+            </span>
+          ),
+        },
         {
           key: "runtime",
           label: "Runtime",
-          render: (item) => `${item.invocations} invocations · ${item.generatedFunction}`,
+          render: (item) => (
+            <span className="flex min-w-0 flex-col">
+              <span className="font-mono text-xs tabular-nums">
+                {item.invocations}
+                <span className="text-muted-foreground"> invocations</span>
+              </span>
+              <code
+                className="truncate font-mono text-[11px] text-muted-foreground"
+                title={item.generatedFunction}
+              >
+                {item.generatedFunction}
+              </code>
+            </span>
+          ),
         },
       ]}
       href={(item) => `/agents/${encodeURIComponent(item.id)}`}

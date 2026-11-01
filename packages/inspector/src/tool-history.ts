@@ -61,3 +61,13 @@ export const recoverInspection = Effect.fn("Inspector.recover")(function* (
   if (historyFailure && current.history) yield* Scope.close(current.history.scope, Exit.void);
   yield* Effect.sleep(1000);
 });
+
+/**
+ * Names the remedy for a locked history database. DuckDB reports the holder's
+ * PID; only that number is echoed, never the file path or the rest of the message.
+ */
+export function historyFailureHint(error: InspectionConnectionError): string | undefined {
+  if (error.operation !== "history.writer-conflict") return undefined;
+  const pid = /\bPID (\d+)/.exec(error.cause.message)?.[1];
+  return `Inspection history is locked by another process${pid ? ` (PID ${pid})` : ""}. Stop the other inspector for this project, or pass --history-directory`;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createInspectorBackendStream, createInspectorClient } from "../lib/client";
 import { normalizeDiagnostics, type DiagnosticsSnapshot } from "../lib/env-diagnostics-model";
 import { DiagnosticsView } from "./diagnostics-view";
@@ -9,6 +9,7 @@ export function DiagnosticsClient() {
   const [snapshot, setSnapshot] = useState<DiagnosticsSnapshot>();
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [liveState, setLiveState] = useState("connecting");
+  const reload = useRef<() => void>(() => undefined);
 
   useEffect(() => {
     let disposed = false;
@@ -25,6 +26,7 @@ export function DiagnosticsClient() {
           if (!disposed) setState("error");
         });
     };
+    reload.current = load;
     const stream = createInspectorBackendStream({
       cache: { invalidate: (tags) => api.invalidate(tags) },
       onStateChange: (current) => {
@@ -38,9 +40,17 @@ export function DiagnosticsClient() {
     stream.start();
     return () => {
       disposed = true;
+      reload.current = () => undefined;
       stream.stop();
     };
   }, []);
 
-  return <DiagnosticsView snapshot={snapshot} state={state} liveState={liveState} />;
+  return (
+    <DiagnosticsView
+      snapshot={snapshot}
+      state={state}
+      liveState={liveState}
+      onRetry={() => reload.current()}
+    />
+  );
 }

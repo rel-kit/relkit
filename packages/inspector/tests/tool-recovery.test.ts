@@ -1,6 +1,6 @@
 /** Storage startup/retry ownership cannot leak leases or spin after the bounded recovery budget. */
 import { expect, it } from "@effect/vitest";
-import { Cause, Deferred, Effect, Exit, Fiber, Layer, Ref } from "effect";
+import { Cause, Deferred, Effect, Exit, Fiber, Layer, Logger, Ref, Scope } from "effect";
 import { TestClock } from "effect/testing";
 import { InspectionConnectionError } from "@relkit/inspector-api/connection";
 import type { InspectionFilesOperations } from "@relkit/inspector-api/connection";
@@ -71,42 +71,92 @@ it.effect("a mixed discovery failure and defect never becomes a recoverable retr
   ),
 );
 
-it.effect(
-  "three failed openings release every partial lease and stop automatic history retries",
-  () =>
-    Effect.scoped(
-      Effect.gen(function* () {
-        const counts = { attempts: 0, released: 0 };
-        const entered = yield* Deferred.make<void>();
-        const native = failedOpenings(entered, counts);
-        const current = yield* state();
-        const events = yield* acquireLiveEvents;
-        const fiber = yield* Effect.forkChild(
-          Effect.scoped(
-            inspectionLoop(
-              current,
-              { select: () => Effect.succeed({ state: "disconnected", rejected: 0 }) },
-              remote,
-              files,
-              options,
-              events,
-            ),
-          ).pipe(Effect.provide(native)),
-        );
-        yield* Deferred.await(entered);
-        yield* TestClock.adjust(5000);
-        expect(counts.attempts).toBe(3);
-        expect(counts.released).toBe(3);
-        expect(yield* Ref.get(current)).toMatchObject({
-          history: undefined,
-          error: "history.writer-conflict",
-          incomplete: true,
-        });
-        yield* TestClock.adjust(5000);
-        expect(counts.attempts).toBe(3);
-        yield* Fiber.interrupt(fiber);
-      }),
-    ),
+it.effect("three failed openings release every partial lease and back off history retries", () =>
+  Effect.scoped(
+    Effect.gen(function* () {
+      const counts = { attempts: 0, released: 0 };
+      const entered = yield* Deferred.make<void>();
+      const native = failedOpenings(entered, counts);
+      const current = yield* state();
+      const events = yield* acquireLiveEvents;
+      const fiber = yield* Effect.forkChild(
+        Effect.scoped(
+          inspectionLoop(
+            current,
+            { select: () => Effect.succeed({ state: "disconnected", rejected: 0 }) },
+            remote,
+            files,
+            options,
+            events,
+          ),
+        ).pipe(Effect.provide(native)),
+      );
+      yield* Deferred.await(entered);
+      yield* TestClock.adjust(5000);
+      expect(counts.attempts).toBe(3);
+      expect(counts.released).toBe(3);
+      expect(yield* Ref.get(current)).toMatchObject({
+        history: undefined,
+        error: "history.writer-conflict",
+        incomplete: true,
+      });
+      yield* TestClock.adjust(5000);
+      expect(counts.attempts).toBe(3);
+      // A released lock (for example a stopped stale inspector) is picked up without a restart.
+      yield* TestClock.adjust(25_000);
+      expect(counts.attempts).toBe(4);
+      expect(counts.released).toBe(4);
+      yield* TestClock.adjust(5000);
+      expect(counts.attempts).toBe(4);
+      yield* Fiber.interrupt(fiber);
+    }),
+  ),
+);
+
+it.effect("a lock conflict after history reopened names its holder again", () =>
+  Effect.scoped(
+    Effect.gen(function* () {
+      const counts = { attempts: 0, released: 0 };
+      const entered = yield* Deferred.make<void>();
+      const warnings: string[] = [];
+      const logger = Logger.layer([
+        Logger.make((event) => {
+          if (event.logLevel === "Warn") warnings.push(String(event.message));
+        }),
+      ]);
+      const current = yield* state();
+      const events = yield* acquireLiveEvents;
+      const fiber = yield* Effect.forkChild(
+        Effect.scoped(
+          inspectionLoop(
+            current,
+            { select: () => Effect.succeed({ state: "disconnected", rejected: 0 }) },
+            remote,
+            files,
+            options,
+            events,
+          ),
+        ).pipe(Effect.provide(Layer.merge(failedOpenings(entered, counts), logger))),
+      );
+      yield* Deferred.await(entered);
+      yield* TestClock.adjust(5000);
+      expect(warnings).toHaveLength(2);
+      expect(warnings[1]).toContain("retrying every 30s");
+
+      // History opens (the lock was released) while still disconnected, then is lost again.
+      const scope = yield* Scope.make();
+      yield* Ref.update(current, (value) => ({
+        ...value,
+        history: { projectId: "project", scope, operations: {} as never },
+      }));
+      yield* TestClock.adjust(30_000);
+      yield* Ref.update(current, (value) => ({ ...value, history: undefined }));
+      yield* TestClock.adjust(1000);
+      expect(warnings).toHaveLength(3);
+      expect(warnings[2]).toContain("locked by another process");
+      yield* Fiber.interrupt(fiber);
+    }),
+  ),
 );
 
 it.effect("cancellation during opening joins its partial native resource", () =>

@@ -17,12 +17,17 @@ import {
 } from "../lib/observability-model";
 import { defaultSignalFilters } from "../lib/signal-defaults";
 import { Pagination } from "../components/ui/pagination";
+import { FailedState, LoadingRows } from "../components/blocks/block-state";
+import { PageHeader } from "../components/blocks/page-header";
+import { Section } from "../components/blocks/section";
+import { StatusBadge, statusTone } from "../components/neon/status-badge";
 import { SignalsFilters } from "./signals-filters";
 import { SignalRows } from "./signal-rows";
 import { RuntimeStatus } from "./runtime-status";
 import { signalEventTypes } from "../lib/signal-events";
 
-export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
+/** The Requests history page: bounded filters, live-merged rows and cursor pagination. */
+export function SignalsClient({ kind }: { readonly kind: Extract<SignalKind, "requests"> }) {
   const [draft, setDraft] = useState<SignalFilters>(() => defaultSignalFilters(kind));
   const [filters, setFilters] = useState<SignalFilters>(() => defaultSignalFilters(kind));
   const [limit, setLimit] = useState(50);
@@ -35,7 +40,7 @@ export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
   const [announcement, setAnnouncement] = useState("Loading telemetry…");
   const cursor = cursors[pageIndex];
   const query = useMemo(() => queryFromFilters(filters, limit, cursor), [filters, limit, cursor]);
-  const title = kind === "requests" ? "Requests" : kind === "logs" ? "Logs" : "Traces";
+  const title = "Requests";
 
   useEffect(() => {
     let mounted = true;
@@ -103,22 +108,20 @@ export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
 
   return (
     <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">ACTIVE WORKSPACE</p>
-          <h1>{title}</h1>
-          <p className="lede">
-            Retained redacted telemetry. Capture and history are bounded; external sampling is
-            independent.
-          </p>
-        </div>
-        <div className="signal-status" role="status" aria-live="polite">
-          <span className="badge">{items.length} visible</span>
-          <span>Live: {liveState}</span>
-          <span className="sr-only">{announcement}</span>
-        </div>
-      </header>
-      <RuntimeStatus telemetryOnly />
+      <PageHeader
+        title={title}
+        description="Retained redacted telemetry. Capture and history are bounded; external sampling is independent."
+        badges={<StatusBadge tone="neutral" label={`${items.length} visible`} />}
+        actions={
+          <div className="flex items-center gap-2" role="status" aria-live="polite">
+            <StatusBadge
+              tone={liveState === "connected" ? "live" : statusTone(liveState)}
+              label={`Live: ${liveState}`}
+            />
+            <span className="sr-only">{announcement}</span>
+          </div>
+        }
+      />
       <SignalsFilters
         kind={kind}
         value={draft}
@@ -131,17 +134,26 @@ export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
         onSubmit={apply}
         onReset={reset}
       />
-      {state === "loading" && (
-        <p className="panel route-state" role="status">
-          Loading {title.toLowerCase()}…
-        </p>
-      )}
-      {state === "error" && (
-        <p className="panel route-state" role="alert">
-          The {title.toLowerCase()} API is unavailable.
-        </p>
-      )}
-      {state === "ready" && <SignalRows kind={kind} items={items} />}
+      <Section
+        flush
+        title="History"
+        description={`Newest first · ${limit} per page · page ${pageIndex + 1}`}
+        actions={
+          <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
+            {items.length} {items.length === 1 ? "record" : "records"}
+          </span>
+        }
+      >
+        {state === "loading" && <LoadingRows label={`Loading ${title.toLowerCase()}…`} rows={8} />}
+        {state === "error" && (
+          <FailedState
+            className="m-3"
+            title={`The ${title.toLowerCase()} API is unavailable.`}
+            description="Retained history is read from the active backend. Check that it is running."
+          />
+        )}
+        {state === "ready" && <SignalRows items={items} />}
+      </Section>
       <Pagination
         page={pageIndex + 1}
         hasPrevious={pageIndex > 0}
@@ -158,6 +170,7 @@ export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
           }
         }}
       />
+      <RuntimeStatus telemetryOnly />
     </div>
   );
 }

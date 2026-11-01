@@ -15,7 +15,9 @@ test.beforeAll(async ({ request }) => {
     "/traces",
     "/traces/00000000000000000000000000000001",
   ]) {
-    const response = await request.get(path);
+    // `next dev` under the suite's heap cap can restart mid-compile and reset the socket;
+    // one retry lets the restarted server finish compiling the page.
+    const response = await request.get(path).catch(() => request.get(path));
     expect(response.status()).toBe(200);
   }
 });
@@ -40,7 +42,7 @@ test("shows a new request live and renders its correlated timeline and edges", a
   await expect(page.getByText("orders.create").first()).toBeVisible();
   await expect(page.getByText("prices.getOrSet").first()).toBeVisible();
 
-  await page.getByRole("link", { name: "Functions" }).click();
+  await page.getByRole("link", { name: "Functions", exact: true }).click();
   await page.getByRole("link", { name: "Open function" }).first().click();
   await expect(page.getByRole("heading", { name: "Declared edges" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Observed recent edges" })).toBeVisible();
@@ -71,22 +73,26 @@ test("follows a paused request through completion and linked work", async ({ pag
   await expect(page.getByRole("heading", { name: "Request timeline" })).toBeVisible();
   await expect(page.getByText("In progress").first()).toBeVisible();
   await page.getByRole("button", { name: "Inspect HTTP POST /orders" }).click();
-  const spanDialog = page.getByRole("dialog", { name: "HTTP POST /orders" });
-  await expect(spanDialog).toBeVisible();
-  await spanDialog.getByRole("tab", { name: "Metadata" }).click();
-  await expect(spanDialog.getByText(/relkit\.request\.id/)).toBeVisible();
-  await spanDialog.getByRole("tab", { name: "Events" }).click();
-  await expect(spanDialog.getByText(/http\.request\.received/)).toBeVisible();
+  // The selected step's details stay open beside the waterfall: attributes and events inline.
+  const stepDetails = page.getByRole("complementary", { name: "Step details" });
+  await expect(stepDetails.getByRole("heading", { name: "HTTP POST /orders" })).toBeVisible();
+  await expect(stepDetails.getByText(/relkit\.request\.id/)).toBeVisible();
+  await expect(stepDetails.getByText(/http\.request\.received/)).toBeVisible();
 
   await request.post(`${backend}/__fixture__/release`);
   await pending;
-  await expect(page.getByText("http.response.completed", { exact: true })).toBeVisible();
+  const timeline = page.getByRole("list", { name: "Ordered trace timeline" });
+  await expect(timeline.getByText("http.response.completed", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Continuations" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open trace" })).toBeVisible();
 
   await page.reload();
   await expect(page.getByText("request-paused-0001").first()).toBeVisible();
-  await expect(page.getByText("http.request.received", { exact: false })).toHaveCount(1);
+  await expect(
+    page
+      .getByRole("list", { name: "Ordered trace timeline" })
+      .getByText("http.request.received", { exact: false }),
+  ).toHaveCount(1);
   await page.getByRole("link", { name: /222222222222/ }).click();
   await expect(page.getByRole("heading", { name: "Trace detail" })).toBeVisible();
 });
@@ -102,7 +108,8 @@ test("pinpoints failed, timed out, cancelled, and incomplete requests", async ({
     await expect(page.getByText(outcome, { exact: true }).first()).toBeVisible();
     await expect(page.getByText(/Incomplete telemetry: missing-parent/)).toBeVisible();
     await page.getByRole("button", { name: "Inspect HTTP POST /orders" }).click();
-    await page.getByRole("tab", { name: "Metadata" }).click();
-    await expect(page.getByText(/"attributes": 2/)).toBeVisible();
+    await expect(
+      page.getByRole("complementary", { name: "Step details" }).getByText(/"attributes": 2/),
+    ).toBeVisible();
   }
 });

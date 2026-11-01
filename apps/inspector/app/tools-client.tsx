@@ -5,7 +5,9 @@ import type { InspectorObject, InspectorPage, InspectorQuery } from "../lib/api-
 import { createInspectorClient } from "../lib/client";
 import { unpagedQuery } from "../lib/list-query";
 import { toolViews } from "../lib/agents-model";
+import { StatusBadge } from "../components/neon/status-badge";
 import { ResourceTable, type ResourceTableItem } from "./resource-table";
+import { sideEffectTone } from "./tool-detail-view";
 
 interface ToolItem extends ResourceTableItem {
   readonly target: string;
@@ -51,16 +53,36 @@ export function ToolsClient() {
       load={load}
       statusOptions={statuses}
       columns={[
-        { key: "target", label: "Target", render: (item) => item.target },
+        {
+          key: "target",
+          label: "Target function",
+          render: (item) => <code className="font-mono text-xs">{item.target}</code>,
+        },
         {
           key: "policy",
           label: "Policy",
-          render: (item) => `${item.sideEffect} · ${item.approval}`,
+          render: (item) => (
+            <span className="flex items-center gap-1 whitespace-nowrap">
+              <StatusBadge tone={sideEffectTone(item.sideEffect)} label={item.sideEffect} />
+              <StatusBadge
+                tone={item.approval === "never" || item.approval === "none" ? "neutral" : "warning"}
+                label={`approval ${item.approval}`}
+              />
+            </span>
+          ),
         },
         {
           key: "runtime",
           label: "Runtime",
-          render: (item) => `${item.runtime} calls · ${item.pending} pending`,
+          render: (item) => (
+            <span className="font-mono text-xs whitespace-nowrap tabular-nums">
+              {item.runtime}
+              <span className="text-muted-foreground"> calls</span>
+              {item.pending > 0 ? (
+                <span className="text-warning"> · {item.pending} pending</span>
+              ) : null}
+            </span>
+          ),
         },
       ]}
       href={(item) => `/tools/${encodeURIComponent(item.id)}`}

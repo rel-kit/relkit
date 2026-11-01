@@ -810,6 +810,19 @@ declare const acquireHistory: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L11)
 
+### historyFailureHint
+
+Names the remedy for a locked history database. DuckDB reports the holder's
+PID; only that number is echoed, never the file path or the rest of the message.
+
+**Signature**
+
+```ts
+declare const historyFailureHint: (error: InspectionConnectionError) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L69)
+
 ### recoverInspection
 
 Recovery detaches unavailable history and its connection fence before awaiting a slow close.
@@ -846,7 +859,7 @@ declare const inspectionLoop: (
 ) => Effect.Effect<never, InspectionConnectionError, Scope | InspectorHistoryNative>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-loop.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-loop.ts#L19)
 
 ## `tool-main.ts`
 
@@ -860,7 +873,7 @@ Shares the native signal owner between package and restricted container entries.
 declare const runInspectorMain: (container: boolean) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-main.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-main.ts#L18)
 
 ## `tool-state.types.ts`
 
@@ -959,7 +972,7 @@ Native UI acquisition is separate from all application/session ownership.
 declare class InspectorUiNative
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L12)
 
 ### InspectorUiNativeLive
 
@@ -971,7 +984,7 @@ Live child adapter, acquired only by an explicit standalone launch.
 declare const InspectorUiNativeLive: Layer.Layer<InspectorUiNative, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L28)
 
 ### acquireInspectorUi
 
@@ -992,7 +1005,7 @@ declare const acquireInspectorUi: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L31)
 
 ## `ui-readiness.ts`
 

@@ -1,0 +1,237 @@
+/*
+ * Utility classes used by components vendored from Neon UI (https://ui.neon.com), MIT.
+ * See public/THIRD_PARTY_NOTICES.txt. Token names are mapped onto the inspector's own tokens.
+ */
+
+@keyframes neon-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.72;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Scroll-aware edge fade + thin scrollbar for scrolling panels.
+   Vendored from shadcn's scroll-fade utility (ui.shadcn.com/docs/utils/scroll-fade)
+   as plain CSS: crisp edges at rest ends, faded edges mid-scroll. */
+@property --neon-scroll-fade-t {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --neon-scroll-fade-b {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes neon-scroll-fade-reveal-t {
+  from {
+    --neon-scroll-fade-t: 0px;
+  }
+
+  to {
+    --neon-scroll-fade-t: 32px;
+  }
+}
+
+@keyframes neon-scroll-fade-reveal-b {
+  from {
+    --neon-scroll-fade-b: 32px;
+  }
+
+  to {
+    --neon-scroll-fade-b: 0px;
+  }
+}
+
+.neon-scroll-fade {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--neon-scroll-fade-t, 0px),
+    #000 calc(100% - var(--neon-scroll-fade-b, 0px)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--neon-scroll-fade-t, 0px),
+    #000 calc(100% - var(--neon-scroll-fade-b, 0px)),
+    transparent 100%
+  );
+  scrollbar-color: var(--line) transparent;
+  scrollbar-width: thin;
+}
+
+.neon-scroll-fade::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.neon-scroll-fade::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.neon-scroll-fade::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+}
+
+.neon-scroll-fade::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+.neon-scroll-fade::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Panels that auto-scroll (log tails) hide the scrollbar while they are pinned
+   to the end: the thumb reports a position the reader does not control, and it
+   slides on every new line. Scrolling still works; the bar returns as soon as
+   the reader scrolls away and takes over. */
+.neon-scroll-pinned {
+  scrollbar-width: none;
+}
+
+.neon-scroll-pinned::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+@supports (animation-timeline: scroll()) {
+  .neon-scroll-fade {
+    animation:
+      neon-scroll-fade-reveal-t 1ms ease-in-out,
+      neon-scroll-fade-reveal-b 1ms ease-in-out;
+    animation-fill-mode: both;
+    animation-range:
+      0 96px,
+      calc(100% - 96px) 100%;
+    animation-timeline: scroll(self y), scroll(self y);
+  }
+}
+
+@supports not (animation-timeline: scroll()) {
+  .neon-scroll-fade {
+    --neon-scroll-fade-t: 0px;
+    --neon-scroll-fade-b: 0px;
+  }
+}
+
+/*
+ * Status breathe: a slow inhale/exhale for in-flight status dots. The dot
+ * dims and swells a soft glow on a 2.6s ease-in-out cycle — alive, not
+ * blinking. Static and fully lit under reduced motion.
+ */
+@keyframes neon-status-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+    opacity: 0.45;
+  }
+  50% {
+    box-shadow: 0 0 6px 1px color-mix(in oklch, currentColor 45%, transparent);
+    opacity: 1;
+  }
+}
+
+.neon-status-breathe {
+  animation: neon-status-breathe 2.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neon-status-breathe {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/*
+ * Card wash: a grainy gradient rising from the bottom edge, colored by
+ * currentColor so the status hue drives it. The base layer is a smooth
+ * color fade; ::after dithers it with the same fractal noise MetricCard
+ * draws over its trend (baseFrequency 0.7, octaves 2, seed 7). Gradient
+ * first, grain as texture — never a static field.
+ */
+.neon-card-wash {
+  background: linear-gradient(
+    to top,
+    color-mix(in oklch, currentColor 70%, transparent),
+    transparent 85%
+  );
+}
+
+.neon-card-wash::after {
+  background-color: currentColor;
+  content: "";
+  inset: 0;
+  mask-composite: intersect;
+  mask-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.7' numOctaves='2' seed='7' stitchTiles='stitch' type='fractalNoise'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='48' height='48' filter='url(%23n)'/%3E%3C/svg%3E"),
+    linear-gradient(to top, black, transparent);
+  mask-repeat: repeat, no-repeat;
+  mask-size:
+    48px 48px,
+    100% 100%;
+  opacity: 0.6;
+  position: absolute;
+  transition: mask-position 900ms ease-out;
+  -webkit-mask-composite: source-in;
+  -webkit-mask-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.7' numOctaves='2' seed='7' stitchTiles='stitch' type='fractalNoise'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='48' height='48' filter='url(%23n)'/%3E%3C/svg%3E"),
+    linear-gradient(to top, black, transparent);
+  -webkit-mask-repeat: repeat, no-repeat;
+  -webkit-mask-size:
+    48px 48px,
+    100% 100%;
+}
+
+[data-slot="app-card"]:hover .neon-card-wash::after {
+  mask-position:
+    0 -10px,
+    0 0;
+  -webkit-mask-position:
+    0 -10px,
+    0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neon-card-wash::after,
+  [data-slot="app-card"]:hover .neon-card-wash::after {
+    mask-position:
+      0 0,
+      0 0;
+    transition: none;
+    -webkit-mask-position:
+      0 0,
+      0 0;
+  }
+}
+
+/*
+ * Stripe march: the EmptyState hairline stripes on the move — a slow
+ * barber-pole for in-flight actions. Static under reduced motion.
+ */
+@keyframes neon-stripe-march {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 9.9px 0;
+  }
+}
+
+.neon-stripe-march {
+  animation: neon-stripe-march 700ms linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neon-stripe-march {
+    animation: none;
+  }
+}

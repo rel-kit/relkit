@@ -1,5 +1,7 @@
-import { cx } from "./cx";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
-export function cn(...values: readonly (string | false | null | undefined)[]): string {
-  return cx(...values);
+/** Joins class names and lets later Tailwind utilities override earlier ones (shadcn convention). */
+export function cn(...values: ClassValue[]): string {
+  return twMerge(clsx(values));
 }

@@ -3,11 +3,16 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { graphHref } from "../../lib/graph-url-state";
 import type { InspectorObject } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
 import { invokeFunction, type FunctionInvocationResult } from "../../lib/function-invocation";
-import { FunctionContract } from "./function-contract";
+import { Radio } from "lucide-react";
+import { Section } from "../../components/blocks/section";
+import { Badge } from "../../components/ui/badge";
+import { DetailLayout } from "../detail-layout";
+import { SourceLink } from "../source-link";
+import { DetailPending, ExposureBadge, GraphAction, MetaItem } from "../domains/catalog-kit";
+import { FunctionContract, FunctionFacts } from "./function-contract";
 import { FunctionInvocation } from "./function-invocation";
 import { FunctionSignals } from "./function-signals";
 
@@ -83,49 +88,69 @@ export function FunctionDetailClient() {
 
   if (error || snapshot === undefined)
     return (
-      <section className="panel route-state" role={error ? "alert" : "status"}>
-        {error ? "The function API is unavailable." : "Loading function contract…"}
-      </section>
+      <DetailPending
+        failed={error}
+        failedTitle="The function API is unavailable."
+        loadingLabel="Loading function contract…"
+      />
     );
 
   const api = createInspectorClient();
+  const node = snapshot.node;
+  const functionId = text(node.id) || id;
+  const domainId = text(node.domainId);
+  const eventOnly = node.invocationMode === "event-only";
   return (
-    <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">ACTIVE WORKSPACE</p>
-          <h1>Function detail</h1>
-          <p className="lede">Contracts and telemetry are read from one active graph identity.</p>
-        </div>
-        <div className="page-heading__aside">
-          <span className="badge">{text(snapshot.node.id) || id}</span>
-          <Link
-            className="text-link"
-            href={graphHref({
-              view: "flow",
-              scope: text(snapshot.node.id) || id,
-              node: text(snapshot.node.id) || id,
-            })}
-          >
-            Follow in graph →
-          </Link>
-        </div>
-      </header>
-      <FunctionContract {...snapshot} />
-      {snapshot.node.invocationMode === "event-only" ? (
-        <p className="supporting-copy">This function runs only through event delivery or replay.</p>
+    <DetailLayout
+      header={{
+        kicker: "Function",
+        title: <span className="font-mono">{functionId}</span>,
+        badges: (
+          <>
+            <ExposureBadge exposure={node.exposure} />
+            <Badge>{text(node.invocationMode) || "callable"}</Badge>
+          </>
+        ),
+        meta: (
+          <>
+            {domainId ? (
+              <MetaItem label="domain">
+                <Link
+                  href={`/domains/${encodeURIComponent(domainId)}`}
+                  className="underline-offset-2 hover:underline"
+                >
+                  {domainId}
+                </Link>
+              </MetaItem>
+            ) : null}
+            <MetaItem label="generation">{snapshot.generationId}</MetaItem>
+            <SourceLink source={record(node.source)} />
+          </>
+        ),
+        actions: <GraphAction id={functionId} />,
+      }}
+      aside={<FunctionFacts {...snapshot} />}
+    >
+      {eventOnly ? (
+        <Section id="function-invocation-note">
+          <p className="m-0 flex items-center gap-2 text-xs text-muted-foreground">
+            <Radio aria-hidden="true" className="size-3.5" />
+            This function runs only through event delivery or replay.
+          </p>
+        </Section>
       ) : (
         <FunctionInvocation
           functionId={id}
           generationId={snapshot.generationId}
           graphHash={snapshot.graphHash}
-          inputSchema={snapshot.node.input}
+          inputSchema={node.input}
           invoke={(input) => invokeFunction(api, input)}
           onComplete={(_result: FunctionInvocationResult) => loadSignals()}
         />
       )}
       <FunctionSignals logs={logs} traces={traces} />
-    </div>
+      <FunctionContract {...snapshot} />
+    </DetailLayout>
   );
 }
 

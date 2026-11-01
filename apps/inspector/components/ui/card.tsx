@@ -1,13 +1,10 @@
 import type { HTMLAttributes } from "react";
-import { cx } from "../../lib/cx";
+import { cn } from "../../lib/utils";
 
 export function Card({ className, ...props }: HTMLAttributes<HTMLElement>) {
   return (
     <section
-      className={cx(
-        "rounded-xl border border-[var(--line)] bg-[var(--panel)] p-5 shadow-[var(--shadow)]",
-        className,
-      )}
+      className={cn("rounded-lg border border-border bg-card p-4 text-card-foreground", className)}
       {...props}
     />
   );
