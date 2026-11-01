@@ -1,5 +1,6 @@
 import { Context, Data, Effect, Layer, Option } from "effect";
 import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
+import { sharedAcrossCopies } from "./package-identity.js";
 import type { FailureDetail, FailureDetailStoreService } from "./failure-internals.types.js";
 
 export type { FailureDetail, FailureDetailStoreService } from "./failure-internals.types.js";
@@ -20,7 +21,10 @@ export class FailureDetailStore extends Context.Service<
   FailureDetailStoreService
 >()("relkit/invocation/FailureDetailStore") {}
 
-const liveStore: FailureDetailStoreService = { details: new WeakMap() };
+// Shared so a defect recorded by one package copy keeps its cause when another copy reports it.
+const liveStore: FailureDetailStoreService = sharedAcrossCopies("failure-details@1", () => ({
+  details: new WeakMap(),
+}));
 
 /** Live private detail registry.
  * @example Effect.runSync(Effect.provide(readFailureDetailEffect(failure), FailureDetailStoreLive));

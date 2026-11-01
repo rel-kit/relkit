@@ -10,7 +10,7 @@ import { type StandardIssue } from "@relkit/schema";
 import { Context, Effect, Layer, Result } from "effect";
 import { observeHttp, runHttp } from "./http-effect.js";
 import type { RequestMappingIssue } from "./request-mapping.js";
-import { developmentProviderMessage } from "./response-mapping-provider.js";
+import { developmentFailureMessage } from "./response-mapping-provider.js";
 import {
   findError,
   findResponse,
@@ -220,7 +220,7 @@ const genericFailureResponse = Effect.fn("ResponseMapping.genericFailure")(funct
     defect: { status: 500, error: "internal-error" },
   };
   const detail = details[outcome] ?? details[kind] ?? { status: 500, error: "internal-error" };
-  const message = developmentProviderMessage(failure, options.mode);
+  const message = developmentFailureMessage(failure, options.mode);
   const body = { error: detail.error, ...(message === undefined ? {} : { message }) };
   return (yield* responseIsValid(trigger, declaration, body, options))
     ? yield* encodeJson(body, responseStatus(declaration, detail.status))

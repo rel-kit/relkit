@@ -1,6 +1,7 @@
 import { Data, Effect } from "effect";
 import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
 import { DescriptorIdentityFailure } from "./identity-state.js";
+import { brandAcrossCopies } from "./package-identity.js";
 import type { InvocationCallFrame } from "./recursion.types.js";
 
 /** Public recursion policy denial with the repeated function and cycle.
@@ -20,6 +21,7 @@ export class RecursionPolicyError extends Error {
     this.cycle = Object.freeze([...cycle]);
   }
 }
+brandAcrossCopies(RecursionPolicyError, "@relkit/invocation/RecursionPolicyError");
 
 /** Tagged recursion or frame validation failure.
  * @example Effect.catchTag(stack.enterEffect("tasks.run"), "RecursionFailure", () => Effect.void);

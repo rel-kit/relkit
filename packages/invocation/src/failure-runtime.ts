@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { FailureDetailError, rememberFailureEffect } from "./failure-internals.js";
 import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
+import { brandAcrossCopies } from "./package-identity.js";
 import type { ErrorRetry, FailureKind, FailureOutcome, FailureTag } from "./failure.types.js";
 import type { FailureSpec } from "./failure-runtime.types.js";
 
@@ -28,6 +29,7 @@ export class RuntimeFailure {
     runInvocationSync(initializeRuntimeFailureEffect(this, spec, cause));
   }
 }
+brandAcrossCopies(RuntimeFailure, "@relkit/invocation/RuntimeFailure");
 
 /** Constructs a frozen runtime failure through Effect.
  * @param spec - Public failure metadata.
