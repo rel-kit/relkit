@@ -57,7 +57,7 @@ test("public server query entry preserves identity-fetch failures", async () => 
         request: new Request("https://app.example.test"),
         queryClient,
       }),
-    ).rejects.toThrow("Relkit identity request failed (401)");
+    ).rejects.toThrow("RelKit identity request failed (401)");
   } finally {
     globalThis.fetch = original;
     queryClient.clear();

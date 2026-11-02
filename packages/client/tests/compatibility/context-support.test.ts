@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { mockFetch } from "../fixtures/fetch.ts";
 import { identityHeaders, streamFetcher } from "../../src/react/context-support.ts";
 
-test("client headers include the Relkit CSRF cookie", async () => {
+test("client headers include the RelKit CSRF cookie", async () => {
   const descriptor = Object.getOwnPropertyDescriptor(globalThis, "document");
   Object.defineProperty(globalThis, "document", {
     configurable: true,

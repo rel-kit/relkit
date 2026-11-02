@@ -77,7 +77,7 @@ export function useSuspenseRoute<Name extends QuerySelector, Selected = OutputFo
 ): UseSuspenseQueryResult<Selected, ErrorFor<Name>> {
   const runtime = useRelkitClient();
   if (runtime.status !== "ready" || runtime.scope === undefined || runtime.identityKey === null) {
-    throw new Error(`Relkit client is not ready (${runtime.status})`);
+    throw new Error(`RelKit client is not ready (${runtime.status})`);
   }
   const generated = procedureUtils(runtime.utils, name).queryOptions({ input: options.input });
   return useSuspenseQuery({
@@ -122,7 +122,7 @@ export function useRouteMutation<Name extends MutationSelector, Context = unknow
         runtime.identityKey === null ||
         runtime.identity === undefined
       ) {
-        throw new RelkitWriteError("not-sent", `Relkit client is not ready (${runtime.status})`);
+        throw new RelkitWriteError("not-sent", `RelKit client is not ready (${runtime.status})`);
       }
       if (
         (globalThis as { navigator?: { readonly onLine?: boolean } }).navigator?.onLine === false

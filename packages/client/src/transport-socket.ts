@@ -50,7 +50,7 @@ export const connectSocketEffect = Effect.fn("ClientTransport.connect")(
         const error = (): void => {
           cleanup();
           socket.close();
-          resume(Effect.fail(new Error("Relkit WebSocket connection failed.")));
+          resume(Effect.fail(new Error("RelKit WebSocket connection failed.")));
         };
         socket.addEventListener("open", open, { once: true });
         socket.addEventListener("error", error, { once: true });

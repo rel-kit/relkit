@@ -72,7 +72,7 @@ export function useAgent<Name extends AgentSelector>(name: Name): UseAgentResult
     async (options: AgentThreadOptions): Promise<void> => {
       const threadId = requiredThreadId(options);
       if (runtime.status !== "ready" && runtime.status !== "application-updated") {
-        throw new Error(`Relkit client is not ready (${runtime.status})`);
+        throw new Error(`RelKit client is not ready (${runtime.status})`);
       }
       setObservation((current) => ({ threadId, revision: (current?.revision ?? 0) + 1 }));
     },
@@ -81,7 +81,7 @@ export function useAgent<Name extends AgentSelector>(name: Name): UseAgentResult
   const invoke = useCallback(
     async (kind: string, payload: unknown, options: InvocationOptions) => {
       if (runtime.status !== "ready" || runtime.scope === undefined || runtime.identityKey === null)
-        throw new Error(`Relkit client is not ready (${runtime.status})`);
+        throw new Error(`RelKit client is not ready (${runtime.status})`);
       const threadId = requiredThreadId(options);
       const scope = pendingScopeKey(runtime.scope);
       const receipt = await runExecutionPromise(

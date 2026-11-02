@@ -32,7 +32,7 @@ export async function createRelkitServerContext(
     cache: "no-store",
   });
   if (!identityResponse.ok) {
-    throw new Error(`Relkit identity request failed (${identityResponse.status})`);
+    throw new Error(`RelKit identity request failed (${identityResponse.status})`);
   }
   const identity = (await identityResponse.json()) as ClientIdentityDocument;
   forwarded.set("x-relkit-identity-scope", identity.identityScope);

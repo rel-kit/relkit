@@ -174,7 +174,7 @@ export const AgentOperationsLive = Layer.effect(
                 receipt.threadId !== request.threadId
               )
                 return yield* Effect.fail(
-                  new Error("Relkit returned a different thread ID than the caller supplied."),
+                  new Error("RelKit returned a different thread ID than the caller supplied."),
                 );
               if (receipt !== undefined) yield* pending.forget(request.scopeKey, entry.operationId);
               return receipt;

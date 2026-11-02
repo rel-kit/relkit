@@ -14,7 +14,7 @@ export function writableScope(
   runtime: RelkitClientRuntime,
 ): NonNullable<RelkitClientRuntime["scope"]> {
   if (runtime.status !== "ready" || runtime.scope === undefined || runtime.identity === undefined) {
-    throw new RelkitWriteError("not-sent", `Relkit client is not ready (${runtime.status})`);
+    throw new RelkitWriteError("not-sent", `RelKit client is not ready (${runtime.status})`);
   }
   return runtime.scope;
 }

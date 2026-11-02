@@ -12,7 +12,7 @@ import type { Procedure } from "./reconcile.types.js";
 export function resolveJobProcedure(root: unknown, name: string, operation: string): Procedure {
   const value = descend(root, ["jobs", name, "runs", operation]);
   if (typeof value !== "function") {
-    throw new TypeError(`Unknown Relkit job procedure "jobs.${name}.runs.${operation}"`);
+    throw new TypeError(`Unknown RelKit job procedure "jobs.${name}.runs.${operation}"`);
   }
   return value as Procedure;
 }
@@ -68,7 +68,7 @@ export function optionalJobProcedure(
   try {
     return resolveJobProcedure(root, name, operation);
   } catch (error) {
-    if (error instanceof TypeError && error.message.startsWith("Unknown Relkit job procedure"))
+    if (error instanceof TypeError && error.message.startsWith("Unknown RelKit job procedure"))
       return undefined;
     throw error;
   }

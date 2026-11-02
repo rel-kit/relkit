@@ -9,7 +9,7 @@ export const recordCalculation = Effect.fnUntraced(function* (value: unknown) {
     ? (value as Record<string, unknown>)
     : undefined;
 });
-/** Unwraps RELKIT schema documents and accepts ordinary JSON Schema records.
+/** Unwraps RelKit schema documents and accepts ordinary JSON Schema records.
  * @param value - Schema document or unknown input.
  * @returns An Effect yielding a schema record or `undefined`; it has no expected failure.
  * @example Effect.runSync(schemaDocumentCalculation({ type: "string" }));

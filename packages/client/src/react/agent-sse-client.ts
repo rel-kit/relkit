@@ -77,7 +77,7 @@ async function responseError(response: Response): Promise<ORPCError<string, unkn
   const message =
     nested !== undefined && typeof nested.message === "string"
       ? nested.message
-      : `Relkit agent SSE request failed (${response.status})`;
+      : `RelKit agent SSE request failed (${response.status})`;
   return new ORPCError(code, { message });
 }
 

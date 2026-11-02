@@ -37,7 +37,7 @@ export function useStream<Name extends StreamSelector>(
   const start = useCallback(
     async (input: InputFor<Name>): Promise<void> => {
       if (runtime.status !== "ready")
-        throw new Error(`Relkit client is not ready (${runtime.status})`);
+        throw new Error(`RelKit client is not ready (${runtime.status})`);
       controller.current?.abort();
       const next = new AbortController();
       controller.current = next;
