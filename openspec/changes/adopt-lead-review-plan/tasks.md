@@ -51,12 +51,12 @@ not tasks of this change.
 
 ## 5. Core and Labs (#5)
 
-- [ ] 5.1 Add `relkit.maturity` (`core` or `labs`) to every package manifest, and verify a manifest check lists every package with a tier
-- [ ] 5.2 Tag every Labs export with `@experimental` TSDoc, and verify with the maturity check from 5.4
-- [ ] 5.3 Add `labs: true` docs frontmatter that renders a Labs badge on the page and in the sidebar, and verify in a browser check that the realtime guide shows both
-- [ ] 5.4 Add a maturity check comparing manifest tiers, TSDoc tags and docs flags, and verify it fails on a fixture with a missing tag
-- [ ] 5.5 Publish the maturity table with the initial assignment (Core including built-in telemetry; Labs including realtime, AWS hosting, job adapters, agent adapters and graph workflows), and verify the page renders
-- [ ] 5.6 Record the feature freeze in CONTRIBUTING and the pull request template, and verify the template asks whether a new feature area has an approved OpenSpec change
+- [x] 5.1 Add `relkit.maturity` (`core` or `labs`) to every package manifest, and verify a manifest check lists every package with a tier
+- [x] 5.2 Tag every Labs export with `@experimental` TSDoc, and verify with the maturity check from 5.4
+- [x] 5.3 Add `labs: true` docs frontmatter that renders a Labs badge on the page and in the sidebar, and verify in a browser check that the realtime guide shows both
+- [x] 5.4 Add a maturity check comparing manifest tiers, TSDoc tags and docs flags, and verify it fails on a fixture with a missing tag
+- [x] 5.5 Publish the maturity table with the initial assignment (Core including built-in telemetry; Labs including realtime, AWS hosting, job adapters, agent adapters and graph workflows), and verify the page renders
+- [x] 5.6 Record the feature freeze in CONTRIBUTING and the pull request template, and verify the template asks whether a new feature area has an approved OpenSpec change
 
 ## 6. Governance, repository hygiene, dependency policy and stop-doing rules (#7, #8)
 
