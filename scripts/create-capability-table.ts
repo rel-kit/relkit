@@ -3,12 +3,15 @@
  * table CI publishes. A template that fails or is not measured is listed as untested; only a failed
  * default minimal template fails the merge, because it blocks the release.
  *
- *   bun scripts/create-capability-table.ts measure --template api --output <dir>
- *   bun scripts/create-capability-table.ts merge --input <dir> --output <table.json>
+ * Results live in `$RUNNER_TEMP/creation-capability` (the OS temporary directory outside CI);
+ * the merged table is written there as `capability-table.json`.
+ *
+ *   bun scripts/create-capability-table.ts measure --template api
+ *   bun scripts/create-capability-table.ts merge
  */
 import { appendFile, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, resolve, sep } from "node:path";
+import { join, resolve } from "node:path";
 import {
   CREATE_TEMPLATES,
   type CreateCapabilityEvidence,
@@ -152,18 +155,8 @@ async function readResults(input: string): Promise<TemplateResult[]> {
   return results;
 }
 
-/**
- * Resolves a directory or file option inside the repository or the temporary directory.
- * @param name - Literal option flag.
- * @returns The absolute path.
- */
-function ownedPath(name: string): string {
-  const path = resolve(option(name));
-  const roots = [root, resolve(process.env.RUNNER_TEMP ?? tmpdir())];
-  if (!roots.some((owner) => path === owner || path.startsWith(owner + sep)))
-    throw new Error(`${name} must be inside ${roots.join(" or ")}`);
-  return path;
-}
+/** Directory shared by measurement and merge; never taken from the command line. */
+const resultsDirectory = join(process.env.RUNNER_TEMP ?? tmpdir(), "creation-capability");
 
 function option(name: string): string {
   const index = process.argv.indexOf(name);
@@ -175,16 +168,20 @@ function option(name: string): string {
 async function main(): Promise<void> {
   const mode = process.argv[2];
   if (mode === "measure") {
-    const template = option("--template");
-    if (!(CREATE_TEMPLATES as readonly string[]).includes(template))
+    const requested = option("--template");
+    const template = CREATE_TEMPLATES.find((value) => value === requested);
+    if (template === undefined)
       throw new Error(`--template must be one of: ${CREATE_TEMPLATES.join("|")}`);
-    const result = await measureTemplate(template as CreateTemplate, ownedPath("--output"));
+    const result = await measureTemplate(template, resultsDirectory);
     console.log(`${template}: ${result.status === "tested" ? "tested" : result.reason}`);
     return;
   }
   if (mode === "merge") {
-    const table = mergeResults(await readResults(ownedPath("--input")), Bun.version);
-    await writeFile(ownedPath("--output"), JSON.stringify(table, null, 2) + "\n");
+    const table = mergeResults(await readResults(resultsDirectory), Bun.version);
+    await writeFile(
+      join(resultsDirectory, "capability-table.json"),
+      JSON.stringify(table, null, 2) + "\n",
+    );
     const summary = formatTable(table);
     if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, summary);
     console.log(summary);

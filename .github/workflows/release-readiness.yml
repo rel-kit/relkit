@@ -129,7 +129,6 @@ jobs:
       - name: Measure fresh and restart readiness
         run: >-
           bun scripts/create-capability-table.ts measure --template "${{ matrix.template }}"
-          --output "$RUNNER_TEMP/creation-capability"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
@@ -160,8 +159,7 @@ jobs:
           merge-multiple: true
       - name: Merge per-template results; a failed minimal template blocks the release
         run: >-
-          bun scripts/create-capability-table.ts merge --input "$RUNNER_TEMP/creation-capability"
-          --output "$RUNNER_TEMP/creation-capability/capability-table.json"
+          bun scripts/create-capability-table.ts merge
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
