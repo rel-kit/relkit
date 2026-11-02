@@ -4,12 +4,12 @@
  * default minimal template fails the merge, because it blocks the release.
  *
  * Results live in the ignored `test-results/creation-capability` directory; the merged table is
- * written there as `capability-table.json`.
+ * written there as `capability-table.json` and printed as Markdown for the CI job summary.
  *
  *   bun scripts/create-capability-table.ts measure --template api
  *   bun scripts/create-capability-table.ts merge
  */
-import { appendFile, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import {
   CREATE_TEMPLATES,
@@ -181,9 +181,7 @@ async function main(): Promise<void> {
       join(resultsDirectory, "capability-table.json"),
       JSON.stringify(table, null, 2) + "\n",
     );
-    const summary = formatTable(table);
-    if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, summary);
-    console.log(summary);
+    console.log(formatTable(table));
     if (table.untested.some((item) => item.template === "minimal"))
       throw new Error("The default minimal template is untested; the release is blocked.");
     return;
