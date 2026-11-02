@@ -97,3 +97,16 @@ test("doctor does not hide a broken nearer installation behind a valid hoisted o
   );
   expect(await check(project, { "@relkit/app": "0.7.9" })).toMatchObject({ ok: false });
 });
+
+test("doctor treats a pinned packageManager Bun version as the minimum", async () => {
+  const root = await fixture({});
+  const bun = async (packageManager: string) =>
+    (await versionChecks({ packageManager, dependencies: {} }, root)).find(
+      (result) => result.name === "bun",
+    );
+  const [major, minor] = Bun.version.split(".").map(Number);
+  expect(await bun(`bun@${major}.${minor! - 1 < 0 ? 0 : minor! - 1}.0`)).toMatchObject({
+    ok: true,
+  });
+  expect(await bun(`bun@${major! + 1}.0.0`)).toMatchObject({ ok: false });
+});
