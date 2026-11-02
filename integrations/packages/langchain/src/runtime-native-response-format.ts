@@ -1,5 +1,5 @@
 /**
- * Converts a validated RELKIT output schema to the native structured response
+ * Converts a validated RelKit output schema to the native structured response
  * strategy, preserving schema failures and disabling native silent recovery.
  */
 import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";

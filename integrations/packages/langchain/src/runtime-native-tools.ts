@@ -1,4 +1,4 @@
-/** Combines authored native tools and RELKIT callable adapters for invocation, retaining input schemas and native dispatch identity. */
+/** Combines authored native tools and RelKit callable adapters for invocation, retaining input schemas and native dispatch identity. */
 
 import { nativeToolEntry } from "./runtime-native-tool-build.js";
 import { getJsonSchema } from "@relkit/schema";

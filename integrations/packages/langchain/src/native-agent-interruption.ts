@@ -1,4 +1,4 @@
-/** Projects native agent interruption state into RELKIT approval and continuation records without losing native interrupt identity. */
+/** Projects native agent interruption state into RelKit approval and continuation records without losing native interrupt identity. */
 
 import { Command } from "@langchain/langgraph";
 import { Effect } from "effect";

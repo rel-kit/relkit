@@ -1,4 +1,4 @@
-/** Publishes native invocation loop observations to RELKIT telemetry using the current execution context and stable agent identifiers. */
+/** Publishes native invocation loop observations to RelKit telemetry using the current execution context and stable agent identifiers. */
 
 import type { ProtocolEvent } from "@langchain/langgraph";
 import { frameworkTrace } from "@relkit/invocation";

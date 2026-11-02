@@ -1,4 +1,4 @@
-/** Dispatches native tool calls to the selected RELKIT tool target and carries approval and execution failures back to the native loop. */
+/** Dispatches native tool calls to the selected RelKit tool target and carries approval and execution failures back to the native loop. */
 
 import {
   currentExecutionContext,

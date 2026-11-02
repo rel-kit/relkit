@@ -1,4 +1,4 @@
-/** Declares executable schemas for native interruption payloads before they cross the durable RELKIT continuation boundary. */
+/** Declares executable schemas for native interruption payloads before they cross the durable RelKit continuation boundary. */
 
 import type { JsonValue } from "@relkit/contracts";
 import { Effect } from "effect";

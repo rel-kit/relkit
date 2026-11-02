@@ -1,4 +1,4 @@
-/** Consumes native graph streams and publishes RELKIT execution events, finalizing the native iterator before settling the invocation. */
+/** Consumes native graph streams and publishes RelKit execution events, finalizing the native iterator before settling the invocation. */
 
 import { collectCompiledGraphStateEffect } from "./graph-runtime-stream-state.js";
 import { isInterrupted } from "@langchain/langgraph";

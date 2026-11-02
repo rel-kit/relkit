@@ -1,4 +1,4 @@
-/** Combines authored native tools and RELKIT callable adapters for invocation, retaining input schemas and native dispatch identity. This companion preserves the native input and output types without starting runtime work. */
+/** Combines authored native tools and RelKit callable adapters for invocation, retaining input schemas and native dispatch identity. This companion preserves the native input and output types without starting runtime work. */
 
 import type { ClientTool, ServerTool } from "@langchain/core/tools";
 import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";

@@ -1,4 +1,4 @@
-/** Adapts native graph execution to the RELKIT workflow contract, carrying invocation context and scoped persistence through completion. */
+/** Adapts native graph execution to the RelKit workflow contract, carrying invocation context and scoped persistence through completion. */
 
 import { END, START } from "@langchain/langgraph";
 import type { JsonValue } from "@relkit/contracts";

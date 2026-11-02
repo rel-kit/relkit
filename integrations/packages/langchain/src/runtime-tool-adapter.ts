@@ -1,4 +1,4 @@
-/** Adapts RELKIT callable tools to native SDK tools while preserving validated input, execution context and typed invocation failures. */
+/** Adapts RelKit callable tools to native SDK tools while preserving validated input, execution context and typed invocation failures. */
 
 import { invokeRegisteredAgentToolEffect } from "./runtime-tool-invocation.js";
 import {

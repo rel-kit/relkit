@@ -1,4 +1,4 @@
-/** Declares executable schemas for native interruption payloads before they cross the durable RELKIT continuation boundary. This companion preserves the native input and output types without starting runtime work. */
+/** Declares executable schemas for native interruption payloads before they cross the durable RelKit continuation boundary. This companion preserves the native input and output types without starting runtime work. */
 
 import type { JsonValue } from "@relkit/contracts";
 
