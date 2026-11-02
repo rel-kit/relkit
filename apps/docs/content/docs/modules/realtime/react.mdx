@@ -6,7 +6,7 @@ sidebar:
   icon: panels-top-left
 ---
 
-Subscribe a React component to one channel partition with `useChannel()`. RELKIT shares equivalent subscriptions by channel name and canonical parameters, so multiple components do not create duplicate transport subscriptions.
+Subscribe a React component to one channel partition with `useChannel()`. RelKit shares equivalent subscriptions by channel name and canonical parameters, so multiple components do not create duplicate transport subscriptions.
 
 The component still owns its application state. A channel callback may patch local state, update the TanStack Query cache, or invalidate an ordinary route query.
 
@@ -42,7 +42,7 @@ contract containing those operations. See [`useChannel`](/docs/api/client#usecha
 | ------------ | ------------------------------------------------------------------------------------------------------- |
 | `params`     | Selects one validated channel partition.                                                                |
 | `on`         | Maps declared event names to typed callbacks. Omitted events are ignored.                               |
-| `onCaughtUp` | Runs after RELKIT has attached to the live tail and applied any valid reconnect replay.                 |
+| `onCaughtUp` | Runs after RelKit has attached to the live tail and applied any valid reconnect replay.                 |
 | `onGap`      | Restores authoritative state when replay cannot bridge the previous checkpoint. It may be asynchronous. |
 
 The result exposes:
@@ -55,7 +55,7 @@ The result exposes:
 | `gap`        | The latest recovery reason, when replay could not continue.              |
 | `presence`   | Present only when the channel declares count or member presence.         |
 
-`caughtUp` does not mean your database query has loaded. It means RELKIT has completed the subscription handoff. Coordinate it with the loading state of the route query that owns the page's current data.
+`caughtUp` does not mean your database query has loaded. It means RelKit has completed the subscription handoff. Coordinate it with the loading state of the route query that owns the page's current data.
 
 ## Patch or invalidate?
 

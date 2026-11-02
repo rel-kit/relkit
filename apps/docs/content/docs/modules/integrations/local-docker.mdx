@@ -40,7 +40,7 @@ Connected Cloudflare KV/R2, hosted models, Sentry, and OTLP have no bundled loca
   `@relkit/docker`; installing the materializer alone supplies no Redis/S3 adapter or binding.
 </Callout>
 
-The integration packages pin an immutable digest. A RELKIT package release therefore
+The integration packages pin an immutable digest. A RelKit package release therefore
 selects an exact local-service image rather than whatever a mutable tag points to later.
 
 | Adapter    | Image reference          | Immutable digest                                                          |
@@ -51,7 +51,7 @@ selects an exact local-service image rather than whatever a mutable tag points t
 The MinIO reference uses a public mirror of `RELEASE.2025-04-22T22-12-26Z` with the same digest as the
 original image.
 
-RELKIT discovers the Docker server version at startup but does not currently enforce a minimum engine
+RelKit discovers the Docker server version at startup but does not currently enforce a minimum engine
 version. Use a maintained Docker Engine or Docker Desktop release with the `docker` CLI available on `PATH`:
 
 ```sh
