@@ -9,7 +9,7 @@ export type CacheOperation = "get" | "set" | "delete" | "has" | "getOrSet" | "in
  * @example const capability: CacheCapability = "increment";
  */
 export type CacheCapability = "increment";
-/** Stable operation outcomes for RELKIT observations.
+/** Stable operation outcomes for RelKit observations.
  * @example const outcome: CacheOperationOutcome = "success";
  */
 export type CacheOperationOutcome =

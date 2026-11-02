@@ -10,7 +10,7 @@ export type * from "./client-provider.types.js";
 /** Bounded outcome classification emitted to observation hooks. */
 export type BucketOperationOutcome =
   "success" | "provider-failure" | "cancelled" | "timeout" | "unsupported";
-/** Promise adapter used by existing RELKIT application code.
+/** Promise adapter used by existing RelKit application code.
  * @example await client.get("images/logo.png");
  */
 export interface BucketClient {

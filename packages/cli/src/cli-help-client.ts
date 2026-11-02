@@ -14,7 +14,7 @@ export const clientHelp = command(
           : "Check a pulled client for contract drift",
         `relkit client ${name} <baseUrl> --out <directory>`,
         {
-          arguments: [argument("baseUrl", true, "Running RELKIT application URL")],
+          arguments: [argument("baseUrl", true, "Running RelKit application URL")],
           options: [option("out", "string", "Output directory")],
         },
       ),

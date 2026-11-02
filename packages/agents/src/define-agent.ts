@@ -18,7 +18,7 @@ export type * from "./define-agent.types.js";
 export type { AgentChatMapping, AgentClientPolicy, AgentControl } from "./agent-client.js";
 
 /** Validates plain authoring inputs and preserves source identity generation.
- * @param options - Schemas, selector model, RELKIT tools, limits and client policy.
+ * @param options - Schemas, selector model, RelKit tools, limits and client policy.
  * @returns A frozen descriptor or AgentDefinitionFailure.
  */
 export const defineAgentEffect = Effect.fn("Agents.definition.define")(
@@ -53,7 +53,7 @@ export const defineAgentEffect = Effect.fn("Agents.definition.define")(
   (effect) => observeAgent("definition.define", effect),
 );
 
-/** Defines an SDK-independent agent using validated schemas and RELKIT tool references.
+/** Defines an SDK-independent agent using validated schemas and RelKit tool references.
  * @typeParam Id - Explicit or source-inferred agent identity.
  * @typeParam InputSchema - Runtime input validator.
  * @typeParam OutputSchema - Runtime output validator.

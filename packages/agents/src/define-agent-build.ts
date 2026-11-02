@@ -101,7 +101,7 @@ function assertGenericCapabilities(options: { readonly middleware?: readonly [] 
   }
 }
 
-/** Copies a validated RELKIT tool tuple without converting native tools.
+/** Copies a validated RelKit tool tuple without converting native tools.
  * @param tools - Authored references whose order and literal identities must be retained.
  * @returns Frozen tool tuple.
  */
@@ -110,7 +110,7 @@ function copyTools<const Tools extends readonly ToolRefAny[]>(
 ): AgentToolReferences<Tools> {
   if (!Array.isArray(tools) || tools.some((tool) => !isToolRef(tool))) {
     throw new TypeError(
-      "Generic agent tools must be RELKIT references; native tools use @relkit/langchain",
+      "Generic agent tools must be RelKit references; native tools use @relkit/langchain",
     );
   }
   const ids = tools.map((tool) => tool.ref.id);

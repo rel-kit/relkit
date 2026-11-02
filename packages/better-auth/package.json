@@ -1,7 +1,7 @@
 {
   "name": "@relkit/better-auth",
   "version": "0.8.4",
-  "description": "Better Auth integration for RELKIT routes.",
+  "description": "Better Auth integration for RelKit routes.",
   "license": "MIT",
   "repository": {
     "type": "git",

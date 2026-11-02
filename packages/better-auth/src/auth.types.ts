@@ -19,7 +19,7 @@ export type {
   InferBetterAuthSession,
 } from "./declaration.types.js";
 
-/** Native options; RELKIT supplies database and the route-derived base path. */
+/** Native options; RelKit supplies database and the route-derived base path. */
 export type BetterAuthServiceOptions = DeclarationOptions & {
   readonly drizzle?: Omit<DrizzleAdapterConfig, "provider">;
 };

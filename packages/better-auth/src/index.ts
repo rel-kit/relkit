@@ -24,7 +24,7 @@ export type {
  * @typeParam Options - Native options retaining session and plugin inference.
  * @param options - Native SDK configuration plus optional Drizzle adapter settings.
  * @returns A frozen declaration and stable handler; inactive handlers return 503.
- * @remarks Mount handler in a filesystem ALL catch-all route. RELKIT supplies
+ * @remarks Mount handler in a filesystem ALL catch-all route. RelKit supplies
  * database and basePath. Declaration and compilation never construct native auth.
  * Supply BETTER_AUTH_SECRET in the server environment before activation.
  * @throws TypeError When options is not an object or specifies database/basePath.

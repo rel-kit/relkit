@@ -1,5 +1,5 @@
 /**
- * Projects generic RELKIT tool references and public event schemas into client metadata.
+ * Projects generic RelKit tool references and public event schemas into client metadata.
  * Native middleware, graph state and SDK schema projection remain in @relkit/langchain.
  */
 import { Effect } from "effect";
@@ -59,7 +59,7 @@ export function agentClientContractMetadata(
 }
 
 /** Reads optional schema data only when a reference also carries its authored descriptor.
- * @param tool - Stable RELKIT tool reference, optionally carrying target validators.
+ * @param tool - Stable RelKit tool reference, optionally carrying target validators.
  * @returns Static tool identity with projected or explicitly dynamic schemas.
  */
 function toolMetadata(tool: ToolRefAny): ClientToolMetadata {

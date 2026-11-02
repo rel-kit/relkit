@@ -64,7 +64,7 @@ export class AuthOpenApi extends Context.Service<
 }) {}
 
 /**
- * Projects native core and plugin endpoints for RELKIT's shared API reference.
+ * Projects native core and plugin endpoints for RelKit's shared API reference.
  * @param auth - Activated native auth instance; schema generation performs no database calls.
  * @param instrumentation - Owning application's logger, tracer and metric context.
  * @returns JSON-safe schema with mounted paths and isolated component names.

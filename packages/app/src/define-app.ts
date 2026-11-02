@@ -63,7 +63,7 @@ export const defineAppEffect = Effect.fn("App.defineApp")(
       "define",
       Effect.gen(function* () {
         if (!isRecord(options) || !(yield* isEnvDefinitionEffect(options.env)))
-          return yield* invalid("RELKIT app requires an environment definition");
+          return yield* invalid("RelKit app requires an environment definition");
         for (const key of Object.keys(options))
           if (!OPTION_KEYS.has(key)) return yield* invalid(`Unknown defineApp option "${key}"`);
         yield* assertExclusiveAliasEffect(

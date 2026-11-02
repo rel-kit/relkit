@@ -100,7 +100,7 @@ test("check locates removed config keys and shows the fixed replacement", async 
       file: "relkit.config.ts",
       line: 2,
       column: 3,
-      message: expect.stringContaining('RELKIT always discovers "src/**/*.ts"'),
+      message: expect.stringContaining('RelKit always discovers "src/**/*.ts"'),
     }),
   );
   expect(result.diagnostics[0]?.message).toContain("defineApp({ env: defineEnv({})");

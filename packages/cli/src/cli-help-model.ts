@@ -20,7 +20,7 @@ const root = command(
   {
     options: [option("json", "boolean", "Emit machine-readable output")],
     commands: [
-      command("create", "Create a new RELKIT application", "relkit create [name]", {
+      command("create", "Create a new RelKit application", "relkit create [name]", {
         arguments: [argument("name", false, "npm package and application name")],
         options: [
           option(

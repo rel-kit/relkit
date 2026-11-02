@@ -66,7 +66,7 @@ export const normalizeDefaultsEffect = Effect.fn("App.normalizeDefaults")(
     }),
 );
 
-/** Copies a serializable configuration value through RELKIT's serializer.
+/** Copies a serializable configuration value through RelKit's serializer.
  * @param value - Configuration value to copy.
  * @returns A JSON copy or AppValidationFailure.
  * @example Effect.runSync(copyEffect({ port: 3000 }));
