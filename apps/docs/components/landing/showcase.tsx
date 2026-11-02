@@ -11,7 +11,7 @@ import styles from "./landing-showcase.module.css";
 const guides = [
   {
     label: "01 / Get started",
-    title: "Your first Relkit app",
+    title: "Your first RelKit app",
     description: "Create, change, verify, and run an application.",
     href: "/docs/learn/create-an-app",
     icon: Terminal,
@@ -48,19 +48,19 @@ export function InspectorShowcase() {
           <Link
             className={styles.inspector}
             href="/docs/modules/operations/inspector"
-            aria-label="Explore the Relkit Inspector guide"
+            aria-label="Explore the RelKit Inspector guide"
           >
             <div className={styles.inspectorBar}>
               <span>
                 <i /> localhost:3210
               </span>
               <span>
-                Relkit Inspector <ArrowUpRight size={14} aria-hidden="true" />
+                RelKit Inspector <ArrowUpRight size={14} aria-hidden="true" />
               </span>
             </div>
             <Image
               src="/inspector-light.png"
-              alt="Relkit Inspector with its navigation sidebar and routes workspace"
+              alt="RelKit Inspector with its navigation sidebar and routes workspace"
               width={1280}
               height={900}
               loading="lazy"
@@ -100,7 +100,7 @@ export function Community() {
           <div>
             <p>Explore the source, run the examples, or help shape what comes next.</p>
             <a className={system.textLink} href="https://github.com/rel-kit/relkit">
-              View Relkit on GitHub <ArrowUpRight size={14} aria-hidden="true" />
+              View RelKit on GitHub <ArrowUpRight size={14} aria-hidden="true" />
             </a>
           </div>
         </div>
@@ -111,7 +111,7 @@ export function Community() {
                 <ul
                   key={String(duplicate)}
                   className={motion.stack}
-                  aria-label={duplicate ? undefined : "Relkit technology stack"}
+                  aria-label={duplicate ? undefined : "RelKit technology stack"}
                   aria-hidden={duplicate || undefined}
                 >
                   {landingCommunityStack.map((item) => (

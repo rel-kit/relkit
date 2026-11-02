@@ -76,7 +76,7 @@ const toAuthor = (value: unknown): BlogAuthor | undefined => {
 
 const toAuthors = (value: unknown): readonly BlogAuthor[] => {
   const authors = (Array.isArray(value) ? value : [value]).flatMap((item) => toAuthor(item) ?? []);
-  return authors.length > 0 ? authors : [{ name: "RELKIT Team" }];
+  return authors.length > 0 ? authors : [{ name: "RelKit Team" }];
 };
 
 /** Counts prose words, skipping fenced code and MDX/HTML tags so reading time stays honest. */

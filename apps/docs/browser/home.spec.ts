@@ -8,7 +8,7 @@ test("docs hero animates, pauses with the keyboard and respects reduced motion",
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/docs");
   await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
-  const hero = page.getByRole("region", { name: "RELKIT documentation", exact: true });
+  const hero = page.getByRole("region", { name: "RelKit documentation", exact: true });
   await expect(hero.getByRole("heading", { level: 1 })).toContainText("TypeScript API.");
   await expect(hero.locator("h1 p, .docs-hero-actions a p")).toHaveCount(0);
   const flow = hero.locator(".docs-hero-flow").first();

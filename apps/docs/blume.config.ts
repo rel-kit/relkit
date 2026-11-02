@@ -11,7 +11,7 @@ const mono = { name: "Geist Mono", variants: [{ src: "./public/fonts/geist-mono-
 const site = process.env.RELKIT_DOCS_SITE ?? "https://relkit.dev";
 
 export default defineConfig({
-  title: "RELKIT",
+  title: "RelKit",
   logo: "/logo.svg",
   agents: {
     llmsTxt: true,

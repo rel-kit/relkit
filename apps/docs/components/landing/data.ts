@@ -83,7 +83,7 @@ export const productStages = [
   {
     number: "02",
     title: "Check",
-    copy: "Relkit resolves schemas, profiles, local recipes, dependencies, and policies into one graph.",
+    copy: "RelKit resolves schemas, profiles, local recipes, dependencies, and policies into one graph.",
     detail: "Invalid applications fail before a runtime starts.",
   },
   {

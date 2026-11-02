@@ -82,7 +82,7 @@ test("navigation between docs and the landing preserves hydration and styling", 
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/docs/modules/storage");
-  await page.getByRole("banner").getByRole("link", { name: "RELKIT", exact: true }).click();
+  await page.getByRole("banner").getByRole("link", { name: "RelKit", exact: true }).click();
   await expect(page).toHaveURL("http://127.0.0.1:3002/");
   await expect(page.getByRole("tab", { name: "Routes", exact: true })).toBeVisible();
   await expect(page.locator("h1")).toHaveCount(1);
