@@ -1,12 +1,10 @@
-# RELKIT
+# RelKit
 
 [![CI](https://github.com/rel-kit/relkit/actions/workflows/checks.yml/badge.svg)](https://github.com/rel-kit/relkit/actions/workflows/checks.yml)
 [![npm](https://img.shields.io/npm/v/%40relkit%2Fapp.svg)](https://www.npmjs.com/package/@relkit/app)
 [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-RELKIT is a Bun and TypeScript monorepo for generating applications whose source
-descriptors compile to one graph, local HTTP runtime, inspector protocol, and
-Pulumi deployment plan.
+The TypeScript backend framework where you write the business logic. RelKit wires the APIs, jobs, events, agents and typed client, and gives you, and your coding agent, a live map of the app.
 
 ## Install
 

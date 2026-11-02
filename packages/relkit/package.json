@@ -1,7 +1,7 @@
 {
   "name": "relkit",
   "version": "0.8.8",
-  "description": "The RELKIT CLI for bunx relkit and global installation.",
+  "description": "The TypeScript backend framework where you write the business logic. RelKit wires the APIs, jobs, events, agents and typed client, and gives you, and your coding agent, a live map of the app.",
   "license": "MIT",
   "repository": {
     "type": "git",

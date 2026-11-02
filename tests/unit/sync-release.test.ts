@@ -13,6 +13,7 @@ async function prepareProducers(fixture: string) {
   for (const file of [
     "sync-release.ts",
     "release-package-descriptions.ts",
+    "positioning.ts",
     "workspace-packages.ts",
     "release-templates.ts",
     "catalog-manifest.ts",

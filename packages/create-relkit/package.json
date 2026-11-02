@@ -1,7 +1,7 @@
 {
   "name": "create-relkit",
   "version": "0.8.8",
-  "description": "Create a RELKIT application from a supported project template.",
+  "description": "The TypeScript backend framework where you write the business logic. RelKit wires the APIs, jobs, events, agents and typed client, and gives you, and your coding agent, a live map of the app.",
   "license": "MIT",
   "repository": {
     "type": "git",

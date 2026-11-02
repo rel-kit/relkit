@@ -1,4 +1,6 @@
 /** Canonical published package descriptions used by release metadata synchronization. */
+import { POSITIONING } from "./positioning.js";
+
 export const descriptions: Record<string, string> = {
   "@relkit/agents": "RELKIT agent authoring API; prefer @relkit/app/agents in applications.",
   "@relkit/app": "The primary typed application-authoring API for RELKIT.",
@@ -60,6 +62,6 @@ export const descriptions: Record<string, string> = {
   "@relkit/inngest": "Inngest durable-jobs integration for RELKIT.",
   "@relkit/trigger": "Trigger.dev jobs integration for RELKIT.",
   "@relkit/effect-mq": "Effect MQ retryable-jobs integration for RELKIT.",
-  "create-relkit": "Create a RELKIT application from a supported project template.",
-  relkit: "The RELKIT CLI for bunx relkit and global installation.",
+  "create-relkit": POSITIONING,
+  relkit: POSITIONING,
 };

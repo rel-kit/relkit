@@ -15,8 +15,9 @@ import "../app/hero-examples.css";
 import "../components/landing/fonts.css";
 
 const examples = await highlightHeroExamples();
-const title = "Relkit — One application model for TypeScript backends";
-const description = "Build typed TypeScript backends from one checked application graph across development, tests, HTTP, async work, inspection, and deployment.";
+const title = "RelKit — The TypeScript backend framework";
+// Must match POSITIONING in scripts/positioning.ts; the release check compares them.
+const description = "The TypeScript backend framework where you write the business logic. RelKit wires the APIs, jobs, events, agents and typed client, and gives you, and your coding agent, a live map of the app.";
 ---
 
 <!doctype html>
@@ -28,7 +29,7 @@ const description = "Build typed TypeScript backends from one checked applicatio
     <meta name="description" content={description} />
     <link rel="canonical" href="https://relkit.dev/" />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="RELKIT" />
+    <meta property="og:site_name" content="RelKit" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content="https://relkit.dev/metadata/og.png" />

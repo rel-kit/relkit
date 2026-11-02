@@ -88,6 +88,7 @@ async function main(): Promise<void> {
   if (writeNotes) allow.add("RELEASE_NOTES.md");
   if (!allowDirty) await assertClean(allow);
   await command(bun, ["run", "scripts/sync-release.ts"]);
+  await command(bun, ["run", "scripts/positioning.ts"]);
   const items = await packages();
   const rootManifest = await readJson(join(root, "package.json"));
   const checked = checkManifests(items, rootManifest);

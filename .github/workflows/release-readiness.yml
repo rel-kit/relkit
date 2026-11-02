@@ -85,6 +85,9 @@ jobs:
           if test -s "$patch"; then git apply --index "$patch"; fi
       - run: bun install --frozen-lockfile
       - name: Build and validate using the publishing command without publication credentials
+        env:
+          # Reads the repository description for the positioning check.
+          GITHUB_TOKEN: ${{ github.token }}
         run: bun run release:pack --ci-pack --allow-dirty --output "$RUNNER_TEMP/rehearsal-pack"
       - name: Verify npm package registration
         env:
