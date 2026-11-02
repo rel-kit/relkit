@@ -53,7 +53,7 @@ export const frontendWorkflow = Effect.fn("DocsInstallation.frontend")(function*
   );
 });
 
-/** Creates ordinary frontend type tooling independently of the RELKIT installation recipe.
+/** Creates ordinary frontend type tooling independently of the RelKit installation recipe.
  * @param app - Fresh outside-workspace frontend root.
  * @returns Finite creation of its baseline package manifest.
  */

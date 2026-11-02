@@ -69,7 +69,7 @@ test("separates identity, integration, transport protection, and business author
 });
 test("teaches a migrated existing-app flow without hard-coded server secrets", async () => {
   const tutorial = read("first-auth");
-  expect(tutorial).toContain("existing RELKIT app");
+  expect(tutorial).toContain("existing RelKit app");
   for (const path of [
     "relkit.config.ts",
     "drizzle.config.ts",

@@ -53,7 +53,7 @@ test("connects Database guides and the generated Drizzle reference", async () =>
 });
 test("uses application workflows and Drizzle Kit rather than SQL bootstrap or test snippets", async () => {
   const tutorial = read("first-database");
-  expect(tutorial).toContain("existing RELKIT app");
+  expect(tutorial).toContain("existing RelKit app");
   for (const path of [
     "src/platform/env.ts",
     "src/services/database/service.ts",
@@ -115,6 +115,6 @@ test("explains generated data shapes and Better Auth's native-client boundary", 
   const auth = read("better-auth");
   expect(auth).toContain("native Drizzle client");
   expect(auth).toContain("Do not set `database` or `basePath`");
-  expect(auth).toContain("not pass through RELKIT's portable CRUD");
+  expect(auth).toContain("not pass through RelKit's portable CRUD");
   expect(auth).toContain("drizzle-kit generate --name=better-auth");
 });

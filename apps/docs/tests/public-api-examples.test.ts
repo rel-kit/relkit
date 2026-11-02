@@ -32,7 +32,7 @@ test("the shared context example resolves environment references and preserves p
 test("the local provider example stores exact bytes and leaves its caller-owned directory intact", async () => {
   const root = await mkdtemp(resolve(tmpdir(), "relkit-docs-local-"));
   try {
-    expect(new TextDecoder().decode(await readLocalObject(root))).toBe("Hello, RELKIT!");
+    expect(new TextDecoder().decode(await readLocalObject(root))).toBe("Hello, RelKit!");
     await access(root);
   } finally {
     await rm(root, { recursive: true, force: true });

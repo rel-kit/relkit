@@ -38,7 +38,7 @@ test("teaches an existing-app upload with source-backed examples and local verif
   const tutorial = await Bun.file(
     resolve(content, "guides/storage/upload-product-images.mdx"),
   ).text();
-  expect(tutorial).toContain("RELKIT application");
+  expect(tutorial).toContain("RelKit application");
   expect(tutorial).not.toContain("create-relkit");
   expect(tutorial).toContain("relkit.config.ts#storage-local-profile");
   expect(tutorial).toContain("bun run dev --local=off");
