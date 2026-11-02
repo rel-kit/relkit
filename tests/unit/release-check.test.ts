@@ -23,7 +23,7 @@ test("release template contracts preserve canonical emitted-JavaScript startup",
   }
 });
 
-test("the release certifies default creation using its actual tool identity", () => {
+test("the release reports default creation as tested for its actual tool identity", () => {
   expect(CREATE_CAPABILITY_TABLE.entries[0]?.identity).toEqual(currentCreateCapabilityIdentity());
   expect(() =>
     assertCreateCapability({ template: "minimal", cloud: "none", deploy: "none", examples: true }),

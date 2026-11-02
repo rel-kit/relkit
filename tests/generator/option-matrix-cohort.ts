@@ -15,6 +15,8 @@ import testingManifest from "../../packages/testing/package.json" with { type: "
 import localManifest from "../../integrations/packages/local/package.json" with { type: "json" };
 import nativeManifest from "../../integrations/packages/langchain/package.json" with { type: "json" };
 import workspaceManifest from "../../package.json" with { type: "json" };
+import creatorManifest from "../../packages/create-relkit/package.json" with { type: "json" };
+import { CREATE_TASKS_DEFAULT_JOBS } from "../../packages/create-relkit/src/options.js";
 import { createOptions, contextFor, templateRoot } from "./option-matrix-fixture.js";
 import { GeneratedManifest, GeneratedTsconfig } from "./option-matrix.schemas.js";
 import { scanGeneratedProject } from "./option-matrix-scan.js";
@@ -29,7 +31,13 @@ export async function verifyCreationTuple(root: string, selection: CreationTuple
   const { template, examples, install, git } = selection;
   const name = `${template}-${examples ? "examples" : "plain"}-${install ? "install" : "no-install"}-${git ? "git" : "no-git"}`;
   const commands: string[][] = [];
-  const result = await generateProject(createOptions(name, selection), contextFor(root, commands));
+  const result = await generateProject(
+    createOptions(name, {
+      ...selection,
+      ...(template === "tasks" ? { jobs: CREATE_TASKS_DEFAULT_JOBS } : {}),
+    }),
+    contextFor(root, commands),
+  );
   const manifest = Schema.decodeUnknownSync(GeneratedManifest)(
     JSON.parse(await readFile(join(result.destination, "package.json"), "utf8")),
   );
@@ -41,7 +49,12 @@ export async function verifyCreationTuple(root: string, selection: CreationTuple
   expect(result.gitInitialized).toBe(git);
   verifyGeneratedManifest(manifest, template);
   expect(tsconfig.compilerOptions).toMatchObject({ baseUrl: ".", paths: { "@app/*": ["src/*"] } });
-  expect(result.files.some((path) => path.startsWith("src/services/hello/functions/"))).toBe(true);
+  if (template === "tasks")
+    expect(result.files.some((path) => path.startsWith("src/services/orders/"))).toBe(examples);
+  else
+    expect(result.files.some((path) => path.startsWith("src/services/hello/functions/"))).toBe(
+      true,
+    );
   expect(result.files.some((path) => path.startsWith("tests/"))).toBe(examples);
   for (const path of [
     ".agents/skills/relkit/SKILL.md",
@@ -91,7 +104,15 @@ function verifyGeneratedManifest(
         }
       : {}),
     "@relkit/app": appManifest.version,
+    "@scalar/hono-api-reference": "0.12.9",
     effect: workspaceManifest.catalog.effect,
+    ...(template === "tasks"
+      ? {
+          "@relkit/docker": creatorManifest.relkit.providerVersions["@relkit/docker"],
+          "@relkit/inngest": creatorManifest.relkit.providerVersions["@relkit/inngest"],
+          "@relkit/local": creatorManifest.relkit.providerVersions["@relkit/local"],
+        }
+      : {}),
     ...(template === "fullstack"
       ? {
           "@ag-ui/core": "0.0.59",

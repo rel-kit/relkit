@@ -7,9 +7,9 @@ import type { ReleaseTemplate } from "./release-templates.types.js";
 
 export type { ReleaseTemplate } from "./release-templates.types.js";
 
-/** Public templates published with the current CLI release. */
+/** Templates whose generated scripts share the backend command contract. */
 export const releaseTemplates = ["minimal", "api", "agent", "fullstack"] as const;
-/** Release fixtures also include the documented legacy task starter. */
+/** Every public template, including the tasks starter with its jobs script. */
 export const packedTemplates = [...releaseTemplates, "tasks"] as const;
 
 const backendScripts = {

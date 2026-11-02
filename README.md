@@ -135,8 +135,8 @@ bun run relkit:local -- create my-app --cloud none --deploy none
 - `packages/` contains the public authoring APIs, compiler, graph, engine,
   runtime, inspector API, providers, CLI, generator, and Pulumi deployment
   packages.
-- `templates/default/v1` contains the `minimal`, `api`, and `agent` project
-  templates.
+- `templates/default/v1` contains the `minimal`, `api`, `agent`, `fullstack`
+  and `tasks` project templates.
 - `tests/` and `scripts/` contain the focused test layers and verification
   tooling.
 - `repos/effect` is local Effect reference source for agents, ignored by Git
