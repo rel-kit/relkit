@@ -4,6 +4,7 @@ import type {
   AddRequest,
   AddResult,
   ApplyScaffoldContext,
+  CreateCapabilityWarning as CreateWarning,
   CreateScaffoldPlan,
   PromptDriver,
   ScaffoldPlan,
@@ -36,7 +37,14 @@ export interface CliGeneratorOperations {
   readonly resolveCreate: (
     args: readonly string[],
     context: GeneratorCreateResolution,
-  ) => Effect.Effect<{ readonly options: unknown; readonly prompted: boolean }, CliAdapterError>;
+  ) => Effect.Effect<
+    {
+      readonly options: unknown;
+      readonly prompted: boolean;
+      readonly warnings?: readonly CreateWarning[];
+    },
+    CliAdapterError
+  >;
   /**
    * Produces an optional preview through the existing foreign API.
    * @param options - Opaque generator-owned normalized options.

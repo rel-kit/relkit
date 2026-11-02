@@ -7,25 +7,25 @@ export async function case8Policy() {
   const unexpected = async (): Promise<never> => {
     throw new Error("Unexpected setup question.");
   };
-  await expect(
-    resolveCreateOptionsDetails(
-      ["sample-app", "--template=agent", "--directory=apps/sample", "--no-git"],
-      {
-        interactive: true,
-        promptDriver: {
-          ...driver({}),
-          text: unexpected,
-          confirm: unexpected,
-          select: async (options) => {
-            questions.push(options.message);
-            const selected = options.options.find((option) => option.value === "none");
-            if (!selected) throw new Error("Missing jobs default.");
-            return selected.value;
-          },
+  const resolved = await resolveCreateOptionsDetails(
+    ["sample-app", "--template=agent", "--directory=apps/sample", "--no-git"],
+    {
+      interactive: true,
+      promptDriver: {
+        ...driver({}),
+        text: unexpected,
+        confirm: unexpected,
+        select: async (options) => {
+          questions.push(options.message);
+          const selected = options.options.find((option) => option.value === "none");
+          if (!selected) throw new Error("Missing jobs default.");
+          return selected.value;
         },
       },
-    ),
-  ).rejects.toThrow("not certified");
+    },
+  );
+  expect(resolved.options.template).toBe("agent");
+  expect(resolved.warnings).toMatchObject([{ code: "RELKIT_CREATE_UNTESTED" }]);
   expect(questions).toEqual(["Jobs service"]);
 }
 

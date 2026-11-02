@@ -100,7 +100,7 @@ export function installedCreateArguments(
   ];
 }
 
-/** Requires an uncertified tuple to reject without creating its destination. */
+/** Requires strict creation of an untested combination to reject without creating its destination. */
 export async function rejectUnsupportedInstalledCreate(fixture: InstalledCliFixture) {
   const unsupported = join(fixture.parent, "unsupported");
   const rejected = Bun.spawn(
@@ -115,6 +115,7 @@ export async function rejectUnsupportedInstalledCreate(fixture: InstalledCliFixt
       "agent",
       "--no-install",
       "--no-git",
+      "--strict",
       "--json",
     ],
     {
@@ -131,8 +132,8 @@ export async function rejectUnsupportedInstalledCreate(fixture: InstalledCliFixt
   ]);
   expect(code, error).toBe(2);
   expect(JSON.parse(output).error).toMatchObject({
-    code: "RELKIT_CREATE_USAGE",
-    message: expect.stringContaining("not certified"),
+    code: "RELKIT_CREATE_UNTESTED",
+    message: expect.stringContaining("--strict refuses untested combinations"),
   });
   await expect(stat(unsupported)).rejects.toMatchObject({ code: "ENOENT" });
 }

@@ -48,6 +48,7 @@ export async function case5Creation() {
       forceEmptyDirectory: false,
       json: false,
     },
+    warnings: [],
   });
 }
 
@@ -62,27 +63,39 @@ export async function case6Creation() {
     multiselect: unexpected,
     confirm: unexpected,
   };
+  const args = [
+    "sample-app",
+    "--template",
+    "api",
+    "--cloud",
+    "aws",
+    "--deploy",
+    "pulumi",
+    "--jobs",
+    "effect-mq-docker",
+    "--directory",
+    "apps/sample",
+    "--no-install",
+    "--no-git",
+    "--no-examples",
+  ];
+  const resolved = await resolveCreateOptionsDetails(args, {
+    interactive: true,
+    promptDriver: prompt,
+  });
+  expect(resolved.options).toMatchObject({ template: "api", jobs: "effect-mq-docker" });
+  expect(resolved.warnings).toEqual([
+    {
+      code: "RELKIT_CREATE_UNTESTED",
+      message: expect.stringContaining(
+        "template=api/jobs=effect-mq-docker/cloud=aws/deploy=pulumi/examples=off",
+      ),
+      docs: "https://relkit.dev/docs/modules/cli/relkit-create-untested",
+    },
+  ]);
   await expect(
-    resolveCreateOptionsDetails(
-      [
-        "sample-app",
-        "--template",
-        "api",
-        "--cloud",
-        "aws",
-        "--deploy",
-        "pulumi",
-        "--jobs",
-        "effect-mq-docker",
-        "--directory",
-        "apps/sample",
-        "--no-install",
-        "--no-git",
-        "--no-examples",
-      ],
-      { interactive: true, promptDriver: prompt },
-    ),
-  ).rejects.toThrow("not certified");
+    resolveCreateOptionsDetails([...args, "--strict"], { interactive: true, promptDriver: prompt }),
+  ).rejects.toMatchObject({ code: "RELKIT_CREATE_UNTESTED" });
 }
 
 export async function case7Creation() {

@@ -4,6 +4,7 @@ import type {
   AddRequest,
   AddResult,
   ApplyScaffoldContext,
+  CreateCapabilityWarning as CreateWarning,
   CreateScaffoldPlan,
   PromptDriver,
   ScaffoldPlan,
@@ -79,7 +80,11 @@ export interface CreateRelkitGeneratorApi {
       readonly signal?: AbortSignal;
       readonly promptDriver?: PromptDriver;
     },
-  ) => Promise<{ readonly options: unknown; readonly prompted: boolean }>;
+  ) => Promise<{
+    readonly options: unknown;
+    readonly prompted: boolean;
+    readonly warnings?: readonly CreateWarning[];
+  }>;
   /** Previews a validated create plan without mutation. */
   readonly planCreate?: (
     options: unknown,

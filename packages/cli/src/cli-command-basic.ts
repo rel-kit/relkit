@@ -54,6 +54,7 @@ function createCommand(select: SelectInvocation) {
         examples: booleanFlag(createPath, "examples"),
         noExamples: booleanFlag(createPath, "no-examples"),
         forceEmpty: booleanFlag(createPath, "force-empty-directory"),
+        strict: booleanFlag(createPath, "strict"),
       },
       (value) =>
         Effect.sync(() =>
@@ -71,6 +72,7 @@ function createCommand(select: SelectInvocation) {
             ...booleanArgs("examples", value.examples),
             ...booleanArgs("no-examples", value.noExamples),
             ...booleanArgs("force-empty-directory", value.forceEmpty),
+            ...booleanArgs("strict", value.strict),
           ]),
         ),
     ),
