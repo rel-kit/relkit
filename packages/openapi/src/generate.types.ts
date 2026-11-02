@@ -38,7 +38,7 @@ export interface OpenApiResponse {
   >;
 }
 
-/** One documented route operation and RELKIT provenance.
+/** One documented route operation and RelKit provenance.
  * @example const operation = generateOpenApi(graph).paths["/orders"]?.get;
  */
 export interface OpenApiOperation {
@@ -74,7 +74,7 @@ export interface OpenApiPathItem {
   readonly [method: string]: OpenApiOperation | undefined;
 }
 
-/** Complete deterministic OpenAPI 3.1 projection of a RELKIT graph.
+/** Complete deterministic OpenAPI 3.1 projection of a RelKit graph.
  * @example const document: OpenApiDocument = generateOpenApi(graph);
  */
 export interface OpenApiDocument {

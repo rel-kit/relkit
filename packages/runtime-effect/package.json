@@ -1,7 +1,7 @@
 {
   "name": "@relkit/runtime-effect",
   "version": "0.7.14",
-  "description": "Unsupported internal Effect runtime for RELKIT; use @relkit/app.",
+  "description": "Unsupported internal Effect runtime for RelKit; use @relkit/app.",
   "license": "MIT",
   "repository": {
     "type": "git",

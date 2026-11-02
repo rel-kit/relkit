@@ -1,7 +1,7 @@
 {
   "name": "@relkit/openapi",
   "version": "0.7.13",
-  "description": "Unsupported internal OpenAPI generator for RELKIT; use @relkit/cli.",
+  "description": "Unsupported internal OpenAPI generator for RelKit; use @relkit/cli.",
   "license": "MIT",
   "repository": {
     "type": "git",

@@ -1,7 +1,7 @@
 {
   "name": "@relkit/providers-local",
   "version": "0.8.3",
-  "description": "Local runtime providers for RELKIT development and testing.",
+  "description": "Local runtime providers for RelKit development and testing.",
   "license": "MIT",
   "repository": {
     "type": "git",

@@ -48,7 +48,7 @@ function missingAdapter(
       {
         code: "RELKIT_DEPENDENCY_ADAPTER_MISSING",
         package: selection.adapter,
-        supportedRange: "the declared RELKIT release",
+        supportedRange: "the declared RelKit release",
         installedVersion: null,
         capabilities: selection.capabilities,
         ...(selection.source === undefined ? {} : { source: selection.source }),

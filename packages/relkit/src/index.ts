@@ -99,7 +99,7 @@ function projectRoot(cwd: string): string {
     }
     if (dirname(root) === root)
       throw new Error(
-        "RELKIT_PROJECT_REQUIRED: Run project commands inside a RELKIT project, or use relkit create <name>.",
+        "RELKIT_PROJECT_REQUIRED: Run project commands inside a RelKit project, or use relkit create <name>.",
       );
   }
 }

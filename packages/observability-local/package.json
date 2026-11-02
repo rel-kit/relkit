@@ -1,7 +1,7 @@
 {
   "name": "@relkit/observability-local",
   "version": "0.1.4",
-  "description": "Explicit local diagnostic history and worker storage for RELKIT inspection.",
+  "description": "Explicit local diagnostic history and worker storage for RelKit inspection.",
   "license": "MIT",
   "repository": {
     "type": "git",

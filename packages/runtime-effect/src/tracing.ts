@@ -18,7 +18,7 @@ export const InvocationTrace = Context.Reference<InvocationTraceContext | undefi
 /**
  * Projects invocation identifiers into span attributes.
  * @param options - Invocation metadata and explicit safe attributes.
- * @returns Attributes using the established RELKIT keys.
+ * @returns Attributes using the established RelKit keys.
  */
 function spanAttributes(
   options: Pick<

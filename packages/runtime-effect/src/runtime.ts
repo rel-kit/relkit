@@ -40,7 +40,7 @@ export class GenerationEnvironmentResolver extends Context.Service<
   GenerationEnvironmentResolverContract
 >()("relkit/runtime/GenerationEnvironmentResolver") {}
 
-/** Uses RELKIT's Config parser without introducing implicit environment reads. */
+/** Uses RelKit's Config parser without introducing implicit environment reads. */
 export const GenerationEnvironmentResolverLive = Layer.effect(
   GenerationEnvironmentResolver,
   Effect.succeed(

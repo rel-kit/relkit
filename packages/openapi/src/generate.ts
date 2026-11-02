@@ -33,7 +33,7 @@ export type {
 export type { OpenApiTag } from "./generate-tags.types.js";
 
 /** Generate a deterministic OpenAPI 3.1 document from a graph.
- * @param graph - Serializable RELKIT application graph.
+ * @param graph - Serializable RelKit application graph.
  * @returns Effect containing the document or an OpenApiGenerationError.
  * @example Effect.runSync(generateOpenApiEffect(graph));
  */
@@ -121,7 +121,7 @@ export const generateOpenApiEffect = Effect.fn("OpenApi.generate")((graph: Appli
 );
 
 /** Synchronous compatibility adapter for graph projection.
- * @param graph - Serializable RELKIT application graph.
+ * @param graph - Serializable RelKit application graph.
  * @returns Deterministic OpenAPI document.
  * @throws TypeError for a missing target function or duplicate route.
  * @example const document = generateOpenApi(graph);
@@ -131,7 +131,7 @@ export function generateOpenApi(graph: ApplicationGraph): OpenApiDocument {
 }
 
 /** Serialize a generated document with canonical JSON ordering.
- * @param graph - Serializable RELKIT application graph.
+ * @param graph - Serializable RelKit application graph.
  * @returns Effect containing newline-terminated JSON or OpenApiGenerationError.
  * @example Effect.runSync(generateOpenApiJsonEffect(graph));
  */
@@ -146,7 +146,7 @@ export const generateOpenApiJsonEffect = Effect.fn("OpenApi.serialize")((graph: 
 );
 
 /** Synchronous compatibility adapter for canonical OpenAPI JSON.
- * @param graph - Serializable RELKIT application graph.
+ * @param graph - Serializable RelKit application graph.
  * @returns Newline-terminated canonical JSON.
  * @throws TypeError for a missing target function or duplicate route.
  * @example const json = generateOpenApiJson(graph);

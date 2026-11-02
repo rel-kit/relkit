@@ -1,7 +1,7 @@
 {
   "name": "@relkit/provider",
   "version": "0.8.2",
-  "description": "Portable provider authoring and binding protocol for RELKIT.",
+  "description": "Portable provider authoring and binding protocol for RelKit.",
   "license": "MIT",
   "repository": {
     "type": "git",

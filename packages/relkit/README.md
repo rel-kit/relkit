@@ -1,6 +1,6 @@
 # relkit
 
-Run the RELKIT CLI with Bun:
+Run the RelKit CLI with Bun:
 
 ```sh
 bunx relkit --help
