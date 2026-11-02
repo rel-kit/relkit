@@ -3,14 +3,13 @@
  * table CI publishes. A template that fails or is not measured is listed as untested; only a failed
  * default minimal template fails the merge, because it blocks the release.
  *
- * Results live in `$RUNNER_TEMP/creation-capability` (the OS temporary directory outside CI);
- * the merged table is written there as `capability-table.json`.
+ * Results live in the ignored `test-results/creation-capability` directory; the merged table is
+ * written there as `capability-table.json`.
  *
  *   bun scripts/create-capability-table.ts measure --template api
  *   bun scripts/create-capability-table.ts merge
  */
 import { appendFile, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import {
   CREATE_TEMPLATES,
@@ -155,8 +154,8 @@ async function readResults(input: string): Promise<TemplateResult[]> {
   return results;
 }
 
-/** Directory shared by measurement and merge; never taken from the command line. */
-const resultsDirectory = join(process.env.RUNNER_TEMP ?? tmpdir(), "creation-capability");
+/** Directory shared by measurement and merge; never taken from the command line or environment. */
+const resultsDirectory = join(root, "test-results", "creation-capability");
 
 function option(name: string): string {
   const index = process.argv.indexOf(name);
