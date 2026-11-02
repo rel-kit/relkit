@@ -24,11 +24,11 @@ not tasks of this change.
 
 ## 2. Positioning and Why RelKit (#2)
 
-- [ ] 2.1 Put the positioning sentence in the README opening, the landing hero and the docs index, and verify the positioning check from 2.4 passes
-- [ ] 2.2 Set the npm descriptions of `relkit` and `create-relkit` and the GitHub repository description to the positioning sentence, and verify with the positioning check
-- [ ] 2.3 Write the Why RelKit page comparing RelKit with Encore.ts, Motia, NestJS and Hono with tRPC or oRPC, stating where each side is stronger, and verify it renders and appears in the docs navigation
-- [ ] 2.4 Add a release check that fails when the README, landing page, those npm descriptions or the GitHub description differ from the positioning sentence, and verify it fails on a mismatched fixture
-- [ ] 2.5 Write an FAQ and a "Migrate from Express or Hono" guide with runnable snippets, and verify the snippets compile in the docs test suite
+- [x] 2.1 Put the positioning sentence in the README opening, the landing hero and the docs index, and verify the positioning check from 2.4 passes
+- [x] 2.2 Set the npm descriptions of `relkit` and `create-relkit` and the GitHub repository description to the positioning sentence, and verify with the positioning check
+- [x] 2.3 Write the Why RelKit page comparing RelKit with Encore.ts, Motia, NestJS and Hono with tRPC or oRPC, stating where each side is stronger, and verify it renders and appears in the docs navigation
+- [x] 2.4 Add a release check that fails when the README, landing page, those npm descriptions or the GitHub description differ from the positioning sentence, and verify it fails on a mismatched fixture
+- [x] 2.5 Write an FAQ and a "Migrate from Express or Hono" guide with runnable snippets, and verify the snippets compile in the docs test suite
 
 ## 3. Plain language (#3)
 
