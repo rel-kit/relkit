@@ -24,6 +24,14 @@ import { realtimeGuideGroup, realtimeGuideRelations } from "./realtime-guide-cat
 import { operationsGuideRelations } from "./operations-guide-catalog.js";
 import { cliGuideGroup, cliGuideRelations } from "./cli-guide-catalog.js";
 import { deploymentGuideGroup, deploymentGuideRelations } from "./deployment-guide-catalog.js";
+/** Authored pages outside every guide group: the section overviews and the root Docs pages. */
+export const overviewPages = [
+  "docs/index",
+  "docs/why-relkit",
+  "docs/faq",
+  "docs/modules/index",
+  "guides/index",
+] as const;
 export const guideGroups = [
   group("docs/learn", "Learn", "Rocket", [
     "index",
@@ -79,6 +87,7 @@ export const guideGroups = [
     "trigger",
     "effect-mq",
   ]),
+  group("guides/migrate", "Migrate", "ArrowRightLeft", ["from-express-or-hono"]),
   group("guides/cli", "CLI", "Terminal", ["create-and-build-an-api"]),
   frontendGuideGroup,
   group("guides/storage", "Storage", "HardDrive", ["upload-product-images"]),
@@ -92,6 +101,21 @@ const relations = [
   relation("docs/index", ["app", "routes", "testing"], ["templates/default/v1/api/README.md"]),
   relation("docs/learn/index", ["app"], ["templates/default/v1/minimal/README.md"]),
   relation("docs/modules/index", ["app"], []),
+  relation("docs/why-relkit", ["app"], []),
+  relation(
+    "docs/faq",
+    ["app", "functions"],
+    ["apps/docs/examples/migrate/src/services/orders/functions/create-order.function.ts"],
+  ),
+  relation(
+    "guides/migrate/from-express-or-hono",
+    ["functions", "routes", "testing"],
+    [
+      "apps/docs/examples/migrate/src/routes/legacy/[[...path]]/route.ts",
+      "apps/docs/examples/migrate/src/services/orders/functions/get-order.function.ts",
+      "apps/docs/examples/migrate/tests/orders.route.test.ts",
+    ],
+  ),
   relation("guides/index", ["app"], []),
   uploadGuideRelation,
   frontendGuideRelation,

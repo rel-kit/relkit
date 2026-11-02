@@ -12,7 +12,7 @@
     "dev": "bun run generate && NODE_OPTIONS=--max-old-space-size=8192 blume dev --host=127.0.0.1 --port=3001",
     "generate": "bun run scripts/generate.ts",
     "generate:check": "bun run scripts/generate.ts --check",
-    "test": "bun test tests/*.test.ts",
+    "test": "bun test tests/*.test.ts ./examples/migrate/tests/orders.route.test.ts",
     "test:browser": "playwright test --config=playwright.config.ts",
     "test:installations": "bun x turbo run build --cwd=../.. --filter='./packages/*' --filter='./integrations/*' --filter='./integrations/packages/*' --output-logs=errors-only && bun run scripts/check-installation-workflows.ts",
     "typecheck": "tsc --noEmit"
@@ -68,6 +68,7 @@
     "better-auth": "catalog:",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
+    "hono": "catalog:",
     "prettier": "catalog:",
     "tailwindcss": "catalog:",
     "tsx": "4.23.15",

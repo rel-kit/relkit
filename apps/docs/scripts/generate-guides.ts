@@ -5,7 +5,7 @@ import type { CliHelpCommand } from "@relkit/cli/help";
 import { startJourney } from "../lib/start-journey.js";
 import { apiPackageName } from "./documentation-catalog.js";
 import { features } from "./feature-catalog.js";
-import { guideGroups, guideRelations } from "./guide-catalog.js";
+import { guideGroups, guideRelations, overviewPages } from "./guide-catalog.js";
 import { emitNavigation } from "./generate-navigation.js";
 import type { Emit } from "./generation.types.js";
 
@@ -46,9 +46,7 @@ export async function generateGuides(
 async function validateCatalog(root: string, content: string): Promise<void> {
   const directories = new Set<string>(guideGroups.map(({ directory }) => directory));
   const authoredPages = new Set([
-    "docs/index",
-    "docs/modules/index",
-    "guides/index",
+    ...overviewPages,
     ...guideGroups.flatMap(({ directory, pages }) =>
       pages
         .filter((page) => !directories.has(`${directory}/${page}`))

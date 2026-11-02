@@ -250,6 +250,23 @@
       "next": "docs/learn/create-an-app"
     },
     { "path": "docs/modules/index", "api": ["app"], "examples": [] },
+    { "path": "docs/why-relkit", "api": ["app"], "examples": [] },
+    {
+      "path": "docs/faq",
+      "api": ["app", "functions"],
+      "examples": [
+        "apps/docs/examples/migrate/src/services/orders/functions/create-order.function.ts"
+      ]
+    },
+    {
+      "path": "guides/migrate/from-express-or-hono",
+      "api": ["functions", "routes", "testing"],
+      "examples": [
+        "apps/docs/examples/migrate/src/routes/legacy/[[...path]]/route.ts",
+        "apps/docs/examples/migrate/src/services/orders/functions/get-order.function.ts",
+        "apps/docs/examples/migrate/tests/orders.route.test.ts"
+      ]
+    },
     { "path": "guides/index", "api": ["app"], "examples": [] },
     {
       "path": "guides/storage/upload-product-images",

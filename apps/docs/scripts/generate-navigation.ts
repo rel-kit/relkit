@@ -9,7 +9,7 @@ const groups = [
     directory: "docs",
     title: "Documentation",
     icon: "book-open",
-    pages: ["index", "learn", "modules", "api"],
+    pages: ["index", "why-relkit", "faq", "learn", "modules", "api"],
     display: "flat",
   },
   {
@@ -40,7 +40,18 @@ const groups = [
     directory: "guides",
     title: "Guides",
     icon: "book-open",
-    pages: ["index", "cli", "frontend", "storage", "caching", "events", "database", "auth", "ai"],
+    pages: [
+      "index",
+      "migrate",
+      "cli",
+      "frontend",
+      "storage",
+      "caching",
+      "events",
+      "database",
+      "auth",
+      "ai",
+    ],
     display: "flat",
   },
   ...guideGroups.map(({ directory, title, icon, pages }) => ({
@@ -119,6 +130,8 @@ const referencePages = groupItems("docs/api").filter((item) => typeof item === "
  */
 export const documentationSidebar: SidebarItemConfig[] = [
   "/docs",
+  "/docs/why-relkit",
+  "/docs/faq",
   section(
     "docs/learn",
     groupItems("docs/learn").filter((item) => typeof item === "string"),
