@@ -1,7 +1,7 @@
 {
   "name": "@relkit/otlp",
   "version": "0.7.14",
-  "description": "OTLP telemetry integration for RELKIT.",
+  "description": "OTLP telemetry integration for RelKit.",
   "license": "MIT",
   "repository": {
     "type": "git",

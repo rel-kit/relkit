@@ -27,7 +27,7 @@ export interface EffectMqScheduleBridge {
   readonly queue?: string;
 }
 
-/** Maps effect-mq JobSchedules' native Postgres records to the RELKIT schedule SPI. */
+/** Maps effect-mq JobSchedules' native Postgres records to the RelKit schedule SPI. */
 export function createEffectMqScheduleOperations(
   options: EffectMqScheduleBridge,
 ): NativeScheduleOperations {

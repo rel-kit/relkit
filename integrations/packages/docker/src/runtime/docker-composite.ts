@@ -57,7 +57,7 @@ export async function startComposite(
       );
       createdNetwork = true;
     } else if (!owned(existingNetwork, request.labels)) {
-      throw new Error(`Docker network "${networkName}" is not owned by this Relkit project.`);
+      throw new Error(`Docker network "${networkName}" is not owned by this RelKit project.`);
     }
     const existingVolumes = new Map(
       (await client.volumes(undefined, request.signal)).map((volume) => [volume.name, volume]),
@@ -69,7 +69,7 @@ export async function startComposite(
           !owned(existing.labels, request.labels) ||
           existing.labels["dev.relkit.volume"] !== volume
         ) {
-          throw new Error(`Docker volume "${volumeName}" is not owned by this Relkit project.`);
+          throw new Error(`Docker volume "${volumeName}" is not owned by this RelKit project.`);
         }
       } else {
         await client.command(

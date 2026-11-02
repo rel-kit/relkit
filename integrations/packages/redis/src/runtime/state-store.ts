@@ -64,12 +64,12 @@ function createCore<State>(options: RedisStateStoreOptions<State>) {
       await redis.command("SET", [options.key, JSON.stringify(options.empty()), "NX"]);
       value = await redis.get(options.key);
     }
-    if (value === null) throw new Error("Redis Relkit state initialization failed.");
+    if (value === null) throw new Error("Redis RelKit state initialization failed.");
     return value;
   };
   const parse = (value: string): State => {
     const parsed: unknown = JSON.parse(value);
-    if (!options.valid(parsed)) throw new TypeError("Redis Relkit state is invalid.");
+    if (!options.valid(parsed)) throw new TypeError("Redis RelKit state is invalid.");
     return parsed;
   };
   const read = async (): Promise<State> => parse(await readRaw(await connect()));
@@ -92,7 +92,7 @@ function createCore<State>(options: RedisStateStoreOptions<State>) {
       if (Number(committed) === 1) return value;
       await Bun.sleep(10);
     }
-    throw new Error("Redis Relkit state update timed out.");
+    throw new Error("Redis RelKit state update timed out.");
   };
   const lifecycle: RedisStateWaiter = {
     ready: async () => {

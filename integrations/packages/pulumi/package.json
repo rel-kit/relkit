@@ -1,7 +1,7 @@
 {
   "name": "@relkit/pulumi",
   "version": "0.8.3",
-  "description": "Pulumi deployment-engine integration for RELKIT.",
+  "description": "Pulumi deployment-engine integration for RelKit.",
   "license": "MIT",
   "repository": {
     "type": "git",
