@@ -1,7 +1,7 @@
 {
   "name": "@relkit/supervisor",
   "version": "0.7.14",
-  "description": "Unsupported internal RELKIT process supervisor; use @relkit/cli.",
+  "description": "Unsupported internal RelKit process supervisor; use @relkit/cli.",
   "license": "MIT",
   "repository": {
     "type": "git",

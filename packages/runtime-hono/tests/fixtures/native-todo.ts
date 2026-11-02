@@ -47,7 +47,7 @@ const app = createApp({
         input: request.input,
         threadId: trigger.threadId,
         tools: {},
-        engine: { invoke: () => Promise.reject(new Error("Unexpected RELKIT tool.")) },
+        engine: { invoke: () => Promise.reject(new Error("Unexpected RelKit tool.")) },
         contentSink: {
           ...sink,
           emitEvent: async (event: AgentExecutionEvent, signal: AbortSignal) => {

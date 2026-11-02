@@ -75,7 +75,7 @@ test("serves the active document and URL-backed Scalar page during development",
   });
   expect(reference.status).toBe(200);
   expect(reference.headers.get("content-type")).toContain("text/html");
-  expect(html).toContain("RELKIT API Reference");
+  expect(html).toContain("RelKit API Reference");
   expect(html).toContain("./openapi.json");
 });
 
@@ -92,7 +92,7 @@ test("requires production opt-in and existing authorization, embedding the prote
     bearerToken: "secret",
     document: {
       openapi: "3.1.0",
-      info: { title: "Protected RELKIT API", version: "1" },
+      info: { title: "Protected RelKit API", version: "1" },
       paths: {},
     },
   });
@@ -104,9 +104,9 @@ test("requires production opt-in and existing authorization, embedding the prote
   const html = await reference.text();
 
   expect(raw.status).toBe(200);
-  expect(await raw.json()).toMatchObject({ info: { title: "Protected RELKIT API" } });
+  expect(await raw.json()).toMatchObject({ info: { title: "Protected RelKit API" } });
   expect(reference.status).toBe(200);
-  expect(html).toContain("Protected RELKIT API");
+  expect(html).toContain("Protected RelKit API");
   expect(html).not.toContain(`\"url\":\"${OPENAPI_PATH}\"`);
 });
 

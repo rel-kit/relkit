@@ -13,7 +13,7 @@ export class RateLimitStoreError extends Error {
   }
 }
 
-/** Adapts a numeric RELKIT cache provider to hono-rate-limiter's fixed-window store contract.
+/** Adapts a numeric RelKit cache provider to hono-rate-limiter's fixed-window store contract.
  * @param routeId - Stable route identifier included in the counter namespace.
  * @param storeId - Declared provider binding supplying the counter store.
  * @param windowMs - Positive fixed-window duration in milliseconds.

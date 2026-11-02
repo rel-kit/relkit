@@ -17,7 +17,7 @@ const controlPlanePaths = [
   "/_relkit/v1/stream",
 ] as const;
 
-test("keeps the RELKIT control plane out of application telemetry", async () => {
+test("keeps the RelKit control plane out of application telemetry", async () => {
   const collector = createObservabilityCollector();
   const lifecycle: string[] = [];
   const options = {

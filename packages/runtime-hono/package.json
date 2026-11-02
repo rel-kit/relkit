@@ -1,7 +1,7 @@
 {
   "name": "@relkit/runtime-hono",
   "version": "0.8.4",
-  "description": "Unsupported internal Hono runtime for RELKIT; use @relkit/app.",
+  "description": "Unsupported internal Hono runtime for RelKit; use @relkit/app.",
   "license": "MIT",
   "repository": {
     "type": "git",

@@ -1,7 +1,7 @@
 import type { JsonValue, RelkitSchema, StandardResult } from "./standard-schema.types.js";
 
 /**
- * Directional JSON Schema projection hooks carried by a RELKIT schema.
+ * Directional JSON Schema projection hooks carried by a RelKit schema.
  * @example const hooks: SchemaProjectionHooks = { jsonSchema: () => ({ type: "string" }) };
  */
 export interface SchemaProjectionHooks {
@@ -11,7 +11,7 @@ export interface SchemaProjectionHooks {
 }
 
 /**
- * RELKIT schema with parsing and composition methods.
+ * RelKit schema with parsing and composition methods.
  * Input and output types may differ after transformation.
  * @example const schema: Schema<string, number> = z.string().transform(Number);
  */

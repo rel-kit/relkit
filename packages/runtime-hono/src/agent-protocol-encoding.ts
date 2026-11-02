@@ -77,7 +77,7 @@ function* agUiToolFrames(frame: ToolFrame): Iterable<unknown> {
 
 /** Encode execution events with native journal metadata for replay correlation.
  * @param frame - Native frame to validate or encode.
- * @returns An AG-UI state snapshot or custom event with RELKIT metadata.
+ * @returns An AG-UI state snapshot or custom event with RelKit metadata.
  */
 function executionEvent(frame: Extract<AgentProtocolFrame, { readonly kind: "event" }>): unknown {
   const value = frame.value;
@@ -112,7 +112,7 @@ function executionEvent(frame: Extract<AgentProtocolFrame, { readonly kind: "eve
   };
 }
 
-/** Read a nonempty custom event name or use the RELKIT fallback.
+/** Read a nonempty custom event name or use the RelKit fallback.
  * @param value - Value to validate or project.
  * @returns The custom name, defaulting to relkit.custom.
  */

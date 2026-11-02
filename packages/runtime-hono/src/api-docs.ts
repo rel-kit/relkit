@@ -115,7 +115,7 @@ function registerDocumentRoutes(
         ...(embed
           ? { content: canonicalJson(await document(context.req.raw.signal)) }
           : { url: "./openapi.json" }),
-        pageTitle: "RELKIT API Reference",
+        pageTitle: "RelKit API Reference",
       });
       const response = await render(context, next);
       if (!(response instanceof Response)) return response;
@@ -169,7 +169,7 @@ function validate(mode: InternalEndpointMode, enabled: boolean, options: ApiDocs
 
 /** Builds response headers for the selected API-document representation.
  * @param contentType - Media type advertised by the resulting response.
- * @returns No-store headers containing the selected content type and RELKIT API version.
+ * @returns No-store headers containing the selected content type and RelKit API version.
  */
 function responseHeaders(contentType: string): Record<string, string> {
   return {

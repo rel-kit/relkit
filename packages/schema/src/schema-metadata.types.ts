@@ -12,7 +12,7 @@ export type SchemaProjection = () => JsonValue;
 export type SchemaProjectionDirection = "input" | "output";
 
 /**
- * Metadata attached to a RELKIT schema for deterministic projection.
+ * Metadata attached to a RelKit schema for deterministic projection.
  * Directional hooks may differ after a transform or default is applied.
  * @example const metadata: SchemaMetadata = { jsonSchema: () => ({ type: "string" }) };
  */

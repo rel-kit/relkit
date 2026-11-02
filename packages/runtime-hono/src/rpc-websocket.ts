@@ -36,7 +36,7 @@ export function installRpcWebSocket(
          */
         onMessage(event, socket) {
           if (encodedBytes(event.data) > REALTIME_RUNTIME_LIMITS.transportFrameBytes) {
-            socket.close(1009, "Relkit frame exceeds the transport limit.");
+            socket.close(1009, "RelKit frame exceeds the transport limit.");
             return;
           }
           const peer = (socket.raw ?? socket) as WebSocketLike;
@@ -45,7 +45,7 @@ export function installRpcWebSocket(
               context: (request) => ({ ...context, rpcHeaders: request.headers }),
             })
             .catch(() => {
-              socket.close(1011, "Relkit RPC transport failed.");
+              socket.close(1011, "RelKit RPC transport failed.");
             });
         },
         /** Releases protocol state when the WebSocket closes.

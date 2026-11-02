@@ -19,7 +19,7 @@ export { SchemaValidationError } from "./schema-validation-error.js";
  * Constructs a schema within an observed Effect.
  * @param check - Path-aware validator callback.
  * @param metadata - Optional projection and refinement metadata.
- * @returns A RELKIT schema, or SchemaExecutionError if construction fails.
+ * @returns A RelKit schema, or SchemaExecutionError if construction fails.
  * @example Effect.runSync(createSchemaEffect((value) => ({ value })));
  */
 export function createSchemaEffect<TInput, TOutput>(
@@ -43,7 +43,7 @@ export function createSchemaEffect<TInput, TOutput>(
  * Synchronous compatibility adapter for schema construction.
  * @param check - Path-aware validator callback.
  * @param metadata - Optional projection metadata.
- * @returns A RELKIT schema.
+ * @returns A RelKit schema.
  * @throws The original construction error if creation fails.
  * @example createSchema((value) => ({ value }));
  */

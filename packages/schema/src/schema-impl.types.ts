@@ -1,7 +1,7 @@
 import type { Schema, StandardPathSegment, StandardResult } from "./standard-schema.types.js";
 
 /**
- * Path-aware validation callback used by a constructed RELKIT schema.
+ * Path-aware validation callback used by a constructed RelKit schema.
  * @example const check: SchemaCheck<string> = (value) => ({ value: String(value) });
  */
 export type SchemaCheck<T> = (
@@ -10,7 +10,7 @@ export type SchemaCheck<T> = (
 ) => StandardResult<T> | Promise<StandardResult<T>>;
 
 /**
- * RELKIT schema with its internal path-aware validation hook.
+ * RelKit schema with its internal path-aware validation hook.
  * The hook is only used while composing nested schemas.
  * @example const internal = schema as InternalSchema<string, string>;
  */

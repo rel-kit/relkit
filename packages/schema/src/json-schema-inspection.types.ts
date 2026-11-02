@@ -2,7 +2,7 @@ import type { JsonSchemaFactory } from "./json-schema.types.js";
 import type { StandardSchemaV1 } from "./standard-schema.types.js";
 
 /**
- * RELKIT extension hook shapes for directional JSON projections.
+ * RelKit extension hook shapes for directional JSON projections.
  * @example const projection = (schema as RelkitProjectable).relkit?.inputJsonSchema;
  */
 export type RelkitProjectable = StandardSchemaV1 & {
