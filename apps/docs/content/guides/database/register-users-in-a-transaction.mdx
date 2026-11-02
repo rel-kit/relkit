@@ -1,17 +1,17 @@
 ---
 title: Register users in a transaction
-description: Add SQLite tables and a Drizzle service to an existing RELKIT app, customize the Users model, and verify the database and public query path.
+description: Add SQLite tables and a Drizzle service to an existing RelKit app, customize the Users model, and verify the database and public query path.
 pagination: false
 sidebar:
   icon: database
 ---
 
-Add a Users database to an existing RELKIT app using the executable data-model example. You will define
+Add a Users database to an existing RelKit app using the executable data-model example. You will define
 tables, generate migrations, add a custom query and an override, and use the generated CRUD schemas
 in a member-registration transaction. You will expose a read operation and verify the result.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-  You'll need an existing RELKIT application, Bun 1.3.10 or later, and a new local SQLite database.
+  You'll need an existing RelKit application, Bun 1.3.10 or later, and a new local SQLite database.
   The final test verifies that registration writes both records and rolls back on failure.
 </Callout>
 

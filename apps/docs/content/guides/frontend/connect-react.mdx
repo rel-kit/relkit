@@ -10,14 +10,14 @@ search:
   boost: 5
 ---
 
-Show **Hello, RELKIT!** in a React page using the same `GET /hello` operation you ran in
+Show **Hello, RelKit!** in a React page using the same `GET /hello` operation you ran in
 [Create and run an API](/docs/learn/create-an-app). Your backend owns its input and output
 schemas; the frontend receives generated types and calls it through RPC.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
   Keep that backend running on `http://127.0.0.1:3000`. You'll also need an existing Vite React or
   Next.js App Router TypeScript app with its dependencies installed. Run frontend commands in that
-  app's root. This guide adds RELKIT to it; it does not require the fullstack or agent starter.
+  app's root. This guide adds RelKit to it; it does not require the fullstack or agent starter.
 </Callout>
 
 Select your framework in the tabs below. Your selection carries through the remaining steps.
@@ -137,10 +137,10 @@ its `rewrites`. Keep the other options and any existing rules:
 
 [`withRelkit`](/docs/api/client#withrelkit) embeds the pulled contract fingerprint.
 The [Next.js rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites)
-forward `/rpc` calls and the `/_relkit/v1/client/identity` handshake to RELKIT. The browser stays
+forward `/rpc` calls and the `/_relkit/v1/client/identity` handshake to RelKit. The browser stays
 on the frontend origin, so the provider needs no separate `baseUrl`.
 
-Keep RELKIT running as a separate backend on port `3000`; run Next.js on port `3002` in step 5.
+Keep RelKit running as a separate backend on port `3000`; run Next.js on port `3002` in step 5.
 These rewrites also run in production: replace their local destinations with your backend's server URL
 before deploying. Static exports cannot run rewrites; use your gateway or a public backend URL with
 [credentialed CORS and cookies](/docs/modules/client/authentication) instead.
@@ -212,7 +212,7 @@ bun run relkit client check http://127.0.0.1:3000 --out .relkit/generated
 bun run dev
 ```
 
-Open `http://127.0.0.1:5173`. Expect a loading message followed by **Hello, RELKIT!**. In the browser's
+Open `http://127.0.0.1:5173`. Expect a loading message followed by **Hello, RelKit!**. In the browser's
 Network panel, the identity request and the RPC request should succeed. Stop the backend and reload
 to check the connection error message.
 
@@ -227,7 +227,7 @@ bun run relkit client check http://127.0.0.1:3000 --out .relkit/generated
 bun run dev --hostname 127.0.0.1 --port 3002
 ```
 
-Open `http://127.0.0.1:3002`. Expect a loading message followed by **Hello, RELKIT!**. In the browser's
+Open `http://127.0.0.1:3002`. Expect a loading message followed by **Hello, RelKit!**. In the browser's
 Network panel, the identity and RPC requests should use port `3002` and succeed through the rewrites.
 Stop the backend and reload to check the connection error message.
 
@@ -254,7 +254,7 @@ Each module documents its backend declaration next to the corresponding frontend
 | Agent with a client policy            | `useAgent`                                                       | [Run an agent](/docs/modules/ai/agents#use-this-agent-from-the-frontend)                                  |
 | `defineGraph` with a client policy    | `useAgent` with typed initial input and resume replies           | [Run and resume a graph](/docs/modules/ai/graphs-persistence#run-and-resume-this-graph-from-the-frontend) |
 | `defineChannel` with browser access   | `useChannel`, `useRealtime`                                      | [Subscribe to a channel](/docs/modules/realtime#subscribe-from-the-frontend)                              |
-| Better Auth mount                     | Better Auth's browser client and the RELKIT identity provider    | [Sign-in clients](/docs/modules/auth/clients)                                                             |
+| Better Auth mount                     | Better Auth's browser client and the RelKit identity provider    | [Sign-in clients](/docs/modules/auth/clients)                                                             |
 
 Buckets, caches, database models, and backend events have no direct generated browser API.
 Expose an authorized function through a route when the frontend needs that operation. File uploads

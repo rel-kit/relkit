@@ -5,7 +5,7 @@ sidebar:
   icon: workflow
 ---
 
-A function's second parameter, `context`, gives that invocation access to logging, time, cancellation, and its declared resources. RELKIT builds it from the checked graph, so a function
+A function's second parameter, `context`, gives that invocation access to logging, time, cancellation, and its declared resources. RelKit builds it from the checked graph, so a function
 receives common runtime capabilities plus typed clients for only the resources it declares. Never store context
 in a module variable or reuse it after the invocation completes.
 
@@ -57,7 +57,7 @@ There is no service middleware or `context.service`. A service exposes public fu
 inject handler state. Database and Auth are specialized application context integrations, documented in
 [Database](/docs/modules/database) and [Auth sessions](/docs/modules/auth/sessions).
 
-RELKIT traces routes, functions, declared clients, jobs, events, tools, and agents automatically. Use
+RelKit traces routes, functions, declared clients, jobs, events, tools, and agents automatically. Use
 `context.trace` only for application work the runtime cannot infer. See [Observability](/docs/modules/operations/observability#add-application-trace-detail)
 for the three tracing operations and an executable example.
 
