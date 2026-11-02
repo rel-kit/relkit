@@ -1094,6 +1094,11 @@
       "examples": ["apps/docs/examples/public-api/tooling.ts"]
     },
     {
+      "path": "docs/modules/cli/relkit-create-untested",
+      "api": ["create-relkit"],
+      "examples": ["packages/create-relkit/src/create-capabilities.ts"]
+    },
+    {
       "path": "guides/cli/create-and-build-an-api",
       "api": ["routes"],
       "examples": ["templates/default/v1/minimal/package.json"]
