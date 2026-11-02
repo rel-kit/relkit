@@ -46,7 +46,7 @@ export const generateEffect = Effect.fn("ProjectGeneration.execute")(
             ),
           );
         }
-        context.onProgress?.(`Creating a new RELKIT app in ${validated.destination}.`);
+        context.onProgress?.(`Creating a new RelKit app in ${validated.destination}.`);
         const owned = yield* acquireGenerationStage(validated.destination, context);
         yield* materializeGenerationStage(owned.stage, options, context);
         const gitInitialized = yield* installGenerationStage(owned.stage, options, context);

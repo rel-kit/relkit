@@ -159,7 +159,7 @@ export const listProjectFilesEffect = Effect.fn("ProjectFiles.list")(
 );
 
 /**
- * Converts a package name to the existing stable RELKIT application identifier.
+ * Converts a package name to the existing stable RelKit application identifier.
  * @param name - Authored name or declaration key.
  * @returns A safe unscoped project ID, with app as the empty-normalization fallback.
  */

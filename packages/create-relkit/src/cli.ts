@@ -33,7 +33,7 @@ export async function main(args: readonly string[]): Promise<void> {
   const controller = new AbortController();
   let progressStarted = false;
   const onProgress = (message: string): void => {
-    if (progress === undefined || message.startsWith("Creating a new RELKIT app")) return;
+    if (progress === undefined || message.startsWith("Creating a new RelKit app")) return;
     if (!progressStarted) {
       progress.start(message);
       progressStarted = true;
@@ -115,7 +115,7 @@ function creationProgram(
   return Effect.scoped(
     Effect.gen(function* () {
       yield* acquireCreationSignals(controller);
-      if (interactive) prompt.intro("Create a RELKIT app");
+      if (interactive) prompt.intro("Create a RelKit app");
       const resolved = yield* resolveCreateOptionsDetailsEffect(args, { json, interactive });
       for (const warning of resolved.warnings) process.stderr.write(formatCreateWarning(warning));
       return yield* generateProjectEffect(resolved.options, {

@@ -14,7 +14,7 @@ export interface DiagnosticLocation extends SourceLocation {
   readonly descriptorId?: string;
 }
 
-/** Immutable, portable diagnostic emitted by RELKIT tools.
+/** Immutable, portable diagnostic emitted by RelKit tools.
  * Instances returned by createDiagnostic are deeply frozen.
  * @example const diagnostic: Diagnostic = createDiagnostic({ code: "X", severity: "info", message: "Note" });
  */

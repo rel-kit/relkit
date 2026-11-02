@@ -99,7 +99,7 @@ function failingIterator<T>(): LazyEffectIterator<T> {
       Effect.fail(
         new StreamLifecycleFailure({
           code: "RELKIT_STREAM_ALREADY_CONSUMED",
-          message: "A Relkit stream can be consumed only once",
+          message: "A RelKit stream can be consumed only once",
         }),
       ),
     );

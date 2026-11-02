@@ -59,7 +59,7 @@ export const acquireInspectorUi = Effect.fn("Inspector.startUi")(function* (
     (child) => stopUi(child),
   );
   yield* Effect.raceFirst(waitUiReady(options), uiExit(child));
-  yield* Effect.logInfo(`RELKIT Inspector listening at http://${options.hostname}:${options.port}`);
+  yield* Effect.logInfo(`RelKit Inspector listening at http://${options.hostname}:${options.port}`);
   return uiExit(child);
 });
 

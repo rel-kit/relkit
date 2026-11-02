@@ -1,7 +1,7 @@
 {
   "name": "@relkit/invocation",
   "version": "0.7.14",
-  "description": "Unsupported internal RELKIT invocation contracts; use @relkit/app.",
+  "description": "Unsupported internal RelKit invocation contracts; use @relkit/app.",
   "license": "MIT",
   "repository": {
     "type": "git",

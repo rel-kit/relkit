@@ -1,7 +1,7 @@
 {
   "name": "@relkit/deploy",
   "version": "0.7.13",
-  "description": "Unsupported internal RELKIT deployment contracts; use @relkit/cli.",
+  "description": "Unsupported internal RelKit deployment contracts; use @relkit/cli.",
   "license": "MIT",
   "repository": {
     "type": "git",

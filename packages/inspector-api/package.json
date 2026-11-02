@@ -1,7 +1,7 @@
 {
   "name": "@relkit/inspector-api",
   "version": "0.8.4",
-  "description": "Internal live bridge and native jobs protocol for RELKIT tooling.",
+  "description": "Internal live bridge and native jobs protocol for RelKit tooling.",
   "license": "MIT",
   "repository": {
     "type": "git",

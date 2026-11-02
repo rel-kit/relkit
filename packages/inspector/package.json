@@ -1,7 +1,7 @@
 {
   "name": "@relkit/inspector",
   "version": "0.2.1",
-  "description": "Standalone RELKIT development inspector, collector, and local diagnostic history.",
+  "description": "Standalone RelKit development inspector, collector, and local diagnostic history.",
   "license": "MIT",
   "repository": {
     "type": "git",

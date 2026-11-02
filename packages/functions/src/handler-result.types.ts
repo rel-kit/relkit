@@ -94,7 +94,7 @@ type InvalidHandlerResult<Result, Output, AllowedError> = unknown extends Result
           ? Exclude<EffectError<Result>, AllowedError> extends never
             ? [EffectRequirements<Result>] extends [never]
               ? never
-              : "Effect requirements must be provided by RELKIT"
+              : "Effect requirements must be provided by RelKit"
             : "undeclared Effect error"
           : "Effect output does not match the output schema"
       : Result extends globalThis.Error
