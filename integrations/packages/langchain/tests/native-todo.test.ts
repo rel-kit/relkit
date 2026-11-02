@@ -47,7 +47,7 @@ test("native todo middleware replaces public state before final output", async (
     agent,
     modelRegistry: {},
     tools: [],
-    engine: { invoke: () => Promise.reject(new Error("Unexpected RELKIT tool")) },
+    engine: { invoke: () => Promise.reject(new Error("Unexpected RelKit tool")) },
     input: { message: "Check the order" },
     contentSink: {
       emitEvent: async (event: AgentExecutionEvent) => {

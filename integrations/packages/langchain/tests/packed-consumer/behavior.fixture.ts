@@ -9,7 +9,7 @@ import { z } from "@relkit/schema";
 const limits = { maxSteps: 4, maxToolCalls: 2, timeoutMs: 5_000 };
 const engine = {
   invoke: async () => {
-    throw new Error("Unexpected RELKIT tool");
+    throw new Error("Unexpected RelKit tool");
   },
 };
 

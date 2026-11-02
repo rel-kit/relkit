@@ -43,7 +43,7 @@ async function invokeNested(
     input: { message: "root-private" },
     threadId: "nested:relkit",
     tools: [],
-    engine: { invoke: () => Promise.reject(new Error("unexpected RELKIT tool")) },
+    engine: { invoke: () => Promise.reject(new Error("unexpected RelKit tool")) },
     contentSink: {
       emitOutput: () => undefined,
       emitEvent: (event) => void events.push(event),

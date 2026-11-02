@@ -1,4 +1,4 @@
-/** Builds invocation tool bindings from the selected RELKIT registry and native tool descriptors, keeping execution ownership with the caller. */
+/** Builds invocation tool bindings from the selected RelKit registry and native tool descriptors, keeping execution ownership with the caller. */
 
 import type { JsonValue } from "@relkit/contracts";
 import { Effect } from "effect";
@@ -24,7 +24,7 @@ export {
   modelToolNameEffect,
 } from "./runtime-tool-lookup.js";
 
-/** Executes an allowed RELKIT tool with safe public error projection.
+/** Executes an allowed RelKit tool with safe public error projection.
  * @param options - Runtime and invocation integrations.
  * @param turn - Model requested tool call.
  * @param signal - Invocation cancellation signal.

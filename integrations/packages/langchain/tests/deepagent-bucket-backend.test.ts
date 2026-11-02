@@ -11,7 +11,7 @@ import {
 import { createDeepAgentBucketBackend } from "../src/deepagent-bucket-backend.ts";
 import { memoryBackend } from "./deepagent-bucket-backend.fixture.js";
 
-describe("DeepAgents RELKIT bucket backend", () => {
+describe("DeepAgents RelKit bucket backend", () => {
   test(
     "implements V2 text, pagination, edit, search, and recursive delete semantics",
     caseImplementsV2TextPaginationEditSearchAnd,
@@ -123,7 +123,7 @@ async function caseContainsPathsInsideItsBucketPrefixAnd() {
     delete: async () => undefined,
   };
   expect(() => createDeepAgentBucketBackend(cacheClient as never)).toThrow(
-    "requires a RELKIT BucketClient",
+    "requires a RelKit BucketClient",
   );
 }
 

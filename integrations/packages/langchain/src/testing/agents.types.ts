@@ -1,4 +1,4 @@
-/** Publishes the native agent test harness helpers from the explicit integration while sharing RELKIT testing ownership and clock boundaries. This companion preserves the native input and output types without starting runtime work. */
+/** Publishes the native agent test harness helpers from the explicit integration while sharing RelKit testing ownership and clock boundaries. This companion preserves the native input and output types without starting runtime work. */
 
 import type {
   AgentApprovalHandler,

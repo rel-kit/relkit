@@ -1,4 +1,4 @@
-/** Publishes the native agent test harness helpers from the explicit integration while sharing RELKIT testing ownership and clock boundaries. */
+/** Publishes the native agent test harness helpers from the explicit integration while sharing RelKit testing ownership and clock boundaries. */
 
 import { createAgentState } from "./agent-state.js";
 

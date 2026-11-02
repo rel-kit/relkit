@@ -30,7 +30,7 @@ describe("native graph runtime", () => {
   );
 
   test(
-    "routes function nodes through the RELKIT engine once",
+    "routes function nodes through the RelKit engine once",
     caseRoutesFunctionNodesThroughTheRELKITEngine,
   );
 });
@@ -88,7 +88,7 @@ async function caseSupportsParallelJoinsConditionalLoopsAndUpdate() {
   ).resolves.toEqual({ answer: 9 });
 }
 
-/** Verifies that routes function nodes through the RELKIT engine once.
+/** Verifies that routes function nodes through the RelKit engine once.
  * @returns Completion after fixture assertions and owned cleanup settle.
  */
 async function caseRoutesFunctionNodesThroughTheRELKITEngine() {

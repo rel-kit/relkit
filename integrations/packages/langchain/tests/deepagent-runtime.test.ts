@@ -28,7 +28,7 @@ describe("native DeepAgents runtime selection", () => {
     caseResolvesNativeCheckpointAndMemoryResources,
   );
 
-  test("binds a RELKIT bucket as a thread-scoped native backend", caseBindsARELKITBucketAsAThread);
+  test("binds a RelKit bucket as a thread-scoped native backend", caseBindsARELKITBucketAsAThread);
 
   test(
     "recognizes and validates every deep capability",
@@ -97,7 +97,7 @@ async function caseResolvesNativeCheckpointAndMemoryResources() {
   ).resolves.toBeDefined();
 }
 
-/** Verifies that binds a RELKIT bucket as a thread-scoped native backend.
+/** Verifies that binds a RelKit bucket as a thread-scoped native backend.
  * @returns Completion after fixture assertions and owned cleanup settle.
  */
 async function caseBindsARELKITBucketAsAThread() {
@@ -134,7 +134,7 @@ async function caseBindsARELKITBucketAsAThread() {
       threadId: "customer/../42",
       bucketBackend: bucket,
       tools: [],
-      engine: { invoke: () => Promise.reject(new Error("unexpected RELKIT tool")) },
+      engine: { invoke: () => Promise.reject(new Error("unexpected RelKit tool")) },
     }),
   ).resolves.toEqual({ answer: "saved" });
   expect([...objects.keys()]).toHaveLength(1);

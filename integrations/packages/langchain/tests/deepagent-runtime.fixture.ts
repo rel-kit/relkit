@@ -45,7 +45,7 @@ export function runtime(agent: ReturnType<typeof deepAgent>, threadId: string) {
     input: { message: "Delegate this." },
     threadId,
     tools: [],
-    engine: { invoke: () => Promise.reject(new Error("unexpected RELKIT tool")) },
+    engine: { invoke: () => Promise.reject(new Error("unexpected RelKit tool")) },
   });
 }
 

@@ -1,4 +1,4 @@
-/** Builds and validates RELKIT signal descriptors used by native agent execution while retaining their payload schema and stable identity. */
+/** Builds and validates RelKit signal descriptors used by native agent execution while retaining their payload schema and stable identity. */
 
 import { executionDeadline } from "./signal-deadline.js";
 import type { MaybePromise } from "@relkit/contracts";

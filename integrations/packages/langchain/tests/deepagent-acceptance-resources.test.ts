@@ -15,7 +15,7 @@ const limits = { maxSteps: 8, maxToolCalls: 8, timeoutMs: 2_000 };
 const roots: string[] = [];
 afterEach(async () => Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true }))));
 
-test("loads memory and skills through native and RELKIT backends", async () => {
+test("loads memory and skills through native and RelKit backends", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-deep-resources-"));
   roots.push(root);
   await mkdir(join(root, "skills", "native-orders"), { recursive: true });
@@ -39,7 +39,7 @@ test("loads memory and skills through native and RELKIT backends", async () => {
     source: memoryBucketProvider(),
   });
   const scoped = createThreadBucketBackend(bucket, "relkit.resources", "relkit:resources");
-  await scoped.write("/AGENTS.md", "Remember RELKIT-MEMORY.");
+  await scoped.write("/AGENTS.md", "Remember RelKit-MEMORY.");
   await scoped.write("/skills/relkit-orders/SKILL.md", skill("relkit-orders"));
   const relkit = createTestModel([{ type: "final", output: { answer: "relkit" } }]);
   await runResourceAgent(
@@ -49,7 +49,7 @@ test("loads memory and skills through native and RELKIT backends", async () => {
     "relkit:resources",
     bucket,
   );
-  expect(JSON.stringify(relkit.calls[0])).toMatch(/RELKIT-MEMORY|relkit-orders/);
+  expect(JSON.stringify(relkit.calls[0])).toMatch(/RelKit-MEMORY|relkit-orders/);
 });
 
 async function runResourceAgent(
