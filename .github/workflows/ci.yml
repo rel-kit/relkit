@@ -137,8 +137,8 @@ jobs:
         with:
           github-token: ${{ steps.release-app.outputs.token }}
           script: bun run version:packages
-          commit-message: "chore: version RELKIT packages"
-          pr-title: "chore: release RELKIT"
+          commit-message: "chore: version RelKit packages"
+          pr-title: "chore: release RelKit"
           pr-base-branch: main
       - name: Preserve failed creation certification reports
         if: failure()

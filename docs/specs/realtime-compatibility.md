@@ -18,10 +18,10 @@ it does not create a second normative specification.
 
 ## Supported profiles
 
-- Relkit client identity document version 1.
-- Relkit public client contract and generator version 7.
-- Relkit graph and runtime manifest version 10.
-- Existing Relkit API v1 and oRPC/Hono transport ownership.
+- RelKit client identity document version 1.
+- RelKit public client contract and generator version 7.
+- RelKit graph and runtime manifest version 10.
+- Existing RelKit API v1 and oRPC/Hono transport ownership.
 - AG-UI event schemas from `@ag-ui/core@0.0.59`.
 - Canonical RelKit agent events over HTTP iteration, AG-UI SSE, and WebSocket.
 
@@ -39,6 +39,6 @@ it does not create a second normative specification.
 - `packages/runtime-hono/tests/agent-rpc.test.ts` verifies durable run acceptance,
   same-thread reuse, and cross-generation control admission/consumption.
 
-No Pi package is installed. Pi-derived behavior is represented only by Relkit-owned
+No Pi package is installed. Pi-derived behavior is represented only by RelKit-owned
 contracts and tests. WebSocket upgrades and Redis-backed multi-process guarantees
 remain release gates and must not be inferred from the HTTP iterator evidence.

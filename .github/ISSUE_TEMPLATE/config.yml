@@ -5,4 +5,4 @@ contact_links:
     about: Report vulnerabilities privately to the maintainers.
   - name: Documentation
     url: https://relkit.dev
-    about: Guides and API reference for RELKIT.
+    about: Guides and API reference for RelKit.

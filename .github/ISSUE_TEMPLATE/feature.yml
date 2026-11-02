@@ -1,5 +1,5 @@
 name: Feature request
-description: Propose a focused RELKIT capability or API improvement.
+description: Propose a focused RelKit capability or API improvement.
 title: "feature: "
 labels: [enhancement]
 body:

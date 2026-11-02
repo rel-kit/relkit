@@ -1,17 +1,17 @@
 # AGENTS.md
 
-This is the working guide for agents in the RELKIT repository. User instructions
+This is the working guide for agents in the RelKit repository. User instructions
 take precedence; a more-specific `AGENTS.md` in a subtree takes precedence
 over this file. Read it before editing.
 
 ## Repository
 
-RELKIT is experimental: interfaces may change, and current consumers are
+RelKit is experimental: interfaces may change, and current consumers are
 repository samples. Update affected samples directly within the task while
 preserving their data and applied migration history. This does not authorize
 data deletion or new legacy upgrade commands or compatibility layers.
 
-RELKIT is a strict TypeScript monorepo managed by Bun `1.3.10` and Turborepo.
+RelKit is a strict TypeScript monorepo managed by Bun `1.3.10` and Turborepo.
 The main product topology is:
 
 | Path                    | Role                                                                                                                            |
@@ -41,7 +41,7 @@ New applications group generic, database, and auth boundaries at
 `src/services/<name>/service.ts`, with their descriptors, schemas, helpers, and
 assets colocated beneath that service. Routes remain in `src/routes`; environment
 contracts and explicitly imported configuration/provider fragments live in
-`src/platform`. Application descriptors use plain TypeScript and public RELKIT
+`src/platform`. Application descriptors use plain TypeScript and public RelKit
 APIs, without requiring Effect imports.
 
 Existing flat `src/<name>/service.ts` applications remain supported; add preserves
@@ -121,7 +121,7 @@ Before changing exports, imports, directories, or naming conventions, read
   references before each relevant phase.
 - For Effect implementation or review, read `.agents/skills/effect/SKILL.md`
   and the references matching the task before editing. Apply it alongside the
-  nearest `AGENTS.md` and established RELKIT conventions. Use the skill to
+  nearest `AGENTS.md` and established RelKit conventions. Use the skill to
   identify relevant Effect APIs and patterns.
 - For each relevant API or pattern, always inspect its implementation, tests,
   and examples in the read-only `repos/effect` checkout, even when the skill
