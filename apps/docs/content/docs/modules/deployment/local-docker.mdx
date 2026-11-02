@@ -6,7 +6,7 @@ sidebar:
   icon: container
 ---
 
-Use local Docker first. RELKIT can manage development provider recipes while Bun runs your
+Use local Docker first. RelKit can manage development provider recipes while Bun runs your
 application, and its build can produce a server image for a separate container smoke check.
 
 ## Pre-setup
@@ -61,10 +61,10 @@ docker run --rm --name relkit-docs-preview -p 127.0.0.1:3000:3000 -e PORT=3000 r
 In another terminal:
 
 ```sh title="Second terminal"
-curl -i http://127.0.0.1:3000/hello\?name=RELKIT
+curl -i http://127.0.0.1:3000/hello\?name=RelKit
 ```
 
-Expect HTTP `200` and `{"message":"Hello, RELKIT!"}`. Stop this temporary container with Ctrl+C.
+Expect HTTP `200` and `{"message":"Hello, RelKit!"}`. Stop this temporary container with Ctrl+C.
 It has no application data. Apps with file-backed state need an explicitly mounted persistent
 volume before accepting data; do not rely on a disposable container's writable layer.
 

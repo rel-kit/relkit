@@ -69,7 +69,7 @@ Test both forms, especially when middleware or authentication depends on the pat
 
 ## Treat route identity as a public contract
 
-When `id` is omitted, RELKIT derives it from the method and normalized URL. For example,
+When `id` is omitted, RelKit derives it from the method and normalized URL. For example,
 `GET /orders/:orderId` becomes `route.get.orders.by-order-id`, and `GET /` becomes `route.get.root`.
 Changing a path or method changes that inferred identity. Route IDs also name generated-client operations.
 

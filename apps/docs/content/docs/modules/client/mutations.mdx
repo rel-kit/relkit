@@ -17,7 +17,7 @@ Use a mutation for a request that changes application state, and track whether t
 
 `useRouteMutation` never runs on mount and defaults to no retry. Known-offline work fails as
 `not-sent`; after a request is handed to `fetch`, timeout or disconnect is conservatively `unknown`.
-RELKIT stores only scoped reconciliation metadata in `sessionStorage`, never variables or retry
+RelKit stores only scoped reconciliation metadata in `sessionStorage`, never variables or retry
 payloads. Application mutations need an application-owned status endpoint to reconcile an unknown
 outcome.
 

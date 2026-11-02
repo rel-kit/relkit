@@ -43,7 +43,7 @@ the client still uses RPC rather than constructing a REST request.
 | [`useSuspenseRoute`](/docs/api/client#usesuspenseroute)          | A ready provider and your Suspense/error boundaries own loading and failure. It throws while the provider is not ready.                             |
 | [`useInfiniteRoute`](/docs/api/client#useinfiniteroute)          | The backend already accepts pagination input; supply `initialPageParam`, `input(page)`, and `getNextPageParam`. It does not add backend pagination. |
 | [`useRouteUtils`](/docs/api/client#userouteutils)                | You need the selected procedure's underlying query/mutation option builders.                                                                        |
-| [`createTanstackQueryUtils`](/docs/api/client#all-exported-apis) | An application outside the RELKIT React hooks owns its QueryClient and identity lifecycle. Import it from `@relkit/client/tanstack-query`.          |
+| [`createTanstackQueryUtils`](/docs/api/client#all-exported-apis) | An application outside the RelKit React hooks owns its QueryClient and identity lifecycle. Import it from `@relkit/client/tanstack-query`.          |
 
 For the standalone query adapter, install its selected peers in the caller package:
 

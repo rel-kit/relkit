@@ -44,7 +44,7 @@ denied. It calls `next()` only when processing should continue.
   real access control.
 </Callout>
 
-The handler receives the Hono `context`, `next`, and a RELKIT context containing `signal`, `env`,
+The handler receives the Hono `context`, `next`, and a RelKit context containing `signal`, `env`,
 `auth`, `log`, and `time`. It does not receive the route target's validated input or its dependency clients.
 Call public service functions for domain behavior rather than importing their private implementation.
 
