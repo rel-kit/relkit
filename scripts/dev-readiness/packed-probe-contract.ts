@@ -2,6 +2,8 @@
  * Derives a packed project's exact expected response before its measured launch.
  * Route examples use the preparation contract; example-free projects compare the
  * existing protected graph body with sealed metadata and initial generation one.
+ * A project without a prepared snapshot compares the served OpenAPI document with
+ * the one its creation check generated.
  * Reads are finite owned native calls, outside the command-to-response timer.
  */
 import {
@@ -31,7 +33,29 @@ import type { SnapshotFileOperations } from "@relkit/cli/internal/tooling";
 export const packedProbeContract = Effect.fn("ReadinessBenchmark.probeContract")(
   function* (root: string, port: number) {
     const files = yield* SnapshotFiles;
-    const pointer = yield* readDocument(SnapshotPointer, files, root, ".relkit/dev/current.json");
+    const pointer = yield* readDocument(
+      SnapshotPointer,
+      files,
+      root,
+      ".relkit/dev/current.json",
+    ).pipe(
+      Effect.catchTag("DevSnapshotIoError", (error) =>
+        isMissing(error) ? Effect.succeed(undefined) : Effect.fail(error),
+      ),
+    );
+    if (pointer === undefined) {
+      const document = yield* readDocument(
+        Schema.Json,
+        files,
+        root,
+        ".relkit/generated/openapi.json",
+      );
+      return {
+        url: `http://127.0.0.1:${port}${API_BASE_PATH}/openapi.json`,
+        expectedStatus: 200,
+        expectedBody: canonicalJson(document),
+      };
+    }
     const capsule = `.relkit/dev/generations/${pointer.generation.slice(7)}`;
     const receipt = yield* readDocument(DevSnapshot, files, root, `${capsule}/receipt.json`);
     if (receipt.readiness.kind === "route")
@@ -89,4 +113,18 @@ function readDocument<A>(
       }),
     ),
   );
+}
+
+/**
+ * Recognizes an absent file without treating other native read failures as absence.
+ * @param error - Native snapshot read failure.
+ * @returns Whether the underlying cause is ENOENT.
+ */
+function isMissing(error: { readonly cause: Error }): boolean {
+  let cause: unknown = error.cause;
+  while (cause instanceof Error) {
+    if ("code" in cause && cause.code === "ENOENT") return true;
+    cause = cause.cause;
+  }
+  return false;
 }
