@@ -60,6 +60,7 @@ it.effect(
         "@relkit/docker": "3.4.5",
         "@relkit/local": "4.5.6",
         "@relkit/inngest": "5.6.7",
+        inngest: "4.20.0",
       });
       expect(manifest.custom).toBe("preserved");
       expect(manifest.scripts.test).toBe("bun test");

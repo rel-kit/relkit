@@ -111,6 +111,7 @@ function verifyGeneratedManifest(
           "@relkit/docker": creatorManifest.relkit.providerVersions["@relkit/docker"],
           "@relkit/inngest": creatorManifest.relkit.providerVersions["@relkit/inngest"],
           "@relkit/local": creatorManifest.relkit.providerVersions["@relkit/local"],
+          inngest: workspaceManifest.catalog.inngest,
         }
       : {}),
     ...(template === "fullstack"

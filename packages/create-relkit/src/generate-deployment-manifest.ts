@@ -9,6 +9,7 @@ import { domainError, domainTry } from "./generator-errors.js";
 import { TemplateManifest, JsonObject } from "./project-manifest.schemas.js";
 import type { CreateOptions } from "./options.js";
 import { buildCatalogProvider } from "./build-catalog.js";
+import { jobsNativeDependencies } from "./jobs-dependencies.js";
 
 /** Applies the original validated manifest patch while preserving unrelated native JSON fields.
  * @param root - Owned staged project root.
@@ -57,6 +58,9 @@ export const customizeDeploymentManifestEffect = Effect.fn(
     }
     for (const provider of providers)
       manifest.dependencies[provider] = yield* domainTry(() => buildCatalogProvider(provider));
+    const jobs = options.jobs;
+    if (jobs !== undefined)
+      Object.assign(manifest.dependencies, yield* domainTry(() => jobsNativeDependencies(jobs)));
     if (options.cloud === "aws" && options.deploy === "pulumi") {
       manifest.scripts["deploy:preview"] = "relkit deploy preview";
       manifest.scripts.deploy = "relkit deploy up";
