@@ -18,9 +18,9 @@ not tasks of this change.
 - [x] 1.4 Offer the `minimal`, `api`, `agent`, `fullstack` and `tasks` templates in interactive and flag-based creation, marking untested combinations, and verify by creating each template in the packed-consumer test
 - [x] 1.5 Make `--help`, the README and the templates README list the same five templates, and verify with a docs test that compares the three lists
 - [x] 1.6 Make CI release readiness measure every template on each Tier 1 runtime and write the capability table as a CI output, and verify the release-readiness workflow uploads the table
-- [ ] 1.7 Add a creation canary workflow that runs nightly with the published `create-relkit@latest` on the latest Bun and opens or updates an issue on failure, and also runs on pull requests that change creation, templates or the workflow itself using the creator packed from the pull request; for each template it creates the project, runs its test command and runs its dev command until the app responds; verify with the pull request's canary run passing for every template
+- [x] 1.7 Add a creation canary workflow that runs nightly with the published `create-relkit@latest` on the latest Bun and opens or updates an issue on failure, and also runs on pull requests that change creation, templates or the workflow itself using the creator packed from the pull request; for each template it creates the project, runs its test command and runs its dev command until the app responds; verify with the pull request's canary run passing for every template
 - [x] 1.8 Document the untested warning and `--strict` in the create guide and on the `RELKIT_CREATE_UNTESTED` page, and verify the docs build passes
-- [ ] 1.9 Make the `tasks` template prepare and start when created with installation (it fails with `RELKIT_CREATE_PREPARE_FAILED: Development snapshot ineligible during compilation.aliases`), and verify with a regression test and with release readiness reporting `tasks` as tested on the pull request
+- [x] 1.9 Make the `tasks` template prepare and start when created with installation (it fails with `RELKIT_CREATE_PREPARE_FAILED: Development snapshot ineligible during compilation.aliases`), and verify with a regression test and with release readiness reporting `tasks` as tested on the pull request
 
 ## 2. Positioning and Why RelKit (#2)
 
