@@ -76,6 +76,7 @@ export const measurePackedSet = Effect.fn("ReadinessBenchmark.measurePackedSet")
             fixture.registry,
             `readiness-fresh-${run}`,
             fixture.examples,
+            fixture.template,
           );
         const attempt = yield* benchmarkReportEffect(
           benchmark,
