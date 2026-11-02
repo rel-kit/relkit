@@ -1,4 +1,4 @@
-/** Checks hello.function through the supported public RELKIT APIs. */
+/** Checks hello.function through the supported public RelKit APIs. */
 import { expect, test } from "bun:test";
 import { invokeFunction } from "@relkit/testing";
 import hello from "@app/services/hello/functions/hello.function.js";

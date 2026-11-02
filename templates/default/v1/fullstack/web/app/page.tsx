@@ -17,7 +17,7 @@ function interruptQuestion(value: unknown): string {
 }
 
 export default function Page() {
-  const greeting = useRoute("route.get.hello", { input: { name: "Relkit" } });
+  const greeting = useRoute("route.get.hello", { input: { name: "RelKit" } });
   const assistant = useAgent("hello.assistant");
   const review = useAgent("hello.review");
 
