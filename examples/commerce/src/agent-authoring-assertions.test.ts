@@ -8,7 +8,7 @@ import cancelOrder from "./services/orders/tools/cancel-order.tool.js";
 import lookupOrder from "./services/orders/tools/lookup-order.tool.js";
 import { orderCheckpoints, orderMemory } from "./services/orders/agents/order-agent-persistence.js";
 
-const unusedEngine = { invoke: () => Promise.reject(new Error("Unexpected RELKIT tool.")) };
+const unusedEngine = { invoke: () => Promise.reject(new Error("Unexpected RelKit tool.")) };
 
 test("native support agent executes mixed tools and publishes todo state", async () => {
   const values: string[] = [];

@@ -42,8 +42,8 @@ function ClientStatus() {
   return (
     <p role="alert">
       {status === "application-updated"
-        ? "The RELKIT application changed. Restart this web dev server to load its current typed client."
-        : "The RELKIT API is unavailable. Check that the backend is running."}
+        ? "The RelKit application changed. Restart this web dev server to load its current typed client."
+        : "The RelKit API is unavailable. Check that the backend is running."}
     </p>
   );
 }

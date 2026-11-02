@@ -19,7 +19,7 @@ Drizzle Kit generates migrations from `src/services/database/schema/index.ts` in
 After editing a table, run `bun run db:generate --name=your-change`, review the SQL
 and required metadata, then migrate. `db:migrate` uses installed `relkit db migrate`
 and root `drizzle.config.ts`; `--config <path>` selects another explicit config.
-Migration execution lives in RELKIT rather than a copied application runner.
+Migration execution lives in RelKit rather than a copied application runner.
 Keep one ordered history for the database and preserve applied identifiers/logs.
 The service opens a connection; it does not create tables.
 Do not apply the initial migration to an existing database without establishing a baseline.

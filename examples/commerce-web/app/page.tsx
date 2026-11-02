@@ -29,7 +29,7 @@ export default function Page() {
 
   return (
     <main style={{ fontFamily: "system-ui", margin: "3rem auto", maxWidth: 720 }}>
-      <h1>Relkit commerce client</h1>
+      <h1>RelKit commerce client</h1>
       <p>Orders: {orders.data?.count ?? "loading"}</p>
       <p>
         Channel: {channel.status}; caught up: {String(channel.caughtUp)}
