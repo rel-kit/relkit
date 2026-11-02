@@ -16,7 +16,7 @@ export interface CreateCapabilityTuple {
   readonly examples: boolean;
 }
 
-/** Every field must match the running packaged tool before a tuple is offered. */
+/** Release, template and runtime major.minor must match the running tool for a tuple to count as tested. */
 export interface CreateCapabilityIdentity {
   /** Exact first-party release version. */
   readonly release: string;
@@ -57,3 +57,13 @@ export type PartialCreateCapability = Readonly<{
   /** Optional example choice. */
   examples?: boolean;
 }>;
+
+/** Coded notice that creation continues with a combination CI has not measured. */
+export interface CreateCapabilityWarning {
+  /** Stable diagnostic code. */
+  readonly code: "RELKIT_CREATE_UNTESTED";
+  /** One-line explanation with the next step. */
+  readonly message: string;
+  /** Docs page explaining the warning. */
+  readonly docs: string;
+}

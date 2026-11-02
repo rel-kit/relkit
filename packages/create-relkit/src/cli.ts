@@ -13,6 +13,7 @@ import { generationError } from "./generate-process.js";
 import { GenerateProjectError } from "./generate-types.js";
 import { stageCleanupFor } from "./generate-stage-cleanup.js";
 import { transferCleanupFailures } from "./generator-cleanup.js";
+import { formatCreateHelp, formatCreateWarning } from "./create-help.js";
 
 /**
  * Runs the executable presentation boundary with invocation-owned signal listeners.
@@ -21,6 +22,10 @@ import { transferCleanupFailures } from "./generator-cleanup.js";
  * @remarks The library barrel has no executable side effects. Generation owns final consent.
  */
 export async function main(args: readonly string[]): Promise<void> {
+  if (args.includes("--help") || args.includes("-h")) {
+    process.stdout.write(formatCreateHelp());
+    return;
+  }
   const json = args.includes("--json");
   const interactive = !json && !process.env.CI && process.stdin.isTTY === true;
   const prompt = createClackPromptDriver("RELKIT_CREATE_CANCELLED");
@@ -112,6 +117,7 @@ function creationProgram(
       yield* acquireCreationSignals(controller);
       if (interactive) prompt.intro("Create a RELKIT app");
       const resolved = yield* resolveCreateOptionsDetailsEffect(args, { json, interactive });
+      for (const warning of resolved.warnings) process.stderr.write(formatCreateWarning(warning));
       return yield* generateProjectEffect(resolved.options, {
         interactive,
         signal: controller.signal,

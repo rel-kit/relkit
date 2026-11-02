@@ -2,6 +2,7 @@
 
 export * from "./options.js";
 export * from "./create-capabilities.js";
+export * from "./create-help.js";
 export * from "./add-types.js";
 export * from "./scaffold-catalog.js";
 export { resolveCatalogVersion } from "./catalog-resolution.js";

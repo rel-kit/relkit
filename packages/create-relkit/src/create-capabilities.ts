@@ -1,24 +1,32 @@
 /**
- * Packaged creation support is an allow-list backed by exact packed readiness evidence.
- * Candidate literals remain parseable so explicit unsupported requests can return
- * a precise pre-staging diagnostic instead of masquerading as syntax errors.
+ * Packaged creation evidence records which combinations CI has measured. Creation offers every
+ * valid combination; one without matching evidence produces a coded warning, or, in strict mode,
+ * a refusal before any file is written.
  */
 
 import { createHash } from "node:crypto";
 import manifest from "../package.json";
-import { CreateOptionsError, type CreateOptions, type CreateTemplate } from "./options.js";
+import { CREATE_OPTION_DEFAULTS, type CreateOptions, type CreateTemplate } from "./options.js";
 
 import type {
   CreateCapabilityTuple,
   CreateCapabilityIdentity,
   CreateCapabilityEvidence,
+  CreateCapabilityWarning,
   PartialCreateCapability,
 } from "./create-capabilities.types.js";
 export type {
   CreateCapabilityTuple,
   CreateCapabilityIdentity,
   CreateCapabilityEvidence,
+  CreateCapabilityWarning,
 } from "./create-capabilities.types.js";
+
+/** Stable code for a combination without current CI evidence. */
+export const CREATE_UNTESTED_CODE = "RELKIT_CREATE_UNTESTED" as const;
+/** Docs page for {@link CREATE_UNTESTED_CODE}. */
+export const CREATE_UNTESTED_DOCS =
+  "https://relkit.dev/docs/modules/cli/relkit-create-untested" as const;
 
 const entries: readonly CreateCapabilityEvidence[] = Object.freeze([
   Object.freeze({
@@ -45,62 +53,109 @@ export const CREATE_CAPABILITY_TABLE = Object.freeze({
   entries,
 });
 
+/** Strict-mode refusal of a combination without current CI evidence. */
+export class CreateUntestedError extends Error {
+  /** Stable code shared with the untested warning. */
+  readonly code = CREATE_UNTESTED_CODE;
+  /** Usage exit status. */
+  readonly exitCode = 2 as const;
+  /**
+   * Creates the strict-mode refusal.
+   * @param message - User-facing diagnostic.
+   */
+  constructor(message: string) {
+    super(message);
+    this.name = "CreateUntestedError";
+  }
+}
+
 /**
  * Reads the executing SDK's release and pinned dependency catalog without acquiring application clients.
- * @returns The complete identity that packaged evidence must match exactly.
+ * @param template - Template whose source identity is reported.
+ * @returns The identity that packaged evidence is compared against.
  */
-export function currentCreateCapabilityIdentity(): CreateCapabilityIdentity {
+export function currentCreateCapabilityIdentity(
+  template: CreateTemplate = CREATE_OPTION_DEFAULTS.template,
+): CreateCapabilityIdentity {
   const catalog = manifest.relkit.buildCatalog;
   return {
     release: manifest.version,
     bun: Bun.version,
     typescript: catalog.dependencies.typescript,
     packageCatalogDigest: createHash("sha256").update(JSON.stringify(catalog)).digest("hex"),
-    template: "default/v1/minimal",
+    template: templateIdentity(template),
     snapshotProtocol: 1,
   };
 }
 
 /**
- * Rejects missing or stale tuples before destination planning or installation.
+ * Checks a complete combination before destination planning or installation.
  * @param options - Complete public creation choice.
- * @param identity - Executing tool identity, or an explicit identity used by compatibility checks.
- * @returns When a current evidence entry admits the complete tuple.
+ * @param settings - Strict refusal and an explicit identity used by compatibility checks.
+ * @returns A coded warning when the combination is untested, or undefined when it is tested.
+ * @throws CreateUntestedError when strict mode is set and the combination is untested.
  */
-export function assertCreateCapability(
+export function checkCreateCapability(
   options: Pick<CreateOptions, "template" | "cloud" | "deploy" | "jobs" | "examples">,
-  identity: CreateCapabilityIdentity = currentCreateCapabilityIdentity(),
-): void {
-  if (supported(options, identity)) return;
-  throw new CreateOptionsError(
-    `Creation combination is not certified: ${formatTuple(options)}. Supported: ${supportedTuples(identity).join(", ") || "none for this tool identity"}.`,
-  );
+  settings: { readonly strict?: boolean; readonly identity?: CreateCapabilityIdentity } = {},
+): CreateCapabilityWarning | undefined {
+  const identity = settings.identity ?? currentCreateCapabilityIdentity(options.template);
+  if (supported(options, identity)) return undefined;
+  const subject = `${formatTuple(options)} has not been tested with RelKit ${identity.release} on Bun ${runtimeLine(identity.bun)}`;
+  if (settings.strict === true) {
+    const tested = testedTuples(identity).join(", ") || "none for this RelKit and Bun version";
+    throw new CreateUntestedError(
+      `${subject}, and --strict refuses untested combinations. Tested: ${tested}. See ${CREATE_UNTESTED_DOCS}`,
+    );
+  }
+  return Object.freeze({
+    code: CREATE_UNTESTED_CODE,
+    message: `${subject}. Creation continues; pass --strict to refuse untested combinations.`,
+    docs: CREATE_UNTESTED_DOCS,
+  });
 }
 
 /**
- * Filters interactive template choices through the same evidence allow-list.
+ * Refuses a combination without current evidence, as strict creation does.
+ * @param options - Complete public creation choice.
+ * @param identity - Executing tool identity, or an explicit identity used by compatibility checks.
+ * @returns When current evidence covers the complete combination.
+ */
+export function assertCreateCapability(
+  options: Pick<CreateOptions, "template" | "cloud" | "deploy" | "jobs" | "examples">,
+  identity: CreateCapabilityIdentity = currentCreateCapabilityIdentity(options.template),
+): void {
+  checkCreateCapability(options, { strict: true, identity });
+}
+
+/**
+ * Lists templates with current evidence for the choices resolved so far.
  * @param options - Choices resolved so far by the native prompt flow.
- * @param identity - Executing tool identity.
- * @returns Only templates admitted by current complete evidence entries.
+ * @param identity - Executing tool identity; defaults to each entry's own template identity.
+ * @returns Templates that creation reports as tested.
  */
 export function supportedCreateTemplates(
   options: PartialCreateCapability,
-  identity: CreateCapabilityIdentity = currentCreateCapabilityIdentity(),
+  identity?: CreateCapabilityIdentity,
 ): readonly CreateTemplate[] {
   return CREATE_CAPABILITY_TABLE.entries
-    .filter((entry) => current(entry.identity, identity) && matchesPartial(entry, options))
+    .filter(
+      (entry) =>
+        current(entry.identity, identity ?? currentCreateCapabilityIdentity(entry.template)) &&
+        matchesPartial(entry, options),
+    )
     .map((entry) => entry.template);
 }
 
 /**
- * Checks every field of a complete tuple and its exact tool identity.
+ * Checks every field of a complete tuple against evidence for the running tool.
  * @param options - Complete creation choice.
  * @param identity - Executing tool identity.
- * @returns Whether a current complete evidence entry admits this choice.
+ * @returns Whether current evidence covers this choice.
  */
 export function supported(
   options: Pick<CreateOptions, "template" | "cloud" | "deploy" | "jobs" | "examples">,
-  identity: CreateCapabilityIdentity = currentCreateCapabilityIdentity(),
+  identity: CreateCapabilityIdentity = currentCreateCapabilityIdentity(options.template),
 ): boolean {
   return CREATE_CAPABILITY_TABLE.entries.some(
     (entry) =>
@@ -114,35 +169,52 @@ export function supported(
 }
 
 /**
- * Formats the current complete choices for a public refusal diagnostic.
+ * Formats the tested choices for a strict refusal.
  * @param identity - Executing tool identity.
  * @returns Deterministic native option descriptions.
  */
-function supportedTuples(identity: CreateCapabilityIdentity): readonly string[] {
+function testedTuples(identity: CreateCapabilityIdentity): readonly string[] {
   return CREATE_CAPABILITY_TABLE.entries
-    .filter((entry) => current(entry.identity, identity))
+    .filter((entry) =>
+      current(entry.identity, { ...identity, template: templateIdentity(entry.template) }),
+    )
     .map(formatTuple);
 }
 
 /**
- * Compares all mandatory tool identity fields without ignoring patch versions.
- * @param left - Recorded certification identity.
+ * Compares release and template identity plus the runtime's major and minor version.
+ * @param left - Recorded evidence identity.
  * @param right - Current executing identity.
- * @returns Whether every mandatory field matches.
+ * @returns Whether the evidence applies to the running tool.
  */
 function current(left: CreateCapabilityIdentity, right: CreateCapabilityIdentity): boolean {
   return (
     left.release === right.release &&
-    left.bun === right.bun &&
-    left.typescript === right.typescript &&
-    left.packageCatalogDigest === right.packageCatalogDigest &&
     left.template === right.template &&
-    left.snapshotProtocol === right.snapshotProtocol
+    runtimeLine(left.bun) === runtimeLine(right.bun)
   );
 }
 
 /**
- * Preserves unresolved native prompt choices while filtering complete certified entries.
+ * Drops the patch and any pre-release suffix from a runtime version.
+ * @param version - Semantic runtime version.
+ * @returns The major.minor release line.
+ */
+function runtimeLine(version: string): string {
+  return version.split(".", 2).join(".");
+}
+
+/**
+ * Names the packaged template directory evidence was measured from.
+ * @param template - Public template choice.
+ * @returns Template identity recorded in evidence.
+ */
+function templateIdentity(template: CreateTemplate): string {
+  return `default/v1/${template}`;
+}
+
+/**
+ * Preserves unresolved native prompt choices while filtering complete tested entries.
  * @param entry - Complete recorded tuple.
  * @param options - Choices already supplied by the user.
  * @returns Whether the entry agrees with every resolved choice.

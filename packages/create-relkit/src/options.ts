@@ -2,7 +2,7 @@
 
 import { createParsingState, applyCreateBoolean, readValue, choice } from "./options-parser.js";
 /** Templates supported by explicit --template selection. */
-export const CREATE_TEMPLATES = ["minimal", "api", "agent", "fullstack"] as const;
+export const CREATE_TEMPLATES = ["minimal", "api", "agent", "fullstack", "tasks"] as const;
 /** Supported template selected by an explicit creation flag. */
 export type CreateTemplate = (typeof CREATE_TEMPLATES)[number];
 /** Supported cloud selections; none is the default. */
@@ -17,6 +17,8 @@ export type CreateDeployment = (typeof CREATE_DEPLOYMENTS)[number];
 export const CREATE_JOBS = ["inngest-docker", "effect-mq-docker", "trigger-docker"] as const;
 /** Supported local job provider selected by an explicit creation flag. */
 export type CreateJobs = (typeof CREATE_JOBS)[number];
+/** Job provider used by the tasks template when --jobs is omitted. */
+export const CREATE_TASKS_DEFAULT_JOBS: CreateJobs = "inngest-docker";
 /** Minimal local defaults applied before explicit create flags are parsed. */
 export const CREATE_OPTION_DEFAULTS = Object.freeze({
   template: "minimal" as CreateTemplate,
@@ -27,6 +29,7 @@ export const CREATE_OPTION_DEFAULTS = Object.freeze({
   git: true as boolean,
   examples: true as boolean,
   forceEmptyDirectory: false as boolean,
+  strict: false as boolean,
   json: false as boolean,
 });
 /** Normalized creation flags preserving omitted directory and job-provider fields. */
@@ -41,6 +44,8 @@ export interface CreateOptions {
   readonly examples: boolean;
   readonly directory?: string;
   readonly forceEmptyDirectory: boolean;
+  /** Refuses combinations without current CI evidence instead of warning. */
+  readonly strict?: boolean;
   readonly json: boolean;
 }
 /** Additional JSON output policy used while parsing creation flags. */
@@ -104,6 +109,8 @@ export function normalizeCreateOptions(
   }
   if (state.name === undefined)
     throw new CreateOptionsError("Usage: create-relkit <name> [options]");
+  if (state.template === "tasks" && state.jobs === undefined)
+    state.jobs = CREATE_TASKS_DEFAULT_JOBS;
   return Object.freeze({
     name: state.name,
     template: state.template,
@@ -115,6 +122,7 @@ export function normalizeCreateOptions(
     examples: state.examples,
     ...(state.directory === undefined ? {} : { directory: state.directory }),
     forceEmptyDirectory: state.forceEmptyDirectory,
+    ...(state.strict ? { strict: true } : {}),
     json: state.json,
   });
 }

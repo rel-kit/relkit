@@ -19,6 +19,7 @@ export function applyCreateBoolean(
 ): boolean {
   if (argument === "--json") state.json = true;
   else if (argument === "--force-empty-directory") state.forceEmptyDirectory = true;
+  else if (argument === "--strict") state.strict = true;
   else if (argument === "--install") state.install = true;
   else if (argument === "--no-install") state.install = false;
   else if (argument === "--git") state.git = true;

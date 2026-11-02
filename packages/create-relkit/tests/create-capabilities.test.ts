@@ -4,7 +4,10 @@ import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   CREATE_CAPABILITY_TABLE,
+  CREATE_UNTESTED_DOCS,
+  CreateUntestedError,
   assertCreateCapability,
+  checkCreateCapability,
   currentCreateCapabilityIdentity,
   supportedCreateTemplates,
 } from "../src/create-capabilities.js";
@@ -18,7 +21,7 @@ const supported = {
 } as const;
 
 describe("creation capability evidence", () => {
-  it("certifies the default tuple for the actual packaged release identity", () => {
+  it("reports the default combination as tested for the packaged release identity", () => {
     expect(() => assertCreateCapability(supported)).not.toThrow();
     expect(identity).toEqual(currentCreateCapabilityIdentity());
     expect(supportedCreateTemplates({ cloud: "none", deploy: "none", examples: true })).toEqual([
@@ -26,23 +29,55 @@ describe("creation capability evidence", () => {
     ]);
   });
 
-  it("accepts only the current fully evidenced tuple", () => {
-    expect(() => assertCreateCapability(supported, identity)).not.toThrow();
-    expect(() => assertCreateCapability({ ...supported, template: "agent" }, identity)).toThrow(
-      "not certified",
+  it("matches evidence by release, template and runtime major.minor", () => {
+    expect(checkCreateCapability(supported, { identity })).toBeUndefined();
+    expect(checkCreateCapability(supported, { identity: { ...identity, bun: "1.3.11" } })).toBe(
+      undefined,
     );
-    expect(() => assertCreateCapability(supported, { ...identity, bun: "1.3.11" })).toThrow(
-      "none for this tool identity",
+    expect(
+      checkCreateCapability(supported, {
+        identity: { ...identity, typescript: "5.9.4", packageCatalogDigest: "other" },
+      }),
+    ).toBeUndefined();
+    expect(checkCreateCapability(supported, { identity: { ...identity, bun: "1.4.4" } })).toEqual({
+      code: "RELKIT_CREATE_UNTESTED",
+      message: expect.stringContaining("on Bun 1.4"),
+      docs: CREATE_UNTESTED_DOCS,
+    });
+    expect(
+      checkCreateCapability(supported, { identity: { ...identity, release: "0.7.2" } }),
+    ).toMatchObject({ code: "RELKIT_CREATE_UNTESTED" });
+    expect(
+      checkCreateCapability(supported, {
+        identity: { ...identity, template: "default/v2/minimal" },
+      }),
+    ).toMatchObject({ code: "RELKIT_CREATE_UNTESTED" });
+  });
+
+  it("warns about untested combinations instead of refusing them", () => {
+    const warning = checkCreateCapability({ ...supported, template: "agent" });
+    expect(warning).toEqual({
+      code: "RELKIT_CREATE_UNTESTED",
+      message: expect.stringContaining("template=agent"),
+      docs: CREATE_UNTESTED_DOCS,
+    });
+    expect(warning?.message).toContain("pass --strict");
+    expect(checkCreateCapability(supported, { identity: { ...identity, bun: "1.3.11" } })).toBe(
+      undefined,
     );
-    expect(() => assertCreateCapability(supported, { ...identity, release: "0.7.2" })).toThrow(
-      "none for this tool identity",
-    );
-    expect(() => assertCreateCapability(supported, { ...identity, typescript: "5.9.4" })).toThrow(
-      "none for this tool identity",
-    );
+  });
+
+  it("refuses untested combinations in strict mode and lists the tested ones", () => {
     expect(() =>
-      assertCreateCapability(supported, { ...identity, packageCatalogDigest: "stale" }),
-    ).toThrow("none for this tool identity");
+      checkCreateCapability({ ...supported, template: "agent" }, { strict: true, identity }),
+    ).toThrow(CreateUntestedError);
+    expect(() =>
+      checkCreateCapability({ ...supported, template: "agent" }, { strict: true, identity }),
+    ).toThrow("Tested: template=minimal/jobs=none/cloud=none/deploy=none/examples=on");
+    expect(() => assertCreateCapability(supported, { ...identity, bun: "1.4.4" })).toThrow(
+      "none for this RelKit and Bun version",
+    );
+    expect(() => assertCreateCapability(supported, { ...identity, bun: "1.3.11" })).not.toThrow();
   });
 
   it("filters partial interactive choices with the same table", () => {
@@ -54,7 +89,7 @@ describe("creation capability evidence", () => {
     ).toEqual([]);
   });
 
-  it("pins the certified source template bytes", () => {
+  it("pins the measured source template bytes", () => {
     const root = join(import.meta.dirname, "../../../templates/default/v1/minimal");
     expect(templateDigest(root)).toBe(CREATE_CAPABILITY_TABLE.entries[0]!.templateDigest);
   });

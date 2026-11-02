@@ -1,9 +1,16 @@
-/** Resolves creation options and certified template choices through the prompt service while preserving headless defaults and explicit user arguments. */
+/** Resolves creation options and template choices through the prompt service while preserving headless defaults and explicit user arguments. */
 
 import { Effect } from "effect";
 import { observeExecution } from "@relkit/contracts/operation";
-import { CREATE_OPTION_DEFAULTS, normalizeCreateOptions, type CreateOptions } from "./options.js";
-import { assertCreateCapability, supportedCreateTemplates } from "./create-capabilities.js";
+import {
+  CREATE_JOBS,
+  CREATE_OPTION_DEFAULTS,
+  CREATE_TASKS_DEFAULT_JOBS,
+  CREATE_TEMPLATES,
+  normalizeCreateOptions,
+  type CreateOptions,
+} from "./options.js";
+import { checkCreateCapability, supportedCreateTemplates } from "./create-capabilities.js";
 import { createClackPromptDriver } from "./prompt-driver.js";
 import { GeneratorPrompt, generatorPromptLayer } from "./generator-prompt.js";
 import { domainTry } from "./generator-errors.js";
@@ -41,14 +48,22 @@ export const resolveCreateOptionsDetailsEffect = Effect.fn("CreateResolution.res
         prompted = true;
       }
       if (!has(output, "template")) {
-        const templates = supportedCreateTemplates(explicitCapabilityOptions(output));
+        const tested = supportedCreateTemplates(explicitCapabilityOptions(output));
+        const strict = output.includes("--strict");
+        const templates = CREATE_TEMPLATES.filter((value) => !strict || tested.includes(value));
         if (templates.length === 0)
           return yield* domainTry(() => {
-            throw new Error("No certified starter template matches the explicit creation flags.");
+            throw new Error(
+              "No tested starter template matches the creation flags; remove --strict to see every template.",
+            );
           });
         const template = yield* prompt.select({
           message: "Starter template",
-          options: templates.map((value) => ({ value, label: title(value) })),
+          options: templates.map((value) => ({
+            value,
+            label: title(value),
+            ...(tested.includes(value) ? {} : { hint: "untested" }),
+          })),
           initialValue: CREATE_OPTION_DEFAULTS.template,
         });
         output.push("--template", template);
@@ -71,8 +86,10 @@ export const resolveCreateOptionsDetailsEffect = Effect.fn("CreateResolution.res
     const options = yield* domainTry(() =>
       normalizeCreateOptions(output, context.json === undefined ? {} : { json: context.json }),
     );
-    yield* domainTry(() => assertCreateCapability(options));
-    return { options, prompted };
+    const warning = yield* domainTry(() =>
+      checkCreateCapability(options, { strict: options.strict === true }),
+    );
+    return { options, prompted, warnings: warning === undefined ? [] : [warning] };
   },
   (effect) => observeExecution("generator", "create.resolve", effect),
 );
@@ -174,10 +191,28 @@ const resolveJobsChoice = Effect.fn("CreateResolution.jobs")(function* (
   output: string[],
   prompt: GeneratorPrompt["Service"],
 ) {
+  if (explicitValue(output, "template") !== "tasks") {
+    yield* prompt.select({
+      message: "Jobs service",
+      options: [{ value: "none", label: "None" }],
+      initialValue: "none",
+    });
+    return;
+  }
   const jobs = yield* prompt.select({
     message: "Jobs service",
-    options: [{ value: "none", label: "None" }],
-    initialValue: "none",
+    options: CREATE_JOBS.map((value) => ({
+      value,
+      label: title(value),
+      ...(supportedCreateTemplates({
+        ...explicitCapabilityOptions(output),
+        template: "tasks",
+        jobs: value,
+      }).length > 0
+        ? {}
+        : { hint: "untested" }),
+    })),
+    initialValue: CREATE_TASKS_DEFAULT_JOBS,
   });
-  if (jobs !== "none") output.push("--jobs", jobs);
+  output.push("--jobs", jobs);
 });
