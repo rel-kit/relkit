@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { Schema } from "effect";
@@ -7,14 +7,14 @@ import { SnapshotPath, SnapshotResolutionPath } from "../../src/dev-snapshot/sna
 import { SnapshotEligibleTsConfig } from "../../src/dev-snapshot/snapshot-eligibility.schemas.js";
 import { watchSnapshotInputs } from "../../src/dev-snapshot/snapshot-input-watch.js";
 
-test("snapshot discovery accepts the current generated context declaration with supported root discovery", async () => {
-  for (const starter of ["minimal", "api", "agent", "fullstack"]) {
-    const path = resolve(
-      import.meta.dir,
-      "../../../../templates/default/v1",
-      starter,
-      "tsconfig.json",
-    );
+test("snapshot discovery accepts every template's generated context declaration and root discovery", async () => {
+  const templates = resolve(import.meta.dir, "../../../../templates/default/v1");
+  const starters = (await readdir(templates, { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name);
+  expect(starters).toContain("tasks");
+  for (const starter of starters) {
+    const path = join(templates, starter, "tsconfig.json");
     const config = JSON.parse(await readFile(path, "utf8"));
     expect(Schema.is(SnapshotEligibleTsConfig)(config), starter).toBe(true);
   }

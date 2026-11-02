@@ -46,6 +46,45 @@ test("finite preparation is the only compiler command and its artifact survives 
   expect((await readdir(root)).filter((name) => name.startsWith(".prepared-relkit-"))).toEqual([]);
 });
 
+test("a project the snapshot cannot capture is checked instead of prepared", async () => {
+  const root = await temporaryRoot();
+  const executed: string[][] = [];
+  const result = await generateProject(normalizeCreateOptions(["prepared", "--no-git"]), {
+    cwd: root,
+    templateRoot,
+    relkitExecutable: "relkit",
+    commandRunner: async (command) => {
+      executed.push([...command]);
+      return command[1] === "dev"
+        ? { exitCode: 1, stderr: "Development snapshot ineligible during compilation.dynamic." }
+        : { exitCode: 0 };
+    },
+  });
+  expect(executed.map((command) => command[1])).toEqual(["install", "doctor", "dev", "check"]);
+  expect(executed[3]?.slice(1, 3)).toEqual(["check", "--project-root"]);
+  expect(result.installed).toBe(true);
+});
+
+test("a failing check after an ineligible preparation still refuses creation", async () => {
+  const root = await temporaryRoot();
+  await expect(
+    generateProject(normalizeCreateOptions(["prepared", "--no-git"]), {
+      cwd: root,
+      templateRoot,
+      relkitExecutable: "relkit",
+      commandRunner: async (command) => {
+        if (command[1] === "dev")
+          return {
+            exitCode: 1,
+            stderr: "Development snapshot ineligible during compilation.dynamic.",
+          };
+        return command[1] === "check" ? { exitCode: 1, stderr: "invalid source" } : { exitCode: 0 };
+      },
+    }),
+  ).rejects.toMatchObject({ code: "RELKIT_CREATE_CHECK_FAILED" });
+  expect(await readdir(root)).toEqual([]);
+});
+
 test("preparation rejection cleans its private stage and preserves an existing empty destination", async () => {
   const root = await temporaryRoot();
   await mkdir(join(root, "prepared"));
