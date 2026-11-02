@@ -1,4 +1,4 @@
-/** Checks mcp-options.ts through the supported public RELKIT APIs. */
+/** Checks mcp-options.ts through the supported public RelKit APIs. */
 // #region private-tool
 import hello from "@app/services/hello/functions/hello.function.js";
 

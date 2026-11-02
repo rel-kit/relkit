@@ -1,4 +1,4 @@
-/** Checks lookup.tool.ts through the supported public RELKIT APIs. */
+/** Checks lookup.tool.ts through the supported public RelKit APIs. */
 import { defineTool } from "@relkit/app/tools";
 import hello from "@app/services/hello/functions/hello.function.js";
 

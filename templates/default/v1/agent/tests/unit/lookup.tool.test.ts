@@ -1,4 +1,4 @@
-/** Checks lookup.tool through the supported public RELKIT APIs. */
+/** Checks lookup.tool through the supported public RelKit APIs. */
 import { expect, test } from "bun:test";
 import hello from "@app/services/hello/functions/hello.function.js";
 import lookup from "../fixtures/lookup.tool.js";
