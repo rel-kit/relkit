@@ -50,7 +50,7 @@ function pathViolations(root: string, file: string): ScopeViolation[] {
     add("out-of-scope-package", `apps/${parts[1]} is not an approved RelKit app`);
   }
   if (parts[0] === "examples" && parts[1] && !approvedExamples.has(parts[1])) {
-    add("out-of-scope-package", `examples/${parts[1]} is not an approved RELKIT example`);
+    add("out-of-scope-package", `examples/${parts[1]} is not an approved RelKit example`);
   }
   if (parts[0] === "templates" && parts[1] && !approvedTemplates.has(parts[1])) {
     add("out-of-scope-template-name", `templates/${parts[1]} is not the approved template root`);

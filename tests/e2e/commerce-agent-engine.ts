@@ -45,7 +45,7 @@ export function commerceAgentEngine(
         input: request.input,
         threadId: trigger.threadId,
         tools: [lookupOrder, cancelOrder],
-        engine: { invoke: () => Promise.reject(new Error("Unexpected RELKIT tool invocation.")) },
+        engine: { invoke: () => Promise.reject(new Error("Unexpected RelKit tool invocation.")) },
         contentSink: trigger.contentSink,
         ...(request.signal === undefined ? {} : { signal: request.signal }),
       });

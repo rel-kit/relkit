@@ -60,7 +60,7 @@ test("reports only the create milestones that run", async () => {
     onProgress: (message) => full.push(message),
   });
   expect(full).toEqual([
-    `Creating a new RELKIT app in ${join(root, "full-progress")}.`,
+    `Creating a new RelKit app in ${join(root, "full-progress")}.`,
     "Installing dependencies...",
     "Initializing Git repository...",
     "Checking prerequisites...",
@@ -72,7 +72,7 @@ test("reports only the create milestones that run", async () => {
     ...contextFor(root),
     onProgress: (message) => minimal.push(message),
   });
-  expect(minimal).toEqual([`Creating a new RELKIT app in ${join(root, "minimal-progress")}.`]);
+  expect(minimal).toEqual([`Creating a new RelKit app in ${join(root, "minimal-progress")}.`]);
 });
 
 test("produces byte-identical content from separate destinations", async () => {

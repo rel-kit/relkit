@@ -61,7 +61,7 @@ afterEach(async () => {
   }
 });
 
-test("local create preserves unrelated dependency versions when linking RELKIT packages", async () => {
+test("local create preserves unrelated dependency versions when linking RelKit packages", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-local-workspace-"));
   roots.push(root);
   await writeFile(
@@ -87,7 +87,7 @@ test("local create preserves unrelated dependency versions when linking RELKIT p
   successful.add(root);
 });
 
-test("doctor accepts local RELKIT package links", async () => {
+test("doctor accepts local RelKit package links", async () => {
   const checks = await versionChecks(
     {
       packageManager: `bun@${Bun.version}`,

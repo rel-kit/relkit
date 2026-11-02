@@ -109,7 +109,7 @@ export async function packAll(items: PackageInfo[], destination: string): Promis
         throw new Error(`Packed license mismatch: ${item.name}`);
       assertPackedDependencies(item.manifest, packed, rootManifest, workspaceVersions);
       if (JSON.stringify(stable(packed.relkit)) !== JSON.stringify(stable(item.manifest.relkit)))
-        throw new Error(`Packed RELKIT metadata mismatch: ${item.name}`);
+        throw new Error(`Packed RelKit metadata mismatch: ${item.name}`);
       if (JSON.stringify(stable(packed.files)) !== JSON.stringify(stable(item.manifest.files)))
         throw new Error(`Packed files allowlist mismatch: ${item.name}`);
       assertListing(item, listing, packed);
