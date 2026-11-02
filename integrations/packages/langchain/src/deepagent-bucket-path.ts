@@ -9,7 +9,7 @@ import type {
 } from "./deepagent-bucket-files.types.js";
 
 /** Validates a bucket client and creates its private prefix context.
- * @param bucket - RELKIT bucket client.
+ * @param bucket - RelKit bucket client.
  * @param prefix - Backend prefix.
  * @returns An Effect with context or DeepAgentBucketFailure.
  * @example Effect.runSync(createBucketContextEffect(bucket));
@@ -27,7 +27,7 @@ export const createBucketContextEffect = Effect.fn("Agents.bucket.context")(
 );
 
 /** Creates a bucket context for existing synchronous callers.
- * @param bucket - RELKIT bucket client.
+ * @param bucket - RelKit bucket client.
  * @param prefix - Backend prefix.
  * @returns Frozen bucket context.
  * @throws The original invalid bucket or prefix error.
@@ -161,7 +161,7 @@ function assertBucketClient(value: DeepAgentBucketClient): void {
   const client = value as unknown as Record<string, unknown>;
   for (const operation of ["put", "get", "head", "delete", "exists", "list"] as const) {
     if (typeof client?.[operation] !== "function") {
-      throw new TypeError("DeepAgents bucket backend requires a RELKIT BucketClient");
+      throw new TypeError("DeepAgents bucket backend requires a RelKit BucketClient");
     }
   }
 }

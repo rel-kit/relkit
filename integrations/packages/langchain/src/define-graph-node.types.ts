@@ -31,7 +31,7 @@ export type GraphNodeHandler<
   config?: LangGraphRunnableConfig,
 ) => MaybePromise<GraphNodeResult<OutputSchema, Ends>>;
 
-/** User implementation before RELKIT input and output validation. */
+/** User implementation before RelKit input and output validation. */
 export type GraphNodeImplementation<
   InputSchema extends StandardSchemaV1,
   OutputSchema extends StandardSchemaV1,

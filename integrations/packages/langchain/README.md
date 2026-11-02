@@ -32,7 +32,7 @@ contracts. Tests can use native fake models without network access or paid servi
 Client-exposed agents require an agent-state profile. Every run, observation, control, and continuation
 also requires an application-owned thread ID; RelKit never derives or invents that business identity.
 
-Only allowlisted tools execute, and RELKIT approval remains authoritative. Runtime hooks expose safe
+Only allowlisted tools execute, and RelKit approval remains authoritative. Runtime hooks expose safe
 agent, model, and tool span metadata; prompts, results, secrets, and full tool content remain omitted
 unless bounded development-redacted capture is selected.
 
@@ -40,7 +40,7 @@ Generic declarations remain available from `@relkit/app/agents`. Install this in
 
 | API                                                                   | Import                      |
 | --------------------------------------------------------------------- | --------------------------- |
-| Generic `defineAgent`, RELKIT refs, public events and state contracts | `@relkit/app/agents`        |
+| Generic `defineAgent`, RelKit refs, public events and state contracts | `@relkit/app/agents`        |
 | Native `defineAgent`, model/tool/middleware types                     | `@relkit/langchain`         |
 | `defineGraph`, graph nodes/edges, native persistence resources        | `@relkit/langchain`         |
 | Explicit execution, dependency check and persistence release          | `@relkit/langchain/runtime` |

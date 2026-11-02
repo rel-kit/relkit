@@ -22,10 +22,10 @@ export type AgentModel = string | AgentLanguageModel | AgentModelFactory;
 /** LangChain client or server tool. */
 export type NativeAgentTool = ClientTool | ServerTool;
 
-/** RELKIT reference or native LangChain tool. */
+/** RelKit reference or native LangChain tool. */
 export type AgentTool = ToolRefAny | NativeAgentTool;
 
-/** SDK fields RELKIT inspects; each descriptor retains its complete inferred middleware tuple, including native hooks, tools and phantom schema data. Runtime validation checks the SDK brand. */
+/** SDK fields RelKit inspects; each descriptor retains its complete inferred middleware tuple, including native hooks, tools and phantom schema data. Runtime validation checks the SDK brand. */
 export type AgentMiddleware = Pick<NativeAgentMiddleware, "name" | "stateSchema">;
 
 /** Public state composed from middleware state schemas. */

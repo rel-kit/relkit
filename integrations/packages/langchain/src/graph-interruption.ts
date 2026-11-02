@@ -1,4 +1,4 @@
-/** Converts native graph interrupt observations into RELKIT continuation data while preserving the interrupt identifiers needed for resume. */
+/** Converts native graph interrupt observations into RelKit continuation data while preserving the interrupt identifiers needed for resume. */
 
 import type { JsonValue } from "@relkit/contracts";
 import { Effect, Metric, Schema } from "effect";

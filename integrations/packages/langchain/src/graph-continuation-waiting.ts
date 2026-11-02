@@ -1,4 +1,4 @@
-/** Projects native graph interrupts into durable waiting state used by the RELKIT continuation protocol before returning control to callers. */
+/** Projects native graph interrupts into durable waiting state used by the RelKit continuation protocol before returning control to callers. */
 
 import { getJsonSchema } from "@relkit/schema";
 import { Effect } from "effect";

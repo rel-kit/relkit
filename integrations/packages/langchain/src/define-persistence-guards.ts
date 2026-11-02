@@ -7,7 +7,7 @@ import { RELKIT_PERSISTENCE } from "./persistence-symbol.js";
 import type { PersistenceResource } from "./define-persistence.types.js";
 import { agentPersistenceFailure } from "./persistence-error.js";
 
-/** Checks whether a value is a RELKIT persistence resource descriptor.
+/** Checks whether a value is a RelKit persistence resource descriptor.
  * @param value - Candidate descriptor.
  * @returns An Effect with a boolean and no typed failure.
  * @example Effect.runSync(isPersistenceResourceEffect(candidate));

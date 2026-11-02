@@ -1,4 +1,4 @@
-/** Assembles validated native agent configuration into a RELKIT descriptor, preserving native model, tools and execution metadata for runtime selection. */
+/** Assembles validated native agent configuration into a RelKit descriptor, preserving native model, tools and execution metadata for runtime selection. */
 
 import { createDescriptorBase, normalizeId } from "@relkit/contracts";
 import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";

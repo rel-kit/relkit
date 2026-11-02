@@ -1,7 +1,7 @@
 {
   "name": "@relkit/langchain",
   "version": "0.7.15",
-  "description": "Explicit native LangChain agent execution for RELKIT.",
+  "description": "Explicit native LangChain agent execution for RelKit.",
   "license": "MIT",
   "repository": {
     "type": "git",

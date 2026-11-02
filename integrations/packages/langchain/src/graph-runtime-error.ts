@@ -1,4 +1,4 @@
-/** Translates native graph execution failures into the RELKIT graph error boundary while preserving their original causes. */
+/** Translates native graph execution failures into the RelKit graph error boundary while preserving their original causes. */
 
 import { Schema } from "effect";
 

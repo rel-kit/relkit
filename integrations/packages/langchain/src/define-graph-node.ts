@@ -57,7 +57,7 @@ export const runGraphNodeHandlerEffect = Effect.fn("Agents.graphNode.handle")(
   (effect) => observeAgent("graph-node.handle", effect),
 );
 
-/** Defines a native LangGraph node with RELKIT schemas and declared dynamic routes.
+/** Defines a native LangGraph node with RelKit schemas and declared dynamic routes.
  * @param options - Node identity, schemas, destinations, and implementation.
  * @returns An Effect with an immutable descriptor or GraphNodeValidationFailure.
  * @example Effect.runSync(defineGraphNodeEffect({ id: "step", input, output, handler }));

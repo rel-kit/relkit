@@ -1,4 +1,4 @@
-/** Compiles validated RELKIT graph descriptors into LangGraph execution objects using the authored nodes, edges, state and persistence options. */
+/** Compiles validated RelKit graph descriptors into LangGraph execution objects using the authored nodes, edges, state and persistence options. */
 
 import { StateGraph, type LangGraphRunnableConfig } from "@langchain/langgraph";
 import type { MaybePromise } from "@relkit/contracts";

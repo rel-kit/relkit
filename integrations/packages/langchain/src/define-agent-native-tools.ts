@@ -1,4 +1,4 @@
-/** Separates native SDK tools from RELKIT callable references while retaining native identity and serializable generic tool references. */
+/** Separates native SDK tools from RelKit callable references while retaining native identity and serializable generic tool references. */
 
 import { isLangChainTool } from "@langchain/core/tools";
 import { isToolRef, type ToolRefAny } from "@relkit/tools";
@@ -7,7 +7,7 @@ import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { agentDefinitionFailure } from "@relkit/agents/internal/define-agent-error";
 import type { AgentTool, NativeAgentTool } from "./define-agent-native.types.js";
 
-/** Validates and freezes RELKIT and native agent tools in input order.
+/** Validates and freezes RelKit and native agent tools in input order.
  * @param value - Tool references and native tools.
  * @returns An Effect with a frozen list or AgentDefinitionFailure.
  * @example Effect.runSync(copyAgentToolsEffect([]));
@@ -52,9 +52,9 @@ export function copyAgentTools<Tools extends readonly AgentTool[]>(value: Tools)
   );
 }
 
-/** Selects RELKIT tool references from a mixed native tool list.
+/** Selects RelKit tool references from a mixed native tool list.
  * @param tools - Agent tool list.
- * @returns An Effect with RELKIT references and no typed failure.
+ * @returns An Effect with RelKit references and no typed failure.
  * @example Effect.runSync(relkitToolRefsEffect([]));
  */
 export const relkitToolRefsEffect = Effect.fn("Agents.definition.toolRefs")(
@@ -62,9 +62,9 @@ export const relkitToolRefsEffect = Effect.fn("Agents.definition.toolRefs")(
   (effect) => observeAgent("definition.tool-refs", effect),
 );
 
-/** Selects RELKIT references for existing synchronous authoring callers.
+/** Selects RelKit references for existing synchronous authoring callers.
  * @param tools - Agent tool list.
- * @returns RELKIT tool references in input order.
+ * @returns RelKit tool references in input order.
  * @example const refs = relkitToolRefs(tools);
  */
 export function relkitToolRefs(tools: readonly AgentTool[]): readonly ToolRefAny[] {
