@@ -1,6 +1,6 @@
 ---
 title: Creation options
-description: Control dependency installation, Git initialization, and supported starter choices when creating an application.
+description: Choose a starter template, control dependency installation and Git initialization, and refuse untested combinations with --strict.
 pagination: false
 sidebar:
   icon: folder-plus
@@ -8,9 +8,35 @@ sidebar:
 
 The [quickstart](/docs/learn/create-an-app) uses the default minimal starter. Use these options when another tool owns installation or repository initialization.
 
-## Supported choices
+## Templates
 
-The packaged capability table currently offers the certified `minimal` template with examples, no jobs service, no cloud, and no deployment adapter. Interactive and headless creation use the same table. Explicit unsupported combinations fail before staging or installation.
+Pass `--template` or pick a template when prompted:
+
+| Template    | What you get                                                                                              |
+| ----------- | --------------------------------------------------------------------------------------------------------- |
+| `minimal`   | One function and a `GET /hello` route. This is the default.                                               |
+| `api`       | The minimal example plus a JSON `POST /echo` route and an orders service.                                 |
+| `agent`     | A native LangChain agent and a LangGraph review workflow.                                                 |
+| `fullstack` | The agent backend plus a Next.js web app that uses the typed client.                                      |
+| `tasks`     | An orders service with a task and a durable job. Choose a provider with `--jobs`; Inngest is the default. |
+
+## Untested combinations
+
+CI measures each template on each supported runtime before a release. If your combination of template, options, RelKit version and Bun version has not been measured, creation prints a warning and continues:
+
+```txt title="Terminal"
+RELKIT_CREATE_UNTESTED: template=api/jobs=none/cloud=none/deploy=none/examples=on has not been tested with RelKit 0.8.8 on Bun 1.4. Creation continues; pass --strict to refuse untested combinations. See https://relkit.dev/docs/modules/cli/relkit-create-untested
+```
+
+Bun patch releases don't trigger the warning: a project tested on Bun 1.3.10 counts as tested on Bun 1.3.11. Interactive creation marks untested templates in the list.
+
+Pass `--strict` to refuse untested combinations instead. Strict creation stops before writing any file and lists the tested combinations. Use it in automation that must only produce tested projects:
+
+```sh title="Terminal — parent directory"
+bunx create-relkit@latest my-app --template minimal --strict
+```
+
+`relkit create` accepts the same options. See [`RELKIT_CREATE_UNTESTED`](/docs/modules/cli/relkit-create-untested) for what to do when you see the warning.
 
 Interactive creation asks for a missing project name and confirms the destination before writing. Git initializes by default; pass `--no-git` to disable it.
 

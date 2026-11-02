@@ -36,8 +36,8 @@ test("keeps a single ordered Orders journey with optional scaffolding last", asy
     );
   }
 });
-test("extends the certified minimal app into the same Orders journey", async () => {
-  expect(read("create-an-app")).toContain("certified `minimal` template");
+test("extends the default minimal app into the same Orders journey", async () => {
+  expect(read("create-an-app")).toContain("The default is the `minimal` template.");
   expect(read("create-an-app")).toContain("/hello\\?name=RELKIT");
   expect(read("first-route")).toContain("templates/default/v1/api/src/routes/orders/route.ts");
   expect(read("first-route")).toContain(

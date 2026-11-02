@@ -6,6 +6,7 @@ export const cliGuideGroup = group("docs/modules/cli", "CLI", "Terminal", [
   "create-an-app",
   "add-artifacts",
   "automation",
+  "relkit-create-untested",
 ]);
 
 export const cliGuideRelations = [
@@ -20,6 +21,11 @@ export const cliGuideRelations = [
     "docs/modules/cli/automation",
     ["cli-api", "create-relkit", "relkit"],
     ["apps/docs/examples/public-api/tooling.ts"],
+  ),
+  relation(
+    "docs/modules/cli/relkit-create-untested",
+    ["create-relkit"],
+    ["packages/create-relkit/src/create-capabilities.ts"],
   ),
   relation(
     "guides/cli/create-and-build-an-api",
