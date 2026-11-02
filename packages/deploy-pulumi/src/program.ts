@@ -7,10 +7,12 @@ import { identity, snapshotPlan } from "./program-support.js";
 import { materializeDeploymentOperations } from "./materialization.js";
 import { executeDeploymentOperations } from "./operation-executor.js";
 
+/** @experimental */
 export const PULUMI_PROGRAM_VERSION = 1 as const;
 const DEFAULT_STACK = "development";
 const DEFAULT_DIRECTORY = ".relkit/generated/pulumi";
 
+/** @experimental */
 export interface PulumiProgramOptions {
   readonly stackName?: string;
   readonly projectName?: string;
@@ -20,6 +22,7 @@ export interface PulumiProgramOptions {
   readonly integrationImports?: readonly PulumiIntegrationImport[];
 }
 
+/** @experimental */
 export interface PulumiIntegrationImport {
   readonly integrationId: string;
   readonly role: "engine" | "host" | "infrastructure" | "access";
@@ -28,6 +31,7 @@ export interface PulumiIntegrationImport {
   readonly exportName: string;
 }
 
+/** @experimental */
 export interface PulumiProgramFiles {
   readonly directory: string;
   readonly projectName: string;
@@ -37,7 +41,7 @@ export interface PulumiProgramFiles {
   readonly planJson: string;
 }
 
-/** Renders a path-independent Pulumi project from a provider-neutral plan. */
+/** Renders a path-independent Pulumi project from a provider-neutral plan. @experimental */
 export function renderPulumiProgram(
   plan: DeploymentPlan,
   options: PulumiProgramOptions = {},
@@ -60,7 +64,7 @@ export function renderPulumiProgram(
   });
 }
 
-/** Writes only the deterministic Pulumi project files and returns their contents. */
+/** Writes only the deterministic Pulumi project files and returns their contents. @experimental */
 export async function writePulumiProgram(
   plan: DeploymentPlan,
   options: PulumiProgramOptions = {},
@@ -74,7 +78,7 @@ export async function writePulumiProgram(
   return files;
 }
 
-/** Creates the same plan-only resource tree for Pulumi Automation API inline use. */
+/** Creates the same plan-only resource tree for Pulumi Automation API inline use. @experimental */
 export function createPulumiProgram(
   plan: DeploymentPlan,
   options: PulumiProgramOptions = {},
@@ -94,8 +98,10 @@ export function createPulumiProgram(
   };
 }
 
+/** @experimental */
 export const createInlinePulumiProgram = createPulumiProgram;
 
+/** @experimental */
 export function materializePulumiDeployment(
   plan: DeploymentPlan,
   options: { readonly stackName: string; readonly integrations: readonly unknown[] },

@@ -8,6 +8,7 @@ const dispatchScope = new AsyncLocalStorage<RealtimeDispatcher>();
 let activeDispatcher: RealtimeDispatcher | undefined;
 /** Injectable dispatcher for Effect-native channel operations.
  * @example Effect.provide(currentRealtimeDispatcherEffect(), RealtimeDispatcherLive);
+ * @experimental
  */
 export class RealtimeDispatcherService extends Context.Service<
   RealtimeDispatcherService,
@@ -15,6 +16,7 @@ export class RealtimeDispatcherService extends Context.Service<
 >()("relkit/realtime/RealtimeDispatcher") {}
 /** Resolves the currently bound dispatcher when an Effect requests it.
  * @example Effect.provide(currentRealtimeDispatcherEffect(), RealtimeDispatcherLive);
+ * @experimental
  */
 export const RealtimeDispatcherLive = Layer.effect(
   RealtimeDispatcherService,
@@ -26,6 +28,7 @@ export const RealtimeDispatcherLive = Layer.effect(
  * @param dispatcher - Dispatcher or undefined to clear the fallback.
  * @returns An Effect of void without a typed failure.
  * @example Effect.runSync(setActiveRealtimeDispatcherEffect(dispatcher));
+ * @experimental
  */
 export const setActiveRealtimeDispatcherEffect = Effect.fn("Realtime.setActiveDispatcher")(
   function* (dispatcher: RealtimeDispatcher | undefined) {
@@ -37,6 +40,7 @@ export const setActiveRealtimeDispatcherEffect = Effect.fn("Realtime.setActiveDi
  * @param dispatcher - Dispatcher or undefined to clear it.
  * @returns Nothing.
  * @example setActiveRealtimeDispatcher(dispatcher);
+ * @experimental
  */
 export function setActiveRealtimeDispatcher(dispatcher: RealtimeDispatcher | undefined): void {
   Effect.runSync(setActiveRealtimeDispatcherEffect(dispatcher));
@@ -61,6 +65,7 @@ function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
  * @param action - Action that may return a Promise and can observe interruption through its signal.
  * @returns An Effect of the settled action result or RealtimeActionError.
  * @example Effect.runSync(runWithRealtimeDispatcherEffect(dispatcher, () => 1));
+ * @experimental
  */
 export const runWithRealtimeDispatcherEffect = Effect.fn("Realtime.runWithDispatcher")(
   function* <Value>(dispatcher: RealtimeDispatcher, action: (signal: AbortSignal) => Value) {
@@ -89,6 +94,7 @@ export const runWithRealtimeDispatcherEffect = Effect.fn("Realtime.runWithDispat
  * @returns The action's value or a Promise resolving to it.
  * @throws The action's synchronous error or an Effect runtime defect.
  * @example runWithRealtimeDispatcher(dispatcher, () => channel.trigger({}, "posted", "hello"));
+ * @experimental
  */
 export function runWithRealtimeDispatcher<Value>(
   dispatcher: RealtimeDispatcher,
@@ -113,6 +119,7 @@ export function runWithRealtimeDispatcher<Value>(
 /** Resolves the current dispatcher with a typed missing-binding error.
  * @returns An Effect of the dispatcher or RealtimeDispatcherError.
  * @example Effect.runPromise(currentRealtimeDispatcherEffect());
+ * @experimental
  */
 export const currentRealtimeDispatcherEffect = Effect.fn("Realtime.currentDispatcher")(
   function* () {
@@ -134,6 +141,7 @@ export const currentRealtimeDispatcherEffect = Effect.fn("Realtime.currentDispat
  * @returns The active dispatcher.
  * @throws Error when no dispatcher is active.
  * @example currentRealtimeDispatcher();
+ * @experimental
  */
 export function currentRealtimeDispatcher(): RealtimeDispatcher {
   const result = Effect.runSync(Effect.result(currentRealtimeDispatcherEffect()));

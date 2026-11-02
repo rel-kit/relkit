@@ -8,6 +8,7 @@ import type { RunSnapshot } from "@relkit/contracts/jobs";
 import type { TriggerNativeClient } from "./native.js";
 import { record, triggerSnapshot } from "./sdk-mapping.js";
 
+/** @experimental */
 export async function* observeTriggerRun(
   request: NativeWatchRequest,
   context: OperationContext,
@@ -41,6 +42,7 @@ export async function* observeTriggerRun(
   }
 }
 
+/** @experimental */
 export interface TriggerObservationOptions {
   readonly pollIntervalMs?: number;
   readonly readTimeoutMs?: number;

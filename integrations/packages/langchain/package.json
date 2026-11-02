@@ -101,6 +101,7 @@
     "test:coverage": "vitest run --coverage --config vitest.config.ts"
   },
   "relkit": {
+    "maturity": "labs",
     "integration": {
       "id": "langchain",
       "exports": {

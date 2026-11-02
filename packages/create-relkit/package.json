@@ -156,6 +156,7 @@
     "vitest": "catalog:"
   },
   "relkit": {
+    "maturity": "core",
     "buildCatalog": {
       "dependencies": {
         "@better-fetch/fetch": "1.3.2",

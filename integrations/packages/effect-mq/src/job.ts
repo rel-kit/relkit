@@ -1,6 +1,7 @@
 import { Duration, Effect, Schema } from "effect";
 import { Job, Worker } from "effect-mq";
 
+/** @experimental */
 export interface EffectMqJobOptions {
   readonly name: string;
   readonly queue?: string;
@@ -18,13 +19,14 @@ export interface EffectMqJobOptions {
   readonly worker?: Parameters<typeof Worker.layer>[0];
 }
 
+/** @experimental */
 export interface EffectMqJobDefinition {
   readonly job: ReturnType<typeof Job.make>;
   readonly workerLayer: ReturnType<typeof Worker.layer>;
   readonly handlerLayer: unknown;
 }
 
-/** Builds a schema-first native Job.make definition without exposing app schemas. */
+/** Builds a schema-first native Job.make definition without exposing app schemas. @experimental */
 export function createEffectMqJob(options: EffectMqJobOptions): EffectMqJobDefinition {
   assertName(options.name);
   const job = Job.make(options.name, {
@@ -52,6 +54,7 @@ export function createEffectMqJob(options: EffectMqJobOptions): EffectMqJobDefin
   });
 }
 
+/** @experimental */
 export function createEffectMqWorkerLayer(
   options?: Parameters<typeof Worker.layer>[0],
 ): ReturnType<typeof Worker.layer> {

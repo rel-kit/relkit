@@ -8,7 +8,7 @@ import type { RelkitCacheEndpoint, RelkitCacheResource, RelkitCachesArgs } from 
 export * from "./client.js";
 export * from "./types.js";
 
-/** Maps logical caches to ElastiCache Valkey. */
+/** Maps logical caches to ElastiCache Valkey. @experimental */
 export class RelkitCaches extends pulumi.ComponentResource {
   readonly caches: readonly RelkitCacheResource[];
   readonly cacheResources: readonly RelkitCacheResource[];

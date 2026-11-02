@@ -5,6 +5,7 @@ import {
   type TelemetryExporterRuntime,
 } from "@relkit/observability";
 
+/** @experimental */
 export interface SentryExporterOptions {
   readonly dsn: string;
   readonly environment?: string;
@@ -12,10 +13,12 @@ export interface SentryExporterOptions {
   readonly sdk?: SentrySdk;
 }
 
+/** @experimental */
 export interface SentryScope {
   readonly setTag: (name: string, value: string) => void;
 }
 
+/** @experimental */
 export interface SentrySdk {
   readonly init: (options: Readonly<Record<string, unknown>>) => void;
   readonly withScope: (callback: (scope: SentryScope) => void) => void;
@@ -25,12 +28,14 @@ export interface SentrySdk {
   readonly close: (timeout?: number) => Promise<boolean>;
 }
 
+/** @experimental */
 export interface SentryExporter {
   readonly exportRecord: (record: RedactedObservabilityRecord) => void;
   readonly flush: (timeoutMs?: number) => Promise<boolean>;
   readonly close: (timeoutMs?: number) => Promise<boolean>;
 }
 
+/** @experimental */
 export async function createSentryExporter(
   options: SentryExporterOptions,
 ): Promise<SentryExporter> {
@@ -73,6 +78,7 @@ export async function createSentryExporter(
   });
 }
 
+/** @experimental */
 export async function createTelemetryExporter(
   context: TelemetryExporterFactoryContext,
 ): Promise<TelemetryExporterRuntime> {

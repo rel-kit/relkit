@@ -9,23 +9,23 @@ type AgentAny = AgentDescriptor<string, unknown, unknown> | GraphDescriptor;
 type ApprovalDecision =
   "approved" | "denied" | boolean | import("@relkit/agents/internal/approval").ApprovalRecord;
 
-/** Resolves a pending tool approval for an invocation. */
+/** Resolves a pending tool approval for an invocation. @experimental */
 export type AgentApprovalHandler = (
   approval: import("@relkit/agents/internal/approval").PendingApproval,
 ) => MaybePromise<ApprovalDecision>;
 
-/** Supplies queued steering messages to a running agent. */
+/** Supplies queued steering messages to a running agent. @experimental */
 export interface AgentSteeringSource {
   readonly drain: () => MaybePromise<readonly string[]>;
 }
 
-/** One user or assistant message in a native agent conversation. */
+/** One user or assistant message in a native agent conversation. @experimental */
 export interface AgentConversationMessage {
   readonly role: "user" | "assistant";
   readonly content: string;
 }
 
-/** Sends agent output and events to the surrounding runtime. */
+/** Sends agent output and events to the surrounding runtime. @experimental */
 export interface AgentContentSink {
   readonly emitOutput: (value: unknown, signal: AbortSignal) => MaybePromise<void>;
   readonly finishOutput?: (signal: AbortSignal) => MaybePromise<void>;
@@ -59,7 +59,7 @@ export interface AgentContentSink {
   ) => MaybePromise<void>;
 }
 
-/** Common authoring and execution dependencies for an agent runtime. */
+/** Common authoring and execution dependencies for an agent runtime. @experimental */
 export interface AgentRuntimeBaseOptions {
   readonly agent: AgentAny;
   readonly tools: import("@relkit/tools").ToolSource;
@@ -76,12 +76,12 @@ export interface AgentRuntimeBaseOptions {
   readonly environment?: Readonly<Record<string, unknown>>;
 }
 
-/** Long-lived dependencies shared by agent invocations. */
+/** Long-lived dependencies shared by agent invocations. @experimental */
 export type AgentRuntimeOptions = AgentRuntimeBaseOptions & {
   readonly modelRegistry?: unknown;
 };
 
-/** Per-call identity, input, cancellation, and control options. */
+/** Per-call identity, input, cancellation, and control options. @experimental */
 export interface AgentInvocationOptions {
   readonly input: unknown;
   readonly invocationId?: string;
@@ -97,7 +97,7 @@ export interface AgentInvocationOptions {
   readonly resume?: boolean;
 }
 
-/** Reusable invocation API bound to one agent catalog. */
+/** Reusable invocation API bound to one agent catalog. @experimental */
 export interface AgentRuntime {
   readonly invoke: (
     input: unknown,

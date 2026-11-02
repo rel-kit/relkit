@@ -20,6 +20,7 @@ export type { EffectMqPostgresSchema } from "./postgres.types.js";
  * Builds the existing native store's complete schema without opening a database connection.
  * @param prefix - Validated PostgreSQL job-table name; related table names retain the SDK contract.
  * @returns Native Drizzle tables borrowed by the scoped store Layer.
+ * @experimental
  */
 export function createEffectMqPostgresSchema(prefix = "effect_mq_jobs"): EffectMqPostgresSchema {
   if (!/^[a-z][a-z0-9_]{2,62}$/u.test(prefix))
@@ -40,6 +41,7 @@ export function createEffectMqPostgresSchema(prefix = "effect_mq_jobs"): EffectM
  * @param postgresUrl - Explicit provider connection string, redacted before driver construction.
  * @param prefix - Validated native job-table name.
  * @returns A lazy store Layer retaining native SQL/store failures and requiring no remaining services.
+ * @experimental
  */
 export function createEffectMqPostgresLayer(
   postgresUrl: string,
@@ -82,5 +84,5 @@ export function createEffectMqPostgresLayer(
     Layer.provide(EffectMqPgCompatibility.pipe(Layer.provide(pg))),
   );
 }
-/** Existing native Promise edge; callers supply and own the complete store/worker Layer lifetime. */
+/** Existing native Promise edge; callers supply and own the complete store/worker Layer lifetime. @experimental */
 export const runEffectMq = Effect.runPromise;

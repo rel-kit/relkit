@@ -2,7 +2,7 @@
 
 import type { StandardIssue } from "@relkit/schema";
 
-/** Safe public failure fields; a non-enumerable native cause is private diagnostic data. */
+/** Safe public failure fields; a non-enumerable native cause is private diagnostic data. @experimental */
 export class AgentRuntimeError extends Error {
   /** @param code - Stable failure code. @param message - Safe public description.
    * @param issues - Validation issues. @param options - Private cause; never serialize or log raw. */

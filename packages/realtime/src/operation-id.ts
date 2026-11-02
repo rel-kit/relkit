@@ -6,6 +6,7 @@ import { observeRealtime } from "./realtime-observability.js";
 const UUID_V7 = /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 /** Compatibility error for invalid or expired operation IDs.
  * @example new OperationIdError("OPERATION_ID_INVALID", "Operation ID must be a UUIDv7.");
+ * @experimental
  */
 export class OperationIdError extends TypeError {
   /** Constructs a legacy operation ID error.
@@ -24,6 +25,7 @@ export class OperationIdError extends TypeError {
 }
 /** Injectable random-byte service for operation ID generation.
  * @example Effect.provide(createOperationIdEffect(0), OperationIdEntropyLive);
+ * @experimental
  */
 export class OperationIdEntropy extends Context.Service<
   OperationIdEntropy,
@@ -31,6 +33,7 @@ export class OperationIdEntropy extends Context.Service<
 >()("relkit/realtime/OperationIdEntropy") {}
 /** Cryptographic entropy for live UUIDv7 creation.
  * @example Effect.provide(createOperationIdEffect(0), OperationIdEntropyLive);
+ * @experimental
  */
 export const OperationIdEntropyLive = Layer.succeed(OperationIdEntropy, {
   bytes: Effect.fn("Realtime.operationIdBytes")(function* () {
@@ -41,6 +44,7 @@ export const OperationIdEntropyLive = Layer.succeed(OperationIdEntropy, {
  * @param value - UUID-shaped string.
  * @returns An Effect of milliseconds or NaN for malformed input.
  * @example Effect.runSync(operationIdTimestampEffect(id));
+ * @experimental
  */
 export const operationIdTimestampEffect = Effect.fn("Realtime.operationIdTimestamp")(
   function* (value: string) {
@@ -52,6 +56,7 @@ export const operationIdTimestampEffect = Effect.fn("Realtime.operationIdTimesta
  * @param value - UUID-shaped string.
  * @returns Timestamp in milliseconds, or NaN.
  * @example operationIdTimestamp(id);
+ * @experimental
  */
 export function operationIdTimestamp(value: string): number {
   return Effect.runSync(operationIdTimestampEffect(value));
@@ -61,6 +66,7 @@ export function operationIdTimestamp(value: string): number {
  * @param options - Optional deterministic clock and retention window.
  * @returns An Effect of a normalized ID or OperationIdFailure.
  * @example Effect.runSync(parseOperationIdEffect(id, { now: Date.now() }));
+ * @experimental
  */
 export const parseOperationIdEffect = Effect.fn("Realtime.parseOperationId")(
   function* (value: string, options: ParseOperationIdOptions = {}) {
@@ -97,6 +103,7 @@ export const parseOperationIdEffect = Effect.fn("Realtime.parseOperationId")(
  * @returns A normalized operation ID.
  * @throws OperationIdError for an invalid or expired ID.
  * @example parseOperationId(id, { now: Date.now() });
+ * @experimental
  */
 export function parseOperationId(
   value: string,
@@ -111,6 +118,7 @@ export function parseOperationId(
  * @param now - Optional explicit timestamp in milliseconds.
  * @returns An Effect of an ID or OperationIdFailure; requires OperationIdEntropy.
  * @example Effect.runSync(Effect.provide(createOperationIdEffect(0), OperationIdEntropyLive));
+ * @experimental
  */
 export const createOperationIdEffect = Effect.fn("Realtime.createOperationId")(
   function* (now: number | undefined) {
@@ -147,6 +155,7 @@ export const createOperationIdEffect = Effect.fn("Realtime.createOperationId")(
  * @returns A UUIDv7 operation ID.
  * @throws RangeError for an invalid timestamp.
  * @example createOperationId(Date.now());
+ * @experimental
  */
 export function createOperationId(now?: number): OperationId {
   const result = Effect.runSync(

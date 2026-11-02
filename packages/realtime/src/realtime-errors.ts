@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 /** Invalid authored channel data or an invalid channel operation.
  * @example new ChannelValidationError({ operation: "channel.define", reason: "Missing events" });
+ * @experimental
  */
 export class ChannelValidationError extends Schema.TaggedError<ChannelValidationError>()(
   "Realtime.ChannelValidationError",
@@ -8,6 +9,7 @@ export class ChannelValidationError extends Schema.TaggedError<ChannelValidation
 ) {}
 /** A realtime dispatcher was required but none was bound.
  * @example new RealtimeDispatcherError({ operation: "dispatch.current", reason: "No realtime dispatcher is active." });
+ * @experimental
  */
 export class RealtimeDispatcherError extends Schema.TaggedError<RealtimeDispatcherError>()(
   "Realtime.DispatcherError",
@@ -15,6 +17,7 @@ export class RealtimeDispatcherError extends Schema.TaggedError<RealtimeDispatch
 ) {}
 /** An action thrown while entering a dispatcher scope.
  * @example new RealtimeActionError({ operation: "dispatch.runWith", cause: new Error("failed") });
+ * @experimental
  */
 export class RealtimeActionError extends Schema.TaggedError<RealtimeActionError>()(
   "Realtime.ActionError",
@@ -22,6 +25,7 @@ export class RealtimeActionError extends Schema.TaggedError<RealtimeActionError>
 ) {}
 /** A provider operation failed at the external adapter boundary.
  * @example new RealtimeProviderError({ operation: "provider.trigger", cause: new Error("offline") });
+ * @experimental
  */
 export class RealtimeProviderError extends Schema.TaggedError<RealtimeProviderError>()(
   "Realtime.ProviderError",
@@ -29,6 +33,7 @@ export class RealtimeProviderError extends Schema.TaggedError<RealtimeProviderEr
 ) {}
 /** An operation ID is malformed or outside its receipt window.
  * @example new OperationIdFailure({ code: "OPERATION_ID_INVALID", reason: "Invalid ID" });
+ * @experimental
  */
 export class OperationIdFailure extends Schema.TaggedError<OperationIdFailure>()(
   "Realtime.OperationIdFailure",

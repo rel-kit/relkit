@@ -9,6 +9,7 @@ import {
   type RelkitComponentArgs,
 } from "../common.js";
 
+/** @experimental */
 export interface RelkitNetworkArgs extends RelkitComponentArgs {
   readonly cidrBlock?: string;
   readonly numberOfAvailabilityZones?: number;
@@ -17,7 +18,7 @@ export interface RelkitNetworkArgs extends RelkitComponentArgs {
   readonly servicePort?: number;
 }
 
-/** Shared VPC, subnet, and security-group boundary for AWS application resources. */
+/** Shared VPC, subnet, and security-group boundary for AWS application resources. @experimental */
 export class RelkitNetwork extends pulumi.ComponentResource {
   readonly vpc: awsx.ec2.Vpc;
   readonly vpcId: pulumi.Output<string>;

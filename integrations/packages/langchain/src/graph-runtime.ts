@@ -21,6 +21,7 @@ export { GraphInvocationIdentity, GraphInvocationIdentityLive } from "./graph-ru
  * @param options - Graph, engine, input, and invocation integrations.
  * @returns An Effect with graph output or GraphInvocationFailure.
  * @example Effect.runPromise(Effect.provide(invokeGraphEffect(options), GraphInvocationIdentityLive));
+ * @experimental
  */
 export const invokeGraphEffect = Effect.fn("Agents.graph.invoke")(
   function* (options: GraphRuntimeOptions) {
@@ -80,6 +81,7 @@ export const invokeGraphEffect = Effect.fn("Agents.graph.invoke")(
  * @returns Validated graph output.
  * @throws The original graph, provider, validation, or cancellation error.
  * @example await invokeGraph(options);
+ * @experimental
  */
 export function invokeGraph(options: GraphRuntimeOptions): Promise<unknown> {
   return Effect.runPromise(

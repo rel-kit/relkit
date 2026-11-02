@@ -36,5 +36,8 @@
   "dependencies": {
     "@relkit/contracts": "workspace:*",
     "@relkit/graph": "workspace:*"
+  },
+  "relkit": {
+    "maturity": "core"
   }
 }

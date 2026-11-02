@@ -48,6 +48,7 @@ export const assertGraphNodeDestinationsEffect = Effect.fn("Agents.graphNode.des
  * @returns Nothing when every destination is known.
  * @throws The original unknown destination error.
  * @example assertGraphNodeDestinations(node, ids);
+ * @experimental
  */
 export function assertGraphNodeDestinations(
   node: Pick<GraphNodeAny, "id" | "ends">,

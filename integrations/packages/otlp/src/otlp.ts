@@ -10,15 +10,17 @@ type TextReference =
   | BindingValueRef<string, string, "secret-string">;
 type TextInput = string | TextReference;
 
+/** @experimental */
 export interface OtlpOptions {
   readonly endpoint: TextInput;
   readonly headers?: Readonly<Record<string, TextInput>>;
   readonly serviceName?: TextInput;
 }
 
+/** @experimental */
 export type OtlpTelemetryExporter = TelemetryExporterDescriptor<"otlp", "otlp", OtlpOptions>;
 
-/** Declares one statically loaded OTLP/HTTP telemetry exporter. */
+/** Declares one statically loaded OTLP/HTTP telemetry exporter. @experimental */
 export function otlp(options: OtlpOptions): OtlpTelemetryExporter {
   if (!record(options)) throw new TypeError("OTLP options are invalid");
   exact(options, ["endpoint", "headers", "serviceName"]);

@@ -42,7 +42,7 @@ export type {
 export { assertAgentTrace } from "./agents-utils.js";
 export { createTestModel } from "./agents-model.js";
 
-/** Agent decisions, approval ownership and scripted invocation share one service. */
+/** Agent decisions, approval ownership and scripted invocation share one service. @experimental */
 export class TestAgentHarness extends Context.Service<TestAgentHarness, AgentHarnessService>()(
   "relkit/testing/AgentHarness",
 ) {}
@@ -52,6 +52,7 @@ export class TestAgentHarness extends Context.Service<TestAgentHarness, AgentHar
  * @typeParam Agent Descriptor carrying input/output schema inference.
  * @param options Script, tool engine, approval and capture policies.
  * @returns A scoped service Layer; scope release resets outstanding work.
+ * @experimental
  */
 export function testAgentLayer<Agent extends TestAgentDescriptor>(
   options: TestAgentOptions<Agent>,
@@ -97,6 +98,7 @@ export function testAgentLayer<Agent extends TestAgentDescriptor>(
  * @typeParam Agent Descriptor determining public input/output types.
  * @param options Network-free script and native engine dependencies.
  * @returns A synchronously ready harness preserving existing results and errors.
+ * @experimental
  */
 export function createTestAgent<Agent extends TestAgentDescriptor>(
   options: TestAgentOptions<Agent>,

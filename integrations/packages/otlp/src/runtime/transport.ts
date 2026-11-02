@@ -1,19 +1,23 @@
 import { canonicalJson, type JsonValue } from "@relkit/contracts";
 
+/** @experimental */
 export type OtlpSignal = "logs" | "traces";
 
+/** @experimental */
 export interface OtlpTransportOptions {
   readonly endpoint: string;
   readonly headers?: Readonly<Record<string, string>>;
   readonly fetch?: typeof globalThis.fetch;
 }
 
+/** @experimental */
 export interface OtlpTransport {
   readonly send: (signal: OtlpSignal, payload: JsonValue, abort?: AbortSignal) => Promise<void>;
   readonly flush: () => Promise<void>;
   readonly close: () => Promise<void>;
 }
 
+/** @experimental */
 export function createOtlpTransport(options: OtlpTransportOptions): OtlpTransport {
   const endpoint = parseEndpoint(options.endpoint);
   const fetcher = options.fetch ?? globalThis.fetch;

@@ -14,6 +14,7 @@ import { generateErrorPages } from "./generate-error-pages.js";
 import { generateGuides } from "./generate-guides.js";
 import { generateInstallations } from "./generate-installations.js";
 import { contentFiles, pruneGenerated } from "./generation-files.js";
+import { labsRoutes, maturityTables } from "./maturity-table.js";
 import { generateSourceSnippets } from "./source-snippets.js";
 import { referenceOverview } from "./api-related.js";
 import {
@@ -46,6 +47,7 @@ async function main(): Promise<void> {
   await generateGuides(root, content, cliModel, emit);
   await generateInstallations(root, emit);
   await emit("_snippets/generated/api-overview.mdx", referenceOverview());
+  await emit("_snippets/generated/maturity.mdx", maturityTables());
   await emit("docs/api/cli.mdx", renderCliReference(cliModel));
   await generateErrorPages(root, content, emit);
   const pages = (await contentFiles(content)).filter(
@@ -63,6 +65,8 @@ async function main(): Promise<void> {
     }
     expected.add(resolve(content, "docs/api/public.mdx"));
   } else await generateApis();
+  // Read after the API pages, whose `labs` flag comes from their package's tier.
+  await emit("_snippets/generated/labs-routes.json", labsRoutes(root));
   await pruneGenerated(content, expected, checkOnly);
   console.log(
     checkOnly ? "Generated documentation is current." : "Generated documentation updated.",

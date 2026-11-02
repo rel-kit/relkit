@@ -21,6 +21,7 @@ export * from "./worker.js";
 export * from "../job.js";
 export * from "../postgres.js";
 
+/** @experimental */
 export interface EffectMqRuntimeOptions {
   readonly native?: EffectMqNativeClient;
   readonly postgresUrl?: string;
@@ -33,10 +34,12 @@ export interface EffectMqRuntimeOptions {
   readonly serviceOptions?: JobsServiceOptions;
 }
 
+/** @experimental */
 export interface EffectMqRuntime extends JobsAdapterRuntime {
   readonly registerWorker: (options: EffectMqWorkerRegistrationOptions) => EffectMqWorkerHandle;
 }
 
+/** @experimental */
 export function createEffectMqRuntime(options: EffectMqRuntimeOptions = {}): EffectMqRuntime {
   assertSupportedJobsServiceOptions(options.serviceOptions ?? {}, ["observation"]);
   const native =
@@ -126,6 +129,7 @@ export function createEffectMqRuntime(options: EffectMqRuntimeOptions = {}): Eff
   return Object.freeze(adapter);
 }
 
+/** @experimental */
 export const runtimeIntegration: RuntimeProviderIntegration<"effect-mq"> = Object.freeze({
   kind: "runtime-integration",
   integrationId: "effect-mq",

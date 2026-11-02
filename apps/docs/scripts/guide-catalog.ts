@@ -29,6 +29,7 @@ export const overviewPages = [
   "docs/index",
   "docs/why-relkit",
   "docs/faq",
+  "docs/maturity",
   "docs/modules/index",
   "guides/index",
 ] as const;
@@ -102,6 +103,7 @@ const relations = [
   relation("docs/learn/index", ["app"], ["templates/default/v1/minimal/README.md"]),
   relation("docs/modules/index", ["app"], []),
   relation("docs/why-relkit", ["app"], []),
+  relation("docs/maturity", ["app"], []),
   relation(
     "docs/faq",
     ["app", "functions"],

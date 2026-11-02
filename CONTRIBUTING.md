@@ -8,6 +8,22 @@ work so maintainers can confirm scope and avoid duplicate effort.
 Every word users read — the README, docs, CLI help, error messages and the changelog — follows the
 [writing standard](WRITING.md). Run `bun scripts/user-text.ts` to check spelling and banned terms.
 
+## Core and Labs
+
+Every package declares a tier in the `relkit.maturity` field of its `package.json`. Core features
+are covered by the stability promise; Labs features can change in any release, carry the
+`@experimental` TSDoc tag on every export, and set `labs: true` on their docs pages. The
+[maturity table](https://relkit.dev/docs/maturity) lists every feature; its source is
+`scripts/maturity.ts`. Run `bun scripts/maturity.ts` after changing a tier, an export of a Labs
+package or a Labs docs page.
+
+## Feature freeze until 1.0
+
+Until Core reaches 1.0, do not add a new feature area — a descriptor kind, a provider family or an
+integration — unless an approved OpenSpec change lists it. Open the OpenSpec change first and link it
+from the pull request; review rejects a new feature area without one. Bug fixes and hardening remain
+welcome in both Core and Labs.
+
 ## Development
 
 RelKit is experimental, interfaces may change, and current consumers are the

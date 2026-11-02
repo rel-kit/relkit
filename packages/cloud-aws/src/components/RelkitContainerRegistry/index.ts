@@ -2,6 +2,7 @@ import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
 import { resourceName, tagsFor, type RelkitComponentArgs } from "../common.js";
 
+/** @experimental */
 export interface RelkitContainerRegistryArgs extends RelkitComponentArgs {
   readonly repositoryName?: pulumi.Input<string>;
   readonly imageTagMutability?: pulumi.Input<"MUTABLE" | "IMMUTABLE">;
@@ -9,7 +10,7 @@ export interface RelkitContainerRegistryArgs extends RelkitComponentArgs {
   readonly forceDelete?: pulumi.Input<boolean>;
 }
 
-/** ECR repository with immutable deploy identities and image scanning enabled. */
+/** ECR repository with immutable deploy identities and image scanning enabled. @experimental */
 export class RelkitContainerRegistry extends pulumi.ComponentResource {
   readonly repository: aws.ecr.Repository;
   readonly repositoryArn: pulumi.Output<string>;

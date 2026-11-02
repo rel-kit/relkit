@@ -47,6 +47,7 @@ export type {
  * @param options - Schemas, model, tools, middleware, limits, and client metadata.
  * @returns An Effect with a frozen agent descriptor or AgentDefinitionFailure.
  * @example Effect.runSync(defineAgentEffect({ id: "support", input, output, instructions: "Reply.", tools: [], limits }));
+ * @experimental
  */
 export const defineAgentEffect = Effect.fn("Agents.definition.define")(
   function* <
@@ -105,6 +106,7 @@ export const defineAgentEffect = Effect.fn("Agents.definition.define")(
  * ```
  * @category Agents
  * @since 0.4.0
+ * @experimental
  */
 export function defineAgent<
   const Id extends string,

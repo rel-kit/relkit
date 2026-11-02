@@ -103,5 +103,8 @@
     "@relkit/routes": "workspace:*",
     "drizzle-orm": "catalog:",
     "vitest": "catalog:"
+  },
+  "relkit": {
+    "maturity": "core"
   }
 }

@@ -14,6 +14,7 @@ export type * from "./provider-dispatcher.types.js";
 export { limitsForEffect } from "./provider-limits.js";
 /** Injectable profile-to-provider lookup.
  * @example Effect.provide(triggerProviderEffect(options, request), providerSourceLayer(options));
+ * @experimental
  */
 export class RealtimeProviderSource extends Context.Service<
   RealtimeProviderSource,
@@ -23,6 +24,7 @@ export class RealtimeProviderSource extends Context.Service<
  * @param options - Dispatcher options containing the provider callback.
  * @returns A composable provider source Layer.
  * @example providerSourceLayer(options);
+ * @experimental
  */
 export function providerSourceLayer(options: ProviderRealtimeDispatcherOptions) {
   return Layer.effect(
@@ -62,6 +64,7 @@ async function runProviderPromise<A, E>(
  * @param request - Validated trigger request.
  * @returns An Effect of the receipt or OperationIdFailure or RealtimeProviderError; requires RealtimeProviderSource.
  * @example Effect.runPromise(Effect.provide(triggerProviderEffect(options, request), providerSourceLayer(options)));
+ * @experimental
  */
 export const triggerProviderEffect = Effect.fn("Realtime.triggerProvider")(
   function* (
@@ -126,6 +129,7 @@ export const triggerProviderEffect = Effect.fn("Realtime.triggerProvider")(
  * @param request - Validated presence request.
  * @returns An Effect of presence or RealtimeProviderError; requires RealtimeProviderSource.
  * @example Effect.runPromise(Effect.provide(readProviderPresenceEffect(options, request), providerSourceLayer(options)));
+ * @experimental
  */
 export const readProviderPresenceEffect = Effect.fn("Realtime.readProviderPresence")(
   function* (
@@ -168,6 +172,7 @@ export const readProviderPresenceEffect = Effect.fn("Realtime.readProviderPresen
  * @param options - Provider lookup and generation identity.
  * @returns An Effect of a dispatcher without a typed failure.
  * @example Effect.runSync(createProviderRealtimeDispatcherEffect(options));
+ * @experimental
  */
 export const createProviderRealtimeDispatcherEffect = Effect.fn(
   "Realtime.createProviderDispatcher",
@@ -191,6 +196,7 @@ export const createProviderRealtimeDispatcherEffect = Effect.fn(
  * @returns A dispatcher with Promise-based trigger and presence methods.
  * @throws An Effect runtime defect if construction cannot execute synchronously.
  * @example const dispatcher = createProviderRealtimeDispatcher(options);
+ * @experimental
  */
 export function createProviderRealtimeDispatcher(
   options: ProviderRealtimeDispatcherOptions,

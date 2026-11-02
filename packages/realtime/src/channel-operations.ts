@@ -37,6 +37,7 @@ export async function runChannelPromise<A, E>(effect: Effect.Effect<A, E>): Prom
  * @param options - Optional idempotency data.
  * @returns An Effect of the provider receipt or a tagged validation, dispatcher, or provider error.
  * @example Effect.runPromise(triggerChannelEffect(channel, {}, "posted", "hello"));
+ * @experimental
  */
 export const triggerChannelEffect = Effect.fn("Realtime.triggerChannel")(
   function* (
@@ -81,6 +82,7 @@ export const triggerChannelEffect = Effect.fn("Realtime.triggerChannel")(
  * @param params - Channel parameters.
  * @returns An Effect of presence or a tagged validation, dispatcher, or provider error.
  * @example Effect.runPromise(getChannelPresenceEffect(channel, {}));
+ * @experimental
  */
 export const getChannelPresenceEffect = Effect.fn("Realtime.getChannelPresence")(
   function* (channel: ChannelDescriptorData, params: unknown) {

@@ -4,13 +4,13 @@ import type { StandardSchemaV1 } from "@relkit/schema";
 import type { GraphDescriptor } from "./define-graph.js";
 import type { RELKIT_SUBGRAPH, RELKIT_SUBGRAPH_NODE } from "./graph-subgraph-symbol.js";
 
-/** Authoring options for a graph embedded as a node. */
+/** Authoring options for a graph embedded as a node. @experimental */
 export interface GraphAsNodeOptions<Id extends string = string> {
   readonly id?: Id;
   readonly ends?: readonly string[];
 }
 
-/** Native graph node whose action is another graph. */
+/** Native graph node whose action is another graph. @experimental */
 export interface SubgraphNodeDescriptor<
   Id extends string = string,
   InputSchema extends StandardSchemaV1 = StandardSchemaV1,

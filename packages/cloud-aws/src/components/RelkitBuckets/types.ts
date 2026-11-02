@@ -2,8 +2,10 @@ import type * as aws from "@pulumi/aws";
 import type * as pulumi from "@pulumi/pulumi";
 import type { RelkitComponentArgs, RelkitEnvironmentVariable } from "../common.js";
 
+/** @experimental */
 export type RelkitBucketVisibility = "private" | "public";
 
+/** @experimental */
 export interface RelkitBucketDefinition {
   readonly id: string;
   readonly visibility?: RelkitBucketVisibility;
@@ -12,10 +14,12 @@ export interface RelkitBucketDefinition {
   readonly versioned?: pulumi.Input<boolean>;
 }
 
+/** @experimental */
 export interface RelkitBucketsArgs extends RelkitComponentArgs {
   readonly buckets: readonly RelkitBucketDefinition[];
 }
 
+/** @experimental */
 export interface RelkitBucketResource {
   readonly id: string;
   readonly bucket: aws.s3.Bucket;

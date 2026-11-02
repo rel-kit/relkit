@@ -3,6 +3,6 @@ import { defineMeta } from "blume";
 export default defineMeta({
   title: "Documentation",
   icon: "book-open",
-  pages: ["index", "why-relkit", "faq", "learn", "modules", "api", "errors"],
+  pages: ["index", "why-relkit", "faq", "maturity", "learn", "modules", "api", "errors"],
   display: "flat",
 });

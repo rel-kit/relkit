@@ -31,6 +31,7 @@ export const isAgentDescriptorEffect = Effect.fn("Agents.definition.isDescriptor
  * @param value - Candidate descriptor.
  * @returns Whether the value is an agent descriptor.
  * @example if (isAgentDescriptor(candidate)) use(candidate);
+ * @experimental
  */
 export function isAgentDescriptor(value: unknown): value is AgentAny {
   return Effect.runSync(isAgentDescriptorEffect(value));
@@ -77,6 +78,7 @@ export const assertAgentDescriptorEffect = Effect.fn("Agents.definition.assertDe
  * @returns Nothing when the descriptor is valid.
  * @throws TypeError when the descriptor is invalid.
  * @example assertAgentDescriptor(candidate);
+ * @experimental
  */
 export function assertAgentDescriptor(value: unknown): asserts value is AgentAny {
   Effect.runSync(

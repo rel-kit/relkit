@@ -5,6 +5,7 @@ import type {
 } from "./realtime-observability.types.js";
 /** Injectable realtime telemetry boundary.
  * @example Effect.provide(Effect.succeed(1), RealtimeTelemetryLive);
+ * @experimental
  */
 export class RealtimeTelemetry extends Context.Service<
   RealtimeTelemetry,
@@ -12,6 +13,7 @@ export class RealtimeTelemetry extends Context.Service<
 >()("relkit/realtime/RealtimeTelemetry") {}
 /** Live span and metric observer for realtime operations.
  * @example Effect.provide(Effect.succeed(1), RealtimeTelemetryLive);
+ * @experimental
  */
 export const RealtimeTelemetryLive = Layer.succeed(RealtimeTelemetry, { observe: observeLive });
 const calls = Metric.counter("relkit_realtime_operations_total", { incremental: true });
@@ -24,6 +26,7 @@ const duration = Metric.histogram("relkit_realtime_duration_ms", {
  * @param effect - The operation to measure.
  * @returns The observed Effect with unchanged success and error channels.
  * @example observeRealtime("channel.define", Effect.succeed(undefined));
+ * @experimental
  */
 export function observeRealtime<A, E, R>(
   operation: RealtimeOperation,

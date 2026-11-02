@@ -25,7 +25,7 @@ import type {
 export * from "./types.js";
 export { toAwsScheduleExpression } from "./validation.js";
 
-/** SQS job queues, redrive policies, worker settings, and EventBridge schedules. */
+/** SQS job queues, redrive policies, worker settings, and EventBridge schedules. @experimental */
 export class RelkitJobQueues extends pulumi.ComponentResource {
   readonly queues: readonly RelkitJobQueueResource[];
   readonly queueResources: readonly RelkitJobQueueResource[];

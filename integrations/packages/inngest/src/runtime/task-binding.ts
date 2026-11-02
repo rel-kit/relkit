@@ -11,15 +11,18 @@ export { createInngestFunction } from "./task-binding-function.js";
 type InngestConstructor = typeof import("inngest").Inngest;
 type InngestServe = typeof import("inngest/bun").serve;
 
+/** @experimental */
 export interface InngestSdk {
   readonly Inngest: InngestConstructor;
   readonly serve: InngestServe;
 }
 
+/** @experimental */
 export function loadInngestSdk(): InngestSdk {
   return Object.freeze({ Inngest, serve });
 }
 
+/** @experimental */
 export interface InngestTaskDefinition {
   readonly functionId: string;
   readonly eventName: string;
@@ -36,6 +39,7 @@ export interface InngestTaskDefinition {
   readonly schedule?: ScheduleDefinition;
 }
 
+/** @experimental */
 export function createInngestFunctionConfig(
   definition: InngestTaskDefinition,
 ): Readonly<Record<string, unknown>> {
@@ -74,6 +78,7 @@ function scheduleTrigger(schedule: ScheduleDefinition): Readonly<Record<string, 
   return { cron: schedule.cron };
 }
 
+/** @experimental */
 export function inngestFunctionId(
   jobId: string,
   taskId: string,
@@ -85,6 +90,7 @@ export function inngestFunctionId(
     .join("-");
 }
 
+/** @experimental */
 export interface InngestWorkerOptions {
   readonly client: Inngest.Any;
   readonly definitions: readonly InngestTaskDefinition[];
@@ -94,8 +100,10 @@ export interface InngestWorkerOptions {
   readonly startWorker?: boolean;
 }
 
+/** @experimental */
 export type InngestWorkerRegistrationOptions = Omit<InngestWorkerOptions, "client">;
 
+/** @experimental */
 export interface InngestWorkerHandle {
   readonly path: string;
   readonly handler: (request: Request) => Promise<Response>;
@@ -103,6 +111,7 @@ export interface InngestWorkerHandle {
   readonly close: () => Promise<void>;
 }
 
+/** @experimental */
 export function createInngestWorker(options: InngestWorkerOptions): {
   readonly path: string;
   readonly handler: (request: Request) => Promise<Response>;
@@ -132,6 +141,7 @@ export function createInngestWorker(options: InngestWorkerOptions): {
   });
 }
 
+/** @experimental */
 export function createInngestServeHandler(
   options: InngestWorkerOptions,
   activeSignals = new Set<AbortController>(),

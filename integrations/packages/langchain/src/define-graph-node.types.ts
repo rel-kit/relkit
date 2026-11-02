@@ -17,11 +17,11 @@ type CommandNodes<Ends extends readonly string[]> = Ends extends readonly []
   ? string
   : Extract<Ends[number], string>;
 
-/** Validated graph node result or native routing command. */
+/** Validated graph node result or native routing command. @experimental */
 export type GraphNodeResult<OutputSchema extends StandardSchemaV1, Ends extends readonly string[]> =
   NodeUpdate<OutputSchema> | Command<unknown, NodeUpdate<OutputSchema>, CommandNodes<Ends>>;
 
-/** Validated handler stored on a graph node descriptor. */
+/** Validated handler stored on a graph node descriptor. @experimental */
 export type GraphNodeHandler<
   InputSchema extends StandardSchemaV1,
   OutputSchema extends StandardSchemaV1,
@@ -31,7 +31,7 @@ export type GraphNodeHandler<
   config?: LangGraphRunnableConfig,
 ) => MaybePromise<GraphNodeResult<OutputSchema, Ends>>;
 
-/** User implementation before RelKit input and output validation. */
+/** User implementation before RelKit input and output validation. @experimental */
 export type GraphNodeImplementation<
   InputSchema extends StandardSchemaV1,
   OutputSchema extends StandardSchemaV1,
@@ -44,7 +44,7 @@ export type GraphNodeImplementation<
   | Command<unknown, NodeUpdateInput<OutputSchema>, CommandNodes<Ends>>
 >;
 
-/** Immutable native graph node descriptor. */
+/** Immutable native graph node descriptor. @experimental */
 export interface GraphNodeDescriptor<
   Id extends string = string,
   InputSchema extends StandardSchemaV1 = StandardSchemaV1,
@@ -62,7 +62,7 @@ export interface GraphNodeDescriptor<
   readonly handler: GraphNodeHandler<InputSchema, OutputSchema, Ends>;
 }
 
-/** Erased graph node descriptor for runtime validation. */
+/** Erased graph node descriptor for runtime validation. @experimental */
 export type GraphNodeAny = GraphNodeDescriptor<
   string,
   StandardSchemaV1,
@@ -71,7 +71,7 @@ export type GraphNodeAny = GraphNodeDescriptor<
   readonly string[]
 >;
 
-/** Authoring options for a native LangGraph node. */
+/** Authoring options for a native LangGraph node. @experimental */
 export interface DefineGraphNodeOptions<
   Id extends string,
   InputSchema extends StandardSchemaV1,

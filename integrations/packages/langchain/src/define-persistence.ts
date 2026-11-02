@@ -26,6 +26,7 @@ export {
  * @param options - Identity, client factory, ownership, and disposal policy.
  * @returns An Effect with a resource descriptor or AgentPersistenceFailure.
  * @example Effect.runSync(defineCheckpointerDbEffect({ id: "db", client: saver }));
+ * @experimental
  */
 export const defineCheckpointerDbEffect = Effect.fn("Agents.persistence.defineCheckpointer")(
   <Value extends BaseCheckpointSaver>(options: PersistenceOptions<Value>) =>
@@ -41,6 +42,7 @@ export const defineCheckpointerDbEffect = Effect.fn("Agents.persistence.defineCh
  * @returns A lazily acquired resource descriptor.
  * @throws The original invalid options error.
  * @example const resource = defineCheckpointerDb({ id: "db", client: saver });
+ * @experimental
  */
 export function defineCheckpointerDb<Value extends BaseCheckpointSaver>(
   options: PersistenceOptions<Value>,
@@ -56,6 +58,7 @@ export function defineCheckpointerDb<Value extends BaseCheckpointSaver>(
  * @param options - Identity, client factory, ownership, and disposal policy.
  * @returns An Effect with a resource descriptor or AgentPersistenceFailure.
  * @example Effect.runSync(defineMemoryDbEffect({ id: "memory", client: store }));
+ * @experimental
  */
 export const defineMemoryDbEffect = Effect.fn("Agents.persistence.defineMemory")(
   <Value extends BaseStore>(options: PersistenceOptions<Value>) =>
@@ -71,6 +74,7 @@ export const defineMemoryDbEffect = Effect.fn("Agents.persistence.defineMemory")
  * @returns A lazily acquired resource descriptor.
  * @throws The original invalid options error.
  * @example const resource = defineMemoryDb({ id: "memory", client: store });
+ * @experimental
  */
 export function defineMemoryDb<Value extends BaseStore>(
   options: PersistenceOptions<Value>,

@@ -3,7 +3,7 @@
 import type { END, START } from "@langchain/langgraph";
 import type { JsonValue } from "@relkit/contracts";
 
-/** Serializable node entry in an agent graph workflow. */
+/** Serializable node entry in an agent graph workflow. @experimental */
 export interface GraphWorkflowNode {
   readonly id: string;
   readonly kind: "node" | "function" | "subgraph";
@@ -15,7 +15,7 @@ export interface GraphWorkflowNode {
   readonly workflow?: GraphWorkflow;
 }
 
-/** Serializable static, join, or conditional graph edge. */
+/** Serializable static, join, or conditional graph edge. @experimental */
 export type GraphWorkflowEdge =
   | { readonly kind: "edge"; readonly from: string; readonly to: string }
   | { readonly kind: "join"; readonly from: readonly string[]; readonly to: string }
@@ -26,7 +26,7 @@ export type GraphWorkflowEdge =
       readonly dynamic: boolean;
     };
 
-/** Immutable serializable graph topology for runtime and clients. */
+/** Immutable serializable graph topology for runtime and clients. @experimental */
 export interface GraphWorkflow {
   readonly version: 1;
   readonly start: typeof START;

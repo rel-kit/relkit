@@ -3,12 +3,14 @@ import type { ChannelDescriptorData } from "./channel.types.js";
 import type { PresenceSnapshot, TriggerReceipt } from "./types.js";
 /** Options attached to a channel trigger request.
  * @example const options: ChannelTriggerOptions = { idempotencyKey: id };
+ * @experimental
  */
 export interface ChannelTriggerOptions {
   readonly idempotencyKey?: OperationId;
 }
 /** A generation-bound dispatcher for validated realtime operations.
  * @example const dispatcher: RealtimeDispatcher = { trigger: async () => receipt, getPresence: async () => presence };
+ * @experimental
  */
 export interface RealtimeDispatcher {
   /** Publishes a validated event.

@@ -2,7 +2,7 @@
 
 import { Schema } from "effect";
 
-/** Tagged graph invocation failure with the original runtime cause. */
+/** Tagged graph invocation failure with the original runtime cause. @experimental */
 export class GraphInvocationFailure extends Schema.TaggedError<GraphInvocationFailure>()(
   "GraphInvocationFailure",
   { message: Schema.String, cause: Schema.Unknown },

@@ -12,6 +12,7 @@ import {
   wireInput,
 } from "./task-binding-support.js";
 
+/** @experimental */
 export function createInngestFunction(
   client: Inngest.Any,
   definition: InngestTaskDefinition,

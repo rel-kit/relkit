@@ -1,9 +1,11 @@
+/** @experimental */
 export interface AwsCredentials {
   readonly accessKeyId: string;
   readonly secretAccessKey: string;
   readonly sessionToken?: string;
 }
 
+/** @experimental */
 export function text(value: unknown, name: string): string | undefined {
   if (value === undefined) return undefined;
   if (value instanceof URL) return value.toString();

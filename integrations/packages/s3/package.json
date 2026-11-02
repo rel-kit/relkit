@@ -37,6 +37,7 @@
     }
   },
   "relkit": {
+    "maturity": "core",
     "integration": {
       "id": "s3",
       "exports": {

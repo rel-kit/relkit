@@ -3,8 +3,10 @@ import type * as aws from "@pulumi/aws";
 import type * as pulumi from "@pulumi/pulumi";
 import type { RelkitComponentArgs } from "../common.js";
 
+/** @experimental */
 export type RelkitRetryJitter = "none" | "full" | "equal";
 
+/** @experimental */
 export interface RelkitJobRetryPolicy {
   readonly maxAttempts: number;
   readonly initialDelayMs: number;
@@ -13,6 +15,7 @@ export interface RelkitJobRetryPolicy {
   readonly jitter: RelkitRetryJitter;
 }
 
+/** @experimental */
 export interface RelkitJobQueueDefinition {
   readonly id: string;
   readonly retry: RelkitJobRetryPolicy;
@@ -26,6 +29,7 @@ export interface RelkitJobQueueDefinition {
   readonly workerWaitTimeSeconds?: number;
 }
 
+/** @experimental */
 export interface RelkitScheduleDefinition {
   readonly id: string;
   readonly jobId: string;
@@ -35,11 +39,13 @@ export interface RelkitScheduleDefinition {
   readonly overlap: "skip" | "allow";
 }
 
+/** @experimental */
 export interface RelkitSchedulerRetryPolicy {
   readonly maximumRetryAttempts?: number;
   readonly maximumEventAgeInSeconds?: number;
 }
 
+/** @experimental */
 export interface RelkitJobQueuesArgs extends RelkitComponentArgs {
   readonly jobs: readonly RelkitJobQueueDefinition[];
   readonly schedules?: readonly RelkitScheduleDefinition[];
@@ -50,6 +56,7 @@ export interface RelkitJobQueuesArgs extends RelkitComponentArgs {
   readonly schedulerRetryPolicy?: RelkitSchedulerRetryPolicy;
 }
 
+/** @experimental */
 export interface RelkitWorkerConsumptionConfiguration {
   readonly jobId: string;
   readonly queueArn: pulumi.Output<string>;
@@ -63,6 +70,7 @@ export interface RelkitWorkerConsumptionConfiguration {
   readonly environment: pulumi.Output<Record<string, string>>;
 }
 
+/** @experimental */
 export interface RelkitJobQueueResource {
   readonly id: string;
   readonly queue: aws.sqs.Queue;
@@ -75,6 +83,7 @@ export interface RelkitJobQueueResource {
   readonly worker: RelkitWorkerConsumptionConfiguration;
 }
 
+/** @experimental */
 export interface RelkitScheduleResource {
   readonly id: string;
   readonly jobId: string;

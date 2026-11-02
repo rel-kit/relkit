@@ -3,6 +3,7 @@ import type { RelkitContainerRegistry } from "../RelkitContainerRegistry/index.j
 import type { RelkitNetwork } from "../RelkitNetwork/index.js";
 import type { RelkitComponentArgs, RelkitEnvironmentInput, RelkitSecretInput } from "../common.js";
 
+/** @experimental */
 export interface RelkitApplicationServiceArgs extends RelkitComponentArgs {
   readonly network: RelkitNetwork;
   readonly registry: RelkitContainerRegistry;

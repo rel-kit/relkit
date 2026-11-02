@@ -65,5 +65,8 @@
     "valibot": "1.5.0",
     "vitest": "catalog:",
     "zod": "4.6.7"
+  },
+  "relkit": {
+    "maturity": "core"
   }
 }

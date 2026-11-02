@@ -3,19 +3,19 @@
 import type { END, START, LangGraphRunnableConfig, Send } from "@langchain/langgraph";
 import type { MaybePromise } from "@relkit/contracts";
 
-/** Native graph conditional route callback. */
+/** Native graph conditional route callback. @experimental */
 export type GraphRoute<Id extends string, State> = (
   state: State,
   config: LangGraphRunnableConfig,
 ) => MaybePromise<Id | typeof END | Send<Id> | readonly (Id | Send<Id>)[]>;
 
-/** Label based graph conditional route callback. */
+/** Label based graph conditional route callback. @experimental */
 export type GraphConditionalRoute<Id extends string, State, Key extends string> = (
   state: State,
   config: LangGraphRunnableConfig,
 ) => MaybePromise<Key | Send<Id, Partial<State>> | readonly (Key | Send<Id, Partial<State>>)[]>;
 
-/** Mutable graph edge authoring interface backed by Effect operations. */
+/** Mutable graph edge authoring interface backed by Effect operations. @experimental */
 export interface GraphEdgeBuilder<Id extends string, State> {
   /** Adds a static or join edge.
    * @param start - One or more source nodes.
@@ -54,7 +54,7 @@ export interface GraphEdgeBuilder<Id extends string, State> {
   ): GraphEdgeBuilder<Id, State>;
 }
 
-/** Recorded edge operation consumed by the LangGraph compiler. */
+/** Recorded edge operation consumed by the LangGraph compiler. @experimental */
 export type GraphEdgeOperation<Id extends string, State> =
   | {
       readonly kind: "edge";

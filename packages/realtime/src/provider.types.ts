@@ -9,6 +9,7 @@ import type {
 
 /** Provider-enforced bounds for event, connection, partition, and presence storage.
  * @example const limits: RealtimeLimits = { maxEventBytes: 1024, maxRetainedBytes: 4096, maxPartitions: 10, maxConnections: 10, maxPresenceMembers: 10 };
+ * @experimental
  */
 export interface RealtimeLimits {
   readonly maxEventBytes: number;
@@ -20,6 +21,7 @@ export interface RealtimeLimits {
 
 /** Validated event append request including idempotency and retention settings.
  * @example const append: AppendChannelEvent = { ...scope, event: "posted", payload: "hi", encodedBytes: 42, occurredAt: new Date().toISOString(), limits };
+ * @experimental
  */
 export interface AppendChannelEvent extends RealtimeScope {
   readonly operationId?: OperationId;
@@ -36,6 +38,7 @@ export interface AppendChannelEvent extends RealtimeScope {
 
 /** Provider lookup for an existing idempotent append receipt.
  * @example const lookup: LookupAppendReceipt = { ...scope, operationId: id, semanticDigest: digest, receiptWindowMs: 60000, now: new Date().toISOString() };
+ * @experimental
  */
 export interface LookupAppendReceipt extends RealtimeScope {
   readonly operationId: OperationId;
@@ -46,11 +49,13 @@ export interface LookupAppendReceipt extends RealtimeScope {
 
 /** Provider receipt lookup result.
  * @example const result: AppendReceiptLookup = await provider.lookupAppendReceipt(lookup);
+ * @experimental
  */
 export type AppendReceiptLookup = ReceiptLookup<TriggerReceipt>;
 
 /** Bounded replay page request.
  * @example const read: ReadChannelEvents = { ...scope, limit: 10, maxEncodedBytes: 4096 };
+ * @experimental
  */
 export interface ReadChannelEvents extends RealtimeScope {
   readonly after?: ChannelCheckpoint;
@@ -60,6 +65,7 @@ export interface ReadChannelEvents extends RealtimeScope {
 
 /** Ordered provider replay page and its next checkpoint.
  * @example const page: ChannelEventPage = await provider.readAfter(read);
+ * @experimental
  */
 export interface ChannelEventPage {
   readonly events: readonly ChannelEventRecord[];
@@ -70,6 +76,7 @@ export interface ChannelEventPage {
 
 /** Abortable long-poll request owned by its caller.
  * @example const wait: WaitForChannelEvents = { ...scope, after: checkpoint, deadlineMs: Date.now() + 1000, signal: controller.signal };
+ * @experimental
  */
 export interface WaitForChannelEvents extends RealtimeScope {
   readonly after: ChannelCheckpoint;
@@ -79,6 +86,7 @@ export interface WaitForChannelEvents extends RealtimeScope {
 
 /** Presence lease mutation request; providers own lease persistence.
  * @example const lease: PresenceLeaseRequest = { ...scope, leaseId: "l1", connectionId: "c1", expiresAt: new Date().toISOString(), maxMembers: 10, maxConnections: 10 };
+ * @experimental
  */
 export interface PresenceLeaseRequest extends RealtimeScope {
   readonly leaseId: string;
@@ -92,26 +100,31 @@ export interface PresenceLeaseRequest extends RealtimeScope {
 
 /** Presence read with a bounded member count.
  * @example const read: ReadPresenceRequest = { ...scope, maxMembers: 10 };
+ * @experimental
  */
 export type ReadPresenceRequest = RealtimeScope & {
   readonly maxMembers: number;
 };
 /** Initial lease request.
  * @example const request: AcquirePresenceLease = lease;
+ * @experimental
  */
 export type AcquirePresenceLease = PresenceLeaseRequest;
 /** Existing lease renewal request.
  * @example const request: RenewPresenceLease = lease;
+ * @experimental
  */
 export type RenewPresenceLease = PresenceLeaseRequest;
 /** Lease release request without an expiry.
  * @example const request: ReleasePresenceLease = { ...scope, leaseId: "l1", connectionId: "c1", maxMembers: 10, maxConnections: 10 };
+ * @experimental
  */
 export type ReleasePresenceLease = Omit<PresenceLeaseRequest, "expiresAt">;
 
 /** Backend contract for ordered events, idempotency, and presence.
  * The caller owns aborting waitAfter; provider implementations own their internal resources.
  * @example const epoch = await provider.getEpoch();
+ * @experimental
  */
 export interface RealtimeProvider {
   readonly capabilities: {

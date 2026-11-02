@@ -33,6 +33,7 @@
     }
   },
   "relkit": {
+    "maturity": "core",
     "integration": {
       "id": "docker",
       "exports": {

@@ -13,6 +13,7 @@ import type {
  * @param trace - Captured native trace assertion snapshot.
  * @param expected - Existing expected status or ordered captured values.
  * @returns Nothing when the existing assertion contract matches.
+ * @experimental
  */
 export function assertAgentTrace(
   trace: TestAgentTraceSnapshot,

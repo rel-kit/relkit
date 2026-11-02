@@ -46,5 +46,8 @@
   "devDependencies": {
     "@effect/vitest": "catalog:",
     "vitest": "catalog:"
+  },
+  "relkit": {
+    "maturity": "core"
   }
 }

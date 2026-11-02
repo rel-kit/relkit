@@ -33,6 +33,7 @@
     }
   },
   "relkit": {
+    "maturity": "labs",
     "integration": {
       "id": "pulumi",
       "dependencies": [

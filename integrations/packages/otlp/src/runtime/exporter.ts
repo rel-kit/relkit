@@ -18,6 +18,7 @@ import {
   within,
 } from "./exporter-support.js";
 
+/** @experimental */
 export interface OtlpExporterOptions {
   readonly transport: OtlpTransport;
   readonly serviceName?: string;
@@ -29,6 +30,7 @@ export interface OtlpExporterOptions {
   readonly delay?: (milliseconds: number) => Promise<void>;
 }
 
+/** @experimental */
 export interface OtlpExporter extends TelemetryExporterRuntime {
   readonly stats: () => TelemetryExporterRuntimeStats & {
     readonly exportedRecords: number;
@@ -36,6 +38,7 @@ export interface OtlpExporter extends TelemetryExporterRuntime {
   };
 }
 
+/** @experimental */
 export function createOtlpExporter(options: OtlpExporterOptions): OtlpExporter {
   const maximum = positive(options.maxRecords ?? 1_024, "maxRecords");
   const batchSize = positive(options.batchSize ?? 64, "batchSize");
@@ -156,6 +159,7 @@ export function createOtlpExporter(options: OtlpExporterOptions): OtlpExporter {
   return Object.freeze({ exportRecord, flush, close, stats });
 }
 
+/** @experimental */
 export async function createTelemetryExporter(
   context: TelemetryExporterFactoryContext,
 ): Promise<TelemetryExporterRuntime> {

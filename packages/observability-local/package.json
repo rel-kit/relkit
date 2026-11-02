@@ -52,5 +52,8 @@
     "check": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run --config vitest.config.ts"
+  },
+  "relkit": {
+    "maturity": "core"
   }
 }

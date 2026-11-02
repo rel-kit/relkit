@@ -6056,7 +6056,7 @@ new TaskSupportError({ reason: "Task tags must be unique" });
 declare class TaskSupportError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task-support.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task-support.ts#L8)
 
 ### assertHook
 
@@ -6078,7 +6078,7 @@ assertHook(() => {}, "onStart");
 declare const assertHook: (value: unknown, name: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task-support.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task-support.ts#L85)
 
 ### assertHookEffect
 
@@ -6099,7 +6099,7 @@ declare const assertHookEffect: (
 ) => Effect.Effect<undefined, TaskSupportError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task-support.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task-support.ts#L68)
 
 ### copyStrings
 
@@ -6121,7 +6121,7 @@ copyStrings(["red"], "tags");
 declare const copyStrings: (value: unknown, name: string) => readonly string[] | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task-support.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task-support.ts#L56)
 
 ### copyStringsEffect
 
@@ -6142,7 +6142,7 @@ declare const copyStringsEffect: (
 ) => Effect.Effect<ReadonlyArray<string> | undefined, TaskSupportError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task-support.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task-support.ts#L19)
 
 ### hasOwn
 
@@ -6265,7 +6265,7 @@ Effect.runSync(isSchemaEffect({ "~standard": { version: 1, validate() {} } }));
 declare const isSchemaEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task-support.ts#L96)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/define-task-support.ts#L95)
 
 ## `define-task-value.ts`
 
@@ -9326,7 +9326,7 @@ export interface JobsTelemetryService {
 declare const DefineJobOptions: DefineJobOptions<Id, InputSchema, Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L26)
 
 ### IdempotencyDefinition
 
@@ -9336,7 +9336,7 @@ declare const DefineJobOptions: DefineJobOptions<Id, InputSchema, Target>;
 declare const IdempotencyDefinition: IdempotencyDefinition<Input>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L24)
 
 ### JobDescriptor
 
@@ -9346,7 +9346,7 @@ declare const IdempotencyDefinition: IdempotencyDefinition<Input>;
 declare const JobDescriptor: JobDescriptor<Id, Input, InputSchema, Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L25)
 
 ### LegacyJobValidationError (class)
 
@@ -9364,7 +9364,7 @@ if (error instanceof LegacyJobValidationError) console.log(error.message);
 declare class LegacyJobValidationError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L33)
 
 ### RetryJitter
 
@@ -9374,7 +9374,7 @@ declare class LegacyJobValidationError
 declare const RetryJitter: RetryJitter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L20)
 
 ### RetryPolicy
 
@@ -9384,7 +9384,7 @@ declare const RetryJitter: RetryJitter;
 declare const RetryPolicy: RetryPolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L21)
 
 ### ScheduleDefinition
 
@@ -9394,7 +9394,7 @@ declare const RetryPolicy: RetryPolicy;
 declare const ScheduleDefinition: ScheduleDefinition<Input>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L23)
 
 ### ScheduleOverlap
 
@@ -9404,7 +9404,7 @@ declare const ScheduleDefinition: ScheduleDefinition<Input>;
 declare const ScheduleOverlap: ScheduleOverlap;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L22)
 
 ### defineJob
 
@@ -9432,7 +9432,7 @@ declare const defineJob: <
 ) => JobDescriptor<Id, InferInput<InputSchema>, InputSchema, Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L68)
 
 ### defineJobEffect
 
@@ -9460,7 +9460,7 @@ declare const defineJobEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/legacy-define-job.ts#L42)
 
 ## `legacy-define-job.types.ts`
 

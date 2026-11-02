@@ -5,6 +5,7 @@ import type { GraphInvocationIdentityService } from "./graph-runtime-identity.ty
 
 /** Substitutable random source for graph invocation IDs.
  * @example Effect.provide(invokeGraphEffect(options), GraphInvocationIdentityLive);
+ * @experimental
  */
 export class GraphInvocationIdentity extends Context.Service<
   GraphInvocationIdentity,
@@ -13,6 +14,7 @@ export class GraphInvocationIdentity extends Context.Service<
 
 /** Live graph invocation identity source.
  * @example Effect.runPromise(Effect.provide(invokeGraphEffect(options), GraphInvocationIdentityLive));
+ * @experimental
  */
 export const GraphInvocationIdentityLive = Layer.succeed(GraphInvocationIdentity, {
   randomUUID: () => crypto.randomUUID(),

@@ -41,7 +41,7 @@ export {
   type PulumiUpdateReport,
 } from "./events-types.js";
 
-/** Converts one Automation API event into safe data suitable for Effect logs. */
+/** Converts one Automation API event into safe data suitable for Effect logs. @experimental */
 export function toPulumiLog(
   event: EngineEvent,
   options: PulumiEventOptions = {},
@@ -131,7 +131,7 @@ export function toPulumiLog(
   return undefined;
 }
 
-/** Builds an Effect log with only the already-redacted event message and fields. */
+/** Builds an Effect log with only the already-redacted event message and fields. @experimental */
 export function toPulumiEffectLog(
   event: EngineEvent,
   options: PulumiEventOptions = {},
@@ -147,7 +147,7 @@ export function toPulumiEffectLog(
   return effect.pipe(Effect.annotateLogs({ ...log.fields }));
 }
 
-/** Adapts the synchronous Automation API callback to an existing Effect runtime/logger. */
+/** Adapts the synchronous Automation API callback to an existing Effect runtime/logger. @experimental */
 export function createPulumiEventLogger(
   emit: (effect: Effect.Effect<void>) => void,
   options: PulumiEventOptions = {},
@@ -161,13 +161,14 @@ export function createPulumiEventLogger(
   };
 }
 
-/** Produces a stable summary from event order-independent engine data. */
+/** Produces a stable summary from event order-independent engine data. @experimental */
 export function summarizePulumiEvents(events: readonly EngineEvent[]): PulumiEventSummary {
   return summarize(events);
 }
 
 export { formatPulumiSummary, serializePulumiReport } from "./events-report.js";
 
+/** @experimental */
 export function createPreviewReport(
   result: Pick<PreviewResult, "changeSummary">,
   events: readonly EngineEvent[] = [],
@@ -176,6 +177,7 @@ export function createPreviewReport(
   return buildPreviewReport(result, events, (event) => toPulumiLog(event, options));
 }
 
+/** @experimental */
 export function createUpdateReport(
   result: Pick<UpResult, "summary" | "outputs">,
   events: readonly EngineEvent[] = [],
@@ -184,6 +186,7 @@ export function createUpdateReport(
   return buildUpdateReport(result, events, (event) => toPulumiLog(event, options), options);
 }
 
+/** @experimental */
 export function createOutputReport(
   outputs: OutputMap,
   options: PulumiEventOptions = {},

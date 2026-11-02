@@ -105,6 +105,7 @@ CREATE TABLE IF NOT EXISTS effect_mq_flow_outbox (
 );`;
 const EFFECT_MQ_SCHEMA_COMMAND = EFFECT_MQ_SCHEMA_SQL.replace(/\s+/gu, " ").trim();
 
+/** @experimental */
 export const localRecipe = Object.freeze({
   kind: "local-service-recipe",
   protocolVersion: LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,

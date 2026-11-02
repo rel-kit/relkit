@@ -127,6 +127,7 @@ export const validateNativeAgentResumeInputEffect = Effect.fn("Agents.nativeHitl
  * @returns Validated reply values.
  * @throws The original invalid continuation error.
  * @example const reply = validateNativeAgentResumeInput(requests, value);
+ * @experimental
  */
 export function validateNativeAgentResumeInput(
   requests: readonly AgentWaitingRequest[],

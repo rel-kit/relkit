@@ -1,12 +1,13 @@
 import { RedisClient } from "bun";
 
+/** @experimental */
 export interface RelkitValkeyClientOptions {
   readonly url: string;
   readonly tls?: boolean;
   readonly connectionTimeoutMs?: number;
 }
 
-/** Promise-only cache operations backed by Bun's native RedisClient. */
+/** Promise-only cache operations backed by Bun's native RedisClient. @experimental */
 export interface RelkitValkeyClient {
   readonly connected: boolean;
   connect(): Promise<void>;
@@ -19,7 +20,7 @@ export interface RelkitValkeyClient {
   increment(key: string, amount?: number): Promise<number>;
 }
 
-/** Creates a private native Valkey client without exporting its Bun type. */
+/** Creates a private native Valkey client without exporting its Bun type. @experimental */
 export function createValkeyClient(options: RelkitValkeyClientOptions): RelkitValkeyClient {
   if (options.url.trim() === "") throw new TypeError("Valkey URL must not be empty.");
   if (

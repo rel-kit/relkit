@@ -24,6 +24,7 @@ import type { TestAgentModelCall, TestAgentModelOptions, TestModelTurn } from ".
  * @param options - Explicit configuration and native dependencies for this test owner.
  * @returns A synchronous model facade owning script state and cancellation-aware turns.
  * @see tests/fixtures/checked-examples.ts ownedHelpersExample for checked script ownership.
+ * @experimental
  */
 export function createTestModel(
   options: TestAgentModelOptions & { readonly script?: readonly TestModelTurn[] } = {},

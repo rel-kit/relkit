@@ -1,0 +1,38 @@
+---
+/** Marks a page that sets `labs: true`: the feature carries no compatibility promise yet. */
+import Badge from "blume/components/content/Badge.astro";
+import labsRoutes from "../content/_snippets/generated/labs-routes.json";
+
+interface Props {
+  route: string;
+}
+
+const labs = (labsRoutes as readonly string[]).includes(Astro.props.route);
+---
+
+{
+  labs && (
+    <p class="labs-notice not-prose" data-labs-badge>
+      <a href="/docs/maturity">
+        <Badge variant="warning" icon="flask-conical">
+          Labs
+        </Badge>
+      </a>
+      <span>This feature is in Labs and can change in any release.</span>
+    </p>
+  )
+}
+
+<style>
+  .labs-notice {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1rem;
+    font-size: 0.875rem;
+    color: var(--blume-muted-foreground, currentColor);
+  }
+  .labs-notice a {
+    text-decoration: none;
+  }
+</style>

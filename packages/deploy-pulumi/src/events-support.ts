@@ -125,6 +125,7 @@ export function summarizePulumiEvents(events: readonly EngineEvent[]): PulumiEve
   });
 }
 
+/** @experimental */
 export function redactPulumiOutputs(
   outputs: OutputMap | PulumiOutputs,
   options: PulumiEventOptions,

@@ -6,6 +6,7 @@ import type {
 } from "@relkit/deploy";
 import * as pulumi from "@pulumi/pulumi";
 
+/** @experimental */
 export interface ExecutedDeploymentOperations {
   readonly outputs: Readonly<Record<string, pulumi.Input<unknown>>>;
   readonly resourceCount: number;
@@ -23,6 +24,7 @@ class OperationResource extends pulumi.CustomResource {
   }
 }
 
+/** @experimental */
 export function executeDeploymentOperations(
   program: DeploymentProgramMaterialization,
 ): ExecutedDeploymentOperations {

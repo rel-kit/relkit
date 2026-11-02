@@ -18,6 +18,10 @@ export default defineConfig({
   },
   description:
     "Build TypeScript backends with guided examples, module documentation, and API reference.",
+  // `labs: true` marks a Labs feature page: a badge above the article and beside its sidebar row.
+  frontmatter: {
+    extend: { labs: Schema.toStandardSchemaV1(Schema.UndefinedOr(Schema.Boolean)) },
+  },
   content: {
     root: "content",
     exclude: ["generated/**"],

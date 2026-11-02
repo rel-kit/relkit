@@ -22,6 +22,7 @@ export type * from "./define-graph.types.js";
  * @param options - Graph state, nodes, edges, limits, and client policy.
  * @returns An Effect with a frozen graph descriptor or GraphDefinitionFailure.
  * @example Effect.runSync(defineGraphEffect({ id: "flow", state, input, output, nodes, edges, limits }));
+ * @experimental
  */
 export const defineGraphEffect = Effect.fn("Agents.graph.define")(
   function* <
@@ -59,6 +60,7 @@ export const defineGraphEffect = Effect.fn("Agents.graph.define")(
  * @returns A frozen inspectable graph descriptor.
  * @throws The original invalid graph authoring or identity error.
  * @example const graph = defineGraph({ id: "flow", state, input, output, nodes, edges, limits });
+ * @experimental
  */
 export function defineGraph<
   const Id extends string,
@@ -80,6 +82,7 @@ export function defineGraph<
  * @param value - Valid graph descriptor.
  * @returns An Effect with graph state and persistence declarations.
  * @example Effect.runSync(graphExecutionEffect(graph));
+ * @experimental
  */
 export const graphExecutionEffect = Effect.fn("Agents.graph.execution")(
   (value: GraphDescriptor) => Effect.sync(() => value[GRAPH_EXECUTION]),
@@ -90,6 +93,7 @@ export const graphExecutionEffect = Effect.fn("Agents.graph.execution")(
  * @param value - Valid graph descriptor.
  * @returns Hidden graph state and persistence declarations.
  * @example graphExecution(graph);
+ * @experimental
  */
 export function graphExecution(value: GraphDescriptor): GraphExecution {
   return Effect.runSync(graphExecutionEffect(value));
@@ -99,6 +103,7 @@ export function graphExecution(value: GraphDescriptor): GraphExecution {
  * @param value - Candidate descriptor.
  * @returns An Effect with a boolean and no typed failure.
  * @example Effect.runSync(isGraphDescriptorEffect(candidate));
+ * @experimental
  */
 export const isGraphDescriptorEffect = Effect.fn("Agents.graph.isDescriptor")(
   (value: unknown) =>
@@ -118,6 +123,7 @@ export const isGraphDescriptorEffect = Effect.fn("Agents.graph.isDescriptor")(
  * @param value - Candidate descriptor.
  * @returns Whether the value is a native graph descriptor.
  * @example if (isGraphDescriptor(candidate)) invokeGraph(candidate);
+ * @experimental
  */
 export function isGraphDescriptor(value: unknown): value is GraphDescriptor {
   return Effect.runSync(isGraphDescriptorEffect(value));

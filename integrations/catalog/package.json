@@ -29,6 +29,7 @@
     }
   },
   "relkit": {
+    "maturity": "core",
     "catalog": {
       "./aws": "@relkit/aws",
       "./cloudflare": "@relkit/cloudflare",

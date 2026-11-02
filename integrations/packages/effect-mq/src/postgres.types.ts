@@ -9,7 +9,7 @@ import type {
   mqFlowOutbox,
 } from "effect-mq/drizzle-postgres";
 
-/** Native table handles retain the SDK's exact row, query and foreign-key contracts. */
+/** Native table handles retain the SDK's exact row, query and foreign-key contracts. @experimental */
 export interface EffectMqPostgresSchema {
   /** Durable job state and acceptance metadata. */
   readonly jobs: ReturnType<typeof mqJobs>;

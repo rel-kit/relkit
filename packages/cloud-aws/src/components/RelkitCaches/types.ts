@@ -3,6 +3,7 @@ import type * as pulumi from "@pulumi/pulumi";
 import type { RelkitNetwork } from "../RelkitNetwork/index.js";
 import type { RelkitComponentArgs, RelkitEnvironmentVariable } from "../common.js";
 
+/** @experimental */
 export interface RelkitCacheDefinition {
   readonly id: string;
   readonly engineVersion?: pulumi.Input<string>;
@@ -12,6 +13,7 @@ export interface RelkitCacheDefinition {
   readonly securityGroupIds?: pulumi.Input<pulumi.Input<string>[]>;
 }
 
+/** @experimental */
 export interface RelkitCachesArgs extends RelkitComponentArgs {
   readonly caches: readonly RelkitCacheDefinition[];
   readonly network?: RelkitNetwork;
@@ -19,11 +21,13 @@ export interface RelkitCachesArgs extends RelkitComponentArgs {
   readonly kmsKeyId?: pulumi.Input<string>;
 }
 
+/** @experimental */
 export interface RelkitCacheEndpoint {
   readonly address: string;
   readonly port: number;
 }
 
+/** @experimental */
 export interface RelkitCacheResource {
   readonly id: string;
   readonly cache: aws.elasticache.ServerlessCache;

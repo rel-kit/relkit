@@ -33,6 +33,7 @@ const connectionContract = defineConnectionContract({
 type SecretReference = BindingValueRef<string, string, "secret-string">;
 type TextReference = BindingValueRef<string, string, "string">;
 
+/** @experimental */
 export interface TriggerOptions extends JobsServiceOptions {
   readonly projectRef?: string | TextReference;
   readonly secretKey?: SecretReference;
@@ -40,7 +41,9 @@ export interface TriggerOptions extends JobsServiceOptions {
   readonly native?: Readonly<Record<string, import("@relkit/contracts").JsonValue>>;
 }
 
+/** @experimental */
 export type TriggerBehavior = JobsServiceBehavior;
+/** @experimental */
 export type TriggerAdapter<Options extends TriggerOptions = TriggerOptions> = ProviderAdapter<
   typeof job,
   "trigger",
@@ -48,10 +51,14 @@ export type TriggerAdapter<Options extends TriggerOptions = TriggerOptions> = Pr
   ProviderBehavior<TriggerBehavior>
 >;
 
+/** @experimental */
 export const triggerIntegration = integration;
+/** @experimental */
 export const triggerConnectionContract = connectionContract;
+/** @experimental */
 export const triggerLocalRecipe = localRecipe;
 
+/** @experimental */
 export function trigger<const Options extends TriggerOptions = TriggerOptions>(
   options: Options = {} as Options,
 ): TriggerAdapter<Options> {

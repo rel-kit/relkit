@@ -23,6 +23,7 @@ export type * from "./graph-workflow.types.js";
  * @param edges - Validated graph edge operations.
  * @returns An Effect with a workflow or GraphWorkflowFailure.
  * @example Effect.runSync(graphWorkflowEffect(nodes, edges));
+ * @experimental
  */
 export const graphWorkflowEffect = Effect.fn("Agents.graph.workflow")(
   <Id extends string, State>(
@@ -49,6 +50,7 @@ export const graphWorkflowEffect = Effect.fn("Agents.graph.workflow")(
  * @returns A frozen serializable workflow.
  * @throws The original node or schema projection error.
  * @example graphWorkflow(nodes, edges);
+ * @experimental
  */
 export function graphWorkflow<Id extends string, State>(
   nodes: readonly (GraphNodeAny | FunctionGraphNodeDescriptor | SubgraphNodeDescriptor)[],
@@ -65,6 +67,7 @@ export function graphWorkflow<Id extends string, State>(
  * @param workflow - Frozen graph workflow.
  * @returns An Effect with a boolean and no typed failure.
  * @example Effect.runSync(graphWorkflowRequiresPersistenceEffect(workflow));
+ * @experimental
  */
 export const graphWorkflowRequiresPersistenceEffect = Effect.fn("Agents.graph.requiresPersistence")(
   (workflow: GraphWorkflow) => Effect.sync(() => requiresPersistence(workflow)),
@@ -75,6 +78,7 @@ export const graphWorkflowRequiresPersistenceEffect = Effect.fn("Agents.graph.re
  * @param workflow - Frozen graph workflow.
  * @returns Whether any node has a resumable continuation.
  * @example graphWorkflowRequiresPersistence(workflow);
+ * @experimental
  */
 export function graphWorkflowRequiresPersistence(workflow: GraphWorkflow): boolean {
   return Effect.runSync(graphWorkflowRequiresPersistenceEffect(workflow));

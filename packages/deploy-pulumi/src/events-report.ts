@@ -18,6 +18,7 @@ import {
   summarizePulumiEvents,
 } from "./events-support.js";
 
+/** @experimental */
 export function formatPulumiSummary(
   summary: PulumiPreviewReport["summary"],
   operation = "preview",
@@ -72,6 +73,7 @@ export function createOutputReport(
   });
 }
 
+/** @experimental */
 export function serializePulumiReport(
   report: PulumiReport,
   options: PulumiEventOptions = {},

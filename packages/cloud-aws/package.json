@@ -49,5 +49,8 @@
     "build": "tsc -b",
     "check": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false"
+  },
+  "relkit": {
+    "maturity": "labs"
   }
 }

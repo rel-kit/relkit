@@ -34,6 +34,7 @@ export { getChannelPresenceEffect, triggerChannelEffect };
  * @param options - Authored channel options.
  * @returns An Effect of the frozen descriptor or ChannelValidationError.
  * @example Effect.runSync(defineChannelEffect({ id: "news", params: schema, events: { posted: schema } }));
+ * @experimental
  */
 export const defineChannelEffect = Effect.fn("Realtime.defineChannel")(
   function* <
@@ -128,6 +129,7 @@ export const defineChannelEffect = Effect.fn("Realtime.defineChannel")(
  * ```
  * @category Realtime
  * @since 0.4.0
+ * @experimental
  */
 export function defineChannel<
   const Id extends string,
@@ -146,6 +148,7 @@ export function defineChannel<
  * @param value - Candidate descriptor.
  * @returns An Effect of a boolean with no typed error.
  * @example Effect.runSync(isChannelDescriptorEffect(channel));
+ * @experimental
  */
 export const isChannelDescriptorEffect = Effect.fn("Realtime.isChannelDescriptor")(
   function* (value: unknown) {
@@ -158,6 +161,7 @@ export const isChannelDescriptorEffect = Effect.fn("Realtime.isChannelDescriptor
  * @param value - Candidate descriptor.
  * @returns Whether the value is a channel descriptor.
  * @example isChannelDescriptor(channel);
+ * @experimental
  */
 export function isChannelDescriptor(value: unknown): value is ChannelDescriptorAny {
   return Effect.runSync(isChannelDescriptorEffect(value));

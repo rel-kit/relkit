@@ -32,6 +32,7 @@ export { assertGraphNodeDestinations } from "./graph-node-validation.js";
  * @param config - LangGraph runnable configuration.
  * @returns A validated node result or GraphNodeValidationFailure.
  * @example await Effect.runPromise(runGraphNodeHandlerEffect(options, [], input));
+ * @experimental
  */
 export const runGraphNodeHandlerEffect = Effect.fn("Agents.graphNode.handle")(
   function* <
@@ -61,6 +62,7 @@ export const runGraphNodeHandlerEffect = Effect.fn("Agents.graphNode.handle")(
  * @param options - Node identity, schemas, destinations, and implementation.
  * @returns An Effect with an immutable descriptor or GraphNodeValidationFailure.
  * @example Effect.runSync(defineGraphNodeEffect({ id: "step", input, output, handler }));
+ * @experimental
  */
 export const defineGraphNodeEffect = Effect.fn("Agents.graphNode.define")(
   function* <
@@ -117,6 +119,7 @@ export const defineGraphNodeEffect = Effect.fn("Agents.graphNode.define")(
  * @returns An immutable graph node descriptor.
  * @throws The original authoring error for invalid options.
  * @example const node = defineGraphNode({ id: "step", input, output, handler });
+ * @experimental
  */
 export function defineGraphNode<
   const Id extends string,
@@ -138,6 +141,7 @@ export function defineGraphNode<
  * @param value - Candidate descriptor.
  * @returns An Effect with a boolean and no typed failure.
  * @example Effect.runSync(isGraphNodeDescriptorEffect(value));
+ * @experimental
  */
 export const isGraphNodeDescriptorEffect = Effect.fn("Agents.graphNode.isDescriptor")(
   function* (value: unknown) {
@@ -162,6 +166,7 @@ export const isGraphNodeDescriptorEffect = Effect.fn("Agents.graphNode.isDescrip
  * @param value - Candidate descriptor.
  * @returns Whether the value is a native graph node descriptor.
  * @example if (isGraphNodeDescriptor(value)) useNode(value);
+ * @experimental
  */
 export function isGraphNodeDescriptor(value: unknown): value is GraphNodeAny {
   return Effect.runSync(isGraphNodeDescriptorEffect(value));

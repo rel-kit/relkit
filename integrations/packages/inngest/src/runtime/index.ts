@@ -22,10 +22,12 @@ import type { RuntimeProviderContext, RuntimeProviderIntegration } from "@relkit
 import { providerEventId, submitInngestEvent } from "./submission.js";
 import { duplicateReceipt, observationOptions } from "./support.js";
 
+/** @experimental */
 export interface InngestRuntime extends JobsAdapterRuntime {
   readonly registerWorker: (options: InngestWorkerRegistrationOptions) => InngestWorkerHandle;
 }
 
+/** @experimental */
 export interface InngestRuntimeOptions {
   readonly appId: string;
   readonly baseUrl: string;
@@ -39,6 +41,7 @@ export interface InngestRuntimeOptions {
   readonly serviceOptions?: JobsServiceOptions;
 }
 
+/** @experimental */
 export function createInngestRuntime(options: InngestRuntimeOptions): InngestRuntime {
   assertSupportedJobsServiceOptions(options.serviceOptions ?? {}, ["observation"]);
   text(options.appId, "Inngest appId");
@@ -150,6 +153,7 @@ export function createInngestRuntime(options: InngestRuntimeOptions): InngestRun
   return Object.freeze(adapter);
 }
 
+/** @experimental */
 export const runtimeIntegration: RuntimeProviderIntegration<"inngest"> = Object.freeze({
   kind: "runtime-integration",
   integrationId: "inngest",

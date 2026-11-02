@@ -52,5 +52,8 @@
     "@effect/vitest": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "vitest": "catalog:"
+  },
+  "relkit": {
+    "maturity": "core"
   }
 }

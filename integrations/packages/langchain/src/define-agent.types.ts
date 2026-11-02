@@ -17,11 +17,13 @@ import type {
 } from "./define-agent-native.js";
 import type { DeepAgentCapabilities } from "./define-agent-deep.js";
 
+/** @experimental */
 export interface PromptTemplate {
   readonly template: string;
   readonly variables?: readonly string[];
 }
 
+/** @experimental */
 export interface PromptInstructions {
   readonly kind: "prompt";
   readonly id: string;
@@ -29,14 +31,17 @@ export interface PromptInstructions {
   readonly value: string | readonly string[];
 }
 
+/** @experimental */
 export type AgentInstructions = string | PromptTemplate | PromptInstructions;
 
+/** @experimental */
 export interface AgentLimits {
   readonly maxSteps: number;
   readonly maxToolCalls: number;
   readonly timeoutMs: number;
 }
 
+/** @experimental */
 export interface AgentDescriptor<
   Id extends string,
   Input,
@@ -62,6 +67,7 @@ export interface AgentDescriptor<
   readonly clientContract: AgentClientContractMetadata;
 }
 
+/** @experimental */
 export interface DefineAgentOptions<
   Id extends string,
   InputSchema extends StandardSchemaV1,

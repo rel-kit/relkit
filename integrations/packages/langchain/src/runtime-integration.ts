@@ -4,6 +4,7 @@
  */
 import type { RuntimeIntegrationModuleMetadata } from "@relkit/contracts";
 
+/** @experimental */
 export const runtimeIntegration = Object.freeze({
   kind: "runtime-integration",
   integrationId: "langchain",

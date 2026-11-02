@@ -8,6 +8,7 @@ import type { JsonValue } from "@relkit/contracts";
  *
  * @example
  * const interrupt: GraphWaitingInterrupt = { node: "review", response: true };
+ * @experimental
  */
 export interface GraphWaitingInterrupt {
   readonly id?: string;

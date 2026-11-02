@@ -34,6 +34,7 @@ const connectionContract = defineConnectionContract({
 type SecretReference = BindingValueRef<string, string, "secret-string">;
 type TextReference = BindingValueRef<string, string, "string">;
 
+/** @experimental */
 export interface EffectMqOptions extends JobsServiceOptions {
   readonly postgresUrl?: string | TextReference | SecretReference;
   readonly schema?: string;
@@ -42,7 +43,9 @@ export interface EffectMqOptions extends JobsServiceOptions {
   readonly native?: Readonly<Record<string, import("@relkit/contracts").JsonValue>>;
 }
 
+/** @experimental */
 export type EffectMqBehavior = JobsServiceBehavior;
+/** @experimental */
 export type EffectMqAdapter<Options extends EffectMqOptions = EffectMqOptions> = ProviderAdapter<
   typeof job,
   "effect-mq",
@@ -50,10 +53,14 @@ export type EffectMqAdapter<Options extends EffectMqOptions = EffectMqOptions> =
   ProviderBehavior<EffectMqBehavior>
 >;
 
+/** @experimental */
 export const effectMqIntegration = integration;
+/** @experimental */
 export const effectMqConnectionContract = connectionContract;
+/** @experimental */
 export const effectMqLocalRecipe = localRecipe;
 
+/** @experimental */
 export function effectMq<const Options extends EffectMqOptions = EffectMqOptions>(
   options: Options = {} as Options,
 ): EffectMqAdapter<Options> {

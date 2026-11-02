@@ -2,8 +2,10 @@ import type * as aws from "@pulumi/aws";
 import type * as pulumi from "@pulumi/pulumi";
 import type { RelkitComponentArgs } from "../common.js";
 
+/** @experimental */
 export type RelkitEventRetryJitter = "none" | "full" | "equal";
 
+/** @experimental */
 export interface RelkitEventRetryPolicy {
   readonly maxAttempts: number;
   readonly initialDelayMs: number;
@@ -12,11 +14,13 @@ export interface RelkitEventRetryPolicy {
   readonly jitter: RelkitEventRetryJitter;
 }
 
+/** @experimental */
 export interface RelkitEventDefinition {
   readonly id: string;
   readonly version: number;
 }
 
+/** @experimental */
 export interface RelkitEventTriggerDefinition {
   readonly id: string;
   readonly targetFunctionId: string;
@@ -33,11 +37,13 @@ export interface RelkitEventTriggerDefinition {
   readonly workerWaitTimeSeconds?: number;
 }
 
+/** @experimental */
 export interface RelkitEventBridgeRetryPolicy {
   readonly maximumRetryAttempts?: number;
   readonly maximumEventAgeInSeconds?: number;
 }
 
+/** @experimental */
 export interface RelkitEventBusArgs extends RelkitComponentArgs {
   readonly events: readonly RelkitEventDefinition[];
   readonly eventTriggers?: readonly RelkitEventTriggerDefinition[];
@@ -50,6 +56,7 @@ export interface RelkitEventBusArgs extends RelkitComponentArgs {
   readonly eventBridgeRetryPolicy?: RelkitEventBridgeRetryPolicy;
 }
 
+/** @experimental */
 export interface RelkitEventWorkerConfiguration {
   readonly eventTriggerId: string;
   readonly targetFunctionId: string;
@@ -70,6 +77,7 @@ export interface RelkitEventWorkerConfiguration {
   readonly environment: pulumi.Output<Record<string, string>>;
 }
 
+/** @experimental */
 export interface RelkitEventTriggerResource {
   readonly id: string;
   readonly targetFunctionId: string;

@@ -142,6 +142,7 @@ export function normalizeSchedulerRetry(
   return { maximumRetryAttempts, maximumEventAgeInSeconds };
 }
 
+/** @experimental */
 export function toAwsScheduleExpression(cron: string): string {
   const fields = cron.trim().split(/\s+/);
   if (fields.length !== 5) throw new TypeError("AWS schedules require five-field cron.");

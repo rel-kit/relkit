@@ -6,7 +6,7 @@ import type { RelkitBucketResource, RelkitBucketsArgs } from "./types.js";
 
 export * from "./types.js";
 
-/** Maps logical buckets to stable, private-by-default S3 buckets. */
+/** Maps logical buckets to stable, private-by-default S3 buckets. @experimental */
 export class RelkitBuckets extends pulumi.ComponentResource {
   readonly buckets: readonly RelkitBucketResource[];
   readonly bucketResources: readonly RelkitBucketResource[];

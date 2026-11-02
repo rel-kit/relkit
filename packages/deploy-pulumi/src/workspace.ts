@@ -12,18 +12,24 @@ import {
   type PulumiFn,
 } from "@pulumi/pulumi/automation/index.js";
 
+/** @experimental */
 export const PULUMI_CLOUD_BACKEND_URL = "https://api.pulumi.com" as const;
+/** @experimental */
 export type PulumiBackendKind = "cloud" | "object-storage" | "local";
+/** @experimental */
 export type PulumiStackMode = "create" | "select" | "create-or-select";
 
+/** @experimental */
 export interface PulumiBackend {
   readonly kind: PulumiBackendKind;
   readonly url?: string;
   readonly directory?: string;
 }
 
+/** @experimental */
 export type ResolvedPulumiBackend = { readonly kind: PulumiBackendKind; readonly url: string };
 
+/** @experimental */
 export interface PulumiWorkspaceOptions {
   readonly projectName: string;
   readonly stackName: string;
@@ -38,6 +44,7 @@ export interface PulumiWorkspaceOptions {
   readonly secretsProvider?: string;
 }
 
+/** @experimental */
 export interface PulumiWorkspaceHandle {
   readonly workspace: LocalWorkspace;
   readonly stack: Stack;
@@ -47,6 +54,7 @@ export interface PulumiWorkspaceHandle {
   readonly backend: ResolvedPulumiBackend;
 }
 
+/** @experimental */
 export class PulumiWorkspaceConfigurationError extends Error {
   readonly code = "RELKIT_PULUMI_WORKSPACE_INVALID" as const;
 
@@ -56,7 +64,7 @@ export class PulumiWorkspaceConfigurationError extends Error {
   }
 }
 
-/** Resolves a supported Pulumi backend without creating a second state store. */
+/** Resolves a supported Pulumi backend without creating a second state store. @experimental */
 export function resolvePulumiBackend(
   backend: PulumiBackend = { kind: "cloud" },
   workDir = process.cwd(),
@@ -76,7 +84,7 @@ export function resolvePulumiBackend(
   throw new PulumiWorkspaceConfigurationError("Unsupported Pulumi backend kind.");
 }
 
-/** Creates/selects one explicit Pulumi stack and delegates persistence to Pulumi. */
+/** Creates/selects one explicit Pulumi stack and delegates persistence to Pulumi. @experimental */
 export async function createPulumiWorkspace(
   options: PulumiWorkspaceOptions,
 ): Promise<PulumiWorkspaceHandle> {

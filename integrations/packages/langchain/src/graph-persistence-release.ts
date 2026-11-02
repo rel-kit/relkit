@@ -11,6 +11,7 @@ import { agentPersistenceFailure } from "./persistence-error.js";
  * @param descriptors - Agent and graph descriptors owning resources.
  * @returns An Effect with void or AgentPersistenceFailure.
  * @example Effect.runPromise(releaseAgentPersistenceEffect([agent]));
+ * @experimental
  */
 export const releaseAgentPersistenceEffect = Effect.fn("Agents.persistence.release")(
   function* (descriptors: readonly unknown[]) {
@@ -41,6 +42,7 @@ export const releaseAgentPersistenceEffect = Effect.fn("Agents.persistence.relea
  * @returns A Promise that resolves after every release has been attempted.
  * @throws The first release error in descriptor order.
  * @example await releaseAgentPersistence([agent]);
+ * @experimental
  */
 export function releaseAgentPersistence(descriptors: readonly unknown[]): Promise<void> {
   return Effect.runPromise(

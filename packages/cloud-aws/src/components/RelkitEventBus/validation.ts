@@ -143,6 +143,7 @@ export function normalizeSource(source: string | undefined): string {
   return value;
 }
 
+/** @experimental */
 export function eventPattern(source: string, event: NormalizedEvent): string {
   return canonicalJson({
     "detail-type": [event.id],

@@ -1,6 +1,7 @@
 import type { Effect } from "effect";
 /** Bounded names used for realtime spans and metrics.
  * @example const operation: RealtimeOperation = "channel.define";
+ * @experimental
  */
 export type RealtimeOperation =
   | "channel.define"
@@ -31,6 +32,7 @@ export type RealtimeOperation =
   | "provider.limits";
 /** Substitutable observer for realtime operation tests and application telemetry.
  * @example const observer: RealtimeTelemetryService = { observe: (_name, effect) => effect };
+ * @experimental
  */
 export interface RealtimeTelemetryService {
   /** Surrounds an operation without changing its result.

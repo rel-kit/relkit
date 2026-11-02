@@ -14,6 +14,7 @@ export type * from "./graph-edges.types.js";
  * @param nodeIds - Registered node identities.
  * @returns An Effect with a builder and its ordered operation log.
  * @example Effect.runSync(createGraphEdgeBuilderEffect(ids));
+ * @experimental
  */
 export const createGraphEdgeBuilderEffect = Effect.fn("Agents.graph.edgeBuilder")(
   <Id extends string, State>(nodeIds: ReadonlySet<Id>) =>
@@ -48,6 +49,7 @@ export const createGraphEdgeBuilderEffect = Effect.fn("Agents.graph.edgeBuilder"
  * @param nodeIds - Registered node identities.
  * @returns A builder and its ordered operation log.
  * @example const { builder, operations } = createGraphEdgeBuilder(ids);
+ * @experimental
  */
 export function createGraphEdgeBuilder<Id extends string, State>(
   nodeIds: ReadonlySet<Id>,

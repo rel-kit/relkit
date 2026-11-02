@@ -7,6 +7,7 @@ import { observeRealtime } from "./realtime-observability.js";
  * @param options - Dispatcher options with optional limit overrides.
  * @returns An Effect of the merged limits without a typed failure.
  * @example Effect.runSync(limitsForEffect(options));
+ * @experimental
  */
 export const limitsForEffect = Effect.fn("Realtime.providerLimits")(
   function* (options: ProviderRealtimeDispatcherOptions): Generator<never, RealtimeLimits> {

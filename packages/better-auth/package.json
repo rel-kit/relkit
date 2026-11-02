@@ -75,6 +75,7 @@
     "vitest": "catalog:"
   },
   "relkit": {
+    "maturity": "core",
     "integration": {
       "id": "better-auth",
       "exports": {

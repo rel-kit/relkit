@@ -4,6 +4,7 @@ import type { JobEnqueueOptions, JobOperationContext, JobProvider } from "@relki
 import { type AwsCredentials, text } from "./config.js";
 import { assertResponse, awsRequest } from "./http.js";
 
+/** @experimental */
 export interface AwsJobOptions {
   readonly region: string;
   readonly queueUrl?: unknown;
@@ -12,10 +13,12 @@ export interface AwsJobOptions {
   readonly fetch?: typeof globalThis.fetch | undefined;
 }
 
+/** @experimental */
 export interface AwsJobProvider extends JobProvider {
   readonly createQueue: (context: JobQueueFactoryContext) => JobQueueHandle;
 }
 
+/** @experimental */
 export function createSqsJobProvider(options: AwsJobOptions): AwsJobProvider {
   const queueUrl = text(options.queueUrl, "AWS job queueUrl");
   const endpoint =

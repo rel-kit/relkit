@@ -19,7 +19,7 @@ import type {
 export * from "./types.js";
 export { eventPattern } from "./validation.js";
 
-/** Maps versioned RelKit events to independent durable EventBridge/SQS triggers. */
+/** Maps versioned RelKit events to independent durable EventBridge/SQS triggers. @experimental */
 export class RelkitEventBus extends pulumi.ComponentResource {
   readonly eventBus: aws.cloudwatch.EventBus;
   readonly bus: aws.cloudwatch.EventBus;

@@ -1973,7 +1973,7 @@ declare const defineCache: <
 ) => CacheDescriptor<Id, InferInput<KeySchema>, InferOutput<ValueSchema>, KeySchema, ValueSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L100)
 
 Since v0.1.0
 
@@ -1985,7 +1985,7 @@ Since v0.1.0
 declare const CacheDescriptor: CacheDescriptor<Id, Key, Value, KeySchema, ValueSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L19)
 
 ### CacheDescriptorAny
 
@@ -1995,7 +1995,7 @@ declare const CacheDescriptor: CacheDescriptor<Id, Key, Value, KeySchema, ValueS
 declare const CacheDescriptorAny: CacheDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L20)
 
 ### CacheDescriptorError
 
@@ -2005,7 +2005,7 @@ declare const CacheDescriptorAny: CacheDescriptorAny;
 declare const CacheDescriptorError: typeof CacheDescriptorError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L23)
 
 ### DefineCacheOptions
 
@@ -2015,7 +2015,7 @@ declare const CacheDescriptorError: typeof CacheDescriptorError;
 declare const DefineCacheOptions: DefineCacheOptions<Id, KeySchema, ValueSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L21)
 
 ### assertCacheDescriptor
 
@@ -2037,7 +2037,7 @@ assertCacheDescriptor(value);
 declare const assertCacheDescriptor: (value: unknown) => asserts value is CacheDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L142)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L148)
 
 ### assertCacheDescriptorEffect
 
@@ -2057,7 +2057,7 @@ declare const assertCacheDescriptorEffect: (
 ) => Effect.Effect<undefined, CacheDescriptorError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L127)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L133)
 
 ### defineCacheEffect
 
@@ -2085,7 +2085,7 @@ declare const defineCacheEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L29)
 
 ### isCacheDescriptor
 
@@ -2103,7 +2103,7 @@ if (isCacheDescriptor(value)) console.log(value.id);
 declare const isCacheDescriptor: (value: unknown) => value is CacheDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L119)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L125)
 
 ### isCacheDescriptorEffect
 
@@ -2121,7 +2121,7 @@ Effect.runSync(isCacheDescriptorEffect(value));
 declare const isCacheDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L114)
 
 ## `define-cache.types.ts`
 

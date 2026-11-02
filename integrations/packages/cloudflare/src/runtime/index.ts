@@ -5,6 +5,7 @@ import { createCloudflareR2BucketProvider } from "./r2.js";
 export * from "./kv.js";
 export * from "./r2.js";
 
+/** @experimental */
 export const runtimeIntegration = Object.freeze({
   kind: "runtime-integration",
   integrationId: "cloudflare",

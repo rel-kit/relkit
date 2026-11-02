@@ -15,16 +15,16 @@ import type { JsonValue } from "@relkit/contracts";
 import type { InferInput, InferOutput } from "@relkit/schema";
 import type { TestFailureControls } from "@relkit/testing/internal/fakes";
 
-/** Native agent descriptor vocabulary retained by public test inference. */
+/** Native agent descriptor vocabulary retained by public test inference. @experimental */
 export type TestAgentDescriptor = AgentDescriptor<string, unknown, unknown>;
 
-/** Fixed or pending native approval policy vocabulary. */
+/** Fixed or pending native approval policy vocabulary. @experimental */
 export type TestAgentApprovalMode = "approved" | "denied" | "pending";
 
-/** Fixed, pending or caller-native approval decision authority. */
+/** Fixed, pending or caller-native approval decision authority. @experimental */
 export type TestAgentApproval = TestAgentApprovalMode | AgentApprovalHandler;
 
-/** Scripted native model outcome supporting final values, tool calls and failures. */
+/** Scripted native model outcome supporting final values, tool calls and failures. @experimental */
 export type TestModelTurn =
   | {
       readonly type: "tool-call";
@@ -36,7 +36,7 @@ export type TestModelTurn =
   | { readonly type: "error"; readonly code: string; readonly message: string }
   | { readonly type: "cancelled"; readonly reason?: string };
 
-/** Network-free model identity, hanging behavior and explicit logging policy. */
+/** Network-free model identity, hanging behavior and explicit logging policy. @experimental */
 export interface TestAgentModelOptions {
   readonly logger?: NonNullable<
     Parameters<typeof import("@relkit/testing/internal/testing-owner").testingLoggerLayer>[0]
@@ -46,7 +46,7 @@ export interface TestAgentModelOptions {
   readonly hang?: boolean;
 }
 
-/** Detached native request and scripted turn evidence captured in order. */
+/** Detached native request and scripted turn evidence captured in order. @experimental */
 export interface TestAgentModelCall {
   readonly index: number;
   readonly request: {
@@ -56,7 +56,7 @@ export interface TestAgentModelCall {
   readonly turn: TestModelTurn;
 }
 
-/** Public model facade owning script mutation, capture and release. */
+/** Public model facade owning script mutation, capture and release. @experimental */
 export interface TestAgentModel {
   readonly provider: string;
   readonly modelId: string;
@@ -69,6 +69,7 @@ export interface TestAgentModel {
 /**
  * Native agent, tool engine, model script and capture dependencies.
  * @typeParam Agent - Native descriptor determining input/output schema inference.
+ * @experimental
  */
 export interface TestAgentOptions<Agent extends TestAgentDescriptor = TestAgentDescriptor> {
   readonly logger?: NonNullable<
@@ -87,33 +88,33 @@ export interface TestAgentOptions<Agent extends TestAgentDescriptor = TestAgentD
   readonly capture?: AgentCapturePolicy;
 }
 
-/** Invocation-only native overrides excluding owned model and engine dependencies. */
+/** Invocation-only native overrides excluding owned model and engine dependencies. @experimental */
 export type TestAgentInvocationOptions = Omit<
   AgentInvocationOptions,
   "input" | "approval" | "hooks"
 >;
 
-/** Detached observed span and edge evidence for a test invocation. */
+/** Detached observed span and edge evidence for a test invocation. @experimental */
 export interface TestAgentTraceSnapshot {
   readonly spans: readonly ReturnType<typeof spanSnapshot>[];
   readonly edges: readonly AgentObservedEdge[];
 }
 
-/** Owned trace evidence with explicit read, clear and assertion operations. */
+/** Owned trace evidence with explicit read, clear and assertion operations. @experimental */
 export interface TestAgentTrace extends TestAgentTraceSnapshot {
   readonly read: () => TestAgentTraceSnapshot;
   readonly clear: () => void;
   readonly assert: (expected: TestAgentTraceExpectation) => void;
 }
 
-/** Selected span, outcome and tool-edge evidence checked by trace assertions. */
+/** Selected span, outcome and tool-edge evidence checked by trace assertions. @experimental */
 export interface TestAgentTraceExpectation {
   readonly spanKinds?: readonly ReturnType<typeof spanSnapshot>["kind"][];
   readonly names?: readonly string[];
   readonly edges?: readonly AgentObservedEdge[];
 }
 
-/** Synchronous selection controls over owned pending native decisions. */
+/** Synchronous selection controls over owned pending native decisions. @experimental */
 export interface TestAgentApprovals {
   readonly pending: () => readonly PendingApproval[];
   readonly approve: (toolCallId?: string) => void;
@@ -123,6 +124,7 @@ export interface TestAgentApprovals {
 /**
  * Owned native agent facade preserving schema inference, approvals and trace evidence.
  * @typeParam Agent - Native descriptor determining input/output schema inference.
+ * @experimental
  */
 export interface TestAgent<Agent extends TestAgentDescriptor = TestAgentDescriptor> {
   readonly model: TestAgentModel;

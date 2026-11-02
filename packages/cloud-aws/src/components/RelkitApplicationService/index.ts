@@ -14,7 +14,7 @@ import { containerDefinitions } from "./container.js";
 import { createFoundation } from "./foundation.js";
 
 export type { RelkitApplicationServiceArgs } from "./types.js";
-/** ECS/Fargate application behind an internet-facing ALB with safe deployment defaults. */
+/** ECS/Fargate application behind an internet-facing ALB with safe deployment defaults. @experimental */
 export class RelkitApplicationService extends pulumi.ComponentResource {
   readonly cluster: aws.ecs.Cluster;
   readonly loadBalancer: aws.lb.LoadBalancer;

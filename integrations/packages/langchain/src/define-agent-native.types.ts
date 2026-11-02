@@ -11,24 +11,24 @@ export interface AgentLanguageModel {
   readonly invoke: (...args: never[]) => unknown;
 }
 
-/** Environment-bound factory for a native model. */
+/** Environment-bound factory for a native model. @experimental */
 export type AgentModelFactory<Environment = Readonly<Record<string, unknown>>> = (
   environment: Environment,
 ) => MaybePromise<AgentLanguageModel>;
 
-/** Model selector, native model, or model factory. */
+/** Model selector, native model, or model factory. @experimental */
 export type AgentModel = string | AgentLanguageModel | AgentModelFactory;
 
-/** LangChain client or server tool. */
+/** LangChain client or server tool. @experimental */
 export type NativeAgentTool = ClientTool | ServerTool;
 
-/** RelKit reference or native LangChain tool. */
+/** RelKit reference or native LangChain tool. @experimental */
 export type AgentTool = ToolRefAny | NativeAgentTool;
 
-/** SDK fields RelKit inspects; each descriptor retains its complete inferred middleware tuple, including native hooks, tools and phantom schema data. Runtime validation checks the SDK brand. */
+/** SDK fields RelKit inspects; each descriptor retains its complete inferred middleware tuple, including native hooks, tools and phantom schema data. Runtime validation checks the SDK brand. @experimental */
 export type AgentMiddleware = Pick<NativeAgentMiddleware, "name" | "stateSchema">;
 
-/** Public state composed from middleware state schemas. */
+/** Public state composed from middleware state schemas. @experimental */
 export type AgentMiddlewareState<Middleware extends readonly AgentMiddleware[]> =
   Middleware extends readonly [infer First, ...infer Rest]
     ? First extends AgentMiddleware
@@ -60,7 +60,7 @@ type MiddlewareStateKey<Middleware> = Middleware extends AgentMiddleware
       : Extract<keyof MiddlewareState<Middleware>, string>
   : never;
 
-/** Public state keys selected from each middleware schema without erasing tuples. */
+/** Public state keys selected from each middleware schema without erasing tuples. @experimental */
 export type AgentClientStateKey<Middleware extends readonly AgentMiddleware[]> = MiddlewareStateKey<
   Middleware[number]
 >;

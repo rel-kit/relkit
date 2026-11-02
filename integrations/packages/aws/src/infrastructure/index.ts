@@ -4,6 +4,7 @@ import {
 } from "@relkit/deploy";
 import { materializeAwsInfrastructure } from "./materialize.js";
 
+/** @experimental */
 export const awsInfrastructure = Object.freeze({
   kind: "deployment-integration",
   protocolVersion: DEPLOYMENT_INTEGRATION_PROTOCOL_VERSION,
@@ -12,4 +13,5 @@ export const awsInfrastructure = Object.freeze({
   materialize: materializeAwsInfrastructure,
 }) satisfies DeploymentInfrastructureIntegration;
 
+/** @experimental */
 export const deploymentIntegration = awsInfrastructure;

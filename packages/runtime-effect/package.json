@@ -51,5 +51,8 @@
     "check": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false",
     "test:typecheck": "tsc -p tsconfig.tests.json --pretty false"
+  },
+  "relkit": {
+    "maturity": "core"
   }
 }

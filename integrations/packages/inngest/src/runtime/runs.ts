@@ -4,8 +4,10 @@ import type { RunHandle, RunSnapshot } from "@relkit/contracts/jobs";
 import { date, hashSigningKey, number, record, rows, text } from "./runs-support.js";
 import { url } from "./support.js";
 
+/** @experimental */
 export const MAX_LOCAL_INDEX_ENTRIES = 1_000;
 
+/** @experimental */
 export interface InngestRunMetadata extends RunHandle {
   readonly eventId: string;
   readonly input?: JsonValue;
@@ -25,6 +27,7 @@ export interface InngestRunMetadata extends RunHandle {
   readonly serviceGeneration?: string;
 }
 
+/** @experimental */
 export class InngestApiRequestError extends Error {
   constructor(
     readonly status: number,
@@ -35,6 +38,7 @@ export class InngestApiRequestError extends Error {
   }
 }
 
+/** @experimental */
 export interface InngestRunApi {
   readonly eventRuns: (
     eventId: string,
@@ -49,6 +53,7 @@ export interface InngestRunApi {
   readonly retry: (runId: string, signal?: AbortSignal) => Promise<Record<string, unknown>>;
 }
 
+/** @experimental */
 export function createInngestRunApi(options: {
   readonly baseUrl: string;
   readonly signingKey?: string;
@@ -111,6 +116,7 @@ export function createInngestRunApi(options: {
   });
 }
 
+/** @experimental */
 export function snapshot(
   value: Record<string, unknown>,
   metadata: InngestRunMetadata,
@@ -161,6 +167,7 @@ export function snapshot(
   ) as RunSnapshot;
 }
 
+/** @experimental */
 export function statusOf(value: unknown): RunSnapshot["status"] {
   const status = typeof value === "string" ? value.toLowerCase().replaceAll(" ", "-") : "unknown";
   if (status.includes("complete")) return "completed";
@@ -175,10 +182,12 @@ export function statusOf(value: unknown): RunSnapshot["status"] {
   return "unknown";
 }
 
+/** @experimental */
 export function isAmbiguousInngestWrite(error: unknown): boolean {
   return !(error instanceof InngestApiRequestError && error.status >= 400 && error.status < 500);
 }
 
+/** @experimental */
 export function rememberInngestRecord(
   records: Map<string, InngestRunMetadata>,
   key: string,

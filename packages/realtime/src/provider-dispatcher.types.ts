@@ -4,6 +4,7 @@ import type { RealtimeProviderError } from "./realtime-errors.js";
 
 /** Configuration for a provider-backed generation dispatcher.
  * @example const options: ProviderRealtimeDispatcherOptions = { applicationId: "app", environment: "dev", generationId: "g1", publicFingerprint: "p1", provider: async () => provider };
+ * @experimental
  */
 export interface ProviderRealtimeDispatcherOptions {
   readonly applicationId: string;
@@ -25,6 +26,7 @@ export interface ProviderRealtimeDispatcherOptions {
 
 /** Injectable provider resolver used by Effect-native dispatcher operations.
  * @example const source: RealtimeProviderSourceService = { resolve: () => Effect.succeed(provider) };
+ * @experimental
  */
 export interface RealtimeProviderSourceService {
   /** Resolves the provider configured for one profile.

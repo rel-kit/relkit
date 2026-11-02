@@ -1,6 +1,7 @@
 import type { CacheOperationContext, CacheOperationOptions, CacheProvider } from "@relkit/cache";
 import { canonicalJson } from "@relkit/contracts";
 
+/** @experimental */
 export interface CloudflareKvCacheOptions {
   readonly accountId: string;
   readonly namespaceId: string;
@@ -9,11 +10,13 @@ export interface CloudflareKvCacheOptions {
   readonly fetch?: typeof globalThis.fetch;
 }
 
+/** @experimental */
 export interface CloudflareKvCacheProvider extends CacheProvider {
   readonly ready: () => Promise<void>;
   readonly close: () => Promise<void>;
 }
 
+/** @experimental */
 export function createCloudflareKvCacheProvider(
   options: CloudflareKvCacheOptions,
 ): CloudflareKvCacheProvider {

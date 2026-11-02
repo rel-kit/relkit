@@ -63,6 +63,7 @@ export const validateGraphResumeInputEffect = Effect.fn("Agents.graph.validateRe
  * @returns Validated reply values.
  * @throws The original continuation validation error.
  * @example await validateGraphResumeInput(graph, requests, reply);
+ * @experimental
  */
 export function validateGraphResumeInput(
   descriptor: GraphDescriptor,

@@ -8,6 +8,7 @@ import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
 import type { CountPresence, MemberPresence, TriggerReceipt } from "./types.js";
 /** Authorizes channel parameters against an application context.
  * @example const allow: ChannelGuard = async () => true;
+ * @experimental
  */
 export type ChannelGuard<Params = unknown, Context = unknown> = (
   params: Params,
@@ -15,12 +16,14 @@ export type ChannelGuard<Params = unknown, Context = unknown> = (
 ) => MaybePromise<boolean>;
 /** Public access or an authorization guard, exclusively.
  * @example const policy: ChannelClientPolicy<ChannelGuard> = { public: true };
+ * @experimental
  */
 export type ChannelClientPolicy<Guard> =
   | { readonly public: true; readonly authorize?: never }
   | { readonly authorize: Guard; readonly public?: never };
 /** Describes validated member presence for a protected channel.
  * @example const presence: MemberPresenceDescriptor<typeof schema> = { member: schema, resolve: async () => ({ name: "Ada" }), maxMembers: 10 };
+ * @experimental
  */
 export interface MemberPresenceDescriptor<
   MemberSchema extends StandardSchemaV1 = StandardSchemaV1,
@@ -33,11 +36,13 @@ export interface MemberPresenceDescriptor<
 }
 /** Count-only or protected member presence.
  * @example const presence: ChannelPresence = "count";
+ * @experimental
  */
 export type ChannelPresence<Params = unknown, Context = unknown> =
   "count" | MemberPresenceDescriptor<StandardSchemaV1, Params, Context>;
 /** Retention settings copied into a channel descriptor.
  * @example const replay: ChannelReplay = { retentionMs: 60000, maxEvents: 100 };
+ * @experimental
  */
 export interface ChannelReplay {
   readonly retentionMs: number;
@@ -45,6 +50,7 @@ export interface ChannelReplay {
 }
 /** A typed channel descriptor with backend publication methods.
  * @example const channel: ChannelDescriptorAny = defineChannel(options);
+ * @experimental
  */
 export type ChannelDescriptor<
   Id extends string,
@@ -93,6 +99,7 @@ type PresenceResult<Presence> = Presence extends "count"
     : never;
 /** Erased descriptor type retained for existing public API consumers.
  * @example const channel: ChannelDescriptorAny = registry.get("news");
+ * @experimental
  */
 export type ChannelDescriptorAny = ChannelDescriptor<
   string,
@@ -104,6 +111,7 @@ export type ChannelDescriptorAny = ChannelDescriptor<
 /** Descriptor data read by provider and transport boundaries.
  * Typed trigger methods remain on ChannelDescriptor; providers read only this data.
  * @example const data: ChannelDescriptorData = defineChannel(options);
+ * @experimental
  */
 export type ChannelDescriptorData = DescriptorBase<"channel", string> & {
   readonly params: StandardSchemaV1;
@@ -115,6 +123,7 @@ export type ChannelDescriptorData = DescriptorBase<"channel", string> & {
 };
 /** Authored channel options before validation and normalization.
  * @example const options: DefineChannelOptions<"news", typeof schema, { posted: typeof schema }, undefined, undefined> = { id: "news", params: schema, events: { posted: schema } };
+ * @experimental
  */
 export interface DefineChannelOptions<
   Id extends string,

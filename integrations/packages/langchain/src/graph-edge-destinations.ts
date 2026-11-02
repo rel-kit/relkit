@@ -12,6 +12,7 @@ import { graphDefinitionFailure } from "./define-graph-error.js";
  * @param nodeIds - Registered node identities.
  * @returns An Effect with void or GraphDefinitionFailure.
  * @example Effect.runSync(assertGraphDestinationEffect("next", ids));
+ * @experimental
  */
 export const assertGraphDestinationEffect = Effect.fn("Agents.graph.destination")(
   <Id extends string>(value: unknown, nodeIds: ReadonlySet<Id>) =>
@@ -28,6 +29,7 @@ export const assertGraphDestinationEffect = Effect.fn("Agents.graph.destination"
  * @returns Nothing when all destinations are known.
  * @throws The original invalid destination error.
  * @example assertGraphDestination("next", ids);
+ * @experimental
  */
 export function assertGraphDestination<Id extends string>(
   value: unknown,
@@ -57,6 +59,7 @@ function assertGraphDestinationCore<Id extends string>(
  * @param destinations - Optional label mapping.
  * @returns An Effect with void or GraphDefinitionFailure.
  * @example Effect.runSync(validateGraphRouteEffect("yes", ids, { yes: "next" }));
+ * @experimental
  */
 export const validateGraphRouteEffect = Effect.fn("Agents.graph.validateRoute")(
   <Id extends string>(
@@ -78,6 +81,7 @@ export const validateGraphRouteEffect = Effect.fn("Agents.graph.validateRoute")(
  * @returns Nothing when all route targets are valid.
  * @throws The original invalid route error.
  * @example validateGraphRoute("yes", ids, { yes: "next" });
+ * @experimental
  */
 export function validateGraphRoute<Id extends string>(
   value: unknown,

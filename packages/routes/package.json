@@ -48,5 +48,8 @@
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run --config vitest.config.ts",
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
+  },
+  "relkit": {
+    "maturity": "core"
   }
 }

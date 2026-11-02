@@ -15,11 +15,13 @@ import { deploymentConfiguration } from "@relkit/deploy";
 import { assertDeploymentPlanVersion } from "@relkit/deploy";
 import { nativeWorkerOperations } from "./worker-materialization.js";
 
+/** @experimental */
 export interface MaterializeDeploymentOptions {
   readonly stackName: string;
   readonly integrations: readonly unknown[];
 }
 
+/** @experimental */
 export function materializeDeploymentOperations(
   plan: DeploymentPlan,
   options: MaterializeDeploymentOptions,

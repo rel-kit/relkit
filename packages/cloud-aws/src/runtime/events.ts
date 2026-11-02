@@ -13,6 +13,7 @@ import type { EventNode } from "@relkit/graph";
 import { assertResponse, awsRequest } from "./http.js";
 import { type AwsCredentials, text } from "./config.js";
 
+/** @experimental */
 export interface AwsEventOptions {
   readonly region: string;
   readonly busName?: unknown;
@@ -22,6 +23,7 @@ export interface AwsEventOptions {
   readonly fetch?: typeof globalThis.fetch | undefined;
 }
 
+/** @experimental */
 export interface AwsEventProvider extends EventProvider, EventRuntimeProvider {
   readonly deliver: (
     triggerId: string,
@@ -30,6 +32,7 @@ export interface AwsEventProvider extends EventProvider, EventRuntimeProvider {
   ) => Promise<unknown>;
 }
 
+/** @experimental */
 export function createEventBridgeProvider(options: AwsEventOptions): AwsEventProvider {
   const busName = text(options.busName, "AWS event busName");
   const source = text(options.source, "AWS event source") ?? "relkit.application";

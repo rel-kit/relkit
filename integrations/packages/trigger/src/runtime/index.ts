@@ -27,6 +27,7 @@ export * from "./native.js";
 export * from "./subscription.js";
 export * from "./task-binding.js";
 
+/** @experimental */
 export interface TriggerRuntimeOptions {
   readonly projectRef: string;
   readonly secretKey?: string;
@@ -40,6 +41,7 @@ export interface TriggerRuntimeOptions {
   readonly serviceOptions?: JobsServiceOptions;
 }
 
+/** @experimental */
 export interface TriggerWorkerRegistrationOptions {
   readonly definitions: readonly TriggerTaskDefinition[];
   readonly executor: import("@relkit/jobs/adapter").TaskExecutor;
@@ -47,10 +49,12 @@ export interface TriggerWorkerRegistrationOptions {
   readonly register?: (tasks: readonly unknown[]) => Promise<void> | void;
 }
 
+/** @experimental */
 export interface TriggerRuntime extends JobsAdapterRuntime {
   readonly registerWorker: (options: TriggerWorkerRegistrationOptions) => TriggerWorkerHandle;
 }
 
+/** @experimental */
 export function createTriggerRuntime(options: TriggerRuntimeOptions): TriggerRuntime {
   assertSupportedJobsServiceOptions(options.serviceOptions ?? {}, ["observation"]);
   text(options.projectRef, "Trigger projectRef");
@@ -169,6 +173,7 @@ export function createTriggerRuntime(options: TriggerRuntimeOptions): TriggerRun
   return Object.freeze(adapter);
 }
 
+/** @experimental */
 export const runtimeIntegration: RuntimeProviderIntegration<"trigger"> = Object.freeze({
   kind: "runtime-integration",
   integrationId: "trigger",

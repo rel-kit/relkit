@@ -41,6 +41,7 @@
     }
   },
   "relkit": {
+    "maturity": "labs",
     "integration": {
       "id": "trigger",
       "exports": {
