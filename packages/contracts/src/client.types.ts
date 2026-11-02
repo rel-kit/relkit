@@ -3,7 +3,7 @@ import type { JobUnknownOutcome } from "./jobs-access.js";
 
 declare const operationIdBrand: unique symbol;
 
-/** A UUIDv7 validated by Relkit for bounded idempotency. */
+/** A UUIDv7 validated by RelKit for bounded idempotency. */
 export type OperationId = string & { readonly [operationIdBrand]: "OperationId" };
 
 /** Identity scope and epoch expected by a client request. */

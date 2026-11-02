@@ -1,4 +1,4 @@
-/** Detects known live RELKIT development commands by their native cwd before publication. */
+/** Detects known live RelKit development commands by their native cwd before publication. */
 import { Effect } from "effect";
 import { realpath } from "node:fs/promises";
 import { cliPromise } from "../cli-errors.js";
@@ -8,7 +8,7 @@ import { fail } from "../main-support.js";
 /**
  * Refuses a known live dev process while leaving unrelated editors and processes alone.
  * @param root - Canonical authored root.
- * @returns Completion when no identified RELKIT dev command owns this root.
+ * @returns Completion when no identified RelKit dev command owns this root.
  * @remarks Unknown external watchers still require the plan's explicit stop-development advice.
  */
 export const assertNoActiveLayoutDev = Effect.fn("Migration.guard.dev")(function* (root: string) {

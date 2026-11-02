@@ -50,7 +50,7 @@ it("rejects legacy keys with direct migration guidance", () => {
     CONFIG_CODES.legacy,
   ]);
   expect(issues.map(({ message }) => message).join("\n")).toContain(
-    'RELKIT discovers descriptors from "src/**/*.ts"',
+    'RelKit discovers descriptors from "src/**/*.ts"',
   );
   expect(() => loadConfig({ server: { port: 0 } }, "/workspace/app")).toThrow(
     ConfigValidationError,

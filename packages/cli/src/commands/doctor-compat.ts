@@ -21,7 +21,7 @@ export {
  * Compares installed versions with strictly resolved project catalogs.
  * @param manifest - Optional authored package metadata.
  * @param root - Project catalog and dependency resolution root.
- * @returns Ordered Bun, TypeScript and RELKIT compatibility results.
+ * @returns Ordered Bun, TypeScript and RelKit compatibility results.
  */
 export const versionChecksEffect = Effect.fn("Doctor.versions")(
   function* (manifest: PackageJson | undefined, root: string) {
@@ -90,7 +90,7 @@ export function versionChecks(
   );
 }
 
-/** Checks each installed RELKIT package against its own declaration.
+/** Checks each installed RelKit package against its own declaration.
  * @param dependencies - Strictly resolved version specifications.
  * @param root - Project dependency resolution root.
  * @returns Compatibility and package/version names suitable for public diagnostics.

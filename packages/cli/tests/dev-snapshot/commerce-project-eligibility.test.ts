@@ -57,7 +57,7 @@ it.effect(
           ["langchain.ts", "export function tool() { return process.env.SECRET; }"],
           ["LangChain.ts", "export function tool() { return process.env.SECRET; }"],
           [
-            "RELKIT.CONFIG.TS",
+            "Relkit.CONFIG.TS",
             'import {defineApp} from "@relkit/app/config"; export default defineApp({id:process.env.SECRET});',
           ],
           [

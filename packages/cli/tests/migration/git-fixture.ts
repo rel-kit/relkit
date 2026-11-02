@@ -37,7 +37,7 @@ export const initializeFixtureGit = Effect.fn("test.migration.git.initialize")(f
   ]);
   yield* fixtureGit(root, [
     "-c",
-    "user.name=RELKIT Test",
+    "user.name=RelKit Test",
     "-c",
     "user.email=fixture@relkit.test",
     "commit",

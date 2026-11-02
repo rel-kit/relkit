@@ -24,7 +24,7 @@ const Plan = Schema.Struct({
 });
 
 /**
- * Resolves literal RELKIT imports using existing AST facts without evaluation.
+ * Resolves literal RelKit imports using existing AST facts without evaluation.
  * @param projectRoot - Actual consuming application root.
  * @param sources - Unevaluated source snapshots already owned by the caller.
  * @param configurationPath - Exact selected config remains strict even under excluded source paths.

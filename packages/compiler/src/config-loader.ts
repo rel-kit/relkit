@@ -238,8 +238,8 @@ const parseConfigEffect = Effect.fn("Compiler.parseConfig")(function* (
 function legacyMigration(key: string): string | undefined {
   return (
     {
-      entry: 'Remove "entry"; RELKIT discovers descriptors from "src/**/*.ts".',
-      source: 'Remove "source"; RELKIT always discovers "src/**/*.ts".',
+      entry: 'Remove "entry"; RelKit discovers descriptors from "src/**/*.ts".',
+      source: 'Remove "source"; RelKit always discovers "src/**/*.ts".',
       exclude:
         'Remove "exclude"; tests, fixtures, declarations, and generated content are excluded by convention.',
       generatedDirectory:

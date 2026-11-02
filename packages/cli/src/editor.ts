@@ -13,7 +13,7 @@ const ROUTE_DIAGNOSTIC = 99001;
 export default function initialize(modules: EditorModules): ts.server.PluginModule {
   const typescript = modules.typescript;
   return {
-    /** Adds RELKIT findings and fixes while forwarding all other host methods.
+    /** Adds RelKit findings and fixes while forwarding all other host methods.
      * @param info - Host language service and plugin context.
      * @returns A synchronous proxy backed by the existing language service.
      */
@@ -34,7 +34,7 @@ export default function initialize(modules: EditorModules): ts.server.PluginModu
       }
       /** Reads current host snapshots and appends route findings.
        * @param file - Source file requested by the editor.
-       * @returns Host diagnostics followed by RELKIT diagnostics, or just host results
+       * @returns Host diagnostics followed by RelKit diagnostics, or just host results
        * when the file or current program is unavailable.
        */
       proxy.getSemanticDiagnostics = (file) => {
@@ -58,14 +58,14 @@ export default function initialize(modules: EditorModules): ts.server.PluginModu
           })),
         ];
       };
-      /** Adds the destructuring fix only for an overlapping RELKIT finding.
+      /** Adds the destructuring fix only for an overlapping RelKit finding.
        * @param file - Requested source file.
        * @param start - Start of the editor selection.
        * @param end - End of the editor selection.
        * @param codes - Diagnostic codes selected for fixing.
        * @param format - Host formatting options passed through unchanged.
        * @param preferences - Host code-fix preferences passed through unchanged.
-       * @returns Existing host fixes followed by applicable RELKIT fixes.
+       * @returns Existing host fixes followed by applicable RelKit fixes.
        */
       proxy.getCodeFixesAtPosition = (file, start, end, codes, format, preferences) => {
         const fixes = service.getCodeFixesAtPosition(file, start, end, codes, format, preferences);

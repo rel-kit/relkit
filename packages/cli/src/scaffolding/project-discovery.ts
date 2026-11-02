@@ -40,7 +40,7 @@ export const projectDiscoveryLive = Layer.effect(
                 domainError(
                   new AddScaffoldError(
                     ADD_FAILURE_CODES.invalidProject,
-                    `${root} is not a RELKIT project (package.json and relkit.config.ts are required).`,
+                    `${root} is not a RelKit project (package.json and relkit.config.ts are required).`,
                   ),
                 ),
               ),
@@ -63,7 +63,7 @@ export const projectDiscoveryLive = Layer.effect(
 );
 
 /**
- * Discovers canonical RELKIT source facts using caller-provided filesystem authority.
+ * Discovers canonical RelKit source facts using caller-provided filesystem authority.
  * @param projectRoot - Project directory.
  * @returns Lazy declaration-only discovery with its service visible in the type.
  * @example

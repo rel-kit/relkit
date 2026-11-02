@@ -36,7 +36,7 @@ export function lastSegment(expression: ts.Expression): string | undefined {
   return undefined;
 }
 
-/** Resolves named RELKIT import aliases before classifying a factory call. */
+/** Resolves named RelKit import aliases before classifying a factory call. */
 export function factoryName(expression: ts.Expression): string | undefined {
   const name = lastSegment(expression);
   if (!ts.isIdentifier(expression)) return name;

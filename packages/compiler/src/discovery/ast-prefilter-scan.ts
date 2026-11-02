@@ -123,7 +123,7 @@ export const scanSourceNode = Effect.fn("Discovery.scanSourceNode")(function* (
 });
 
 /**
- * Registers an authored RELKIT dependency in this module's syntax evidence.
+ * Registers an authored RelKit dependency in this module's syntax evidence.
  * @param state - Current invocation-local scan state.
  * @param specifier - Literal dependency name.
  * @returns No value.
