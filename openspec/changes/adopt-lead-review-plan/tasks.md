@@ -11,7 +11,7 @@ appear in group titles.
 - [x] 1.3 Add `--strict` to `create-relkit` and `relkit create` so untested combinations are refused before any file is written, and verify with a test that the destination stays empty after a strict refusal
 - [x] 1.4 Offer the `minimal`, `api`, `agent`, `fullstack` and `tasks` templates in interactive and flag-based creation, marking untested combinations, and verify by creating each template in the packed-consumer test
 - [x] 1.5 Make `--help`, the README and the templates README list the same five templates, and verify with a docs test that compares the three lists
-- [ ] 1.6 Make CI release readiness measure every template on each Tier 1 runtime and write the capability table as a CI output, and verify the release-readiness workflow uploads the table
+- [x] 1.6 Make CI release readiness measure every template on each Tier 1 runtime and write the capability table as a CI output, and verify the release-readiness workflow uploads the table
 - [ ] 1.7 Add a nightly workflow that creates every template on the latest Bun, runs its dev and test commands, and opens or updates an issue on failure, and verify it with one manual run
 - [x] 1.8 Document the untested warning and `--strict` in the create guide and on the `RELKIT_CREATE_UNTESTED` page, and verify the docs build passes
 
