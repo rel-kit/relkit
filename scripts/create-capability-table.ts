@@ -7,7 +7,8 @@
  *   bun scripts/create-capability-table.ts merge --input <dir> --output <table.json>
  */
 import { appendFile, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { tmpdir } from "node:os";
+import { join, resolve, sep } from "node:path";
 import {
   CREATE_TEMPLATES,
   type CreateCapabilityEvidence,
@@ -151,6 +152,19 @@ async function readResults(input: string): Promise<TemplateResult[]> {
   return results;
 }
 
+/**
+ * Resolves a directory or file option inside the repository or the temporary directory.
+ * @param name - Literal option flag.
+ * @returns The absolute path.
+ */
+function ownedPath(name: string): string {
+  const path = resolve(option(name));
+  const roots = [root, resolve(process.env.RUNNER_TEMP ?? tmpdir())];
+  if (!roots.some((owner) => path === owner || path.startsWith(owner + sep)))
+    throw new Error(`${name} must be inside ${roots.join(" or ")}`);
+  return path;
+}
+
 function option(name: string): string {
   const index = process.argv.indexOf(name);
   const value = index < 0 ? undefined : process.argv[index + 1];
@@ -164,13 +178,13 @@ async function main(): Promise<void> {
     const template = option("--template");
     if (!(CREATE_TEMPLATES as readonly string[]).includes(template))
       throw new Error(`--template must be one of: ${CREATE_TEMPLATES.join("|")}`);
-    const result = await measureTemplate(template as CreateTemplate, resolve(option("--output")));
+    const result = await measureTemplate(template as CreateTemplate, ownedPath("--output"));
     console.log(`${template}: ${result.status === "tested" ? "tested" : result.reason}`);
     return;
   }
   if (mode === "merge") {
-    const table = mergeResults(await readResults(resolve(option("--input"))), Bun.version);
-    await writeFile(resolve(option("--output")), JSON.stringify(table, null, 2) + "\n");
+    const table = mergeResults(await readResults(ownedPath("--input")), Bun.version);
+    await writeFile(ownedPath("--output"), JSON.stringify(table, null, 2) + "\n");
     const summary = formatTable(table);
     if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, summary);
     console.log(summary);
