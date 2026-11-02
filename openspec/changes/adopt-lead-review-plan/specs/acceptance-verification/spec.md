@@ -71,9 +71,9 @@ inspection or snapshots alone.
 ### Requirement: Nightly creation canary
 
 A nightly CI job SHALL create every template with the published creator on the latest Bun and Node
-releases, run its dev and test commands, and open or update an issue when any of them fails. The same
-job SHALL run on pull requests that change creation, templates or the job itself, using the creator
-packed from the pull request, and SHALL NOT open issues from those runs.
+releases, run its dev and test commands, and open or update an issue when any of them fails. The canary
+SHALL also run on pull requests that change creation, templates or the canary itself, using the
+creator packed from the pull request, and SHALL NOT open issues from those runs.
 
 #### Scenario: New Bun release breaks creation
 

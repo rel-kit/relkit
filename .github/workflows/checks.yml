@@ -279,6 +279,41 @@ jobs:
     permissions:
       contents: read
 
+  creation-changes:
+    name: Detect creation changes
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: diff
+        name: Check whether creation, templates or the canary changed
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          pattern='^(packages/create-relkit/|packages/cli/|templates/|scripts/creation-canary\.ts$|\.github/workflows/creation-canary)'
+          if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -qE "$pattern"; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  creation-canary:
+    name: Creation canary
+    needs: creation-changes
+    if: needs.creation-changes.outputs.changed == 'true'
+    uses: ./.github/workflows/creation-canary-candidate.yml
+    permissions:
+      contents: read
+
   ci-gate:
     name: CI Gate
     if: always()
@@ -292,6 +327,8 @@ jobs:
         docs-installations,
         dependency-review,
         release-readiness,
+        creation-changes,
+        creation-canary,
       ]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -305,6 +342,8 @@ jobs:
       AUTO_CHANGESET_RESULT: ${{ needs.auto-changeset.result }}
       RELEASE_READINESS_RESULT: ${{ needs.release-readiness.result }}
       DEPENDENCY_UPDATE_RESULT: ${{ needs.dependency-update.result }}
+      CREATION_CHANGES_RESULT: ${{ needs.creation-changes.result }}
+      CREATION_CANARY_RESULT: ${{ needs.creation-canary.result }}
     steps:
       - name: Require fast safety jobs
         run: |
@@ -316,6 +355,8 @@ jobs:
           test "$AUTO_CHANGESET_RESULT" = success || test "$AUTO_CHANGESET_RESULT" = skipped
           test "$RELEASE_READINESS_RESULT" = success
           test "$DEPENDENCY_UPDATE_RESULT" = success -o "$DEPENDENCY_UPDATE_RESULT" = skipped
+          test "$CREATION_CHANGES_RESULT" = success || test "$CREATION_CHANGES_RESULT" = skipped
+          test "$CREATION_CANARY_RESULT" = success || test "$CREATION_CANARY_RESULT" = skipped
 
   dispatch-release:
     name: Dispatch release after manual main CI
