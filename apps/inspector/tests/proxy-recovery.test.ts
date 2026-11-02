@@ -31,7 +31,7 @@ test("unavailable upstream yields safe JSON and later requests recover without r
   expect(unavailable.status).toBe(503);
   expect(unavailable.headers.get("content-type")).toContain("application/json");
   expect(unavailable.headers.get("cache-control")).toBe("no-store");
-  expect(await unavailable.json()).toEqual({ error: "RELKIT inspector backend is unavailable." });
+  expect(await unavailable.json()).toEqual({ error: "RelKit inspector backend is unavailable." });
   let calls = 0;
   backend = Bun.serve({
     hostname: "127.0.0.1",

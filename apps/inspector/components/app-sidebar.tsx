@@ -36,8 +36,8 @@ export function AppSidebar({
       <SidebarHeader className="border-b border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild tooltip="RELKIT Inspector">
-              <Link href="/" aria-label="RELKIT Inspector overview">
+            <SidebarMenuButton size="lg" asChild tooltip="RelKit Inspector">
+              <Link href="/" aria-label="RelKit Inspector overview">
                 <Image
                   className="brand-mark aspect-square size-7 rounded-md object-cover"
                   src="/logo.svg"
@@ -47,7 +47,7 @@ export function AppSidebar({
                   priority
                 />
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="text-[13px] font-semibold">RELKIT</span>
+                  <span className="text-[13px] font-semibold">RelKit</span>
                   <span className="text-[11px] text-muted-foreground">Inspector</span>
                 </div>
               </Link>

@@ -106,7 +106,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
               }
               items={[
                 { id: "api", label: "API Reference", description: "Open active Scalar docs" },
-                { id: "docs", label: "Framework docs", description: "Open RELKIT guides" },
+                { id: "docs", label: "Framework docs", description: "Open RelKit guides" },
               ]}
               onAction={openUtility}
             />

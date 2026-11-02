@@ -14,7 +14,7 @@ type RouteContext = { readonly params: Promise<{ readonly path: readonly string[
 async function proxy(request: Request, context: RouteContext): Promise<Response> {
   const backend = localBackend(process.env.RELKIT_BACKEND_URL);
   if (backend === undefined)
-    return Response.json({ error: "RELKIT inspector backend is not configured." }, { status: 503 });
+    return Response.json({ error: "RelKit inspector backend is not configured." }, { status: 503 });
   const { path } = await context.params;
   const incoming = new URL(request.url);
   const target = new URL(backend);
@@ -47,7 +47,7 @@ async function proxy(request: Request, context: RouteContext): Promise<Response>
       return Response.json({ error: "Request body exceeds one MiB" }, { status: 413 });
     if (request.signal.aborted) return new Response(null, { status: 499 });
     return Response.json(
-      { error: "RELKIT inspector backend is unavailable." },
+      { error: "RelKit inspector backend is unavailable." },
       { status: 503, headers: { "cache-control": "no-store" } },
     );
   }

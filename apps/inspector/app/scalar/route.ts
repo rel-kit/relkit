@@ -35,7 +35,7 @@ function referenceHtml(snapshot: string): string {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>RELKIT API Reference</title>
+    <title>RelKit API Reference</title>
     <link rel="icon" href="/logo.svg" type="image/svg+xml" />
   </head>
   <body>
