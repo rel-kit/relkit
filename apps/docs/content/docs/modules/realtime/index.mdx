@@ -20,7 +20,7 @@ The channel is not your database. Load the current state from an ordinary route,
 
 ## Realtime channels or application events?
 
-RELKIT has two event-shaped features with different jobs:
+RelKit has two event-shaped features with different jobs:
 
 | Use                                            | Choose                                       | Why                                                     |
 | ---------------------------------------------- | -------------------------------------------- | ------------------------------------------------------- |
@@ -101,11 +101,11 @@ Call `trigger()` from backend code after the application change succeeds:
   /_snippets/source/examples/commerce/src/services/announcements/functions/post-announcement.function.ts
 </include>
 
-RELKIT validates the partition parameters and payload before appending the event. The returned receipt contains the event ID, checkpoint, provider profile and epoch, and whether an idempotent request was a duplicate.
+RelKit validates the partition parameters and payload before appending the event. The returned confirmation contains the event ID, checkpoint, provider profile and epoch, and whether an idempotent request was a duplicate.
 
-`accepted: true` means the provider stored the append and its receipt atomically. It does not mean every subscriber received the event. A subscriber can disconnect immediately after the append and recover according to the channel's replay policy.
+`accepted: true` means the provider stored the append and its confirmation atomically. It does not mean every subscriber received the event. A subscriber can disconnect immediately after the append and recover according to the channel's replay policy.
 
-For a retryable publish, pass an `idempotencyKey` created by RELKIT. Reusing the same UUIDv7 key with the same channel, partition, event, and payload during the 24-hour receipt window returns the original receipt. Reusing it for different content fails. Without a key, retrying after a lost response may append the event twice; RELKIT never retries it automatically.
+For a retryable publish, pass an `idempotencyKey` created by RelKit. Reusing the same UUIDv7 key with the same channel, partition, event, and payload during the 24-hour idempotency window returns the original confirmation. Reusing it for different content fails. Without a key, retrying after a lost response may append the event twice; RelKit never retries it automatically.
 
 If a database update and publication must succeed together, write an outbox entry in the same database transaction and publish from the outbox. Calling `trigger()` after a database write does not make the two operations atomic.
 
@@ -117,7 +117,7 @@ If a database update and publication must succeed together, write an outbox entr
 The snippets above belong to the repository's `examples/commerce` app. From the repository
 root, with dependencies installed, run its focused HTTP test:
 
-```sh title="Terminal — RELKIT repository root"
+```sh title="Terminal — RelKit repository root"
 bun test examples/commerce/tests/http.test.ts
 ```
 

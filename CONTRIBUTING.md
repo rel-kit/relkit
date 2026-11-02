@@ -1,11 +1,16 @@
-# Contributing to RELKIT
+# Contributing to RelKit
 
-Thank you for improving RELKIT. Please open an issue before substantial design
+Thank you for improving RelKit. Please open an issue before substantial design
 work so maintainers can confirm scope and avoid duplicate effort.
+
+## Writing
+
+Every word users read — the README, docs, CLI help, error messages and the changelog — follows the
+[writing standard](WRITING.md). Run `bun scripts/user-text.ts` to check spelling and banned terms.
 
 ## Development
 
-RELKIT is experimental, interfaces may change, and current consumers are the
+RelKit is experimental, interfaces may change, and current consumers are the
 repository samples. Update affected samples directly within a scoped change;
 preserve data and applied migration history. Do not add legacy upgrade commands
 or compatibility layers merely to retain an experimental sample's old layout.
@@ -110,7 +115,7 @@ plus registry lookup time) before failing with the original-artifact recovery co
 
 ### GitHub App setup
 
-1. Register a GitHub App owned by `rel-kit`, for example **RELKIT Release**.
+1. Register a GitHub App owned by `rel-kit`, for example **RelKit Release**.
    Disable webhooks; no webhook endpoint or user permissions are needed.
 2. Give it repository **Contents: read and write** and **Pull requests: read and
    write** permissions. Historical release recovery also requires **Workflows:

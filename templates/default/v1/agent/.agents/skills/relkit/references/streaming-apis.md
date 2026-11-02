@@ -8,7 +8,7 @@ Create a function in `src/services/reports/functions/stream-report.function.ts`:
 
 ```ts
 import { defineFunction, streamOf } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 export default defineFunction({
   id: "reports.stream",

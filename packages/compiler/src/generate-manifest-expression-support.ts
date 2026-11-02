@@ -1,4 +1,4 @@
-import { SourceLocationError } from "@relkit/contracts";
+import { SourceLocationError, canCarryStandardSchema } from "@relkit/contracts";
 import { normalizeSourcePath } from "@relkit/contracts";
 import type { EvaluatorManifestReference } from "./discovery/evaluator-protocol.js";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
@@ -57,7 +57,11 @@ function modulePath(
  * @returns True when source-bound schema metadata requires an executable registry binding.
  */
 export function isExecutableSchema(value: unknown): boolean {
-  if (!isRecord(value) || !isRecord(value.schema) || !isRecord(value.schema["~standard"]))
+  if (
+    !isRecord(value) ||
+    !canCarryStandardSchema(value.schema) ||
+    !isRecord(value.schema["~standard"])
+  )
     return false;
   return typeof value.schema["~standard"].validate === "function";
 }

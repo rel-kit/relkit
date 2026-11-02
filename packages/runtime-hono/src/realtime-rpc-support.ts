@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson, canCarryStandardSchema } from "@relkit/contracts";
 import type { ChannelDescriptorAny, RealtimeScope } from "@relkit/realtime";
 import { validate, type StandardSchemaV1 } from "@relkit/schema";
 import { createHash } from "node:crypto";
@@ -101,5 +101,9 @@ function isChannel(value: unknown): value is ChannelDescriptorAny {
  * @returns Whether the inspected value satisfies the declared type guard.
  */
 function isSchema(value: unknown): value is StandardSchemaV1 {
-  return isRecord(value) && isRecord(value["~standard"]) && value["~standard"].version === 1;
+  return (
+    canCarryStandardSchema(value) &&
+    isRecord(value["~standard"]) &&
+    value["~standard"].version === 1
+  );
 }

@@ -62,7 +62,7 @@ Put domain behavior in `src/services/<domain>/functions/*.function.ts`. A functi
 
 ```ts
 import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 const greet = defineFunction({
   id: "hello.greet",
@@ -95,7 +95,7 @@ Declare an event payload in `src/services/<domain>/events/*.event.ts`:
 
 ```ts
 import { defineEvent } from "@relkit/app/events";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 const orderCreated = defineEvent({
   id: "orders.created",
@@ -134,7 +134,7 @@ export default defineEventFunction({
 
 ```ts
 import { defineError } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 export default defineError({
   id: "orders.not-found",
@@ -149,7 +149,7 @@ Declare only expected failures callers should handle on a function. Return each 
 
 ```ts
 import { defineFunction, fail } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 import AuthenticationRequired from "../errors/authentication-required.error.js";
 
 export default defineFunction({

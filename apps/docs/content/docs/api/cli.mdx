@@ -27,7 +27,7 @@ Convention-first TypeScript application framework
 
 ### `relkit create [name]`
 
-Create a new RELKIT application
+Create a new RelKit application
 
 | Argument | Value    | Description                      |
 | -------- | -------- | -------------------------------- |
@@ -51,7 +51,7 @@ Create a new RELKIT application
 
 #### Examples
 
-`relkit create` — Create a new RELKIT application
+`relkit create` — Create a new RelKit application
 
 ### `relkit add <kind>`
 
@@ -455,11 +455,11 @@ Preview and apply source layout migrations
 
 Move flat services into src/services with guarded rollback
 
-| Option         | Value   | Description                                                   |
-| -------------- | ------- | ------------------------------------------------------------- |
-| --project-root | string  | Application directory (defaults to cwd)                       |
-| --write        | boolean | Validate and apply; stop development first                    |
-| --rollback     | string  | Restore a local migration receipt; conflicts refuse overwrite |
+| Option         | Value   | Description                                                             |
+| -------------- | ------- | ----------------------------------------------------------------------- |
+| --project-root | string  | Application directory (defaults to cwd)                                 |
+| --write        | boolean | Validate and apply; stop development first                              |
+| --rollback     | string  | Restore files from a migration record; refuses to overwrite later edits |
 
 ##### Examples
 
@@ -1143,7 +1143,7 @@ Pull a versioned client contract
 
 | Argument | Value    | Description                    |
 | -------- | -------- | ------------------------------ |
-| baseUrl  | required | Running RELKIT application URL |
+| baseUrl  | required | Running RelKit application URL |
 
 | Option | Value  | Description      |
 | ------ | ------ | ---------------- |
@@ -1159,7 +1159,7 @@ Check a pulled client for contract drift
 
 | Argument | Value    | Description                    |
 | -------- | -------- | ------------------------------ |
-| baseUrl  | required | Running RELKIT application URL |
+| baseUrl  | required | Running RelKit application URL |
 
 | Option | Value  | Description      |
 | ------ | ------ | ---------------- |

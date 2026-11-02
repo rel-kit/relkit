@@ -1,5 +1,5 @@
 import { FunctionInputError } from "./function-input-error.js";
-import { isStableId } from "@relkit/contracts";
+import { isStableId, canCarryStandardSchema } from "@relkit/contracts";
 import { normalizeErrorRetry } from "@relkit/invocation";
 import type { StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
@@ -77,7 +77,7 @@ export function validateErrorHttp(http: ErrorHttpMapping | undefined): void {
 export const assertErrorSchemaEffect = Effect.fn("functions.error.assert-schema")(
   (value: unknown) =>
     functionTry("error.assert-schema", () => {
-      if (!isRecord(value))
+      if (!canCarryStandardSchema(value))
         throw new FunctionInputError("Declared error data must be a Standard Schema v1 validator");
       const standard = value["~standard"];
       if (

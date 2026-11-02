@@ -1,0 +1,56 @@
+---
+title: RELKIT_SCHEMA_UNAVAILABLE
+description: A schema in your app cannot be described as JSON Schema, so RelKit cannot build its API description.
+pagination: false
+search:
+  keywords:
+    [RELKIT_SCHEMA_UNAVAILABLE, JSON Schema, Standard Schema, Zod, Valibot, ArkType, Effect Schema]
+sidebar:
+  icon: triangle-alert
+---
+
+`relkit check` reports this error when a function, event, task, error or agent uses a schema that RelKit cannot turn into JSON Schema. RelKit needs JSON Schema to write the OpenAPI document, the typed client and the tool descriptions agents see.
+
+```txt title="Terminal"
+src/services/orders/functions/create-order.function.ts:6:3 - error RELKIT_SCHEMA_UNAVAILABLE: input cannot produce deterministic JSON Schema: Schema does not expose a deterministic projection.
+  docs: https://relkit.dev/docs/errors/relkit-schema-unavailable
+```
+
+## Supported schema libraries
+
+RelKit accepts any [Standard Schema](https://standardschema.dev) validator. It reads JSON Schema from the first source that works, in this order:
+
+1. RelKit's built-in builder from `@relkit/app/schema`.
+2. The schema's own `~standard.jsonSchema` hook, for the input or output side as needed.
+3. A converter for the schema's library, loaded only when a schema from that library appears.
+
+| Library           | Version | What to install                                                             |
+| ----------------- | ------- | --------------------------------------------------------------------------- |
+| Zod               | 4.2+    | `zod`. Its schemas describe themselves.                                     |
+| ArkType           | 2       | `arktype`. Its schemas describe themselves.                                 |
+| Valibot           | 1       | `valibot` and `@valibot/to-json-schema`, which RelKit loads as a converter. |
+| Effect Schema     | 4       | `effect`. RelKit uses Effect's own JSON Schema converter.                   |
+| Any other library | —       | Works when its schemas implement `~standard.jsonSchema`.                    |
+
+The installed version of each library is part of your build's fingerprint, so upgrading one makes the next `relkit check` describe its schemas again.
+
+## Why it happens
+
+- The schema comes from a library that has no JSON Schema hook and no converter RelKit knows, such as Zod 3 or Yup.
+- The schema is from Valibot, but `@valibot/to-json-schema` is not installed.
+- The schema uses a feature JSON Schema cannot express, such as a custom refinement function, a `Date`, a `bigint`, a `Map` or a transform with no JSON form. The message ends with the library's own explanation.
+
+## What to do
+
+1. Read the end of the message: it names the schema and the reason.
+2. If the library is not in the table, switch that contract to a supported library. Zod 4 is the default in new projects.
+3. For Valibot, install the converter:
+
+   ```sh title="Terminal — project root"
+   bun add @valibot/to-json-schema
+   ```
+
+4. If the schema uses a type JSON Schema cannot express, describe the wire value instead (for example an ISO date string rather than a `Date`) and convert it inside your handler.
+5. Run `bun run check` again.
+
+See [Schemas](/docs/learn/concepts/schemas) for how RelKit uses schemas, and [all error codes](/docs/errors).

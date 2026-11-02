@@ -165,6 +165,8 @@ const validateSchemaEffect = Effect.fn("Compiler.validateSchema")(function* (
   else if (result.schema !== undefined) {
     work.schemas.set(key, result.schema);
     if (result.contractHash !== undefined) work.schemaHashes.set(key, result.contractHash);
+    if (result.library !== undefined)
+      work.schemaLibraries.set(result.library.vendor, result.library.version);
   }
 });
 

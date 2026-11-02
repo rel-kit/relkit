@@ -2,6 +2,7 @@ import type { HttpTriggerRegistration } from "@relkit/graph";
 import type { StandardIssue, StandardSchemaV1 } from "@relkit/schema";
 import type { RequestMappingIssue } from "./request-mapping.js";
 import type { ResponseDeclaration, ResponseSchemaEntries } from "./response-mapping-utils.types.js";
+import { canCarryStandardSchema } from "@relkit/contracts";
 export type { ResponseDeclaration, ResponseSchemaEntries } from "./response-mapping-utils.types.js";
 
 /** Select an explicit response ID or the route's default success declaration.
@@ -144,7 +145,7 @@ function responses(trigger: HttpTriggerRegistration): readonly ResponseDeclarati
  * @returns The descriptor when valid, otherwise undefined.
  */
 function standardSchema(value: unknown): StandardSchemaV1 | undefined {
-  if (!isRecord(value) || !isRecord(value["~standard"])) return undefined;
+  if (!canCarryStandardSchema(value) || !isRecord(value["~standard"])) return undefined;
   return value["~standard"].version === 1 && typeof value["~standard"].validate === "function"
     ? (value as unknown as StandardSchemaV1)
     : undefined;

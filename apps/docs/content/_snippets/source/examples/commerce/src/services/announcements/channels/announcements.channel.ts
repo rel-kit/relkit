@@ -1,6 +1,6 @@
 /** Declares public posted-announcement events with five-minute replay retention and a thousand-event limit. */
 import { defineChannel } from "@relkit/app/realtime";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 const announcements = defineChannel({
   id: "announcements.feed",

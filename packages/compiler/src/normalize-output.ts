@@ -93,6 +93,9 @@ export const makeOutputsEffect = Effect.fn("Compiler.makeOutputs")(
               ...(localServices?.services.length === 0 || localServicesSource === ""
                 ? {}
                 : { localServicesPlanSource: localServicesSource }),
+              ...(work.schemaLibraries.size === 0
+                ? {}
+                : { schemaLibraries: Object.fromEntries(work.schemaLibraries) }),
             }),
           )}\n`;
     return Object.freeze({

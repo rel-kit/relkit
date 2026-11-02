@@ -1,4 +1,4 @@
-export { z } from "./builder.js";
+export { s, z } from "./builder.js";
 export { buildSchemaEffect, SchemaBuilderError } from "./builder-effect.js";
 export type { NumberSchema, StringSchema, ZBuilder } from "./builder.types.js";
 export type { FileSchema, FileSchemaOptions } from "./file.types.js";
@@ -21,6 +21,13 @@ export {
   getJsonSchemaEffect,
 } from "./json-schema-effect.js";
 export type { SchemaProjectorService } from "./json-schema-effect.types.js";
+export {
+  JSON_SCHEMA_DIALECT,
+  SCHEMA_LIBRARIES,
+  schemaConverter,
+  schemaLibraryVersion,
+} from "./schema-converters.js";
+export type { SchemaConverter, SchemaLibrary } from "./schema-converters.types.js";
 export { SchemaTelemetry, SchemaTelemetryLive } from "./schema-observability.js";
 export type { SchemaTelemetryService } from "./schema-observability.types.js";
 export {

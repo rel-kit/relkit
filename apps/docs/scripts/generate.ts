@@ -10,6 +10,7 @@ import { format } from "prettier";
 import { getCliHelpModel, type CliHelpCommand } from "@relkit/cli/help";
 import { apiPackageDefinitions } from "./documentation-catalog.js";
 import { renderApi } from "./generate-api.js";
+import { generateErrorPages } from "./generate-error-pages.js";
 import { generateGuides } from "./generate-guides.js";
 import { generateInstallations } from "./generate-installations.js";
 import { contentFiles, pruneGenerated } from "./generation-files.js";
@@ -46,6 +47,7 @@ async function main(): Promise<void> {
   await generateInstallations(root, emit);
   await emit("_snippets/generated/api-overview.mdx", referenceOverview());
   await emit("docs/api/cli.mdx", renderCliReference(cliModel));
+  await generateErrorPages(root, content, emit);
   const pages = (await contentFiles(content)).filter(
     (path) =>
       /\.mdx?$/.test(path) &&

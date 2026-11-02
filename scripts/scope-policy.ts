@@ -6,7 +6,7 @@ export const approvedPackages = new Set(
 );
 export const approvedApps = new Set(["docs", "inspector"]);
 export const approvedExamples = new Set(
-  "README.md auth-drizzle commerce commerce-web data-model".split(" "),
+  "README.md auth-drizzle commerce commerce-web data-model schema-libraries".split(" "),
 );
 export const approvedTemplates = new Set(["default"]);
 export const integrationPath = /^integrations\/(?:catalog(?:\/|$)|packages\/[^/]+(?:\/|$))/;

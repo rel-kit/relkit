@@ -13,6 +13,7 @@ export type SchemaResult =
       readonly contractHash: string;
       readonly transformed?: boolean;
       readonly refined?: boolean;
+      readonly library?: SchemaLibraryVersion;
       readonly reason?: never;
     }
   | {
@@ -24,7 +25,14 @@ export type SchemaResult =
       readonly contractHash?: never;
       readonly transformed?: never;
       readonly refined?: never;
+      readonly library?: never;
     };
+
+/** Third-party schema library and its installed version. */
+export interface SchemaLibraryVersion {
+  readonly vendor: string;
+  readonly version: string;
+}
 
 /** Data-only schema provenance received from the isolated evaluator. */
 export interface SchemaSnapshot {
@@ -36,4 +44,5 @@ export interface SchemaSnapshot {
   readonly transformed?: boolean;
   readonly refined?: boolean;
   readonly reason?: string;
+  readonly library?: SchemaLibraryVersion;
 }

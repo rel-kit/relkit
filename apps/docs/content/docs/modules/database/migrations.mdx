@@ -9,7 +9,7 @@ sidebar:
 A migration applies a reviewed schema change to a database. With Drizzle, generate migrations from your TypeScript tables using Drizzle Kit. You do not write table-creation statements in `defineDrizzleService`
 or maintain a second handwritten copy of your schema.
 
-RELKIT's `check`, `build`, and `dev` commands do not apply migrations. Migrate the database before
+RelKit's `check`, `build`, and `dev` commands do not apply migrations. Migrate the database before
 starting code that depends on its new shape.
 
 <Steps>
@@ -20,8 +20,8 @@ starting code that depends on its new shape.
 <Callout type="note" title="Before you begin" icon="clipboard-check">
   Complete [database installation](/docs/modules/database/define#install-compatible-packages) first.
   That setup selects the compatible ORM, development-only Drizzle Kit and application-owned
-  declaration repair; the database scaffold installs them automatically. Keep that cohort and
-  lockfile together instead of installing an arbitrary Kit version separately.
+  declaration repair; the database scaffold installs them automatically. Keep those package versions
+  and lockfile together instead of installing an arbitrary Kit version separately.
 </Callout>
 
 Add this application-root configuration, adjusting the schema path for your app:
@@ -36,7 +36,7 @@ The configuration deliberately requires an explicit persistent file path. A sepa
 migrate the in-memory connection later opened by your application.
 
 The example's package scripts use `bun --bun drizzle-kit generate` and
-`relkit db migrate`. Shared migration execution lives in installed RELKIT tooling;
+`relkit db migrate`. Shared migration execution lives in installed RelKit tooling;
 SQLite uses the Bun-native driver without a copied runner. PostgreSQL/MySQL
 delegate to the application's installed Drizzle Kit under Bun.
 
@@ -136,7 +136,7 @@ bun run check
 bun run typecheck
 ```
 
-The migration test invokes shared RELKIT tooling against a temporary file, writes data through Drizzle, and
+The migration test invokes shared RelKit tooling against a temporary file, writes data through Drizzle, and
 runs migrations again to verify that the data survives. Application tests apply the generated
 migration to their own isolated connection. As history grows, add upgrade tests from deployed
 versions, not just tests of an empty database.

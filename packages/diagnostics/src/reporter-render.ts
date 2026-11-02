@@ -1,4 +1,5 @@
 import type { SourceLocation } from "@relkit/contracts";
+import { diagnosticCode, DOCS_ORIGIN, diagnosticDocsPath } from "./codes/index.js";
 import type { Diagnostic, DiagnosticLocation } from "./diagnostic.types.js";
 import type { DiagnosticReporterOptions } from "./reporter.types.js";
 
@@ -38,8 +39,13 @@ export function renderDiagnostic(
     );
   }
   if (diagnostic.suggestion !== undefined) lines.push(`  suggestion: ${diagnostic.suggestion}`);
+  const entry = diagnosticCode(diagnostic.code);
+  if (diagnostic.suggestion === undefined && entry !== undefined)
+    lines.push(`  next: ${entry.fix}`);
   if (diagnostic.documentationPath !== undefined)
     lines.push(`  docs: ${diagnostic.documentationPath}`);
+  else if (entry !== undefined)
+    lines.push(`  docs: ${DOCS_ORIGIN}${diagnosticDocsPath(diagnostic.code)}`);
   return lines.join("\n");
 }
 

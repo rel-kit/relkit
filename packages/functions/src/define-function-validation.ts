@@ -1,5 +1,5 @@
 import { FunctionInputError } from "./function-input-error.js";
-import { isRef } from "@relkit/contracts";
+import { isRef, canCarryStandardSchema } from "@relkit/contracts";
 import type { StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
 import type { FunctionRefAny } from "./types.js";
@@ -73,7 +73,7 @@ export function assertHook(value: unknown, name: string): void {
 export const assertSchemaEffect = Effect.fn("functions.function.assert-schema")(
   (value: unknown, name: string) =>
     functionTry("function.assert-schema", () => {
-      if (!isRecord(value))
+      if (!canCarryStandardSchema(value))
         throw new FunctionInputError(`${name} must be a Standard Schema v1 validator`);
       const standard = value["~standard"];
       if (

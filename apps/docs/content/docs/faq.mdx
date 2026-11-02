@@ -30,7 +30,7 @@ No. Handlers are plain `async` functions that return values. RelKit uses [Effect
 
 ## Which schema library do I use? [#schemas]
 
-Import `z` from `@relkit/app/schema`. Its builders, such as `z.object` and `z.string`, look like Zod's. RelKit uses these schemas to validate input and output, produce the OpenAPI document and type the generated client. See [Runtime schemas](/docs/learn/concepts/schemas).
+Zod 4. New projects depend on `zod` and import `z` from it. RelKit accepts any [Standard Schema](https://standardschema.dev) library that can describe itself as JSON Schema, so ArkType, Valibot and Effect Schema work too, and you can mix them in one app. RelKit uses these schemas to validate input and output, produce the OpenAPI document and type the generated client. See [Runtime schemas](/docs/learn/concepts/schemas#choose-a-schema-library).
 
 ## Can I use my own database or libraries? [#libraries]
 

@@ -143,6 +143,7 @@ const linkInstalledDependencies = Effect.fn("AddFixture.dependencies")(function*
     yield* link(join(repository, "integrations/packages", name), join(relkit, name));
   const aliases = [
     ["node_modules/effect", "effect"],
+    ["packages/schema/node_modules/zod", "zod"],
     ["integrations/packages/langchain/node_modules/langchain", "langchain"],
     ["integrations/packages/langchain/node_modules/langsmith", "langsmith"],
     ["integrations/packages/langchain/node_modules/@langchain/core", "@langchain/core"],

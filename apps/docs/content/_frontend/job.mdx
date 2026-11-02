@@ -10,8 +10,8 @@ this component under the provider. It selects this job's public `exportOrders` n
 </include>
 
 The task determines the `orderIds` input. The job's `client.operations` permits triggering and
-observation, while `client.fields` selects public run data. The returned `runId` is an admission
-receipt; completion and output arrive through the run observer. The example keeps uncertain
+observation, while `client.fields` selects public run data. The returned `runId` confirms that
+the provider accepted the run; completion and output arrive through the run observer. The example keeps uncertain
 submissions visible instead of automatically sending them again.
 
 Reference: [`useJobTrigger`](/docs/api/client#usejobtrigger), [`useJobRun`](/docs/api/client#usejobrun).

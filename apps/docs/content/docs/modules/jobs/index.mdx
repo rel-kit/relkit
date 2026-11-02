@@ -6,7 +6,7 @@ sidebar:
   icon: list-todo
 ---
 
-A job exposes work that can continue after the request that started it has ended. Define a typed task, expose it through a job, and let RELKIT persist the run, retry transient failures, and report progress.
+A job exposes work that can continue after the request that started it has ended. Define a typed task, expose it through a job, and let RelKit persist the run, retry transient failures, and report progress.
 
 <Callout type="tip" title="Start here" icon="route">
   Follow the [quickstart](/docs/modules/jobs/quickstart) to run an order export. For exact task and
@@ -61,7 +61,7 @@ A job exposes work that can continue after the request that started it has ended
   /_snippets/source/examples/commerce/src/services/orders/jobs/export-orders.job.ts
 </include>
 
-Tasks own execution code, schemas, retry policy, limits, and hooks. Jobs own the public API name, admission, schedules, service selection, and client projection. The task ID, version, input schema, output schema, and policy are part of the durable identity of a run.
+Tasks own execution code, schemas, retry policy, limits, and hooks. Jobs own the public API name, acceptance checks, schedules, service selection, and client projection. The task ID, version, input schema, output schema, and policy are part of the durable identity of a run.
 
 ## Defaults worth knowing
 

@@ -1,6 +1,6 @@
 /** Declares the missing-order failure and its HTTP 404 status. */
 import { defineError } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 const orderNotFound = defineError({
   id: "orders.not-found",

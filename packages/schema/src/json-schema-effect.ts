@@ -1,5 +1,6 @@
 import { Context, Data, Effect, Layer } from "effect";
 import { getSchemaProjection } from "./json-schema-inspection.js";
+import { JSON_SCHEMA_DIALECT, missingConverterReason } from "./schema-converters.js";
 import { sortJsonValue } from "./json-schema.js";
 import { observeSchema } from "./schema-observability.js";
 import type { SchemaProjectorService } from "./json-schema-effect.types.js";
@@ -72,7 +73,8 @@ export function getJsonSchemaEffect(
       if (projection === undefined) {
         return yield* Effect.fail(
           new JsonSchemaUnavailableError({
-            reason: "Schema does not expose a deterministic projection",
+            reason:
+              missingConverterReason(schema) ?? "Schema does not expose a deterministic projection",
           }),
         );
       }
@@ -80,7 +82,10 @@ export function getJsonSchemaEffect(
         try: () => {
           const value = sortJsonValue(projection(), "$", undefined);
           if (!isRecord(value)) throw new TypeError("Schema projection must be a JSON object");
-          return value;
+          // The dialect is always 2020-12; dropping it keeps every library's output alike.
+          if (value.$schema !== JSON_SCHEMA_DIALECT) return value;
+          const { $schema: _dialect, ...rest } = value;
+          return rest;
         },
         catch: (cause) => new JsonSchemaUnavailableError({ reason: errorMessage(cause), cause }),
       });

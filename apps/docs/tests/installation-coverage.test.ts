@@ -32,6 +32,7 @@ test("every authored page is navigable and has a reviewed installation dispositi
       (path) =>
         path.endsWith(".mdx") &&
         !path.startsWith("docs/api/") &&
+        !path.startsWith("docs/errors/") &&
         !path.startsWith("blog/") &&
         !path.split("/").some((segment) => segment.startsWith("_")),
     )

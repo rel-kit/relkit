@@ -32,22 +32,22 @@ not tasks of this change.
 
 ## 3. Plain language (#3)
 
-- [ ] 3.1 Write the writing standard (product name, message structure, banned terms, changelog format) and link it from CONTRIBUTING, and verify the link resolves in the docs link check
-- [ ] 3.2 Add a spelling check for "RELKIT" and "Relkit" outside code in docs, README and CLI strings, replace the existing occurrences with "RelKit", and verify the check passes
-- [ ] 3.3 Add a banned-term check for user-facing text (tuple, certified, readiness evidence, receipt, capsule, cohort, admission), remove agent-only instructions from the README, and verify the check passes on the repository and fails on a fixture
-- [ ] 3.4 Give every user-facing CLI and runtime error a `RELKIT_*` code, the next step and a docs link, and verify with snapshot tests for creation, check, dev and deploy errors
-- [ ] 3.5 Generate one docs page per `RELKIT_*` code from diagnostic metadata and make docs generation fail when a code has no page, and verify by adding an undocumented code in a test
-- [ ] 3.6 Convert the changelog to one line per change under Breaking, New and Fixed with migration links, and verify the release-notes generator output in its tests
-- [ ] 3.7 Fix stale facts in the README (the docs tool), the templates README and the `documentation-writer` skill, and verify the template-list check from 1.5 and a docs review pass
+- [x] 3.1 Write the writing standard (product name, message structure, banned terms, changelog format) and link it from CONTRIBUTING, and verify the link resolves in the docs link check
+- [x] 3.2 Add a spelling check for "RELKIT" and "Relkit" outside code in docs, README and CLI strings, replace the existing occurrences with "RelKit", and verify the check passes
+- [x] 3.3 Add a banned-term check for user-facing text (tuple, certified, readiness evidence, receipt, capsule, cohort, admission), remove agent-only instructions from the README, and verify the check passes on the repository and fails on a fixture
+- [x] 3.4 Give every user-facing CLI and runtime error a `RELKIT_*` code, the next step and a docs link, and verify with snapshot tests for creation, check, dev and deploy errors
+- [x] 3.5 Generate one docs page per `RELKIT_*` code from diagnostic metadata and make docs generation fail when a code has no page, and verify by adding an undocumented code in a test
+- [x] 3.6 Convert the changelog to one line per change under Breaking, New and Fixed with migration links, and verify the release-notes generator output in its tests
+- [x] 3.7 Fix stale facts in the README (the docs tool), the templates README and the `documentation-writer` skill, and verify the template-list check from 1.5 and a docs review pass
 
 ## 4. Standard Schema validators (#4)
 
-- [ ] 4.1 Add projection fallbacks: `~standard.jsonSchema` in the input and output directions, then lazily loaded converters for Effect Schema, Valibot and ArkType as optional peers, and verify with unit tests per library
-- [ ] 4.2 Canonicalize projected JSON and add schema library versions to the build fingerprint, and verify the projection is identical across two runs and the fingerprint changes when the Zod version changes
-- [ ] 4.3 Add a test app whose function, event, task and error contracts use Zod 4, ArkType, Effect Schema and Valibot, and verify `relkit check` passes and OpenAPI contains every schema
-- [ ] 4.4 Keep `RELKIT_SCHEMA_UNAVAILABLE` for schemas without a projection path and document the supported libraries on its page, and verify with a fixture schema that has none
-- [ ] 4.5 Switch templates, examples and docs to Zod 4 with `zod` as a template dependency, and verify the template creation tests and docs examples pass
-- [ ] 4.6 Prepare the rename of the built-in builder from `z` to `s` for the breaking release (export and codemod rule land in groups 7 and 12), and verify type tests for `s` on the pull request
+- [x] 4.1 Add projection fallbacks: `~standard.jsonSchema` in the input and output directions, then lazily loaded converters for Effect Schema, Valibot and ArkType as optional peers, and verify with unit tests per library
+- [x] 4.2 Canonicalize projected JSON and add schema library versions to the build fingerprint, and verify the projection is identical across two runs and the fingerprint changes when the Zod version changes
+- [x] 4.3 Add a test app whose function, event, task and error contracts use Zod 4, ArkType, Effect Schema and Valibot, and verify `relkit check` passes and OpenAPI contains every schema
+- [x] 4.4 Keep `RELKIT_SCHEMA_UNAVAILABLE` for schemas without a projection path and document the supported libraries on its page, and verify with a fixture schema that has none
+- [x] 4.5 Switch templates, examples and docs to Zod 4 with `zod` as a template dependency, and verify the template creation tests and docs examples pass
+- [x] 4.6 Prepare the rename of the built-in builder from `z` to `s` for the breaking release (export and codemod rule land in groups 7 and 12), and verify type tests for `s` on the pull request
 
 ## 5. Core and Labs (#5)
 

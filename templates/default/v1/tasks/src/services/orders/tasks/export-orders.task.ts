@@ -1,6 +1,6 @@
 /** Demonstrates a durable export task by emitting progress, logging the count and returning the requested order count. */
 import { defineTask } from "@relkit/app/tasks";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 const exportOrders = defineTask({
   id: "orders.export-orders",

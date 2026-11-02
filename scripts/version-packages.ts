@@ -9,9 +9,19 @@ import { packedTemplates } from "./release-templates.js";
 import { dependencyFields } from "./catalog-manifest.js";
 
 type ChangesetStatus = {
-  changesets: { summary: string }[];
+  changesets: { summary: string; releases?: { name: string; type: string }[] }[];
   releases: { name: string; type: string; newVersion?: string }[];
 };
+
+/** Changelog groups, in the order a release section lists them. See WRITING.md. */
+export const CHANGE_KINDS = ["Breaking", "New", "Fixed"] as const;
+export type ChangeKind = (typeof CHANGE_KINDS)[number];
+
+/** One changelog line and its group. */
+export interface ChangelogChange {
+  readonly kind: ChangeKind;
+  readonly summary: string;
+}
 
 const root = resolve(import.meta.dirname, "..");
 const changesetCli = join(root, "node_modules", "@changesets", "cli", "bin.js");
@@ -38,10 +48,40 @@ async function readStatus(): Promise<ChangesetStatus> {
   }
 }
 
+/**
+ * Groups a changeset: a summary starting with `Breaking:`, `New:` or `Fixed:` names its group;
+ * otherwise a major bump is Breaking, a minor bump New and a patch Fixed.
+ * @param changeset - Summary and the package bumps it declares.
+ * @returns The change as one changelog line; a Breaking change must link its migration note.
+ */
+export function classifyChange(changeset: ChangesetStatus["changesets"][number]): ChangelogChange {
+  const text = changeset.summary.trim().replace(/\s+/g, " ");
+  const prefix = /^(Breaking|New|Fixed):\s*/i.exec(text);
+  const types = new Set((changeset.releases ?? []).map(({ type }) => type));
+  const kind: ChangeKind = prefix
+    ? (CHANGE_KINDS.find((name) => name.toLowerCase() === prefix[1]!.toLowerCase()) ?? "Fixed")
+    : types.has("major")
+      ? "Breaking"
+      : types.has("minor")
+        ? "New"
+        : "Fixed";
+  const summary = prefix ? text.slice(prefix[0].length) : text;
+  if (kind === "Breaking" && !/\]\([^)]*migrat[^)]*\)/i.test(summary))
+    throw new Error(`Breaking change has no migration link: ${summary}`);
+  return { kind, summary };
+}
+
+/**
+ * Promotes Unreleased into a release section with Breaking, New and Fixed groups.
+ * @param source - Current CHANGELOG.md.
+ * @param version - Release version.
+ * @param changes - Changes from this release's changesets.
+ * @returns The new changelog.
+ */
 export function renderChangelog(
   source: string,
   version: string,
-  summaries: readonly string[],
+  changes: readonly ChangelogChange[],
 ): string {
   const heading = /^## Unreleased([^\n]*)\n/m.exec(source);
   if (heading?.index === undefined) throw new Error("CHANGELOG.md has no Unreleased section");
@@ -50,20 +90,37 @@ export function renderChangelog(
   const bodyEnd = nextHeading ? bodyStart + nextHeading.index : source.length;
   const body = source.slice(bodyStart, bodyEnd).trim();
   const rest = source.slice(bodyEnd).trim();
-  const bullets = summaries
-    .map((summary) => summary.trim().replace(/\s+/g, " "))
-    .filter((summary) => summary !== "" && !body.includes(summary))
-    .map((summary) => `- ${summary}`)
-    .join("\n");
+  const groups = CHANGE_KINDS.map((kind) => {
+    const lines = changes
+      .filter((change) => change.kind === kind && change.summary !== "")
+      .filter((change) => !body.includes(change.summary))
+      .map((change) => `- ${change.summary}`);
+    return lines.length === 0 ? "" : `### ${kind}\n\n${lines.join("\n")}`;
+  });
   const sections = [
     source.slice(0, heading.index).trimEnd(),
     "## Unreleased",
     `## ${version}${heading[1] ?? ""}`,
     body,
-    bullets === "" ? "" : `### Changes\n\n${bullets}`,
+    ...groups,
     rest,
   ].filter((section) => section !== "");
   return `${sections.join("\n\n")}\n`;
+}
+
+/**
+ * Reads one release's section from the changelog.
+ * @param changelog - CHANGELOG.md source.
+ * @param version - Release version.
+ * @returns The section body without its heading, or undefined when the release has none.
+ */
+export function changelogSection(changelog: string, version: string): string | undefined {
+  const escaped = version.replaceAll(".", "\\.");
+  const heading = new RegExp(`^## ${escaped}(?:\\s[^\\n]*)?\\n`, "m").exec(changelog);
+  if (heading?.index === undefined) return undefined;
+  const start = heading.index + heading[0].length;
+  const next = /^## /m.exec(changelog.slice(start));
+  return changelog.slice(start, next ? start + next.index : undefined).trim();
 }
 
 export function renderActionChangelog(name: string, version: string): string {
@@ -140,11 +197,7 @@ async function main(): Promise<void> {
         return { name: item.name, version: item.newVersion };
       }),
   };
-  const changelog = renderChangelog(
-    source,
-    version,
-    status.changesets.map((changeset) => changeset.summary),
-  );
+  const changelog = renderChangelog(source, version, status.changesets.map(classifyChange));
   if (process.argv.includes("--check")) {
     console.log(JSON.stringify(plan));
     return;

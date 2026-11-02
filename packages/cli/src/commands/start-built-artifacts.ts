@@ -68,6 +68,9 @@ export const validateBuiltArtifactsEffect = Effect.fn("BuiltProject.artifacts")(
     ...(activation.providerOverridesGeneration === undefined
       ? {}
       : { providerOverridesGeneration: activation.providerOverridesGeneration }),
+    ...(activation.schemaLibrariesHash === undefined
+      ? {}
+      : { schemaLibrariesHash: activation.schemaLibrariesHash }),
   });
 });
 

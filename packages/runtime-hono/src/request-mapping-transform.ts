@@ -1,5 +1,6 @@
 import { validate, type StandardSchemaV1 } from "@relkit/schema";
 import { MISSING, type Missing } from "./request-mapping-body.js";
+import { canCarryStandardSchema } from "@relkit/contracts";
 
 /** Applies a declared Standard Schema transform and reports public mapping issues.
  * @param id - Stable declaration identifier used for lookup.
@@ -51,7 +52,7 @@ export async function applyTransform(
  */
 function transformSchema(value: unknown): StandardSchemaV1 | undefined {
   const candidate = isRecord(value) && isRecord(value.schema) ? value.schema : value;
-  return isRecord(candidate) &&
+  return canCarryStandardSchema(candidate) &&
     isRecord(candidate["~standard"]) &&
     candidate["~standard"].version === 1 &&
     typeof candidate["~standard"].validate === "function"

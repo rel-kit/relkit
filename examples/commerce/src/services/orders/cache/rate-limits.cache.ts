@@ -1,6 +1,6 @@
 /** Declares nonnegative counters keyed by strings in the timeline cache profile for order rate-limit examples. */
 import { defineCache } from "@relkit/app/cache";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 const rateLimits = defineCache({
   id: "orders.rate-limits",

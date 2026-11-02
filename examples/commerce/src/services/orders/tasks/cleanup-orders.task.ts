@@ -1,6 +1,6 @@
 /** Demonstrates retryable cleanup using process-local cancelled orders and key-deduplicated fake mail receipts. */
 import { defineTask } from "@relkit/app/tasks";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 import { removeOrdersBefore } from "../helpers/fake-business.js";
 import { sendFakeMail } from "../helpers/fake-mail.js";
 

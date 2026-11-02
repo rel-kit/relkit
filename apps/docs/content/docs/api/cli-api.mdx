@@ -734,6 +734,7 @@ declare const DevSnapshot: Struct<{
     readonly jobsManifestHash: optionalKey<String>;
     readonly runtimeIntegrationsPlanHash: String;
     readonly localServicesPlanHash: optionalKey<String>;
+    readonly schemaLibrariesHash: optionalKey<String>;
   }>;
   readonly tools: Struct<{
     readonly layout: Literal<1>;
@@ -1159,7 +1160,7 @@ Re-exports all named exports from the "./main-support-types.js" module.
 export * from "./main-support-types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L10)
 
 ### CLI_EXIT_CODES
 
@@ -1178,7 +1179,7 @@ declare const CLI_EXIT_CODES: Readonly<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L15)
 
 ### CLI_VERSION
 
@@ -1190,7 +1191,7 @@ Version of this installed CLI package.
 declare const CLI_VERSION: string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L13)
 
 ### createReporter
 
@@ -1202,7 +1203,19 @@ Builds the existing result/error presentation policy.
 declare const createReporter: (json: boolean, io: CliIo) => CliReporter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L30)
+
+### errorLines
+
+Formats a terminal failure as its code and message, then the next step and docs link.
+
+**Signature**
+
+```ts
+declare const errorLines: (code: string, message: string) => string[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L51)
 
 ### errorMessage
 
@@ -1214,7 +1227,7 @@ Formats an existing terminal diagnostic without changing Error identity.
 declare const errorMessage: (error: unknown) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L155)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L171)
 
 ### fail
 
@@ -1231,7 +1244,7 @@ declare const fail: (
 ) => CliFailureError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L119)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L135)
 
 ### failSignal
 
@@ -1243,7 +1256,7 @@ Preserves signal-specific public cancellation codes.
 declare const failSignal: (signal: "SIGINT" | "SIGTERM" | "SIGHUP") => CliFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L107)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L123)
 
 ### helpPayload
 
@@ -1258,7 +1271,7 @@ declare const helpPayload: (
 ) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L66)
 
 ### helpText
 
@@ -1270,7 +1283,7 @@ Formats the existing compact human help.
 declare const helpText: (version: string, command: string | undefined) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L85)
 
 ### installSignals
 
@@ -1282,7 +1295,7 @@ Installs native process cancellation for one invocation owner.
 declare const installSignals: (controller: AbortController) => () => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L107)
 
 ### isGeneratorApi
 
@@ -1292,7 +1305,7 @@ declare const installSignals: (controller: AbortController) => () => void;
 declare const isGeneratorApi: (value: unknown) => value is CreateRelkitGeneratorApi;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L178)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L194)
 
 ### loadCreateRelkit
 
@@ -1302,7 +1315,7 @@ declare const isGeneratorApi: (value: unknown) => value is CreateRelkitGenerator
 declare const loadCreateRelkit: () => Promise<CreateRelkitGeneratorApi>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L178)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L194)
 
 ### loadCreateRelkitEffect
 
@@ -1312,7 +1325,7 @@ declare const loadCreateRelkit: () => Promise<CreateRelkitGeneratorApi>;
 declare const loadCreateRelkitEffect: Effect<CreateRelkitGeneratorApi, CliAdapterError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L178)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L194)
 
 ### toFailure
 
@@ -1324,7 +1337,7 @@ Applies the terminal invocation error policy after owned cleanup completes.
 declare const toFailure: (error: unknown, signal: AbortSignal) => CliFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L138)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L154)
 
 ## `main.ts`
 
@@ -2336,7 +2349,7 @@ declare const discoverProject: (projectRoot: string) => Promise<ProjectDiscovery
 
 ### discoverProjectEffect
 
-Discovers canonical RELKIT source facts using caller-provided filesystem authority.
+Discovers canonical RelKit source facts using caller-provided filesystem authority.
 
 **Example**
 

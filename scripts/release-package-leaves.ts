@@ -53,6 +53,7 @@ export const packageLeafExports: Readonly<Record<string, ReleaseExports>> = {
     "./internal/tooling": esm("internal/tooling"),
   },
   compiler: { "./editor": esm("editor") },
+  diagnostics: { "./codes": esm("codes/index") },
   engine: { "./internal/server-runtime": esm("internal/server-runtime") },
   provider: { "./internal/dependencies": esm("dependency-preflight.service") },
   config: { "./internal/config": esm("internal/config") },

@@ -6,6 +6,7 @@ import {
   validationCount,
   validationFailures,
 } from "./agent-validation-error.js";
+import { canCarryStandardSchema } from "@relkit/contracts";
 
 /**
  * Validates that a value implements the Standard Schema v1 protocol.
@@ -85,7 +86,7 @@ export function isAgentSchema(value: unknown): value is StandardSchemaV1 {
 }
 
 function schemaShape(value: unknown): value is StandardSchemaV1 {
-  if (!recordShape(value) || !recordShape(value["~standard"])) return false;
+  if (!canCarryStandardSchema(value) || !recordShape(value["~standard"])) return false;
   return value["~standard"].version === 1 && typeof value["~standard"].validate === "function";
 }
 

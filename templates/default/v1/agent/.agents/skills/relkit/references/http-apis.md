@@ -62,7 +62,7 @@ export default defineMiddleware("/orders/*", async (_context, next) => {
 
 ```ts
 import { defineTransform } from "@relkit/app/routes";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 export default defineTransform({ schema: z.string() });
 ```

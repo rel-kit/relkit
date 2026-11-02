@@ -2,6 +2,7 @@ import type { StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
 import { EventDefinitionError } from "./event-errors.js";
 import { runEventSync } from "./event-observability.js";
+import { canCarryStandardSchema } from "@relkit/contracts";
 
 /** Checks the Standard Schema v1 runtime contract.
  * @param value - Candidate schema.
@@ -19,7 +20,7 @@ export function isSchema(value: unknown): value is StandardSchemaV1 {
  */
 export const isSchemaEffect = Effect.fn("Events.isSchema")((value: unknown) =>
   Effect.sync(() => {
-    if (!recordShape(value) || !recordShape(value["~standard"])) return false;
+    if (!canCarryStandardSchema(value) || !recordShape(value["~standard"])) return false;
     return value["~standard"].version === 1 && typeof value["~standard"].validate === "function";
   }),
 );

@@ -25,7 +25,7 @@ The default retry policy is three attempts with a one-second initial delay, a 30
 </include>
 
 Set `retry` on `defineTask`, using `maxAttempts`, readable `initialDelay` and `maxDelay`, `factor`, and
-`jitter`. A job can add an admission idempotency key and retention policy, but it cannot multiply the
+`jitter`. A job can add an idempotency key for accepting runs and retention policy, but it cannot multiply the
 task's retry budget.
 
 Retries are at-least-once. Use an idempotency key for every external side effect and store the result before acknowledging the step. A run ID is not an idempotency key: a retry keeps the run identity but may execute the task again.

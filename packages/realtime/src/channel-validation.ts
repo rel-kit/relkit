@@ -40,7 +40,8 @@ export function isRecord(value: unknown): value is Record<PropertyKey, unknown> 
  */
 export const isChannelSchemaEffect = Effect.fn("Realtime.isChannelSchema")(
   function* (value: unknown) {
-    if (!(yield* isRecordEffect(value))) return false;
+    // ArkType schemas are callable, so a function can carry the capability too.
+    if (typeof value !== "function" && !(yield* isRecordEffect(value))) return false;
     const standard = (value as Record<PropertyKey, unknown>)["~standard"];
     if (!(yield* isRecordEffect(standard))) return false;
     const shape = standard as Record<PropertyKey, unknown>;

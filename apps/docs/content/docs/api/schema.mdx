@@ -432,9 +432,33 @@ export interface StringSchema extends Schema<string, string> {
 
 ## `builder.ts`
 
+### s
+
+Builds RelKit Standard Schema validators with familiar composition helpers.
+
+**Example**
+
+```ts
+import { s } from "@relkit/schema";
+
+const order = s.object({ id: s.string(), quantity: s.number().int().positive() });
+order.parse({ id: "order-1", quantity: 2 });
+```
+
+**Signature**
+
+```ts
+declare const s: ZBuilder;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/builder.ts#L36)
+
+Since v0.9.0
+
 ### z
 
-Builds RELKIT Standard Schema validators with familiar composition helpers.
+The built-in schema builder under its current public name. The breaking release renames it to
+`s`; until then `z` and `s` are the same builder.
 
 **Example**
 
@@ -451,7 +475,7 @@ order.parse({ id: "order-1", quantity: 2 });
 declare const z: ZBuilder;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/builder.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/builder.ts#L78)
 
 Since v0.1.0
 
@@ -864,7 +888,7 @@ declare const FileSchemaOptions: FileSchemaOptions;
 declare const InferInput: InferInput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L55)
 
 ### InferOutput
 
@@ -874,7 +898,17 @@ declare const InferInput: InferInput<S>;
 declare const InferOutput: InferOutput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L56)
+
+### JSON_SCHEMA_DIALECT
+
+**Signature**
+
+```ts
+declare const JSON_SCHEMA_DIALECT: "https://json-schema.org/draft/2020-12/schema";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L25)
 
 ### JSON_SCHEMA_UNAVAILABLE
 
@@ -884,7 +918,7 @@ declare const InferOutput: InferOutput<S>;
 declare const JSON_SCHEMA_UNAVAILABLE: "RELKIT_SCHEMA_UNAVAILABLE";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L43)
 
 ### JsonSchema
 
@@ -894,7 +928,7 @@ declare const JSON_SCHEMA_UNAVAILABLE: "RELKIT_SCHEMA_UNAVAILABLE";
 declare const JsonSchema: JsonSchema;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L46)
 
 ### JsonSchemaAvailable
 
@@ -904,7 +938,7 @@ declare const JsonSchema: JsonSchema;
 declare const JsonSchemaAvailable: JsonSchemaAvailable;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L47)
 
 ### JsonSchemaDirection
 
@@ -914,7 +948,7 @@ declare const JsonSchemaAvailable: JsonSchemaAvailable;
 declare const JsonSchemaDirection: SchemaProjectionDirection;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L48)
 
 ### JsonSchemaFactory
 
@@ -924,7 +958,7 @@ declare const JsonSchemaDirection: SchemaProjectionDirection;
 declare const JsonSchemaFactory: JsonSchemaFactory;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L49)
 
 ### JsonSchemaOptions
 
@@ -934,7 +968,7 @@ declare const JsonSchemaFactory: JsonSchemaFactory;
 declare const JsonSchemaOptions: JsonSchemaOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L50)
 
 ### JsonSchemaResult
 
@@ -944,7 +978,7 @@ declare const JsonSchemaOptions: JsonSchemaOptions;
 declare const JsonSchemaResult: JsonSchemaResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L51)
 
 ### JsonSchemaUnavailable
 
@@ -954,7 +988,7 @@ declare const JsonSchemaResult: JsonSchemaResult;
 declare const JsonSchemaUnavailable: JsonSchemaUnavailable;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L52)
 
 ### JsonSchemaUnavailableError
 
@@ -984,7 +1018,17 @@ declare const NumberSchema: NumberSchema;
 declare const RelkitSchema: RelkitSchema<TInput, TOutput>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L67)
+
+### SCHEMA_LIBRARIES
+
+**Signature**
+
+```ts
+declare const SCHEMA_LIBRARIES: Readonly<Record<string, SchemaLibrary>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L26)
 
 ### Schema
 
@@ -994,7 +1038,7 @@ declare const RelkitSchema: RelkitSchema<TInput, TOutput>;
 declare const Schema: Schema<TInput, TOutput>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L57)
 
 ### SchemaAsyncError
 
@@ -1015,6 +1059,16 @@ declare const SchemaBuilderError: typeof SchemaBuilderError;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L2)
+
+### SchemaConverter
+
+**Signature**
+
+```ts
+declare const SchemaConverter: SchemaConverter;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L30)
 
 ### SchemaExecutionError
 
@@ -1045,6 +1099,16 @@ declare const SchemaIssuesError: typeof SchemaIssuesError;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L10)
+
+### SchemaLibrary
+
+**Signature**
+
+```ts
+declare const SchemaLibrary: SchemaLibrary;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L30)
 
 ### SchemaProjector
 
@@ -1084,7 +1148,7 @@ declare const SchemaProjectorService: SchemaProjectorService;
 declare const SchemaTelemetry: typeof SchemaTelemetry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L31)
 
 ### SchemaTelemetryLive
 
@@ -1094,7 +1158,7 @@ declare const SchemaTelemetry: typeof SchemaTelemetry;
 declare const SchemaTelemetryLive: Layer<SchemaTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L31)
 
 ### SchemaTelemetryService
 
@@ -1104,7 +1168,7 @@ declare const SchemaTelemetryLive: Layer<SchemaTelemetry, never, never>;
 declare const SchemaTelemetryService: SchemaTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L32)
 
 ### SchemaValidationError
 
@@ -1154,7 +1218,7 @@ declare const SchemaValidatorService: SchemaValidatorService;
 declare const StandardFailure: StandardFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L58)
 
 ### StandardIssue
 
@@ -1164,7 +1228,7 @@ declare const StandardFailure: StandardFailure;
 declare const StandardIssue: StandardIssue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L59)
 
 ### StandardJSONSchemaV1
 
@@ -1174,7 +1238,7 @@ declare const StandardIssue: StandardIssue;
 declare const StandardJSONSchemaV1: StandardJSONSchemaV1<TInput, TOutput>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L65)
 
 ### StandardPathSegment
 
@@ -1184,7 +1248,7 @@ declare const StandardJSONSchemaV1: StandardJSONSchemaV1<TInput, TOutput>;
 declare const StandardPathSegment: StandardPathSegment;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L60)
 
 ### StandardResult
 
@@ -1194,7 +1258,7 @@ declare const StandardPathSegment: StandardPathSegment;
 declare const StandardResult: StandardResult<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L61)
 
 ### StandardSchemaOptions
 
@@ -1204,7 +1268,7 @@ declare const StandardResult: StandardResult<T>;
 declare const StandardSchemaOptions: StandardSchemaOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L62)
 
 ### StandardSchemaTypes
 
@@ -1214,7 +1278,7 @@ declare const StandardSchemaOptions: StandardSchemaOptions;
 declare const StandardSchemaTypes: StandardSchemaTypes<TInput, TOutput>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L63)
 
 ### StandardSchemaV1
 
@@ -1224,7 +1288,7 @@ declare const StandardSchemaTypes: StandardSchemaTypes<TInput, TOutput>;
 declare const StandardSchemaV1: StandardSchemaV1<TInput, TOutput>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L64)
 
 ### StandardSuccess
 
@@ -1234,7 +1298,7 @@ declare const StandardSchemaV1: StandardSchemaV1<TInput, TOutput>;
 declare const StandardSuccess: StandardSuccess<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L66)
 
 ### StringSchema
 
@@ -1280,7 +1344,7 @@ declare const getJsonSchema: (
 ) => JsonSchemaResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L40)
 
 ### getJsonSchemaEffect
 
@@ -1303,7 +1367,7 @@ declare const getJsonSchemaEffect: (
 declare const getSchemaMetadata: (schema: StandardSchemaV1) => SchemaMetadata | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L34)
 
 ### getSchemaMetadataEffect
 
@@ -1315,7 +1379,7 @@ declare const getSchemaMetadataEffect: (
 ) => Effect<SchemaMetadata | undefined>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L35)
 
 ### isJsonSchemaAvailable
 
@@ -1325,7 +1389,7 @@ declare const getSchemaMetadataEffect: (
 declare const isJsonSchemaAvailable: (result: JsonSchemaResult) => result is JsonSchemaAvailable;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L41)
 
 ### isSchemaTransformed
 
@@ -1335,7 +1399,7 @@ declare const isJsonSchemaAvailable: (result: JsonSchemaResult) => result is Jso
 declare const isSchemaTransformed: (schema: StandardSchemaV1) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L36)
 
 ### isSchemaTransformedEffect
 
@@ -1345,7 +1409,37 @@ declare const isSchemaTransformed: (schema: StandardSchemaV1) => boolean;
 declare const isSchemaTransformedEffect: (schema: StandardSchemaV1) => Effect<boolean>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L37)
+
+### s
+
+**Signature**
+
+```ts
+declare const s: ZBuilder;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L1)
+
+### schemaConverter
+
+**Signature**
+
+```ts
+declare const schemaConverter: (schema: StandardSchemaV1) => SchemaConverter | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L27)
+
+### schemaLibraryVersion
+
+**Signature**
+
+```ts
+declare const schemaLibraryVersion: (vendor: string, from?: string) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L28)
 
 ### toJsonSchema
 
@@ -1358,7 +1452,7 @@ declare const toJsonSchema: (
 ) => JsonSchemaResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L42)
 
 ### validate
 
@@ -1448,7 +1542,7 @@ Effect.catchTag("JsonSchemaUnavailableError", (error) => Effect.succeed(error.re
 declare class JsonSchemaUnavailableError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-effect.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-effect.ts#L14)
 
 ### SchemaProjector (class)
 
@@ -1466,7 +1560,7 @@ Effect.provide(getJsonSchemaEffect(z.string()), SchemaProjectorLive);
 declare class SchemaProjector
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-effect.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-effect.ts#L27)
 
 ### SchemaProjectorLive
 
@@ -1484,7 +1578,7 @@ Effect.runSync(Effect.provide(getJsonSchemaEffect(z.string()), SchemaProjectorLi
 declare const SchemaProjectorLive: Layer.Layer<SchemaProjector, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-effect.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-effect.ts#L35)
 
 ### getJsonSchemaEffect
 
@@ -1505,7 +1599,7 @@ declare const getJsonSchemaEffect: (
 ) => Effect.Effect<JsonSchema, JsonSchemaUnavailableError, SchemaProjector>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-effect.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-effect.ts#L46)
 
 ## `json-schema-effect.types.ts`
 
@@ -1561,11 +1655,12 @@ declare const getSchemaProjection: (
 ) => JsonSchemaFactory | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-inspection.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-inspection.ts#L62)
 
 ### getSchemaProjectionEffect
 
-Finds a deterministic projection hook inside Effect.
+Finds a deterministic projection inside Effect: RelKit builder metadata, then the schema's
+`~standard.jsonSchema` hook, then a converter for the schema's library.
 
 **Example**
 
@@ -1582,7 +1677,7 @@ declare const getSchemaProjectionEffect: (
 ) => Effect.Effect<JsonSchemaFactory | undefined>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-inspection.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-inspection.ts#L17)
 
 ### isSchemaOptional
 
@@ -1603,7 +1698,7 @@ declare const isSchemaOptional: (
 ) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-inspection.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-inspection.ts#L90)
 
 ### isSchemaOptionalEffect
 
@@ -1624,13 +1719,13 @@ declare const isSchemaOptionalEffect: (
 ) => Effect.Effect<boolean>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-inspection.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema-inspection.ts#L76)
 
 ## `json-schema-inspection.types.ts`
 
 ### RelkitProjectable (type alias)
 
-RELKIT extension hook shapes for directional JSON projections.
+RelKit extension hook shapes for directional JSON projections.
 
 **Example**
 
@@ -2160,6 +2255,173 @@ type SchemaTask<T> = () => StandardResult<T> | Promise<StandardResult<T>>;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-collection.types.ts#L7)
 
+## `schema-converters.ts`
+
+Converts third-party Standard Schemas that have no `~standard.jsonSchema` hook, using each
+library's own converter. Converters are optional peers, loaded on first use with a synchronous
+`require` where the runtime has one (Bun and Node); browsers simply have none.
+
+### JSON_SCHEMA_DIALECT
+
+JSON Schema dialect RelKit asks converters for.
+
+**Signature**
+
+```ts
+declare const JSON_SCHEMA_DIALECT: "https://json-schema.org/draft/2020-12/schema";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-converters.ts#L12)
+
+### SCHEMA_LIBRARIES
+
+Libraries RelKit recognizes by `~standard.vendor`, with the package that converts them.
+
+**Signature**
+
+```ts
+declare const SCHEMA_LIBRARIES: Readonly<Record<string, SchemaLibrary>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-converters.ts#L15)
+
+### SchemaConverter
+
+**Signature**
+
+```ts
+declare const SchemaConverter: SchemaConverter;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-converters.ts#L9)
+
+### SchemaLibrary
+
+**Signature**
+
+```ts
+declare const SchemaLibrary: SchemaLibrary;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-converters.ts#L9)
+
+### missingConverterReason
+
+Explains why a schema has no converter, for the unavailable reason.
+
+**Example**
+
+```ts
+missingConverterReason(v.string()); // "Install @valibot/to-json-schema …"
+```
+
+**Signature**
+
+```ts
+declare const missingConverterReason: (schema: StandardSchemaV1) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-converters.ts#L44)
+
+### schemaConverter
+
+Finds a converter for a schema whose library has no `~standard.jsonSchema` hook.
+
+**Example**
+
+```ts
+schemaConverter(v.string())?.(v.string(), "input");
+```
+
+**Signature**
+
+```ts
+declare const schemaConverter: (schema: StandardSchemaV1) => SchemaConverter | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-converters.ts#L30)
+
+### schemaLibraryVersion
+
+Reads the installed version of the library that made a schema.
+
+**Example**
+
+```ts
+schemaLibraryVersion("zod", process.cwd()); // "4.6.7"
+```
+
+**Signature**
+
+```ts
+declare const schemaLibraryVersion: (vendor: string, from?: string) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-converters.ts#L58)
+
+## `schema-converters.types.ts`
+
+### LoadedConverter (interface)
+
+A converter that loaded, or the reason it could not.
+
+**Example**
+
+```ts
+const missing: LoadedConverter = { error: "Install @valibot/to-json-schema." };
+```
+
+**Signature**
+
+```ts
+export interface LoadedConverter {
+  readonly convert?: SchemaConverter;
+  readonly error?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-converters.types.ts#L26)
+
+### SchemaConverter (type alias)
+
+Converts one schema to JSON Schema for the input or output side.
+
+**Example**
+
+```ts
+const converter: SchemaConverter = (schema, direction) => ({ type: "string" });
+```
+
+**Signature**
+
+```ts
+type SchemaConverter = (schema: StandardSchemaV1, direction: "input" | "output") => JsonValue;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-converters.types.ts#L7)
+
+### SchemaLibrary (interface)
+
+A schema library RelKit recognizes, with the package that makes its schemas and, when the
+schemas cannot describe themselves, the package that converts them.
+
+**Example**
+
+```ts
+const valibot: SchemaLibrary = { package: "valibot", converter: "@valibot/to-json-schema" };
+```
+
+**Signature**
+
+```ts
+export interface SchemaLibrary {
+  readonly package: string;
+  readonly converter?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-converters.types.ts#L17)
+
 ## `schema-execution.ts`
 
 ### throwCause
@@ -2408,7 +2670,7 @@ declare const runSchemaEffect: <TOutput>(
 
 ### InternalSchema (interface)
 
-RELKIT schema with its internal path-aware validation hook.
+RelKit schema with its internal path-aware validation hook.
 The hook is only used while composing nested schemas.
 
 **Example**
@@ -2429,7 +2691,7 @@ export interface InternalSchema<TInput, TOutput> extends Schema<TInput, TOutput>
 
 ### SchemaCheck (type alias)
 
-Path-aware validation callback used by a constructed RELKIT schema.
+Path-aware validation callback used by a constructed RelKit schema.
 
 **Example**
 
@@ -2644,7 +2906,7 @@ readonly _run: SchemaCheck<TOutput>
 **Signature**
 
 ```ts
-readonly "~standard": { readonly version: 1; readonly vendor: string; readonly validate: (value: unknown, options?: StandardSchemaOptions) => StandardResult<TOutput> | Promise<StandardResult<TOutput>>; readonly types?: StandardSchemaTypes<TInput, TOutput>; } & StandardJSONSchemaV1.Props<TInput, TOutput>
+readonly "~standard": { readonly version: 1; readonly vendor: string; readonly validate: (value: unknown, options?: StandardSchemaOptions) => StandardResult<TOutput> | Promise<StandardResult<TOutput>>; readonly types?: StandardSchemaTypes<TInput, TOutput> | undefined; } & StandardJSONSchemaV1.Props<TInput, TOutput>
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-implementation.ts#L35)
@@ -2663,7 +2925,7 @@ readonly relkit: SchemaProjectionHooks
 
 ### Schema (interface)
 
-RELKIT schema with parsing and composition methods.
+RelKit schema with parsing and composition methods.
 Input and output types may differ after transformation.
 
 **Example**
@@ -2743,7 +3005,7 @@ export interface Schema<TInput = unknown, TOutput = TInput> extends RelkitSchema
 
 ### SchemaProjectionHooks (interface)
 
-Directional JSON Schema projection hooks carried by a RELKIT schema.
+Directional JSON Schema projection hooks carried by a RelKit schema.
 
 **Example**
 
@@ -3268,7 +3530,7 @@ declare const withTransformMetadata: (schema: StandardSchemaV1) => SchemaMetadat
 
 ### SchemaMetadata (interface)
 
-Metadata attached to a RELKIT schema for deterministic projection.
+Metadata attached to a RelKit schema for deterministic projection.
 Directional hooks may differ after a transform or default is applied.
 
 **Example**
@@ -4456,7 +4718,7 @@ type Input = InferInput<typeof schema>;
 type InferInput<S extends StandardSchemaV1> = S["~standard"] extends {
   readonly types?: infer Types;
 }
-  ? Types extends StandardSchemaTypes<infer Input, unknown>
+  ? NonNullable<Types> extends StandardSchemaTypes<infer Input, unknown>
     ? Input
     : unknown
   : unknown;
@@ -4480,7 +4742,7 @@ type Output = InferOutput<typeof schema>;
 type InferOutput<S extends StandardSchemaV1> = S["~standard"] extends {
   readonly types?: infer Types;
 }
-  ? Types extends StandardSchemaTypes<unknown, infer Output>
+  ? NonNullable<Types> extends StandardSchemaTypes<unknown, infer Output>
     ? Output
     : unknown
   : unknown;
@@ -4509,7 +4771,7 @@ type JsonValue =
 
 ### RelkitSchema (interface)
 
-RELKIT schema boundary with optional legacy and directional projections.
+RelKit schema boundary with optional legacy and directional projections.
 
 **Example**
 
@@ -4581,7 +4843,7 @@ const issue: StandardIssue = { message: "Required", path: ["name"] };
 ```ts
 export interface StandardIssue {
   readonly message: string;
-  readonly path?: readonly StandardPathSegment[];
+  readonly path?: readonly StandardPathSegment[] | undefined;
 }
 ```
 
@@ -4627,7 +4889,7 @@ const props: StandardJSONSchemaV1.Props = schema["~standard"];
 export interface Props<Input = unknown, Output = Input> {
   readonly version: 1;
   readonly vendor: string;
-  readonly types?: StandardSchemaTypes<Input, Output>;
+  readonly types?: StandardSchemaTypes<Input, Output> | undefined;
   readonly jsonSchema: {
     readonly input: (options: Options) => Record<string, unknown>;
     readonly output: (options: Options) => Record<string, unknown>;
@@ -4737,7 +4999,7 @@ export interface StandardSchemaTypes<TInput = unknown, TOutput = TInput> {
 
 ### StandardSchemaV1 (interface)
 
-Standard Schema v1 contract accepted by RELKIT.
+Standard Schema v1 contract accepted by RelKit.
 The validate hook may return synchronously or asynchronously.
 
 **Example**
@@ -4764,7 +5026,7 @@ export interface StandardSchemaV1<TInput = unknown, TOutput = TInput> {
       value: unknown,
       options?: StandardSchemaOptions,
     ) => StandardResult<TOutput> | Promise<StandardResult<TOutput>>;
-    readonly types?: StandardSchemaTypes<TInput, TOutput>;
+    readonly types?: StandardSchemaTypes<TInput, TOutput> | undefined;
   };
 }
 ```

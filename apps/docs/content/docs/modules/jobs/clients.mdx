@@ -33,8 +33,8 @@ and pulling that backend's contract, render this component under `RelkitClientPr
 
 The hook selector is the job's public **name**, `exportOrders`, rather than its stable backend ID
 `orders.export-orders`. `useJobTrigger` supplies managed operation identity and retains pending
-receipt metadata. `useJobRun` waits for an accepted `runId`; mounting it does not submit a job.
-Persist that receipt in your application's own UI state if the page must restore it after navigation.
+submission metadata. `useJobRun` waits for an accepted `runId`; mounting it does not submit a job.
+Persist that `runId` in your application's own UI state if the page must restore it after navigation.
 
 | Client API                                                                                | Backend policy required               | Use                                                          |
 | ----------------------------------------------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------ |

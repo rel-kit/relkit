@@ -1,4 +1,4 @@
-import { normalizeId } from "@relkit/contracts";
+import { normalizeId, canCarryStandardSchema } from "@relkit/contracts";
 import { getJsonSchema, isSchemaTransformed, type StandardSchemaV1 } from "@relkit/schema";
 import { durationToMillis, type DurationInput } from "./duration.js";
 import { assertCanonicalProjection } from "./canonical-support.js";
@@ -12,7 +12,7 @@ import type { NormalizedTaskRetryPolicy, TaskStreamSchemas } from "./task-types.
  */
 export function assertSchema(value: unknown, name: string): asserts value is StandardSchemaV1 {
   if (
-    !isRecord(value) ||
+    !canCarryStandardSchema(value) ||
     !isRecord(value["~standard"]) ||
     value["~standard"].version !== 1 ||
     typeof value["~standard"].validate !== "function"

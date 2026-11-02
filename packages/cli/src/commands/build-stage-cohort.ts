@@ -120,8 +120,20 @@ function stageActivation(
       ...(input.options.providerOverridesGeneration === undefined
         ? {}
         : { providerOverridesGeneration: input.options.providerOverridesGeneration }),
+      ...schemaLibrariesHash(outputs.runtimeActivation),
     }),
   );
+}
+
+/**
+ * Carries the compiler's schema-library hash into the build's fingerprint.
+ * @param source - Compiler runtime activation JSON, or empty when not activatable.
+ * @returns The hash field, or nothing when the app uses no third-party schema library.
+ */
+function schemaLibrariesHash(source: string): { readonly schemaLibrariesHash?: string } {
+  if (source.trim() === "") return {};
+  const value = (JSON.parse(source) as { schemaLibrariesHash?: unknown }).schemaLibrariesHash;
+  return typeof value === "string" ? { schemaLibrariesHash: value } : {};
 }
 
 /**

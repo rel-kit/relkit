@@ -1,4 +1,4 @@
-import { assertJsonValue } from "@relkit/contracts";
+import { assertJsonValue, canCarryStandardSchema } from "@relkit/contracts";
 import type { JsonValue } from "@relkit/contracts";
 import type { StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
@@ -28,7 +28,7 @@ export function isSchema(value: unknown): value is StandardSchemaV1 {
  */
 export function isSchemaValue(value: unknown): value is StandardSchemaV1 {
   return (
-    isRecordValue(value) &&
+    canCarryStandardSchema(value) &&
     isRecordValue(value["~standard"]) &&
     value["~standard"].version === 1 &&
     typeof value["~standard"].validate === "function"

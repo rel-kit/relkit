@@ -1,4 +1,4 @@
-import { isRef, isStableId } from "@relkit/contracts";
+import { isRef, isStableId, canCarryStandardSchema } from "@relkit/contracts";
 import { Effect } from "effect";
 import type { ErrorDescriptorAny } from "./define-error.js";
 import type { FunctionRefAny } from "./types.js";
@@ -63,7 +63,7 @@ export function isErrorDescriptor(value: unknown): value is ErrorDescriptorAny {
 }
 
 function isSchema(value: unknown): boolean {
-  if (!isRecord(value) || !isRecord(value["~standard"])) return false;
+  if (!canCarryStandardSchema(value) || !isRecord(value["~standard"])) return false;
   return value["~standard"].version === 1 && typeof value["~standard"].validate === "function";
 }
 

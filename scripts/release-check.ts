@@ -16,6 +16,7 @@ import {
 } from "./release-check-support.js";
 import { packAll, templateInputs } from "./release-check-artifacts.js";
 import { readReleasePlan, selectReleasePackages } from "./release-plan.js";
+import { changelogSection } from "./version-packages.js";
 
 export function releaseNotes(data: RecordValue): string {
   const packageRows = (data.packages as RecordValue[])
@@ -29,9 +30,17 @@ export function releaseNotes(data: RecordValue): string {
   const templateRows = (data.templates as RecordValue[])
     .map((item) => `| ${item.name} | ${item.files} | \`${item.sha256}\` |`)
     .join("\n");
+  const changes =
+    typeof data.changes === "string" && data.changes.trim() !== ""
+      ? data.changes.trim()
+      : "No changelog entry for this release.";
   return `# RelKit ${data.version} release candidate
 
 Deterministic release output generated from checked-in package and template metadata.
+
+## Changes
+
+${changes}
 
 ## Review status
 
@@ -103,6 +112,7 @@ async function main(): Promise<void> {
   );
   const input = {
     version,
+    changes: changelogSection(await readFile(join(root, "CHANGELOG.md"), "utf8"), version) ?? "",
     packageManager: rootManifest.packageManager,
     packages: summary,
     templates,

@@ -5,11 +5,12 @@ import type {
 } from "./normalize-schema-projection.types.js";
 export type { SchemaDirection, SchemaResult } from "./normalize-schema-projection.types.js";
 import { createHash } from "node:crypto";
-import { canonicalJson, type JsonValue } from "@relkit/contracts";
+import { canonicalJson, type JsonValue, canCarryStandardSchema } from "@relkit/contracts";
 import {
   getJsonSchemaEffect,
   getSchemaMetadataEffect,
   isSchemaTransformedEffect,
+  schemaLibraryVersion,
   SchemaProjectorLive,
   type StandardSchemaV1,
 } from "@relkit/schema";
@@ -51,6 +52,8 @@ export const schemaEffect = Effect.fn("Compiler.schema")(
     const transformed = yield* isSchemaTransformedEffect(value);
     const metadata = yield* getSchemaMetadataEffect(value);
     const standard = value["~standard"];
+    const version = schemaLibraryVersion(standard.vendor);
+    const library = version === undefined ? undefined : { vendor: standard.vendor, version };
     return {
       ok: true,
       schema: selected.success,
@@ -63,9 +66,11 @@ export const schemaEffect = Effect.fn("Compiler.schema")(
         transformed,
         vendor: standard.vendor,
         validator: standard.validate.toString(),
+        ...(library === undefined ? {} : { library }),
       }),
       transformed,
       refined: metadata?.refined === true,
+      ...(library === undefined ? {} : { library }),
     };
   },
   (effect) => observeCompiler("normalization", "schema", effect, () => ({ schemas: 1 })),
@@ -89,7 +94,7 @@ export function schema(value: unknown, direction: SchemaDirection = "legacy"): S
  */
 export function isSchema(value: unknown): value is StandardSchemaV1 {
   return (
-    isRecord(value) &&
+    canCarryStandardSchema(value) &&
     isRecord(value["~standard"]) &&
     value["~standard"].version === 1 &&
     typeof value["~standard"].validate === "function"
@@ -138,6 +143,7 @@ function snapshotResult(value: SchemaSnapshot, direction: SchemaDirection): Sche
           }),
     ...(value.transformed === true ? { transformed: true } : {}),
     ...(value.refined === true ? { refined: true } : {}),
+    ...(value.library === undefined ? {} : { library: value.library }),
   };
 }
 

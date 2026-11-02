@@ -8,6 +8,7 @@ import {
 import { Effect } from "effect";
 import { functionTry, runFunctionSync } from "./function-observability.js";
 import type { StreamOutputSchema } from "./stream.types.js";
+import { canCarryStandardSchema } from "@relkit/contracts";
 
 export type { StreamOutputSchema } from "./stream.types.js";
 
@@ -103,7 +104,7 @@ function assertSchema(value: unknown): asserts value is StandardSchemaV1 {
 
 function isSchema(value: unknown): value is StandardSchemaV1 {
   return (
-    isRecord(value) &&
+    canCarryStandardSchema(value) &&
     isRecord(value["~standard"]) &&
     value["~standard"].version === 1 &&
     typeof value["~standard"].validate === "function"

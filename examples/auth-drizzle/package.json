@@ -18,7 +18,8 @@
     "@relkit/client": "workspace:*",
     "@relkit/drizzle": "workspace:*",
     "better-auth": "catalog:",
-    "drizzle-orm": "catalog:"
+    "drizzle-orm": "catalog:",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20250121.0",

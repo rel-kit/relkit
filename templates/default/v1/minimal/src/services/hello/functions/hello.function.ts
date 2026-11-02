@@ -1,6 +1,6 @@
-/** Returns a validated named greeting and logs each invocation through RELKIT's request context. */
+/** Returns a validated named greeting and logs each invocation through RelKit's request context. */
 import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 const hello = defineFunction({
   id: "hello.greet",
@@ -9,7 +9,7 @@ const hello = defineFunction({
   /**
    * Logs the greeting invocation and returns the validated greeting response.
    * @param input - Validated name from the function schema.
-   * @param context - RELKIT invocation context owning structured logging.
+   * @param context - RelKit invocation context owning structured logging.
    * @returns Greeting response matching the output schema.
    */
   handler: async ({ name }, context) => {

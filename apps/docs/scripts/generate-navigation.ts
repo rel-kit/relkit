@@ -9,7 +9,7 @@ const groups = [
     directory: "docs",
     title: "Documentation",
     icon: "book-open",
-    pages: ["index", "why-relkit", "faq", "learn", "modules", "api"],
+    pages: ["index", "why-relkit", "faq", "learn", "modules", "api", "errors"],
     display: "flat",
   },
   {
@@ -149,6 +149,7 @@ export const documentationSidebar: SidebarItemConfig[] = [
     },
     section("docs/api/integrations"),
   ]),
+  "/docs/errors",
 ];
 
 /** Emits ordered section and module navigation without maintaining a second tree.

@@ -1,6 +1,6 @@
 /** Produces demonstration CSV through the ordinary order helper and emits validated progress around the durable export. */
 import { defineTask } from "@relkit/app/tasks";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 import { exportOrderCsv } from "../helpers/fake-business.js";
 
 const exportOrders = defineTask({

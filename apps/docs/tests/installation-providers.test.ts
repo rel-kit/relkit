@@ -21,7 +21,7 @@ test("each job provider establishes its selected SDK recipe before configuration
     const install = source.indexOf(`/_snippets/generated/installations/${provider}.mdx`);
     expect(install, provider).toBeGreaterThan(0);
     expect(install, provider).toBeLessThan(source.search(/<include\s+source=/));
-    expect(source).toContain("creation tuple is currently rejected");
+    expect(source).toContain("creation combination is currently rejected");
   }
   expect(guide("docs/modules/jobs/providers/trigger")).not.toContain("@trigger.dev/sdk@4.5.16");
   expect(guide("docs/modules/jobs/providers/trigger")).toContain("**unverified**");

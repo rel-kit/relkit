@@ -55,12 +55,12 @@ Use `defineEventFunction` to run work when an event is published. After [definin
 - `event` is the exact ID of the event to consume.
 - `handler` receives the event data. This example logs a confirmation; replace the log with your own work, such as sending an email.
 
-Run `bun run check` from your app's root. RELKIT runs the handler when `orders.created` is published; you do not call it yourself.
+Run `bun run check` from your app's root. RelKit runs the handler when `orders.created` is published; you do not call it yourself.
 
 Use `defineFunction` when the caller needs a result, such as the created order. Use `defineEventFunction` for a reaction that runs separately, without returning a result to the publisher.
 
 When the reaction must survive the consumer process or expose run progress, trigger a task-first job from
-the event function. Event delivery and task admission remain separate operations; use an explicit stable
+the event function. Event delivery and task acceptance remain separate operations; use an explicit stable
 idempotency key where repeated event delivery could duplicate business work.
 
 ## Add another subscriber

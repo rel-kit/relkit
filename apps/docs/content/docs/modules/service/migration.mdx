@@ -1,6 +1,6 @@
 ---
 title: Move a flat application to grouped services
-description: Preview an optional source-only move, apply validated edits, and restore a guarded recovery receipt.
+description: Preview an optional source-only move, apply validated edits, and restore a guarded recovery record.
 pagination: false
 sidebar:
   icon: folder-input
@@ -52,7 +52,7 @@ IDs, ownership, contracts, exposure, policies, bindings, and resources before pu
 validation is a refusal, not a compatibility pass. The operation does not install packages, run SQL
 migrations or seeds, acquire providers, provision cloud infrastructure, or edit global skills.
 
-Publication is coordinated across files. The restricted local receipt retains before/after bytes,
+Publication is coordinated across files. The restricted local recovery record retains before/after bytes,
 permissions, and created-directory ownership for interruption or crash recovery; it does not promise
 cross-file atomicity. Keep the returned `.relkit/migrations/<id>/receipt.json` private. Failure recovery
 restores only matching transaction-owned states and preserves later edits.
@@ -60,7 +60,7 @@ restores only matching transaction-owned states and preserves later edits.
 </Step>
 </Steps>
 
-## Roll back with the exact receipt
+## Roll back with the exact recovery record
 
 Use the path returned by the write result:
 
@@ -68,12 +68,12 @@ Use the path returned by the write result:
 bun run relkit migrate layout --rollback .relkit/migrations/RECEIPT_ID/receipt.json
 ```
 
-Rollback rejects foreign, redirected, tampered, or permissive receipts. Later edits and occupied original
-locations are conflicts; it refuses to overwrite them. Inspect a retained recovery-required receipt and
+Rollback rejects foreign, redirected, tampered, or permissive recovery records. Later edits and occupied original
+locations are conflicts; it refuses to overwrite them. Inspect a retained recovery-required record and
 resolve its reported conflict before retrying. Never delete runtime state or migration history to force
 a rollback.
 
-After migration or restoration, prepare a fresh development cohort:
+After migration or restoration, prepare a fresh development build:
 
 ```sh
 bun run check
@@ -82,9 +82,9 @@ bun run relkit dev --prepare
 bun run dev
 ```
 
-Verify actual public responses and authorization before accepting the new cohort. Graph/build hashes
+Verify actual public responses and authorization before accepting the new build. Graph/build hashes
 and source links can change; that physical provenance is distinct from the stable logical contracts.
-Accepted jobs and agent threads can remain pinned to immutable older executable cohorts, so retain their
+Accepted jobs and agent threads can remain pinned to immutable older executable builds, so retain their
 owned artifacts and test native recovery before claiming source-move continuity. Stable IDs alone do not
 prove a provider can resume incompatible or unavailable historical executables.
 

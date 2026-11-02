@@ -25,7 +25,8 @@ export function isRuntimeActivationFingerprintEffect(value: unknown): Effect.Eff
         text(record.runtimeIntegrationsPlanHash) &&
         (record.localServicesPlanHash === undefined || text(record.localServicesPlanHash)) &&
         (record.providerOverridesGeneration === undefined ||
-          text(record.providerOverridesGeneration))
+          text(record.providerOverridesGeneration)) &&
+        (record.schemaLibrariesHash === undefined || text(record.schemaLibrariesHash))
       );
     }),
   );

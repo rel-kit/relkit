@@ -10,7 +10,7 @@ contract, integration bindings, server policy, telemetry, Inspector, and optiona
 handlers do not import this file.
 
 Use [defineApp](/docs/api/app#defineapp) from `@relkit/app/config` to declare this configuration.
-`defineConfig` is no longer exported by RELKIT. The environment declaration comes from
+`defineConfig` is no longer exported by RelKit. The environment declaration comes from
 [defineEnv](/docs/api/config#defineenv), explained in [Environment contracts](/docs/learn/concepts/environment).
 
 ## Configure the application with defineApp [#read-the-generated-configuration]
@@ -23,10 +23,10 @@ Use [defineApp](/docs/api/app#defineapp) from `@relkit/app/config` to declare th
   /_snippets/source/templates/default/v1/minimal/relkit.config.ts
 </include>
 
-The certified minimal app starts local-only: one environment contract, bounded telemetry capture and
+The tested minimal app starts local-only: one environment contract, bounded telemetry capture and
 an application listener. Inspection is disabled; the [standalone tool](/docs/modules/operations/inspector) has
 its own install/enable/run procedure. Cloud and deployment remain unselected, and the AWS/Pulumi
-creation tuple is currently unavailable. Add only explicitly [selected integration packages](/docs/modules/integrations)
+creation combination is currently unavailable. Add only explicitly [selected integration packages](/docs/modules/integrations)
 and their native SDKs before importing their constructors into this config.
 
 ## Import Platform fragments explicitly

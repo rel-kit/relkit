@@ -10,7 +10,7 @@ export type StandardPathSegment = PropertyKey | { readonly key: PropertyKey };
  */
 export interface StandardIssue {
   readonly message: string;
-  readonly path?: readonly StandardPathSegment[];
+  readonly path?: readonly StandardPathSegment[] | undefined;
 }
 
 /**
@@ -54,7 +54,7 @@ export interface StandardSchemaTypes<TInput = unknown, TOutput = TInput> {
 }
 
 /**
- * Standard Schema v1 contract accepted by RELKIT.
+ * Standard Schema v1 contract accepted by RelKit.
  * The validate hook may return synchronously or asynchronously.
  * @example const result = await schema["~standard"].validate(value);
  */
@@ -73,7 +73,7 @@ export interface StandardSchemaV1<TInput = unknown, TOutput = TInput> {
       value: unknown,
       options?: StandardSchemaOptions,
     ) => StandardResult<TOutput> | Promise<StandardResult<TOutput>>;
-    readonly types?: StandardSchemaTypes<TInput, TOutput>;
+    readonly types?: StandardSchemaTypes<TInput, TOutput> | undefined;
   };
 }
 
@@ -93,7 +93,7 @@ export namespace StandardJSONSchemaV1 {
   export interface Props<Input = unknown, Output = Input> {
     readonly version: 1;
     readonly vendor: string;
-    readonly types?: StandardSchemaTypes<Input, Output>;
+    readonly types?: StandardSchemaTypes<Input, Output> | undefined;
     readonly jsonSchema: {
       readonly input: (options: Options) => Record<string, unknown>;
       readonly output: (options: Options) => Record<string, unknown>;
@@ -129,7 +129,7 @@ export namespace StandardSchemaV1 {
 }
 
 /**
- * RELKIT schema boundary with optional legacy and directional projections.
+ * RelKit schema boundary with optional legacy and directional projections.
  * @example const schema: RelkitSchema = z.string();
  */
 export interface RelkitSchema<TInput = unknown, TOutput = TInput> extends StandardSchemaV1<
@@ -159,7 +159,7 @@ export type JsonValue =
 export type InferInput<S extends StandardSchemaV1> = S["~standard"] extends {
   readonly types?: infer Types;
 }
-  ? Types extends StandardSchemaTypes<infer Input, unknown>
+  ? NonNullable<Types> extends StandardSchemaTypes<infer Input, unknown>
     ? Input
     : unknown
   : unknown;
@@ -171,7 +171,7 @@ export type InferInput<S extends StandardSchemaV1> = S["~standard"] extends {
 export type InferOutput<S extends StandardSchemaV1> = S["~standard"] extends {
   readonly types?: infer Types;
 }
-  ? Types extends StandardSchemaTypes<unknown, infer Output>
+  ? NonNullable<Types> extends StandardSchemaTypes<unknown, infer Output>
     ? Output
     : unknown
   : unknown;

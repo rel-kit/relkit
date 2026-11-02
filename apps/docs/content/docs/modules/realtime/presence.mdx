@@ -34,9 +34,9 @@ The protected order channel enables connection counts:
   /_snippets/source/examples/commerce/src/services/orders/channels/order-updates.channel.ts
 </include>
 
-Member presence is allowed only on a protected channel. Its `member` schema defines the public information, `resolve(params, context)` derives that information from trusted server context, and `maxMembers` limits the returned list. It does not limit how many connections may join; provider admission limits are separate.
+Member presence is allowed only on a protected channel. Its `member` schema defines the public information, `resolve(params, context)` derives that information from trusted server context, and `maxMembers` limits the returned list. It does not limit how many connections may join; provider connection limits are separate.
 
-Return only data another authorized member may see. RELKIT adds an opaque, stable, scope-bound member ID and never exposes the raw ID from your authentication provider.
+Return only data another authorized member may see. RelKit adds an opaque, stable, scope-bound member ID and never exposes the raw ID from your authentication provider.
 
 ## Read presence in React
 

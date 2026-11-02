@@ -126,6 +126,8 @@ export interface NormalizationWork {
   transformReferences: Map<string, NormalizedDescriptor>;
   schemas: Map<string, JsonValue>;
   schemaHashes: Map<string, string>;
+  /** Installed version of each third-party schema library the app's contracts use. */
+  schemaLibraries: Map<string, string>;
   nodes: GraphNode[];
   edges: GraphEdge[];
   observedEdges: ObservedEdge[];

@@ -21,19 +21,19 @@ export type {
 } from "./builder.types.js";
 
 /**
- * Builds RELKIT Standard Schema validators with familiar composition helpers.
+ * Builds RelKit Standard Schema validators with familiar composition helpers.
  *
  * @example
  * ```ts
- * import { z } from "@relkit/app/schema"
+ * import { s } from "@relkit/schema"
  *
- * const order = z.object({ id: z.string(), quantity: z.number().int().positive() })
+ * const order = s.object({ id: s.string(), quantity: s.number().int().positive() })
  * order.parse({ id: "order-1", quantity: 2 })
  * ```
  * @category Schemas
- * @since 0.1.0
+ * @since 0.9.0
  */
-export const z: ZBuilder = {
+export const s: ZBuilder = {
   string: () => stringSchema(),
   number: () => numberSchema(),
   boolean: () =>
@@ -60,6 +60,22 @@ export const z: ZBuilder = {
   array: arraySchema,
   union: unionSchema,
 };
+
+/**
+ * The built-in schema builder under its current public name. The breaking release renames it to
+ * `s`; until then `z` and `s` are the same builder.
+ *
+ * @example
+ * ```ts
+ * import { z } from "@relkit/app/schema"
+ *
+ * const order = z.object({ id: z.string(), quantity: z.number().int().positive() })
+ * order.parse({ id: "order-1", quantity: 2 })
+ * ```
+ * @category Schemas
+ * @since 0.1.0
+ */
+export const z: ZBuilder = s;
 
 function primitiveSchema<T>(name: string, guard: (value: unknown) => value is T): Schema<T, T> {
   return createSchema(

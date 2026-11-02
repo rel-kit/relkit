@@ -79,6 +79,7 @@ export const EvaluatorSchemaSnapshot = Schema.Struct({
   transformed: Schema.optionalKey(Schema.Boolean),
   refined: Schema.optionalKey(Schema.Boolean),
   reason: Schema.optionalKey(Schema.String),
+  library: Schema.optionalKey(Schema.Struct({ vendor: Schema.String, version: Schema.String })),
 });
 
 /** Descriptor identity and JSON-safe metadata returned by the evaluator. */

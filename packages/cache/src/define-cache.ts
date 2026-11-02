@@ -1,4 +1,10 @@
-import { createDescriptorBase, deepFreeze, isDescriptor, normalizeId } from "@relkit/contracts";
+import {
+  createDescriptorBase,
+  deepFreeze,
+  isDescriptor,
+  normalizeId,
+  canCarryStandardSchema,
+} from "@relkit/contracts";
 import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
 import { observeCache } from "./client-observability.js";
@@ -165,7 +171,7 @@ function hasOwn(value: object, key: PropertyKey): boolean {
 }
 /** Checks the Standard Schema protocol. */
 function isSchema(value: unknown): value is StandardSchemaV1 {
-  if (!isRecord(value) || !isRecord(value["~standard"])) return false;
+  if (!canCarryStandardSchema(value) || !isRecord(value["~standard"])) return false;
   return value["~standard"].version === 1 && typeof value["~standard"].validate === "function";
 }
 /** Checks positive integer TTLs. */

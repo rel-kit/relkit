@@ -4,7 +4,7 @@
  * by its stable identity without importing a private service implementation.
  */
 import { defineServiceRoutes, http } from "@relkit/app/routes";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 import orders from "../../services/orders/service.js";
 
 export const { GET, POST } = defineServiceRoutes(orders, {

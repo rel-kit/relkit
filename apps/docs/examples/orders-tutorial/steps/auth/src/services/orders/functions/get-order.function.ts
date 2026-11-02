@@ -1,6 +1,6 @@
 /** Reads a validated order ID only within the authenticated user's ownership and returns a concealed missing result otherwise. */
 import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 export default defineFunction({
   input: z.object({ orderId: z.string().min(1) }),
   output: z.object({

@@ -51,7 +51,7 @@ With `--no-install`, run `bun install` and `bun run check` before continuing. Se
 </Tab>
 <Tab title="Manual" icon="file-code">
 
-Install the compatible owner-specific cohort before creating the files below. RELKIT packages
+Install the compatible owner-specific package versions before creating the files below. RelKit packages
 have independent versions; keep existing manifest settings when merging the repair.
 
 <include>/_snippets/generated/installations/database.mdx</include>
@@ -103,7 +103,7 @@ Define the model in [Drizzle tables](/docs/modules/database/schema), then use
 [Drizzle Kit](/docs/modules/database/migrations) to generate and apply its migrations before starting the app.
 
 `models` and `overrides` are optional; omit both for base CRUD. `dispose(database)` closes the underlying
-driver or pool. RELKIT calls it during normal runtime shutdown. A process crash still requires normal
+driver or pool. RelKit calls it during normal runtime shutdown. A process crash still requires normal
 database recovery; shutdown hooks are not backup or durability guarantees.
 
 </Step>
@@ -118,7 +118,7 @@ database recovery; shutdown hooks are not backup or durability guarantees.
 | MySQL      | MySQL tables and a compatible async Drizzle client/pool                 | Returned mutation rows need a recoverable primary/unique key; see [queries](/docs/modules/database/queries#understand-dialect-and-upsert-limits). |
 
 Driver construction remains native Drizzle configuration. Configure TLS, connection limits, query
-timeouts, logging, and pool disposal there as appropriate for that driver. RELKIT does not add these as
+timeouts, logging, and pool disposal there as appropriate for that driver. RelKit does not add these as
 service options or translate tables between dialects. The executable guides here verify Bun SQLite;
 test other drivers against their actual database before deploying.
 

@@ -1,6 +1,6 @@
-/** Runs an offline greeting agent with RELKIT/native tools, todo middleware and public state observation. */
+/** Runs an offline greeting agent with RelKit/native tools, todo middleware and public state observation. */
 import { defineAgent } from "@relkit/langchain";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 import { FakeToolCallingModel, todoListMiddleware, tool } from "langchain";
 import lookup from "@app/services/hello/tools/lookup.tool.js";
 

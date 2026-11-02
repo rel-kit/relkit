@@ -1,8 +1,9 @@
-import { serializeJsonEffect, type JsonValue } from "@relkit/contracts";
+import { canCarryStandardSchema, serializeJsonEffect, type JsonValue } from "@relkit/contracts";
 import {
   getJsonSchemaEffect,
   getSchemaMetadataEffect,
   isSchemaTransformedEffect,
+  schemaLibraryVersion,
   SchemaProjectorLive,
   type StandardSchemaV1,
 } from "@relkit/schema";
@@ -20,8 +21,8 @@ import { ownDataProperty, schemaHasAccessorsEffect } from "./evaluator-snapshot-
  */
 export const snapshotSchemaEffect = Effect.fn("Discovery.snapshotSchema")(
   function* (value: unknown) {
-    if (!isRecord(value)) return undefined;
-    const standard = ownDataProperty(value, "~standard");
+    if (!canCarryStandardSchema(value)) return undefined;
+    const standard = standardCapability(value);
     if (!isRecord(standard)) return undefined;
     const version = ownDataProperty(standard, "version");
     const validate = ownDataProperty(standard, "validate");
@@ -56,10 +57,12 @@ export const snapshotSchemaEffect = Effect.fn("Discovery.snapshotSchema")(
     };
     const transformed = yield* isSchemaTransformedEffect(schema);
     const metadata = yield* getSchemaMetadataEffect(schema);
+    const library = schemaLibrary(standard);
     const contract: JsonValue = {
       projections,
       transformed,
       validator: Function.prototype.toString.call(validate),
+      ...(library === undefined ? {} : { library }),
     };
     const serialized = yield* serializeJsonEffect(contract).pipe(Effect.orDie);
     return EvaluatorSchemaSnapshot.make({
@@ -68,10 +71,43 @@ export const snapshotSchemaEffect = Effect.fn("Discovery.snapshotSchema")(
       contractHash: `sha256:${createHash("sha256").update(serialized, "utf8").digest("hex")}`,
       ...(transformed ? { transformed: true } : {}),
       ...(metadata?.refined === true ? { refined: true } : {}),
+      ...(library === undefined ? {} : { library }),
     });
   },
   (effect) => observeCompiler("discovery", "snapshotSchema", effect, () => ({}), false),
 );
+
+/**
+ * Reads the `~standard` capability. Libraries such as Zod 4 define it as an inherited getter,
+ * so the getter runs once when no data property exists; its body is the schema library's own
+ * code, like the projection hooks that run next.
+ * @param value - Metadata node.
+ * @returns The capability object, or undefined for ordinary metadata.
+ */
+function standardCapability(value: Record<string, unknown>): unknown {
+  const own = ownDataProperty(value, "~standard");
+  if (own !== undefined) return own;
+  if (!("~standard" in value)) return undefined;
+  try {
+    return Reflect.get(value, "~standard");
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Names the installed library that made a schema, so its version joins the build fingerprint.
+ * @param standard - The schema's `~standard` capability.
+ * @returns Vendor and version for a recognized third-party library, otherwise undefined.
+ */
+function schemaLibrary(
+  standard: Record<string, unknown>,
+): { readonly vendor: string; readonly version: string } | undefined {
+  const vendor = ownDataProperty(standard, "vendor");
+  if (typeof vendor !== "string") return undefined;
+  const version = schemaLibraryVersion(vendor, process.cwd());
+  return version === undefined ? undefined : { vendor, version };
+}
 
 /**
  * Narrows non-array objects for descriptor inspection.

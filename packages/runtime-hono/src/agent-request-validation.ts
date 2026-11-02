@@ -8,6 +8,7 @@ import {
   AGENT_STREAM_VERSION,
   canonicalJson,
   REALTIME_RUNTIME_LIMITS,
+  canCarryStandardSchema,
 } from "@relkit/contracts";
 import type { AgentStateLimits, RunOwner } from "@relkit/agents";
 import { type StandardSchemaV1 } from "@relkit/schema";
@@ -106,5 +107,9 @@ export function isAgent(value: unknown): value is {
  * @returns Whether the inspected value satisfies the declared type guard.
  */
 export function isSchema(value: unknown): value is StandardSchemaV1 {
-  return isRecord(value) && isRecord(value["~standard"]) && value["~standard"].version === 1;
+  return (
+    canCarryStandardSchema(value) &&
+    isRecord(value["~standard"]) &&
+    value["~standard"].version === 1
+  );
 }

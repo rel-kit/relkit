@@ -1,6 +1,6 @@
 /** Supplies the report route with ten validated stream items, stopping when its invocation signal aborts. */
 import { defineFunction, streamOf } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 const streamOrderReport = defineFunction({
   input: z.object({ reportId: z.string().min(1) }),

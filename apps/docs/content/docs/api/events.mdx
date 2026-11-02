@@ -3109,7 +3109,7 @@ hasOwn({ id: "orders.created" }, "id");
 declare const hasOwn: (value: object, key: PropertyKey) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L52)
 
 ### hasOwnEffect
 
@@ -3130,7 +3130,7 @@ declare const hasOwnEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L62)
 
 ### isPositiveInteger
 
@@ -3148,7 +3148,7 @@ isPositiveInteger(1);
 declare const isPositiveInteger: (value: unknown) => value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L71)
 
 ### isPositiveIntegerEffect
 
@@ -3166,7 +3166,7 @@ Effect.runSync(isPositiveIntegerEffect(1));
 declare const isPositiveIntegerEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L80)
 
 ### isRecord
 
@@ -3184,7 +3184,7 @@ isRecord({ id: "orders.created" });
 declare const isRecord: (value: unknown) => value is Record<PropertyKey, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L33)
 
 ### isRecordEffect
 
@@ -3202,7 +3202,7 @@ Effect.runSync(isRecordEffect({ id: "orders.created" }));
 declare const isRecordEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L42)
 
 ### isSchema
 
@@ -3220,7 +3220,7 @@ isSchema(schema);
 declare const isSchema: (value: unknown) => value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L12)
 
 ### isSchemaEffect
 
@@ -3238,7 +3238,7 @@ Effect.runSync(isSchemaEffect(schema));
 declare const isSchemaEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L21)
 
 ### validateVersion
 
@@ -3260,7 +3260,7 @@ validateVersion(1);
 declare const validateVersion: (value: unknown) => asserts value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L89)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L90)
 
 ### validateVersionEffect
 
@@ -3280,7 +3280,7 @@ declare const validateVersionEffect: (
 ) => Effect.Effect<number, EventDefinitionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L103)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L104)
 
 ## `event-errors.ts`
 

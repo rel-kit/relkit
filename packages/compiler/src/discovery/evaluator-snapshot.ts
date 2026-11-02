@@ -84,6 +84,9 @@ const snapshotValue: (
     return Number.isFinite(value) ? value : marker("non-finite-number");
   if (typeof value === "undefined") return marker("undefined");
   if (depth > 8) return marker("depth-limit");
+  // Some libraries, such as ArkType, make schemas callable, so check for a schema first.
+  const schema = yield* snapshotSchemaEffect(value);
+  if (schema !== undefined) return schema;
   if (typeof value === "function") {
     const nameValue = ownDataProperty(value, "name");
     const name = typeof nameValue === "string" ? nameValue : "";
@@ -98,8 +101,6 @@ const snapshotValue: (
   }
   if (typeof value === "symbol") return marker("symbol", value.description);
   if (typeof value === "bigint") return marker("bigint");
-  const schema = yield* snapshotSchemaEffect(value);
-  if (schema !== undefined) return schema;
   if (Array.isArray(value)) {
     if (seen.has(value)) return marker("cycle");
     seen.add(value);

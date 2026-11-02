@@ -6,7 +6,7 @@ sidebar:
   icon: lock-keyhole
 ---
 
-Require a session on selected application paths after mounting Better Auth. This HTTP admission
+Require a session on selected application paths after mounting Better Auth. This HTTP access
 check answers “is the caller signed in?” It does not answer “may this caller access this order?”
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
@@ -27,7 +27,7 @@ check answers “is the caller signed in?” It does not answer “may this call
 
 The optional catch-all owns `/api/auth` and nested auth endpoints. The named export must be `ALL`, and
 the handler must be the registered service's `auth.handler`. It is a [raw handler](/docs/modules/http/raw-handlers),
-not a typed function route. Native auth requests and responses do not become RELKIT OpenAPI/client
+not a typed function route. Native auth requests and responses do not become RelKit OpenAPI/client
 operations, and raw routes do not accept the function-route `request`, `responses`, or `rateLimit` options.
 
 The `auth` option is accepted only for a recognized Better Auth handler. It cannot attach session
@@ -50,7 +50,7 @@ empty, the integration does not require sessions on other application paths. Unl
 public unless another policy protects them.
 
 `/orders/*` in the example does not create an Orders route. Likewise, protecting `/mcp` controls HTTP
-admission to that path; it does not change [which tools MCP exposes](/docs/modules/ai/mcp).
+access to that path; it does not change [which tools MCP exposes](/docs/modules/ai/mcp).
 
 The mounted auth base path and its descendants remain reachable even with `protected: ["/*"]`, so
 callers can sign in. This exception is only the auth mount, not a configurable list of other public
@@ -75,11 +75,11 @@ A request without a valid session receives HTTP `401`:
 { "error": { "id": "UNAUTHORIZED", "message": "Authentication required" } }
 ```
 
-RELKIT does not redirect the browser to a login page. Your frontend handles the response and offers a
+RelKit does not redirect the browser to a login page. Your frontend handles the response and offers a
 sign-in flow. Preserve a safe, validated return destination if you redirect after authentication;
 do not turn arbitrary input into an open redirect.
 
-With the example running, verify admission from another terminal:
+With the example running, verify the access check from another terminal:
 
 ```sh
 curl -i http://127.0.0.1:3000/account/profile

@@ -6,7 +6,7 @@ sidebar:
   icon: workflow
 ---
 
-A graph describes a workflow whose steps and branching rules belong to your application. RELKIT registers the declared topology and compiles a native LangGraph while preserving native reducers,
+A graph describes a workflow whose steps and branching rules belong to your application. RelKit registers the declared topology and compiles a native LangGraph while preserving native reducers,
 parallel scheduling, conditional edges, loops, `Send`, subgraphs, retry behavior, and pending writes.
 
 Agent graph state and checkpoint resources remain the authority for graph continuation. A task may invoke an
@@ -60,7 +60,7 @@ Checkpoint history and long-term memory are separate resources:
 </include>
 
 `defineCheckpointerDb` accepts a native `BaseCheckpointSaver`; `defineMemoryDb` accepts a native
-`BaseStore`. The tested driver cohort is:
+`BaseStore`. The tested drivers are:
 
 | Resource     | Supported native implementations                                                                  |
 | ------------ | ------------------------------------------------------------------------------------------------- |
@@ -69,12 +69,12 @@ Checkpoint history and long-term memory are separate resources:
 
 The tested `RedisStore` does not satisfy the selected LangGraph `BaseStore` declarations: it lacks
 the lifecycle methods and operation-specific batch result typing required by `defineMemoryDb`.
-Strict Redis memory-store compatibility is therefore not guaranteed in this cohort. This declaration
+Strict Redis memory-store compatibility is therefore not guaranteed with these tested versions. This declaration
 limitation does not establish that Redis memory cannot run through LangGraph's internal batching
 wrapper. The Redis and shallow Redis checkpointer entries above remain supported separately.
 
 Driver-specific retention, TTL, serialization, shallow-history, and semantic-search capabilities remain
-native. RELKIT does not flatten them into options that every driver supposedly supports.
+native. RelKit does not flatten them into options that every driver supposedly supports.
 
 The in-memory saver/store in the example are supplied by the selected LangGraph SDK. External driver
 packages are application-owned dependencies. Install only the driver you choose, in the backend root;
@@ -87,29 +87,29 @@ driver deployment. Keep the Redis memory-store limitation above when choosing a 
 
 ## Initialize and own resources explicitly
 
-RELKIT never calls driver `.setup()`, runs migrations, creates tables or indexes, installs extensions, or
+RelKit never calls driver `.setup()`, runs migrations, creates tables or indexes, installs extensions, or
 pushes an application schema during compilation, inspection, activation, or an ordinary request. Perform
 the driver's documented initialization as an explicit application or infrastructure step before starting
 workers.
 
-A supplied instance is borrowed by default and is never closed by RELKIT. A factory is owned by default;
+A supplied instance is borrowed by default and is never closed by RelKit. A factory is owned by default;
 owned resources require a `dispose` callback and are released once. Set `ownership` explicitly when the
 default does not match the real lifecycle.
 
 Prefer a dedicated AI database. Sharing a physical database requires a compatible underlying client,
 isolated tables or schemas, a restricted role, and migration filters that keep checkpoint/store objects out
-of the application Drizzle lifecycle. A RELKIT Redis cache provider is not a Redis saver or store.
+of the application Drizzle lifecycle. A RelKit Redis cache provider is not a Redis saver or store.
 
 ## Resume the same business thread
 
 Every initial run, observation, stop, steering operation, follow-up, approval, and continuation supplies a
-caller-owned `threadId`. RELKIT never derives one from input, remembers an implicit current thread, or
+caller-owned `threadId`. RelKit never derives one from input, remembers an implicit current thread, or
 generates a fallback. Internal run, task, attempt, and operation IDs are separate.
 
 After the graph persists its checkpoint and waiting contract, submit the exact declared reply on the same
-thread with `{ resume: true }`. A boolean wait rejects text such as `"yes"`; RELKIT does not interpret it.
+thread with `{ resume: true }`. A boolean wait rejects text such as `"yes"`; RelKit does not interpret it.
 The runtime binds the continuation to the waiting revision, scope, action, policy, and response schema,
-deduplicates an accepted receipt, and fences competing workers.
+deduplicates an accepted resume request, and fences competing workers.
 
 See [Threads and recovery](/docs/modules/ai/threads-recovery) for restart and external-effect safety, and
 [Agent streaming](/docs/modules/ai/streaming) for the public event sequence.

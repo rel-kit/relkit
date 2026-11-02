@@ -1,7 +1,7 @@
 {
   "name": "@relkit/schema",
   "version": "0.7.13",
-  "description": "RELKIT schema API; prefer @relkit/app/schema in applications.",
+  "description": "RelKit schema API; prefer @relkit/app/schema in applications.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -38,8 +38,32 @@
   "dependencies": {
     "effect": "catalog:"
   },
+  "peerDependencies": {
+    "@valibot/to-json-schema": ">=1.3.0 <2",
+    "arktype": ">=2.1.0 <3",
+    "valibot": ">=1.0.0 <2",
+    "zod": ">=4.2.0 <5"
+  },
+  "peerDependenciesMeta": {
+    "@valibot/to-json-schema": {
+      "optional": true
+    },
+    "arktype": {
+      "optional": true
+    },
+    "valibot": {
+      "optional": true
+    },
+    "zod": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@valibot/to-json-schema": "1.8.0",
     "@vitest/coverage-v8": "catalog:",
-    "vitest": "catalog:"
+    "arktype": "2.2.9",
+    "valibot": "1.5.0",
+    "vitest": "catalog:",
+    "zod": "4.6.7"
   }
 }

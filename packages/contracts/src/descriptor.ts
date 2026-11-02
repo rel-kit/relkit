@@ -158,9 +158,42 @@ export function deepFreeze<T>(value: T): T {
 function freezeObject(value: unknown, seen: WeakSet<object>): void {
   if (value === null || typeof value !== "object" || seen.has(value)) return;
   seen.add(value);
+  if (isForeignSchema(value)) return;
   for (const key of Reflect.ownKeys(value)) {
     const property = Object.getOwnPropertyDescriptor(value, key);
     if (property && "value" in property) freezeObject(property.value, seen);
   }
   Object.freeze(value);
+}
+
+/**
+ * Recognizes a Standard Schema from another library. Such schemas belong to their library, which
+ * may fill caches on them later (Zod does while producing JSON Schema), so they are not frozen.
+ * @param value - Object inside a descriptor.
+ * @returns Whether it is a Standard Schema whose vendor is not RelKit.
+ */
+function isForeignSchema(value: object): boolean {
+  if (!("~standard" in value)) return false;
+  try {
+    const standard = (value as { readonly "~standard"?: { readonly vendor?: unknown } })[
+      "~standard"
+    ];
+    return typeof standard?.vendor === "string" && standard.vendor !== "relkit";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Checks whether a value can carry a Standard Schema `~standard` property. Most schema libraries
+ * use objects, but some, such as ArkType, make schemas callable functions.
+ * @param value - Candidate schema.
+ * @returns Whether the value is a non-null object or a function.
+ * @example canCarryStandardSchema(type("string")); // true
+ */
+export function canCarryStandardSchema(value: unknown): value is Record<PropertyKey, unknown> {
+  return (
+    value !== null &&
+    (typeof value === "function" || (typeof value === "object" && !Array.isArray(value)))
+  );
 }

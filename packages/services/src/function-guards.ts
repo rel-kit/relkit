@@ -1,4 +1,4 @@
-import { isDescriptorEffect } from "@relkit/contracts";
+import { canCarryStandardSchema, isDescriptorEffect } from "@relkit/contracts";
 import type { FunctionRefAny } from "@relkit/functions";
 import { Effect } from "effect";
 import { observeService, runServiceSync } from "./service-observability.js";
@@ -38,7 +38,7 @@ export function isFunctionDescriptor(value: unknown): value is FunctionRefAny {
 /** Recognize Standard Schema v1 within the parent function guard span. */
 function isSchemaEffect(value: unknown): Effect.Effect<boolean> {
   return Effect.sync(() => {
-    if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
+    if (!canCarryStandardSchema(value)) return false;
     const standard = Reflect.get(value, "~standard");
     return (
       standard !== null &&

@@ -40,7 +40,7 @@ The paths below are patterns, not files you must create in every domain. Replace
 
 Default-export each ordinary descriptor from its own file, following its capability's guide. Route files
 are different: they export named HTTP methods. Plain helper modules are ordinary TypeScript; they do not
-need a RELKIT descriptor or their own service.
+need a RelKit descriptor or their own service.
 
 ## One selected service root
 
@@ -122,12 +122,12 @@ and review [tool approvals](/docs/modules/ai/approvals) before exposing them.
 ## Events and jobs belong to the work's owner
 
 Put the fact in the producing domain's `events/` directory and the reaction in the receiving domain's
-`functions/` directory. For example, Orders defines `orders.created`, while Receipts defines the
+`functions/` directory. For example, Orders defines `orders.created`, while the `receipts` domain defines the
 `defineEventFunction` that reacts to it. The subscriber stays out of `service.functions`: it runs through
 event delivery or replay, not direct invocation.
 
 A task and job belong to the domain responsible for completing the durable work. The task stays in that
-domain's `tasks/` directory and the job owns its public name, admission, and schedules. A schedule is an
+domain's `tasks/` directory and the job owns its public name, acceptance checks, and schedules. A schedule is an
 option on the job, not a separate service or a reason to move the task. Follow [your first event](/guides/events/react-to-order-events),
 [jobs](/docs/modules/jobs), and [schedules](/docs/modules/jobs/schedules) for the complete workflows.
 

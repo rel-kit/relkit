@@ -6,7 +6,7 @@
 | Native `defineAgent`, `defineGraph`, `defineGraphNode` | `@relkit/langchain`  | LangChain model execution or native graph |
 | `defineTool`                                           | `@relkit/app/tools`  | Policy-controlled view of a function      |
 | `definePrompt`                                         | `@relkit/app`        | Reusable instructions                     |
-| `z`                                                    | `@relkit/app/schema` | Agent and tool schemas                    |
+| `z`                                                    | `zod`                | Agent and tool schemas                    |
 
 The native integration requires application-installed `@langchain/core`, `@langchain/langgraph`, `langchain` and `langsmith` at the supported versions. Add `deepagents` only for a deep-agent declaration. Check/build/start validate selected requirements before readiness; they do not install missing peers. Generic descriptors, tools and agent-state provider contracts do not select a native engine.
 
@@ -16,7 +16,7 @@ Use `defineAgent` when a model should choose among tools. The agent template pro
 
 ```ts
 import { defineAgent } from "@relkit/langchain";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 import { FakeToolCallingModel } from "langchain";
 import lookup from "@app/services/hello/tools/lookup.tool.js";
 export default defineAgent({
@@ -36,7 +36,7 @@ Other generated projects may need a native model package and application-owned p
 
 ## `defineTool` and `definePrompt`
 
-A RELKIT tool wraps a callable function without duplicating its schemas:
+A RelKit tool wraps a callable function without duplicating its schemas:
 
 ```ts
 import { defineTool } from "@relkit/app/tools";

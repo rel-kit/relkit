@@ -13,6 +13,7 @@ import {
   type ParsedRouteFilePath,
 } from "@relkit/compiler";
 import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
+import { canCarryStandardSchema } from "@relkit/contracts";
 
 const methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ALL"] as const;
 
@@ -215,7 +216,7 @@ function isRawRoute(
  * @returns True for a usable authored schema.
  */
 function isSchema(value: unknown): value is StandardSchemaV1 {
-  return isRecord(value) && isRecord(value["~standard"]);
+  return canCarryStandardSchema(value) && isRecord(value["~standard"]);
 }
 
 /**

@@ -6,7 +6,7 @@ Use a task for work that must outlive its initiating request; a function remains
 
 ```ts
 import { defineTask } from "@relkit/app/tasks";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 export default defineTask({
   id: "orders.export-orders",

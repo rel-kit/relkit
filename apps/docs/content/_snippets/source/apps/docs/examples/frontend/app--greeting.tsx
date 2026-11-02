@@ -2,7 +2,7 @@
  * @returns Loading, connection failure, request failure, or the successful greeting. */
 export function Greeting() {
   const { status } = useRelkitClient();
-  const greeting = useRoute("GET /hello", { input: { name: "RELKIT" } });
+  const greeting = useRoute("GET /hello", { input: { name: "RelKit" } });
 
   if (status === "application-updated") {
     return <p role="alert">The API changed. Pull its contract and restart the frontend.</p>;

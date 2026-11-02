@@ -21,6 +21,10 @@ test("the real check pipeline rejects an inferred users path without id input", 
   await mkdir(join(root, "node_modules/@relkit"), { recursive: true });
   await symlink(join(repository, "packages/app"), join(root, "node_modules/@relkit/app"));
   await symlink(join(repository, "packages/testing"), join(root, "node_modules/@relkit/testing"));
+  await symlink(
+    join(repository, "packages/schema/node_modules/zod"),
+    join(root, "node_modules/zod"),
+  );
   await mkdir(join(root, "src/routes/users/[id]"), { recursive: true });
   await mkdir(join(root, "src/users/functions"), { recursive: true });
   await writeFile(

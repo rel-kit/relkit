@@ -1,5 +1,5 @@
 import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 const createOrder = defineFunction({
   input: z.object({

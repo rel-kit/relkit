@@ -1,5 +1,5 @@
 import { defineEvent } from "@relkit/app/events";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 const orderCreated = defineEvent({
   id: "orders.created",

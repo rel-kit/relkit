@@ -8,7 +8,7 @@ Create `src/services/announcements/channels/announcements.channel.ts`:
 
 ```ts
 import { defineChannel } from "@relkit/app/realtime";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 const announcements = defineChannel({
   id: "announcements.feed",
@@ -29,7 +29,7 @@ After the application change succeeds, publish one validated event from a backen
 
 ```ts
 import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 import announcements from "@app/services/announcements/channels/announcements.channel.js";
 
 export default defineFunction({
@@ -46,7 +46,7 @@ export default defineFunction({
 });
 ```
 
-The `trigger()` receipt confirms the provider accepted the append; it does not prove delivery to every browser. If a database write and publication must be atomic, use an outbox in the database transaction. A retryable publish can pass a RELKIT-issued `idempotencyKey` as the fourth argument.
+The `trigger()` receipt confirms the provider accepted the append; it does not prove delivery to every browser. If a database write and publication must be atomic, use an outbox in the database transaction. A retryable publish can pass a RelKit-issued `idempotencyKey` as the fourth argument.
 
 In a React client with `@relkit/client`, subscribe using the generated channel registry:
 

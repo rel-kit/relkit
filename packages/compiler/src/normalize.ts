@@ -68,6 +68,7 @@ export const normalizeCompilationWithSourcesEffect = Effect.fn("Compiler.normali
       transformReferences: new Map(),
       schemas: new Map(),
       schemaHashes: new Map(),
+      schemaLibraries: new Map(),
       nodes: [],
       edges: [],
       observedEdges: [...(input.observedEdges ?? [])],

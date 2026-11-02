@@ -6,4 +6,6 @@ export interface RuntimeActivationFingerprint {
   readonly runtimeIntegrationsPlanHash: string;
   readonly localServicesPlanHash?: string;
   readonly providerOverridesGeneration?: string;
+  /** Hash of the installed versions of third-party schema libraries the app's contracts use. */
+  readonly schemaLibrariesHash?: string;
 }

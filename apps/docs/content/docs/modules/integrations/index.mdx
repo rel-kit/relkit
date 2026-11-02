@@ -6,7 +6,7 @@ sidebar:
   icon: plug
 ---
 
-An integration connects a RELKIT capability to a provider, such as S3 for files or Redis for cached values. Services, functions, routes, and events
+An integration connects a RelKit capability to a provider, such as S3 for files or Redis for cached values. Services, functions, routes, and events
 depend on checked capability contracts; integrations connect those contracts to Redis, S3,
 telemetry exporters, local Docker services, and deployment platforms.
 
@@ -64,7 +64,7 @@ identifies providers without a recipe.
 | `@relkit/effect-mq`   | PostgreSQL-backed retryable task adapter                                         | [Jobs](/docs/modules/jobs/providers/effect-mq)                |
 | `@relkit/drizzle`     | Optional database integration and selected native ORM                            | [Database installation](/docs/modules/database/define)        |
 | `@relkit/better-auth` | Optional auth bridge; native SDK and React leaf selected separately              | [Auth installation](/docs/modules/auth/better-auth)           |
-| `@relkit/langchain`   | Optional native agent engine and selected SDK cohort                             | [Agent installation](/guides/ai/build-an-offline-agent)       |
+| `@relkit/langchain`   | Optional native agent engine and selected SDK versions                           | [Agent installation](/guides/ai/build-an-offline-agent)       |
 | `@relkit/inspector`   | Separately installed UI and history tool                                         | [Inspector setup](/docs/modules/operations/inspector)         |
 
 Install standalone packages when you want the smallest dependency surface:

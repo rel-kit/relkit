@@ -19,7 +19,7 @@ export const migrateHelp = command(
             option(
               "rollback",
               "string",
-              "Restore a local migration receipt; conflicts refuse overwrite",
+              "Restore files from a migration record; refuses to overwrite later edits",
             ),
           ],
         },

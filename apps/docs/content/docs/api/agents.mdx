@@ -771,7 +771,7 @@ declare const assertAgentSchema: (
 ) => asserts value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-schema.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-schema.ts#L47)
 
 ### assertAgentSchemaEffect
 
@@ -792,7 +792,7 @@ declare const assertAgentSchemaEffect: (
 ) => Effect.Effect<StandardSchemaV1<unknown, unknown>, AgentValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-schema.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-schema.ts#L20)
 
 ### isAgentSchema
 
@@ -810,7 +810,7 @@ if (isAgentSchema(value)) value["~standard"].validate(input);
 declare const isAgentSchema: (value: unknown) => value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-schema.ts#L83)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-schema.ts#L84)
 
 ### isAgentSchemaEffect
 
@@ -828,7 +828,7 @@ const valid = Effect.runSync(isAgentSchemaEffect(z.string()));
 declare const isAgentSchemaEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-schema.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-schema.ts#L67)
 
 ## `agent-validation-value.ts`
 
@@ -2011,7 +2011,7 @@ export interface AgentSpanCapture {
 
 ## `client-contract-metadata.ts`
 
-Projects generic RELKIT tool references and public event schemas into client metadata.
+Projects generic RelKit tool references and public event schemas into client metadata.
 Native middleware, graph state and SDK schema projection remain in @relkit/langchain.
 
 ### "./client-contract-metadata.types.js" (namespace export)
@@ -2775,7 +2775,7 @@ The compiler selects native execution when an application actually declares agen
 
 ### defineAgent
 
-Defines an SDK-independent agent using validated schemas and RELKIT tool references.
+Defines an SDK-independent agent using validated schemas and RelKit tool references.
 
 **Throws**
 

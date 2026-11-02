@@ -8,11 +8,11 @@ sidebar:
 
 An agent uses a language model to decide which steps and tools can answer a request. For a fixed sequence of steps, use [a function](/docs/learn/concepts/functions).
 
-Pass compatible LangChain models, tools, and middleware directly. RELKIT validates the declared input,
+Pass compatible LangChain models, tools, and middleware directly. RelKit validates the declared input,
 output, limits, tool policies, and public client contract around the native execution. For exact options,
 use the [native agent reference](/docs/api/integrations/langchain#defineagent).
 
-See [Native runtime and DeepAgents](/docs/modules/ai/native-runtime) for the supported package cohort, public
+See [Native runtime and DeepAgents](/docs/modules/ai/native-runtime) for the supported package versions, public
 typing boundary, and deep-agent limitations. For explicit workflows and durable continuation, use
 [LangGraph, persistence, and resume](/docs/modules/ai/graphs-persistence).
 
@@ -71,7 +71,7 @@ For every prompt scaffolding flag, see the [prompt command reference](/docs/api/
 <Callout type="note" title="Before you begin" icon="clipboard-check">
   Start with an [existing minimal app](/docs/learn/create-an-app). Its generic agent contracts do
   not install native execution. When adding the declaration manually, install the explicit
-  integration and SDK cohort before importing `defineAgent` from `@relkit/langchain`:
+  integration and its tested SDK versions before importing `defineAgent` from `@relkit/langchain`:
 </Callout>
 
 <include>/_snippets/generated/installations/agent.mdx</include>
@@ -96,7 +96,7 @@ This agent answers greeting questions using a single tool. Create it after [defi
   /_snippets/source/templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts
 </include>
 
-`input` describes what your app sends; `output` describes the answer your app expects. RELKIT validates both. Output validation checks the shape, not whether the model's answer is factually correct.
+`input` describes what your app sends; `output` describes the answer your app expects. RelKit validates both. Output validation checks the shape, not whether the model's answer is factually correct.
 
 Write `instructions` that explain when to use each tool and how to answer. The agent can call only tools in its `tools` array. Start with the smallest set needed for the task.
 

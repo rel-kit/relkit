@@ -453,7 +453,7 @@ declare const validateNativeAgentResumeInput: (
 
 ## `deepagent-bucket-backend.ts`
 
-Adapts a configured RELKIT bucket to the DeepAgents file backend, sharing the invocation scope and preserving bucket failures at the native adapter.
+Adapts a configured RelKit bucket to the DeepAgents file backend, sharing the invocation scope and preserving bucket failures at the native adapter.
 
 ### DeepAgentBucketBackendOptions
 
@@ -492,7 +492,7 @@ declare const createDeepAgentBucketBackend: (
 
 ### createDeepAgentBucketBackendEffect
 
-Builds a DeepAgents backend from a RELKIT bucket client.
+Builds a DeepAgents backend from a RelKit bucket client.
 
 **Example**
 
@@ -538,11 +538,11 @@ declare const createDeepAgentBucketBackendEffect: (
 
 ## `deepagent-bucket-backend.types.ts`
 
-Configuration for a DeepAgents backend bound to a RELKIT bucket.
+Configuration for a DeepAgents backend bound to a RelKit bucket.
 
 ### DeepAgentBucketBackendOptions (interface)
 
-Configuration for a DeepAgents backend bound to a RELKIT bucket.
+Configuration for a DeepAgents backend bound to a RelKit bucket.
 
 **Signature**
 
@@ -2119,7 +2119,7 @@ declare const writeBucketEffect: (
 
 ## `define-agent-build.ts`
 
-Assembles validated native agent configuration into a RELKIT descriptor, preserving native model, tools and execution metadata for runtime selection.
+Assembles validated native agent configuration into a RelKit descriptor, preserving native model, tools and execution metadata for runtime selection.
 
 ### prepareAgentDescriptor
 
@@ -2444,7 +2444,7 @@ declare const isAgentModelEffect: (value: unknown) => Effect.Effect<boolean, nev
 
 ## `define-agent-native-tools.ts`
 
-Separates native SDK tools from RELKIT callable references while retaining native identity and serializable generic tool references.
+Separates native SDK tools from RelKit callable references while retaining native identity and serializable generic tool references.
 
 ### copyAgentTools
 
@@ -2470,7 +2470,7 @@ declare const copyAgentTools: <Tools extends readonly AgentTool[]>(value: Tools)
 
 ### copyAgentToolsEffect
 
-Validates and freezes RELKIT and native agent tools in input order.
+Validates and freezes RelKit and native agent tools in input order.
 
 **Example**
 
@@ -2490,7 +2490,7 @@ declare const copyAgentToolsEffect: <Tools extends readonly AgentTool[]>(
 
 ### relkitToolRefs
 
-Selects RELKIT references for existing synchronous authoring callers.
+Selects RelKit references for existing synchronous authoring callers.
 
 **Example**
 
@@ -2508,7 +2508,7 @@ declare const relkitToolRefs: (tools: readonly AgentTool[]) => readonly ToolRefA
 
 ### relkitToolRefsEffect
 
-Selects RELKIT tool references from a mixed native tool list.
+Selects RelKit tool references from a mixed native tool list.
 
 **Example**
 
@@ -2612,7 +2612,7 @@ export interface AgentLanguageModel {
 
 ### AgentMiddleware (type alias)
 
-SDK fields RELKIT inspects; each descriptor retains its complete inferred middleware tuple, including native hooks, tools and phantom schema data. Runtime validation checks the SDK brand.
+SDK fields RelKit inspects; each descriptor retains its complete inferred middleware tuple, including native hooks, tools and phantom schema data. Runtime validation checks the SDK brand.
 
 **Signature**
 
@@ -2669,7 +2669,7 @@ type AgentModelFactory<Environment = Readonly<Record<string, unknown>>> = (
 
 ### AgentTool (type alias)
 
-RELKIT reference or native LangChain tool.
+RelKit reference or native LangChain tool.
 
 **Signature**
 
@@ -3428,7 +3428,7 @@ declare const defineGraphNode: <
 
 ### defineGraphNodeEffect
 
-Defines a native LangGraph node with RELKIT schemas and declared dynamic routes.
+Defines a native LangGraph node with RelKit schemas and declared dynamic routes.
 
 **Example**
 
@@ -3623,7 +3623,7 @@ type GraphNodeHandler<
 
 ### GraphNodeImplementation (type alias)
 
-User implementation before RELKIT input and output validation.
+User implementation before RelKit input and output validation.
 
 **Signature**
 
@@ -4061,7 +4061,7 @@ declare const isPersistenceResource: (value: unknown) => value is PersistenceRes
 
 ### isPersistenceResourceEffect
 
-Checks whether a value is a RELKIT persistence resource descriptor.
+Checks whether a value is a RelKit persistence resource descriptor.
 
 **Example**
 
@@ -4343,7 +4343,7 @@ declare const graphCompilationFailure: (cause: unknown) => GraphCompilationFailu
 
 ## `graph-compile.ts`
 
-Compiles validated RELKIT graph descriptors into LangGraph execution objects using the authored nodes, edges, state and persistence options.
+Compiles validated RelKit graph descriptors into LangGraph execution objects using the authored nodes, edges, state and persistence options.
 
 ### compileGraph
 
@@ -4515,7 +4515,7 @@ declare const validateGraphResumeInputEffect: (
 
 ## `graph-continuation-waiting.ts`
 
-Projects native graph interrupts into durable waiting state used by the RELKIT continuation protocol before returning control to callers.
+Projects native graph interrupts into durable waiting state used by the RelKit continuation protocol before returning control to callers.
 
 ### waitingInterrupts
 
@@ -5296,7 +5296,7 @@ declare const GRAPH_EXECUTION: unique symbol;
 
 ## `graph-interruption.ts`
 
-Converts native graph interrupt observations into RELKIT continuation data while preserving the interrupt identifiers needed for resume.
+Converts native graph interrupt observations into RelKit continuation data while preserving the interrupt identifiers needed for resume.
 
 ### GraphInterruptedError (class)
 
@@ -5473,7 +5473,7 @@ declare const publicWaitingRequestsEffect: (
 
 ## `graph-interruption.types.ts`
 
-Converts native graph interrupt observations into RELKIT continuation data while preserving the interrupt identifiers needed for resume. This companion preserves the native input and output types without starting runtime work.
+Converts native graph interrupt observations into RelKit continuation data while preserving the interrupt identifiers needed for resume. This companion preserves the native input and output types without starting runtime work.
 
 ### GraphWaitingInterrupt (interface)
 
@@ -5519,11 +5519,11 @@ declare const validateGraphNodeSchemasEffect: (
 
 ## `graph-node-symbol.ts`
 
-Private brand identifying a validated RELKIT graph node.
+Private brand identifying a validated RelKit graph node.
 
 ### RELKIT_GRAPH_NODE
 
-Private brand identifying a validated RELKIT graph node.
+Private brand identifying a validated RelKit graph node.
 
 **Signature**
 
@@ -6201,7 +6201,7 @@ export interface ResolvedGraphPersistence {
 
 ## `graph-runtime-error.ts`
 
-Translates native graph execution failures into the RELKIT graph error boundary while preserving their original causes.
+Translates native graph execution failures into the RelKit graph error boundary while preserving their original causes.
 
 ### GraphInvocationFailure (class)
 
@@ -6370,7 +6370,7 @@ declare const collectCompiledGraphStateEffect: (
 
 ## `graph-runtime-stream.ts`
 
-Consumes native graph streams and publishes RELKIT execution events, finalizing the native iterator before settling the invocation.
+Consumes native graph streams and publishes RelKit execution events, finalizing the native iterator before settling the invocation.
 
 ### streamCompiledGraphEffect
 
@@ -6828,7 +6828,7 @@ export interface SubgraphNodeDescriptor<
 
 ## `graph-workflow-error.ts`
 
-Defines graph workflow failures at the RELKIT execution boundary, preserving graph identity and the native failure cause.
+Defines graph workflow failures at the RelKit execution boundary, preserving graph identity and the native failure cause.
 
 ### GraphWorkflowFailure (class)
 
@@ -6862,7 +6862,7 @@ declare const graphWorkflowFailure: (cause: unknown) => GraphWorkflowFailure;
 
 ## `graph-workflow.ts`
 
-Adapts native graph execution to the RELKIT workflow contract, carrying invocation context and scoped persistence through completion.
+Adapts native graph execution to the RelKit workflow contract, carrying invocation context and scoped persistence through completion.
 
 ### "./graph-workflow.types.js" (namespace export)
 
@@ -6979,7 +6979,7 @@ declare const graphWorkflowRequiresPersistenceEffect: (
 
 ## `graph-workflow.types.ts`
 
-Adapts native graph execution to the RELKIT workflow contract, carrying invocation context and scoped persistence through completion. This companion preserves the native input and output types without starting runtime work.
+Adapts native graph execution to the RelKit workflow contract, carrying invocation context and scoped persistence through completion. This companion preserves the native input and output types without starting runtime work.
 
 ### GraphWorkflow (interface)
 
@@ -7444,7 +7444,7 @@ declare const nativeAgentInterruptionFailure: (cause: unknown) => NativeAgentInt
 
 ## `native-agent-interruption-schema.ts`
 
-Declares executable schemas for native interruption payloads before they cross the durable RELKIT continuation boundary.
+Declares executable schemas for native interruption payloads before they cross the durable RelKit continuation boundary.
 
 ### "./native-agent-interruption-schema.types.js" (namespace export)
 
@@ -7644,7 +7644,7 @@ declare const publicHitlRequestEffect: (
 
 ## `native-agent-interruption-schema.types.ts`
 
-Declares executable schemas for native interruption payloads before they cross the durable RELKIT continuation boundary. This companion preserves the native input and output types without starting runtime work.
+Declares executable schemas for native interruption payloads before they cross the durable RelKit continuation boundary. This companion preserves the native input and output types without starting runtime work.
 
 ### DecisionType (type alias)
 
@@ -7741,7 +7741,7 @@ declare const validateNativeAgentResumeInputCore: (
 
 ## `native-agent-interruption.ts`
 
-Projects native agent interruption state into RELKIT approval and continuation records without losing native interrupt identity.
+Projects native agent interruption state into RelKit approval and continuation records without losing native interrupt identity.
 
 ### nativeAgentResumeCommand
 
@@ -7951,11 +7951,11 @@ declare const agentPersistenceFailure: (cause: unknown) => AgentPersistenceFailu
 
 ## `persistence-symbol.ts`
 
-Shared marker used to recognize RELKIT persistence descriptors.
+Shared marker used to recognize RelKit persistence descriptors.
 
 ### RELKIT_PERSISTENCE
 
-Shared marker used to recognize RELKIT persistence descriptors.
+Shared marker used to recognize RelKit persistence descriptors.
 
 **Signature**
 
@@ -8230,7 +8230,7 @@ declare const streamNativeAgentLoop: (context: NativeAgentLoopContext) => Promis
 
 ## `runtime-loop-telemetry.ts`
 
-Publishes native invocation loop observations to RELKIT telemetry using the current execution context and stable agent identifiers.
+Publishes native invocation loop observations to RelKit telemetry using the current execution context and stable agent identifiers.
 
 ### createLoopTelemetry
 
@@ -9005,7 +9005,7 @@ type NativeAgentRuntimeOptions = Omit<AgentRuntimeOptions, "agent"> &
 
 ## `runtime-native-event-tools.ts`
 
-Projects native tool events into RELKIT tool lifecycle observations while preserving tool call identifiers and status order.
+Projects native tool events into RelKit tool lifecycle observations while preserving tool call identifiers and status order.
 
 ### emitToolEvent
 
@@ -9145,7 +9145,7 @@ declare const trackExecutionContext: (
 
 ## `runtime-native-events.ts`
 
-Maps the native event stream into RELKIT execution events and public observations in the order delivered by the native iterator.
+Maps the native event stream into RelKit execution events and public observations in the order delivered by the native iterator.
 
 ### collectNativeEvents
 
@@ -9557,7 +9557,7 @@ type NativeExecutionContext = Pick<AgentExecutionEvent, "agent" | "parent">;
 
 ## `runtime-native-response-format.ts`
 
-Converts a validated RELKIT output schema to the native structured response
+Converts a validated RelKit output schema to the native structured response
 strategy, preserving schema failures and disabling native silent recovery.
 
 ### responseFormatEffect
@@ -10047,7 +10047,7 @@ declare const NativeToolIdentityLive: Layer.Layer<NativeToolIdentity, never, nev
 
 ## `runtime-native-tools.ts`
 
-Combines authored native tools and RELKIT callable adapters for invocation, retaining input schemas and native dispatch identity.
+Combines authored native tools and RelKit callable adapters for invocation, retaining input schemas and native dispatch identity.
 
 ### NativeToolIdentity
 
@@ -10135,7 +10135,7 @@ declare const createNativeToolsEffect: (
 
 ## `runtime-native-tools.types.ts`
 
-Combines authored native tools and RELKIT callable adapters for invocation, retaining input schemas and native dispatch identity. This companion preserves the native input and output types without starting runtime work.
+Combines authored native tools and RelKit callable adapters for invocation, retaining input schemas and native dispatch identity. This companion preserves the native input and output types without starting runtime work.
 
 ### NativeToolIdentityService (interface)
 
@@ -10284,7 +10284,7 @@ declare const selectedStateSchemas: (
 ) => ReadonlyMap<string, StandardSchemaV1>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-state-schemas.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-state-schemas.ts#L31)
 
 ### selectedStateSchemasEffect
 
@@ -10309,7 +10309,7 @@ declare const selectedStateSchemasEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-state-schemas.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-state-schemas.ts#L15)
 
 ## `runtime-strict-response-schema.ts`
 
@@ -10329,7 +10329,7 @@ declare const strictResponseSchema: (schema: JsonSchema, depth?: number) => Json
 
 ## `runtime-tool-adapter.ts`
 
-Adapts RELKIT callable tools to native SDK tools while preserving validated input, execution context and typed invocation failures.
+Adapts RelKit callable tools to native SDK tools while preserving validated input, execution context and typed invocation failures.
 
 ### createAgentInvocationDispatcher
 
@@ -10433,7 +10433,7 @@ declare const invokeAgentToolEffect: (
 
 ## `runtime-tool-dispatcher.ts`
 
-Dispatches native tool calls to the selected RELKIT tool target and carries approval and execution failures back to the native loop.
+Dispatches native tool calls to the selected RelKit tool target and carries approval and execution failures back to the native loop.
 
 ### createAgentInvocationDispatcher
 
@@ -10653,7 +10653,7 @@ declare const invokeRegisteredAgentToolEffect: (
 
 ## `runtime-tool-lookup.ts`
 
-Resolves authored RELKIT tool references against the invocation tool registry before native tool construction.
+Resolves authored RelKit tool references against the invocation tool registry before native tool construction.
 
 ### findModelTool
 
@@ -10779,7 +10779,7 @@ declare const modelToolNameEffect: (
 
 ## `runtime-tools.ts`
 
-Builds invocation tool bindings from the selected RELKIT registry and native tool descriptors, keeping execution ownership with the caller.
+Builds invocation tool bindings from the selected RelKit registry and native tool descriptors, keeping execution ownership with the caller.
 
 ### AgentToolCall
 
@@ -10897,7 +10897,7 @@ declare const runTool: (
 
 ### runToolEffect
 
-Executes an allowed RELKIT tool with safe public error projection.
+Executes an allowed RelKit tool with safe public error projection.
 
 **Example**
 
@@ -10923,11 +10923,11 @@ declare const runToolEffect: (
 
 ## `runtime-tools.types.ts`
 
-One model requested RELKIT tool call.
+One model requested RelKit tool call.
 
 ### AgentToolCall (interface)
 
-One model requested RELKIT tool call.
+One model requested RelKit tool call.
 
 **Signature**
 
@@ -11494,7 +11494,7 @@ declare const executionDeadline: (options: ExecutionSignalOptions, now: number) 
 
 ## `signal.ts`
 
-Builds and validates RELKIT signal descriptors used by native agent execution while retaining their payload schema and stable identity.
+Builds and validates RelKit signal descriptors used by native agent execution while retaining their payload schema and stable identity.
 
 ### "./signal.types.js" (namespace export)
 
@@ -11699,7 +11699,7 @@ declare const withSignalEffect: <T>(
 
 ## `signal.types.ts`
 
-Builds and validates RELKIT signal descriptors used by native agent execution while retaining their payload schema and stable identity. This companion preserves the native input and output types without starting runtime work.
+Builds and validates RelKit signal descriptors used by native agent execution while retaining their payload schema and stable identity. This companion preserves the native input and output types without starting runtime work.
 
 ### ExecutionSignalClockService (interface)
 
@@ -12274,7 +12274,7 @@ declare const createTrace: (
 
 ## `agents.ts`
 
-Publishes the native agent test harness helpers from the explicit integration while sharing RELKIT testing ownership and clock boundaries.
+Publishes the native agent test harness helpers from the explicit integration while sharing RelKit testing ownership and clock boundaries.
 
 ### TestAgent
 
@@ -12483,7 +12483,7 @@ declare const testAgentLayer: <Agent extends TestAgentDescriptor>(
 
 ## `agents.types.ts`
 
-Publishes the native agent test harness helpers from the explicit integration while sharing RELKIT testing ownership and clock boundaries. This companion preserves the native input and output types without starting runtime work.
+Publishes the native agent test harness helpers from the explicit integration while sharing RelKit testing ownership and clock boundaries. This companion preserves the native input and output types without starting runtime work.
 
 ### TestAgent (interface)
 

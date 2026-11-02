@@ -1,20 +1,59 @@
 /** Checks release changelog rendering and that certification or documentation failure prevents an incomplete candidate from reaching release notes. */
 import { expect, test } from "bun:test";
-import { renderActionChangelog, renderChangelog } from "../../scripts/version-packages.ts";
+import {
+  changelogSection,
+  classifyChange,
+  renderActionChangelog,
+  renderChangelog,
+} from "../../scripts/version-packages.ts";
 import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-test("the release train promotes Unreleased into one root changelog entry", () => {
+test("the release train promotes Unreleased into Breaking, New and Fixed groups", () => {
   expect(
     renderChangelog(
       "# Changelog\n\n## Unreleased — Breaking\n\n- Existing change.\n\n## 0.0.0\n\n- Bootstrap.\n",
       "0.0.1",
-      ["New public API.", "Existing change."],
+      [
+        { kind: "Fixed", summary: "`relkit dev` keeps the last good build." },
+        { kind: "New", summary: "Functions accept Valibot contracts." },
+        { kind: "Fixed", summary: "Existing change." },
+        {
+          kind: "Breaking",
+          summary:
+            "Export the builder as `s`. [Migration](https://relkit.dev/docs/guides/migrate/0-9)",
+        },
+      ],
     ),
   ).toBe(
-    "# Changelog\n\n## Unreleased\n\n## 0.0.1 — Breaking\n\n- Existing change.\n\n### Changes\n\n- New public API.\n\n## 0.0.0\n\n- Bootstrap.\n",
+    "# Changelog\n\n## Unreleased\n\n## 0.0.1 — Breaking\n\n- Existing change.\n\n### Breaking\n\n- Export the builder as `s`. [Migration](https://relkit.dev/docs/guides/migrate/0-9)\n\n### New\n\n- Functions accept Valibot contracts.\n\n### Fixed\n\n- `relkit dev` keeps the last good build.\n\n## 0.0.0\n\n- Bootstrap.\n",
   );
+});
+
+test("changesets are grouped by prefix, then by bump, and kept on one line", () => {
+  expect(
+    classifyChange({
+      summary: "New: Add\n`relkit mcp`.",
+      releases: [{ name: "a", type: "patch" }],
+    }),
+  ).toEqual({ kind: "New", summary: "Add `relkit mcp`." });
+  expect(
+    classifyChange({ summary: "Adds a hook.", releases: [{ name: "a", type: "minor" }] }),
+  ).toEqual({ kind: "New", summary: "Adds a hook." });
+  expect(
+    classifyChange({ summary: "Fix a crash.", releases: [{ name: "a", type: "patch" }] }),
+  ).toEqual({ kind: "Fixed", summary: "Fix a crash." });
+  expect(() =>
+    classifyChange({ summary: "Rename `z` to `s`.", releases: [{ name: "a", type: "major" }] }),
+  ).toThrow("Breaking change has no migration link");
+});
+
+test("a release section is read back for the release notes", () => {
+  const changelog =
+    "# Changelog\n\n## Unreleased\n\n## 0.0.2\n\n### New\n\n- A.\n\n## 0.0.1\n\n- B.\n";
+  expect(changelogSection(changelog, "0.0.2")).toBe("### New\n\n- A.");
+  expect(changelogSection(changelog, "0.0.3")).toBeUndefined();
 });
 
 test("the Changesets action receives an untracked package changelog", () => {

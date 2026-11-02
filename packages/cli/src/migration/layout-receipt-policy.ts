@@ -19,7 +19,10 @@ export function validateLayoutReceipt(
 ): void {
   const expected = join(root, ".relkit", "migrations", receipt.id, "receipt.json");
   if (receipt.root !== root || location !== expected)
-    throw fail("RELKIT_LAYOUT_RECEIPT_INVALID", "Receipt does not belong to this project.");
+    throw fail(
+      "RELKIT_LAYOUT_RECEIPT_INVALID",
+      "The migration record does not belong to this project.",
+    );
   for (const directory of receipt.directories) {
     if (
       !receipt.edits.some((edit) => edit.after.path.startsWith(directory + "/")) ||
@@ -27,7 +30,10 @@ export function validateLayoutReceipt(
         directory,
       )
     )
-      throw fail("RELKIT_LAYOUT_RECEIPT_INVALID", "Receipt has invalid directory ownership.");
+      throw fail(
+        "RELKIT_LAYOUT_RECEIPT_INVALID",
+        "The migration record lists directories outside this project.",
+      );
   }
   const paths = new Set<string>();
   const outputs = new Set<string>();
@@ -36,16 +42,22 @@ export function validateLayoutReceipt(
       if (
         /(?:^|\/)(?:\.git|node_modules|\.env[^/]*|credentials|migrations)(?:\/|$)/.test(file.path)
       )
-        throw fail("RELKIT_LAYOUT_RECEIPT_INVALID", `Receipt touches protected path: ${file.path}`);
+        throw fail(
+          "RELKIT_LAYOUT_RECEIPT_INVALID",
+          `The migration record touches a protected path: ${file.path}`,
+        );
     }
     if (paths.has(edit.before.path) || outputs.has(edit.after.path))
-      throw fail("RELKIT_LAYOUT_RECEIPT_INVALID", "Receipt has duplicate edit ownership.");
+      throw fail(
+        "RELKIT_LAYOUT_RECEIPT_INVALID",
+        "The migration record lists the same edit twice.",
+      );
     paths.add(edit.before.path);
     outputs.add(edit.after.path);
   }
   for (const edit of receipt.edits) {
     if (edit.before.path !== edit.after.path && paths.has(edit.after.path))
-      throw fail("RELKIT_LAYOUT_RECEIPT_INVALID", "Receipt has overlapping edit ownership.");
+      throw fail("RELKIT_LAYOUT_RECEIPT_INVALID", "The migration record lists edits that overlap.");
   }
   for (const edit of receipt.edits) {
     for (const file of [edit.before, edit.after]) {

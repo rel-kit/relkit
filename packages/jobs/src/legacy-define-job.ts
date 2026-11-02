@@ -5,6 +5,7 @@ import {
   isRef,
   normalizeId,
   type JsonValue,
+  canCarryStandardSchema,
 } from "@relkit/contracts";
 import type { FunctionRefAny } from "@relkit/functions";
 import { Effect, Result, Schema } from "effect";
@@ -159,7 +160,7 @@ function isFunctionTarget(value: unknown): value is FunctionRefAny {
 }
 function isSchema(value: unknown): value is StandardSchemaV1 {
   return (
-    isRecord(value) &&
+    canCarryStandardSchema(value) &&
     isRecord(value["~standard"]) &&
     value["~standard"].version === 1 &&
     typeof value["~standard"].validate === "function"

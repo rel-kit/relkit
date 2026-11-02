@@ -3,16 +3,21 @@ import type { HttpTriggerRegistration } from "@relkit/graph";
 import type { MiddlewareDescriptor } from "@relkit/routes";
 import type { StandardSchemaV1 } from "@relkit/schema";
 import { isRecord } from "./materialize-routes-utils.js";
+import { canCarryStandardSchema } from "@relkit/contracts";
 
 /** Recognize a Standard Schema v1 descriptor at the RPC boundary.
  * @param value - Value to validate or project.
  * @returns Whether the value exposes the supported Standard Schema marker.
  */
 export function isSchema(value: unknown): value is StandardSchemaV1 {
-  return isRecord(value) && isRecord(value["~standard"]) && value["~standard"].version === 1;
+  return (
+    canCarryStandardSchema(value) &&
+    isRecord(value["~standard"]) &&
+    value["~standard"].version === 1
+  );
 }
 
-/** Adapt RELKIT stream schemas to oRPC's async iterator schema.
+/** Adapt RelKit stream schemas to oRPC's async iterator schema.
  * @param schema - Schema used to validate or infer the value.
  * @returns The stream item iterator schema or the original scalar schema.
  */
@@ -71,7 +76,7 @@ export function routeOperation(trigger: HttpTriggerRegistration): "query" | "mut
   return ["GET", "HEAD", "OPTIONS"].includes(trigger.config.method) ? "query" : "mutation";
 }
 
-/** Recognize a RELKIT stream schema with a Standard Schema item.
+/** Recognize a RelKit stream schema with a Standard Schema item.
  * @param value - Value to validate or project.
  * @returns Whether the schema requires an iterator output adapter.
  */

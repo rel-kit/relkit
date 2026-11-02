@@ -79,4 +79,20 @@ test("tracked release notes exclude rebuild-dependent tarball hashes", () => {
   expect(notes).toContain("attached\nrelease manifest and checksum files");
   expect(notes).toContain("Archive checks run during publication");
   expect(notes).not.toContain("packed-artifact, template, declaration");
+  expect(notes).toContain("## Changes\n\nNo changelog entry for this release.");
+});
+
+test("release notes list the release's changelog groups", () => {
+  const notes = releaseNotes({
+    version: "0.0.2",
+    inputFingerprint: "input",
+    packageManager: "bun@1.3.10",
+    changes:
+      "### Breaking\n\n- Rename. [Migration](https://relkit.dev/docs/guides/migrate)\n\n### Fixed\n\n- Fix.",
+    packages: [],
+    templates: [],
+  });
+  expect(notes).toContain(
+    "## Changes\n\n### Breaking\n\n- Rename. [Migration](https://relkit.dev/docs/guides/migrate)\n\n### Fixed\n\n- Fix.\n",
+  );
 });

@@ -78,6 +78,7 @@ export const SnapshotActivation = Schema.Struct({
   jobsManifestHash: Schema.optionalKey(SnapshotHash),
   runtimeIntegrationsPlanHash: SnapshotHash,
   localServicesPlanHash: Schema.optionalKey(SnapshotHash),
+  schemaLibrariesHash: Schema.optionalKey(SnapshotHash),
 });
 
 /** All runtime-affecting versions participate in snapshot compatibility. */

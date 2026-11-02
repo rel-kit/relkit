@@ -4,6 +4,7 @@ import type { StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
 import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
+import { canCarryStandardSchema } from "@relkit/contracts";
 
 /** Resolves validators for selected public state keys.
  * @param sources - State schema sources in precedence order.
@@ -65,7 +66,7 @@ function stateFields(value: unknown): Record<string, unknown> | undefined {
 
 function isStandardSchema(value: unknown): value is StandardSchemaV1 {
   return (
-    isRecord(value) &&
+    canCarryStandardSchema(value) &&
     isRecord(value["~standard"]) &&
     value["~standard"].version === 1 &&
     typeof value["~standard"].validate === "function"

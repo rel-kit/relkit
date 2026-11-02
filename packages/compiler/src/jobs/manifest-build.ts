@@ -145,6 +145,7 @@ export function inputWork(input: JobsManifestInput): NormalizationWork {
     descriptors: [...input.descriptors],
     referencesByKind,
     schemaHashes: new Map(),
+    schemaLibraries: new Map(),
     references: new Map(),
     middlewareReferences: new Map(),
     transformReferences: new Map(),

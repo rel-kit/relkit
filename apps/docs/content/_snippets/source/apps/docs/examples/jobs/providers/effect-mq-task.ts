@@ -1,5 +1,5 @@
 import { defineTask } from "@relkit/app/tasks";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 const order = z.object({
   id: z.string().min(1),

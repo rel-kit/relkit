@@ -1,4 +1,4 @@
-import { isRef } from "@relkit/contracts";
+import { isRef, canCarryStandardSchema } from "@relkit/contracts";
 import { isErrorDescriptor } from "@relkit/functions";
 import { Effect } from "effect";
 import { observeTool, runToolSync } from "./tool-observability.js";
@@ -175,6 +175,6 @@ function rawIsRecord(value: unknown): value is Record<PropertyKey, unknown> {
 }
 
 function isSchema(value: unknown): boolean {
-  if (!rawIsRecord(value) || !rawIsRecord(value["~standard"])) return false;
+  if (!canCarryStandardSchema(value) || !rawIsRecord(value["~standard"])) return false;
   return value["~standard"].version === 1 && typeof value["~standard"].validate === "function";
 }

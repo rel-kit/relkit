@@ -17,13 +17,13 @@ export default defineEnv({
 });
 ```
 
-Builders include `string`, `secret`, `number`, `boolean`, `port`, `url`, `json`, and `literal(...)`. Use `.default(value)` only for intentional safe defaults, `.optional()` for absent values, `.requiredIn("production")` for environment-specific requirements, and `.description(text)` or `.example(value)` for safe metadata. A URL field resolves to a `URL`, a number field to a number, and a Boolean field to a boolean. Do not declare `PORT` or `RELKIT_ENV`; RELKIT reserves them.
+Builders include `string`, `secret`, `number`, `boolean`, `port`, `url`, `json`, and `literal(...)`. Use `.default(value)` only for intentional safe defaults, `.optional()` for absent values, `.requiredIn("production")` for environment-specific requirements, and `.description(text)` or `.example(value)` for safe metadata. A URL field resolves to a `URL`, a number field to a number, and a Boolean field to a boolean. Do not declare `PORT` or `RELKIT_ENV`; RelKit reserves them.
 
 Pass the definition into `defineApp({ env })`. Functions read the resolved, typed values through `context.env`:
 
 ```ts
 import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 export default defineFunction({
   input: z.object({}),

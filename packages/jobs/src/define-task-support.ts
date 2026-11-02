@@ -94,7 +94,8 @@ export function assertHook(value: unknown, name: string): void {
  */
 export const isSchemaEffect = Effect.fn("Jobs.isSchema")(
   function* (value: unknown) {
-    if (!(yield* isRecordEffect(value))) return false;
+    // ArkType schemas are callable, so a function can carry the capability too.
+    if (typeof value !== "function" && !(yield* isRecordEffect(value))) return false;
     const outer = value as Record<PropertyKey, unknown>;
     const standard = outer["~standard"];
     if (!(yield* isRecordEffect(standard))) return false;

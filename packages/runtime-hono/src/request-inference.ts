@@ -1,4 +1,5 @@
 import { getJsonSchema, type JsonSchema, type StandardSchemaV1 } from "@relkit/schema";
+import { canCarryStandardSchema } from "@relkit/contracts";
 
 const schemaCache = new WeakMap<object, JsonSchema | null>();
 const JSON_NUMBER = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/;
@@ -94,7 +95,7 @@ function acceptsType(value: unknown, schema: unknown): boolean {
  */
 function isSchema(value: unknown): value is StandardSchemaV1 {
   return (
-    isRecord(value) &&
+    canCarryStandardSchema(value) &&
     isRecord(value["~standard"]) &&
     value["~standard"].version === 1 &&
     typeof value["~standard"].validate === "function"

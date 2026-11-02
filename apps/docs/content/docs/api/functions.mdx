@@ -5764,7 +5764,7 @@ export * from "./function-descriptor-factory.js";
 declare const StreamOutputSchema: StreamOutputSchema<ItemSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L13)
 
 ### isStreamOutputSchema
 
@@ -5782,7 +5782,7 @@ if (isStreamOutputSchema(value)) console.log(value.item);
 declare const isStreamOutputSchema: (value: unknown) => value is StreamOutputSchema;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L92)
 
 ### isStreamOutputSchemaEffect
 
@@ -5802,7 +5802,7 @@ declare const isStreamOutputSchemaEffect: (
 ) => Effect.Effect<boolean, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L79)
 
 ### streamOf
 
@@ -5826,7 +5826,7 @@ declare const streamOf: <const ItemSchema extends StandardSchemaV1>(
 ) => StreamOutputSchema<ItemSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L68)
 
 #### Backend and frontend example
 
@@ -5870,7 +5870,7 @@ declare const streamOfEffect: <const ItemSchema extends StandardSchemaV1>(
 ) => Effect.Effect<StreamOutputSchema<ItemSchema>, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L20)
 
 ## `stream.types.ts`
 

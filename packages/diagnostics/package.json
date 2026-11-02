@@ -1,7 +1,7 @@
 {
   "name": "@relkit/diagnostics",
   "version": "0.7.13",
-  "description": "Unsupported internal RELKIT diagnostics; use @relkit/cli.",
+  "description": "Unsupported internal RelKit diagnostics; use @relkit/cli.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -26,6 +26,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./codes": {
+      "types": "./dist/codes/index.d.ts",
+      "import": "./dist/codes/index.js"
     }
   },
   "dependencies": {

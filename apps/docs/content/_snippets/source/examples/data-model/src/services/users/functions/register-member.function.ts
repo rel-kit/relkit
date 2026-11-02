@@ -1,6 +1,6 @@
 /** Validates native user data and creates the user/membership in one borrowed database transaction, retaining rollback failures. */
 import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 
 export default defineFunction({
   input: z.object({ email: z.string().email(), organizationId: z.string().min(1) }),

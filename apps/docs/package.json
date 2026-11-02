@@ -7,7 +7,7 @@
     "build": "bun run generate && blume build --strict",
     "check": "bun run generate:check && tsc --noEmit && bun run check:jsdoc && bun run check:links && bun run check:search",
     "check:jsdoc": "bun run scripts/check-jsdoc.ts",
-    "check:links": "blume validate --strict",
+    "check:links": "blume validate --strict && bun run scripts/check-repository-links.ts",
     "check:search": "bun run scripts/check-search.ts",
     "dev": "bun run generate && NODE_OPTIONS=--max-old-space-size=8192 blume dev --host=127.0.0.1 --port=3001",
     "generate": "bun run scripts/generate.ts",
@@ -43,6 +43,7 @@
     "@relkit/client": "workspace:*",
     "@relkit/cloudflare": "workspace:*",
     "@relkit/contracts": "workspace:*",
+    "@relkit/diagnostics": "workspace:*",
     "@relkit/docker": "workspace:*",
     "@relkit/drizzle": "workspace:*",
     "@relkit/effect-mq": "workspace:*",
@@ -72,6 +73,7 @@
     "prettier": "catalog:",
     "tailwindcss": "catalog:",
     "tsx": "4.23.15",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "zod": "4.6.7"
   }
 }

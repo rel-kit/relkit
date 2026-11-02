@@ -4,7 +4,7 @@ import { observeCompiler } from "./observability.js";
 import type { RuntimeActivationFingerprintInput } from "./activation-fingerprint.types.js";
 export type { RuntimeActivationFingerprintInput } from "./activation-fingerprint.types.js";
 import { createHash } from "node:crypto";
-import type { RuntimeActivationFingerprint } from "@relkit/contracts";
+import { canonicalJson, type RuntimeActivationFingerprint } from "@relkit/contracts";
 
 /** Expected empty activation identity or artifact, preserving the legacy TypeError. */
 export class ActivationFingerprintError extends Schema.TaggedError<ActivationFingerprintError>()(
@@ -44,6 +44,11 @@ export const createRuntimeActivationFingerprintEffect = Effect.fn(
       ...(input.providerOverridesGeneration === undefined
         ? {}
         : { providerOverridesGeneration: input.providerOverridesGeneration }),
+      ...(input.schemaLibraries !== undefined && Object.keys(input.schemaLibraries).length > 0
+        ? { schemaLibrariesHash: hashGeneratedArtifact(canonicalJson(input.schemaLibraries)) }
+        : input.schemaLibrariesHash === undefined
+          ? {}
+          : { schemaLibrariesHash: input.schemaLibrariesHash }),
     });
   },
   (effect, input) =>

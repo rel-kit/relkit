@@ -60,13 +60,13 @@ The commerce application configures distinct Redis-backed realtime, agent-state,
 
 ## Understand acknowledgements and resets
 
-`trigger()` acknowledges an atomic provider append and receipt, not delivery to browser tabs. Redis durability is only as strong as the selected Redis persistence and replication settings. Document that deployment choice rather than describing every Redis-backed append as durable.
+`trigger()` acknowledges an atomic provider append and its confirmation, not delivery to browser tabs. Redis durability is only as strong as the selected Redis persistence and replication settings. Document that deployment choice rather than describing every Redis-backed append as durable.
 
-Each provider exposes an epoch. If retained state is lost or replaced, the epoch changes. Old checkpoints then produce a recovery gap, and missing idempotency receipts are reported as state loss rather than permission to retry an uncertain publish automatically.
+Each provider exposes an epoch. If retained state is lost or replaced, the epoch changes. Old checkpoints then produce a recovery gap, and missing idempotency records are reported as state loss rather than permission to retry an uncertain publish automatically.
 
 ## Capacity and overload
 
-RELKIT enforces per-record and aggregate limits for encoded event size, retained bytes, active partitions, live connections, subscriptions, presence members, and receipt retention. Per-principal limits return a typed 429 response; application or provider capacity returns a typed 503 response.
+RelKit enforces per-record and aggregate limits for encoded event size, retained bytes, active partitions, live connections, subscriptions, presence members, and idempotency record retention. Per-principal limits return a typed 429 response; application or provider capacity returns a typed 503 response.
 
 Existing unrelated work is not evicted to admit a new partition or event. Tune provider capacity and retention together: longer replay windows consume more storage, while authoritative route recovery makes short windows safe.
 
