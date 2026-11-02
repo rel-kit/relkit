@@ -6,7 +6,7 @@ sidebar:
   icon: settings
 ---
 
-Use `defineBetterAuthService` to add Better Auth credentials, accounts, and sessions to your application. RELKIT discovers it, activates
+Use `defineBetterAuthService` to add Better Auth credentials, accounts, and sessions to your application. RelKit discovers it, activates
 the application's Drizzle connection first, and passes that native client to Better Auth's Drizzle
 adapter. Better Auth handles credentials, accounts, sessions, and its HTTP protocol.
 
@@ -135,7 +135,7 @@ and restarts. Do not regenerate it on every startup. Never put it in a browser b
 environment variable, source control, logs, or a copied example configuration.
 
 Auth options are a plain object, not an `({ env })` factory. Declaring a field in `defineEnv` validates
-the RELKIT environment; it does not inject parsed values into that object or replace `process.env`.
+the RelKit environment; it does not inject parsed values into that object or replace `process.env`.
 The URL here is read during module evaluation, so supply it before loading the app. The secret uses
 Better Auth's native process-environment lookup. A test harness `env` override alone does not set that
 process value; see [Testing](/docs/modules/auth/testing).
@@ -153,7 +153,7 @@ process value; see [Testing](/docs/modules/auth/testing).
   /_snippets/source/examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts
 </include>
 
-RELKIT derives `/api/auth` from this route and preserves Better Auth's native responses, including
+RelKit derives `/api/auth` from this route and preserves Better Auth's native responses, including
 cookies. The `auth.protected` paths are application paths that require a session, not endpoints created
 by Better Auth. See [Protect routes](/docs/modules/auth/protect-routes) for matching and authorization rules.
 
@@ -169,7 +169,7 @@ activation returns HTTP `503`; importing the descriptor is not a standalone auth
 
 <include>/_frontend/auth.mdx</include>
 
-## Know which settings RELKIT owns
+## Know which settings RelKit owns
 
 | Setting                       | Owner and behavior                                                                                |
 | ----------------------------- | ------------------------------------------------------------------------------------------------- |
@@ -180,7 +180,7 @@ activation returns HTTP `503`; importing the descriptor is not a standalone auth
 | `drizzle`                     | Optional adapter settings, including schema mapping; provider is derived from the service dialect |
 | Connection disposal           | The Drizzle service's `dispose` callback                                                          |
 
-Better Auth writes through the native adapter, bypassing RELKIT portable CRUD, generated Zod parsers,
+Better Auth writes through the native adapter, bypassing RelKit portable CRUD, generated Zod parsers,
 and operation overrides. Do not use a table override as an auth policy or expose credential/session
 tables through generic CRUD routes. See [Database integration](/docs/modules/database/better-auth).
 

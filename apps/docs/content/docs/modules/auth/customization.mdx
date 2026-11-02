@@ -6,7 +6,7 @@ sidebar:
   icon: sliders-horizontal
 ---
 
-Configure sign-in providers, plugins, and session policy on your existing authentication service. Except for RELKIT's reserved `database` and `basePath`, the options follow
+Configure sign-in providers, plugins, and session policy on your existing authentication service. Except for RelKit's reserved `database` and `basePath`, the options follow
 the installed Better Auth API. The `drizzle` option configures its adapter separately.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
@@ -42,7 +42,7 @@ Typecheck against your installed Better Auth version and test each enabled flow 
 | Extend authentication behavior      | `plugins`                                        | Required tables/migrations, plugin options, and any matching client plugin                      |
 
 Enabling verified-email sign-in without delivering verification messages can lock users out. These
-callbacks are native Better Auth callbacks, not RELKIT function handlers: they do not receive a RELKIT
+callbacks are native Better Auth callbacks, not RelKit function handlers: they do not receive a RelKit
 invocation context or automatically inherit declared job/resource dependencies. Keep delivery failure
 handling explicit. Do not log verification/reset URLs or tokens as a substitute for sending them.
 
@@ -86,7 +86,7 @@ before deploying code that relies on those fields. Other apps can use the underl
 
 Plugin requirements are additional to the four core tables. Use the plugin's installed types and
 schema requirements rather than guessing columns. Better Auth's own schema generator expects native
-configuration; the RELKIT service descriptor is not its activated `betterAuth()` instance. See
+configuration; the RelKit service descriptor is not its activated `betterAuth()` instance. See
 [Database integration](/docs/modules/database/better-auth) before choosing a schema-generation workflow.
 
 Application profiles can instead live in a separate domain table referencing the auth user ID. That
@@ -97,7 +97,7 @@ model needs: the example's `userId` columns alone do not declare foreign-key con
 
 Native `session.expiresIn` and `session.updateAge` are measured in seconds. Choose a session lifetime
 and refresh policy appropriate to your application, and test them through the native session flow.
-They are not the same as RELKIT's request-scoped memoization of `getSession()`.
+They are not the same as RelKit's request-scoped memoization of `getSession()`.
 
 Changing `session.cookieCache`, secondary storage, or session persistence can affect how quickly
 revocation and user changes become visible. Do not enable a cache and assume the uncached example's
@@ -106,7 +106,7 @@ and privileged changes under the actual configuration.
 
 Use auth-supported password, account, and session operations for lifecycle changes. Directly updating
 an account's password column or deleting arbitrary auth rows bypasses the auth system's expected
-hashing, linking, and cleanup behavior. RELKIT CRUD schemas and overrides do not enforce that behavior.
+hashing, linking, and cleanup behavior. RelKit CRUD schemas and overrides do not enforce that behavior.
 
 ## Review deployment security
 

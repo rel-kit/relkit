@@ -1,14 +1,14 @@
 ---
 title: Clients and sign-in flows
-description: Use Better Auth's browser client for authentication, preserve session cookies, and distinguish auth endpoints from RELKIT's generated client.
+description: Use Better Auth's browser client for authentication, preserve session cookies, and distinguish auth endpoints from RelKit's generated client.
 pagination: false
 sidebar:
   icon: panels-top-left
 ---
 
 Use Better Auth's browser client to sign users up, sign them in, and manage their sessions. Use the
-[RELKIT generated client](/docs/modules/http/generated-clients) for your application's function-backed routes.
-They serve different APIs; mounting auth does not generate typed RELKIT methods for its raw endpoints.
+[RelKit generated client](/docs/modules/http/generated-clients) for your application's function-backed routes.
+They serve different APIs; mounting auth does not generate typed RelKit methods for its raw endpoints.
 
 ## Create a browser auth client
 
@@ -20,9 +20,9 @@ They serve different APIs; mounting auth does not generate typed RELKIT methods 
 
 <include>/_snippets/generated/installations/auth-client.mdx</include>
 
-For RELKIT's React convenience leaf, use the separate [React authentication setup](/docs/modules/client/authentication).
+For RelKit's React convenience leaf, use the separate [React authentication setup](/docs/modules/client/authentication).
 
-That setup includes a copyable `AuthProvider` connecting the native session hook to RELKIT's
+That setup includes a copyable `AuthProvider` connecting the native session hook to RelKit's
 private query cache. Start with the [Frontend guide](/guides/frontend/connect-react) for the shared
 contract and provider workflow; auth endpoints themselves use the native client below.
 
@@ -91,7 +91,7 @@ Never share a mutable cookie/header object across users in a long-lived server c
 
 ## Do not confuse bearer headers with authentication
 
-After [installing the RELKIT client](/docs/modules/client), its transport can mutate request headers:
+After [installing the RelKit client](/docs/modules/client), its transport can mutate request headers:
 
 <include
   source="examples/auth-drizzle/src/platform/browser-client.ts"

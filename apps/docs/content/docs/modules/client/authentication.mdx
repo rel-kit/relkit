@@ -28,7 +28,7 @@ The [auth module](/docs/modules/auth/clients) owns sign-up, sign-in, and session
 
 `GET /_relkit/v1/client/identity` is private and non-cacheable. It returns opaque identity scope,
 session epoch, application ID, and public fingerprint. Scope or epoch changes abort in-flight work,
-clear private RELKIT stores, grants, and presence, and reject late callbacks.
+clear private RelKit stores, grants, and presence, and reject late callbacks.
 
 ## Connect a provider
 
@@ -45,7 +45,7 @@ allowed Origin.
   /_snippets/source/apps/docs/examples/frontend/auth-provider.tsx
 </include>
 
-Wrap the part of your app that calls RELKIT hooks in `AuthProvider`. For a same-origin proxy,
+Wrap the part of your app that calls RelKit hooks in `AuthProvider`. For a same-origin proxy,
 forward the backend's `/api/auth` mount as well as `/rpc` and `/_relkit`, and configure Better Auth's
 trusted origins for the frontend. Do not nest a second generic provider around private queries.
 The wrapper responds to native session changes; it does not replace the server's authorization.

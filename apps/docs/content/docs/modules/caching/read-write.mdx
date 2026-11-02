@@ -47,4 +47,4 @@ Check for `undefined`, not truthiness: `0` can be a valid cached price. Keys and
 
 A cache with a numeric value schema also exposes `increment(key, delta, options)`. The default increment is `1`. Use a separate cache for counters rather than changing product prices this way.
 
-For limiting HTTP requests, use RELKIT's [route rate limits](/docs/modules/http/rate-limits). Keep the cache shared across app instances when a limit must apply to all of them.
+For limiting HTTP requests, use RelKit's [route rate limits](/docs/modules/http/rate-limits). Keep the cache shared across app instances when a limit must apply to all of them.
