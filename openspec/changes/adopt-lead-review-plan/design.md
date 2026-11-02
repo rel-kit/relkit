@@ -84,8 +84,10 @@ the codemod. A `0.9.0-beta` precedes `0.9.0`.
 
 The capability table stays as data that CI writes, but the creator compares only release and
 template identity plus the runtime's major and minor version against tested combinations, and turns
-a mismatch into a `RELKIT_CREATE_UNTESTED` warning. `--strict` restores refusal. A nightly workflow
-creates every template on the latest Bun and Node and opens an issue on failure.
+a mismatch into a `RELKIT_CREATE_UNTESTED` warning. `--strict` restores refusal. A creation canary
+creates every template on the latest Bun and Node: nightly with the published creator, opening an
+issue on failure, and on pull requests that change creation with the creator packed from the pull
+request, so the canary itself is proven before it merges.
 
 - **Alternative:** keep the allow-list but refresh it faster. Rejected: any Bun patch release still
   breaks creation between refreshes.
@@ -270,12 +272,18 @@ walkthrough. The launch checklist reads the same page.
 
 ## Migration Plan
 
+**Verification rule:** every task is verified on its pull request, before it merges, by local runs
+or CI runs against packages packed from that pull request. No task may need a merge to `main`, a
+published release or a workflow run from `main` to be verified; publishing and announcing are
+release steps after the change merges.
+
 1. **Phase 1 (weeks 1–2):** groups 1–5. These changes are additive except the builder rename, which
    ships in the breaking release.
 2. **Phase 2 (weeks 3–8):** groups 6–13 on a release branch: packaging, errors, Better Auth file,
    Effect boundary, dependency model and runtime handle, client call style, `relkit migrate`, and the
-   first benchmarks. Migrate examples and templates with the codemod, publish `0.9.0-beta`, fix
-   issues, then publish `0.9.0` and the deprecated final `@relkit/app`.
+   first benchmarks. Migrate examples and templates with the codemod and rehearse `0.9.0-beta` from
+   packed packages on the release-branch pull request. After the change merges, publish `0.9.0-beta`,
+   fix issues, then publish `0.9.0` and the deprecated final `@relkit/app`.
 3. **Phase 3 (weeks 9–14):** groups 14–19: Node, TypeScript 7, Postgres backend, production image and
    Railway, access rules and typed middleware, `relkit mcp` and Inspector actions, incremental reload.
 4. **Launch:** group 20 when the P0 items and the Railway newcomer test pass.

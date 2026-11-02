@@ -70,14 +70,22 @@ inspection or snapshots alone.
 
 ### Requirement: Nightly creation canary
 
-A nightly CI job SHALL create every template on the latest Bun and Node releases, run its dev and test
-commands, and open or update an issue when any of them fails.
+A nightly CI job SHALL create every template with the published creator on the latest Bun and Node
+releases, run its dev and test commands, and open or update an issue when any of them fails. The same
+job SHALL run on pull requests that change creation, templates or the job itself, using the creator
+packed from the pull request, and SHALL NOT open issues from those runs.
 
 #### Scenario: New Bun release breaks creation
 
 - **WHEN** a new Bun release breaks creation of any template
 - **THEN** the next nightly run fails and opens or updates an issue that names the template and the
   Bun version
+
+#### Scenario: A pull request changes creation
+
+- **WHEN** a pull request changes the creator, a template or the canary workflow
+- **THEN** the canary runs every template with the creator packed from that pull request, and a
+  failure blocks the pull request
 
 ### Requirement: Plan verification matrices join release readiness
 

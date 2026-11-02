@@ -4,6 +4,12 @@ Groups follow the plan's roadmap: groups 1–5 are phase 1, groups 6–13 phase 
 groups 14–19 phase 3, group 20 the launch, and groups 21–26 the next quarter. Plan decision numbers
 appear in group titles.
 
+Every task is verified on its pull request, before it merges: by local runs or by CI runs on that
+pull request, against packages packed from it. No task's verification may depend on merging to
+`main`, publishing a release, or running a workflow from `main`. Steps that can only happen after a
+merge, such as publishing to npm or announcing, are listed under "Release steps after merge" and are
+not tasks of this change.
+
 ## 1. Creation works on current Bun (#1)
 
 - [x] 1.1 Change `create-capabilities.ts` to match release and template identity plus the runtime's major and minor version instead of exact identities, and verify with unit tests that a Bun 1.3.11 identity matches 1.3.10 evidence while 1.4.4 is reported as untested
@@ -12,8 +18,9 @@ appear in group titles.
 - [x] 1.4 Offer the `minimal`, `api`, `agent`, `fullstack` and `tasks` templates in interactive and flag-based creation, marking untested combinations, and verify by creating each template in the packed-consumer test
 - [x] 1.5 Make `--help`, the README and the templates README list the same five templates, and verify with a docs test that compares the three lists
 - [x] 1.6 Make CI release readiness measure every template on each Tier 1 runtime and write the capability table as a CI output, and verify the release-readiness workflow uploads the table
-- [ ] 1.7 Add a nightly workflow that creates every template on the latest Bun, runs its dev and test commands, and opens or updates an issue on failure, and verify it with one manual run
+- [ ] 1.7 Add a creation canary workflow that runs nightly with the published `create-relkit@latest` on the latest Bun and opens or updates an issue on failure, and also runs on pull requests that change creation, templates or the workflow itself using the creator packed from the pull request; for each template it creates the project, runs its test command and runs its dev command until the app responds; verify with the pull request's canary run passing for every template
 - [x] 1.8 Document the untested warning and `--strict` in the create guide and on the `RELKIT_CREATE_UNTESTED` page, and verify the docs build passes
+- [ ] 1.9 Make the `tasks` template prepare and start when created with installation (it fails with `RELKIT_CREATE_PREPARE_FAILED: Development snapshot ineligible during compilation.aliases`), and verify with a regression test and with release readiness reporting `tasks` as tested on the pull request
 
 ## 2. Positioning and Why RelKit (#2)
 
@@ -40,7 +47,7 @@ appear in group titles.
 - [ ] 4.3 Add a test app whose function, event, task and error contracts use Zod 4, ArkType, Effect Schema and Valibot, and verify `relkit check` passes and OpenAPI contains every schema
 - [ ] 4.4 Keep `RELKIT_SCHEMA_UNAVAILABLE` for schemas without a projection path and document the supported libraries on its page, and verify with a fixture schema that has none
 - [ ] 4.5 Switch templates, examples and docs to Zod 4 with `zod` as a template dependency, and verify the template creation tests and docs examples pass
-- [ ] 4.6 Prepare the rename of the built-in builder from `z` to `s` for the breaking release (export and codemod rule land in groups 7 and 12), and verify type tests for `s` on the release branch
+- [ ] 4.6 Prepare the rename of the built-in builder from `z` to `s` for the breaking release (export and codemod rule land in groups 7 and 12), and verify type tests for `s` on the pull request
 
 ## 5. Core and Labs (#5)
 
@@ -54,7 +61,7 @@ appear in group titles.
 ## 6. Governance, repository hygiene, dependency policy and stop-doing rules (#7, #8)
 
 - [ ] 6.1 Write the OpenSpec scope rule into CONTRIBUTING and the pull request template, and verify the template asks whether the change needs a spec
-- [ ] 6.2 Make evidence-producing scripts upload full reports as CI artifacts and release assets, delete raw JSON under `docs/evidence` while keeping per-release summaries, and add a check that keeps `docs/` under 5 MB; verify the check passes and the next CI run uploads the artifacts
+- [ ] 6.2 Make evidence-producing scripts upload full reports as CI artifacts and release assets, delete raw JSON under `docs/evidence` while keeping per-release summaries, and add a check that keeps `docs/` under 5 MB; verify the check passes, the pull request's CI run uploads the artifacts, and the release-readiness packaging rehearsal attaches them to the rehearsed release
 - [ ] 6.3 Remove the committed `bug-fix-reports/` and `bug-fix-ui-reports/` artifacts, link their GitHub issues instead, and add a check that rejects new report artifacts; verify the check fails on a fixture
 - [ ] 6.4 Remove machine-specific absolute paths from committed files and add a path check with a documented allowlist, and verify the check passes on the repository
 - [ ] 6.5 Vendor the `use-effect` skill into `.agents/skills` and point AGENTS.md at it, and verify no guidance references a personal path
@@ -124,13 +131,13 @@ appear in group titles.
 - [ ] 12.2 Give `relkit migrate` preview, write and rollback receipts like `migrate layout`, listing code it cannot change with file and line, and verify with tests
 - [ ] 12.3 Migrate every repository example and template with `relkit migrate` only, and verify their check, typecheck, test and build commands pass
 - [ ] 12.4 Write the 0.9 migration guide and changelog in the new format, and verify the guide's snippets compile
-- [ ] 12.5 Publish `0.9.0-beta` from the release branch and run the packed-consumer, creation and runtime suites against it, and verify all pass
-- [ ] 12.6 Publish `0.9.0` and a final `@relkit/app` that re-exports `relkit` and is deprecated on npm, and verify npm shows the deprecation and a project on the final `@relkit/app` still builds
+- [ ] 12.5 Rehearse `0.9.0-beta` on the release-branch pull request: version and pack the candidate, run the packed-consumer, creation and runtime suites against the packed packages from a local registry, and verify all pass
+- [ ] 12.6 Prepare the final `@relkit/app` that re-exports `relkit` and carries its deprecation message in the release configuration, and verify with the packed candidate that a project on the final `@relkit/app` builds and the release rehearsal includes the deprecation step
 
 ## 13. Development loop (#9; benchmarks in phase 2, reload in phase 3)
 
 - [ ] 13.1 Generate benchmark apps with 10, 100 and 500 functions and a script that measures save-to-serving p95 and `relkit check` peak memory against `tsc`, and verify the script reports both metrics
-- [ ] 13.2 Run the benchmarks in CI for each release and publish the benchmarks page with the measuring host, and verify the page shows the current numbers
+- [ ] 13.2 Run the benchmarks in release readiness and build the benchmarks page with the measuring host from that CI output, and verify the pull request's run produces the numbers and the docs build shows them
 - [ ] 13.3 Keep one warm evaluator per dev session that re-evaluates only changed modules and their dependents through `invalidateWatchDependencies`, and verify tests that unchanged modules are not re-imported
 - [ ] 13.4 Swap the handler table atomically when configuration, providers and route shape are unchanged and fall back to blue/green otherwise, and verify the process stays the same on a handler edit and restarts on a binding change
 - [ ] 13.5 Run type-checking as a parallel watch process that streams diagnostics to the CLI and Inspector without blocking reloads, and verify a type error does not block a reload
@@ -147,7 +154,7 @@ appear in group titles.
 - [ ] 14.2 Implement the Node adapter on Hono's Node server, and verify the `api` template's HTTP suite passes on Node 22 and 24
 - [ ] 14.3 Add `relkit build --runtime node` producing a Node server and container image, and verify the production build runs on Node
 - [ ] 14.4 Replace `Bun.RedisClient` with a portable client on Node and choose Sentry and SQLite clients per runtime, and verify the Redis, SQLite and Sentry conformance tests on Bun and Node
-- [ ] 14.5 Make `create-relkit` and the CLI run on Node with npm and pnpm, and verify `npx create-relkit` and `npm run dev` in a CI job without Bun
+- [ ] 14.5 Make `create-relkit` and the CLI run on Node with npm and pnpm, and verify `npx create-relkit` against the packed candidate from a local registry and `npm run dev` in a CI job without Bun
 - [ ] 14.6 Add a portability check that rejects runtime-specific APIs outside adapters, and verify it fails on a fixture
 - [ ] 14.7 List Bun and Node ranges in every framework package's `engines`, and verify the manifest check
 - [ ] 14.8 Add Node to the pull-request runtime matrix and the nightly creation canary, and verify a deliberate Node failure blocks a pull request
@@ -203,15 +210,15 @@ appear in group titles.
 - [ ] 19.6 Evaluate MCP elicitation for approval-required tools on `/mcp`, record the decision, and return an actionable coded error when approval is not possible, and verify the error test
 - [ ] 19.7 Add Inspector UI actions for publishing and replaying events, triggering jobs and retrying or cancelling event deliveries, and verify browser tests
 - [ ] 19.8 Add the Inspector page that lists MCP-exposed tools and calls them, and verify a browser test that calls a tool and opens its trace
-- [ ] 19.9 Run the agent evaluations for each release and publish the pass rate, and verify the release workflow records it
+- [ ] 19.9 Run the agent evaluations in release readiness and record the pass rate as a CI output, and verify the pull request's run records it
 - [ ] 19.10 Document setting up `relkit mcp` for coding agents, and verify the docs build
 
 ## 20. Metrics and launch (#21)
 
-- [ ] 20.1 Build the metrics page from CI outputs (creation canary, runtime matrix, benchmarks, agent evaluations, Railway test, package count) and link it from release notes, and verify it renders for a release
+- [ ] 20.1 Build the metrics page from CI outputs (creation canary, runtime matrix, benchmarks, agent evaluations, Railway test, package count) and link it from release notes, and verify it renders from the pull request's CI outputs and the release-notes generator test includes the link
 - [ ] 20.2 Script the newcomer walkthrough (create to first route, create to Railway deploy) and record its timings, and verify the script runs end to end
 - [ ] 20.3 Enable GitHub Discussions or a Discord, publish the roadmap with Core and Labs status, label about ten good first issues and set the repository description, and verify each item on the launch checklist
-- [ ] 20.4 Launch after the P0 items and the Railway newcomer test pass, and verify the launch checklist passes before announcing
+- [ ] 20.4 Write the launch checklist (P0 items, Railway newcomer test, community channels, roadmap) as a check, and verify it passes on the pull request
 
 ## 21. Vercel target (#12)
 
@@ -248,7 +255,7 @@ appear in group titles.
 
 ## 25. Provider-author kit (#19)
 
-- [ ] 25.1 Publish the jobs, events, cache, buckets and realtime conformance suites through `@relkit/testing`, and verify a first-party provider runs them from the published package
+- [ ] 25.1 Publish the jobs, events, cache, buckets and realtime conformance suites through `@relkit/testing`, and verify a first-party provider runs them from the packed `@relkit/testing` package
 - [ ] 25.2 Write the provider-author guide and a starter package, and verify the starter's tests pass and it installs into an app
 - [ ] 25.3 Publish the runtime, deploy-target and agent adapter interfaces with their conformance suites, and verify each first-party adapter runs them
 - [ ] 25.4 Mark the provider contract Core, and verify the maturity table
@@ -272,9 +279,17 @@ appear in group titles.
 
 ## 28. Integration checks
 
-- [ ] 28.1 Run full release readiness on the 0.9.0 candidate — creation matrix on Tier 1 runtimes, TypeScript 5.9 and 7 matrix, benchmarks and agent evaluations — and verify every job passes
-- [ ] 28.2 Run the newcomer walkthrough from `bunx create-relkit@latest` and from `npx create-relkit` to a Railway deploy, and verify the timings meet the metric targets
+- [ ] 28.1 Run full release readiness on the 0.9.0 candidate pull request — creation matrix on Tier 1 runtimes, TypeScript 5.9 and 7 matrix, benchmarks and agent evaluations — and verify every job passes
+- [ ] 28.2 Run the newcomer walkthrough with `bunx create-relkit` and `npx create-relkit` resolving the packed candidate from a local registry, through to a Railway deploy, and verify the timings meet the metric targets
 - [ ] 28.3 Run `openspec validate adopt-lead-review-plan --strict`, confirm each requirement has a passing test or recorded evidence, and verify the plan coverage table in design.md is current
+
+## Release steps after merge
+
+These are release operations, not tasks of this change. They run only after every task above is
+complete and the change has merged.
+
+- Publish `0.9.0-beta`, then `0.9.0`, and deprecate the final `@relkit/app` on npm.
+- Announce the launch once the release is published.
 
 ## Workflow follow-up
 
