@@ -88,19 +88,16 @@ const seedRunnerCaches = Effect.fn("PackedWrapper.seed")(function* (
   for (const runner of wrapperRunners(context))
     for (const direct of [false, true]) {
       const prefix = direct ? wrapperCreatorPrefix(context, runner) : runner.prefix;
-      const output = yield* packedWrapperCommand(
-        {
-          executable: runner.executable,
-          cwd: context.consumer,
-          env: context.env,
-          args: [
-            ...prefix.filter((part) => part !== "--offline" && part !== "--no-install"),
-            "--help",
-          ],
-        },
-        direct ? 2 : 0,
-      );
-      if (direct) assert.match(output.stderr, /RELKIT_CREATE_USAGE: Unknown create option: --help/);
+      const output = yield* packedWrapperCommand({
+        executable: runner.executable,
+        cwd: context.consumer,
+        env: context.env,
+        args: [
+          ...prefix.filter((part) => part !== "--offline" && part !== "--no-install"),
+          "--help",
+        ],
+      });
+      if (direct) assert.match(output.stdout, /^Usage: create-relkit <name> \[options\]/m);
     }
   for (const specifier of ["relkit", "relkit@latest"])
     assert.equal(
