@@ -61,7 +61,7 @@ not tasks of this change.
 ## 6. Governance, repository hygiene, dependency policy and stop-doing rules (#7, #8)
 
 - [x] 6.1 Write the OpenSpec scope rule into CONTRIBUTING and the pull request template, and verify the template asks whether the change needs a spec
-- [ ] 6.2 Make evidence-producing scripts upload full reports as CI artifacts and release assets, delete raw JSON under `docs/evidence` while keeping per-release summaries, and add a check that keeps `docs/` under 5 MB; verify the check passes, the pull request's CI run uploads the artifacts, and the release-readiness packaging rehearsal attaches them to the rehearsed release
+- [x] 6.2 Make evidence-producing scripts upload full reports as CI artifacts and release assets, delete raw JSON under `docs/evidence` while keeping per-release summaries, and add a check that keeps `docs/` under 5 MB; verify the check passes, the pull request's CI run uploads the artifacts, and the release-readiness packaging rehearsal attaches them to the rehearsed release
 - [x] 6.3 Remove the committed `bug-fix-reports/` and `bug-fix-ui-reports/` artifacts, link their GitHub issues instead, and add a check that rejects new report artifacts; verify the check fails on a fixture
 - [x] 6.4 Remove machine-specific absolute paths from committed files and add a path check with a documented allowlist, and verify the check passes on the repository
 - [x] 6.5 Vendor the `use-effect` skill into `.agents/skills` and point AGENTS.md at it, and verify no guidance references a personal path
