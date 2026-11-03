@@ -70,6 +70,12 @@ The review's starting map is adjusted where the dependency graph requires it:
 - The deploy integration contract (today's `deploy` package) moves into `relkit` as the public
   `relkit/deploy` subpath, because `@relkit/aws` and `@relkit/pulumi` implement it and must not depend
   on `@relkit/cli`. The Pulumi engine (`deploy-pulumi`) still moves into `@relkit/cli`.
+- `inspector-api` moves into `relkit` as an area, not into `@relkit/inspector`. The CLI and the
+  generated development server use its bridge and connection protocol, and `@relkit/inspector` ships
+  the Next.js UI, so keeping the protocol in `relkit` stops every CLI install from pulling in the
+  Inspector UI. Production builds do not bundle it.
+- `deploy-pulumi` moves into `@relkit/pulumi`, which already exposes the engine as
+  `@relkit/pulumi/engine`, so no integration depends on `@relkit/cli`. The CLI uses only its types.
 - Inside `relkit`, each former package becomes a source folder (`src/<area>/`) with its tests in
   `tests/<area>/`, and areas import each other through relative paths. Each former package's public
   entry points stay reachable as `relkit/<area>` subpaths for first-party tools and integrations;
@@ -321,31 +327,31 @@ changes.
 
 Every item in the plan maps to specs and tasks:
 
-| Plan item                            | Capabilities                                                                                     | Task groups |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------ | ----------- |
-| #1 Creation on current Bun           | cli-scaffolding, acceptance-verification, user-facing-text                                       | 1, 28       |
-| #2 Why RelKit and positioning        | developer-documentation                                                                          | 2           |
-| #3 Plain language                    | user-facing-text, developer-documentation                                                        | 3           |
-| #4 Any Standard Schema validator     | public-authoring, compiler-graph, cli-scaffolding                                                | 4, 12       |
-| #5 Core and Labs                     | release-stability, developer-documentation, project-governance                                   | 5           |
-| #6 Packages and one version          | package-distribution, workspace-foundation, cli-scaffolding, release-stability                   | 7, 12       |
-| #7 Process and repository hygiene    | project-governance                                                                               | 6           |
-| #8 Pre-release dependency policy     | project-governance                                                                               | 6, 23       |
-| #9 Development loop                  | development-loop, compiler-graph, cli-scaffolding, acceptance-verification                       | 13          |
-| #10 Runtimes                         | runtime-portability, acceptance-verification                                                     | 14, 22      |
-| #11 TypeScript 7                     | typescript-compatibility, workspace-foundation, acceptance-verification                          | 15          |
-| #12 Production and deploy targets    | deployment-targets, durable-postgres-backend, jobs-events, pulumi-aws-deployment, cli-scaffolding | 16, 17, 21, 22 |
-| #13 HTTP and auth model              | http-runtime, public-authoring, function-runtime, domain-services, access-control                | 8, 18       |
-| #14 Effect boundary                  | public-authoring, function-runtime                                                               | 9           |
-| #15 One way and runtime handle       | public-authoring, function-runtime, compiler-graph, domain-services, jobs-events, runtime-handle | 10          |
-| #16 Client and wire protocol         | http-runtime                                                                                     | 11, 23      |
-| #17 Escape hatches                   | Deferred (non-goal)                                                                              | Workflow follow-up |
-| #18 relkit mcp                       | developer-mcp, development-inspector                                                             | 19          |
-| #19 Provider kit                     | provider-authoring-kit                                                                           | 25          |
-| #20 Stability policy and 1.0         | release-stability, developer-documentation                                                       | 12, 26      |
-| #21 Community launch                 | project-governance                                                                               | 20          |
-| #22 Agent adapters                   | agent-adapters, tools-agents, ai-sdk-migration                                                   | 24          |
-| Stop-doing rules                     | project-governance, release-stability                                                            | 6           |
-| Metrics                              | project-governance, acceptance-verification, developer-mcp                                       | 1, 13, 20   |
-| Additional findings                  | developer-documentation, jobs-events, cli-scaffolding, development-inspector                     | 27          |
-| Inspector future                     | development-inspector                                                                            | 19          |
+| Plan item                         | Capabilities                                                                                      | Task groups        |
+| --------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------ |
+| #1 Creation on current Bun        | cli-scaffolding, acceptance-verification, user-facing-text                                        | 1, 28              |
+| #2 Why RelKit and positioning     | developer-documentation                                                                           | 2                  |
+| #3 Plain language                 | user-facing-text, developer-documentation                                                         | 3                  |
+| #4 Any Standard Schema validator  | public-authoring, compiler-graph, cli-scaffolding                                                 | 4, 12              |
+| #5 Core and Labs                  | release-stability, developer-documentation, project-governance                                    | 5                  |
+| #6 Packages and one version       | package-distribution, workspace-foundation, cli-scaffolding, release-stability                    | 7, 12              |
+| #7 Process and repository hygiene | project-governance                                                                                | 6                  |
+| #8 Pre-release dependency policy  | project-governance                                                                                | 6, 23              |
+| #9 Development loop               | development-loop, compiler-graph, cli-scaffolding, acceptance-verification                        | 13                 |
+| #10 Runtimes                      | runtime-portability, acceptance-verification                                                      | 14, 22             |
+| #11 TypeScript 7                  | typescript-compatibility, workspace-foundation, acceptance-verification                           | 15                 |
+| #12 Production and deploy targets | deployment-targets, durable-postgres-backend, jobs-events, pulumi-aws-deployment, cli-scaffolding | 16, 17, 21, 22     |
+| #13 HTTP and auth model           | http-runtime, public-authoring, function-runtime, domain-services, access-control                 | 8, 18              |
+| #14 Effect boundary               | public-authoring, function-runtime                                                                | 9                  |
+| #15 One way and runtime handle    | public-authoring, function-runtime, compiler-graph, domain-services, jobs-events, runtime-handle  | 10                 |
+| #16 Client and wire protocol      | http-runtime                                                                                      | 11, 23             |
+| #17 Escape hatches                | Deferred (non-goal)                                                                               | Workflow follow-up |
+| #18 relkit mcp                    | developer-mcp, development-inspector                                                              | 19                 |
+| #19 Provider kit                  | provider-authoring-kit                                                                            | 25                 |
+| #20 Stability policy and 1.0      | release-stability, developer-documentation                                                        | 12, 26             |
+| #21 Community launch              | project-governance                                                                                | 20                 |
+| #22 Agent adapters                | agent-adapters, tools-agents, ai-sdk-migration                                                    | 24                 |
+| Stop-doing rules                  | project-governance, release-stability                                                             | 6                  |
+| Metrics                           | project-governance, acceptance-verification, developer-mcp                                        | 1, 13, 20          |
+| Additional findings               | developer-documentation, jobs-events, cli-scaffolding, development-inspector                      | 27                 |
+| Inspector future                  | development-inspector                                                                             | 19                 |
