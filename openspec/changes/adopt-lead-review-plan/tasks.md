@@ -67,7 +67,7 @@ not tasks of this change.
 - [x] 6.5 Vendor the `use-effect` skill into `.agents/skills` and point AGENTS.md at it, and verify no guidance references a personal path
 - [x] 6.6 Remove vendored skills that do not apply to this repository and add a skills check, and verify the check passes
 - [x] 6.7 Turn each mandatory rule in AGENTS.md and CONTRIBUTING into a `prepush` or CI check or label it advisory, and verify with a CONTRIBUTING table that maps every mandatory rule to its check
-- [ ] 6.8 Start CONTRIBUTING with a quickstart of at most ten lines and move release certification to a maintainer document, and verify the quickstart in a clean-checkout CI job
+- [x] 6.8 Start CONTRIBUTING with a quickstart of at most ten lines and move release certification to a maintainer document, and verify the quickstart in a clean-checkout CI job
 - [x] 6.9 Write `docs/dependencies.md` listing the oRPC 2.0 beta, the patched drizzle-orm release candidate and the patched blume and `@effect/docgen` with owners and exit plans, and add a policy check against the lockfile; verify it fails when an unlisted pre-release is added
 - [x] 6.10 Update lagging pins (Effect, Hono, Better Auth) where the test suite passes and record any that cannot move in the policy, and verify with the full test suite
 - [x] 6.11 Record the stop-doing rules in CONTRIBUTING and the review checklist, and verify the checklist appears in the pull request template
