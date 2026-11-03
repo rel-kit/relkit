@@ -5,8 +5,8 @@
       "--max-old-space-size=256",
       "node_modules/prettier/bin/prettier.cjs",
       "--check",
-      "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/tasks.md",
-      "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/independent-verification.md",
+      "<repo>/openspec/changes/refine-application-skills-and-generated-projects/tasks.md",
+      "<repo>/openspec/changes/refine-application-skills-and-generated-projects/evidence/independent-verification.md",
       "packages/cli/tests/database/fixture.ts"
     ],
     "exit": 0,

@@ -79,7 +79,7 @@
     }
   ],
   "finalNativeCoordinatorEvidence": {
-    "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/final-native-replay-evidence.json",
+    "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/final-native-replay-evidence.json",
     "sha256": "3dcf4c6bbc15008bdd8392cf9d746bf58070b36dd33fdf522a55eca19d719411",
     "bytes": 17217
   },
@@ -90,35 +90,35 @@
   },
   "copiedNativeResults": [
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-composed-telemetry-results.json",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-composed-telemetry-results.json",
       "sha256": "40cb344d73d0118bf582b5ce2b6d01872e78b9432da16fe7e55abad3f72c5f29",
       "bytes": 2756,
       "originalPath": "/tmp/relkit-phase7-telemetry-B6eZLD/composed-telemetry-results.json",
       "semanticEquality": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-held-agent-results.json",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-held-agent-results.json",
       "sha256": "7960bebb9e7cfa3d816f92d7f08f9427010998f2206be0dc22c7f0e1dd111b98",
       "bytes": 8422,
       "originalPath": "/tmp/relkit-core-consumers-agent-held-8b18daca/evidence/results.json",
       "semanticEquality": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-held-job-results.json",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-held-job-results.json",
       "sha256": "afd0b16d8cc036def814d26fd7c4163445a61e9e7fd09ec7b86b8d9b9f5fcb13",
       "bytes": 7737,
       "originalPath": "/tmp/relkit-core-consumers-job-held-39c7e6b8/evidence/results.json",
       "semanticEquality": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-generated-host-results.json",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-generated-host-results.json",
       "sha256": "8b51cda42203d6ccb1eeed79b49671596e52b599466a3f560126b5c69864a748",
       "bytes": 6775,
       "originalPath": "/tmp/relkit-core-consumers-demo-3d6cp84c/fixture/evidence/replay-candidate/generated-results.json",
       "semanticEquality": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-realtime-disconnect-results.json",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/openspec/changes/core-consumers-effect-service-alignment/native-realtime-disconnect-results.json",
       "sha256": "c79fbcab0c6ab6f3bb00bfcfb2a79e14cb784709dacf9c822c503da7c8a0b532",
       "bytes": 556,
       "originalPath": "/tmp/relkit-core-consumers-demo-3d6cp84c/fixture/evidence/replay-candidate-disconnect/realtime-disconnect-results.json",

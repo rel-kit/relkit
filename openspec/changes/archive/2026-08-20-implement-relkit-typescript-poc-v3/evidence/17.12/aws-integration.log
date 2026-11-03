@@ -42,14 +42,14 @@ error: could not create secrets manager for new stack: passphrase must be set wi
  isCanceled: false,
      killed: false,
 
-      at makeError (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/execa@5.1.1/node_modules/execa/lib/error.js:60:15)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/execa@5.1.1/node_modules/execa/index.js:118:26)
+      at makeError (<repo>/node_modules/.bun/execa@5.1.1/node_modules/execa/lib/error.js:60:15)
+      at <anonymous> (<repo>/node_modules/.bun/execa@5.1.1/node_modules/execa/index.js:118:26)
 ,
   toString: [Function: toString],
 },
 
-      at createCommandError (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/@pulumi+pulumi@3.258.0+ca84541ac88a3075/node_modules/@pulumi/pulumi/automation/errors.js:81:23)
-      at exec (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/@pulumi+pulumi@3.258.0+ca84541ac88a3075/node_modules/@pulumi/pulumi/automation/cmd.js:195:24)
+      at createCommandError (<repo>/node_modules/.bun/@pulumi+pulumi@3.258.0+ca84541ac88a3075/node_modules/@pulumi/pulumi/automation/errors.js:81:23)
+      at exec (<repo>/node_modules/.bun/@pulumi+pulumi@3.258.0+ca84541ac88a3075/node_modules/@pulumi/pulumi/automation/cmd.js:195:24)
 (fail) creates, smokes, updates, and independently cleans an ephemeral AWS stack [4155.82ms]
 
  1 pass

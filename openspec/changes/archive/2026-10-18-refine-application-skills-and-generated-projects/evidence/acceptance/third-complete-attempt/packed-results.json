@@ -1,5 +1,5 @@
 {
-  "temporary": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv",
+  "temporary": "<tmp>/relkit-packed-acceptance-ITuFuv",
   "registry": "http://127.0.0.1:51548",
   "results": [
     {
@@ -14,7 +14,7 @@
         "--registry",
         "http://127.0.0.1:51548"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv",
       "passed": true,
       "ms": 164616,
       "pressure": 2
@@ -22,7 +22,7 @@
     {
       "label": "create-direct",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/node_modules/.bin/create-relkit",
+        "<tmp>/relkit-packed-acceptance-ITuFuv/node_modules/.bin/create-relkit",
         "acceptance-app",
         "--directory",
         "consumer-direct",
@@ -37,7 +37,7 @@
         "--no-git",
         "--json"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv",
       "passed": true,
       "ms": 172,
       "pressure": 1
@@ -54,7 +54,7 @@
         "--registry",
         "http://127.0.0.1:51548"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct",
       "passed": true,
       "ms": 20011,
       "pressure": 2
@@ -70,7 +70,7 @@
         "--registry",
         "http://127.0.0.1:51548"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct",
       "passed": true,
       "ms": 68,
       "pressure": 1
@@ -78,12 +78,12 @@
     {
       "label": "direct-help-without-orm",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct/node_modules/.bin/relkit",
+        "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct/node_modules/.bin/relkit",
         "db",
         "migrate",
         "--help"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct",
       "passed": true,
       "ms": 1058,
       "pressure": 1
@@ -91,10 +91,10 @@
     {
       "label": "direct-check-without-orm",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct/node_modules/.bin/relkit",
+        "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct/node_modules/.bin/relkit",
         "check"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct",
       "passed": true,
       "ms": 5384,
       "pressure": 1
@@ -102,11 +102,11 @@
     {
       "label": "direct-dev-prepare-without-orm",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct/node_modules/.bin/relkit",
+        "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct/node_modules/.bin/relkit",
         "dev",
         "--prepare"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct",
       "passed": true,
       "ms": 6894,
       "pressure": 1
@@ -117,7 +117,7 @@
         "run",
         "check"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct",
       "passed": true,
       "ms": 4563,
       "pressure": 2
@@ -128,7 +128,7 @@
         "run",
         "typecheck"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct",
       "passed": true,
       "ms": 1806,
       "pressure": 1
@@ -139,7 +139,7 @@
         "run",
         "test"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct",
       "passed": true,
       "ms": 709,
       "pressure": 1
@@ -150,7 +150,7 @@
         "run",
         "build"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct",
       "passed": true,
       "ms": 3282,
       "pressure": 1
@@ -158,11 +158,11 @@
     {
       "label": "direct-prepare",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct/node_modules/.bin/relkit",
+        "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct/node_modules/.bin/relkit",
         "dev",
         "--prepare"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct",
       "passed": true,
       "ms": 5675,
       "pressure": 1
@@ -170,7 +170,7 @@
     {
       "label": "create-cli",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/node_modules/.bin/relkit",
+        "<tmp>/relkit-packed-acceptance-ITuFuv/node_modules/.bin/relkit",
         "create",
         "acceptance-app",
         "--directory",
@@ -186,7 +186,7 @@
         "--no-git",
         "--json"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv",
       "passed": true,
       "ms": 1183,
       "pressure": 1
@@ -203,7 +203,7 @@
         "--registry",
         "http://127.0.0.1:51548"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli",
       "passed": true,
       "ms": 2837,
       "pressure": 2
@@ -219,7 +219,7 @@
         "--registry",
         "http://127.0.0.1:51548"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli",
       "passed": true,
       "ms": 154,
       "pressure": 1
@@ -227,12 +227,12 @@
     {
       "label": "cli-help-without-orm",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli/node_modules/.bin/relkit",
+        "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli/node_modules/.bin/relkit",
         "db",
         "migrate",
         "--help"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli",
       "passed": true,
       "ms": 1270,
       "pressure": 1
@@ -240,10 +240,10 @@
     {
       "label": "cli-check-without-orm",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli/node_modules/.bin/relkit",
+        "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli/node_modules/.bin/relkit",
         "check"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli",
       "passed": true,
       "ms": 20534,
       "pressure": 1
@@ -251,11 +251,11 @@
     {
       "label": "cli-dev-prepare-without-orm",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli/node_modules/.bin/relkit",
+        "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli/node_modules/.bin/relkit",
         "dev",
         "--prepare"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli",
       "passed": true,
       "ms": 33403,
       "pressure": 1
@@ -266,7 +266,7 @@
         "run",
         "check"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli",
       "passed": true,
       "ms": 22498,
       "pressure": 1
@@ -277,7 +277,7 @@
         "run",
         "typecheck"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli",
       "passed": true,
       "ms": 1865,
       "pressure": 1
@@ -288,7 +288,7 @@
         "run",
         "test"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli",
       "passed": true,
       "ms": 673,
       "pressure": 1
@@ -299,7 +299,7 @@
         "run",
         "build"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli",
       "passed": true,
       "ms": 8397,
       "pressure": 1
@@ -307,11 +307,11 @@
     {
       "label": "cli-prepare",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli/node_modules/.bin/relkit",
+        "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli/node_modules/.bin/relkit",
         "dev",
         "--prepare"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli",
       "passed": true,
       "ms": 5561,
       "pressure": 1
@@ -319,7 +319,7 @@
     {
       "label": "existing-database-auth-add",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct/node_modules/.bin/relkit",
+        "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct/node_modules/.bin/relkit",
         "--json",
         "add",
         "database",
@@ -327,7 +327,7 @@
         "sqlite",
         "--no-install"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct",
       "passed": true,
       "ms": 410553,
       "pressure": 1
@@ -344,9 +344,9 @@
         "--registry",
         "http://127.0.0.1:51548"
       ],
-      "cwd": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct",
+      "cwd": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct",
       "passed": false,
-      "error": "ScaffoldProcessFailure: --smol install --network-concurrency 1 --force --no-cache --registry http://127.0.0.1:51548 failed in /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct (1)\nbun install v1.3.10 (30e609e0)\nResolving dependencies\nResolved, downloaded and extracted [11]\nerror: GET http://127.0.0.1:51548/drizzle-kit - 502\nerror: drizzle-kit@1.0.0-rc.5-ab785fc failed to resolve\n",
+      "error": "ScaffoldProcessFailure: --smol install --network-concurrency 1 --force --no-cache --registry http://127.0.0.1:51548 failed in <tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct (1)\nbun install v1.3.10 (30e609e0)\nResolving dependencies\nResolved, downloaded and extracted [11]\nerror: GET http://127.0.0.1:51548/drizzle-kit - 502\nerror: drizzle-kit@1.0.0-rc.5-ab785fc failed to resolve\n",
       "ms": 412287,
       "pressure": 1
     }
@@ -355,13 +355,13 @@
     "parentIdentity": [
       {
         "name": "@relkit/cli",
-        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/node_modules/@relkit/cli",
+        "directory": "<tmp>/relkit-packed-acceptance-ITuFuv/node_modules/@relkit/cli",
         "version": "0.7.7",
         "binSha256": "7b439e073f89e51fcc792ae8aa1ce56443a77b8cf2e3c21ddcac3baa92ba23eb"
       },
       {
         "name": "create-relkit",
-        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/node_modules/create-relkit",
+        "directory": "<tmp>/relkit-packed-acceptance-ITuFuv/node_modules/create-relkit",
         "version": "0.7.7",
         "binSha256": "00735b75abda57c2f43af062ea6d8c3dd2da459daea2d037d177a72ba7434392"
       }
@@ -370,13 +370,13 @@
     "directIdentity": [
       {
         "name": "@relkit/cli",
-        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct/node_modules/@relkit/cli",
+        "directory": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct/node_modules/@relkit/cli",
         "version": "0.7.7",
         "binSha256": "7b439e073f89e51fcc792ae8aa1ce56443a77b8cf2e3c21ddcac3baa92ba23eb"
       },
       {
         "name": "create-relkit",
-        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct/node_modules/create-relkit",
+        "directory": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct/node_modules/create-relkit",
         "version": "0.7.7",
         "binSha256": "00735b75abda57c2f43af062ea6d8c3dd2da459daea2d037d177a72ba7434392"
       }
@@ -391,13 +391,13 @@
     "cliIdentity": [
       {
         "name": "@relkit/cli",
-        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli/node_modules/@relkit/cli",
+        "directory": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli/node_modules/@relkit/cli",
         "version": "0.7.7",
         "binSha256": "7b439e073f89e51fcc792ae8aa1ce56443a77b8cf2e3c21ddcac3baa92ba23eb"
       },
       {
         "name": "create-relkit",
-        "directory": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-cli/node_modules/create-relkit",
+        "directory": "<tmp>/relkit-packed-acceptance-ITuFuv/consumer-cli/node_modules/create-relkit",
         "version": "0.7.7",
         "binSha256": "00735b75abda57c2f43af062ea6d8c3dd2da459daea2d037d177a72ba7434392"
       }
@@ -409,7 +409,7 @@
       "prepare": true,
       "startHello": true
     },
-    "blocker": "ScaffoldProcessFailure: --smol install --network-concurrency 1 --force --no-cache --registry http://127.0.0.1:51548 failed in /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct (1)\nbun install v1.3.10 (30e609e0)\nResolving dependencies\nResolved, downloaded and extracted [11]\nerror: GET http://127.0.0.1:51548/drizzle-kit - 502\nerror: drizzle-kit@1.0.0-rc.5-ab785fc failed to resolve\n",
+    "blocker": "ScaffoldProcessFailure: --smol install --network-concurrency 1 --force --no-cache --registry http://127.0.0.1:51548 failed in <tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct (1)\nbun install v1.3.10 (30e609e0)\nResolving dependencies\nResolved, downloaded and extracted [11]\nerror: GET http://127.0.0.1:51548/drizzle-kit - 502\nerror: drizzle-kit@1.0.0-rc.5-ab785fc failed to resolve\n",
     "cleanup": {
       "registryStopped": true,
       "temporaryRemoved": true

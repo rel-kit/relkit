@@ -1,6 +1,6 @@
 {
   "root": "/tmp/relkit-core-consumers-job-held-39c7e6b8",
-  "candidate": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "candidate": "<home>/.codex/worktrees/core-consumers-effect/relkit",
   "cases": [
     {
       "mode": "return",

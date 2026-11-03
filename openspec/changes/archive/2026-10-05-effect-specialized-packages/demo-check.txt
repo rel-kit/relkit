@@ -1,2 +1,2 @@
 $ relkit check
-Checked /Users/mustafaelsayed/Workspace/relkit-regression-demo
+Checked <home>/Workspace/relkit-regression-demo

@@ -1,4 +1,0 @@
-SUMMARY:
-   28 pass
-   0 fail
-  Ran 28 tests across 1 file. [119.52s]

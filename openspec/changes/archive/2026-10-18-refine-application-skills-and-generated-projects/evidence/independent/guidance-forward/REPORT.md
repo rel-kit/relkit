@@ -2,7 +2,7 @@
 
 Model: a specific runtime model identifier/version is unavailable. The session's generic developer identity says GPT-6.
 
-Read source skill: /Users/mustafaelsayed/Workspace/relkit/templates/default/v1/minimal/.agents/skills/relkit/SKILL.md, plus its CLI/domain/HTTP/data/testing/realtime references. Also read the system skill-creator workflow. No rubric or implementation conclusions were read.
+Read source skill: <repo>/templates/default/v1/minimal/.agents/skills/relkit/SKILL.md, plus its CLI/domain/HTTP/data/testing/realtime references. Also read the system skill-creator workflow. No rubric or implementation conclusions were read.
 
 Each case has its literal REQUEST.md, actual RESPONSE.md describing the selected action/question, OBSERVED.md with the resulting response and limitations, and source artifact/diff/hash evidence. Questions recorded in RESPONSE.md were not sent to the real user.
 

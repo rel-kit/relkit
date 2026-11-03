@@ -4,7 +4,7 @@
     "--smol",
     "openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/packed.ts"
   ],
-  "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+  "cwd": "<repo>",
   "before": {
     "at": "2026-10-18T17:02:06.305647+00:00",
     "cpu": 10,

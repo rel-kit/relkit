@@ -1,3 +1,0 @@
-Command: rtk bun run test:types
-Exit code: 0
-Type fixtures passed (public descriptor inference and boundary rejection).

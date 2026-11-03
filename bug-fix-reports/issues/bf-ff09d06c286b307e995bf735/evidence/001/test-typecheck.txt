@@ -1,2 +1,0 @@
-Command: rtk proxy bun x tsc -p packages/create-relkit/tsconfig.tests.json --pretty false
-Exit code: 0

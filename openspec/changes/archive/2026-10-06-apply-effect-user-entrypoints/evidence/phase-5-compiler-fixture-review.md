@@ -76,7 +76,7 @@ installed `src/Effect.ts` at 13111–13189. Version-matched upstream tests cache
 at `/tmp/relkit-effect-4.0.1-Effect.test.ts` at 317–398, 657–663, 2254–2308
 and 2915–3007 cover bracket release, native signal limitations, inherited
 interruption masks, and combined usage/release failures. The read-only vendor
-checkout at `/Users/mustafaelsayed/Workspace/relkit/repos/effect` lacks these
+checkout at `<repo>/repos/effect` lacks these
 core implementation/test files, its `.agents/AGENTS.md` and its `LLMS.md`.
 No vendor file was changed or installed. CodeGraph was attempted and reported
 that this candidate has no usable index; ordinary source reads followed.

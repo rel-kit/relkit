@@ -2,7 +2,7 @@
   "commands": [
     {
       "label": "baseline-install",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/baseline",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/baseline",
       "args": [
         "bun",
         "install",
@@ -16,7 +16,7 @@
     },
     {
       "label": "baseline-frozen",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/baseline",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/baseline",
       "args": [
         "bun",
         "install",
@@ -31,7 +31,7 @@
     },
     {
       "label": "baseline-types",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/baseline",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/baseline",
       "args": [
         "node",
         "--max-old-space-size=512",
@@ -47,7 +47,7 @@
     },
     {
       "label": "baseline-generate",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/baseline",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/baseline",
       "args": [
         "bun",
         "--bun",
@@ -62,7 +62,7 @@
     },
     {
       "label": "baseline-apply",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/baseline",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/baseline",
       "args": [
         "bun",
         "migrate.ts",
@@ -75,7 +75,7 @@
     },
     {
       "label": "baseline-noop",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/baseline",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/baseline",
       "args": [
         "bun",
         "migrate.ts",
@@ -87,7 +87,7 @@
     },
     {
       "label": "current-unpatched-install",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/current-unpatched",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/current-unpatched",
       "args": [
         "bun",
         "install",
@@ -101,7 +101,7 @@
     },
     {
       "label": "current-unpatched-frozen",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/current-unpatched",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/current-unpatched",
       "args": [
         "bun",
         "install",
@@ -116,7 +116,7 @@
     },
     {
       "label": "current-unpatched-types",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/current-unpatched",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/current-unpatched",
       "args": [
         "node",
         "--max-old-space-size=512",
@@ -132,7 +132,7 @@
     },
     {
       "label": "current-unpatched-baseline-history",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/current-unpatched",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/current-unpatched",
       "args": [
         "bun",
         "migrate.ts",
@@ -144,7 +144,7 @@
     },
     {
       "label": "rc5-install",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/rc5",
       "args": [
         "bun",
         "install",
@@ -158,7 +158,7 @@
     },
     {
       "label": "rc5-frozen",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/rc5",
       "args": [
         "bun",
         "install",
@@ -173,7 +173,7 @@
     },
     {
       "label": "rc5-types",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/rc5",
       "args": [
         "node",
         "--max-old-space-size=512",
@@ -189,7 +189,7 @@
     },
     {
       "label": "rc5-baseline-history",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/rc5",
       "args": [
         "bun",
         "migrate.ts",
@@ -201,7 +201,7 @@
     },
     {
       "label": "rc5-generate-next",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/rc5",
       "args": [
         "bun",
         "--bun",
@@ -216,7 +216,7 @@
     },
     {
       "label": "rc5-apply-next",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/rc5",
       "args": [
         "bun",
         "migrate.ts",
@@ -228,7 +228,7 @@
     },
     {
       "label": "rc5-next-noop",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/rc5",
       "args": [
         "bun",
         "migrate.ts",
@@ -240,7 +240,7 @@
     },
     {
       "label": "rc5-fresh",
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-drizzle-compat-uc_b3zs0/rc5",
+      "cwd": "<tmp>/relkit-drizzle-compat-uc_b3zs0/rc5",
       "args": [
         "bun",
         "migrate.ts",

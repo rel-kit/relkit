@@ -462,7 +462,7 @@ shares one version; and the 42 framework packages become five (`relkit`, `@relki
 
 - Generated material dominates the repository: `docs/` is ~196 MB (mostly evidence JSON),
   `openspec/` is ~433k lines, 1,661 bug-fix report files are committed, and 767 committed files
-  contain `/Users/mustafaelsayed/...` paths.
+  contain `/Users/<name>/...` paths.
 - [AGENTS.md#L119](../../AGENTS.md#L119) requires a skill stored at a personal path that no
   contributor, or their agent, can read.
 - 28 of the 31 skills in `.agents/skills` are vendored from other projects, and some target code that

@@ -5,8 +5,8 @@
   "platform": "darwin",
   "arch": "arm64",
   "cpu": "Apple M1 Pro",
-  "originalRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-head-ae4etj17",
-  "candidateRoot": "/Users/mustafaelsayed/Workspace/relkit",
+  "originalRoot": "<tmp>/relkit-effect-head-ae4etj17",
+  "candidateRoot": "<repo>",
   "originalCommit": "56cb00a4e09f7908d456848e69f6b623bd859c84",
   "entrypoint": "packages/observability/src/index.ts",
   "fixture": {
@@ -50,12 +50,12 @@
   ],
   "effect": [
     {
-      "root": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-effect-head-ae4etj17",
-      "path": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect"
+      "root": "<tmp>/relkit-effect-head-ae4etj17",
+      "path": "<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect"
     },
     {
-      "root": "/Users/mustafaelsayed/Workspace/relkit",
-      "path": "/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect"
+      "root": "<repo>",
+      "path": "<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect"
     }
   ],
   "outputEqual": true,

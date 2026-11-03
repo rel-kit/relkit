@@ -17,6 +17,6 @@ AssertionError: Expected values to be strictly equal:
    operator: "strictEqual",
        code: "ERR_ASSERTION"
 
-      at /private/tmp/relkit-effect-specialized-foreign-origin.mjs:17:8
+      at <tmp>/relkit-effect-specialized-foreign-origin.mjs:17:8
 
 Bun v1.3.10 (macOS arm64)

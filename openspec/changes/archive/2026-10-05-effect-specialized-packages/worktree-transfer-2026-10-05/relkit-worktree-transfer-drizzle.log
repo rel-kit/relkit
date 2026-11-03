@@ -1,5 +1,5 @@
 
- RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit/packages/drizzle
+ RUN  v5.0.1 <repo>/packages/drizzle
 
 
  Test Files  12 passed (12)

@@ -92,14 +92,14 @@
         "examples/data-model/drizzle/20260831090701_initial/migration.sql": "ba8bfddd5f7e8de731afddf2683ba174439457c377339ec15a2964958f3f1172",
         "examples/data-model/drizzle/20260831090701_initial/snapshot.json": "8b6c8f0ed377775fd0ddc780dcbcfe5abaf113817398f60985005b7046d7fc41"
       },
-      "config": "/Users/mustafaelsayed/Workspace/relkit/examples/data-model/drizzle.config.ts"
+      "config": "<repo>/examples/data-model/drizzle.config.ts"
     },
     "auth-drizzle": {
       "history": {
         "examples/auth-drizzle/drizzle/20260831094750_auth/migration.sql": "e1df74edaaf8262ca42010cd88a441fa643ccf4ba9e2276670e7318cfd4c67d5",
         "examples/auth-drizzle/drizzle/20260831094750_auth/snapshot.json": "ae61f5a4a152b4bc0178d4379855ab6af7ea3c29b8ebbb7fe2527b602b962cc7"
       },
-      "config": "/Users/mustafaelsayed/Workspace/relkit/examples/auth-drizzle/drizzle.config.ts"
+      "config": "<repo>/examples/auth-drizzle/drizzle.config.ts"
     },
     "commerce": {
       "history": {},

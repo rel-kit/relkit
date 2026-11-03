@@ -21,7 +21,7 @@
         "mounts": [
           {
             "Type": "bind",
-            "Source": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-smoke-sWEgzm/tasks-inngest-docker-tarball-project/node_modules",
+            "Source": "<tmp>/relkit-create-smoke-sWEgzm/tasks-inngest-docker-tarball-project/node_modules",
             "Destination": "/relkit-node-modules",
             "Mode": "",
             "RW": false,
@@ -29,7 +29,7 @@
           },
           {
             "Type": "bind",
-            "Source": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-smoke-sWEgzm/tasks-inngest-docker-tarball-project/.relkit/state/local/1e6b5c822b933ccd20dea1a840bc9834018f80d9e59c4baab75bdc49bd8fb73e",
+            "Source": "<tmp>/relkit-create-smoke-sWEgzm/tasks-inngest-docker-tarball-project/.relkit/state/local/1e6b5c822b933ccd20dea1a840bc9834018f80d9e59c4baab75bdc49bd8fb73e",
             "Destination": "/relkit-state",
             "Mode": "",
             "RW": false,
@@ -37,7 +37,7 @@
           },
           {
             "Type": "bind",
-            "Source": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-smoke-sWEgzm/tasks-inngest-docker-tarball-project/.relkit/generated/.dev-eBEIlH/generation-1",
+            "Source": "<tmp>/relkit-create-smoke-sWEgzm/tasks-inngest-docker-tarball-project/.relkit/generated/.dev-eBEIlH/generation-1",
             "Destination": "/relkit-worker",
             "Mode": "",
             "RW": false,

@@ -251,16 +251,16 @@ create-relkit:build: $ tsc -b && bun ../../scripts/package-create-relkit-templat
 @relkit/docs:build: cache miss, executing 92729596570f9a4b
 @relkit/example-data-model:build: cache hit, replaying logs 90f9c97d0187c744
 @relkit/example-data-model:build: $ bun ../../packages/cli/dist/bin.js build
-@relkit/example-data-model:build: Built /Users/mustafaelsayed/Workspace/relkit/examples/data-model/.relkit/build
+@relkit/example-data-model:build: Built <repo>/examples/data-model/.relkit/build
 relkit:build: cache hit, replaying logs ba4bbd5cd28bd229
 @relkit/example-commerce:build: cache hit, replaying logs 90b87fc287f2ea31
 relkit:build: $ tsc -b
 @relkit/example-commerce:build: $ bun ../../packages/cli/dist/bin.js build
-@relkit/example-commerce:build: Built /Users/mustafaelsayed/Workspace/relkit/examples/commerce/.relkit/build
+@relkit/example-commerce:build: Built <repo>/examples/commerce/.relkit/build
 @relkit/example-commerce-web:build: cache hit, replaying logs d48f2e305c95e2bd
 @relkit/example-commerce-web:build: $ bun --cwd ../commerce check && bun run scripts/build.ts
 @relkit/example-commerce-web:build: $ bun ../../packages/cli/dist/bin.js check
-@relkit/example-commerce-web:build: Checked /Users/mustafaelsayed/Workspace/relkit/examples/commerce
+@relkit/example-commerce-web:build: Checked <repo>/examples/commerce
 @relkit/example-commerce-web:build: ▲ Next.js 16.3.8 (Turbopack)
 @relkit/example-commerce-web:build: ✓ Running next.config.ts took 83ms
 @relkit/example-commerce-web:build: 
@@ -429,7 +429,7 @@ relkit:build: $ tsc -b
 @relkit/docs:build: generated apps/docs/content/generated/related/operations-troubleshooting.mdx
 @relkit/docs:build: generated apps/docs/content/docs/operations/cli-reference.mdx
 @relkit/docs:build: generated apps/docs/content/docs/api/config.mdx
-@relkit/example-auth-drizzle:build: Built /Users/mustafaelsayed/Workspace/relkit/examples/auth-drizzle/.relkit/build
+@relkit/example-auth-drizzle:build: Built <repo>/examples/auth-drizzle/.relkit/build
 @relkit/docs:build: generated apps/docs/content/docs/api/schema.mdx
 @relkit/docs:build: generated apps/docs/content/docs/api/functions.mdx
 @relkit/docs:build: generated apps/docs/content/docs/api/drizzle.mdx

@@ -10,7 +10,7 @@ The specialized database and authentication packages still coordinate runtime ac
 - Preserve public model inference, `zodSchemas`, dialect/transaction behavior, auth session and route semantics, lazy compilation, and public error compatibility. Review all requested Effect capability families and adopt only those supported by actual domain needs.
 - Audit `providers-standard` consumers, package/release tooling, and public history. Retain its empty compatibility surface for this change if removal would break consumers; do not invent a runtime service for an empty module.
 - Organize implementation into a shared-contract phase, conditional parallel package work, ordered integration (`drizzle` → `better-auth` → `providers-standard`), and final repository/demo acceptance. Require an independent use-effect reviewer to inspect every changed TypeScript file at each phase boundary.
-- Replay the existing offline E2E and browser checks in `/Users/mustafaelsayed/Workspace/relkit-regression-demo`, plus focused database/auth lifecycle coverage, against the actual changed framework build. Record historical diagnostic failures separately and preserve prior evidence.
+- Replay the existing offline E2E and browser checks in `<home>/Workspace/relkit-regression-demo`, plus focused database/auth lifecycle coverage, against the actual changed framework build. Record historical diagnostic failures separately and preserve prior evidence.
 
 ## Capabilities
 

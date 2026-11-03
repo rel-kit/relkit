@@ -3,7 +3,7 @@
     "python3",
     "openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/postgres.py"
   ],
-  "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+  "cwd": "<repo>",
   "before": {
     "at": "2026-10-18T17:37:34.697060+00:00",
     "cpu": 10,

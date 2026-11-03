@@ -84,7 +84,7 @@
         "tests/unit/packed-registry.test.ts",
         "tests/unit/release-check-listing.test.ts"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 1.0413744999968912,
@@ -107,7 +107,7 @@
         "--timeout",
         "30000"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 8.356645374995423,
@@ -125,7 +125,7 @@
         "--timeout",
         "30000"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 23.13946429200587,
@@ -138,7 +138,7 @@
         "--smol",
         "scripts/sync-release.ts"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.048175167001318187,
@@ -151,7 +151,7 @@
         "--smol",
         "scripts/sync-release.ts"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.04517679099808447,
@@ -167,7 +167,7 @@
         "--write-notes",
         "--allow-dirty"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.16957516700495034,
@@ -182,7 +182,7 @@
         "--notes-only",
         "--allow-dirty"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.15640470798825845,
@@ -200,7 +200,7 @@
         "--pretty",
         "false"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.09895783301908523,
@@ -216,7 +216,7 @@
         "--pretty",
         "false"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit/apps/docs",
+      "cwd": "<repo>/apps/docs",
       "exit": 134,
       "expected": 0,
       "seconds": 2.9659405830025207,
@@ -232,7 +232,7 @@
         "--pretty",
         "false"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit/apps/docs",
+      "cwd": "<repo>/apps/docs",
       "exit": 0,
       "expected": 0,
       "seconds": 2.898428792017512,
@@ -250,7 +250,7 @@
         "apps/docs/tests/service-learning.test.ts",
         "apps/docs/tests/cli-scaffolding.test.ts"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.21377695800038055,
@@ -265,7 +265,7 @@
         "--cli-only",
         "--check"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.3212419170013163,
@@ -286,7 +286,7 @@
         "apps/docs/content/docs/start/protect-orders.mdx",
         "apps/docs/content/docs/start/save-orders.mdx"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 1,
       "expected": 0,
       "seconds": 0.03164754100725986,
@@ -307,7 +307,7 @@
         "apps/docs/content/docs/start/protect-orders.mdx",
         "apps/docs/content/docs/start/save-orders.mdx"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.8934999169723596,
@@ -320,7 +320,7 @@
         "--smol",
         "scripts/check-boundaries.ts"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 3.1614471659995615,
@@ -333,7 +333,7 @@
         "--smol",
         "scripts/lint.ts"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.24166016600793228,
@@ -349,7 +349,7 @@
         "--",
         "validate"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.354258374980418,
@@ -363,7 +363,7 @@
         "refine-application-skills-and-generated-projects",
         "--strict"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.8887828329752665,

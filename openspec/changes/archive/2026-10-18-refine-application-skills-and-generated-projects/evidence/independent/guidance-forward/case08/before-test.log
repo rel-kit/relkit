@@ -13,7 +13,7 @@ error: expect(received).toBe(expected)
 Expected: 200
 Received: 404
 
-      at <anonymous> (/private/tmp/relkit-skill-forward-d4_6o6f0/case08/app/tests/items.test.ts:6:27)
+      at <anonymous> (<tmp>/relkit-skill-forward-d4_6o6f0/case08/app/tests/items.test.ts:6:27)
 (fail) GET item zero succeeds through Request/Response [0.54ms]
 
  0 pass

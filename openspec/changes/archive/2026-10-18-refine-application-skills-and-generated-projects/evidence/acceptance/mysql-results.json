@@ -1,19 +1,19 @@
 {
-  "temporary": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp",
+  "temporary": "<tmp>/relkit MySQL acceptance 352wwmkp",
   "workspaceLinked": true,
   "commands": [
     {
       "label": "mysql-initialize",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysqld",
+        "<tmp>/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysqld",
         "--no-defaults",
-        "--basedir=/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7",
-        "--datadir=/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/data",
+        "--basedir=<tmp>/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7",
+        "--datadir=<tmp>/relkit MySQL acceptance 352wwmkp/data",
         "--innodb-buffer-pool-size=16M",
         "--performance-schema=OFF",
         "--initialize-insecure"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 1.6176089169748593,
@@ -22,7 +22,7 @@
     {
       "label": "mysql-create",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "<tmp>/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
         "--no-defaults",
         "--protocol=TCP",
         "--host=127.0.0.1",
@@ -33,7 +33,7 @@
         "--execute",
         "CREATE DATABASE acceptance; CREATE DATABASE acceptance_fresh;"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 0.33525383297819644,
@@ -44,13 +44,13 @@
       "args": [
         "bun",
         "--smol",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/node_modules/drizzle-kit/bin.cjs",
+        "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces/node_modules/drizzle-kit/bin.cjs",
         "generate",
         "--config",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts",
+        "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts",
         "--name=initial"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 0.5603373329795431,
@@ -61,14 +61,14 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "<repo>/packages/cli/dist/bin.js",
         "--json",
         "db",
         "migrate",
         "--config",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
+        "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 1.7801002500054892,
@@ -77,7 +77,7 @@
     {
       "label": "mysql-insert",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "<tmp>/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
         "--no-defaults",
         "--protocol=TCP",
         "--host=127.0.0.1",
@@ -89,7 +89,7 @@
         "--execute",
         "INSERT INTO entries(value) VALUES ('business-row-survives');"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 0.10861816600663587,
@@ -98,7 +98,7 @@
     {
       "label": "mysql-log-before",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "<tmp>/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
         "--no-defaults",
         "--protocol=TCP",
         "--host=127.0.0.1",
@@ -110,7 +110,7 @@
         "--execute",
         "SELECT * FROM acceptance_log ORDER BY id;"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 0.10413079199497588,
@@ -121,14 +121,14 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "<repo>/packages/cli/dist/bin.js",
         "--json",
         "db",
         "migrate",
         "--config",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
+        "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 1.3417667909816373,
@@ -137,7 +137,7 @@
     {
       "label": "mysql-log-repeat-initial",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "<tmp>/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
         "--no-defaults",
         "--protocol=TCP",
         "--host=127.0.0.1",
@@ -149,7 +149,7 @@
         "--execute",
         "SELECT * FROM acceptance_log ORDER BY id;"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 0.1035191249975469,
@@ -160,13 +160,13 @@
       "args": [
         "bun",
         "--smol",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/node_modules/drizzle-kit/bin.cjs",
+        "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces/node_modules/drizzle-kit/bin.cjs",
         "generate",
         "--config",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts",
+        "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts",
         "--name=second"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 0.39307604197529145,
@@ -177,14 +177,14 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "<repo>/packages/cli/dist/bin.js",
         "--json",
         "db",
         "migrate",
         "--config",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
+        "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 1.3339599590108264,
@@ -193,7 +193,7 @@
     {
       "label": "mysql-log-second",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "<tmp>/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
         "--no-defaults",
         "--protocol=TCP",
         "--host=127.0.0.1",
@@ -205,7 +205,7 @@
         "--execute",
         "SELECT * FROM acceptance_log ORDER BY id;"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 0.09995304100448266,
@@ -214,7 +214,7 @@
     {
       "label": "mysql-business-rows",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "<tmp>/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
         "--no-defaults",
         "--protocol=TCP",
         "--host=127.0.0.1",
@@ -226,7 +226,7 @@
         "--execute",
         "SELECT value,note FROM entries ORDER BY id;"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 0.10546649998286739,
@@ -237,14 +237,14 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "<repo>/packages/cli/dist/bin.js",
         "--json",
         "db",
         "migrate",
         "--config",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
+        "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 1.3446028750040568,
@@ -253,7 +253,7 @@
     {
       "label": "mysql-log-repeat-second",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "<tmp>/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
         "--no-defaults",
         "--protocol=TCP",
         "--host=127.0.0.1",
@@ -265,7 +265,7 @@
         "--execute",
         "SELECT * FROM acceptance_log ORDER BY id;"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 0.10405862500192598,
@@ -276,14 +276,14 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "<repo>/packages/cli/dist/bin.js",
         "--json",
         "db",
         "migrate",
         "--config",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
+        "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 1.361194750003051,
@@ -292,7 +292,7 @@
     {
       "label": "mysql-fresh-log",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "<tmp>/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
         "--no-defaults",
         "--protocol=TCP",
         "--host=127.0.0.1",
@@ -304,7 +304,7 @@
         "--execute",
         "SELECT * FROM acceptance_log ORDER BY id;"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 0.10078149999026209,
@@ -315,14 +315,14 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "<repo>/packages/cli/dist/bin.js",
         "--json",
         "db",
         "migrate",
         "--config",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
+        "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 1,
       "expected": 1,
       "seconds": 1.333882207982242,
@@ -331,7 +331,7 @@
     {
       "label": "mysql-log-after-failure",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "<tmp>/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
         "--no-defaults",
         "--protocol=TCP",
         "--host=127.0.0.1",
@@ -343,7 +343,7 @@
         "--execute",
         "SELECT * FROM acceptance_log ORDER BY id;"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 0.10026062501128763,
@@ -352,7 +352,7 @@
     {
       "label": "mysql-rows-after-failure",
       "args": [
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
+        "<tmp>/relkit-mysql-bottles-bs0173tg/mysql@8.4/8.4.11_7/bin/mysql",
         "--no-defaults",
         "--protocol=TCP",
         "--host=127.0.0.1",
@@ -364,7 +364,7 @@
         "--execute",
         "SELECT value,note FROM entries ORDER BY id;"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces",
+      "cwd": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces",
       "exit": 0,
       "expected": 0,
       "seconds": 0.10435408301418647,
@@ -375,11 +375,11 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/dialect-auth.ts",
+        "<repo>/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/dialect-auth.ts",
         "mysql",
         "mysql://root@127.0.0.1:61448/acceptance"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 20.59591045801062,
@@ -389,9 +389,9 @@
   "serverPid": 6086,
   "initialMigrate": {
     "command": "db migrate",
-    "configPath": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts",
+    "configPath": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces/nested config/drizzle.config.ts",
     "dialect": "mysql",
-    "migrationPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit MySQL acceptance 352wwmkp/application with spaces/src/services/database/migrations",
+    "migrationPath": "<tmp>/relkit MySQL acceptance 352wwmkp/application with spaces/src/services/database/migrations",
     "ok": true
   },
   "failedMigration": {

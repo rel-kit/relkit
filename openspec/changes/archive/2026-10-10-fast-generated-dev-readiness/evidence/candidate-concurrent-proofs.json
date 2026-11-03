@@ -16,7 +16,7 @@
     ]
   },
   "request": {
-    "projectRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ysY8BK/readiness-baseline",
+    "projectRoot": "<tmp>/relkit-readiness-ysY8BK/readiness-baseline",
     "url": "http://127.0.0.1:3000/hello?name=RelKit",
     "expectedStatus": 200,
     "expectedBody": "{\"message\":\"Hello, RelKit!\"}"
@@ -36,7 +36,7 @@
         "durationMs": 387.162333,
         "outcome": "child-exited",
         "exitCode": 1,
-        "output": "$ bun --no-env-file node_modules/@relkit/cli/dist/bin.js dev\n21:11:37.307 INFO  relkit            Starting development server\n21:11:37.330 INFO  build             Compiling application\n21:11:37.472 INFO  relkit            Stopping development server\n21:11:37.474 INFO  relkit            Development server stopped\nerror: Unable to connect. Is the computer able to access the url?\n  path: \"http://127.0.0.1:63237/hello?name=RelKit\",\n errno: 0,\n  code: \"ConnectionRefused\"\n\nnote: missing sourcemaps for /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ysY8BK/readiness-baseline/node_modules/@relkit/cli/dist/bin.js\nnote: consider bundling with '--sourcemap' to get unminified traces\n\nBun v1.3.10 (macOS arm64)\nerror: script \"dev\" exited with code 1\n"
+        "output": "$ bun --no-env-file node_modules/@relkit/cli/dist/bin.js dev\n21:11:37.307 INFO  relkit            Starting development server\n21:11:37.330 INFO  build             Compiling application\n21:11:37.472 INFO  relkit            Stopping development server\n21:11:37.474 INFO  relkit            Development server stopped\nerror: Unable to connect. Is the computer able to access the url?\n  path: \"http://127.0.0.1:63237/hello?name=RelKit\",\n errno: 0,\n  code: \"ConnectionRefused\"\n\nnote: missing sourcemaps for <tmp>/relkit-readiness-ysY8BK/readiness-baseline/node_modules/@relkit/cli/dist/bin.js\nnote: consider bundling with '--sourcemap' to get unminified traces\n\nBun v1.3.10 (macOS arm64)\nerror: script \"dev\" exited with code 1\n"
       }
     },
     {
@@ -45,7 +45,7 @@
         "durationMs": 346.194,
         "outcome": "child-exited",
         "exitCode": 1,
-        "output": "$ bun --no-env-file node_modules/@relkit/cli/dist/bin.js dev\n21:11:37.668 INFO  relkit            Starting development server\n21:11:37.692 INFO  build             Compiling application\n21:11:37.822 INFO  relkit            Stopping development server\n21:11:37.824 INFO  relkit            Development server stopped\nerror: Unable to connect. Is the computer able to access the url?\n  path: \"http://127.0.0.1:63278/hello?name=RelKit\",\n errno: 0,\n  code: \"ConnectionRefused\"\n\nnote: missing sourcemaps for /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ysY8BK/readiness-baseline/node_modules/@relkit/cli/dist/bin.js\nnote: consider bundling with '--sourcemap' to get unminified traces\n\nBun v1.3.10 (macOS arm64)\nerror: script \"dev\" exited with code 1\n"
+        "output": "$ bun --no-env-file node_modules/@relkit/cli/dist/bin.js dev\n21:11:37.668 INFO  relkit            Starting development server\n21:11:37.692 INFO  build             Compiling application\n21:11:37.822 INFO  relkit            Stopping development server\n21:11:37.824 INFO  relkit            Development server stopped\nerror: Unable to connect. Is the computer able to access the url?\n  path: \"http://127.0.0.1:63278/hello?name=RelKit\",\n errno: 0,\n  code: \"ConnectionRefused\"\n\nnote: missing sourcemaps for <tmp>/relkit-readiness-ysY8BK/readiness-baseline/node_modules/@relkit/cli/dist/bin.js\nnote: consider bundling with '--sourcemap' to get unminified traces\n\nBun v1.3.10 (macOS arm64)\nerror: script \"dev\" exited with code 1\n"
       }
     },
     {
@@ -54,7 +54,7 @@
         "durationMs": 462.330792,
         "outcome": "child-exited",
         "exitCode": 1,
-        "output": "$ bun --no-env-file node_modules/@relkit/cli/dist/bin.js dev\n21:11:38.039 INFO  relkit            Starting development server\n21:11:38.067 INFO  build             Compiling application\n21:11:38.281 INFO  relkit            Stopping development server\n21:11:38.283 INFO  relkit            Development server stopped\nerror: Unable to connect. Is the computer able to access the url?\n  path: \"http://127.0.0.1:63318/hello?name=RelKit\",\n errno: 0,\n  code: \"ConnectionRefused\"\n\nnote: missing sourcemaps for /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ysY8BK/readiness-baseline/node_modules/@relkit/cli/dist/bin.js\nnote: consider bundling with '--sourcemap' to get unminified traces\n\nBun v1.3.10 (macOS arm64)\nerror: script \"dev\" exited with code 1\n"
+        "output": "$ bun --no-env-file node_modules/@relkit/cli/dist/bin.js dev\n21:11:38.039 INFO  relkit            Starting development server\n21:11:38.067 INFO  build             Compiling application\n21:11:38.281 INFO  relkit            Stopping development server\n21:11:38.283 INFO  relkit            Development server stopped\nerror: Unable to connect. Is the computer able to access the url?\n  path: \"http://127.0.0.1:63318/hello?name=RelKit\",\n errno: 0,\n  code: \"ConnectionRefused\"\n\nnote: missing sourcemaps for <tmp>/relkit-readiness-ysY8BK/readiness-baseline/node_modules/@relkit/cli/dist/bin.js\nnote: consider bundling with '--sourcemap' to get unminified traces\n\nBun v1.3.10 (macOS arm64)\nerror: script \"dev\" exited with code 1\n"
       }
     },
     {
@@ -63,7 +63,7 @@
         "durationMs": 431.212125,
         "outcome": "child-exited",
         "exitCode": 1,
-        "output": "$ bun --no-env-file node_modules/@relkit/cli/dist/bin.js dev\n21:11:38.568 INFO  relkit            Starting development server\n21:11:38.591 INFO  build             Compiling application\n21:11:38.724 INFO  relkit            Stopping development server\n21:11:38.726 INFO  relkit            Development server stopped\nerror: Unable to connect. Is the computer able to access the url?\n  path: \"http://127.0.0.1:63361/hello?name=RelKit\",\n errno: 0,\n  code: \"ConnectionRefused\"\n\nnote: missing sourcemaps for /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-ysY8BK/readiness-baseline/node_modules/@relkit/cli/dist/bin.js\nnote: consider bundling with '--sourcemap' to get unminified traces\n\nBun v1.3.10 (macOS arm64)\nerror: script \"dev\" exited with code 1\n"
+        "output": "$ bun --no-env-file node_modules/@relkit/cli/dist/bin.js dev\n21:11:38.568 INFO  relkit            Starting development server\n21:11:38.591 INFO  build             Compiling application\n21:11:38.724 INFO  relkit            Stopping development server\n21:11:38.726 INFO  relkit            Development server stopped\nerror: Unable to connect. Is the computer able to access the url?\n  path: \"http://127.0.0.1:63361/hello?name=RelKit\",\n errno: 0,\n  code: \"ConnectionRefused\"\n\nnote: missing sourcemaps for <tmp>/relkit-readiness-ysY8BK/readiness-baseline/node_modules/@relkit/cli/dist/bin.js\nnote: consider bundling with '--sourcemap' to get unminified traces\n\nBun v1.3.10 (macOS arm64)\nerror: script \"dev\" exited with code 1\n"
       }
     }
   ],

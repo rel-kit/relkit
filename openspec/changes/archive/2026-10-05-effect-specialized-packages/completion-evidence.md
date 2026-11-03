@@ -1,6 +1,6 @@
 # Completion replay, October 5, 2026
 
-Candidate: `/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit`,
+Candidate: `<home>/.codex/worktrees/effect-specialized-recovery/relkit`,
 base `0dbc3c445664d53c79d54c3e3e69628f039e6842`. Framework changes remain
 uncommitted. The original checkout's implementation and Git index remain untouched.
 

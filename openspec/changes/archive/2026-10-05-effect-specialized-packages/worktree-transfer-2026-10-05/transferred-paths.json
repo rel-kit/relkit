@@ -1,6 +1,6 @@
 {
-  "source": "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit",
-  "target": "/Users/mustafaelsayed/Workspace/relkit",
+  "source": "<home>/.codex/worktrees/effect-specialized-recovery/relkit",
+  "target": "<repo>",
   "base": "0dbc3c445664d53c79d54c3e3e69628f039e6842",
   "capturedAt": "2026-10-05T11:36:32.047358+00:00",
   "entries": [

@@ -1,4 +1,0 @@
-Command: rtk bun x vitest run packages/routes/tests
-Exit code: 0
-Test Files: 7 passed (7)
-Tests: 35 passed (35)

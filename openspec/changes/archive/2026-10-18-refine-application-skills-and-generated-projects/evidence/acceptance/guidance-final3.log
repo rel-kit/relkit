@@ -16,10 +16,10 @@ guidance02-test
 guidance02-build-api
 guidance02-build-web
 Traceback (most recent call last):
-  File "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/guidance.py", line 63, in <module>
+  File "<repo>/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/guidance.py", line 63, in <module>
     run(report,"guidance02-"+label,args,second,env,timeout=240)
     ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/local_support.py", line 42, in run
+  File "<repo>/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/local_support.py", line 42, in run
     raise RuntimeError(label + " failed: " + output[-3000:])
 RuntimeError: guidance02-build-web failed: e invalid.
 warning @relkit/tools@0.7.7: The engine "bun" appears to be invalid.

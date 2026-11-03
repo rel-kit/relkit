@@ -1,4 +1,0 @@
-Command: bun x tsc -b packages/cli --pretty false
-Working directory: /Users/mustafaelsayed/Workspace/relkit
-Exit code: 0
-No compiler diagnostics.

@@ -213,7 +213,7 @@ tests/compiler/job-names.test.ts:
 Ran 23 tests across 3 files. [620.00ms]
 $ vitest run --config packages/graph/vitest.config.ts
 
- RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+ RUN  v5.0.1 <repo>
 
 
  Test Files  20 passed (20)

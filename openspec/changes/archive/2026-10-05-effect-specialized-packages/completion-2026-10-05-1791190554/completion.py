@@ -12,9 +12,9 @@ import tempfile
 import time
 import urllib.request
 
-CANDIDATE = pathlib.Path('/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit')
-DEMO = pathlib.Path('/Users/mustafaelsayed/Workspace/relkit-regression-demo')
-CHANGE = pathlib.Path('/Users/mustafaelsayed/Workspace/relkit/openspec/changes/effect-specialized-packages')
+CANDIDATE = pathlib.Path('<home>/.codex/worktrees/effect-specialized-recovery/relkit')
+DEMO = pathlib.Path('<home>/Workspace/relkit-regression-demo')
+CHANGE = pathlib.Path('<repo>/openspec/changes/effect-specialized-packages')
 STATE = pathlib.Path('/tmp/relkit-effect-specialized-completion-state.json')
 INPUTS = ['src', 'tests', 'package.json', 'bun.lock', 'relkit.config.ts', 'tsconfig.json']
 

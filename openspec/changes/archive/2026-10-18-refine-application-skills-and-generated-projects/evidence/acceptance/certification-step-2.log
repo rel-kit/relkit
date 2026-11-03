@@ -252,7 +252,7 @@
   duration_ms: 590.155875,
 }
 [20:27:18.918] INFO (#1): Packed candidate recorded {
-  path: "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-FZf7gW/fresh.json",
+  path: "<tmp>/relkit-create-certification-FZf7gW/fresh.json",
   summary: {
     runs: 20,
     medianMs: 574.6285,

@@ -8646,7 +8646,7 @@ inspector browser suite: 121.3s
 26 | if (failure !== undefined) throw new Error(`${failure.name} browser suite failed.`);
                                           ^
 error: inspector browser suite failed.
-      at /Users/mustafaelsayed/Workspace/relkit/scripts/test-e2e.ts:26:38
+      at <repo>/scripts/test-e2e.ts:26:38
 
 Bun v1.3.10 (macOS arm64)
 error: script "test:e2e" exited with code 1

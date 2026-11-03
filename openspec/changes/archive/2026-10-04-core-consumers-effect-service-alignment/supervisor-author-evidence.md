@@ -1,6 +1,6 @@
 # Supervisor author evidence
 
-Worktree: /Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit. Author: root. Independent reviewer: inspector_baseline; final source acceptance is complete. Earlier checkpoints below remain historical evidence.
+Worktree: <home>/.codex/worktrees/core-consumers-effect/relkit. Author: root. Independent reviewer: inspector_baseline; final source acceptance is complete. Earlier checkpoints below remain historical evidence.
 
 All 33 original TypeScript files were read through EOF (25 source and eight suites). Current inventory is reconciled recursively across src/tests plus Vitest and strict test configs; exact current hashes are in the phase inventory. Legacy state-machine assertions moved into Effect tests; native Bun fixtures retain transport/process assertions. The independent reviewer found 121 original outer expect chains retained before additive regression coverage.
 

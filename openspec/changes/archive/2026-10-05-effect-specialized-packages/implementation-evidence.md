@@ -3,7 +3,7 @@
 ## Phase 1: inventory and baseline
 
 Started 2026-10-04 at approximately 18:24 Asia/Riyadh.
-Candidate: `/Users/mustafaelsayed/.codex/worktrees/effect-specialized-packages/relkit`.
+Candidate: `<home>/.codex/worktrees/effect-specialized-packages/relkit`.
 Source revision: `0dbc3c445664d53c79d54c3e3e69628f039e6842`.
 No existing worktree attachments were present. Candidate created from the current
 revision, with the planning directory linked to the original checkout. The
@@ -199,7 +199,7 @@ the app showed no archived snapshot. No archive/delete operation was issued by
 this task. Original source and planning remain intact. The user was asked whether
 removal was intentional; no answer had arrived before recovery began.
 
-Fresh candidate: `/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit`,
+Fresh candidate: `<home>/.codex/worktrees/effect-specialized-recovery/relkit`,
 created at the same source revision. Planning symlink restored. Replayed 14
 successful integrator patches. Drizzle recovery preserves 16 original successful
 patches plus one unfinished documentation patch that is now applied; Auth
@@ -477,7 +477,7 @@ unrelated process kill or unscoped container cleanup occurred. Final Docker
 cleanup verification remains unavailable.
 
 The framework candidate is uncommitted at
-`/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit`,
+`<home>/.codex/worktrees/effect-specialized-recovery/relkit`,
 base0dbc3c445664d53c79d54c3e3e69628f039e6842. Original source checkout/index
 remains unchanged except this untracked planning/evidence directory.
 Full release acceptance and Docker demo live/inspector/origin gates are pending;
