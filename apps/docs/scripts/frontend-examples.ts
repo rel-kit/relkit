@@ -75,8 +75,8 @@ export const frontendExamples = [
     symbol: "defineBetterAuthService",
     partial: "auth",
     backend: [
+      "examples/auth-drizzle/src/services/auth/better-auth.ts",
       "examples/auth-drizzle/src/services/auth/service.ts",
-      "examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts",
     ],
   },
   {
@@ -84,8 +84,8 @@ export const frontendExamples = [
     symbol: "defineBetterAuthService",
     partial: "auth",
     backend: [
+      "examples/auth-drizzle/src/services/auth/better-auth.ts",
       "examples/auth-drizzle/src/services/auth/service.ts",
-      "examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts",
     ],
   },
 ] as const;

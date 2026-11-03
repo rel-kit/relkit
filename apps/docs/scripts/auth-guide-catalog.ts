@@ -45,7 +45,7 @@ export const authGuideRelations = [
   {
     path: "docs/modules/auth/protect-routes",
     api: ["better-auth", "routes"],
-    examples: ["examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"],
+    examples: ["examples/auth-drizzle/src/routes/account/profile/route.ts"],
   },
   {
     path: "docs/modules/auth/clients",

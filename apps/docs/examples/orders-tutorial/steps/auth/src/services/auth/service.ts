@@ -1,7 +1,5 @@
-/** Declares email/password Better Auth using the configured URL and the sole database owner's native tables. */
+/** Serves the tutorial's Better Auth instance at /api/auth against the sole database's native tables. */
 import { defineBetterAuthService } from "@relkit/better-auth";
+import { auth } from "./better-auth.js";
 
-export default defineBetterAuthService({
-  baseURL: process.env.BETTER_AUTH_URL ?? "http://127.0.0.1:3000",
-  emailAndPassword: { enabled: true },
-});
+export default defineBetterAuthService({ auth });

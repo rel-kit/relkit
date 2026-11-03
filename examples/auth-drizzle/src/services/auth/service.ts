@@ -1,8 +1,5 @@
-/** Configures email/password Better Auth against the sole database, borrowing URL and secret from server configuration. */
+/** Serves the application's Better Auth instance at /api/auth against the sole Drizzle database. */
 import { defineBetterAuthService } from "@relkit/better-auth";
+import { auth } from "./better-auth.js";
 
-export default defineBetterAuthService({
-  baseURL: process.env.BETTER_AUTH_URL ?? "http://127.0.0.1:3000",
-  // Better Auth reads BETTER_AUTH_SECRET from the server process environment.
-  emailAndPassword: { enabled: true },
-});
+export default defineBetterAuthService({ auth });

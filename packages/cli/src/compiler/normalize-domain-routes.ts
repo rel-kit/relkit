@@ -96,13 +96,19 @@ function validateAuthMounts(work: NormalizationWork): void {
       if (descriptor.kind !== "route" || !isRecord(value.auth)) return false;
       return refId(value.auth.service) === service.id;
     });
+    // A service built from an instance mounts itself, or opts out with mount: false.
+    const instance =
+      isRecord(service.value) &&
+      isRecord(service.value.capability) &&
+      "mount" in service.value.capability;
+    if (mounts.length === 0 && instance) continue;
     if (mounts.length !== 1) {
       add(
         work,
         service,
         NORMALIZE_CODES.authDuplicate,
         mounts.length === 0
-          ? "Better Auth service requires one ALL catch-all route mount."
+          ? "Better Auth options need one ALL catch-all route mount; pass a Better Auth instance with defineBetterAuthService({ auth }) to have RelKit mount it."
           : "Better Auth service has multiple route mounts.",
       );
       continue;

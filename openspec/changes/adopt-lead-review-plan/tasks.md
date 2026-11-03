@@ -94,7 +94,7 @@ not tasks of this change.
 - [x] 8.6 Accept a Better Auth instance in `defineBetterAuthService({ auth })`: rebuild it from `auth.options` with the default Drizzle database when none is set, mount it at `basePath` unless `mount: false`, and type the session from the instance; verify integration tests for both database modes
 - [x] 8.7 Verify with the evaluator's detectors that importing a Better Auth file during `check` opens no timers or sockets
 - [x] 8.8 Declare `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` in the auth templates' `defineEnv` and fail startup with a coded error when they are missing, and verify the startup test
-- [ ] 8.9 Update the auth templates, `examples/auth-drizzle`, the commerce example and the auth docs to the plain Better Auth file and route-level auth, and verify their tests and docs examples pass
+- [x] 8.9 Update the auth templates, `examples/auth-drizzle`, the commerce example and the auth docs to the plain Better Auth file and route-level auth, and verify their tests and docs examples pass
 
 ## 9. Effect boundary (#14)
 

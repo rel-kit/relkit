@@ -17,19 +17,10 @@ Require a session on selected routes after mounting Better Auth. This HTTP acces
 
 ## Mount the API
 
-<include
-  source="examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"
-  lang="ts"
-  meta='title="src/routes/api/auth/[[...auth]]/route.ts"'
->
-  /_snippets/source/examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts
-</include>
-
-The optional catch-all owns `/api/auth` and nested auth endpoints. The named export must be `ALL`, and
-the handler must be the registered service's `auth.handler`. It is a [raw handler](/docs/modules/http/raw-handlers),
-not a typed function route. Native auth requests and responses do not become RelKit OpenAPI/client
-operations, and raw routes do not accept the function-route `request`, `responses`, or `rateLimit` options.
-Auth endpoints never require a session, so callers can always sign in.
+RelKit mounts the Better Auth service's handler at `/api/auth`, owning that path and the auth endpoints
+under it. They are Better Auth's native endpoints, not typed function routes, so they do not become
+RelKit OpenAPI or client operations. Auth endpoints never require a session, so callers can always sign in.
+See [Better Auth service](/docs/modules/auth/better-auth) to set it up.
 
 ## Require a session on a route
 

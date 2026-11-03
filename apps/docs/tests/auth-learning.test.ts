@@ -79,7 +79,7 @@ test("teaches a migrated existing-app flow without hard-coded server secrets", a
     "src/services/account/functions/session.function.ts",
     "src/routes/session/route.ts",
     "src/routes/account/profile/route.ts",
-    "src/routes/api/auth/[[...auth]]/route.ts",
+    "src/services/auth/better-auth.ts",
   ])
     expect(tutorial).toContain(`examples/auth-drizzle/${path}`);
   for (const operation of ["sign-up/email", "sign-in/email", "sign-out", "account/profile"]) {

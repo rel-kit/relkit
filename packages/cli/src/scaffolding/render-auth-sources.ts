@@ -1,31 +1,32 @@
 /**
- * Renders native Better Auth declarations and the sole raw route mount. Layout
- * planning supplies the physical service path; source rendering performs no live
- * auth initialization and preserves borrowing of the native database owner.
+ * Renders the application's plain Better Auth file and the service that serves it. RelKit adds
+ * the database and mounts the handler, so no route file is rendered. Source rendering performs no
+ * live auth initialization.
  */
 /**
- * Renders the native authentication service without executing user modules.
- * @returns TypeScript declaring an email/password Better Auth service with a local URL fallback.
+ * Renders the Better Auth file: the instance the application configures with Better Auth's own API.
+ * @param basePath - Mount point selected for the auth endpoints.
+ * @returns TypeScript exporting an email/password Better Auth instance.
  */
-export function authServiceSource(): string {
-  return `import { defineBetterAuthService } from "@relkit/better-auth";
+export function betterAuthFileSource(basePath: string): string {
+  return `import { betterAuth } from "better-auth";
 
-export default defineBetterAuthService({
-  baseURL: process.env.BETTER_AUTH_URL ?? "http://127.0.0.1:3000",
+export const auth = betterAuth({
+  // The server refuses to start without BETTER_AUTH_URL; the fallback only serves \`relkit check\`.
+  baseURL: process.env.BETTER_AUTH_URL ?? "http://127.0.0.1:3000",${basePath === "/api/auth" ? "" : `\n  basePath: ${JSON.stringify(basePath)},`}
   emailAndPassword: { enabled: true },
 });
 `;
 }
 
 /**
- * Renders auth Route Source as source text without executing user modules.
- * @param servicePath - Selected grouped or compatible flat auth boundary.
- * @returns TypeScript exporting the auth handler as an ALL route.
+ * Renders the auth service over the Better Auth file next to it.
+ * @returns TypeScript declaring the service RelKit mounts at the instance's base path.
  */
-export function authRouteSource(servicePath: string): string {
-  return `import { defineRoute } from "relkit/routes";
-import auth from "@app/${servicePath.replace(/^src\//, "").replace(/\.ts$/, ".js")}";
+export function authServiceSource(): string {
+  return `import { defineBetterAuthService } from "@relkit/better-auth";
+import { auth } from "./better-auth.js";
 
-export const ALL = defineRoute({ handler: auth.handler });
+export default defineBetterAuthService({ auth });
 `;
 }

@@ -43,7 +43,10 @@ export function createApplicationRequest(
           : new Request(new URL(input.toString(), "http://relkit.test").toString(), init);
       return requests.run(request, async () => {
         const path = new URL(request.url).pathname;
-        if (isAuthEndpoint(routes, path) && services.authHandler !== undefined) {
+        if (
+          isAuthEndpoint(routes, path, services.authBasePath) &&
+          services.authHandler !== undefined
+        ) {
           return services.authHandler(request);
         }
         return handleTestRequest(routes, applicationRuntime, request, () =>
@@ -60,14 +63,19 @@ export function createApplicationRequest(
  * Matches the configured authentication catch-all mount.
  * @param routes - Loaded native filesystem routes.
  * @param path - Native module path or route path being resolved.
+ * @param serviceBasePath - The service's own mount when no route mounts it.
  * @returns True for the mount base or a path beneath it.
  */
 function isAuthEndpoint(
   routes: readonly { readonly method: string; readonly path: string; readonly auth?: unknown }[],
   path: string,
+  serviceBasePath: string | undefined,
 ): boolean {
   const mount = routes.find((route) => route.method === "ALL" && route.auth !== undefined);
-  if (mount === undefined) return false;
-  const base = mount.path.replace(/\/\*[^/]+\??$/, "");
+  if (mount === undefined && serviceBasePath === undefined) return false;
+  const base =
+    mount === undefined
+      ? serviceBasePath!.replace(/\/$/, "")
+      : mount.path.replace(/\/\*[^/]+\??$/, "");
   return path === base || path.startsWith(`${base}/`);
 }

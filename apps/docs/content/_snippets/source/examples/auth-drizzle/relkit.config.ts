@@ -5,7 +5,7 @@ export default defineApp({
   env: defineEnv({
     DATABASE_PATH: env.string().default("./auth.sqlite"),
     BETTER_AUTH_SECRET: env.secret(),
-    BETTER_AUTH_URL: env.url().default(new URL("http://127.0.0.1:3000")),
+    BETTER_AUTH_URL: env.url(),
   }),
   server: { port: 3000 },
 });

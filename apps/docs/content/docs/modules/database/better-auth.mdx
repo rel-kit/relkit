@@ -32,12 +32,12 @@ src/services/database/service.ts → activated native Drizzle client
   ├─ RelKit table clients → business functions via context.database
   └─ Better Auth Drizzle adapter → auth handler and session lookup
 
-src/routes/api/auth/[[...auth]]/route.ts → auth.handler at /api/auth
+src/services/auth/better-auth.ts → betterAuth() instance, mounted by RelKit at /api/auth
 ```
 
-RelKit activates Drizzle before Better Auth and supplies the native client to Better Auth's Drizzle
-adapter. The adapter uses the database service's schema by default and derives its provider from the
-service dialect. You do not call `drizzleAdapter()` yourself in a RelKit auth service.
+RelKit activates Drizzle before Better Auth and, when your Better Auth file sets no `database`, supplies
+the native client to Better Auth's Drizzle adapter. The adapter uses the database service's schema and
+derives its provider from the service dialect. You do not call `drizzleAdapter()` yourself.
 
 The current integration requires one Drizzle service, one Better Auth service, and one filesystem
 `ALL` route mounting the auth handler. It does not support selecting a second database for auth.
@@ -110,7 +110,7 @@ hard-coded secret. Supply a strong, stable server secret before startup; configu
 and trusted origins for the real application. The loopback URL is a local default only. The integration
 does not accept an `({ env })` factory for auth options, and merely declaring a field in `defineEnv`
 does not inject it into native options or populate the process environment. See
-[Auth environment setup](/docs/modules/auth/better-auth#define-the-service-and-environment).
+[Auth environment setup](/docs/modules/auth/better-auth#write-the-better-auth-file-and-the-service).
 
 Do not set `database` or `basePath` on `defineBetterAuthService`: both are reserved. RelKit supplies the
 database and derives the base path from the mounting route. Optional `drizzle` adapter settings can
@@ -120,23 +120,12 @@ If you use custom model/field names, align Better Auth's naming configuration wi
 mapping. An optional `drizzle.schema` map changes what the adapter sees, not what the database service
 registers or what Kit migrates. Keep those definitions and table identities consistent.
 
-## Mount the API and read the session
+## Reach the API and read the session
 
-Create the filesystem catch-all route:
-
-<include
-  source="examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"
-  lang="ts"
-  meta='title="src/routes/api/auth/[[...auth]]/route.ts"'
->
-  /_snippets/source/examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts
-</include>
-
-This mounts the API at `/api/auth` and protects the listed application paths. Authentication endpoints
-must remain reachable so a caller can sign in. Use the registered raw handler rather than wrapping it
-in a JSON business function; auth owns its response headers and cookies. See
-[Raw HTTP handlers](/docs/modules/http/raw-handlers) for mounting rules.
-See [Protect routes](/docs/modules/auth/protect-routes) for path matching, public auth endpoints, and permission checks.
+RelKit mounts the Better Auth handler at `/api/auth`; authentication endpoints stay reachable so a caller
+can sign in, and auth owns its response headers and cookies. Routes that need a session set
+`auth: "required"`. See [Protect routes](/docs/modules/auth/protect-routes) for that check and for
+permission checks.
 
 A business function can read the request's session:
 

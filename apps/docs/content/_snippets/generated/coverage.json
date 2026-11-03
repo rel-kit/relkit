@@ -505,7 +505,7 @@
     {
       "path": "docs/modules/http/raw-handlers",
       "api": ["routes"],
-      "examples": ["examples/commerce/src/routes/api/auth/[[...auth]]/route.ts"]
+      "examples": ["examples/commerce/src/routes/orders/export/route.ts"]
     },
     {
       "path": "docs/modules/http/openapi",
@@ -757,7 +757,7 @@
     {
       "path": "docs/modules/auth/protect-routes",
       "api": ["better-auth", "routes"],
-      "examples": ["examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"]
+      "examples": ["examples/auth-drizzle/src/routes/account/profile/route.ts"]
     },
     {
       "path": "docs/modules/auth/clients",

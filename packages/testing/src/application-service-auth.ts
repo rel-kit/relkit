@@ -16,7 +16,7 @@ import { nativeServiceError } from "./application-errors.js";
  * @param platform - Native activation dependencies.
  * @param declaration - Optional authored auth declaration.
  * @param database - The already acquired, owner-scoped database.
- * @param routes - Routes with the one native ALL mount.
+ * @param routes - Routes; one may mount the handler, otherwise the service mounts itself.
  * @returns Borrowed auth authority without a database finalizer.
  */
 export const acquireApplicationAuth = Effect.fn("Testing.services.auth")(function* (
@@ -27,23 +27,33 @@ export const acquireApplicationAuth = Effect.fn("Testing.services.auth")(functio
 ) {
   if (declaration === undefined) return {};
   const mounts = routes.filter(isAuthMount);
-  const mount = mounts[0];
-  if (database === undefined || mount === undefined || mounts.length !== 1) {
+  const capability = declaration.capability;
+  const mountedPath =
+    mounts.length === 1
+      ? basePath(mounts[0]!)
+      : mounts.length === 0 && capability.mount === true
+        ? capability.basePath
+        : undefined;
+  const customDatabase = capability.database === "custom";
+  if (mountedPath === undefined || (database === undefined && !customDatabase)) {
     return yield* Effect.fail(
-      new Error("Better Auth tests require one Drizzle service and one auth ALL route"),
+      new Error(
+        "Better Auth tests require a Drizzle service, unless the instance sets its own database, and one mount: the service's or one auth ALL route",
+      ),
     );
   }
   const instrumentation = yield* Effect.context<never>();
   const active = yield* Effect.tryPromise({
-    try: () => platform.auth(declaration, database, basePath(mount)),
+    try: () => platform.auth(declaration, customDatabase ? undefined : database, mountedPath),
     catch: nativeServiceError,
   });
-  const result: Pick<TestApplicationServices, "auth" | "authHandler"> = {
+  const result: Pick<TestApplicationServices, "auth" | "authHandler" | "authBasePath"> = {
     auth: createHttpAuthRuntime({
       getOpenApiDocument: () => generateBetterAuthOpenApi(active, instrumentation),
       getSession: async (headers) => (await active.api.getSession({ headers })) ?? null,
     }),
     authHandler: (request) => active.handler(request),
+    authBasePath: mountedPath,
   };
   return result;
 });

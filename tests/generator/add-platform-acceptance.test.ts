@@ -33,8 +33,12 @@ test("route platform and singleton additions compile in every starter", async ()
       default: { description: "Response returned by the route handler" },
     });
     expect(operation["x-relkit"]).not.toHaveProperty("functionId");
+    // RelKit mounts the Better Auth service itself; the scaffold writes its Better Auth file.
     expect(await Bun.file(join(root, "src/routes/api/auth/[[...auth]]/route.ts")).exists()).toBe(
-      true,
+      false,
+    );
+    expect(await Bun.file(join(root, "src/services/auth/better-auth.ts")).text()).toContain(
+      "betterAuth({",
     );
   }
 }, 30_000);

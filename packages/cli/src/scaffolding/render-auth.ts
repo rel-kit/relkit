@@ -1,6 +1,6 @@
 /**
- * Plans the sole native Better Auth service and route at the compiler-selected
- * layout. Existing databases retain their owner/schema/dialect; the transaction
+ * Plans the application's Better Auth file and its service at the compiler-selected
+ * layout; RelKit mounts the handler, so no route is planned. Existing databases retain their owner/schema/dialect; the transaction
  * owns source publication and no live client, migration or secret is created here.
  */
 
@@ -8,12 +8,11 @@ import { Effect } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
 import { scaffoldErrors, domainError, domainTry } from "create-relkit/generator-errors";
 import { runGeneratorPromise } from "create-relkit/generator-runtime";
-import { routePathToFilePath } from "../compiler/index.js";
 import { ADD_FAILURE_CODES, AddScaffoldError, type AddRequest } from "create-relkit/add-types";
 import type { PlanBuilder } from "./plan-builder.js";
 import { scaffoldServiceBoundary } from "./scaffold-layout.js";
 import { ensureEnvironmentEffect } from "./provider-planning.js";
-import { authRouteSource, authServiceSource } from "./render-auth-sources.js";
+import { authServiceSource, betterAuthFileSource } from "./render-auth-sources.js";
 import { renderDatabaseEffect } from "./render-database.js";
 import type { RenderedDatabase } from "./render-database.types.js";
 import {
@@ -23,7 +22,7 @@ import {
 } from "./render-auth-database.js";
 
 /**
- * Plans native auth/database composition and one raw catch-all mount.
+ * Plans native auth/database composition: the Better Auth file and its service.
  * @param builder - Per-request planning owner with declaration-only discovery.
  * @param request - Native dialect and static auth mount configuration.
  * @returns Lazy completion with typed scaffold/filesystem failures; no resource activation.
@@ -57,11 +56,11 @@ export const renderAuthEffect = Effect.fn("Scaffold.renderAuth")(
       });
     if (found) yield* addAuthSchemaEffect(builder, database);
     const servicePath = yield* domainTry(() => scaffoldServiceBoundary(builder.discovery, "auth"));
-    yield* builder.createEffect(servicePath, authServiceSource());
     yield* builder.createEffect(
-      routePathToFilePath(`${request.basePath}/*auth?`),
-      authRouteSource(servicePath),
+      servicePath.replace(/[^/]+$/, "better-auth.ts"),
+      betterAuthFileSource(request.basePath),
     );
+    yield* builder.createEffect(servicePath, authServiceSource());
     yield* authEnvironmentEffect(builder);
     yield* builder.registerArtifactEffect("service", {
       domain: "auth",

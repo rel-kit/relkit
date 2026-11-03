@@ -71,7 +71,7 @@ export const httpGuideRelations = [
   {
     path: "docs/modules/http/raw-handlers",
     api: ["routes"],
-    examples: ["examples/commerce/src/routes/api/auth/[[...auth]]/route.ts"],
+    examples: ["examples/commerce/src/routes/orders/export/route.ts"],
   },
   {
     path: "docs/modules/http/openapi",
