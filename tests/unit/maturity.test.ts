@@ -27,9 +27,10 @@ const manifest = (name: string, maturity?: string) =>
     ...(maturity ? { relkit: { maturity } } : {}),
   });
 
+// Scans every package source and docs page; CI runners take longer than the default 5 s.
 test("the repository agrees with the maturity table", () => {
   expect(maturityProblems(root)).toEqual([]);
-});
+}, 30_000);
 
 test("every published package declares a tier", () => {
   const packages = readPackageTiers(root);

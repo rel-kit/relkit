@@ -209,9 +209,19 @@ jobs:
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/evidence
       - name: Bundle full reports and summaries as a release asset
-        run: >-
-          bun scripts/release-evidence.ts bundle --reports "$RUNNER_TEMP/evidence"
-          --output "$RUNNER_TEMP/npm-release"
+        # Same layout as scripts/release-evidence.ts bundle. Plain shell only: no
+        # repository code or package manager runs after the artifact download.
+        run: |
+          version="$(jq -r .version .changeset/release.json)"
+          name="evidence-$version"
+          output="$RUNNER_TEMP/npm-release"
+          stage="$(mktemp -d)"
+          test -n "$(find "$RUNNER_TEMP/evidence" -type f -print -quit)"
+          mkdir -p "$stage/$name/reports" "$stage/$name/summaries"
+          cp -R "$RUNNER_TEMP/evidence" "$stage/$name/reports/evidence"
+          cp -R docs/evidence/. "$stage/$name/summaries/"
+          tar -czf "$output/$name.tar.gz" -C "$stage" "$name"
+          (cd "$output" && sha256sum "$name.tar.gz" > "$name.tar.gz.sha256")
       - id: archives
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
