@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import * as pulumi from "@pulumi/pulumi";
 import type { MockResourceArgs } from "@pulumi/pulumi/runtime/mocks";
-import { toAwsScheduleExpression, RelkitJobQueues } from "./src/index.js";
+import { toAwsScheduleExpression, RelkitJobQueues } from "../../src/cloud-aws/index.js";
 
 interface SeenResource {
   readonly type: string;

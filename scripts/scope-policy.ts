@@ -1,8 +1,6 @@
 /** Finite approved workspace owners and forbidden source-scope patterns; no files are read here. */
 export const approvedPackages = new Set(
-  "agents app better-auth buckets cache cli client client-generator cloud-aws compiler config contracts create-relkit deploy deploy-pulumi diagnostics drizzle engine events functions graph inspector inspector-api invocation jobs local-service observability observability-local openapi provider providers-local providers-standard realtime relkit routes runtime-effect runtime-hono schema services supervisor testing tools".split(
-    " ",
-  ),
+  "app better-auth cli client create-relkit drizzle inspector relkit testing".split(" "),
 );
 export const approvedApps = new Set(["docs", "inspector"]);
 export const approvedExamples = new Set(

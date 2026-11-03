@@ -1,6 +1,6 @@
 /** Owns finite native filesystem/SDK operations used by packed export acceptance; unresolved Promise work is joined before root release. */
 import { readFile, readdir, mkdir } from "node:fs/promises";
-import { basename, join, relative } from "node:path";
+import { basename, join } from "node:path";
 import { Effect, Schema } from "effect";
 import { canonicalJson } from "relkit/contracts";
 import { observeExecution } from "relkit/contracts/operation";
@@ -65,9 +65,7 @@ export function assertExportManifest(
 ): void {
   const name = basename(directory);
   let expectedName = `@relkit/${name}`;
-  if (relative(repository, directory) === "integrations/catalog")
-    expectedName = "@relkit/integrations";
-  else if (name === "create-relkit" || name === "relkit") expectedName = name;
+  if (name === "create-relkit" || name === "relkit") expectedName = name;
   if (manifest.name !== expectedName) throw new Error(`Unexpected package name in ${directory}`);
   if (
     manifest.exports === undefined ||

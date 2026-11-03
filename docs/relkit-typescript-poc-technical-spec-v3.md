@@ -493,7 +493,7 @@ import {
 | `relkit/inspector-api`   | versioned inspector HTTP/SSE protocol                                |
 | `relkit/deploy`          | provider-neutral deployment plan                                     |
 | `@relkit/pulumi/deploy-pulumi`   | Pulumi Automation API integration                                    |
-| `@relkit/cloud-aws`       | AWS runtime providers and Pulumi resource mapping                    |
+| `@relkit/aws/cloud-aws`       | AWS runtime providers and Pulumi resource mapping                    |
 | `@relkit/cli`             | `relkit` commands and terminal UX                                      |
 | `create-relkit`           | new-project generator                                                |
 
@@ -3333,7 +3333,7 @@ A source file rename must not replace a cloud resource when the stable descripto
 
 ### 22.5 Pulumi component structure
 
-`@relkit/cloud-aws` SHOULD define reusable component resources:
+`@relkit/aws/cloud-aws` SHOULD define reusable component resources:
 
 ```text
 RelkitNetwork

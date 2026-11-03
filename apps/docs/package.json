@@ -43,7 +43,6 @@
     "@relkit/drizzle": "workspace:*",
     "@relkit/effect-mq": "workspace:*",
     "@relkit/inngest": "workspace:*",
-    "@relkit/integrations": "workspace:*",
     "@relkit/local": "workspace:*",
     "@relkit/otlp": "workspace:*",
     "@relkit/pulumi": "workspace:*",

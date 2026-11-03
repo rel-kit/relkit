@@ -7,11 +7,15 @@ import {
 } from "create-relkit/internal/project-manifest.schemas";
 import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
 import {
+  bundledIntegration,
   SCAFFOLD_DEPENDENCIES,
   type ScaffoldDependencyName,
 } from "create-relkit/internal/scaffold-catalog";
 import type { ScaffoldManifest, ScaffoldManifestMerge } from "./plan-manifest.types.js";
 import { repairSelectedAuthManifest } from "./auth-manifest-repair.js";
+
+/** First-party tools that `relkit add` installs but that are not integrations. */
+const TOOL_PACKAGES: ReadonlySet<string> = new Set(["@relkit/inspector"]);
 
 /**
  * Merges supported dependencies and scripts while retaining compatible authored specifications.
@@ -30,6 +34,11 @@ export function mergeScaffoldManifest(
   const manifest = parseManifest(source);
   const added: Record<string, string> = {};
   for (const name of [...dependencies].sort()) {
+    if (name.startsWith("@relkit/") && !TOOL_PACKAGES.has(name) && !bundledIntegration(name))
+      throw new AddScaffoldError(
+        ADD_FAILURE_CODES.validation,
+        `${name} is not an integration released with this RelKit version.`,
+      );
     const wanted = SCAFFOLD_DEPENDENCIES[name];
     const current = manifest.dependencies?.[name] ?? manifest.devDependencies?.[name];
     const compared = resolvedDependencies[name] ?? current;

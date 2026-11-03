@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import type { JobQueueFactoryContext } from "relkit/engine";
-import { createEventBridgeProvider, createSqsJobProvider } from "./src/index.ts";
+import { createEventBridgeProvider, createSqsJobProvider } from "../../src/cloud-aws/index.ts";
 
 describe("AWS runtime providers", () => {
   test("maps the materialized job queue contract to SQS send, receive, and acknowledge", async () => {

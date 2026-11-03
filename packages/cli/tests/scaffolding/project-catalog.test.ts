@@ -120,3 +120,22 @@ test("catalog entries cannot hide recursive, workspace, link, file, network or p
     });
   }
 });
+
+test("relkit add accepts only integrations in the bundled catalog", () => {
+  const source = JSON.stringify({ dependencies: {} });
+  expect(mergeScaffoldManifest(source, new Set(["@relkit/redis"]), new Map()).added).toHaveProperty(
+    "@relkit/redis",
+  );
+  expect(() =>
+    mergeScaffoldManifest(
+      source,
+      new Set(["@relkit/unknown"] as unknown as ["@relkit/redis"]),
+      new Map(),
+    ),
+  ).toThrow(
+    expect.objectContaining({
+      code: ADD_FAILURE_CODES.validation,
+      message: expect.stringContaining("@relkit/unknown is not an integration released"),
+    }),
+  );
+});

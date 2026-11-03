@@ -34,7 +34,7 @@ test("the repository agrees with the maturity table", () => {
 
 test("every published package declares a tier", () => {
   const packages = readPackageTiers(root);
-  expect(packages.length).toBeGreaterThan(50);
+  expect(packages.length).toBeGreaterThan(40);
   expect(packages.filter(({ tier }) => tier !== "core" && tier !== "labs")).toEqual([]);
 });
 

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { awsRequest } from "./src/runtime/http.ts";
+import { awsRequest } from "../../src/cloud-aws/runtime/http.ts";
 
 test("signs product requests with ECS task-role credentials", async () => {
   const previous = process.env.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI;

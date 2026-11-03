@@ -5,7 +5,6 @@ export async function linkWorkspacePackages(projectRoot: string): Promise<void> 
   const repositoryRoot = resolve(import.meta.dir, "../..");
   const manifests = [
     ...new Bun.Glob("packages/*/package.json").scanSync({ cwd: repositoryRoot }),
-    ...new Bun.Glob("integrations/catalog/package.json").scanSync({ cwd: repositoryRoot }),
     ...new Bun.Glob("integrations/packages/*/package.json").scanSync({ cwd: repositoryRoot }),
   ].sort();
   const scope = join(projectRoot, "node_modules", "@relkit");

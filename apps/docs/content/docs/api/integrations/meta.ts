@@ -6,7 +6,6 @@ export default defineMeta({
   pages: [
     "langchain",
     "aws",
-    "catalog",
     "cloudflare",
     "docker",
     "local",

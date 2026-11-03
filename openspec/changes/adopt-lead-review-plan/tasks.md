@@ -77,7 +77,7 @@ not tasks of this change.
 - [x] 7.1 Create the `relkit` package from the authoring and runtime packages listed in design D1, with root and focused subpath exports, and verify packed export maps and a consumer import test
 - [x] 7.2 Move the `relkit` command into the `relkit` package as a launcher for the project's `@relkit/cli`, with a coded error when the CLI is missing, and verify both cases in tests
 - [x] 7.3 Merge compiler, client-generator and supervisor into `@relkit/cli`, observability-local into `@relkit/inspector`, inspector-api into `relkit` and deploy-pulumi into `@relkit/pulumi` (graph and the deploy contract go to `relkit`; see design D1), and verify each package builds and its tests pass
-- [ ] 7.4 Remove `providers-standard`, fold `cloud-aws` into `@relkit/aws` and the integration catalog metadata into `create-relkit`, and verify the creator and `relkit add` read the bundled metadata
+- [x] 7.4 Remove `providers-standard`, fold `cloud-aws` into `@relkit/aws` and the integration catalog metadata into `create-relkit`, and verify the creator and `relkit add` read the bundled metadata
 - [ ] 7.5 Replace package-boundary enforcement with source-folder boundary and konsistent rules inside merged packages, and verify `bun run check` and `konsistent validate` fail on a cross-boundary import fixture
 - [ ] 7.6 Remove `internal/*` subpath exports and internal type references from published packages, and verify with an export-map and declaration scan
 - [ ] 7.7 Configure one Changesets `fixed` group for `relkit`, `create-relkit` and `@relkit/*` and make the Git tag equal the release version, and verify a dry-run version bump gives every package the same version

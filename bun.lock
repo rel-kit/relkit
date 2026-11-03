@@ -70,7 +70,6 @@
         "@relkit/drizzle": "workspace:*",
         "@relkit/effect-mq": "workspace:*",
         "@relkit/inngest": "workspace:*",
-        "@relkit/integrations": "workspace:*",
         "@relkit/local": "workspace:*",
         "@relkit/otlp": "workspace:*",
         "@relkit/pulumi": "workspace:*",
@@ -238,10 +237,6 @@
         "typescript": "catalog:",
       },
     },
-    "integrations/catalog": {
-      "name": "@relkit/integrations",
-      "version": "0.8.1",
-    },
     "integrations/packages/aws": {
       "name": "@relkit/aws",
       "version": "0.8.2",
@@ -250,12 +245,18 @@
       },
       "devDependencies": {
         "@pulumi/aws": "catalog:",
+        "@pulumi/awsx": "3.10.0",
+        "@pulumi/pulumi": "catalog:",
       },
       "peerDependencies": {
         "@pulumi/aws": "catalog:",
+        "@pulumi/awsx": "3.10.0",
+        "@pulumi/pulumi": "catalog:",
       },
       "optionalPeers": [
         "@pulumi/aws",
+        "@pulumi/awsx",
+        "@pulumi/pulumi",
       ],
     },
     "integrations/packages/cloudflare": {
@@ -518,16 +519,6 @@
         "react",
       ],
     },
-    "packages/cloud-aws": {
-      "name": "@relkit/cloud-aws",
-      "version": "0.7.15",
-      "dependencies": {
-        "@pulumi/aws": "catalog:",
-        "@pulumi/awsx": "3.10.0",
-        "@pulumi/pulumi": "catalog:",
-        "relkit": "workspace:*",
-      },
-    },
     "packages/create-relkit": {
       "name": "create-relkit",
       "version": "0.8.8",
@@ -589,10 +580,6 @@
         "typescript": "catalog:",
         "vitest": "catalog:",
       },
-    },
-    "packages/providers-standard": {
-      "name": "@relkit/providers-standard",
-      "version": "0.7.12",
     },
     "packages/relkit": {
       "name": "relkit",
@@ -1833,8 +1820,6 @@
 
     "@relkit/client": ["@relkit/client@workspace:packages/client"],
 
-    "@relkit/cloud-aws": ["@relkit/cloud-aws@workspace:packages/cloud-aws"],
-
     "@relkit/cloudflare": ["@relkit/cloudflare@workspace:integrations/packages/cloudflare"],
 
     "@relkit/docker": ["@relkit/docker@workspace:integrations/packages/docker"],
@@ -1861,15 +1846,11 @@
 
     "@relkit/inspector-ui": ["@relkit/inspector-ui@workspace:apps/inspector"],
 
-    "@relkit/integrations": ["@relkit/integrations@workspace:integrations/catalog"],
-
     "@relkit/langchain": ["@relkit/langchain@workspace:integrations/packages/langchain"],
 
     "@relkit/local": ["@relkit/local@workspace:integrations/packages/local"],
 
     "@relkit/otlp": ["@relkit/otlp@workspace:integrations/packages/otlp"],
-
-    "@relkit/providers-standard": ["@relkit/providers-standard@workspace:packages/providers-standard"],
 
     "@relkit/pulumi": ["@relkit/pulumi@workspace:integrations/packages/pulumi"],
 

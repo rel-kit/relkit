@@ -6,14 +6,10 @@ export const descriptions: Record<string, string> = {
   "@relkit/better-auth": "Better Auth integration for RelKit routes.",
   "@relkit/cli": "The RelKit development, build, inspection, and deployment CLI.",
   "@relkit/client": "Typed RelKit client helpers, including TanStack Query integration.",
-  "@relkit/cloud-aws":
-    "Unsupported internal AWS deployment components for RelKit; use @relkit/cli.",
   "@relkit/drizzle": "Drizzle ORM integration for RelKit functions.",
   "@relkit/inspector":
     "Standalone RelKit development inspector, collector, and local diagnostic history.",
-  "@relkit/integrations": "Metadata-only catalog of independently selected RelKit integrations.",
   "@relkit/langchain": "Explicit native LangChain agent execution for RelKit.",
-  "@relkit/providers-standard": "Empty compatibility package retained for RelKit tooling.",
   "@relkit/testing": "Testing utilities and local providers for RelKit applications.",
   "@relkit/aws": "AWS host and infrastructure integration for RelKit.",
   "@relkit/cloudflare": "Cloudflare integration for RelKit.",

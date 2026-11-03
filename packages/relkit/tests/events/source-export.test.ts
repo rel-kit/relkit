@@ -15,7 +15,7 @@ const forbidden = new RegExp(`\\b(?:${defineName}|${term}s?|${pascalTerm}[A-Za-z
 const forbiddenSuffix = new RegExp(`\\.${term}s?\\.ts$`, "i");
 const providerInternalPrefixes = [
   "packages/relkit/src/providers-local/",
-  "packages/cloud-aws/",
+  "integrations/packages/aws/",
   "tests/contracts/events/provider-internal/",
   "tests/integration/events/provider-internal/",
   "tests/restart/events/provider-internal/",

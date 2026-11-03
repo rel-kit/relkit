@@ -1015,7 +1015,6 @@
     {
       "path": "docs/modules/integrations/index",
       "api": [
-        "integrations/catalog",
         "integrations/docker",
         "integrations/redis",
         "integrations/s3",

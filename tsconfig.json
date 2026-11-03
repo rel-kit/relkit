@@ -3,7 +3,6 @@
   "files": [],
   "references": [
     { "path": "./apps/inspector" },
-    { "path": "./integrations/catalog" },
     { "path": "./integrations/packages/aws" },
     { "path": "./integrations/packages/cloudflare" },
     { "path": "./integrations/packages/docker" },
@@ -22,11 +21,9 @@
     { "path": "./packages/better-auth" },
     { "path": "./packages/client" },
     { "path": "./packages/cli" },
-    { "path": "./packages/cloud-aws" },
     { "path": "./packages/create-relkit" },
     { "path": "./packages/drizzle" },
     { "path": "./packages/inspector" },
-    { "path": "./packages/providers-standard" },
     { "path": "./packages/testing" }
   ]
 }

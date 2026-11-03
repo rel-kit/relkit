@@ -2681,6 +2681,44 @@ declare const resolveCatalogVersion: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L8)
 
+## `integration-catalog.ts`
+
+Reads the integration catalog that release synchronization bundles into this package's manifest.
+
+### BundledIntegration
+
+**Signature**
+
+```ts
+declare const BundledIntegration: BundledIntegration;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/integration-catalog.ts#L4)
+
+### bundledIntegration
+
+Finds the bundled catalog entry of one integration package.
+
+**Signature**
+
+```ts
+declare const bundledIntegration: (packageName: string) => BundledIntegration | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/integration-catalog.ts#L35)
+
+### bundledIntegrations
+
+Lists every RelKit integration package released with this creator.
+
+**Signature**
+
+```ts
+declare const bundledIntegrations: () => readonly BundledIntegration[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/integration-catalog.ts#L10)
+
 ## `launcher.ts`
 
 Owns one Bun child until exit, forwarding terminal cancellation before releasing listeners.
@@ -3219,7 +3257,7 @@ declare const SCAFFOLD_DEPENDENCIES: Readonly<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L13)
 
 ### ScaffoldDependency
 
@@ -3237,31 +3275,51 @@ declare const ScaffoldDependency: ScaffoldDependency;
 
 ```ts
 declare const ScaffoldDependencyName:
-  | "drizzle-orm"
-  | "@cloudflare/workers-types"
   | "@relkit/aws"
+  | "better-auth"
   | "@relkit/better-auth"
   | "@relkit/cloudflare"
   | "@relkit/docker"
-  | "@relkit/effect-mq"
-  | "@relkit/inspector"
-  | "@relkit/inngest"
   | "@relkit/drizzle"
-  | "@relkit/local"
+  | "@relkit/effect-mq"
+  | "@relkit/inngest"
+  | "langchain"
   | "@relkit/langchain"
+  | "@relkit/local"
   | "@relkit/pulumi"
   | "@relkit/redis"
   | "@relkit/s3"
   | "@relkit/trigger"
-  | "better-auth"
+  | "drizzle-orm"
+  | "@cloudflare/workers-types"
+  | "@relkit/inspector"
   | "drizzle-kit"
-  | "langchain"
   | "@langchain/core"
   | "@langchain/langgraph"
   | "langsmith";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L8)
+
+### bundledIntegration
+
+**Signature**
+
+```ts
+declare const bundledIntegration: (packageName: string) => BundledIntegration | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L10)
+
+### bundledIntegrations
+
+**Signature**
+
+```ts
+declare const bundledIntegrations: () => readonly BundledIntegration[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L10)
 
 ### scaffoldDependency
 
@@ -3273,7 +3331,7 @@ Selects one supported dependency from the release's portable scaffold catalog.
 declare const scaffoldDependency: (name: ScaffoldDependencyName) => ScaffoldDependency;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L67)
 
 ## `scaffold-catalog.types.ts`
 

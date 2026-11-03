@@ -7,6 +7,7 @@ export type {
   ScaffoldDependency,
   ScaffoldDependencyName,
 } from "./scaffold-catalog.types.js";
+export { bundledIntegration, bundledIntegrations } from "./integration-catalog.js";
 
 /** Versions copied into generated projects from each package's own release metadata. */
 export const SCAFFOLD_DEPENDENCIES = Object.freeze({

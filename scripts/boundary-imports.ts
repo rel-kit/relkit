@@ -24,7 +24,6 @@ export const publicApplicationPackages = new Set([
   "@relkit/drizzle",
   "relkit/events",
   "relkit/functions",
-  "@relkit/integrations",
   "relkit/jobs",
   "relkit/realtime",
   "relkit/routes",
@@ -49,13 +48,11 @@ export const descriptorPackages = new Set(
 );
 
 export const internalRuntimePackages = new Set([
-  "@relkit/cloud-aws",
   "relkit/engine",
   "relkit/inspector-api",
   "relkit/invocation",
   "relkit/observability",
   "relkit/providers-local",
-  "@relkit/providers-standard",
   "relkit/runtime-effect",
   "relkit/runtime-hono",
   "@relkit/cli",

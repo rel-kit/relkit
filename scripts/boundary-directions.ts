@@ -1,4 +1,4 @@
-/** Checks installed dependency directions between core protocols, selected integrations and the metadata catalog. */
+/** Checks installed dependency directions between core protocols and selected integrations. */
 import { relative, resolve } from "node:path";
 import { discoverScopes, readManifest, type Scope } from "./boundary-imports";
 
@@ -68,10 +68,7 @@ export function dependencyDirectionViolations(
       if (owner.manifest?.name === "relkit/engine" && dependency === "relkit/providers-local") {
         rule = "engine-local-provider-dependency";
         message = "@relkit/engine depends on local provider implementations";
-      } else if (
-        owner.path.startsWith("packages/") &&
-        (dependency === "@relkit/integrations" || integrations.has(dependency))
-      ) {
+      } else if (owner.path.startsWith("packages/") && integrations.has(dependency)) {
         rule = "core-integration-dependency";
         message = `${owner.manifest?.name} depends on integration package "${dependency}"`;
       } else if (
@@ -82,9 +79,6 @@ export function dependencyDirectionViolations(
       ) {
         rule = "integration-non-protocol-dependency";
         message = `${owner.manifest?.name} depends on non-protocol package "${dependency}"`;
-      } else if (owner.path === "integrations/catalog" && !integrations.has(dependency)) {
-        rule = "catalog-non-integration-dependency";
-        message = `@relkit/integrations depends on non-integration package "${dependency}"`;
       }
       if (rule && message) {
         violations.push({

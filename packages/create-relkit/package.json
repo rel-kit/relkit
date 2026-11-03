@@ -223,6 +223,83 @@
       "@relkit/redis": "0.8.3",
       "@relkit/s3": "0.7.13",
       "@relkit/inspector": "0.2.1"
-    }
+    },
+    "integrations": [
+      {
+        "id": "aws",
+        "package": "@relkit/aws",
+        "maturity": "labs"
+      },
+      {
+        "id": "better-auth",
+        "package": "@relkit/better-auth",
+        "maturity": "core"
+      },
+      {
+        "id": "cloudflare",
+        "package": "@relkit/cloudflare",
+        "maturity": "labs"
+      },
+      {
+        "id": "docker",
+        "package": "@relkit/docker",
+        "maturity": "core"
+      },
+      {
+        "id": "drizzle",
+        "package": "@relkit/drizzle",
+        "maturity": "core"
+      },
+      {
+        "id": "effect-mq",
+        "package": "@relkit/effect-mq",
+        "maturity": "labs"
+      },
+      {
+        "id": "inngest",
+        "package": "@relkit/inngest",
+        "maturity": "labs"
+      },
+      {
+        "id": "langchain",
+        "package": "@relkit/langchain",
+        "maturity": "labs"
+      },
+      {
+        "id": "local",
+        "package": "@relkit/local",
+        "maturity": "core"
+      },
+      {
+        "id": "otlp",
+        "package": "@relkit/otlp",
+        "maturity": "labs"
+      },
+      {
+        "id": "pulumi",
+        "package": "@relkit/pulumi",
+        "maturity": "labs"
+      },
+      {
+        "id": "redis",
+        "package": "@relkit/redis",
+        "maturity": "core"
+      },
+      {
+        "id": "s3",
+        "package": "@relkit/s3",
+        "maturity": "core"
+      },
+      {
+        "id": "sentry",
+        "package": "@relkit/sentry",
+        "maturity": "labs"
+      },
+      {
+        "id": "trigger",
+        "package": "@relkit/trigger",
+        "maturity": "labs"
+      }
+    ]
   }
 }

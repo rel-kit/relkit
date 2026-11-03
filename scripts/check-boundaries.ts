@@ -108,8 +108,7 @@ function reportImport(
       dependency.startsWith("@hono/") ||
       dependency === "relkit/runtime-hono" ||
       dependency.startsWith("@pulumi/") ||
-      dependency === "@relkit/pulumi" ||
-      dependency === "@relkit/cloud-aws")
+      dependency === "@relkit/pulumi")
   ) {
     add("graph-hono-pulumi-import", `relkit/graph imports Hono/Pulumi package "${dependency}"`);
   }

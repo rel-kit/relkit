@@ -62,13 +62,6 @@ export const apiPackageDefinitions = [
   ),
   apiPackage("integrations/aws", "AWS", "@relkit/aws", "integrations/packages/aws", "integrations"),
   apiPackage(
-    "integrations/catalog",
-    "Integration catalog",
-    "@relkit/integrations",
-    "integrations/catalog",
-    "integrations",
-  ),
-  apiPackage(
     "integrations/cloudflare",
     "Cloudflare",
     "@relkit/cloudflare",

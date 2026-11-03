@@ -29,7 +29,7 @@ test("generated runtime carries and verifies its activation fingerprint", () => 
   expect(source).toContain("Runtime integration plan version");
   expect(source).toContain("Runtime integration plan does not match the application graph");
   expect(source).toContain('from "./runtime-integrations.ts"');
-  expect(source).not.toContain("@relkit/cloud-aws/runtime");
+  expect(source).not.toContain("@relkit/aws/cloud-aws");
   expect(source).not.toContain("awsProviderFactories");
   expect(source).toContain(
     "runtimeIntegrationModules, bindingValues: sourceValues, localBindingValues",

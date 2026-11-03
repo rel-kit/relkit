@@ -22,7 +22,7 @@ describe("Pulumi workspace setup", () => {
         process.execPath,
         "-e",
         `
-      import { createPulumiWorkspace } from "../../../../../integrations/packages/pulumi/integrations/packages/pulumi/src/deploy-pulumi/workspace.ts";
+      import { createPulumiWorkspace } from "./integrations/packages/pulumi/src/deploy-pulumi/workspace.ts";
       try {
         await createPulumiWorkspace({ projectName: "orders" + "-".repeat(100_000) + "app", stackName: "!" });
       } catch (error) {

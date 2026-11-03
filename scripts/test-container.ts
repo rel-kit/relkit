@@ -69,7 +69,6 @@ const buildPackages = Effect.gen(function* () {
       "run",
       "build",
       "--filter=./packages/*",
-      "--filter=./integrations/catalog",
       "--filter=./integrations/packages/*",
       "--concurrency=1",
     ],

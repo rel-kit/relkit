@@ -21,7 +21,6 @@ test("frontend client dependency closure excludes native agent runtimes", async 
 async function workspaceManifests(): Promise<ReadonlyMap<string, PackageManifest>> {
   const files = [
     ...new Bun.Glob("packages/*/package.json").scanSync(repositoryRoot),
-    ...new Bun.Glob("integrations/catalog/package.json").scanSync(repositoryRoot),
     ...new Bun.Glob("integrations/packages/*/package.json").scanSync(repositoryRoot),
   ];
   const manifests = await Promise.all(

@@ -6,13 +6,11 @@ import { resolve } from "node:path";
 import { movedModules as agents } from "./moved-artifacts/agents.js";
 import { movedModules as testing } from "./moved-artifacts/testing.js";
 import { movedModules as creator } from "./moved-artifacts/creator.js";
-import { movedModules as catalog } from "./moved-artifacts/catalog.js";
 
 const owners = {
   agents: { root: "packages/relkit", modules: agents },
   testing: { root: "packages/testing", modules: testing },
   creator: { root: "packages/create-relkit", modules: creator },
-  catalog: { root: "integrations/catalog", modules: catalog },
 } as const;
 
 /** Prunes an exact former-owner output list with sequential filesystem operations.

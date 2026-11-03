@@ -151,11 +151,9 @@ export function checkManifests(
   for (const item of items) {
     const directoryName = basename(item.directory);
     const expectedName =
-      relative(root, item.directory) === "integrations/catalog"
-        ? "@relkit/integrations"
-        : directoryName === "create-relkit" || directoryName === "relkit"
-          ? directoryName
-          : `@relkit/${directoryName}`;
+      directoryName === "create-relkit" || directoryName === "relkit"
+        ? directoryName
+        : `@relkit/${directoryName}`;
     if (item.name !== expectedName)
       throw new Error(`Package name mismatch: ${relative(root, item.directory)}`);
     if (

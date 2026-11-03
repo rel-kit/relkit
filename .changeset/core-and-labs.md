@@ -1,8 +1,7 @@
 ---
 "relkit": patch
-"@relkit/cloud-aws": patch
-"@relkit/pulumi": patch
 "@relkit/aws": patch
+"@relkit/pulumi": patch
 "@relkit/cloudflare": patch
 "@relkit/inngest": patch
 "@relkit/trigger": patch

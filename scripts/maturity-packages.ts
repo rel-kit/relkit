@@ -16,8 +16,8 @@ export interface PackageTier {
 const packageParents = ["packages", "integrations/packages"];
 
 /**
- * Reads every published workspace manifest: `packages/*`, `integrations/packages/*` and
- * `integrations/catalog`. @param root - Repository root. @returns Packages in directory order.
+ * Reads every published workspace manifest: `packages/*` and `integrations/packages/*`.
+ * @param root - Repository root. @returns Packages in directory order.
  */
 export function readPackageTiers(root: string): PackageTier[] {
   const directories = [
@@ -28,7 +28,6 @@ export function readPackageTiers(root: string): PackageTier[] {
             .map((name) => `${parent}/${name}`)
         : [],
     ),
-    "integrations/catalog",
   ];
   return directories.flatMap((directory) => {
     const path = join(root, directory, "package.json");

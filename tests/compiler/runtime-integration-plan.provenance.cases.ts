@@ -75,7 +75,7 @@ async function seedSelectedIntegrations(projectRoot: string) {
 export async function case5Provenance() {
   expect(() =>
     resolveRuntimeIntegrationPackages({
-      projectRoot: resolve(process.cwd(), "integrations/catalog"),
+      projectRoot: resolve(process.cwd(), "examples/commerce"),
       imports: ["@relkit/redis/runtime"],
     }),
   ).toThrow("not an authoring export");

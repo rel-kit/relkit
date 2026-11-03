@@ -42,7 +42,7 @@ const forbiddenSymbols = [
   ["provider-client", /\b[A-Z][A-Za-z0-9]*ProviderClient\b/g],
   [
     "internal-provider-sdk",
-    /from ["'](?:@relkit\/(?:providers-standard|cloud-aws|deploy-pulumi|supervisor|inspector-api)|relkit\/(?:providers-local|runtime-effect|runtime-hono|engine|observability(?!\/telemetry["'])))(?:\/|["'])/g,
+    /from ["'](?:@relkit\/(?:aws\/cloud-aws|pulumi\/engine|cli)|relkit\/(?:providers-local|runtime-effect|runtime-hono|engine|inspector-api|observability(?!\/telemetry["'])))(?:\/|["'])/g,
   ],
   [
     "framework-or-provider-import",

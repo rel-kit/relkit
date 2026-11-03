@@ -127,9 +127,8 @@ bun run relkit:local -- create my-app --cloud none --deploy none
 - `apps/inspector` is the private Next.js UI packaged by the independently installed
   `@relkit/inspector` tool, whose UI defaults to port `3210`.
 - `examples/commerce` is the canonical executable, cross-feature example.
-- `integrations/catalog` contains the optional side-effect-free integration
-  catalog; `integrations/packages` contains independently publishable
-  standalone integrations.
+- `integrations/packages` contains independently publishable standalone
+  integrations; the creator bundles their catalog.
 - `packages/` contains the public authoring APIs, compiler, graph, engine,
   runtime, inspector API, providers, CLI, generator, and Pulumi deployment
   packages.

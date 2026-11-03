@@ -31,36 +31,8 @@ export async function copyProject(): Promise<string> {
 export async function linkWorkspacePackages(root: string): Promise<void> {
   const scope = join(root, "node_modules", "@relkit");
   await mkdir(scope, { recursive: true });
-  for (const name of [
-    "agents",
-    "app",
-    "buckets",
-    "cache",
-    "cloud-aws",
-    "cli",
-    "compiler",
-    "config",
-    "contracts",
-    "diagnostics",
-    "engine",
-    "events",
-    "functions",
-    "graph",
-    "inspector-api",
-    "invocation",
-    "jobs",
-    "observability",
-    "providers-local",
-    "providers-standard",
-    "routes",
-    "runtime-effect",
-    "runtime-hono",
-    "schema",
-    "services",
-    "supervisor",
-    "testing",
-    "tools",
-  ])
+  await symlink(join(process.cwd(), "packages/relkit"), join(root, "node_modules/relkit"));
+  for (const name of ["app", "cli", "testing"])
     await symlink(join(process.cwd(), "packages", name), join(scope, name));
 }
 

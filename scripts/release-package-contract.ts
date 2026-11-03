@@ -34,7 +34,6 @@ export function expectedExports(directoryName: string, packageName?: string): Re
  * @returns The package's own export map.
  */
 function ownExports(directoryName: string, packageName?: string): ReleaseExports {
-  if (packageName === "@relkit/integrations") return { ".": rootExport };
   const subpaths = packageName ? integrationSubpaths[packageName] : undefined;
   if (subpaths)
     return Object.fromEntries([

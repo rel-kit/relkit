@@ -5,7 +5,6 @@ export const operationsGuideRelations = [
   relation(
     "docs/modules/integrations/index",
     [
-      "integrations/catalog",
       "integrations/docker",
       "integrations/redis",
       "integrations/s3",

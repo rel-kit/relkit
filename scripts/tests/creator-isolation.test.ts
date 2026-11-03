@@ -143,19 +143,19 @@ async function caseMissingBunDiagnostic() {
   });
 }
 
-/** Verifies that catalog_no_executable_exports.
- * @returns Completion after fixture assertions and owned cleanup settle.
+/** Verifies that the creator bundles the integration catalog as metadata only.
+ * @returns Completion after the manifest assertions settle.
  */
 async function caseCatalogNoExecutableExports() {
   const manifest = JSON.parse(
-    await readFile(join(root, "integrations/catalog/package.json"), "utf8"),
+    await readFile(join(root, "packages/create-relkit/package.json"), "utf8"),
   );
-  expect(Object.keys(manifest.exports)).toEqual(["."]);
-  expect(manifest.dependencies ?? {}).toEqual({});
-  expect(manifest.relkit.catalog["./langchain"]).toBe("@relkit/langchain");
-  expect((await readFile(join(root, "integrations/catalog/src/index.ts"), "utf8")).trim()).toBe(
-    "export {};",
-  );
+  expect(manifest.dependencies["@relkit/langchain"]).toBeUndefined();
+  expect(manifest.relkit.integrations).toContainEqual({
+    id: "langchain",
+    package: "@relkit/langchain",
+    maturity: "labs",
+  });
 }
 
 /** Verifies that drizzle_patch_only_selected.

@@ -28,9 +28,9 @@ export async function templateInputs(
     "@scalar/hono-api-reference"
   ];
   const forbidden =
-    /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/|@aws-sdk\/|@relkit\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
+    /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/|@aws-sdk\/|@relkit\/(?:cli|aws\/cloud-aws|pulumi\/engine)|relkit\/(?:engine|graph|runtime-effect|runtime-hono|providers-local|deploy|observability|inspector-api))["']/;
   const fullstackForbidden =
-    /(?:from|import)\s*["'](?:effect|hono|@pulumi\/|@aws-sdk\/|@relkit\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
+    /(?:from|import)\s*["'](?:effect|hono|@pulumi\/|@aws-sdk\/|@relkit\/(?:cli|aws\/cloud-aws|pulumi\/engine)|relkit\/(?:engine|graph|runtime-effect|runtime-hono|providers-local|deploy|observability|inspector-api))["']/;
   for (const name of packedTemplates) {
     const directory = join(root, "templates/default/v1", name);
     const manifest = await readJson(join(directory, "package.json"));

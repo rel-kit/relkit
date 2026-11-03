@@ -27,6 +27,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./access": {
+      "types": "./dist/access/index.d.ts",
+      "import": "./dist/access/index.js"
+    },
     "./host": {
       "types": "./dist/host/index.d.ts",
       "import": "./dist/host/index.js"
@@ -34,10 +38,6 @@
     "./infrastructure": {
       "types": "./dist/infrastructure/index.d.ts",
       "import": "./dist/infrastructure/index.js"
-    },
-    "./access": {
-      "types": "./dist/access/index.d.ts",
-      "import": "./dist/access/index.js"
     }
   },
   "relkit": {
@@ -76,14 +76,24 @@
     "relkit": "workspace:*"
   },
   "peerDependencies": {
-    "@pulumi/aws": "catalog:"
+    "@pulumi/aws": "catalog:",
+    "@pulumi/awsx": "3.10.0",
+    "@pulumi/pulumi": "catalog:"
   },
   "peerDependenciesMeta": {
     "@pulumi/aws": {
       "optional": true
+    },
+    "@pulumi/awsx": {
+      "optional": true
+    },
+    "@pulumi/pulumi": {
+      "optional": true
     }
   },
   "devDependencies": {
-    "@pulumi/aws": "catalog:"
+    "@pulumi/aws": "catalog:",
+    "@pulumi/awsx": "3.10.0",
+    "@pulumi/pulumi": "catalog:"
   }
 }

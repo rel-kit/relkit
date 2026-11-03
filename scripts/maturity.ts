@@ -44,7 +44,6 @@ export const MATURITY_FEATURES: readonly MaturityFeature[] = [
       "relkit/invocation",
       "relkit/diagnostics",
       "relkit/provider",
-      "@relkit/providers-standard",
       "relkit/runtime-effect",
     ],
     ["/docs/learn/concepts/application"],
@@ -80,7 +79,7 @@ export const MATURITY_FEATURES: readonly MaturityFeature[] = [
   core("relkit mcp", ["@relkit/cli"], ["/docs/modules/ai/mcp"]),
   core("Agent declarations and tools", ["relkit/agents", "relkit/tools"], ["/docs/modules/ai"]),
   core("Bun and Node LTS runtimes", [], ["/docs/learn/local-development"]),
-  core("Integration catalog", ["@relkit/integrations"], ["/docs/modules/integrations"]),
+  core("Integration catalog", ["create-relkit"], ["/docs/modules/integrations"]),
   core(
     "Docker deploy",
     ["@relkit/docker", "relkit/deploy"],
@@ -102,7 +101,7 @@ export const MATURITY_FEATURES: readonly MaturityFeature[] = [
   ),
   labs(
     "AWS hosting",
-    ["@relkit/aws", "@relkit/cloud-aws", "@relkit/pulumi"],
+    ["@relkit/aws", "@relkit/pulumi"],
     ["/docs/modules/deployment/aws", "/docs/api/integrations/aws", "/docs/api/integrations/pulumi"],
   ),
   labs("Cloudflare bindings", ["@relkit/cloudflare"], ["/docs/api/integrations/cloudflare"]),

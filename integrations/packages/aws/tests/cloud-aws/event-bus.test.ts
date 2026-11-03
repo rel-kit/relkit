@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import * as pulumi from "@pulumi/pulumi";
 import type { MockResourceArgs } from "@pulumi/pulumi/runtime/mocks";
-import { RelkitEventBus } from "./src/index.js";
-import { childResourceName } from "./src/components/RelkitEventBus/names.js";
+import { RelkitEventBus } from "../../src/cloud-aws/index.js";
+import { childResourceName } from "../../src/cloud-aws/components/RelkitEventBus/names.js";
 
 interface SeenResource {
   readonly type: string;

@@ -108,7 +108,6 @@ export function newlyDocumentedSources(
       "observability-local",
       "cli-api",
       "create-relkit",
-      "integrations/catalog",
     ].includes(slug)
   )
     return undefined;

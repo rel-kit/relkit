@@ -6,8 +6,7 @@
 "@relkit/docker": patch
 "@relkit/drizzle": patch
 "@relkit/inspector": patch
-"@relkit/integrations": patch
-"@relkit/providers-standard": patch
+"create-relkit": patch
 "@relkit/redis": patch
 "@relkit/s3": patch
 ---

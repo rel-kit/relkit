@@ -8,7 +8,7 @@ import {
   RelkitContainerRegistry,
   RelkitNetwork,
   createValkeyClient,
-} from "./src/index.js";
+} from "../../src/cloud-aws/index.js";
 
 interface SeenResource {
   readonly type: string;
