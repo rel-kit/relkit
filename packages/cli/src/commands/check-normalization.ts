@@ -52,7 +52,11 @@ const normalizeCheckEvaluation = Effect.fn("Project.checkNormalization")(functio
     ],
     { concurrency: 2 },
   );
-  const typeDiagnostics = yield* compiler.typecheck(projectRoot, config.generatedDirectory);
+  const typeDiagnostics = yield* compiler.typecheck(
+    projectRoot,
+    config.generatedDirectory,
+    config.check,
+  );
   const hasAgents = extracted.some((entry) => entry.descriptor.kind === "agent");
   const runtimeIntegrationPackages =
     hasAgents && !declaredIntegrations.some((entry) => entry.integrationId === "langchain")

@@ -1,5 +1,6 @@
 /** Lists every `RELKIT_*` code with its title, cause, next step and docs page. */
 import type { DiagnosticCodeEntry } from "./codes.types.js";
+import { checkRuleCodes } from "./check-rules.js";
 import { cliCodes } from "./cli.js";
 import { compilerCodes } from "./compiler.js";
 import { inspectorCodes } from "./inspector.js";
@@ -18,6 +19,7 @@ export const DIAGNOSTIC_CODES: readonly DiagnosticCodeEntry[] = Object.freeze(
     ...cliCodes,
     ...launcherCodes,
     ...compilerCodes,
+    ...checkRuleCodes,
     ...runtimeCodes,
     ...jobsCodes,
     ...inspectorCodes,

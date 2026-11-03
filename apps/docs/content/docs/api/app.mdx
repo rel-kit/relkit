@@ -492,12 +492,13 @@ Normalizes immutable runtime policy without starting its selected features.
 
 ```ts
 declare const normalizeAppRuntimeMetadataEffect: (
-  options: Pick<ApplicationDescriptor, "server" | "inspector" | "deployment">,
+  options: Pick<ApplicationDescriptor, "server" | "inspector" | "deployment" | "check">,
 ) => Effect.Effect<
   {
     server: ServerConfig | undefined;
     inspector: InspectorConfiguration | undefined;
     deployment: Readonly<Record<string, JsonValue>> | undefined;
+    check: AppCheckConfig | undefined;
   },
   AppValidationFailure,
   never
@@ -1426,7 +1427,7 @@ declare const defineApp: <
 ) => ApplicationDescriptor<Shape, Providers, Exporters>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L127)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L130)
 
 Since v0.2.0
 
@@ -1484,7 +1485,7 @@ declare const defineAppEffect: <
 ) => Effect.Effect<ApplicationDescriptor<Shape, Providers, Exporters>, AppValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L55)
 
 ## `define-app.types.ts`
 
@@ -1497,6 +1498,27 @@ declare const ApiDocsConfig: ApiDocsConfig;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L13)
+
+### AppCheckConfig (interface)
+
+Opt-in `relkit check` rules.
+
+**Example**
+
+```ts
+const check: AppCheckConfig = { unusedErrors: true };
+```
+
+**Signature**
+
+```ts
+export interface AppCheckConfig {
+  /** Warn when a function declares an error that its handler never raises. Defaults to `false`. */
+  readonly unusedErrors?: boolean;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L39)
 
 ### AppCompatibilityConfig
 
@@ -1602,10 +1624,11 @@ type ApplicationDescriptor<
     readonly server?: ServerConfig;
     readonly inspector?: InspectorConfig;
     readonly deployment?: AppDeploymentConfig;
+    readonly check?: AppCheckConfig;
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L67)
 
 ### DefineAppOptions (type alias)
 
@@ -1634,10 +1657,11 @@ type DefineAppOptions<
     readonly server?: ServerConfig;
     readonly inspector?: InspectorConfig;
     readonly deployment?: AppDeploymentConfig;
+    readonly check?: AppCheckConfig;
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L47)
 
 ### InspectorConfig
 

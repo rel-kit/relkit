@@ -88,7 +88,7 @@ not tasks of this change.
 
 - [x] 8.1 Return RFC 9457 Problem Details for declared, validation, rate-limit, timeout, cancellation, authentication, access, unmatched-route (404 and 405) and defect responses, with `traceId` and `Retry-After`, and verify HTTP tests for each case
 - [x] 8.2 Generate OpenAPI problem schemas for each declared error and for validation, and verify the OpenAPI snapshot tests
-- [ ] 8.3 Let handler types accept thrown declared errors, drop the rule that every declared error must be raised, and add it as an opt-in lint rule, and verify type tests for thrown, returned and unused errors
+- [x] 8.3 Let handler types accept thrown declared errors, drop the rule that every declared error must be raised, and add it as an opt-in lint rule, and verify type tests for thrown, returned and unused errors
 - [ ] 8.4 Add route response options for status, headers and cookies computed from the function's output, and verify HTTP tests plus a test that the same function still runs from a job
 - [ ] 8.5 Add route-level `auth: "required"` checked before middleware and the target, remove protected-path lists, and share one memoized session across middleware and context, and verify tests for signed-out, signed-in and auth-endpoint requests
 - [ ] 8.6 Accept a Better Auth instance in `defineBetterAuthService({ auth })`: rebuild it from `auth.options` with the default Drizzle database when none is set, mount it at `basePath` unless `mount: false`, and type the session from the instance; verify integration tests for both database modes

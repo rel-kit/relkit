@@ -19,7 +19,7 @@ import {
   unwrapDefault,
 } from "./config-loader-utils.js";
 import { readInspector, readServer } from "./config-loader-runtime.js";
-import { readDeployment } from "./config-loader-deployment.js";
+import { readOptionalSections } from "./config-loader-optional.js";
 
 const ParsedConfig = Data.taggedEnum<ParsedConfig>();
 
@@ -214,7 +214,7 @@ const parseConfigEffect = Effect.fn("Compiler.parseConfig")(function* (
   }
   const server = readServer(record.server, issues);
   const inspector = readInspector(record.inspector, issues);
-  const deployment = readDeployment(record.deployment, issues);
+  const optional = readOptionalSections(record, issues);
   if (issues.length > 0) return ParsedConfig.Rejected({ issues: freezeIssues(issues) });
   return ParsedConfig.Accepted({
     config: Object.freeze({
@@ -224,7 +224,7 @@ const parseConfigEffect = Effect.fn("Compiler.parseConfig")(function* (
       generatedDirectory: DEFAULT_TOOLING_CONFIG.generatedDirectory,
       server: Object.freeze({ ...server, apiDocs: Object.freeze(server.apiDocs) }),
       inspector: Object.freeze(inspector),
-      ...(deployment === undefined ? {} : { deployment }),
+      ...optional,
     }),
     issues: Object.freeze([]),
   });

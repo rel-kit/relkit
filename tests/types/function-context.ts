@@ -79,12 +79,12 @@ defineFunction({
   handler: () => effectResult,
 });
 
+// A declared error the handler never raises is allowed; `check.unusedErrors` reports it.
 defineFunction({
-  id: "types.missing-declared-error",
+  id: "types.unraised-declared-error",
   input,
   output,
   errors: [expectedFailure],
-  // @ts-expect-error every error listed in errors must be returned by the handler
   handler: () => ({ ok: true as const }),
 });
 

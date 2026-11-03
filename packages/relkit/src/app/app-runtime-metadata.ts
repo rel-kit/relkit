@@ -16,7 +16,7 @@ import type { ApplicationDescriptor } from "./define-app.types.js";
  * @returns Lazy metadata copies, failing with AppValidationFailure on invalid input.
  */
 export const normalizeAppRuntimeMetadataEffect = Effect.fn("App.runtimeMetadata")(
-  (options: Pick<ApplicationDescriptor, "server" | "inspector" | "deployment">) =>
+  (options: Pick<ApplicationDescriptor, "server" | "inspector" | "deployment" | "check">) =>
     observeApp(
       "runtimeMetadata.normalize",
       Effect.gen(function* () {
@@ -31,7 +31,8 @@ export const normalizeAppRuntimeMetadataEffect = Effect.fn("App.runtimeMetadata"
               );
         const deployment =
           options.deployment === undefined ? undefined : yield* copyEffect(options.deployment);
-        return { server, inspector, deployment };
+        const check = options.check === undefined ? undefined : yield* copyEffect(options.check);
+        return { server, inspector, deployment, check };
       }),
     ),
 );

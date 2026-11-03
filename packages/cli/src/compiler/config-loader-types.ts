@@ -61,6 +61,7 @@ export const ToolingConfigInputSchema = Schema.Struct({
   ),
   inspector: Schema.optionalKey(InspectorConfigurationInputSchema),
   deployment: Schema.optionalKey(Schema.Struct({ engine: Schema.String, host: Schema.String })),
+  check: Schema.optionalKey(Schema.Struct({ unusedErrors: Schema.optionalKey(Schema.Boolean) })),
 });
 
 /** Fully defaulted data-only tooling configuration produced by the parser. */
@@ -83,6 +84,7 @@ export const LoadedToolingConfigSchema = Schema.Struct({
   }),
   inspector: InspectorConfigurationSchema,
   deployment: Schema.optionalKey(Schema.Struct({ engine: Schema.String, host: Schema.String })),
+  check: Schema.optionalKey(Schema.Struct({ unusedErrors: Schema.Boolean })),
 });
 
 /** Configuration issue evidence kept in declaration order. */

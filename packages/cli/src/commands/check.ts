@@ -42,6 +42,7 @@ export const checkProjectEffect = Effect.fn("Project.check")(
       const typeDiagnostics = yield* compiler.typecheck(
         projectRoot,
         input.config.generatedDirectory,
+        input.config.check,
       );
       return yield* emitCheckResultEffect(projectRoot, input.outputDirectory, [
         ...typeDiagnostics,

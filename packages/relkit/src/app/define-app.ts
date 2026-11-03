@@ -42,6 +42,7 @@ const OPTION_KEYS = new Set([
   "server",
   "inspector",
   "deployment",
+  "check",
   ...APP_PROVIDER_CAPABILITIES,
   "jobs",
 ]);
@@ -94,7 +95,8 @@ export const defineAppEffect = Effect.fn("App.defineApp")(
                 try: () => normalizeTelemetryConfiguration(options.telemetry),
                 catch: fromCause,
               });
-        const { server, inspector, deployment } = yield* normalizeAppRuntimeMetadataEffect(options);
+        const { server, inspector, deployment, check } =
+          yield* normalizeAppRuntimeMetadataEffect(options);
         // Provider/default normalizers retain the authored generic profile keys.
         return deepFreeze({
           ...base,
@@ -106,6 +108,7 @@ export const defineAppEffect = Effect.fn("App.defineApp")(
           ...(server === undefined ? {} : { server }),
           ...(inspector === undefined ? {} : { inspector }),
           ...(deployment === undefined ? {} : { deployment }),
+          ...(check === undefined ? {} : { check }),
         }) as ApplicationDescriptor<Shape, Providers, Exporters>;
       }),
     ),

@@ -5356,7 +5356,9 @@ type FunctionHandlerResult<
 
 ### FunctionHandlerValidation (type alias)
 
-Compile-time check of handler output and declared errors.
+Compile-time check of handler output and declared errors. A handler may throw or return its
+declared errors, and need not raise all of them; the opt-in `check.unusedErrors` rule reports a
+declared error the handler never raises.
 
 **Example**
 
@@ -5370,17 +5372,13 @@ type Valid = FunctionHandlerValidation<ReturnType<typeof handler>, Output, Error
 type FunctionHandlerValidation<Result, Output, Errors extends readonly ErrorDescriptorAny[]> = [
   InvalidHandlerResult<Awaited<Result>, Output, DeclaredErrorsOf<Errors>>,
 ] extends [never]
-  ? [MissingDeclaredErrors<Result, Errors>] extends [never]
-    ? {}
-    : {
-        readonly __relkit_handler_error__: "Return every error declared in the function's errors list";
-      }
+  ? {}
   : {
       readonly __relkit_handler_error__: "Return values and errors must match the function contract";
     };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.types.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.types.ts#L103)
 
 ## `index.ts`
 

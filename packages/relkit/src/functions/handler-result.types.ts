@@ -71,16 +71,6 @@ type EffectRequirements<Value> =
     ? EffectChannelValue<Channel>
     : never;
 
-type ReturnedErrors<Result> = Result extends unknown
-  ? Result extends FunctionFailure<infer Error>
-    ? Error
-    : Result extends FunctionEffectValue
-      ? EffectError<Result>
-      : Result extends globalThis.Error
-        ? Result
-        : never
-  : never;
-
 type InvalidHandlerResult<Result, Output, AllowedError> = unknown extends Result
   ? never
   : Result extends FunctionFailure<infer Error>
@@ -105,12 +95,9 @@ type InvalidHandlerResult<Result, Output, AllowedError> = unknown extends Result
           ? never
           : "handler return does not match the output schema";
 
-type MissingDeclaredErrors<Result, Errors extends readonly ErrorDescriptorAny[]> = Exclude<
-  DeclaredErrorsOf<Errors>,
-  ReturnedErrors<Awaited<Result>>
->;
-
-/** Compile-time check of handler output and declared errors.
+/** Compile-time check of handler output and declared errors. A handler may throw or return its
+ * declared errors, and need not raise all of them; the opt-in `check.unusedErrors` rule reports a
+ * declared error the handler never raises.
  * @example type Valid = FunctionHandlerValidation<ReturnType<typeof handler>, Output, Errors>;
  */
 export type FunctionHandlerValidation<
@@ -118,11 +105,7 @@ export type FunctionHandlerValidation<
   Output,
   Errors extends readonly ErrorDescriptorAny[],
 > = [InvalidHandlerResult<Awaited<Result>, Output, DeclaredErrorsOf<Errors>>] extends [never]
-  ? [MissingDeclaredErrors<Result, Errors>] extends [never]
-    ? {}
-    : {
-        readonly __relkit_handler_error__: "Return every error declared in the function's errors list";
-      }
+  ? {}
   : {
       readonly __relkit_handler_error__: "Return values and errors must match the function contract";
     };

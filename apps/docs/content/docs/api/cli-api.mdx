@@ -1276,6 +1276,7 @@ declare const LoadedToolingConfigSchema: Struct<{
     readonly maxPreviewBytes: Number;
   }>;
   readonly deployment: optionalKey<Struct<{ readonly engine: String; readonly host: String }>>;
+  readonly check: optionalKey<Struct<{ readonly unusedErrors: Boolean }>>;
 }>;
 ```
 

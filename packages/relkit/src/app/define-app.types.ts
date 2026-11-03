@@ -33,6 +33,14 @@ export type AppTelemetryConfig<Exporters extends TelemetryExporterMap = Telemetr
  */
 export type AppDeploymentConfig = Readonly<Record<string, JsonValue>>;
 
+/** Opt-in `relkit check` rules.
+ * @example const check: AppCheckConfig = { unusedErrors: true };
+ */
+export interface AppCheckConfig {
+  /** Warn when a function declares an error that its handler never raises. Defaults to `false`. */
+  readonly unusedErrors?: boolean;
+}
+
 /** Authored application topology and runtime settings.
  * @example const options: DefineAppOptions<{}, {}> = { env: defineEnv({}) };
  */
@@ -50,6 +58,7 @@ export type DefineAppOptions<
     readonly server?: ServerConfig;
     readonly inspector?: InspectorConfig;
     readonly deployment?: AppDeploymentConfig;
+    readonly check?: AppCheckConfig;
   };
 
 /** Immutable normalized application descriptor returned by `defineApp`.
@@ -68,4 +77,5 @@ export type ApplicationDescriptor<
     readonly server?: ServerConfig;
     readonly inspector?: InspectorConfig;
     readonly deployment?: AppDeploymentConfig;
+    readonly check?: AppCheckConfig;
   };

@@ -36,8 +36,21 @@ The `id` is the durable contract used by graphs, clients, traces, and matching. 
 may receive. `http.status` contributes a typed HTTP response, while `retry` tells durable delivery whether another
 attempt could help.
 
-Register the descriptor in a function's `errors` list and throw the constructed declared value. Do not convert
-every caught exception into a declared error; callers should depend only on failures the domain promises.
+Register the descriptor in a function's `errors` list and throw the constructed declared value; returning it
+works the same way. Do not convert every caught exception into a declared error; callers should depend only on
+failures the domain promises.
+
+A function may declare an error its handler never raises. To catch stale declarations, turn on the
+`unusedErrors` check in `relkit.config.ts`, and `relkit check` warns about each one:
+
+```ts title="relkit.config.ts"
+import { defineApp, defineEnv } from "@relkit/app/config";
+
+export default defineApp({ env: defineEnv({}), check: { unusedErrors: true } });
+```
+
+The check only looks inside the handler, so an error raised from a helper function the handler calls is reported
+as unused.
 
 ## Verify the public contract
 

@@ -11,6 +11,7 @@ import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import ts from "typescript";
 import { runCompilerSync } from "./compatibility.js";
 import { eventSourceDiagnosticsEffect } from "./event-source-diagnostics.js";
+import { unusedErrorDiagnosticsEffect } from "./unused-error-diagnostics.js";
 import { observeCompiler } from "./observability.js";
 import { ROUTE_MODULE_CHECKS_FILE } from "./route-module-checks.js";
 import { routeModuleDiagnostics } from "./route-module-diagnostics.js";
@@ -20,10 +21,15 @@ import { TypecheckInputs } from "./typecheck-inputs.service.js";
  * Checks an authored project after generated declarations are available.
  * @param projectRoot - Absolute project root for portable source paths.
  * @param generatedDirectory - Project-relative location of generated route declarations.
+ * @param rules - Opt-in check rules from the tooling configuration.
  * @returns A lazy effect that checks an authored project after generated declarations are available; unexpected access failures remain defects.
  */
 export const typecheckProjectEffect = Effect.fn("Compiler.typecheckProject")(
-  function* (projectRoot: string, generatedDirectory = ".relkit/generated") {
+  function* (
+    projectRoot: string,
+    generatedDirectory = ".relkit/generated",
+    rules: CheckRules = {},
+  ) {
     const configPath = resolve(projectRoot, "tsconfig.json");
     if (!existsSync(configPath)) return [];
     const journal = yield* Effect.serviceOption(TypecheckInputs);
@@ -57,12 +63,15 @@ export const typecheckProjectEffect = Effect.fn("Compiler.typecheckProject")(
         .getSourceFiles()
         .flatMap((source) => routeModuleDiagnostics(program, source, projectRoot)),
       ...(yield* eventSourceDiagnosticsEffect(program, projectRoot)),
+      ...(rules.unusedErrors === true
+        ? yield* unusedErrorDiagnosticsEffect(program, projectRoot)
+        : []),
       ...[...parsed.errors, ...ts.getPreEmitDiagnostics(program)].map((diagnostic) =>
         typescriptDiagnostic(diagnostic, projectRoot, physicalRoot),
       ),
     ];
   },
-  (effect, projectRoot, _generatedDirectory = ".relkit/generated") =>
+  (effect, projectRoot, _generatedDirectory = ".relkit/generated", _rules: CheckRules = {}) =>
     observeCompiler("configuration", "typecheckProject", effect, () => ({})),
 );
 
@@ -70,13 +79,20 @@ export const typecheckProjectEffect = Effect.fn("Compiler.typecheckProject")(
  * Checks an authored project after generated declarations are available.
  * @param projectRoot - Absolute project root for portable source paths.
  * @param generatedDirectory - Project-relative location of generated route declarations.
+ * @param rules - Opt-in check rules from the tooling configuration.
  * @returns Ordered TypeScript diagnostics converted to compiler evidence.
  */
 export function typecheckProject(
   projectRoot: string,
   generatedDirectory = ".relkit/generated",
+  rules: CheckRules = {},
 ): readonly Diagnostic[] {
-  return runCompilerSync(typecheckProjectEffect(projectRoot, generatedDirectory));
+  return runCompilerSync(typecheckProjectEffect(projectRoot, generatedDirectory, rules));
+}
+
+/** Opt-in check rules; every rule is off unless set. */
+export interface CheckRules {
+  readonly unusedErrors?: boolean;
 }
 
 /**

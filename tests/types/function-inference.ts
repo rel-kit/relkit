@@ -228,3 +228,46 @@ defineFunction({
   },
   handler: () => ({}),
 });
+
+// A handler may throw a declared error instead of returning it.
+const thrownLookup = defineFunction({
+  id: "types.inference-thrown-lookup",
+  input: transformedInput,
+  output: lookupOutput,
+  errors: [notFound],
+  handler: async (input) => {
+    if (input.orderId === "missing") throw new notFound({ orderId: input.orderId });
+    return { orderId: input.orderId, totalCents: 100 };
+  },
+});
+void thrownLookup;
+
+// Declaring an error the handler never raises is not a type error.
+const unusedErrorLookup = defineFunction({
+  id: "types.inference-unused-error",
+  input: transformedInput,
+  output: lookupOutput,
+  errors: [notFound],
+  handler: async (input) => ({ orderId: input.orderId, totalCents: 100 }),
+});
+void unusedErrorLookup;
+const unusedValidation: FunctionHandlerValidation<
+  Promise<InferOutput<typeof lookupOutput>>,
+  InferOutput<typeof lookupOutput>,
+  [typeof notFound]
+> = {};
+void unusedValidation;
+
+const otherError = defineError({
+  id: "types.inference-other",
+  data: z.object({}),
+  message: "Other",
+});
+defineFunction({
+  id: "types.inference-undeclared-error",
+  input: transformedInput,
+  output: lookupOutput,
+  errors: [notFound],
+  // @ts-expect-error a returned error must be one of the declared errors
+  handler: async () => new otherError({}),
+});

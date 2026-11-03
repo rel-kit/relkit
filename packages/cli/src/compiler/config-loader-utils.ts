@@ -137,5 +137,6 @@ export const allowedKeys = new Set([
   "server",
   "inspector",
   "deployment",
+  "check",
   "compatibility",
 ]);

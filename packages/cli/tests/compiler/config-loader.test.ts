@@ -97,3 +97,16 @@ it("accepts generic deployment roles and rejects the removed AWS/Pulumi shape", 
     ]),
   );
 });
+
+it("enables the unused-errors check only when configured", () => {
+  expect(loadConfig({}, "/workspace/app").check).toBeUndefined();
+  expect(loadConfig({ check: { unusedErrors: false } }, "/workspace/app").check).toBeUndefined();
+  expect(loadConfig({ check: { unusedErrors: true } }, "/workspace/app").check).toEqual({
+    unusedErrors: true,
+  });
+  expect(
+    validateConfig({ check: { unusedErrors: "yes", strict: true } }, "/workspace/app").map(
+      ({ path }) => path,
+    ),
+  ).toEqual(["check.strict", "check.unusedErrors"]);
+});
