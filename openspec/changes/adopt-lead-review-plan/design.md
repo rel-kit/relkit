@@ -201,7 +201,9 @@ declared errors; the "every declared error is raised" check moves to an opt-in l
 
 ### D12. Auth model (#13 d, g)
 
-Route `auth: "required"` is checked before middleware and the target. Function `access` rules run in
+Route `auth: "required"` is checked before middleware and the target. The Better Auth
+protected-path list goes away; the MCP endpoint, which is not a route, is protected with
+`server.mcp: { auth: "required" }`, checked before any tool runs with the same memoized session. Function `access` rules run in
 the engine for every invocation source, read the memoized session and the organization role, and are
 recorded in the graph and OpenAPI. Runtime-handle calls run as a `system` principal that passes access
 rules; `relkit.as(session)` swaps in a user principal.

@@ -154,8 +154,8 @@ process value; see [Testing](/docs/modules/auth/testing).
 </include>
 
 RelKit derives `/api/auth` from this route and preserves Better Auth's native responses, including
-cookies. The `auth.protected` paths are application paths that require a session, not endpoints created
-by Better Auth. See [Protect routes](/docs/modules/auth/protect-routes) for matching and authorization rules.
+cookies. To require a session on an application route, set `auth: "required"` on that route; see
+[Protect routes](/docs/modules/auth/protect-routes) for the check and authorization rules.
 
 Do not wrap `auth.handler` in a function or another handler. Mount the recognized handler directly so
 the compiler can associate the auth service and its base path. You do not manually call

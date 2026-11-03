@@ -9,8 +9,6 @@ import {
   copyStreamEffect,
 } from "../../src/routes/route-client.js";
 import {
-  copyProtectedPaths,
-  copyProtectedPathsEffect,
   readBetterAuthRegistration,
   readBetterAuthRegistrationEffect,
 } from "../../src/routes/route-auth.js";
@@ -48,7 +46,7 @@ describe("route authoring helpers", () => {
     expect(() => copyStream({ format: "bytes", other: 1 }, stream)).toThrow("exactly one");
   });
 
-  test("reads Better Auth registrations and normalizes protected paths", () => {
+  test("reads Better Auth registrations", () => {
     const handler = () => new Response("ok");
     expect(readBetterAuthRegistration(handler)).toBeUndefined();
     Object.defineProperty(handler, Symbol.for("relkit.better-auth.handler"), {
@@ -57,14 +55,6 @@ describe("route authoring helpers", () => {
     expect(Effect.runSync(readBetterAuthRegistrationEffect(handler))).toMatchObject({
       service: { ref: { id: "auth" } },
     });
-    expect(copyProtectedPaths(undefined)).toEqual([]);
-    expect(Effect.runSync(copyProtectedPathsEffect(["/z/*", "/a", "/a"]))).toEqual(["/a", "/z/*"]);
-    expect(Object.isFrozen(copyProtectedPaths(["/a"]))).toBe(true);
-    expect(() => copyProtectedPaths(["a"])).toThrow("Invalid protected");
-    expect(() => copyProtectedPaths(["/a?x"])).toThrow("Invalid protected");
-    expect(() => copyProtectedPaths(["/a*b"])).toThrow("wildcard");
-    expect(() => copyProtectedPaths(null as never)).toThrow("must be an array");
-    expect(() => copyProtectedPaths([1] as never)).toThrow("Invalid protected route pattern");
   });
 
   test("validates numeric policies and copies a rate limit", () => {

@@ -40,8 +40,6 @@ export const acquireApplicationAuth = Effect.fn("Testing.services.auth")(functio
   });
   const result: Pick<TestApplicationServices, "auth" | "authHandler"> = {
     auth: createHttpAuthRuntime({
-      protected: mount.auth?.protected ?? [],
-      publicPaths: [basePath(mount), mount.path],
       getOpenApiDocument: () => generateBetterAuthOpenApi(active, instrumentation),
       getSession: async (headers) => (await active.api.getSession({ headers })) ?? null,
     }),

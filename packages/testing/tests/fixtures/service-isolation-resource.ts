@@ -29,4 +29,4 @@ export const auth = defineBetterAuthService({
   secret: "testing-isolated-auth-owner-secret-at-least-32-bytes",
   emailAndPassword: { enabled: true },
 });
-export const authRoute = defineRoute({ handler: auth.handler, auth: { protected: [] } });
+export const authRoute = defineRoute({ handler: auth.handler });

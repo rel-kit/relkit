@@ -22,7 +22,8 @@ export interface ServerConfig {
   readonly maxBodyBytes?: number;
   readonly apiDocs?: ApiDocsConfig;
   readonly clientContract?: boolean;
-  readonly mcp?: boolean;
+  /** Enables the MCP endpoint; `{ auth: "required" }` limits it to signed-in callers. */
+  readonly mcp?: boolean | { readonly auth?: "required" };
   /** Explicitly selects the optional AG-UI HTTP protocol independently of agent RPC. */
   readonly agUi?: boolean;
 }

@@ -23,6 +23,7 @@ export type TestFunctionRoute = {
   }[];
   /** The route's `response` option, applied to successful responses. */
   readonly response?: (output: never) => unknown;
+  readonly auth?: "required";
 };
 
 /** Raw native HTTP route preserving its original handler and method contract. */
@@ -30,7 +31,7 @@ export type TestRawRoute = {
   readonly method: "ALL";
   readonly path: string;
   readonly handler: (request: Request) => Response | Promise<Response>;
-  readonly auth?: { readonly protected: readonly string[] };
+  readonly auth?: { readonly kind: "better-auth" };
 };
 
 /** Supported native function or raw HTTP route declaration. */
@@ -43,4 +44,5 @@ export type AuthoredRoute = Omit<TestFunctionRoute, "method" | "path" | "request
   readonly responses?: TestFunctionRoute["responses"];
   readonly successStatus?: number;
   readonly response?: (output: never) => unknown;
+  readonly auth?: "required";
 };

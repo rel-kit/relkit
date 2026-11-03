@@ -46,16 +46,11 @@ export function createApplicationRequest(
         if (isAuthEndpoint(routes, path) && services.authHandler !== undefined) {
           return services.authHandler(request);
         }
-        if (!isAuthEndpoint(routes, path) && services.auth?.protects(path)) {
-          const session = await services.auth.contextFor(request).getSession();
-          if (session === null) {
-            return Response.json(
-              { error: { id: "UNAUTHORIZED", message: "Authentication required" } },
-              { status: 401 },
-            );
-          }
-        }
-        return handleTestRequest(routes, applicationRuntime, request);
+        return handleTestRequest(routes, applicationRuntime, request, () =>
+          services.auth === undefined
+            ? Promise.resolve(null)
+            : services.auth.contextFor(request).getSession(),
+        );
       });
     },
   };

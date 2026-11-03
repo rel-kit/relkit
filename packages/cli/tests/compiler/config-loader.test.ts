@@ -110,3 +110,16 @@ it("enables the unused-errors check only when configured", () => {
     ),
   ).toEqual(["check.strict", "check.unusedErrors"]);
 });
+
+it("reads server.mcp as a boolean or as an auth requirement", () => {
+  expect(loadConfig({}, "/workspace/app").server).toMatchObject({ mcp: false });
+  expect(loadConfig({ server: { mcp: true } }, "/workspace/app").server.mcpAuth).toBeUndefined();
+  expect(
+    loadConfig({ server: { mcp: { auth: "required" } } }, "/workspace/app").server,
+  ).toMatchObject({ mcp: true, mcpAuth: "required" });
+  expect(
+    validateConfig({ server: { mcp: { auth: "optional" } } }, "/workspace/app").map(
+      ({ path }) => path,
+    ),
+  ).toEqual(["server.mcp"]);
+});

@@ -80,7 +80,7 @@ export interface AppCompatibilityConfig {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L39)
 
 ### InspectorConfig (interface)
 
@@ -98,7 +98,7 @@ const inspector: InspectorConfig = { enabled: true };
 export interface InspectorConfig extends InspectorConfigurationInput {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L34)
 
 ### ServerConfig (interface)
 
@@ -118,7 +118,8 @@ export interface ServerConfig {
   readonly maxBodyBytes?: number;
   readonly apiDocs?: ApiDocsConfig;
   readonly clientContract?: boolean;
-  readonly mcp?: boolean;
+  /** Enables the MCP endpoint; `{ auth: "required" }` limits it to signed-in callers. */
+  readonly mcp?: boolean | { readonly auth?: "required" };
   /** Explicitly selects the optional AG-UI HTTP protocol independently of agent RPC. */
   readonly agUi?: boolean;
 }

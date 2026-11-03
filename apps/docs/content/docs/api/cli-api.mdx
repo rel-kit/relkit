@@ -1268,6 +1268,7 @@ declare const LoadedToolingConfigSchema: Struct<{
     }>;
     readonly clientContract: Boolean;
     readonly mcp: Boolean;
+    readonly mcpAuth: optionalKey<Literal<"required">>;
     readonly agUi: optionalKey<Boolean>;
   }>;
   readonly inspector: Struct<{

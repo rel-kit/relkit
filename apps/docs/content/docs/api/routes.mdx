@@ -3089,70 +3089,6 @@ declare const BetterAuthRegistration: BetterAuthRegistration;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-auth.ts#L6)
 
-### copyProtectedPaths
-
-Validates and copies protected route patterns synchronously.
-
-**Throws**
-
-TypeError for invalid patterns.
-
-**Example**
-
-```ts
-copyProtectedPaths(["/admin/*"]);
-```
-
-**Signature**
-
-```ts
-declare const copyProtectedPaths: (values: readonly string[] | undefined) => readonly string[];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-auth.ts#L67)
-
-### copyProtectedPathsEffect
-
-Validates and copies protected paths through Effect.
-
-**Example**
-
-```ts
-Effect.runSync(copyProtectedPathsEffect(["/admin/*"]));
-```
-
-**Signature**
-
-```ts
-declare const copyProtectedPathsEffect: (
-  values: ReadonlyArray<string> | undefined,
-) => Effect.Effect<ReadonlyArray<string>, RouteOperationError, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-auth.ts#L56)
-
-### copyProtectedValues
-
-Copies protected paths inside an already observed operation.
-
-**Throws**
-
-RouteInputError for an invalid pattern.
-
-**Example**
-
-```ts
-copyProtectedValues(["/admin/*"]);
-```
-
-**Signature**
-
-```ts
-declare const copyProtectedValues: (values: readonly string[] | undefined) => readonly string[];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-auth.ts#L77)
-
 ### readBetterAuthRegistration
 
 Reads a Better Auth handler registration synchronously.
@@ -4156,10 +4092,11 @@ export interface FunctionRouteDescriptor<
   readonly client?: RouteClientPolicy;
   readonly stream?: { readonly format: NativeStreamFormat };
   readonly response?: RouteResponseFor<Target>;
+  readonly auth?: "required";
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L69)
 
 ### FunctionRouteOptions (interface)
 
@@ -4192,6 +4129,8 @@ export interface FunctionRouteOptions<
   readonly stream?: { readonly format: NativeStreamFormat };
   /** Sets the success status, headers and cookies from the function's output. */
   readonly response?: RouteResponseFor<Target>;
+  /** `"required"` rejects a request without a session with 401, before middleware and the target. */
+  readonly auth?: "required";
 }
 ```
 
@@ -4257,7 +4196,6 @@ export interface RawRouteDescriptor<
   readonly handler: Handler;
   readonly auth?: {
     readonly kind: "better-auth";
-    readonly protected: readonly string[];
     readonly service: { readonly ref: { readonly kind: "service"; readonly id: string } };
   };
 }
@@ -4284,13 +4222,10 @@ export interface RawRouteOptions<
 > extends RouteSharedOptions<Id> {
   readonly handler: Handler;
   readonly target?: never;
-  readonly auth?: {
-    readonly protected?: readonly string[];
-  };
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L58)
 
 ### RouteClientPolicy (type alias)
 
@@ -4330,4 +4265,4 @@ type RouteDescriptor<
 > = FunctionRouteDescriptor<Id, Target, Request> | RawRouteDescriptor<Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L113)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L112)

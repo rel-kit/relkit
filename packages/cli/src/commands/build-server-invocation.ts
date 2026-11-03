@@ -113,11 +113,7 @@ function createAuthRegistration(applicationGraph, routes = {}, authStartup) {
     if (route?.auth?.kind !== "better-auth") continue;
     const registration = route.handler?.[brand];
     if (registration?.kind !== "better-auth") throw new Error("Better Auth registration is unavailable.");
-    const trigger = applicationGraph.nodes.find((node) => node.kind === "trigger" && node.id === routeId);
-    const publicPaths = trigger?.config?.runtimePaths ?? [trigger?.config?.path].filter(Boolean);
     return createHttpAuthRuntime({
-      protected: route.auth.protected,
-      publicPaths,
       getOpenApiDocument: async () => generateBetterAuthOpenApi(await authStartup, specializedInstrumentation),
       getSession: async (headers) => {
         const auth = await authStartup;

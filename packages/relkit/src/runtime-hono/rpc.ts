@@ -130,10 +130,7 @@ function procedure(
     .input(target.input)
     .output(rpcOutputSchema(outputSchema))
     .handler(async ({ input, context, signal }) => {
-      if (
-        options.auth?.protects(trigger.config.path) &&
-        (await context.auth?.getSession()) == null
-      ) {
+      if (trigger.config.auth?.kind === "required" && (await context.auth?.getSession()) == null) {
         throw new ORPCError("UNAUTHORIZED", { message: "Authentication required" });
       }
       if (routeOperation(trigger) === "mutation" && options.clientIdentity !== undefined) {

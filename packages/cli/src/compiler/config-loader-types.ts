@@ -55,7 +55,12 @@ export const ToolingConfigInputSchema = Schema.Struct({
         }),
       ),
       clientContract: Schema.optionalKey(Schema.Boolean),
-      mcp: Schema.optionalKey(Schema.Boolean),
+      mcp: Schema.optionalKey(
+        Schema.Union([
+          Schema.Boolean,
+          Schema.Struct({ auth: Schema.optionalKey(Schema.Literal("required")) }),
+        ]),
+      ),
       agUi: Schema.optionalKey(Schema.Boolean),
     }),
   ),
@@ -80,6 +85,7 @@ export const LoadedToolingConfigSchema = Schema.Struct({
     }),
     clientContract: Schema.Boolean,
     mcp: Schema.Boolean,
+    mcpAuth: Schema.optionalKey(Schema.Literal("required")),
     agUi: Schema.optionalKey(Schema.Boolean),
   }),
   inspector: InspectorConfigurationSchema,

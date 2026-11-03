@@ -7,6 +7,7 @@ import { McpServer, createMcpHandler } from "@modelcontextprotocol/server";
 import type { ToolRegistration } from "../graph/index.js";
 import { Effect, Context as EffectContext, Layer, Result } from "effect";
 import type { Context, Hono } from "hono";
+import { requireSession } from "./auth.js";
 import { observeHttp, runHttp } from "./http-effect.js";
 import { HttpInvocation, httpInvocationLayer } from "./http-invocation.js";
 import { getEntry, isRecord } from "./materialize-routes-utils.js";
@@ -22,7 +23,13 @@ export type { McpOptions } from "./optional-transports.types.js";
  */
 export function installMcp(app: Hono, options: RouteMaterializationOptions): void {
   if (options.mcp?.enabled === false) return;
-  app.all("/mcp", async (context) => handlerFor(context, options).fetch(context.req.raw));
+  app.all("/mcp", async (context) => {
+    if (options.mcp?.auth === "required") {
+      const rejected = await requireSession(context, options.auth);
+      if (rejected !== undefined) return rejected;
+    }
+    return handlerFor(context, options).fetch(context.req.raw);
+  });
 }
 
 /** Creates the per-request MCP server and registers exposed tools deterministically.

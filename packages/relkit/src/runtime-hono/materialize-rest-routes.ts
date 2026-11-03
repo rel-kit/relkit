@@ -6,7 +6,7 @@
  */
 import type { HttpTriggerRegistration } from "../graph/index.js";
 import type { Context, Hono } from "hono";
-import { registerAuthMiddleware } from "./auth.js";
+import { registerRouteAuth } from "./auth.js";
 import { installHttpLogging } from "./http-logging.js";
 import {
   announceRoute,
@@ -27,7 +27,7 @@ import { registerRouteMiddleware } from "./route-middleware.js";
 export function materializeRestRoutes(app: Hono, options: RouteMaterializationOptions): void {
   assertHttpManifest(options);
   installHttpLogging(app, options);
-  registerAuthMiddleware(app, options.auth);
+  registerRouteAuth(app, options.plan.httpTriggers, options.auth);
   registerRouteMiddleware(app, options);
   const triggers = [...options.plan.httpTriggers].sort(
     (left, right) => Number(right.config.method === "HEAD") - Number(left.config.method === "HEAD"),

@@ -54,19 +54,18 @@ makes arbitrary adapter body reads bounded or validates their payloads: configur
 limits, signature checks, session security, and error handling. Use middleware or an upstream gateway
 for transport policy that the raw-route API does not provide.
 
-## Keep Better Auth protection explicit
+## Mount Better Auth with a raw handler
 
-The example's `auth.protected` list protects `/account/*` and `/mcp` using the registered Better Auth
-service. It is not a list of routes created by the auth handler. The adapter owns the `/api/auth`
-endpoints; protected paths select other application entry points that require a session.
+The example mounts the registered Better Auth service's handler. The adapter owns the `/api/auth`
+endpoints, which never require a session. The route does not protect other paths: set
+`auth: "required"` on each function route that needs a signed-in caller.
 
-The `auth` option is accepted only when `handler` belongs to a recognized Better Auth service.
-It cannot add authentication to an arbitrary raw handler. This route also needs the corresponding
-auth service and database configuration; copying only the route is not a complete auth setup.
-See the [specialized service guidance](/docs/modules/service/organization#resources-do-not-go-in-the-service-member-list)
+This route also needs the corresponding auth service and database configuration; copying only the
+route is not a complete auth setup. See the
+[specialized service guidance](/docs/modules/service/organization#resources-do-not-go-in-the-service-member-list)
 for the owning domain and the [Routes API reference](/docs/api/routes) for raw-route options.
 Use [Better Auth service](/docs/modules/auth/better-auth) for a complete setup and
-[Protect routes](/docs/modules/auth/protect-routes) for exact path matching and authorization boundaries.
+[Protect routes](/docs/modules/auth/protect-routes) for requiring sessions and authorization boundaries.
 
 ## Verify the adapter separately
 

@@ -14,7 +14,7 @@ import {
 
 import * as authSchema from "./auth/native-schema.js";
 
-test("creates a stable lazy handler and derives route protection", async () => {
+test("creates a stable lazy handler and registers its mount route", async () => {
   const database = defineDrizzleService({
     schema: authSchema,
     client: () => drizzle({ client: new Database(":memory:") }),
@@ -22,14 +22,14 @@ test("creates a stable lazy handler and derives route protection", async () => {
   });
   const auth = defineBetterAuthService({ emailAndPassword: { enabled: true } });
   const handler = auth.handler;
-  const route = defineRoute({
-    handler,
-    auth: { protected: ["/orders/*", "/account/*", "/orders/*"] },
-  });
+  const route = defineRoute({ handler });
 
   expect(auth.handler).toBe(handler);
   expect(handler[BETTER_AUTH_HANDLER].service).toBe(auth);
-  expect(route.auth?.protected).toEqual(["/account/*", "/orders/*"]);
+  expect(route.auth).toEqual({ kind: "better-auth", service: { ref: auth.ref } });
+  expect(() => defineRoute({ handler, auth: { protected: ["/account/*"] } } as never)).toThrow(
+    'set auth: "required" on each route that needs a session',
+  );
   expect((await handler(new Request("http://localhost/api/auth/session"))).status).toBe(503);
 
   const activeDatabase = await activateDrizzleService(database, {});

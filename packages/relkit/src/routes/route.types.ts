@@ -48,6 +48,8 @@ export interface FunctionRouteOptions<
   readonly stream?: { readonly format: NativeStreamFormat };
   /** Sets the success status, headers and cookies from the function's output. */
   readonly response?: RouteResponseFor<Target>;
+  /** `"required"` rejects a request without a session with 401, before middleware and the target. */
+  readonly auth?: "required";
 }
 
 /** Authoring options for a raw HTTP route.
@@ -59,9 +61,6 @@ export interface RawRouteOptions<
 > extends RouteSharedOptions<Id> {
   readonly handler: Handler;
   readonly target?: never;
-  readonly auth?: {
-    readonly protected?: readonly string[];
-  };
 }
 
 /** Frozen descriptor for a function-backed route.
@@ -86,6 +85,7 @@ export interface FunctionRouteDescriptor<
   readonly client?: RouteClientPolicy;
   readonly stream?: { readonly format: NativeStreamFormat };
   readonly response?: RouteResponseFor<Target>;
+  readonly auth?: "required";
 }
 
 /** Frozen descriptor for a raw HTTP route.
@@ -102,7 +102,6 @@ export interface RawRouteDescriptor<
   readonly handler: Handler;
   readonly auth?: {
     readonly kind: "better-auth";
-    readonly protected: readonly string[];
     readonly service: { readonly ref: { readonly kind: "service"; readonly id: string } };
   };
 }

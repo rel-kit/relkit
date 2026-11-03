@@ -60,9 +60,45 @@ export function readServer<Value>(value: Value, issues: ConfigIssue[]) {
   );
   const apiDocs = readApiDocs(record.apiDocs, issues);
   const clientContract = readBoolean(record.clientContract, "server.clientContract", true, issues);
-  const mcp = readBoolean(record.mcp, "server.mcp", false, issues);
+  const { mcp, mcpAuth } = readMcp(record.mcp, issues);
   const agUi = readBoolean(record.agUi, "server.agUi", false, issues);
-  return { port, maxBodyBytes, apiDocs, clientContract, mcp, agUi };
+  return {
+    port,
+    maxBodyBytes,
+    apiDocs,
+    clientContract,
+    mcp,
+    ...(mcpAuth === undefined ? {} : { mcpAuth }),
+    agUi,
+  };
+}
+
+/**
+ * Reads `server.mcp`: a boolean, or `{ auth: "required" }` to enable MCP for signed-in callers only.
+ * @param value - Configured value inspected without coercion.
+ * @param issues - Caller-owned ordered configuration issues.
+ * @returns Whether MCP is enabled and whether it requires a session.
+ */
+function readMcp(
+  value: unknown,
+  issues: ConfigIssue[],
+): { readonly mcp: boolean; readonly mcpAuth?: "required" } {
+  if (value === undefined || typeof value === "boolean")
+    return { mcp: readBoolean(value, "server.mcp", false, issues) };
+  const record =
+    value !== null && typeof value === "object" && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : undefined;
+  if (record !== undefined && Object.keys(record).every((key) => key === "auth")) {
+    if (record.auth === "required") return { mcp: true, mcpAuth: "required" };
+    if (record.auth === undefined) return { mcp: true };
+  }
+  issues.push({
+    code: CONFIG_CODES.behavior,
+    path: "server.mcp",
+    message: 'server.mcp must be a boolean or { auth: "required" }.',
+  });
+  return { mcp: false };
 }
 
 /**

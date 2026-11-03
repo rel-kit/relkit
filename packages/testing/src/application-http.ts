@@ -9,12 +9,14 @@ import type { TestRuntime } from "./runtime.js";
  * @param routes - Loaded native filesystem routes.
  * @param runtime - Acquired deterministic invocation runtime.
  * @param request - Native operation input carrying explicit identity and execution context.
+ * @param getSession - The request's memoized session lookup, for routes with `auth: "required"`.
  * @returns The native HTTP response; errors are Problem Details like the runtime's.
  */
 export async function handleTestRequest(
   routes: readonly TestRoute[],
   runtime: TestRuntime,
   request: Request,
+  getSession: () => Promise<unknown> = () => Promise.resolve(null),
 ): Promise<Response> {
   const url = new URL(request.url);
   const matched = routes.find(
@@ -28,6 +30,12 @@ export async function handleTestRequest(
       detail: "No route matches this request.",
     });
   if ("handler" in matched) return matched.handler(request);
+  if (matched.auth === "required" && (await getSession()) == null)
+    return problemResponse({
+      status: 401,
+      code: "unauthenticated",
+      detail: "This route requires a signed-in session.",
+    });
   const params = match(matched.path, url) ?? {};
   const body = await readBody(request);
   try {

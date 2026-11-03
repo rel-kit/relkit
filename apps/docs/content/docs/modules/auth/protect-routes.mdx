@@ -1,13 +1,13 @@
 ---
 title: Protect routes
-description: Mount Better Auth's public API, require sessions on selected application paths, and enforce resource permissions inside business operations.
+description: Mount Better Auth's public API, require sessions on selected routes, and enforce resource permissions inside business operations.
 pagination: false
 sidebar:
   icon: lock-keyhole
 ---
 
-Require a session on selected application paths after mounting Better Auth. This HTTP access
-check answers “is the caller signed in?” It does not answer “may this caller access this order?”
+Require a session on selected routes after mounting Better Auth. This HTTP access check answers
+“is the caller signed in?” It does not answer “may this caller access this order?”
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
   Before using this guide, complete [Better Auth installation and
@@ -15,7 +15,7 @@ check answers “is the caller signed in?” It does not answer “may this call
   does not include the optional auth SDK.
 </Callout>
 
-## Mount the API and select protected paths
+## Mount the API
 
 <include
   source="examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"
@@ -29,37 +29,11 @@ The optional catch-all owns `/api/auth` and nested auth endpoints. The named exp
 the handler must be the registered service's `auth.handler`. It is a [raw handler](/docs/modules/http/raw-handlers),
 not a typed function route. Native auth requests and responses do not become RelKit OpenAPI/client
 operations, and raw routes do not accept the function-route `request`, `responses`, or `rateLimit` options.
+Auth endpoints never require a session, so callers can always sign in.
 
-The `auth` option is accepted only for a recognized Better Auth handler. It cannot attach session
-authentication to an arbitrary raw integration. Ordinary application routes continue to target
-their owning service functions.
+## Require a session on a route
 
-## Match exact paths and subtrees
-
-Use absolute pathnames, without a query string or fragment:
-
-| Protected pattern | Matches                                              | Does not match                                |
-| ----------------- | ---------------------------------------------------- | --------------------------------------------- |
-| `/account/*`      | `/account`, `/account/profile`, nested account paths | `/accounting`, `/session`                     |
-| `/mcp`            | Exactly `/mcp`                                       | `/mcp/`, `/mcp/anything`                      |
-| `/*`              | Application paths generally                          | The mounted authentication API remains public |
-
-Use exact paths or a trailing `/*` for a subtree; this is not a general regular-expression language.
-Patterns apply across HTTP methods. Duplicate patterns are normalized. If `protected` is omitted or
-empty, the integration does not require sessions on other application paths. Unlisted paths remain
-public unless another policy protects them.
-
-`/orders/*` in the example does not create an Orders route. Likewise, protecting `/mcp` controls HTTP
-access to that path; it does not change [which tools MCP exposes](/docs/modules/ai/mcp).
-
-The mounted auth base path and its descendants remain reachable even with `protected: ["/*"]`, so
-callers can sign in. This exception is only the auth mount, not a configurable list of other public
-paths. With broad protection, do not assume a custom `/sign-in` page or health endpoint is exempt;
-choose explicit protected subtrees when those application paths need to stay public.
-
-## Handle an unauthenticated request
-
-The example protects this ordinary function route:
+Set `auth: "required"` on each function route that needs a signed-in caller:
 
 <include
   source="examples/auth-drizzle/src/routes/account/profile/route.ts"
@@ -68,6 +42,23 @@ The example protects this ordinary function route:
 >
   /_snippets/source/examples/auth-drizzle/src/routes/account/profile/route.ts
 </include>
+
+RelKit checks the session before the route's middleware and its function run. Routes without the option
+stay public. The middleware and the function then read the same session: RelKit looks it up once per
+request. If the application mounts no Better Auth route, `relkit check` reports
+[`RELKIT_ROUTE_AUTH_UNAVAILABLE`](/docs/errors/relkit-route-auth-unavailable), and such a route answers every
+request with `401`.
+
+The [MCP endpoint](/docs/modules/ai/mcp) is not a route. To limit it to signed-in callers, set
+`server.mcp` in `relkit.config.ts`:
+
+```ts title="relkit.config.ts"
+import { defineApp, defineEnv } from "@relkit/app/config";
+
+export default defineApp({ env: defineEnv({}), server: { mcp: { auth: "required" } } });
+```
+
+## Handle an unauthenticated request
 
 A request without a valid session receives a `401` [problem](/docs/modules/http/responses#read-an-error-response):
 

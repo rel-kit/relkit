@@ -57,9 +57,8 @@ test("separates identity, integration, transport protection, and business author
   expect(read("better-auth")).toContain("not an `({ env })` factory");
   expect(read("sessions")).toContain("not an application-wide identity cache");
   expect(read("sessions")).toContain("resolves to `null`");
-  expect(read("protect-routes")).toContain(
-    "mounted auth base path and its descendants remain reachable",
-  );
+  expect(read("protect-routes")).toContain("Auth endpoints never require a session");
+  expect(read("protect-routes")).toContain('Set `auth: "required"` on each function route');
   expect(read("protect-routes")).toContain("not every direct invocation");
   expect(read("clients")).toContain("`trustedOrigins` is not CORS");
   expect(read("clients")).toContain("does **not** enable Better Auth bearer-token support");

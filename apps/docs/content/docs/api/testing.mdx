@@ -120,10 +120,11 @@ declare const handleTestRequest: (
   routes: readonly TestRoute[],
   runtime: TestRuntime,
   request: Request,
+  getSession?: () => Promise<unknown>,
 ) => Promise<Response>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-http.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-http.ts#L15)
 
 ## `application-native-services.types.ts`
 
@@ -374,10 +375,11 @@ type AuthoredRoute = Omit<TestFunctionRoute, "method" | "path" | "request" | "re
   readonly responses?: TestFunctionRoute["responses"];
   readonly successStatus?: number;
   readonly response?: (output: never) => unknown;
+  readonly auth?: "required";
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L41)
 
 ### TestFunctionRoute (type alias)
 
@@ -407,6 +409,7 @@ type TestFunctionRoute = {
   }[];
   /** The route's `response` option, applied to successful responses. */
   readonly response?: (output: never) => unknown;
+  readonly auth?: "required";
 };
 ```
 
@@ -423,11 +426,11 @@ type TestRawRoute = {
   readonly method: "ALL";
   readonly path: string;
   readonly handler: (request: Request) => Response | Promise<Response>;
-  readonly auth?: { readonly protected: readonly string[] };
+  readonly auth?: { readonly kind: "better-auth" };
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L30)
 
 ### TestRoute (type alias)
 
@@ -439,7 +442,7 @@ Supported native function or raw HTTP route declaration.
 type TestRoute = TestFunctionRoute | TestRawRoute;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L38)
 
 ## `application-service-auth.ts`
 
@@ -470,7 +473,7 @@ declare const acquireApplicationAuth: (
 declare const nativeServiceError: <Failure>(cause: Failure) => Error;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-service-auth.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-service-auth.ts#L57)
 
 ## `application-service-discovery.ts`
 

@@ -18,6 +18,8 @@ export interface ServerSourceConfiguration {
   };
   readonly clientContract: boolean;
   readonly mcp: boolean;
+  /** MCP answers 401 to callers without a session. */
+  readonly mcpAuth?: "required";
   readonly agUi?: boolean;
   readonly maxPreviewBytes: number;
   readonly inspectorEnabled?: boolean;

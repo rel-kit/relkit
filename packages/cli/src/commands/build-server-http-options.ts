@@ -114,7 +114,7 @@ const HTTP_OPTIONAL_TRANSPORT_SOURCE = `  ...((plan.channels ?? []).length === 0
  * @returns Closing application options source, retaining live readiness checks.
  */
 function internalHttpOptionsSource(configuration: ServerSourceConfiguration): string {
-  return `  mcp: { enabled: ${String(configuration.mcp)} },
+  return `  mcp: { enabled: ${String(configuration.mcp)}${configuration.mcpAuth === undefined ? "" : `, auth: "${configuration.mcpAuth}"`} },
   agUi: ${String(configuration.agUi ?? false)},
   staticFiles: { root: process.env.RELKIT_PUBLIC_ROOT ?? new URL("../public", import.meta.url).pathname },
   rateLimitRuntime: { resolveStore: resolveRateLimitStore },

@@ -1,5 +1,6 @@
 import { Context, Effect, Layer } from "effect";
-import type { Hono } from "hono";
+import type { Context as HonoContext, Hono } from "hono";
+import type { HttpTriggerRegistration } from "../graph/index.js";
 import type {
   CreateHttpAuthRuntimeOptions,
   HttpAuthInvocation,
@@ -50,13 +51,11 @@ export function httpSessionLayer(
 
 /** Creates request-scoped authentication contexts and shared session lookup state.
  * @param options - Application dependencies and configuration for this domain.
- * @returns A frozen auth runtime with path policy and stable per-request session contexts.
+ * @returns A frozen auth runtime with stable per-request session contexts.
  */
 export function createHttpAuthRuntime(options: CreateHttpAuthRuntimeOptions): HttpAuthRuntime {
   const contexts = new WeakMap<Request, HttpAuthInvocation>();
   return Object.freeze({
-    protected: Object.freeze([...options.protected]),
-    publicPaths: Object.freeze([...options.publicPaths]),
     ...(options.getOpenApiDocument === undefined
       ? {}
       : {
@@ -83,53 +82,45 @@ export function createHttpAuthRuntime(options: CreateHttpAuthRuntimeOptions): Ht
       contexts.set(request, context);
       return context;
     },
-    protects: (path: string) => options.protected.some((pattern) => matches(pattern, path)),
   });
 }
 
-/** Registers configured authentication middleware on its declared paths.
- * @param app - Hono application receiving the configured endpoints or middleware.
- * @param auth - Optional request authentication context or middleware configuration.
- * @returns Nothing; the declared authentication routes are installed.
+/** Rejects a request without a session; middleware and handlers share its memoized lookup.
+ * @param context - Request context.
+ * @param auth - Auth runtime; without one, no request can have a session.
+ * @returns A 401 problem, or undefined when the request has a session.
  */
-export function registerAuthMiddleware(app: Hono, auth: HttpAuthRuntime | undefined): void {
-  if (auth === undefined) return;
-  app.use("*", async (context, next) => {
-    const path = context.req.path;
-    if (
-      auth.publicPaths.some((pattern) => matches(pattern, path)) ||
-      !auth.protected.some((pattern) => matches(pattern, path))
-    ) {
-      await next();
-      return;
-    }
-    const session = await auth.contextFor(context.req.raw).getSession();
-    if (session === null) {
-      return contextProblem(context, {
-        status: 401,
-        code: "unauthenticated",
-        detail: "This route requires a signed-in session.",
+export async function requireSession(
+  context: HonoContext,
+  auth: HttpAuthRuntime | undefined,
+): Promise<Response | undefined> {
+  const session = auth === undefined ? null : await auth.contextFor(context.req.raw).getSession();
+  if (session !== null && session !== undefined) return undefined;
+  return contextProblem(context, {
+    status: 401,
+    code: "unauthenticated",
+    detail: "This route requires a signed-in session.",
+  });
+}
+
+/** Checks the session of each route that sets `auth: "required"`, before its middleware.
+ * @param app - Application receiving the checks ahead of route middleware and handlers.
+ * @param triggers - Compiled routes.
+ * @param auth - Auth runtime; routes that require a session answer 401 without one.
+ * @returns Nothing; one check is registered per protected route path and method.
+ */
+export function registerRouteAuth(
+  app: Hono,
+  triggers: readonly HttpTriggerRegistration[],
+  auth: HttpAuthRuntime | undefined,
+): void {
+  for (const trigger of triggers) {
+    if (trigger.config.auth?.kind !== "required") continue;
+    const method = trigger.config.method === "HEAD" ? "GET" : trigger.config.method;
+    for (const path of trigger.config.runtimePaths ?? [trigger.config.path])
+      app.on(method, path, async (context, next) => {
+        if (trigger.config.method === "HEAD" && context.req.method !== "HEAD") return next();
+        return (await requireSession(context, auth)) ?? next();
       });
-    }
-    await next();
-  });
-}
-
-/** Checks whether an authentication middleware pattern applies to the request path.
- * @param pattern - Declared middleware path pattern.
- * @param path - Ordered validation path or confined resource path.
- * @returns Whether the value satisfies the required public contract.
- */
-function matches(pattern: string, path: string): boolean {
-  if (pattern.endsWith("/*")) {
-    return path === pattern.slice(0, -2) || path.startsWith(pattern.slice(0, -1));
   }
-  const wildcard = pattern.indexOf("*");
-  if (wildcard >= 0) {
-    const base = pattern.slice(0, wildcard).replace(/\/$/, "");
-    return (pattern.endsWith("?") && path === base) || path.startsWith(`${base}/`);
-  }
-  const parameter = pattern.indexOf("/:");
-  if (parameter >= 0) return path.startsWith(`${pattern.slice(0, parameter)}/`);
-  return path === pattern;
 }

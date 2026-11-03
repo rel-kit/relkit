@@ -89,6 +89,7 @@ function normalizeRoute(
     request: route.request ?? inferRequest(route, method, parsed),
     responses: route.responses ?? inferResponses(route),
     ...(route.response === undefined ? {} : { response: route.response }),
+    ...(route.auth === undefined ? {} : { auth: route.auth }),
   });
 }
 

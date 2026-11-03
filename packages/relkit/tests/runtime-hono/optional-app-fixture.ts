@@ -14,7 +14,7 @@ import { installAgentProtocolEndpoints } from "../../src/runtime-hono/agent-prot
 export const createMcpApp: typeof coreApp = (options) =>
   coreApp({
     ...options,
-    mcp: { enabled: true },
+    mcp: { enabled: true, ...options.mcp },
     optionalTransports: { ...options.optionalTransports, mcp: installMcp },
   });
 

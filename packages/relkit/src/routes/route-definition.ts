@@ -15,7 +15,7 @@ import type {
   HttpResponseMapping,
 } from "./http-dsl.types.js";
 import { copyRateLimitValue, positiveValue, successStatusValue } from "./route-options.js";
-import { copyProtectedValues, readRegistrationValue } from "./route-auth.js";
+import { readRegistrationValue } from "./route-auth.js";
 import { copyClientValue, copyStreamValue } from "./route-client.js";
 import { RouteInputError } from "./route-observability.js";
 import type {
@@ -62,6 +62,8 @@ export function prepareRouteValue(
   const stream = copyStreamValue(route.stream, route.target.output);
   if (route.response !== undefined && typeof route.response !== "function")
     throw new RouteInputError("Route response must be a function of the target's output");
+  if (route.auth !== undefined && route.auth !== "required")
+    throw new RouteInputError('Route auth must be "required"');
   const legacy = route as typeof route & {
     readonly method?: HttpMethod;
     readonly path?: string;
@@ -83,15 +85,16 @@ export function prepareRouteValue(
       ...(client === undefined ? {} : { client }),
       ...(stream === undefined ? {} : { stream }),
       ...(route.response === undefined ? {} : { response: route.response }),
+      ...(route.auth === undefined ? {} : { auth: route.auth }),
     }) as FunctionRouteDescriptor<string>;
 }
 function rawRoute(options: RawRouteOptions<string>, id: string): RawRouteDescriptor<string> {
   const base = createDescriptorBase("route", id, options);
   const registration = readRegistrationValue(options.handler);
-  if (options.auth !== undefined && registration === undefined) {
-    throw new RouteInputError("Route auth options require a Better Auth service handler");
-  }
-  const protectedPaths = copyProtectedValues(options.auth?.protected);
+  if (hasOwn(options, "auth"))
+    throw new RouteInputError(
+      'The Better Auth route no longer lists protected paths; set auth: "required" on each route that needs a session.',
+    );
   return deepFreeze({
     ...base,
     raw: true as const,
@@ -101,7 +104,6 @@ function rawRoute(options: RawRouteOptions<string>, id: string): RawRouteDescrip
       : {
           auth: {
             kind: "better-auth" as const,
-            protected: protectedPaths,
             service: { ref: registration.service.ref },
           },
         }),

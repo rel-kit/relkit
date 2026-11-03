@@ -83,3 +83,50 @@ inspectorTest(
   },
   30_000,
 );
+
+test("MCP with auth required rejects callers without a session before any tool runs", async () => {
+  const { createHttpAuthRuntime } =
+    await import("../../../packages/relkit/src/runtime-hono/auth.ts");
+  const calls: HttpInvocationOptions[] = [];
+  const plan = toolPlan([tool("echo", true, "never")]);
+  const build = (session: unknown) =>
+    createApp({
+      plan,
+      manifest: {
+        ...runtimeCohort(plan.graphHash),
+        functions: {},
+        middleware: {},
+        requestTransforms: {},
+        tools: Object.fromEntries(
+          plan.tools.map((entry) => [entry.id, { target: { input, output } }]),
+        ),
+      },
+      mcp: { enabled: true, auth: "required" },
+      auth: createHttpAuthRuntime({ getSession: async () => session }),
+      engine: {
+        invoke: async (options) => {
+          calls.push(options);
+          return { echoed: input.parse(options.input).value };
+        },
+      },
+    });
+  const rejected = await appFetch(build(null))("http://localhost/mcp", {
+    method: "POST",
+    headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
+  });
+  expect(rejected.status).toBe(401);
+  expect(await rejected.json()).toMatchObject({ code: "unauthenticated" });
+
+  const client = new Client({ name: "test", version: "1" });
+  await client.connect(
+    new StreamableHTTPClientTransport(new URL("http://localhost/mcp"), {
+      fetch: appFetch(build("user-1")),
+    }),
+  );
+  expect(await client.callTool({ name: "echo", arguments: { value: "hi" } })).toEqual(
+    expect.objectContaining({ structuredContent: { echoed: "hi" } }),
+  );
+  expect(calls).toHaveLength(1);
+  await client.close();
+});

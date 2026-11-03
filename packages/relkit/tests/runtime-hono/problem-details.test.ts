@@ -54,7 +54,7 @@ function plan(): RegistrationPlan {
       route("/timeout"),
       route("/cancelled"),
       route("/defect"),
-      route("/account"),
+      route("/account", { auth: { kind: "required" } }),
       { ...route("/write"), config: { ...route("/write").config, method: "POST" } },
     ],
     queues: [],
@@ -98,11 +98,7 @@ const app = createApp({
   manifest: manifest(),
   internalEndpoints: { mode: "production" },
   responseMapping: { mode: "production" },
-  auth: createHttpAuthRuntime({
-    protected: ["/account"],
-    publicPaths: [],
-    getSession: async () => null,
-  }),
+  auth: createHttpAuthRuntime({ getSession: async () => null }),
   transportSecurity: { allowedOrigins: ["https://app.example"] },
   engine: {
     invoke: async ({ functionId }) => {

@@ -169,21 +169,30 @@ describe("defineRoute", () => {
       "require only a handler",
     );
     expect(() =>
-      defineRoute({ id: "raw.bad-auth", handler, auth: { protected: ["/private"] } }),
-    ).toThrow("Better Auth service handler");
+      defineRoute({ id: "raw.bad-auth", handler, auth: { protected: ["/private"] } } as never),
+    ).toThrow('set auth: "required" on each route that needs a session');
 
     Object.defineProperty(handler, Symbol.for("relkit.better-auth.handler"), {
       value: { kind: "better-auth", service: { ref: { kind: "service", id: "auth.service" } } },
     });
-    const authenticated = defineRoute({
-      id: "raw.auth",
-      handler,
-      auth: { protected: ["/admin/*", "/admin/*"] },
-    });
-    expect(authenticated.auth).toMatchObject({
+    const authenticated = defineRoute({ id: "raw.auth", handler });
+    expect(authenticated.auth).toEqual({
       kind: "better-auth",
-      protected: ["/admin/*"],
-      service: { ref: { id: "auth.service" } },
+      service: { ref: { kind: "service", id: "auth.service" } },
     });
+  });
+
+  test("a function route can require a session", () => {
+    const target = defineFunction({
+      id: "account.profile",
+      input: z.object({}),
+      output: z.object({ ok: z.boolean() }),
+      handler: async () => ({ ok: true }),
+    });
+    expect(defineRoute({ target, auth: "required" }).auth).toBe("required");
+    expect(defineRoute({ target }).auth).toBeUndefined();
+    expect(() => defineRoute({ target, auth: "optional" } as never)).toThrow(
+      'Route auth must be "required"',
+    );
   });
 });

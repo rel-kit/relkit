@@ -21,4 +21,6 @@ export interface OptionalHttpInstallers {
 /** MCP selection alone, separate from the native tool schema declarations. */
 export interface McpOptions {
   readonly enabled?: boolean;
+  /** `"required"` answers 401 to MCP callers without a session, before any tool runs. */
+  readonly auth?: "required";
 }

@@ -72,12 +72,9 @@ function clientPolicy(value: unknown, method: unknown): JsonValue | undefined {
  * @returns Serializable route authentication settings, or undefined when omitted.
  */
 function authConfig(value: unknown): JsonValue | undefined {
+  if (value === "required") return { kind: "required" };
   if (!isRecord(value) || value.kind !== "better-auth") return undefined;
-  return clean({
-    kind: "better-auth",
-    serviceId: refId(value.service),
-    protected: value.protected,
-  });
+  return clean({ kind: "better-auth", serviceId: refId(value.service) });
 }
 
 /**
