@@ -10,9 +10,8 @@ Preserve durable job and task identities when changing application source or pro
 
 This is a one-release compatibility window. Legacy function-target definitions, `.enqueue()` producers,
 and the deprecated `profile` spelling remain available only when explicitly enabled; new code must use a
-task-first definition and `service` selection. Use a compatible set of package releases before changing the
-application graph; packages have independent versions, so follow the selected owner's installation
-requirements rather than assigning one version number to every RelKit package.
+task-first definition and `service` selection. Upgrade every RelKit package to the same release before changing the
+application graph; all RelKit packages share one version.
 
 The migration helper is exposed from the jobs package; run it against the previous and next snapshots before
 activation. It reports identity, binding, schema, history, schedule, dedupe, and client-fingerprint changes.

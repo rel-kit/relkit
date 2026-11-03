@@ -20,9 +20,10 @@ pins. It then builds the documentation's CLI and creator inputs and regenerates
 version-derived install instructions, source snippets and CLI reference before
 the release PR is committed. Use `bun run version:docs` to refresh those outputs
 on an already versioned candidate without applying Changesets again.
-Packages have independent versions; the root changelog and `v` tag number
-identify the release batch, not a version shared by every package. When the
-generator is in that batch, versioning certifies it with 20 fresh starts and
+Changesets uses one `fixed` group (`relkit`, `create-relkit`, `@relkit/*`), so
+every release gives every published package the same version; the root changelog
+heading and the `v` tag use that version. Every release includes the generator,
+so versioning certifies it with 20 fresh starts and
 20 restarts from packed
 packages, including restart preparation, and requires every complete correct
 response and clean shutdown within the existing 30-second terminal deadline

@@ -53,7 +53,7 @@ core API does not install the full AWS, Pulumi, Next.js, or testing stack.
 Follow the selected capability's [installation guide](apps/docs/content/docs/modules/integrations/index.mdx)
 before copying source. Native SDKs and declaration repairs remain application-owned;
 `relkit add` normally installs the requirements it selects, while `--no-install`
-leaves explicit install/check next steps. Public packages have independent versions.
+leaves explicit install/check next steps. All RelKit packages share one version.
 
 ## AI agent skills
 
@@ -182,7 +182,7 @@ development. The CLI owns no Inspector UI, history database or database worker.
 
 ## Releases and support
 
-Public packages retain independent versions. Repository pull
+All RelKit packages share one version, and each release is tagged with it. Repository pull
 requests that change publishable paths receive an automatic patch Changeset;
 forks and minor or major releases use `bun run changeset`. Automation opens the
 release pull request, auto-merges it after `CI Gate`, and publishes through a

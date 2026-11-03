@@ -102,7 +102,9 @@ declarations, explicit error IDs, removed aliases and legacy jobs, `defineServic
 Better Auth options to a Better Auth file, client hook call sites, agent `runtime` fields). The
 codemods reuse the existing `migrate layout` transaction model: preview, write, and a rollback
 receipt. Repository examples and templates are migrated with the codemod, never by hand, which tests
-the codemod. A `0.9.0-beta` precedes `0.9.0`.
+the codemod. A `0.9.0-beta` precedes `0.9.0`. The migration guide is published at
+`/guides/migrate/relkit-0-9`; every breaking changeset links to it, because versioning rejects a
+breaking change without a migration link.
 
 - **Alternative:** several smaller breaking releases. Rejected by the maintainer in round 3.
 

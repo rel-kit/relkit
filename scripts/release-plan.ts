@@ -1,4 +1,4 @@
-/** Validates independently versioned release plans and enumerates the creator's selected provider catalog. */
+/** Validates release plans of the one fixed package group and enumerates the creator's selected provider catalog. */
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -27,11 +27,22 @@ export const generatorProviders = [
   "@relkit/inspector",
 ] as const;
 
-/** The root release number identifies a batch independently of individual package versions. */
-export function nextReleaseVersion(changelog: string): string {
-  const previous = /^## (\d+)\.(\d+)\.(\d+)(?:\s|$)/m.exec(changelog);
-  assert.ok(previous, "CHANGELOG.md has no previous release version");
-  return `${previous[1]}.${previous[2]}.${Number(previous[3]) + 1}`;
+/**
+ * Reads the release version: every published package is in one fixed Changesets group, so a
+ * release gives all of them the same version, and that version is the release's Git tag.
+ * @param packages - Packages and the versions Changesets gives them.
+ * @returns The version they share; throws when two packages differ.
+ */
+export function sharedReleaseVersion(
+  packages: readonly { name: string; version: string }[],
+): string {
+  const versions = [...new Set(packages.map(({ version }) => version))];
+  assert.equal(
+    versions.length,
+    1,
+    `Release packages must share one version: ${packages.map(({ name, version }) => `${name}@${version}`).join(", ")}`,
+  );
+  return versions[0]!;
 }
 
 export function validateReleasePlan(value: unknown): ReleasePlan {
