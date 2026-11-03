@@ -85,17 +85,13 @@ const authEnvironmentEffect = Effect.fn("Scaffold.authEnvironment")(function* (
   yield* builder.dependencyEffect("better-auth");
   yield* builder.dependencyEffect("@cloudflare/workers-types");
   yield* ensureEnvironmentEffect(builder, "BETTER_AUTH_SECRET", "env.secret()");
-  yield* ensureEnvironmentEffect(
-    builder,
-    "BETTER_AUTH_URL",
-    `env.url().default(new URL("http://127.0.0.1:3000"))`,
-    "http://127.0.0.1:3000",
-  );
+  // Both are required: the server refuses to start without them, with RELKIT_ENVIRONMENT_INVALID.
+  yield* ensureEnvironmentEffect(builder, "BETTER_AUTH_URL", "env.url()", "http://127.0.0.1:3000");
   yield* builder.warningEffect(
     "auth-secret-required",
-    "Populate BETTER_AUTH_SECRET with a strong secret before starting auth.",
+    "Populate BETTER_AUTH_SECRET with a strong secret and BETTER_AUTH_URL with the server's URL before starting auth.",
   );
-  yield* builder.nextStepEffect("Set BETTER_AUTH_SECRET in your environment.");
+  yield* builder.nextStepEffect("Set BETTER_AUTH_SECRET and BETTER_AUTH_URL in your environment.");
 });
 
 /**
