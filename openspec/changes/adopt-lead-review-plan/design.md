@@ -63,6 +63,21 @@ konsistent rules over source folders inside the merged packages. Changesets uses
 (`relkit`, `create-relkit`, `@relkit/*`). The `relkit` bin resolves the project's `@relkit/cli` the way
 today's unscoped `relkit` wrapper resolves project-local tooling.
 
+The review's starting map is adjusted where the dependency graph requires it:
+
+- `graph` moves into `relkit`, not `@relkit/cli`. The engine, `runtime-effect`, `runtime-hono` and
+  `openapi` read the application graph at run time, and it depends only on `effect`.
+- The deploy integration contract (today's `deploy` package) moves into `relkit` as the public
+  `relkit/deploy` subpath, because `@relkit/aws` and `@relkit/pulumi` implement it and must not depend
+  on `@relkit/cli`. The Pulumi engine (`deploy-pulumi`) still moves into `@relkit/cli`.
+- Inside `relkit`, each former package becomes a source folder (`src/<area>/`) with its tests in
+  `tests/<area>/`, and areas import each other through relative paths. Each former package's public
+  entry points stay reachable as `relkit/<area>` subpaths for first-party tools and integrations;
+  `relkit/config`, `relkit/jobs` and `relkit/tasks` keep the application-facing superset that
+  `@relkit/app` exported.
+- Until the section 12 codemod migrates them, examples, templates and docs keep importing
+  `@relkit/app`, which becomes the thin re-export of `relkit` that the deprecated final release ships.
+
 - **Alternative:** keep `@relkit/app` as the core name. Rejected: longer imports and it keeps the
   "which RelKit am I on?" problem.
 - **Alternative:** ship the CLI inside `relkit`. Rejected: production installs would pull the
