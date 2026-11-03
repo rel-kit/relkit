@@ -1,4 +1,4 @@
-/** Checks installed dependency directions between core protocols and selected integrations. */
+/** Checks installed dependency directions between the core package, tools and integrations; area rules live in boundary-areas.ts. */
 import { relative, resolve } from "node:path";
 import { discoverScopes, readManifest, type Scope } from "./boundary-imports";
 
@@ -9,27 +9,6 @@ export type DirectionViolation = {
   rule: string;
   message: string;
 };
-
-const coreProtocols = new Set([
-  "relkit/agents",
-  "relkit/buckets",
-  "relkit/cache",
-  "relkit/contracts",
-  "relkit/deploy",
-  "relkit/local-service",
-  "relkit/jobs",
-  "relkit/observability",
-  "relkit/provider",
-  "relkit/realtime",
-]);
-const integrationImplementations = new Map([
-  ["@relkit/local", new Set(["relkit/providers-local"])],
-  ["@relkit/redis", new Set(["relkit/providers-local"])],
-  [
-    "@relkit/langchain",
-    new Set(["relkit/functions", "relkit/invocation", "relkit/schema", "relkit/tools"]),
-  ],
-]);
 
 export function integrationPackageNames(scopes: readonly Scope[]): Set<string> {
   return new Set(
@@ -65,18 +44,14 @@ export function dependencyDirectionViolations(
     for (const dependency of runtimeDependencies) {
       let rule: string | undefined;
       let message: string | undefined;
-      if (owner.manifest?.name === "relkit/engine" && dependency === "relkit/providers-local") {
-        rule = "engine-local-provider-dependency";
-        message = "@relkit/engine depends on local provider implementations";
-      } else if (owner.path.startsWith("packages/") && integrations.has(dependency)) {
+      if (owner.path.startsWith("packages/") && integrations.has(dependency)) {
         rule = "core-integration-dependency";
         message = `${owner.manifest?.name} depends on integration package "${dependency}"`;
       } else if (
         owner.path.startsWith("integrations/packages/") &&
-        dependency.startsWith("@relkit/") &&
-        !coreProtocols.has(dependency) &&
-        !integrationImplementations.get(owner.manifest?.name ?? "")?.has(dependency)
+        dependency.startsWith("@relkit/")
       ) {
+        // Integrations build on relkit only; which relkit areas they use is an import rule.
         rule = "integration-non-protocol-dependency";
         message = `${owner.manifest?.name} depends on non-protocol package "${dependency}"`;
       }

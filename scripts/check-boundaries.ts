@@ -18,6 +18,7 @@ import {
   readManifest,
   relkitAreaOwner,
 } from "./boundary-imports";
+import { areaViolation } from "./boundary-areas";
 import { dependencyDirectionViolations, integrationPackageNames } from "./boundary-directions";
 import { scanScope } from "./scope-scan";
 import { isDocumentationBuildImport } from "./docs-build-imports.js";
@@ -112,6 +113,8 @@ function reportImport(
   ) {
     add("graph-hono-pulumi-import", `relkit/graph imports Hono/Pulumi package "${dependency}"`);
   }
+  const area = areaViolation(ownerName, owner.path, base.file, dependency);
+  if (area) add(area.rule, area.message);
   const fixturePackage = scopes.find((scope) => scope.path === "examples/commerce")?.manifest?.name;
   if (
     owner.path === "apps/inspector" &&

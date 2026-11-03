@@ -27,20 +27,6 @@ function scope(path: string, manifest: NonNullable<Scope["manifest"]>): Scope {
   };
 }
 
-test("development fixtures do not install engine provider implementations", () => {
-  const path = "packages/relkit";
-  const manifest = {
-    name: "relkit/engine",
-    devDependencies: { "relkit/providers-local": "workspace:*" },
-  };
-  expect(dependencyDirectionViolations("/repo", [scope(path, manifest)])).toEqual([]);
-  expect(
-    dependencyDirectionViolations("/repo", [
-      scope(path, { ...manifest, dependencies: manifest.devDependencies }),
-    ]),
-  ).toMatchObject([{ rule: "engine-local-provider-dependency" }]);
-});
-
 test("core native peers must be explicitly optional instead of installed runtime edges", () => {
   const native = scope("integrations/packages/langchain", { name: "@relkit/langchain" });
   const peerDependencies = { "@relkit/langchain": "workspace:*" };
