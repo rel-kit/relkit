@@ -17,6 +17,7 @@ import {
   type CreateTemplate,
 } from "create-relkit";
 import { templateDigest, validateCreationReport } from "./release-create-evidence.js";
+import { pullTemplateImages } from "./local-images.js";
 
 /** One template's measurement outcome, written next to its reports. */
 export type TemplateResult =
@@ -64,6 +65,7 @@ export async function measureTemplate(
   };
   let result: TemplateResult;
   try {
+    await pullTemplateImages(template);
     for (const set of ["fresh", "restart"] as const) {
       const report = join(directory, `${set}.json`);
       await run([

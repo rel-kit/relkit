@@ -9,6 +9,7 @@
 import { readFile, rm } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { CREATE_TEMPLATES } from "create-relkit";
+import { pullTemplateImages } from "./local-images.js";
 
 const root = resolve(import.meta.dir, "..");
 
@@ -37,6 +38,7 @@ async function main(): Promise<void> {
   if (template === undefined)
     throw new Error(`--template must be one of: ${CREATE_TEMPLATES.join("|")}`);
   const output = join(root, "test-results", "creation-canary", `${template}.json`);
+  await pullTemplateImages(template);
   await run(
     [
       "scripts/benchmark-packed-dev.ts",
