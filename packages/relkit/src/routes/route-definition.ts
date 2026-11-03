@@ -60,6 +60,8 @@ export function prepareRouteValue(
   const rateLimit = copyRateLimitValue(route.rateLimit);
   const client = copyClientValue(route.client);
   const stream = copyStreamValue(route.stream, route.target.output);
+  if (route.response !== undefined && typeof route.response !== "function")
+    throw new RouteInputError("Route response must be a function of the target's output");
   const legacy = route as typeof route & {
     readonly method?: HttpMethod;
     readonly path?: string;
@@ -80,6 +82,7 @@ export function prepareRouteValue(
       ...(timeoutMs === undefined ? {} : { timeoutMs }),
       ...(client === undefined ? {} : { client }),
       ...(stream === undefined ? {} : { stream }),
+      ...(route.response === undefined ? {} : { response: route.response }),
     }) as FunctionRouteDescriptor<string>;
 }
 function rawRoute(options: RawRouteOptions<string>, id: string): RawRouteDescriptor<string> {

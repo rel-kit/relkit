@@ -21,6 +21,8 @@ export type TestFunctionRoute = {
     readonly status?: number;
     readonly errorId?: string;
   }[];
+  /** The route's `response` option, applied to successful responses. */
+  readonly response?: (output: never) => unknown;
 };
 
 /** Raw native HTTP route preserving its original handler and method contract. */
@@ -40,4 +42,5 @@ export type AuthoredRoute = Omit<TestFunctionRoute, "method" | "path" | "request
   readonly request?: unknown;
   readonly responses?: TestFunctionRoute["responses"];
   readonly successStatus?: number;
+  readonly response?: (output: never) => unknown;
 };

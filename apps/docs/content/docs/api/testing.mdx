@@ -123,7 +123,7 @@ declare const handleTestRequest: (
 ) => Promise<Response>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-http.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-http.ts#L14)
 
 ## `application-native-services.types.ts`
 
@@ -373,10 +373,11 @@ type AuthoredRoute = Omit<TestFunctionRoute, "method" | "path" | "request" | "re
   readonly request?: unknown;
   readonly responses?: TestFunctionRoute["responses"];
   readonly successStatus?: number;
+  readonly response?: (output: never) => unknown;
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L40)
 
 ### TestFunctionRoute (type alias)
 
@@ -404,6 +405,8 @@ type TestFunctionRoute = {
     readonly status?: number;
     readonly errorId?: string;
   }[];
+  /** The route's `response` option, applied to successful responses. */
+  readonly response?: (output: never) => unknown;
 };
 ```
 
@@ -424,7 +427,7 @@ type TestRawRoute = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L29)
 
 ### TestRoute (type alias)
 
@@ -436,7 +439,7 @@ Supported native function or raw HTTP route declaration.
 type TestRoute = TestFunctionRoute | TestRawRoute;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L37)
 
 ## `application-service-auth.ts`
 

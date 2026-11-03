@@ -28,5 +28,6 @@ export const { GET, POST } = defineServiceRoutes(orders, {
       },
     },
     successStatus: 201,
+    response: (order) => ({ headers: { location: `/orders/${order.orderId}` } }),
   },
 });

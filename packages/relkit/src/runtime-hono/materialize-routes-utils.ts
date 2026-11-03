@@ -13,9 +13,9 @@ import { invokeWithRecord, mapInputWithRecord, recordDetail } from "./request-re
 import {
   mapFailureResponse,
   mapInputValidationResponse,
-  mapSuccessResponse,
   type ResponseMappingOptions,
 } from "./response-mapping.js";
+import { routeSuccessResponse } from "./route-response.js";
 
 /** Builds the Hono request adapter over the route workflow service.
  * @param trigger - Registered route declaration with its target and transport contract.
@@ -133,7 +133,7 @@ const handleRoute = Effect.fn("HttpRoutes.handle")(function* (
         );
       }
       return yield* httpBoundary("route.response", () =>
-        mapSuccessResponse(trigger, value, responseOptions),
+        routeSuccessResponse(trigger, value, responseOptions, options.manifest),
       );
     }),
   );

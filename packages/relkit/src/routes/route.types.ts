@@ -7,6 +7,8 @@ import type {
   HttpResponseMapping,
 } from "./http-dsl.js";
 import type { RouteRateLimit } from "./route-options.js";
+import type { RouteResponseFor } from "./route-response.types.js";
+export type * from "./route-response.types.js";
 
 /** A raw HTTP handler receiving the incoming Request.
  * @example const handler: RawHttpHandler = () => new Response("ok");
@@ -44,6 +46,8 @@ export interface FunctionRouteOptions<
   readonly timeoutMs?: number;
   readonly client?: RouteClientPolicy;
   readonly stream?: { readonly format: NativeStreamFormat };
+  /** Sets the success status, headers and cookies from the function's output. */
+  readonly response?: RouteResponseFor<Target>;
 }
 
 /** Authoring options for a raw HTTP route.
@@ -81,6 +85,7 @@ export interface FunctionRouteDescriptor<
   readonly timeoutMs?: number;
   readonly client?: RouteClientPolicy;
   readonly stream?: { readonly format: NativeStreamFormat };
+  readonly response?: RouteResponseFor<Target>;
 }
 
 /** Frozen descriptor for a raw HTTP route.

@@ -2973,7 +2973,7 @@ Re-exports all named exports from the "./route-module.types.js" module.
 export * from "./route-module.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L14)
 
 ### "./route.types.js" (namespace export)
 
@@ -2985,7 +2985,7 @@ Re-exports all named exports from the "./route.types.js" module.
 export * from "./route.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L13)
 
 ### HttpRateLimitKey
 
@@ -2995,7 +2995,7 @@ export * from "./route.types.js";
 declare const HttpRateLimitKey: HttpRateLimitKey;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L15)
 
 ### RouteInputError
 
@@ -3005,7 +3005,7 @@ declare const HttpRateLimitKey: HttpRateLimitKey;
 declare const RouteInputError: typeof RouteInputError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L7)
 
 ### RouteOperation
 
@@ -3015,7 +3015,7 @@ declare const RouteInputError: typeof RouteInputError;
 declare const RouteOperation: RouteOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L12)
 
 ### RouteOperationError
 
@@ -3025,7 +3025,7 @@ declare const RouteOperation: RouteOperation;
 declare const RouteOperationError: typeof RouteOperationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L8)
 
 ### RouteRateLimit
 
@@ -3035,7 +3035,7 @@ declare const RouteOperationError: typeof RouteOperationError;
 declare const RouteRateLimit: RouteRateLimit;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L15)
 
 ### RouteTelemetry
 
@@ -3045,7 +3045,7 @@ declare const RouteRateLimit: RouteRateLimit;
 declare const RouteTelemetry: typeof RouteTelemetry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L9)
 
 ### RouteTelemetryLive
 
@@ -3055,7 +3055,7 @@ declare const RouteTelemetry: typeof RouteTelemetry;
 declare const RouteTelemetryLive: Layer<RouteTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L10)
 
 ### RouteTelemetryService
 
@@ -3065,7 +3065,17 @@ declare const RouteTelemetryLive: Layer<RouteTelemetry, never, never>;
 declare const RouteTelemetryService: RouteTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L12)
+
+### applyRouteResponse
+
+**Signature**
+
+```ts
+declare const applyRouteResponse: (response: Response, init: unknown) => Response;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L5)
 
 ## `route-auth.ts`
 
@@ -4011,7 +4021,108 @@ export interface RouteRateLimit {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.types.ts#L19)
 
+## `route-response.ts`
+
+Applies a route's `response` settings to a mapped success response, for the runtime and tests.
+
+### applyRouteResponse
+
+Rebuilds a response with a route's status, headers and cookies.
+
+**Signature**
+
+```ts
+declare const applyRouteResponse: (response: Response, init: unknown) => Response;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-response.ts#L10)
+
+## `route-response.types.ts`
+
+### RouteCookie (interface)
+
+One cookie a route sets on its successful response.
+
+**Example**
+
+```ts
+const cookie: RouteCookie = { name: "session", value: "abc", httpOnly: true };
+```
+
+**Signature**
+
+```ts
+export interface RouteCookie {
+  readonly name: string;
+  readonly value: string;
+  readonly path?: string;
+  readonly domain?: string;
+  readonly maxAge?: number;
+  readonly expires?: Date;
+  readonly httpOnly?: boolean;
+  readonly secure?: boolean;
+  readonly sameSite?: "Strict" | "Lax" | "None";
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-response.types.ts#L7)
+
+### RouteResponseFor (type alias)
+
+Computes the response settings from the target function's validated output.
+
+**Example**
+
+```ts
+const response: RouteResponseFor<typeof createOrder> = (order) => ({ status: 201 });
+```
+
+**Signature**
+
+```ts
+type RouteResponseFor<Target extends FunctionRefAny> = (
+  output: InferOutput<Target["output"]>,
+) => RouteResponseInit;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-response.types.ts#L32)
+
+### RouteResponseInit (interface)
+
+Status, headers and cookies a route adds to its successful response.
+
+**Example**
+
+```ts
+const init: RouteResponseInit = { status: 201, headers: { location: "/orders/1" } };
+```
+
+**Signature**
+
+```ts
+export interface RouteResponseInit {
+  /** A 2xx status replacing the route's success status. */
+  readonly status?: number;
+  readonly headers?: Readonly<Record<string, string>>;
+  readonly cookies?: readonly RouteCookie[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-response.types.ts#L22)
+
 ## `route.types.ts`
+
+### "./route-response.types.js" (namespace export)
+
+Re-exports all named exports from the "./route-response.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./route-response.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L11)
 
 ### FunctionRouteDescriptor (interface)
 
@@ -4044,10 +4155,11 @@ export interface FunctionRouteDescriptor<
   readonly timeoutMs?: number;
   readonly client?: RouteClientPolicy;
   readonly stream?: { readonly format: NativeStreamFormat };
+  readonly response?: RouteResponseFor<Target>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L70)
 
 ### FunctionRouteOptions (interface)
 
@@ -4078,10 +4190,12 @@ export interface FunctionRouteOptions<
   readonly timeoutMs?: number;
   readonly client?: RouteClientPolicy;
   readonly stream?: { readonly format: NativeStreamFormat };
+  /** Sets the success status, headers and cookies from the function's output. */
+  readonly response?: RouteResponseFor<Target>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L33)
 
 ### NativeStreamFormat (type alias)
 
@@ -4099,7 +4213,7 @@ const format: NativeStreamFormat = "sse";
 type NativeStreamFormat = "sse" | "text" | "bytes";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L24)
 
 ### RawHttpHandler (type alias)
 
@@ -4117,7 +4231,7 @@ const handler: RawHttpHandler = () => new Response("ok");
 type RawHttpHandler = (request: Request) => MaybePromise<Response>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L16)
 
 ### RawRouteDescriptor (interface)
 
@@ -4149,7 +4263,7 @@ export interface RawRouteDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L89)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L94)
 
 ### RawRouteOptions (interface)
 
@@ -4176,7 +4290,7 @@ export interface RawRouteOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L56)
 
 ### RouteClientPolicy (type alias)
 
@@ -4194,7 +4308,7 @@ const policy: RouteClientPolicy = { operation: "query" };
 type RouteClientPolicy = false | { readonly operation?: "query" | "mutation" };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L20)
 
 ### RouteDescriptor (type alias)
 
@@ -4216,4 +4330,4 @@ type RouteDescriptor<
 > = FunctionRouteDescriptor<Id, Target, Request> | RawRouteDescriptor<Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L113)

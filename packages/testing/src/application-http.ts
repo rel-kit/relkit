@@ -1,6 +1,7 @@
 import type { TestRoute } from "./application-routes.js";
 import { InvocationValidationError } from "relkit/engine";
 import { problemResponse } from "relkit/contracts";
+import { applyRouteResponse } from "relkit/routes";
 import { normalizeFailure } from "relkit/runtime-effect";
 import type { TestRuntime } from "./runtime.js";
 /**
@@ -35,10 +36,14 @@ export async function handleTestRequest(
       mapInput(matched.request, url, params, request, body),
     );
     const status = matched.responses.find((response) => response.kind === "success")?.status ?? 200;
-    const response = new Response(value === undefined ? null : JSON.stringify(value), {
+    const mapped = new Response(value === undefined ? null : JSON.stringify(value), {
       status,
       headers: { "content-type": "application/json" },
     });
+    const response =
+      matched.response === undefined
+        ? mapped
+        : applyRouteResponse(mapped, (matched.response as (output: unknown) => unknown)(value));
     return request.method === "HEAD"
       ? new Response(null, { status: response.status, headers: response.headers })
       : response;

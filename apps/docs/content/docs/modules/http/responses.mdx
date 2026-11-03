@@ -86,6 +86,24 @@ Use `successStatus` for this case instead of copying all inferred response decla
 `HEAD` invokes the target but removes the response body. `204` responses are empty as well;
 do not choose `204` when callers need the returned JSON.
 
+## Set headers and cookies from the output
+
+A route's `response` option computes the status, headers and cookies from the function's validated
+output. The Orders `POST` above uses it to send `Location: /orders/<orderId>`. The function itself
+does not change, so a job or tool that calls `createOrder` still gets only its output.
+
+```ts
+response: (order) => ({
+  status: 201,
+  headers: { location: `/orders/${order.orderId}` },
+  cookies: [{ name: "last-order", value: order.orderId, httpOnly: true, sameSite: "Lax" }],
+}),
+```
+
+`status` must be a `2xx` other than `205`, and it replaces `successStatus` for that response; OpenAPI
+still documents `successStatus`. The option runs only for successful responses. If it throws or
+returns an invalid status, the request fails with a `500` problem.
+
 ## Replace the complete response contract only when needed
 
 An explicit `responses` array replaces inference. The [Routes API](/docs/api/routes) provides:
