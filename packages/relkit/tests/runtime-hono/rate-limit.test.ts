@@ -36,9 +36,15 @@ describe("route rate limiting", () => {
     expect(second.headers.get("ratelimit-policy")).toBe("2;w=1");
     expect(blocked.status).toBe(429);
     expect(Number(blocked.headers.get("retry-after"))).toBeGreaterThan(0);
+    expect(blocked.headers.get("content-type")).toBe("application/problem+json");
     expect(await blocked.json()).toEqual({
-      error: "rate-limit",
-      retryAfterMs: expect.any(Number),
+      type: "/errors/rate-limited",
+      title: "Too Many Requests",
+      status: 429,
+      code: "rate-limited",
+      detail: "Too many requests to this route; retry after the delay in Retry-After.",
+      data: { retryAfterMs: expect.any(Number) },
+      traceId: expect.stringMatching(/^[0-9a-f]{32}$/),
     });
     expect(calls).toEqual(["hello", "hello"]);
   });

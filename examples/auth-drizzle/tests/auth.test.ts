@@ -58,8 +58,10 @@ test("migrated auth supports sign-up, session lookup, sign-out, and sign-in", as
 async function assertSession(application: TestApplication) {
   const unauthorized = await application.http.get("/account/profile");
   expect(unauthorized.status).toBe(401);
-  expect(await unauthorized.json()).toEqual({
-    error: { id: "UNAUTHORIZED", message: "Authentication required" },
+  expect(await unauthorized.json()).toMatchObject({
+    status: 401,
+    code: "unauthenticated",
+    detail: "This route requires a signed-in session.",
   });
   expect(await (await application.http.get("/session")).json()).toEqual({ authenticated: false });
   const credentials = { name: "Demo", email: "demo@example.com", password: "password123" };

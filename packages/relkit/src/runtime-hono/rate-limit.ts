@@ -7,6 +7,7 @@ import { getRequestState } from "./middleware.js";
 import { createRateLimitStore, type RateLimitStoreResolver } from "./rate-limit-store.js";
 import { recordRateLimitResult } from "./rate-limit-telemetry.js";
 import type { RouteHandler } from "./rate-limit.types.js";
+import { contextProblem } from "./problem-details.js";
 export type { RateLimitRuntimeOptions } from "./rate-limit.types.js";
 
 export const ROUTE_MIDDLEWARE_ORDER = Object.freeze([
@@ -52,7 +53,13 @@ export function withRateLimit(
         0,
         info?.resetTime === undefined ? policy.windowMs : info.resetTime.getTime() - Date.now(),
       );
-      return context.json({ error: "rate-limit", retryAfterMs }, 429);
+      return contextProblem(context, {
+        status: 429,
+        code: "rate-limited",
+        detail: "Too many requests to this route; retry after the delay in Retry-After.",
+        data: { retryAfterMs },
+        retryAfterMs,
+      });
     },
   });
 

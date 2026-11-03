@@ -371,7 +371,7 @@ describe("HTTP integration", () => {
         const response = await harness.client.post("/payload", init);
         expect(response.status).toBe(422);
         expect(await response.json()).toMatchObject({
-          error: "validation",
+          code: "validation",
           issues: [{ code: issueCode }],
         });
         expect(harness.calls).toHaveLength(0);
@@ -476,8 +476,9 @@ describe("HTTP integration", () => {
     try {
       const declared = await harness.client.get("/declared");
       expect(declared.status).toBe(404);
+      expect(declared.headers.get("content-type")).toBe("application/problem+json");
       expect(await declared.json()).toMatchObject({
-        outcome: "declared-error",
+        status: 404,
         code: missing.id,
         data: { orderId: "order-1" },
       });
@@ -485,12 +486,15 @@ describe("HTTP integration", () => {
       const defect = await harness.client.get("/defect");
       expect(defect.status).toBe(500);
       const defectBody = await defect.text();
-      expect(defectBody).toBe(JSON.stringify({ error: "internal-error" }));
+      expect(JSON.parse(defectBody)).toMatchObject({
+        code: "internal-error",
+        detail: "The request failed unexpectedly.",
+      });
       expect(defectBody).not.toContain("database-password");
 
       const timeout = await harness.client.get("/timeout");
       expect(timeout.status).toBe(504);
-      expect(await timeout.json()).toEqual({ error: "timeout" });
+      expect(await timeout.json()).toMatchObject({ status: 504, code: "timeout" });
     } finally {
       await harness.close();
     }
@@ -640,7 +644,7 @@ describe("HTTP integration", () => {
     try {
       const response = await harness.client.get("/response");
       expect(response.status).toBe(500);
-      expect(await response.json()).toEqual({ error: "internal-error" });
+      expect(await response.json()).toMatchObject({ code: "internal-error" });
     } finally {
       await harness.close();
     }

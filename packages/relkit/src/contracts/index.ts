@@ -29,3 +29,4 @@ export type * from "./agent-state-thread-requests.types.js";
 export type * from "./agent-state-control-requests.types.js";
 export type * from "./agent-thread-transition.types.js";
 export * from "./agent-thread-transition.js";
+export * from "./problem-details.js";

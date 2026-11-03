@@ -69,10 +69,17 @@ The example protects this ordinary function route:
   /_snippets/source/examples/auth-drizzle/src/routes/account/profile/route.ts
 </include>
 
-A request without a valid session receives HTTP `401`:
+A request without a valid session receives a `401` [problem](/docs/modules/http/responses#read-an-error-response):
 
 ```json
-{ "error": { "id": "UNAUTHORIZED", "message": "Authentication required" } }
+{
+  "type": "/errors/unauthenticated",
+  "title": "Unauthorized",
+  "status": 401,
+  "code": "unauthenticated",
+  "detail": "This route requires a signed-in session.",
+  "traceId": "4bf92f3577b34da6a3ce929d0e0e4736"
+}
 ```
 
 RelKit does not redirect the browser to a login page. Your frontend handles the response and offers a

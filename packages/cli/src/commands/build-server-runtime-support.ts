@@ -117,6 +117,9 @@ function writeRuntimeLog(record) {
 function healthResponse(status, code = 200) {
   return Response.json({ protocol: "relkit.inspector", version: 1, status, graphHash, activationFingerprint, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, environmentReady: true, providerReady: runtimeState().ready.provider && runtimeState().ready.nativeWorker && !runtimeState().stopping, databaseReady: runtimeState().ready.database && !runtimeState().stopping, authReady: runtimeState().ready.auth && !runtimeState().stopping, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }, { status: code, headers: { "x-relkit-api-version": "1" } });
 }
+function problemResponse(status, title, code, detail) {
+  return new Response(JSON.stringify({ type: "/errors/" + code, title, status, code, detail }), { status, headers: { "content-type": "application/problem+json" } });
+}
 function resolveRuntimeEnvironment(definition, environment, source) {
   try {
     const resolved = resolveEnv(definition, { environment, source });

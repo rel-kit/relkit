@@ -9,6 +9,7 @@ export * from "./materialize-routes.js";
 export * from "./middleware.js";
 export * from "./request-mapping.js";
 export * from "./response-mapping.js";
+export * from "./problem-details.js";
 export * from "./internal-endpoints.js";
 export * from "./rate-limit.js";
 export * from "./rate-limit-store.js";

@@ -37,8 +37,13 @@ test("auth middleware protects matched paths but keeps the Better Auth catch-all
   expect(calls).toBe(0);
   const protectedResponse = await app.request("/account/profile");
   expect(protectedResponse.status).toBe(401);
+  expect(protectedResponse.headers.get("content-type")).toBe("application/problem+json");
   expect(await protectedResponse.json()).toEqual({
-    error: { id: "UNAUTHORIZED", message: "Authentication required" },
+    type: "/errors/unauthenticated",
+    title: "Unauthorized",
+    status: 401,
+    code: "unauthenticated",
+    detail: "This route requires a signed-in session.",
   });
   expect(calls).toBe(1);
 });

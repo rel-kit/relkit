@@ -16,17 +16,55 @@ override the transport only when the public HTTP contract needs it. Keep reusabl
 | --------------------------------------------- | ---------------------------------------- |
 | Non-void function output                      | JSON `200`                               |
 | `void` or `undefined` output                  | Empty `204`                              |
-| Request mapping or input validation failure   | Validation JSON `422`                    |
+| Request mapping or input validation failure   | Validation problem `422`                 |
 | Declared application error                    | Its `http.status`, or `500` when omitted |
-| Route rate-limit rejection                    | JSON `429`                               |
-| Invalid function output or an internal defect | Safe server error `500`                  |
-
-Declared application errors use the public error envelope, including their stable identity and
-validated data. Do not assume the envelope is identical to the error's data schema alone.
-Undeclared exceptions are not a way to create a public error contract.
+| Route rate-limit rejection                    | Problem `429`                            |
+| Invalid function output or an internal defect | Problem `500` without internal detail    |
 
 Runtime failures can also produce responses such as provider failure `502` or timeout `504`.
 The inferred OpenAPI list is not an exhaustive list of infrastructure or middleware failures.
+Undeclared exceptions are not a way to create a public error contract.
+
+## Read an error response
+
+Every error response is [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) Problem Details with the
+`application/problem+json` content type. A declared error looks like this:
+
+```json
+{
+  "type": "/errors/orders.not-found",
+  "title": "Not Found",
+  "status": 404,
+  "code": "orders.not-found",
+  "detail": "Order order-1 was not found",
+  "data": { "orderId": "order-1" },
+  "traceId": "4bf92f3577b34da6a3ce929d0e0e4736"
+}
+```
+
+- `code` is the declared error's ID, or one of RelKit's codes below. Branch on `code`, not on
+  `detail`, which is text for people.
+- `data` is the error's validated data. Only declared errors carry it, and rate limits.
+- `issues` appears on validation problems, with one `code`, `message` and `path` per issue.
+- `traceId` matches the request's trace, so you can find it in the Inspector and in your logs.
+- A declared error that retries later, and a rate-limit rejection, also send `Retry-After` in seconds.
+
+| Status | `code`                         | When                                                  |
+| ------ | ------------------------------ | ----------------------------------------------------- |
+| `401`  | `unauthenticated`              | The route requires a session and the request has none |
+| `403`  | `origin-denied`, `csrf-denied` | The transport policy rejects a state-changing request |
+| `404`  | `not-found`                    | No route matches the path                             |
+| `405`  | `method-not-allowed`           | The path exists for other methods, listed in `Allow`  |
+| `413`  | `payload-too-large`            | The body is larger than the server's limit            |
+| `422`  | `validation`                   | Request mapping or input validation failed            |
+| `429`  | `rate-limited`                 | The route's rate limit is exhausted                   |
+| `499`  | `cancelled`                    | The client went away before the response              |
+| `500`  | `internal-error`               | An unexpected defect or invalid output                |
+| `502`  | `provider-failure`             | A dependency of the request failed                    |
+| `504`  | `timeout`                      | The request ran past its deadline                     |
+
+In production, `500` and `502` problems never contain internal detail. In development and test, their
+`detail` names the redacted cause.
 
 ## Choose one successful status
 

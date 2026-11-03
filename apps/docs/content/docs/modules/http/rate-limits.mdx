@@ -81,7 +81,8 @@ done
 ```
 
 Expect two `200` responses followed by `429` if all three arrive before the window resets.
-The rejection body contains `error: "rate-limit"` and `retryAfterMs`. Inspect `RateLimit-Policy`,
+The rejection is a [problem](/docs/modules/http/responses#read-an-error-response) with `code: "rate-limited"`
+and `data.retryAfterMs`. Inspect `RateLimit-Policy`,
 `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`, and `Retry-After`; reset/retry header values
 use seconds. A subsequent request can succeed after the window resets.
 

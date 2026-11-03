@@ -44,15 +44,15 @@ const server = Bun.serve({
     if (path === "/_relkit/v1/health/live") return healthResponse("ok");
     if (path === "/_relkit/v1/health/ready")
       return healthResponse(runtimeState().ready.provider && runtimeState().ready.nativeWorker && runtimeState().ready.database && runtimeState().ready.auth && !runtimeState().stopping ? "ready" : "not-ready", runtimeState().ready.provider && runtimeState().ready.nativeWorker && runtimeState().ready.database && runtimeState().ready.auth && !runtimeState().stopping ? 200 : 503);
-    if (runtimeState().stopping) return Response.json({ error: "draining" }, { status: 503 });
+    if (runtimeState().stopping) return problemResponse(503, "Service Unavailable", "draining", "The server is shutting down.");
     const nativeWorker = nativeJobHandler(request);
     if (nativeWorker !== undefined) return await nativeWorker;
     if (!runtimeState().ready.provider || !runtimeState().ready.nativeWorker || !runtimeState().ready.database || !runtimeState().ready.auth)
-      return Response.json({ error: "not-ready" }, { status: 503 });
+      return problemResponse(503, "Service Unavailable", "not-ready", "The server is not ready yet.");
     try {
       return await ${dispatchSource};
     } catch {
-      return Response.json({ error: "internal-error" }, { status: 500 });
+      return problemResponse(500, "Internal Server Error", "internal-error", "The request failed unexpectedly.");
     }
   }),
 });

@@ -6,6 +6,7 @@ import type {
   HttpAuthRuntime,
 } from "./auth.types.js";
 import { httpBoundary, HttpBoundaryError, observeHttp, runHttp } from "./http-effect.js";
+import { contextProblem } from "./problem-details.js";
 export type {
   CreateHttpAuthRuntimeOptions,
   HttpAuthInvocation,
@@ -104,10 +105,11 @@ export function registerAuthMiddleware(app: Hono, auth: HttpAuthRuntime | undefi
     }
     const session = await auth.contextFor(context.req.raw).getSession();
     if (session === null) {
-      return context.json(
-        { error: { id: "UNAUTHORIZED", message: "Authentication required" } },
-        401,
-      );
+      return contextProblem(context, {
+        status: 401,
+        code: "unauthenticated",
+        detail: "This route requires a signed-in session.",
+      });
     }
     await next();
   });

@@ -12,6 +12,7 @@ import {
   type HttpMiddlewareOptions,
 } from "./middleware-utils.js";
 import { ensureRequestRecord, finishRequestRecord } from "./request-record-middleware.js";
+import { problemResponse } from "./problem-details.js";
 
 /** Enforces declared body and timeout limits while cleaning up request listeners.
  * @param options - Application dependencies and configuration for this domain.
@@ -30,9 +31,11 @@ export function limitsMiddleware(options: HttpMiddlewareOptions = {}): Middlewar
       Number.isSafeInteger(length) &&
       length > options.maxBodyBytes
     ) {
-      const response = new Response(JSON.stringify({ error: "payload-too-large" }), {
+      const response = problemResponse({
+        traceId: current.traceId,
         status: 413,
-        headers: { "content-type": "application/json" },
+        code: "payload-too-large",
+        detail: `The request body exceeds the ${options.maxBodyBytes}-byte limit.`,
       });
       current.requestRecord?.add({
         kind: "mapping",

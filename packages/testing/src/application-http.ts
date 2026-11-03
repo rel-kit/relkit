@@ -1,13 +1,14 @@
 import type { TestRoute } from "./application-routes.js";
 import { InvocationValidationError } from "relkit/engine";
-import { normalizeFailure, toPublicEnvelope } from "relkit/runtime-effect";
+import { problemResponse } from "relkit/contracts";
+import { normalizeFailure } from "relkit/runtime-effect";
 import type { TestRuntime } from "./runtime.js";
 /**
  * Dispatches a matched route through existing engine validation and error mapping.
  * @param routes - Loaded native filesystem routes.
  * @param runtime - Acquired deterministic invocation runtime.
  * @param request - Native operation input carrying explicit identity and execution context.
- * @returns The native HTTP response with the established status and error envelope.
+ * @returns The native HTTP response; errors are Problem Details like the runtime's.
  */
 export async function handleTestRequest(
   routes: readonly TestRoute[],
@@ -19,7 +20,12 @@ export async function handleTestRequest(
     (route) =>
       (route.method === request.method || route.method === "ALL") && match(route.path, url),
   );
-  if (matched === undefined) return new Response("Not found", { status: 404 });
+  if (matched === undefined)
+    return problemResponse({
+      status: 404,
+      code: "not-found",
+      detail: "No route matches this request.",
+    });
   if ("handler" in matched) return matched.handler(request);
   const params = match(matched.path, url) ?? {};
   const body = await readBody(request);
@@ -40,20 +46,21 @@ export async function handleTestRequest(
     if (error instanceof InvocationValidationError && error.phase === "input") {
       const status =
         matched.responses.find((response) => response.kind === "validation-error")?.status ?? 422;
-      return Response.json(
-        {
-          error: "validation",
-          issues: error.issues.map((issue) => ({
-            code: "validation",
-            message: issue.message.slice(0, 500),
-            path:
-              issue.path?.map((part) =>
-                typeof part === "object" && part !== null && "key" in part ? part.key : part,
-              ) ?? [],
-          })),
-        },
-        { status },
-      );
+      return problemResponse({
+        status,
+        code: "validation",
+        detail: "The request input is invalid.",
+        issues: error.issues.map((issue) => ({
+          code: "validation",
+          message: issue.message.slice(0, 500),
+          path:
+            issue.path?.map((part) => {
+              const key =
+                typeof part === "object" && part !== null && "key" in part ? part.key : part;
+              return typeof key === "number" ? key : String(key);
+            }) ?? [],
+        })),
+      });
     }
     const failure = normalizeFailure(error);
     if (failure.kind === "application") {
@@ -63,19 +70,23 @@ export async function handleTestRequest(
           (response.errorId === failure.id || response.id === failure.id),
       );
       if (declaration !== undefined) {
-        return new Response(JSON.stringify(toPublicEnvelope(failure)), {
+        return problemResponse({
           status: declaration.status ?? failure.status ?? 500,
-          headers: { "content-type": "application/json" },
+          code: failure.id,
+          detail: failure.message,
+          ...(failure.data === undefined ? {} : { data: failure.data }),
+          ...(failure.retry === "later" && failure.afterMs !== undefined
+            ? { retryAfterMs: failure.afterMs }
+            : {}),
         });
       }
     }
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : String(error) }),
-      {
-        status: 500,
-        headers: { "content-type": "application/json" },
-      },
-    );
+    // Tests see the cause, as the runtime shows it in development and test mode.
+    return problemResponse({
+      status: 500,
+      code: "internal-error",
+      detail: error instanceof Error ? error.message : String(error),
+    });
   }
 }
 

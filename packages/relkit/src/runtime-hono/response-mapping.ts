@@ -1,22 +1,24 @@
+import { isJsonValue } from "../contracts/index.js";
 import { InvocationValidationError } from "../engine/index.js";
 import type { HttpTriggerRegistration } from "../graph/index.js";
 import {
   isInvocationFailure,
   normalizeFailure,
-  toPublicEnvelope,
   type InvocationFailure,
 } from "../runtime-effect/index.js";
 import { type StandardIssue } from "../schema/index.js";
 import { Context, Effect, Layer, Result } from "effect";
 import { observeHttp, runHttp } from "./http-effect.js";
 import type { RequestMappingIssue } from "./request-mapping.js";
+import { problemBody, problemResponse } from "./problem-details.js";
+import { encodeJson, encodeProblem, genericFailureResponse } from "./response-mapping-encode.js";
 import { developmentFailureMessage } from "./response-mapping-provider.js";
 import {
   findError,
   findResponse,
   findSuccess,
   findValidation,
-  genericResponse,
+  internalErrorResponse,
   jsonResponse,
   responseStatus,
   safeIssue,
@@ -40,8 +42,8 @@ const success = Effect.fn("ResponseMapping.success")(function* (
   const declaration = findSuccess(trigger, options.responseId);
   if (value instanceof Response) return value;
   if (!(yield* responseIsValid(trigger, declaration, value, options)))
-    return genericResponse("internal-error", 500);
-  return yield* encodeJson(value, responseStatus(declaration, 200));
+    return internalErrorResponse(options.traceId);
+  return yield* encodeJson(value, responseStatus(declaration, 200), options.traceId);
 });
 
 /** Maps declared failures to their public envelope without exposing native causes.
@@ -58,7 +60,7 @@ const failure = Effect.fn("ResponseMapping.failure")(function* (
   if (cause instanceof InvocationValidationError && cause.phase === "input")
     return yield* validation(trigger, cause.issues, options);
   if (cause instanceof InvocationValidationError && cause.phase === "output")
-    return genericResponse("internal-error", 500);
+    return internalErrorResponse(options.traceId);
   const normalized = yield* Effect.result(
     Effect.try({
       try: () =>
@@ -66,7 +68,7 @@ const failure = Effect.fn("ResponseMapping.failure")(function* (
       catch: (error) => error,
     }),
   );
-  if (Result.isFailure(normalized)) return genericResponse("internal-error", 500);
+  if (Result.isFailure(normalized)) return internalErrorResponse(options.traceId);
   const failure = normalized.success;
   if (failure.kind !== "application")
     return yield* genericFailureResponse(trigger, failure, options);
@@ -75,11 +77,17 @@ const failure = Effect.fn("ResponseMapping.failure")(function* (
     declaration === undefined ||
     !(yield* responseIsValid(trigger, declaration, failure.data, options))
   )
-    return genericResponse("internal-error", 500);
-  const response = yield* encodeJson(toPublicEnvelope(failure), responseStatus(declaration, 500));
-  if (failure.retry === "later" && failure.afterMs !== undefined)
-    response.headers.set("Retry-After", String(Math.ceil(failure.afterMs / 1000)));
-  return response;
+    return internalErrorResponse(options.traceId);
+  return yield* encodeProblem({
+    ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
+    status: responseStatus(declaration, 500),
+    code: failure.id,
+    detail: failure.message,
+    ...(isJsonValue(failure.data) ? { data: failure.data } : {}),
+    ...(failure.retry === "later" && failure.afterMs !== undefined
+      ? { retryAfterMs: failure.afterMs }
+      : {}),
+  });
 });
 
 /** Sanitizes validation issue paths before producing the declared validation response.
@@ -93,11 +101,18 @@ const validation = Effect.fn("ResponseMapping.validation")(function* (
   issues: readonly (StandardIssue | RequestMappingIssue)[],
   options: ResponseMappingOptions = {},
 ) {
-  const body = { error: "validation", issues: issues.map(safeIssue) };
   const declaration = findValidation(trigger);
-  return (yield* responseIsValid(trigger, declaration, body, options))
-    ? jsonResponse(body, responseStatus(declaration, 422))
-    : genericResponse("internal-error", 500);
+  const status = responseStatus(declaration, 422);
+  const problem = problemBody({
+    status,
+    code: "validation",
+    detail: "The request input is invalid.",
+    issues: issues.map(safeIssue),
+    ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
+  });
+  return (yield* responseIsValid(trigger, declaration, problem, options))
+    ? problemResponse({ ...problem, status })
+    : internalErrorResponse(options.traceId);
 });
 
 /** Response construction and validation share one replaceable domain contract. */
@@ -186,43 +201,3 @@ export function mapInputValidationResponse(
     ),
   );
 }
-
-/** Converts a serializable application value; invalid JSON values become safe HTTP failures.
- * @param value - Value inspected, validated or projected by this operation.
- * @param status - HTTP status associated with the observed response or lifecycle event.
- * @returns An effect yielding serialized JSON or a safe HTTP 500 response when serialization fails.
- */
-const encodeJson = Effect.fn("ResponseMapping.encodeJson")((value: unknown, status: number) =>
-  Effect.try({ try: () => jsonResponse(value, status), catch: (cause) => cause }).pipe(
-    Effect.catch(() => Effect.succeed(genericResponse("internal-error", 500))),
-  ),
-);
-
-/** Map a non-application failure to its declared response or bounded transport fallback.
- * @param trigger - Route declarations used to select an outcome-specific response.
- * @param failure - Normalized provider, cancellation, timeout or defect failure.
- * @param options - Runtime exposure mode and optional response schemas.
- * @returns An effect yielding a validated public failure response without native cause details.
- */
-const genericFailureResponse = Effect.fn("ResponseMapping.genericFailure")(function* (
-  trigger: HttpTriggerRegistration,
-  failure: InvocationFailure,
-  options: ResponseMappingOptions,
-) {
-  const { kind, outcome } = failure;
-  const declaration = findResponse(trigger, [outcome, kind]);
-  const details: Record<string, { readonly status: number; readonly error: string }> = {
-    provider: { status: 502, error: "provider-failure" },
-    "provider-failure": { status: 502, error: "provider-failure" },
-    cancellation: { status: 499, error: "cancelled" },
-    cancelled: { status: 499, error: "cancelled" },
-    timeout: { status: 504, error: "timeout" },
-    defect: { status: 500, error: "internal-error" },
-  };
-  const detail = details[outcome] ?? details[kind] ?? { status: 500, error: "internal-error" };
-  const message = developmentFailureMessage(failure, options.mode);
-  const body = { error: detail.error, ...(message === undefined ? {} : { message }) };
-  return (yield* responseIsValid(trigger, declaration, body, options))
-    ? yield* encodeJson(body, responseStatus(declaration, detail.status))
-    : genericResponse("internal-error", 500);
-});

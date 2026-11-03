@@ -86,7 +86,7 @@ not tasks of this change.
 
 ## 8. Errors and the Better Auth file (#13 a, b, c, route part of d, g)
 
-- [ ] 8.1 Return RFC 9457 Problem Details for declared, validation, rate-limit, timeout, cancellation, authentication, access, unmatched-route (404 and 405) and defect responses, with `traceId` and `Retry-After`, and verify HTTP tests for each case
+- [x] 8.1 Return RFC 9457 Problem Details for declared, validation, rate-limit, timeout, cancellation, authentication, access, unmatched-route (404 and 405) and defect responses, with `traceId` and `Retry-After`, and verify HTTP tests for each case
 - [ ] 8.2 Generate OpenAPI problem schemas for each declared error and for validation, and verify the OpenAPI snapshot tests
 - [ ] 8.3 Let handler types accept thrown declared errors, drop the rule that every declared error must be raised, and add it as an opt-in lint rule, and verify type tests for thrown, returned and unused errors
 - [ ] 8.4 Add route response options for status, headers and cookies computed from the function's output, and verify HTTP tests plus a test that the same function still runs from a job

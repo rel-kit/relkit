@@ -3,6 +3,7 @@ import type { StandardIssue, StandardSchemaV1 } from "../schema/index.js";
 import type { RequestMappingIssue } from "./request-mapping.js";
 import type { ResponseDeclaration, ResponseSchemaEntries } from "./response-mapping-utils.types.js";
 import { canCarryStandardSchema } from "../contracts/index.js";
+import { problemResponse } from "./problem-details.js";
 export type { ResponseDeclaration, ResponseSchemaEntries } from "./response-mapping-utils.types.js";
 
 /** Select an explicit response ID or the route's default success declaration.
@@ -105,13 +106,17 @@ export function jsonResponse(value: unknown, status: number): Response {
     headers: { "content-type": "application/json" },
   });
 }
-/** Encode a stable error ID as a JSON HTTP response.
- * @param error - Native failure or public error identifier.
- * @param status - HTTP response status.
- * @returns A response containing the error field and requested status.
+/** The 500 problem returned when a response cannot be produced safely.
+ * @param traceId - The request's trace ID, when known.
+ * @returns A Problem Details response without internal detail.
  */
-export function genericResponse(error: string, status: number): Response {
-  return jsonResponse({ error }, status);
+export function internalErrorResponse(traceId?: string): Response {
+  return problemResponse({
+    status: 500,
+    code: "internal-error",
+    detail: "The request failed unexpectedly.",
+    ...(traceId === undefined ? {} : { traceId }),
+  });
 }
 /** Bound issue messages and normalize field paths for public validation errors.
  * @param issue - Validation or mapping issue to sanitize.

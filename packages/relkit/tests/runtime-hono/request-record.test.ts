@@ -193,7 +193,7 @@ function manifest(): RuntimeManifest {
   };
 }
 
-test("answers unmatched paths with JSON 404 and wrong methods with 405 and Allow", async () => {
+test("answers unmatched paths with a 404 problem and wrong methods with a 405 problem and Allow", async () => {
   const app = createApp({
     plan: plan(),
     manifest: manifest(),
@@ -202,11 +202,22 @@ test("answers unmatched paths with JSON 404 and wrong methods with 405 and Allow
 
   const missing = await app.request("http://localhost/missing");
   expect(missing.status).toBe(404);
-  expect(missing.headers.get("content-type")).toContain("application/json");
-  expect(await missing.json()).toEqual({ error: "not-found" });
+  expect(missing.headers.get("content-type")).toBe("application/problem+json");
+  expect(await missing.json()).toEqual({
+    type: "/errors/not-found",
+    title: "Not Found",
+    status: 404,
+    code: "not-found",
+    detail: "No route matches this request.",
+    traceId: expect.stringMatching(/^[0-9a-f]{32}$/),
+  });
 
   const wrongMethod = await app.request("http://localhost/hello", { method: "DELETE" });
   expect(wrongMethod.status).toBe(405);
   expect(wrongMethod.headers.get("allow")).toBe("GET, HEAD");
-  expect(await wrongMethod.json()).toEqual({ error: "method-not-allowed" });
+  expect(await wrongMethod.json()).toMatchObject({
+    status: 405,
+    code: "method-not-allowed",
+    detail: "This path does not accept DELETE; it accepts GET, HEAD.",
+  });
 });

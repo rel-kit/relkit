@@ -192,7 +192,9 @@ test("maps multipart fields and stops before engine invocation on failure", asyn
   expect(response.status).toBe(422);
   expect(calls).toBe(0);
   expect(await response.json()).toMatchObject({
-    error: "validation",
+    type: "/errors/validation",
+    status: 422,
+    code: "validation",
     issues: [{ code: "missing" }],
   });
 });

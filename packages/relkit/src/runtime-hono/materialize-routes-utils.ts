@@ -4,7 +4,7 @@ import { Effect, Context as EffectContext, Layer, Result } from "effect";
 import type { Context } from "hono";
 import { httpBoundary, HttpBoundaryError, observeHttp, runHttp } from "./http-effect.js";
 import type { HttpRouteRequest, RouteMaterializationOptions } from "./materialize-routes.js";
-import { getRequestState } from "./middleware.js";
+import { getRequestState, type HttpRequestState } from "./middleware.js";
 import { nativeStreamResponse } from "./native-stream.js";
 import { requestFromContext } from "./request-context.js";
 import { decodeInferredInput } from "./request-inference.js";
@@ -74,7 +74,7 @@ const handleRoute = Effect.fn("HttpRoutes.handle")(function* (
   const state = getRequestState(context);
   const request = requestFromContext(context, trigger.config.path);
   const builder = announceRoute(context, trigger);
-  const responseOptions = responseOptionsFor(options, state?.signal);
+  const responseOptions = responseOptionsFor(options, state);
   const target =
     options.resolveTarget === undefined
       ? getEntry(options.manifest.targets ?? {}, trigger.targetFunctionId)
@@ -171,21 +171,21 @@ function stripHead(trigger: HttpTriggerRegistration, response: Response): Respon
   });
 }
 
-/** Combines route response validation options with the active cancellation signal.
+/** Combines route response validation options with the request's signal and trace ID.
  * @param options - Application dependencies and configuration for this domain.
- * @param signal - Cancellation signal inherited from the caller or owning scope.
- * @returns Configured response validation options with manifest schemas and the request signal.
+ * @param state - Request state supplying the cancellation signal and trace ID.
+ * @returns Configured response options with manifest schemas, the signal and the trace ID.
  */
 function responseOptionsFor(
   options: RouteMaterializationOptions,
-  signal: AbortSignal | undefined,
+  state: HttpRequestState | undefined,
 ): ResponseMappingOptions {
   return {
     ...(options.responseMapping ?? {}),
     ...(options.manifest.responseSchemas === undefined
       ? {}
       : { responseSchemas: options.manifest.responseSchemas }),
-    ...(signal === undefined ? {} : { signal }),
+    ...(state === undefined ? {} : { signal: state.signal, traceId: state.traceId }),
   };
 }
 

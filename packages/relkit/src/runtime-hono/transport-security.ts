@@ -1,9 +1,10 @@
 import { AGENT_CAPABILITY_HEADER } from "../contracts/index.js";
 import { Context, Effect, Layer } from "effect";
-import type { Hono } from "hono";
+import type { Context as HonoContext, Hono } from "hono";
 import { httpBoundary, HttpBoundaryError, observeHttp, runHttp } from "./http-effect.js";
 import { TransportSecurityError } from "./transport-security-errors.js";
 import type { TransportSecurityOptions } from "./transport-security.types.js";
+import { contextProblem } from "./problem-details.js";
 export { TransportSecurityError } from "./transport-security-errors.js";
 export type { TransportSecurityOptions } from "./transport-security.types.js";
 
@@ -239,6 +240,10 @@ function isStateChanging(method: string): boolean {
  * @param code - Stable public error identifier.
  * @returns The stable HTTP 403 security error response.
  */
-function denied(context: { json(value: unknown, status: 403): Response }, code: string): Response {
-  return context.json({ error: { id: code, message: "Request rejected." } }, 403);
+function denied(context: HonoContext, code: string): Response {
+  return contextProblem(context, {
+    status: 403,
+    code: code.toLowerCase().replaceAll("_", "-"),
+    detail: "The request was rejected.",
+  });
 }

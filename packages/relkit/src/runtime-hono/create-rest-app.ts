@@ -18,6 +18,7 @@ import { installStaticFiles } from "./static-files.js";
 import { installTransportSecurity } from "./transport-security.js";
 import { installCoreEndpoints } from "./core-endpoints.js";
 import { installUnmatchedRoute } from "./unmatched-route.js";
+import { installProblemDetails } from "./problem-details.js";
 
 /** Constructs only eagerly required HTTP behavior.
  * @param options - Complete checked cohort and runtime dependencies.
@@ -38,6 +39,7 @@ export function createRestApp(options: CreateAppOptions): Hono {
 export function createApplicationShell(options: CreateAppOptions): Hono {
   assertHttpManifest(options);
   const app = new Hono();
+  installProblemDetails(app);
   installHttpLogging(app, options);
   const middlewareOptions = {
     ...(options.middleware ?? {}),

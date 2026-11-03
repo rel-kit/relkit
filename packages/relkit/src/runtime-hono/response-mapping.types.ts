@@ -9,4 +9,6 @@ export interface ResponseMappingOptions {
   readonly responseSchemas?: ResponseSchemaEntries;
   readonly signal?: AbortSignal;
   readonly responseId?: string;
+  /** Trace ID added to Problem Details bodies. */
+  readonly traceId?: string;
 }

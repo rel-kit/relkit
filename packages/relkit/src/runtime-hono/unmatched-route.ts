@@ -1,9 +1,10 @@
 /**
- * Answers requests that no route matched with the same JSON error shape as other framework
- * failures, and with 405 plus `Allow` when the path exists under other methods.
+ * Answers requests that no route matched with a 404 Problem Details response, or a 405 with
+ * `Allow` when the path exists under other methods.
  */
 import type { Context, Hono } from "hono";
 import { TrieRouter } from "hono/router/trie-router";
+import { contextProblem } from "./problem-details.js";
 
 /** Installs the unmatched-route response on the application shell.
  * @param app - Shell whose routes are registered before or after this call.
@@ -16,8 +17,17 @@ export function installUnmatchedRoute(app: Hono): void {
     if (table === undefined || table.size !== app.routes.length) table = routeTable(app);
     const allowed = table.allowed(context.req.path, context.req.method);
     if (allowed.length > 0)
-      return context.json({ error: "method-not-allowed" }, 405, { allow: allowed.join(", ") });
-    return context.json({ error: "not-found" }, 404);
+      return contextProblem(context, {
+        status: 405,
+        code: "method-not-allowed",
+        detail: `This path does not accept ${context.req.method}; it accepts ${allowed.join(", ")}.`,
+        headers: { allow: allowed.join(", ") },
+      });
+    return contextProblem(context, {
+      status: 404,
+      code: "not-found",
+      detail: "No route matches this request.",
+    });
   });
 }
 

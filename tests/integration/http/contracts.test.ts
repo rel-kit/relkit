@@ -26,14 +26,14 @@ test("keeps runtime, OpenAPI, and generated client contracts aligned", async () 
     const missing = await client.get("/orders/missing?note=gift");
     expect(missing.status).toBe(404);
     expect(await missing.json()).toMatchObject({
-      outcome: "declared-error",
+      type: "/errors/orders.not-found",
       code: "orders.not-found",
       status: 404,
     });
 
     const invalid = await client.get("/orders/order-1");
     expect(invalid.status).toBe(422);
-    expect(await invalid.json()).toMatchObject({ error: "validation" });
+    expect(await invalid.json()).toMatchObject({ code: "validation" });
     expect(calls).toHaveLength(2);
 
     expect(generateOpenApiJson(graph)).toBe(
