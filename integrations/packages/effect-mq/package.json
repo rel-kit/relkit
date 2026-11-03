@@ -116,7 +116,7 @@
         "drizzle-orm": "1.0.0-rc.5-169397b",
         "effect": "4.0.1",
         "effect-mq": "0.7.0",
-        "hono": "4.13.7",
+        "hono": "4.13.16",
         "inngest": "4.20.0",
         "langchain": "1.5.10",
         "langsmith": "0.10.8",
