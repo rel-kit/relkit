@@ -49,6 +49,9 @@ if (!bunOnly && expected.relkit?.["."]) {
     throw new Error("relkit must export defineFunction and defineService from its root");
   if (events.defineEvent !== core.defineEvent)
     throw new Error("relkit/events must export the same defineEvent as the root");
+  const { s } = await import("relkit/schema");
+  if (s?.object?.({ id: s.string() }).parse({ id: "order-1" }).id !== "order-1")
+    throw new Error("relkit/schema must export the built-in builder s");
 }
 
 if (bunOnly) console.log("Export smoke passed: Bun-only public entries resolved.");

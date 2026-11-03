@@ -4,7 +4,8 @@ import { POSITIONING } from "./positioning.js";
 export const descriptions: Record<string, string> = {
   "@relkit/app": "Deprecated: RelKit is now the relkit package. This release re-exports relkit.",
   "@relkit/better-auth": "Better Auth integration for RelKit routes.",
-  "@relkit/cli": "The RelKit development, build, inspection, and deployment CLI.",
+  "@relkit/cli":
+    "The RelKit CLI: compiler, development server, client generator, build, inspection and deployment.",
   "@relkit/client": "Typed RelKit client helpers, including TanStack Query integration.",
   "@relkit/drizzle": "Drizzle ORM integration for RelKit functions.",
   "@relkit/inspector":

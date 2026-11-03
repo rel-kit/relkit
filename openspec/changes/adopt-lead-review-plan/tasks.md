@@ -81,7 +81,7 @@ not tasks of this change.
 - [x] 7.5 Replace package-boundary enforcement with source-folder boundary and konsistent rules inside merged packages, and verify `bun run check` and `konsistent validate` fail on a cross-boundary import fixture
 - [x] 7.6 Remove `internal/*` subpath exports and internal type references from published packages, and verify with an export-map and declaration scan
 - [x] 7.7 Configure one Changesets `fixed` group for `relkit`, `create-relkit` and `@relkit/*` and make the Git tag equal the release version, and verify a dry-run version bump gives every package the same version
-- [ ] 7.8 Export the renamed builder `s` from `relkit/schema` and update `engines`, descriptions and READMEs for the new packages, and verify the manifest check
+- [x] 7.8 Export the renamed builder `s` from `relkit/schema` and update `engines`, descriptions and READMEs for the new packages, and verify the manifest check
 - [ ] 7.9 Verify with the packed-consumer footprint test that a production install of `relkit` plus one integration contains no compiler, TypeScript, testing, Inspector UI or client package
 
 ## 8. Errors and the Better Auth file (#13 a, b, c, route part of d, g)

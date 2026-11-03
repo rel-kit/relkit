@@ -62,8 +62,8 @@ export const s: ZBuilder = {
 };
 
 /**
- * The built-in schema builder under its current public name. The breaking release renames it to
- * `s`; until then `z` and `s` are the same builder.
+ * The built-in schema builder's former name; `z` and `s` are the same builder. `relkit migrate`
+ * rewrites `z` to `s`.
  *
  * @example
  * ```ts
@@ -74,6 +74,7 @@ export const s: ZBuilder = {
  * ```
  * @category Schemas
  * @since 0.1.0
+ * @deprecated Import `s` from `relkit/schema`.
  */
 export const z: ZBuilder = s;
 

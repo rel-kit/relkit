@@ -455,10 +455,10 @@ declare const s: ZBuilder;
 
 Since v0.9.0
 
-### z
+### ~~z~~
 
-The built-in schema builder under its current public name. The breaking release renames it to
-`s`; until then `z` and `s` are the same builder.
+The built-in schema builder's former name; `z` and `s` are the same builder. `relkit migrate`
+rewrites `z` to `s`.
 
 **Example**
 
@@ -475,7 +475,7 @@ order.parse({ id: "order-1", quantity: 2 });
 declare const z: ZBuilder;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.ts#L79)
 
 Since v0.1.0
 
