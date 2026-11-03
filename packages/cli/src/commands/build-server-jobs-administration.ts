@@ -9,7 +9,7 @@ import type { ServerSourceConfiguration } from "./build-server.types.js";
 export function serverJobsAdministrationSource(configuration: ServerSourceConfiguration): string {
   if (!configuration.jobsAdministration) return "";
   return `if (environment !== "production" && (plan.jobs ?? []).length > 0) {
-  const nativeJobsModule = await import("@relkit/inspector-api");
+  const nativeJobsModule = await import("relkit/inspector-api");
   await runtimeOwner.resource("http.jobs-administration", async () => {
     try {
       nativeJobsModule.installJobsAdministrationEndpoints(app, {

@@ -14,7 +14,7 @@
   "apps/inspector/app/schema-panel.tsx": 446,
   "apps/inspector/app/trace-waterfall-detail.tsx": 488,
   "apps/inspector/lib/graph-views-flow-steps.ts": 256,
-  "packages/compiler/src/normalize-output.ts": 251,
+  "packages/cli/src/compiler/normalize-output.ts": 251,
   "packages/relkit/src/diagnostics/codes/cli.ts": 839,
   "packages/relkit/src/diagnostics/codes/compiler.ts": 842,
   "packages/relkit/src/diagnostics/codes/inspector.ts": 471,

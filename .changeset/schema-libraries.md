@@ -1,9 +1,8 @@
 ---
 "relkit": patch
-"@relkit/compiler": patch
+"@relkit/cli": patch
 "@relkit/testing": patch
 "@relkit/langchain": patch
-"@relkit/cli": patch
 "create-relkit": patch
 ---
 

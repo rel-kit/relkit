@@ -1,7 +1,7 @@
 /** Executes one serialized generation with initial-check reuse, typed diagnostics and local worker activation. */
 import { Effect, Ref } from "effect";
-import type { CandidateCompile, CandidateCompileRequest } from "@relkit/supervisor";
-import { DEFAULT_TOOLING_CONFIG } from "@relkit/compiler";
+import type { CandidateCompile, CandidateCompileRequest } from "../supervisor/index.js";
+import { DEFAULT_TOOLING_CONFIG } from "../compiler/index.js";
 import { cliTry } from "../cli-errors.js";
 import { CliProject } from "../services/project.service.js";
 import { formatDevDiagnostics } from "./dev-local-diagnostics.js";

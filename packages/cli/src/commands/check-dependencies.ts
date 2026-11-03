@@ -4,7 +4,7 @@
  * Resolver authority remains a captured provider service and never installs code.
  */
 import { Effect, Schema } from "effect";
-import { prefilterSources } from "@relkit/compiler";
+import { prefilterSources } from "../compiler/index.js";
 import { IntegrationDependencyRequirements } from "relkit/contracts";
 import { SelectedDependencies } from "relkit/provider/internal/dependencies";
 import { CliCompiler } from "../services/compiler.service.js";

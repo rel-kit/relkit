@@ -4,7 +4,7 @@ import { expect } from "bun:test";
 import { defineAgent } from "../../integrations/packages/langchain/src/index.ts";
 import { defineBucket } from "relkit/buckets";
 import { defineCache } from "relkit/cache";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
 import { z } from "relkit/schema";
 import { limits } from "./deepagent-bucket.fixture.js";
 export function case1Bucket() {

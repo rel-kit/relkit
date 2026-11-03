@@ -57,7 +57,7 @@
     }
   },
   "dependencies": {
-    "@relkit/compiler": "workspace:*",
+    "@relkit/cli": "workspace:*",
     "effect": "catalog:",
     "relkit": "workspace:*"
   },

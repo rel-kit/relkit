@@ -6,7 +6,7 @@ import {
   InspectionFiles,
   InspectionNative,
   type InspectionConnectionFile,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 import { InspectorTool } from "../src/tool.service.js";
 import { InspectorDiscovery } from "../src/discovery.service.js";
 import { InspectorRemote } from "../src/remote.service.js";

@@ -1,6 +1,6 @@
 /** Formats deployment outcomes using the selected engine and captured file authority. */
 import { Effect, Schema } from "effect";
-import type { createOutputReport, PulumiReport } from "@relkit/deploy-pulumi";
+import type { createOutputReport, PulumiReport } from "@relkit/pulumi/deploy-pulumi";
 import { base, saveReportEffect } from "./deploy-report-storage.js";
 import { cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";

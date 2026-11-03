@@ -12,7 +12,7 @@ import {
   RUNTIME_INTEGRATION_PLAN_VERSION,
   canonicalJson,
 } from "relkit/contracts";
-import { createRuntimeActivationFingerprint } from "@relkit/compiler";
+import { createRuntimeActivationFingerprint } from "./src/compiler/index.js";
 import { hashGraph, type ApplicationGraph } from "relkit/graph";
 import { readBuilt } from "./src/commands/start-built.js";
 

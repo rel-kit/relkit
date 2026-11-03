@@ -6,6 +6,7 @@
 import {
   appSubpaths,
   integrationSubpaths,
+  mergedAreas,
   relkitAreas,
 } from "./release-package-contract-tables.js";
 import { packageLeafExports } from "./release-package-leaves.js";
@@ -20,6 +21,19 @@ const rootExport = { types: "./dist/index.d.ts", import: "./dist/index.js" };
  * @returns The export map required by manifest and packed-resolution checks.
  */
 export function expectedExports(directoryName: string, packageName?: string): ReleaseExports {
+  return {
+    ...ownExports(directoryName, packageName),
+    ...areaExports(mergedAreas[directoryName] ?? []),
+  };
+}
+
+/**
+ * Declares a package's own entry points, without the areas merged into it.
+ * @param directoryName - Workspace directory basename.
+ * @param packageName - Published name for integration-specific subpaths.
+ * @returns The package's own export map.
+ */
+function ownExports(directoryName: string, packageName?: string): ReleaseExports {
   if (packageName === "@relkit/integrations") return { ".": rootExport };
   const subpaths = packageName ? integrationSubpaths[packageName] : undefined;
   if (subpaths)
@@ -55,12 +69,22 @@ function leaf(path: string) {
  * @returns The export map of the merged core package.
  */
 function relkitExports(): ReleaseExports {
-  const entries: [string, ReleaseExports[string]][] = [];
-  for (const area of relkitAreas)
-    for (const [key, value] of Object.entries({ ".": rootExport, ...packageLeafExports[area] }))
-      entries.push([`./${area}${key === "." ? "" : key.slice(1)}`, inArea(value, area)]);
+  const entries = Object.entries(areaExports(relkitAreas));
   for (const [key, value] of Object.entries(expectedExports("app")))
     entries.push([key, key === "." ? rootExport : inArea(value, "app")]);
+  return Object.fromEntries(entries);
+}
+
+/**
+ * Declares merged areas' leaves under `./<area>`, built into `dist/<area>/`.
+ * @param areas - Former package directories merged into one package.
+ * @returns Their export entries.
+ */
+function areaExports(areas: readonly string[]): ReleaseExports {
+  const entries: [string, ReleaseExports[string]][] = [];
+  for (const area of areas)
+    for (const [key, value] of Object.entries({ ".": rootExport, ...packageLeafExports[area] }))
+      entries.push([`./${area}${key === "." ? "" : key.slice(1)}`, inArea(value, area)]);
   return Object.fromEntries(entries);
 }
 

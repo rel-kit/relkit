@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { prefilterSources } from "../../packages/compiler/src/discovery/ast-prefilter.ts";
+import { prefilterSources } from "../../packages/cli/src/compiler/discovery/ast-prefilter.ts";
 
 describe("AST discovery prefilter", () => {
   test("finds syntax candidates without evaluating ordinary source", () => {

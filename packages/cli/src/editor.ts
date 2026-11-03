@@ -1,5 +1,5 @@
 import type ts from "typescript";
-import { routeSourceFindings, routeModuleFindings } from "@relkit/compiler/editor";
+import { routeSourceFindings, routeModuleFindings } from "./compiler/editor.js";
 import type { EditorModules } from "./editor.types.js";
 
 const ROUTE_DIAGNOSTIC = 99001;

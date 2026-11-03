@@ -3,7 +3,7 @@ import type {
   createPulumiWorkspace,
   writePulumiProgram,
   PulumiBackend,
-} from "@relkit/deploy-pulumi";
+} from "@relkit/pulumi/deploy-pulumi";
 import type { DeploymentPlan } from "relkit/deploy";
 import type { Schema } from "effect";
 import type { CliCommandContext } from "../main-support.js";

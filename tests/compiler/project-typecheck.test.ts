@@ -2,8 +2,8 @@ import { expect, test } from "bun:test";
 import { Effect, Exit, Fiber } from "effect";
 import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { typecheckProject } from "../../packages/compiler/src/project-typecheck.js";
-import { generateRouteModuleChecks } from "../../packages/compiler/src/route-module-checks.js";
+import { typecheckProject } from "../../packages/cli/src/compiler/project-typecheck.js";
+import { generateRouteModuleChecks } from "../../packages/cli/src/compiler/route-module-checks.js";
 
 const repository = resolve(import.meta.dir, "../..");
 

@@ -3,7 +3,7 @@ import {
   EVENT_REGISTRY_FILE,
   generateEventRegistry,
   type ExtractedDescriptor,
-} from "@relkit/compiler";
+} from "../compiler/index.js";
 import { Effect } from "effect";
 import { cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";

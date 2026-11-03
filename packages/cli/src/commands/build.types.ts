@@ -7,7 +7,7 @@ import type { RuntimeActivationFingerprint } from "relkit/contracts";
 import type { Diagnostic } from "relkit/diagnostics";
 import type { CheckOptions } from "./check.types.js";
 import type { CheckResult } from "./check-result.types.js";
-import type { JobsManifest, LoadedToolingConfig } from "@relkit/compiler";
+import type { JobsManifest, LoadedToolingConfig } from "../compiler/index.js";
 import type { ApplicationGraph } from "relkit/graph";
 import type { ProductionRepairs } from "./build-production-repairs.js";
 

@@ -13,7 +13,7 @@ import {
   NORMALIZE_CODES,
   VALIDATION_PASSES,
   normalizeCompilation,
-} from "../../packages/compiler/src/index.ts";
+} from "../../packages/cli/src/compiler/index.ts";
 import { localJob } from "../../integrations/packages/local/src/index.ts";
 
 const input = z.object({ id: z.string() });

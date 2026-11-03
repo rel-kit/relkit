@@ -21,7 +21,7 @@ import {
 import { defineTool, isToolDescriptor, ToolApprovalRequiredError } from "relkit/tools";
 import { defineService, isServiceDescriptor, isServiceRef } from "relkit/services";
 import { defineEnv, env, isEnvRef } from "relkit/config";
-import { CONVENTION_CODES, checkConventions } from "../../packages/compiler/src/index.ts";
+import { CONVENTION_CODES, checkConventions } from "../../packages/cli/src/compiler/index.ts";
 import { defineApp } from "relkit";
 import {
   defineConnectionContract,

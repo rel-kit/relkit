@@ -32,11 +32,6 @@ export async function wrapperArchiveClosure(
     false,
     "Wrapper runtime must not require the CLI archive",
   );
-  assert.equal(
-    selected.has("@relkit/compiler"),
-    false,
-    "Creator runtime must not require compiler archives",
-  );
   return selected;
 }
 

@@ -5,7 +5,7 @@
  */
 import { dirname, join } from "node:path";
 import { Effect, Schema } from "effect";
-import { createRuntimeActivationFingerprint, DEFAULT_TOOLING_CONFIG } from "@relkit/compiler";
+import { createRuntimeActivationFingerprint, DEFAULT_TOOLING_CONFIG } from "../compiler/index.js";
 import { hashGraph, validateGraphShapeEffect, type ApplicationGraph } from "relkit/graph";
 import { cliAdapterError, cliTry } from "../cli-errors.js";
 import { CliFileSystem } from "../services/filesystem.service.js";

@@ -1,14 +1,14 @@
 import { expect, test } from "bun:test";
-import * as pulumi from "../../packages/deploy-pulumi/node_modules/@pulumi/pulumi/index.js";
-import type { MockResourceArgs } from "../../packages/deploy-pulumi/node_modules/@pulumi/pulumi/runtime/mocks.js";
+import * as pulumi from "../../integrations/packages/pulumi/node_modules/@pulumi/pulumi/index.js";
+import type { MockResourceArgs } from "../../integrations/packages/pulumi/node_modules/@pulumi/pulumi/runtime/mocks.js";
 import type {
   ConnectedBindingPlan,
   DeploymentPlan,
   InfrastructureOperationPlan,
 } from "relkit/deploy";
 import { diffDeploymentPlans } from "../../packages/relkit/src/deploy/diff.ts";
-import { materializeDeploymentOperations } from "../../packages/deploy-pulumi/src/materialization.ts";
-import { materializePulumiDeployment } from "../../packages/deploy-pulumi/src/program.ts";
+import { materializeDeploymentOperations } from "../../integrations/packages/pulumi/src/deploy-pulumi/materialization.ts";
+import { materializePulumiDeployment } from "../../integrations/packages/pulumi/src/deploy-pulumi/program.ts";
 import { awsAccess } from "../../integrations/packages/aws/src/access/index.ts";
 import { awsHost } from "../../integrations/packages/aws/src/host/index.ts";
 import { awsInfrastructure } from "../../integrations/packages/aws/src/infrastructure/index.ts";

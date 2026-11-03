@@ -80,7 +80,7 @@ export function supportingSources(
     "packages/relkit/src/contracts": "app",
     "packages/relkit/src/invocation": "functions",
     "packages/relkit/src/local-service": "integrations/local",
-    "packages/deploy-pulumi": "integrations/pulumi",
+    "integrations/packages/pulumi": "integrations/pulumi",
     "packages/relkit/src/observability": "observability-local",
   };
   return Object.entries(owners)

@@ -8,7 +8,7 @@ import {
 } from "../../integrations/packages/langchain/node_modules/langchain/dist/index.js";
 import { defineAgent } from "../../integrations/packages/langchain/src/index.ts";
 import { defineFunction } from "relkit/functions";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
 import { z } from "relkit/schema";
 export function case4Metadata() {
   const agent = nativeClientFixture();

@@ -1,6 +1,6 @@
 /** Checks selected deployment metadata before its SDK namespace is evaluated. */
 import { Effect } from "effect";
-import type { ResolvedIntegrationPackageRole } from "@relkit/compiler";
+import type { ResolvedIntegrationPackageRole } from "../compiler/index.js";
 import {
   SelectedDependencies,
   SelectedDependenciesLive,

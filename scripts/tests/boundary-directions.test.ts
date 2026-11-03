@@ -65,12 +65,12 @@ test("native engines own only their enumerated implementations", () => {
   });
   const pulumi = scope("integrations/packages/pulumi", {
     name: "@relkit/pulumi",
-    dependencies: { "@relkit/deploy-pulumi": "workspace:*" },
+    dependencies: { relkit: "workspace:*" },
   });
   expect(dependencyDirectionViolations("/repo", [native, pulumi])).toEqual([]);
   const redis = scope("integrations/packages/redis", {
     name: "@relkit/redis",
-    dependencies: { relkit: "workspace:*", "@relkit/deploy-pulumi": "workspace:*" },
+    dependencies: { relkit: "workspace:*", "@relkit/cli": "workspace:*" },
   });
   expect(dependencyDirectionViolations("/repo", [redis])).toMatchObject([
     { rule: "integration-non-protocol-dependency" },

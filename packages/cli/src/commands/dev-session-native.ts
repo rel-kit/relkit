@@ -4,7 +4,7 @@ import {
   createSupervisorObservability,
   createSupervisorProxy,
   createSupervisorStateMachine,
-} from "@relkit/supervisor";
+} from "../supervisor/index.js";
 import type { DevSessionState } from "./dev-session.types.js";
 import type { DevOptions, DevLog } from "./dev.types.js";
 

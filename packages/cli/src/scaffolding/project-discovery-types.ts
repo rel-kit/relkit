@@ -4,7 +4,7 @@
  * declarations while creating sources at their selected physical boundaries.
  */
 
-import type { SourceFactoryKind } from "@relkit/compiler";
+import type { SourceFactoryKind } from "../compiler/index.js";
 import type { ApplicationLayout } from "relkit/contracts";
 import type { DatabaseDialect } from "create-relkit/internal/add-types";
 

@@ -1,7 +1,7 @@
 /** Serializes bounded discovery, recovery and collection independently from application requests. */
 import { Cause, Clock, Effect, Ref } from "effect";
-import { InspectionConnectionError } from "@relkit/inspector-api/connection";
-import type { InspectionFilesOperations } from "@relkit/inspector-api/connection";
+import { InspectionConnectionError } from "relkit/inspector-api/connection";
+import type { InspectionFilesOperations } from "relkit/inspector-api/connection";
 import type { InspectorDiscoveryOperations } from "./discovery.types.js";
 import type { InspectorRemoteOperations } from "./remote.types.js";
 import type { InspectorOptions } from "./options.types.js";

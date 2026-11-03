@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { captureOutputLines } from "@relkit/supervisor";
+import { captureOutputLines } from "./src/supervisor/index.js";
 import { createDevLogger, devLogSinks } from "./src/commands/dev-logger";
 import { formatDevLog } from "./src/commands/dev-log-format";
 import { parseProjectArgs } from "./src/commands/project-args";

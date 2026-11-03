@@ -7,7 +7,7 @@ import {
   fromGraph,
   type DeploymentPlan,
 } from "relkit/deploy";
-import { renderPulumiProgram } from "../../packages/deploy-pulumi/src/program.ts";
+import { renderPulumiProgram } from "../../integrations/packages/pulumi/src/deploy-pulumi/program.ts";
 import type { ApplicationGraph, GraphNode } from "relkit/graph";
 
 const fixtureRoot = join(import.meta.dir, "..", "compiler", "fixtures");

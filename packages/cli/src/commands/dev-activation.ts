@@ -4,7 +4,7 @@
  * preserves last-known-good traffic and never swallows mixed Causes.
  */
 import { Effect, Exit, Ref } from "effect";
-import type { SupervisorCandidateToken } from "@relkit/supervisor";
+import type { SupervisorCandidateToken } from "../supervisor/index.js";
 import { redactFailureDetail } from "relkit/runtime-effect";
 import { CliAdapterError, cliOriginalError, cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";

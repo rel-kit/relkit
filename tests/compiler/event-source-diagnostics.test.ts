@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { resolve } from "node:path";
 import ts from "typescript";
-import { eventSourceDiagnostics } from "../../packages/compiler/src/event-source-diagnostics.ts";
+import { eventSourceDiagnostics } from "../../packages/cli/src/compiler/event-source-diagnostics.ts";
 
 test("reports source-located event function option, result, capability, and target errors", () => {
   const root = resolve(import.meta.dir, "../..");

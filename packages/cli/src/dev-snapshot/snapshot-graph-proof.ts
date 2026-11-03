@@ -12,7 +12,7 @@ import { SnapshotRouteProjection } from "./snapshot.schemas.js";
 import { snapshotDigest } from "./snapshot-fingerprint.js";
 import type { SnapshotProbeResponse } from "./snapshot-candidate.types.js";
 import type { DevSnapshot } from "./snapshot.types.js";
-import type { SupervisorCandidateToken } from "@relkit/supervisor";
+import type { SupervisorCandidateToken } from "../supervisor/index.js";
 
 /**
  * Compares live metadata with the previously validated immutable receipt.

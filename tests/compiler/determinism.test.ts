@@ -9,8 +9,8 @@ import {
   invalidateWatchDependencies,
   WATCH_ARTIFACTS,
   writeGeneratedArtifacts,
-} from "../../packages/compiler/src/index.ts";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
+} from "../../packages/cli/src/compiler/index.ts";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
 import { defineFunction } from "relkit/functions";
 import { defineRoute, http } from "relkit/routes";
 import { z } from "relkit/schema";

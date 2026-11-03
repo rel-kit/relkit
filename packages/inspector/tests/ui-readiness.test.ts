@@ -2,7 +2,7 @@
 import { expect, it } from "@effect/vitest";
 import { Deferred, Effect, Fiber } from "effect";
 import { TestClock } from "effect/testing";
-import { InspectionConnectionError } from "@relkit/inspector-api/connection";
+import { InspectionConnectionError } from "relkit/inspector-api/connection";
 import { waitInspectorUiReady } from "../src/ui-readiness.js";
 
 it.effect("keeps a cold UI alive beyond five seconds and waits for its full response", () =>

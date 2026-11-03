@@ -1,6 +1,6 @@
 /** Validates isolated baseline/candidate projects with the installed toolchain and offline plans. */
 import { dirname, join } from "node:path";
-import { layoutContract } from "@relkit/compiler";
+import { layoutContract } from "../compiler/index.js";
 import { fromGraph } from "relkit/deploy";
 import { validateGraphShape, type ApplicationGraph } from "relkit/graph";
 import { canonicalJson } from "relkit/contracts";

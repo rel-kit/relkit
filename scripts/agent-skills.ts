@@ -25,7 +25,7 @@ export const SKILL_USES: Readonly<Record<string, SkillUse>> = {
   "minimalist-ui": { dependency: "react" },
   opentelemetry: { dependency: "@opentelemetry/api" },
   "relkit-app": { path: "templates/default/v1" },
-  "relkit-deploy": { path: "packages/deploy-pulumi" },
+  "relkit-deploy": { path: "integrations/packages/pulumi" },
   streamdown: { dependency: "streamdown" },
   turborepo: { dependency: "turbo" },
   "typescript-async-patterns": { dependency: "typescript" },

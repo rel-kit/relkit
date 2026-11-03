@@ -25,14 +25,14 @@ async function main(): Promise<void> {
     layoutModule,
   ] = await Promise.all([
     load("packages/relkit/src/contracts/index.ts"),
-    load("packages/compiler/src/index.ts"),
+    load("packages/cli/src/compiler/index.ts"),
     load("packages/relkit/src/functions/index.ts"),
     load("packages/relkit/src/schema/index.ts"),
     load("packages/relkit/src/engine/index.ts"),
     load("packages/relkit/src/events/index.ts"),
     load("packages/relkit/src/runtime-hono/index.ts"),
     load("packages/testing/src/index.ts"),
-    load("packages/supervisor/src/index.ts"),
+    load("packages/cli/src/supervisor/index.ts"),
     load("packages/relkit/src/observability/index.ts"),
     load("apps/inspector/lib/graph-layout.ts"),
   ]);

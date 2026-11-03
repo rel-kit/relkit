@@ -2,7 +2,7 @@
 import { Cause, Effect } from "effect";
 import { CliAdapterError, CliFailureError } from "../cli-errors.js";
 import { SourceLocationError } from "relkit/contracts";
-import { AuthoredSourceInspectionError, SourceResolutionError } from "@relkit/compiler";
+import { AuthoredSourceInspectionError, SourceResolutionError } from "../compiler/index.js";
 import type { CliCommandContext } from "../main-support.js";
 
 /**

@@ -4,12 +4,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "bun:test";
 import type { DeploymentPlan } from "relkit/deploy";
-import { createPulumiProgram } from "../../packages/deploy-pulumi/src/program.ts";
+import { createPulumiProgram } from "../../integrations/packages/pulumi/src/deploy-pulumi/program.ts";
 import {
   createPulumiWorkspace,
   type PulumiBackend,
   type PulumiWorkspaceHandle,
-} from "../../packages/deploy-pulumi/src/workspace.ts";
+} from "../../integrations/packages/pulumi/src/deploy-pulumi/workspace.ts";
 import { awsHost } from "../../integrations/packages/aws/src/host/index.ts";
 import { pulumiEngine } from "../../integrations/packages/pulumi/src/engine/index.ts";
 

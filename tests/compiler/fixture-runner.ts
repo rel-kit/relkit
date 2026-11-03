@@ -10,10 +10,10 @@ import {
   resolveRuntimeIntegrationPackages,
   type NormalizationResult,
   type RuntimeIntegrationPackage,
-} from "../../packages/compiler/src/index.ts";
+} from "../../packages/cli/src/compiler/index.ts";
 import { workspacePackageDirectories } from "../../scripts/workspace-packages.ts";
-import type { ExtractedDescriptor } from "../../packages/compiler/src/discovery/extract.ts";
-import type { EvaluatorResponse } from "../../packages/compiler/src/discovery/evaluator-protocol.ts";
+import type { ExtractedDescriptor } from "../../packages/cli/src/compiler/discovery/extract.ts";
+import type { EvaluatorResponse } from "../../packages/cli/src/compiler/discovery/evaluator-protocol.ts";
 import type { Diagnostic } from "relkit/diagnostics";
 import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";

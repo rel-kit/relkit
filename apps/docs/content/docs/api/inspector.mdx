@@ -683,6 +683,2124 @@ declare const publishSelection: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L21)
 
+## `index.ts`
+
+Optional native history API; importing this package explicitly selects local storage.
+
+### "./local/duckdb-database-effect.js" (namespace export)
+
+Re-exports all named exports from the "./local/duckdb-database-effect.js" module.
+
+**Signature**
+
+```ts
+export * from "./local/duckdb-database-effect.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/index.ts#L3)
+
+### "./local/duckdb-database.js" (namespace export)
+
+Re-exports all named exports from the "./local/duckdb-database.js" module.
+
+**Signature**
+
+```ts
+export * from "./local/duckdb-database.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/index.ts#L4)
+
+### "./local/duckdb-driver.js" (namespace export)
+
+Re-exports all named exports from the "./local/duckdb-driver.js" module.
+
+**Signature**
+
+```ts
+export * from "./local/duckdb-driver.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/index.ts#L5)
+
+### "./local/duckdb-error.js" (namespace export)
+
+Re-exports all named exports from the "./local/duckdb-error.js" module.
+
+**Signature**
+
+```ts
+export * from "./local/duckdb-error.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/index.ts#L6)
+
+### "./local/duckdb-worker-effect.js" (namespace export)
+
+Re-exports all named exports from the "./local/duckdb-worker-effect.js" module.
+
+**Signature**
+
+```ts
+export * from "./local/duckdb-worker-effect.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/index.ts#L7)
+
+### "./local/worker-client.js" (namespace export)
+
+Re-exports all named exports from the "./local/worker-client.js" module.
+
+**Signature**
+
+```ts
+export * from "./local/worker-client.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/index.ts#L2)
+
+### "relkit/observability/local/record" (namespace export)
+
+Re-exports all named exports from the "relkit/observability/local/record" module.
+
+**Signature**
+
+```ts
+export * from "relkit/observability/local/record";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/index.ts#L8)
+
+## `duckdb-batch-cursors.ts`
+
+Assigns explicit monotonically ordered cursors without relying on native sequence row order.
+
+### assignDuckdbCursors
+
+**Signature**
+
+```ts
+declare const assignDuckdbCursors: (
+  connection: DuckdbConnectionPort,
+  admitted: Array<PreparedDuckdbRecord>,
+) => Effect.Effect<Array<{ prepared: PreparedDuckdbRecord; cursor: string }>, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-batch-cursors.ts#L8)
+
+## `duckdb-batch-insert.ts`
+
+Writes explicitly assigned cursor/payload rows inside the caller's atomic batch transaction.
+
+### insertDuckdbBatch
+
+**Signature**
+
+```ts
+declare const insertDuckdbBatch: (
+  connection: DuckdbConnectionPort,
+  assigned: ReadonlyArray<AssignedDuckdbRecord>,
+  receivedAt: number,
+) => Effect.Effect<Array<StoredLocalRecord>, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-batch-insert.ts#L9)
+
+## `duckdb-batch-prepare.ts`
+
+Validates every envelope before receipt deduplication and encodes only admitted redacted payloads.
+
+### prepareDuckdbBatch
+
+**Signature**
+
+```ts
+declare const prepareDuckdbBatch: (
+  records: ReadonlyArray<LocalRecord>,
+  redaction?: RedactionPolicy | undefined,
+) => Effect.Effect<Map<string, PreparedDuckdbRecord>, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-batch-prepare.ts#L13)
+
+## `duckdb-batch-receipts.ts`
+
+Inserts stable transport receipts transactionally and recovers first-input ordering from returned keys.
+
+### admitDuckdbReceipts
+
+**Signature**
+
+```ts
+declare const admitDuckdbReceipts: (
+  connection: DuckdbConnectionPort,
+  first: Map<string, PreparedDuckdbRecord>,
+  receivedAt: number,
+) => Effect.Effect<Array<PreparedDuckdbRecord>, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-batch-receipts.ts#L8)
+
+## `duckdb-batch.ts`
+
+Composes validated receipt admission, explicit cursor allocation and insertion within one borrowed transaction.
+
+### appendDuckdbBatchEffect
+
+**Signature**
+
+```ts
+declare const appendDuckdbBatchEffect: (
+  connection: DuckdbConnectionPort,
+  records: ReadonlyArray<LocalRecord>,
+  receivedAt: number,
+  redaction?: RedactionPolicy | undefined,
+) => Effect.Effect<Array<StoredLocalRecord>, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-batch.ts#L12)
+
+## `duckdb-batch.types.ts`
+
+Owns duckdb batch.types for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### AssignedDuckdbRecord (interface)
+
+Cursor assignment validated before inserting the record payload.
+
+**Signature**
+
+```ts
+export interface AssignedDuckdbRecord {
+  readonly prepared: PreparedDuckdbRecord;
+  readonly cursor: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-batch.types.ts#L17)
+
+### PreparedDuckdbRecord (interface)
+
+Validated and redacted envelope retained until its transaction commits.
+
+**Signature**
+
+```ts
+export interface PreparedDuckdbRecord {
+  readonly item: LocalRecord;
+  readonly safe: ObservabilityRecord;
+  readonly payload: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-batch.types.ts#L10)
+
+## `duckdb-database-effect.ts`
+
+Owns duckdb database effect for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### DuckdbDatabaseService (class)
+
+Database operations provided for one owned Effect Scope.
+
+**Example**
+
+```ts
+const database = yield * DuckdbDatabaseService;
+yield * database.flush();
+```
+
+**Signature**
+
+```ts
+declare class DuckdbDatabaseService
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-database-effect.ts#L27)
+
+### duckdbDatabaseLayer
+
+Provides a scoped database service using an injectable DuckdbDriverService.
+
+**Example**
+
+```ts
+const program = Effect.gen(function* () {
+  return yield* DuckdbDatabaseService;
+});
+const layer = duckdbDatabaseLayer(root);
+```
+
+**Signature**
+
+```ts
+declare const duckdbDatabaseLayer: (
+  root: string,
+  configured?: TelemetryLocalRetentionPolicy,
+  redaction?: RedactionPolicy,
+) => Layer.Layer<DuckdbDatabaseService, DuckdbError, DuckdbDriverService>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-database-effect.ts#L95)
+
+### openDuckdbDatabaseEffect
+
+Acquires an instance and connection in the caller's Scope, initializes schema,
+and returns Effect operations. Scope finalizers close the connection first,
+then the instance, including on setup failure or interruption.
+
+**Example**
+
+```ts
+const database = yield * openDuckdbDatabaseEffect(root);
+yield * database.flush();
+```
+
+**Signature**
+
+```ts
+declare const openDuckdbDatabaseEffect: (
+  root: string,
+  configured?: TelemetryLocalRetentionPolicy | undefined,
+  redaction?: RedactionPolicy | undefined,
+) => Effect.Effect<
+  {
+    imported: { records: number; malformed: number };
+    append: (records: readonly LocalRecord[]) => Effect.Effect<StoredLocalRecord[], DuckdbError>;
+    configure: (
+      retention: TelemetryLocalRetentionPolicy,
+      redaction?: RedactionPolicy,
+    ) => Effect.Effect<void, DuckdbError>;
+    flush: () => Effect.Effect<void, DuckdbError>;
+    list: (
+      kind: "logs" | "requests" | "traces",
+      input?: ObservabilityQueryRequest | undefined,
+    ) => Effect.Effect<
+      ObservabilityQueryPage<StoredLocalRecord>,
+      DuckdbError | DuckdbQueryError,
+      never
+    >;
+    detail: (
+      kind: "log" | "request" | "trace",
+      id: string,
+    ) => Effect.Effect<
+      | {
+          log: StoredLocalRecord;
+          items: ReadonlyArray<never>;
+          nextCursor?: string;
+          protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+          version: typeof OBSERVABILITY_QUERY_VERSION;
+        }
+      | {
+          request: RequestRecord;
+          spans: readonly SpanRecord[];
+          roots: readonly SpanNode[];
+          continuations: readonly { readonly traceId: string; readonly active: boolean }[];
+          records: readonly ObservabilityRecord[];
+          counts: {
+            readonly records: number;
+            readonly spans: number;
+            readonly continuations: number;
+          };
+          incomplete: readonly string[];
+          items: ReadonlyArray<never>;
+          nextCursor?: string;
+          protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+          version: typeof OBSERVABILITY_QUERY_VERSION;
+        }
+      | {
+          trace: StoredLocalRecord | undefined;
+          spans: Array<SpanRecord>;
+          records: ReadonlyArray<StoredLocalRecord>;
+          items: ReadonlyArray<StoredLocalRecord>;
+          nextCursor?: string;
+          protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+          version: typeof OBSERVABILITY_QUERY_VERSION;
+        }
+      | undefined,
+      DuckdbError | DuckdbQueryError,
+      never
+    >;
+  },
+  DuckdbError,
+  Scope | DuckdbDriverService
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-database-effect.ts#L46)
+
+## `duckdb-database.ts`
+
+Owns duckdb database for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### openDuckdbDatabase
+
+Opens a private DuckDB database and owns its Effect Scope until close.
+The scoped Effect implementation contains acquisition and operation logic.
+
+**Throws**
+
+If acquisition, storage, or import fails.
+
+**Example**
+
+```ts
+const database = await openDuckdbDatabase(root);
+await database.close();
+```
+
+**Signature**
+
+```ts
+declare const openDuckdbDatabase: (
+  root: string,
+  configured?: TelemetryLocalRetentionPolicy,
+  redaction?: RedactionPolicy,
+) => Promise<{
+  imported: { records: number; malformed: number };
+  append: (
+    records: Parameters<
+      (records: readonly LocalRecord[]) => Effect.Effect<StoredLocalRecord[], DuckdbError>
+    >[0],
+  ) => Promise<Array<StoredLocalRecord>>;
+  list: (
+    kind: Parameters<
+      (
+        kind: "logs" | "requests" | "traces",
+        input?: ObservabilityQueryRequest | undefined,
+      ) => Effect.Effect<
+        ObservabilityQueryPage<StoredLocalRecord>,
+        DuckdbError | DuckdbQueryError,
+        never
+      >
+    >[0],
+    input?: Parameters<
+      (
+        kind: "logs" | "requests" | "traces",
+        input?: ObservabilityQueryRequest | undefined,
+      ) => Effect.Effect<
+        ObservabilityQueryPage<StoredLocalRecord>,
+        DuckdbError | DuckdbQueryError,
+        never
+      >
+    >[1],
+  ) => Promise<ObservabilityQueryPage<StoredLocalRecord>>;
+  detail: (
+    kind: Parameters<
+      (
+        kind: "log" | "request" | "trace",
+        id: string,
+      ) => Effect.Effect<
+        | {
+            log: StoredLocalRecord;
+            items: ReadonlyArray<never>;
+            nextCursor?: string;
+            protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+            version: typeof OBSERVABILITY_QUERY_VERSION;
+          }
+        | {
+            request: RequestRecord;
+            spans: readonly SpanRecord[];
+            roots: readonly SpanNode[];
+            continuations: readonly { readonly traceId: string; readonly active: boolean }[];
+            records: readonly ObservabilityRecord[];
+            counts: {
+              readonly records: number;
+              readonly spans: number;
+              readonly continuations: number;
+            };
+            incomplete: readonly string[];
+            items: ReadonlyArray<never>;
+            nextCursor?: string;
+            protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+            version: typeof OBSERVABILITY_QUERY_VERSION;
+          }
+        | {
+            trace: StoredLocalRecord | undefined;
+            spans: Array<SpanRecord>;
+            records: ReadonlyArray<StoredLocalRecord>;
+            items: ReadonlyArray<StoredLocalRecord>;
+            nextCursor?: string;
+            protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+            version: typeof OBSERVABILITY_QUERY_VERSION;
+          }
+        | undefined,
+        DuckdbError | DuckdbQueryError,
+        never
+      >
+    >[0],
+    id: string,
+  ) => Promise<
+    | {
+        log: StoredLocalRecord;
+        items: ReadonlyArray<never>;
+        nextCursor?: string;
+        protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+        version: typeof OBSERVABILITY_QUERY_VERSION;
+      }
+    | {
+        request: RequestRecord;
+        spans: readonly SpanRecord[];
+        roots: readonly SpanNode[];
+        continuations: readonly { readonly traceId: string; readonly active: boolean }[];
+        records: readonly ObservabilityRecord[];
+        counts: {
+          readonly records: number;
+          readonly spans: number;
+          readonly continuations: number;
+        };
+        incomplete: readonly string[];
+        items: ReadonlyArray<never>;
+        nextCursor?: string;
+        protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+        version: typeof OBSERVABILITY_QUERY_VERSION;
+      }
+    | {
+        trace: StoredLocalRecord | undefined;
+        spans: Array<SpanRecord>;
+        records: ReadonlyArray<StoredLocalRecord>;
+        items: ReadonlyArray<StoredLocalRecord>;
+        nextCursor?: string;
+        protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+        version: typeof OBSERVABILITY_QUERY_VERSION;
+      }
+    | undefined
+  >;
+  configure: (
+    value: TelemetryLocalRetentionPolicy,
+    nextRedaction?: RedactionPolicy,
+  ) => Promise<void>;
+  flush: () => Promise<void>;
+  close: () => Promise<void>;
+}>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-database.ts#L27)
+
+## `duckdb-database.types.ts`
+
+Owns duckdb database.types for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### DuckdbDatabaseEffects (type alias)
+
+Scoped local database operations; the owning Scope releases native handles.
+
+**Example**
+
+```ts
+const database = yield * openDuckdbDatabaseEffect(root);
+const page = yield * database.list("logs");
+```
+
+**Signature**
+
+```ts
+type DuckdbDatabaseEffects = DuckdbStorageEffects &
+  ReturnType<typeof makeDuckdbQueryEffect> & {
+    readonly imported: LegacyImportSummary;
+  };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-database.types.ts#L17)
+
+## `duckdb-driver.ts`
+
+Owns duckdb driver for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### DuckdbDriverService (class)
+
+Injectable native DuckDB instance factory.
+
+**Example**
+
+```ts
+const driver = yield * DuckdbDriverService;
+const instance = yield * driver.create(path);
+```
+
+**Signature**
+
+```ts
+declare class DuckdbDriverService
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-driver.ts#L17)
+
+### duckdbDriverLayer
+
+Live native driver for local observability storage.
+
+**Example**
+
+```ts
+const database = yield * openDuckdbDatabaseEffect(root).pipe(Effect.provide(duckdbDriverLayer));
+```
+
+**Signature**
+
+```ts
+declare const duckdbDriverLayer: Layer.Layer<DuckdbDriverService, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-driver.ts#L38)
+
+## `duckdb-driver.types.ts`
+
+Owns duckdb driver.types for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### DuckdbConnectionPort (interface)
+
+Substitutable DuckDB connection with the operations used by this package.
+The owning Effect Scope calls `closeSync` after all operations settle.
+
+**Example**
+
+```ts
+const result = await connection.runAndReadAll("SELECT 1");
+```
+
+**Signature**
+
+```ts
+export interface DuckdbConnectionPort {
+  /**
+   * Runs a statement or transaction command.
+   * @param sql - SQL statement.
+   * @param values - Bound parameters.
+   * @returns Native completion result.
+   * @example
+   * await connection.run("CHECKPOINT");
+   */
+  readonly run: (sql: string, values?: DuckDBValue[]) => Promise<DuckDBMaterializedResult | void>;
+  /**
+   * Reads all rows from a completed statement.
+   * @param sql - SQL query.
+   * @param values - Bound parameters.
+   * @returns A Promise containing a row reader.
+   * @example
+   * const rows = await connection.runAndReadAll("SELECT 1");
+   */
+  readonly runAndReadAll: (sql: string, values?: DuckDBValue[]) => Promise<DuckdbRows>;
+  /**
+   * Releases the native connection from its Scope finalizer.
+   * @returns Nothing after release.
+   * @example
+   * connection.closeSync();
+   */
+  readonly closeSync: () => void;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-driver.types.ts#L33)
+
+### DuckdbDriver (interface)
+
+Creates a native instance; tests can supply deterministic handles.
+
+**Example**
+
+```ts
+const instance = yield * driver.create(path);
+```
+
+**Signature**
+
+```ts
+export interface DuckdbDriver {
+  /**
+   * Creates an instance at the requested database path.
+   * @param path - Private DuckDB database path.
+   * @returns An Effect yielding an instance or a tagged IO error.
+   * @example
+   * const instance = yield* driver.create(path);
+   */
+  readonly create: (path: string) => Effect.Effect<DuckdbInstancePort, DuckdbError>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-driver.types.ts#L90)
+
+### DuckdbInstancePort (interface)
+
+Native database instance owned by the acquiring Effect Scope.
+
+**Example**
+
+```ts
+const connection = await instance.connect();
+```
+
+**Signature**
+
+```ts
+export interface DuckdbInstancePort {
+  /**
+   * Opens a connection owned by the same Scope.
+   * @returns A Promise containing the live connection.
+   * @example
+   * const connection = await instance.connect();
+   */
+  readonly connect: () => Promise<DuckdbConnectionPort>;
+  /**
+   * Releases the native instance after its connection closes.
+   * @returns Nothing after release.
+   * @example
+   * instance.closeSync();
+   */
+  readonly closeSync: () => void;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-driver.types.ts#L67)
+
+### DuckdbRows (interface)
+
+SQL result shape used by the local observability store.
+
+**Example**
+
+```ts
+const rows = result.getRowObjectsJson();
+```
+
+**Signature**
+
+```ts
+export interface DuckdbRows {
+  /**
+   * Returns JSON-compatible rows from a completed statement.
+   * @returns Row objects decoded by the native driver.
+   * @example
+   * const rows = result.getRowObjectsJson();
+   */
+  readonly getRowObjectsJson: () => Record<string, Json>[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-driver.types.ts#L16)
+
+## `duckdb-error.ts`
+
+Owns duckdb error for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### DuckdbError (class)
+
+Expected local DuckDB IO or schema failure with a stable operation label.
+
+**Example**
+
+```ts
+const failure = new DuckdbError({ operation: "connect", message: "failed", cause });
+```
+
+**Signature**
+
+```ts
+declare class DuckdbError
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-error.ts#L14)
+
+### duckdbError
+
+Converts a native DuckDB failure to the local storage error channel.
+
+**Example**
+
+```ts
+const error = duckdbError("connect", cause);
+```
+
+**Signature**
+
+```ts
+declare const duckdbError: <Cause>(operation: string, cause: Cause) => DuckdbError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-error.ts#L30)
+
+## `duckdb-metrics.ts`
+
+Owns duckdb metrics for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### observeDuckdb
+
+Records bounded operation, duration, and outcome telemetry for DuckDB work.
+
+**Example**
+
+```ts
+yield * observeDuckdb("append", appendBatch);
+```
+
+**Signature**
+
+```ts
+declare const observeDuckdb: <A, E, R>(
+  operation: string,
+  effect: Effect.Effect<A, E, R>,
+) => Effect.Effect<A, E, R>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-metrics.ts#L16)
+
+## `duckdb-query-detail.ts`
+
+Assembles request/log/trace detail from bounded serialized history reads.
+
+### makeDuckdbDetail
+
+**Signature**
+
+```ts
+declare const makeDuckdbDetail: (
+  rows: DuckdbReadRows,
+  list: ReturnType<typeof makeDuckdbList>,
+) => (
+  kind: "log" | "request" | "trace",
+  id: string,
+) => Effect.Effect<
+  | {
+      log: StoredLocalRecord;
+      items: ReadonlyArray<never>;
+      nextCursor?: string;
+      protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+      version: typeof OBSERVABILITY_QUERY_VERSION;
+    }
+  | {
+      request: RequestRecord;
+      spans: readonly SpanRecord[];
+      roots: readonly SpanNode[];
+      continuations: readonly { readonly traceId: string; readonly active: boolean }[];
+      records: readonly ObservabilityRecord[];
+      counts: { readonly records: number; readonly spans: number; readonly continuations: number };
+      incomplete: readonly string[];
+      items: ReadonlyArray<never>;
+      nextCursor?: string;
+      protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+      version: typeof OBSERVABILITY_QUERY_VERSION;
+    }
+  | {
+      trace: StoredLocalRecord | undefined;
+      spans: Array<SpanRecord>;
+      records: ReadonlyArray<StoredLocalRecord>;
+      items: ReadonlyArray<StoredLocalRecord>;
+      nextCursor?: string;
+      protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+      version: typeof OBSERVABILITY_QUERY_VERSION;
+    }
+  | undefined,
+  DuckdbError | DuckdbQueryError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-detail.ts#L17)
+
+## `duckdb-query-effect.ts`
+
+Composes native history rows, versioned pages and execution detail under one serialization permit.
+
+### makeDuckdbQueryEffect
+
+**Signature**
+
+```ts
+declare const makeDuckdbQueryEffect: (
+  connection: DuckdbConnectionPort,
+  permit: Semaphore.Semaphore,
+) => {
+  list: (
+    kind: "logs" | "requests" | "traces",
+    input?: ObservabilityQueryRequest | undefined,
+  ) => Effect<ObservabilityQueryPage<StoredLocalRecord>, DuckdbError | DuckdbQueryError, never>;
+  detail: (
+    kind: "log" | "request" | "trace",
+    id: string,
+  ) => Effect<
+    | {
+        log: StoredLocalRecord;
+        items: ReadonlyArray<never>;
+        nextCursor?: string;
+        protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+        version: typeof OBSERVABILITY_QUERY_VERSION;
+      }
+    | {
+        request: RequestRecord;
+        spans: readonly SpanRecord[];
+        roots: readonly SpanNode[];
+        continuations: readonly { readonly traceId: string; readonly active: boolean }[];
+        records: readonly ObservabilityRecord[];
+        counts: {
+          readonly records: number;
+          readonly spans: number;
+          readonly continuations: number;
+        };
+        incomplete: readonly string[];
+        items: ReadonlyArray<never>;
+        nextCursor?: string;
+        protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+        version: typeof OBSERVABILITY_QUERY_VERSION;
+      }
+    | {
+        trace: StoredLocalRecord | undefined;
+        spans: Array<SpanRecord>;
+        records: ReadonlyArray<StoredLocalRecord>;
+        items: ReadonlyArray<StoredLocalRecord>;
+        nextCursor?: string;
+        protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+        version: typeof OBSERVABILITY_QUERY_VERSION;
+      }
+    | undefined,
+    DuckdbError | DuckdbQueryError,
+    never
+  >;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-effect.ts#L8)
+
+## `duckdb-query-error.ts`
+
+Owns duckdb query error for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### DuckdbQueryError (class)
+
+Invalid local query input reported through the Effect error channel.
+
+**Example**
+
+```ts
+const failure = new DuckdbQueryError({
+  code: "RELKIT_OBSERVABILITY_QUERY_INVALID",
+  message: "Invalid cursor",
+});
+```
+
+**Signature**
+
+```ts
+declare class DuckdbQueryError
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-error.ts#L16)
+
+### duckdbQueryError
+
+Converts a query validation exception to a tagged Effect error.
+
+**Example**
+
+```ts
+const failure = duckdbQueryError(error);
+```
+
+**Signature**
+
+```ts
+declare const duckdbQueryError: (error: ObservabilityQueryError) => DuckdbQueryError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-error.ts#L31)
+
+## `duckdb-query-filters.ts`
+
+Compiles validated query filters into bound native SQL parameters; no user value becomes SQL.
+
+### duckdbQueryFilters
+
+**Signature**
+
+```ts
+declare const duckdbQueryFilters: (
+  kind: "logs" | "requests" | "traces",
+  query: NormalizedQuery,
+) => { clauses: Array<string>; values: Array<DuckDBValue> };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-filters.ts#L6)
+
+## `duckdb-query-list.ts`
+
+Executes a validated list plan and emits versioned cursor pages over committed history.
+
+### makeDuckdbList
+
+**Signature**
+
+```ts
+declare const makeDuckdbList: (
+  rows: DuckdbReadRows,
+) => (
+  kind: "logs" | "requests" | "traces",
+  input?: ObservabilityQueryRequest | undefined,
+) => Effect.Effect<
+  ObservabilityQueryPage<StoredLocalRecord>,
+  DuckdbError | DuckdbQueryError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-list.ts#L12)
+
+## `duckdb-query-plan.ts`
+
+Builds history paging SQL with stable request/trace revision selection and bound parameters.
+
+### duckdbQueryPlan
+
+**Signature**
+
+```ts
+declare const duckdbQueryPlan: (
+  kind: "logs" | "requests" | "traces",
+  query: NormalizedQuery,
+) => { sql: string; values: Array<DuckDBValue> };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-plan.ts#L6)
+
+## `duckdb-query-rows.ts`
+
+Decodes native JSON rows into validated diagnostic records under the shared database permit.
+
+### makeDuckdbRows
+
+**Signature**
+
+```ts
+declare const makeDuckdbRows: (
+  connection: DuckdbConnectionPort,
+  permit: Semaphore.Semaphore,
+) => (
+  sql: string,
+  values?: Array<DuckDBValue> | undefined,
+) => Effect.Effect<Array<StoredLocalRecord>, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-rows.ts#L10)
+
+## `duckdb-query-rows.types.ts`
+
+SQL row reader shared by native list/detail query operations.
+
+### DuckdbReadRows (type alias)
+
+Reads only fully decoded stored records from native SQL.
+
+**Signature**
+
+```ts
+type DuckdbReadRows = (
+  sql: string,
+  values?: DuckDBValue[],
+) => Effect.Effect<StoredLocalRecord[], DuckdbError>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-rows.types.ts#L7)
+
+## `duckdb-query.ts`
+
+Owns duckdb query for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### createDuckdbQuery
+
+Creates Promise query adapters for a scoped DuckDB connection.
+
+**Example**
+
+```ts
+const query = createDuckdbQuery(connection);
+const page = await query.list("logs");
+```
+
+**Signature**
+
+```ts
+declare const createDuckdbQuery: (connection: DuckdbConnectionPort) => {
+  list: (
+    kind: "logs" | "requests" | "traces",
+    input?: ObservabilityQueryRequest,
+  ) => Promise<ObservabilityQueryPage<StoredLocalRecord>>;
+  detail: (
+    kind: "log" | "request" | "trace",
+    id: string,
+  ) => Promise<
+    | {
+        log: StoredLocalRecord;
+        items: ReadonlyArray<never>;
+        nextCursor?: string;
+        protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+        version: typeof OBSERVABILITY_QUERY_VERSION;
+      }
+    | {
+        request: RequestRecord;
+        spans: readonly SpanRecord[];
+        roots: readonly SpanNode[];
+        continuations: readonly { readonly traceId: string; readonly active: boolean }[];
+        records: readonly ObservabilityRecord[];
+        counts: {
+          readonly records: number;
+          readonly spans: number;
+          readonly continuations: number;
+        };
+        incomplete: readonly string[];
+        items: ReadonlyArray<never>;
+        nextCursor?: string;
+        protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+        version: typeof OBSERVABILITY_QUERY_VERSION;
+      }
+    | {
+        trace: StoredLocalRecord | undefined;
+        spans: Array<SpanRecord>;
+        records: ReadonlyArray<StoredLocalRecord>;
+        items: ReadonlyArray<StoredLocalRecord>;
+        nextCursor?: string;
+        protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+        version: typeof OBSERVABILITY_QUERY_VERSION;
+      }
+    | undefined
+  >;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query.ts#L21)
+
+## `duckdb-retention.ts`
+
+Applies the existing history/receipt retention policy inside the caller's database permit.
+
+### retainDuckdbRecords
+
+**Signature**
+
+```ts
+declare const retainDuckdbRecords: (
+  state: DuckdbStorageState,
+) => Effect.Effect<void, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-retention.ts#L7)
+
+## `duckdb-schema.ts`
+
+Owns duckdb schema for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### initializeDuckdbSchema
+
+Initializes the local observability schema and checks compatibility.
+
+**Example**
+
+```ts
+yield * initializeDuckdbSchema(connection);
+```
+
+**Signature**
+
+```ts
+declare const initializeDuckdbSchema: (
+  connection: DuckdbConnectionPort,
+) => Effect.Effect<undefined, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-schema.ts#L18)
+
+## `duckdb-sql.ts`
+
+Owns duckdb sql for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### readDuckdbSql
+
+Reads rows from one native SQL command under the owning connection Scope.
+
+**Example**
+
+```ts
+const result = yield * readDuckdbSql(connection, "schema", "SELECT 1");
+```
+
+**Signature**
+
+```ts
+declare const readDuckdbSql: (
+  connection: DuckdbConnectionPort,
+  operation: string,
+  sql: string,
+  values?: Array<DuckDBValue> | undefined,
+) => Effect.Effect<DuckdbRows, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-sql.ts#L43)
+
+### runDuckdbSql
+
+Runs one native SQL command without closing its connection during interruption.
+DuckDB's Promise API has no cancellation signal, so interruption waits for
+the native command to settle before Scope finalizers release the handles.
+
+**Example**
+
+```ts
+yield * runDuckdbSql(connection, "checkpoint", "CHECKPOINT");
+```
+
+**Signature**
+
+```ts
+declare const runDuckdbSql: (
+  connection: DuckdbConnectionPort,
+  operation: string,
+  sql: string,
+  values?: Array<DuckDBValue> | undefined,
+) => Effect.Effect<void | DuckDBMaterializedResult, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-sql.ts#L23)
+
+## `duckdb-storage-state.types.ts`
+
+Retention/redaction policy captured by one serialized native history store.
+
+### DuckdbStorageState (interface)
+
+Mutable configuration shares the same permit as writes and queries.
+
+**Signature**
+
+```ts
+export interface DuckdbStorageState {
+  readonly connection: DuckdbConnectionPort;
+  readonly permit: Semaphore.Semaphore;
+  retention: TelemetryLocalRetentionPolicy;
+  redaction: RedactionPolicy | undefined;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-storage-state.types.ts#L6)
+
+## `duckdb-storage.ts`
+
+Composes serialized append, retention configuration and checkpoint operations for one native history owner.
+
+### makeDuckdbStorage
+
+**Signature**
+
+```ts
+declare const makeDuckdbStorage: (
+  connection: DuckdbConnectionPort,
+  permit: Semaphore.Semaphore,
+  configured: TelemetryLocalRetentionPolicy,
+  initialRedaction?: RedactionPolicy,
+) => DuckdbStorageEffects;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-storage.ts#L12)
+
+## `duckdb-storage.types.ts`
+
+Owns duckdb storage.types for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### DuckdbStorageEffects (interface)
+
+Effect operations that persist and retain local telemetry.
+All methods serialize access to one native connection.
+
+**Example**
+
+```ts
+const stored = yield * storage.append(records);
+```
+
+**Signature**
+
+```ts
+export interface DuckdbStorageEffects {
+  /**
+   * Appends at most 256 idempotent records in one transaction.
+   * @param records - Valid local telemetry envelopes.
+   * @returns An Effect with committed records or a tagged DuckdbError.
+   * @example
+   * const stored = yield* storage.append(records);
+   */
+  readonly append: (
+    records: readonly LocalRecord[],
+  ) => Effect.Effect<StoredLocalRecord[], DuckdbError>;
+  /**
+   * Reconfigures retention and redaction, then checkpoints.
+   * @param retention - New retention limits.
+   * @param redaction - New admission policy.
+   * @returns An Effect completing after checkpoint or a DuckdbError.
+   * @example
+   * yield* storage.configure({ maxEntries: 100 });
+   */
+  readonly configure: (
+    retention: TelemetryLocalRetentionPolicy,
+    redaction?: RedactionPolicy,
+  ) => Effect.Effect<void, DuckdbError>;
+  /**
+   * Applies retention and checkpoints.
+   * @returns An Effect completing after the flush or a DuckdbError.
+   * @example
+   * yield* storage.flush();
+   */
+  readonly flush: () => Effect.Effect<void, DuckdbError>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-storage.types.ts#L18)
+
+## `duckdb-transaction.ts`
+
+Commits one validated idempotent batch and retention atomically; failures retain rollback behavior.
+
+### appendDuckdbRecords
+
+**Signature**
+
+```ts
+declare const appendDuckdbRecords: (
+  state: DuckdbStorageState,
+  records: ReadonlyArray<LocalRecord>,
+) => Effect.Effect<Array<StoredLocalRecord>, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-transaction.ts#L11)
+
+## `duckdb-worker-database.ts`
+
+Transfers a database's native handles to the worker's explicit owning scope.
+Acquisition failure closes partial handles; retirement flushes before release.
+
+### closeDuckdbWorkerDatabase
+
+**Signature**
+
+```ts
+declare const closeDuckdbWorkerDatabase: (
+  state: DuckdbWorkerState,
+) => Effect.Effect<void, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-database.ts#L13)
+
+### executeDuckdbWorkerCommand
+
+**Signature**
+
+```ts
+declare const executeDuckdbWorkerCommand: (
+  state: DuckdbWorkerState,
+  command: LocalWorkerCommand,
+) => Effect.Effect<
+  | void
+  | Array<StoredLocalRecord>
+  | ObservabilityQueryPage<StoredLocalRecord>
+  | { records: number; malformed: number },
+  DuckdbError | DuckdbQueryError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-database.ts#L55)
+
+### openDuckdbWorkerDatabase
+
+**Signature**
+
+```ts
+declare const openDuckdbWorkerDatabase: (
+  state: DuckdbWorkerState,
+  command: {
+    readonly type: "open";
+    readonly root: string;
+    readonly retention?: TelemetryLocalRetentionPolicy;
+    readonly redaction?: RedactionPolicy;
+  },
+) => Effect.Effect<{ records: number; malformed: number }, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-database.ts#L25)
+
+## `duckdb-worker-effect.ts`
+
+Composes serialized storage commands behind an injectable worker service.
+Its scope owns the explicit database scope until close, failure or interruption.
+
+### DuckdbWorkerService (class)
+
+Injectable command executor whose owner must close its database.
+
+**Signature**
+
+```ts
+declare class DuckdbWorkerService
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-effect.ts#L14)
+
+### duckdbWorkerLayer
+
+Owns the command service and releases native state on every scope exit.
+
+**Signature**
+
+```ts
+declare const duckdbWorkerLayer: Layer.Layer<DuckdbWorkerService, never, DuckdbDriverService>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-effect.ts#L43)
+
+### makeDuckdbWorkerEffect
+
+**Signature**
+
+```ts
+declare const makeDuckdbWorkerEffect: () => Effect.Effect<
+  {
+    execute: (
+      command: LocalWorkerCommand,
+    ) => Effect.Effect<
+      | void
+      | Array<StoredLocalRecord>
+      | ObservabilityQueryPage<StoredLocalRecord>
+      | { records: number; malformed: number },
+      DuckdbError | DuckdbQueryError,
+      never
+    >;
+    close: () => Effect.Effect<void, DuckdbError, never>;
+  },
+  never,
+  DuckdbDriverService
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-effect.ts#L20)
+
+## `duckdb-worker-ipc.ts`
+
+Registers the existing worker command/reply channel within the process owner's Effect scope.
+
+### installDuckdbWorkerIpc
+
+**Signature**
+
+```ts
+declare const installDuckdbWorkerIpc: (
+  worker: DuckdbWorkerEffects,
+  state: DuckdbProcessState,
+) => Effect.Effect<void, never, Scope>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-ipc.ts#L7)
+
+## `duckdb-worker-maintenance.ts`
+
+Runs the existing minute retention checkpoint only while the process owns an open database.
+
+### installDuckdbWorkerMaintenance
+
+**Signature**
+
+```ts
+declare const installDuckdbWorkerMaintenance: (
+  worker: DuckdbWorkerEffects,
+  state: DuckdbProcessState,
+) => Effect.Effect<void, never, Scope>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-maintenance.ts#L6)
+
+## `duckdb-worker-process.ts`
+
+Owns native database commands, IPC, signals and maintenance until the physical worker process disconnects.
+
+### startDuckdbWorkerProcessEffect
+
+**Signature**
+
+```ts
+declare const startDuckdbWorkerProcessEffect: (
+  scope: Scope.Closeable,
+) => Effect.Effect<void, never, Scope.Scope>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-process.ts#L10)
+
+## `duckdb-worker-process.types.ts`
+
+Owns duckdb worker process.types for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### DuckdbProcessState (interface)
+
+Tracks whether maintenance may issue database commands in this process.
+
+**Signature**
+
+```ts
+export interface DuckdbProcessState {
+  opened: boolean;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-process.types.ts#L20)
+
+### DuckdbWorkerMessage (interface)
+
+IPC envelope received by the local DuckDB worker process.
+
+**Example**
+
+```ts
+const message: DuckdbWorkerMessage = { id: 1, command: { type: "flush" } };
+```
+
+**Signature**
+
+```ts
+export interface DuckdbWorkerMessage {
+  readonly id: number;
+  readonly command: LocalWorkerCommand;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-process.types.ts#L14)
+
+## `duckdb-worker-signals.ts`
+
+Holds signal/disconnect listeners until the worker process scope finishes database finalization.
+
+### installDuckdbWorkerSignals
+
+**Signature**
+
+```ts
+declare const installDuckdbWorkerSignals: (
+  scope: Scope.Closeable,
+) => Effect.Effect<void, never, Scope.Scope>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-signals.ts#L4)
+
+## `duckdb-worker-state.types.ts`
+
+Physical database scope and serialization state owned by one storage worker.
+
+### DuckdbWorkerState (interface)
+
+Open transfers its database scope here; close clears authority before release.
+
+**Signature**
+
+```ts
+export interface DuckdbWorkerState {
+  readonly driver: DuckdbDriver;
+  readonly permit: Semaphore.Semaphore;
+  database: DuckdbDatabaseEffects | undefined;
+  databaseScope: Scope.Closeable | undefined;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-state.types.ts#L7)
+
+## `duckdb-worker.ts`
+
+Owns duckdb worker for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+## `duckdb-worker.types.ts`
+
+Owns duckdb worker.types for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### DuckdbWorkerEffects (interface)
+
+Serialized command operations for the local DuckDB worker.
+The Layer owns any open database until its Scope closes.
+
+**Example**
+
+```ts
+const worker = yield * DuckdbWorkerService;
+yield * worker.execute({ type: "flush" });
+```
+
+**Signature**
+
+```ts
+export interface DuckdbWorkerEffects {
+  /**
+   * Executes one IPC command with a tagged database or query failure.
+   * @param command - Open, append, query, retention, flush, or close command.
+   * @returns An Effect with the command result or tagged failure.
+   * @example
+   * const summary = yield* worker.execute({ type: "open", root });
+   */
+  readonly execute: (
+    command: LocalWorkerCommand,
+  ) => Effect.Effect<DuckdbWorkerResult, DuckdbError | DuckdbQueryError>;
+  /**
+   * Flushes and releases the active database Scope once.
+   * @returns An Effect completing after release or a DuckdbError.
+   * @example
+   * yield* worker.close();
+   */
+  readonly close: () => Effect.Effect<void, DuckdbError>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker.types.ts#L19)
+
+### DuckdbWorkerResult (type alias)
+
+Actual command results before JSON serialization at the IPC boundary.
+
+**Signature**
+
+```ts
+type DuckdbWorkerResult =
+  | void
+  | DuckdbDatabaseEffects["imported"]
+  | Effect.Success<ReturnType<DuckdbDatabaseEffects["append"]>>
+  | Effect.Success<ReturnType<DuckdbDatabaseEffects["list"]>>
+  | Effect.Success<ReturnType<DuckdbDatabaseEffects["detail"]>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker.types.ts#L40)
+
+## `import-history-effect.ts`
+
+Imports existing history in stable path order using original path/hash markers.
+Source files, receipt identities, malformed counts and applied schema stay intact.
+
+### importLocalHistoryEffect
+
+**Signature**
+
+```ts
+declare const importLocalHistoryEffect: (
+  root: string,
+  connection: DuckdbConnectionPort,
+  append: LegacyAppend,
+) => Effect.Effect<{ records: number; malformed: number }, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/import-history-effect.ts#L15)
+
+## `import-history-files.ts`
+
+Owns import history effect for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### historyFiles
+
+**Signature**
+
+```ts
+declare const historyFiles: (
+  root: string,
+) => Effect.Effect<string[], ReturnType<typeof duckdbError>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/import-history-files.ts#L13)
+
+### historyFingerprint
+
+**Signature**
+
+```ts
+declare const historyFingerprint: (path: string) => Effect.Effect<string, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/import-history-files.ts#L37)
+
+## `import-history-line.ts`
+
+Derives unchanged path/line/hash receipt keys and admits bounded legacy batches.
+
+### importLegacyLine
+
+**Signature**
+
+```ts
+declare const importLegacyLine: (
+  state: LegacyLineState,
+  line: string,
+  append: LegacyAppend,
+) => Effect.Effect<void, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/import-history-line.ts#L39)
+
+## `import-history-lines.ts`
+
+Streams one legacy NDJSON source with owned reader handles and sequential receipt identity.
+
+### importLegacyLines
+
+**Signature**
+
+```ts
+declare const importLegacyLines: (
+  path: string,
+  sourcePath: string,
+  append: LegacyAppend,
+) => Effect.Effect<{ records: number; malformed: number }, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/import-history-lines.ts#L11)
+
+## `import-history-lines.types.ts`
+
+Sequential line/import counters private to one legacy NDJSON source.
+
+### LegacyLineState (interface)
+
+Keeps file line identity stable across malformed rows and batch boundaries.
+
+**Signature**
+
+```ts
+export interface LegacyLineState {
+  readonly sourcePath: string;
+  lineNumber: number;
+  malformed: number;
+  records: number;
+  pending: LocalRecord[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/import-history-lines.types.ts#L5)
+
+## `import-history.ts`
+
+Owns import history for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### importLocalHistory
+
+Imports legacy NDJSON through the scoped Effect implementation.
+
+**Throws**
+
+If file IO or persistence fails.
+
+**Example**
+
+```ts
+const summary = await importLocalHistory(root, connection, append);
+```
+
+**Signature**
+
+```ts
+declare const importLocalHistory: (
+  root: string,
+  connection: DuckdbConnectionPort,
+  append: (records: readonly LocalRecord[]) => Promise<readonly StoredLocalRecord[]>,
+) => Promise<{ records: number; malformed: number }>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/import-history.ts#L22)
+
+## `import-history.types.ts`
+
+Owns import history.types for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### LegacyAppend (type alias)
+
+Effect batch writer used during the ordered legacy import.
+
+**Example**
+
+```ts
+const append: LegacyAppend = (records) => storage.append(records);
+```
+
+**Signature**
+
+```ts
+type LegacyAppend = (
+  records: readonly LocalRecord[],
+) => Effect.Effect<readonly StoredLocalRecord[], DuckdbError>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/import-history.types.ts#L29)
+
+### LegacyImportSummary (interface)
+
+Counts persisted and malformed legacy segment records.
+
+**Example**
+
+```ts
+const summary: LegacyImportSummary = { records: 2, malformed: 1 };
+```
+
+**Signature**
+
+```ts
+export interface LegacyImportSummary {
+  readonly records: number;
+  readonly malformed: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/import-history.types.ts#L16)
+
+## `worker-client-effect.ts`
+
+Acquires the optional isolated Node worker and exposes shared structural effects.
+Its caller owns close; neither record producers nor console logging import it.
+
+### startLocalWorkerEffect
+
+Starts one child without opening a database until the caller sends open.
+
+**Signature**
+
+```ts
+declare const startLocalWorkerEffect: (
+  onFailure?: ((error: Error) => void) | undefined,
+) => Effect.Effect<LocalWorkerEffects, LocalWorkerError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-effect.ts#L23)
+
+## `worker-client-send.ts`
+
+Sends timeout-bound commands to an owned storage child and joins its close IPC.
+Caller cancellation stops waiting; the shared worker retains sent commands
+until their reply or deadline, so one disconnected reader cannot abort writes.
+
+### closeWorkerClient
+
+**Signature**
+
+```ts
+declare const closeWorkerClient: (state: WorkerClientState) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-send.ts#L75)
+
+### sendWorkerCommand
+
+**Signature**
+
+```ts
+declare const sendWorkerCommand: (
+  state: WorkerClientState,
+  command: LocalWorkerCommand,
+  signal?: AbortSignal,
+) => Promise<Schema.Json | undefined>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-send.ts#L13)
+
+## `worker-client-service.ts`
+
+Owns worker client service for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### LocalWorkerService (class)
+
+Injectable local worker operations. A Layer owns the worker process until
+its scope closes, so callers can substitute a deterministic service in tests.
+
+**Example**
+
+```ts
+const program = Effect.gen(function* () {
+  const worker = yield* LocalWorkerService;
+  return worker.pid;
+});
+```
+
+**Signature**
+
+```ts
+declare class LocalWorkerService
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-service.ts#L20)
+
+### localWorkerLayer
+
+Acquires a worker for the Layer scope and releases it on every exit.
+
+**Example**
+
+```ts
+const result = await Effect.runPromise(program.pipe(Effect.provide(localWorkerLayer())));
+```
+
+**Signature**
+
+```ts
+declare const localWorkerLayer: (
+  onFailure?: (error: Error) => void,
+) => Layer.Layer<LocalWorkerService, LocalWorkerError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-service.ts#L38)
+
+## `worker-client-state.ts`
+
+Registers IPC reply/exit handlers for one isolated storage worker.
+Invalid replies fail pending callers; stopping affects only the owned child.
+
+### createWorkerClientState
+
+**Signature**
+
+```ts
+declare const createWorkerClientState: (
+  child: ChildProcess,
+  onFailure: (error: Error) => void,
+) => WorkerClientState;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-state.ts#L25)
+
+### failWorkerClient
+
+**Signature**
+
+```ts
+declare const failWorkerClient: (state: WorkerClientState, error: Error) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-state.ts#L70)
+
+### stopWorkerClient
+
+**Signature**
+
+```ts
+declare const stopWorkerClient: (state: WorkerClientState) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-state.ts#L61)
+
+## `worker-client-state.types.ts`
+
+Private IPC ownership state; every pending reply belongs to one child process.
+
+### PendingWorkerCall (interface)
+
+One timer-bound IPC reply, settled or rejected when the worker retires.
+
+**Signature**
+
+```ts
+export interface PendingWorkerCall {
+  readonly resolve: (value: Schema.Json | undefined) => void;
+  readonly reject: (error: Error) => void;
+  readonly timer: ReturnType<typeof setTimeout>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-state.types.ts#L6)
+
+### WorkerClientState (interface)
+
+Physical process, pending replies, and exactly-once close state.
+
+**Signature**
+
+```ts
+export interface WorkerClientState {
+  readonly child: ChildProcess;
+  readonly pending: Map<number, PendingWorkerCall>;
+  readonly onFailure: (error: Error) => void;
+  readonly exited: Promise<void>;
+  nextId: number;
+  closed: boolean;
+  closing: boolean;
+  opened: boolean;
+  failure: Error | undefined;
+  diagnostic: string;
+  closePromise: Promise<void> | undefined;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-state.types.ts#L13)
+
+## `worker-client.ts`
+
+Owns worker client for the optional local history store.
+Shared records and query contracts come from lightweight observability; native
+handles and worker lifetimes remain owned by this storage package.
+
+### LocalWorkerEffects
+
+**Signature**
+
+```ts
+declare const LocalWorkerEffects: LocalWorkerEffects;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client.ts#L15)
+
+### LocalWorkerError
+
+**Signature**
+
+```ts
+declare const LocalWorkerError: typeof LocalWorkerError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client.ts#L12)
+
+### LocalWorkerService
+
+**Signature**
+
+```ts
+declare const LocalWorkerService: typeof LocalWorkerService;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client.ts#L14)
+
+### localWorkerLayer
+
+**Signature**
+
+```ts
+declare const localWorkerLayer: (
+  onFailure?: (error: Error) => void,
+) => Layer<LocalWorkerService, LocalWorkerError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client.ts#L14)
+
+### startLocalWorker
+
+Starts a local worker with the existing Promise API.
+
+**Throws**
+
+If process creation fails.
+
+**Example**
+
+```ts
+const worker = startLocalWorker();
+try {
+  await worker.call({ type: "flush" });
+} finally {
+  await worker.close();
+}
+```
+
+**Signature**
+
+```ts
+declare const startLocalWorker: (onFailure?: (error: Error) => void) => {
+  pid: number | undefined;
+  call: <T>(command: LocalWorkerCommand) => Promise<T>;
+  close: () => Promise<void>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client.ts#L30)
+
+### startLocalWorkerEffect
+
+**Signature**
+
+```ts
+declare const startLocalWorkerEffect: (
+  onFailure?: ((error: Error) => void) | undefined,
+) => Effect.Effect<LocalWorkerEffects, LocalWorkerError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client.ts#L13)
+
+## `worker.ts`
+
+Exposes IPC transport without evaluating the native DuckDB driver in its caller.
+The isolated Node worker imports that driver in its own process. Its caller
+retains the transport's explicit close operation and physical child identity.
+
+### LocalWorkerCommand
+
+**Signature**
+
+```ts
+declare const LocalWorkerCommand: LocalWorkerCommand;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker.ts#L14)
+
+### LocalWorkerEffects
+
+**Signature**
+
+```ts
+declare const LocalWorkerEffects: LocalWorkerEffects;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker.ts#L12)
+
+### LocalWorkerError
+
+**Signature**
+
+```ts
+declare const LocalWorkerError: LocalWorkerError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker.ts#L13)
+
+### startLocalWorkerEffect
+
+**Signature**
+
+```ts
+declare const startLocalWorkerEffect: (
+  onFailure?: ((error: Error) => void) | undefined,
+) => Effect<LocalWorkerEffects, LocalWorkerError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker.ts#L11)
+
 ## `options.ts`
 
 Parses trusted tool launch flags without importing an application's config or dependencies.

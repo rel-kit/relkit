@@ -4,7 +4,7 @@
  * ephemeral bridge cannot collide with a fixed application port before binding.
  */
 import { expect, test } from "vitest";
-import { loadConfig } from "@relkit/compiler";
+import { loadConfig } from "../../src/compiler/index.js";
 import { checkPorts } from "../../src/commands/doctor-checks.js";
 
 test("disabled inspection never probes the standalone UI port", async () => {

@@ -16,4 +16,4 @@ export const pulumiEngine = Object.freeze({
 export const deploymentIntegration = pulumiEngine;
 
 // The selected engine owns the implementation; authoring stays metadata-only.
-export * from "@relkit/deploy-pulumi";
+export * from "../deploy-pulumi/index.js";

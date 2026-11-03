@@ -3,7 +3,7 @@ import { Schema } from "effect";
 
 /** Existing Pulumi implementation signatures remain owned by the selected engine. */
 export type PulumiImplementation = Pick<
-  typeof import("@relkit/deploy-pulumi"),
+  typeof import("@relkit/pulumi/deploy-pulumi"),
   | "createPulumiProgram"
   | "createPulumiWorkspace"
   | "writePulumiProgram"

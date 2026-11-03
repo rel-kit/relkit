@@ -9,7 +9,7 @@ import {
   extractDescriptors,
   normalizeCompilation,
   type GeneratedOutputs,
-} from "@relkit/compiler";
+} from "../compiler/index.js";
 import { sortDiagnostics } from "relkit/diagnostics";
 import { Effect } from "effect";
 import { cliTry } from "../cli-errors.js";

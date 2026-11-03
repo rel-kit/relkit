@@ -5,7 +5,7 @@ import { expect, test } from "bun:test";
 import { defineFunction, defineService } from "relkit";
 import { invokeFunction, createInspectableObservabilityHooks } from "relkit/engine";
 import { createRegistrationPlan, type ApplicationGraph } from "relkit/graph";
-import { generateClient } from "../../../packages/client-generator/src/index.ts";
+import { generateClient } from "../../../packages/cli/src/client-generator/index.ts";
 import { generateOpenApi, type OpenApiDocument } from "relkit/openapi";
 import {
   API_REFERENCE_PATH,

@@ -4,7 +4,7 @@ import {
   GENERATED_ARTIFACT_FILES,
   type GeneratedOutputs,
   type LoadedToolingConfig,
-} from "@relkit/compiler";
+} from "../compiler/index.js";
 import { createDiagnostic, sortDiagnostics, type Diagnostic } from "relkit/diagnostics";
 import { Effect } from "effect";
 import { cliOriginalError } from "../cli-errors.js";

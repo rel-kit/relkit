@@ -4,7 +4,7 @@ import { defineFunction } from "relkit/functions";
 import { defineService } from "relkit/services";
 import { defineRoute, defineTransform, http } from "relkit/routes";
 import { z } from "relkit/schema";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
 
 const input = z.object({ id: z.string() });
 const output = z.object({ ok: z.boolean() });

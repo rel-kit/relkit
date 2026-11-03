@@ -20,7 +20,7 @@ import type {
 } from "./snapshot-candidate.types.js";
 import type { SnapshotProbeOperations } from "./snapshot-candidate.types.js";
 import type { SnapshotCandidateFileOperations } from "./snapshot-candidate.types.js";
-import type { StartedCandidate } from "@relkit/supervisor";
+import type { StartedCandidate } from "../supervisor/index.js";
 
 /** Candidate policy captures replaceable file authorities once per session Layer. */
 export class SnapshotCandidates extends Context.Service<

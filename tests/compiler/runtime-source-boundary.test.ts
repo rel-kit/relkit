@@ -1,6 +1,6 @@
 /** Checks emitted integration metadata remains inert when source is embedded in a JavaScript host. */
 import { expect, test } from "bun:test";
-import { generateRuntimeIntegrationImports } from "../../packages/compiler/src/index.ts";
+import { generateRuntimeIntegrationImports } from "../../packages/cli/src/compiler/index.ts";
 import { planEntry } from "./runtime-integration-plan.fixture.js";
 
 test("integration metadata cannot terminate an enclosing script", () => {

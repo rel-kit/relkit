@@ -6,7 +6,7 @@ import {
   InspectionFilesLive,
   InspectionNative,
   InspectionNativeLive,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 import { InspectorDiscovery, InspectorDiscoveryLive } from "./discovery.service.js";
 import { InspectorRemote, InspectorRemoteLive } from "./remote.service.js";
 import { InspectorUiNative, InspectorUiNativeLive } from "./ui-native.service.js";

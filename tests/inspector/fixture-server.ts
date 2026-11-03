@@ -9,8 +9,8 @@ import {
   InspectionFilesLive,
   InspectionNativeLive,
   InspectionCapture,
-} from "@relkit/inspector-api/connection";
-import { disposeInspectorEndpoints } from "../../packages/inspector-api/src/index.ts";
+} from "relkit/inspector-api/connection";
+import { disposeInspectorEndpoints } from "../../packages/relkit/src/inspector-api/index.ts";
 import { createInspectorFixture, FIXTURE_GENERATION_ID } from "./fixture-backend.ts";
 
 /** Acquires the application before the bridge and releases it after the bridge closes. */

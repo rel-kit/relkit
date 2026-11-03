@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { Effect } from "effect";
-import { hashGeneratedArtifact } from "@relkit/compiler";
+import { hashGeneratedArtifact } from "../compiler/index.js";
 import { normalizeLocalServiceRecipeEffect } from "relkit/local-service";
 import { cliAdapterError, cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";

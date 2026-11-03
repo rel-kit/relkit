@@ -8,7 +8,7 @@ import s3Manifest from "../../integrations/packages/s3/package.json";
 import {
   resolveIntegrationPackageRole,
   resolveRuntimeIntegrationPackages,
-} from "../../packages/compiler/src/index.ts";
+} from "../../packages/cli/src/compiler/index.ts";
 import { runtimePackage, fixtureManifest } from "./runtime-integration-plan.fixture.js";
 export async function case2Provenance() {
   const projectRoot = await mkdtemp(join(tmpdir(), "relkit-selected-integrations-"));

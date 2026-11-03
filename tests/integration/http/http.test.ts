@@ -24,7 +24,7 @@ import {
   type TestObservability,
 } from "../../../packages/testing/src/index.ts";
 import { defineRoute, http } from "relkit/routes";
-import { normalizeCompilation } from "../../../packages/compiler/src/index.ts";
+import { normalizeCompilation } from "../../../packages/cli/src/compiler/index.ts";
 import { GRAPH_VERSION } from "relkit/contracts";
 import { z } from "relkit/schema";
 import { runtimeCohort } from "../runtime-cohort.ts";

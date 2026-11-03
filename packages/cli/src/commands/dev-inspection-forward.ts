@@ -1,9 +1,9 @@
 /** Reuses supervisor request/body ownership so inspection participates in native generation draining. */
 import { Cause, Effect } from "effect";
 import type { Scope } from "effect";
-import { proxyRequest } from "@relkit/supervisor/internal/request";
-import { InspectionConnectionError } from "@relkit/inspector-api/connection";
-import type { InspectionBridgeAuthority } from "@relkit/inspector-api/connection";
+import { proxyRequest } from "../supervisor/proxy-request.js";
+import { InspectionConnectionError } from "relkit/inspector-api/connection";
+import type { InspectionBridgeAuthority } from "relkit/inspector-api/connection";
 import type { DevSession } from "./dev-session.js";
 
 /** Captures the committed candidate and lease before any forwarding await; mutations never retry. */

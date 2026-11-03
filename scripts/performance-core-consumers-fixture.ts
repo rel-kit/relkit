@@ -1,4 +1,4 @@
-import { installInspectorEndpoints } from "@relkit/inspector-api";
+import { installInspectorEndpoints } from "relkit/inspector-api";
 import {
   createObservabilityStream,
   type ObservabilityQuery,

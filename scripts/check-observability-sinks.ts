@@ -6,12 +6,12 @@ import { resolveOwnedSourceFile, scanLoggerSinks } from "./check-logger-sinks.ts
 
 export const OBSERVABILITY_SOURCE_ROOTS = Object.freeze([
   "packages/relkit/src/observability",
-  "packages/observability-local/src",
+  "packages/inspector/src/observability-local",
   "packages/relkit/src/runtime-effect",
   "packages/relkit/src/runtime-hono",
   "packages/relkit/src/engine",
   "packages/relkit/src/agents",
-  "packages/inspector-api/src",
+  "packages/relkit/src/inspector-api",
   "packages/inspector/src",
   "packages/cli/src/commands",
 ] as const);
@@ -42,8 +42,8 @@ export const OBSERVABILITY_RECORD_ADAPTERS = Object.freeze([
   "packages/relkit/src/observability/storage/segment-files.ts",
   "packages/relkit/src/runtime-effect/logger.ts",
   // The response-owned SSE exporter serializes admitted native stream events.
-  "packages/inspector-api/src/observability-stream.ts",
-  "packages/inspector-api/src/observability-utils.ts",
+  "packages/relkit/src/inspector-api/observability-stream.ts",
+  "packages/relkit/src/inspector-api/observability-utils.ts",
 ] as const);
 
 export interface ObservabilitySinkViolation {

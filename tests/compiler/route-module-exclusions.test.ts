@@ -1,12 +1,12 @@
 import { expect, test } from "bun:test";
 import ts from "typescript";
-import { generateRouteModuleChecks } from "../../packages/compiler/src/route-module-checks.js";
-import { routeModuleFindings } from "../../packages/compiler/src/route-module-diagnostics.js";
+import { generateRouteModuleChecks } from "../../packages/cli/src/compiler/route-module-checks.js";
+import { routeModuleFindings } from "../../packages/cli/src/compiler/route-module-diagnostics.js";
 import {
   isRouteModule,
   routeSourceFindings,
-} from "../../packages/compiler/src/route-source-checks.js";
-import { prefilterSources } from "../../packages/compiler/src/discovery/ast-prefilter.js";
+} from "../../packages/cli/src/compiler/route-source-checks.js";
+import { prefilterSources } from "../../packages/cli/src/compiler/discovery/ast-prefilter.js";
 
 const excluded = [
   "src/routes/__fixtures__/route.ts",

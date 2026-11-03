@@ -19,8 +19,8 @@ export const apiPackageDefinitions = [
   apiPackage(
     "observability-local",
     "Local history",
-    "@relkit/observability-local",
-    "packages/observability-local",
+    "@relkit/inspector/observability-local",
+    "packages/inspector/src/observability-local",
     "core",
   ),
   apiPackage("cli-api", "CLI automation", "@relkit/cli", "packages/cli", "core"),
@@ -141,16 +141,19 @@ export const apiPackageDefinitions = [
   ),
 ] as const;
 
+/** A source area merged into a package, such as `packages/relkit/src/functions`. */
+const AREA_DIRECTORY = /^(?:packages|integrations\/packages)\/[^/]+\/src\/[^/]+$/;
+
 /** Source folder documented for a catalog directory: a `relkit` area is its own source folder.
- * @param directory - Workspace package or `packages/relkit/src/<area>`. @returns Folder holding the sources. */
+ * @param directory - Workspace package or a merged area's folder. @returns Folder holding the sources. */
 export function sourceDirectory(directory: string): string {
-  return /^packages\/relkit\/src\/[^/]+$/.test(directory) ? directory : `${directory}/src`;
+  return AREA_DIRECTORY.test(directory) ? directory : `${directory}/src`;
 }
 
 /** Workspace package that owns a catalog directory.
- * @param directory - Workspace package or `packages/relkit/src/<area>`. @returns Package directory. */
+ * @param directory - Workspace package or a merged area's folder. @returns Package directory. */
 export function packageDirectory(directory: string): string {
-  return /^packages\/relkit\/src\/[^/]+$/.test(directory) ? "packages/relkit" : directory;
+  return AREA_DIRECTORY.test(directory) ? directory.replace(/\/src\/[^/]+$/, "") : directory;
 }
 
 export type ApiPackage = (typeof apiPackageDefinitions)[number]["slug"];

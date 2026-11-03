@@ -11,7 +11,7 @@ import {
   compareRouteFilePaths,
   parseRouteFilePath,
   type ParsedRouteFilePath,
-} from "@relkit/compiler";
+} from "@relkit/cli/compiler";
 import { getJsonSchema, type StandardSchemaV1 } from "relkit/schema";
 import { canCarryStandardSchema } from "relkit/contracts";
 

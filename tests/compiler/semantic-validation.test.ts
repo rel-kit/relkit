@@ -18,7 +18,7 @@ import { z, type StandardSchemaV1 } from "relkit/schema";
 import {
   NORMALIZE_CODES,
   normalizeCompilation as normalize,
-} from "../../packages/compiler/src/index.ts";
+} from "../../packages/cli/src/compiler/index.ts";
 import { docker } from "../../integrations/packages/docker/src/index.ts";
 import { redis } from "../../integrations/packages/redis/src/index.ts";
 import { s3 } from "../../integrations/packages/s3/src/index.ts";

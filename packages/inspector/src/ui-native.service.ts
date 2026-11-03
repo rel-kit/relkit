@@ -4,7 +4,7 @@ import { dirname } from "node:path";
 import { access } from "node:fs/promises";
 import { createServer } from "node:net";
 import { Context, Effect, Layer } from "effect";
-import { connectionAttempt, InspectionConnectionError } from "@relkit/inspector-api/connection";
+import { connectionAttempt, InspectionConnectionError } from "relkit/inspector-api/connection";
 import type { InspectorOptions } from "./options.types.js";
 import { probeInspectorUi, waitInspectorUiReady } from "./ui-readiness.js";
 

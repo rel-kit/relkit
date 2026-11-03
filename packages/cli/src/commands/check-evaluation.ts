@@ -4,7 +4,7 @@
  * the result retains source provenance for normalization and diagnostics.
  */
 import { join } from "node:path";
-import { prefilterSources } from "@relkit/compiler";
+import { prefilterSources } from "../compiler/index.js";
 import { Effect } from "effect";
 import { cliTry } from "../cli-errors.js";
 import { CliCompiler } from "../services/compiler.service.js";

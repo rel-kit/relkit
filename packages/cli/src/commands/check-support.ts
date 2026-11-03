@@ -5,7 +5,7 @@
  */
 import { canonicalJson, RELKIT_DESCRIPTOR } from "relkit/contracts";
 import { createDiagnostic, type Diagnostic } from "relkit/diagnostics";
-import { ConfigValidationError, type GeneratedOutputs } from "@relkit/compiler";
+import { ConfigValidationError, type GeneratedOutputs } from "../compiler/index.js";
 import { Effect } from "effect";
 import { relative } from "node:path";
 import { observeCli, runCliEffect } from "../cli-runtime.js";

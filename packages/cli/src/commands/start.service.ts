@@ -1,6 +1,6 @@
 import { join, resolve } from "node:path";
 import { Context, Effect, Layer } from "effect";
-import { DEFAULT_CANDIDATE_HEALTH_TIMEOUT_MS } from "@relkit/supervisor";
+import { DEFAULT_CANDIDATE_HEALTH_TIMEOUT_MS } from "../supervisor/index.js";
 import { cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { fileSystemLayer } from "../services/filesystem.service.js";

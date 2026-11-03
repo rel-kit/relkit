@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { GRAPH_VERSION } from "relkit/contracts";
-import { generateLocalServicePlan } from "../../packages/compiler/src/index.ts";
+import { generateLocalServicePlan } from "../../packages/cli/src/compiler/index.ts";
 import type { ApplicationGraph, ProviderBindingNode } from "relkit/graph";
 
 const source = { file: "src/app.ts", line: 1, column: 1 } as const;

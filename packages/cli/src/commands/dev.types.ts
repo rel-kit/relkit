@@ -6,8 +6,8 @@ import type {
   CandidateCompile,
   StartedCandidate,
   SupervisorObservabilityOptions,
-} from "@relkit/supervisor";
-import type { InspectionBridgeOptions } from "@relkit/inspector-api/connection";
+} from "../supervisor/index.js";
+import type { InspectionBridgeOptions } from "relkit/inspector-api/connection";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { DevInspectorPolicy } from "./dev-inspector-support.types.js";
 

@@ -30,13 +30,24 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./observability-local": {
+      "types": "./dist/observability-local/index.d.ts",
+      "import": "./dist/observability-local/index.js"
+    },
+    "./observability-local/internal/local-worker": {
+      "types": "./dist/observability-local/local/duckdb-worker.d.ts",
+      "import": "./dist/observability-local/local/duckdb-worker.js"
+    },
+    "./observability-local/worker": {
+      "types": "./dist/observability-local/local/worker.d.ts",
+      "import": "./dist/observability-local/local/worker.js"
     }
   },
   "dependencies": {
+    "@duckdb/node-api": "1.5.5-r.4",
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node-shared": "catalog:",
-    "@relkit/inspector-api": "workspace:*",
-    "@relkit/observability-local": "workspace:*",
     "effect": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
@@ -45,6 +56,7 @@
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },

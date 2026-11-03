@@ -13,7 +13,7 @@ import {
   InspectionConnectionError,
   InspectionFilesLive,
   InspectionNativeLive,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 import { INSPECTOR_HELP, parseInspectorOptions } from "../src/options.js";
 import type { InspectorOptions } from "../src/options.types.js";
 import { InspectorDiscoveryLive } from "../src/discovery.service.js";

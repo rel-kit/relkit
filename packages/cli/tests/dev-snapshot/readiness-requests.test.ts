@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { SnapshotReadinessRequests } from "../../src/dev-snapshot/snapshot-readiness-requests.js";
-import type { StartedCandidate } from "@relkit/supervisor";
+import type { StartedCandidate } from "../../src/supervisor/index.js";
 
 const candidate = {
   token: { sourceToken: 1, generationToken: 2 },

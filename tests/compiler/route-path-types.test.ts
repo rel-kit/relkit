@@ -2,8 +2,8 @@ import { afterEach, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import ts from "typescript";
-import { generateRouteModuleChecks } from "../../packages/compiler/src/route-module-checks.js";
-import { routeModuleFindings } from "../../packages/compiler/src/route-module-diagnostics.js";
+import { generateRouteModuleChecks } from "../../packages/cli/src/compiler/route-module-checks.js";
+import { routeModuleFindings } from "../../packages/cli/src/compiler/route-module-diagnostics.js";
 
 const repository = resolve(import.meta.dir, "../..");
 const roots: string[] = [];

@@ -1,7 +1,7 @@
 /** Protects UI server requests and serves history locally while forwarding live operations once. */
 import { timingSafeEqual } from "node:crypto";
 import { Effect, Ref } from "effect";
-import { streamResponse } from "@relkit/inspector-api";
+import { streamResponse } from "relkit/inspector-api";
 import {
   ObservabilityQueryError,
   ObservabilityStreamError,

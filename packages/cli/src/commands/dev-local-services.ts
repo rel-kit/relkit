@@ -1,5 +1,5 @@
 import { assertRuntimeIntegrationPlanVersion, isStableId } from "relkit/contracts";
-import { hashGeneratedArtifact } from "@relkit/compiler";
+import { hashGeneratedArtifact } from "../compiler/index.js";
 import { validateGraphShape, type ApplicationGraph } from "relkit/graph";
 import {
   assertLocalServicePlanVersion,

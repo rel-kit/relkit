@@ -2,8 +2,8 @@
 import assert from "node:assert/strict";
 import { diffGraph, validateGraphShape, type ApplicationGraph } from "relkit/graph";
 import { fromGraph, diffDeploymentPlans } from "relkit/deploy";
-import { renderPulumiProgram } from "../../packages/deploy-pulumi/src/program.js";
-import type { NormalizedGraph } from "../../packages/compiler/src/normalize-graph-types.js";
+import { renderPulumiProgram } from "../../integrations/packages/pulumi/src/deploy-pulumi/program.js";
+import type { NormalizedGraph } from "../../packages/cli/src/compiler/normalize-graph-types.js";
 
 /**
  * Admits the compiler's graph projection only after the native graph validator proves its contract.

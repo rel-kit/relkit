@@ -18,10 +18,7 @@
         "@playwright/test": "1.63.0",
         "@relkit/cli": "workspace:*",
         "@relkit/client": "workspace:*",
-        "@relkit/compiler": "workspace:*",
-        "@relkit/inspector-api": "workspace:*",
         "@relkit/langchain": "workspace:*",
-        "@relkit/supervisor": "workspace:*",
         "@stryker-mutator/core": "10.0.0",
         "@stryker-mutator/typescript-checker": "10.0.0",
         "@stryker-mutator/vitest-runner": "10.0.0",
@@ -372,11 +369,8 @@
       "name": "@relkit/pulumi",
       "version": "0.8.3",
       "dependencies": {
-        "@relkit/deploy-pulumi": "workspace:*",
+        "effect": "catalog:",
         "relkit": "workspace:*",
-      },
-      "devDependencies": {
-        "@pulumi/pulumi": "catalog:",
       },
       "peerDependencies": {
         "@pulumi/pulumi": "catalog:",
@@ -478,10 +472,6 @@
       "dependencies": {
         "@clack/prompts": "catalog:",
         "@relkit/client": "workspace:*",
-        "@relkit/client-generator": "workspace:*",
-        "@relkit/compiler": "workspace:*",
-        "@relkit/inspector-api": "workspace:*",
-        "@relkit/supervisor": "workspace:*",
         "create-relkit": "workspace:*",
         "effect": "catalog:",
         "hono": "catalog:",
@@ -490,8 +480,8 @@
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
-        "@relkit/deploy-pulumi": "workspace:*",
         "@relkit/local": "workspace:*",
+        "@relkit/pulumi": "workspace:*",
         "vitest": "catalog:",
       },
     },
@@ -528,17 +518,6 @@
         "react",
       ],
     },
-    "packages/client-generator": {
-      "name": "@relkit/client-generator",
-      "version": "0.7.13",
-      "dependencies": {
-        "effect": "catalog:",
-        "relkit": "workspace:*",
-      },
-      "devDependencies": {
-        "vitest": "catalog:",
-      },
-    },
     "packages/cloud-aws": {
       "name": "@relkit/cloud-aws",
       "version": "0.7.15",
@@ -547,20 +526,6 @@
         "@pulumi/awsx": "3.10.0",
         "@pulumi/pulumi": "catalog:",
         "relkit": "workspace:*",
-      },
-    },
-    "packages/compiler": {
-      "name": "@relkit/compiler",
-      "version": "0.8.3",
-      "dependencies": {
-        "@relkit/client-generator": "workspace:*",
-        "effect": "catalog:",
-        "relkit": "workspace:*",
-        "typescript": "catalog:",
-      },
-      "devDependencies": {
-        "@effect/vitest": "catalog:",
-        "vitest": "catalog:",
       },
     },
     "packages/create-relkit": {
@@ -578,23 +543,6 @@
         "@effect/vitest": "catalog:",
         "vitest": "catalog:",
       },
-    },
-    "packages/deploy-pulumi": {
-      "name": "@relkit/deploy-pulumi",
-      "version": "0.8.3",
-      "dependencies": {
-        "effect": "catalog:",
-        "relkit": "workspace:*",
-      },
-      "devDependencies": {
-        "@pulumi/pulumi": "catalog:",
-      },
-      "peerDependencies": {
-        "@pulumi/pulumi": "catalog:",
-      },
-      "optionalPeers": [
-        "@pulumi/pulumi",
-      ],
     },
     "packages/drizzle": {
       "name": "@relkit/drizzle",
@@ -626,10 +574,9 @@
         "relkit-inspector": "./dist/bin.js",
       },
       "dependencies": {
+        "@duckdb/node-api": "1.5.5-r.4",
         "@effect/platform-bun": "catalog:",
         "@effect/platform-node-shared": "catalog:",
-        "@relkit/inspector-api": "workspace:*",
-        "@relkit/observability-local": "workspace:*",
         "effect": "catalog:",
         "next": "catalog:",
         "react": "catalog:",
@@ -638,34 +585,8 @@
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
-        "typescript": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/inspector-api": {
-      "name": "@relkit/inspector-api",
-      "version": "0.8.4",
-      "dependencies": {
-        "effect": "catalog:",
-        "hono": "catalog:",
-        "relkit": "workspace:*",
-      },
-      "devDependencies": {
-        "@effect/vitest": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/observability-local": {
-      "name": "@relkit/observability-local",
-      "version": "0.1.4",
-      "dependencies": {
-        "@duckdb/node-api": "1.5.5-r.4",
-        "effect": "catalog:",
-        "relkit": "workspace:*",
-      },
-      "devDependencies": {
-        "@effect/vitest": "catalog:",
         "@vitest/coverage-v8": "catalog:",
+        "typescript": "catalog:",
         "vitest": "catalog:",
       },
     },
@@ -692,7 +613,6 @@
         "semver": "7.8.5",
       },
       "devDependencies": {
-        "@ag-ui/core": "0.0.59",
         "@effect/vitest": "catalog:",
         "@langchain/core": "catalog:",
         "@langchain/langgraph": "catalog:",
@@ -701,19 +621,13 @@
         "@langchain/langgraph-checkpoint-redis": "1.0.11",
         "@langchain/langgraph-checkpoint-sqlite": "1.0.4",
         "@modelcontextprotocol/client": "2.3.0",
-        "@modelcontextprotocol/server": "2.3.0",
         "@orpc/client": "catalog:",
-        "@scalar/hono-api-reference": "0.12.9",
         "@types/semver": "7.8.0",
-        "@valibot/to-json-schema": "1.8.0",
         "@vitest/coverage-v8": "catalog:",
-        "arktype": "2.2.9",
         "deepagents": "catalog:",
         "langchain": "catalog:",
         "typescript": "catalog:",
-        "valibot": "1.5.0",
         "vitest": "catalog:",
-        "zod": "4.6.7",
       },
       "peerDependencies": {
         "@ag-ui/core": "0.0.59",
@@ -736,23 +650,11 @@
         "zod",
       ],
     },
-    "packages/supervisor": {
-      "name": "@relkit/supervisor",
-      "version": "0.7.14",
-      "dependencies": {
-        "effect": "catalog:",
-        "relkit": "workspace:*",
-      },
-      "devDependencies": {
-        "@effect/vitest": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
     "packages/testing": {
       "name": "@relkit/testing",
       "version": "0.8.4",
       "dependencies": {
-        "@relkit/compiler": "workspace:*",
+        "@relkit/cli": "workspace:*",
         "effect": "catalog:",
         "relkit": "workspace:*",
       },
@@ -1931,15 +1833,9 @@
 
     "@relkit/client": ["@relkit/client@workspace:packages/client"],
 
-    "@relkit/client-generator": ["@relkit/client-generator@workspace:packages/client-generator"],
-
     "@relkit/cloud-aws": ["@relkit/cloud-aws@workspace:packages/cloud-aws"],
 
     "@relkit/cloudflare": ["@relkit/cloudflare@workspace:integrations/packages/cloudflare"],
-
-    "@relkit/compiler": ["@relkit/compiler@workspace:packages/compiler"],
-
-    "@relkit/deploy-pulumi": ["@relkit/deploy-pulumi@workspace:packages/deploy-pulumi"],
 
     "@relkit/docker": ["@relkit/docker@workspace:integrations/packages/docker"],
 
@@ -1963,8 +1859,6 @@
 
     "@relkit/inspector": ["@relkit/inspector@workspace:packages/inspector"],
 
-    "@relkit/inspector-api": ["@relkit/inspector-api@workspace:packages/inspector-api"],
-
     "@relkit/inspector-ui": ["@relkit/inspector-ui@workspace:apps/inspector"],
 
     "@relkit/integrations": ["@relkit/integrations@workspace:integrations/catalog"],
@@ -1972,8 +1866,6 @@
     "@relkit/langchain": ["@relkit/langchain@workspace:integrations/packages/langchain"],
 
     "@relkit/local": ["@relkit/local@workspace:integrations/packages/local"],
-
-    "@relkit/observability-local": ["@relkit/observability-local@workspace:packages/observability-local"],
 
     "@relkit/otlp": ["@relkit/otlp@workspace:integrations/packages/otlp"],
 
@@ -1986,8 +1878,6 @@
     "@relkit/s3": ["@relkit/s3@workspace:integrations/packages/s3"],
 
     "@relkit/sentry": ["@relkit/sentry@workspace:integrations/packages/sentry"],
-
-    "@relkit/supervisor": ["@relkit/supervisor@workspace:packages/supervisor"],
 
     "@relkit/testing": ["@relkit/testing@workspace:packages/testing"],
 

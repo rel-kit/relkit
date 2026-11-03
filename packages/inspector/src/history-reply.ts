@@ -11,7 +11,7 @@ import {
   telemetryTraceDetailSchema,
 } from "relkit/observability/local/protocol";
 import type { LocalWorkerCommand } from "relkit/observability/local/worker-contract";
-import { InspectionConnectionError } from "@relkit/inspector-api/connection";
+import { InspectionConnectionError } from "relkit/inspector-api/connection";
 
 /** A transport-level JSON decode alone cannot certify a worker query response. */
 export function validateHistoryReply(command: LocalWorkerCommand, value: Schema.Json | undefined) {

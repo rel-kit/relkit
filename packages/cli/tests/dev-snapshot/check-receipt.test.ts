@@ -6,7 +6,7 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DEFAULT_TOOLING_CONFIG } from "@relkit/compiler";
+import { DEFAULT_TOOLING_CONFIG } from "../../src/compiler/index.js";
 import { expect, it } from "@effect/vitest";
 import { Effect, Layer } from "effect";
 import { fileSystemLayer } from "../../src/services/filesystem.service.js";

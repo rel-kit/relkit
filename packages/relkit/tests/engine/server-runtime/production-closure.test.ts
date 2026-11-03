@@ -40,10 +40,7 @@ test("production framework closure has no development CLI or native local store 
   }
   for (const name of [
     "@relkit/cli",
-    "@relkit/compiler",
-    "@relkit/observability-local",
-    "@relkit/inspector-api",
-    "@relkit/deploy-pulumi",
+    "@relkit/inspector",
     "@relkit/pulumi",
     "@pulumi/pulumi",
     "@duckdb/node-api",

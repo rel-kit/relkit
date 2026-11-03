@@ -2,7 +2,7 @@
 import { expect } from "bun:test";
 import { Effect } from "effect";
 import { API_REFERENCE_PATH, OPENAPI_PATH } from "relkit/runtime-hono";
-import { generateClient } from "../../../packages/client-generator/src/index.ts";
+import { generateClient } from "../../../packages/cli/src/client-generator/index.ts";
 import { generateOpenApiJson } from "relkit/openapi";
 import type { CommerceHttpFixture } from "./commerce-http.types.ts";
 /**

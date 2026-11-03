@@ -4,7 +4,7 @@ import {
   agentProcedureEntriesFromDocument,
   generateContractFromDocument,
   jobProcedureSourcesFromDocument,
-} from "@relkit/client-generator";
+} from "../client-generator/index.js";
 import {
   cliAdapterError,
   cliTry,

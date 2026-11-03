@@ -8,7 +8,7 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import { Effect, Ref, Semaphore } from "effect";
 import type { InspectorConfiguration } from "relkit/contracts";
-import type { CandidateCompileRequest } from "@relkit/supervisor";
+import type { CandidateCompileRequest } from "../supervisor/index.js";
 import { DISABLED_CAPTURE_ENVIRONMENT } from "./dev-capture.service.js";
 import type { DevCapture } from "./dev-capture.types.js";
 import type { DevInspectorPolicy } from "./dev-inspector-support.types.js";

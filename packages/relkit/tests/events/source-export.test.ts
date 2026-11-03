@@ -21,7 +21,7 @@ const providerInternalPrefixes = [
   "tests/restart/events/provider-internal/",
 ];
 const providerInternalFiles = new Set([
-  "packages/inspector-api/src/observability-utils.ts",
+  "packages/relkit/src/inspector-api/observability-utils.ts",
   "packages/relkit/src/observability/stream-subscriber.ts",
   // Observability stream APIs use their established consumer terminology.
   "packages/relkit/src/observability/stream.ts",
@@ -120,7 +120,7 @@ test("keeps Effect operations on their separate entry point", () => {
 test("artifact scans reject application names in generated, graph, API, and inspector contracts", () => {
   const generated = `.relkit/generated/application.graph.json`;
   const graph = "packages/relkit/src/graph/model.ts";
-  const api = "packages/inspector-api/src/contracts.ts";
+  const api = "packages/relkit/src/inspector-api/contracts.ts";
   const inspector = "apps/inspector/src/navigation.tsx";
   const packageName = `@relkit/${term}s`;
   const navigation = `/${term}s`;

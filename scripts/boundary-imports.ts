@@ -50,16 +50,15 @@ export const descriptorPackages = new Set(
 
 export const internalRuntimePackages = new Set([
   "@relkit/cloud-aws",
-  "@relkit/deploy-pulumi",
   "relkit/engine",
-  "@relkit/inspector-api",
+  "relkit/inspector-api",
   "relkit/invocation",
   "relkit/observability",
   "relkit/providers-local",
   "@relkit/providers-standard",
   "relkit/runtime-effect",
   "relkit/runtime-hono",
-  "@relkit/supervisor",
+  "@relkit/cli",
 ]);
 
 /** Shared invocation contracts are internal, but descriptor packages may consume them. */

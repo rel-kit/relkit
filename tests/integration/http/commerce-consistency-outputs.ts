@@ -1,7 +1,7 @@
 /** Builds original pure registration/deployment/Pulumi outputs from the same native graph; rendering acquires no cloud resources. */
 import { createRegistrationPlan, type ApplicationGraph } from "relkit/graph";
 import { fromGraph } from "relkit/deploy";
-import { renderPulumiProgram } from "../../../packages/deploy-pulumi/src/program.ts";
+import { renderPulumiProgram } from "../../../integrations/packages/pulumi/src/deploy-pulumi/program.ts";
 
 const integrationImports: NonNullable<
   NonNullable<Parameters<typeof renderPulumiProgram>[1]>["integrationImports"]

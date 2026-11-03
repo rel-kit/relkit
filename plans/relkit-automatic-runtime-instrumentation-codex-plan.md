@@ -2217,7 +2217,7 @@ An event or job can finish after the request detail was first loaded.
 
 ### 17.1 API
 
-Extend `@relkit/inspector-api` with:
+Extend `relkit/inspector-api` with:
 
 ```text
 GET /_relkit/v1/requests/:requestId/execution

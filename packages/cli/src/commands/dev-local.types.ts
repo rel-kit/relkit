@@ -1,4 +1,4 @@
-import type { CandidateCompile, CandidateCompileRequest } from "@relkit/supervisor";
+import type { CandidateCompile, CandidateCompileRequest } from "../supervisor/index.js";
 import type { TelemetryConfiguration } from "relkit/observability";
 import type { InspectorConfiguration } from "relkit/contracts";
 import type { Effect } from "effect";

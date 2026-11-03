@@ -2,7 +2,7 @@
 import { access, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { SqliteSaver } from "../../integrations/packages/langchain/node_modules/@langchain/langgraph-checkpoint-sqlite/dist/index.js";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
 import { createRegistrationPlan } from "relkit/graph";
 import { createLocalAgentStateProvider } from "relkit/providers-local";
 import { createOperationId } from "relkit/realtime";

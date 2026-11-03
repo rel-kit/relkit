@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { ROUTE_MODULE_CHECKS_FILE, generateRouteModuleChecks } from "@relkit/compiler";
+import { ROUTE_MODULE_CHECKS_FILE, generateRouteModuleChecks } from "../compiler/index.js";
 import { Effect } from "effect";
 import { cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";

@@ -5,23 +5,15 @@ export const descriptions: Record<string, string> = {
   "@relkit/app": "Deprecated: RelKit is now the relkit package. This release re-exports relkit.",
   "@relkit/better-auth": "Better Auth integration for RelKit routes.",
   "@relkit/cli": "The RelKit development, build, inspection, and deployment CLI.",
-  "@relkit/client-generator": "Unsupported internal RelKit client generator; use @relkit/app.",
   "@relkit/client": "Typed RelKit client helpers, including TanStack Query integration.",
   "@relkit/cloud-aws":
     "Unsupported internal AWS deployment components for RelKit; use @relkit/cli.",
-  "@relkit/compiler": "Unsupported internal RelKit source compiler; use @relkit/cli.",
-  "@relkit/deploy-pulumi":
-    "Unsupported internal Pulumi deployment engine for RelKit; use @relkit/cli.",
   "@relkit/drizzle": "Drizzle ORM integration for RelKit functions.",
-  "@relkit/inspector-api": "Internal live bridge and native jobs protocol for RelKit tooling.",
   "@relkit/inspector":
     "Standalone RelKit development inspector, collector, and local diagnostic history.",
   "@relkit/integrations": "Metadata-only catalog of independently selected RelKit integrations.",
-  "@relkit/observability-local":
-    "Explicit local diagnostic history and worker storage for RelKit inspection.",
   "@relkit/langchain": "Explicit native LangChain agent execution for RelKit.",
   "@relkit/providers-standard": "Empty compatibility package retained for RelKit tooling.",
-  "@relkit/supervisor": "Unsupported internal RelKit process supervisor; use @relkit/cli.",
   "@relkit/testing": "Testing utilities and local providers for RelKit applications.",
   "@relkit/aws": "AWS host and infrastructure integration for RelKit.",
   "@relkit/cloudflare": "Cloudflare integration for RelKit.",

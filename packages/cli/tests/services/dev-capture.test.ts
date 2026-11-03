@@ -1,8 +1,8 @@
 /** Proves CLI capture is memory-only, authenticated, redacted and independent of support bind failure. */
 import { expect, it } from "@effect/vitest";
 import { Effect, Layer } from "effect";
-import { InspectionNative, InspectionConnectionError } from "@relkit/inspector-api/connection";
-import type { InspectionNativeOperations } from "@relkit/inspector-api/connection";
+import { InspectionNative, InspectionConnectionError } from "relkit/inspector-api/connection";
+import type { InspectionNativeOperations } from "relkit/inspector-api/connection";
 import { CliDevCapture } from "../../src/commands/dev-capture.service.js";
 
 /** Supplies bounded transport authority without ever opening a store or native socket. */

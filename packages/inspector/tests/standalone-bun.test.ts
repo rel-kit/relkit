@@ -12,7 +12,7 @@ import {
   InspectionNativeLive,
   InspectionCapture,
   connectionAttempt,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 
 const bridgeLayer = InspectionBridgeLive.pipe(
   Layer.provide(Layer.merge(InspectionFilesLive, InspectionNativeLive)),

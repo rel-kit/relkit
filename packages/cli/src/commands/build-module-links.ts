@@ -8,7 +8,7 @@ import { cleanupEffect } from "../services/cleanup.service.js";
 import type { FileSystemCapabilities } from "../services/filesystem.types.js";
 
 /** These packages are fixed imports emitted by the framework server producer. */
-const FRAMEWORK_PACKAGES = ["effect", "relkit", "@relkit/inspector-api"] as const;
+const FRAMEWORK_PACKAGES = ["effect", "relkit"] as const;
 
 /**
  * Links fixed framework dependencies only; external integrations use native consumer resolution.

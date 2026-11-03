@@ -1,5 +1,5 @@
 import { Schema } from "effect";
-import type { PulumiBackend } from "@relkit/deploy-pulumi";
+import type { PulumiBackend } from "@relkit/pulumi/deploy-pulumi";
 import { CliFailureError } from "../cli-errors.js";
 import { DEPLOY_COMMANDS, deployOperationSchema } from "./deploy.schemas.js";
 import type { ConfigMap, ParsedDeployArgs } from "./deploy-support.types.js";

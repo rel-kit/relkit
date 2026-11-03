@@ -5,7 +5,7 @@
  */
 
 import { join } from "node:path";
-import { discoverApplicationLayout, type AstSourceModule } from "@relkit/compiler";
+import { discoverApplicationLayout, type AstSourceModule } from "../compiler/index.js";
 import * as ts from "typescript";
 import type { ProjectDiscovery } from "./project-discovery-types.js";
 import { readAppDiscovery } from "./project-discovery-app.js";

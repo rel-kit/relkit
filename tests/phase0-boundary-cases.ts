@@ -152,7 +152,7 @@ export const boundaryCases: readonly BoundaryCase[] = [
       rule: "inspector-runtime-application-import",
     },
   })),
-  ...["effect", "hono", "next", "@pulumi/pulumi", "@aws-sdk/client-s3", "@relkit/compiler"].map(
+  ...["effect", "hono", "next", "@pulumi/pulumi", "@aws-sdk/client-s3", "@relkit/cli/compiler"].map(
     (dependency) => ({
       name: `fixture imports ${dependency}`,
       files: packageFiles([
@@ -173,7 +173,7 @@ export const boundaryCases: readonly BoundaryCase[] = [
   {
     name: "template imports an internal package",
     files: {
-      "templates/default/src/index.ts": 'import "@relkit/compiler";\nexport {};\n',
+      "templates/default/src/index.ts": 'import "@relkit/cli/compiler";\nexport {};\n',
     },
     expected: {
       path: "templates/default/src/index.ts",

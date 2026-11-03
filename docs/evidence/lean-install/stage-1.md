@@ -849,7 +849,7 @@ installation or four-boundary acceptance.
 - Runtime lifecycle is below CLI. Production preflight resolves from the
   executable module directory, matching relocated native import ancestry.
 - Core observability uses bounded in-memory storage; explicit local history
-  belongs to `@relkit/observability-local`. Only measured CLI inspector paths
+  belongs to `@relkit/inspector/observability-local`. Only measured CLI inspector paths
   can receive temporary Stage 1 admissions.
 - Creator and wrapper bootstrap avoid compiler-backed existing-project editing;
   that work belongs to CLI. The catalog supplies metadata, and selected starters

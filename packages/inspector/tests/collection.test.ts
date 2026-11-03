@@ -1,8 +1,8 @@
 /** Proves collection admission, durability ordering and replay after lost acknowledgements. */
 import { expect, test } from "vitest";
 import { Effect } from "effect";
-import type { InspectionConnectionFile } from "@relkit/inspector-api/connection";
-import { InspectionConnectionError, InspectionCapture } from "@relkit/inspector-api/connection";
+import type { InspectionConnectionFile } from "relkit/inspector-api/connection";
+import { InspectionConnectionError, InspectionCapture } from "relkit/inspector-api/connection";
 import { collectInspectionBatch } from "../src/collector.js";
 import type { InspectorRemoteOperations } from "../src/remote.types.js";
 import type { InspectorHistoryOperations } from "../src/history.types.js";

@@ -1,5 +1,5 @@
 /** Builds a deterministic byte-preserving migration preview without project mutations. */
-import { discoverApplicationLayoutEffect, sourceResolutionLayer } from "@relkit/compiler";
+import { discoverApplicationLayoutEffect, sourceResolutionLayer } from "../compiler/index.js";
 import { Effect } from "effect";
 import { observeCli } from "../cli-runtime.js";
 import { CliFileSystem } from "../services/filesystem.service.js";

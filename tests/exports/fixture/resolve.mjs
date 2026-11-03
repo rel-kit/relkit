@@ -7,12 +7,15 @@ if (bunOnly && !process.versions.bun) throw new Error("Bun-only public checks re
 
 for (const [packageName, exports] of Object.entries(expected)) {
   for (const [subpath, target] of Object.entries(exports)) {
-    // The Bun creator owner and unchanged named Bun adapter expose paths for tooling, not Node execution.
+    // The Bun creator and CLI and the named Bun adapter expose paths for tooling, not Node execution.
     const nativeBunLeaf =
       packageName === "create-relkit" ||
+      packageName === "@relkit/cli" ||
       (packageName === "relkit" && subpath === "./runtime-hono/bun");
     if (bunOnly && !nativeBunLeaf && (typeof target === "string" || target.bun === undefined))
       continue;
+    // A require-only entry, such as the CLI's editor plugin, is not an ESM import target.
+    if (typeof target !== "string" && !target.import && !target.default && !target.bun) continue;
     const specifier = subpath === "." ? packageName : `${packageName}${subpath.slice(1)}`;
     let importTarget = target;
     if (typeof target !== "string") {

@@ -1,8 +1,8 @@
-import { Hono } from "../../packages/inspector-api/node_modules/hono";
+import { Hono } from "../../packages/relkit/node_modules/hono";
 import { Schema } from "effect";
 import { telemetryRecordSchema } from "relkit/observability/local/protocol";
 // @ts-expect-error The workspace package exposes this runtime subpath without a relative declaration path.
-import { cors } from "../../packages/inspector-api/node_modules/hono/dist/middleware/cors/index.js";
+import { cors } from "../../packages/relkit/node_modules/hono/dist/middleware/cors/index.js";
 import { PROTOCOL_VERSION } from "relkit/contracts";
 import {
   assembleRequestExecution,
@@ -16,7 +16,7 @@ import {
   installInspectorEndpoints,
   type InspectorActionServices,
   type InspectorActiveGeneration,
-} from "../../packages/inspector-api/src/index.ts";
+} from "../../packages/relkit/src/inspector-api/index.ts";
 import { createAgentApplicationFixture } from "./fixture-agent-runtime.ts";
 
 export const FIXTURE_GRAPH_HASH = "sha256:commerce-inspector-fixture-v1";

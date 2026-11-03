@@ -31,13 +31,25 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./help": {
-      "types": "./dist/cli-help-model.d.ts",
-      "import": "./dist/cli-help-model.js"
+    "./client-generator": {
+      "types": "./dist/client-generator/index.d.ts",
+      "import": "./dist/client-generator/index.js"
+    },
+    "./compiler": {
+      "types": "./dist/compiler/index.d.ts",
+      "import": "./dist/compiler/index.js"
+    },
+    "./compiler/editor": {
+      "types": "./dist/compiler/editor.d.ts",
+      "import": "./dist/compiler/editor.js"
     },
     "./editor": {
       "types": "./dist/editor.d.ts",
       "require": "./dist/editor.cjs"
+    },
+    "./help": {
+      "types": "./dist/cli-help-model.d.ts",
+      "import": "./dist/cli-help-model.js"
     },
     "./internal/tooling": {
       "types": "./dist/internal/tooling.d.ts",
@@ -46,15 +58,19 @@
     "./scaffolding": {
       "types": "./dist/scaffolding/index.d.ts",
       "import": "./dist/scaffolding/index.js"
+    },
+    "./supervisor": {
+      "types": "./dist/supervisor/index.d.ts",
+      "import": "./dist/supervisor/index.js"
+    },
+    "./supervisor/internal/request": {
+      "types": "./dist/supervisor/proxy-request.d.ts",
+      "import": "./dist/supervisor/proxy-request.js"
     }
   },
   "dependencies": {
     "@clack/prompts": "catalog:",
     "@relkit/client": "workspace:*",
-    "@relkit/client-generator": "workspace:*",
-    "@relkit/compiler": "workspace:*",
-    "@relkit/inspector-api": "workspace:*",
-    "@relkit/supervisor": "workspace:*",
     "create-relkit": "workspace:*",
     "effect": "catalog:",
     "hono": "catalog:",
@@ -63,14 +79,14 @@
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
-    "@relkit/deploy-pulumi": "workspace:*",
     "@relkit/local": "workspace:*",
+    "@relkit/pulumi": "workspace:*",
     "vitest": "catalog:"
   },
   "scripts": {
     "build": "tsc -b && bun run ../../scripts/prune-cli-output.ts && bun run ../../scripts/package-editor.ts && bun run ../../scripts/package-dev-bootstrap.ts",
     "check": "tsc -b --pretty false",
-    "typecheck": "tsc -b --pretty false && bun run ../../scripts/package-editor.ts"
+    "typecheck": "tsc -b --pretty false && tsc -p tsconfig.tests.json --pretty false && bun run ../../scripts/package-editor.ts"
   },
   "relkit": {
     "maturity": "core",

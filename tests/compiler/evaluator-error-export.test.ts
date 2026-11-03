@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { defineError } from "relkit/functions";
 import { z } from "relkit/schema";
-import { snapshotModule } from "../../packages/compiler/src/discovery/evaluator-child-utils.ts";
+import { snapshotModule } from "../../packages/cli/src/compiler/discovery/evaluator-child-utils.ts";
 
 test("exported error constructors survive evaluator discovery", () => {
   const Issue = defineError({

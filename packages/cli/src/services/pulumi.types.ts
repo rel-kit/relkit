@@ -1,6 +1,6 @@
 /** Carries selected engine program, workspace and stack operations as SDK-derived Effect capabilities. */
 import type { Effect } from "effect";
-import type { createPulumiWorkspace, writePulumiProgram } from "@relkit/deploy-pulumi";
+import type { createPulumiWorkspace, writePulumiProgram } from "@relkit/pulumi/deploy-pulumi";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { PulumiStack } from "../commands/deploy-support.types.js";
 import type { PulumiImplementation } from "../commands/deployment-engine.schemas.js";

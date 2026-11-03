@@ -12,7 +12,7 @@ test("readiness packing retains isolated optional and development workspace owne
     "@relkit/langchain",
     "@relkit/better-auth",
     "@relkit/drizzle",
-    "@relkit/deploy-pulumi",
+    "@relkit/pulumi",
   ])
     expect(names).toContain(name);
   for (const name of names)

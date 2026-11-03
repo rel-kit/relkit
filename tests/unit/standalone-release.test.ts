@@ -41,6 +41,7 @@ test("archive policy requires tool UI assets and rejects retired CLI payloads", 
     "package/dist/index.js",
     "package/dist/index.d.ts",
     "package/dist/bin.js",
+    ...exportTargets(tool.manifest.exports).map((path) => `package/${path.replace(/^\.\//, "")}`),
   ];
   const ui = [
     "package/dist/ui/server.js",

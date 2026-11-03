@@ -1,4 +1,4 @@
-import type { GeneratedOutputs, LoadedToolingConfig } from "@relkit/compiler";
+import type { GeneratedOutputs, LoadedToolingConfig } from "../compiler/index.js";
 import type { Diagnostic } from "relkit/diagnostics";
 
 /** Compilation outcome; failed compilations never publish an activatable manifest. */

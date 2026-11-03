@@ -1,6 +1,6 @@
 /** Checks persisted segments, indexed queries and every original inspector/runtime response before the owning test closes its index. */
 import { expect } from "bun:test";
-import { Hono } from "../../../packages/inspector-api/node_modules/hono/dist/index.js";
+import { Hono } from "../../../packages/relkit/node_modules/hono/dist/index.js";
 import { API_BASE_PATH } from "relkit/contracts";
 import {
   createObservabilityIndex,
@@ -10,7 +10,7 @@ import {
   type LogRecord,
   type ObservabilityCollector,
 } from "relkit/observability";
-import { installObservabilityEndpoints } from "../../../packages/inspector-api/src/index.ts";
+import { installObservabilityEndpoints } from "../../../packages/relkit/src/inspector-api/index.ts";
 import {
   securityTraceId,
   unsafeLog,

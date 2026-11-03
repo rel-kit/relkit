@@ -1,5 +1,5 @@
 import { Schema } from "effect";
-import { LoadedToolingConfigSchema } from "@relkit/compiler";
+import { LoadedToolingConfigSchema } from "../compiler/index.js";
 
 /** Data-only request admitted by the isolated compiler process. */
 export const devCheckRequestSchema = Schema.Struct({

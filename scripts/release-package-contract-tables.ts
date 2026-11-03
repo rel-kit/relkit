@@ -36,6 +36,7 @@ export const relkitAreas = [
   "events",
   "functions",
   "graph",
+  "inspector-api",
   "invocation",
   "jobs",
   "local-service",
@@ -51,6 +52,13 @@ export const relkitAreas = [
   "services",
   "tools",
 ] as const;
+
+/** Former packages merged into tool and integration packages, keyed by the owner's directory. */
+export const mergedAreas: Readonly<Record<string, readonly string[]>> = {
+  cli: ["compiler", "client-generator", "supervisor"],
+  inspector: ["observability-local"],
+  pulumi: ["deploy-pulumi"],
+};
 
 /** Integration packages expose finite capability leaves beside their catalog root. */
 export const integrationSubpaths: Readonly<Record<string, readonly string[]>> = {

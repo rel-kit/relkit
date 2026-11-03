@@ -5,7 +5,7 @@
  * it does not import TypeScript, parse source or run the checker again.
  */
 import { Effect, Schema } from "effect";
-import type { TypecheckInputWitness } from "@relkit/compiler";
+import type { TypecheckInputWitness } from "../compiler/index.js";
 import { mapErrorCause } from "../services/map-error-cause.js";
 import { SnapshotTypecheckInputs } from "./snapshot.schemas.js";
 import { DevSnapshotRejected } from "./snapshot-error.js";

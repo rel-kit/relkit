@@ -483,16 +483,16 @@ import {
 | `relkit/contracts`       | JSON values, branded IDs, source locations, versioned protocol types |
 | `relkit/diagnostics`     | structured errors and warnings                                       |
 | `relkit/graph`           | normalized graph schema, hashing, sorting, compatibility diff        |
-| `@relkit/compiler`        | discovery, evaluation, normalization, code generation                |
+| `@relkit/cli/compiler`        | discovery, evaluation, normalization, code generation                |
 | `relkit/engine`          | invocation protocol, lifecycle, concurrency, cancellation            |
 | `relkit/runtime-effect`  | Effect runtime, Layers, internal error causes, loggers, tracing      |
 | `relkit/runtime-hono`    | graph-driven Hono materialization                                    |
 | `relkit/providers-local` | local bucket, cache, jobs, events, and fake model providers          |
 | `relkit/observability`   | request records, logs, traces, storage, query protocol               |
-| `@relkit/supervisor`      | candidate generation, readiness, switching, draining                 |
-| `@relkit/inspector-api`   | versioned inspector HTTP/SSE protocol                                |
+| `@relkit/cli/supervisor`      | candidate generation, readiness, switching, draining                 |
+| `relkit/inspector-api`   | versioned inspector HTTP/SSE protocol                                |
 | `relkit/deploy`          | provider-neutral deployment plan                                     |
-| `@relkit/deploy-pulumi`   | Pulumi Automation API integration                                    |
+| `@relkit/pulumi/deploy-pulumi`   | Pulumi Automation API integration                                    |
 | `@relkit/cloud-aws`       | AWS runtime providers and Pulumi resource mapping                    |
 | `@relkit/cli`             | `relkit` commands and terminal UX                                      |
 | `create-relkit`           | new-project generator                                                |
@@ -3309,7 +3309,7 @@ The plan contains no Pulumi `Input` or `Output` values.
 
 ### 22.3 Generated Pulumi program
 
-`@relkit/deploy-pulumi` converts the deployment plan into a Pulumi program. Generated files may be materialized under:
+`@relkit/pulumi/deploy-pulumi` converts the deployment plan into a Pulumi program. Generated files may be materialized under:
 
 ```text
 .relkit/generated/pulumi/

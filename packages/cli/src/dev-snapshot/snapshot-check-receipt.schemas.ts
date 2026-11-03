@@ -3,7 +3,7 @@
  * check and finite snapshot preparation. It contains compiler output and input
  * identities, but never diagnostics, environment values, or absolute roots.
  */
-import { LoadedToolingConfigSchema } from "@relkit/compiler";
+import { LoadedToolingConfigSchema } from "../compiler/index.js";
 import { Schema } from "effect";
 import {
   SnapshotHash,

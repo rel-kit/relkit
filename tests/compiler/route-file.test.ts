@@ -3,7 +3,7 @@ import {
   compareRouteFilePaths,
   parseRouteFilePath,
   routePathToFilePath,
-} from "../../packages/compiler/src/route-file.ts";
+} from "../../packages/cli/src/compiler/route-file.ts";
 
 describe("route-file paths", () => {
   test("parses root, static, and dynamic routes", () => {

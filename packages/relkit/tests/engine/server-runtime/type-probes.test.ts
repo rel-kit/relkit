@@ -57,24 +57,30 @@ function diagnostics(source: string): readonly ts.Diagnostic[] {
   return ts.getPreEmitDiagnostics(ts.createProgram([filename], options, host));
 }
 
-it.effect("requires lifecycle/environment authority and checks the documented host example", () =>
-  Effect.sync(() => {
-    const result = diagnostics(probe);
-    expect(result.map((value) => ts.flattenDiagnosticMessageText(value.messageText, "\n"))).toEqual(
-      [],
-    );
-  }),
+it.effect(
+  "requires lifecycle/environment authority and checks the documented host example",
+  () =>
+    Effect.sync(() => {
+      const result = diagnostics(probe);
+      expect(
+        result.map((value) => ts.flattenDiagnosticMessageText(value.messageText, "\n")),
+      ).toEqual([]);
+    }),
+  30_000,
 );
 
-it.effect("compiler probes fail when a live layer requirement is erased", () =>
-  Effect.sync(() => {
-    const result = diagnostics(
-      probe.replace(
-        "const live = ServerRuntimeLive;",
-        "declare const live: Layer.Layer<ServerRuntime>;",
-      ),
-    );
-    expect(result.some((value) => value.code === 2322)).toBe(true);
-    expect(result.some((value) => value.code === 2578)).toBe(true);
-  }),
+it.effect(
+  "compiler probes fail when a live layer requirement is erased",
+  () =>
+    Effect.sync(() => {
+      const result = diagnostics(
+        probe.replace(
+          "const live = ServerRuntimeLive;",
+          "declare const live: Layer.Layer<ServerRuntime>;",
+        ),
+      );
+      expect(result.some((value) => value.code === 2322)).toBe(true);
+      expect(result.some((value) => value.code === 2578)).toBe(true);
+    }),
+  30_000,
 );

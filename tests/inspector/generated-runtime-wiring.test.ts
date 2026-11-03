@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
-import { Hono } from "../../packages/inspector-api/node_modules/hono";
+import { Hono } from "../../packages/relkit/node_modules/hono";
 import {
   installInspectorEndpoints,
   InspectorQueryError,
-} from "../../packages/inspector-api/src/index.ts";
+} from "../../packages/relkit/src/inspector-api/index.ts";
 import { inspectorEndpointsSource } from "../../packages/cli/src/commands/build-server-http-inspector.ts";
 import { SERVER_RUNTIME_SUPPORT_SOURCE } from "../../packages/cli/src/commands/build-server-runtime-support.ts";
 

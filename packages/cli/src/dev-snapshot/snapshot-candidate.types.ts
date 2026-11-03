@@ -4,7 +4,7 @@ import type {
   CandidateCompileRequest,
   CandidateCompileResult,
   StartedCandidate,
-} from "@relkit/supervisor";
+} from "../supervisor/index.js";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { ValidatedDevSnapshot } from "./snapshot.types.js";
 import type { SnapshotEpoch, SnapshotEpochToken } from "./snapshot-epoch.types.js";

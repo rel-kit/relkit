@@ -4,13 +4,13 @@
  * activation and scoped workers preserve their original typed failure contracts.
  */
 import type { RuntimeActivationFingerprint } from "relkit/contracts";
-import type { StartedCandidate, SupervisorGenerationDrain } from "@relkit/supervisor";
+import type { StartedCandidate, SupervisorGenerationDrain } from "../supervisor/index.js";
 import type { Deferred, Effect, Fiber, Queue, Scope } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";
-import type { InspectionBridgeHandle } from "@relkit/inspector-api/connection";
+import type { InspectionBridgeHandle } from "relkit/inspector-api/connection";
 import type { EffectDevSourceWatcher } from "./dev-watch.types.js";
 import type { CleanupCapabilities } from "../services/cleanup.types.js";
-import type { SupervisorCandidateToken } from "@relkit/supervisor";
+import type { SupervisorCandidateToken } from "../supervisor/index.js";
 import type { DevEngineAuthorities } from "./dev-engine-state.types.js";
 import type { DevInspectorPolicy } from "./dev-inspector-support.types.js";
 

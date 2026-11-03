@@ -1,6 +1,6 @@
 /** Owns finite selected-engine filesystem and workspace SDK calls. */
 import { Effect } from "effect";
-import type { createPulumiWorkspace, writePulumiProgram } from "@relkit/deploy-pulumi";
+import type { createPulumiWorkspace, writePulumiProgram } from "@relkit/pulumi/deploy-pulumi";
 import type { PulumiImplementation } from "../commands/deployment-engine.schemas.js";
 import type { DeployCommandOptions } from "../commands/deploy-support.types.js";
 import { cliPromise } from "../cli-errors.js";

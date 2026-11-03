@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vitest";
 import { Effect, Layer } from "effect";
-import { DEFAULT_TOOLING_CONFIG } from "@relkit/compiler";
+import { DEFAULT_TOOLING_CONFIG } from "../src/compiler/index.js";
 import { GRAPH_VERSION } from "relkit/contracts";
 import { hashGraph } from "relkit/graph";
 import { DependencySource, SelectedDependenciesLayer } from "relkit/provider/internal/dependencies";

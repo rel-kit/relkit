@@ -9,7 +9,7 @@ import {
   type GeneratorIoError,
 } from "create-relkit/internal/generator-errors";
 import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
-import { routePathToFilePath } from "@relkit/compiler";
+import { routePathToFilePath } from "../compiler/index.js";
 import {
   ADD_FAILURE_CODES,
   AddScaffoldError,

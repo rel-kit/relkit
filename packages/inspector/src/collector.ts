@@ -6,8 +6,8 @@ import {
   CAPTURE_CONSUMER_HEADER,
   InspectionConnectionError,
   inspectionReplayRecord,
-} from "@relkit/inspector-api/connection";
-import type { InspectionConnectionFile } from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
+import type { InspectionConnectionFile } from "relkit/inspector-api/connection";
 import type { InspectorRemoteOperations } from "./remote.types.js";
 import type { InspectorHistoryOperations } from "./history.types.js";
 import { InspectionCollectionBatch } from "./collection.schemas.js";

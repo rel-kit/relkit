@@ -40,11 +40,11 @@ describe.serial("Phase 0 guardrails", () => {
   });
   test("ignores workspace coverage reports but still checks authored coverage files", async () => {
     const report = JSON.stringify({ name: ["pers", "istence"].join("") });
-    const generated = "packages/compiler/coverage/coverage-final.json";
-    const authored = "packages/compiler/src/coverage/coverage-final.json";
+    const generated = "packages/cli/coverage/compiler/coverage-final.json";
+    const authored = "packages/cli/src/compiler/coverage/coverage-final.json";
     return withFixture(
       {
-        "packages/compiler/package.json": manifest("@relkit/compiler"),
+        "packages/cli/package.json": manifest("@relkit/cli/compiler"),
         [generated]: report,
       },
       async (fixture) => {

@@ -4,7 +4,7 @@
  * probe the independently installed inspector UI.
  */
 import { Effect, Layer } from "effect";
-import type { LoadedToolingConfig } from "@relkit/compiler";
+import type { LoadedToolingConfig } from "../compiler/index.js";
 import { doctorCommandEffect, availablePortEffect } from "./doctor-native.js";
 import { checkPortsEffect } from "./doctor-ports.js";
 export { checkPortsEffect } from "./doctor-ports.js";

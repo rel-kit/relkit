@@ -8,7 +8,7 @@ import {
   RUNTIME_ACTIVATION_FILE,
   RUNTIME_INTEGRATION_PLAN_FILE,
 } from "relkit/contracts";
-import { GENERATED_ARTIFACT_FILES } from "@relkit/compiler";
+import { GENERATED_ARTIFACT_FILES } from "../compiler/index.js";
 import type { BuildManifestInputs } from "./build.types.js";
 import { repairSelectedAuthManifest } from "../scaffolding/auth-manifest-repair.js";
 

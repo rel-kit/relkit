@@ -3,7 +3,7 @@ import {
   createSupervisorDrain,
   type StartedCandidate,
   type SupervisorCandidateToken,
-} from "@relkit/supervisor";
+} from "../supervisor/index.js";
 import { cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliDevSupervisor } from "../services/dev-supervisor.service.js";

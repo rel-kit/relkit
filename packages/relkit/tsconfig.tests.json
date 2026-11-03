@@ -15,6 +15,7 @@
     "tests/contracts/**/*.ts",
     "tests/engine/**/*.ts",
     "tests/graph/**/*.ts",
+    "tests/inspector-api/**/*.ts",
     "tests/local-service/**/*.ts",
     "tests/provider/**/*.ts",
     "tests/providers-local/**/*.ts",

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { createEventBridgeProvider } from "../../packages/cloud-aws/src/runtime/events.ts";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
 import { invoke, materializeEvents, type InvocationTarget } from "relkit/engine";
 import {
   bindFunctionEvents,

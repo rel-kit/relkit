@@ -4,7 +4,7 @@
  * is a session-owned FIFO bridge; callbacks never run an Effect themselves.
  */
 import { Context, Effect, Exit, Layer, Ref, Scope } from "effect";
-import type { CandidateCompileRequest } from "@relkit/supervisor";
+import type { CandidateCompileRequest } from "../supervisor/index.js";
 import { observeExecution } from "relkit/contracts/operation";
 import { makeDevCompilerBridgeEffect } from "../commands/dev-compiler-bridge.js";
 import { cliAdapterError } from "../cli-errors.js";
@@ -87,7 +87,7 @@ const acquireCompiler = Effect.fn("DevSnapshot.sessionCompiler")(function* (
   });
   const bridge = yield* makeDevCompilerBridgeEffect(compile, scope);
   yield* Effect.addFinalizer(() => Effect.sync(bridge.close));
-  const prepared = (child: import("@relkit/supervisor").StartedCandidate) =>
+  const prepared = (child: import("../supervisor/index.js").StartedCandidate) =>
     installed?.candidate.token.generationToken === child.token.generationToken
       ? installed
       : undefined;

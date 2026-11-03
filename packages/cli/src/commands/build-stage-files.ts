@@ -10,7 +10,7 @@ import {
   RUNTIME_ACTIVATION_FILE,
   RUNTIME_INTEGRATION_PLAN_FILE,
 } from "relkit/contracts";
-import { GENERATED_ARTIFACT_FILES } from "@relkit/compiler";
+import { GENERATED_ARTIFACT_FILES } from "../compiler/index.js";
 import { cliOriginalError, cliTry, type CliAdapterError } from "../cli-errors.js";
 import { CliFileSystem } from "../services/filesystem.service.js";
 import { stageJobsEffect } from "./build-jobs.js";

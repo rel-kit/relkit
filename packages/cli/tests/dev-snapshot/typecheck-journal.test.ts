@@ -3,7 +3,7 @@ import { mkdir, writeFile, stat, utimes } from "node:fs/promises";
 import { join } from "node:path";
 import { expect, it } from "@effect/vitest";
 import { Effect, Exit } from "effect";
-import { TypecheckInputs, typecheckProjectEffect } from "@relkit/compiler";
+import { TypecheckInputs, typecheckProjectEffect } from "../../src/compiler/index.js";
 import { SnapshotFiles, snapshotFilesLive } from "../../src/dev-snapshot/snapshot-files.service.js";
 import {
   captureSnapshotTypecheckInputs,

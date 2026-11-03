@@ -105,7 +105,7 @@
       "id": "RG10",
       "status": "passed",
       "evidence": [
-        "packages/inspector-api/jobs.test.ts",
+        "packages/relkit/jobs.test.ts",
         "tests/inspector/job-name-filters.test.ts",
         "tests/e2e/inspector.spec.ts"
       ]

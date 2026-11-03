@@ -4,7 +4,7 @@
  * preparation requires the same evidence when no current cache can be reused.
  */
 import { resolve } from "node:path";
-import { TypecheckInputs } from "@relkit/compiler";
+import { TypecheckInputs } from "../compiler/index.js";
 import { Effect } from "effect";
 import { checkProjectEffect } from "../commands/check.js";
 import type { CheckOptions } from "../commands/check.types.js";

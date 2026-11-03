@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import * as ts from "typescript";
-import { readFacts } from "../../packages/compiler/src/discovery/source-facts.ts";
-import { mapSourceLocations } from "../../packages/compiler/src/discovery/source-map.ts";
+import { readFacts } from "../../packages/cli/src/compiler/discovery/source-facts.ts";
+import { mapSourceLocations } from "../../packages/cli/src/compiler/discovery/source-map.ts";
 
 const source = `
   import { defineError, defineFunction } from "relkit/functions";

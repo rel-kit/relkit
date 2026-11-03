@@ -1,8 +1,8 @@
 /** Acquires the optional isolated writer and validates its opening receipt before exposing it. */
 import { Cause, Context, Effect, Layer, Schema } from "effect";
-import { startLocalWorkerEffect } from "@relkit/observability-local/worker";
+import { startLocalWorkerEffect } from "./observability-local/local/worker.js";
 import { telemetryImportSchema } from "relkit/observability/local/protocol";
-import { InspectionConnectionError } from "@relkit/inspector-api/connection";
+import { InspectionConnectionError } from "relkit/inspector-api/connection";
 import { LocalWorkerError } from "relkit/observability/local/worker-contract";
 import { bindInspectorHistory } from "./history-binding.js";
 import type { InspectorHistoryNativeOperations } from "./history-native.types.js";

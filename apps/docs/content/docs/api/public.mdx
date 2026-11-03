@@ -19,8 +19,8 @@ The export-map audit covers **37 supported packages**, **90 import paths**, and 
 | [Configuration](/docs/api/config#public-imports)                     | `relkit/config`                                                                                                                                                                                                             | [Usage and examples](/docs/learn/concepts/environment)              |
 | [Provider authoring](/docs/api/provider#public-imports)              | `relkit/provider`                                                                                                                                                                                                           | [Usage and examples](/docs/modules/integrations/provider-authoring) |
 | [Local providers](/docs/api/providers-local#public-imports)          | `relkit/providers-local`                                                                                                                                                                                                    | [Usage and examples](/docs/modules/integrations/local-providers)    |
-| [Local history](/docs/api/observability-local#public-imports)        | `@relkit/observability-local`, `@relkit/observability-local/worker`                                                                                                                                                         | [Usage and examples](/docs/modules/operations/inspector)            |
-| [CLI automation](/docs/api/cli-api#public-imports)                   | `@relkit/cli`, `@relkit/cli/help`, `@relkit/cli/editor`, `@relkit/cli/scaffolding`                                                                                                                                          | [Usage and examples](/docs/modules/cli/automation)                  |
+| [Local history](/docs/api/observability-local#public-imports)        | `@relkit/inspector/observability-local`, `@relkit/inspector/observability-local/worker`                                                                                                                                     | [Usage and examples](/docs/modules/operations/inspector)            |
+| [CLI automation](/docs/api/cli-api#public-imports)                   | `@relkit/cli`, `@relkit/cli/editor`, `@relkit/cli/help`, `@relkit/cli/scaffolding`                                                                                                                                          | [Usage and examples](/docs/modules/cli/automation)                  |
 | [Project generator](/docs/api/create-relkit#public-imports)          | `create-relkit`, `create-relkit/cli`, `create-relkit/launcher`, `create-relkit/catalog-resolution`                                                                                                                          | [Usage and examples](/docs/modules/cli/automation)                  |
 | [Schema](/docs/api/schema#public-imports)                            | `relkit/schema`                                                                                                                                                                                                             | [Usage and examples](/docs/learn/concepts/schemas)                  |
 | [Functions](/docs/api/functions#public-imports)                      | `relkit/functions`                                                                                                                                                                                                          | [Usage and examples](/docs/learn/concepts/functions)                |
@@ -58,16 +58,15 @@ The export-map audit covers **37 supported packages**, **90 import paths**, and 
 The following packages are explicitly described as internal or empty compatibility packages, or use an `/internal` export path. They are inventoried but are not supported application imports. Public re-exports from their implementation files are documented through the supported facade above.
 
 - `@relkit/app`
+- `@relkit/cli/client-generator`
+- `@relkit/cli/compiler`
 - `@relkit/cli/internal/tooling`
-- `@relkit/client-generator`
+- `@relkit/cli/supervisor`
 - `@relkit/cloud-aws`
-- `@relkit/compiler`
-- `@relkit/deploy-pulumi`
 - `@relkit/drizzle/internal`
-- `@relkit/inspector-api`
-- `@relkit/observability-local/internal/local-worker`
+- `@relkit/inspector/observability-local/internal/local-worker`
 - `@relkit/providers-standard`
-- `@relkit/supervisor`
+- `@relkit/pulumi/deploy-pulumi`
 - `@relkit/testing/internal/fakes`
 - `@relkit/testing/internal/jobs-utils`
 - `@relkit/testing/internal/runtime-clock`
@@ -127,6 +126,7 @@ The following packages are explicitly described as internal or empty compatibili
 - `relkit/engine`
 - `relkit/functions/internal`
 - `relkit/graph`
+- `relkit/inspector-api`
 - `relkit/internal`
 - `relkit/invocation`
 - `relkit/local-service`

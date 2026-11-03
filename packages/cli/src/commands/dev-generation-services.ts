@@ -2,7 +2,7 @@
 import { isStableId } from "relkit/contracts";
 import type { ApplicationGraph } from "relkit/graph";
 import type { LocalServicePlan } from "relkit/local-service";
-import type { CandidateCompileRequest } from "@relkit/supervisor";
+import type { CandidateCompileRequest } from "../supervisor/index.js";
 import { Effect, Ref, Scope } from "effect";
 import { resolve } from "node:path";
 import { cliTry } from "../cli-errors.js";

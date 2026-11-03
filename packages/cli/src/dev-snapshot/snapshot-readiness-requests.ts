@@ -2,7 +2,7 @@
  * Holds at most one initial public readiness request so the verified candidate
  * response can become that caller's response after the atomic publish edge.
  */
-import type { StartedCandidate } from "@relkit/supervisor";
+import type { StartedCandidate } from "../supervisor/index.js";
 import type { SnapshotProbeResponse } from "./snapshot-candidate.types.js";
 
 interface PendingReadinessRequest {

@@ -25,7 +25,6 @@ const coreProtocols = new Set([
 const integrationImplementations = new Map([
   ["@relkit/local", new Set(["relkit/providers-local"])],
   ["@relkit/redis", new Set(["relkit/providers-local"])],
-  ["@relkit/pulumi", new Set(["@relkit/deploy-pulumi"])],
   [
     "@relkit/langchain",
     new Set(["relkit/functions", "relkit/invocation", "relkit/schema", "relkit/tools"]),

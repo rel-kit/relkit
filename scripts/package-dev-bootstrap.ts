@@ -120,7 +120,6 @@ const buildPreparedEntries = Effect.fn("Packaging.preparedEntries")(
         splitting: true,
         naming: { entry: "[name].js", chunk },
         minify: true,
-        external: ["@relkit/compiler"],
         plugins: [
           lazyImports(["../services/local-capabilities.js", "../commands/dev-local-compiler.js"]),
           narrowEffectImportPlugin(),

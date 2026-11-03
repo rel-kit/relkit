@@ -1,6 +1,6 @@
 /** Live operations are forwarded once; bridge rejections retain their HTTP status in the UI protocol. */
 import { Effect, Option, Schema } from "effect";
-import type { InspectionConnectionFile } from "@relkit/inspector-api/connection";
+import type { InspectionConnectionFile } from "relkit/inspector-api/connection";
 import type { InspectorRemoteOperations } from "./remote.types.js";
 import { backendError } from "./backend-history.js";
 

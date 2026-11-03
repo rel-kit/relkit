@@ -5,7 +5,7 @@
  * shadow-module query is omitted unless that containing absence is itself rechecked.
  */
 import { posix } from "node:path";
-import type { TypecheckInputWitness } from "@relkit/compiler";
+import type { TypecheckInputWitness } from "../compiler/index.js";
 
 /**
  * Selects the minimal query set implied by the complete consumed-read inventory.

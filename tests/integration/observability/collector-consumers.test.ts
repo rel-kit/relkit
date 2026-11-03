@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 import { existsSync } from "node:fs";
 import { mkdtemp, rm } from "node:fs/promises";
 import { resolve } from "node:path";
-import { Hono } from "../../../packages/inspector-api/node_modules/hono/dist/index.js";
+import { Hono } from "../../../packages/relkit/node_modules/hono/dist/index.js";
 import {
   createObservabilityCollector,
   createObservabilityIndex,
@@ -25,7 +25,7 @@ import {
   type RedactedLogRecord,
 } from "../../../packages/relkit/src/runtime-effect/logger.ts";
 import { API_BASE_PATH } from "relkit/contracts";
-import { installObservabilityEndpoints } from "../../../packages/inspector-api/src/index.ts";
+import { installObservabilityEndpoints } from "../../../packages/relkit/src/inspector-api/index.ts";
 
 const secret = "super-secret-password";
 const root = resolve(import.meta.dir, "../../..");

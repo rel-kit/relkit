@@ -4,7 +4,7 @@ import { GRAPH_VERSION, type RuntimeIntegrationPlan } from "relkit/contracts";
 import {
   generateRuntimeIntegrationImports,
   generateRuntimeIntegrationPlan,
-} from "../../packages/compiler/src/index.ts";
+} from "../../packages/cli/src/compiler/index.ts";
 import type { ApplicationGraph } from "relkit/graph";
 import {
   source,

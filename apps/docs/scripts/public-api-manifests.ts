@@ -28,6 +28,7 @@ const INTERNAL_RELKIT_AREAS = new Set([
   "diagnostics",
   "engine",
   "graph",
+  "inspector-api",
   "invocation",
   "local-service",
   "observability",
@@ -40,10 +41,18 @@ const INTERNAL_RELKIT_AREAS = new Set([
  * @param name - Package name. @param subpath - Export map key.
  * @returns `relkit/<area>` for a `relkit` subpath, otherwise the package name. */
 function referenceOwner(name: string, subpath: string): string {
-  if (name !== "relkit" || subpath === ".") return name;
-  const area = subpath.split("/")[1]!;
-  return `relkit/${area === "tasks" ? "jobs" : area}`;
+  const area = subpath.split("/")[1] ?? "";
+  if (name === "relkit")
+    return subpath === "." ? name : `relkit/${area === "tasks" ? "jobs" : area}`;
+  return MERGED_AREAS[name]?.includes(area) ? `${name}/${area}` : name;
 }
+
+/** Source areas merged into tool packages; only the Inspector's local history is documented. */
+const MERGED_AREAS: Readonly<Record<string, readonly string[]>> = {
+  "@relkit/cli": ["compiler", "client-generator", "supervisor"],
+  "@relkit/inspector": ["observability-local"],
+  "@relkit/pulumi": ["deploy-pulumi"],
+};
 
 /** Inventories supported and explicitly internal import paths independently of the docs catalog.
  * @param root - Repository root. @returns Validated manifests with source locations. */
@@ -63,7 +72,9 @@ export function publicManifests(root: string): PublicImport[] {
           manifest.description,
         ) ||
         /\/internal(?:\/|$)/.test(subpath) ||
-        (manifest.name === "relkit" && INTERNAL_RELKIT_AREAS.has(subpath.split("/")[1] ?? "")),
+        (manifest.name === "relkit" && INTERNAL_RELKIT_AREAS.has(subpath.split("/")[1] ?? "")) ||
+        (manifest.name !== "@relkit/inspector" &&
+          MERGED_AREAS[manifest.name]?.includes(subpath.split("/")[1] ?? "") === true),
       symbols: [],
     }));
   });

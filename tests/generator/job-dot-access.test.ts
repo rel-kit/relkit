@@ -5,7 +5,7 @@ import {
   generateClientRegistry,
   generateContract,
   publicFingerprint,
-} from "../../packages/client-generator/src/index.ts";
+} from "../../packages/cli/src/client-generator/index.ts";
 
 test("generates name-based job dot access without exposing private jobs", () => {
   const graph = graphWithJobs();

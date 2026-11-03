@@ -2,8 +2,8 @@
 import { expect, it } from "@effect/vitest";
 import { Cause, Deferred, Effect, Exit, Fiber, Layer, Logger, Ref, Scope } from "effect";
 import { TestClock } from "effect/testing";
-import { InspectionConnectionError } from "@relkit/inspector-api/connection";
-import type { InspectionFilesOperations } from "@relkit/inspector-api/connection";
+import { InspectionConnectionError } from "relkit/inspector-api/connection";
+import type { InspectionFilesOperations } from "relkit/inspector-api/connection";
 import { inspectionLoop } from "../src/tool-loop.js";
 import { acquireLiveEvents } from "../src/live-events.js";
 import { InspectorHistoryNative } from "../src/history-native.service.js";

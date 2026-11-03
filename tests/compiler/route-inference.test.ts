@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
 import { defineError, defineFunction } from "relkit/functions";
 import { defineRoute } from "relkit/routes";
 import { z } from "relkit/schema";

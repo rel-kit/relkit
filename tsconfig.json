@@ -22,17 +22,11 @@
     { "path": "./packages/better-auth" },
     { "path": "./packages/client" },
     { "path": "./packages/cli" },
-    { "path": "./packages/client-generator" },
     { "path": "./packages/cloud-aws" },
-    { "path": "./packages/compiler" },
     { "path": "./packages/create-relkit" },
-    { "path": "./packages/deploy-pulumi" },
     { "path": "./packages/drizzle" },
-    { "path": "./packages/inspector-api" },
     { "path": "./packages/inspector" },
-    { "path": "./packages/observability-local" },
     { "path": "./packages/providers-standard" },
-    { "path": "./packages/supervisor" },
     { "path": "./packages/testing" }
   ]
 }

@@ -1,4 +1,4 @@
-import type { InspectorActiveGeneration } from "@relkit/inspector-api";
+import type { InspectorActiveGeneration } from "relkit/inspector-api";
 import type { ObservabilityQueryRequest } from "relkit/observability";
 import type { Hono } from "hono";
 

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { createRuntimeActivationFingerprint } from "../../packages/compiler/src/index.ts";
+import { createRuntimeActivationFingerprint } from "../../packages/cli/src/compiler/index.ts";
 
 const input = {
   graphHash: "sha256:graph",

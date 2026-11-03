@@ -11,7 +11,7 @@ import { ownedNativePromise } from "./src/services/owned-promise.js";
 import { CliProcess } from "./src/services/process.service.js";
 import type { BuildSupportFixture } from "./build-support-fixture.types.js";
 
-const FRAMEWORK_PEERS = ["effect", "@relkit/inspector-api"];
+const FRAMEWORK_PEERS = ["effect"];
 
 /**
  * Captures one real Bun process through owned process-group and bounded pipe authority.

@@ -13,8 +13,8 @@ import {
   generateManifest,
   MANIFEST_CODES,
   normalizeCompilation,
-} from "../../packages/compiler/src/index.ts";
-import { renderManifest } from "../../packages/compiler/src/generate-manifest-format.ts";
+} from "../../packages/cli/src/compiler/index.ts";
+import { renderManifest } from "../../packages/cli/src/compiler/generate-manifest-format.ts";
 
 const graph = { contractVersion: GRAPH_VERSION, nodes: [], edges: [] } as const;
 const graphHash = hashGraph(graph);

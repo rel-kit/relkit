@@ -3,7 +3,7 @@ import { defineFunction } from "relkit/functions";
 import { defineJob, defineTask } from "relkit/jobs";
 import { defineRoute, http } from "relkit/routes";
 import { z } from "relkit/schema";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
 
 const source = { file: "src/orders/tasks/send.task.ts", line: 1, column: 1 } as const;
 

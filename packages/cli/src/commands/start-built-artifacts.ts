@@ -7,7 +7,7 @@ import {
   isRuntimeActivationFingerprint,
   type RuntimeActivationFingerprint,
 } from "relkit/contracts";
-import { createRuntimeActivationFingerprint } from "@relkit/compiler";
+import { createRuntimeActivationFingerprint } from "../compiler/index.js";
 import { cliAdapterError, cliOriginalError, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { CliFileSystem } from "../services/filesystem.service.js";

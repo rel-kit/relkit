@@ -5,7 +5,7 @@
 import { expect, test } from "bun:test";
 import { defineApp } from "../../packages/relkit/src/app/define-app.ts";
 import { defineEnv, env } from "relkit/config";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
 import { validateGraphShape } from "relkit/graph";
 import { otlp } from "../../integrations/packages/otlp/src/index.ts";
 import { sentry } from "../../integrations/packages/sentry/src/index.ts";

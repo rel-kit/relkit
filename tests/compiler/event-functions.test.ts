@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
 import { defineEvent, defineEventFunction } from "relkit/events";
 import { defineFunction } from "relkit/functions";
 import { z } from "relkit/schema";
