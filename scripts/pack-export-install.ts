@@ -17,7 +17,8 @@ import { consumerInputFailure } from "./consumer-installation-native.js";
  * @param temporary - Outer acceptance root owning the private registry and cache.
  * @param repository - Read-only workspace identities used to reject first-party registry fallback.
  * @param tarballs - Exact required archives, including creator-owned repair assets.
- * @returns An installation operation borrowing the registry until the enclosing Scope closes.
+ * @returns An installation operation borrowing the registry until the enclosing Scope closes; a
+ * production install selects only the named packages, without their peers or development dependencies.
  */
 export const makeExportInstaller = Effect.fn("ExportSmoke.installer")(function* (
   run: ExportCommand,
@@ -26,7 +27,8 @@ export const makeExportInstaller = Effect.fn("ExportSmoke.installer")(function* 
   tarballs: Map<string, string>,
 ) {
   const context = yield* exportInstallContext(temporary, repository, tarballs);
-  return (root: string, names: readonly string[]) => installSelection(run, context, root, names);
+  return (root: string, names: readonly string[], production = false) =>
+    installSelection(run, context, root, names, production);
 });
 
 /** Keeps candidate metadata and registry lifetime with the outer export acceptance owner. */
@@ -64,13 +66,16 @@ const installSelection = Effect.fn("ExportSmoke.installSelection")(function* (
   context: Effect.Success<ReturnType<typeof exportInstallContext>>,
   root: string,
   names: readonly string[],
+  production: boolean,
 ) {
   const dependencies: Record<string, string> = {};
   for (const name of names) {
     const manifest = context.manifests.get(name);
     if (manifest === undefined)
       return yield* consumerInputFailure("export.selection", `Missing packed selection ${name}`);
-    Object.assign(dependencies, manifest.peerDependencies, { [name]: manifest.version });
+    Object.assign(dependencies, production ? {} : manifest.peerDependencies, {
+      [name]: manifest.version,
+    });
   }
   yield* exportNative("selected.release-copy", () =>
     rm(join(root, "node_modules"), { recursive: true, force: true }),
@@ -78,7 +83,7 @@ const installSelection = Effect.fn("ExportSmoke.installSelection")(function* (
   yield* writeSelection(root, dependencies, context);
   const command = yield* consumerInstallCommand(
     "bun-isolated",
-    { name: "public-exports", dependencies, devDependencies: {}, production: false },
+    { name: "public-exports", dependencies, devDependencies: {}, production },
     root,
     context.registry,
     context.cache,
