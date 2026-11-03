@@ -57,24 +57,9 @@
     }
   },
   "dependencies": {
-    "@relkit/buckets": "workspace:*",
-    "@relkit/cache": "workspace:*",
-    "@relkit/config": "workspace:*",
     "@relkit/compiler": "workspace:*",
-    "@relkit/contracts": "workspace:*",
-    "@relkit/engine": "workspace:*",
-    "@relkit/events": "workspace:*",
-    "@relkit/functions": "workspace:*",
-    "@relkit/graph": "workspace:*",
-    "@relkit/invocation": "workspace:*",
-    "@relkit/jobs": "workspace:*",
-    "@relkit/providers-local": "workspace:*",
-    "@relkit/realtime": "workspace:*",
-    "@relkit/runtime-effect": "workspace:*",
-    "@relkit/runtime-hono": "workspace:*",
-    "@relkit/schema": "workspace:*",
-    "@relkit/tools": "workspace:*",
-    "effect": "catalog:"
+    "effect": "catalog:",
+    "relkit": "workspace:*"
   },
   "peerDependencies": {
     "@relkit/better-auth": "workspace:*",
@@ -96,11 +81,10 @@
     "typecheck": "tsc -b --pretty false && tsc -p tsconfig.tests.json --pretty false"
   },
   "devDependencies": {
+    "@effect/vitest": "catalog:",
     "@relkit/better-auth": "workspace:*",
     "@relkit/drizzle": "workspace:*",
     "@relkit/langchain": "workspace:*",
-    "@effect/vitest": "catalog:",
-    "@relkit/routes": "workspace:*",
     "drizzle-orm": "catalog:",
     "vitest": "catalog:"
   },

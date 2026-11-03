@@ -57,8 +57,8 @@ test("a release section is read back for the release notes", () => {
 });
 
 test("the Changesets action receives an untracked package changelog", () => {
-  expect(renderActionChangelog("@relkit/app", "0.0.1")).toBe(
-    "# @relkit/app\n\n## 0.0.1\n\nSee the root CHANGELOG.md for this release batch.\n",
+  expect(renderActionChangelog("relkit", "0.0.1")).toBe(
+    "# relkit\n\n## 0.0.1\n\nSee the root CHANGELOG.md for this release batch.\n",
   );
 });
 

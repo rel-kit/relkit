@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { z } from "@relkit/schema";
-import { defineEventFunction } from "@relkit/events";
+import { z } from "relkit/schema";
+import { defineEventFunction } from "relkit/events";
 import { createTestEvent } from "../../src/index.ts";
 
 const target = defineEventFunction({

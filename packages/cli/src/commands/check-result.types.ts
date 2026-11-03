@@ -1,5 +1,5 @@
 import type { GeneratedOutputs, LoadedToolingConfig } from "@relkit/compiler";
-import type { Diagnostic } from "@relkit/diagnostics";
+import type { Diagnostic } from "relkit/diagnostics";
 
 /** Compilation outcome; failed compilations never publish an activatable manifest. */
 export interface CheckResult {

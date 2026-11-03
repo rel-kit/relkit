@@ -164,13 +164,15 @@ export function checkManifests(
     )
       throw new Error(`Export map mismatch: ${item.name}`);
     const expectedBin =
-      directoryName === "cli" || directoryName === "relkit"
+      directoryName === "cli"
         ? { relkit: "./dist/bin.js" }
-        : directoryName === "create-relkit"
-          ? { "create-relkit": "./dist/bin.js" }
-          : directoryName === "inspector"
-            ? { "relkit-inspector": "./dist/bin.js" }
-            : undefined;
+        : directoryName === "relkit"
+          ? { relkit: "./dist/launcher/bin.js" }
+          : directoryName === "create-relkit"
+            ? { "create-relkit": "./dist/bin.js" }
+            : directoryName === "inspector"
+              ? { "relkit-inspector": "./dist/bin.js" }
+              : undefined;
     if (JSON.stringify(stable(item.manifest.bin)) !== JSON.stringify(stable(expectedBin)))
       throw new Error(`Binary map mismatch: ${item.name}`);
     if (

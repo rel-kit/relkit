@@ -69,7 +69,7 @@ All repository paths below are relative to the repository root.
   TypeScript `@example`; see `apps/docs/scripts/check-jsdoc.ts`.
 - **CLI reference:** Edit the CLI help model exposed by `@relkit/cli/help`, not
   `apps/docs/content/docs/api/cli.mdx`.
-- **Error code pages:** Edit the code's entry in `packages/diagnostics/src/codes/`, not
+- **Error code pages:** Edit the code's entry in `packages/relkit/src/diagnostics/codes/`, not
   `apps/docs/content/docs/errors/*.mdx`. Docs generation fails when a code has no entry.
 - **Navigation and related content:** Update `apps/docs/scripts/guide-catalog.ts` and any
   relevant imported catalogs when adding or moving guides. Update

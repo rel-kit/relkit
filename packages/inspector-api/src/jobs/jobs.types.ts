@@ -1,4 +1,4 @@
-import type { JsonValue, MaybePromise } from "@relkit/contracts";
+import type { JsonValue, MaybePromise } from "relkit/contracts";
 import type {
   RunCancellationReceipt,
   RunListQuery,
@@ -6,7 +6,7 @@ import type {
   RunRetryReceipt,
   RunSnapshot,
   RunWatchFrame,
-} from "@relkit/contracts/jobs";
+} from "relkit/contracts/jobs";
 
 /** Declared native Inspector privilege categories. */
 export type InspectorJobsOperation = "read" | "control" | "schedule";

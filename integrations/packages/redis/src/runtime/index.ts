@@ -1,4 +1,4 @@
-import type { RuntimeProviderContext, RuntimeProviderIntegration } from "@relkit/provider";
+import type { RuntimeProviderContext, RuntimeProviderIntegration } from "relkit/provider";
 import { createRedisCacheProvider } from "./provider.js";
 import { createRedisRealtimeProvider } from "./realtime-provider.js";
 import { createRedisAgentStateProvider } from "./agent-state-provider.js";

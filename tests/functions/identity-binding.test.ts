@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
-import { bindDescriptorIdentity } from "../../packages/invocation/dist/index.js";
-import { invokeFunction } from "../../packages/engine/src/index.ts";
-import { defineError, defineFunction } from "../../packages/functions/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
-import { resolveToolTarget } from "../../packages/tools/src/runtime.ts";
+import { bindDescriptorIdentity } from "relkit/invocation";
+import { invokeFunction } from "relkit/engine";
+import { defineError, defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
+import { resolveToolTarget } from "../../packages/relkit/src/tools/runtime.ts";
 
 test("bound inferred errors create canonical instances and engine records", async () => {
   const error = defineError({

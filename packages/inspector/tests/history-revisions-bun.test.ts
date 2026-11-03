@@ -4,7 +4,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
-import type { LocalRecord } from "@relkit/observability/local/record";
+import type { LocalRecord } from "relkit/observability/local/record";
 import { InspectorHistory } from "../src/history.service.js";
 import { InspectorHistoryNativeLive } from "../src/history-native.service.js";
 

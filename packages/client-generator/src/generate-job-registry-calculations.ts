@@ -93,7 +93,7 @@ export const jobProcedureTypeEffect = Effect.fnUntraced(function* (
     const input = yield* triggerInputEffect(source);
     return yield* jobProcedureContractEffect(
       input,
-      'import("@relkit/contracts/jobs").RunHandle',
+      'import("relkit/contracts/jobs").RunHandle',
       error,
       "mutation",
     );
@@ -105,13 +105,13 @@ export const jobProcedureTypeEffect = Effect.fnUntraced(function* (
     if (operation === "list")
       return yield* jobProcedureContractEffect(
         listInputType,
-        yield* renderTypeApplicationEffect('import("@relkit/contracts/jobs").RunPage', [snapshot]),
+        yield* renderTypeApplicationEffect('import("relkit/contracts/jobs").RunPage', [snapshot]),
         error,
         "query",
       );
     return yield* jobStreamProcedureContractEffect(
       watchInputType,
-      yield* renderTypeApplicationEffect('import("@relkit/contracts/jobs").RunWatchFrame', [
+      yield* renderTypeApplicationEffect('import("relkit/contracts/jobs").RunWatchFrame', [
         snapshot,
       ]),
       error,
@@ -123,7 +123,7 @@ export const jobProcedureTypeEffect = Effect.fnUntraced(function* (
     const item = yield* jobTypeCalculations.streamItemEffect(source);
     return yield* jobStreamProcedureContractEffect(
       input,
-      yield* renderTypeApplicationEffect('import("@relkit/contracts/jobs").NamedStreamFrame', [
+      yield* renderTypeApplicationEffect('import("relkit/contracts/jobs").NamedStreamFrame', [
         item,
       ]),
       error,
@@ -133,13 +133,13 @@ export const jobProcedureTypeEffect = Effect.fnUntraced(function* (
   if (operation === "cancel")
     return yield* jobProcedureContractEffect(
       cancelInputType,
-      'import("@relkit/contracts/jobs").RunCancellationReceipt',
+      'import("relkit/contracts/jobs").RunCancellationReceipt',
       error,
       "mutation",
     );
   return yield* jobProcedureContractEffect(
     retryInputType,
-    'import("@relkit/contracts/jobs").RunRetryReceipt',
+    'import("relkit/contracts/jobs").RunRetryReceipt',
     error,
     "mutation",
   );

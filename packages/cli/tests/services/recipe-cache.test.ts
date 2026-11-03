@@ -1,10 +1,7 @@
 import { expect, it } from "@effect/vitest";
 import { Deferred, Effect, Exit, Fiber, Layer, Ref } from "effect";
-import {
-  LOCAL_SERVICE_PROTOCOL_VERSION,
-  type LocalServiceRecipeInput,
-} from "@relkit/local-service";
-import type { RuntimeIntegrationPlan } from "@relkit/contracts";
+import { LOCAL_SERVICE_PROTOCOL_VERSION, type LocalServiceRecipeInput } from "relkit/local-service";
+import type { RuntimeIntegrationPlan } from "relkit/contracts";
 import { makeDevRecipeCacheEffect } from "../../src/commands/dev-recipe-cache.js";
 import { CliModules } from "../../src/services/modules.service.js";
 import { compilerTestLayer } from "./test-layers.js";

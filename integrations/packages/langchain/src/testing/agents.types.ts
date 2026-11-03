@@ -10,9 +10,9 @@ import type {
   AgentRuntimeOptions,
   PendingApproval,
 } from "../index.js";
-import type { spanSnapshot } from "@relkit/invocation";
-import type { JsonValue } from "@relkit/contracts";
-import type { InferInput, InferOutput } from "@relkit/schema";
+import type { spanSnapshot } from "relkit/invocation";
+import type { JsonValue } from "relkit/contracts";
+import type { InferInput, InferOutput } from "relkit/schema";
 import type { TestFailureControls } from "@relkit/testing/internal/fakes";
 
 /** Native agent descriptor vocabulary retained by public test inference. @experimental */

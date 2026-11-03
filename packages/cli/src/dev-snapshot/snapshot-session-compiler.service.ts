@@ -5,7 +5,7 @@
  */
 import { Context, Effect, Exit, Layer, Ref, Scope } from "effect";
 import type { CandidateCompileRequest } from "@relkit/supervisor";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { makeDevCompilerBridgeEffect } from "../commands/dev-compiler-bridge.js";
 import { cliAdapterError } from "../cli-errors.js";
 import { SnapshotCandidates } from "./snapshot-candidate.service.js";

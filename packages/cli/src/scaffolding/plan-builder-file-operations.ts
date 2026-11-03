@@ -2,7 +2,7 @@
 
 import { resolve } from "node:path";
 import { Effect, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
 import type { ProjectDiscovery } from "./project-discovery-types.js";
 

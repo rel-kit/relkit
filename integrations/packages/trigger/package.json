@@ -82,10 +82,7 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@relkit/contracts": "workspace:*",
-    "@relkit/jobs": "workspace:*",
-    "@relkit/local-service": "workspace:*",
-    "@relkit/provider": "workspace:*"
+    "relkit": "workspace:*"
   },
   "peerDependencies": {
     "@trigger.dev/sdk": "4.7.2"

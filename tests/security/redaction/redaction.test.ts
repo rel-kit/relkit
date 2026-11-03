@@ -6,7 +6,7 @@ import {
   createObservabilityCollector,
   createObservabilityIndex,
   type LogRecord,
-} from "../../../packages/observability/src/index.ts";
+} from "relkit/observability";
 import { secrets, flowInput, source } from "./redaction-records.fixture.js";
 import {
   emitLoggerRecord,

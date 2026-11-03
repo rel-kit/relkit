@@ -1,5 +1,5 @@
 import { strict as assert } from "node:assert";
-import { createObservabilityStream } from "@relkit/observability";
+import { createObservabilityStream } from "relkit/observability";
 import { streamResponse } from "../../src/observability-stream.js";
 import type { NativeResponseReader } from "./native-stream.types.js";
 

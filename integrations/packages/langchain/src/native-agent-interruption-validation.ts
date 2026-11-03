@@ -10,7 +10,7 @@ import {
   publicHitlRequest,
   type ReviewConfig,
 } from "./native-agent-interruption-schema.js";
-import type { AgentWaitingRequest } from "@relkit/agents/internal/state.types";
+import type { AgentWaitingRequest } from "relkit/agents/internal/state.types";
 
 /** Extracts public native interruptions from nested graph state.
  * @param snapshot - Native graph state.

@@ -1,4 +1,4 @@
-import type { LoggerOptions } from "@relkit/runtime-effect/logger";
+import type { LoggerOptions } from "relkit/runtime-effect/logger";
 import type {
   SupervisorCandidateTokenSchema,
   SupervisorStateSchema,

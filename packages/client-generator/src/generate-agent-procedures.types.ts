@@ -8,4 +8,4 @@ export interface AgentSource {
   readonly controls?: unknown;
   readonly workflow?: unknown;
 }
-export type { AgentNode, ApplicationGraph } from "@relkit/graph";
+export type { AgentNode, ApplicationGraph } from "relkit/graph";

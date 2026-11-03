@@ -3,8 +3,8 @@ import {
   type DiagnosticRecord,
   type GenerationEvent,
   type GenerationRecord,
-} from "@relkit/observability";
-import type { RuntimeActivationFingerprint } from "@relkit/contracts";
+} from "relkit/observability";
+import type { RuntimeActivationFingerprint } from "relkit/contracts";
 import type { SupervisorTelemetryRecord } from "./observability-records.types.js";
 export type { SupervisorTelemetryRecord } from "./observability-records.types.js";
 import type {

@@ -1,5 +1,5 @@
 import type { Deferred, Effect } from "effect";
-import type { ObservabilityRecord } from "@relkit/observability";
+import type { ObservabilityRecord } from "relkit/observability";
 import type { SupervisorTelemetry } from "./state-machine.types.js";
 
 /** FIFO persistence item already admitted by the shared redaction policy. */

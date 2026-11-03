@@ -1,5 +1,5 @@
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { runWatchFeed } from "./watch-feed-loop.js";
 import type { JobObservationService } from "./observation.types.js";
 

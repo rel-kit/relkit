@@ -19,7 +19,7 @@ import {
   assertUniqueRegistrationsEffect,
 } from "./runtime-integration-selection.js";
 export type { RuntimeIntegrationPlanErrorCode } from "./runtime-integration-plan.types.js";
-import { RUNTIME_INTEGRATION_PLAN_VERSION, type RuntimeIntegrationPlan } from "@relkit/contracts";
+import { RUNTIME_INTEGRATION_PLAN_VERSION, type RuntimeIntegrationPlan } from "relkit/contracts";
 import type { RuntimeIntegrationPackage } from "./normalize-types.js";
 import { telemetryRequirementsEffect } from "./runtime-integration-telemetry.js";
 

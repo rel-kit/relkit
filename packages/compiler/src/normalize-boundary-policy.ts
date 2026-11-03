@@ -3,7 +3,7 @@
  * Ordinary helpers inherit their owning layer; tests/scripts and unowned source
  * folders cannot serve as an intermediate route into another service's internals.
  */
-import type { ApplicationSourceLayer } from "@relkit/contracts";
+import type { ApplicationSourceLayer } from "relkit/contracts";
 
 /**
  * Checks one resolved authored edge against fixed application boundary rules.

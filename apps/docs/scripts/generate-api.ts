@@ -1,7 +1,11 @@
 /** Composes native source contracts into package references while preserving existing heading anchors. */
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import type { apiPackageDefinitions } from "./documentation-catalog.js";
+import {
+  packageDirectory,
+  sourceDirectory,
+  type apiPackageDefinitions,
+} from "./documentation-catalog.js";
 import { referenceLinks } from "./api-related.js";
 import { withFrontendExample } from "./api-frontend.js";
 import type { ReferenceSource } from "./public-api.types.js";
@@ -35,9 +39,11 @@ export async function renderApi(
 /** Reads the Core or Labs tier a package declares in `relkit.maturity`.
  * @param directory - Owning workspace package. @returns The declared tier, if any. */
 async function packageMaturity(directory: string): Promise<unknown> {
-  const manifest = JSON.parse(await readFile(resolve(root, directory, "package.json"), "utf8")) as {
-    relkit?: { maturity?: unknown };
-  };
+  const manifest = JSON.parse(
+    await readFile(resolve(root, packageDirectory(directory), "package.json"), "utf8"),
+  ) as { relkit?: { maturity?: unknown; labs?: readonly string[] } };
+  const area = directory.slice(`${packageDirectory(directory)}/src/`.length);
+  if (area && manifest.relkit?.labs?.includes(area)) return "labs";
   return manifest.relkit?.maturity;
 }
 
@@ -52,15 +58,19 @@ async function renderSource(
 ): Promise<string> {
   return (await nativeDocgen(directory, exampleConfiguration, selected))
     .map(({ markdown, sourcePath }) =>
-      withFrontendExample(cleanDocgen(markdown, sourcePath), `${directory}/src/${sourcePath}`),
+      withFrontendExample(
+        cleanDocgen(markdown, sourcePath, sourceDirectory(directory)),
+        `${sourceDirectory(directory)}/${sourcePath}`,
+      ),
     )
     .join("\n\n");
 }
 
 /** Removes docgen page frontmatter before composing the package reference.
  * @param markdown - Generated module page. @param sourcePath - Original path below src; native docgen drops nested directories from source links.
+ * @param sourceRoot - Repository-relative source folder, when it is not the package's only `src`.
  * @returns Package-embeddable Markdown with accurate source links. */
-export function cleanDocgen(markdown: string, sourcePath?: string): string {
+export function cleanDocgen(markdown: string, sourcePath?: string, sourceRoot?: string): string {
   const body = markdown
     .replace(/^---\n[\s\S]*?\n---\n+/, "")
     .replace(/\n---\n+## Exports Grouped by Category\n[\s\S]*?\n---\n/, "\n");
@@ -87,10 +97,14 @@ export function cleanDocgen(markdown: string, sourcePath?: string): string {
     if (line || lines.at(-1)) lines.push(line);
   }
   const cleaned = lines.join("\n").trim();
-  return sourcePath
+  if (!sourcePath) return cleaned;
+  return sourceRoot
     ? cleaned.replace(
+        /(\[Source\]\(https:\/\/github\.com\/rel-kit\/relkit\/blob\/main\/)[^#)]+(#L\d+\))/g,
+        `$1${sourceRoot}/${sourcePath}$2`,
+      )
+    : cleaned.replace(
         /(\[Source\]\(https:\/\/github\.com\/rel-kit\/relkit\/blob\/main\/[^\n)]+\/src\/)[^#)]+(#L\d+\))/g,
         `$1${sourcePath}$2`,
-      )
-    : cleaned;
+      );
 }

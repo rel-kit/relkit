@@ -1,6 +1,6 @@
 ---
 title: Events API
-description: Generated public TypeScript reference for @relkit/events.
+description: Generated public TypeScript reference for relkit/events.
 search:
   exclude: true
 sidebar:
@@ -38,7 +38,7 @@ new EventClientValidationError({ message: "Invalid event options" });
 declare class EventClientValidationError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L98)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L98)
 
 ### EventDependencyError (class)
 
@@ -58,7 +58,7 @@ declare class EventDependencyError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L31)
 
 ### code (property)
 
@@ -68,7 +68,7 @@ declare class EventDependencyError {
 readonly code: "RELKIT_EVENT_DEPENDENCY_UNDECLARED"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L35)
 
 ### EventOperationCancelledError (class)
 
@@ -88,7 +88,7 @@ declare class EventOperationCancelledError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L70)
 
 ### code (property)
 
@@ -98,7 +98,7 @@ declare class EventOperationCancelledError {
 readonly code: "ABORT_ERR"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L74)
 
 ### EventOperationTimeoutError (class)
 
@@ -118,7 +118,7 @@ declare class EventOperationTimeoutError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L84)
 
 ### code (property)
 
@@ -128,7 +128,7 @@ declare class EventOperationTimeoutError {
 readonly code: "ETIMEDOUT"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L88)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L88)
 
 ### EventPayloadValidationError (class)
 
@@ -146,7 +146,7 @@ new EventPayloadValidationError([{ message: "Required" }]);
 declare class EventPayloadValidationError { constructor(readonly issues: readonly StandardIssue[]) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L7)
 
 ### code (property)
 
@@ -156,7 +156,7 @@ declare class EventPayloadValidationError { constructor(readonly issues: readonl
 readonly code: "RELKIT_EVENT_PAYLOAD_VALIDATION"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L8)
 
 ### EventPayloadValidationFailure (class)
 
@@ -176,7 +176,7 @@ declare class EventPayloadValidationFailure {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L18)
 
 ### issues (property)
 
@@ -186,7 +186,7 @@ declare class EventPayloadValidationFailure {
 readonly issues: ReadonlyArray<StandardIssue>
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L22)
 
 ### EventProfileError (class)
 
@@ -206,7 +206,7 @@ declare class EventProfileError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L44)
 
 ### code (property)
 
@@ -216,7 +216,7 @@ declare class EventProfileError {
 readonly code: "RELKIT_EVENT_PROFILE_UNKNOWN"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L48)
 
 ### EventProviderError (class)
 
@@ -236,7 +236,7 @@ declare class EventProviderError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L57)
 
 ### code (property)
 
@@ -246,7 +246,7 @@ declare class EventProviderError {
 readonly code: "RELKIT_EVENT_PROVIDER_UNAVAILABLE"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-errors.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-errors.ts#L61)
 
 ## `client-operation.ts`
 
@@ -266,7 +266,7 @@ new EventWorkFailed({ cause: new Error("Provider failed") });
 declare class EventWorkFailed
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-operation.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-operation.ts#L14)
 
 ### runAbortable
 
@@ -292,7 +292,7 @@ declare const runAbortable: <A>(
 ) => Promise<A>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-operation.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-operation.ts#L116)
 
 ### runAbortableEffect
 
@@ -323,7 +323,7 @@ declare const runAbortableEffect: <A>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-operation.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-operation.ts#L25)
 
 ## `client-provider.ts`
 
@@ -347,7 +347,7 @@ declare const notify: <T>(
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-provider.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-provider.ts#L67)
 
 ### notifyEffect
 
@@ -369,7 +369,7 @@ declare const notifyEffect: <T>(
 ) => Effect.Effect<void, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-provider.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-provider.ts#L78)
 
 ### resolveProvider
 
@@ -395,7 +395,7 @@ declare const resolveProvider: (
 ) => EventProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-provider.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-provider.ts#L46)
 
 ### resolveProviderEffect
 
@@ -421,7 +421,7 @@ declare const resolveProviderEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-provider.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-provider.ts#L18)
 
 ### resolveValue
 
@@ -439,7 +439,7 @@ resolveValue(() => "correlation-1");
 declare const resolveValue: (value: EventClientOptions["correlationId"]) => string | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-provider.ts#L98)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-provider.ts#L98)
 
 ### resolveValueEffect
 
@@ -459,7 +459,7 @@ declare const resolveValueEffect: (
 ) => Effect.Effect<string | undefined, EventClientValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-provider.ts#L113)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-provider.ts#L113)
 
 ## `client-publish.ts`
 
@@ -479,7 +479,7 @@ Effect.provide(publishEventEffect(setup, payload), eventPublisherLayer(provider)
 declare class EventPublisher
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-publish.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.ts#L32)
 
 ### eventPublisherLayer
 
@@ -497,7 +497,7 @@ eventPublisherLayer(provider);
 declare const eventPublisherLayer: (provider: EventProvider) => Layer.Layer<EventPublisher>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-publish.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.ts#L41)
 
 ### publishEventEffect
 
@@ -529,7 +529,7 @@ declare const publishEventEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-publish.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.ts#L62)
 
 ## `client-publish.types.ts`
 
@@ -541,7 +541,7 @@ declare const publishEventEffect: <
 declare const EventProvider: EventProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-publish.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.types.ts#L5)
 
 ### EventPublishFailure (type alias)
 
@@ -565,7 +565,7 @@ type EventPublishFailure =
   | EventWorkFailed;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-publish.types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.types.ts#L24)
 
 ### EventPublishOptions
 
@@ -575,7 +575,7 @@ type EventPublishFailure =
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-publish.types.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.types.ts#L3)
 
 ### EventPublishResult
 
@@ -585,7 +585,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-publish.types.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.types.ts#L3)
 
 ### EventPublishSetup (interface)
 
@@ -614,7 +614,7 @@ export interface EventPublishSetup<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-publish.types.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.types.ts#L53)
 
 ### EventPublisherService (interface)
 
@@ -645,7 +645,7 @@ export interface EventPublisherService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-publish.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.types.ts#L35)
 
 ### InferInput
 
@@ -655,7 +655,7 @@ export interface EventPublisherService {
 declare const InferInput: InferInput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-publish.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.types.ts#L4)
 
 ### InferOutput
 
@@ -665,7 +665,7 @@ declare const InferInput: InferInput<S>;
 declare const InferOutput: InferOutput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-publish.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.types.ts#L4)
 
 ### StandardSchemaV1
 
@@ -675,7 +675,7 @@ declare const InferOutput: InferOutput<S>;
 declare const StandardSchemaV1: StandardSchemaV1<TInput, TOutput>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-publish.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.types.ts#L4)
 
 ## `client-record.ts`
 
@@ -695,7 +695,7 @@ isRecord({ key: "value" });
 declare const isRecord: (value: unknown) => value is Record<string, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-record.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-record.ts#L9)
 
 ### isRecordEffect
 
@@ -713,7 +713,7 @@ Effect.runSync(isRecordEffect({ key: "value" }));
 declare const isRecordEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-record.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-record.ts#L18)
 
 ## `client-result.ts`
 
@@ -736,7 +736,7 @@ Effect.provide(
 declare class EventIdentity
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-result.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-result.ts#L17)
 
 ### EventIdentityLive
 
@@ -757,7 +757,7 @@ Effect.provide(
 declare const EventIdentityLive: Layer.Layer<EventIdentity, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-result.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-result.ts#L28)
 
 ### normalizeResult
 
@@ -787,7 +787,7 @@ declare const normalizeResult: <Id extends string, Version extends number, Paylo
 ) => EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-result.ts#L105)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-result.ts#L105)
 
 ### normalizeResultEffect
 
@@ -813,7 +813,7 @@ declare const normalizeResultEffect: <Id extends string, Version extends number,
 ) => Effect.Effect<EventPublishResult<Id, Version, Payload>, EventClientValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-result.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-result.ts#L41)
 
 ## `client-result.types.ts`
 
@@ -852,7 +852,7 @@ export interface EventIdentityService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-result.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-result.types.ts#L4)
 
 ### EventOperationContext
 
@@ -862,7 +862,7 @@ export interface EventIdentityService {
 declare const EventOperationContext: EventOperationContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-result.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-result.types.ts#L17)
 
 ### EventProviderResult
 
@@ -872,7 +872,7 @@ declare const EventOperationContext: EventOperationContext;
 declare const EventProviderResult: EventProviderResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-result.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-result.types.ts#L17)
 
 ### EventPublishOptions
 
@@ -882,7 +882,7 @@ declare const EventProviderResult: EventProviderResult<Id, Version, Payload>;
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-result.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-result.types.ts#L16)
 
 ### EventPublishResult
 
@@ -892,7 +892,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-result.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-result.types.ts#L16)
 
 ## `client-utils.ts`
 
@@ -904,7 +904,7 @@ declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 declare const EventClientValidationError: typeof EventClientValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L2)
 
 ### EventDependencyError
 
@@ -914,7 +914,7 @@ declare const EventClientValidationError: typeof EventClientValidationError;
 declare const EventDependencyError: typeof EventDependencyError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L3)
 
 ### EventOperationCancelledError
 
@@ -924,7 +924,7 @@ declare const EventDependencyError: typeof EventDependencyError;
 declare const EventOperationCancelledError: typeof EventOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L4)
 
 ### EventOperationTimeoutError
 
@@ -934,7 +934,7 @@ declare const EventOperationCancelledError: typeof EventOperationCancelledError;
 declare const EventOperationTimeoutError: typeof EventOperationTimeoutError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L5)
 
 ### EventPayloadValidationError
 
@@ -944,7 +944,7 @@ declare const EventOperationTimeoutError: typeof EventOperationTimeoutError;
 declare const EventPayloadValidationError: typeof EventPayloadValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L6)
 
 ### EventProfileError
 
@@ -954,7 +954,7 @@ declare const EventPayloadValidationError: typeof EventPayloadValidationError;
 declare const EventProfileError: typeof EventProfileError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L7)
 
 ### EventProviderError
 
@@ -964,7 +964,7 @@ declare const EventProfileError: typeof EventProfileError;
 declare const EventProviderError: typeof EventProviderError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L8)
 
 ### assertOptionalText
 
@@ -974,7 +974,7 @@ declare const EventProviderError: typeof EventProviderError;
 declare const assertOptionalText: (value: unknown, name: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L11)
 
 ### assertOptionalTextEffect
 
@@ -987,7 +987,7 @@ declare const assertOptionalTextEffect: (
 ) => Effect<void, EventClientValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L12)
 
 ### assertVersion
 
@@ -997,7 +997,7 @@ declare const assertOptionalTextEffect: (
 declare const assertVersion: (value: unknown) => asserts value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L13)
 
 ### assertVersionEffect
 
@@ -1009,7 +1009,7 @@ declare const assertVersionEffect: (
 ) => Effect<number, EventClientValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L14)
 
 ### normalizeAttributesEffect
 
@@ -1021,7 +1021,7 @@ declare const normalizeAttributesEffect: (
 ) => Effect<Readonly<Record<string, EventAttributeValue>>, EventClientValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L15)
 
 ### normalizeOptions
 
@@ -1031,7 +1031,7 @@ declare const normalizeAttributesEffect: (
 declare const normalizeOptions: (value: unknown) => EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L16)
 
 ### normalizeOptionsEffect
 
@@ -1043,7 +1043,7 @@ declare const normalizeOptionsEffect: (
 ) => Effect<EventPublishOptions, EventClientValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L17)
 
 ### normalizeResult
 
@@ -1061,7 +1061,7 @@ declare const normalizeResult: <Id extends string, Version extends number, Paylo
 ) => EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L21)
 
 ### normalizeResultEffect
 
@@ -1079,7 +1079,7 @@ declare const normalizeResultEffect: <Id extends string, Version extends number,
 ) => Effect<EventPublishResult<Id, Version, Payload>, EventClientValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L21)
 
 ### notify
 
@@ -1093,7 +1093,7 @@ declare const notify: <T>(
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L23)
 
 ### notifyEffect
 
@@ -1107,7 +1107,7 @@ declare const notifyEffect: <T>(
 ) => Effect<void, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L24)
 
 ### parsePayload
 
@@ -1120,7 +1120,7 @@ declare const parsePayload: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L18)
 
 ### parsePayloadEffect
 
@@ -1133,7 +1133,7 @@ declare const parsePayloadEffect: (
 ) => Effect<unknown, EventClientValidationError | EventPayloadValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L19)
 
 ### resolveProvider
 
@@ -1147,7 +1147,7 @@ declare const resolveProvider: (
 ) => EventProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L25)
 
 ### resolveProviderEffect
 
@@ -1165,7 +1165,7 @@ declare const resolveProviderEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L26)
 
 ### resolveValue
 
@@ -1175,7 +1175,7 @@ declare const resolveProviderEffect: (
 declare const resolveValue: (value: EventClientOptions["correlationId"]) => string | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L27)
 
 ### resolveValueEffect
 
@@ -1187,7 +1187,7 @@ declare const resolveValueEffect: (
 ) => Effect<string | undefined, EventClientValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-utils.ts#L28)
 
 ## `client-validation.ts`
 
@@ -1211,7 +1211,7 @@ assertOptionalText("key", "key");
 declare const assertOptionalText: (value: unknown, name: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-validation.ts#L143)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-validation.ts#L143)
 
 ### assertOptionalTextEffect
 
@@ -1232,7 +1232,7 @@ declare const assertOptionalTextEffect: (
 ) => Effect.Effect<void, EventClientValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-validation.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-validation.ts#L128)
 
 ### assertVersion
 
@@ -1254,7 +1254,7 @@ assertVersion(1);
 declare const assertVersion: (value: unknown) => asserts value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-validation.ts#L174)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-validation.ts#L174)
 
 ### assertVersionEffect
 
@@ -1274,7 +1274,7 @@ declare const assertVersionEffect: (
 ) => Effect.Effect<number, EventClientValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-validation.ts#L157)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-validation.ts#L157)
 
 ### normalizeAttributesEffect
 
@@ -1298,7 +1298,7 @@ declare const normalizeAttributesEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-validation.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-validation.ts#L99)
 
 ### normalizeOptions
 
@@ -1320,7 +1320,7 @@ normalizeOptions({ key: "order-1" });
 declare const normalizeOptions: (value: unknown) => EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-validation.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-validation.ts#L77)
 
 ### normalizeOptionsEffect
 
@@ -1340,7 +1340,7 @@ declare const normalizeOptionsEffect: (
 ) => Effect.Effect<EventPublishOptions, EventClientValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-validation.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-validation.ts#L64)
 
 ### parsePayload
 
@@ -1365,7 +1365,7 @@ declare const parsePayload: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-validation.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-validation.ts#L46)
 
 ### parsePayloadEffect
 
@@ -1386,7 +1386,7 @@ declare const parsePayloadEffect: (
 ) => Effect.Effect<unknown, EventClientValidationError | EventPayloadValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-validation.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-validation.ts#L18)
 
 ## `client.ts`
 
@@ -1398,7 +1398,7 @@ declare const parsePayloadEffect: (
 declare const EventAttributeValue: EventAttributeValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L38)
 
 ### EventClient
 
@@ -1408,7 +1408,7 @@ declare const EventAttributeValue: EventAttributeValue;
 declare const EventClient: EventClient<Input, Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L27)
 
 ### EventClientOptions
 
@@ -1418,7 +1418,7 @@ declare const EventClient: EventClient<Input, Id, Version, Payload>;
 declare const EventClientOptions: EventClientOptions<Id, Version, PayloadSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L28)
 
 ### EventDeclaredEdge
 
@@ -1428,7 +1428,7 @@ declare const EventClientOptions: EventClientOptions<Id, Version, PayloadSchema>
 declare const EventDeclaredEdge: EventDeclaredEdge;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L29)
 
 ### EventDependencyError
 
@@ -1438,7 +1438,7 @@ declare const EventDeclaredEdge: EventDeclaredEdge;
 declare const EventDependencyError: typeof EventDependencyError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L43)
 
 ### EventInvocationBridge
 
@@ -1448,7 +1448,7 @@ declare const EventDependencyError: typeof EventDependencyError;
 declare const EventInvocationBridge: EventInvocationBridge;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L30)
 
 ### EventInvocationBridgeOptions
 
@@ -1458,7 +1458,7 @@ declare const EventInvocationBridge: EventInvocationBridge;
 declare const EventInvocationBridgeOptions: EventInvocationBridgeOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L31)
 
 ### EventObservedEdge
 
@@ -1468,7 +1468,7 @@ declare const EventInvocationBridgeOptions: EventInvocationBridgeOptions;
 declare const EventObservedEdge: EventObservedEdge;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L32)
 
 ### EventOperationCancelledError
 
@@ -1478,7 +1478,7 @@ declare const EventObservedEdge: EventObservedEdge;
 declare const EventOperationCancelledError: typeof EventOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L44)
 
 ### EventOperationContext
 
@@ -1488,7 +1488,7 @@ declare const EventOperationCancelledError: typeof EventOperationCancelledError;
 declare const EventOperationContext: EventOperationContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L33)
 
 ### EventOperationTimeoutError
 
@@ -1498,7 +1498,7 @@ declare const EventOperationContext: EventOperationContext;
 declare const EventOperationTimeoutError: typeof EventOperationTimeoutError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L45)
 
 ### EventPayloadValidationError
 
@@ -1508,7 +1508,7 @@ declare const EventOperationTimeoutError: typeof EventOperationTimeoutError;
 declare const EventPayloadValidationError: typeof EventPayloadValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L46)
 
 ### EventProfileError
 
@@ -1518,7 +1518,7 @@ declare const EventPayloadValidationError: typeof EventPayloadValidationError;
 declare const EventProfileError: typeof EventProfileError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L47)
 
 ### EventProvider
 
@@ -1528,7 +1528,7 @@ declare const EventProfileError: typeof EventProfileError;
 declare const EventProvider: EventProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L34)
 
 ### EventProviderError
 
@@ -1538,7 +1538,7 @@ declare const EventProvider: EventProvider;
 declare const EventProviderError: typeof EventProviderError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L48)
 
 ### EventProviderResult
 
@@ -1548,7 +1548,7 @@ declare const EventProviderError: typeof EventProviderError;
 declare const EventProviderResult: EventProviderResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L35)
 
 ### EventPublishOptions
 
@@ -1558,7 +1558,7 @@ declare const EventProviderResult: EventProviderResult<Id, Version, Payload>;
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L39)
 
 ### EventPublishResult
 
@@ -1568,7 +1568,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L40)
 
 ### createEventClient
 
@@ -1601,7 +1601,7 @@ declare const createEventClient: <
 ) => EventClient<InferInput<PayloadSchema>, Id, Version, InferOutput<PayloadSchema>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L57)
 
 ### createEventClientEffect
 
@@ -1635,7 +1635,7 @@ declare const createEventClientEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L79)
 
 ## `client.types.ts`
 
@@ -1647,7 +1647,7 @@ declare const createEventClientEffect: <
 declare const EventAttributeValue: EventAttributeValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L5)
 
 ### EventClient (interface)
 
@@ -1681,7 +1681,7 @@ export interface EventClient<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L109)
 
 ### EventClientOptions (interface)
 
@@ -1725,7 +1725,7 @@ export interface EventClientOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L84)
 
 ### EventDeclaredEdge (interface)
 
@@ -1751,7 +1751,7 @@ export interface EventDeclaredEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L130)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L130)
 
 ### EventInvocationBridge (interface)
 
@@ -1780,7 +1780,7 @@ export interface EventInvocationBridge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L67)
 
 ### EventInvocationBridgeOptions (interface)
 
@@ -1804,7 +1804,7 @@ export interface EventInvocationBridgeOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L56)
 
 ### EventObservedEdge (interface)
 
@@ -1830,7 +1830,7 @@ export interface EventObservedEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L139)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L139)
 
 ### EventOperationContext (interface)
 
@@ -1857,7 +1857,7 @@ export interface EventOperationContext {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L15)
 
 ### EventProvider (interface)
 
@@ -1890,7 +1890,7 @@ export interface EventProvider {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L38)
 
 ### EventProviderResult (type alias)
 
@@ -1913,7 +1913,7 @@ type EventProviderResult<
   Partial<Omit<EventPublishResult<Id, Version, Payload>, "instanceId" | "accepted">>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L28)
 
 ### EventPublishOptions
 
@@ -1923,7 +1923,7 @@ type EventProviderResult<
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L6)
 
 ### EventPublishResult
 
@@ -1933,7 +1933,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L7)
 
 ### InferInput
 
@@ -1943,7 +1943,7 @@ declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 declare const InferInput: InferInput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L9)
 
 ### InferOutput
 
@@ -1953,7 +1953,7 @@ declare const InferInput: InferInput<S>;
 declare const InferOutput: InferOutput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L9)
 
 ### StandardSchemaV1
 
@@ -1963,7 +1963,7 @@ declare const InferOutput: InferOutput<S>;
 declare const StandardSchemaV1: StandardSchemaV1<TInput, TOutput>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L9)
 
 ## `define-event-function.ts`
 
@@ -1979,8 +1979,8 @@ TypeError for malformed options.
 **Example**
 
 ```ts
-import { defineEvent, defineEventFunction } from "@relkit/app/events";
-import { z } from "@relkit/app/schema";
+import { defineEvent, defineEventFunction } from "relkit/events";
+import { z } from "relkit/schema";
 
 const orderCreated = defineEvent({
   id: "orders.created",
@@ -2020,7 +2020,7 @@ declare const defineEventFunction: <
 ) => EventFunctionDescriptor<Id, Event, Publishes, Dependencies, ErrorListOf<Options>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event-function.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L59)
 
 Since v0.1.0
 
@@ -2056,7 +2056,7 @@ declare const defineEventFunctionEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event-function.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L84)
 
 ### isEventFunctionDescriptor
 
@@ -2074,7 +2074,7 @@ isEventFunctionDescriptor(candidate);
 declare const isEventFunctionDescriptor: (value: unknown) => value is EventFunctionDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event-function.ts#L145)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L145)
 
 ### isEventFunctionDescriptorEffect
 
@@ -2094,7 +2094,7 @@ declare const isEventFunctionDescriptorEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event-function.ts#L154)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L154)
 
 ## `define-event-function.types.ts`
 
@@ -2106,7 +2106,7 @@ declare const isEventFunctionDescriptorEffect: (
 declare const ErrorDescriptorAny: ErrorDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event-function.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L8)
 
 ### ErrorListOf (type alias)
 
@@ -2128,7 +2128,7 @@ type ErrorListOf<Options> = Options extends {
   : readonly [];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event-function.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L18)
 
 ### EventFunctionCallOptions (type alias)
 
@@ -2159,7 +2159,7 @@ type EventFunctionCallOptions<
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event-function.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L27)
 
 ### EventFunctionDescriptor
 
@@ -2175,7 +2175,7 @@ declare const EventFunctionDescriptor: EventFunctionDescriptor<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event-function.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L11)
 
 ### EventFunctionDescriptorAny
 
@@ -2185,7 +2185,7 @@ declare const EventFunctionDescriptor: EventFunctionDescriptor<
 declare const EventFunctionDescriptorAny: EventFunctionDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event-function.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L12)
 
 ### EventFunctionValidation (type alias)
 
@@ -2204,7 +2204,7 @@ type EventFunctionValidation<Options extends { readonly handler: (...args: never
   FunctionHandlerValidation<Awaited<ReturnType<Options["handler"]>>, void, ErrorListOf<Options>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event-function.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L45)
 
 ### EventName
 
@@ -2214,7 +2214,7 @@ type EventFunctionValidation<Options extends { readonly handler: (...args: never
 declare const EventName: never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event-function.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L9)
 
 ### FunctionDependencies
 
@@ -2224,7 +2224,7 @@ declare const EventName: never;
 declare const FunctionDependencies: FunctionDependencies;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event-function.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L8)
 
 ## `define-event.ts`
 
@@ -2239,8 +2239,8 @@ TypeError when the contract is malformed.
 **Example**
 
 ```ts
-import { defineEvent } from "@relkit/app/events";
-import { z } from "@relkit/app/schema";
+import { defineEvent } from "relkit/events";
+import { z } from "relkit/schema";
 
 const created = defineEvent({ id: "orders.created", input: z.object({ orderId: z.string() }) });
 void created;
@@ -2258,7 +2258,7 @@ declare const defineEvent: <
 ) => EventDescriptor<Id, Version, InferOutput<InputSchema>, InputSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L46)
 
 Since v0.1.0
 
@@ -2270,7 +2270,7 @@ Since v0.1.0
 declare const DefineEventOptions: DefineEventOptions<Id, Version, InputSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L21)
 
 ### EventDescriptor
 
@@ -2280,7 +2280,7 @@ declare const DefineEventOptions: DefineEventOptions<Id, Version, InputSchema>;
 declare const EventDescriptor: EventDescriptor<Id, Version, Input, InputSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L22)
 
 ### EventDescriptorAny
 
@@ -2290,7 +2290,7 @@ declare const EventDescriptor: EventDescriptor<Id, Version, Input, InputSchema>;
 declare const EventDescriptorAny: EventDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L23)
 
 ### EventEnvelope
 
@@ -2300,7 +2300,7 @@ declare const EventDescriptorAny: EventDescriptorAny;
 declare const EventEnvelope: EventEnvelope<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L24)
 
 ### EventEnvelopeFor
 
@@ -2310,7 +2310,7 @@ declare const EventEnvelope: EventEnvelope<Id, Version, Payload>;
 declare const EventEnvelopeFor: EventEnvelopeFor<E>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L25)
 
 ### UnknownEventEnvelope
 
@@ -2320,7 +2320,7 @@ declare const EventEnvelopeFor: EventEnvelopeFor<E>;
 declare const UnknownEventEnvelope: UnknownEventEnvelope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L26)
 
 ### assertEventDescriptor
 
@@ -2342,7 +2342,7 @@ assertEventDescriptor(value);
 declare const assertEventDescriptor: (value: unknown) => asserts value is EventDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L164)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L164)
 
 ### assertEventDescriptorEffect
 
@@ -2362,7 +2362,7 @@ declare const assertEventDescriptorEffect: (
 ) => Effect.Effect<EventDescriptorAny, EventDefinitionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L178)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L178)
 
 ### defineEventEffect
 
@@ -2389,7 +2389,7 @@ declare const defineEventEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L66)
 
 ### isEventDescriptor
 
@@ -2407,7 +2407,7 @@ isEventDescriptor(value);
 declare const isEventDescriptor: (value: unknown) => value is EventDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L122)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L122)
 
 ### isEventDescriptorEffect
 
@@ -2425,7 +2425,7 @@ Effect.runSync(isEventDescriptorEffect(candidate));
 declare const isEventDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L131)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L131)
 
 ## `define-event.types.ts`
 
@@ -2460,7 +2460,7 @@ export interface DefineEventOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.types.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L55)
 
 ### EventDescriptor (interface)
 
@@ -2492,7 +2492,7 @@ export interface EventDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L31)
 
 ### EventDescriptorAny (type alias)
 
@@ -2510,7 +2510,7 @@ const registry: EventDescriptorAny[] = [created];
 type EventDescriptorAny = EventDescriptor<string, number, unknown, StandardSchemaV1>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.types.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L50)
 
 ### EventEnvelope (type alias)
 
@@ -2532,7 +2532,7 @@ type EventEnvelope<
 > = Omit<EventPublishResult<Id, Version, Payload>, "accepted">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L9)
 
 ### EventEnvelopeFor (type alias)
 
@@ -2553,7 +2553,7 @@ type EventEnvelopeFor<E> =
     : UnknownEventEnvelope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L23)
 
 ### InferOutput
 
@@ -2563,7 +2563,7 @@ type EventEnvelopeFor<E> =
 declare const InferOutput: InferOutput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L4)
 
 ### StandardSchemaV1
 
@@ -2573,7 +2573,7 @@ declare const InferOutput: InferOutput<S>;
 declare const StandardSchemaV1: StandardSchemaV1<TInput, TOutput>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L4)
 
 ### UnknownEventEnvelope (type alias)
 
@@ -2591,7 +2591,7 @@ const envelope: UnknownEventEnvelope = received;
 type UnknownEventEnvelope = EventEnvelope<string, number, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L18)
 
 ## `effect.ts`
 
@@ -2603,7 +2603,7 @@ type UnknownEventEnvelope = EventEnvelope<string, number, unknown>;
 declare const EventBindingError: typeof EventBindingError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L37)
 
 ### EventDefinitionError
 
@@ -2613,7 +2613,7 @@ declare const EventBindingError: typeof EventBindingError;
 declare const EventDefinitionError: typeof EventDefinitionError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L37)
 
 ### EventIdentity
 
@@ -2623,7 +2623,7 @@ declare const EventDefinitionError: typeof EventDefinitionError;
 declare const EventIdentity: typeof EventIdentity;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L26)
 
 ### EventIdentityLive
 
@@ -2633,7 +2633,7 @@ declare const EventIdentity: typeof EventIdentity;
 declare const EventIdentityLive: Layer<EventIdentity, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L26)
 
 ### EventIdentityService
 
@@ -2643,7 +2643,7 @@ declare const EventIdentityLive: Layer<EventIdentity, never, never>;
 declare const EventIdentityService: EventIdentityService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L27)
 
 ### EventOperation
 
@@ -2653,7 +2653,7 @@ declare const EventIdentityService: EventIdentityService;
 declare const EventOperation: EventOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L30)
 
 ### EventPayloadValidationFailure
 
@@ -2663,7 +2663,7 @@ declare const EventOperation: EventOperation;
 declare const EventPayloadValidationFailure: typeof EventPayloadValidationFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L38)
 
 ### EventPublishFailure
 
@@ -2673,7 +2673,7 @@ declare const EventPayloadValidationFailure: typeof EventPayloadValidationFailur
 declare const EventPublishFailure: EventPublishFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L14)
 
 ### EventPublishSetup
 
@@ -2683,7 +2683,7 @@ declare const EventPublishFailure: EventPublishFailure;
 declare const EventPublishSetup: EventPublishSetup<Id, Version, PayloadSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L15)
 
 ### EventPublisher
 
@@ -2693,7 +2693,7 @@ declare const EventPublishSetup: EventPublishSetup<Id, Version, PayloadSchema>;
 declare const EventPublisher: typeof EventPublisher;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L12)
 
 ### EventPublisherService
 
@@ -2703,7 +2703,7 @@ declare const EventPublisher: typeof EventPublisher;
 declare const EventPublisherService: EventPublisherService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L16)
 
 ### EventTelemetry
 
@@ -2713,7 +2713,7 @@ declare const EventPublisherService: EventPublisherService;
 declare const EventTelemetry: typeof EventTelemetry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L29)
 
 ### EventTelemetryLive
 
@@ -2723,7 +2723,7 @@ declare const EventTelemetry: typeof EventTelemetry;
 declare const EventTelemetryLive: Layer<EventTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L29)
 
 ### EventTelemetryService
 
@@ -2733,7 +2733,7 @@ declare const EventTelemetryLive: Layer<EventTelemetry, never, never>;
 declare const EventTelemetryService: EventTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L30)
 
 ### EventWorkFailed
 
@@ -2743,7 +2743,7 @@ declare const EventTelemetryService: EventTelemetryService;
 declare const EventWorkFailed: typeof EventWorkFailed;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L18)
 
 ### assertEventDescriptorEffect
 
@@ -2755,7 +2755,7 @@ declare const assertEventDescriptorEffect: (
 ) => Effect<EventDescriptorAny, EventDefinitionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L4)
 
 ### assertOptionalTextEffect
 
@@ -2768,7 +2768,7 @@ declare const assertOptionalTextEffect: (
 ) => Effect<void, EventClientValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L23)
 
 ### assertVersionEffect
 
@@ -2780,7 +2780,7 @@ declare const assertVersionEffect: (
 ) => Effect<number, EventClientValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L24)
 
 ### bindFunctionEventsEffect
 
@@ -2794,7 +2794,7 @@ declare const bindFunctionEventsEffect: <T extends FunctionWithEvents>(
 ) => Effect<T, EventBindingError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L10)
 
 ### createEventClientEffect
 
@@ -2813,7 +2813,7 @@ declare const createEventClientEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L11)
 
 ### defineEventEffect
 
@@ -2832,7 +2832,7 @@ declare const defineEventEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L2)
 
 ### defineEventFunctionEffect
 
@@ -2856,7 +2856,7 @@ declare const defineEventFunctionEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L7)
 
 ### eventDeliveryEffect
 
@@ -2868,7 +2868,7 @@ declare const eventDeliveryEffect: (
 ) => Effect<EventDelivery, EventDefinitionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L32)
 
 ### eventProfileEffect
 
@@ -2878,7 +2878,7 @@ declare const eventDeliveryEffect: (
 declare const eventProfileEffect: (value: unknown) => Effect<string, EventDefinitionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L33)
 
 ### eventPublisherLayer
 
@@ -2888,7 +2888,7 @@ declare const eventProfileEffect: (value: unknown) => Effect<string, EventDefini
 declare const eventPublisherLayer: (provider: EventProvider) => Layer<EventPublisher>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L12)
 
 ### eventRetryEffect
 
@@ -2900,7 +2900,7 @@ declare const eventRetryEffect: (
 ) => Effect<RetryPolicy, EventDefinitionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L34)
 
 ### isEventDescriptorEffect
 
@@ -2910,7 +2910,7 @@ declare const eventRetryEffect: (
 declare const isEventDescriptorEffect: (value: unknown) => Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L3)
 
 ### isEventFunctionDescriptorEffect
 
@@ -2920,7 +2920,7 @@ declare const isEventDescriptorEffect: (value: unknown) => Effect<boolean, never
 declare const isEventFunctionDescriptorEffect: (value: unknown) => Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L8)
 
 ### normalizeAttributesEffect
 
@@ -2932,7 +2932,7 @@ declare const normalizeAttributesEffect: (
 ) => Effect<Readonly<Record<string, EventAttributeValue>>, EventClientValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L21)
 
 ### normalizeOptionsEffect
 
@@ -2944,7 +2944,7 @@ declare const normalizeOptionsEffect: (
 ) => Effect<EventPublishOptions, EventClientValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L20)
 
 ### normalizeResultEffect
 
@@ -2962,7 +2962,7 @@ declare const normalizeResultEffect: <Id extends string, Version extends number,
 ) => Effect<EventPublishResult<Id, Version, Payload>, EventClientValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L26)
 
 ### notifyEffect
 
@@ -2976,7 +2976,7 @@ declare const notifyEffect: <T>(
 ) => Effect<void, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L28)
 
 ### observeEvent
 
@@ -2989,7 +2989,7 @@ declare const observeEvent: <A, E, R>(
 ) => Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L29)
 
 ### parsePayloadEffect
 
@@ -3002,7 +3002,7 @@ declare const parsePayloadEffect: (
 ) => Effect<unknown, EventClientValidationError | EventPayloadValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L22)
 
 ### publishEventEffect
 
@@ -3024,7 +3024,7 @@ declare const publishEventEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L12)
 
 ### rejectEventFunctionFieldsEffect
 
@@ -3036,7 +3036,7 @@ declare const rejectEventFunctionFieldsEffect: (
 ) => Effect<void, EventDefinitionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L35)
 
 ### resolveProviderEffect
 
@@ -3054,7 +3054,7 @@ declare const resolveProviderEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L28)
 
 ### resolveValueEffect
 
@@ -3066,7 +3066,7 @@ declare const resolveValueEffect: (
 ) => Effect<string | undefined, EventClientValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L28)
 
 ### runAbortableEffect
 
@@ -3089,7 +3089,7 @@ declare const runAbortableEffect: <A>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/effect.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L18)
 
 ## `event-contract-shape.ts`
 
@@ -3109,7 +3109,7 @@ hasOwn({ id: "orders.created" }, "id");
 declare const hasOwn: (value: object, key: PropertyKey) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-contract-shape.ts#L52)
 
 ### hasOwnEffect
 
@@ -3130,7 +3130,7 @@ declare const hasOwnEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-contract-shape.ts#L62)
 
 ### isPositiveInteger
 
@@ -3148,7 +3148,7 @@ isPositiveInteger(1);
 declare const isPositiveInteger: (value: unknown) => value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-contract-shape.ts#L71)
 
 ### isPositiveIntegerEffect
 
@@ -3166,7 +3166,7 @@ Effect.runSync(isPositiveIntegerEffect(1));
 declare const isPositiveIntegerEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-contract-shape.ts#L80)
 
 ### isRecord
 
@@ -3184,7 +3184,7 @@ isRecord({ id: "orders.created" });
 declare const isRecord: (value: unknown) => value is Record<PropertyKey, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-contract-shape.ts#L33)
 
 ### isRecordEffect
 
@@ -3202,7 +3202,7 @@ Effect.runSync(isRecordEffect({ id: "orders.created" }));
 declare const isRecordEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-contract-shape.ts#L42)
 
 ### isSchema
 
@@ -3220,7 +3220,7 @@ isSchema(schema);
 declare const isSchema: (value: unknown) => value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-contract-shape.ts#L12)
 
 ### isSchemaEffect
 
@@ -3238,7 +3238,7 @@ Effect.runSync(isSchemaEffect(schema));
 declare const isSchemaEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-contract-shape.ts#L21)
 
 ### validateVersion
 
@@ -3260,7 +3260,7 @@ validateVersion(1);
 declare const validateVersion: (value: unknown) => asserts value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-contract-shape.ts#L90)
 
 ### validateVersionEffect
 
@@ -3280,7 +3280,7 @@ declare const validateVersionEffect: (
 ) => Effect.Effect<number, EventDefinitionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-contract-shape.ts#L104)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-contract-shape.ts#L104)
 
 ## `event-errors.ts`
 
@@ -3300,7 +3300,7 @@ new EventBindingError({ message: "Missing event contract" });
 declare class EventBindingError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-errors.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-errors.ts#L14)
 
 ### EventDefinitionError (class)
 
@@ -3318,7 +3318,7 @@ new EventDefinitionError({ message: "Invalid event descriptor" });
 declare class EventDefinitionError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-errors.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-errors.ts#L6)
 
 ## `event-function-target.ts`
 
@@ -3346,7 +3346,7 @@ declare const bindFunctionEvents: <T extends FunctionWithEvents>(
 ) => T;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-target.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-target.ts#L22)
 
 ### bindFunctionEventsEffect
 
@@ -3368,7 +3368,7 @@ declare const bindFunctionEventsEffect: <T extends FunctionWithEvents>(
 ) => Effect.Effect<T, EventBindingError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-target.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-target.ts#L42)
 
 ## `event-function-target.types.ts`
 
@@ -3388,7 +3388,7 @@ const target: FunctionWithEvents = { id: "orders.create", publishes: ["orders.cr
 declare const EventDescriptorAny: EventDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-target.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-target.types.ts#L11)
 
 ### FunctionWithEvents (interface)
 
@@ -3412,7 +3412,7 @@ export interface FunctionWithEvents {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-target.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-target.types.ts#L4)
 
 ## `event-function-validation.ts`
 
@@ -3436,7 +3436,7 @@ eventDelivery("durable");
 declare const eventDelivery: (value: unknown) => EventDelivery;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-validation.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-validation.ts#L22)
 
 ### eventDeliveryEffect
 
@@ -3456,7 +3456,7 @@ declare const eventDeliveryEffect: (
 ) => Effect.Effect<EventDelivery, EventDefinitionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-validation.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-validation.ts#L31)
 
 ### eventProfile
 
@@ -3478,7 +3478,7 @@ eventProfile("default");
 declare const eventProfile: (value: unknown) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-validation.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-validation.ts#L52)
 
 ### eventProfileEffect
 
@@ -3498,7 +3498,7 @@ declare const eventProfileEffect: (
 ) => Effect.Effect<string, EventDefinitionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-validation.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-validation.ts#L61)
 
 ### eventRetry
 
@@ -3520,7 +3520,7 @@ eventRetry({ maxAttempts: 3 });
 declare const eventRetry: (value: unknown) => RetryPolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-validation.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-validation.ts#L80)
 
 ### eventRetryEffect
 
@@ -3540,7 +3540,7 @@ declare const eventRetryEffect: (
 ) => Effect.Effect<RetryPolicy, EventDefinitionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-validation.ts#L89)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-validation.ts#L89)
 
 ### rejectEventFunctionFields
 
@@ -3562,7 +3562,7 @@ rejectEventFunctionFields({ event: "orders.created" });
 declare const rejectEventFunctionFields: (options: Record<PropertyKey, unknown>) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-validation.ts#L121)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-validation.ts#L121)
 
 ### rejectEventFunctionFieldsEffect
 
@@ -3582,7 +3582,7 @@ declare const rejectEventFunctionFieldsEffect: (
 ) => Effect.Effect<void, EventDefinitionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-validation.ts#L130)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-validation.ts#L130)
 
 ## `event-function.types.ts`
 
@@ -3632,7 +3632,7 @@ export interface DefineEventFunctionOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function.types.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L76)
 
 ### EventDelivery (type alias)
 
@@ -3650,7 +3650,7 @@ const delivery: EventDelivery = "durable";
 type EventDelivery = "ephemeral" | "durable";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L20)
 
 ### EventFunctionContext (interface)
 
@@ -3674,7 +3674,7 @@ export interface EventFunctionContext<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function.types.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L52)
 
 ### EventFunctionDescriptor (interface)
 
@@ -3713,7 +3713,7 @@ export interface EventFunctionDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function.types.ts#L111)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L111)
 
 ### EventFunctionDescriptorAny (interface)
 
@@ -3741,7 +3741,7 @@ export interface EventFunctionDescriptorAny extends DescriptorBase<"function"> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function.types.ts#L137)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L137)
 
 ### EventFunctionHandler (type alias)
 
@@ -3767,7 +3767,7 @@ type EventFunctionHandler<
 ) => MaybePromise<FunctionHandlerResult<void, Errors>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function.types.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L63)
 
 ### EventFunctionTrigger (interface)
 
@@ -3802,7 +3802,7 @@ export interface EventFunctionTrigger<Event extends EventName = EventName> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function.types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L30)
 
 ### EventRetryPolicy (type alias)
 
@@ -3826,7 +3826,7 @@ const retry: EventRetryPolicy = {
 type EventRetryPolicy = RetryPolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L25)
 
 ## `event-observability.ts`
 
@@ -3846,7 +3846,7 @@ Effect.provide(observeEvent("event.define", Effect.void), EventTelemetryLive);
 declare class EventTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-observability.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-observability.ts#L7)
 
 ### EventTelemetryLive
 
@@ -3864,7 +3864,7 @@ Effect.provide(observeEvent("event.define", Effect.void), EventTelemetryLive);
 declare const EventTelemetryLive: Layer.Layer<EventTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-observability.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-observability.ts#L14)
 
 ### observeEvent
 
@@ -3885,7 +3885,7 @@ declare const observeEvent: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-observability.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-observability.ts#L28)
 
 ### runEventSync
 
@@ -3907,7 +3907,7 @@ runEventSync(Effect.succeed(1));
 declare const runEventSync: <A, E>(effect: Effect.Effect<A, E>) => A;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-observability.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-observability.ts#L67)
 
 ## `event-observability.types.ts`
 
@@ -3949,7 +3949,7 @@ type EventOperation =
   | "client.runAbortable";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-observability.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-observability.types.ts#L6)
 
 ### EventTelemetryService (interface)
 
@@ -3979,7 +3979,7 @@ export interface EventTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-observability.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-observability.types.ts#L34)
 
 ## `event-registry.ts`
 
@@ -4001,7 +4001,7 @@ type EventDescriptorByName<Name extends EventName> = EventRegistry[Name] extends
   : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-registry.ts#L24)
 
 ### EventInputByName (type alias)
 
@@ -4019,7 +4019,7 @@ type Payload = EventInputByName<"orders.created">;
 type EventInputByName<Name extends EventName> = InferOutput<EventDescriptorByName<Name>["input"]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-registry.ts#L30)
 
 ### EventName (type alias)
 
@@ -4037,7 +4037,7 @@ type Id = EventName;
 type EventName = Extract<keyof EventRegistry, string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-registry.ts#L19)
 
 ### EventRegistry (type alias)
 
@@ -4055,7 +4055,7 @@ type Events = EventRegistry;
 type EventRegistry = Relkit.EventRegistry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-registry.ts#L14)
 
 ### EventVersionByName (type alias)
 
@@ -4073,7 +4073,7 @@ type Version = EventVersionByName<"orders.created">;
 type EventVersionByName<Name extends EventName> = EventDescriptorByName<Name>["version"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-registry.ts#L37)
 
 ## `index.ts`
 
@@ -4087,7 +4087,7 @@ Re-exports all named exports from the "./event-function.types.js" module.
 export * from "./event-function.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L35)
 
 ### "./event-registry.js" (namespace export)
 
@@ -4099,7 +4099,7 @@ Re-exports all named exports from the "./event-registry.js" module.
 export * from "./event-registry.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L33)
 
 ### DefineEventOptions
 
@@ -4109,7 +4109,7 @@ export * from "./event-registry.js";
 declare const DefineEventOptions: DefineEventOptions<Id, Version, InputSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L3)
 
 ### EventAttributeValue
 
@@ -4119,7 +4119,7 @@ declare const DefineEventOptions: DefineEventOptions<Id, Version, InputSchema>;
 declare const EventAttributeValue: EventAttributeValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L20)
 
 ### EventClient
 
@@ -4129,7 +4129,7 @@ declare const EventAttributeValue: EventAttributeValue;
 declare const EventClient: EventClient<Input, Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L21)
 
 ### EventClientOptions
 
@@ -4139,7 +4139,7 @@ declare const EventClient: EventClient<Input, Id, Version, Payload>;
 declare const EventClientOptions: EventClientOptions<Id, Version, PayloadSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L22)
 
 ### EventDeclaredEdge
 
@@ -4149,7 +4149,7 @@ declare const EventClientOptions: EventClientOptions<Id, Version, PayloadSchema>
 declare const EventDeclaredEdge: EventDeclaredEdge;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L23)
 
 ### EventDependencyError
 
@@ -4159,7 +4159,7 @@ declare const EventDeclaredEdge: EventDeclaredEdge;
 declare const EventDependencyError: typeof EventDependencyError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L12)
 
 ### EventDescriptor
 
@@ -4169,7 +4169,7 @@ declare const EventDependencyError: typeof EventDependencyError;
 declare const EventDescriptor: EventDescriptor<Id, Version, Input, InputSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L4)
 
 ### EventDescriptorAny
 
@@ -4179,7 +4179,7 @@ declare const EventDescriptor: EventDescriptor<Id, Version, Input, InputSchema>;
 declare const EventDescriptorAny: EventDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L5)
 
 ### EventEnvelope
 
@@ -4189,7 +4189,7 @@ declare const EventDescriptorAny: EventDescriptorAny;
 declare const EventEnvelope: EventEnvelope<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L6)
 
 ### EventEnvelopeFor
 
@@ -4199,7 +4199,7 @@ declare const EventEnvelope: EventEnvelope<Id, Version, Payload>;
 declare const EventEnvelopeFor: EventEnvelopeFor<E>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L7)
 
 ### EventInvocationBridge
 
@@ -4209,7 +4209,7 @@ declare const EventEnvelopeFor: EventEnvelopeFor<E>;
 declare const EventInvocationBridge: EventInvocationBridge;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L24)
 
 ### EventInvocationBridgeOptions
 
@@ -4219,7 +4219,7 @@ declare const EventInvocationBridge: EventInvocationBridge;
 declare const EventInvocationBridgeOptions: EventInvocationBridgeOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L25)
 
 ### EventObservedEdge
 
@@ -4229,7 +4229,7 @@ declare const EventInvocationBridgeOptions: EventInvocationBridgeOptions;
 declare const EventObservedEdge: EventObservedEdge;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L26)
 
 ### EventOperationCancelledError
 
@@ -4239,7 +4239,7 @@ declare const EventObservedEdge: EventObservedEdge;
 declare const EventOperationCancelledError: typeof EventOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L13)
 
 ### EventOperationContext
 
@@ -4249,7 +4249,7 @@ declare const EventOperationCancelledError: typeof EventOperationCancelledError;
 declare const EventOperationContext: EventOperationContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L27)
 
 ### EventOperationTimeoutError
 
@@ -4259,7 +4259,7 @@ declare const EventOperationContext: EventOperationContext;
 declare const EventOperationTimeoutError: typeof EventOperationTimeoutError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L14)
 
 ### EventPayloadValidationError
 
@@ -4269,7 +4269,7 @@ declare const EventOperationTimeoutError: typeof EventOperationTimeoutError;
 declare const EventPayloadValidationError: typeof EventPayloadValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L15)
 
 ### EventProfileError
 
@@ -4279,7 +4279,7 @@ declare const EventPayloadValidationError: typeof EventPayloadValidationError;
 declare const EventProfileError: typeof EventProfileError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L16)
 
 ### EventProvider
 
@@ -4289,7 +4289,7 @@ declare const EventProfileError: typeof EventProfileError;
 declare const EventProvider: EventProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L28)
 
 ### EventProviderError
 
@@ -4299,7 +4299,7 @@ declare const EventProvider: EventProvider;
 declare const EventProviderError: typeof EventProviderError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L17)
 
 ### EventProviderResult
 
@@ -4309,7 +4309,7 @@ declare const EventProviderError: typeof EventProviderError;
 declare const EventProviderResult: EventProviderResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L29)
 
 ### EventPublishOptions
 
@@ -4319,7 +4319,7 @@ declare const EventProviderResult: EventProviderResult<Id, Version, Payload>;
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L30)
 
 ### EventPublishResult
 
@@ -4329,7 +4329,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L31)
 
 ### UnknownEventEnvelope
 
@@ -4339,7 +4339,7 @@ declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 declare const UnknownEventEnvelope: UnknownEventEnvelope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L8)
 
 ### assertEventDescriptor
 
@@ -4349,7 +4349,7 @@ declare const UnknownEventEnvelope: UnknownEventEnvelope;
 declare const assertEventDescriptor: (value: unknown) => asserts value is EventDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L1)
 
 ### bindFunctionEvents
 
@@ -4363,7 +4363,7 @@ declare const bindFunctionEvents: <T extends FunctionWithEvents>(
 ) => T;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L36)
 
 ### createEventClient
 
@@ -4379,7 +4379,7 @@ declare const createEventClient: <
 ) => EventClient<InferInput<PayloadSchema>, Id, Version, InferOutput<PayloadSchema>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L11)
 
 ### defineEvent
 
@@ -4395,7 +4395,7 @@ declare const defineEvent: <
 ) => EventDescriptor<Id, Version, InferOutput<InputSchema>, InputSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L1)
 
 ### defineEventFunction
 
@@ -4416,7 +4416,7 @@ declare const defineEventFunction: <
 ) => EventFunctionDescriptor<Id, Event, Publishes, Dependencies, ErrorListOf<Options>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L34)
 
 ### isEventDescriptor
 
@@ -4426,7 +4426,7 @@ declare const defineEventFunction: <
 declare const isEventDescriptor: (value: unknown) => value is EventDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L1)
 
 ### isEventFunctionDescriptor
 
@@ -4436,4 +4436,4 @@ declare const isEventDescriptor: (value: unknown) => value is EventDescriptorAny
 declare const isEventFunctionDescriptor: (value: unknown) => value is EventFunctionDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L34)

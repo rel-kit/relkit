@@ -7,7 +7,7 @@
       "summary": "Define application identity and runtime topology.",
       "guide": "docs/learn/concepts/application",
       "apiPackage": "app",
-      "entrypoints": [{ "source": "packages/app/src/define-app.ts", "name": "defineApp" }],
+      "entrypoints": [{ "source": "packages/relkit/src/app/define-app.ts", "name": "defineApp" }],
       "examples": ["templates/default/v1/api/relkit.config.ts"]
     },
     {
@@ -16,7 +16,7 @@
       "summary": "Parse, default, and protect runtime configuration.",
       "guide": "docs/learn/concepts/environment",
       "apiPackage": "config",
-      "entrypoints": [{ "source": "packages/config/src/env.ts", "name": "defineEnv" }],
+      "entrypoints": [{ "source": "packages/relkit/src/config/env.ts", "name": "defineEnv" }],
       "examples": ["templates/default/v1/api/src/platform/env.ts"]
     },
     {
@@ -40,8 +40,8 @@
       "guide": "docs/learn/concepts/schemas",
       "apiPackage": "schema",
       "entrypoints": [
-        { "source": "packages/schema/src/builder.ts", "name": "z" },
-        { "source": "packages/schema/src/standard-schema.ts", "name": "validate" }
+        { "source": "packages/relkit/src/schema/builder.ts", "name": "z" },
+        { "source": "packages/relkit/src/schema/standard-schema.ts", "name": "validate" }
       ],
       "examples": ["examples/commerce/src/platform/schemas.ts"]
     },
@@ -52,7 +52,7 @@
       "guide": "docs/learn/concepts/functions",
       "apiPackage": "functions",
       "entrypoints": [
-        { "source": "packages/functions/src/define-function.ts", "name": "defineFunction" }
+        { "source": "packages/relkit/src/functions/define-function.ts", "name": "defineFunction" }
       ],
       "examples": ["examples/commerce/src/services/orders/functions/create-order.function.ts"]
     },
@@ -63,7 +63,7 @@
       "guide": "docs/learn/concepts/errors",
       "apiPackage": "functions",
       "entrypoints": [
-        { "source": "packages/functions/src/define-error.ts", "name": "defineError" }
+        { "source": "packages/relkit/src/functions/define-error.ts", "name": "defineError" }
       ],
       "examples": ["examples/commerce/src/services/orders/errors/order-not-found.error.ts"]
     },
@@ -74,7 +74,7 @@
       "guide": "docs/modules/service/define",
       "apiPackage": "services",
       "entrypoints": [
-        { "source": "packages/services/src/define-service.ts", "name": "defineService" }
+        { "source": "packages/relkit/src/services/define-service.ts", "name": "defineService" }
       ],
       "examples": ["examples/commerce/src/services/orders/service.ts"]
     },
@@ -108,7 +108,9 @@
       "summary": "Map filesystem routes to validated function calls.",
       "guide": "docs/modules/http/define",
       "apiPackage": "routes",
-      "entrypoints": [{ "source": "packages/routes/src/define-route.ts", "name": "defineRoute" }],
+      "entrypoints": [
+        { "source": "packages/relkit/src/routes/define-route.ts", "name": "defineRoute" }
+      ],
       "examples": ["examples/commerce/src/routes/orders/[orderId]/route.ts"]
     },
     {
@@ -118,7 +120,7 @@
       "guide": "docs/modules/http/middleware",
       "apiPackage": "routes",
       "entrypoints": [
-        { "source": "packages/routes/src/define-middleware.ts", "name": "defineMiddleware" }
+        { "source": "packages/relkit/src/routes/define-middleware.ts", "name": "defineMiddleware" }
       ],
       "examples": ["examples/commerce/src/routes/middleware/order-auth.middleware.ts"]
     },
@@ -137,7 +139,9 @@
       "summary": "Append typed events and observe authorized partitions with replay and presence.",
       "guide": "docs/modules/realtime/index",
       "apiPackage": "realtime",
-      "entrypoints": [{ "source": "packages/realtime/src/channel.ts", "name": "defineChannel" }],
+      "entrypoints": [
+        { "source": "packages/relkit/src/realtime/channel.ts", "name": "defineChannel" }
+      ],
       "examples": ["examples/commerce/src/services/announcements/channels/announcements.channel.ts"]
     },
     {
@@ -147,8 +151,11 @@
       "guide": "docs/modules/events/index",
       "apiPackage": "events",
       "entrypoints": [
-        { "source": "packages/events/src/define-event.ts", "name": "defineEvent" },
-        { "source": "packages/events/src/define-event-function.ts", "name": "defineEventFunction" }
+        { "source": "packages/relkit/src/events/define-event.ts", "name": "defineEvent" },
+        {
+          "source": "packages/relkit/src/events/define-event-function.ts",
+          "name": "defineEventFunction"
+        }
       ],
       "examples": ["apps/docs/examples/events/order-created.event.ts"]
     },
@@ -159,8 +166,8 @@
       "guide": "docs/modules/jobs/quickstart",
       "apiPackage": "jobs",
       "entrypoints": [
-        { "source": "packages/jobs/src/define-task.ts", "name": "defineTask" },
-        { "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }
+        { "source": "packages/relkit/src/jobs/define-task.ts", "name": "defineTask" },
+        { "source": "packages/relkit/src/jobs/define-job.ts", "name": "defineJob" }
       ],
       "examples": ["examples/commerce/src/services/orders/tasks/export-orders.task.ts"]
     },
@@ -170,7 +177,7 @@
       "summary": "Trigger a job from explicit cron and timezone rules.",
       "guide": "docs/modules/jobs/schedules",
       "apiPackage": "jobs",
-      "entrypoints": [{ "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }],
+      "entrypoints": [{ "source": "packages/relkit/src/jobs/define-job.ts", "name": "defineJob" }],
       "examples": ["examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts"]
     },
     {
@@ -180,7 +187,7 @@
       "guide": "docs/modules/storage/define",
       "apiPackage": "buckets",
       "entrypoints": [
-        { "source": "packages/buckets/src/define-bucket.ts", "name": "defineBucket" }
+        { "source": "packages/relkit/src/buckets/define-bucket.ts", "name": "defineBucket" }
       ],
       "examples": ["examples/commerce/src/services/assets/buckets/assets.bucket.ts"]
     },
@@ -190,7 +197,9 @@
       "summary": "Reuse expensive lookups and keep cached values fresh.",
       "guide": "docs/modules/caching/define",
       "apiPackage": "cache",
-      "entrypoints": [{ "source": "packages/cache/src/define-cache.ts", "name": "defineCache" }],
+      "entrypoints": [
+        { "source": "packages/relkit/src/cache/define-cache.ts", "name": "defineCache" }
+      ],
       "examples": ["examples/commerce/src/services/orders/cache/prices.cache.ts"]
     },
     {
@@ -199,7 +208,9 @@
       "summary": "Let AI agents and MCP clients use your application's functions.",
       "guide": "docs/modules/ai/tools",
       "apiPackage": "tools",
-      "entrypoints": [{ "source": "packages/tools/src/define-tool.ts", "name": "defineTool" }],
+      "entrypoints": [
+        { "source": "packages/relkit/src/tools/define-tool.ts", "name": "defineTool" }
+      ],
       "examples": ["examples/commerce/src/services/orders/tools/lookup-order.tool.ts"]
     },
     {
@@ -209,8 +220,8 @@
       "guide": "docs/modules/ai/approvals",
       "apiPackage": "agents",
       "entrypoints": [
-        { "source": "packages/agents/src/approval.ts", "name": "approveApproval" },
-        { "source": "packages/agents/src/approval.ts", "name": "denyApproval" }
+        { "source": "packages/relkit/src/agents/approval.ts", "name": "approveApproval" },
+        { "source": "packages/relkit/src/agents/approval.ts", "name": "denyApproval" }
       ],
       "examples": ["examples/commerce/src/services/orders/tools/cancel-order.tool.ts"]
     },
@@ -220,7 +231,9 @@
       "summary": "Run bounded model workflows with allowlisted tools and offline tests.",
       "guide": "docs/modules/ai/agents",
       "apiPackage": "agents",
-      "entrypoints": [{ "source": "packages/agents/src/define-agent.ts", "name": "defineAgent" }],
+      "entrypoints": [
+        { "source": "packages/relkit/src/agents/define-agent.ts", "name": "defineAgent" }
+      ],
       "examples": ["examples/commerce/src/services/orders/agents/order-support.agent.ts"]
     },
     {
@@ -487,7 +500,7 @@
     {
       "path": "docs/modules/http/streaming",
       "api": ["routes", "functions", "client"],
-      "examples": ["packages/runtime-hono/tests/native-stream.test.ts"]
+      "examples": ["packages/relkit/tests/runtime-hono/native-stream.test.ts"]
     },
     {
       "path": "docs/modules/http/raw-handlers",
@@ -576,7 +589,7 @@
       "api": ["jobs", "testing"],
       "examples": [
         "examples/commerce/src/services/orders/tasks/export-orders.task.ts",
-        "packages/jobs/tests/task-policy.test.ts"
+        "packages/relkit/tests/jobs/task-policy.test.ts"
       ]
     },
     {
@@ -599,7 +612,7 @@
       "api": ["jobs", "integrations/inngest", "integrations/effect-mq"],
       "examples": [
         "examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts",
-        "packages/jobs/tests/schedule-reconciliation.test.ts"
+        "packages/relkit/tests/jobs/schedule-reconciliation.test.ts"
       ]
     },
     {
@@ -633,7 +646,7 @@
       "path": "docs/modules/jobs/testing",
       "api": ["jobs", "testing", "client"],
       "examples": [
-        "packages/jobs/tests/task-wire.test.ts",
+        "packages/relkit/tests/jobs/task-wire.test.ts",
         "packages/client/tests/compatibility/jobs-watch.test.ts"
       ]
     },
@@ -641,7 +654,7 @@
       "path": "docs/modules/jobs/migration",
       "api": ["app", "jobs"],
       "examples": [
-        "packages/jobs/tests/migration.test.ts",
+        "packages/relkit/tests/jobs/migration.test.ts",
         "apps/docs/examples/jobs/send-receipt.job.ts"
       ]
     },
@@ -1037,7 +1050,7 @@
     {
       "path": "docs/modules/operations/realtime-agents-streaming",
       "api": ["realtime", "agents", "client"],
-      "examples": ["packages/runtime-hono/tests/realtime-rpc.test.ts"]
+      "examples": ["tests/runtime-rpc/runtime-hono/realtime-rpc.test.ts"]
     },
     {
       "path": "docs/modules/operations/testing",
@@ -1108,7 +1121,7 @@
     },
     {
       "path": "docs/modules/cli/automation",
-      "api": ["cli-api", "create-relkit", "relkit"],
+      "api": ["cli-api", "create-relkit"],
       "examples": ["apps/docs/examples/public-api/tooling.ts"]
     },
     {

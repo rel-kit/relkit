@@ -1,7 +1,7 @@
 /** Resolves creation options and template choices through the prompt service while preserving headless defaults and explicit user arguments. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import {
   CREATE_JOBS,
   CREATE_OPTION_DEFAULTS,

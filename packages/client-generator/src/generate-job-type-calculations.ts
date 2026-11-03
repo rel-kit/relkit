@@ -29,7 +29,7 @@ export const jobFailureTypeCore = Effect.fnUntraced(function* (value: unknown) {
     );
   }
   return errors.length === 0
-    ? 'import("@relkit/contracts/jobs").JobErrorEnvelope'
+    ? 'import("relkit/contracts/jobs").JobErrorEnvelope'
     : errors.join(" | ");
 });
 /** Renders the union of named job stream item variants.
@@ -63,7 +63,7 @@ export const jobSnapshotTypeCore = Effect.fnUntraced(function* (source: JobProce
  * @example Effect.runSync(pageTypeEffect(source));
  */
 export const pageTypeEffect = Effect.fnUntraced(function* (source: JobProcedureSource) {
-  return `import("@relkit/contracts/jobs").RunPage<${yield* jobSnapshotTypeCore(source)}>`;
+  return `import("relkit/contracts/jobs").RunPage<${yield* jobSnapshotTypeCore(source)}>`;
 });
 /** Renders live job watch frames.
  * @param source - Normalized public job.
@@ -71,7 +71,7 @@ export const pageTypeEffect = Effect.fnUntraced(function* (source: JobProcedureS
  * @example Effect.runSync(watchFrameTypeEffect(source));
  */
 export const watchFrameTypeEffect = Effect.fnUntraced(function* (source: JobProcedureSource) {
-  return `import("@relkit/contracts/jobs").RunWatchFrame<${yield* jobSnapshotTypeCore(source)}>`;
+  return `import("relkit/contracts/jobs").RunWatchFrame<${yield* jobSnapshotTypeCore(source)}>`;
 });
 /** Renders named job stream frames.
  * @param source - Normalized public job.
@@ -79,7 +79,7 @@ export const watchFrameTypeEffect = Effect.fnUntraced(function* (source: JobProc
  * @example Effect.runSync(streamFrameTypeEffect(source));
  */
 export const streamFrameTypeEffect = Effect.fnUntraced(function* (source: JobProcedureSource) {
-  return `import("@relkit/contracts/jobs").NamedStreamFrame<${yield* jobStreamItemTypeCore(source)}>`;
+  return `import("relkit/contracts/jobs").NamedStreamFrame<${yield* jobStreamItemTypeCore(source)}>`;
 });
 /** Renders trigger input metadata for a job source.
  * @param source - Normalized public job.
@@ -87,7 +87,7 @@ export const streamFrameTypeEffect = Effect.fnUntraced(function* (source: JobPro
  * @example Effect.runSync(triggerInputEffect(source));
  */
 export const triggerInputEffect = Effect.fnUntraced(function* (source: JobProcedureSource) {
-  return `{ readonly input: ${yield* schemaCalculations.typeEffect(source.input)}; readonly options?: import("@relkit/client/jobs").JobTriggerOptions; readonly expectedIdentity?: import("@relkit/contracts").ExpectedClientIdentity }`;
+  return `{ readonly input: ${yield* schemaCalculations.typeEffect(source.input)}; readonly options?: import("@relkit/client/jobs").JobTriggerOptions; readonly expectedIdentity?: import("relkit/contracts").ExpectedClientIdentity }`;
 });
 /** Renders the input for a named job stream.
  * @param source - Normalized public job.
@@ -95,5 +95,5 @@ export const triggerInputEffect = Effect.fnUntraced(function* (source: JobProced
  * @example Effect.runSync(streamInputTypeEffect(source));
  */
 export const streamInputTypeEffect = Effect.fnUntraced(function* (source: JobProcedureSource) {
-  return `{ readonly runId: string; readonly name: ${source.streamNames.map((name) => JSON.stringify(name)).join(" | ") || "never"}; readonly after?: string; readonly expectedIdentity?: import("@relkit/contracts").ExpectedClientIdentity }`;
+  return `{ readonly runId: string; readonly name: ${source.streamNames.map((name) => JSON.stringify(name)).join(" | ") || "never"}; readonly after?: string; readonly expectedIdentity?: import("relkit/contracts").ExpectedClientIdentity }`;
 });

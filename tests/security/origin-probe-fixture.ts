@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect, Schema } from "effect";
 import { ownedNativePromise } from "@relkit/cli/internal/tooling";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { scaffoldChild } from "../../scripts/scaffold-process.js";
 import { originProbeResult } from "./origin-probe.schemas.js";
 

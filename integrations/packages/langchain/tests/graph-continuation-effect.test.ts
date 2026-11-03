@@ -2,7 +2,7 @@
 
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
-import { z, type StandardSchemaV1 } from "@relkit/schema";
+import { z, type StandardSchemaV1 } from "relkit/schema";
 import { defineGraphNode } from "../src/define-graph-node.js";
 import type { GraphDescriptor } from "../src/define-graph.js";
 import { GRAPH_EXECUTION } from "../src/graph-execution-symbol.js";

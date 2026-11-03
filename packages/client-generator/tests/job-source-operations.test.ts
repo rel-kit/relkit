@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { Effect } from "effect";
-import type { ApplicationGraph, TaskJobNode } from "@relkit/graph";
+import type { ApplicationGraph, TaskJobNode } from "relkit/graph";
 import {
   isExposedJobEffect,
   isExposedJob,

@@ -1,4 +1,4 @@
-import { type JsonValue } from "@relkit/contracts";
+import { type JsonValue } from "relkit/contracts";
 import { InspectorQueryError, isRecord, page } from "./shared.js";
 import {
   records,

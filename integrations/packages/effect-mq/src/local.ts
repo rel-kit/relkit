@@ -2,7 +2,7 @@ import {
   LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,
   type CompositeLocalServiceRecipe,
   type LocalServiceRecipeOutputContext,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import { BUN_IMAGE, number, POSTGRES_IMAGE, text } from "./local-support.js";
 const EFFECT_MQ_SCHEMA_SQL = String.raw`
 CREATE TABLE IF NOT EXISTS effect_mq (

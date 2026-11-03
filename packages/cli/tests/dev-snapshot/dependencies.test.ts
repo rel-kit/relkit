@@ -4,7 +4,7 @@
  * cannot escape containment or turn undecoded bundle metadata into import authority.
  */
 import { expect, it } from "@effect/vitest";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import { Cause, Effect, Exit, Layer } from "effect";
 import {
   SnapshotDependencies,

@@ -1,4 +1,4 @@
-import type { StandardSchemaV1 } from "@relkit/schema";
+import type { StandardSchemaV1 } from "relkit/schema";
 import type { TestRuntime } from "./runtime.js";
 
 /** Native function-backed HTTP route and its declared exposure/validation contract. */

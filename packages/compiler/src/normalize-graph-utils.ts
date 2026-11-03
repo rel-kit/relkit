@@ -1,4 +1,4 @@
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { isErrorDescriptorLike } from "./normalize-utils.js";
 
 /**

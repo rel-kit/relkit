@@ -10,10 +10,10 @@ export type {
   TestClock,
   TestRuntime,
 } from "./runtime.types.js";
-import { type EnvShape } from "@relkit/config";
+import { type EnvShape } from "relkit/config";
 
 import { Layer, ManagedRuntime } from "effect";
-import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionPromise, runExecutionSync } from "relkit/contracts/operation";
 import { TestRuntimeExecution, testRuntimeLayer } from "./runtime-execution.js";
 import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
 
@@ -24,7 +24,7 @@ import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
  * @returns A synchronously ready test owner; await close to release its resources.
  * @example
  * ```ts
- * import { defineEnv } from "@relkit/app/config";
+ * import { defineEnv } from "relkit/config";
  * import { createTestRuntime } from "@relkit/testing";
  *
  * export async function runtimeExample(): Promise<void> {

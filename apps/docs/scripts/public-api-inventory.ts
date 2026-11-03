@@ -1,7 +1,7 @@
 /** Resolves actual TypeScript exports, including aliases, star barrels and React entrypoints. */
 import { relative, resolve } from "node:path";
 import ts from "typescript";
-import { apiPackageDefinitions } from "./documentation-catalog.js";
+import { apiPackageDefinitions, sourceDirectory } from "./documentation-catalog.js";
 import { publicManifests } from "./public-api-manifests.js";
 import { repositoryExamples } from "./public-api-examples.js";
 import type { PublicImport, PublicSymbol, ReferenceSource } from "./public-api.types.js";
@@ -77,11 +77,11 @@ export function supportingSources(
   slug: string,
 ): ReferenceSource[] {
   const owners: Readonly<Record<string, string>> = {
-    "packages/contracts": "app",
-    "packages/invocation": "functions",
-    "packages/local-service": "integrations/local",
+    "packages/relkit/src/contracts": "app",
+    "packages/relkit/src/invocation": "functions",
+    "packages/relkit/src/local-service": "integrations/local",
     "packages/deploy-pulumi": "integrations/pulumi",
-    "packages/observability": "observability-local",
+    "packages/relkit/src/observability": "observability-local",
   };
   return Object.entries(owners)
     .filter(([, owner]) => owner === slug)
@@ -89,7 +89,7 @@ export function supportingSources(
       directory,
       files: [
         ...new Set(inventory.flatMap(({ symbols }) => symbols.map(({ source }) => source))),
-      ].filter((source) => source.startsWith(`${directory}/src/`)),
+      ].filter((source) => source.startsWith(`${sourceDirectory(directory)}/`)),
     }))
     .filter(({ files }) => files.length > 0);
 }
@@ -108,7 +108,6 @@ export function newlyDocumentedSources(
       "observability-local",
       "cli-api",
       "create-relkit",
-      "relkit",
       "integrations/catalog",
     ].includes(slug)
   )
@@ -118,5 +117,5 @@ export function newlyDocumentedSources(
     ...new Set(
       inventory.flatMap((entry) => [entry.source, ...entry.symbols.map(({ source }) => source)]),
     ),
-  ].filter((file) => file.startsWith(`${definition.directory}/src/`));
+  ].filter((file) => file.startsWith(`${sourceDirectory(definition.directory)}/`));
 }

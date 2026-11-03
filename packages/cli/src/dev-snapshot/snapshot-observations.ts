@@ -5,7 +5,7 @@
  * rejection remains an expected safe-path miss.
  */
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { DevSnapshotIoError, DevSnapshotRejected } from "./snapshot-error.js";
 import { acquireSnapshotReadRoot } from "./snapshot-file-reads.js";
 import { readSnapshotObservations } from "./snapshot-observation-native.js";

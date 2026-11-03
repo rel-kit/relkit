@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { admitObservabilityRecord } from "@relkit/observability";
-import { createBindingValueRef } from "@relkit/provider";
+import { admitObservabilityRecord } from "relkit/observability";
+import { createBindingValueRef } from "relkit/provider";
 import { sentry } from "./src/index.ts";
 import { createSentryExporter, type SentryScope, type SentrySdk } from "./src/runtime/index.ts";
 

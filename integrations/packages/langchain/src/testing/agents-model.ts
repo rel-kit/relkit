@@ -12,7 +12,7 @@ import {
   observeExecution,
   runExecutionPromise,
   runExecutionSync,
-} from "@relkit/contracts/operation";
+} from "relkit/contracts/operation";
 import { disposeTestingOwner, testingLoggerLayer } from "@relkit/testing/internal/testing-owner";
 
 import type { ModelScriptService, RuntimeTestAgentModel } from "./agents-model.types.js";

@@ -3,8 +3,8 @@ import {
   deserializeJobsServiceOptions,
   durationToMillis,
   type JobsServiceOptions,
-} from "@relkit/jobs";
-import type { JobsAdapterRuntime, NativeControlReceipt, NativeReceipt } from "@relkit/jobs/adapter";
+} from "relkit/jobs";
+import type { JobsAdapterRuntime, NativeControlReceipt, NativeReceipt } from "relkit/jobs/adapter";
 import { createInngestRunApi, type InngestRunMetadata } from "./runs.js";
 import { observeInngestRun } from "./observe.js";
 import { listInngestRuns, readInngestRun } from "./run-operations.js";
@@ -18,7 +18,7 @@ import {
   loadInngestSdk,
 } from "./task-binding.js";
 import { optionalText, text, url } from "./support.js";
-import type { RuntimeProviderContext, RuntimeProviderIntegration } from "@relkit/provider";
+import type { RuntimeProviderContext, RuntimeProviderIntegration } from "relkit/provider";
 import { providerEventId, submitInngestEvent } from "./submission.js";
 import { duplicateReceipt, observationOptions } from "./support.js";
 

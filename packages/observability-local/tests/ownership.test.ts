@@ -6,7 +6,7 @@ import { expect, test } from "vitest";
 import { existsSync } from "node:fs";
 import { mkdtemp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { createObservabilityRuntime } from "@relkit/observability";
+import { createObservabilityRuntime } from "relkit/observability";
 import { openDuckdbDatabase } from "../src/local/duckdb-database.js";
 import { withPackedConsumer, packedCommand } from "./packed-consumer.js";
 import { seedExistingHistory, inspectExistingHistory } from "./ownership-history.js";
@@ -55,11 +55,11 @@ test("console_without_storage", async () => {
 });
 
 test("production_no_duckdb", async () => {
-  await withPackedConsumer(["contracts", "observability"], async (root) => {
+  await withPackedConsumer(["relkit"], async (root) => {
     const installed = await packedCommand(["bun", "pm", "ls", "--all"], root);
     expect(installed).not.toContain("@duckdb/");
     expect(existsSync(join(root, "node_modules/@duckdb"))).toBe(false);
-    const assets = await readdir(join(root, "node_modules/@relkit/observability/dist/local"));
+    const assets = await readdir(join(root, "node_modules/relkit/dist/observability/local"));
     expect(
       assets.some((name) =>
         /^(?:duckdb-|import-history|worker-client-(?:effect|service))/.test(name),
@@ -68,7 +68,7 @@ test("production_no_duckdb", async () => {
     await writeFile(
       join(root, "production.ts"),
       `
-      import { createObservabilityRuntime } from "@relkit/observability";
+      import { createObservabilityRuntime } from "relkit/observability";
       const runtime = await createObservabilityRuntime({ root: "must-not-exist" });
       runtime.collect({ version: 2, signal: "log", timestamp: new Date().toISOString(), level: "info", component: "production", message: "ready", fields: {} });
       if ((await runtime.query.logs()).items.length !== 1) throw new Error("Missing application record");
@@ -87,7 +87,7 @@ test("production_no_duckdb", async () => {
 }, 60_000);
 
 test("driver_worker_assets_pack", async () => {
-  await withPackedConsumer(["contracts", "observability", "observability-local"], async (root) => {
+  await withPackedConsumer(["relkit", "observability-local"], async (root) => {
     expect(
       existsSync(
         join(root, "node_modules/@relkit/observability-local/dist/local/duckdb-worker.js"),

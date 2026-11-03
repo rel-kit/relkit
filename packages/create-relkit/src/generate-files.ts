@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GenerateProjectError } from "./generate-types.js";
 import { GeneratorFileSystem } from "./generator-filesystem.js";
 import { domainError } from "./generator-errors.js";

@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { ScaffoldProcess, scaffoldProcessLayer } from "./scaffold-process.js";
 import { exportNative } from "./pack-export-native.js";
 import { exportInventory, exportTarballs } from "./pack-export-inventory.js";

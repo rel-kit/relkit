@@ -2,7 +2,7 @@
 
 import { expect, test } from "vitest";
 import { MemorySaver } from "@langchain/langgraph";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { createNativeStringTool } from "./test-native-tool.ts";
 import { createTestModel } from "./test-model.ts";
 import { defineAgent, GraphInterruptedError, invokeAgent } from "../src/index.ts";

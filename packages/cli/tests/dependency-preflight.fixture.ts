@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Layer } from "effect";
-import { SelectedDependenciesLive } from "@relkit/provider/internal/dependencies";
+import { SelectedDependenciesLive } from "relkit/provider/internal/dependencies";
 import { compilerLayer } from "../src/services/compiler.service.js";
 import { fileSystemLayer } from "../src/services/filesystem.service.js";
 import { moduleLayer } from "../src/services/modules.service.js";

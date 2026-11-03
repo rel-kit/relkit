@@ -1,9 +1,9 @@
-import { API_BASE_PATH, PROTOCOL_VERSION } from "@relkit/contracts";
+import { API_BASE_PATH, PROTOCOL_VERSION } from "relkit/contracts";
 import {
   createObservabilityStream,
   type ObservabilityQuery,
   type ObservabilityQueryRequest,
-} from "@relkit/observability";
+} from "relkit/observability";
 import { Hono } from "hono";
 import {
   installInspectorEndpoints,

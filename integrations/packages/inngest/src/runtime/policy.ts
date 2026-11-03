@@ -1,4 +1,4 @@
-import { durationToMillis } from "@relkit/jobs";
+import { durationToMillis } from "relkit/jobs";
 
 export interface InngestPolicyMapping {
   readonly retries?: number;

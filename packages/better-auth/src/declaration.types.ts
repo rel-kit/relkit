@@ -1,6 +1,6 @@
 /** Lazy authentication declarations independent of a database adapter or browser. */
-import type { createDescriptorBase } from "@relkit/contracts";
-import type { RawHttpHandler } from "@relkit/routes";
+import type { createDescriptorBase } from "relkit/contracts";
+import type { RawHttpHandler } from "relkit/routes";
 import type { Auth, BetterAuthOptions } from "better-auth";
 import { BETTER_AUTH_HANDLER } from "./symbols.js";
 

@@ -1,6 +1,6 @@
 import { createContextEffect } from "./source-map-context.js";
 import { observeCompiler } from "../observability.js";
-import { createSourceLocationEffect, normalizeSourcePathEffect } from "@relkit/contracts";
+import { createSourceLocationEffect, normalizeSourcePathEffect } from "relkit/contracts";
 import { Effect } from "effect";
 import { resolve } from "node:path";
 import * as ts from "typescript";
@@ -136,7 +136,7 @@ const locateEffect = Effect.fn("discovery.source.locate")(function* (
   visited: Set<string>,
 ): Effect.fn.Return<
   Mapping.LocatedSource | undefined,
-  import("@relkit/contracts").SourceLocationError,
+  import("relkit/contracts").SourceLocationError,
   DiscoverySourceReader
 > {
   const key = `${file}\0${exportName}`;

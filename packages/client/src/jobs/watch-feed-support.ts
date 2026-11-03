@@ -1,5 +1,5 @@
 import type { Pending } from "./watch-feed-support.types.js";
-import type { RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunWatchFrame } from "relkit/contracts/jobs";
 import type { JobWatchOptions } from "./types.js";
 export type { Pending } from "./watch-feed-support.types.js";
 

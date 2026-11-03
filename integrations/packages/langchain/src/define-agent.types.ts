@@ -1,13 +1,13 @@
 /** Exposes SDK-native agent authoring with inferred input and output types; validation and descriptor assembly are delegated to the integration's owning helpers. This companion preserves the native input and output types without starting runtime work. */
 
-import type { DescriptorBase, DescriptorMetadata } from "@relkit/contracts";
-import type { AgentRef } from "@relkit/functions";
-import type { StandardSchemaV1 } from "@relkit/schema";
+import type { DescriptorBase, DescriptorMetadata } from "relkit/contracts";
+import type { AgentRef } from "relkit/functions";
+import type { StandardSchemaV1 } from "relkit/schema";
 import type {
   AgentChatMapping,
   AgentClientPolicy,
   AgentControl,
-} from "@relkit/agents/internal/agent-client";
+} from "relkit/agents/internal/agent-client";
 import type { AgentClientContractMetadata } from "./client-contract-metadata.js";
 import type {
   AgentClientStateKey,

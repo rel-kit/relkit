@@ -9,7 +9,7 @@ import {
   type LocalServiceMaterializerRuntime,
   type LocalServicePlan,
   type LocalServiceRecipe,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import {
   createLocalProjectIdentity,
   createLocalServiceReconciler,

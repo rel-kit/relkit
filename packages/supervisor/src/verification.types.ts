@@ -1,6 +1,6 @@
-import type { API_VERSION, RuntimeActivationFingerprint } from "@relkit/contracts";
+import type { API_VERSION, RuntimeActivationFingerprint } from "relkit/contracts";
 import type { SupervisorCandidateToken } from "./state-machine.types.js";
-import type { LoggerOptions } from "@relkit/runtime-effect/logger";
+import type { LoggerOptions } from "relkit/runtime-effect/logger";
 
 import type { CandidateVerificationCodeSchema } from "./verification.schemas.js";
 

@@ -1,4 +1,4 @@
-import type { PendingOperationMetadata } from "@relkit/contracts";
+import type { PendingOperationMetadata } from "relkit/contracts";
 import { isPersistedPendingMetadata } from "./pending.schemas.js";
 
 export const PENDING_PREFIX = "relkit.pending.";

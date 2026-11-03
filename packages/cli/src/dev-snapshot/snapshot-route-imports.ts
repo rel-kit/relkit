@@ -4,7 +4,7 @@
  * directory and never evaluated or imported while preparing the receipt.
  */
 import { isAbsolute, posix, relative } from "node:path";
-import type { ApplicationGraph } from "@relkit/graph";
+import type { ApplicationGraph } from "relkit/graph";
 import { Schema } from "effect";
 import { SnapshotPath } from "./snapshot.schemas.js";
 

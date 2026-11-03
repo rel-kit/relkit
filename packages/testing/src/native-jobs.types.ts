@@ -1,6 +1,6 @@
 import type { Deferred, Effect, Ref, Stream } from "effect";
-import type { JobsAdapterRuntime } from "@relkit/jobs/adapter";
-import type { RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
+import type { JobsAdapterRuntime } from "relkit/jobs/adapter";
+import type { RunSnapshot, RunWatchFrame } from "relkit/contracts/jobs";
 import type { TestClock } from "./runtime.js";
 import type { TestNativeRun } from "./test-jobs-adapter-support.js";
 

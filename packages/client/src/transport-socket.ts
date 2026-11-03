@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { runClient } from "./client-runtime.js";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 /**
  * Establishes a socket through an interruptible Clock deadline and native callback.

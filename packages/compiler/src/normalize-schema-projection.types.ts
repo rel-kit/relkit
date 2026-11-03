@@ -1,4 +1,4 @@
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 
 /** Wire projection direction; legacy retains compatibility selection. */
 export type SchemaDirection = "legacy" | "input" | "output";

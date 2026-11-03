@@ -1,4 +1,4 @@
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import type { Context } from "hono";
 import type { ResolvedActiveGeneration } from "./shared.js";
 import type { InspectorProjection } from "./query.types.js";

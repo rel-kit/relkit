@@ -1,11 +1,7 @@
 /** Compares native graph diffs and offline deployment/Pulumi programs from actual paired flat and grouped compiler outputs without resource acquisition. */
 import assert from "node:assert/strict";
-import {
-  diffGraph,
-  validateGraphShape,
-  type ApplicationGraph,
-} from "../../packages/graph/src/index.js";
-import { fromGraph, diffDeploymentPlans } from "../../packages/deploy/src/index.js";
+import { diffGraph, validateGraphShape, type ApplicationGraph } from "relkit/graph";
+import { fromGraph, diffDeploymentPlans } from "relkit/deploy";
 import { renderPulumiProgram } from "../../packages/deploy-pulumi/src/program.js";
 import type { NormalizedGraph } from "../../packages/compiler/src/normalize-graph-types.js";
 

@@ -9,7 +9,7 @@ import {
   observeSpecializedOperation,
   squashDrizzleCause,
 } from "@relkit/drizzle/internal";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import type { Auth } from "better-auth";
 import { Cause, Context, Effect, Exit, Layer } from "effect";
 import { AuthFailure } from "./auth.errors.js";

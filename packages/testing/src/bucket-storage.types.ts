@@ -1,5 +1,5 @@
 import type { Effect } from "effect";
-import type { BucketProvider, BucketObjectMetadata } from "@relkit/buckets";
+import type { BucketProvider, BucketObjectMetadata } from "relkit/buckets";
 import type { TestBucketObject } from "./buckets-types.js";
 import type { BucketStorageSnapshot as SnapshotSchema } from "./bucket-storage.schemas.js";
 

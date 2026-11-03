@@ -1,4 +1,4 @@
-import type { ClientIdentityDocument } from "@relkit/contracts";
+import type { ClientIdentityDocument } from "relkit/contracts";
 import { createAutoClient, createClient, createWebSocketClient } from "../transport.js";
 import type { ClientHeaders } from "../index.types.js";
 import type { RelkitKeyScope } from "./keys.js";

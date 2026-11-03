@@ -1,6 +1,6 @@
 /** Acquires the general runtime and explicitly selected application services in one scope. */
 import { Effect, Exit } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { createTestHttpClient, createTestObservability } from "./http.js";
 import { createTestRuntime, type TestRuntimeOptions } from "./runtime.js";
 import { bindTestRealtime } from "./application-realtime.js";

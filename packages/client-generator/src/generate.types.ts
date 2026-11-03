@@ -1,1 +1,1 @@
-export type { ApplicationGraph } from "@relkit/graph";
+export type { ApplicationGraph } from "relkit/graph";

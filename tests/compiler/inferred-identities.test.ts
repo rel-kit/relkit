@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import * as ts from "typescript";
-import { diffGraph } from "../../packages/graph/src/index.ts";
+import { diffGraph } from "relkit/graph";
 import { readFacts } from "../../packages/compiler/src/discovery/source-facts.ts";
 import {
   NORMALIZE_CODES,

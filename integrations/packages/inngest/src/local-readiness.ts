@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { LocalServiceRecipeOutputContext } from "@relkit/local-service";
+import type { LocalServiceRecipeOutputContext } from "relkit/local-service";
 import { INNGEST_LOCAL_STARTUP_TIMEOUT_MS } from "./local-timeouts.js";
 
 export async function waitForInngestReadiness(

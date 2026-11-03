@@ -1,7 +1,7 @@
 /** Composes project discovery, artifact planning and request-local builder state into an immutable scaffold plan before transaction acquisition. */
 
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import { scaffoldErrors } from "create-relkit/internal/generator-errors";
 import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";

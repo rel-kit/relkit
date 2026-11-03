@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import {
   SelectedDependencies,
   SelectedDependenciesLive,
-} from "@relkit/provider/internal/dependencies";
+} from "relkit/provider/internal/dependencies";
 import { Effect } from "effect";
 import type { DrizzleServiceDescriptor } from "./types.js";
 import type { DrizzleActivation, DrizzleActivationOptions } from "./activation.types.js";

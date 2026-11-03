@@ -14,7 +14,6 @@ export default defineMeta({
     "observability-local",
     "cli-api",
     "create-relkit",
-    "relkit",
     "schema",
     "functions",
     "services",

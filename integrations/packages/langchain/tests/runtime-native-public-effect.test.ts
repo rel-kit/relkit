@@ -1,6 +1,6 @@
 /** Exercises native runtime native public effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
-import type { StandardSchemaV1 } from "@relkit/schema";
+import type { StandardSchemaV1 } from "relkit/schema";
 import { Effect } from "effect";
 import { expect, test } from "vitest";
 import { nativePublicEventEffect, publicToolValueEffect } from "../src/runtime-native-public.js";

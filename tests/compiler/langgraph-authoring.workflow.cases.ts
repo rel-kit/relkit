@@ -10,7 +10,7 @@ import {
 import { defineGraph, defineGraphNode } from "../../integrations/packages/langchain/src/index.ts";
 import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
 import { readFacts } from "../../packages/compiler/src/discovery/source-facts.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { z } from "relkit/schema";
 export function case1Workflow() {
   const source = ts.createSourceFile(
     "src/order.agent.ts",

@@ -3,7 +3,7 @@
  * Tests supply complete file authority through the same Layer as live validation;
  * no malformed document can acquire module-import or candidate-start authority.
  */
-import { canonicalJson, GRAPH_VERSION } from "@relkit/contracts";
+import { canonicalJson, GRAPH_VERSION } from "relkit/contracts";
 import { expect, it } from "@effect/vitest";
 import { Cause, Effect, Exit } from "effect";
 import { verifySnapshotCohort } from "../../src/dev-snapshot/snapshot-cohort.js";
@@ -59,7 +59,7 @@ it.effect("rejects duplicate complete runtime registrations", () =>
       capability: "cache",
       adapterId: "memory",
       protocolVersion: 1,
-      packageName: "@relkit/cache",
+      packageName: "relkit/cache",
       packageVersion: "0.7.2",
       exportName: "cache",
     };

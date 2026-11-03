@@ -9,8 +9,8 @@ import {
   parseModelProviderConfigurationEffect,
   resolveModelSelector,
   resolveModelSelectorEffect,
-} from "@relkit/agents/internal/model-selection";
-import { z } from "@relkit/schema";
+} from "relkit/agents/internal/model-selection";
+import { z } from "relkit/schema";
 
 const configuration = parseModelProviderConfiguration({
   defaultProvider: "openai",

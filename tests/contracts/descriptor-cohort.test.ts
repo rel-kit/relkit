@@ -4,41 +4,33 @@ import {
   canonicalJson,
   createDescriptorBase,
   isDescriptor,
-} from "../../packages/contracts/src/index.ts";
-import { DeclaredError, defineError, defineFunction } from "../../packages/functions/src/index.ts";
-import { defineBucket, isBucketDescriptor } from "../../packages/buckets/src/index.ts";
-import { defineCache, isCacheDescriptor } from "../../packages/cache/src/index.ts";
-import { defineAgent, isAgentDescriptor } from "../../packages/agents/src/index.ts";
-import { defineEvent, isEventDescriptor } from "../../packages/events/src/index.ts";
-import { defineJob } from "../../packages/jobs/src/legacy.ts";
+} from "relkit/contracts";
+import { DeclaredError, defineError, defineFunction } from "relkit/functions";
+import { defineBucket, isBucketDescriptor } from "relkit/buckets";
+import { defineCache, isCacheDescriptor } from "relkit/cache";
+import { defineAgent, isAgentDescriptor } from "relkit/agents";
+import { defineEvent, isEventDescriptor } from "relkit/events";
+import { defineJob } from "../../packages/relkit/src/jobs/legacy.ts";
 import {
   defineMiddleware,
   defineRoute,
   defineTransform,
   http,
   isMiddlewareDescriptor,
-} from "../../packages/routes/src/index.ts";
-import {
-  defineTool,
-  isToolDescriptor,
-  ToolApprovalRequiredError,
-} from "../../packages/tools/src/index.ts";
-import {
-  defineService,
-  isServiceDescriptor,
-  isServiceRef,
-} from "../../packages/services/src/index.ts";
-import { defineEnv, env, isEnvRef } from "../../packages/config/src/index.ts";
+} from "relkit/routes";
+import { defineTool, isToolDescriptor, ToolApprovalRequiredError } from "relkit/tools";
+import { defineService, isServiceDescriptor, isServiceRef } from "relkit/services";
+import { defineEnv, env, isEnvRef } from "relkit/config";
 import { CONVENTION_CODES, checkConventions } from "../../packages/compiler/src/index.ts";
-import { defineApp } from "../../packages/app/src/index.ts";
+import { defineApp } from "relkit";
 import {
   defineConnectionContract,
   defineIntegrationReference,
   defineProviderAdapter,
   defineProviderBehavior,
   defineProviderCapability,
-} from "../../packages/provider/src/index.ts";
-import { getJsonSchema, z } from "../../packages/schema/src/index.ts";
+} from "relkit/provider";
+import { getJsonSchema, z } from "relkit/schema";
 
 const input = z.object({ id: z.string() });
 const output = z.object({ ok: z.boolean() });

@@ -1,4 +1,4 @@
-import type { RunPage, RunSnapshot } from "@relkit/contracts/jobs";
+import type { RunPage, RunSnapshot } from "relkit/contracts/jobs";
 import type { InspectorJobsBinding } from "./types.js";
 import type { NativeRunPage } from "./native.types.js";
 

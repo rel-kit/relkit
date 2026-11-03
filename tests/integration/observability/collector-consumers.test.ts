@@ -1,4 +1,4 @@
-import { Effect } from "../../../packages/runtime-effect/node_modules/effect/dist/index.js";
+import { Effect } from "../../../packages/relkit/node_modules/effect/dist/index.js";
 import { expect, test } from "bun:test";
 import { existsSync } from "node:fs";
 import { mkdtemp, rm } from "node:fs/promises";
@@ -13,7 +13,7 @@ import {
   isRedactedObservabilityRecord,
   type ObservabilityRecord,
   type RedactedObservabilityRecord,
-} from "../../../packages/observability/src/index.ts";
+} from "relkit/observability";
 import {
   OBSERVABILITY_RECORD_ADAPTERS,
   scanObservabilitySinks,
@@ -23,8 +23,8 @@ import {
   type HumanLogSink,
   type JsonLogSink,
   type RedactedLogRecord,
-} from "../../../packages/runtime-effect/src/logger.ts";
-import { API_BASE_PATH } from "../../../packages/contracts/src/index.ts";
+} from "../../../packages/relkit/src/runtime-effect/logger.ts";
+import { API_BASE_PATH } from "relkit/contracts";
 import { installObservabilityEndpoints } from "../../../packages/inspector-api/src/index.ts";
 
 const secret = "super-secret-password";

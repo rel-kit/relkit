@@ -2,7 +2,7 @@ import {
   deploymentJoin,
   type DeploymentInput,
   type DeploymentResourceOperation,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 import { containerEnvironment } from "./environment.js";
 import { type HostContext, output, resource } from "./shared.js";
 

@@ -5,7 +5,7 @@
  */
 import { randomBytes, randomUUID } from "node:crypto";
 import { Clock, Context, Effect, Layer, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { InspectionFiles } from "./files.service.js";
 import { InspectionNative } from "./native.service.js";
 import { createInspectionHandler } from "./bridge-handler.js";

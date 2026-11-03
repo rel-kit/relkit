@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import { type FunctionContext, defineError, defineFunction, fail } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { type FunctionContext, defineError, defineFunction, fail } from "relkit/functions";
+import { z } from "relkit/schema";
 
 type EmptyContext = FunctionContext;
 declare const emptyContext: EmptyContext;

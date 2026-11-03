@@ -1,6 +1,6 @@
 import type { LoadedDeploymentConfig } from "./config-loader-deployment.types.js";
 export type { LoadedDeploymentConfig } from "./config-loader-deployment.types.js";
-import { isStableId } from "@relkit/contracts";
+import { isStableId } from "relkit/contracts";
 import { CONFIG_CODES, type ConfigIssue } from "./config-loader-types.js";
 import { readRecord } from "./config-loader-utils.js";
 

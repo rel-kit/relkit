@@ -3,7 +3,7 @@
  * Decoding grants no activation authority: the prover compares the selected
  * generation, sealed cohort and complete route-table digest with its receipt.
  */
-import { API_VERSION } from "@relkit/contracts";
+import { API_VERSION } from "relkit/contracts";
 import { Schema } from "effect";
 import { SnapshotActivation, SnapshotHash } from "./snapshot.schemas.js";
 

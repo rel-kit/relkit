@@ -1,9 +1,9 @@
 /** Validates every envelope before receipt deduplication and encodes only admitted redacted payloads. */
-import { canonicalJson } from "@relkit/contracts";
-import { admitObservabilityRecord } from "@relkit/observability";
-import type { RedactionPolicy } from "@relkit/observability";
-import { validateLocalRecord } from "@relkit/observability/local/record";
-import type { LocalRecord } from "@relkit/observability/local/record";
+import { canonicalJson } from "relkit/contracts";
+import { admitObservabilityRecord } from "relkit/observability";
+import type { RedactionPolicy } from "relkit/observability";
+import { validateLocalRecord } from "relkit/observability/local/record";
+import type { LocalRecord } from "relkit/observability/local/record";
 import { Effect } from "effect";
 import { duckdbError } from "./duckdb-error.js";
 import { readDuckdbSql } from "./duckdb-sql.js";

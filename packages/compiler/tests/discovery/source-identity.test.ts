@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { Effect } from "effect";
-import { StableIdError } from "@relkit/contracts";
+import { StableIdError } from "relkit/contracts";
 import {
   encodeErrorIdEffect,
   encodeExportIdEffect,

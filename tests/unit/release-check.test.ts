@@ -51,23 +51,23 @@ for (const set of ["fresh", "restart"] as const) {
   });
 }
 
-test("accepts the unscoped wrapper and publishes its creator dependency first", async () => {
+test("publishes the core package before the creator that depends on it", async () => {
   const items = await packages();
   const wrapper = items.find((item) => item.name === "relkit");
   expect(wrapper).toBeDefined();
   const manifest = await readJson(join(root, "package.json"));
   const checked = checkManifests(items, manifest);
-  expect(checked.summary.find((item) => item.name === "relkit")?.workspaceDependencies).toEqual([
-    "create-relkit",
-  ]);
+  expect(checked.summary.find((item) => item.name === "relkit")?.workspaceDependencies).toEqual([]);
   const ordered = publicationOrder(items).map((item) => item.name);
-  expect(ordered.indexOf("relkit")).toBeGreaterThan(ordered.indexOf("create-relkit"));
+  expect(ordered.indexOf("relkit")).toBeLessThan(ordered.indexOf("create-relkit"));
   expect(() =>
     checkManifests(
-      items.map((item) => (item === wrapper ? { ...item, name: "@relkit/relkit" } : item)),
+      items.map((item) =>
+        item.name === "@relkit/app" ? { ...item, name: "@relkit/legacy-app" } : item,
+      ),
       manifest,
     ),
-  ).toThrow("Package name mismatch: packages/relkit");
+  ).toThrow("Package name mismatch: packages/app");
 });
 
 test("tracked release notes exclude rebuild-dependent tarball hashes", () => {
@@ -77,7 +77,7 @@ test("tracked release notes exclude rebuild-dependent tarball hashes", () => {
     packageManager: "bun@1.3.10",
     packages: [
       {
-        name: "@relkit/app",
+        name: "relkit",
         version: "0.0.1",
         exports: { ".": "./dist/index.js" },
         dependencyFields: { dependencies: {} },

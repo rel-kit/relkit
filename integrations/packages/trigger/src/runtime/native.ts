@@ -8,7 +8,7 @@ import type {
   NativeScheduleOperations,
   NativeSubmission,
   OperationContext,
-} from "@relkit/jobs/adapter";
+} from "relkit/jobs/adapter";
 import { createTriggerSdkNativeClient } from "./sdk-native.js";
 
 /** @experimental */

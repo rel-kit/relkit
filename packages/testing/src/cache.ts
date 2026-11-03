@@ -3,10 +3,10 @@ import {
   type CacheClient,
   type CacheOperationOptions,
   type CacheProvider,
-} from "@relkit/cache";
+} from "relkit/cache";
 import { Effect, Layer, ManagedRuntime } from "effect";
-import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
-import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
+import { runExecutionPromise, runExecutionSync } from "relkit/contracts/operation";
+import type { InferInput, InferOutput, StandardSchemaV1 } from "relkit/schema";
 import { TestCacheStorage, cacheStorageLayer } from "./cache-storage.js";
 import type { CacheStorageService } from "./cache-storage.types.js";
 import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";

@@ -3,13 +3,13 @@ import {
   observeExecutionStream,
   runExecutionPromise,
   runExecutionSync,
-} from "@relkit/contracts/operation";
-import { canonicalJson } from "@relkit/contracts";
+} from "relkit/contracts/operation";
+import { canonicalJson } from "relkit/contracts";
 import type {
   ObservabilityStream,
   ObservabilityStreamEvent,
   ObservabilityStreamSubscriptionOptions,
-} from "@relkit/observability";
+} from "relkit/observability";
 import { inspectorExecution } from "./execution.js";
 import { readStreamOptions } from "./observability-utils.js";
 import { InspectorBoundaryError } from "./native-edge.js";
@@ -27,7 +27,7 @@ import { InspectorBoundaryError } from "./native-edge.js";
  * That resource is acquired and finalized inside the response scope.
  * @example
  * ```ts
- * import { createObservabilityStream } from "@relkit/observability";
+ * import { createObservabilityStream } from "relkit/observability";
  * import { streamResponse } from "@relkit/inspector-api";
  * const source = createObservabilityStream();
  * const response = streamResponse(source, new Request("http://localhost"), 1);

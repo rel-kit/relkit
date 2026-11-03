@@ -1,17 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import type { MiddlewareHandler } from "hono";
-import { defineError, defineFunction } from "../../../packages/functions/src/index.ts";
-import {
-  invokeFunction,
-  type InvocationCompletion,
-  type InvocationTarget,
-} from "../../../packages/engine/src/index.ts";
+import { defineError, defineFunction } from "relkit/functions";
+import { invokeFunction, type InvocationCompletion, type InvocationTarget } from "relkit/engine";
 import {
   createRegistrationPlan,
   type ApplicationGraph,
   type HttpTriggerRegistration,
   type RegistrationPlan,
-} from "../../../packages/graph/src/index.ts";
+} from "relkit/graph";
 import {
   createApp,
   type FrameworkMiddlewareInput,
@@ -20,17 +16,17 @@ import {
   type RequestMappingOptions,
   type ResponseMappingOptions,
   type RuntimeManifest,
-} from "../../../packages/runtime-hono/src/index.ts";
+} from "relkit/runtime-hono";
 import {
   createTestHttpClient,
   createTestObservability,
   type TestHttpClient,
   type TestObservability,
 } from "../../../packages/testing/src/index.ts";
-import { defineRoute, http } from "../../../packages/routes/src/index.ts";
+import { defineRoute, http } from "relkit/routes";
 import { normalizeCompilation } from "../../../packages/compiler/src/index.ts";
-import { GRAPH_VERSION } from "../../../packages/contracts/src/index.ts";
-import { z } from "../../../packages/schema/src/index.ts";
+import { GRAPH_VERSION } from "relkit/contracts";
+import { z } from "relkit/schema";
 import { runtimeCohort } from "../runtime-cohort.ts";
 
 const source = { file: "src/http.ts", line: 1, column: 1 } as const;

@@ -1,7 +1,7 @@
 /** Creates isolated native deepagent runtime fixtures; each caller owns the returned model, state and provider observations. */
 
-import { type BucketProvider } from "@relkit/buckets";
-import { z } from "@relkit/schema";
+import { type BucketProvider } from "relkit/buckets";
+import { z } from "relkit/schema";
 import { defineAgent, invokeAgent } from "../src/index.ts";
 
 import { createTestModel } from "./test-model.ts";

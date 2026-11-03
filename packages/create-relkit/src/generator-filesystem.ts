@@ -2,7 +2,7 @@
 
 import * as fs from "node:fs/promises";
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorIoError, errorMessage, hasErrno } from "./generator-errors.js";
 import type {
   GeneratorEntryKind,

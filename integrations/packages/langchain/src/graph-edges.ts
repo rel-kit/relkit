@@ -3,9 +3,9 @@
 import { conditionalEdgeMutation, edgeMutation } from "./graph-edge-mutations.js";
 import { assertEndpoint, copyDestinations, addUnique } from "./graph-edge-destinations.js";
 import { END, START, type LangGraphRunnableConfig } from "@langchain/langgraph";
-import type { MaybePromise } from "@relkit/contracts";
+import type { MaybePromise } from "relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/internal/agent-telemetry";
 import { graphDefinitionFailure } from "./define-graph-error.js";
 import type { GraphEdgeBuilder, GraphEdgeOperation } from "./graph-edges.types.js";
 

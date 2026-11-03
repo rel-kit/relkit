@@ -5,7 +5,7 @@
  */
 
 import type { SourceFactoryKind } from "@relkit/compiler";
-import type { ApplicationLayout } from "@relkit/contracts";
+import type { ApplicationLayout } from "relkit/contracts";
 import type { DatabaseDialect } from "create-relkit/internal/add-types";
 
 /**

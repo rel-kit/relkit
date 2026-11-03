@@ -3,7 +3,7 @@ import {
   type RedactedObservabilityRecord,
   type TelemetryExporterFactoryContext,
   type TelemetryExporterRuntime,
-} from "@relkit/observability";
+} from "relkit/observability";
 
 /** @experimental */
 export interface SentryExporterOptions {

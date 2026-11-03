@@ -4,7 +4,7 @@ import { MemorySaver } from "@langchain/langgraph";
 import { tool } from "langchain";
 import { defineAgent, invokeAgent } from "@relkit/langchain";
 import { createTestAgent, createTestModel } from "@relkit/langchain/testing";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 
 const limits = { maxSteps: 4, maxToolCalls: 2, timeoutMs: 5_000 };
 const engine = {

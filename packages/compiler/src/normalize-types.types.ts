@@ -2,12 +2,8 @@
  * Shares compiler stage inputs, immutable integration ownership and generated
  * output contracts. Runtime dependency declarations remain portable metadata.
  */
-import type {
-  JsonValue,
-  SourceLocation,
-  IntegrationDependencyRequirement,
-} from "@relkit/contracts";
-import type { Diagnostic } from "@relkit/diagnostics";
+import type { JsonValue, SourceLocation, IntegrationDependencyRequirement } from "relkit/contracts";
+import type { Diagnostic } from "relkit/diagnostics";
 import type {
   EvaluatorModuleResult,
   EvaluatorResponse,
@@ -57,7 +53,7 @@ export interface RuntimeIntegrationPackage {
   readonly packageName: string;
   readonly packageVersion: string;
   readonly exportName: string;
-  readonly registrations: readonly import("@relkit/contracts").RuntimeIntegrationRegistrationMetadata[];
+  readonly registrations: readonly import("relkit/contracts").RuntimeIntegrationRegistrationMetadata[];
   /** Validated SDK requirements declared by the owning integration manifest. */
   readonly requirements?: readonly IntegrationDependencyRequirement[];
 }

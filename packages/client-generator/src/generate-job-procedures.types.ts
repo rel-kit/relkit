@@ -23,7 +23,7 @@ export interface JobProcedureSource {
   readonly fields: readonly string[];
   readonly streamNames: readonly string[];
 }
-export type { ApplicationGraph } from "@relkit/graph";
+export type { ApplicationGraph } from "relkit/graph";
 
 /** Serialized job source with stable path metadata.
  * @example const document: JobProcedureDocument = jobProcedureDocument(source);

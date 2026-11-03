@@ -1,6 +1,6 @@
 import { join, resolve } from "node:path";
 import { Context, Effect, Layer, Schema } from "effect";
-import { GRAPH_VERSION } from "@relkit/contracts";
+import { GRAPH_VERSION } from "relkit/contracts";
 import {
   canonicalGraphJson,
   canonicalizeGraph,
@@ -8,7 +8,7 @@ import {
   hashGraph,
   validateGraphShapeEffect,
   type ApplicationGraph,
-} from "@relkit/graph";
+} from "relkit/graph";
 import { cliAdapterError, cliOriginalError, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.js";

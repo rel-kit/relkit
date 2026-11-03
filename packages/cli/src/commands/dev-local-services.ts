@@ -1,13 +1,13 @@
-import { assertRuntimeIntegrationPlanVersion, isStableId } from "@relkit/contracts";
+import { assertRuntimeIntegrationPlanVersion, isStableId } from "relkit/contracts";
 import { hashGeneratedArtifact } from "@relkit/compiler";
-import { validateGraphShape, type ApplicationGraph } from "@relkit/graph";
+import { validateGraphShape, type ApplicationGraph } from "relkit/graph";
 import {
   assertLocalServicePlanVersion,
   normalizeLocalServiceRecipeEffect,
   type LocalServicePlan,
   type LocalServiceRecipeInput,
   type LocalServiceWorkerArtifact,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import { Effect, Layer } from "effect";
 import { cliAdapterError, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";

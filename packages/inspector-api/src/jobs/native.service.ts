@@ -1,5 +1,5 @@
 import { Context, Effect, Layer, ManagedRuntime } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { inspectorLoggerLayer } from "../execution.js";
 import { nativeAttempt, unwrapInspectorFailure } from "../native-edge.js";
 import type { ResolvedActiveGeneration } from "../shared.js";

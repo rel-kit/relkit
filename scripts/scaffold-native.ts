@@ -1,6 +1,6 @@
 /** Joins finite native filesystem and packed SDK calls before scaffold fixture ownership can end. */
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { ScaffoldProcessFailure } from "./scaffold-process.errors.js";
 
 /**

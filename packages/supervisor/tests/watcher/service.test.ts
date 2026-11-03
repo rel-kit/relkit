@@ -1,14 +1,14 @@
 import { expect, it } from "@effect/vitest";
 import { Deferred, Effect, Fiber } from "effect";
 import { TestClock } from "effect/testing";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
 import { createSupervisorStateMachine } from "../../src/state-machine.js";
 import { createWatcherLayer, SupervisorSourceWatcher } from "../../src/watcher-service.js";
 import { createSupervisorWatcher } from "../../src/watcher.js";
 import { nativeGate } from "../fixtures/native-gate.js";
 import type { RecordedWatcherBatch } from "../fixtures/watcher.types.js";
 import { Exit, Layer, Metric } from "effect";
-import type { LogRecord } from "@relkit/runtime-effect/logger";
+import type { LogRecord } from "relkit/runtime-effect/logger";
 
 it.effect("standalone watcher records typed invalid admission and owned scheduling outcomes", () =>
   Effect.gen(function* () {

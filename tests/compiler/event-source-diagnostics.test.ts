@@ -7,11 +7,11 @@ test("reports source-located event function option, result, capability, and targ
   const root = resolve(import.meta.dir, "../..");
   const file = resolve(import.meta.dir, "event-source-fixture.ts");
   const source = `
-    import { defineEventFunction as reaction } from "../../packages/events/src/index.js";
-    import { defineError, defineFunction } from "../../packages/functions/src/index.js";
-    import { Effect } from "../../packages/runtime-effect/node_modules/effect/dist/index.js";
-    import { defineJob } from "../../packages/jobs/src/legacy.js";
-    import { z } from "../../packages/schema/src/index.js";
+    import { defineEventFunction as reaction } from "relkit/events";
+    import { defineError, defineFunction } from "relkit/functions";
+    import { Effect } from "../../packages/relkit/node_modules/effect/dist/index.js";
+    import { defineJob } from "../../packages/relkit/src/jobs/legacy.js";
+    import { z } from "relkit/schema";
     const consumer = reaction({ id: "consumer", event: "created" as never, handler: () => {} });
     consumer.invoke({});
     (consumer as any).asTool();

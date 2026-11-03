@@ -1,6 +1,6 @@
 import { observeCompiler } from "./observability.js";
 import { passOutputsEffect, sortDiagnostics } from "./normalize-finalize.js";
-import { createDiagnostic } from "@relkit/diagnostics";
+import { createDiagnostic } from "relkit/diagnostics";
 import { Cause, Effect, Schema } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 import {

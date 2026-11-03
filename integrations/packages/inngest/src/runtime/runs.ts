@@ -1,6 +1,6 @@
-import type { JsonValue } from "@relkit/contracts";
-import type { TracePropagation } from "@relkit/contracts";
-import type { RunHandle, RunSnapshot } from "@relkit/contracts/jobs";
+import type { JsonValue } from "relkit/contracts";
+import type { TracePropagation } from "relkit/contracts";
+import type { RunHandle, RunSnapshot } from "relkit/contracts/jobs";
 import { date, hashSigningKey, number, record, rows, text } from "./runs-support.js";
 import { url } from "./support.js";
 

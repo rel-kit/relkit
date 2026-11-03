@@ -4,8 +4,8 @@
  * activation; input-epoch guards preserve the previous snapshot on obsolete work.
  */
 import { relative } from "node:path";
-import { canonicalJson } from "@relkit/contracts";
-import { observeExecution } from "@relkit/contracts/operation";
+import { canonicalJson } from "relkit/contracts";
+import { observeExecution } from "relkit/contracts/operation";
 import { Context, Effect, Layer, Schema } from "effect";
 import { SnapshotFiles } from "./snapshot-files.service.js";
 import { SnapshotPublicationNative } from "./snapshot-publication-native.js";

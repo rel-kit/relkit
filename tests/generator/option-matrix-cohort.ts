@@ -103,7 +103,7 @@ function verifyGeneratedManifest(
           langsmith: workspaceManifest.catalog.langsmith,
         }
       : {}),
-    "@relkit/app": appManifest.version,
+    relkit: appManifest.version,
     "@scalar/hono-api-reference": "0.12.9",
     effect: workspaceManifest.catalog.effect,
     ...(template === "tasks"

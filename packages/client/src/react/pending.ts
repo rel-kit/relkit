@@ -1,7 +1,7 @@
-import type { PendingOperationMetadata } from "@relkit/contracts";
-import type { JobUnknownOutcome } from "@relkit/contracts/jobs";
+import type { PendingOperationMetadata } from "relkit/contracts";
+import type { JobUnknownOutcome } from "relkit/contracts/jobs";
 import { ManagedRuntime } from "effect";
-import { runExecutionSync, runExecutionPromise } from "@relkit/contracts/operation";
+import { runExecutionSync, runExecutionPromise } from "relkit/contracts/operation";
 import type { RelkitKeyScope } from "./keys.js";
 import { PendingOperations, pendingOperationsLayer } from "./pending.service.js";
 import type { PendingRememberOptions, PendingReferences } from "./pending.types.js";

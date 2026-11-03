@@ -1,7 +1,7 @@
 /** Groups consumed package paths and selected external package metadata without loading exports. */
 import { isAbsolute, join, relative } from "node:path";
 import { Effect, Schema } from "effect";
-import type { DependencySourceContract } from "@relkit/provider/internal/dependencies";
+import type { DependencySourceContract } from "relkit/provider/internal/dependencies";
 import { SnapshotPath } from "./snapshot.schemas.js";
 import { DevSnapshotRejected } from "./snapshot-error.js";
 import { resolveProductionDependency } from "../services/production-dependency-source.js";

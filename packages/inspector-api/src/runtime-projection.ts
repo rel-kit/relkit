@@ -1,5 +1,5 @@
 import type { RuntimeCollection } from "./runtime.types.js";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { runtimeItemId } from "./runtime-item.js";
 import { isRecord, pick, safeJson, safeSource, type ResolvedActiveGeneration } from "./shared.js";
 

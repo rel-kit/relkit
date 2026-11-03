@@ -3,7 +3,7 @@ import type {
   BucketObjectMetadata,
   BucketProvider,
   BucketPutOptions,
-} from "@relkit/buckets";
+} from "relkit/buckets";
 import type { TestFailureControls } from "./fakes.js";
 
 /** Bucket write policy and explicit clock, root and failure dependencies. */
@@ -13,7 +13,7 @@ export interface TestBucketFakeOptions {
   readonly stateRoot?: string;
   readonly clock?: () => number;
   readonly failures?: TestFailureControls;
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly maxObjectBytes?: number;
   readonly allowedContentTypes?: readonly string[];
 }

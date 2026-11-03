@@ -1,8 +1,8 @@
 import { Deferred, Effect, Ref, Stream } from "effect";
-import { observeExecutionStream } from "@relkit/contracts/operation";
-import { interruptOnSignal } from "@relkit/runtime-effect";
-import type { NativeWatchRequest, OperationContext } from "@relkit/jobs/adapter";
-import type { RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
+import { observeExecutionStream } from "relkit/contracts/operation";
+import { interruptOnSignal } from "relkit/runtime-effect";
+import type { NativeWatchRequest, OperationContext } from "relkit/jobs/adapter";
+import type { RunSnapshot, RunWatchFrame } from "relkit/contracts/jobs";
 import type { NativeJobsState } from "./native-jobs.types.js";
 import type { TestClock } from "./runtime.js";
 import { isTerminal, snapshotOf } from "./test-jobs-adapter-support.js";

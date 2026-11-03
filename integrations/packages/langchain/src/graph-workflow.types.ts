@@ -1,7 +1,7 @@
 /** Adapts native graph execution to the RelKit workflow contract, carrying invocation context and scoped persistence through completion. This companion preserves the native input and output types without starting runtime work. */
 
 import type { END, START } from "@langchain/langgraph";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 
 /** Serializable node entry in an agent graph workflow. @experimental */
 export interface GraphWorkflowNode {

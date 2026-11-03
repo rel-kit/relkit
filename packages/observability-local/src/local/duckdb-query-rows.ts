@@ -1,8 +1,8 @@
 /** Decodes native JSON rows into validated diagnostic records under the shared database permit. */
 import type { DuckDBValue } from "@duckdb/node-api";
 import { Effect, Semaphore } from "effect";
-import { validateLocalRecord } from "@relkit/observability/local/record";
-import type { StoredLocalRecord } from "@relkit/observability/local/record";
+import { validateLocalRecord } from "relkit/observability/local/record";
+import type { StoredLocalRecord } from "relkit/observability/local/record";
 import { duckdbError } from "./duckdb-error.js";
 import { readDuckdbSql } from "./duckdb-sql.js";
 import type { DuckdbConnectionPort } from "./duckdb-driver.types.js";

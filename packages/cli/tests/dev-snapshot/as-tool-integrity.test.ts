@@ -4,7 +4,7 @@ import { Effect, Exit } from "effect";
 import { verifyStaticSnapshotSource } from "../../src/dev-snapshot/snapshot-eligibility.js";
 
 test("rejects an ambient function disguised as a local asTool constructor", async () => {
-  const source = `import {defineApp, defineEnv} from "@relkit/app/config";
+  const source = `import {defineApp, defineEnv} from "relkit/config";
 function readAmbient(_options: {}) { return process.env.REVIEW_VALUE ?? "fallback"; }
 const builder = {asTool: readAmbient};
 export default defineApp({id: builder.asTool({}), env: defineEnv({})});`;
@@ -36,8 +36,8 @@ test("rejects eager computed destructuring keys while preserving static route bi
   ).toBe(true);
 });
 
-const descriptor = `import {defineFunction as fn} from "@relkit/app/functions";
-import {z} from "@relkit/app/schema";
+const descriptor = `import {defineFunction as fn} from "relkit/functions";
+import {z} from "relkit/schema";
 const hello = fn({input:z.string(), output:z.string(), handler:async value => value});
 export {hello as named}; export default hello;`;
 

@@ -8,7 +8,6 @@ import { dependencyName, importReferences } from "../../scripts/boundary-imports
 
 const allowedPackages = new Set([
   "@orpc/client",
-  "@relkit/contracts",
   "@xyflow/react",
   "anser",
   "class-variance-authority",
@@ -41,8 +40,8 @@ const networkFiles = new Set([
 export const FORBIDDEN_PAYLOAD_MARKERS = Object.freeze([
   "@relkit/",
   "examples/commerce",
-  "packages/engine",
-  "packages/providers-local",
+  "packages/relkit/src/engine",
+  "packages/relkit/src/providers-local",
   "packages/providers-standard",
   "packages/cloud-aws",
   "inspector-synthetic-secret-14-16",
@@ -73,7 +72,12 @@ export async function scanInspectorImports(root: string): Promise<InspectorImpor
     const sourceFile = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true);
     for (const reference of importReferences(sourceFile)) {
       const dependency = dependencyName(reference.specifier);
-      if (dependency !== undefined && !allowedPackages.has(dependency))
+      // From relkit, the Inspector may import only the shared contracts.
+      const allowed =
+        dependency === "relkit"
+          ? reference.specifier === "relkit/contracts"
+          : allowedPackages.has(dependency ?? "");
+      if (dependency !== undefined && !allowed)
         violations.push(`${name}: forbidden import ${reference.specifier}`);
     }
   }

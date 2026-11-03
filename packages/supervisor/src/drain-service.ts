@@ -1,4 +1,4 @@
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { Clock, Context, Deferred, Effect, Exit, Layer, Ref } from "effect";
 import { runDrain } from "./drain-run.js";
 import { sameToken } from "./proxy-validation.js";

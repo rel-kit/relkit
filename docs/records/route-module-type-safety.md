@@ -112,4 +112,4 @@ to the output schema updated the live response without restarting the server.
 
 Repository-wide guardrails still encounter two pre-existing failures: the scope scan
 includes `packages/compiler/coverage/coverage-final.json`, and package export smoke
-rejects the current `@relkit/events` export map. These checks are not reported as passing.
+rejects the current `relkit/events` export map. These checks are not reported as passing.

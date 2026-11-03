@@ -1,4 +1,4 @@
-import { API_VERSION, canonicalJson } from "@relkit/contracts";
+import { API_VERSION, canonicalJson } from "relkit/contracts";
 import { Schema } from "effect";
 import { unwrapInspectorFailure } from "./native-edge.js";
 import type { Hono } from "hono";

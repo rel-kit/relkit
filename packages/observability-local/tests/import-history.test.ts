@@ -4,7 +4,7 @@ import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { DuckDBInstance } from "@duckdb/node-api";
 import { importLocalHistory } from "../src/local/import-history.js";
-import type { LocalRecord, StoredLocalRecord } from "@relkit/observability/local/record";
+import type { LocalRecord, StoredLocalRecord } from "relkit/observability/local/record";
 test("legacy import accounts for malformed lines and skips a repeated file", async () => {
   const root = await mkdtemp(join("/tmp", "relkit-import-history-"));
   const directory = join(root, "logs", "2026-09-25");

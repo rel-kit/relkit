@@ -1,4 +1,4 @@
-import { defineApp, defineEnv, env } from "@relkit/app";
+import { defineApp, defineEnv, env } from "relkit";
 import { s3 } from "@relkit/s3";
 
 export default defineApp({

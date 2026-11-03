@@ -1,12 +1,12 @@
 import { Cause, Context, Effect, Layer, ManagedRuntime } from "effect";
-import { createLoggerLayer } from "@relkit/runtime-effect";
-import { runExecutionPromise } from "@relkit/contracts/operation";
+import { createLoggerLayer } from "relkit/runtime-effect";
+import { runExecutionPromise } from "relkit/contracts/operation";
 import { cliOriginalError, cliPromise } from "../cli-errors.js";
 import { CliCleanup } from "../services/cleanup.service.js";
 import { localCapabilitiesLayer } from "../services/local-capabilities.js";
 import { cliCleanupSnapshotUnsafe, retainCliCleanupFailures } from "../cli-cleanup-evidence.js";
 import { makeDevLocalCompilerEffect } from "./dev-local-compiler.js";
-import type { TelemetryConfiguration } from "@relkit/observability";
+import type { TelemetryConfiguration } from "relkit/observability";
 import type { DevLocalCompiler, EffectDevLocalCompiler } from "./dev-local.types.js";
 export { checkedLocalArtifacts } from "./dev-local-services.js";
 export { formatDevDiagnostics } from "./dev-local-diagnostics.js";

@@ -2,7 +2,7 @@
 
 import { join, resolve } from "node:path";
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import { domainError, domainTry } from "create-relkit/internal/generator-errors";

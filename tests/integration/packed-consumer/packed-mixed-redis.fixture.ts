@@ -6,8 +6,8 @@ import {
   generateRuntimeIntegrationPlan,
   resolveRuntimeIntegrationPackages,
 } from "@relkit/compiler";
-import { assertRuntimeIntegrationModules } from "@relkit/engine";
-import { createOperationId } from "@relkit/realtime";
+import { assertRuntimeIntegrationModules } from "relkit/engine";
+import { createOperationId } from "relkit/realtime";
 import { redis, redisRealtime } from "@relkit/redis";
 import { createRedisCacheProvider, createRedisRealtimeProvider } from "@relkit/redis/runtime";
 import * as module from "@relkit/redis/runtime";

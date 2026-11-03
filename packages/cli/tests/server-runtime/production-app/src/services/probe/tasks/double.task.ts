@@ -1,6 +1,6 @@
 /** Defines the immutable retryable task whose doubled output proves selected production worker execution. */
-import { defineTask } from "@relkit/app/tasks";
-import { z } from "@relkit/app/schema";
+import { defineTask } from "relkit/tasks";
+import { z } from "relkit/schema";
 
 export default defineTask({
   id: "probe.double",

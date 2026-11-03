@@ -1,1 +1,1 @@
-export * from "@relkit/events";
+export * from "relkit/events";

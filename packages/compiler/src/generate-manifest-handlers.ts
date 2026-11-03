@@ -1,4 +1,4 @@
-import type { Diagnostic } from "@relkit/diagnostics";
+import type { Diagnostic } from "relkit/diagnostics";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import { missingReference, type ImportBinding } from "./generate-manifest-utils.js";
 import type { NormalizedDescriptor } from "./normalize-types.js";

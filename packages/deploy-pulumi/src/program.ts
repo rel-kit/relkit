@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { canonicalJson } from "@relkit/contracts";
-import type { DeploymentPlan } from "@relkit/deploy";
+import { canonicalJson } from "relkit/contracts";
+import type { DeploymentPlan } from "relkit/deploy";
 import type { PulumiFn } from "@pulumi/pulumi/automation";
 import { identity, snapshotPlan } from "./program-support.js";
 import { materializeDeploymentOperations } from "./materialization.js";

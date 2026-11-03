@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { defineEvent, defineEventFunction } from "../../packages/events/src/index.ts";
-import { defineFunction } from "../../packages/functions/src/index.ts";
-import { defineService } from "../../packages/services/src/index.ts";
-import { defineRoute, defineTransform, http } from "../../packages/routes/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { defineEvent, defineEventFunction } from "relkit/events";
+import { defineFunction } from "relkit/functions";
+import { defineService } from "relkit/services";
+import { defineRoute, defineTransform, http } from "relkit/routes";
+import { z } from "relkit/schema";
 import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
 
 const input = z.object({ id: z.string() });

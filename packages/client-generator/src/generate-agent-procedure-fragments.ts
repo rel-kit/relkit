@@ -7,9 +7,9 @@ import {
 } from "./generate-type-syntax.js";
 /** Identity field included in each agent protocol request. */
 export const expectedIdentity =
-  'readonly expectedIdentity?: import("@relkit/contracts").ExpectedClientIdentity';
+  'readonly expectedIdentity?: import("relkit/contracts").ExpectedClientIdentity';
 /** Optional operation identifier included in agent run and control requests. */
-export const operationId = 'readonly operationId?: import("@relkit/contracts").OperationId';
+export const operationId = 'readonly operationId?: import("relkit/contracts").OperationId';
 /** Joins rendered alternatives into a TypeScript union.
  * @param values - Already rendered type alternatives.
  * @returns An Effect yielding their union, or `never` for an empty list; it has no expected failure.
@@ -83,18 +83,18 @@ export const agentProtocolTypesEffect = Effect.fnUntraced(function* () {
   const property = renderTypePropertyEffect;
   const object = renderTypeObjectEffect;
   const threadList = yield* object([
-    yield* property("threads", 'readonly import("@relkit/contracts").ThreadListItem[]'),
+    yield* property("threads", 'readonly import("relkit/contracts").ThreadListItem[]'),
   ]);
   const runReceipt = yield* renderTypeUnionEffect([
     yield* object([
-      yield* property("operationId", 'import("@relkit/contracts").OperationId'),
+      yield* property("operationId", 'import("relkit/contracts").OperationId'),
       yield* property("threadId", "string"),
       yield* property("runId", "string"),
       yield* property("status", '"accepted"'),
       yield* property("duplicate", "boolean"),
     ]),
     yield* object([
-      yield* property("operationId", 'import("@relkit/contracts").OperationId'),
+      yield* property("operationId", 'import("relkit/contracts").OperationId'),
       yield* property("threadId", "string"),
       yield* property("interruptedRunId", "string"),
       yield* property("runId", "string"),
@@ -104,24 +104,24 @@ export const agentProtocolTypesEffect = Effect.fnUntraced(function* () {
     ]),
   ]);
   const controlReceipt = yield* object([
-    yield* property("operationId", 'import("@relkit/contracts").OperationId'),
+    yield* property("operationId", 'import("relkit/contracts").OperationId'),
     yield* property("threadId", "string"),
     yield* property("runId", "string"),
-    yield* property("status", 'import("@relkit/contracts").ControlStatus'),
-    yield* property("effect", 'import("@relkit/contracts").ControlEffectOutcome'),
+    yield* property("status", 'import("relkit/contracts").ControlStatus'),
+    yield* property("effect", 'import("relkit/contracts").ControlEffectOutcome'),
     yield* property("duplicate", "boolean"),
   ]);
   const receiptFields = [
     yield* property("threadId", "string", { optional: true }),
     yield* property("runId", "string", { optional: true }),
-    yield* property("operationId", 'import("@relkit/contracts").OperationId'),
+    yield* property("operationId", 'import("relkit/contracts").OperationId'),
     yield* property("kind", '"agent-run" | "agent-control" | "continuation"', {
       optional: true,
     }),
     yield* property("requestDigest", "string"),
     expectedIdentity,
   ];
-  const receiptLookup = `import("@relkit/contracts").ReceiptLookup<${yield* object([
+  const receiptLookup = `import("relkit/contracts").ReceiptLookup<${yield* object([
     yield* property("threadId", "string"),
   ])}>`;
   return { threadList, runReceipt, controlReceipt, receiptFields, receiptLookup };

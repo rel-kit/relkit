@@ -1,5 +1,5 @@
-import { assertRuntimeIntegrationPlanVersion } from "@relkit/contracts";
-import { assertLocalServicePlanVersion } from "@relkit/local-service";
+import { assertRuntimeIntegrationPlanVersion } from "relkit/contracts";
+import { assertLocalServicePlanVersion } from "relkit/local-service";
 
 /**
  * Checks generated plan versions and graph identities before copying a local cohort.

@@ -3,7 +3,7 @@ import {
   DEPLOYMENT_INTEGRATION_PROTOCOL_VERSION,
   type DeploymentPlan,
   type InfrastructureOperationPlan,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 import {
   defineConnectionContract,
   defineIntegrationReference,
@@ -11,7 +11,7 @@ import {
   defineProviderAdapter,
   defineProviderBehavior,
   defineProviderCapability,
-} from "@relkit/provider";
+} from "relkit/provider";
 import { aws } from "./src/aws.ts";
 import { awsAccess } from "./src/access/index.ts";
 import { awsHost } from "./src/host/index.ts";

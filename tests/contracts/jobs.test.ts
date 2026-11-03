@@ -1,8 +1,8 @@
-import { createScheduler } from "../../packages/providers-local/src/index.ts";
+import { createScheduler } from "relkit/providers-local";
 import { createTestJob } from "../../packages/testing/src/index.ts";
-import type { InvocationContext } from "../../packages/engine/src/index.ts";
+import type { InvocationContext } from "relkit/engine";
 import { registerJobContractSuite, type JobContractTarget } from "./jobs.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { z } from "relkit/schema";
 
 const input = z.object({ orderId: z.string() });
 const output = z.object({ processed: z.boolean() });

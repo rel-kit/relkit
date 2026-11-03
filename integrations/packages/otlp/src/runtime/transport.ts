@@ -1,4 +1,4 @@
-import { canonicalJson, type JsonValue } from "@relkit/contracts";
+import { canonicalJson, type JsonValue } from "relkit/contracts";
 
 /** @experimental */
 export type OtlpSignal = "logs" | "traces";

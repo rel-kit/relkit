@@ -142,7 +142,7 @@ Defines a Redis-compatible cache adapter. Omit `url` for a deferred local or inf
 **Example**
 
 ```ts
-import { env } from "@relkit/app/config";
+import { env } from "relkit/config";
 import { redis } from "@relkit/redis";
 const cache = redis({ url: env.secret("CACHE_URL") });
 ```

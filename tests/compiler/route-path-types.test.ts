@@ -23,16 +23,16 @@ test("built declarations and editor findings reject missing inferred input while
   await writeFile(
     join(root, "src/users/service.ts"),
     `
-import { defineFunction } from "@relkit/app/functions";
-import { defineService } from "@relkit/app/services";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { defineService } from "relkit/services";
+import { z } from "relkit/schema";
 const example = defineFunction({ input: z.object({ value: z.string() }),
   output: z.object({ value: z.string() }), handler: async ({ value }) => ({ value }) });
 export default defineService({ functions: { example } });`,
   );
   const route = join(root, "src/routes/users/[id]/route.ts");
   const prefix = `import service from "../../../users/service.js";
-import { defineServiceRoutes, http, type ServiceRouteOptions } from "@relkit/app/routes";`;
+import { defineServiceRoutes, http, type ServiceRouteOptions } from "relkit/routes";`;
   await writeFile(
     join(root, ".relkit/generated/route-module-checks.ts"),
     generateRouteModuleChecks(["src/routes/users/[id]/route.ts"], root),

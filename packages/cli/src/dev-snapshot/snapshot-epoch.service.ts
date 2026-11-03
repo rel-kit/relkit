@@ -4,7 +4,7 @@
  * authority. Native callbacks only update witnesses and bounded event admission.
  */
 import { Context, Effect, Layer, Queue } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { DevSnapshotRejected, type DevSnapshotIoError } from "./snapshot-error.js";
 import { acquireSnapshotEpochWatch } from "./snapshot-epoch-watch.js";
 import type {

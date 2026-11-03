@@ -22,7 +22,7 @@ import type {
 } from "../jobs/job-registry-derived.types.js";
 import { useRelkitClient } from "./context.js";
 import { relkitJobKey } from "./keys.js";
-import { runExecutionPromise } from "@relkit/contracts/operation";
+import { runExecutionPromise } from "relkit/contracts/operation";
 import { mutationOperations, mutationRuntime } from "./mutation-runtime.js";
 import { pendingScopeKey } from "./pending.js";
 import { procedureUtils } from "./procedure.js";

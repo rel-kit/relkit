@@ -1,6 +1,6 @@
 /** Resolves declared package versions for selected scaffold dependencies using installed project metadata and the portable release catalog. */
 
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { dirname, join, resolve } from "node:path";
 import { Effect, Schema } from "effect";
 import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";

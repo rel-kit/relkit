@@ -1,12 +1,12 @@
-import type { MaybePromise } from "@relkit/contracts";
+import type { MaybePromise } from "relkit/contracts";
 import type {
   DependencyClientSources,
   FunctionRegistry,
   InvocationContext,
   InvocationHooks,
   InvocationIdSource,
-} from "@relkit/engine";
-import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
+} from "relkit/engine";
+import type { InferInput, InferOutput, StandardSchemaV1 } from "relkit/schema";
 
 /** Native function descriptor retaining input, output and dependency validation. */
 export interface StandaloneFunctionTarget {
@@ -14,9 +14,9 @@ export interface StandaloneFunctionTarget {
   readonly input: StandardSchemaV1;
   readonly output: StandardSchemaV1;
   readonly errors?: readonly { readonly id: string; readonly data: StandardSchemaV1 }[];
-  readonly dependencies?: import("@relkit/engine").DependencyDeclarations;
+  readonly dependencies?: import("relkit/engine").DependencyDeclarations;
   readonly publishes?: readonly string[];
-  readonly publications?: Readonly<Record<string, import("@relkit/engine").DependencyRefLike>>;
+  readonly publications?: Readonly<Record<string, import("relkit/engine").DependencyRefLike>>;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly handler: (...arguments_: readonly never[]) => MaybePromise<unknown>;

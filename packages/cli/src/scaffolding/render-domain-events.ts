@@ -1,7 +1,7 @@
 /** Plans event descriptors beneath the selected service and registers their imports and exports without creating a new domain boundary. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import {
   scaffoldErrors,

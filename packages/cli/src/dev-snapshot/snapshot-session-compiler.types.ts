@@ -1,7 +1,7 @@
 /** Compiler handoff consumes one validated immutable cohort and a still-owned input epoch. */
 import type { Effect, Scope } from "effect";
 import type { CandidateCompile, StartedCandidate } from "@relkit/supervisor";
-import type { RuntimeActivationFingerprint } from "@relkit/contracts";
+import type { RuntimeActivationFingerprint } from "relkit/contracts";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { DevCompilerOptions } from "../commands/dev-local.types.js";
 import type { ValidatedDevSnapshot } from "./snapshot.types.js";

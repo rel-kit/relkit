@@ -6,12 +6,12 @@ export const boundaryCases: readonly BoundaryCase[] = [
   {
     name: "undeclared dependencies",
     files: packageFiles([
-      { path: "packages/app", name: "@relkit/app", source: 'import "@relkit/config";' },
-      { path: "packages/config", name: "@relkit/config", source: "" },
+      { path: "packages/app", name: "relkit", source: 'import "relkit/config";' },
+      { path: "packages/relkit", name: "relkit/config", source: "" },
     ]),
     expected: {
-      path: "packages/app/src/index.ts",
-      owner: "@relkit/app",
+      path: "packages/relkit/src/app/index.ts",
+      owner: "relkit",
       rule: "undeclared-dependency",
     },
   },
@@ -20,14 +20,14 @@ export const boundaryCases: readonly BoundaryCase[] = [
     files: packageFiles([
       {
         path: "packages/app",
-        name: "@relkit/app",
+        name: "relkit",
         source: 'import "../../config/src/index";',
       },
-      { path: "packages/config", name: "@relkit/config", source: "" },
+      { path: "packages/relkit", name: "relkit/config", source: "" },
     ]),
     expected: {
-      path: "packages/app/src/index.ts",
-      owner: "@relkit/app",
+      path: "packages/relkit/src/app/index.ts",
+      owner: "relkit",
       rule: "cross-package-relative-import",
     },
   },
@@ -36,15 +36,15 @@ export const boundaryCases: readonly BoundaryCase[] = [
     files: packageFiles([
       {
         path: "packages/app",
-        name: "@relkit/app",
-        source: 'import "@relkit/runtime-effect";',
-        dependencies: { "@relkit/runtime-effect": "workspace:*" },
+        name: "relkit",
+        source: 'import "relkit/runtime-effect";',
+        dependencies: { "relkit/runtime-effect": "workspace:*" },
       },
-      { path: "packages/runtime-effect", name: "@relkit/runtime-effect", source: "" },
+      { path: "packages/relkit", name: "relkit/runtime-effect", source: "" },
     ]),
     expected: {
-      path: "packages/app/src/index.ts",
-      owner: "@relkit/app",
+      path: "packages/relkit/src/app/index.ts",
+      owner: "relkit",
       rule: "descriptor-runtime-import",
     },
   },
@@ -53,7 +53,7 @@ export const boundaryCases: readonly BoundaryCase[] = [
     files: packageFiles([
       {
         path: "packages/app",
-        name: "@relkit/app",
+        name: "relkit",
         source: 'import "@relkit/redis";',
         dependencies: { "@relkit/redis": "workspace:*" },
       },
@@ -61,7 +61,7 @@ export const boundaryCases: readonly BoundaryCase[] = [
     ]),
     expected: {
       path: "packages/app/package.json",
-      owner: "@relkit/app",
+      owner: "relkit",
       rule: "core-integration-dependency",
     },
   },
@@ -69,20 +69,20 @@ export const boundaryCases: readonly BoundaryCase[] = [
     name: "engine dependencies on local provider implementations",
     files: packageFiles([
       {
-        path: "packages/engine",
-        name: "@relkit/engine",
-        source: 'import "@relkit/providers-local";',
-        dependencies: { "@relkit/providers-local": "workspace:*" },
+        path: "packages/relkit",
+        name: "relkit/engine",
+        source: 'import "relkit/providers-local";',
+        dependencies: { "relkit/providers-local": "workspace:*" },
       },
       {
-        path: "packages/providers-local",
-        name: "@relkit/providers-local",
+        path: "packages/relkit",
+        name: "relkit/providers-local",
         source: "",
       },
     ]),
     expected: {
-      path: "packages/engine/package.json",
-      owner: "@relkit/engine",
+      path: "packages/relkit/package.json",
+      owner: "relkit/engine",
       rule: "engine-local-provider-dependency",
     },
   },
@@ -92,10 +92,10 @@ export const boundaryCases: readonly BoundaryCase[] = [
       {
         path: "integrations/packages/redis",
         name: "@relkit/redis",
-        source: 'import "@relkit/app";',
-        dependencies: { "@relkit/app": "workspace:*" },
+        source: 'import "relkit";',
+        dependencies: { relkit: "workspace:*" },
       },
-      { path: "packages/app", name: "@relkit/app", source: "" },
+      { path: "packages/app", name: "relkit", source: "" },
     ]),
     expected: {
       path: "integrations/packages/redis/package.json",
@@ -109,10 +109,10 @@ export const boundaryCases: readonly BoundaryCase[] = [
       {
         path: "integrations/catalog",
         name: "@relkit/integrations",
-        source: 'import "@relkit/provider";',
-        dependencies: { "@relkit/provider": "workspace:*" },
+        source: 'import "relkit/provider";',
+        dependencies: { "relkit/provider": "workspace:*" },
       },
-      { path: "packages/provider", name: "@relkit/provider", source: "" },
+      { path: "packages/relkit", name: "relkit/provider", source: "" },
     ]),
     expected: {
       path: "integrations/catalog/package.json",
@@ -124,19 +124,19 @@ export const boundaryCases: readonly BoundaryCase[] = [
     name: `graph imports ${dependency}`,
     files: packageFiles([
       {
-        path: "packages/graph",
-        name: "@relkit/graph",
+        path: "packages/relkit",
+        name: "relkit/graph",
         source: `import "${dependency}";`,
         dependencies: { [dependency]: "test" },
       },
     ]),
     expected: {
-      path: "packages/graph/src/index.ts",
-      owner: "@relkit/graph",
+      path: "packages/relkit/src/graph/index.ts",
+      owner: "relkit/graph",
       rule: "graph-hono-pulumi-import",
     },
   })),
-  ...["@relkit/app", "@relkit/engine"].map((dependency) => ({
+  ...["relkit", "relkit/engine"].map((dependency) => ({
     name: `inspector imports ${dependency}`,
     files: packageFiles([
       {

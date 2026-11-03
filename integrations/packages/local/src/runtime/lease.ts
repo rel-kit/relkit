@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { isStableId } from "@relkit/contracts";
+import { isStableId } from "relkit/contracts";
 import { localProjectLabels, type LocalProjectIdentity } from "./identity.js";
 import {
   ensureLeaseDirectory,

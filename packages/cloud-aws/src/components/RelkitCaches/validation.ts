@@ -1,4 +1,4 @@
-import { normalizeId } from "@relkit/contracts";
+import { normalizeId } from "relkit/contracts";
 import type * as pulumi from "@pulumi/pulumi";
 import type { RelkitCacheDefinition, RelkitCachesArgs } from "./types.js";
 

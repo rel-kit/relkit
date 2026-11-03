@@ -2,7 +2,7 @@ import type {
   ProviderAdapterProjection,
   ProviderConnectionFieldProjection,
   ProviderNamedValueProjection,
-} from "@relkit/graph";
+} from "relkit/graph";
 import { clean } from "./normalize-graph-utils.js";
 import { isRecord } from "./normalize-utils.js";
 

@@ -3,8 +3,8 @@
  * shared layout, reports conflicts and checks each evidenced public boundary.
  * Direct descriptor-only normalization remains independent of application files.
  */
-import { selectApplicationLayout, type ApplicationLayout } from "@relkit/contracts";
-import { createDiagnostic } from "@relkit/diagnostics";
+import { selectApplicationLayout, type ApplicationLayout } from "relkit/contracts";
+import { createDiagnostic } from "relkit/diagnostics";
 import { Effect } from "effect";
 import { observeCompiler } from "./observability.js";
 import { discoverApplicationLayoutEffect } from "./discovery/application-layout.js";

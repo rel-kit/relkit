@@ -28,10 +28,10 @@ function scope(path: string, manifest: NonNullable<Scope["manifest"]>): Scope {
 }
 
 test("development fixtures do not install engine provider implementations", () => {
-  const path = "packages/engine";
+  const path = "packages/relkit";
   const manifest = {
-    name: "@relkit/engine",
-    devDependencies: { "@relkit/providers-local": "workspace:*" },
+    name: "relkit/engine",
+    devDependencies: { "relkit/providers-local": "workspace:*" },
   };
   expect(dependencyDirectionViolations("/repo", [scope(path, manifest)])).toEqual([]);
   expect(
@@ -44,8 +44,8 @@ test("development fixtures do not install engine provider implementations", () =
 test("core native peers must be explicitly optional instead of installed runtime edges", () => {
   const native = scope("integrations/packages/langchain", { name: "@relkit/langchain" });
   const peerDependencies = { "@relkit/langchain": "workspace:*" };
-  const owner = scope("packages/runtime-hono", {
-    name: "@relkit/runtime-hono",
+  const owner = scope("packages/relkit", {
+    name: "relkit/runtime-hono",
     peerDependencies,
     peerDependenciesMeta: { "@relkit/langchain": { optional: true } },
   });
@@ -61,7 +61,7 @@ test("core native peers must be explicitly optional instead of installed runtime
 test("native engines own only their enumerated implementations", () => {
   const native = scope("integrations/packages/langchain", {
     name: "@relkit/langchain",
-    dependencies: { "@relkit/functions": "workspace:*", "@relkit/schema": "workspace:*" },
+    dependencies: { relkit: "workspace:*" },
   });
   const pulumi = scope("integrations/packages/pulumi", {
     name: "@relkit/pulumi",
@@ -70,7 +70,7 @@ test("native engines own only their enumerated implementations", () => {
   expect(dependencyDirectionViolations("/repo", [native, pulumi])).toEqual([]);
   const redis = scope("integrations/packages/redis", {
     name: "@relkit/redis",
-    dependencies: { "@relkit/functions": "workspace:*" },
+    dependencies: { relkit: "workspace:*", "@relkit/deploy-pulumi": "workspace:*" },
   });
   expect(dependencyDirectionViolations("/repo", [redis])).toMatchObject([
     { rule: "integration-non-protocol-dependency" },

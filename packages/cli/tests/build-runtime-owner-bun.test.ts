@@ -31,23 +31,21 @@ for (const development of [false, true]) {
           expect(started.exitCode, started.stdout + started.stderr).toBe(0);
           expect(started.stdout.split("\n")[0]).toBe('["mcp","ag-ui","scalar"]');
           yield* ownedNativePromise("test.runtimeLinks", async () => {
-            expect(await readdir(join(activated, "node_modules/@relkit"))).toEqual([
-              "runtime-hono",
-            ]);
-            expect(
-              (await lstat(join(activated, "node_modules/@relkit/runtime-hono"))).isSymbolicLink(),
-            ).toBe(true);
+            expect(await readdir(join(activated, "node_modules"))).toEqual(["relkit"]);
+            expect((await lstat(join(activated, "node_modules/relkit"))).isSymbolicLink()).toBe(
+              true,
+            );
           });
         }),
       ).pipe(Effect.provide(processLayer)),
     ));
 }
 
-const source = `import { selectedHttpCapabilities } from "@relkit/runtime-hono/internal/prepared";
+const source = `import { selectedHttpCapabilities } from "relkit/runtime-hono/internal/prepared";
 console.log(JSON.stringify(selectedHttpCapabilities({mcp:{enabled:true},agUi:true,apiDocs:{ui:"scalar",mode:"production",enabledInProduction:true}})));
-console.log(import.meta.resolve("@relkit/runtime-hono/mcp"));
-console.log(import.meta.resolve("@relkit/runtime-hono/ag-ui"));
-console.log(import.meta.resolve("@relkit/runtime-hono/scalar"));
+console.log(import.meta.resolve("relkit/runtime-hono/mcp"));
+console.log(import.meta.resolve("relkit/runtime-hono/ag-ui"));
+console.log(import.meta.resolve("relkit/runtime-hono/scalar"));
 `;
 
 /** Runs the copied production bundler with the real selected external owner.
@@ -57,10 +55,10 @@ console.log(import.meta.resolve("@relkit/runtime-hono/scalar"));
  */
 function bundleSource(helper: string, server: string, root: string, development: boolean): string {
   return `import { Effect, Layer } from "effect";
-import { DependencySourceLive } from "@relkit/provider/internal/dependencies";
+import { DependencySourceLive } from "relkit/provider/internal/dependencies";
 import { bundleServerEffect } from ${JSON.stringify(join(helper, "commands/build-support.ts"))};
 import { fileSystemLayer } from ${JSON.stringify(join(helper, "services/filesystem.service.ts"))};
 import { processLayer } from ${JSON.stringify(join(helper, "services/process.service.ts"))};
 import { cleanupLayer } from ${JSON.stringify(join(helper, "services/cleanup.service.ts"))};
-await Effect.runPromise(bundleServerEffect(${JSON.stringify(server)}, ${JSON.stringify(root)}, ${development}, undefined, ["@relkit/runtime-hono"]).pipe(Effect.provide(Layer.mergeAll(fileSystemLayer, processLayer, cleanupLayer, DependencySourceLive))));`;
+await Effect.runPromise(bundleServerEffect(${JSON.stringify(server)}, ${JSON.stringify(root)}, ${development}, undefined, ["relkit"]).pipe(Effect.provide(Layer.mergeAll(fileSystemLayer, processLayer, cleanupLayer, DependencySourceLive))));`;
 }

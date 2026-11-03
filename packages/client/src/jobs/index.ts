@@ -10,7 +10,7 @@ export type {
   RunRetryReceipt,
   RunSnapshot,
   RunWatchFrame,
-} from "@relkit/contracts/jobs";
+} from "relkit/contracts/jobs";
 
 export type * from "./contracts.types.js";
 

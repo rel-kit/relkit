@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { defineTool, ToolArgumentValidationError, invokeTool } from "@relkit/tools";
+import { defineTool, ToolArgumentValidationError, invokeTool } from "relkit/tools";
 import {
   engineForTarget,
   harness,

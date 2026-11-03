@@ -2,7 +2,7 @@ import type {
   ObservabilityStreamEventType,
   ObservabilityStreamOverflow,
   ObservabilityStreamSubscriptionOptions,
-} from "@relkit/observability";
+} from "relkit/observability";
 
 /** Native SSE replay cursor, type filter and bounded live feed buffer request. */
 export type StreamRequest = Omit<

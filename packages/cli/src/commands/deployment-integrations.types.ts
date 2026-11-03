@@ -1,4 +1,4 @@
-import type { DeploymentIntegrationMetadata } from "@relkit/deploy";
+import type { DeploymentIntegrationMetadata } from "relkit/deploy";
 import type { ModuleNamespace } from "../services/modules.types.js";
 
 /** Accepted package resolution and original native module namespace. */

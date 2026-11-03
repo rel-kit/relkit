@@ -23,7 +23,7 @@ export default defineBetterAuthService({
  * @returns TypeScript exporting the auth handler as an ALL route.
  */
 export function authRouteSource(servicePath: string): string {
-  return `import { defineRoute } from "@relkit/app/routes";
+  return `import { defineRoute } from "relkit/routes";
 import auth from "@app/${servicePath.replace(/^src\//, "").replace(/\.ts$/, ".js")}";
 
 export const ALL = defineRoute({ handler: auth.handler });

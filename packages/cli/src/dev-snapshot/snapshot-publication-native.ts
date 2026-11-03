@@ -8,7 +8,7 @@ import { lstat, mkdir, mkdtemp, open, realpath, rename, rm } from "node:fs/promi
 import { join } from "node:path";
 import { Context, Effect, Layer, Schema } from "effect";
 import { mapErrorCause } from "../services/map-error-cause.js";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import { ownedNativePromise } from "../services/owned-promise.js";
 import { cliOriginalError } from "../cli-errors.js";
 import { DevSnapshotIoError, DevSnapshotRejected } from "./snapshot-error.js";

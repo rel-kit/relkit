@@ -1,8 +1,5 @@
 import { createTestRuntime } from "../../packages/testing/src/index.ts";
-import {
-  createLocalCacheProviderForTest,
-  type LocalCacheProvider,
-} from "../../packages/providers-local/src/index.ts";
+import { createLocalCacheProviderForTest, type LocalCacheProvider } from "relkit/providers-local";
 import { registerCacheContractSuite, type CacheContractTarget } from "./cache.ts";
 
 const localCache: CacheContractTarget = {

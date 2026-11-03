@@ -1,5 +1,5 @@
 /** Native application service ownership and replaceable activation dependencies. */
-import type { HttpAuthRuntime } from "@relkit/runtime-hono";
+import type { HttpAuthRuntime } from "relkit/runtime-hono";
 import type { TestRoute } from "./application-routes.js";
 import type { TestRuntime, TestRuntimeOptions } from "./runtime.types.js";
 

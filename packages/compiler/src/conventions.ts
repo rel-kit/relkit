@@ -13,8 +13,8 @@ import type {
   ConventionCheckOptions,
   KindRule,
 } from "./conventions.types.js";
-import type { DescriptorKind } from "@relkit/contracts";
-import type { Diagnostic } from "@relkit/diagnostics";
+import type { DescriptorKind } from "relkit/contracts";
+import type { Diagnostic } from "relkit/diagnostics";
 
 export { CONVENTION_CODES } from "./convention-findings.js";
 export type {

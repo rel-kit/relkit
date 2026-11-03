@@ -6,7 +6,7 @@ import {
   LOCAL_SERVICE_PLAN_VERSION,
   type LocalServicePlan,
   type LocalServicePlanEntry,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 
 /**
  * Projects selected local provider services and their dependants.

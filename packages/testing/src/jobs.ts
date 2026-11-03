@@ -1,6 +1,6 @@
 import { Context, Effect, Layer, ManagedRuntime } from "effect";
-import { observeExecution, runExecutionPromise } from "@relkit/contracts/operation";
-import type { JsonValue } from "@relkit/contracts";
+import { observeExecution, runExecutionPromise } from "relkit/contracts/operation";
+import type { JsonValue } from "relkit/contracts";
 import { createTestJobRuntime } from "./job-runtime.js";
 import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
 import type { TestJobCloseOptions, TestJobFake, TestJobOptions } from "./jobs-types.js";

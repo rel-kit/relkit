@@ -2,7 +2,7 @@
 
 import { Context, Effect, Layer } from "effect";
 
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 import {
   ADD_FAILURE_CODES,

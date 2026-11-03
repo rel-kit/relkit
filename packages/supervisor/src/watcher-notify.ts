@@ -1,4 +1,4 @@
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { Effect, Ref, Schema } from "effect";
 import { SourceVersionSchema } from "./watcher.schemas.js";
 import type { WatcherState, SupervisorSourceChange } from "./watcher.types.js";

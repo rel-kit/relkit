@@ -1,4 +1,4 @@
-import { normalizeLocalServiceRecipe, type LocalServiceRecipeInput } from "@relkit/local-service";
+import { normalizeLocalServiceRecipe, type LocalServiceRecipeInput } from "relkit/local-service";
 
 export function environmentFile(
   recipe: LocalServiceRecipeInput,

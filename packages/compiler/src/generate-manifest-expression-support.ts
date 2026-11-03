@@ -1,5 +1,5 @@
-import { SourceLocationError, canCarryStandardSchema } from "@relkit/contracts";
-import { normalizeSourcePath } from "@relkit/contracts";
+import { SourceLocationError, canCarryStandardSchema } from "relkit/contracts";
+import { normalizeSourcePath } from "relkit/contracts";
 import type { EvaluatorManifestReference } from "./discovery/evaluator-protocol.js";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import { generatedAgentMarker, isRecord, type ImportBinding } from "./generate-manifest-utils.js";

@@ -1,5 +1,5 @@
-import type { RunListQuery, RunPage, RunSnapshot } from "@relkit/contracts/jobs";
-import type { NativeLocator, OperationContext } from "@relkit/jobs/adapter";
+import type { RunListQuery, RunPage, RunSnapshot } from "relkit/contracts/jobs";
+import type { NativeLocator, OperationContext } from "relkit/jobs/adapter";
 import {
   rememberInngestRecord,
   snapshot,

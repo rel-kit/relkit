@@ -1,9 +1,9 @@
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { runInspectorPromise as runExecutionPromise } from "../native-edge.js";
 import { InspectorNativeJobs, inspectorNativeJobsExecution } from "./native.service.js";
 import { nativeAttempt } from "../native-edge.js";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { InspectorJobsError, type InspectorJobsServices } from "./types.js";
 import { isRecord, pick, safeJson, type ResolvedActiveGeneration } from "../shared.js";
 import type { JobDefinitionRecord } from "./definitions.js";

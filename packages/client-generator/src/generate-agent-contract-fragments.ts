@@ -147,7 +147,7 @@ export const waitingTypeEffect = Effect.fnUntraced(function* (
   const types: string[] = [];
   for (const waiting of contract?.waiting ?? [])
     types.push(
-      `{ readonly node: ${waiting.scope.kind === "dynamic" ? "string" : JSON.stringify(waiting.scope.id)}; readonly value?: unknown; readonly response: import("@relkit/contracts").JsonValue }`,
+      `{ readonly node: ${waiting.scope.kind === "dynamic" ? "string" : JSON.stringify(waiting.scope.id)}; readonly value?: unknown; readonly response: import("relkit/contracts").JsonValue }`,
     );
   return yield* agentTypeUnionEffect(types);
 });

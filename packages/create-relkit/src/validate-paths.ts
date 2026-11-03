@@ -2,7 +2,7 @@ import { basename, dirname, isAbsolute, join, relative, resolve } from "node:pat
 
 import { Effect } from "effect";
 
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 import { GeneratorPaths } from "./generator-paths.js";
 

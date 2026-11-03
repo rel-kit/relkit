@@ -1,6 +1,6 @@
 import { ORPCError } from "@orpc/client";
-import type { ThreadSnapshot } from "@relkit/contracts";
-import { observeExecution } from "@relkit/contracts/operation";
+import type { ThreadSnapshot } from "relkit/contracts";
+import { observeExecution } from "relkit/contracts/operation";
 import { Context, Effect, Layer } from "effect";
 import { nativeCall } from "../native-stream.js";
 import { observeAgent } from "./agent-observation-effect.js";

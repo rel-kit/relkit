@@ -1,6 +1,6 @@
 /** Reads a snapshot address and decoded receipt before granting cohort authority. */
 import { join } from "node:path";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import { Effect, Schema } from "effect";
 import { SnapshotPointer } from "./snapshot.schemas.js";
 import { decodeSnapshotEffect, MAX_SNAPSHOT_RECEIPT_BYTES } from "./snapshot-decode.js";

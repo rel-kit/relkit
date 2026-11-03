@@ -4,7 +4,7 @@
  * handles and worker lifetimes remain owned by this storage package.
  */
 import { Schema } from "effect";
-import { ObservabilityQueryError } from "@relkit/observability";
+import { ObservabilityQueryError } from "relkit/observability";
 /**
  * Invalid local query input reported through the Effect error channel.
  *

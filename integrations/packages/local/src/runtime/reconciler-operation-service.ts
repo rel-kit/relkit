@@ -3,8 +3,8 @@ import type {
   LocalServicePlanEntry,
   LocalServiceRecipeInput,
   NormalizedLocalServiceRecipe,
-} from "@relkit/local-service";
-import { normalizeLocalServiceRecipe } from "@relkit/local-service";
+} from "relkit/local-service";
+import { normalizeLocalServiceRecipe } from "relkit/local-service";
 import type {
   LocalServiceReconcileRequest,
   LocalServiceReconcilerOptions,

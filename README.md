@@ -34,17 +34,17 @@ bun add @relkit/app
 
 Application code can import the root API or focused typed paths:
 
-- `@relkit/app/schema`
-- `@relkit/app/config`
-- `@relkit/app/routes`
-- `@relkit/app/functions`
-- `@relkit/app/events`
-- `@relkit/app/agents`
-- `@relkit/app/jobs`
-- `@relkit/app/cache`
-- `@relkit/app/tools`
-- `@relkit/app/buckets`
-- `@relkit/app/services`
+- `relkit/schema`
+- `relkit/config`
+- `relkit/routes`
+- `relkit/functions`
+- `relkit/events`
+- `relkit/agents`
+- `relkit/jobs`
+- `relkit/cache`
+- `relkit/tools`
+- `relkit/buckets`
+- `relkit/services`
 
 Optional integrations such as `@relkit/client`, `@relkit/drizzle`,
 `@relkit/better-auth`, `@relkit/langchain`, providers, testing, the Inspector and CLI remain separate so the
@@ -190,7 +190,7 @@ release pull request, auto-merges it after `CI Gate`, and publishes through a
 separate GitHub release workflow using npm trusted publishing. Documentation
 and internal chores outside release paths merge without a release.
 
-`@relkit/app`, `create-relkit`, `relkit`, and the explicitly documented optional
+`relkit`, `create-relkit`, and the explicitly documented optional
 integrations are supported public entry points. Packages described as
 unsupported internals are published only so workspace dependencies remain
 resolvable; application code should not depend on them directly.

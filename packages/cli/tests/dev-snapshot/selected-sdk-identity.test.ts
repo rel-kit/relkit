@@ -1,7 +1,7 @@
 /** Verifies selected SDK manifest identity remains mutable after preparation. */
 import { expect, it } from "@effect/vitest";
-import { canonicalJson } from "@relkit/contracts";
-import { DependencySource } from "@relkit/provider/internal/dependencies";
+import { canonicalJson } from "relkit/contracts";
+import { DependencySource } from "relkit/provider/internal/dependencies";
 import { Cause, Effect, Exit, Layer } from "effect";
 import {
   SnapshotDependencies,

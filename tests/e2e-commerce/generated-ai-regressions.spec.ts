@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { AGENT_CAPABILITY_VALUE } from "../../packages/contracts/src/version.ts";
+import { AGENT_CAPABILITY_VALUE } from "../../packages/relkit/src/contracts/version.ts";
 
 test("generated dev host admits its browser origin and classifies malformed AI input", async ({
   page,

@@ -9,7 +9,7 @@ import { observeCompiler } from "./observability.js";
 import { RuntimeIntegrationImportFailure } from "./runtime-integration-errors.js";
 export { RuntimeIntegrationImportFailure } from "./runtime-integration-errors.js";
 import type { RuntimeModuleImport } from "./runtime-integration-imports.types.js";
-import type { RuntimeIntegrationPlan } from "@relkit/contracts";
+import type { RuntimeIntegrationPlan } from "relkit/contracts";
 
 /**
  * Renders static imports for the selected runtime integrations.
@@ -57,7 +57,7 @@ export const generateRuntimeIntegrationImportsEffect = Effect.fn(
     // Match the emitted module's native import ancestry after production relocation.
     const preflight = `import { Effect } from "effect";
 import { fileURLToPath } from "node:url";
-import { checkIntegrationDependencies, SelectedDependenciesLive, initializeIntegration } from "@relkit/app/internal/runtime";
+import { checkIntegrationDependencies, SelectedDependenciesLive, initializeIntegration } from "relkit/internal/runtime";
 await Effect.runPromise(checkIntegrationDependencies(${sourceJson(JSON.stringify(selectedPlan))}, { projectRoot: fileURLToPath(new URL(".", import.meta.url)), phase: "runtime" }).pipe(Effect.provide(SelectedDependenciesLive)));
 `;
     return `${preflight}${imports.join("\n")}\n\nexport const runtimeIntegrationModules = [\n${entries.join("\n")}\n] as const;\n`;

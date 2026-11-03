@@ -14,7 +14,7 @@ export async function linkWorkspacePackages(projectRoot: string): Promise<void> 
     const manifest = JSON.parse(await readFile(join(repositoryRoot, manifestPath), "utf8")) as {
       readonly name?: string;
     };
-    if (manifest.name?.startsWith("@relkit/"))
+    if (manifest.name === "relkit" || manifest.name?.startsWith("@relkit/"))
       await symlink(
         dirname(join(repositoryRoot, manifestPath)),
         join(projectRoot, "node_modules", manifest.name),

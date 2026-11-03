@@ -7,7 +7,7 @@ import {
   observeExecution,
   runExecutionPromise,
   runExecutionSync,
-} from "@relkit/contracts/operation";
+} from "relkit/contracts/operation";
 import { disposeTestingOwner, testingLoggerLayer } from "@relkit/testing/internal/testing-owner";
 import { combineSignals } from "@relkit/testing/internal/runtime-clock";
 import type { AgentHarnessService } from "./agent-harness.types.js";
@@ -75,7 +75,7 @@ export function testAgentLayer<Agent extends TestAgentDescriptor>(
                     const signals = combineSignals(invocation?.signal, signal);
                     try {
                       return await value.invoke(
-                        input as import("@relkit/schema").InferInput<Agent["input"]>,
+                        input as import("relkit/schema").InferInput<Agent["input"]>,
                         { ...invocation, signal: signals.signal },
                       );
                     } finally {
@@ -117,7 +117,7 @@ export function createTestAgent<Agent extends TestAgentDescriptor>(
   return Object.freeze({
     ...service.value,
     invoke: (
-      input: import("@relkit/schema").InferInput<Agent["input"]>,
+      input: import("relkit/schema").InferInput<Agent["input"]>,
       options?: TestAgentInvocationOptions,
     ) => runExecutionPromise(owner, service.invoke(input, options)),
     close: () => (closing ??= disposeTestingOwner(owner)),

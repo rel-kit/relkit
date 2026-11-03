@@ -2,8 +2,8 @@
  * Proves that generic descriptors still execute natively and ordinary execution
  * avoids the optional DeepAgents loader. Installed-module failures retain identity.
  */
-import { defineAgent } from "@relkit/agents";
-import { z } from "@relkit/schema";
+import { defineAgent } from "relkit/agents";
+import { z } from "relkit/schema";
 import { Effect, Layer, Result } from "effect";
 import { expect, test } from "vitest";
 import { invokeAgent } from "../src/runtime.js";

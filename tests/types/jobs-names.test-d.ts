@@ -1,6 +1,6 @@
-import { defineJob } from "@relkit/app/jobs";
-import { defineTask } from "@relkit/app/tasks";
-import { defineError, defineFunction } from "@relkit/app/functions";
+import { defineJob } from "relkit/jobs";
+import { defineTask } from "relkit/tasks";
+import { defineError, defineFunction } from "relkit/functions";
 import type {
   TaskCallerInput,
   TaskCanonicalInput,
@@ -12,12 +12,12 @@ import type {
   TaskStreamOutput,
   TaskSuccessHook,
   TaskValidatedOutput,
-} from "@relkit/app/tasks";
-import type { JobsAdapterRuntime } from "@relkit/jobs/adapter";
-import type { TaskRef } from "@relkit/contracts/jobs";
-import type { RunWithJobsConfig, TriggerOptions } from "@relkit/jobs/server";
-import { defineJob as defineLegacyJob } from "@relkit/jobs/legacy";
-import { z } from "@relkit/schema";
+} from "relkit/tasks";
+import type { JobsAdapterRuntime } from "relkit/jobs/adapter";
+import type { TaskRef } from "relkit/contracts/jobs";
+import type { RunWithJobsConfig, TriggerOptions } from "relkit/jobs/server";
+import { defineJob as defineLegacyJob } from "relkit/jobs/legacy";
+import { z } from "relkit/schema";
 
 const input = z.object({ id: z.string(), tenantId: z.string() });
 const output = z.object({ accepted: z.literal(true) });

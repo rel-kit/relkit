@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@relkit/deploy-pulumi": "workspace:*",
-    "@relkit/deploy": "workspace:*"
+    "relkit": "workspace:*"
   },
   "peerDependencies": {
     "@pulumi/pulumi": "catalog:"

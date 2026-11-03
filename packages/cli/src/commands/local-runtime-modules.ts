@@ -1,10 +1,10 @@
 import { pathToFileURL } from "node:url";
 import { Effect, Layer, Schema } from "effect";
-import type { RuntimeIntegrationPlan } from "@relkit/contracts";
+import type { RuntimeIntegrationPlan } from "relkit/contracts";
 import {
   normalizeLocalServiceRecipeEffect,
   type LocalServiceRecipeInput,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import { cliAdapterError, cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliCompiler, compilerLayer } from "../services/compiler.service.js";

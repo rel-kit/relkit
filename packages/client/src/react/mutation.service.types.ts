@@ -1,4 +1,4 @@
-import type { PendingOperationMetadata } from "@relkit/contracts";
+import type { PendingOperationMetadata } from "relkit/contracts";
 import type { Effect } from "effect";
 import type { PendingReferences, PendingRememberOptions } from "./pending.types.js";
 /** Accepted-work submission authority shared by finite and job React adapters. */

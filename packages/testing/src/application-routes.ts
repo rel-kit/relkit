@@ -12,8 +12,8 @@ import {
   parseRouteFilePath,
   type ParsedRouteFilePath,
 } from "@relkit/compiler";
-import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
-import { canCarryStandardSchema } from "@relkit/contracts";
+import { getJsonSchema, type StandardSchemaV1 } from "relkit/schema";
+import { canCarryStandardSchema } from "relkit/contracts";
 
 const methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ALL"] as const;
 

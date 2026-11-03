@@ -1,4 +1,4 @@
-import type { TaskExecutor } from "@relkit/jobs/adapter";
+import type { TaskExecutor } from "relkit/jobs/adapter";
 import { Effect, Layer, ManagedRuntime, Schema } from "effect";
 import { Job, Worker } from "effect-mq";
 import { createEffectMqJob, type EffectMqJobDefinition } from "../job.js";

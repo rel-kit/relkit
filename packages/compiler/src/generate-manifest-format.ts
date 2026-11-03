@@ -8,7 +8,7 @@ import {
   MANIFEST_VERSION,
   RUNTIME_INTEGRATION_PLAN_FILE,
   RUNTIME_INTEGRATION_PLAN_VERSION,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import type { ImportBinding } from "./generate-manifest-utils.js";
 
@@ -111,15 +111,15 @@ function frameworkImports(
   return [
     'import runtimeActivationFingerprint from "./runtime-activation.json" with { type: "json" };',
     identityBindings.length > 0
-      ? 'import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/app/internal/runtime";'
+      ? 'import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "relkit/internal/runtime";'
       : "",
     [...functions.values()].some((value) =>
       value.startsWith("__relkit_createGeneratedAgentFunction("),
     )
-      ? 'import { createGeneratedAgentFunction as __relkit_createGeneratedAgentFunction } from "@relkit/app/agents";'
+      ? 'import { createGeneratedAgentFunction as __relkit_createGeneratedAgentFunction } from "relkit/agents";'
       : "",
     [...targets.values()].some((value) => value.startsWith("__relkit_bindFunctionEvents("))
-      ? 'import { bindFunctionEvents as __relkit_bindFunctionEvents } from "@relkit/app/events";'
+      ? 'import { bindFunctionEvents as __relkit_bindFunctionEvents } from "relkit/events";'
       : "",
   ]
     .filter(Boolean)

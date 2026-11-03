@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
 import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
-import { defineEvent, defineEventFunction } from "../../packages/events/src/index.ts";
-import { defineFunction } from "../../packages/functions/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { defineEvent, defineEventFunction } from "relkit/events";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 
 const event = defineEvent({ id: "order_created", input: z.object({ orderId: z.string() }) });
 const consumer = defineEventFunction({

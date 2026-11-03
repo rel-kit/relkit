@@ -1,6 +1,6 @@
 import { expect, it } from "@effect/vitest";
 import { Cause, Deferred, Effect, Exit, Fiber, Layer } from "effect";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
 import { CandidatePlatform } from "../../src/candidate-platform.js";
 import { createCandidateLayer, SupervisorCandidate } from "../../src/candidate-service.js";
 import { captureOutputLines } from "../../src/output-lines.js";

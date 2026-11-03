@@ -6,7 +6,7 @@ import { drizzle } from "drizzle-orm/bun-sqlite";
 import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
 import { defineDrizzleService } from "@relkit/drizzle";
 import { defineBetterAuthService } from "@relkit/better-auth";
-import { defineRoute } from "@relkit/routes";
+import { defineRoute } from "relkit/routes";
 
 const records = sqliteTable("records", { id: integer().primaryKey() });
 export const clients: Database[] = [];

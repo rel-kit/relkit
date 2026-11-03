@@ -1,4 +1,4 @@
-import type { LogRecord } from "@relkit/runtime-effect";
+import type { LogRecord } from "relkit/runtime-effect";
 import { devLogDetails } from "./dev-log-details.js";
 import type { DevLogFormatOptions } from "./dev-log-format.types.js";
 export type { DevLogFormatOptions } from "./dev-log-format.types.js";

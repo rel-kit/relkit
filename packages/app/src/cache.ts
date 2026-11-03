@@ -1,1 +1,1 @@
-export * from "@relkit/cache";
+export * from "relkit/cache";

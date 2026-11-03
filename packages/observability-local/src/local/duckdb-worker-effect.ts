@@ -8,7 +8,7 @@ import { observeDuckdb } from "./duckdb-metrics.js";
 import { closeDuckdbWorkerDatabase, executeDuckdbWorkerCommand } from "./duckdb-worker-database.js";
 import type { DuckdbWorkerEffects } from "./duckdb-worker.types.js";
 import type { DuckdbWorkerState } from "./duckdb-worker-state.types.js";
-import type { LocalWorkerCommand } from "@relkit/observability/local/record";
+import type { LocalWorkerCommand } from "relkit/observability/local/record";
 
 /** Injectable command executor whose owner must close its database. */
 export class DuckdbWorkerService extends Context.Service<

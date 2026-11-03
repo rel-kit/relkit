@@ -2,7 +2,7 @@
 import { Effect } from "effect";
 import { ProductionManifest } from "../commands/build-production.schemas.js";
 import { DevSnapshotRejected } from "./snapshot-error.js";
-import type { DependencySourceContract } from "@relkit/provider/internal/dependencies";
+import type { DependencySourceContract } from "relkit/provider/internal/dependencies";
 import type { SnapshotFileOperations } from "./snapshot-files.types.js";
 import type { DevSnapshot } from "./snapshot.types.js";
 import { decodeSnapshotJson } from "./snapshot-json.js";

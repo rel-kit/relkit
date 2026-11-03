@@ -1,7 +1,7 @@
 import type { NativeQueryFixtureResponse, ObservabilityResponse } from "../fixtures/json.types.ts";
 import { nativeFixture, responseJson } from "../fixtures/json.ts";
 import { describe, expect, test } from "bun:test";
-import { API_BASE_PATH } from "@relkit/contracts";
+import { API_BASE_PATH } from "relkit/contracts";
 import { mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import {
@@ -11,7 +11,7 @@ import {
   defineTelemetryExporter,
   type ObservabilityQuery,
   type ObservabilityQueryRequest,
-} from "@relkit/observability";
+} from "relkit/observability";
 import { Hono } from "hono";
 import {
   installObservabilityEndpoints,

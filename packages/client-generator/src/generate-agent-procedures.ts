@@ -81,16 +81,16 @@ function entries(agents: readonly AgentSource[]): Effect.Effect<readonly string[
       yield* procedureEffect(
         "relkit.agent.load",
         yield* scoped([yield* renderTypePropertyEffect("threadId", "string"), expectedIdentity]),
-        'import("@relkit/contracts").ThreadSnapshot',
+        'import("relkit/contracts").ThreadSnapshot',
       ),
       yield* procedureEffect(
         "relkit.agent.observe",
         yield* scoped([
           yield* renderTypePropertyEffect("threadId", "string"),
-          yield* renderTypePropertyEffect("after", 'import("@relkit/contracts").JournalCheckpoint'),
+          yield* renderTypePropertyEffect("after", 'import("relkit/contracts").JournalCheckpoint'),
           expectedIdentity,
         ]),
-        'AsyncIterable<import("@relkit/contracts").AgentObservation>',
+        'AsyncIterable<import("relkit/contracts").AgentObservation>',
       ),
       yield* procedureEffect("relkit.agent.run", yield* unionEffect(run), runReceipt),
       yield* procedureEffect("relkit.agent.control", yield* unionEffect(controls), controlReceipt),
@@ -103,7 +103,7 @@ function entries(agents: readonly AgentSource[]): Effect.Effect<readonly string[
           yield* renderTypePropertyEffect("cursor", "string"),
           expectedIdentity,
         ]),
-        '{ readonly messages: readonly import("@relkit/contracts").BrowserMessage[]; readonly nextCursor?: string }',
+        '{ readonly messages: readonly import("relkit/contracts").BrowserMessage[]; readonly nextCursor?: string }',
       ),
     ];
   });

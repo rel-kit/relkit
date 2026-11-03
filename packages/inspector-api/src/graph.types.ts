@@ -1,5 +1,5 @@
 import type { GRAPH_COLLECTIONS } from "./graph.js";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 
 /** Graph collection vocabulary derived from the declared public collection constant. */
 export type GraphCollection = (typeof GRAPH_COLLECTIONS)[number];

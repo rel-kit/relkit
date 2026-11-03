@@ -1,5 +1,5 @@
 import { Context, Effect, Exit, Layer, MutableRef, RcMap, Ref, Scope } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { runClient, runClientSync } from "../client-runtime.js";
 import { SharedWatchFeed } from "./watch-feed.js";
 import { WatchFeedKey } from "./watch-key.js";
@@ -24,7 +24,7 @@ export class JobFeedRegistry extends Context.Service<JobFeedRegistry, JobFeedReg
  * @example
  * ```ts
  * import { Effect, ManagedRuntime } from "effect";
- * import { runExecutionSync } from "@relkit/contracts/operation";
+ * import { runExecutionSync } from "relkit/contracts/operation";
  * import { JobFeedRegistry, JobFeedRegistryLive } from "./feed-registry.service.js";
  * export async function borrowJobFeed(client: unknown): Promise<void> {
  *   const owner = ManagedRuntime.make(JobFeedRegistryLive);

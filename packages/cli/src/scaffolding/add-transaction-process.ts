@@ -2,7 +2,7 @@
 
 import { join } from "node:path";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { resolveRelkitExecutableEffect } from "create-relkit/internal/generate-process";
 
 import {

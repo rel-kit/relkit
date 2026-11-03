@@ -86,7 +86,7 @@ test("documents native compatibility, typed state, graphs, persistence, and resu
   ).text();
   expect(installation).toContain("@relkit/langchain@");
   expect(installation).toContain("langsmith@");
-  expect(native).not.toContain("runtime dependencies of `@relkit/agents`");
+  expect(native).not.toContain("runtime dependencies of `relkit/agents`");
 
   const graph = await Bun.file(resolve(content, "docs/modules/ai/graphs-persistence.mdx")).text();
   expect(graph).toContain("order-review.agent.ts");

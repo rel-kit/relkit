@@ -1,4 +1,4 @@
-import { API_BASE_PATH, PROTOCOL_VERSION } from "@relkit/contracts";
+import { API_BASE_PATH, PROTOCOL_VERSION } from "relkit/contracts";
 import { Hono } from "hono";
 import { installInspectorEndpoints, type InspectorActionServices } from "../../src/index.ts";
 import type { ActionTestState, ActionTestGeneration } from "./actions-fixtures.types.js";

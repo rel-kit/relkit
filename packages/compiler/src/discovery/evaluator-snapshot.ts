@@ -1,6 +1,6 @@
 import { observeCompiler } from "../observability.js";
 import { createHash } from "node:crypto";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { Effect, Schema } from "effect";
 import {
   isSnapshotErrorDescriptorEffect,

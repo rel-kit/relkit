@@ -9,8 +9,8 @@ import {
   telemetryLogDetailSchema,
   telemetryRequestDetailSchema,
   telemetryTraceDetailSchema,
-} from "@relkit/observability/local/protocol";
-import type { LocalWorkerCommand } from "@relkit/observability/local/worker-contract";
+} from "relkit/observability/local/protocol";
+import type { LocalWorkerCommand } from "relkit/observability/local/worker-contract";
 import { InspectionConnectionError } from "@relkit/inspector-api/connection";
 
 /** A transport-level JSON decode alone cannot certify a worker query response. */

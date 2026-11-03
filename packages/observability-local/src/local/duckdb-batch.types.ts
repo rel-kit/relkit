@@ -3,8 +3,8 @@
  * Shared records and query contracts come from lightweight observability; native
  * handles and worker lifetimes remain owned by this storage package.
  */
-import type { ObservabilityRecord } from "@relkit/observability";
-import type { LocalRecord } from "@relkit/observability/local/record";
+import type { ObservabilityRecord } from "relkit/observability";
+import type { LocalRecord } from "relkit/observability/local/record";
 
 /** Validated and redacted envelope retained until its transaction commits. */
 export interface PreparedDuckdbRecord {

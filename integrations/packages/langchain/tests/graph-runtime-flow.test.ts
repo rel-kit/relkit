@@ -10,8 +10,8 @@ import {
   StateGraph,
   StateSchema,
 } from "@langchain/langgraph";
-import { defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 import { defineGraph, defineGraphNode, invokeAgent } from "../src/index.js";
 import { limits, parallelLoopFixture, parallelLoopNodes } from "./graph-runtime-flow.fixture.js";
 const unusedEngine = {

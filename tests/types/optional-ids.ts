@@ -15,9 +15,9 @@ import {
   defineTool,
   defineTransform,
   http,
-} from "@relkit/app";
+} from "relkit";
 import { defineAgent } from "@relkit/langchain";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 
 const input = z.object({ id: z.string() });
 const output = z.object({ ok: z.boolean() });

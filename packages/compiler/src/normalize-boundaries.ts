@@ -3,9 +3,9 @@
  * The invocation owns its TypeScript resolution Layer; deterministic diagnostics
  * and logical dependency edges are retained without evaluating imported modules.
  */
-import { selectApplicationLayout, type ApplicationLayout } from "@relkit/contracts";
+import { selectApplicationLayout, type ApplicationLayout } from "relkit/contracts";
 import { Effect } from "effect";
-import { createDiagnostic } from "@relkit/diagnostics";
+import { createDiagnostic } from "relkit/diagnostics";
 import * as ts from "typescript";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";

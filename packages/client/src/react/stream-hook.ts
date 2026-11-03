@@ -5,7 +5,7 @@ export type { StreamState, UseStreamResult } from "./stream-hook.types.js";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRelkitClient } from "./context.js";
-import { runExecutionPromise } from "@relkit/contracts/operation";
+import { runExecutionPromise } from "relkit/contracts/operation";
 import { clientStreams, streamRuntime } from "./stream-runtime.js";
 import type { ErrorFor, InputFor, ItemFor, StreamSelector } from "./registry.types.js";
 

@@ -1,7 +1,7 @@
 /** Writes explicitly assigned cursor/payload rows inside the caller's atomic batch transaction. */
 import { Effect } from "effect";
-import { recordTime } from "@relkit/observability/local/record";
-import type { StoredLocalRecord } from "@relkit/observability/local/record";
+import { recordTime } from "relkit/observability/local/record";
+import type { StoredLocalRecord } from "relkit/observability/local/record";
 import { runDuckdbSql } from "./duckdb-sql.js";
 import type { DuckdbConnectionPort } from "./duckdb-driver.types.js";
 import type { AssignedDuckdbRecord } from "./duckdb-batch.types.js";

@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "bun:test";
-import { fromGraph, type DeploymentIamPlan } from "../../packages/deploy/src/index.ts";
-import type { ApplicationGraph } from "../../packages/graph/src/index.ts";
+import { fromGraph, type DeploymentIamPlan } from "relkit/deploy";
+import type { ApplicationGraph } from "relkit/graph";
 
 const fixtureRoot = join(import.meta.dir, "..", "compiler", "fixtures");
 

@@ -5,7 +5,7 @@ import type {
 } from "./normalize-schema-projection.types.js";
 export type { SchemaDirection, SchemaResult } from "./normalize-schema-projection.types.js";
 import { createHash } from "node:crypto";
-import { canonicalJson, type JsonValue, canCarryStandardSchema } from "@relkit/contracts";
+import { canonicalJson, type JsonValue, canCarryStandardSchema } from "relkit/contracts";
 import {
   getJsonSchemaEffect,
   getSchemaMetadataEffect,
@@ -13,7 +13,7 @@ import {
   schemaLibraryVersion,
   SchemaProjectorLive,
   type StandardSchemaV1,
-} from "@relkit/schema";
+} from "relkit/schema";
 import { isRecord, json } from "./normalize-utils.js";
 import { Effect, Result } from "effect";
 import { runCompilerSync } from "./compatibility.js";

@@ -7,7 +7,7 @@ import type { Effect } from "effect";
 import type { DuckdbDatabaseEffects } from "./duckdb-database.types.js";
 import type { DuckdbError } from "./duckdb-error.js";
 import type { DuckdbQueryError } from "./duckdb-query-error.js";
-import type { LocalWorkerCommand } from "@relkit/observability/local/record";
+import type { LocalWorkerCommand } from "relkit/observability/local/record";
 /**
  * Serialized command operations for the local DuckDB worker.
  * The Layer owns any open database until its Scope closes.

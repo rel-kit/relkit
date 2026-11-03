@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { Effect, Schema } from "effect";
-import { APPLICATION_LAYOUT_VERSION, canonicalJson } from "@relkit/contracts";
+import { APPLICATION_LAYOUT_VERSION, canonicalJson } from "relkit/contracts";
 import manifest from "../../package.json" with { type: "json" };
 import effectManifest from "effect/package.json" with { type: "json" };
 import typescriptManifest from "typescript/package.json" with { type: "json" };

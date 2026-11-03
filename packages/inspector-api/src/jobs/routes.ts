@@ -1,7 +1,7 @@
 import type { InspectorGuard } from "./routes.types.js";
 import { runInspectorPromise as runExecutionPromise } from "../native-edge.js";
 import { inspectorNativeJobsExecution } from "./native.service.js";
-import { API_BASE_PATH } from "@relkit/contracts";
+import { API_BASE_PATH } from "relkit/contracts";
 import type { Hono } from "hono";
 import { controlJobRunEffect as controlJobRun } from "./controls.js";
 import {

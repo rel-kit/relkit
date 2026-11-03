@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { JsonValue } from "../../packages/contracts/src/index.ts";
-import { canonicalGraphJson, hashGraph } from "../../packages/graph/src/index.ts";
+import type { JsonValue } from "relkit/contracts";
+import { canonicalGraphJson, hashGraph } from "relkit/graph";
 import { compileFixture, type FixtureCompilation } from "./fixture-runner.ts";
 import {
   invalidateWatchDependencies,
@@ -11,9 +11,9 @@ import {
   writeGeneratedArtifacts,
 } from "../../packages/compiler/src/index.ts";
 import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
-import { defineFunction } from "../../packages/functions/src/index.ts";
-import { defineRoute, http } from "../../packages/routes/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { defineFunction } from "relkit/functions";
+import { defineRoute, http } from "relkit/routes";
+import { z } from "relkit/schema";
 
 const WATCH_ROOT = "/tmp/relkit-determinism-watch";
 const input = z.object({ id: z.string() });

@@ -1,4 +1,4 @@
-import type { JsonValue, MaybePromise, RuntimeActivationFingerprint } from "@relkit/contracts";
+import type { JsonValue, MaybePromise, RuntimeActivationFingerprint } from "relkit/contracts";
 import type { InspectorActionServices } from "./actions.js";
 import type {
   InspectorCandidateGenerationSource,

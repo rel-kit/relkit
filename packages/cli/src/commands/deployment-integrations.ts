@@ -6,7 +6,7 @@ import type {
   DeploymentIntegrationPlan,
   DeploymentIntegrationRole,
   DeploymentPlan,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 import { cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliCompiler, compilerLayer } from "../services/compiler.service.js";

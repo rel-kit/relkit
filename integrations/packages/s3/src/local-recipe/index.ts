@@ -2,7 +2,7 @@ import {
   LOCAL_SERVICE_PROTOCOL_VERSION,
   type LocalServiceRecipe,
   type LocalServiceRecipeOutputContext,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import { signedRequest } from "../runtime/signing.js";
 
 // Public mirror of RELEASE.2025-04-22T22-12-26Z, pinned to the original image digest.

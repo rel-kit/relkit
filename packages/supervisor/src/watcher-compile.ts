@@ -1,5 +1,5 @@
 import { Cause, Effect, Exit, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import type { SupervisorStateMachine } from "./state-machine.js";
 import type { PendingChange, WatcherState, SupervisorCompile } from "./watcher.types.js";
 

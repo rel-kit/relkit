@@ -1,9 +1,9 @@
-import type { RealtimeProvider, WaitForChannelEvents } from "@relkit/realtime";
+import type { RealtimeProvider, WaitForChannelEvents } from "relkit/realtime";
 import {
   createRealtimeProviderFromStore,
   emptyRealtimeState,
   LOCAL_REALTIME_STATE_VERSION,
-} from "@relkit/providers-local";
+} from "relkit/providers-local";
 import { createRedisRealtimeStore } from "./state-store.js";
 
 export interface RedisRealtimeProviderOptions {

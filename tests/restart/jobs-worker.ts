@@ -1,7 +1,7 @@
 import { appendFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { InvocationContext } from "../../packages/engine/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import type { InvocationContext } from "relkit/engine";
+import { z } from "relkit/schema";
 import { createTestJob } from "../../packages/testing/src/index.ts";
 import { resolveRestartStateRoot } from "./state-root.ts";
 

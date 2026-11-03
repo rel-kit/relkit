@@ -3,7 +3,7 @@
  * Shared records and query contracts come from lightweight observability; native
  * handles and worker lifetimes remain owned by this storage package.
  */
-import type { LocalWorkerCommand } from "@relkit/observability/local/record";
+import type { LocalWorkerCommand } from "relkit/observability/local/record";
 
 /**
  * IPC envelope received by the local DuckDB worker process.

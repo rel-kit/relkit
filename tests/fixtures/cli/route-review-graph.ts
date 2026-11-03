@@ -3,7 +3,7 @@ import { expect } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect, Schema } from "effect";
-import { validateGraphShape, type ApplicationGraph } from "../../../packages/graph/src/index.js";
+import { validateGraphShape, type ApplicationGraph } from "relkit/graph";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 
 /**

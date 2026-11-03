@@ -1,4 +1,4 @@
-import { normalizeSourcePathEffect } from "@relkit/contracts";
+import { normalizeSourcePathEffect } from "relkit/contracts";
 import { Effect } from "effect";
 import { dirname, extname, join, resolve } from "node:path";
 import * as ts from "typescript";

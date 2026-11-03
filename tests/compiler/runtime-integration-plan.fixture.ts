@@ -1,7 +1,7 @@
 /** Shares the original deterministic fixture constants and helpers across cohesive runtime-integration-plan cases. */
 import { expect } from "bun:test";
 import { RuntimeIntegrationPlanError } from "../../packages/compiler/src/index.ts";
-import type { ProviderBindingNode } from "../../packages/graph/src/index.ts";
+import type { ProviderBindingNode } from "relkit/graph";
 export const source = { file: "src/app.ts", line: 1, column: 1 } as const;
 
 export function provider(

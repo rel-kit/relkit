@@ -5,8 +5,8 @@
  */
 import { Effect, Schema } from "effect";
 import { prefilterSources } from "@relkit/compiler";
-import { IntegrationDependencyRequirements } from "@relkit/contracts";
-import { SelectedDependencies } from "@relkit/provider/internal/dependencies";
+import { IntegrationDependencyRequirements } from "relkit/contracts";
+import { SelectedDependencies } from "relkit/provider/internal/dependencies";
 import { CliCompiler } from "../services/compiler.service.js";
 import { cliAdapterError, cliTry } from "../cli-errors.js";
 import type { CheckSource } from "./check.types.js";

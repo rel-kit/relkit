@@ -1,6 +1,6 @@
-import { assertJsonValue } from "@relkit/contracts";
-import type { NativeRun, OperationContext } from "@relkit/jobs/adapter";
-import type { RunSnapshot } from "@relkit/contracts/jobs";
+import { assertJsonValue } from "relkit/contracts";
+import type { NativeRun, OperationContext } from "relkit/jobs/adapter";
+import type { RunSnapshot } from "relkit/contracts/jobs";
 
 /** @experimental */
 export function triggerSnapshot(

@@ -8,7 +8,7 @@ import {
   GRAPH_VERSION,
   MANIFEST_VERSION,
   type RuntimeActivationFingerprint,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import { startDev, type DevOptions } from "./src/commands/dev.js";
 
 export type CandidateFailure = "compile" | "start" | "hash" | "api" | "readiness";

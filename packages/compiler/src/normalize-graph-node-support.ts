@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
 import type { GraphNodeBase } from "./normalize-graph-node-support.types.js";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { selectedProviderProfile } from "./normalize-graph-app.js";
 import { clean } from "./normalize-graph-utils.js";
 import type { GraphNode, NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";

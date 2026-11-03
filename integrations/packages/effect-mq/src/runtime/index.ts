@@ -1,11 +1,11 @@
-import type { JobsAdapterRuntime, NativeScheduleOperations } from "@relkit/jobs/adapter";
+import type { JobsAdapterRuntime, NativeScheduleOperations } from "relkit/jobs/adapter";
 import {
   assertSupportedJobsServiceOptions,
   deserializeJobsServiceOptions,
   durationToMillis,
   type JobsServiceOptions,
-} from "@relkit/jobs";
-import type { RuntimeProviderContext, RuntimeProviderIntegration } from "@relkit/provider";
+} from "relkit/jobs";
+import type { RuntimeProviderContext, RuntimeProviderIntegration } from "relkit/provider";
 import {
   createEffectMqWorker,
   type EffectMqWorkerHandle,

@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 import {
   SelectedDependencies,
   type DependencySelection,
-} from "@relkit/provider/internal/dependencies";
+} from "relkit/provider/internal/dependencies";
 import { checkSelectedServiceRequirements } from "../../src/commands/check-service-dependencies.js";
 
 describe("graph-selected native services", () => {

@@ -1,5 +1,5 @@
 import { Context, Effect, Layer, Stream } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { nativeStream } from "../native-stream.js";
 import { procedureCall } from "./procedure.js";
 import type { ClientStreamService } from "./stream.service.types.js";

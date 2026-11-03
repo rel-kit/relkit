@@ -26,14 +26,14 @@ async function prepareProducers(fixture: string) {
     await copyFile(join(root, "scripts", file), join(fixture, "scripts", file));
   await copyFile(join(root, "package.json"), join(fixture, "package.json"));
   await copyFile(join(root, "tsconfig.base.json"), join(fixture, "tsconfig.base.json"));
-  await mkdir(join(fixture, "packages/contracts"), { recursive: true });
+  await mkdir(join(fixture, "packages/relkit"), { recursive: true });
   for (const file of ["package.json", "tsconfig.json", "src"])
-    await cp(join(root, "packages/contracts", file), join(fixture, "packages/contracts", file), {
+    await cp(join(root, "packages/relkit", file), join(fixture, "packages/relkit", file), {
       recursive: true,
     });
   await symlink(
-    join(root, "packages/contracts/node_modules"),
-    join(fixture, "packages/contracts/node_modules"),
+    join(root, "packages/relkit/node_modules"),
+    join(fixture, "packages/relkit/node_modules"),
     "dir",
   );
   await mkdir(join(fixture, "packages/create-relkit/src"), { recursive: true });
@@ -49,12 +49,7 @@ async function prepareProducers(fixture: string) {
   await mkdir(join(fixture, "node_modules"));
   for (const name of ["effect", "typescript", "@types"])
     await symlink(join(root, "node_modules", name), join(fixture, "node_modules", name), "dir");
-  await mkdir(join(fixture, "node_modules/@relkit"));
-  await symlink(
-    join(fixture, "packages/contracts"),
-    join(fixture, "node_modules/@relkit/contracts"),
-    "dir",
-  );
+  await symlink(join(fixture, "packages/relkit"), join(fixture, "node_modules/relkit"), "dir");
   await symlink("../packages/create-relkit", join(fixture, "node_modules/create-relkit"), "dir");
 }
 
@@ -65,22 +60,22 @@ async function prepareManifests(fixture: string) {
     join(root, "patches/drizzle-orm.patch"),
     join(fixture, "patches/drizzle-orm.patch"),
   );
-  for (const name of ["cli", "app", "relkit"]) {
+  for (const name of ["cli", "app"]) {
     const directory = join(fixture, "packages", name);
     await mkdir(directory, { recursive: true });
     await copyFile(join(root, "packages", name, "package.json"), join(directory, "package.json"));
   }
-  const appPath = join(fixture, "packages/app/package.json");
-  const appSource = JSON.parse(await readFile(appPath, "utf8"));
-  appSource.version = "0.8.1";
-  await writeFile(appPath, JSON.stringify(appSource));
+  const corePath = join(fixture, "packages/relkit/package.json");
+  const coreSource = JSON.parse(await readFile(corePath, "utf8"));
+  coreSource.version = "0.8.1";
+  await writeFile(corePath, JSON.stringify(coreSource));
   for (const template of packedTemplates) {
     const directory = join(fixture, "templates/default/v1", template);
     await mkdir(directory, { recursive: true });
     await writeFile(
       join(directory, "package.json"),
       JSON.stringify({
-        dependencies: { "@relkit/app": "0.0.0" },
+        dependencies: { relkit: "0.0.0" },
         devDependencies: { typescript: "0.0.0", "@types/bun": "catalog:" },
       }),
     );
@@ -96,7 +91,7 @@ async function assertReleaseMetadata(fixture: string) {
   expect(app.files).toEqual(["dist"]);
   const wrapper = JSON.parse(await readFile(join(fixture, "packages/relkit/package.json"), "utf8"));
   expect(wrapper.files).toEqual(["dist"]);
-  expect(wrapper.dependencies["create-relkit"]).toBe("workspace:*");
+  expect(wrapper.dependencies["create-relkit"]).toBeUndefined();
   expect(wrapper.dependencies["@relkit/cli"]).toBeUndefined();
   const generator = JSON.parse(
     await readFile(join(fixture, "packages/create-relkit/package.json"), "utf8"),
@@ -118,7 +113,7 @@ async function assertReleaseMetadata(fixture: string) {
     typescript: "5.9.3",
     "@types/bun": "1.3.10",
   });
-  expect(template.dependencies["@relkit/app"]).toBe("0.8.1");
+  expect(template.dependencies.relkit).toBe("0.8.1");
 }
 
 /** Joins all output and exit from one finite metadata producer invocation. */
@@ -145,7 +140,9 @@ test("release sync bootstraps real contracts from source and remains idempotent"
   try {
     await prepareProducers(fixture);
     await prepareManifests(fixture);
-    expect(await Bun.file(join(fixture, "packages/contracts/dist/index.js")).exists()).toBe(false);
+    expect(await Bun.file(join(fixture, "packages/relkit/dist/contracts/index.js")).exists()).toBe(
+      false,
+    );
     const sync = await runSync(fixture, true);
     expect(sync.code, sync.stdout + sync.stderr).toBe(0);
     await assertReleaseMetadata(fixture);
@@ -163,4 +160,4 @@ test("release sync bootstraps real contracts from source and remains idempotent"
     if (complete) await rm(fixture, { recursive: true, force: true });
     else console.error("Failed release synchronization fixture retained: " + fixture);
   }
-});
+}, 120_000);

@@ -110,7 +110,7 @@ it.effect("restores selected runtime ownership from sealed manifest bytes", () =
       service.validate(fixture.root, tools),
     ).pipe(Effect.provide(devSnapshotsLive.pipe(Layer.provide(fixture.layer))));
     const bytes = Buffer.from(
-      JSON.stringify({ dependencies: { "@relkit/runtime-hono": "0.7.10" } }),
+      JSON.stringify({ dependencies: { "relkit/runtime-hono": "0.7.10" } }),
     );
     const member = { path: "package.json", bytes: bytes.length, hash: snapshotDigest(bytes) };
     const selected = {
@@ -123,7 +123,7 @@ it.effect("restores selected runtime ownership from sealed manifest bytes", () =
     yield* SnapshotCandidates.use((service) =>
       service.install(request(selected, () => Effect.void)),
     ).pipe(Effect.provide(candidateLayer(written, linked)));
-    expect(linked).toEqual([["/candidate", "/project", "@relkit/runtime-hono"]]);
+    expect(linked).toEqual([["/candidate", "/project", "relkit/runtime-hono"]]);
     expect(written.get("package.json")).toBe(bytes.toString("utf8"));
   }),
 );

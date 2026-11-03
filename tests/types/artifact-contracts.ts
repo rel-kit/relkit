@@ -4,9 +4,9 @@ import {
   MANIFEST_VERSION,
   RUNTIME_INTEGRATION_PLAN_FILE,
   RUNTIME_INTEGRATION_PLAN_VERSION,
-} from "@relkit/contracts";
-import type { ApplicationGraph } from "../../packages/graph/src/index.ts";
-import type { RuntimeManifest } from "../../packages/runtime-effect/src/index.ts";
+} from "relkit/contracts";
+import type { ApplicationGraph } from "relkit/graph";
+import type { RuntimeManifest } from "relkit/runtime-effect";
 
 const graph: ApplicationGraph = {
   contractVersion: GRAPH_VERSION,

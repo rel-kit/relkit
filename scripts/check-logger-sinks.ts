@@ -9,7 +9,7 @@ export interface LoggerSinkViolation {
   readonly message: string;
 }
 
-const sinkFile = "packages/runtime-effect/src/logger.ts";
+const sinkFile = "packages/relkit/src/runtime-effect/logger.ts";
 
 export function resolveOwnedSourceFile(directory: string, path: string): string {
   const sourceRoot = realpathSync(directory);
@@ -20,7 +20,7 @@ export function resolveOwnedSourceFile(directory: string, path: string): string 
 }
 
 export function scanLoggerSinks(root: string): LoggerSinkViolation[] {
-  const sourceRoot = realpathSync(resolve(root, "packages/runtime-effect/src"));
+  const sourceRoot = realpathSync(resolve(root, "packages/relkit/src/runtime-effect"));
   const violations: LoggerSinkViolation[] = [];
   for (const path of new Bun.Glob("**/*.ts").scanSync({ cwd: sourceRoot, onlyFiles: true })) {
     const file = resolveOwnedSourceFile(sourceRoot, path);

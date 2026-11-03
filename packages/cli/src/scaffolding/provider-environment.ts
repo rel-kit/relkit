@@ -2,7 +2,7 @@
 
 import { Effect } from "effect";
 
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 

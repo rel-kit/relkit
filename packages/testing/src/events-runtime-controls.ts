@@ -8,11 +8,11 @@ import {
   observeExecution,
   runExecutionPromise,
   runExecutionSync,
-} from "@relkit/contracts/operation";
+} from "relkit/contracts/operation";
 import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
 import type { EventControlsService } from "./event-controls.types.js";
 
-import type { EventDeliveryResult } from "@relkit/providers-local";
+import type { EventDeliveryResult } from "relkit/providers-local";
 import type { TestEventCloseOptions } from "./events-types.js";
 
 /**

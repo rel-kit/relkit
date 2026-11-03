@@ -1,5 +1,5 @@
 import { Layer, ManagedRuntime } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionSync } from "relkit/contracts/operation";
 import { JobFeedRegistry, JobFeedRegistryLive } from "./feed-registry.service.js";
 export { SharedWatchFeed } from "./watch-feed.js";
 export type { FeedEvent, FeedStatus } from "./watch-feed.types.js";

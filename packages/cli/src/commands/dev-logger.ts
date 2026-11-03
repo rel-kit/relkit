@@ -1,6 +1,6 @@
-import { canonicalJson } from "@relkit/contracts";
-import { admitObservabilityRecord } from "@relkit/observability";
-import { isLogLevelEnabled } from "@relkit/runtime-effect";
+import { canonicalJson } from "relkit/contracts";
+import { admitObservabilityRecord } from "relkit/observability";
+import { isLogLevelEnabled } from "relkit/runtime-effect";
 import type { DevLog, DevOptions } from "./dev.js";
 import { devLogRecord } from "./dev-log-record.js";
 import { formatDevLog } from "./dev-log-format.js";

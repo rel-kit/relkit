@@ -1,6 +1,6 @@
 /** Lazy authentication authoring; select /drizzle for native database activation. @packageDocumentation */
-import { createDescriptorBase } from "@relkit/contracts";
-import { createUnboundIdentity } from "@relkit/invocation";
+import { createDescriptorBase } from "relkit/contracts";
+import { createUnboundIdentity } from "relkit/invocation";
 import type { Auth } from "better-auth";
 import type {
   BetterAuthHandler,

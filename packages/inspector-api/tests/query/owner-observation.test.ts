@@ -8,7 +8,7 @@ import {
   runInspectorPromise,
 } from "../../src/native-edge.js";
 import { generation } from "../fixtures/services.js";
-import type { RedactedLogRecord } from "@relkit/runtime-effect";
+import type { RedactedLogRecord } from "relkit/runtime-effect";
 
 describe("Inspector owner observations", () => {
   it("isolates reused owner metrics and admits configured redacted logs", async () => {

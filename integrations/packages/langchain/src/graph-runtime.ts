@@ -1,10 +1,10 @@
 /** Composes graph compilation, scoped persistence and execution into the native invocation entrypoint, retaining stream and continuation behavior. */
 
-import { normalizeId } from "@relkit/contracts";
-import { frameworkTrace } from "@relkit/invocation";
+import { normalizeId } from "relkit/contracts";
+import { frameworkTrace } from "relkit/invocation";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
-import { generatedAgentFunctionId } from "@relkit/agents/internal/generated-function";
+import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { generatedAgentFunctionId } from "relkit/agents/internal/generated-function";
 import { graphInvocationFailure } from "./graph-runtime-error.js";
 import { runCompiledGraph } from "./graph-runtime-execution.js";
 import { GraphInvocationIdentity, GraphInvocationIdentityLive } from "./graph-runtime-identity.js";

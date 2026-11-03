@@ -1,7 +1,7 @@
 /** Plans selected job and workflow artifacts with the existing execution profile and service boundary, retaining durable version and exposure choices. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import {
   scaffoldErrors,

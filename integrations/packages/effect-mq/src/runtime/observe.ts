@@ -3,7 +3,7 @@ import type {
   NativeRun,
   NativeWatchRequest,
   OperationContext,
-} from "@relkit/jobs/adapter";
+} from "relkit/jobs/adapter";
 import type { EffectMqNativeClient } from "./native.js";
 
 export interface EffectMqObservationOptions {

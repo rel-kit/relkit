@@ -12,7 +12,7 @@ describe("AST discovery prefilter", () => {
       },
       {
         fileName: "src/orders.function.ts",
-        text: `import { defineFunction } from "@relkit/functions";
+        text: `import { defineFunction } from "relkit/functions";
           export default defineFunction({ id: "orders.create", handler: async () => ({}) });`,
       },
       {
@@ -29,11 +29,11 @@ describe("AST discovery prefilter", () => {
       },
       {
         fileName: "src/ignored.test.ts",
-        text: `import { defineFunction } from "@relkit/functions"; throw new Error("must not run"); export default defineFunction({});`,
+        text: `import { defineFunction } from "relkit/functions"; throw new Error("must not run"); export default defineFunction({});`,
       },
       {
         fileName: "src/a/__fixtures__/ignored.ts",
-        text: `import { defineRoute } from "@relkit/routes"; throw new Error("must not run"); export default defineRoute({});`,
+        text: `import { defineRoute } from "relkit/routes"; throw new Error("must not run"); export default defineRoute({});`,
       },
     ]);
 
@@ -47,7 +47,7 @@ describe("AST discovery prefilter", () => {
       (candidate) => candidate.fileName === "src/orders.function.ts",
     );
     expect(functionCandidate).toMatchObject({
-      imports: ["@relkit/functions"],
+      imports: ["relkit/functions"],
       factories: ["defineFunction"],
       defaultExports: ["default"],
       facts: {
@@ -94,7 +94,7 @@ describe("AST discovery prefilter", () => {
     const result = prefilterSources([
       {
         fileName: "src/types.ts",
-        text: `import type { FunctionRef } from "@relkit/functions"; export type { FunctionRef };`,
+        text: `import type { FunctionRef } from "relkit/functions"; export type { FunctionRef };`,
       },
       {
         fileName: "src/fixture.test.ts",

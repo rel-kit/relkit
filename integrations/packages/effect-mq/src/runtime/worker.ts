@@ -1,4 +1,4 @@
-import type { TaskExecutor } from "@relkit/jobs/adapter";
+import type { TaskExecutor } from "relkit/jobs/adapter";
 
 /** @experimental */
 export interface EffectMqTaskDefinition {

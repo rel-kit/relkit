@@ -3,8 +3,8 @@
  * Invalid replies fail pending callers; stopping affects only the owned child.
  */
 import { Schema } from "effect";
-import { ObservabilityQueryError } from "@relkit/observability";
-import { WorkerTransportError } from "@relkit/observability/local/worker-contract";
+import { ObservabilityQueryError } from "relkit/observability";
+import { WorkerTransportError } from "relkit/observability/local/worker-contract";
 import type { ChildProcess } from "node:child_process";
 import type { WorkerClientState } from "./worker-client-state.types.js";
 

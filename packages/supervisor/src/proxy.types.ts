@@ -1,4 +1,4 @@
-import type { LoggerOptions } from "@relkit/runtime-effect/logger";
+import type { LoggerOptions } from "relkit/runtime-effect/logger";
 import type { Effect, Scope } from "effect";
 import type { StartedCandidate } from "./candidate.types.js";
 import type { SupervisorDrainLease } from "./drain.types.js";

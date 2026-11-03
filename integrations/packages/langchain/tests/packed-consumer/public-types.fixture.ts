@@ -4,7 +4,7 @@ import { MemorySaver } from "@langchain/langgraph";
 import { tool } from "langchain";
 import { defineAgent, type AgentRuntimeOptions } from "@relkit/langchain";
 import { createTestAgent, createTestModel, type TestModelTurn } from "@relkit/langchain/testing";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 
 /** Accepts real engine authority while the compiler checks native objects and inferred input/output. */
 export function nativePublicTypes(engine: AgentRuntimeOptions["engine"]) {

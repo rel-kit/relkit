@@ -1,5 +1,5 @@
 import type { SupervisorCandidateToken } from "./state-machine.types.js";
-import type { LoggerOptions } from "@relkit/runtime-effect/logger";
+import type { LoggerOptions } from "relkit/runtime-effect/logger";
 
 /** Native compiler inputs restricted to one owned generation directory. */
 export interface CandidateCompileRequest {

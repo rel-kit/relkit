@@ -22,7 +22,7 @@ console.log("wrapper-public-entry");
     name,
     development: name !== "production-only",
     source: `
-import { defineService } from "@relkit/app";
+import { defineService } from "relkit";
 if (typeof defineService !== "function") throw new Error("Application authoring export missing");
 console.log("application-public-entry");
 `,

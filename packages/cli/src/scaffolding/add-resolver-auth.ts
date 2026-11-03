@@ -1,7 +1,7 @@
 /** Resolves auth mode and backing database selections for existing-project additions without changing schema or migration state. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import { GeneratorPrompt } from "create-relkit/internal/generator-prompt";
 

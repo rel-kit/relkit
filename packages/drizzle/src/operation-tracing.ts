@@ -1,6 +1,6 @@
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { Effect } from "effect";
-import { frameworkTrace } from "@relkit/invocation";
+import { frameworkTrace } from "relkit/invocation";
 import { redactSpecializedTrace } from "./trace-redaction.js";
 
 const operations = new Set([

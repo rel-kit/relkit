@@ -1,5 +1,5 @@
 import { Effect, Layer, Logger, ManagedRuntime } from "effect";
-import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionPromise, runExecutionSync } from "relkit/contracts/operation";
 import { GeneratorFileSystem, generatorFileSystemLive } from "./generator-filesystem.js";
 import { GeneratorProcess, generatorProcessLive } from "./generator-process.js";
 import { publicFailure } from "./generator-errors.js";

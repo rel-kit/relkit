@@ -1,11 +1,11 @@
-import { defineFunction } from "@relkit/app/functions";
-import { defineService } from "@relkit/app/services";
-import { defineTask } from "@relkit/app/tasks";
-import { defineJob } from "@relkit/app/jobs";
-import { defineEvent } from "@relkit/app/events";
-import { defineApp, defineEnv, env } from "@relkit/app/config";
-import { defineServiceRoutes } from "@relkit/app/routes";
-import { z, type InferInput, type InferOutput } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { defineService } from "relkit/services";
+import { defineTask } from "relkit/tasks";
+import { defineJob } from "relkit/jobs";
+import { defineEvent } from "relkit/events";
+import { defineApp, defineEnv, env } from "relkit/config";
+import { defineServiceRoutes } from "relkit/routes";
+import { z, type InferInput, type InferOutput } from "relkit/schema";
 import { redis } from "@relkit/redis";
 
 type IsAny<Value> = 0 extends 1 & Value ? true : false;

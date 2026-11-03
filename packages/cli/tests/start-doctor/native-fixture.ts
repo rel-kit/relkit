@@ -10,9 +10,9 @@ import {
   RUNTIME_ACTIVATION_FILE,
   RUNTIME_INTEGRATION_PLAN_FILE,
   RUNTIME_INTEGRATION_PLAN_VERSION,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import { createRuntimeActivationFingerprint } from "@relkit/compiler";
-import { hashGraph, type ApplicationGraph } from "@relkit/graph";
+import { hashGraph, type ApplicationGraph } from "relkit/graph";
 
 const source = `const server = Bun.serve({ hostname: "127.0.0.1", port: Number(process.env.PORT), fetch: () => Response.json({ ok: true }) });
 process.stdout.write("owned-output");

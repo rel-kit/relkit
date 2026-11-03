@@ -1,4 +1,4 @@
-import type { EnvDefinition, EnvProjection, EnvShape } from "@relkit/config";
+import type { EnvDefinition, EnvProjection, EnvShape } from "relkit/config";
 import type { Effect } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { EnvCommandOptions, EnvExampleResult } from "./env.types.js";

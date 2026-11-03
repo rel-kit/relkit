@@ -1,6 +1,6 @@
 /** Authenticates bounded server-to-server requests without exposing app credentials to UI. */
 import { Cause, Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { InspectionConnectionError, connectionAttempt } from "@relkit/inspector-api/connection";
 import type { InspectorRemoteOperations } from "./remote.types.js";
 

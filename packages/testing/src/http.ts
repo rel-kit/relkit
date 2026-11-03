@@ -1,5 +1,5 @@
 import { Layer, ManagedRuntime } from "effect";
-import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionPromise, runExecutionSync } from "relkit/contracts/operation";
 import { TestHttpOwner, httpOwnerLayer, TestHttpPlatformLive } from "./http-owner.js";
 import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
 import type {
@@ -25,7 +25,7 @@ import {
   OBSERVABILITY_HOOK_VERSION,
   type InspectableObservabilityHooks,
   type ObservabilityHookEvent,
-} from "@relkit/engine";
+} from "relkit/engine";
 import {
   createTestHttpListener,
   type TestHttpListener,

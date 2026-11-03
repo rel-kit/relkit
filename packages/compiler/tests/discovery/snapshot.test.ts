@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { Effect } from "effect";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { snapshotDescriptor } from "../../src/discovery/evaluator-snapshot.js";
 describe("data-only evaluator snapshots", () => {
   it.effect("marks accessors and cycles without invoking getters", () =>

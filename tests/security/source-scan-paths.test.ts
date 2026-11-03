@@ -12,14 +12,14 @@ test("source scans reject symlinks outside their owned roots", () => {
     for (const sourceRoot of OBSERVABILITY_SOURCE_ROOTS)
       mkdirSync(resolve(root, sourceRoot), { recursive: true });
 
-    const loggerRoot = resolve(root, "packages/runtime-effect/src");
+    const loggerRoot = resolve(root, "packages/relkit/src/runtime-effect");
     symlinkSync(outside, resolve(loggerRoot, "escape.ts"));
     expect(() => resolveOwnedSourceFile(loggerRoot, "escape.ts")).toThrow(
       "Refusing to scan file outside",
     );
 
     rmSync(resolve(loggerRoot, "escape.ts"));
-    symlinkSync(outside, resolve(root, "packages/observability/src/escape.ts"));
+    symlinkSync(outside, resolve(root, "packages/relkit/src/observability/escape.ts"));
     expect(() =>
       resolveOwnedSourceFile(resolve(root, OBSERVABILITY_SOURCE_ROOTS[0]), "escape.ts"),
     ).toThrow("Refusing to scan file outside");

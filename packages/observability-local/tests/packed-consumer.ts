@@ -47,7 +47,7 @@ async function installWorkspaceArchives(packages: readonly string[], root: strin
     );
     const archive = (await readdir(destination)).find((file) => file.endsWith(".tgz"));
     if (!archive) throw new Error(`No packed archive for ${name}`);
-    tarballs[`@relkit/${name}`] = `file:${join(destination, archive)}`;
+    tarballs[name === "relkit" ? name : `@relkit/${name}`] = `file:${join(destination, archive)}`;
   }
   await writeFile(
     join(root, "package.json"),

@@ -1,6 +1,6 @@
 /** Resolves installed project tooling without global fallback or implicit package installation. */
 
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { Effect } from "effect";
 import { GeneratorFileSystem } from "./generator-filesystem.js";
 import { GeneratorProcess } from "./generator-process.js";

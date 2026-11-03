@@ -1,10 +1,10 @@
-import { SourceLocationError } from "@relkit/contracts";
+import { SourceLocationError } from "relkit/contracts";
 import { isRecord } from "./normalize-utils-values.js";
 import {
   normalizeSourceLocation,
   normalizeSourcePath,
   type SourceLocation,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import type { NormalizeInput, NormalizedDescriptor } from "./normalize-types.js";
 
 /**

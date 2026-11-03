@@ -1,7 +1,7 @@
 /** Native development jobs use the existing admin policy without selecting rich inspection. */
 import { Effect, Layer, ManagedRuntime } from "effect";
 import type { Hono } from "hono";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { installJobsEndpoints } from "./jobs/routes.js";
 import { inspectorNativeJobsLayer } from "./jobs/native.service.js";
 import { inspectorLoggerLayer, registerInspectorOwner } from "./execution.js";

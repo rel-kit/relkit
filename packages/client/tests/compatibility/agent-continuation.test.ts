@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import type { ThreadSnapshot } from "@relkit/contracts";
+import type { ThreadSnapshot } from "relkit/contracts";
 import { prepareAgentContinuation } from "../../src/react/agent-continuation.ts";
 import { reconcileAgentRun } from "../../src/react/agent-reconcile.ts";
 import {

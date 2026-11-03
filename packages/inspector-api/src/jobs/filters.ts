@@ -1,7 +1,7 @@
 import type { InspectorRunFilters, InspectorCursor } from "./filters.types.js";
 export type { InspectorRunFilters, InspectorCursor } from "./filters.types.js";
-import { canonicalJson, type JsonValue } from "@relkit/contracts";
-import type { RunListQuery } from "@relkit/contracts/jobs";
+import { canonicalJson, type JsonValue } from "relkit/contracts";
+import type { RunListQuery } from "relkit/contracts/jobs";
 import { InspectorJobsError, type InspectorJobsBinding } from "./types.js";
 import {
   ACTIVE,

@@ -4,8 +4,8 @@
  * retains its runtime planner, and a mismatched accepted hash cannot be emitted.
  */
 import { expect, it } from "@effect/vitest";
-import { deepFreeze, GRAPH_VERSION } from "@relkit/contracts";
-import { createRegistrationPlan, hashGraph } from "@relkit/graph";
+import { deepFreeze, GRAPH_VERSION } from "relkit/contracts";
+import { createRegistrationPlan, hashGraph } from "relkit/graph";
 import { Effect, Schema } from "effect";
 import { serverSource } from "../../src/commands/build-server.js";
 
@@ -38,7 +38,7 @@ it.effect("executes the exact canonical frozen projection without a runtime plan
     if (projected === null || typeof projected !== "object" || Array.isArray(projected))
       throw new Error("Plan must be a record");
     expect(Object.isFrozen(projected.httpTriggers)).toBe(true);
-    expect(source).not.toContain('import { createRegistrationPlan } from "@relkit/graph"');
+    expect(source).not.toContain('import { createRegistrationPlan } from "relkit/graph"');
     expect(source).toContain("Runtime graph hash verification failed.");
     expect(source).not.toContain('from "@relkit/inspector-api";');
     expect(source).not.toContain('await import("@relkit/inspector-api")');

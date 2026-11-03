@@ -147,22 +147,19 @@
   },
   "dependencies": {
     "@effect/sql-pg": "catalog:",
-    "@relkit/contracts": "workspace:*",
-    "@relkit/jobs": "workspace:*",
-    "@relkit/local-service": "workspace:*",
-    "@relkit/provider": "workspace:*",
-    "effect": "catalog:"
+    "effect": "catalog:",
+    "relkit": "workspace:*"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "catalog:",
+    "drizzle-orm": "catalog:",
     "effect-mq": "catalog:",
-    "drizzle-orm": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
-    "effect-mq": "catalog:",
-    "drizzle-orm": "catalog:"
+    "drizzle-orm": "catalog:",
+    "effect-mq": "catalog:"
   },
   "peerDependenciesMeta": {
     "effect-mq": {

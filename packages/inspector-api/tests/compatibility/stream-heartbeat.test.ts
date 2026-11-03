@@ -1,5 +1,5 @@
 import { expect, spyOn, test } from "bun:test";
-import { createObservabilityStream } from "@relkit/observability";
+import { createObservabilityStream } from "relkit/observability";
 import { streamResponse } from "../../src/observability-utils.js";
 
 test("idle Inspector streams survive Bun's timeout through an HTTP proxy", async () => {

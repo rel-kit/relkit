@@ -5,7 +5,7 @@
  */
 import type { Effect } from "effect";
 import type { DuckdbError } from "./duckdb-error.js";
-import type { LocalRecord, StoredLocalRecord } from "@relkit/observability/local/record";
+import type { LocalRecord, StoredLocalRecord } from "relkit/observability/local/record";
 
 /**
  * Counts persisted and malformed legacy segment records.

@@ -1,11 +1,11 @@
-import type { MaybePromise, RuntimeActivationFingerprint } from "@relkit/contracts";
-import type { LoggerOptions } from "@relkit/runtime-effect/logger";
+import type { MaybePromise, RuntimeActivationFingerprint } from "relkit/contracts";
+import type { LoggerOptions } from "relkit/runtime-effect/logger";
 import type {
   ObservabilityCollector,
   ObservabilityRecord,
   ObservabilityStream,
   RedactionPolicy,
-} from "@relkit/observability";
+} from "relkit/observability";
 import type {
   SupervisorCandidateToken,
   SupervisorTelemetry,

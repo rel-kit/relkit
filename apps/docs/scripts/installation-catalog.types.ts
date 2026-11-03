@@ -3,7 +3,7 @@
  * Recipes choose capabilities and public leaves; owner manifests supply versions
  * and SDK phases. The resolved declarations also feed isolated consumer checks.
  */
-import type { IntegrationDependencyPhase } from "@relkit/contracts";
+import type { IntegrationDependencyPhase } from "relkit/contracts";
 import type { ScaffoldDependencyName } from "create-relkit/internal/scaffold-catalog.types";
 import type { Schema } from "effect";
 import type * as Schemas from "./installation-catalog.schemas.js";

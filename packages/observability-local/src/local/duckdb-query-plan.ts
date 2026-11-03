@@ -1,5 +1,5 @@
 /** Builds history paging SQL with stable request/trace revision selection and bound parameters. */
-import type { NormalizedQuery } from "@relkit/observability/internal/query";
+import type { NormalizedQuery } from "relkit/observability/internal/query";
 import { duckdbQueryFilters } from "./duckdb-query-filters.js";
 const select = "SELECT id::VARCHAR AS cursor, payload::VARCHAR AS payload, origin FROM records";
 /** @param kind - Query signal family. @param query - Validated paging/filter request. @returns Native SQL and ordered bindings. */

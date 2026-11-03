@@ -1,4 +1,4 @@
-import { defineCache } from "@relkit/app";
+import { defineCache } from "relkit";
 import { priceKey, priceValue } from "../../platform/schemas.js";
 
 const prices = defineCache({

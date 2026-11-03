@@ -3,7 +3,7 @@
  * Stop reasons remain precise generic values at compatibility edges; queued
  * activation and scoped workers preserve their original typed failure contracts.
  */
-import type { RuntimeActivationFingerprint } from "@relkit/contracts";
+import type { RuntimeActivationFingerprint } from "relkit/contracts";
 import type { StartedCandidate, SupervisorGenerationDrain } from "@relkit/supervisor";
 import type { Deferred, Effect, Fiber, Queue, Scope } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";

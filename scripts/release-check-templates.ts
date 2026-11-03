@@ -24,8 +24,9 @@ export async function templateInputs(
   rootManifest: RecordValue,
 ): Promise<RecordValue[]> {
   const result: RecordValue[] = [];
-  const scalar = (await readJson(join(root, "packages/runtime-hono/package.json")))
-    .peerDependencies?.["@scalar/hono-api-reference"];
+  const scalar = (await readJson(join(root, "packages/relkit/package.json"))).peerDependencies?.[
+    "@scalar/hono-api-reference"
+  ];
   const forbidden =
     /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/|@aws-sdk\/|@relkit\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
   const fullstackForbidden =
@@ -35,7 +36,10 @@ export async function templateInputs(
     const manifest = await readJson(join(directory, "package.json"));
     for (const field of packageFields)
       for (const [dependency, spec] of Object.entries(manifest[field] ?? {}))
-        if (dependency.startsWith("@relkit/") && spec !== versions.get(dependency))
+        if (
+          (dependency === "relkit" || dependency.startsWith("@relkit/")) &&
+          spec !== versions.get(dependency)
+        )
           throw new Error(`Template ${name} has incompatible ${dependency}@${spec}`);
     if (manifest.dependencies?.["@scalar/hono-api-reference"] !== scalar)
       throw new Error(`Template ${name} Scalar version differs from @relkit/runtime-hono`);

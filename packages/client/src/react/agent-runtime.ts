@@ -1,4 +1,4 @@
-import { runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionSync } from "relkit/contracts/operation";
 import { Layer, ManagedRuntime } from "effect";
 import { AgentOperations, AgentOperationsLive } from "./agent-operations.service.js";
 import { pendingOperationsLayer } from "./pending.service.js";

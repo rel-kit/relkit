@@ -2,7 +2,7 @@
 
 import { finishPlannedRequest } from "./plan-builder-finish.js";
 import { Effect, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { type AddRequest } from "create-relkit/internal/add-types";
 import type {
   DiscoveredArtifact,

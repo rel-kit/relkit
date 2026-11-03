@@ -6,7 +6,7 @@ import type {
   generateClientRegistryEffect,
   generateContractEffect,
 } from "@relkit/client-generator";
-import type { generateOpenApiJsonEffect } from "@relkit/openapi";
+import type { generateOpenApiJsonEffect } from "relkit/openapi";
 import type { GraphCompilationFailure } from "./normalize-graph.types.js";
 import type { JobsManifestGenerationFailure } from "./jobs/manifest.types.js";
 import type { RuntimeIntegrationImportFailure } from "./runtime-integration-errors.js";

@@ -1,9 +1,9 @@
 /** Creates isolated native runtime events fixtures; each caller owns the returned model, state and provider observations. */
 
-import { defineFunction } from "@relkit/functions";
+import { defineFunction } from "relkit/functions";
 
-import { z } from "@relkit/schema";
-import { defineTool } from "@relkit/tools";
+import { z } from "relkit/schema";
+import { defineTool } from "relkit/tools";
 import { defineAgent, type AgentRuntimeOptions } from "../src/index.ts";
 import { createTestModel, type TestModelTurn } from "./test-model.ts";
 

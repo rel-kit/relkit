@@ -1,5 +1,5 @@
 import { observeCompiler } from "../observability.js";
-import { serializeJsonEffect } from "@relkit/contracts";
+import { serializeJsonEffect } from "relkit/contracts";
 import { Effect, Fiber, Option, Schema, Stream } from "effect";
 import type { EvaluatorRequest } from "./evaluator-protocol.types.js";
 import type {

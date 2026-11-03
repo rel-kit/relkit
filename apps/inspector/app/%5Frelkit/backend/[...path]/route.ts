@@ -4,7 +4,7 @@ import {
   readInspectorProxyBody,
 } from "../../../../lib/backend-proxy-body";
 import { INSPECTOR_BACKEND_PATH, OPENAPI_PATH } from "../../../../lib/backend-proxy-paths";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 
 const requestHeadersToDrop = ["connection", "host", "transfer-encoding"];
 const responseHeadersToDrop = ["connection", "content-encoding", "content-length"];

@@ -1,7 +1,7 @@
 /** Exercises native todo behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
 import { expect, test } from "vitest";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { todoListMiddleware } from "langchain";
 import { defineAgent, invokeAgent, type AgentExecutionEvent } from "../src/index.ts";
 import { createTestModel } from "./test-model.ts";

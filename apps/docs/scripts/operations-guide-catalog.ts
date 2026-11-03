@@ -40,7 +40,7 @@ export const operationsGuideRelations = [
   relation(
     "docs/modules/operations/realtime-agents-streaming",
     ["realtime", "agents", "client"],
-    ["packages/runtime-hono/tests/realtime-rpc.test.ts"],
+    ["tests/runtime-rpc/runtime-hono/realtime-rpc.test.ts"],
   ),
   relation(
     "docs/modules/operations/testing",

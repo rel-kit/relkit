@@ -1,5 +1,5 @@
 import type { Effect } from "effect";
-import type { ObservabilityQueryRequest } from "@relkit/observability";
+import type { ObservabilityQueryRequest } from "relkit/observability";
 import type { InspectorObservationFailure } from "./native-edge.types.js";
 
 /** Fixed observability collection labels; request IDs never become operation labels. */

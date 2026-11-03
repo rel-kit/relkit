@@ -9,7 +9,7 @@ It requires Bun 1.3.10 or newer and Node.js 20.9.0 or newer.
 Select inspection explicitly in the application's `relkit.config.ts`:
 
 ```ts
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 
 export default defineApp({ env: defineEnv({}), inspector: { enabled: true } });
 ```

@@ -1,8 +1,8 @@
-import { SourceLocationError } from "@relkit/contracts";
+import { SourceLocationError } from "relkit/contracts";
 import type { ImportBinding } from "./generate-manifest-utils.types.js";
 export type { ImportBinding } from "./generate-manifest-utils.types.js";
-import { createDiagnostic, type Diagnostic } from "@relkit/diagnostics";
-import { normalizeSourcePath } from "@relkit/contracts";
+import { createDiagnostic, type Diagnostic } from "relkit/diagnostics";
+import { normalizeSourcePath } from "relkit/contracts";
 import type { EvaluatorManifestReference } from "./discovery/evaluator-protocol.js";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import type { NormalizedDescriptor } from "./normalize-types.js";

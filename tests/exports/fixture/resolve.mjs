@@ -10,7 +10,7 @@ for (const [packageName, exports] of Object.entries(expected)) {
     // The Bun creator owner and unchanged named Bun adapter expose paths for tooling, not Node execution.
     const nativeBunLeaf =
       packageName === "create-relkit" ||
-      (packageName === "@relkit/runtime-hono" && subpath === "./bun");
+      (packageName === "relkit" && subpath === "./runtime-hono/bun");
     if (bunOnly && !nativeBunLeaf && (typeof target === "string" || target.bun === undefined))
       continue;
     const specifier = subpath === "." ? packageName : `${packageName}${subpath.slice(1)}`;
@@ -36,6 +36,16 @@ for (const [packageName, exports] of Object.entries(expected)) {
     const specifier = `${packageName}/${internalPath}`;
     await rejectImport(specifier);
   }
+}
+
+if (!bunOnly && expected.relkit?.["."]) {
+  // Applications import core APIs from the root and from focused subpaths that share one identity.
+  const core = await import("relkit");
+  const events = await import("relkit/events");
+  if (typeof core.defineFunction !== "function" || typeof core.defineService !== "function")
+    throw new Error("relkit must export defineFunction and defineService from its root");
+  if (events.defineEvent !== core.defineEvent)
+    throw new Error("relkit/events must export the same defineEvent as the root");
 }
 
 if (bunOnly) console.log("Export smoke passed: Bun-only public entries resolved.");

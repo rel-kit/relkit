@@ -1,9 +1,9 @@
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { runInspectorPromise as runExecutionPromise } from "./native-edge.js";
 import { inspectorExecution } from "./execution.js";
 import { nativeAttempt, projectionAttempt } from "./native-edge.js";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import {
   identity,
   isRecord,

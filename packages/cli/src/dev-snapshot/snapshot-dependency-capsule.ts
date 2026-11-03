@@ -4,7 +4,7 @@
  * package directories remain portable and are verified with the other artifacts.
  */
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import { Effect, Schema } from "effect";
 import type { FileSystemCapabilities } from "../services/filesystem.types.js";
 import { DevSnapshotRejected } from "./snapshot-error.js";

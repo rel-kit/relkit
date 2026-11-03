@@ -29,11 +29,8 @@
     }
   },
   "dependencies": {
-    "@relkit/contracts": "workspace:*",
-    "@relkit/deploy": "workspace:*",
-    "@relkit/observability": "workspace:*",
-    "@relkit/runtime-effect": "workspace:*",
-    "effect": "catalog:"
+    "effect": "catalog:",
+    "relkit": "workspace:*"
   },
   "peerDependencies": {
     "@pulumi/pulumi": "catalog:"

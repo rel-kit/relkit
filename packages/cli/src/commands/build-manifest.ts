@@ -7,7 +7,7 @@ import {
   MANIFEST_VERSION,
   RUNTIME_ACTIVATION_FILE,
   RUNTIME_INTEGRATION_PLAN_FILE,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import { GENERATED_ARTIFACT_FILES } from "@relkit/compiler";
 import type { BuildManifestInputs } from "./build.types.js";
 import { repairSelectedAuthManifest } from "../scaffolding/auth-manifest-repair.js";

@@ -1,6 +1,6 @@
 import { expect, it } from "@effect/vitest";
 import { Effect, Layer, ManagedRuntime } from "effect";
-import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionPromise, runExecutionSync } from "relkit/contracts/operation";
 import { JobFeedRegistry, JobFeedRegistryLive } from "../../src/jobs/feed-registry.service.js";
 import { JobControllers, JobControllersLive } from "../../src/jobs/controller.service.js";
 import { watchJobRun } from "../../src/jobs/controller.js";

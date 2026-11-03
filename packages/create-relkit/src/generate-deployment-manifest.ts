@@ -2,7 +2,7 @@
 
 import { join } from "node:path";
 import { Effect, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "./generator-filesystem.js";
 import { GenerateProjectError } from "./generate-types.js";
 import { domainError, domainTry } from "./generator-errors.js";
@@ -36,7 +36,7 @@ export const customizeDeploymentManifestEffect = Effect.fn(
       dependencies: { ...decoded.dependencies },
       scripts: { ...decoded.scripts },
     };
-    const version = manifest.dependencies["@relkit/app"];
+    const version = manifest.dependencies["relkit"];
     if (version === undefined)
       return yield* Effect.fail(
         domainError(

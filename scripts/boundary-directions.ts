@@ -11,24 +11,24 @@ export type DirectionViolation = {
 };
 
 const coreProtocols = new Set([
-  "@relkit/agents",
-  "@relkit/buckets",
-  "@relkit/cache",
-  "@relkit/contracts",
-  "@relkit/deploy",
-  "@relkit/local-service",
-  "@relkit/jobs",
-  "@relkit/observability",
-  "@relkit/provider",
-  "@relkit/realtime",
+  "relkit/agents",
+  "relkit/buckets",
+  "relkit/cache",
+  "relkit/contracts",
+  "relkit/deploy",
+  "relkit/local-service",
+  "relkit/jobs",
+  "relkit/observability",
+  "relkit/provider",
+  "relkit/realtime",
 ]);
 const integrationImplementations = new Map([
-  ["@relkit/local", new Set(["@relkit/providers-local"])],
-  ["@relkit/redis", new Set(["@relkit/providers-local"])],
+  ["@relkit/local", new Set(["relkit/providers-local"])],
+  ["@relkit/redis", new Set(["relkit/providers-local"])],
   ["@relkit/pulumi", new Set(["@relkit/deploy-pulumi"])],
   [
     "@relkit/langchain",
-    new Set(["@relkit/functions", "@relkit/invocation", "@relkit/schema", "@relkit/tools"]),
+    new Set(["relkit/functions", "relkit/invocation", "relkit/schema", "relkit/tools"]),
   ],
 ]);
 
@@ -66,7 +66,7 @@ export function dependencyDirectionViolations(
     for (const dependency of runtimeDependencies) {
       let rule: string | undefined;
       let message: string | undefined;
-      if (owner.manifest?.name === "@relkit/engine" && dependency === "@relkit/providers-local") {
+      if (owner.manifest?.name === "relkit/engine" && dependency === "relkit/providers-local") {
         rule = "engine-local-provider-dependency";
         message = "@relkit/engine depends on local provider implementations";
       } else if (

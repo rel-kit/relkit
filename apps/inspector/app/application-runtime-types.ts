@@ -12,9 +12,9 @@ export type {
   ThreadListItem,
   ThreadSnapshot,
   ToolPartState,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 
-import type { ThreadListItem } from "@relkit/contracts";
+import type { ThreadListItem } from "relkit/contracts";
 
 export interface ThreadList {
   readonly threads: readonly ThreadListItem[];

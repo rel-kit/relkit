@@ -11,13 +11,13 @@ import {
   type ProviderAdapter,
   type ProviderBehavior,
   type ProviderConnectionValues,
-} from "@relkit/provider";
+} from "relkit/provider";
 import {
   serializeJobsServiceOptions,
   validateJobsServiceOptions,
   type JobsServiceBehavior,
   type JobsServiceOptions,
-} from "@relkit/jobs";
+} from "relkit/jobs";
 
 const job = defineProviderCapability("job");
 const durable = defineProviderFeature(job, "durable");
@@ -38,7 +38,7 @@ export interface TriggerOptions extends JobsServiceOptions {
   readonly projectRef?: string | TextReference;
   readonly secretKey?: SecretReference;
   readonly baseUrl?: string | URL | TextReference;
-  readonly native?: Readonly<Record<string, import("@relkit/contracts").JsonValue>>;
+  readonly native?: Readonly<Record<string, import("relkit/contracts").JsonValue>>;
 }
 
 /** @experimental */

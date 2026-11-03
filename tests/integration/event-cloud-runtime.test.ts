@@ -1,26 +1,17 @@
 import { expect, test } from "bun:test";
 import { createEventBridgeProvider } from "../../packages/cloud-aws/src/runtime/events.ts";
 import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
-import {
-  invoke,
-  materializeEvents,
-  type InvocationTarget,
-} from "../../packages/engine/src/index.ts";
+import { invoke, materializeEvents, type InvocationTarget } from "relkit/engine";
 import {
   bindFunctionEvents,
   createEventClient,
   defineEvent,
   defineEventFunction,
-} from "../../packages/events/src/index.ts";
-import { createRegistrationPlan, type ApplicationGraph } from "../../packages/graph/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
-import { createSpanId, createTraceId } from "../../packages/contracts/src/index.ts";
-import {
-  completeSpan,
-  runInExecutionContext,
-  SpanRuntime,
-  startRootSpan,
-} from "../../packages/invocation/dist/index.js";
+} from "relkit/events";
+import { createRegistrationPlan, type ApplicationGraph } from "relkit/graph";
+import { z } from "relkit/schema";
+import { createSpanId, createTraceId } from "relkit/contracts";
+import { completeSpan, runInExecutionContext, SpanRuntime, startRootSpan } from "relkit/invocation";
 
 test("EventBridge keeps the published envelope and delivery/replay metadata", async () => {
   const requests: Array<{ Entries: Array<{ Detail: string }> }> = [];

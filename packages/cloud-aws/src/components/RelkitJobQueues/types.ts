@@ -1,4 +1,4 @@
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import type * as aws from "@pulumi/aws";
 import type * as pulumi from "@pulumi/pulumi";
 import type { RelkitComponentArgs } from "../common.js";

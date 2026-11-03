@@ -42,11 +42,12 @@ test("all current creator, agent and testing internal callers have explicit owni
       if (/(?:^|\/)(?:dist|node_modules|\.next|\.relkit|content\/docs\/api)\//.test(file)) continue;
       const text = await readFile(resolve(root, directory, file), "utf8");
       for (const match of text.matchAll(
-        /["']((create-relkit|@relkit\/(?:agents|testing))\/internal\/([^"']+))["']/g,
+        /["']((create-relkit|@relkit\/testing|relkit\/agents)\/internal\/([^"']+))["']/g,
       )) {
-        const owner = manifests.get(match[2]!);
+        const area = match[2] === "relkit/agents" ? "agents/" : "";
+        const owner = manifests.get(area ? "relkit" : match[2]!);
         const exports = owner?.manifest.exports;
-        expect(Object.keys(exports ?? {}), match[1]).toContain(`./internal/${match[3]}`);
+        expect(Object.keys(exports ?? {}), match[1]).toContain(`./${area}internal/${match[3]}`);
         callers += 1;
       }
     }
@@ -57,7 +58,7 @@ test("real archives satisfy every explicit internal target and still reject a mi
   const directory = await mkdtemp(join(tmpdir(), "relkit-internal-exports-"));
   try {
     const manifests = await readManifests(root);
-    for (const name of ["create-relkit", "@relkit/agents", "@relkit/testing"]) {
+    for (const name of ["create-relkit", "relkit", "@relkit/testing"]) {
       const item = manifests.get(name)!;
       const before = new Set(await readdir(directory));
       await command(

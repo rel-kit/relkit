@@ -1,5 +1,5 @@
-import type { ExpectedClientIdentity, OperationId } from "@relkit/contracts";
-import type { RunListQuery } from "@relkit/contracts/jobs";
+import type { ExpectedClientIdentity, OperationId } from "relkit/contracts";
+import type { RunListQuery } from "relkit/contracts/jobs";
 
 /** Filters accepted by a generated job-specific list; ownership is server-derived. */
 export type JobListQuery = Omit<RunListQuery, "jobId" | "service">;

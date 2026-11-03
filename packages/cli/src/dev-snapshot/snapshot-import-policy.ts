@@ -3,10 +3,10 @@ import { posix } from "node:path";
 
 export const snapshotFactories = new Map([
   ["@langchain/langgraph", new Set(["END", "MemorySaver", "START", "StateSchema", "interrupt"])],
-  ["@relkit/app/agents", new Set(["defineAgent"])],
+  ["relkit/agents", new Set(["defineAgent"])],
   ["@relkit/langchain", new Set(["defineAgent", "defineGraph", "defineGraphNode"])],
-  ["@relkit/app/config", new Set(["defineApp", "defineEnv", "env"])],
-  ["@relkit/app/functions", new Set(["defineFunction", "defineError"])],
+  ["relkit/config", new Set(["defineApp", "defineEnv", "env"])],
+  ["relkit/functions", new Set(["defineFunction", "defineError"])],
   ["@relkit/better-auth", new Set(["defineBetterAuthService"])],
   ["@relkit/drizzle", new Set(["defineDrizzleService"])],
   [
@@ -18,14 +18,18 @@ export const snapshotFactories = new Map([
   ["node:fs", new Set(["mkdirSync"])],
   ["node:path", new Set(["dirname"])],
   ["drizzle-orm/bun-sqlite", new Set(["drizzle"])],
-  ["@relkit/app/jobs", new Set(["defineJob"])],
-  ["@relkit/app/services", new Set(["defineService"])],
-  ["@relkit/app/routes", new Set(["defineRoute", "defineServiceRoutes"])],
-  ["@relkit/app/schema", new Set(["z"])],
-  ["@relkit/app/tasks", new Set(["defineTask"])],
+  ["relkit/jobs", new Set(["defineJob"])],
+  ["relkit/services", new Set(["defineService"])],
+  ["relkit/routes", new Set(["defineRoute", "defineServiceRoutes"])],
+  ["relkit/schema", new Set(["z"])],
+  ["relkit/tasks", new Set(["defineTask"])],
   ["@relkit/local", new Set(["localAgentState", "localRealtime"])],
   ["langchain", new Set(["FakeToolCallingModel", "todoListMiddleware", "tool"])],
 ]);
+// The deprecated @relkit/app re-exports relkit, so its subpaths carry the same constructors.
+for (const [module, names] of [...snapshotFactories])
+  if (module.startsWith("relkit/"))
+    snapshotFactories.set(`@relkit/app/${module.slice("relkit/".length)}`, names);
 
 /** Detects authored files or package self-references that could shadow an audited import. */
 export function isSnapshotFactoryShadow(path: string): boolean {

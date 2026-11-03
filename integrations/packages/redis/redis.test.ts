@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createBindingValueRef } from "@relkit/provider";
+import { createBindingValueRef } from "relkit/provider";
 import { redis, redisAgentState, redisRealtime } from "./src/index.ts";
 import { localRecipe } from "./src/local-recipe/index.ts";
 

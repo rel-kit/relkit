@@ -7,7 +7,7 @@ import type { InspectorRemoteOperations } from "./remote.types.js";
 import type { InspectorOptions } from "./options.types.js";
 import type { InspectorToolStateRef } from "./tool-state.types.js";
 import { collectInspectionBatch } from "./collector.js";
-import type { ObservabilityStream } from "@relkit/observability";
+import type { ObservabilityStream } from "relkit/observability";
 import { publishSelection, publishCollection } from "./live-events.js";
 import { acquireHistory, historyFailureHint, recoverInspection } from "./tool-history.js";
 

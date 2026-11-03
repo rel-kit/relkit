@@ -1,5 +1,5 @@
-import { JsonValueError } from "@relkit/contracts";
-import { canonicalJson, type JsonValue } from "@relkit/contracts";
+import { JsonValueError } from "relkit/contracts";
+import { canonicalJson, type JsonValue } from "relkit/contracts";
 
 export { schemaKey, stableKey, taskSchemaKey } from "./normalize-utils-keys.js";
 

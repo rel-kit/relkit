@@ -1,4 +1,4 @@
-import type { Diagnostic } from "@relkit/diagnostics";
+import type { Diagnostic } from "relkit/diagnostics";
 
 import type { NormalizedDescriptor, NormalizedGraph } from "./normalize-types.js";
 

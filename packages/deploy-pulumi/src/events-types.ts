@@ -1,5 +1,5 @@
 import type { OpMap, UpdateResult } from "@pulumi/pulumi/automation";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 
 /** @experimental */
 export const PULUMI_REPORT_VERSION = 1 as const;
@@ -7,7 +7,7 @@ export const PULUMI_REPORT_VERSION = 1 as const;
 export type PulumiLogLevel = "info" | "warn" | "error";
 /** @experimental */
 export interface PulumiEventOptions {
-  readonly redaction?: import("@relkit/observability").RedactionPolicy;
+  readonly redaction?: import("relkit/observability").RedactionPolicy;
   readonly redact?: (value: unknown) => JsonValue;
 }
 /** @experimental */

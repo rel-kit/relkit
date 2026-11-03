@@ -1,14 +1,14 @@
 import type { GraphCollection } from "./graph.types.js";
 export type { GraphCollection } from "./graph.types.js";
 import { Effect, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import {
   runInspectorPromise as runExecutionPromise,
   runInspectorSync as runExecutionSync,
 } from "./native-edge.js";
 import { inspectorExecution } from "./execution.js";
 import { projectionAttempt } from "./native-edge.js";
-import { type JsonValue } from "@relkit/contracts";
+import { type JsonValue } from "relkit/contracts";
 import { identity, isRecord, page, type ResolvedActiveGeneration } from "./shared.js";
 import { projectDescriptors, projectObservedEdges } from "./graph-utils.js";
 import { projectIntegrationProvenance } from "./topology.js";

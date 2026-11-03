@@ -1,4 +1,4 @@
-import type { MaybePromise, RuntimeActivationFingerprint } from "@relkit/contracts";
+import type { MaybePromise, RuntimeActivationFingerprint } from "relkit/contracts";
 import type { InspectorGenerationServices } from "./shared.js";
 
 /** Unactivated candidate identity and declaration metadata, resolved independently from active runtime services. */

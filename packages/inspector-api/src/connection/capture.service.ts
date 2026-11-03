@@ -4,17 +4,17 @@
  * slow tool. Only an authenticated durable ACK retires a captured prefix.
  */
 import { Context, Effect, Ref, Schema } from "effect";
-import { EarlyRetention, type EarlyRetentionOperations } from "@relkit/observability/early";
+import { EarlyRetention, type EarlyRetentionOperations } from "relkit/observability/early";
 import {
   admitObservabilityRecordEffect,
   normalizeTelemetryConfigurationEffect,
-} from "@relkit/observability";
-import { validateLocalRecord, type LocalRecord } from "@relkit/observability/local/record";
-import type { ObservabilityRecord, TelemetryConfiguration } from "@relkit/observability";
+} from "relkit/observability";
+import { validateLocalRecord, type LocalRecord } from "relkit/observability/local/record";
+import type { ObservabilityRecord, TelemetryConfiguration } from "relkit/observability";
 import type { InspectionCaptureOperations } from "./capture.types.js";
 import { readInspectionBody } from "./bridge-body.js";
 import { InspectionConnectionError } from "./connection-error.js";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { collectCapture } from "./capture-collection.js";
 import { makeCaptureConsumers } from "./capture-consumers.js";
 import { makeCaptureLoss } from "./capture-loss.js";

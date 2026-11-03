@@ -3,7 +3,7 @@
  * Acquisition failure closes partial handles; retirement flushes before release.
  */
 import { Effect, Exit, Scope } from "effect";
-import type { LocalWorkerCommand } from "@relkit/observability/local/record";
+import type { LocalWorkerCommand } from "relkit/observability/local/record";
 import { openDuckdbDatabaseEffect } from "./duckdb-database-effect.js";
 import { DuckdbDriverService } from "./duckdb-driver.js";
 import { duckdbError } from "./duckdb-error.js";

@@ -8,7 +8,7 @@ export type {
   InspectorJobsServices,
 } from "./jobs.types.js";
 import { Schema } from "effect";
-import type { JobRunStatus } from "@relkit/contracts/jobs";
+import type { JobRunStatus } from "relkit/contracts/jobs";
 
 /** Native jobs validation/availability failure retaining the existing positional constructor. */
 export class InspectorJobsError extends Schema.TaggedError<InspectorJobsError>()(

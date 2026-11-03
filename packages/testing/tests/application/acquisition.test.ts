@@ -1,8 +1,8 @@
 import { expect, it } from "@effect/vitest";
 import { Cause, Effect, Exit, Layer } from "effect";
 import { existsSync } from "node:fs";
-import { defineEnv } from "@relkit/config";
-import type { ProviderRegistry } from "@relkit/engine";
+import { defineEnv } from "relkit/config";
+import type { ProviderRegistry } from "relkit/engine";
 import {
   TestApplicationHarness,
   TestApplicationPlatform,

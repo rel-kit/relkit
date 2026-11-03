@@ -1,10 +1,10 @@
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import type {
   ObservabilityQuery,
   ObservabilityQueryRequest,
   ObservabilityStream,
-} from "@relkit/observability";
+} from "relkit/observability";
 import { nativeAttempt, projectionAttempt } from "./native-edge.js";
 import type { InspectorObservationFailure } from "./native-edge.types.js";
 import { streamResponse } from "./observability-stream.js";
@@ -31,7 +31,7 @@ export class InspectorObservability extends Context.Service<
  * @example
  * ```ts
  * import { Effect, ManagedRuntime } from "effect";
- * import { createObservabilityStream } from "@relkit/observability";
+ * import { createObservabilityStream } from "relkit/observability";
  * import { InspectorObservability, inspectorObservabilityLayer } from "@relkit/inspector-api";
  * const source = createObservabilityStream();
  * const owner = ManagedRuntime.make(inspectorObservabilityLayer(undefined, source));

@@ -1,6 +1,6 @@
 import { Cause, Context, Deferred, Effect, Exit, Fiber, Scope } from "effect";
 import type { OwnedCloseOperation, WorkOwnershipState } from "./work-ownership.types.js";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 /**
  * Runs a native facade callback in its already acquired observation context.

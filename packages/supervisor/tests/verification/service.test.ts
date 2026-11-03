@@ -1,8 +1,8 @@
 import { expect, it } from "@effect/vitest";
 import { Deferred, Effect, Exit, Fiber, Layer, Metric } from "effect";
 import { TestClock } from "effect/testing";
-import { API_VERSION, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { API_VERSION, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "relkit/contracts";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
 import {
   CandidateVerification,
   createVerificationLayer,

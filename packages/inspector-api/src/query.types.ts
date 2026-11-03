@@ -1,5 +1,5 @@
 import type { Effect } from "effect";
-import type { JsonValue, MaybePromise } from "@relkit/contracts";
+import type { JsonValue, MaybePromise } from "relkit/contracts";
 import type { ActiveGenerationOptions, ResolvedActiveGeneration } from "./shared.js";
 import type { GRAPH_COLLECTIONS } from "./graph.js";
 import type { RUNTIME_COLLECTIONS } from "./runtime.js";

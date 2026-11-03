@@ -1,1 +1,1 @@
-export type { AgentClientContractMetadata } from "@relkit/graph";
+export type { AgentClientContractMetadata } from "relkit/graph";

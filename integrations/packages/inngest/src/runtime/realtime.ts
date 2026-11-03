@@ -1,5 +1,5 @@
 import type { Inngest } from "inngest";
-import type { OperationContext } from "@relkit/jobs/adapter";
+import type { OperationContext } from "relkit/jobs/adapter";
 
 export async function subscribeInngestRun(
   client: Inngest.Any,

@@ -1,6 +1,6 @@
 /** Verifies externalized SDK selection is freshly resolved independently of bundle members. */
 import { expect, it } from "@effect/vitest";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import { Cause, Effect, Exit } from "effect";
 import { verifySnapshotSelectedDependencies } from "../../src/dev-snapshot/snapshot-selected-dependencies.js";
 import { SnapshotFiles } from "../../src/dev-snapshot/snapshot-files.service.js";
@@ -11,7 +11,7 @@ import { selectedManifestPaths } from "../../src/dev-snapshot/snapshot-dependenc
 it.effect("isolated preparation retains its fixed HTTP producer owner", () =>
   Effect.gen(function* () {
     const fixture = validationFixture();
-    const manifest = canonicalJson({ dependencies: { "@relkit/runtime-hono": "0.7.10" } });
+    const manifest = canonicalJson({ dependencies: { relkit: "0.7.10" } });
     fixture.bytes.set(`${fixture.capsuleRoot}/package.json`, manifest);
     const receipt = {
       ...fixture.receipt,
@@ -34,9 +34,9 @@ it.effect("isolated preparation retains its fixed HTTP producer owner", () =>
         ),
       satisfies: () => true,
     };
-    expect(
-      yield* selectedManifestPaths(source, fixture.root, { "@relkit/runtime-hono": "0.7.10" }),
-    ).toEqual(["/producer/runtime-hono/package.json"]);
+    expect(yield* selectedManifestPaths(source, fixture.root, { relkit: "0.7.10" })).toEqual([
+      "/producer/runtime-hono/package.json",
+    ]);
     const files = yield* SnapshotFiles.pipe(Effect.provide(fixture.layer));
     yield* verifySnapshotSelectedDependencies(
       source,

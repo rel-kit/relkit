@@ -1,4 +1,4 @@
-type RelkitApplicationEnv = import("@relkit/config").ResolvedEnv<typeof import("../../relkit.config.js")["default"]["env"]["shape"]>;
+type RelkitApplicationEnv = import("relkit/config").ResolvedEnv<typeof import("../../relkit.config.js")["default"]["env"]["shape"]>;
 
 declare global {
   namespace Relkit {

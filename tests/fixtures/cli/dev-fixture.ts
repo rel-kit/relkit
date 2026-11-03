@@ -11,7 +11,7 @@ import {
   MANIFEST_VERSION,
   GENERATOR_VERSION,
   type RuntimeActivationFingerprint,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import type { startDev, DevOptions } from "../../../packages/cli/src/commands/dev.js";
 
 /** The runner's scope owns roots and admits existing SDK sessions without changing their identity. */

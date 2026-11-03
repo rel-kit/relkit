@@ -1,5 +1,5 @@
 import { observeJobs } from "./observability.js";
-import { serializeJsonEffect } from "@relkit/contracts";
+import { serializeJsonEffect } from "relkit/contracts";
 import { Effect, Schema } from "effect";
 import type { JobsManifestWorkerEntry } from "./manifest.types.js";
 import { JobWorkerConflictError } from "./worker-errors.js";

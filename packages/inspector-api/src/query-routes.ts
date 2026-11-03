@@ -1,4 +1,4 @@
-import { API_BASE_PATH } from "@relkit/contracts";
+import { API_BASE_PATH } from "relkit/contracts";
 import type { Hono } from "hono";
 import { INSPECTOR_API_PATHS } from "./inspector-endpoint-paths.js";
 import { identity } from "./shared.js";

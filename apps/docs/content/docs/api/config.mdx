@@ -1,6 +1,6 @@
 ---
 title: Configuration API
-description: Generated public TypeScript reference for @relkit/config.
+description: Generated public TypeScript reference for relkit/config.
 search:
   exclude: true
 sidebar:
@@ -29,7 +29,7 @@ For a complete workflow, follow [upload product images](/guides/storage/upload-p
 declare const ConfigOperation: ConfigOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/config-observability.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L4)
 
 ### ConfigTelemetry (class)
 
@@ -47,7 +47,7 @@ Effect.provide(resolveEnvEffect(definition, options), ConfigTelemetryLive);
 declare class ConfigTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/config-observability.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L9)
 
 ### ConfigTelemetryLive
 
@@ -65,7 +65,7 @@ Effect.runSync(Effect.provide(projectEnvEffect(definition), ConfigTelemetryLive)
 declare const ConfigTelemetryLive: Layer.Layer<ConfigTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/config-observability.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L16)
 
 ### ConfigTelemetryService
 
@@ -75,7 +75,7 @@ declare const ConfigTelemetryLive: Layer.Layer<ConfigTelemetry, never, never>;
 declare const ConfigTelemetryService: ConfigTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/config-observability.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L4)
 
 ### observeConfig
 
@@ -96,7 +96,7 @@ declare const observeConfig: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/config-observability.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L30)
 
 ### runConfigSync
 
@@ -118,7 +118,7 @@ runConfigSync(Effect.succeed("ready"));
 declare const runConfigSync: <A, E>(effect: Effect.Effect<A, E>) => A;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/config-observability.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L69)
 
 ## `config-observability.types.ts`
 
@@ -155,7 +155,7 @@ type ConfigOperation =
   | "builder-example";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/config-observability.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.types.ts#L4)
 
 ### ConfigTelemetryService (interface)
 
@@ -178,7 +178,7 @@ export interface ConfigTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/config-observability.types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.types.ts#L30)
 
 ## `config-validation-error.ts`
 
@@ -198,7 +198,7 @@ new ConfigValidationError({ message: "Expected a finite number" });
 declare class ConfigValidationError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/config-validation-error.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-validation-error.ts#L6)
 
 ## `env-builder-metadata.ts`
 
@@ -222,7 +222,7 @@ declare const metadata: (
 ) => EnvMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-builder-metadata.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-builder-metadata.ts#L10)
 
 ### updateMetadata
 
@@ -240,7 +240,7 @@ updateMetadata(env.string().metadata, { optional: true });
 declare const updateMetadata: (value: EnvMetadata, changes: Record<string, unknown>) => EnvMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-builder-metadata.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-builder-metadata.ts#L31)
 
 ## `env-builder.ts`
 
@@ -265,7 +265,7 @@ declare const createEnvBuilder: <T>(
 ) => EnvBuilder<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-builder.ts#L190)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-builder.ts#L190)
 
 ### createEnvBuilderEffect
 
@@ -288,7 +288,7 @@ declare const createEnvBuilderEffect: <T>(
 ) => Effect.Effect<EnvBuilder<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-builder.ts#L170)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-builder.ts#L170)
 
 ### parseEnvBuilderEffect
 
@@ -309,7 +309,7 @@ declare const parseEnvBuilderEffect: <T>(
 ) => Effect.Effect<Exclude<T, undefined>, ConfigValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-builder.ts#L131)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-builder.ts#L131)
 
 ## `env-builder.types.ts`
 
@@ -337,7 +337,7 @@ const fallback: DefaultFactory<string> = () => "test";
 type DefaultFactory<T> = () => Exclude<T, undefined>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-builder.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-builder.types.ts#L9)
 
 ### Parse (type alias)
 
@@ -355,7 +355,7 @@ const parse: Parse<number> = Number;
 type Parse<T> = (value: string) => Exclude<T, undefined>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-builder.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-builder.types.ts#L4)
 
 ## `env-factory.ts`
 
@@ -380,7 +380,7 @@ declare const bindingOrBuilderEffect: <Value>(
 ) => Effect.Effect<EnvBuilder<Value> | BindingValueRef<string, Value>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-factory.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-factory.ts#L80)
 
 ### env
 
@@ -398,7 +398,7 @@ const declaration = defineEnv({ MODE: env.string() });
 declare const env: EnvBuilderFactory;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-factory.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-factory.ts#L14)
 
 ### literalBuilderEffect
 
@@ -420,7 +420,7 @@ declare const literalBuilderEffect: <
 ) => Effect.Effect<EnvBuilder<Values[number]>, ConfigValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-factory.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-factory.ts#L50)
 
 ### parseJsonEffect
 
@@ -440,7 +440,7 @@ declare const parseJsonEffect: (
 ) => Effect.Effect<JsonValue, ConfigValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-factory.ts#L125)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-factory.ts#L125)
 
 ### parseUrlEffect
 
@@ -458,7 +458,7 @@ Effect.runSync(parseUrlEffect("https://example.test"));
 declare const parseUrlEffect: (value: string) => Effect.Effect<URL, ConfigValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-factory.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-factory.ts#L100)
 
 ## `env-factory.types.ts`
 
@@ -567,7 +567,7 @@ export interface EnvBuilderFactory {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-factory.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-factory.types.ts#L9)
 
 ## `env-json.ts`
 
@@ -579,7 +579,7 @@ export interface EnvBuilderFactory {
 declare const JsonValue: JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-json.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-json.ts#L6)
 
 ### toJsonValue
 
@@ -601,7 +601,7 @@ toJsonValue({ count: 2 });
 declare const toJsonValue: (value: unknown) => JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-json.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-json.ts#L23)
 
 ### toJsonValueEffect
 
@@ -621,7 +621,7 @@ declare const toJsonValueEffect: (
 ) => Effect.Effect<JsonValue, ConfigValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-json.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-json.ts#L13)
 
 ## `env-json.types.ts`
 
@@ -650,7 +650,7 @@ type JsonValue =
   string | number | boolean | null | readonly JsonValue[] | { readonly [key: string]: JsonValue };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-json.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-json.types.ts#L4)
 
 ## `env-parsers.ts`
 
@@ -674,7 +674,7 @@ parseBoolean("false");
 declare const parseBoolean: (value: string) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-parsers.ts#L88)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-parsers.ts#L88)
 
 ### parseBooleanEffect
 
@@ -692,7 +692,7 @@ Effect.runSync(parseBooleanEffect("true"));
 declare const parseBooleanEffect: (value: string) => Effect.Effect<boolean, ConfigValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-parsers.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-parsers.ts#L71)
 
 ### parseLiteral
 
@@ -714,7 +714,7 @@ parseLiteral("test", ["test", "prod"]);
 declare const parseLiteral: <T extends LiteralValue>(value: string, values: readonly T[]) => T;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-parsers.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-parsers.ts#L123)
 
 ### parseLiteralEffect
 
@@ -735,7 +735,7 @@ declare const parseLiteralEffect: <T extends LiteralValue>(
 ) => Effect.Effect<T, ConfigValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-parsers.ts#L98)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-parsers.ts#L98)
 
 ### parseNumber
 
@@ -757,7 +757,7 @@ parseNumber("42");
 declare const parseNumber: (value: string) => number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-parsers.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-parsers.ts#L32)
 
 ### parseNumberEffect
 
@@ -775,7 +775,7 @@ Effect.runSync(parseNumberEffect("42"));
 declare const parseNumberEffect: (value: string) => Effect.Effect<number, ConfigValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-parsers.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-parsers.ts#L11)
 
 ### parsePort
 
@@ -797,7 +797,7 @@ parsePort("3000");
 declare const parsePort: (value: string) => number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-parsers.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-parsers.ts#L62)
 
 ### parsePortEffect
 
@@ -815,7 +815,7 @@ Effect.runSync(parsePortEffect("3000"));
 declare const parsePortEffect: (value: string) => Effect.Effect<number, ConfigValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-parsers.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-parsers.ts#L41)
 
 ## `env-ref.ts`
 
@@ -838,7 +838,7 @@ declare const createEnvRef: <Name extends string, Value>(
 ) => EnvRef<Name, Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-ref.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-ref.ts#L65)
 
 ### createEnvRefEffect
 
@@ -859,7 +859,7 @@ declare const createEnvRefEffect: <Name extends string, Value>(
 ) => Effect.Effect<EnvRef<Name, Value>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-ref.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-ref.ts#L40)
 
 ### isEnvRef
 
@@ -877,7 +877,7 @@ isEnvRef(definition.MODE);
 declare const isEnvRef: (value: unknown) => value is EnvRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-ref.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-ref.ts#L30)
 
 ### isEnvRefEffect
 
@@ -895,7 +895,7 @@ Effect.runSync(isEnvRefEffect(definition.MODE));
 declare const isEnvRefEffect: (value: unknown) => Effect.Effect<boolean>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-ref.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-ref.ts#L10)
 
 ## `env-resolution-error.ts`
 
@@ -919,7 +919,7 @@ declare class EnvResolutionError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-resolution-error.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-resolution-error.ts#L7)
 
 ### name (property)
 
@@ -929,7 +929,7 @@ declare class EnvResolutionError {
 readonly name: "EnvResolutionError"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env-resolution-error.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-resolution-error.ts#L11)
 
 ## `env.ts`
 
@@ -944,7 +944,7 @@ TypeError for a reserved name or invalid builder.
 **Example**
 
 ```ts
-import { defineEnv, env } from "@relkit/config";
+import { defineEnv, env } from "relkit/config";
 const environment = defineEnv({ MODE: env.string().default("development") });
 ```
 
@@ -956,7 +956,7 @@ declare const defineEnv: <const S extends EnvShape>(
 ) => EnvDefinition<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L105)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L105)
 
 Since v0.1.0
 
@@ -968,7 +968,7 @@ Since v0.1.0
 declare const BindingValueRef: BindingValueRef<Name, Value, Type>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L14)
 
 ### EnvBuilder
 
@@ -978,7 +978,7 @@ declare const BindingValueRef: BindingValueRef<Name, Value, Type>;
 declare const EnvBuilder: EnvBuilder<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L11)
 
 ### EnvBuilderBase
 
@@ -988,7 +988,7 @@ declare const EnvBuilder: EnvBuilder<T>;
 declare const EnvBuilderBase: EnvBuilderBase;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L12)
 
 ### EnvBuilderFactory
 
@@ -998,7 +998,7 @@ declare const EnvBuilderBase: EnvBuilderBase;
 declare const EnvBuilderFactory: EnvBuilderFactory;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L13)
 
 ### EnvDefinition
 
@@ -1008,7 +1008,7 @@ declare const EnvBuilderFactory: EnvBuilderFactory;
 declare const EnvDefinition: EnvDefinition<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L15)
 
 ### EnvMetadata
 
@@ -1018,7 +1018,7 @@ declare const EnvDefinition: EnvDefinition<S>;
 declare const EnvMetadata: EnvMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L16)
 
 ### EnvMetadataMap
 
@@ -1028,7 +1028,7 @@ declare const EnvMetadata: EnvMetadata;
 declare const EnvMetadataMap: EnvMetadataMap<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L17)
 
 ### EnvRef
 
@@ -1038,7 +1038,7 @@ declare const EnvMetadataMap: EnvMetadataMap<S>;
 declare const EnvRef: EnvRef<Name, Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L20)
 
 ### EnvShape
 
@@ -1048,7 +1048,7 @@ declare const EnvRef: EnvRef<Name, Value>;
 declare const EnvShape: EnvShape;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L18)
 
 ### EnvValueType
 
@@ -1058,7 +1058,7 @@ declare const EnvShape: EnvShape;
 declare const EnvValueType: EnvValueType;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L19)
 
 ### InferEnvValue
 
@@ -1068,7 +1068,7 @@ declare const EnvValueType: EnvValueType;
 declare const InferEnvValue: InferEnvValue<B>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L21)
 
 ### InferEnvValues
 
@@ -1078,7 +1078,7 @@ declare const InferEnvValue: InferEnvValue<B>;
 declare const InferEnvValues: InferEnvValues<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L22)
 
 ### JsonValue
 
@@ -1088,7 +1088,7 @@ declare const InferEnvValues: InferEnvValues<S>;
 declare const JsonValue: JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L9)
 
 ### LiteralValue
 
@@ -1098,7 +1098,7 @@ declare const JsonValue: JsonValue;
 declare const LiteralValue: LiteralValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L23)
 
 ### defineEnvEffect
 
@@ -1118,7 +1118,7 @@ declare const defineEnvEffect: <const S extends EnvShape>(
 ) => Effect.Effect<EnvDefinition<S>, ConfigValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L31)
 
 ### env
 
@@ -1128,7 +1128,7 @@ declare const defineEnvEffect: <const S extends EnvShape>(
 declare const env: EnvBuilderFactory;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L7)
 
 ### isEnvRef
 
@@ -1138,7 +1138,7 @@ declare const env: EnvBuilderFactory;
 declare const isEnvRef: (value: unknown) => value is EnvRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L8)
 
 ## `env.types.ts`
 
@@ -1150,7 +1150,7 @@ declare const isEnvRef: (value: unknown) => value is EnvRef;
 declare const BindingValueRef: BindingValueRef<Name, Value, Type>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.types.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L3)
 
 ### EnvBuilder (interface)
 
@@ -1205,7 +1205,7 @@ export interface EnvBuilder<T> extends EnvBuilderBase {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.types.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L71)
 
 ### EnvBuilderBase (interface)
 
@@ -1240,7 +1240,7 @@ export interface EnvBuilderBase {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.types.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L49)
 
 ### EnvBuilderFactory
 
@@ -1250,7 +1250,7 @@ export interface EnvBuilderBase {
 declare const EnvBuilderFactory: EnvBuilderFactory;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L4)
 
 ### EnvDefinition (type alias)
 
@@ -1275,7 +1275,7 @@ type EnvDefinition<S extends EnvShape> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.types.ts#L134)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L134)
 
 ### EnvMetadata (interface)
 
@@ -1303,7 +1303,7 @@ export interface EnvMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L21)
 
 ### EnvMetadataMap (type alias)
 
@@ -1323,7 +1323,7 @@ type EnvMetadataMap<S extends EnvShape> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.types.ts#L126)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L126)
 
 ### EnvRef (interface)
 
@@ -1349,7 +1349,7 @@ export interface EnvRef<Name extends string = string, Value = unknown> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.types.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L36)
 
 ### EnvShape (type alias)
 
@@ -1367,7 +1367,7 @@ const shape: EnvShape = { MODE: env.string() };
 type EnvShape = { readonly [name: string]: EnvBuilderBase };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.types.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L112)
 
 ### EnvValueType (type alias)
 
@@ -1386,7 +1386,7 @@ type EnvValueType =
   "string" | "number" | "boolean" | "port" | "literal" | "url" | "json" | "secret-string";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L14)
 
 ### InferEnvValue (type alias)
 
@@ -1404,7 +1404,7 @@ type Mode = InferEnvValue<ReturnType<typeof env.string>>;
 type InferEnvValue<B> = B extends EnvBuilder<infer T> ? T : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.types.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L116)
 
 ### InferEnvValues (type alias)
 
@@ -1424,7 +1424,7 @@ type InferEnvValues<S extends EnvShape> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.types.ts#L120)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L120)
 
 ### LiteralValue (type alias)
 
@@ -1442,7 +1442,7 @@ env.literal("test", "production");
 type LiteralValue = string | number | boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L9)
 
 ## `index.ts`
 
@@ -1454,7 +1454,7 @@ type LiteralValue = string | number | boolean;
 declare const BindingValueRef: BindingValueRef<Name, Value, Type>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L9)
 
 ### ConfigOperation
 
@@ -1464,7 +1464,7 @@ declare const BindingValueRef: BindingValueRef<Name, Value, Type>;
 declare const ConfigOperation: ConfigOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L4)
 
 ### ConfigTelemetry
 
@@ -1474,7 +1474,7 @@ declare const ConfigOperation: ConfigOperation;
 declare const ConfigTelemetry: typeof ConfigTelemetry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L3)
 
 ### ConfigTelemetryLive
 
@@ -1484,7 +1484,7 @@ declare const ConfigTelemetry: typeof ConfigTelemetry;
 declare const ConfigTelemetryLive: Layer<ConfigTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L3)
 
 ### ConfigTelemetryService
 
@@ -1494,7 +1494,7 @@ declare const ConfigTelemetryLive: Layer<ConfigTelemetry, never, never>;
 declare const ConfigTelemetryService: ConfigTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L4)
 
 ### ConfigValidationError
 
@@ -1504,7 +1504,7 @@ declare const ConfigTelemetryService: ConfigTelemetryService;
 declare const ConfigValidationError: typeof ConfigValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L5)
 
 ### EnvBuilder
 
@@ -1514,7 +1514,7 @@ declare const ConfigValidationError: typeof ConfigValidationError;
 declare const EnvBuilder: EnvBuilder<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L10)
 
 ### EnvBuilderBase
 
@@ -1524,7 +1524,7 @@ declare const EnvBuilder: EnvBuilder<T>;
 declare const EnvBuilderBase: EnvBuilderBase;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L11)
 
 ### EnvBuilderFactory
 
@@ -1534,7 +1534,7 @@ declare const EnvBuilderBase: EnvBuilderBase;
 declare const EnvBuilderFactory: EnvBuilderFactory;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L12)
 
 ### EnvDefinition
 
@@ -1544,7 +1544,7 @@ declare const EnvBuilderFactory: EnvBuilderFactory;
 declare const EnvDefinition: EnvDefinition<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L13)
 
 ### EnvIssue
 
@@ -1554,7 +1554,7 @@ declare const EnvDefinition: EnvDefinition<S>;
 declare const EnvIssue: EnvIssue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L32)
 
 ### EnvMetadata
 
@@ -1564,7 +1564,7 @@ declare const EnvIssue: EnvIssue;
 declare const EnvMetadata: EnvMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L14)
 
 ### EnvMetadataMap
 
@@ -1574,7 +1574,7 @@ declare const EnvMetadata: EnvMetadata;
 declare const EnvMetadataMap: EnvMetadataMap<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L15)
 
 ### EnvProjection
 
@@ -1584,7 +1584,7 @@ declare const EnvMetadataMap: EnvMetadataMap<S>;
 declare const EnvProjection: EnvProjection;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L33)
 
 ### EnvRef
 
@@ -1594,7 +1594,7 @@ declare const EnvProjection: EnvProjection;
 declare const EnvRef: EnvRef<Name, Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L18)
 
 ### EnvResolutionError
 
@@ -1604,7 +1604,7 @@ declare const EnvRef: EnvRef<Name, Value>;
 declare const EnvResolutionError: typeof EnvResolutionError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L25)
 
 ### EnvShape
 
@@ -1614,7 +1614,7 @@ declare const EnvResolutionError: typeof EnvResolutionError;
 declare const EnvShape: EnvShape;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L16)
 
 ### EnvSource
 
@@ -1624,7 +1624,7 @@ declare const EnvShape: EnvShape;
 declare const EnvSource: Readonly<Record<string, string | undefined>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L34)
 
 ### EnvValueType
 
@@ -1634,7 +1634,7 @@ declare const EnvSource: Readonly<Record<string, string | undefined>>;
 declare const EnvValueType: EnvValueType;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L17)
 
 ### InferEnvValue
 
@@ -1644,7 +1644,7 @@ declare const EnvValueType: EnvValueType;
 declare const InferEnvValue: InferEnvValue<B>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L19)
 
 ### InferEnvValues
 
@@ -1654,7 +1654,7 @@ declare const InferEnvValue: InferEnvValue<B>;
 declare const InferEnvValues: InferEnvValues<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L20)
 
 ### JsonValue
 
@@ -1664,7 +1664,7 @@ declare const InferEnvValues: InferEnvValues<S>;
 declare const JsonValue: JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L21)
 
 ### LiteralValue
 
@@ -1674,7 +1674,7 @@ declare const JsonValue: JsonValue;
 declare const LiteralValue: LiteralValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L22)
 
 ### ResolveEnvOptions
 
@@ -1684,7 +1684,7 @@ declare const LiteralValue: LiteralValue;
 declare const ResolveEnvOptions: ResolveEnvOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L35)
 
 ### ResolvedEnv
 
@@ -1694,7 +1694,7 @@ declare const ResolveEnvOptions: ResolveEnvOptions;
 declare const ResolvedEnv: Readonly<InferEnvValues<S>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L36)
 
 ### createEnvRefEffect
 
@@ -1707,7 +1707,7 @@ declare const createEnvRefEffect: <Name extends string, Value>(
 ) => Effect<EnvRef<Name, Value>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L2)
 
 ### defineEnv
 
@@ -1719,7 +1719,7 @@ declare const defineEnv: <const S extends EnvShape>(
 ) => EnvDefinition<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L1)
 
 ### defineEnvEffect
 
@@ -1731,7 +1731,7 @@ declare const defineEnvEffect: <const S extends EnvShape>(
 ) => Effect<EnvDefinition<S>, ConfigValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L1)
 
 ### env
 
@@ -1741,7 +1741,7 @@ declare const defineEnvEffect: <const S extends EnvShape>(
 declare const env: EnvBuilderFactory;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L1)
 
 ### isBindingValueRef
 
@@ -1751,7 +1751,7 @@ declare const env: EnvBuilderFactory;
 declare const isBindingValueRef: (value: unknown) => value is BindingValueRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L7)
 
 ### isEnvRef
 
@@ -1761,7 +1761,7 @@ declare const isBindingValueRef: (value: unknown) => value is BindingValueRef;
 declare const isEnvRef: (value: unknown) => value is EnvRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L1)
 
 ### isEnvRefEffect
 
@@ -1771,7 +1771,7 @@ declare const isEnvRef: (value: unknown) => value is EnvRef;
 declare const isEnvRefEffect: (value: unknown) => Effect<boolean>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L2)
 
 ### parseEnvBuilderEffect
 
@@ -1784,7 +1784,7 @@ declare const parseEnvBuilderEffect: <T>(
 ) => Effect<Exclude<T, undefined>, ConfigValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L6)
 
 ### projectEnv
 
@@ -1796,7 +1796,7 @@ declare const projectEnv: <S extends EnvShape>(
 ) => readonly EnvProjection[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L26)
 
 ### projectEnvEffect
 
@@ -1808,7 +1808,7 @@ declare const projectEnvEffect: <S extends EnvShape>(
 ) => Effect<readonly EnvProjection[], ConfigValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L27)
 
 ### resolveEnv
 
@@ -1821,7 +1821,7 @@ declare const resolveEnv: <S extends EnvShape>(
 ) => ResolvedEnv<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L28)
 
 ### resolveEnvEffect
 
@@ -1834,7 +1834,7 @@ declare const resolveEnvEffect: <S extends EnvShape>(
 ) => Effect<ResolvedEnv<S>, ConfigValidationError | EnvResolutionError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/index.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L29)
 
 ## `config.ts`
 
@@ -1858,7 +1858,7 @@ declare const resolveEnvWithEffect: <S extends EnvShape>(
 ) => Promise<ResolvedEnv<S>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/internal/config.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/internal/config.ts#L39)
 
 ### resolveEnvWithEffectEffect
 
@@ -1880,7 +1880,7 @@ declare const resolveEnvWithEffectEffect: <S extends EnvShape>(
 ) => Effect.Effect<ResolvedEnv<S>, Config.ConfigError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/internal/config.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/internal/config.ts#L18)
 
 ## `resolve-helpers.ts`
 
@@ -1900,7 +1900,7 @@ definitionIssue(defineEnv({ MODE: env.string() }));
 declare const definitionIssue: (value: unknown) => string | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve-helpers.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve-helpers.ts#L9)
 
 ### optionsIssue
 
@@ -1918,7 +1918,7 @@ optionsIssue({ environment: "test", source: {} });
 declare const optionsIssue: (options: ResolveEnvOptions) => string | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve-helpers.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve-helpers.ts#L31)
 
 ### resolveField
 
@@ -1943,7 +1943,7 @@ declare const resolveField: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve-helpers.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve-helpers.ts#L54)
 
 ## `resolve.ts`
 
@@ -1955,7 +1955,7 @@ declare const resolveField: (
 declare const EnvIssue: EnvIssue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.ts#L11)
 
 ### EnvProjection
 
@@ -1965,7 +1965,7 @@ declare const EnvIssue: EnvIssue;
 declare const EnvProjection: EnvProjection;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.ts#L12)
 
 ### EnvResolutionError
 
@@ -1975,7 +1975,7 @@ declare const EnvProjection: EnvProjection;
 declare const EnvResolutionError: typeof EnvResolutionError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.ts#L9)
 
 ### EnvSource
 
@@ -1985,7 +1985,7 @@ declare const EnvResolutionError: typeof EnvResolutionError;
 declare const EnvSource: Readonly<Record<string, string | undefined>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.ts#L13)
 
 ### ResolveEnvOptions
 
@@ -1995,7 +1995,7 @@ declare const EnvSource: Readonly<Record<string, string | undefined>>;
 declare const ResolveEnvOptions: ResolveEnvOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.ts#L14)
 
 ### ResolvedEnv
 
@@ -2005,7 +2005,7 @@ declare const ResolveEnvOptions: ResolveEnvOptions;
 declare const ResolvedEnv: Readonly<InferEnvValues<S>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.ts#L15)
 
 ### projectEnv
 
@@ -2029,7 +2029,7 @@ declare const projectEnv: <S extends EnvShape>(
 ) => readonly EnvProjection[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.ts#L97)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.ts#L97)
 
 ### projectEnvEffect
 
@@ -2049,7 +2049,7 @@ declare const projectEnvEffect: <S extends EnvShape>(
 ) => Effect.Effect<readonly EnvProjection[], ConfigValidationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.ts#L74)
 
 ### resolveEnv
 
@@ -2074,7 +2074,7 @@ declare const resolveEnv: <S extends EnvShape>(
 ) => ResolvedEnv<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.ts#L62)
 
 ### resolveEnvEffect
 
@@ -2100,7 +2100,7 @@ declare const resolveEnvEffect: <S extends EnvShape>(
 ) => Effect.Effect<ResolvedEnv<S>, ConfigValidationError | EnvResolutionError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.ts#L24)
 
 ## `resolve.types.ts`
 
@@ -2131,7 +2131,7 @@ export interface EnvIssue {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.types.ts#L20)
 
 ### EnvProjection (interface)
 
@@ -2151,7 +2151,7 @@ export interface EnvProjection extends EnvMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.types.ts#L35)
 
 ### EnvSource (type alias)
 
@@ -2169,7 +2169,7 @@ const source: EnvSource = { MODE: "test" };
 type EnvSource = Readonly<Record<string, string | undefined>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.types.ts#L6)
 
 ### ResolveEnvOptions (interface)
 
@@ -2190,7 +2190,7 @@ export interface ResolveEnvOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.types.ts#L11)
 
 ### ResolvedEnv (type alias)
 
@@ -2208,4 +2208,4 @@ type Values = ResolvedEnv<{ MODE: EnvBuilder<string> }>;
 type ResolvedEnv<S extends EnvShape> = Readonly<InferEnvValues<S>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.types.ts#L30)

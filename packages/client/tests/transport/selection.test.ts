@@ -1,6 +1,6 @@
 import { expect, it } from "@effect/vitest";
 import { Context, Effect, Layer, ManagedRuntime } from "effect";
-import { runExecutionPromise } from "@relkit/contracts/operation";
+import { runExecutionPromise } from "relkit/contracts/operation";
 import {
   ClientTransport,
   clientTransportLayer,

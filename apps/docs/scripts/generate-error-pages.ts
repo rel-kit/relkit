@@ -10,7 +10,7 @@ import {
   diagnosticDocsPath,
   diagnosticSlug,
   type DiagnosticCodeEntry,
-} from "@relkit/diagnostics/codes";
+} from "relkit/diagnostics/codes";
 import type { Emit } from "./generation.types.js";
 
 const SOURCES = ["packages/*/src/**/*.{ts,tsx}", "integrations/packages/*/src/**/*.{ts,tsx}"];
@@ -71,7 +71,7 @@ export async function generateErrorPages(
   const missing = undocumentedCodes(emitted, catalog);
   if (missing.length > 0)
     throw new Error(
-      `These codes have no entry in packages/diagnostics/src/codes, so they have no docs page:\n${missing.join("\n")}\nAdd an entry for each code; see WRITING.md.`,
+      `These codes have no entry in packages/relkit/src/diagnostics/codes, so they have no docs page:\n${missing.join("\n")}\nAdd an entry for each code; see WRITING.md.`,
     );
   const unwritten = catalog.filter(
     ({ page }) =>
@@ -165,6 +165,8 @@ function mdx(text: string): string {
 }
 
 function packageName(root: string, path: string): string {
+  const area = /^packages\/relkit\/src\/([^/]+)\//u.exec(path)?.[1];
+  if (area !== undefined) return area === "app" ? "relkit" : `relkit/${area}`;
   const directory = path.startsWith("integrations/")
     ? path.split("/").slice(0, 3).join("/")
     : path.split("/").slice(0, 2).join("/");

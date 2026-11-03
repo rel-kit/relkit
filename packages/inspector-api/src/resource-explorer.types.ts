@@ -1,4 +1,4 @@
-import type { MaybePromise } from "@relkit/contracts";
+import type { MaybePromise } from "relkit/contracts";
 
 /** Bounded native bucket listing and preview authority; unsupported buckets remain explicit. */
 export interface InspectorBucketExplorer {

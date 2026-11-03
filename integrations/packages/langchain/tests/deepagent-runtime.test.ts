@@ -2,8 +2,8 @@
 
 import { describe, expect, test } from "vitest";
 import { InMemoryStore, MemorySaver } from "@langchain/langgraph";
-import { createBucketClient, defineBucket, type BucketProvider } from "@relkit/buckets";
-import { z } from "@relkit/schema";
+import { createBucketClient, defineBucket, type BucketProvider } from "relkit/buckets";
+import { z } from "relkit/schema";
 import { defineAgent, defineCheckpointerDb, defineMemoryDb, invokeAgent } from "../src/index.ts";
 import { hasDeepAgentCapabilities } from "../src/define-agent-deep.ts";
 import { createTestModel } from "./test-model.ts";

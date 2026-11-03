@@ -1,4 +1,4 @@
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { isRecord, safeJson, safeSource, stringValue } from "./shared.js";
 
 /**

@@ -1,6 +1,6 @@
 /** Registers newly planned domain artifacts in their service's public exports so cross-service callers use the established service boundary. */
 
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import type { DomainTarget, DomainArtifact } from "./domain-planning.js";
 import { PlanBuilder } from "./plan-builder.js";
 import { Effect } from "effect";

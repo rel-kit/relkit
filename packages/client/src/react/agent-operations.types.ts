@@ -1,4 +1,4 @@
-import type { JournalCheckpoint, ThreadSnapshot } from "@relkit/contracts";
+import type { JournalCheckpoint, ThreadSnapshot } from "relkit/contracts";
 import type { Effect } from "effect";
 import type { AgentBase } from "./agent-hook-types.types.js";
 

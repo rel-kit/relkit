@@ -1,6 +1,6 @@
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
-import type { JsonValue } from "@relkit/contracts";
+import { observeExecution } from "relkit/contracts/operation";
+import type { JsonValue } from "relkit/contracts";
 import { resolveActiveGenerationEffect } from "./generation.js";
 import { negotiate } from "./router-utils.js";
 import {

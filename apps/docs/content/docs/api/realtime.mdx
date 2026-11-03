@@ -1,6 +1,6 @@
 ---
 title: Realtime API
-description: Generated public TypeScript reference for @relkit/realtime.
+description: Generated public TypeScript reference for relkit/realtime.
 search:
   exclude: true
 sidebar:
@@ -47,7 +47,7 @@ declare const getChannelPresenceEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-operations.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-operations.ts#L87)
 
 ### runChannelPromise
 
@@ -69,7 +69,7 @@ await runChannelPromise(triggerChannelEffect(channel, {}, "posted", "hello"));
 declare const runChannelPromise: <A, E>(effect: Effect.Effect<A, E>) => Promise<A>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-operations.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-operations.ts#L18)
 
 ### triggerChannelEffect
 
@@ -97,7 +97,7 @@ declare const triggerChannelEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-operations.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-operations.ts#L42)
 
 ## `channel-policy.ts`
 
@@ -121,7 +121,7 @@ copyChannelClient({ public: true });
 declare const copyChannelClient: (value: unknown) => ChannelClientPolicy<ChannelGuard> | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-policy.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-policy.ts#L56)
 
 ### copyChannelClientEffect
 
@@ -145,7 +145,7 @@ declare const copyChannelClientEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-policy.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-policy.ts#L21)
 
 ### copyChannelPresence
 
@@ -170,7 +170,7 @@ declare const copyChannelPresence: (
 ) => ChannelPresence | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-policy.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-policy.ts#L116)
 
 ### copyChannelPresenceEffect
 
@@ -201,7 +201,7 @@ declare const copyChannelPresenceEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-policy.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-policy.ts#L73)
 
 ### copyChannelReplay
 
@@ -223,7 +223,7 @@ copyChannelReplay({ retentionMs: 100, maxEvents: 10 });
 declare const copyChannelReplay: (value: unknown) => ChannelReplay | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-policy.ts#L155)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-policy.ts#L155)
 
 ### copyChannelReplayEffect
 
@@ -247,7 +247,7 @@ declare const copyChannelReplayEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-policy.ts#L127)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-policy.ts#L127)
 
 ## `channel-validation.ts`
 
@@ -274,7 +274,7 @@ declare const assertChannelSchema: (
 ) => asserts value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-validation.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-validation.ts#L85)
 
 ### assertChannelSchemaEffect
 
@@ -295,7 +295,7 @@ declare const assertChannelSchemaEffect: (
 ) => Effect.Effect<undefined, ChannelValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-validation.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-validation.ts#L66)
 
 ### copyChannelEvents
 
@@ -317,7 +317,7 @@ copyChannelEvents({ changed: schema });
 declare const copyChannelEvents: (value: unknown) => Readonly<Record<string, StandardSchemaV1>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-validation.ts#L178)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-validation.ts#L178)
 
 ### copyChannelEventsEffect
 
@@ -341,7 +341,7 @@ declare const copyChannelEventsEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-validation.ts#L146)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-validation.ts#L146)
 
 ### isChannelSchema
 
@@ -359,7 +359,7 @@ isChannelSchema(schema);
 declare const isChannelSchema: (value: unknown) => value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-validation.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-validation.ts#L57)
 
 ### isChannelSchemaEffect
 
@@ -377,7 +377,7 @@ Effect.runSync(isChannelSchemaEffect(schema));
 declare const isChannelSchemaEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-validation.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-validation.ts#L41)
 
 ### isRecord
 
@@ -395,7 +395,7 @@ isRecord({});
 declare const isRecord: (value: unknown) => value is Record<PropertyKey, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-validation.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-validation.ts#L33)
 
 ### isRecordEffect
 
@@ -413,7 +413,7 @@ Effect.runSync(isRecordEffect({}));
 declare const isRecordEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-validation.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-validation.ts#L22)
 
 ### runChannelValidation
 
@@ -435,7 +435,7 @@ runChannelValidation(copyChannelEventsEffect({ posted: schema }));
 declare const runChannelValidation: <A>(effect: Effect.Effect<A, ChannelValidationError>) => A;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-validation.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-validation.ts#L12)
 
 ### validateChannelValue
 
@@ -461,7 +461,7 @@ declare const validateChannelValue: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-validation.ts#L127)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-validation.ts#L127)
 
 ### validateChannelValueEffect
 
@@ -483,7 +483,7 @@ declare const validateChannelValueEffect: (
 ) => Effect.Effect<unknown, ChannelValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel-validation.ts#L98)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-validation.ts#L98)
 
 ## `channel.ts`
 
@@ -498,8 +498,8 @@ TypeError for invalid channel options.
 **Example**
 
 ```ts
-import { defineChannel } from "@relkit/realtime";
-import { z } from "@relkit/schema";
+import { defineChannel } from "relkit/realtime";
+import { z } from "relkit/schema";
 const alerts = defineChannel({
   id: "alerts",
   params: z.object({}),
@@ -521,7 +521,7 @@ declare const defineChannel: <
 ) => ChannelDescriptor<Id, ParamsSchema, Events, Client, Presence>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.ts#L134)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L134)
 
 Since v0.4.0
 
@@ -551,7 +551,7 @@ Re-exports all named exports from the "./channel.types.js" module.
 export * from "./channel.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L31)
 
 ### defineChannelEffect
 
@@ -581,7 +581,7 @@ declare const defineChannelEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L39)
 
 ### getChannelPresenceEffect
 
@@ -598,7 +598,7 @@ declare const getChannelPresenceEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L32)
 
 ### isChannelDescriptor
 
@@ -616,7 +616,7 @@ isChannelDescriptor(channel);
 declare const isChannelDescriptor: (value: unknown) => value is ChannelDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.ts#L166)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L166)
 
 ### isChannelDescriptorEffect
 
@@ -634,7 +634,7 @@ Effect.runSync(isChannelDescriptorEffect(channel));
 declare const isChannelDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.ts#L153)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L153)
 
 ### triggerChannelEffect
 
@@ -654,7 +654,7 @@ declare const triggerChannelEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L32)
 
 ## `channel.types.ts`
 
@@ -676,7 +676,7 @@ type ChannelClientPolicy<Guard> =
   | { readonly authorize: Guard; readonly public?: never };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L21)
 
 ### ChannelDescriptor (type alias)
 
@@ -732,7 +732,7 @@ type ChannelDescriptor<
       });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.types.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L55)
 
 ### ChannelDescriptorAny (type alias)
 
@@ -756,7 +756,7 @@ type ChannelDescriptorAny = ChannelDescriptor<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.types.ts#L104)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L104)
 
 ### ChannelDescriptorData (type alias)
 
@@ -782,7 +782,7 @@ type ChannelDescriptorData = DescriptorBase<"channel", string> & {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.types.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L116)
 
 ### ChannelGuard (type alias)
 
@@ -803,7 +803,7 @@ type ChannelGuard<Params = unknown, Context = unknown> = (
 ) => MaybePromise<boolean>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L13)
 
 ### ChannelPresence (type alias)
 
@@ -822,7 +822,7 @@ type ChannelPresence<Params = unknown, Context = unknown> =
   "count" | MemberPresenceDescriptor<StandardSchemaV1, Params, Context>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L41)
 
 ### ChannelReplay (interface)
 
@@ -843,7 +843,7 @@ export interface ChannelReplay {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.types.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L47)
 
 ### DefineChannelOptions (interface)
 
@@ -885,7 +885,7 @@ export interface DefineChannelOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.types.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L128)
 
 ### MemberPresenceDescriptor (interface)
 
@@ -915,7 +915,7 @@ export interface MemberPresenceDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L28)
 
 ## `dispatch.ts`
 
@@ -929,7 +929,7 @@ Re-exports all named exports from the "./dispatch.types.js" module.
 export * from "./dispatch.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/dispatch.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/dispatch.ts#L6)
 
 ### RealtimeDispatcherLive
 
@@ -951,7 +951,7 @@ declare const RealtimeDispatcherLive: Layer.Layer<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/dispatch.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/dispatch.ts#L21)
 
 ### RealtimeDispatcherService (class)
 
@@ -969,7 +969,7 @@ Effect.provide(currentRealtimeDispatcherEffect(), RealtimeDispatcherLive);
 declare class RealtimeDispatcherService
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/dispatch.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/dispatch.ts#L13)
 
 ### currentRealtimeDispatcher
 
@@ -991,7 +991,7 @@ currentRealtimeDispatcher();
 declare const currentRealtimeDispatcher: () => RealtimeDispatcher;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/dispatch.ts#L146)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/dispatch.ts#L146)
 
 ### currentRealtimeDispatcherEffect
 
@@ -1013,7 +1013,7 @@ declare const currentRealtimeDispatcherEffect: () => Effect.Effect<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/dispatch.ts#L124)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/dispatch.ts#L124)
 
 ### runWithRealtimeDispatcher
 
@@ -1038,7 +1038,7 @@ declare const runWithRealtimeDispatcher: <Value>(
 ) => Value;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/dispatch.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/dispatch.ts#L99)
 
 ### runWithRealtimeDispatcherEffect
 
@@ -1059,7 +1059,7 @@ declare const runWithRealtimeDispatcherEffect: <Value>(
 ) => Effect.Effect<Awaited<Value>, RealtimeActionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/dispatch.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/dispatch.ts#L70)
 
 ### setActiveRealtimeDispatcher
 
@@ -1077,7 +1077,7 @@ setActiveRealtimeDispatcher(dispatcher);
 declare const setActiveRealtimeDispatcher: (dispatcher: RealtimeDispatcher | undefined) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/dispatch.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/dispatch.ts#L45)
 
 ### setActiveRealtimeDispatcherEffect
 
@@ -1097,7 +1097,7 @@ declare const setActiveRealtimeDispatcherEffect: (
 ) => Effect.Effect<void, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/dispatch.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/dispatch.ts#L33)
 
 ## `dispatch.types.ts`
 
@@ -1119,7 +1119,7 @@ export interface ChannelTriggerOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/dispatch.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/dispatch.types.ts#L8)
 
 ### RealtimeDispatcher (interface)
 
@@ -1170,7 +1170,7 @@ export interface RealtimeDispatcher {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/dispatch.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/dispatch.types.ts#L15)
 
 ## `index.ts`
 
@@ -1184,7 +1184,7 @@ Re-exports all named exports from the "./channel.js" module.
 export * from "./channel.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/index.ts#L1)
 
 ### "./dispatch.js" (namespace export)
 
@@ -1196,7 +1196,7 @@ Re-exports all named exports from the "./dispatch.js" module.
 export * from "./dispatch.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/index.ts#L4)
 
 ### "./operation-id.js" (namespace export)
 
@@ -1208,7 +1208,7 @@ Re-exports all named exports from the "./operation-id.js" module.
 export * from "./operation-id.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/index.ts#L3)
 
 ### "./provider-dispatcher.js" (namespace export)
 
@@ -1220,7 +1220,7 @@ Re-exports all named exports from the "./provider-dispatcher.js" module.
 export * from "./provider-dispatcher.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/index.ts#L6)
 
 ### "./provider.js" (namespace export)
 
@@ -1232,7 +1232,7 @@ Re-exports all named exports from the "./provider.js" module.
 export * from "./provider.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/index.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/index.ts#L2)
 
 ### "./realtime-errors.js" (namespace export)
 
@@ -1244,7 +1244,7 @@ Re-exports all named exports from the "./realtime-errors.js" module.
 export * from "./realtime-errors.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/index.ts#L7)
 
 ### "./realtime-observability.js" (namespace export)
 
@@ -1256,7 +1256,7 @@ Re-exports all named exports from the "./realtime-observability.js" module.
 export * from "./realtime-observability.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/index.ts#L8)
 
 ### "./realtime-observability.types.js" (namespace export)
 
@@ -1268,7 +1268,7 @@ Re-exports all named exports from the "./realtime-observability.types.js" module
 export * from "./realtime-observability.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/index.ts#L9)
 
 ### "./types.js" (namespace export)
 
@@ -1280,7 +1280,7 @@ Re-exports all named exports from the "./types.js" module.
 export * from "./types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/index.ts#L5)
 
 ## `operation-id.ts`
 
@@ -1300,7 +1300,7 @@ Effect.provide(createOperationIdEffect(0), OperationIdEntropyLive);
 declare class OperationIdEntropy
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/operation-id.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/operation-id.ts#L30)
 
 ### OperationIdEntropyLive
 
@@ -1318,7 +1318,7 @@ Effect.provide(createOperationIdEffect(0), OperationIdEntropyLive);
 declare const OperationIdEntropyLive: Layer.Layer<OperationIdEntropy, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/operation-id.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/operation-id.ts#L38)
 
 ### OperationIdError (class)
 
@@ -1339,7 +1339,7 @@ declare class OperationIdError { constructor(
   ) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/operation-id.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/operation-id.ts#L11)
 
 ### createOperationId
 
@@ -1361,7 +1361,7 @@ createOperationId(Date.now());
 declare const createOperationId: (now?: number) => OperationId;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/operation-id.ts#L160)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/operation-id.ts#L160)
 
 ### createOperationIdEffect
 
@@ -1381,7 +1381,7 @@ declare const createOperationIdEffect: (
 ) => Effect.Effect<OperationId, OperationIdFailure, OperationIdEntropy>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/operation-id.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/operation-id.ts#L123)
 
 ### operationIdTimestamp
 
@@ -1399,7 +1399,7 @@ operationIdTimestamp(id);
 declare const operationIdTimestamp: (value: string) => number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/operation-id.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/operation-id.ts#L61)
 
 ### operationIdTimestampEffect
 
@@ -1417,7 +1417,7 @@ Effect.runSync(operationIdTimestampEffect(id));
 declare const operationIdTimestampEffect: (value: string) => Effect.Effect<number, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/operation-id.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/operation-id.ts#L49)
 
 ### parseOperationId
 
@@ -1439,7 +1439,7 @@ parseOperationId(id, { now: Date.now() });
 declare const parseOperationId: (value: string, options?: ParseOperationIdOptions) => OperationId;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/operation-id.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/operation-id.ts#L108)
 
 ### parseOperationIdEffect
 
@@ -1460,7 +1460,7 @@ declare const parseOperationIdEffect: (
 ) => Effect.Effect<OperationId, OperationIdFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/operation-id.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/operation-id.ts#L71)
 
 ## `operation-id.types.ts`
 
@@ -1486,7 +1486,7 @@ export interface OperationIdEntropyService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/operation-id.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/operation-id.types.ts#L14)
 
 ### ParseOperationIdOptions (interface)
 
@@ -1507,7 +1507,7 @@ export interface ParseOperationIdOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/operation-id.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/operation-id.types.ts#L6)
 
 ## `provider-dispatcher.ts`
 
@@ -1521,7 +1521,7 @@ Re-exports all named exports from the "./provider-dispatcher.types.js" module.
 export * from "./provider-dispatcher.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider-dispatcher.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider-dispatcher.ts#L13)
 
 ### RealtimeProviderSource (class)
 
@@ -1539,7 +1539,7 @@ Effect.provide(triggerProviderEffect(options, request), providerSourceLayer(opti
 declare class RealtimeProviderSource
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider-dispatcher.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider-dispatcher.ts#L19)
 
 ### createProviderRealtimeDispatcher
 
@@ -1563,7 +1563,7 @@ declare const createProviderRealtimeDispatcher: (
 ) => RealtimeDispatcher;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider-dispatcher.ts#L201)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider-dispatcher.ts#L201)
 
 ### createProviderRealtimeDispatcherEffect
 
@@ -1583,7 +1583,7 @@ declare const createProviderRealtimeDispatcherEffect: (
 ) => Effect.Effect<RealtimeDispatcher, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider-dispatcher.ts#L177)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider-dispatcher.ts#L177)
 
 ### limitsForEffect
 
@@ -1595,7 +1595,7 @@ declare const limitsForEffect: (
 ) => Effect.Effect<RealtimeLimits, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider-dispatcher.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider-dispatcher.ts#L14)
 
 ### providerSourceLayer
 
@@ -1615,7 +1615,7 @@ declare const providerSourceLayer: (
 ) => Layer.Layer<RealtimeProviderSource, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider-dispatcher.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider-dispatcher.ts#L29)
 
 ### readProviderPresenceEffect
 
@@ -1638,7 +1638,7 @@ declare const readProviderPresenceEffect: (
 ) => Effect.Effect<PresenceSnapshot, RealtimeProviderError, RealtimeProviderSource>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider-dispatcher.ts#L134)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider-dispatcher.ts#L134)
 
 ### triggerProviderEffect
 
@@ -1671,7 +1671,7 @@ declare const triggerProviderEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider-dispatcher.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider-dispatcher.ts#L69)
 
 ## `provider-dispatcher.types.ts`
 
@@ -1713,7 +1713,7 @@ export interface ProviderRealtimeDispatcherOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider-dispatcher.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider-dispatcher.types.ts#L9)
 
 ### RealtimeProviderSourceService (interface)
 
@@ -1738,7 +1738,7 @@ export interface RealtimeProviderSourceService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider-dispatcher.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider-dispatcher.types.ts#L31)
 
 ## `provider-encoding.ts`
 
@@ -1758,7 +1758,7 @@ Effect.runSync(digestEffect({ id: "one" }));
 declare const digestEffect: (value: unknown) => Effect.Effect<string, RealtimeProviderError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider-encoding.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider-encoding.ts#L12)
 
 ### encodedBytesEffect
 
@@ -1778,7 +1778,7 @@ declare const encodedBytesEffect: (
 ) => Effect.Effect<number, RealtimeProviderError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider-encoding.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider-encoding.ts#L26)
 
 ### providerScopeEffect
 
@@ -1815,7 +1815,7 @@ declare const providerScopeEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider-encoding.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider-encoding.ts#L43)
 
 ## `provider-limits.ts`
 
@@ -1837,7 +1837,7 @@ declare const limitsForEffect: (
 ) => Effect.Effect<RealtimeLimits, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider-limits.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider-limits.ts#L12)
 
 ## `provider.ts`
 
@@ -1851,7 +1851,7 @@ Re-exports all named exports from the "./provider.types.js" module.
 export * from "./provider.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider.ts#L1)
 
 ## `provider.types.ts`
 
@@ -1871,7 +1871,7 @@ const request: AcquirePresenceLease = lease;
 type AcquirePresenceLease = PresenceLeaseRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider.types.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider.types.ts#L112)
 
 ### AppendChannelEvent (interface)
 
@@ -1907,7 +1907,7 @@ export interface AppendChannelEvent extends RealtimeScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider.types.ts#L26)
 
 ### AppendReceiptLookup (type alias)
 
@@ -1925,7 +1925,7 @@ const result: AppendReceiptLookup = await provider.lookupAppendReceipt(lookup);
 type AppendReceiptLookup = ReceiptLookup<TriggerReceipt>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider.types.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider.types.ts#L54)
 
 ### ChannelEventPage (interface)
 
@@ -1948,7 +1948,7 @@ export interface ChannelEventPage {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider.types.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider.types.ts#L70)
 
 ### LookupAppendReceipt (interface)
 
@@ -1977,7 +1977,7 @@ export interface LookupAppendReceipt extends RealtimeScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider.types.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider.types.ts#L43)
 
 ### PresenceLeaseRequest (interface)
 
@@ -2010,7 +2010,7 @@ export interface PresenceLeaseRequest extends RealtimeScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider.types.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider.types.ts#L91)
 
 ### ReadChannelEvents (interface)
 
@@ -2032,7 +2032,7 @@ export interface ReadChannelEvents extends RealtimeScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider.types.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider.types.ts#L60)
 
 ### ReadPresenceRequest (type alias)
 
@@ -2052,7 +2052,7 @@ type ReadPresenceRequest = RealtimeScope & {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider.types.ts#L105)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider.types.ts#L105)
 
 ### RealtimeLimits (interface)
 
@@ -2082,7 +2082,7 @@ export interface RealtimeLimits {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider.types.ts#L14)
 
 ### RealtimeProvider (interface)
 
@@ -2163,7 +2163,7 @@ export interface RealtimeProvider {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider.types.ts#L129)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider.types.ts#L129)
 
 ### ReleasePresenceLease (type alias)
 
@@ -2187,7 +2187,7 @@ const request: ReleasePresenceLease = {
 type ReleasePresenceLease = Omit<PresenceLeaseRequest, "expiresAt">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider.types.ts#L122)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider.types.ts#L122)
 
 ### RenewPresenceLease (type alias)
 
@@ -2205,7 +2205,7 @@ const request: RenewPresenceLease = lease;
 type RenewPresenceLease = PresenceLeaseRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider.types.ts#L117)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider.types.ts#L117)
 
 ### WaitForChannelEvents (interface)
 
@@ -2232,7 +2232,7 @@ export interface WaitForChannelEvents extends RealtimeScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/provider.types.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/provider.types.ts#L81)
 
 ## `realtime-errors.ts`
 
@@ -2252,7 +2252,7 @@ new ChannelValidationError({ operation: "channel.define", reason: "Missing event
 declare class ChannelValidationError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/realtime-errors.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/realtime-errors.ts#L6)
 
 ### OperationIdFailure (class)
 
@@ -2270,7 +2270,7 @@ new OperationIdFailure({ code: "OPERATION_ID_INVALID", reason: "Invalid ID" });
 declare class OperationIdFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/realtime-errors.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/realtime-errors.ts#L38)
 
 ### RealtimeActionError (class)
 
@@ -2288,7 +2288,7 @@ new RealtimeActionError({ operation: "dispatch.runWith", cause: new Error("faile
 declare class RealtimeActionError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/realtime-errors.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/realtime-errors.ts#L22)
 
 ### RealtimeDispatcherError (class)
 
@@ -2309,7 +2309,7 @@ new RealtimeDispatcherError({
 declare class RealtimeDispatcherError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/realtime-errors.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/realtime-errors.ts#L14)
 
 ### RealtimeProviderError (class)
 
@@ -2327,7 +2327,7 @@ new RealtimeProviderError({ operation: "provider.trigger", cause: new Error("off
 declare class RealtimeProviderError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/realtime-errors.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/realtime-errors.ts#L30)
 
 ## `realtime-observability.ts`
 
@@ -2347,7 +2347,7 @@ Effect.provide(Effect.succeed(1), RealtimeTelemetryLive);
 declare class RealtimeTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/realtime-observability.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/realtime-observability.ts#L10)
 
 ### RealtimeTelemetryLive
 
@@ -2365,7 +2365,7 @@ Effect.provide(Effect.succeed(1), RealtimeTelemetryLive);
 declare const RealtimeTelemetryLive: Layer.Layer<RealtimeTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/realtime-observability.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/realtime-observability.ts#L18)
 
 ### observeRealtime
 
@@ -2386,7 +2386,7 @@ declare const observeRealtime: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/realtime-observability.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/realtime-observability.ts#L31)
 
 ## `realtime-observability.types.ts`
 
@@ -2432,7 +2432,7 @@ type RealtimeOperation =
   | "provider.limits";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/realtime-observability.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/realtime-observability.types.ts#L6)
 
 ### RealtimeTelemetryService (interface)
 
@@ -2461,7 +2461,7 @@ export interface RealtimeTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/realtime-observability.types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/realtime-observability.types.ts#L37)
 
 ## `types.ts`
 
@@ -2490,7 +2490,7 @@ export interface ChannelCheckpoint extends RealtimeScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/types.ts#L22)
 
 ### ChannelEventRecord (interface)
 
@@ -2522,7 +2522,7 @@ export interface ChannelEventRecord {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/types.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/types.ts#L43)
 
 ### ChannelGrant (interface)
 
@@ -2551,7 +2551,7 @@ export interface ChannelGrant extends RealtimeScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/types.ts#L32)
 
 ### CountPresence (interface)
 
@@ -2574,7 +2574,7 @@ export interface CountPresence {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/types.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/types.ts#L70)
 
 ### MemberPresence (interface)
 
@@ -2604,7 +2604,7 @@ export interface MemberPresence<Member = unknown> extends CountPresence {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/types.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/types.ts#L90)
 
 ### PresenceMember (interface)
 
@@ -2625,7 +2625,7 @@ export interface PresenceMember<Member = unknown> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/types.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/types.ts#L81)
 
 ### PresenceSnapshot (type alias)
 
@@ -2643,7 +2643,7 @@ const snapshot: PresenceSnapshot = await provider.readPresence(read);
 type PresenceSnapshot<Member = unknown> = CountPresence | MemberPresence<Member>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/types.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/types.ts#L100)
 
 ### RealtimeScope (interface)
 
@@ -2680,7 +2680,7 @@ export interface RealtimeScope extends ExpectedClientIdentity {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/types.ts#L7)
 
 ### TriggerReceipt (interface)
 
@@ -2706,4 +2706,4 @@ export interface TriggerReceipt {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/types.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/types.ts#L56)

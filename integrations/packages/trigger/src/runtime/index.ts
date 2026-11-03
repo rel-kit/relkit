@@ -5,14 +5,14 @@ import type {
   NativeScheduleOperations,
   NativeWatchRequest,
   OperationContext,
-} from "@relkit/jobs/adapter";
+} from "relkit/jobs/adapter";
 import {
   assertSupportedJobsServiceOptions,
   deserializeJobsServiceOptions,
   durationToMillis,
   type JobsServiceOptions,
-} from "@relkit/jobs";
-import type { RuntimeProviderContext, RuntimeProviderIntegration } from "@relkit/provider";
+} from "relkit/jobs";
+import type { RuntimeProviderContext, RuntimeProviderIntegration } from "relkit/provider";
 import { createTriggerHttpClient, type TriggerNativeClient } from "./native.js";
 import { observeTriggerRun, type TriggerObservationOptions } from "./subscription.js";
 import {
@@ -44,7 +44,7 @@ export interface TriggerRuntimeOptions {
 /** @experimental */
 export interface TriggerWorkerRegistrationOptions {
   readonly definitions: readonly TriggerTaskDefinition[];
-  readonly executor: import("@relkit/jobs/adapter").TaskExecutor;
+  readonly executor: import("relkit/jobs/adapter").TaskExecutor;
   readonly startWorker?: boolean;
   readonly register?: (tasks: readonly unknown[]) => Promise<void> | void;
 }

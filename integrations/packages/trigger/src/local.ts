@@ -2,7 +2,7 @@ import {
   LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,
   type CompositeLocalServiceRecipe,
   type LocalServiceRecipeOutputContext,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 
 const TRIGGER_IMAGE =
   "triggerdotdev/trigger.dev@sha256:3563088912cf4b880602d99815ddd787274c4ce5fc77738adf1e5bad287fbd1e";

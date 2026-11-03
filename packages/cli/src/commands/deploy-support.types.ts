@@ -4,7 +4,7 @@ import type {
   writePulumiProgram,
   PulumiBackend,
 } from "@relkit/deploy-pulumi";
-import type { DeploymentPlan } from "@relkit/deploy";
+import type { DeploymentPlan } from "relkit/deploy";
 import type { Schema } from "effect";
 import type { CliCommandContext } from "../main-support.js";
 import type { BuildOptions, BuildResult } from "./build.js";

@@ -1,7 +1,7 @@
 import type { JsonValue, ApplicationGraph, ClientRoute } from "./generate-contract.types.js";
 import { Effect } from "effect";
 import { makeGraphOperation } from "./generator-graph-operation.js";
-import { canonicalJson, CONTRACT_VERSION } from "@relkit/contracts";
+import { canonicalJson, CONTRACT_VERSION } from "relkit/contracts";
 import { contractFromDocumentCalculations } from "./generate-contract-from-document.js";
 import { registryCalculations } from "./generate-registry-fingerprint.js";
 import { manifestCalculations } from "./generate-public-manifest.js";

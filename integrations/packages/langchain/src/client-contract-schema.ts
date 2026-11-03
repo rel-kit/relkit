@@ -1,18 +1,18 @@
 /** Inspects native schema adapters to describe client-visible inputs and outputs; unsupported shapes produce the existing contract errors before execution. */
 
 import { toJsonSchema } from "@langchain/core/utils/json_schema";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { Effect, Metric } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/internal/agent-telemetry";
 import type {
   ClientSchemaMetadata,
   ClientTypeField,
-} from "@relkit/agents/internal/client-contract-schema.types";
+} from "relkit/agents/internal/client-contract-schema.types";
 
 export type {
   ClientSchemaMetadata,
   ClientTypeField,
-} from "@relkit/agents/internal/client-contract-schema.types";
+} from "relkit/agents/internal/client-contract-schema.types";
 
 /** Marker for a schema that cannot be represented in the client contract. */
 export const dynamicClientSchema = Object.freeze({ kind: "dynamic" as const });

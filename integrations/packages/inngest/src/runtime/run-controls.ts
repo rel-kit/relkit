@@ -1,10 +1,10 @@
-import type { JobUnknownOutcome } from "@relkit/contracts/jobs";
-import type { RunRetryReceipt, RunSnapshot } from "@relkit/contracts/jobs";
+import type { JobUnknownOutcome } from "relkit/contracts/jobs";
+import type { RunRetryReceipt, RunSnapshot } from "relkit/contracts/jobs";
 import type {
   NativeControlReceipt,
   NativeRetryRequest,
   OperationContext,
-} from "@relkit/jobs/adapter";
+} from "relkit/jobs/adapter";
 import {
   isAmbiguousInngestWrite,
   rememberInngestRecord,

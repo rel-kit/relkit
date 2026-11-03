@@ -1,5 +1,5 @@
 import { Cause, Context, Deferred, Effect, Exit, Fiber, Layer, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { createWatcherNotify } from "./watcher-notify.js";
 import { runWatcherCompile } from "./watcher-compile.js";
 import type { SupervisorStateMachine } from "./state-machine.js";

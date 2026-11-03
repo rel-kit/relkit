@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { defineEnv } from "@relkit/config";
+import { defineEnv } from "relkit/config";
 import { createTestApplication as createGeneric } from "../../src/application.js";
 import { createTestApplication } from "../../src/drizzle.js";
 import { clients, released } from "./drizzle-service-resource.js";

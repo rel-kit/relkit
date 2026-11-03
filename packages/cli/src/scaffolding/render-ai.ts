@@ -1,7 +1,7 @@
 /** Plans agent and tool artifacts plus their explicit native integration and SDK dependencies before any generated project file is mutated. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import {
   scaffoldErrors,

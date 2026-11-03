@@ -4,7 +4,7 @@
  * expected receipts to isolate ordering and coverage from snapshot validation.
  */
 import { expect, it } from "@effect/vitest";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import { Effect, Exit } from "effect";
 import { verifySnapshotGraphResponse } from "../../src/dev-snapshot/snapshot-graph-proof.js";
 import { snapshotDigest } from "../../src/dev-snapshot/snapshot-fingerprint.js";

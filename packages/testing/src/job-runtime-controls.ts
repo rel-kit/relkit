@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import type { JobQueue } from "@relkit/providers-local";
-import type { JobRunResult } from "@relkit/engine";
+import type { JobQueue } from "relkit/providers-local";
+import type { JobRunResult } from "relkit/engine";
 import type { JobWorkerState } from "./job-runtime.types.js";
 
 /**

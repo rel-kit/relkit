@@ -1,6 +1,6 @@
 import { Context, Effect, Fiber, Layer, Ref, Scope, Stream } from "effect";
-import type { ClientIdentityDocument } from "@relkit/contracts";
-import { observeExecution } from "@relkit/contracts/operation";
+import type { ClientIdentityDocument } from "relkit/contracts";
+import { observeExecution } from "relkit/contracts/operation";
 import { nativeStream } from "../native-stream.js";
 import { procedureCall } from "./procedure.js";
 import { realtimeSubscriptionKey } from "./realtime-session-key.js";
@@ -24,7 +24,7 @@ export class RealtimeSessions extends Context.Service<RealtimeSessions, Realtime
  * @example
  * ```ts
  * import { ManagedRuntime } from "effect";
- * import { runExecutionSync } from "@relkit/contracts/operation";
+ * import { runExecutionSync } from "relkit/contracts/operation";
  * import { RealtimeSessions, realtimeSessionsLayer } from "./realtime-session.service.js";
  * export async function realtimeOwner(): Promise<void> {
  *   const owner = ManagedRuntime.make(realtimeSessionsLayer({}));

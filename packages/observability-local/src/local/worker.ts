@@ -9,6 +9,6 @@
  * retains the transport's explicit close operation and physical child identity.
  */
 export { startLocalWorkerEffect } from "./worker-client-effect.js";
-export type { LocalWorkerEffects } from "@relkit/observability/local/worker-contract";
-export type { LocalWorkerError } from "@relkit/observability/local/worker-contract";
-export type { LocalWorkerCommand } from "@relkit/observability/local/record";
+export type { LocalWorkerEffects } from "relkit/observability/local/worker-contract";
+export type { LocalWorkerError } from "relkit/observability/local/worker-contract";
+export type { LocalWorkerCommand } from "relkit/observability/local/record";

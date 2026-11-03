@@ -2,8 +2,8 @@ import type {
   DeploymentHostMaterialization,
   DeploymentPlan,
   DeploymentResourceOperation,
-} from "@relkit/deploy";
-import { deploymentOutput } from "@relkit/deploy";
+} from "relkit/deploy";
+import { deploymentOutput } from "relkit/deploy";
 
 /** Converts task jobs into provider-native staged operations. No HTTP container is synthesized. */
 export function nativeWorkerOperations(

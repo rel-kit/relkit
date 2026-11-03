@@ -57,7 +57,7 @@ test("failed checks preserve the last valid graph and update diagnostics", async
   const graph = await readFile(graphPath, "utf8");
   await writeFile(
     join(root, "src/routes/hello/[name]/route.ts"),
-    'import { defineRoute } from "@relkit/app";\nexport default defineRoute({});\n',
+    'import { defineRoute } from "relkit";\nexport default defineRoute({});\n',
   );
 
   const invalid = await checkProject({ projectRoot: root });

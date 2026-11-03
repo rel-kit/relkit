@@ -1,5 +1,5 @@
 import { Config, Context, Effect, Layer, Option, Redacted } from "effect";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import {
   agentProcedureEntriesFromDocument,
   generateContractFromDocument,

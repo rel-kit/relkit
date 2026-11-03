@@ -1,5 +1,5 @@
 /** State shared by serialized compilation stages; native resource lifetimes remain owned by the compiler. */
-import type { RuntimeIntegrationPlan } from "@relkit/contracts";
+import type { RuntimeIntegrationPlan } from "relkit/contracts";
 import type { Deferred, Effect, Ref, Scope } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { CliCleanup } from "../services/cleanup.service.js";

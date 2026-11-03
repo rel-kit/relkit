@@ -3,12 +3,12 @@
  * workflow. These readonly contracts carry validated graph identities between
  * filesystem steps without acquiring resources or evaluating application code.
  */
-import type { RuntimeActivationFingerprint } from "@relkit/contracts";
-import type { Diagnostic } from "@relkit/diagnostics";
+import type { RuntimeActivationFingerprint } from "relkit/contracts";
+import type { Diagnostic } from "relkit/diagnostics";
 import type { CheckOptions } from "./check.types.js";
 import type { CheckResult } from "./check-result.types.js";
 import type { JobsManifest, LoadedToolingConfig } from "@relkit/compiler";
-import type { ApplicationGraph } from "@relkit/graph";
+import type { ApplicationGraph } from "relkit/graph";
 import type { ProductionRepairs } from "./build-production-repairs.js";
 
 /** Build inputs; an injected check remains the established public compatibility seam. */

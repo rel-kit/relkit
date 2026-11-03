@@ -1,6 +1,6 @@
-import type { ThreadSnapshot } from "@relkit/contracts";
+import type { ThreadSnapshot } from "relkit/contracts";
 import type { AgentThreadOptions } from "./agent-hook-types.types.js";
-import { runExecutionPromise } from "@relkit/contracts/operation";
+import { runExecutionPromise } from "relkit/contracts/operation";
 import { agentOperations, agentRuntime } from "./agent-runtime.js";
 import type { PreparedContinuation } from "./agent-operations.types.js";
 

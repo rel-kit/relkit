@@ -14,7 +14,7 @@ import { observeCompiler } from "./observability.js";
 import type { LoadedPackage } from "./integration-package-resolution.types.js";
 import { CompilerPackageSource } from "./integration-package-source.js";
 
-import { isStableId, type RuntimeIntegrationRegistrationMetadata } from "@relkit/contracts";
+import { isStableId, type RuntimeIntegrationRegistrationMetadata } from "relkit/contracts";
 
 /**
  * Checks runtime package metadata and resolves its declared export.

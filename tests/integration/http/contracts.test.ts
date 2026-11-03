@@ -1,18 +1,11 @@
 import { expect, test } from "bun:test";
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import {
-  API_BASE_PATH,
-  API_VERSION,
-  canonicalJson,
-} from "../../../packages/contracts/src/index.ts";
-import {
-  createRegistrationPlan,
-  type RegistrationPlan,
-} from "../../../packages/graph/src/index.ts";
+import { API_BASE_PATH, API_VERSION, canonicalJson } from "relkit/contracts";
+import { createRegistrationPlan, type RegistrationPlan } from "relkit/graph";
 import { generateClient } from "../../../packages/client-generator/src/index.ts";
-import { generateOpenApiJson } from "../../../packages/openapi/src/index.ts";
-import { createApp, type RuntimeManifest } from "../../../packages/runtime-hono/src/index.ts";
+import { generateOpenApiJson } from "relkit/openapi";
+import { createApp, type RuntimeManifest } from "relkit/runtime-hono";
 import { createTestHttpClient } from "../../../packages/testing/src/index.ts";
 import { runtimeCohort } from "../runtime-cohort.ts";
 import { contractGraph } from "./contract-fixture.ts";

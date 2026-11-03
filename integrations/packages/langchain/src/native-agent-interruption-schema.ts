@@ -1,8 +1,8 @@
 /** Declares executable schemas for native interruption payloads before they cross the durable RelKit continuation boundary. */
 
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/internal/agent-telemetry";
 import type {
   DecisionType,
   HitlRequest,

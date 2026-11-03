@@ -8,7 +8,7 @@ import { Effect, Semaphore } from "effect";
 import { initializeDuckdbSchema } from "../src/local/duckdb-schema.js";
 import { makeDuckdbStorage } from "../src/local/duckdb-storage.js";
 import type { DuckdbConnectionPort } from "../src/local/duckdb-driver.types.js";
-import type { LocalRecord } from "@relkit/observability/local/record";
+import type { LocalRecord } from "relkit/observability/local/record";
 
 /**
  * Builds distinct current log records for the actual native storage boundary.

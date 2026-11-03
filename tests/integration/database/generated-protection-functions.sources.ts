@@ -1,13 +1,13 @@
 /** Native functions, direct calls, tools and real HTTP middleware enforce the same user and tenant denial in both physical layouts. */
 export const generatedProtectionFunctionSources = {
   "src/services/ownership/errors/denied.error.ts": `/** Native declared denial retains its HTTP mapping and precise subject data. */
-import { defineError } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineError } from "relkit/functions";
+import { z } from "relkit/schema";
 export default defineError({ id: "ownership.denied", data: z.object({ ownerId: z.string() }), message: "Subject access denied", http: { status: 403 }, retry: "never" });
 `,
   "src/services/ownership/functions/read.function.ts": `/** Native function validates ownership even when called directly or through a tool. */
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 import { owns } from "@app/platform/ownership.js";
 import denied from "../errors/denied.error.js";
 export default defineFunction({ id: "ownership.read", input: z.object({ ownerId: z.string(), tenant: z.string() }), output: z.object({ allowed: z.boolean() }), errors: [denied],
@@ -29,8 +29,8 @@ export default read.asTool({ id: "ownership.read-tool", description: "Read an ow
     "ownership.tool-read",
   ),
   "src/services/ownership/functions/publish.function.ts": `/** Native publication keeps the original channel descriptor and current request authorization. */
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 import { owns } from "@app/platform/ownership.js";
 import feed from "../channels/feed.channel.js";
 import denied from "../errors/denied.error.js";
@@ -43,8 +43,8 @@ export default defineFunction({ id: "ownership.publish", input: z.object({ owner
 });
 `,
   "src/services/ownership/functions/presence.function.ts": `/** Native presence inspection uses the same guarded subject and real provider as live channel streams. */
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 import { owns } from "@app/platform/ownership.js";
 import feed from "../channels/feed.channel.js";
 import denied from "../errors/denied.error.js";
@@ -58,8 +58,8 @@ export default defineFunction({ id: "ownership.presence", input: z.object({ owne
 });
 `,
   "src/services/ownership/functions/stream.function.ts": `/** Finite native SSE target validates its original subject and completes under the real request middleware. */
-import { defineFunction, streamOf } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction, streamOf } from "relkit/functions";
+import { z } from "relkit/schema";
 import { owns } from "@app/platform/ownership.js";
 import read from "./read.function.js";
 export default defineFunction({ id: "ownership.stream", input: read.input, output: streamOf(z.object({ phase: z.string() })), handler: async function* (input, context) {
@@ -69,12 +69,12 @@ export default defineFunction({ id: "ownership.stream", input: read.input, outpu
 } });
 `,
   "src/routes/ownership/stream/route.ts": `/** Native finite SSE route retains its URL, original target and stream response mapping. */
-import { defineRoute } from "@relkit/app/routes";
+import { defineRoute } from "relkit/routes";
 import ownership from "@app/services/ownership/service.js";
 export const GET = defineRoute({ target: ownership.stream, stream: { format: "sse" } });
 `,
   "src/services/ownership/service.ts": `/** Exposes only the controlled guarded function facade without new framework authoring APIs. */
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 import read from "./functions/read.function.js";
 import directRead from "./functions/direct-read.function.js";
 import toolRead from "./functions/tool-read.function.js";
@@ -84,7 +84,7 @@ import stream from "./functions/stream.function.js";
 export default defineService({ functions: { read, directRead, toolRead, publish, presence, stream } });
 `,
   "src/routes/middleware/ownership-auth.middleware.ts": `/** Real HTTP middleware rejects anonymous requests before any business function or nested tool invocation. */
-import { defineMiddleware } from "@relkit/app/routes";
+import { defineMiddleware } from "relkit/routes";
 export default defineMiddleware("/ownership/*", async (context, next, relkit) => {
   if (await relkit.auth.getSession() === null) return context.json({ error: "unauthorized" }, 401);
   await next();
@@ -102,7 +102,7 @@ export default defineMiddleware("/ownership/*", async (context, next, relkit) =>
  */
 function guardedBridge(invoke: string, imports: string, id: string): string {
   return `/** Native nested invocation preserves declared subject denial and original failures. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 ${imports}
 import denied from "../errors/denied.error.js";
 export default defineFunction({ id: ${JSON.stringify(id)}, input: read.input, output: read.output, errors: [denied], handler: async (input) => {
@@ -123,7 +123,7 @@ function ownershipRoutes(): Record<string, string> {
   return Object.fromEntries(
     ["read", "directRead", "toolRead", "presence", "publish"].map((member) => [
       `src/routes/ownership/${member}/route.ts`,
-      `/** Mounts ${member} through the real native HTTP runtime. */\nimport { defineRoute } from "@relkit/app/routes";\nimport ownership from "@app/services/ownership/service.js";\nexport const ${member === "publish" ? "POST" : "GET"} = defineRoute({ target: ownership.${member} });\n`,
+      `/** Mounts ${member} through the real native HTTP runtime. */\nimport { defineRoute } from "relkit/routes";\nimport ownership from "@app/services/ownership/service.js";\nexport const ${member === "publish" ? "POST" : "GET"} = defineRoute({ target: ownership.${member} });\n`,
     ]),
   );
 }

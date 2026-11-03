@@ -1,6 +1,6 @@
-import { isRuntimeActivationFingerprint } from "@relkit/contracts";
-import { observeExecution } from "@relkit/contracts/operation";
-import { admitObservabilityRecord } from "@relkit/observability";
+import { isRuntimeActivationFingerprint } from "relkit/contracts";
+import { observeExecution } from "relkit/contracts/operation";
+import { admitObservabilityRecord } from "relkit/observability";
 import { Cause, Clock, Context, Deferred, Effect, Exit, Layer, Queue, Ref } from "effect";
 import { recordsForTelemetry } from "./observability-records.js";
 import type { SupervisorObservabilityOptions } from "./observability.types.js";

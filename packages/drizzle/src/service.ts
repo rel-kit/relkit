@@ -1,5 +1,5 @@
-import { createDescriptorBase } from "@relkit/contracts";
-import { createUnboundIdentity } from "@relkit/invocation";
+import { createDescriptorBase } from "relkit/contracts";
+import { createUnboundIdentity } from "relkit/invocation";
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-orm/zod";
 import { getTableName } from "drizzle-orm";
 import { extractTables, inspectTables } from "./metadata.js";

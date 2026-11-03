@@ -3,7 +3,7 @@
  * single-flight dynamic imports. The graph remains the complete validated route
  * table; only executable materialization is deferred.
  */
-import type { ApplicationGraph } from "@relkit/graph";
+import type { ApplicationGraph } from "relkit/graph";
 import {
   identityStatements,
   identifierPattern,

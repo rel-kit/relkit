@@ -1,6 +1,6 @@
 /** The built-in builder is `s`; `z` is the same builder until the breaking release renames it. */
-import { defineFunction } from "@relkit/functions";
-import { s, z, type InferInput, type InferOutput } from "@relkit/schema";
+import { defineFunction } from "relkit/functions";
+import { s, z, type InferInput, type InferOutput } from "relkit/schema";
 
 /** Mutual assignability; the builder returns mapped types that strict identity does not match. */
 type Equal<Left, Right> = [Left] extends [Right] ? ([Right] extends [Left] ? true : false) : false;

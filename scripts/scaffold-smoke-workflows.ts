@@ -3,7 +3,7 @@ import { strict as assert } from "node:assert";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { Context, Effect, Layer, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { ScaffoldProcess, scaffoldProcessLayer } from "./scaffold-process.js";
 import { scaffoldRequest } from "./scaffold-http.js";
 import { ScaffoldProcessFailure } from "./scaffold-process.errors.js";

@@ -4,7 +4,7 @@ import { cp, lstat, mkdir, mkdtemp, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { Context, Effect, Layer, ManagedRuntime, References, Scope } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { prepareProjectDependencyPatch } from "../../packages/create-relkit/src/dependency-patches.ts";
 import {
   applyScaffoldPlan,
@@ -142,13 +142,14 @@ const linkInstalledDependencies = Effect.fn("AddFixture.dependencies")(function*
   for (const name of ["docker", "local", "redis", "s3", "langchain"])
     yield* link(join(repository, "integrations/packages", name), join(relkit, name));
   const aliases = [
+    ["packages/relkit", "relkit"],
     ["node_modules/effect", "effect"],
-    ["packages/schema/node_modules/zod", "zod"],
+    ["packages/relkit/node_modules/zod", "zod"],
     ["integrations/packages/langchain/node_modules/langchain", "langchain"],
     ["integrations/packages/langchain/node_modules/langsmith", "langsmith"],
     ["integrations/packages/langchain/node_modules/@langchain/core", "@langchain/core"],
-    ["packages/runtime-hono/node_modules/@ag-ui/core", "@ag-ui/core"],
-    ["packages/runtime-hono/node_modules/@scalar/hono-api-reference", "@scalar/hono-api-reference"],
+    ["packages/relkit/node_modules/@ag-ui/core", "@ag-ui/core"],
+    ["packages/relkit/node_modules/@scalar/hono-api-reference", "@scalar/hono-api-reference"],
     ["integrations/packages/langchain/node_modules/@langchain/langgraph", "@langchain/langgraph"],
     ["packages/drizzle/node_modules/drizzle-orm", "drizzle-orm"],
     ["packages/better-auth/node_modules/better-auth", "better-auth"],

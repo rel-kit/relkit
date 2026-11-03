@@ -1,4 +1,4 @@
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { Cause, Deferred, Effect, Exit, Fiber, Scope } from "effect";
 import { ownProxyBody } from "./proxy-body.js";
 import { forwardProxyRequest } from "./proxy-forward.js";

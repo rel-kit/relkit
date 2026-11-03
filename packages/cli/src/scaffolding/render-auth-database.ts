@@ -6,7 +6,7 @@
 
 import { Effect } from "effect";
 import { dirname, posix } from "node:path";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import { scaffoldErrors, domainError } from "create-relkit/internal/generator-errors";
 import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";

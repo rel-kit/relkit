@@ -1,5 +1,5 @@
-import type { MaybePromise } from "@relkit/contracts";
-import type { InspectableObservabilityHooks, ObservabilityHookEvent } from "@relkit/engine";
+import type { MaybePromise } from "relkit/contracts";
+import type { InspectableObservabilityHooks, ObservabilityHookEvent } from "relkit/engine";
 import type { TestHttpListener, TestHttpListenerOptions } from "./http-listener.js";
 
 /** Native Request, URL or relative path accepted by direct HTTP fixtures. */
@@ -16,7 +16,7 @@ export interface TestHttpApplication {
 
 /** Explicit test origin, listener close policy and ownership callbacks. */
 export interface TestHttpClientOptions {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly baseUrl?: string | URL;
   /** Registers client shutdown with the owning test runtime/application. */
   readonly registerClose?: (close: () => Promise<void>) => void;

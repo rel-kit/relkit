@@ -1,8 +1,8 @@
 /** Exercises native deep events public behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
 import { expect, test } from "vitest";
-import { z } from "@relkit/schema";
-import type { BrowserMessage } from "@relkit/contracts";
+import { z } from "relkit/schema";
+import type { BrowserMessage } from "relkit/contracts";
 import type { AgentExecutionEvent } from "../src/index.ts";
 import { collectNativeEvents } from "../src/runtime-native-events.ts";
 import { limitFailure, native, sink, stream } from "./native-deep-events.helpers.ts";

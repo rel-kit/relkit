@@ -33,17 +33,10 @@
     }
   },
   "dependencies": {
-    "@relkit/agents": "workspace:*",
-    "@relkit/buckets": "workspace:*",
-    "@relkit/cache": "workspace:*",
-    "@relkit/contracts": "workspace:*",
-    "@relkit/engine": "workspace:*",
-    "@relkit/events": "workspace:*",
-    "@relkit/graph": "workspace:*",
-    "@relkit/jobs": "workspace:*",
     "@pulumi/aws": "catalog:",
     "@pulumi/awsx": "3.10.0",
-    "@pulumi/pulumi": "catalog:"
+    "@pulumi/pulumi": "catalog:",
+    "relkit": "workspace:*"
   },
   "scripts": {
     "build": "tsc -b",

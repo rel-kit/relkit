@@ -10,7 +10,7 @@ import {
   type BindingValueRef,
   type ProviderAdapter,
   type ProviderBehavior,
-} from "@relkit/provider";
+} from "relkit/provider";
 
 const cache = defineProviderCapability("cache");
 export const redisIntegration = defineIntegrationReference("redis");
@@ -57,7 +57,7 @@ export type RedisAdapter<Options extends RedisOptions = RedisOptions> = Provider
  *
  * @example
  * ```ts
- * import { env } from "@relkit/app/config";
+ * import { env } from "relkit/config";
  * import { redis } from "@relkit/redis";
  * const cache = redis({ url: env.secret("CACHE_URL") });
  * ```

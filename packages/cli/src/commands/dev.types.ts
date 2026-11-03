@@ -1,7 +1,7 @@
 /** Explicit development policy keeps resourceful work in the session's Effect scope. */
-import type { LoggerOptions, LogLevel, LogRecord } from "@relkit/runtime-effect";
+import type { LoggerOptions, LogLevel, LogRecord } from "relkit/runtime-effect";
 import type { Effect } from "effect";
-import type { JsonValue, RuntimeActivationFingerprint } from "@relkit/contracts";
+import type { JsonValue, RuntimeActivationFingerprint } from "relkit/contracts";
 import type {
   CandidateCompile,
   StartedCandidate,

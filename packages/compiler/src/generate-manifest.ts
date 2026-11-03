@@ -5,9 +5,9 @@ import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
 import type { ManifestGenerationInput, GeneratedManifest } from "./generate-manifest.types.js";
 export type { ManifestGenerationInput, GeneratedManifest } from "./generate-manifest.types.js";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
-import { createDiagnostic, sortDiagnostics, type Diagnostic } from "@relkit/diagnostics";
-import { hashGraphEffect } from "@relkit/graph";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "relkit/contracts";
+import { createDiagnostic, sortDiagnostics, type Diagnostic } from "relkit/diagnostics";
+import { hashGraphEffect } from "relkit/graph";
 
 import {
   descriptorsOf,

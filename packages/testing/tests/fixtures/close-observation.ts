@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { Context, Effect, Metric } from "effect";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { createTestRuntime } from "../../src/runtime.js";
 import { createTestHttpClient } from "../../src/http.js";
 import { createTestJob } from "../../src/jobs.js";

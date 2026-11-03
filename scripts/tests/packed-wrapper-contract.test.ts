@@ -12,15 +12,14 @@ async function fixture(root: string, includeCli: boolean) {
     {
       name: "relkit",
       version: "1.2.3",
-      dependencies: { "create-relkit": "2.3.4", ...(includeCli ? { "@relkit/cli": "3.4.5" } : {}) },
+      dependencies: { effect: "4.0.1", ...(includeCli ? { "@relkit/cli": "3.4.5" } : {}) },
     },
     {
       name: "create-relkit",
       version: "2.3.4",
-      dependencies: { "@relkit/contracts": "4.5.6", effect: "4.0.1" },
+      dependencies: { relkit: "1.2.3", effect: "4.0.1" },
     },
     { name: "@relkit/cli", version: "3.4.5" },
-    { name: "@relkit/contracts", version: "4.5.6" },
   ];
   const manifests = new Map<string, { readonly manifest: Manifest }>();
   const archives = new Map<string, string>();
@@ -46,11 +45,10 @@ test("wrapper registry serves only its actual creator runtime archive closure", 
     expect([...(await wrapperArchiveClosure(archives, manifests)).keys()]).toEqual([
       "relkit",
       "create-relkit",
-      "@relkit/contracts",
     ]);
-    archives.delete("@relkit/contracts");
+    archives.delete("create-relkit");
     await expect(wrapperArchiveClosure(archives, manifests)).rejects.toThrow(
-      "Missing wrapper runtime archive: @relkit/contracts",
+      "Missing wrapper runtime archive: create-relkit",
     );
   } finally {
     await rm(root, { recursive: true, force: true });

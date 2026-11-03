@@ -1,7 +1,7 @@
 /** Resolves execution and exposure choices for domain artifacts against the selected service and available job profiles. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import { GeneratorPrompt } from "create-relkit/internal/generator-prompt";
 

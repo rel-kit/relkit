@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { Effect } from "../../../packages/testing/node_modules/effect/dist/index.js";
-import { dispatchInvocation } from "../../../packages/invocation/dist/index.js";
-import { defineEnv } from "../../../packages/config/src/index.ts";
+import { dispatchInvocation } from "relkit/invocation";
+import { defineEnv } from "relkit/config";
 import {
   createConcurrencyAdmission,
   createFunctionRegistry,
@@ -16,22 +16,18 @@ import {
   type InvocationRecord,
   type InvocationTarget,
   type PublicLogger,
-} from "../../../packages/engine/src/index.ts";
+} from "relkit/engine";
 import {
   abortablePromise,
   createGenerationRuntime,
   type GenerationServiceDefinition,
   type RuntimeManifest,
-} from "../../../packages/runtime-effect/src/index.ts";
+} from "relkit/runtime-effect";
 import { createDeterministicClock } from "../../../packages/testing/src/runtime-clock.ts";
 import { createTestRuntime } from "../../../packages/testing/src/index.ts";
-import {
-  CONTRACT_VERSION,
-  GRAPH_VERSION,
-  type ProtocolId,
-} from "../../../packages/contracts/src/index.ts";
-import { hashGraph, type ApplicationGraph } from "../../../packages/graph/src/index.ts";
-import { z } from "../../../packages/schema/src/index.ts";
+import { CONTRACT_VERSION, GRAPH_VERSION, type ProtocolId } from "relkit/contracts";
+import { hashGraph, type ApplicationGraph } from "relkit/graph";
+import { z } from "relkit/schema";
 import { runtimeCohort } from "../runtime-cohort.ts";
 
 type Value = { readonly value: number };

@@ -1,24 +1,24 @@
 /** Exposes generated and direct native invocation entrypoints plus dependency and persistence lifecycle operations for the selected integration. */
 
 import { resolveNativeInvocationEffect, invokeNativeWithContextEffect } from "./runtime-invoke.js";
-import { normalizeId } from "@relkit/contracts";
-import { frameworkTrace, unexpectedDefect } from "@relkit/invocation";
+import { normalizeId } from "relkit/contracts";
+import { frameworkTrace, unexpectedDefect } from "relkit/invocation";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import { logAgentFailure } from "./runtime-failure-diagnostics.js";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
-import { createAgentCapturePolicyEffect } from "@relkit/agents/internal/capture-policy";
+import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { createAgentCapturePolicyEffect } from "relkit/agents/internal/capture-policy";
 import { signalFailure, validateValue, withSignal } from "./runtime-utils.js";
 import { acquireExecutionSignalEffect, ExecutionSignalClockLive } from "./signal.js";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
-import { generatedAgentFunctionId } from "@relkit/agents/internal/generated-function";
+import { generatedAgentFunctionId } from "relkit/agents/internal/generated-function";
 import { isGraphDescriptor } from "./define-graph.js";
 import { AgentExecution, AgentExecutionLive } from "./runtime-service.js";
 import type { AgentInvocationOptions, AgentRuntime, AgentRuntimeOptions } from "./runtime.types.js";
 
 export type * from "./runtime.types.js";
 export { runtimeIntegration } from "./runtime-integration.js";
-export { createGeneratedAgentFunction } from "@relkit/agents/internal/generated-function";
+export { createGeneratedAgentFunction } from "relkit/agents/internal/generated-function";
 export { releaseAgentPersistence } from "./graph-persistence-release.js";
 export { assertAgentRuntimeDependencies } from "./runtime-dependencies.js";
 

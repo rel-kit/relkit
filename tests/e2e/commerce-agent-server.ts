@@ -3,19 +3,16 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Context, Effect, Layer, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import orderSupport from "../../examples/commerce/src/services/orders/agents/order-support.agent.ts";
 import announcements from "../../examples/commerce/src/services/announcements/channels/announcements.channel.ts";
 import getAnnouncements from "../../examples/commerce/src/services/announcements/functions/get-announcements.function.ts";
 import postAnnouncement from "../../examples/commerce/src/services/announcements/functions/post-announcement.function.ts";
-import {
-  createLocalAgentStateProvider,
-  createLocalRealtimeProvider,
-} from "../../packages/providers-local/src/index.ts";
-import { createProviderRealtimeDispatcher } from "../../packages/realtime/src/index.ts";
-import type { RuntimeManifest } from "../../packages/runtime-hono/src/index.ts";
-import { createPreparedApp } from "../../packages/runtime-hono/src/prepared-app.ts";
-import { runtimeCohort } from "../../packages/runtime-hono/tests/test-cohort.ts";
+import { createLocalAgentStateProvider, createLocalRealtimeProvider } from "relkit/providers-local";
+import { createProviderRealtimeDispatcher } from "relkit/realtime";
+import type { RuntimeManifest } from "relkit/runtime-hono";
+import { createPreparedApp } from "../../packages/relkit/src/runtime-hono/prepared-app.ts";
+import { runtimeCohort } from "../../packages/relkit/tests/runtime-hono/test-cohort.ts";
 import { AGENT_ID, commerceAgentPlan } from "./commerce-agent-plan.js";
 import { commerceAgentEngine } from "./commerce-agent-engine.js";
 import { commerceAgentRuntimeSettings } from "./commerce-agent-settings.js";

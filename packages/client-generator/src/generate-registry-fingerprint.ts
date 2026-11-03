@@ -4,7 +4,7 @@ import type {
   ClientRoute,
 } from "./generate-registry-fingerprint.types.js";
 import { createHash } from "node:crypto";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import { Effect } from "effect";
 import { makeGraphOperation } from "./generator-graph-operation.js";
 import { manifestCalculations } from "./generate-public-manifest.js";

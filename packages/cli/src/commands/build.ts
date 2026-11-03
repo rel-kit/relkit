@@ -1,6 +1,6 @@
 import { dirname, join, resolve } from "node:path";
 import { Effect } from "effect";
-import { createDiagnostic } from "@relkit/diagnostics";
+import { createDiagnostic } from "relkit/diagnostics";
 import { cliOriginalError, cliPromise } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliFileSystem } from "../services/filesystem.service.js";

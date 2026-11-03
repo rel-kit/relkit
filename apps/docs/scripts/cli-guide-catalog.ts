@@ -19,7 +19,7 @@ export const cliGuideRelations = [
   ),
   relation(
     "docs/modules/cli/automation",
-    ["cli-api", "create-relkit", "relkit"],
+    ["cli-api", "create-relkit"],
     ["apps/docs/examples/public-api/tooling.ts"],
   ),
   relation(

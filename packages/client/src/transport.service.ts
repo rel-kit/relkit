@@ -1,5 +1,5 @@
 import { Context, Effect, Fiber, Layer, type Scope } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { nativeCall } from "./native-stream.js";
 import type { ClientTransportService, TransportLink } from "./transport.types.js";
 import type { CreateAutoClientOptions } from "./index.types.js";
@@ -20,7 +20,7 @@ export class ClientTransport extends Context.Service<ClientTransport, ClientTran
  * @example
  * ```ts
  * import { Effect, ManagedRuntime } from "effect";
- * import { runExecutionSync } from "@relkit/contracts/operation";
+ * import { runExecutionSync } from "relkit/contracts/operation";
  * import { ClientTransport, clientTransportLayer } from "./transport.service.js";
  * export async function transportOwner(): Promise<void> {
  *   const owner = ManagedRuntime.make(clientTransportLayer(Effect.succeed({ call: async () => 1 })));

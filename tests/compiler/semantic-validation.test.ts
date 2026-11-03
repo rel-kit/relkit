@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { defineApp } from "../../packages/app/src/define-app.ts";
-import { defineEnv, env } from "../../packages/config/src/index.ts";
-import { defineFunction } from "../../packages/functions/src/index.ts";
-import { defineAgent } from "../../packages/agents/src/index.ts";
-import { defineBucket } from "../../packages/buckets/src/index.ts";
+import { defineApp } from "../../packages/relkit/src/app/define-app.ts";
+import { defineEnv, env } from "relkit/config";
+import { defineFunction } from "relkit/functions";
+import { defineAgent } from "relkit/agents";
+import { defineBucket } from "relkit/buckets";
 import {
   defineInfrastructureProviderSource,
   defineConnectionContract,
@@ -12,9 +12,9 @@ import {
   defineProviderAccess,
   defineProviderBehavior,
   defineProviderCapability,
-} from "../../packages/provider/src/index.ts";
-import { defineRoute, defineTransform, http } from "../../packages/routes/src/index.ts";
-import { z, type StandardSchemaV1 } from "../../packages/schema/src/index.ts";
+} from "relkit/provider";
+import { defineRoute, defineTransform, http } from "relkit/routes";
+import { z, type StandardSchemaV1 } from "relkit/schema";
 import {
   NORMALIZE_CODES,
   normalizeCompilation as normalize,

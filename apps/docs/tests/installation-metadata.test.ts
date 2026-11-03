@@ -100,7 +100,7 @@ test("conflicting manifest sections cannot generate contradictory install comman
 
 test("HTTP requirement and optional peer drift fails before publishing commands", () => {
   const packages = new Map(catalog.packages);
-  const http = packages.get("@relkit/runtime-hono");
+  const http = packages.get("relkit");
   if (!http) throw new Error("HTTP owner fixture is required.");
   packages.set(http.name, {
     ...http,

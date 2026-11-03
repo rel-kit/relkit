@@ -9,7 +9,7 @@ template READMEs, CLI help and output, error messages, the error-code catalog an
 - Write **RelKit** in prose, headings, help text and messages.
 - Never write `RELKIT` or `Relkit` outside code. The check fails on both.
 - Package names, commands, environment variables and error codes keep their own spelling:
-  `relkit`, `create-relkit`, `@relkit/app`, `RELKIT_ENV`, `RELKIT_SCHEMA_UNAVAILABLE`.
+  `relkit`, `create-relkit`, `RELKIT_ENV`, `RELKIT_SCHEMA_UNAVAILABLE`.
 - The `Relkit` type namespace that applications augment (`declare global { namespace Relkit { … } }`)
   is code and keeps its name.
 
@@ -61,7 +61,7 @@ RELKIT_SCHEMA_UNAVAILABLE: input of orders.create cannot produce a JSON Schema.
   docs: https://relkit.dev/docs/errors/relkit-schema-unavailable
 ```
 
-Each code has an entry in the catalog under `packages/diagnostics/src/codes/`. The entry holds the
+Each code has an entry in the catalog under `packages/relkit/src/diagnostics/codes/`. The entry holds the
 code's title, what happened, the next step and, rarely, a hand-written docs page. The docs site
 generates one page per code from the catalog, and docs generation fails when a code the source can
 emit has no entry. To add a code:

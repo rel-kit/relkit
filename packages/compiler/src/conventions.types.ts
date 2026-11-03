@@ -3,12 +3,12 @@
  * Generic callers retain their descriptor input type at the checking boundary;
  * only recognized descriptors/kinds participate in nonfatal warning calculations.
  */
-import type { DescriptorKind } from "@relkit/contracts";
+import type { DescriptorKind } from "relkit/contracts";
 import type { Schema } from "effect";
 import type * as Models from "./convention-input.schemas.js";
 
 import type { CONVENTION_CODES } from "./convention-findings.js";
-import type { Diagnostic } from "@relkit/diagnostics";
+import type { Diagnostic } from "relkit/diagnostics";
 
 /** Stable warning codes for source authoring conventions. */
 export type ConventionCode = (typeof CONVENTION_CODES)[keyof typeof CONVENTION_CODES];

@@ -3,8 +3,8 @@
  * come from successful compilation and contain declarations rather than acquired
  * runtime resources; generated hosts own the resulting process lifecycle.
  */
-import type { JsonValue, RuntimeActivationFingerprint } from "@relkit/contracts";
-import type { ApplicationGraph } from "@relkit/graph";
+import type { JsonValue, RuntimeActivationFingerprint } from "relkit/contracts";
+import type { ApplicationGraph } from "relkit/graph";
 
 /** Validated HTTP settings supplied to the pure generated-server emitter. */
 export interface ServerSourceConfiguration {

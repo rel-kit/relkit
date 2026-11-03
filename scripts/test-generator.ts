@@ -5,7 +5,7 @@
  */
 import { resolve } from "node:path";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { scaffoldChild } from "./scaffold-process.js";
 import { ScaffoldProcessFailure } from "./scaffold-process.errors.js";
 import { runBenchmarkMain } from "./dev-readiness/benchmark-main.js";

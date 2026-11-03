@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { CollectionResponse } from "../fixtures/json.types.js";
-import { API_BASE_PATH } from "@relkit/contracts";
-import { createObservabilityStream } from "@relkit/observability";
+import { API_BASE_PATH } from "relkit/contracts";
+import { createObservabilityStream } from "relkit/observability";
 import { GRAPH_COLLECTIONS, RUNTIME_COLLECTIONS } from "../../src/index.ts";
 import {
   expectResponse,

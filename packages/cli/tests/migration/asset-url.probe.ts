@@ -23,7 +23,7 @@ const invokeAsset = Effect.fn("test.migration.asset")(function* (
     command: "bun",
     args: [
       "-e",
-      `import { invokeFunction } from "@relkit/engine";
+      `import { invokeFunction } from "relkit/engine";
       import target from "./${serviceRoot}/functions/hello.function.ts";
       console.log(await invokeFunction(target, {}));`,
     ],

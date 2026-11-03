@@ -10,7 +10,7 @@ import { readFacts } from "../../packages/compiler/src/discovery/source-facts.js
 const repository = resolve(import.meta.dir, "../..");
 const roots: string[] = [];
 const prefix = `import service from "../../users/service.js";
-import { defineRoute, defineServiceRoutes } from "@relkit/app/routes";
+import { defineRoute, defineServiceRoutes } from "relkit/routes";
 `;
 
 afterEach(async () => {
@@ -29,9 +29,9 @@ async function fixture(route: string) {
   await writeFile(
     join(root, "src/users/service.ts"),
     `
-import { defineFunction } from "@relkit/app/functions";
-import { defineService } from "@relkit/app/services";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { defineService } from "relkit/services";
+import { z } from "relkit/schema";
 const example = defineFunction({ id: "users.example", input: z.object({ id: z.string() }),
   output: z.object({ id: z.string() }), handler: async ({ id }) => ({ id }) });
 export default defineService({ functions: { example } });
@@ -74,7 +74,7 @@ test("installed public declarations validate individual routes and service-route
     `${prefix}export const { GET, POST } = defineServiceRoutes(service, { GET: "example", POST: "example" });`,
     `${prefix}export const GET = defineRoute({ handler: () => new Response("ok") });`,
     `${prefix}export const GET = defineRoute({ target: service.example });
-export type { defineServiceRoutes as RouteFactory } from "@relkit/app/routes";`,
+export type { defineServiceRoutes as RouteFactory } from "relkit/routes";`,
   ]) {
     const root = await fixture(route);
     const application = program(root);
@@ -124,7 +124,7 @@ test("module checking follows reexports instead of relying on initializer syntax
   await writeFile(
     join(root, "src/users/routes.ts"),
     `import service from "./service.js";
-import { defineServiceRoutes } from "@relkit/app/routes";
+import { defineServiceRoutes } from "relkit/routes";
 export default defineServiceRoutes(service, { GET: "example" });`,
   );
   const application = program(root);
@@ -157,9 +157,9 @@ export const GET = defineServiceRoutes(service, { GET: "example" });`,
 
 test("source rules recognize import aliases, namespaces and wrapped expressions with a precise fix", () => {
   for (const [imported, callee] of [
-    ['import { defineServiceRoutes as routes } from "@relkit/app/routes";', "routes"],
-    ['import { defineServiceRoutes as routes } from "@relkit/app";', "routes"],
-    ['import * as routes from "@relkit/routes";', "routes.defineServiceRoutes"],
+    ['import { defineServiceRoutes as routes } from "relkit/routes";', "routes"],
+    ['import { defineServiceRoutes as routes } from "relkit";', "routes"],
+    ['import * as routes from "relkit/routes";', "routes.defineServiceRoutes"],
   ]) {
     const text = `${imported}\n\nexport const GET = (${callee}(service, { GET: "example" }));`;
     const source = ts.createSourceFile(
@@ -219,7 +219,7 @@ test("aliased service-route factories retain static route identity evidence", ()
   const source = ts.createSourceFile(
     "src/routes/users/route.ts",
     `
-import { defineServiceRoutes as expose } from "@relkit/app/routes";
+import { defineServiceRoutes as expose } from "relkit/routes";
 export const { GET } = expose(service, { GET: "example" });`,
     ts.ScriptTarget.Latest,
     true,

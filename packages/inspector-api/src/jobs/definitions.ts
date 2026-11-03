@@ -1,11 +1,11 @@
 import type { JobDefinitionRecord } from "./definitions.types.js";
 export type { JobDefinitionRecord } from "./definitions.types.js";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { runInspectorPromise as runExecutionPromise, runInspectorSync } from "../native-edge.js";
 import { inspectorNativeJobsExecution as inspectorExecution } from "./native.service.js";
 import { projectionAttempt } from "../native-edge.js";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { cursorSecret, decodeCursor, encodeCursor } from "./filters.js";
 import { InspectorJobsError, type InspectorJobsServices } from "./types.js";
 import { identity, isRecord, pick, safeJson, type ResolvedActiveGeneration } from "../shared.js";

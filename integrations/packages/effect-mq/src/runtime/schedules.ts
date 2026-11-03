@@ -1,8 +1,8 @@
 import { JobStore } from "effect-mq";
 import { Effect } from "effect";
-import type { ScheduleDefinition } from "@relkit/jobs";
-import type { NativeScheduleOperations, OperationContext } from "@relkit/jobs/adapter";
-import { durationToMillis } from "@relkit/jobs";
+import type { ScheduleDefinition } from "relkit/jobs";
+import type { NativeScheduleOperations, OperationContext } from "relkit/jobs/adapter";
+import { durationToMillis } from "relkit/jobs";
 
 type EffectScheduleRecord = JobStore.ScheduleRecord;
 type ScheduleKey = JobStore.ScheduleKey;

@@ -2,10 +2,10 @@
 import { nativeAgentRuntimePackages } from "./native-agent-runtime.fixture.js";
 import { expect } from "bun:test";
 import { defineAgent } from "../../integrations/packages/langchain/src/index.ts";
-import { defineBucket } from "../../packages/buckets/src/index.ts";
-import { defineCache } from "../../packages/cache/src/index.ts";
+import { defineBucket } from "relkit/buckets";
+import { defineCache } from "relkit/cache";
 import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { z } from "relkit/schema";
 import { limits } from "./deepagent-bucket.fixture.js";
 export function case1Bucket() {
   const workspace = defineBucket({ id: "agent.workspace", visibility: "private" });

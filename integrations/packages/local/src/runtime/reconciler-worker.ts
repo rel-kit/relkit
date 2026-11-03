@@ -3,7 +3,7 @@ import type {
   LocalServiceBindMount,
   LocalServiceWorkerArtifact,
   NormalizedLocalServiceRecipe,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 
 export interface WorkerStartOptions {
   readonly bindMounts?: Readonly<Record<string, readonly LocalServiceBindMount[]>>;

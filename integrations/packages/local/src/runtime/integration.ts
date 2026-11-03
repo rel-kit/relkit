@@ -4,8 +4,8 @@ import {
   createLocalEventProvider,
   createLocalJobProvider,
   createLocalRealtimeProvider,
-} from "@relkit/providers-local";
-import type { RuntimeProviderContext, RuntimeProviderIntegration } from "@relkit/provider";
+} from "relkit/providers-local";
+import type { RuntimeProviderContext, RuntimeProviderIntegration } from "relkit/provider";
 
 export const runtimeIntegration: RuntimeProviderIntegration<"local"> = Object.freeze({
   kind: "runtime-integration",

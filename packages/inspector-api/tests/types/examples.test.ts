@@ -1,6 +1,6 @@
 import { assert, describe, it } from "@effect/vitest";
 import { Effect, Layer, ManagedRuntime } from "effect";
-import { createObservabilityStream } from "@relkit/observability";
+import { createObservabilityStream } from "relkit/observability";
 import {
   InspectorQueries,
   inspectorQueriesLayer,

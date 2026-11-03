@@ -1,7 +1,7 @@
 /** Exercises native runtime native public behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
 import { expect, test } from "vitest";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { nativePublicEvent } from "../src/runtime-native-public.ts";
 
 test("native public state omits undefined selected values", async () => {

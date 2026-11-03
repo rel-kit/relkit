@@ -1,13 +1,9 @@
 /** Retains the original redaction runtime helpers and exact synthetic credential assertions. */
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { RegistrationPlan } from "../../../packages/graph/src/index.ts";
-import { type ObservabilityCollector } from "../../../packages/observability/src/index.ts";
-import {
-  createApp,
-  type InternalEndpointOptions,
-  type RuntimeManifest,
-} from "../../../packages/runtime-hono/src/index.ts";
+import type { RegistrationPlan } from "relkit/graph";
+import { type ObservabilityCollector } from "relkit/observability";
+import { createApp, type InternalEndpointOptions, type RuntimeManifest } from "relkit/runtime-hono";
 import { assertNoRawSyntheticSecrets } from "../../../scripts/secret-scan.ts";
 import { runtimeCohort } from "../../integration/runtime-cohort.ts";
 import { source, securityTraceId } from "./redaction-records.fixture.js";

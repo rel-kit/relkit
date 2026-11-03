@@ -1,4 +1,4 @@
-import { deepFreeze, type JsonValue } from "@relkit/contracts";
+import { deepFreeze, type JsonValue } from "relkit/contracts";
 import { isRecord, pick, safeJson, safeSource } from "./shared.js";
 import { projectAppNode, projectProviderNode } from "./topology.js";
 

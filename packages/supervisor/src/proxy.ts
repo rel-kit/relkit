@@ -1,6 +1,6 @@
 import { Cause, Effect, Exit, Layer, ManagedRuntime, Metric, Scope } from "effect";
-import { observeExecution, runExecutionSync } from "@relkit/contracts/operation";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { observeExecution, runExecutionSync } from "relkit/contracts/operation";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
 import { drainResponse } from "./proxy-forward.js";
 import { createProxyLayer, SupervisorProxyOwner } from "./proxy-service.js";
 import { validateHostname, validatePort } from "./proxy-validation.js";

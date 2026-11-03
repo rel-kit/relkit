@@ -1,7 +1,7 @@
 import {
   DEPLOYMENT_INTEGRATION_PROTOCOL_VERSION,
   type DeploymentInfrastructureIntegration,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 import { materializeAwsInfrastructure } from "./materialize.js";
 
 /** @experimental */

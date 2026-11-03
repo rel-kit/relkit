@@ -6,7 +6,7 @@
 import { readFile, realpath } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { ReadinessBenchmarkError } from "./benchmark-error.js";
 import { snapshotDigest } from "@relkit/cli/internal/tooling";
 

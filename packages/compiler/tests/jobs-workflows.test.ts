@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { Cause, Effect, Exit, Metric } from "effect";
-import { createDiagnostic } from "@relkit/diagnostics";
+import { createDiagnostic } from "relkit/diagnostics";
 import { buildManifestEffect, inputWork } from "../src/jobs/manifest-build.js";
 import { generateJobsManifest, generateJobsManifestEffect } from "../src/jobs/manifest.js";
 import { validateJobNamesEffect } from "../src/jobs/names.js";

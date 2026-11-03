@@ -3,7 +3,7 @@
  * Reset, replacement and detached evidence retain their existing ordering.
  */
 import { Effect, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { combineSignals } from "@relkit/testing/internal/runtime-clock";
 import type { ModelScriptOwnedState } from "./agents-model.types.js";
 import type { TestAgentModelCall, TestAgentModelOptions, TestModelTurn } from "./agents-types.js";

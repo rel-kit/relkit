@@ -2,7 +2,7 @@ import {
   defineLocalProviderSource,
   type LocalProviderSource,
   type ProviderAdapter,
-} from "@relkit/provider";
+} from "relkit/provider";
 
 /**
  * Selects an adapter's declared local recipe without contacting Docker.

@@ -1,7 +1,7 @@
 /** Exercises native deep events scopes behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
 import { expect, test } from "vitest";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { createDeepAgent } from "deepagents";
 import { FakeToolCallingModel } from "langchain";
 import type { AgentExecutionEvent } from "../src/index.ts";

@@ -1,5 +1,5 @@
 import { observeCompiler } from "../observability.js";
-import { createSourceLocationEffect, normalizeSourcePathEffect } from "@relkit/contracts";
+import { createSourceLocationEffect, normalizeSourcePathEffect } from "relkit/contracts";
 import { Effect } from "effect";
 import { resolve } from "node:path";
 import type {

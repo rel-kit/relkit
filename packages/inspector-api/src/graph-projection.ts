@@ -1,5 +1,5 @@
 import type { GraphCollection, GraphData } from "./graph.types.js";
-import { GRAPH_VERSION, type JsonValue } from "@relkit/contracts";
+import { GRAPH_VERSION, type JsonValue } from "relkit/contracts";
 import { isRecord, pick, safeJson } from "./shared.js";
 import { projectNode } from "./graph-utils.js";
 

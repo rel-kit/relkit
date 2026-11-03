@@ -1,6 +1,6 @@
 import { ORPCError } from "@orpc/client";
-import type { PendingOperationMetadata } from "@relkit/contracts";
-import { observeExecution } from "@relkit/contracts/operation";
+import type { PendingOperationMetadata } from "relkit/contracts";
+import { observeExecution } from "relkit/contracts/operation";
 import { Context, Effect, Layer } from "effect";
 import { nativeCall } from "../native-stream.js";
 import { PendingOperations } from "./pending.service.js";

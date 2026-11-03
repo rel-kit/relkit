@@ -1,5 +1,5 @@
-import type { MaybePromise } from "@relkit/contracts";
-import type { ObservabilityQuery, ObservabilityStream } from "@relkit/observability";
+import type { MaybePromise } from "relkit/contracts";
+import type { ObservabilityQuery, ObservabilityStream } from "relkit/observability";
 import type { ActiveGenerationOptions, InspectorMode } from "./shared.js";
 import type { InspectorLoggingOptions } from "./execution.types.js";
 

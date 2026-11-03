@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { JobQueueFactoryContext } from "@relkit/engine";
+import type { JobQueueFactoryContext } from "relkit/engine";
 import { createEventBridgeProvider, createSqsJobProvider } from "./src/index.ts";
 
 describe("AWS runtime providers", () => {

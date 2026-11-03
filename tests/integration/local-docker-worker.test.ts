@@ -14,10 +14,7 @@ import {
   localProjectLabels,
   readLocalServiceSecrets,
 } from "../../integrations/packages/local/src/runtime/index.ts";
-import {
-  LOCAL_SERVICE_PLAN_VERSION,
-  type LocalServicePlan,
-} from "../../packages/local-service/src/index.ts";
+import { LOCAL_SERVICE_PLAN_VERSION, type LocalServicePlan } from "relkit/local-service";
 
 const dockerTest = process.env.RELKIT_TEST_DOCKER === "1" ? test : test.skip;
 const graphHash = `sha256:${"e".repeat(64)}`;

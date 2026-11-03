@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import { defineEvent, defineEventFunction } from "@relkit/events";
-import { defineError, defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { defineEvent, defineEventFunction } from "relkit/events";
+import { defineError, defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 
 export const created = defineEvent({
   id: "type_order_created",

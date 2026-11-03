@@ -3,8 +3,8 @@ import type {
   NativeRun,
   NativeWatchRequest,
   OperationContext,
-} from "@relkit/jobs/adapter";
-import type { RunSnapshot } from "@relkit/contracts/jobs";
+} from "relkit/jobs/adapter";
+import type { RunSnapshot } from "relkit/contracts/jobs";
 import type { TriggerNativeClient } from "./native.js";
 import { record, triggerSnapshot } from "./sdk-mapping.js";
 

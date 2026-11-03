@@ -1,4 +1,4 @@
-import type { SourceLocation } from "@relkit/contracts";
+import type { SourceLocation } from "relkit/contracts";
 
 /**
  * Creates a stable schema index key for a descriptor field.

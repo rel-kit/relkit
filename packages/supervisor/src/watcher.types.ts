@@ -1,5 +1,5 @@
 import type { Deferred, Effect, Fiber } from "effect";
-import type { LoggerOptions } from "@relkit/runtime-effect/logger";
+import type { LoggerOptions } from "relkit/runtime-effect/logger";
 import type { SupervisorCandidateToken } from "./state-machine.types.js";
 import type { SupervisorStateMachine } from "./state-machine.js";
 

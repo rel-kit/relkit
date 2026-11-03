@@ -12,7 +12,7 @@ describe.serial("Phase 0 guardrails", () => {
   test("scans content only when the final file extension is text", async () => {
     const name = ["terra", "form"].join("");
     const image = "tests/example.spec.ts-snapshots/image.png";
-    const source = "packages/app/src/value.ts";
+    const source = "packages/relkit/src/app/value.ts";
     return withFixture(
       { [image]: name, [source]: `export const value = "${name}";` },
       async (fixture) => {
@@ -34,7 +34,7 @@ describe.serial("Phase 0 guardrails", () => {
         expect(findings).toContainEqual(expect.objectContaining({ file, rule }));
       }
       expect(findings).not.toContainEqual(
-        expect.objectContaining({ file: "packages/app/src/error-code.ts" }),
+        expect.objectContaining({ file: "packages/relkit/src/app/error-code.ts" }),
       );
     });
   });

@@ -7,8 +7,8 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
-import { DependencySource, DependencySourceLive } from "@relkit/provider/internal/dependencies";
+import { observeExecution } from "relkit/contracts/operation";
+import { DependencySource, DependencySourceLive } from "relkit/provider/internal/dependencies";
 import { ownedNativePromise } from "../services/owned-promise.js";
 import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.js";
 import { linkRuntimeModules } from "../services/runtime-module-links.js";

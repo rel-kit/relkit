@@ -2,7 +2,7 @@ import {
   canonicalJson,
   isRuntimeActivationFingerprint,
   type RuntimeActivationFingerprint,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import { CandidateVerificationError } from "./verification-error.js";
 
 /** Checks the complete runtime activation cohort. @param payload - Selective internal metadata.

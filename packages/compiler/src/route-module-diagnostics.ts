@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { createDiagnostic, type Diagnostic } from "@relkit/diagnostics";
+import { createDiagnostic, type Diagnostic } from "relkit/diagnostics";
 import { missingRoutePathInputs } from "./route-path-input-checks.js";
 import {
   isRouteModule,

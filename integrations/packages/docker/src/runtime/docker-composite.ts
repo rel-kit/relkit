@@ -4,7 +4,7 @@ import {
   type LocalServiceStartRequest,
   type NormalizedLocalServiceRecipe,
   type NormalizedLocalServiceUnit,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import {
   argument,
   bindMountArguments,

@@ -102,7 +102,7 @@ test("route assertions outside rootDir still reject invalid exports", async () =
           const route = join(root, "src/routes/route.ts");
           await writeFile(
             route,
-            'import { defineRoute } from "@relkit/app/routes";\nexport const GET = defineRoute({ handler: () => new Response("ok") });\n',
+            'import { defineRoute } from "relkit/routes";\nexport const GET = defineRoute({ handler: () => new Response("ok") });\n',
           );
           await writeChecks(root, ["src/routes/route.ts"], generatedDirectory);
           expect(typecheckProject(root, generatedDirectory)).toEqual([]);

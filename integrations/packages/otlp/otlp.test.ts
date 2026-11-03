@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { admitObservabilityRecord, type RedactedObservabilityRecord } from "@relkit/observability";
-import { createBindingValueRef } from "@relkit/provider";
+import { admitObservabilityRecord, type RedactedObservabilityRecord } from "relkit/observability";
+import { createBindingValueRef } from "relkit/provider";
 import { otlp } from "./src/index.ts";
 import {
   createOtlpExporter,

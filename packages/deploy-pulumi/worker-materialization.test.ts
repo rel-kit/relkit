@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import type { DeploymentHostMaterialization, DeploymentPlan } from "@relkit/deploy";
+import type { DeploymentHostMaterialization, DeploymentPlan } from "relkit/deploy";
 import { nativeWorkerOperations } from "./src/worker-materialization.ts";
 
 test("scopes schedule activation resources by owning job", () => {

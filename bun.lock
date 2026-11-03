@@ -5,16 +5,22 @@
     "": {
       "name": "relkit",
       "devDependencies": {
+        "@ag-ui/core": "0.0.59",
         "@changesets/cli": "3.0.3",
         "@effect/sql-pg": "catalog:",
         "@effect/vitest": "catalog:",
         "@hughescr/stryker-bun-runner": "1.4.0",
+        "@langchain/langgraph": "catalog:",
+        "@modelcontextprotocol/client": "2.3.0",
+        "@modelcontextprotocol/server": "2.3.0",
+        "@orpc/client": "catalog:",
+        "@orpc/contract": "catalog:",
         "@playwright/test": "1.63.0",
         "@relkit/cli": "workspace:*",
         "@relkit/client": "workspace:*",
-        "@relkit/contracts": "workspace:*",
+        "@relkit/compiler": "workspace:*",
         "@relkit/inspector-api": "workspace:*",
-        "@relkit/observability": "workspace:*",
+        "@relkit/langchain": "workspace:*",
         "@relkit/supervisor": "workspace:*",
         "@stryker-mutator/core": "10.0.0",
         "@stryker-mutator/typescript-checker": "10.0.0",
@@ -33,6 +39,7 @@
         "inngest": "catalog:",
         "konsistent": "1.0.0-beta.4",
         "prettier": "catalog:",
+        "relkit": "workspace:*",
         "turbo": "2.11.7",
         "typescript": "catalog:",
         "vitest": "catalog:",
@@ -62,8 +69,6 @@
         "@relkit/better-auth": "workspace:*",
         "@relkit/client": "workspace:*",
         "@relkit/cloudflare": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/diagnostics": "workspace:*",
         "@relkit/docker": "workspace:*",
         "@relkit/drizzle": "workspace:*",
         "@relkit/effect-mq": "workspace:*",
@@ -71,10 +76,7 @@
         "@relkit/integrations": "workspace:*",
         "@relkit/local": "workspace:*",
         "@relkit/otlp": "workspace:*",
-        "@relkit/provider": "workspace:*",
-        "@relkit/providers-local": "workspace:*",
         "@relkit/pulumi": "workspace:*",
-        "@relkit/realtime": "workspace:*",
         "@relkit/redis": "workspace:*",
         "@relkit/s3": "workspace:*",
         "@relkit/sentry": "workspace:*",
@@ -94,6 +96,7 @@
         "effect": "catalog:",
         "hono": "catalog:",
         "prettier": "catalog:",
+        "relkit": "workspace:*",
         "tailwindcss": "catalog:",
         "tsx": "4.23.15",
         "typescript": "catalog:",
@@ -105,7 +108,6 @@
       "dependencies": {
         "@opentelemetry/api": "1.9.1",
         "@orpc/client": "catalog:",
-        "@relkit/contracts": "workspace:*",
         "@swc/helpers": "0.5.23",
         "@xyflow/react": "12.12.0",
         "anser": "2.3.5",
@@ -119,6 +121,7 @@
         "react": "catalog:",
         "react-aria-components": "1.21.1",
         "react-dom": "catalog:",
+        "relkit": "workspace:*",
         "streamdown": "2.7.0",
         "tailwind-merge": "3.7.0",
         "uuid": "14.0.2",
@@ -138,6 +141,7 @@
         "@relkit/drizzle": "workspace:*",
         "better-auth": "catalog:",
         "drizzle-orm": "catalog:",
+        "relkit": "workspace:*",
         "zod": "4.6.7",
       },
       "devDependencies": {
@@ -174,6 +178,7 @@
         "drizzle-orm": "catalog:",
         "langchain": "catalog:",
         "langsmith": "0.10.8",
+        "relkit": "workspace:*",
         "zod": "4.6.7",
       },
       "devDependencies": {
@@ -205,6 +210,7 @@
         "@relkit/app": "workspace:*",
         "@relkit/drizzle": "workspace:*",
         "drizzle-orm": "catalog:",
+        "relkit": "workspace:*",
         "zod": "4.6.7",
       },
       "devDependencies": {
@@ -224,6 +230,7 @@
         "@valibot/to-json-schema": "1.8.0",
         "arktype": "2.2.9",
         "effect": "catalog:",
+        "relkit": "workspace:*",
         "valibot": "1.5.0",
         "zod": "4.6.7",
       },
@@ -242,8 +249,7 @@
       "name": "@relkit/aws",
       "version": "0.8.2",
       "dependencies": {
-        "@relkit/deploy": "workspace:*",
-        "@relkit/provider": "workspace:*",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@pulumi/aws": "catalog:",
@@ -259,18 +265,14 @@
       "name": "@relkit/cloudflare",
       "version": "0.7.14",
       "dependencies": {
-        "@relkit/buckets": "workspace:*",
-        "@relkit/cache": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/provider": "workspace:*",
+        "relkit": "workspace:*",
       },
     },
     "integrations/packages/docker": {
       "name": "@relkit/docker",
       "version": "0.7.13",
       "dependencies": {
-        "@relkit/local-service": "workspace:*",
-        "@relkit/provider": "workspace:*",
+        "relkit": "workspace:*",
       },
     },
     "integrations/packages/effect-mq": {
@@ -278,11 +280,8 @@
       "version": "0.8.3",
       "dependencies": {
         "@effect/sql-pg": "catalog:",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/jobs": "workspace:*",
-        "@relkit/local-service": "workspace:*",
-        "@relkit/provider": "workspace:*",
         "effect": "catalog:",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
@@ -304,10 +303,7 @@
       "name": "@relkit/inngest",
       "version": "0.8.3",
       "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/jobs": "workspace:*",
-        "@relkit/local-service": "workspace:*",
-        "@relkit/provider": "workspace:*",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "inngest": "catalog:",
@@ -324,13 +320,8 @@
       "version": "0.7.15",
       "dependencies": {
         "@cfworker/json-schema": "4.1.1",
-        "@relkit/agents": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/functions": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/schema": "workspace:*",
-        "@relkit/tools": "workspace:*",
         "effect": "catalog:",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
@@ -340,7 +331,6 @@
         "@langchain/langgraph-checkpoint-postgres": "1.0.5",
         "@langchain/langgraph-checkpoint-redis": "1.0.11",
         "@langchain/langgraph-checkpoint-sqlite": "1.0.4",
-        "@relkit/buckets": "workspace:*",
         "@vitest/coverage-v8": "catalog:",
         "deepagents": "catalog:",
         "langchain": "catalog:",
@@ -368,27 +358,22 @@
       "name": "@relkit/local",
       "version": "0.7.14",
       "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/local-service": "workspace:*",
-        "@relkit/provider": "workspace:*",
-        "@relkit/providers-local": "workspace:*",
+        "relkit": "workspace:*",
       },
     },
     "integrations/packages/otlp": {
       "name": "@relkit/otlp",
       "version": "0.7.14",
       "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/observability": "workspace:*",
-        "@relkit/provider": "workspace:*",
+        "relkit": "workspace:*",
       },
     },
     "integrations/packages/pulumi": {
       "name": "@relkit/pulumi",
       "version": "0.8.3",
       "dependencies": {
-        "@relkit/deploy": "workspace:*",
         "@relkit/deploy-pulumi": "workspace:*",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@pulumi/pulumi": "catalog:",
@@ -404,29 +389,21 @@
       "name": "@relkit/redis",
       "version": "0.8.3",
       "dependencies": {
-        "@relkit/cache": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/local-service": "workspace:*",
-        "@relkit/provider": "workspace:*",
-        "@relkit/providers-local": "workspace:*",
-        "@relkit/realtime": "workspace:*",
+        "relkit": "workspace:*",
       },
     },
     "integrations/packages/s3": {
       "name": "@relkit/s3",
       "version": "0.7.13",
       "dependencies": {
-        "@relkit/buckets": "workspace:*",
-        "@relkit/local-service": "workspace:*",
-        "@relkit/provider": "workspace:*",
+        "relkit": "workspace:*",
       },
     },
     "integrations/packages/sentry": {
       "name": "@relkit/sentry",
       "version": "0.8.3",
       "dependencies": {
-        "@relkit/observability": "workspace:*",
-        "@relkit/provider": "workspace:*",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@sentry/bun": "10.71.0",
@@ -442,10 +419,7 @@
       "name": "@relkit/trigger",
       "version": "0.8.3",
       "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/jobs": "workspace:*",
-        "@relkit/local-service": "workspace:*",
-        "@relkit/provider": "workspace:*",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@trigger.dev/sdk": "4.7.2",
@@ -457,53 +431,11 @@
         "@trigger.dev/sdk",
       ],
     },
-    "packages/agents": {
-      "name": "@relkit/agents",
-      "version": "0.8.3",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/functions": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/schema": "workspace:*",
-        "@relkit/tools": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@langchain/langgraph-checkpoint-mongodb": "1.4.1",
-        "@langchain/langgraph-checkpoint-postgres": "1.0.5",
-        "@langchain/langgraph-checkpoint-redis": "1.0.11",
-        "@langchain/langgraph-checkpoint-sqlite": "1.0.4",
-        "@relkit/buckets": "workspace:*",
-        "@vitest/coverage-v8": "catalog:",
-        "deepagents": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
     "packages/app": {
       "name": "@relkit/app",
       "version": "0.8.4",
       "dependencies": {
-        "@relkit/agents": "workspace:*",
-        "@relkit/buckets": "workspace:*",
-        "@relkit/cache": "workspace:*",
-        "@relkit/config": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/events": "workspace:*",
-        "@relkit/functions": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/jobs": "workspace:*",
-        "@relkit/observability": "workspace:*",
-        "@relkit/provider": "workspace:*",
-        "@relkit/realtime": "workspace:*",
-        "@relkit/routes": "workspace:*",
-        "@relkit/schema": "workspace:*",
-        "@relkit/services": "workspace:*",
-        "@relkit/tools": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
+        "relkit": "workspace:*",
       },
     },
     "packages/better-auth": {
@@ -511,11 +443,8 @@
       "version": "0.8.4",
       "dependencies": {
         "@relkit/client": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/provider": "workspace:*",
-        "@relkit/routes": "workspace:*",
         "effect": "catalog:",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@cloudflare/workers-types": "4.20250121.0",
@@ -540,31 +469,6 @@
         "react",
       ],
     },
-    "packages/buckets": {
-      "name": "@relkit/buckets",
-      "version": "0.7.13",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/cache": {
-      "name": "@relkit/cache",
-      "version": "0.7.14",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/schema": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
     "packages/cli": {
       "name": "@relkit/cli",
       "version": "0.8.8",
@@ -573,37 +477,21 @@
       },
       "dependencies": {
         "@clack/prompts": "catalog:",
-        "@relkit/agents": "workspace:*",
-        "@relkit/app": "workspace:*",
         "@relkit/client": "workspace:*",
         "@relkit/client-generator": "workspace:*",
         "@relkit/compiler": "workspace:*",
-        "@relkit/config": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/deploy": "workspace:*",
-        "@relkit/diagnostics": "workspace:*",
-        "@relkit/engine": "workspace:*",
-        "@relkit/graph": "workspace:*",
         "@relkit/inspector-api": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/jobs": "workspace:*",
-        "@relkit/local-service": "workspace:*",
-        "@relkit/observability": "workspace:*",
-        "@relkit/provider": "workspace:*",
-        "@relkit/realtime": "workspace:*",
-        "@relkit/runtime-effect": "workspace:*",
-        "@relkit/runtime-hono": "workspace:*",
         "@relkit/supervisor": "workspace:*",
         "create-relkit": "workspace:*",
         "effect": "catalog:",
         "hono": "catalog:",
+        "relkit": "workspace:*",
         "typescript": "catalog:",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "@relkit/deploy-pulumi": "workspace:*",
         "@relkit/local": "workspace:*",
-        "@relkit/providers-local": "workspace:*",
         "vitest": "catalog:",
       },
     },
@@ -613,10 +501,8 @@
       "dependencies": {
         "@orpc/client": "catalog:",
         "@orpc/contract": "catalog:",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/realtime": "workspace:*",
         "effect": "catalog:",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
@@ -646,9 +532,8 @@
       "name": "@relkit/client-generator",
       "version": "0.7.13",
       "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/graph": "workspace:*",
         "effect": "catalog:",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "vitest": "catalog:",
@@ -661,14 +546,7 @@
         "@pulumi/aws": "catalog:",
         "@pulumi/awsx": "3.10.0",
         "@pulumi/pulumi": "catalog:",
-        "@relkit/agents": "workspace:*",
-        "@relkit/buckets": "workspace:*",
-        "@relkit/cache": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/engine": "workspace:*",
-        "@relkit/events": "workspace:*",
-        "@relkit/graph": "workspace:*",
-        "@relkit/jobs": "workspace:*",
+        "relkit": "workspace:*",
       },
     },
     "packages/compiler": {
@@ -676,43 +554,12 @@
       "version": "0.8.3",
       "dependencies": {
         "@relkit/client-generator": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/diagnostics": "workspace:*",
-        "@relkit/graph": "workspace:*",
-        "@relkit/local-service": "workspace:*",
-        "@relkit/openapi": "workspace:*",
-        "@relkit/schema": "workspace:*",
         "effect": "catalog:",
+        "relkit": "workspace:*",
         "typescript": "catalog:",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/config": {
-      "name": "@relkit/config",
-      "version": "0.7.13",
-      "dependencies": {
-        "@relkit/provider": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/contracts": {
-      "name": "@relkit/contracts",
-      "version": "0.8.2",
-      "dependencies": {
-        "effect": "catalog:",
-        "semver": "7.8.5",
-      },
-      "devDependencies": {
-        "@effect/vitest": "catalog:",
-        "@types/semver": "7.8.0",
-        "@vitest/coverage-v8": "catalog:",
         "vitest": "catalog:",
       },
     },
@@ -724,31 +571,20 @@
       },
       "dependencies": {
         "@clack/prompts": "catalog:",
-        "@relkit/contracts": "workspace:*",
         "effect": "catalog:",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "vitest": "catalog:",
       },
     },
-    "packages/deploy": {
-      "name": "@relkit/deploy",
-      "version": "0.7.13",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/graph": "workspace:*",
-      },
-    },
     "packages/deploy-pulumi": {
       "name": "@relkit/deploy-pulumi",
       "version": "0.8.3",
       "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/deploy": "workspace:*",
-        "@relkit/observability": "workspace:*",
-        "@relkit/runtime-effect": "workspace:*",
         "effect": "catalog:",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@pulumi/pulumi": "catalog:",
@@ -760,26 +596,12 @@
         "@pulumi/pulumi",
       ],
     },
-    "packages/diagnostics": {
-      "name": "@relkit/diagnostics",
-      "version": "0.7.13",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
     "packages/drizzle": {
       "name": "@relkit/drizzle",
       "version": "0.8.3",
       "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/provider": "workspace:*",
         "effect": "catalog:",
+        "relkit": "workspace:*",
         "zod": "4.6.7",
       },
       "devDependencies": {
@@ -797,75 +619,6 @@
         "mysql2",
       ],
     },
-    "packages/engine": {
-      "name": "@relkit/engine",
-      "version": "0.8.4",
-      "dependencies": {
-        "@relkit/app": "workspace:*",
-        "@relkit/buckets": "workspace:*",
-        "@relkit/cache": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/events": "workspace:*",
-        "@relkit/graph": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/jobs": "workspace:*",
-        "@relkit/observability": "workspace:*",
-        "@relkit/provider": "workspace:*",
-        "@relkit/runtime-effect": "workspace:*",
-        "@relkit/schema": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@effect/vitest": "catalog:",
-        "@relkit/compiler": "workspace:*",
-        "@relkit/providers-local": "workspace:*",
-        "typescript": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/events": {
-      "name": "@relkit/events",
-      "version": "0.7.14",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/functions": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/jobs": "workspace:*",
-        "@relkit/schema": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/functions": {
-      "name": "@relkit/functions",
-      "version": "0.7.14",
-      "dependencies": {
-        "@relkit/buckets": "workspace:*",
-        "@relkit/cache": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/schema": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/graph": {
-      "name": "@relkit/graph",
-      "version": "0.7.13",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "vitest": "catalog:",
-      },
-    },
     "packages/inspector": {
       "name": "@relkit/inspector",
       "version": "0.2.1",
@@ -875,14 +628,13 @@
       "dependencies": {
         "@effect/platform-bun": "catalog:",
         "@effect/platform-node-shared": "catalog:",
-        "@relkit/contracts": "workspace:*",
         "@relkit/inspector-api": "workspace:*",
-        "@relkit/observability": "workspace:*",
         "@relkit/observability-local": "workspace:*",
         "effect": "catalog:",
         "next": "catalog:",
         "react": "catalog:",
         "react-dom": "catalog:",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
@@ -894,67 +646,12 @@
       "name": "@relkit/inspector-api",
       "version": "0.8.4",
       "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/observability": "workspace:*",
-        "@relkit/runtime-effect": "workspace:*",
         "effect": "catalog:",
         "hono": "catalog:",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/invocation": {
-      "name": "@relkit/invocation",
-      "version": "0.7.14",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/schema": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/jobs": {
-      "name": "@relkit/jobs",
-      "version": "0.7.14",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/functions": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/schema": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "vitest": "catalog:",
-      },
-    },
-    "packages/local-service": {
-      "name": "@relkit/local-service",
-      "version": "0.7.13",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/provider": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/observability": {
-      "name": "@relkit/observability",
-      "version": "0.8.3",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@effect/vitest": "catalog:",
-        "@vitest/coverage-v8": "catalog:",
         "vitest": "catalog:",
       },
     },
@@ -963,59 +660,12 @@
       "version": "0.1.4",
       "dependencies": {
         "@duckdb/node-api": "1.5.5-r.4",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/observability": "workspace:*",
         "effect": "catalog:",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/openapi": {
-      "name": "@relkit/openapi",
-      "version": "0.7.13",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/graph": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/provider": {
-      "name": "@relkit/provider",
-      "version": "0.8.2",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "effect": "catalog:",
-        "semver": "7.8.5",
-      },
-      "devDependencies": {
-        "@types/semver": "7.8.0",
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/providers-local": {
-      "name": "@relkit/providers-local",
-      "version": "0.8.3",
-      "dependencies": {
-        "@relkit/buckets": "workspace:*",
-        "@relkit/cache": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/events": "workspace:*",
-        "@relkit/jobs": "workspace:*",
-        "@relkit/realtime": "workspace:*",
-        "@relkit/runtime-effect": "workspace:*",
-        "cron-parser": "5.10.1",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@effect/vitest": "catalog:",
         "vitest": "catalog:",
       },
     },
@@ -1023,170 +673,75 @@
       "name": "@relkit/providers-standard",
       "version": "0.7.12",
     },
-    "packages/realtime": {
-      "name": "@relkit/realtime",
-      "version": "0.7.14",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/schema": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
     "packages/relkit": {
       "name": "relkit",
       "version": "0.8.8",
       "bin": {
-        "relkit": "./dist/bin.js",
+        "relkit": "./dist/launcher/bin.js",
       },
-      "dependencies": {
-        "create-relkit": "workspace:*",
-      },
-    },
-    "packages/routes": {
-      "name": "@relkit/routes",
-      "version": "0.7.14",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/functions": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/schema": "workspace:*",
-        "@relkit/services": "workspace:*",
-        "effect": "catalog:",
-        "hono": "catalog:",
-      },
-      "devDependencies": {
-        "@relkit/events": "workspace:*",
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/runtime-effect": {
-      "name": "@relkit/runtime-effect",
-      "version": "0.7.14",
       "dependencies": {
         "@effect/platform-bun": "catalog:",
         "@effect/platform-node-shared": "catalog:",
-        "@relkit/config": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/graph": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/observability": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@effect/vitest": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/runtime-hono": {
-      "name": "@relkit/runtime-hono",
-      "version": "0.8.4",
-      "dependencies": {
         "@opentelemetry/api": "1.9.1",
         "@orpc/contract": "catalog:",
         "@orpc/server": "2.0.0-beta.31",
-        "@relkit/agents": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/engine": "workspace:*",
-        "@relkit/graph": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/jobs": "workspace:*",
-        "@relkit/observability": "workspace:*",
-        "@relkit/openapi": "workspace:*",
-        "@relkit/provider": "workspace:*",
-        "@relkit/realtime": "workspace:*",
-        "@relkit/routes": "workspace:*",
-        "@relkit/runtime-effect": "workspace:*",
-        "@relkit/schema": "workspace:*",
+        "cron-parser": "5.10.1",
         "effect": "catalog:",
         "hono": "catalog:",
         "hono-rate-limiter": "0.5.4",
+        "semver": "7.8.5",
       },
       "devDependencies": {
         "@ag-ui/core": "0.0.59",
         "@effect/vitest": "catalog:",
         "@langchain/core": "catalog:",
         "@langchain/langgraph": "catalog:",
+        "@langchain/langgraph-checkpoint-mongodb": "1.4.1",
+        "@langchain/langgraph-checkpoint-postgres": "1.0.5",
+        "@langchain/langgraph-checkpoint-redis": "1.0.11",
+        "@langchain/langgraph-checkpoint-sqlite": "1.0.4",
         "@modelcontextprotocol/client": "2.3.0",
         "@modelcontextprotocol/server": "2.3.0",
         "@orpc/client": "catalog:",
-        "@relkit/client": "workspace:*",
-        "@relkit/langchain": "workspace:*",
-        "@relkit/providers-local": "workspace:*",
         "@scalar/hono-api-reference": "0.12.9",
+        "@types/semver": "7.8.0",
+        "@valibot/to-json-schema": "1.8.0",
+        "@vitest/coverage-v8": "catalog:",
+        "arktype": "2.2.9",
+        "deepagents": "catalog:",
         "langchain": "catalog:",
         "typescript": "catalog:",
+        "valibot": "1.5.0",
         "vitest": "catalog:",
+        "zod": "4.6.7",
       },
       "peerDependencies": {
         "@ag-ui/core": "0.0.59",
         "@modelcontextprotocol/server": "2.3.0",
         "@relkit/langchain": "workspace:*",
         "@scalar/hono-api-reference": "0.12.9",
-      },
-      "optionalPeers": [
-        "@ag-ui/core",
-        "@modelcontextprotocol/server",
-        "@relkit/langchain",
-        "@scalar/hono-api-reference",
-      ],
-    },
-    "packages/schema": {
-      "name": "@relkit/schema",
-      "version": "0.7.13",
-      "dependencies": {
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@valibot/to-json-schema": "1.8.0",
-        "@vitest/coverage-v8": "catalog:",
-        "arktype": "2.2.9",
-        "valibot": "1.5.0",
-        "vitest": "catalog:",
-        "zod": "4.6.7",
-      },
-      "peerDependencies": {
         "@valibot/to-json-schema": ">=1.3.0 <2",
         "arktype": ">=2.1.0 <3",
         "valibot": ">=1.0.0 <2",
         "zod": ">=4.2.0 <5",
       },
       "optionalPeers": [
+        "@ag-ui/core",
+        "@modelcontextprotocol/server",
+        "@relkit/langchain",
+        "@scalar/hono-api-reference",
         "@valibot/to-json-schema",
         "arktype",
         "valibot",
         "zod",
       ],
     },
-    "packages/services": {
-      "name": "@relkit/services",
-      "version": "0.7.14",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/events": "workspace:*",
-        "@relkit/functions": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/jobs": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@relkit/schema": "workspace:*",
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
     "packages/supervisor": {
       "name": "@relkit/supervisor",
       "version": "0.7.14",
       "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/observability": "workspace:*",
-        "@relkit/runtime-effect": "workspace:*",
         "effect": "catalog:",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
@@ -1197,31 +752,15 @@
       "name": "@relkit/testing",
       "version": "0.8.4",
       "dependencies": {
-        "@relkit/buckets": "workspace:*",
-        "@relkit/cache": "workspace:*",
         "@relkit/compiler": "workspace:*",
-        "@relkit/config": "workspace:*",
-        "@relkit/contracts": "workspace:*",
-        "@relkit/engine": "workspace:*",
-        "@relkit/events": "workspace:*",
-        "@relkit/functions": "workspace:*",
-        "@relkit/graph": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/jobs": "workspace:*",
-        "@relkit/providers-local": "workspace:*",
-        "@relkit/realtime": "workspace:*",
-        "@relkit/runtime-effect": "workspace:*",
-        "@relkit/runtime-hono": "workspace:*",
-        "@relkit/schema": "workspace:*",
-        "@relkit/tools": "workspace:*",
         "effect": "catalog:",
+        "relkit": "workspace:*",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "@relkit/better-auth": "workspace:*",
         "@relkit/drizzle": "workspace:*",
         "@relkit/langchain": "workspace:*",
-        "@relkit/routes": "workspace:*",
         "drizzle-orm": "catalog:",
         "vitest": "catalog:",
       },
@@ -1233,21 +772,6 @@
         "@relkit/better-auth",
         "@relkit/drizzle",
       ],
-    },
-    "packages/tools": {
-      "name": "@relkit/tools",
-      "version": "0.7.14",
-      "dependencies": {
-        "@relkit/contracts": "workspace:*",
-        "@relkit/functions": "workspace:*",
-        "@relkit/invocation": "workspace:*",
-        "@relkit/schema": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@vitest/coverage-v8": "catalog:",
-        "vitest": "catalog:",
-      },
     },
   },
   "patchedDependencies": {
@@ -2397,17 +1921,11 @@
 
     "@redis/time-series": ["@redis/time-series@1.1.0", "", { "peerDependencies": { "@redis/client": "^1.0.0" } }, "sha512-c1Q99M5ljsIuc4YdaCwfUEXsofakb9c8+Zse2qxTadu8TalLXuAESzLvFAvNVbkmSlvlzIQOLpBCmWI9wTOt+g=="],
 
-    "@relkit/agents": ["@relkit/agents@workspace:packages/agents"],
-
     "@relkit/app": ["@relkit/app@workspace:packages/app"],
 
     "@relkit/aws": ["@relkit/aws@workspace:integrations/packages/aws"],
 
     "@relkit/better-auth": ["@relkit/better-auth@workspace:packages/better-auth"],
-
-    "@relkit/buckets": ["@relkit/buckets@workspace:packages/buckets"],
-
-    "@relkit/cache": ["@relkit/cache@workspace:packages/cache"],
 
     "@relkit/cli": ["@relkit/cli@workspace:packages/cli"],
 
@@ -2421,15 +1939,7 @@
 
     "@relkit/compiler": ["@relkit/compiler@workspace:packages/compiler"],
 
-    "@relkit/config": ["@relkit/config@workspace:packages/config"],
-
-    "@relkit/contracts": ["@relkit/contracts@workspace:packages/contracts"],
-
-    "@relkit/deploy": ["@relkit/deploy@workspace:packages/deploy"],
-
     "@relkit/deploy-pulumi": ["@relkit/deploy-pulumi@workspace:packages/deploy-pulumi"],
-
-    "@relkit/diagnostics": ["@relkit/diagnostics@workspace:packages/diagnostics"],
 
     "@relkit/docker": ["@relkit/docker@workspace:integrations/packages/docker"],
 
@@ -2438,10 +1948,6 @@
     "@relkit/drizzle": ["@relkit/drizzle@workspace:packages/drizzle"],
 
     "@relkit/effect-mq": ["@relkit/effect-mq@workspace:integrations/packages/effect-mq"],
-
-    "@relkit/engine": ["@relkit/engine@workspace:packages/engine"],
-
-    "@relkit/events": ["@relkit/events@workspace:packages/events"],
 
     "@relkit/example-auth-drizzle": ["@relkit/example-auth-drizzle@workspace:examples/auth-drizzle"],
 
@@ -2453,10 +1959,6 @@
 
     "@relkit/example-schema-libraries": ["@relkit/example-schema-libraries@workspace:examples/schema-libraries"],
 
-    "@relkit/functions": ["@relkit/functions@workspace:packages/functions"],
-
-    "@relkit/graph": ["@relkit/graph@workspace:packages/graph"],
-
     "@relkit/inngest": ["@relkit/inngest@workspace:integrations/packages/inngest"],
 
     "@relkit/inspector": ["@relkit/inspector@workspace:packages/inspector"],
@@ -2467,55 +1969,27 @@
 
     "@relkit/integrations": ["@relkit/integrations@workspace:integrations/catalog"],
 
-    "@relkit/invocation": ["@relkit/invocation@workspace:packages/invocation"],
-
-    "@relkit/jobs": ["@relkit/jobs@workspace:packages/jobs"],
-
     "@relkit/langchain": ["@relkit/langchain@workspace:integrations/packages/langchain"],
 
     "@relkit/local": ["@relkit/local@workspace:integrations/packages/local"],
 
-    "@relkit/local-service": ["@relkit/local-service@workspace:packages/local-service"],
-
-    "@relkit/observability": ["@relkit/observability@workspace:packages/observability"],
-
     "@relkit/observability-local": ["@relkit/observability-local@workspace:packages/observability-local"],
 
-    "@relkit/openapi": ["@relkit/openapi@workspace:packages/openapi"],
-
     "@relkit/otlp": ["@relkit/otlp@workspace:integrations/packages/otlp"],
-
-    "@relkit/provider": ["@relkit/provider@workspace:packages/provider"],
-
-    "@relkit/providers-local": ["@relkit/providers-local@workspace:packages/providers-local"],
 
     "@relkit/providers-standard": ["@relkit/providers-standard@workspace:packages/providers-standard"],
 
     "@relkit/pulumi": ["@relkit/pulumi@workspace:integrations/packages/pulumi"],
 
-    "@relkit/realtime": ["@relkit/realtime@workspace:packages/realtime"],
-
     "@relkit/redis": ["@relkit/redis@workspace:integrations/packages/redis"],
-
-    "@relkit/routes": ["@relkit/routes@workspace:packages/routes"],
-
-    "@relkit/runtime-effect": ["@relkit/runtime-effect@workspace:packages/runtime-effect"],
-
-    "@relkit/runtime-hono": ["@relkit/runtime-hono@workspace:packages/runtime-hono"],
 
     "@relkit/s3": ["@relkit/s3@workspace:integrations/packages/s3"],
 
-    "@relkit/schema": ["@relkit/schema@workspace:packages/schema"],
-
     "@relkit/sentry": ["@relkit/sentry@workspace:integrations/packages/sentry"],
-
-    "@relkit/services": ["@relkit/services@workspace:packages/services"],
 
     "@relkit/supervisor": ["@relkit/supervisor@workspace:packages/supervisor"],
 
     "@relkit/testing": ["@relkit/testing@workspace:packages/testing"],
-
-    "@relkit/tools": ["@relkit/tools@workspace:packages/tools"],
 
     "@relkit/trigger": ["@relkit/trigger@workspace:integrations/packages/trigger"],
 
@@ -4225,7 +3699,7 @@
 
     "path-expression-matcher": ["path-expression-matcher@1.6.2", "", {}, "sha512-enSlaiat05iasnzmgNxRj8reFdj3puY2QpNgP1aPIaVfT6nn9ICuPoFlKHk8EN22HcwewshO+mN2DGbkCEOtqQ=="],
 
-    "path-key": ["path-key@4.0.0", "", {}, "sha512-haREypq7xkM7ErfgIyA0z+Bj4AGKlMSdlQE2jvJo6huWD1EdkKYV+G/T4nq0YEF2vgTT8kqMFKo1uHn950r4SQ=="],
+    "path-key": ["path-key@3.1.1", "", {}, "sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q=="],
 
     "path-parse": ["path-parse@1.0.7", "", {}, "sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw=="],
 
@@ -4855,7 +4329,7 @@
 
     "yallist": ["yallist@4.0.0", "", {}, "sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A=="],
 
-    "yaml": ["yaml@2.9.0", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA=="],
+    "yaml": ["yaml@2.9.1", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw=="],
 
     "yaml-language-server": ["yaml-language-server@1.23.0", "", { "dependencies": { "@vscode/l10n": "^0.0.18", "ajv": "^8.17.1", "ajv-draft-04": "^1.0.0", "ajv-i18n": "^4.2.0", "prettier": "^3.8.1", "request-light": "^0.5.7", "vscode-json-languageservice": "4.1.8", "vscode-languageserver": "^9.0.0", "vscode-languageserver-textdocument": "^1.0.1", "vscode-languageserver-types": "^3.16.0", "vscode-uri": "^3.0.2", "yaml": "2.8.3" }, "bin": { "yaml-language-server": "bin/yaml-language-server" } }, "sha512-3qVyCOexLCWw06PQa5kRPwvMWMZ/eZeCRWUvgD6a0OkqL/4iCnxy2WumbWifa937Uo5xhyWJ0uxlU39ljhNh7A=="],
 
@@ -4903,8 +4377,6 @@
 
     "@astrojs/internal-helpers/smol-toml": ["smol-toml@1.9.1", "", {}, "sha512-j7WyPdf0CJoutMzMoPLF/bVXHtKZIT9Rb4eGeEbWw8X2t5oirjPgpL+OpaENZrILYaXqYwnVH+qgUwVbl+pUJQ=="],
 
-    "@astrojs/internal-helpers/yaml": ["yaml@2.9.1", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw=="],
-
     "@astrojs/mdx/es-module-lexer": ["es-module-lexer@3.0.4", "", {}, "sha512-BldNY5mwkVu+cQ5Ymn3e6hB9Sx8XHx4ZevWbiUyZbfKxJxYO27Hf0wfzkxIaD5CAJMaGl3YspKELj0ff/7nCMA=="],
 
     "@astrojs/react/@vitejs/plugin-react": ["@vitejs/plugin-react@6.1.2", "", { "dependencies": { "@rolldown/pluginutils": "^1.0.1" }, "peerDependencies": { "@rolldown/plugin-babel": "^0.1.7 || ^0.2.0", "babel-plugin-react-compiler": "^1.0.0", "oxc-transform-react": "^0.152.0", "vite": "^8.0.0" }, "optionalPeers": ["@rolldown/plugin-babel", "babel-plugin-react-compiler", "oxc-transform-react"] }, "sha512-fhJNGUdscQa4HkI0xFxwonWyhnVReCPDbXI7FH7jmzpnVCrFQI7PRrhWecO263610vOrs9tr2Y4xcf8uAdFxbw=="],
@@ -4912,8 +4384,6 @@
     "@astrojs/react/vite": ["vite@8.3.5", "", { "dependencies": { "lightningcss": "^1.33.0", "picomatch": "^4.0.7", "postcss": "^8.5.30", "rolldown": "~1.2.14", "tinyglobby": "^0.2.17" }, "optionalDependencies": { "fsevents": "~2.3.3" }, "peerDependencies": { "@types/node": "^20.19.0 || >=22.12.0", "@vitejs/devtools": "^0.7.1 || ^0.8.0", "esbuild": "^0.27.0 || ^0.28.0", "jiti": ">=1.21.0", "less": "^4.0.0", "sass": "^1.70.0", "sass-embedded": "^1.70.0", "stylus": ">=0.54.8", "sugarss": "^5.0.0", "terser": "^5.16.0", "tsx": "^4.8.1", "yaml": "^2.4.2" }, "optionalPeers": ["@types/node", "@vitejs/devtools", "esbuild", "jiti", "less", "sass", "sass-embedded", "stylus", "sugarss", "terser", "tsx", "yaml"], "bin": { "vite": "bin/vite.js" } }, "sha512-z1YpjieJ9g0ebTmQpLBv/oq9E3F9EIlOe+7LahW8SrE3LTiG3udBRUXQOlYXP9b+IC2q2phHeVxj9xGlw34OEQ=="],
 
     "@astrojs/telemetry/package-manager-detector": ["package-manager-detector@1.9.0", "", {}, "sha512-zAMfbta9nPA8AKkA4WdmNAT8R8s6Dk0/xwPsqNnRidMFcLo1YkLuPDTgs2f64XdzS8vbLNnoJ+uUIkgbz7oRHA=="],
-
-    "@astrojs/yaml2ts/yaml": ["yaml@2.9.1", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw=="],
 
     "@aws-sdk/credential-provider-web-identity/@aws-sdk/core": ["@aws-sdk/core@3.978.2", "", { "dependencies": { "@aws-sdk/types": "^3.974.6", "@aws-sdk/xml-builder": "^3.972.41", "@aws/lambda-invoke-store": "^0.3.0", "@smithy/core": "^3.35.2", "@smithy/signature-v4": "^5.7.4", "@smithy/types": "^4.19.0", "bowser": "^2.11.0", "tslib": "^2.6.2" } }, "sha512-ViOBLuGSSyPAmkKGJ6KJXtVN7MOEp3rnI7uH+kWxnHccvo8C9cvunEAnN5/oaZH1laQfsTBw7IOnmNkWlFZl2A=="],
 
@@ -4959,6 +4429,8 @@
 
     "@changesets/format/tinyexec": ["tinyexec@1.3.0", "", {}, "sha512-QKAl9m8gWWGHV8jZcPeym6j+XULi6tOf1mT83WYJ4Lk2ytW/uwAWkrP0uFsdoYMdueVJ0qs26wZ+23xeB4ibNQ=="],
 
+    "@changesets/parse/yaml": ["yaml@2.9.0", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA=="],
+
     "@effect/docgen/chalk": ["chalk@6.0.0", "", {}, "sha512-2uNTXIuTTxk7ciZgAU1BQcgnchcG0xXnrs6jzkQfj9SsRa9M2s5zE8WT96hS6KmG4MzWHSrvH43DF1m4XRkrFg=="],
 
     "@effect/docgen/prettier": ["prettier@3.9.9", "", { "bin": { "prettier": "bin/prettier.cjs" } }, "sha512-Z/CJHIkdujO/OtN7nXUii0Rf3VT5SRuhjBA82Xvu2XhBUgX3nhP67T0LHceBdQLex7OOFGTox+Q5Yg8Jk2Qivg=="],
@@ -4991,6 +4463,8 @@
 
     "@langchain/langgraph-sdk/p-retry": ["p-retry@7.1.1", "", { "dependencies": { "is-network-error": "^1.1.0" } }, "sha512-J5ApzjyRkkf601HpEeykoiCvzHQjWxPAHhyjFcEUP2SWq0+35NKh8TLhpLw+Dkq5TZBFvUM6UigdE9hIVYTl5w=="],
 
+    "@manypkg/tools/yaml": ["yaml@2.9.0", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA=="],
+
     "@mapbox/node-pre-gyp/nopt": ["nopt@8.1.0", "", { "dependencies": { "abbrev": "^3.0.0" }, "bin": { "nopt": "bin/nopt.js" } }, "sha512-ieGu42u/Qsa4TFktmaKEwM6MQH0pOWnaB3htzh0JRtx84+Mebc0cbZYN5bC+6WTZ4+77xrL9Pn5m7CV6VIkV7A=="],
 
     "@mdx-js/mdx/@types/mdx": ["@types/mdx@2.0.13", "", {}, "sha512-+OWZQfAYyio6YkJb3HLxDrvnx6SWWDbC0zVPfBRzUk0/nqoDyf6dNxQi3eArPe8rJ473nobTMQ/8Zk+LxJ+Yuw=="],
@@ -5014,6 +4488,8 @@
     "@opentelemetry/auto-instrumentations-node/@opentelemetry/resources": ["@opentelemetry/resources@2.11.0", "", { "dependencies": { "@opentelemetry/core": "2.11.0", "@opentelemetry/semantic-conventions": "^1.29.0" }, "peerDependencies": { "@opentelemetry/api": ">=1.3.0 <1.10.0" } }, "sha512-Ie7+8q8MDF4FAEQCKVMTx3ReUvxiIAgIiiW3c9JdmP8+HMcDy20puT+AHjexnExgnbvBxjQ9fjkFDWrikJ2jQA=="],
 
     "@opentelemetry/configuration/@opentelemetry/core": ["@opentelemetry/core@2.11.0", "", { "dependencies": { "@opentelemetry/semantic-conventions": "^1.29.0" }, "peerDependencies": { "@opentelemetry/api": ">=1.0.0 <1.10.0" } }, "sha512-7YP44XH0tV6+Mb54x2YGf84i7yi+31MBZlE8JwvozkxyTvXbSp10X7cI7YE49ChJ3shMJoBmCJF3+1QFBJctGA=="],
+
+    "@opentelemetry/configuration/yaml": ["yaml@2.9.0", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA=="],
 
     "@opentelemetry/exporter-logs-otlp-grpc/@opentelemetry/otlp-grpc-exporter-base": ["@opentelemetry/otlp-grpc-exporter-base@0.222.0", "", { "dependencies": { "@grpc/grpc-js": "^1.14.3", "@opentelemetry/core": "2.11.0", "@opentelemetry/otlp-exporter-base": "0.222.0", "@opentelemetry/otlp-transformer": "0.222.0" }, "peerDependencies": { "@opentelemetry/api": "^1.3.0" } }, "sha512-Kw5WqDBYYpCgY+edHWZS/Jp3bdguqNkCyEWOsqFhf8RmtcEuWYzPFA9i+L6UsNoJXTs8ngeQB6dwELH1czNYjA=="],
 
@@ -5293,14 +4769,6 @@
 
     "@scalar/json-magic/undici": ["undici@8.12.3", "", {}, "sha512-+fdndUTwBP86cVjihTp21hZHo7d6oj1c/47XPA3lL8mM0XHs+C4EkcjmgRsFnFk2f/UONGDy9ItBItmXsLOQHw=="],
 
-    "@scalar/json-magic/yaml": ["yaml@2.9.1", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw=="],
-
-    "@scalar/json-schema-validator/yaml": ["yaml@2.9.1", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw=="],
-
-    "@scalar/openapi-parser/yaml": ["yaml@2.9.1", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw=="],
-
-    "@scalar/openapi-validator/yaml": ["yaml@2.9.1", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw=="],
-
     "@scalar/schemas/@scalar/helpers": ["@scalar/helpers@0.16.0", "", {}, "sha512-lCBNB3hN8sGfUghz5AK5r63G+1/x4PHSgjH9asJVWne5e1tnKkti5eaejPLgy8didpAZsyXEp744xIosoWu9AA=="],
 
     "@scalar/types/nanoid": ["nanoid@5.1.16", "", { "bin": { "nanoid": "bin/nanoid.js" } }, "sha512-kVrnsrJqMR8+oLJnGEmSWw9BivK5mt7H3FZatVRjrc5wGqFYuBxX1yG7+A7Gi5AefkX6t/oCkizcQgpu0cY1dQ=="],
@@ -5401,8 +4869,6 @@
 
     "concat-with-sourcemaps/source-map": ["source-map@0.6.1", "", {}, "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g=="],
 
-    "cross-spawn/path-key": ["path-key@3.1.1", "", {}, "sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q=="],
-
     "css-select/domhandler": ["domhandler@5.0.3", "", { "dependencies": { "domelementtype": "^2.3.0" } }, "sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w=="],
 
     "css-select/domutils": ["domutils@3.2.2", "", { "dependencies": { "dom-serializer": "^2.0.0", "domelementtype": "^2.3.0", "domhandler": "^5.0.3" } }, "sha512-6kZKyUajlDuqlHKVX1w7gyslj9MPIXzIFiz/rGu35uC1wMi+kMhQwGhl4lt9unC9Vb9INnY9Z3/ZA3+FhASLaw=="],
@@ -5422,6 +4888,8 @@
     "d3-sankey/d3-shape": ["d3-shape@1.3.7", "", { "dependencies": { "d3-path": "1" } }, "sha512-EUkvKjqPFUAZyOlhY5gzCxCeI0Aep04LwIRpsZ/mLFelJiUfnK56jo5JMDSE7yyP2kLSb6LtF+S5chMk7uqPqw=="],
 
     "deepagents/langsmith": ["langsmith@0.9.0", "", { "dependencies": { "p-queue": "6.6.2" }, "peerDependencies": { "@opentelemetry/api": "*", "@opentelemetry/exporter-trace-otlp-proto": "*", "@opentelemetry/sdk-trace-base": "*", "openai": "*", "ws": ">=7" }, "optionalPeers": ["@opentelemetry/api", "@opentelemetry/exporter-trace-otlp-proto", "@opentelemetry/sdk-trace-base", "openai", "ws"] }, "sha512-tlg/aG7qezAKY6G3fgADSX7PkRj+JKoF3z7QNkCMsAOvwvuzhiwP9Amn1Z+zAIxuKoWuXQdIjtFN0LVmUC1oUQ=="],
+
+    "deepagents/yaml": ["yaml@2.9.0", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA=="],
 
     "docker-classic/@pulumi/pulumi": ["@pulumi/pulumi@3.258.0", "", { "dependencies": { "@grpc/grpc-js": "^1.10.1", "@logdna/tail-file": "^2.0.6", "@npmcli/arborist": "^9.0.0", "@opentelemetry/api": "^1.9", "@opentelemetry/core": "^2.9", "@opentelemetry/exporter-trace-otlp-grpc": "^0.220", "@opentelemetry/exporter-zipkin": "^2.9", "@opentelemetry/instrumentation": "^0.220", "@opentelemetry/instrumentation-grpc": "^0.220", "@opentelemetry/resources": "^2.9", "@opentelemetry/sdk-trace-base": "^2.9", "@opentelemetry/sdk-trace-node": "^2.9", "@opentelemetry/semantic-conventions": "^1.42", "@types/google-protobuf": "^3.15.5", "@types/semver": "^7.5.6", "execa": "^5.1.0", "google-protobuf": "^3.21.4", "ini": "^2.0.0", "js-yaml": "^4.0.0", "minimist": "^1.2.6", "normalize-package-data": "^6.0.0", "require-from-string": "^2.0.1", "semver": "^7.5.2", "source-map-support": "^0.5.6", "upath": "^1.1.0" }, "peerDependencies": { "ts-node": ">= 7.0.1 < 12", "typescript": ">= 3.8.3 < 7" }, "optionalPeers": ["ts-node", "typescript"] }, "sha512-IUds2PGz92YiaOSvegK6p5JjPdu0we+IcS9iClyaXRWWjxn7Po+omRoe/NJ58A0fpZFIZUUKM8+Lg7gYd1RczA=="],
 
@@ -5450,8 +4918,6 @@
     "fast-glob/glob-parent": ["glob-parent@5.1.2", "", { "dependencies": { "is-glob": "^4.0.1" } }, "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow=="],
 
     "filelist/minimatch": ["minimatch@5.1.9", "", { "dependencies": { "brace-expansion": "^2.0.1" } }, "sha512-7o1wEA2RyMP7Iu7GNba9vc0RWWGACJOCZBJX2GJWip0ikV+wcOsgVuY9uE8CPiyQhkGFSlhuSkZPavN7u1c2Fw=="],
-
-    "fumadocs-core/yaml": ["yaml@2.9.1", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw=="],
 
     "fumadocs-ui/lucide-react": ["lucide-react@1.52.0", "", { "peerDependencies": { "@types/react": "*", "react": "^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0" }, "optionalPeers": ["@types/react"] }, "sha512-TUgPtl5ZI9WgxOcbu4ckaC5B3l1qxPQrCMgb6OfUB9owx/OvSJfcf93SMgUWAxRw5/1XDfh9uI5F5iNGXCcGDQ=="],
 
@@ -5514,6 +4980,8 @@
     "node-html-parser/css-select": ["css-select@5.2.2", "", { "dependencies": { "boolbase": "^1.0.0", "css-what": "^6.1.0", "domhandler": "^5.0.2", "domutils": "^3.0.1", "nth-check": "^2.0.1" } }, "sha512-TizTzUddG/xYLA3NXodFM0fSbNizXjOKhqiQQwvhlspadZokn1KDy0NZFS0wuEubIYAV5/c1/lAr0TaaFXEXzw=="],
 
     "normalize-package-data/hosted-git-info": ["hosted-git-info@7.0.2", "", { "dependencies": { "lru-cache": "^10.0.1" } }, "sha512-puUZAUKT5m8Zzvs72XWy3HtvVbTWljRE66cP60bxJzAqf2DgICo7lYTY2IHUmLnNpjYvw5bvmoHvPc0QO2a62w=="],
+
+    "npm-run-path/path-key": ["path-key@4.0.0", "", {}, "sha512-haREypq7xkM7ErfgIyA0z+Bj4AGKlMSdlQE2jvJo6huWD1EdkKYV+G/T4nq0YEF2vgTT8kqMFKo1uHn950r4SQ=="],
 
     "p-locate/p-limit": ["p-limit@3.1.0", "", { "dependencies": { "yocto-queue": "^0.1.0" } }, "sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ=="],
 
@@ -6129,11 +5597,7 @@
 
     "@pulumi/docker/@pulumi/pulumi/execa/strip-final-newline": ["strip-final-newline@2.0.0", "", {}, "sha512-BrpvfNAE3dcvq7ll3xVumzjKjZQ5tI1sEUIKr3Uoks0XUl45St3FlatVqef9prk4jRDzhW6WZg+3bk93y6pLjA=="],
 
-    "@pulumi/pulumi/execa/npm-run-path/path-key": ["path-key@3.1.1", "", {}, "sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q=="],
-
     "@traceloop/instrumentation-anthropic/@opentelemetry/instrumentation/import-in-the-middle/cjs-module-lexer": ["cjs-module-lexer@1.4.3", "", {}, "sha512-9z8TZaGM1pfswYeXrUpzPrkx8UnWYdhJclsiYMm6x/w5+nN+8Tf/LnAgfLGQCm59qAOxU8WwHEq2vNwF6i4j+Q=="],
-
-    "@vercel/cli-exec/execa/npm-run-path/path-key": ["path-key@3.1.1", "", {}, "sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q=="],
 
     "astro/vite/postcss/nanoid": ["nanoid@3.3.20", "", { "bin": { "nanoid": "bin/nanoid.cjs" } }, "sha512-uKdg2G3GNCKQn9byYOpxbGqrT2fGO5KRt5J/8b3pok8rT6qxGWF6hxMyJiEYtAf+FVyYuD9hRaDqX5uPFYJ4ZQ=="],
 
@@ -6170,14 +5634,6 @@
     "@grpc/proto-loader/yargs/cliui/wrap-ansi/ansi-styles": ["ansi-styles@4.3.0", "", { "dependencies": { "color-convert": "^2.0.1" } }, "sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg=="],
 
     "@grpc/proto-loader/yargs/string-width/strip-ansi/ansi-regex": ["ansi-regex@5.0.1", "", {}, "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ=="],
-
-    "@pulumi/aws/@pulumi/pulumi/execa/npm-run-path/path-key": ["path-key@3.1.1", "", {}, "sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q=="],
-
-    "@pulumi/docker-build/@pulumi/pulumi/execa/npm-run-path/path-key": ["path-key@3.1.1", "", {}, "sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q=="],
-
-    "@pulumi/docker/@pulumi/pulumi/execa/npm-run-path/path-key": ["path-key@3.1.1", "", {}, "sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q=="],
-
-    "docker-classic/@pulumi/pulumi/execa/npm-run-path/path-key": ["path-key@3.1.1", "", {}, "sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q=="],
 
     "node-html-parser/css-select/domutils/dom-serializer/entities": ["entities@4.5.0", "", {}, "sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw=="],
 

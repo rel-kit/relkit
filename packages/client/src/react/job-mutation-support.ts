@@ -1,5 +1,5 @@
-import type { PendingOperationMetadata } from "@relkit/contracts";
-import { runExecutionSync } from "@relkit/contracts/operation";
+import type { PendingOperationMetadata } from "relkit/contracts";
+import { runExecutionSync } from "relkit/contracts/operation";
 import { mutationOperations, mutationRuntime } from "./mutation-runtime.js";
 import { readRunId } from "./job-hooks-support.js";
 import type { RelkitClientRuntime } from "./context.js";

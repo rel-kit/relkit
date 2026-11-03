@@ -3,7 +3,7 @@
  * Tokens remain runtime values and never enter snapshots or diagnostics. Ordinary
  * application routes receive no injected authorization, including the hello probe.
  */
-import { API_BASE_PATH } from "@relkit/contracts";
+import { API_BASE_PATH } from "relkit/contracts";
 
 /**
  * Selects internal authentication without exposing it to application routes.

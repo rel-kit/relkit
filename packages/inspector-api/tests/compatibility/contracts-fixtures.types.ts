@@ -1,5 +1,5 @@
 import type { Hono } from "hono";
-import type { createObservabilityStream, ObservabilityQueryRequest } from "@relkit/observability";
+import type { createObservabilityStream, ObservabilityQueryRequest } from "relkit/observability";
 import type { InspectorApiOptions } from "../../src/router.types.js";
 
 /** Existing fixture protection options derived from the installed router contract. */

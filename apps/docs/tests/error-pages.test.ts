@@ -3,7 +3,7 @@ import { afterAll, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { DIAGNOSTIC_CODES } from "@relkit/diagnostics/codes";
+import { DIAGNOSTIC_CODES } from "relkit/diagnostics/codes";
 import {
   emittedCodes,
   generateErrorPages,
@@ -19,7 +19,7 @@ test("every code in package source is documented", () => {
   const emitted = emittedCodes(root);
   expect(emitted.size).toBeGreaterThan(400);
   expect(emitted.has("RELKIT_ENV")).toBe(false);
-  expect(emitted.get("RELKIT_SCHEMA_UNAVAILABLE")).toContain("@relkit/schema");
+  expect(emitted.get("RELKIT_SCHEMA_UNAVAILABLE")).toContain("relkit/schema");
   expect(undocumentedCodes(emitted)).toEqual([]);
 });
 

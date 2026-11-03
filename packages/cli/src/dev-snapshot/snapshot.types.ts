@@ -5,7 +5,7 @@
  */
 import type { Schema } from "effect";
 import type { Effect, Scope } from "effect";
-import type { ApplicationGraph } from "@relkit/graph";
+import type { ApplicationGraph } from "relkit/graph";
 import type { DevSnapshotIoError, DevSnapshotRejected } from "./snapshot-error.js";
 import type {
   DevSnapshot as SnapshotSchema,

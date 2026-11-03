@@ -1,7 +1,7 @@
 /** Compiles validated query filters into bound native SQL parameters; no user value becomes SQL. */
 import type { DuckDBValue } from "@duckdb/node-api";
-import type { ObservabilityQueryRequest } from "@relkit/observability";
-import type { NormalizedQuery } from "@relkit/observability/internal/query";
+import type { ObservabilityQueryRequest } from "relkit/observability";
+import type { NormalizedQuery } from "relkit/observability/internal/query";
 /** @param kind - Signal family. @param query - Validated query. @returns SQL clauses and ordered values. */
 export function duckdbQueryFilters(kind: "logs" | "requests" | "traces", query: NormalizedQuery) {
   const clauses = [

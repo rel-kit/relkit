@@ -1,5 +1,5 @@
 import type { ClientRoute } from "./generate-request-statements.types.js";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import { Effect } from "effect";
 import { routeParameterCalculations } from "./route-parameters.js";
 const bodyKinds = ["body", "whole-body", "multipart", "multipart-all", "constant"];

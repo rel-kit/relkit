@@ -1,0 +1,26 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "rootDir": "../.."
+  },
+  "include": [
+    "src/**/*.ts",
+    "tests/contracts/**/*.ts",
+    "tests/engine/**/*.ts",
+    "tests/graph/**/*.ts",
+    "tests/local-service/**/*.ts",
+    "tests/provider/**/*.ts",
+    "tests/providers-local/**/*.ts",
+    "tests/realtime/**/*.ts",
+    "tests/runtime-effect/**/*.ts",
+    "tests/runtime-hono/**/*.ts",
+    "tests/schema/**/*.ts"
+  ]
+}

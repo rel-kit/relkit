@@ -1,5 +1,5 @@
 import type { Schema } from "effect";
-import type { Diagnostic } from "@relkit/diagnostics";
+import type { Diagnostic } from "relkit/diagnostics";
 import type {
   NormalizedDescriptor,
   NormalizedGraph,

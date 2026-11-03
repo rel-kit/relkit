@@ -7,7 +7,7 @@
  */
 import { randomBytes, randomUUID } from "node:crypto";
 import { Context, Effect, Exit, Layer, Ref, Scope, Semaphore } from "effect";
-import { admitObservabilityRecord } from "@relkit/observability";
+import { admitObservabilityRecord } from "relkit/observability";
 import {
   InspectionCapture,
   InspectionNative,
@@ -17,8 +17,8 @@ import type {
   InspectionCaptureOperations,
   InspectionNativeOperations,
 } from "@relkit/inspector-api/connection";
-import type { TelemetryConfiguration } from "@relkit/observability";
-import { runExecutionSyncWith } from "@relkit/contracts/operation";
+import type { TelemetryConfiguration } from "relkit/observability";
+import { runExecutionSyncWith } from "relkit/contracts/operation";
 import { cliAdapterError } from "../cli-errors.js";
 import type { DevCapture, DevCaptureOperations } from "./dev-capture.types.js";
 

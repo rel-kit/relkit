@@ -4,13 +4,13 @@
  * handles and worker lifetimes remain owned by this storage package.
  */
 import { Effect, Exit, Scope } from "effect";
-import type { RedactionPolicy } from "@relkit/observability";
-import type { TelemetryLocalRetentionPolicy } from "@relkit/observability";
+import type { RedactionPolicy } from "relkit/observability";
+import type { TelemetryLocalRetentionPolicy } from "relkit/observability";
 import { openDuckdbDatabaseEffect } from "./duckdb-database-effect.js";
 import { duckdbDriverLayer } from "./duckdb-driver.js";
 import { duckdbError } from "./duckdb-error.js";
 import { DuckdbQueryError } from "./duckdb-query-error.js";
-import { ObservabilityQueryError } from "@relkit/observability";
+import { ObservabilityQueryError } from "relkit/observability";
 /**
  * Opens a private DuckDB database and owns its Effect Scope until close.
  * The scoped Effect implementation contains acquisition and operation logic.

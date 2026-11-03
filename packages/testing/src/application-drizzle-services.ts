@@ -1,7 +1,7 @@
 /** Selected database-only test acquisition; authentication SDKs are never imported. */
 import { activateDrizzleService } from "@relkit/drizzle";
 import { Context, Effect, Layer, ManagedRuntime } from "effect";
-import { runExecutionPromise } from "@relkit/contracts/operation";
+import { runExecutionPromise } from "relkit/contracts/operation";
 import { nativeServiceError } from "./application-errors.js";
 import { loadApplicationServices, soleNativeService } from "./application-service-discovery.js";
 import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";

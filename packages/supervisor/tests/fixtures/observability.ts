@@ -1,4 +1,4 @@
-import { isRuntimeActivationFingerprint } from "@relkit/contracts";
+import { isRuntimeActivationFingerprint } from "relkit/contracts";
 import type { ObservableGenerationFixture } from "./observability.types.js";
 
 /** Reads the native SSE fixture fields without inventing a JSON contract cast.

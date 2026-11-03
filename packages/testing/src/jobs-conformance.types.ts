@@ -1,6 +1,6 @@
-import type { RunHandle } from "@relkit/contracts/jobs";
+import type { RunHandle } from "relkit/contracts/jobs";
 import type { JOBS_CONFORMANCE_FIXTURES } from "./jobs-conformance.js";
-import type { OperationContext } from "@relkit/jobs/adapter";
+import type { OperationContext } from "relkit/jobs/adapter";
 import type { TestJobsAdapter } from "./test-jobs-adapter.js";
 
 /** Native adapter fixture inputs for reusable jobs contract assertions. */

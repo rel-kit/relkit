@@ -1,1 +1,1 @@
-export * from "@relkit/routes";
+export * from "relkit/routes";

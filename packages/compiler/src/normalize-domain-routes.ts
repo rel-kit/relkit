@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
-import { createDiagnostic } from "@relkit/diagnostics";
+import { createDiagnostic } from "relkit/diagnostics";
 import * as ts from "typescript";
 import { routeSourceFindings } from "./route-source-checks.js";
 import { add } from "./normalize-pass-utils.js";

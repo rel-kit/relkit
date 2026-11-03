@@ -1,5 +1,5 @@
-import type { JsonValue } from "@relkit/contracts";
-import type { DeploymentRoleProjection } from "@relkit/graph";
+import type { JsonValue } from "relkit/contracts";
+import type { DeploymentRoleProjection } from "relkit/graph";
 import { clean } from "./normalize-graph-utils.js";
 import type { GraphNode, NormalizedDescriptor } from "./normalize-types.js";
 import { isRecord } from "./normalize-utils.js";

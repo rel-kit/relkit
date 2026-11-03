@@ -2,7 +2,7 @@
 import { resolve } from "node:path";
 import { randomBytes, randomUUID } from "node:crypto";
 import { Deferred, Effect, Layer, MutableRef, Ref } from "effect";
-import type { RuntimeActivationFingerprint } from "@relkit/contracts";
+import type { RuntimeActivationFingerprint } from "relkit/contracts";
 import type { StartedCandidate, SupervisorCandidateToken } from "@relkit/supervisor";
 import { runCliEffect } from "../cli-runtime.js";
 import { createDevLogger } from "./dev-logger.js";

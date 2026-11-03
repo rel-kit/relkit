@@ -1,6 +1,6 @@
 import { Cause, Effect, Exit } from "effect";
-import { GraphCanonicalizationError } from "@relkit/graph";
-import { OpenApiGenerationError } from "@relkit/openapi";
+import { GraphCanonicalizationError } from "relkit/graph";
+import { OpenApiGenerationError } from "relkit/openapi";
 
 /**
  * Executes a fully provided synchronous operation at a legacy compiler boundary.

@@ -1,5 +1,5 @@
 import { Schema } from "effect";
-import { isRuntimeActivationFingerprint } from "@relkit/contracts";
+import { isRuntimeActivationFingerprint } from "relkit/contracts";
 
 /** Owner-validated activation identity at the manifest JSON boundary. */
 export const builtActivationSchema = Schema.declare(isRuntimeActivationFingerprint);

@@ -5,7 +5,7 @@
  */
 import { expect, it } from "@effect/vitest";
 import { Effect, Exit } from "effect";
-import { APPLICATION_LAYOUT_VERSION } from "@relkit/contracts";
+import { APPLICATION_LAYOUT_VERSION } from "relkit/contracts";
 import {
   decodeSnapshotEffect,
   MAX_SNAPSHOT_RECEIPT_BYTES,

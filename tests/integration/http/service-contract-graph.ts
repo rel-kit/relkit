@@ -1,6 +1,6 @@
 /** Static HTTP contract shared by the runtime/document/client assertions. */
-import { GRAPH_VERSION } from "../../../packages/contracts/src/index.ts";
-import type { ApplicationGraph } from "../../../packages/graph/src/index.ts";
+import { GRAPH_VERSION } from "relkit/contracts";
+import type { ApplicationGraph } from "relkit/graph";
 const source = { file: "src/routes/orders.ts", line: 1, column: 1 } as const;
 export const serviceGraph: ApplicationGraph = {
   contractVersion: GRAPH_VERSION,

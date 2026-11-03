@@ -1,9 +1,9 @@
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { runInspectorPromise as runExecutionPromise } from "./native-edge.js";
 import { inspectorExecution } from "./execution.js";
 import { nativeAttempt, projectionAttempt } from "./native-edge.js";
-import { PROTOCOL_VERSION } from "@relkit/contracts";
+import { PROTOCOL_VERSION } from "relkit/contracts";
 import { safeJson, type ResolvedActiveGeneration } from "./shared.js";
 import { InspectorActionError } from "./actions-errors.js";
 import { ACTION_REDACTION, projectAdmin, projectApproval } from "./actions-projection.js";

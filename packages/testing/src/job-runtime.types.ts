@@ -1,6 +1,6 @@
 import type { WorkOwnershipState } from "./work-ownership.types.js";
-import type { materializeJobs } from "@relkit/engine";
-import type { JobQueue } from "@relkit/providers-local";
+import type { materializeJobs } from "relkit/engine";
+import type { JobQueue } from "relkit/providers-local";
 
 /** Admission, native cancellation and actual completion receipts for one durable job owner. */
 export interface JobRuntimeState extends WorkOwnershipState {}

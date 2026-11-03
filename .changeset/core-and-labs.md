@@ -1,5 +1,5 @@
 ---
-"@relkit/realtime": patch
+"relkit": patch
 "@relkit/cloud-aws": patch
 "@relkit/deploy-pulumi": patch
 "@relkit/aws": patch

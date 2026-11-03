@@ -37,7 +37,7 @@ export function routeSourceFindings(
     )
       continue;
     if (
-      !["@relkit/routes", "@relkit/app/routes", "@relkit/app"].includes(
+      !["relkit/routes", "relkit", "@relkit/app/routes", "@relkit/app"].includes(
         statement.moduleSpecifier.text,
       )
     )

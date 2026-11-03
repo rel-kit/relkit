@@ -1,5 +1,5 @@
-import type { MaybePromise } from "@relkit/contracts";
-import type { ObservabilityQuery, ObservabilityStream } from "@relkit/observability";
+import type { MaybePromise } from "relkit/contracts";
+import type { ObservabilityQuery, ObservabilityStream } from "relkit/observability";
 import type { InspectorLoggingOptions } from "./execution.types.js";
 
 /** Supported observation environments used for default exposure and production protection. */

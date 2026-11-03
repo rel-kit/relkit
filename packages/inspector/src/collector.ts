@@ -1,7 +1,7 @@
 /** Commits a finite replay batch before ACK; lost ACKs replay stable keys without duplicate writes. */
 import { randomUUID } from "node:crypto";
 import { Effect, Schema } from "effect";
-import { admitObservabilityRecordEffect } from "@relkit/observability";
+import { admitObservabilityRecordEffect } from "relkit/observability";
 import {
   CAPTURE_CONSUMER_HEADER,
   InspectionConnectionError,
@@ -13,7 +13,7 @@ import type { InspectorHistoryOperations } from "./history.types.js";
 import { InspectionCollectionBatch } from "./collection.schemas.js";
 import { collectionChange } from "./collector-changes.js";
 import { persistCollectionGap, persistCollectionLoss } from "./collector-loss.js";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 // Names this Inspector to the bridge, so another Inspector collecting the same session cannot
 // retire records this one has not persisted.

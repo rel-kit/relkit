@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
 
-import { createDiagnostic } from "@relkit/diagnostics";
+import { createDiagnostic } from "relkit/diagnostics";
 import { hashGraphEffect } from "./normalize-graph.js";
 import { generateManifestEffect } from "./generate-manifest.js";
 import { generateJobsManifestEffect } from "./jobs/manifest.js";

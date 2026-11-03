@@ -24,16 +24,16 @@ async function main(): Promise<void> {
     observability,
     layoutModule,
   ] = await Promise.all([
-    load("packages/contracts/src/index.ts"),
+    load("packages/relkit/src/contracts/index.ts"),
     load("packages/compiler/src/index.ts"),
-    load("packages/functions/src/index.ts"),
-    load("packages/schema/src/index.ts"),
-    load("packages/engine/src/index.ts"),
-    load("packages/events/src/index.ts"),
-    load("packages/runtime-hono/src/index.ts"),
+    load("packages/relkit/src/functions/index.ts"),
+    load("packages/relkit/src/schema/index.ts"),
+    load("packages/relkit/src/engine/index.ts"),
+    load("packages/relkit/src/events/index.ts"),
+    load("packages/relkit/src/runtime-hono/index.ts"),
     load("packages/testing/src/index.ts"),
     load("packages/supervisor/src/index.ts"),
-    load("packages/observability/src/index.ts"),
+    load("packages/relkit/src/observability/index.ts"),
     load("apps/inspector/lib/graph-layout.ts"),
   ]);
   const modules = {

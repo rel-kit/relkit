@@ -3,7 +3,7 @@
 import { describe, expect, expectTypeOf, test } from "vitest";
 import { createMiddleware, FakeToolCallingModel, todoListMiddleware, tool } from "langchain";
 import { Annotation } from "@langchain/langgraph";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import {
   defineAgent,
   isAgentDescriptor,

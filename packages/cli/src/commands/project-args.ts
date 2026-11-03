@@ -1,6 +1,6 @@
 /** Parses explicit project flags without importing application code or acquiring resources. */
 import { CliFailureError } from "../cli-errors.js";
-import type { MinimumLogLevel } from "@relkit/runtime-effect";
+import type { MinimumLogLevel } from "relkit/runtime-effect";
 import { Schema } from "effect";
 import { minimumLogLevelSchema } from "./project-args.schemas.js";
 import type { ProjectArgs } from "./project-args.types.js";

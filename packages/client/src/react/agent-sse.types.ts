@@ -1,4 +1,4 @@
-import type { JournalCheckpoint } from "@relkit/contracts";
+import type { JournalCheckpoint } from "relkit/contracts";
 import type { ClientHeaders } from "../index.types.js";
 
 /** Native HTTP configuration for the browser-safe agent SSE edge. */

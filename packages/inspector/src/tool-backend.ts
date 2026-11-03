@@ -6,13 +6,13 @@ import {
   ObservabilityQueryError,
   ObservabilityStreamError,
   type ObservabilityStream,
-} from "@relkit/observability";
+} from "relkit/observability";
 import type { InspectorRemoteOperations } from "./remote.types.js";
 import type { InspectorToolState, InspectorToolStateRef } from "./tool-state.types.js";
 import type { InspectorOptions } from "./options.types.js";
 import { historyResponse, backendError } from "./backend-history.js";
 import { forwardBackend } from "./backend-forward.js";
-import { ExecutionSuccessLogs } from "@relkit/contracts/operation";
+import { ExecutionSuccessLogs } from "relkit/contracts/operation";
 
 /** The packaged Next server alone receives credentials for this local hop. */
 export function inspectorBackend(

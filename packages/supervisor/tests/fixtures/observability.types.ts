@@ -1,4 +1,4 @@
-import type { RuntimeActivationFingerprint } from "@relkit/contracts";
+import type { RuntimeActivationFingerprint } from "relkit/contracts";
 
 /** Selective generation fields retained by the original observable-record assertions. */
 export interface ObservableGenerationFixture {

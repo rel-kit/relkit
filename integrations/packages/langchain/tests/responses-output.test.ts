@@ -1,6 +1,6 @@
 /** Exercises the real native loop with Responses-style JSON output after one tool side effect. */
 import { AIMessage } from "@langchain/core/messages";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { Effect } from "effect";
 import { expect, test, vi } from "vitest";
 import { ProviderStrategy, ToolStrategy } from "langchain";

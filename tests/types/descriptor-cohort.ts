@@ -1,15 +1,15 @@
 /** Checks the retained cross-domain descriptor inference and negative authoring contracts against public package APIs. */
-import { defineApp, defineService } from "@relkit/app";
+import { defineApp, defineService } from "relkit";
 import { defineAgent } from "@relkit/langchain";
-import { defineBucket } from "@relkit/buckets";
-import { defineCache } from "@relkit/cache";
-import { defineEnv, env, type EnvRef } from "@relkit/config";
-import { defineEvent, defineEventFunction, type EventEnvelope } from "@relkit/events";
-import { defineError, defineFunction } from "@relkit/functions";
-import { defineJob } from "@relkit/jobs/legacy";
-import { defineRoute, http } from "@relkit/routes";
-import { z, type InferInput, type InferOutput } from "@relkit/schema";
-import { defineTool } from "@relkit/tools";
+import { defineBucket } from "relkit/buckets";
+import { defineCache } from "relkit/cache";
+import { defineEnv, env, type EnvRef } from "relkit/config";
+import { defineEvent, defineEventFunction, type EventEnvelope } from "relkit/events";
+import { defineError, defineFunction } from "relkit/functions";
+import { defineJob } from "relkit/jobs/legacy";
+import { defineRoute, http } from "relkit/routes";
+import { z, type InferInput, type InferOutput } from "relkit/schema";
+import { defineTool } from "relkit/tools";
 
 const input = z.object({ id: z.string() });
 import { output } from "./descriptor-schemas.fixture.js";

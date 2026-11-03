@@ -1,11 +1,11 @@
 /** Retains original generation assertions for runtime-integration-plan, registered by the owning suite. */
 import { expect } from "bun:test";
-import { GRAPH_VERSION, type RuntimeIntegrationPlan } from "../../packages/contracts/src/index.ts";
+import { GRAPH_VERSION, type RuntimeIntegrationPlan } from "relkit/contracts";
 import {
   generateRuntimeIntegrationImports,
   generateRuntimeIntegrationPlan,
 } from "../../packages/compiler/src/index.ts";
-import type { ApplicationGraph } from "../../packages/graph/src/index.ts";
+import type { ApplicationGraph } from "relkit/graph";
 import {
   source,
   provider,

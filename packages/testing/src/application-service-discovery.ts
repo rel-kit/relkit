@@ -7,9 +7,9 @@ import {
   selectApplicationLayout,
   serviceSource,
   type DescriptorAny,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { nativeServiceError } from "./application-errors.js";
 
 /**

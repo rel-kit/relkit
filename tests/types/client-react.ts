@@ -52,7 +52,7 @@ declare module "@relkit/client/react" {
       { readonly kind: "node"; readonly id: "approve" },
       {
         readonly node: "approve";
-        readonly response: import("@relkit/contracts").JsonValue;
+        readonly response: import("relkit/contracts").JsonValue;
       }
     >;
     readonly exact: ExactContract;
@@ -146,7 +146,7 @@ type ExactContract = ClientAgentContract<
   {
     readonly node: "review";
     readonly value?: unknown;
-    readonly response: import("@relkit/contracts").JsonValue;
+    readonly response: import("relkit/contracts").JsonValue;
   }
 >;
 declare const exactContract: ExactContract;

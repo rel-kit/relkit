@@ -1,4 +1,4 @@
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { InspectorEndpointError } from "./router-utils.js";
 import { identity, type ResolvedActiveGeneration } from "./shared.js";
 

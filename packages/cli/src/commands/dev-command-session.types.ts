@@ -1,6 +1,6 @@
 /** Accepted command state shared by support/session composition; no resource lifetime is transferred by these types. */
 import type { Effect, Ref } from "effect";
-import type { TelemetryConfiguration } from "@relkit/observability";
+import type { TelemetryConfiguration } from "relkit/observability";
 import type { CliCommandContext } from "../main-support-types.js";
 import type { ProjectArgs } from "./project-args.types.js";
 import type { developmentPortsEffect } from "./dev-inspector.js";

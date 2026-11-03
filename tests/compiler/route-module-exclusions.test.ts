@@ -29,7 +29,7 @@ test("generated route contracts omit discovery's excluded test and fixture modul
 });
 
 test("shared route findings skip excluded files while preserving errors in application routes", () => {
-  const text = `import { defineServiceRoutes } from "@relkit/app/routes";
+  const text = `import { defineServiceRoutes } from "relkit/routes";
 export const GET = defineServiceRoutes(service, { GET: "example" });`;
   const files = [...excluded, "src/routes/users/route.ts"];
   const sources = new Map(

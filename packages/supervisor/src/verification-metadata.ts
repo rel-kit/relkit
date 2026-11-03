@@ -1,4 +1,4 @@
-import { API_VERSION, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import { API_VERSION, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "relkit/contracts";
 import { CandidateVerificationError } from "./verification-error.js";
 import type { CandidateProbeResponse, CandidateVerificationOptions } from "./verification.types.js";
 import type {

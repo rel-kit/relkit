@@ -45,7 +45,7 @@ test("every direct first-party oRPC runtime owner declares its required API", as
     expect(version).toBe("1.9.1");
     expect(manifest.peerDependenciesMeta?.[api]?.optional).not.toBe(true);
   }
-  expect(owners.sort()).toEqual(["@relkit/client", "@relkit/inspector", "@relkit/runtime-hono"]);
+  expect(owners.sort()).toEqual(["@relkit/client", "@relkit/inspector-ui", "relkit"]);
 });
 
 test("client exposes a required host API peer while frontend SDK peers remain optional", async () => {

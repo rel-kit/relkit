@@ -12,7 +12,7 @@ import { CliProcess, processLayer } from "../services/process.service.js";
 import { cleanupLayer } from "../services/cleanup.service.js";
 import { runBundleProcess } from "./build-bundle-process.js";
 import { linkBuildModules } from "./build-module-links.js";
-import { DependencySource, DependencySourceLive } from "@relkit/provider/internal/dependencies";
+import { DependencySource, DependencySourceLive } from "relkit/provider/internal/dependencies";
 import { linkRuntimeModules } from "../services/runtime-module-links.js";
 
 export { dockerfile, dockerignore } from "./build-container.js";

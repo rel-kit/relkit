@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { Effect } from "effect";
-import type { TaskJobNode } from "@relkit/graph";
+import type { TaskJobNode } from "relkit/graph";
 import { sourceEffect } from "../src/generate-job-sources.js";
 import { jobProcedureEntrySourcesEffect } from "../src/generate-job-types.js";
 import { jobRegistryTypeEffect } from "../src/generate-job-registry.js";

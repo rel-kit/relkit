@@ -3,7 +3,7 @@
  * and removes token requirements from browser-session documentation. This pure
  * projection is called by AuthOpenApi; malformed metadata throws at that adapter.
  */
-import { assertJsonValue, type JsonValue } from "@relkit/contracts";
+import { assertJsonValue, type JsonValue } from "relkit/contracts";
 
 /**
  * Detaches and projects one native OpenAPI document without changing SDK metadata.

@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 import { createSupervisorDrain } from "../../src/drain.js";
 import { createSupervisorProxy } from "../../src/proxy.js";
 import { Cause, Effect, Exit, Scope } from "effect";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
 import { proxyWebSocketHandler, upgradeProxyWebSocket } from "../../src/proxy-websocket.js";
 import type { ProxySocketData } from "../../src/proxy-websocket.types.js";
 import { joinStoppedProxyListener } from "../../src/proxy-listener-native.js";

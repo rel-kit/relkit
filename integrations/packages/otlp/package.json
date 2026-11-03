@@ -57,8 +57,6 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@relkit/contracts": "workspace:*",
-    "@relkit/observability": "workspace:*",
-    "@relkit/provider": "workspace:*"
+    "relkit": "workspace:*"
   }
 }

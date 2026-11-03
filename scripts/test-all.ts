@@ -11,6 +11,7 @@ const firstLayers = [
   "test:compiler",
   "test:contracts",
   "test:integration",
+  "test:runtime-rpc",
   "test:inspector",
   "test:container",
   "test:security",

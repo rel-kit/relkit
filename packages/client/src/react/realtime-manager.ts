@@ -1,6 +1,6 @@
-import type { ClientIdentityDocument } from "@relkit/contracts";
+import type { ClientIdentityDocument } from "relkit/contracts";
 import { ManagedRuntime } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionSync } from "relkit/contracts/operation";
 import { runClientSync } from "../client-runtime.js";
 import { RealtimeSessions, realtimeSessionsLayer } from "./realtime-session.service.js";
 import type { RealtimeFrame, RealtimeStatus } from "./realtime-manager.types.js";

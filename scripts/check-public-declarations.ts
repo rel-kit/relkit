@@ -3,24 +3,31 @@ import { dirname, relative, resolve } from "node:path";
 import { agentProviderPropertyOffsets } from "./public-declaration-agent";
 import { nonFunctionHandlers } from "./public-declaration-ast";
 
-const publicPackages = [
-  "packages/contracts",
-  "packages/schema",
-  "packages/config",
-  "packages/provider",
-  "packages/diagnostics",
-  "packages/functions",
-  "packages/services",
-  "packages/routes",
-  "packages/jobs",
-  "packages/events",
-  "packages/buckets",
-  "packages/cache",
-  "packages/tools",
-  "packages/agents",
-  "packages/app",
-  "packages/testing",
+/** Public declaration entry points: a package and one export subpath. */
+const publicEntries = [
+  ...[
+    "contracts",
+    "schema",
+    "config",
+    "provider",
+    "diagnostics",
+    "functions",
+    "services",
+    "routes",
+    "jobs",
+    "events",
+    "buckets",
+    "cache",
+    "tools",
+    "agents",
+  ].map((area) => ["packages/relkit", `./${area}`] as const),
+  ["packages/relkit", "."],
+  ["packages/testing", "."],
 ] as const;
+
+/** `relkit` areas that public declarations must not reach; `observability/telemetry` is public. */
+const internalAreaFile =
+  /\/packages\/relkit\/dist\/(?:providers-local|runtime-effect|runtime-hono|engine|observability\/(?!telemetry(?:-config\.types)?\.d\.ts$))/;
 
 const forbiddenSymbols = [
   // Native Effect constructors and injectable services are documented public APIs.
@@ -35,7 +42,7 @@ const forbiddenSymbols = [
   ["provider-client", /\b[A-Z][A-Za-z0-9]*ProviderClient\b/g],
   [
     "internal-provider-sdk",
-    /from ["']@relkit\/(?:providers-local|providers-standard|cloud-aws|deploy-pulumi|runtime-effect|runtime-hono|engine|observability(?!\/telemetry["'])|supervisor|inspector-api)(?:\/|["'])/g,
+    /from ["'](?:@relkit\/(?:providers-standard|cloud-aws|deploy-pulumi|supervisor|inspector-api)|relkit\/(?:providers-local|runtime-effect|runtime-hono|engine|observability(?!\/telemetry["'])))(?:\/|["'])/g,
   ],
   [
     "framework-or-provider-import",
@@ -44,11 +51,7 @@ const forbiddenSymbols = [
 ] as const;
 
 type PackageManifest = {
-  exports?: {
-    "."?: {
-      types?: unknown;
-    };
-  };
+  exports?: Record<string, { types?: unknown }>;
 };
 
 export type DeclarationLeak = {
@@ -62,11 +65,11 @@ function readPackageManifest(packageRoot: string): PackageManifest {
   return JSON.parse(readFileSync(resolve(packageRoot, "package.json"), "utf8")) as PackageManifest;
 }
 
-function declarationEntry(root: string, packagePath: string): string {
+function declarationEntry(root: string, packagePath: string, subpath: string): string {
   const packageRoot = resolve(root, packagePath);
-  const types = readPackageManifest(packageRoot).exports?.["."]?.types;
+  const types = readPackageManifest(packageRoot).exports?.[subpath]?.types;
   if (typeof types !== "string" || !types.endsWith(".d.ts")) {
-    throw new Error(`${packagePath} must expose a .d.ts types export`);
+    throw new Error(`${packagePath} must expose a .d.ts types export for ${subpath}`);
   }
   const entry = resolve(packageRoot, types);
   if (!existsSync(entry)) throw new Error(`Missing emitted declaration: ${relative(root, entry)}`);
@@ -96,8 +99,11 @@ function lineAndColumn(text: string, offset: number): { line: number; column: nu
 
 export function scanPublicDeclarations(root: string): DeclarationLeak[] {
   const leaks: DeclarationLeak[] = [];
-  for (const packagePath of publicPackages) {
-    const pending = [declarationEntry(root, packagePath)];
+  for (const [packagePath, subpath] of publicEntries) {
+    const entry = declarationEntry(root, packagePath, subpath);
+    // Each entry is scanned within its own folder, as each former package was.
+    const scope = dirname(entry);
+    const pending = [entry];
     const visited = new Set<string>();
     while (pending.length > 0) {
       const file = pending.pop();
@@ -121,7 +127,16 @@ export function scanPublicDeclarations(root: string): DeclarationLeak[] {
           ...lineAndColumn(text, offset),
           symbol: "agent-provider-details",
         });
-      pending.push(...localDeclarationReferences(file, text));
+      for (const reference of localDeclarationReferences(file, text)) {
+        if (internalAreaFile.test(reference) && !internalAreaFile.test(file))
+          leaks.push({
+            file: relative(root, file),
+            line: 1,
+            column: 1,
+            symbol: "internal-provider-sdk",
+          });
+        else if (reference.startsWith(scope + "/")) pending.push(reference);
+      }
     }
   }
   return leaks.sort((left, right) =>
@@ -132,7 +147,7 @@ export function scanPublicDeclarations(root: string): DeclarationLeak[] {
 }
 
 function declarationSymbols(file: string): typeof forbiddenSymbols {
-  if (/\/packages\/routes\/dist\/define-middleware(?:\.types)?\.d\.ts$/.test(file))
+  if (/\/packages\/relkit\/dist\/routes\/define-middleware(?:\.types)?\.d\.ts$/.test(file))
     return forbiddenSymbols.filter(
       ([symbol]) => symbol !== "Next.js" && symbol !== "framework-or-provider-import",
     );
@@ -143,7 +158,15 @@ function declarationSymbols(file: string): typeof forbiddenSymbols {
 
 async function emitDeclarations(root: string): Promise<void> {
   const child = Bun.spawn(
-    [process.execPath, "x", "tsc", "-b", ...publicPackages, "--pretty", "false"],
+    [
+      process.execPath,
+      "x",
+      "tsc",
+      "-b",
+      ...new Set(publicEntries.map(([packagePath]) => packagePath)),
+      "--pretty",
+      "false",
+    ],
     { cwd: root, stdout: "pipe", stderr: "pipe" },
   );
   const [stdout, stderr] = await Promise.all([
@@ -168,7 +191,7 @@ async function main(): Promise<void> {
     }
     throw new Error(`Public declaration scan failed with ${leaks.length} forbidden symbol(s).`);
   }
-  console.log(`Public declaration scan passed (${publicPackages.length} packages).`);
+  console.log(`Public declaration scan passed (${publicEntries.length} entry points).`);
 }
 
 if (import.meta.main) {

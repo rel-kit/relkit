@@ -10,7 +10,7 @@ import {
   type ProviderAdapter,
   type ProviderBehavior,
   type ProviderConnectionValues,
-} from "@relkit/provider";
+} from "relkit/provider";
 
 const cache = defineProviderCapability("cache");
 const bucket = defineProviderCapability("bucket");

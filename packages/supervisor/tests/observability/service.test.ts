@@ -1,9 +1,9 @@
 import { expect, it } from "@effect/vitest";
 import { Deferred, Effect, Fiber, Layer, Metric } from "effect";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
-import type { LogRecord } from "@relkit/runtime-effect/logger";
-import type { ObservabilityRecord } from "@relkit/observability";
-import { createObservabilityCollector } from "@relkit/observability";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
+import type { LogRecord } from "relkit/runtime-effect/logger";
+import type { ObservabilityRecord } from "relkit/observability";
+import { createObservabilityCollector } from "relkit/observability";
 import {
   createSupervisorObservabilityLayer,
   SupervisorObservabilityOwner,

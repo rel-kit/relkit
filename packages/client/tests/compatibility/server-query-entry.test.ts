@@ -5,7 +5,7 @@
  */
 import { expect, test } from "bun:test";
 import { QueryClient } from "@tanstack/query-core";
-import type { ClientIdentityDocument } from "@relkit/contracts";
+import type { ClientIdentityDocument } from "relkit/contracts";
 import { createRelkitServerContext } from "@relkit/client/server/tanstack-query";
 import { createTanstackQueryUtils } from "@relkit/client/tanstack-query";
 import { mockFetch } from "../fixtures/fetch.ts";

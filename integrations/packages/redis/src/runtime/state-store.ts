@@ -3,7 +3,7 @@ import type {
   LocalAgentState,
   LocalRealtimeState,
   RealtimeStateStore,
-} from "@relkit/providers-local";
+} from "relkit/providers-local";
 import { createRedisClient, type RedisProtocolClient } from "./client.js";
 
 export interface RedisStateStoreOptions<State> {

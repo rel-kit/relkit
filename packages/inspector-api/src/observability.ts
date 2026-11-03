@@ -6,8 +6,8 @@ export type {
   ObservabilityEndpointMode,
   ObservabilityEndpointOptions,
 } from "./observability.types.js";
-import { API_BASE_PATH, API_VERSION, canonicalJson, type JsonValue } from "@relkit/contracts";
-import { ObservabilityQueryError, ObservabilityStreamError } from "@relkit/observability";
+import { API_BASE_PATH, API_VERSION, canonicalJson, type JsonValue } from "relkit/contracts";
+import { ObservabilityQueryError, ObservabilityStreamError } from "relkit/observability";
 import { Hono, type Context } from "hono";
 import { Effect, Layer, ManagedRuntime } from "effect";
 import {

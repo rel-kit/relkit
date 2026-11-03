@@ -1,6 +1,6 @@
 /** Validates graph-selected native services through their owning manifest metadata. */
 import { Effect, Schema } from "effect";
-import { SelectedDependencies } from "@relkit/provider/internal/dependencies";
+import { SelectedDependencies } from "relkit/provider/internal/dependencies";
 import type { AstPrefilterCandidate } from "@relkit/compiler";
 import { cliAdapterError } from "../cli-errors.js";
 

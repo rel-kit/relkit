@@ -1,9 +1,9 @@
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { runInspectorPromise as runExecutionPromise } from "./native-edge.js";
 import { inspectorExecution } from "./execution.js";
 import { nativeAttempt } from "./native-edge.js";
-import { isRuntimeActivationFingerprint } from "@relkit/contracts";
+import { isRuntimeActivationFingerprint } from "relkit/contracts";
 import type { InspectorActionServices } from "./actions.js";
 import {
   isRecord,

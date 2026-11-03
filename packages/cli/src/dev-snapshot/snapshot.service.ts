@@ -4,12 +4,12 @@
  * service captures file authority during Layer acquisition and returns one frozen
  * cohort for runtime consumers; it performs no evaluator, checker or bundler work.
  */
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { Context, Effect, Fiber, Layer, Option } from "effect";
 import {
   DependencySource,
   type DependencySourceContract,
-} from "@relkit/provider/internal/dependencies";
+} from "relkit/provider/internal/dependencies";
 import { SnapshotFiles } from "./snapshot-files.service.js";
 import { verifySnapshotCohort } from "./snapshot-cohort.js";
 import { sealedArtifactFiles } from "./snapshot-sealed-artifacts.js";

@@ -1,6 +1,6 @@
 /** General test application ownership with explicitly selected capability helpers. */
 import { Layer, ManagedRuntime } from "effect";
-import { runExecutionPromise } from "@relkit/contracts/operation";
+import { runExecutionPromise } from "relkit/contracts/operation";
 import { acquireApplication } from "./application-acquisition.js";
 import { TestApplicationHarness, TestApplicationPlatformLive } from "./application-platform.js";
 import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
@@ -19,7 +19,7 @@ export type { TestApplication, TestApplicationOptions } from "./application.type
  * @returns The ready harness; close releases resources in reverse acquisition order.
  * @example
  * ```ts
- * import { defineEnv } from "@relkit/app/config";
+ * import { defineEnv } from "relkit/config";
  * import { createTestApplication } from "@relkit/testing";
  * async function testApplication(projectRoot: string): Promise<void> {
  *   const app = await createTestApplication({ env: defineEnv({}) }, { projectRoot });

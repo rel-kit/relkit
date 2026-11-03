@@ -9,8 +9,8 @@ import {
   serviceSource,
   applicationSourceLayer,
   type ApplicationLayout,
-} from "@relkit/contracts";
-import { createDiagnostic } from "@relkit/diagnostics";
+} from "relkit/contracts";
+import { createDiagnostic } from "relkit/diagnostics";
 import * as ts from "typescript";
 import { Effect } from "effect";
 import { readFactsEffect } from "./discovery/source-facts.js";

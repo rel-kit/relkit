@@ -10,13 +10,13 @@ import type { RecoveryProcess } from "./recovery.types.js";
 
 /** Creates a declarative environment contract with either a required value or harmless default. */
 export const environmentSource = (required: boolean) =>
-  'import { defineEnv, env } from "@relkit/app/config";\nexport default defineEnv({ RECOVERY_VALUE: env.string()' +
+  'import { defineEnv, env } from "relkit/config";\nexport default defineEnv({ RECOVERY_VALUE: env.string()' +
   (required ? "" : '.default("initial")') +
   " });\n";
 
 /** Creates a valid public function returning either its runtime env or an explicit source marker. */
 export const handlerSource = (marker?: string) =>
-  'import { defineFunction } from "@relkit/app/functions";\nimport { z } from "@relkit/app/schema";\n' +
+  'import { defineFunction } from "relkit/functions";\nimport { z } from "relkit/schema";\n' +
   'export default defineFunction({ id:"hello.greet", input:z.object({}), output:z.object({message:z.string()}), ' +
   `handler:async (_input, context)=>({message:${marker === undefined ? "String(context.env.RECOVERY_VALUE)" : JSON.stringify(marker)}}) });\n`;
 
@@ -78,7 +78,7 @@ export async function environmentCycle(root: string, session: RecoveryProcess): 
   before = session.logs().length;
   await writeFile(
     join(root, "src/platform/env.ts"),
-    'import { defineEnv, env } from "@relkit/app/config";\nexport default defineEnv({ RECOVERY_VALUE: env.literal("valid") });\n',
+    'import { defineEnv, env } from "relkit/config";\nexport default defineEnv({ RECOVERY_VALUE: env.literal("valid") });\n',
   );
   await rejected(session, before, "local");
   await writeFile(join(root, ".env.local"), "RECOVERY_VALUE=valid\n");

@@ -1,4 +1,4 @@
-import { runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionSync } from "relkit/contracts/operation";
 import { ManagedRuntime } from "effect";
 import { ClientStreams, ClientStreamsLive } from "./stream.service.js";
 

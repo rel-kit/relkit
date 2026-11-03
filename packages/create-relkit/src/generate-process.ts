@@ -1,6 +1,6 @@
 /** Runs creation installation and verification commands through the selected process service, retaining local executable resolution and cleanup boundaries. */
 
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { Effect } from "effect";
 
 import { GeneratorProcess, generatorProcessLayer } from "./generator-process.js";

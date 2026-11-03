@@ -5,7 +5,7 @@
  * and preserving the same contained no-follow descriptor authority.
  */
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { DevSnapshotRejected } from "./snapshot-error.js";
 import type { SnapshotFileOperations } from "./snapshot-files.types.js";
 import type { DevSnapshot, SnapshotMember } from "./snapshot.types.js";

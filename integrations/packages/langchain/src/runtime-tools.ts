@@ -1,15 +1,15 @@
 /** Builds invocation tool bindings from the selected RelKit registry and native tool descriptors, keeping execution ownership with the caller. */
 
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
-import { ApprovalRequiredError } from "@relkit/agents/internal/approval";
+import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { ApprovalRequiredError } from "relkit/agents/internal/approval";
 import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { invokeAgentToolEffect } from "./runtime-tool-adapter.js";
 import { jsonValueEffect, signalFailure } from "./runtime-utils.js";
-import type { ToolDescriptor } from "@relkit/tools";
+import type { ToolDescriptor } from "relkit/tools";
 import { relkitToolRefs } from "./define-agent-native.js";
 import { findToolEffect } from "./runtime-tool-lookup.js";
 import type { AgentToolCall } from "./runtime-tools.types.js";

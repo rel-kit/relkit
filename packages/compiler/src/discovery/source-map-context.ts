@@ -1,4 +1,4 @@
-import { normalizeSourcePathEffect } from "@relkit/contracts";
+import { normalizeSourcePathEffect } from "relkit/contracts";
 import { Effect } from "effect";
 import { resolve } from "node:path";
 import type * as Mapping from "./source-map.types.js";

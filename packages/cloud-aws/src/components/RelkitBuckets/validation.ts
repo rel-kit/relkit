@@ -1,4 +1,4 @@
-import { normalizeId } from "@relkit/contracts";
+import { normalizeId } from "relkit/contracts";
 import type { RelkitBucketDefinition, RelkitBucketsArgs } from "./types.js";
 
 export interface NormalizedBucket {

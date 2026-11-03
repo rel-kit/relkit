@@ -47,7 +47,7 @@ for (const outcome of ["success", "build-failure"])
     const fixture = mkdtempSync(join(tmpdir(), "relkit-container-bootstrap-"));
     try {
       prepareContainerFixture(fixture, outcome);
-      expect(existsSync(join(fixture, "packages/contracts/dist"))).toBe(false);
+      expect(existsSync(join(fixture, "packages/relkit/dist/contracts"))).toBe(false);
       const install = Bun.spawnSync([process.execPath, "install", "--ignore-scripts"], {
         cwd: fixture,
         stdout: "pipe",
@@ -91,7 +91,7 @@ function prepareContainerFixture(fixture: string, outcome: string): void {
   const manifest: { scripts: Record<string, string>; packageManager: string } = JSON.parse(
     readFileSync(join(repository, "package.json"), "utf8"),
   );
-  mkdirSync(join(fixture, "packages/contracts/src"), { recursive: true });
+  mkdirSync(join(fixture, "packages/relkit/src/contracts"), { recursive: true });
   mkdirSync(join(fixture, "scripts"));
   writeFileSync(
     join(fixture, "package.json"),
@@ -101,7 +101,7 @@ function prepareContainerFixture(fixture: string, outcome: string): void {
       type: "module",
       packageManager: manifest.packageManager,
       workspaces: ["packages/*"],
-      dependencies: { "@relkit/contracts": "workspace:*" },
+      dependencies: { relkit: "workspace:*" },
       scripts: { "test:container": manifest.scripts["test:container"] },
     }),
   );
@@ -112,7 +112,7 @@ function prepareContainerFixture(fixture: string, outcome: string): void {
   prepareContractsPackage(fixture, outcome);
   writeFileSync(
     join(fixture, "scripts/test-container.ts"),
-    'import { ready } from "@relkit/contracts/operation";\nif (!ready) throw new Error("Missing contracts bootstrap");\nconsole.log("container runtime imported compiled contracts");\n',
+    'import { ready } from "relkit/contracts/operation";\nif (!ready) throw new Error("Missing contracts bootstrap");\nconsole.log("container runtime imported compiled contracts");\n',
   );
 }
 
@@ -124,22 +124,22 @@ function prepareContainerFixture(fixture: string, outcome: string): void {
  */
 function prepareContractsPackage(fixture: string, outcome: string): void {
   writeFileSync(
-    join(fixture, "packages/contracts/package.json"),
+    join(fixture, "packages/relkit/package.json"),
     JSON.stringify({
-      name: "@relkit/contracts",
+      name: "relkit",
       version: "0.0.0",
       type: "module",
-      exports: { "./operation": "./dist/operation.js" },
+      exports: { "./contracts/operation": "./dist/contracts/operation.js" },
       scripts: {
         build:
           outcome === "success"
-            ? "bun build src/operation.ts --outdir dist --target bun"
+            ? "bun build src/contracts/operation.ts --outdir dist/contracts --target bun"
             : "bun -e 'console.error(\"contracts bootstrap failed\");process.exit(37)'",
       },
     }),
   );
   writeFileSync(
-    join(fixture, "packages/contracts/src/operation.ts"),
+    join(fixture, "packages/relkit/src/contracts/operation.ts"),
     "export const ready: boolean = true;\n",
   );
 }

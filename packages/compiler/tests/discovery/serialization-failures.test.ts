@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { JsonValueError } from "@relkit/contracts";
+import { JsonValueError } from "relkit/contracts";
 import { Effect } from "effect";
 import {
   encodeEvaluatorFrame,

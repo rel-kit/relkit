@@ -3,8 +3,8 @@
  * cohort. Optional agent wiring follows graph declarations; the emitted host
  * retains environment/provider checks and owns runtime acquisition and shutdown.
  */
-import type { JsonValue, RuntimeActivationFingerprint } from "@relkit/contracts";
-import type { ApplicationGraph } from "@relkit/graph";
+import type { JsonValue, RuntimeActivationFingerprint } from "relkit/contracts";
+import type { ApplicationGraph } from "relkit/graph";
 import { serverSourceOptions } from "./build-server-options.js";
 import { serverAgentSource } from "./build-server-agents.js";
 import type { ServerSourceConfiguration, ServerSourceEmission } from "./build-server.types.js";

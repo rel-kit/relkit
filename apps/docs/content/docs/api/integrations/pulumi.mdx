@@ -298,7 +298,7 @@ export interface PulumiEventLog {
 
 ```ts
 export interface PulumiEventOptions {
-  readonly redaction?: import("@relkit/observability").RedactionPolicy;
+  readonly redaction?: import("relkit/observability").RedactionPolicy;
   readonly redact?: (value: unknown) => JsonValue;
 }
 ```

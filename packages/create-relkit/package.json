@@ -149,7 +149,7 @@
   "dependencies": {
     "@clack/prompts": "catalog:",
     "effect": "catalog:",
-    "@relkit/contracts": "workspace:*"
+    "relkit": "workspace:*"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",

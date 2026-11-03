@@ -1,12 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { z } from "../../packages/schema/src/index.ts";
-import { defineFunction } from "../../packages/functions/src/index.ts";
-import { invoke, type InvocationTarget } from "../../packages/engine/src/invoke.ts";
-import {
-  bindFunctionEvents,
-  defineEvent,
-  defineEventFunction,
-} from "../../packages/events/src/index.ts";
+import { z } from "relkit/schema";
+import { defineFunction } from "relkit/functions";
+import { invoke, type InvocationTarget } from "../../packages/relkit/src/engine/invoke.ts";
+import { bindFunctionEvents, defineEvent, defineEventFunction } from "relkit/events";
 
 const event = defineEvent({
   id: "order_created",

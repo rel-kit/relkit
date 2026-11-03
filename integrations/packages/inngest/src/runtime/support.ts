@@ -1,5 +1,5 @@
-import { durationToMillis, type JobsServiceOptions } from "@relkit/jobs";
-import type { NativeReceipt, NativeSubmission } from "@relkit/jobs/adapter";
+import { durationToMillis, type JobsServiceOptions } from "relkit/jobs";
+import type { NativeReceipt, NativeSubmission } from "relkit/jobs/adapter";
 import type { InngestRuntimeOptions } from "./index.js";
 
 export function eventNameFor(request: NativeSubmission): string {

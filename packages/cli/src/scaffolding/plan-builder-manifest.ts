@@ -1,6 +1,6 @@
 /** Finalizes selected dependencies, scripts and portable repair assets before the scaffold transaction starts, preserving unrelated authored manifest fields. */
 
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { Effect } from "effect";
 import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
 import { domainError, domainTry } from "create-relkit/internal/generator-errors";

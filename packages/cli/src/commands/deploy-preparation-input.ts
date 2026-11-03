@@ -1,7 +1,7 @@
 /** Reads prior deployment state and validates checked source bytes before SDK calls. */
 import { Effect, Schema } from "effect";
-import { assertDeploymentPlanVersion } from "@relkit/deploy";
-import { validateGraphShape, type ApplicationGraph } from "@relkit/graph";
+import { assertDeploymentPlanVersion } from "relkit/deploy";
+import { validateGraphShape, type ApplicationGraph } from "relkit/graph";
 import { cliOriginalError, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { CliFileSystem } from "../services/filesystem.service.js";

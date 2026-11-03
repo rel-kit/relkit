@@ -1,7 +1,7 @@
 import { expect, it } from "@effect/vitest";
 import { Deferred, Effect, Fiber, Layer } from "effect";
 import { TestClock } from "effect/testing";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
 import { createDrainLayer, SupervisorDrainOwner } from "../../src/drain-service.js";
 
 const token = { sourceToken: 1, generationToken: 1 };

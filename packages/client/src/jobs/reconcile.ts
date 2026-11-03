@@ -10,7 +10,7 @@ import {
 } from "./reconcile-boundary.js";
 export { resolveJobProcedure, ownJobProcedure } from "./reconcile-boundary.js";
 import type { WatchRequest } from "./reconcile.types.js";
-import type { RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunSnapshot, RunWatchFrame } from "relkit/contracts/jobs";
 import type { JobWatchOptions } from "./types.js";
 import { timedCall } from "./read-timeout.js";
 import { closeIterator, newEpoch } from "./reconcile-support.js";

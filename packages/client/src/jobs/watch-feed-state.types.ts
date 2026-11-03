@@ -1,4 +1,4 @@
-import type { RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunWatchFrame } from "relkit/contracts/jobs";
 
 /**
  * Accepted frame, epoch, sequence and cursor retained by one shared observation feed.

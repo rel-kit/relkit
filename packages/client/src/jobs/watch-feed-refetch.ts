@@ -1,4 +1,4 @@
-import type { RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunWatchFrame } from "relkit/contracts/jobs";
 import { authoritativeFrame } from "./reconcile.js";
 import type { JobWatchOptions } from "./types.js";
 import { withAfter } from "./watch-feed-support.js";

@@ -4,7 +4,7 @@ import {
   AGENT_CAPABILITY_HEADER,
   AGENT_CAPABILITY_QUERY,
   AGENT_CAPABILITY_VALUE,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import type {
   ClientHeaders,
   CreateClientOptions,

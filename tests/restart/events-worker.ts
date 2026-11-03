@@ -1,7 +1,7 @@
 import { access, appendFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { defineEventFunction } from "../../packages/events/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { defineEventFunction } from "relkit/events";
+import { z } from "relkit/schema";
 import { createTestEvent } from "../../packages/testing/src/index.ts";
 import { resolveRestartStateRoot } from "./state-root.ts";
 

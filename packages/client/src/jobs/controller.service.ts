@@ -1,5 +1,5 @@
 import { Context, Effect, Layer, MutableRef, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { nativeCall } from "../native-stream.js";
 import { runClient } from "../client-runtime.js";
 import { freeze, notify, resumedOptions } from "./controller-support.js";
@@ -23,7 +23,7 @@ let nextControllerId = 1;
  * @example
  * ```ts
  * import { Layer, ManagedRuntime } from "effect";
- * import { runExecutionSync } from "@relkit/contracts/operation";
+ * import { runExecutionSync } from "relkit/contracts/operation";
  * import { JobControllers, JobControllersLive } from "./controller.service.js";
  * import { JobFeedRegistryLive } from "./feed-registry.service.js";
  * export async function observeJob(client: unknown): Promise<void> {

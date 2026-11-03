@@ -1,5 +1,5 @@
-import { StableIdError } from "@relkit/contracts";
-import { normalizeId } from "@relkit/contracts";
+import { StableIdError } from "relkit/contracts";
+import { normalizeId } from "relkit/contracts";
 
 /**
  * Normalizes a model provider and model name selector.

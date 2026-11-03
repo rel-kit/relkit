@@ -1,1 +1,1 @@
-export * from "@relkit/jobs/legacy";
+export * from "relkit/jobs/legacy";

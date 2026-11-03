@@ -1,7 +1,7 @@
 import { Cause, Effect, Exit, Layer, ManagedRuntime, Metric } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
-import { observeExecution } from "@relkit/contracts/operation";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { runExecutionSync } from "relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
 import { createSupervisorStateMachine } from "./state-machine.js";
 import type { SupervisorStateMachine } from "./state-machine.js";
 import { createWatcherLayer, SupervisorSourceWatcher } from "./watcher-service.js";

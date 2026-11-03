@@ -4,7 +4,7 @@
  * shared pins; release synchronization cannot restore a stale duplicated range.
  */
 import { Schema } from "effect";
-import { IntegrationDependencyRequirements } from "@relkit/contracts";
+import { IntegrationDependencyRequirements } from "relkit/contracts";
 import { resolveCatalogVersion } from "./catalog-manifest.js";
 import type { CatalogManifest } from "./catalog-manifest.types.js";
 

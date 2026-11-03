@@ -1,4 +1,4 @@
-import { deploymentJoin, type DeploymentHostMaterialization } from "@relkit/deploy";
+import { deploymentJoin, type DeploymentHostMaterialization } from "relkit/deploy";
 import { type HostContext, output, resource } from "./shared.js";
 
 export function network(

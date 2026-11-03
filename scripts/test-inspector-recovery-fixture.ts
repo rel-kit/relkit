@@ -21,7 +21,7 @@ export async function recoveryFixture(
     const path = join(root, file);
     await writeFile(
       path,
-      (await readFile(path, "utf8")).replace('"@relkit/app"', `"@relkit/app/${entrypoint}"`),
+      (await readFile(path, "utf8")).replace('"relkit"', `"@relkit/app/${entrypoint}"`),
     );
   }
   const route = join(root, "src/routes/hello/[name]/route.ts");
@@ -43,13 +43,13 @@ export async function recoveryFixture(
   );
   await writeFile(
     join(root, "relkit.config.ts"),
-    `import { defineApp, defineEnv, env } from "@relkit/app/config";
+    `import { defineApp, defineEnv, env } from "relkit/config";
 export default defineApp({id:"reload-recovery",inspector:{enabled:true},env:defineEnv({DAYS:env.number().default(7)})});`,
   );
   await writeFile(
     join(root, "src/hello/functions/hello.function.ts"),
-    `import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+    `import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 export default defineFunction({id:"hello.say-hello",input:z.object({name:z.string()}),output:z.object({message:z.string()}),handler:async (_input,context)=>({message:typeof context.env.DAYS+":"+context.env.DAYS})});`,
   );
   await writeFile(join(root, ".env"), "DAYS=7\n");

@@ -1,5 +1,5 @@
 import { Schema } from "effect";
-import { isTelemetryExporterDescriptor } from "@relkit/observability";
+import { isTelemetryExporterDescriptor } from "relkit/observability";
 
 /** Owner-validated static exporter identity, preserved without reconstructing native metadata. */
 const exporter = Schema.declare(isTelemetryExporterDescriptor);

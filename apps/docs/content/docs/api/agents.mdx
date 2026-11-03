@@ -1,6 +1,6 @@
 ---
 title: Agents API
-description: Generated public TypeScript reference for @relkit/agents.
+description: Generated public TypeScript reference for relkit/agents.
 search:
   exclude: true
 sidebar:
@@ -38,7 +38,7 @@ TypeError for a noncanonical mapping.
 **Example**
 
 ```ts
-import { copyAgentChat } from "@relkit/agents";
+import { copyAgentChat } from "relkit/agents";
 
 const chat = copyAgentChat({ input: "message", output: "answer" });
 void chat;
@@ -50,7 +50,7 @@ void chat;
 declare const copyAgentChat: (value: unknown) => AgentChatMapping | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-chat.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client-chat.ts#L64)
 
 ### copyAgentChatEffect
 
@@ -60,7 +60,7 @@ Validates the fixed chat input and output mapping.
 
 ```ts
 import { Effect } from "effect";
-import { copyAgentChatEffect } from "@relkit/agents";
+import { copyAgentChatEffect } from "relkit/agents";
 
 const chat = Effect.runSync(copyAgentChatEffect({ input: "message", output: "answer" }));
 void chat;
@@ -78,7 +78,7 @@ declare const copyAgentChatEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-chat.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client-chat.ts#L24)
 
 ## `agent-client-controls.ts`
 
@@ -93,7 +93,7 @@ TypeError when an unsupported or duplicate control is present.
 **Example**
 
 ```ts
-import { copyAgentControls } from "@relkit/agents";
+import { copyAgentControls } from "relkit/agents";
 
 const controls = copyAgentControls(["stop"]);
 void controls;
@@ -105,7 +105,7 @@ void controls;
 declare const copyAgentControls: (value: unknown) => readonly AgentControl[] | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-controls.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client-controls.ts#L76)
 
 ### copyAgentControlsEffect
 
@@ -115,7 +115,7 @@ Validates and freezes client control capabilities.
 
 ```ts
 import { Effect } from "effect";
-import { copyAgentControlsEffect } from "@relkit/agents";
+import { copyAgentControlsEffect } from "relkit/agents";
 
 const controls = Effect.runSync(copyAgentControlsEffect(["stop"]));
 void controls;
@@ -129,7 +129,7 @@ declare const copyAgentControlsEffect: (
 ) => Effect.Effect<ReadonlyArray<AgentControl> | undefined, AgentClientPolicyError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-controls.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client-controls.ts#L26)
 
 ## `agent-client-error.ts`
 
@@ -143,7 +143,7 @@ Expected client configuration failure in the Effect error channel.
 declare class AgentClientPolicyError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-error.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client-error.ts#L4)
 
 ### clientPolicyCount
 
@@ -153,7 +153,7 @@ declare class AgentClientPolicyError
 declare const clientPolicyCount: Metric.Counter<number>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-error.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client-error.ts#L9)
 
 ### clientPolicyFailures
 
@@ -163,7 +163,7 @@ declare const clientPolicyCount: Metric.Counter<number>;
 declare const clientPolicyFailures: Metric.Counter<number>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-error.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client-error.ts#L10)
 
 ## `agent-client-policy.ts`
 
@@ -178,7 +178,7 @@ TypeError for malformed access, state, or event declarations.
 **Example**
 
 ```ts
-import { copyAgentClientPolicy } from "@relkit/agents";
+import { copyAgentClientPolicy } from "relkit/agents";
 
 const policy = copyAgentClientPolicy({ public: true }, new Set<string>());
 void policy;
@@ -193,7 +193,7 @@ declare const copyAgentClientPolicy: <StateKey extends string>(
 ) => AgentClientPolicy<(...args: any[]) => unknown, StateKey> | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-policy.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client-policy.ts#L71)
 
 ### copyAgentClientPolicyEffect
 
@@ -203,7 +203,7 @@ Validates and freezes client access, state keys, and event schemas.
 
 ```ts
 import { Effect } from "effect";
-import { copyAgentClientPolicyEffect } from "@relkit/agents";
+import { copyAgentClientPolicyEffect } from "relkit/agents";
 
 const policy = Effect.runSync(copyAgentClientPolicyEffect({ public: true }, new Set<string>()));
 void policy;
@@ -232,7 +232,7 @@ declare const copyAgentClientPolicyEffect: <StateKey extends string>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client-policy.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client-policy.ts#L26)
 
 ## `agent-client.ts`
 
@@ -246,7 +246,7 @@ Re-exports all named exports from the "./agent-client-chat.js" module.
 export * from "./agent-client-chat.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client.ts#L3)
 
 ### "./agent-client-controls.js" (namespace export)
 
@@ -258,7 +258,7 @@ Re-exports all named exports from the "./agent-client-controls.js" module.
 export * from "./agent-client-controls.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client.ts#L2)
 
 ### "./agent-client-error.js" (namespace export)
 
@@ -270,7 +270,7 @@ Re-exports all named exports from the "./agent-client-error.js" module.
 export * from "./agent-client-error.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client.ts#L4)
 
 ### "./agent-client-policy.js" (namespace export)
 
@@ -282,7 +282,7 @@ Re-exports all named exports from the "./agent-client-policy.js" module.
 export * from "./agent-client-policy.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client.ts#L1)
 
 ### AgentChatMapping
 
@@ -292,7 +292,7 @@ export * from "./agent-client-policy.js";
 declare const AgentChatMapping: AgentChatMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client.ts#L9)
 
 ### AgentClientEvents
 
@@ -302,7 +302,7 @@ declare const AgentChatMapping: AgentChatMapping;
 declare const AgentClientEvents: Readonly<Record<string, StandardSchemaV1<unknown, unknown>>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client.ts#L7)
 
 ### AgentClientPolicy
 
@@ -312,7 +312,7 @@ declare const AgentClientEvents: Readonly<Record<string, StandardSchemaV1<unknow
 declare const AgentClientPolicy: AgentClientPolicy<Guard, StateKey, Events>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client.ts#L8)
 
 ### AgentControl
 
@@ -322,7 +322,7 @@ declare const AgentClientPolicy: AgentClientPolicy<Guard, StateKey, Events>;
 declare const AgentControl: AgentControl;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client.ts#L6)
 
 ## `agent-client.types.ts`
 
@@ -345,7 +345,7 @@ export interface AgentChatMapping {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client.types.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client.types.ts#L43)
 
 ### AgentClientEvents (type alias)
 
@@ -355,7 +355,7 @@ Names must be nonempty before the policy is published.
 **Example**
 
 ```ts
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 const events: AgentClientEvents = { completed: z.string() };
 ```
 
@@ -365,7 +365,7 @@ const events: AgentClientEvents = { completed: z.string() };
 type AgentClientEvents = Readonly<Record<string, StandardSchemaV1>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client.types.ts#L19)
 
 ### AgentClientPolicy (type alias)
 
@@ -394,7 +394,7 @@ type AgentClientPolicy<
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client.types.ts#L28)
 
 ### AgentControl (type alias)
 
@@ -412,7 +412,7 @@ const control: AgentControl = "stop";
 type AgentControl = "steer" | "follow-up" | "stop" | "approve";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-client.types.ts#L9)
 
 ## `agent-telemetry.ts`
 
@@ -424,7 +424,7 @@ type AgentControl = "steer" | "follow-up" | "stop" | "approve";
 declare const AgentOperation: AgentOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-telemetry.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L4)
 
 ### AgentTelemetry (class)
 
@@ -442,7 +442,7 @@ Effect.provide(observeAgent("capture.policy", Effect.void), AgentTelemetryLive);
 declare class AgentTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-telemetry.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L9)
 
 ### AgentTelemetryLive
 
@@ -460,7 +460,7 @@ Effect.runSync(Effect.provide(observeAgent("capture.policy", Effect.void), Agent
 declare const AgentTelemetryLive: Layer.Layer<AgentTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-telemetry.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L16)
 
 ### AgentTelemetryService
 
@@ -470,7 +470,7 @@ declare const AgentTelemetryLive: Layer.Layer<AgentTelemetry, never, never>;
 declare const AgentTelemetryService: AgentTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-telemetry.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L4)
 
 ### observeAgent
 
@@ -491,7 +491,7 @@ declare const observeAgent: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-telemetry.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L30)
 
 ## `agent-telemetry.types.ts`
 
@@ -678,7 +678,7 @@ type AgentOperation =
   | "client.graph-metadata";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-telemetry.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.types.ts#L6)
 
 ### AgentTelemetryService (interface)
 
@@ -701,7 +701,7 @@ export interface AgentTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-telemetry.types.ts#L176)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.types.ts#L176)
 
 ## `agent-validation-error.ts`
 
@@ -724,7 +724,7 @@ const error = new AgentValidationError({
 declare class AgentValidationError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-error.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation-error.ts#L9)
 
 ### validationCount
 
@@ -734,7 +734,7 @@ declare class AgentValidationError
 declare const validationCount: Metric.Counter<number>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-error.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation-error.ts#L14)
 
 ### validationFailures
 
@@ -744,7 +744,7 @@ declare const validationCount: Metric.Counter<number>;
 declare const validationFailures: Metric.Counter<number>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-error.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation-error.ts#L15)
 
 ## `agent-validation-schema.ts`
 
@@ -771,7 +771,7 @@ declare const assertAgentSchema: (
 ) => asserts value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-schema.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation-schema.ts#L47)
 
 ### assertAgentSchemaEffect
 
@@ -792,7 +792,7 @@ declare const assertAgentSchemaEffect: (
 ) => Effect.Effect<StandardSchemaV1<unknown, unknown>, AgentValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-schema.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation-schema.ts#L20)
 
 ### isAgentSchema
 
@@ -810,7 +810,7 @@ if (isAgentSchema(value)) value["~standard"].validate(input);
 declare const isAgentSchema: (value: unknown) => value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-schema.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation-schema.ts#L84)
 
 ### isAgentSchemaEffect
 
@@ -828,7 +828,7 @@ const valid = Effect.runSync(isAgentSchemaEffect(z.string()));
 declare const isAgentSchemaEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-schema.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation-schema.ts#L67)
 
 ## `agent-validation-value.ts`
 
@@ -848,7 +848,7 @@ if (isPositiveInteger(value)) console.log(value + 1);
 declare const isPositiveInteger: (value: unknown) => value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-value.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation-value.ts#L82)
 
 ### isPositiveIntegerEffect
 
@@ -866,7 +866,7 @@ const valid = Effect.runSync(isPositiveIntegerEffect(3));
 declare const isPositiveIntegerEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-value.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation-value.ts#L65)
 
 ### isRecord
 
@@ -884,7 +884,7 @@ if (isRecord(value)) console.log(value.id);
 declare const isRecord: (value: unknown) => value is Record<PropertyKey, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-value.ts#L111)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation-value.ts#L111)
 
 ### isRecordEffect
 
@@ -902,7 +902,7 @@ const valid = Effect.runSync(isRecordEffect({ id: "one" }));
 declare const isRecordEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-value.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation-value.ts#L94)
 
 ### positiveInteger
 
@@ -924,7 +924,7 @@ const limit = positiveInteger(3, "maxSteps");
 declare const positiveInteger: (value: unknown, name: string) => number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-value.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation-value.ts#L45)
 
 ### positiveIntegerEffect
 
@@ -945,7 +945,7 @@ declare const positiveIntegerEffect: (
 ) => Effect.Effect<number, AgentValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation-value.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation-value.ts#L18)
 
 ## `agent-validation.ts`
 
@@ -959,7 +959,7 @@ Re-exports all named exports from the "./agent-validation-error.js" module.
 export * from "./agent-validation-error.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation.ts#L1)
 
 ### "./agent-validation-schema.js" (namespace export)
 
@@ -971,7 +971,7 @@ Re-exports all named exports from the "./agent-validation-schema.js" module.
 export * from "./agent-validation-schema.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation.ts#L2)
 
 ### "./agent-validation-value.js" (namespace export)
 
@@ -983,7 +983,7 @@ Re-exports all named exports from the "./agent-validation-value.js" module.
 export * from "./agent-validation-value.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-validation.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-validation.ts#L3)
 
 ## `approval-core.ts`
 
@@ -995,7 +995,7 @@ export * from "./agent-validation-value.js";
 declare const APPROVAL_STATES: readonly ["pending", "approved", "denied"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-core.ts#L18)
 
 ### approveApprovalValue
 
@@ -1017,7 +1017,7 @@ approveApprovalValue(pending);
 declare const approveApprovalValue: (approval: ApprovalRecord) => ApprovedApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-core.ts#L55)
 
 ### assertApprovalGrantedValue
 
@@ -1041,7 +1041,7 @@ declare const assertApprovalGrantedValue: (
 ) => asserts approval is ApprovedApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-core.ts#L77)
 
 ### createApprovalValue
 
@@ -1063,7 +1063,7 @@ createApprovalValue(options);
 declare const createApprovalValue: (options: ApprovalOptions) => ApprovalRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-core.ts#L44)
 
 ### denyApprovalValue
 
@@ -1085,7 +1085,7 @@ denyApprovalValue(pending);
 declare const denyApprovalValue: (approval: ApprovalRecord) => DeniedApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-core.ts#L66)
 
 ### isApprovalRecordValue
 
@@ -1103,7 +1103,7 @@ isApprovalRecordValue(value);
 declare const isApprovalRecordValue: (value: unknown) => value is ApprovalRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-core.ts#L90)
 
 ### requiresApprovalValue
 
@@ -1128,7 +1128,7 @@ declare const requiresApprovalValue: (
 ) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-core.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-core.ts#L27)
 
 ## `approval-effect-error.ts`
 
@@ -1142,7 +1142,7 @@ Tagged failure for an invalid approval or denied execution.
 declare class ApprovalEffectError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-effect-error.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-effect-error.ts#L9)
 
 ### approvalEffectError
 
@@ -1160,7 +1160,7 @@ approvalEffectError(new ApprovalStateError("invalid state"));
 declare const approvalEffectError: (cause: unknown) => ApprovalEffectError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-effect-error.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-effect-error.ts#L19)
 
 ## `approval-error.ts`
 
@@ -1180,7 +1180,7 @@ throw new ApprovalDeniedError(denied);
 declare class ApprovalDeniedError { constructor(readonly approval: DeniedApproval) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-error.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-error.ts#L28)
 
 ### code (property)
 
@@ -1190,7 +1190,7 @@ declare class ApprovalDeniedError { constructor(readonly approval: DeniedApprova
 readonly code: "RELKIT_APPROVAL_DENIED"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-error.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-error.ts#L29)
 
 ### ApprovalRequiredError (class)
 
@@ -1208,7 +1208,7 @@ throw new ApprovalRequiredError(pending);
 declare class ApprovalRequiredError { constructor(readonly approval: PendingApproval) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-error.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-error.ts#L17)
 
 ### code (property)
 
@@ -1218,7 +1218,7 @@ declare class ApprovalRequiredError { constructor(readonly approval: PendingAppr
 readonly code: "RELKIT_APPROVAL_REQUIRED"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-error.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-error.ts#L18)
 
 ### ApprovalStateError (class)
 
@@ -1238,7 +1238,7 @@ declare class ApprovalStateError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-error.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-error.ts#L6)
 
 ### code (property)
 
@@ -1248,7 +1248,7 @@ declare class ApprovalStateError {
 readonly code: "RELKIT_APPROVAL_STATE_INVALID"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval-error.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-error.ts#L7)
 
 ## `approval.ts`
 
@@ -1263,7 +1263,7 @@ ApprovalStateError for a malformed or final decision.
 **Example**
 
 ```ts
-import { approveApproval, createApproval } from "@relkit/app/agents";
+import { approveApproval, createApproval } from "relkit/agents";
 
 const pending = createApproval({
   invocationId: "run",
@@ -1282,7 +1282,7 @@ void approved;
 declare const approveApproval: (approval: ApprovalRecord) => ApprovedApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L106)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L106)
 
 Since v0.4.0
 
@@ -1297,7 +1297,7 @@ ApprovalStateError for a malformed or final decision.
 **Example**
 
 ```ts
-import { createApproval, denyApproval } from "@relkit/app/agents";
+import { createApproval, denyApproval } from "relkit/agents";
 
 const pending = createApproval({
   invocationId: "run",
@@ -1316,7 +1316,7 @@ void denied;
 declare const denyApproval: (approval: ApprovalRecord) => DeniedApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L139)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L139)
 
 Since v0.4.0
 
@@ -1330,7 +1330,7 @@ Re-exports all named exports from the "./approval.types.js" module.
 export * from "./approval.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L28)
 
 ### APPROVAL_STATES
 
@@ -1340,7 +1340,7 @@ export * from "./approval.types.js";
 declare const APPROVAL_STATES: readonly ["pending", "approved", "denied"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L21)
 
 ### ApprovalDeniedError
 
@@ -1350,7 +1350,7 @@ declare const APPROVAL_STATES: readonly ["pending", "approved", "denied"];
 declare const ApprovalDeniedError: typeof ApprovalDeniedError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L23)
 
 ### ApprovalEffectError
 
@@ -1360,7 +1360,7 @@ declare const ApprovalDeniedError: typeof ApprovalDeniedError;
 declare const ApprovalEffectError: typeof ApprovalEffectError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L27)
 
 ### ApprovalRequiredError
 
@@ -1370,7 +1370,7 @@ declare const ApprovalEffectError: typeof ApprovalEffectError;
 declare const ApprovalRequiredError: typeof ApprovalRequiredError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L24)
 
 ### ApprovalStateError
 
@@ -1380,7 +1380,7 @@ declare const ApprovalRequiredError: typeof ApprovalRequiredError;
 declare const ApprovalStateError: typeof ApprovalStateError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L25)
 
 ### approveApprovalEffect
 
@@ -1400,7 +1400,7 @@ declare const approveApprovalEffect: (
 ) => Effect.Effect<ApprovedApproval, ApprovalEffectError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L82)
 
 ### assertApprovalGranted
 
@@ -1424,7 +1424,7 @@ declare const assertApprovalGranted: (
 ) => asserts approval is ApprovedApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L160)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L160)
 
 ### assertApprovalGrantedEffect
 
@@ -1444,7 +1444,7 @@ declare const assertApprovalGrantedEffect: (
 ) => Effect.Effect<void, ApprovalEffectError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L148)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L148)
 
 ### createApproval
 
@@ -1472,7 +1472,7 @@ createApproval({
 declare const createApproval: (options: ApprovalOptions) => ApprovalRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L73)
 
 ### createApprovalEffect
 
@@ -1492,7 +1492,7 @@ declare const createApprovalEffect: (
 ) => Effect.Effect<ApprovalRecord, ApprovalEffectError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L61)
 
 ### denyApprovalEffect
 
@@ -1512,7 +1512,7 @@ declare const denyApprovalEffect: (
 ) => Effect.Effect<DeniedApproval, ApprovalEffectError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L115)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L115)
 
 ### isApprovalRecord
 
@@ -1530,7 +1530,7 @@ if (isApprovalRecord(value)) console.log(value.state);
 declare const isApprovalRecord: (value: unknown) => value is ApprovalRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L181)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L181)
 
 ### isApprovalRecordEffect
 
@@ -1548,7 +1548,7 @@ Effect.runSync(isApprovalRecordEffect(value));
 declare const isApprovalRecordEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L171)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L171)
 
 ### requiresApproval
 
@@ -1570,7 +1570,7 @@ requiresApproval("on-write", "write");
 declare const requiresApproval: (policy: ApprovalPolicy, sideEffect: ApprovalSideEffect) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L52)
 
 ### requiresApprovalEffect
 
@@ -1591,7 +1591,7 @@ declare const requiresApprovalEffect: (
 ) => Effect.Effect<boolean, ApprovalEffectError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L36)
 
 ## `approval.types.ts`
 
@@ -1608,7 +1608,7 @@ export interface ApprovalMetadata extends ApprovalOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.types.ts#L20)
 
 ### ApprovalOptions (interface)
 
@@ -1626,7 +1626,7 @@ export interface ApprovalOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.types.ts#L11)
 
 ### ApprovalPolicy (type alias)
 
@@ -1638,7 +1638,7 @@ Policy controlling which tool calls require approval.
 type ApprovalPolicy = ToolApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.types.ts#L6)
 
 ### ApprovalRecord (type alias)
 
@@ -1650,7 +1650,7 @@ Canonical approval record in any valid state.
 type ApprovalRecord = PendingApproval | ApprovedApproval | DeniedApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.types.ts#L41)
 
 ### ApprovalSideEffect (type alias)
 
@@ -1662,7 +1662,7 @@ Declared side effect of a tool call.
 type ApprovalSideEffect = ToolSideEffect;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.types.ts#L8)
 
 ### ApprovalState (type alias)
 
@@ -1674,7 +1674,7 @@ One canonical approval state.
 type ApprovalState = "pending" | "approved" | "denied";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.types.ts#L4)
 
 ### ApprovedApproval (interface)
 
@@ -1688,7 +1688,7 @@ export interface ApprovedApproval extends ApprovalMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.types.ts#L31)
 
 ### DeniedApproval (interface)
 
@@ -1702,7 +1702,7 @@ export interface DeniedApproval extends ApprovalMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.types.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.types.ts#L36)
 
 ### PendingApproval (interface)
 
@@ -1716,7 +1716,7 @@ export interface PendingApproval extends ApprovalMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.types.ts#L26)
 
 ## `capture-content.ts`
 
@@ -1739,7 +1739,7 @@ declare const captureAgentContent: (
 ) => AgentCaptureRecord | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture-content.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture-content.ts#L55)
 
 ### captureAgentContentEffect
 
@@ -1760,7 +1760,7 @@ declare const captureAgentContentEffect: (
 ) => Effect.Effect<AgentCaptureRecord | undefined, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture-content.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture-content.ts#L18)
 
 ## `capture-policy.ts`
 
@@ -1774,7 +1774,7 @@ Invalid capture configuration in the Effect error channel.
 declare class AgentCapturePolicyError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture-policy.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture-policy.ts#L19)
 
 ### createAgentCapturePolicy
 
@@ -1798,7 +1798,7 @@ declare const createAgentCapturePolicy: (
 ) => AgentCapturePolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture-policy.ts#L89)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture-policy.ts#L89)
 
 ### createAgentCapturePolicyEffect
 
@@ -1818,7 +1818,7 @@ declare const createAgentCapturePolicyEffect: (
 ) => Effect.Effect<AgentCapturePolicy, AgentCapturePolicyError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture-policy.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture-policy.ts#L32)
 
 ## `capture-span.ts`
 
@@ -1841,7 +1841,7 @@ declare const createAgentSpanCapture: (
 ) => AgentSpanCapture | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture-span.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture-span.ts#L37)
 
 ### createAgentSpanCaptureEffect
 
@@ -1866,7 +1866,7 @@ declare const createAgentSpanCaptureEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture-span.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture-span.ts#L16)
 
 ## `capture.ts`
 
@@ -1880,7 +1880,7 @@ Re-exports all named exports from the "./capture-content.js" module.
 export * from "./capture-content.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture.ts#L2)
 
 ### "./capture-policy.js" (namespace export)
 
@@ -1892,7 +1892,7 @@ Re-exports all named exports from the "./capture-policy.js" module.
 export * from "./capture-policy.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture.ts#L1)
 
 ### "./capture-span.js" (namespace export)
 
@@ -1904,7 +1904,7 @@ Re-exports all named exports from the "./capture-span.js" module.
 export * from "./capture-span.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture.ts#L3)
 
 ### AgentCapturePolicy
 
@@ -1914,7 +1914,7 @@ export * from "./capture-span.js";
 declare const AgentCapturePolicy: AgentCapturePolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture.ts#L4)
 
 ### AgentCaptureRecord
 
@@ -1924,7 +1924,7 @@ declare const AgentCapturePolicy: AgentCapturePolicy;
 declare const AgentCaptureRecord: AgentCaptureRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture.ts#L4)
 
 ### AgentSpanCapture
 
@@ -1934,7 +1934,7 @@ declare const AgentCaptureRecord: AgentCaptureRecord;
 declare const AgentSpanCapture: AgentSpanCapture;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture.ts#L4)
 
 ## `capture.types.ts`
 
@@ -1959,7 +1959,7 @@ export interface AgentCapturePolicy {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture.types.ts#L10)
 
 ### AgentCaptureRecord (interface)
 
@@ -1983,7 +1983,7 @@ export interface AgentCaptureRecord {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture.types.ts#L23)
 
 ### AgentSpanCapture (interface)
 
@@ -2007,7 +2007,7 @@ export interface AgentSpanCapture {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/capture.types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/capture.types.ts#L39)
 
 ## `client-contract-metadata.ts`
 
@@ -2024,7 +2024,7 @@ Re-exports all named exports from the "./client-contract-metadata.types.js" modu
 export * from "./client-contract-metadata.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-metadata.ts#L16)
 
 ### agentClientContractMetadata
 
@@ -2042,7 +2042,7 @@ declare const agentClientContractMetadata: (
 ) => AgentClientContractMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-metadata.ts#L51)
 
 ### agentClientContractMetadataEffect
 
@@ -2056,7 +2056,7 @@ declare const agentClientContractMetadataEffect: (
 ) => Effect.Effect<AgentClientContractMetadata, AgentDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-metadata.ts#L22)
 
 ## `client-contract-metadata.types.ts`
 
@@ -2078,7 +2078,7 @@ export interface AgentClientContractMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-metadata.types.ts#L32)
 
 ### AgentClientMetadataOptions (interface)
 
@@ -2097,7 +2097,7 @@ export interface AgentClientMetadataOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-metadata.types.ts#L47)
 
 ### ClientEventMetadata (type alias)
 
@@ -2109,7 +2109,7 @@ Client visible event schema or dynamic event marker.
 type ClientEventMetadata = ClientTypeField | { readonly kind: "dynamic" };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-metadata.types.ts#L8)
 
 ### ClientScopeMetadata (interface)
 
@@ -2124,7 +2124,7 @@ export interface ClientScopeMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-metadata.types.ts#L20)
 
 ### ClientToolMetadata (type alias)
 
@@ -2142,7 +2142,7 @@ type ClientToolMetadata =
   | { readonly kind: "dynamic" };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-metadata.types.ts#L11)
 
 ### ClientWaitingMetadata (interface)
 
@@ -2157,7 +2157,7 @@ export interface ClientWaitingMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-metadata.types.ts#L26)
 
 ### SubagentMetadataSource (interface)
 
@@ -2172,7 +2172,7 @@ export interface SubagentMetadataSource {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-metadata.types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-metadata.types.ts#L41)
 
 ## `client-contract-schema.ts`
 
@@ -2186,7 +2186,7 @@ Describes Standard Schema input and output contracts for generic agent clients w
 declare const ClientSchemaMetadata: ClientSchemaMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-schema.ts#L10)
 
 ### ClientTypeField
 
@@ -2196,7 +2196,7 @@ declare const ClientSchemaMetadata: ClientSchemaMetadata;
 declare const ClientTypeField: ClientTypeField;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-schema.ts#L10)
 
 ### clientSchemaMetadata
 
@@ -2214,7 +2214,7 @@ const metadata = clientSchemaMetadata({ type: "string" });
 declare const clientSchemaMetadata: (value: unknown) => ClientSchemaMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L143)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-schema.ts#L143)
 
 ### clientSchemaMetadataEffect
 
@@ -2234,7 +2234,7 @@ declare const clientSchemaMetadataEffect: (
 ) => Effect.Effect<ClientSchemaMetadata, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L115)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-schema.ts#L115)
 
 ### dynamicClientSchema
 
@@ -2246,7 +2246,7 @@ Marker for a schema that cannot be represented in the client contract.
 declare const dynamicClientSchema: Readonly<{ kind: "dynamic" }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-schema.ts#L13)
 
 ### mergeClientSchemas
 
@@ -2264,7 +2264,7 @@ const schema = mergeClientSchemas([{ type: "object" }]);
 declare const mergeClientSchemas: (values: readonly unknown[]) => ClientSchemaMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-schema.ts#L53)
 
 ### mergeClientSchemasEffect
 
@@ -2284,7 +2284,7 @@ declare const mergeClientSchemasEffect: (
 ) => Effect.Effect<JsonValue, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-schema.ts#L27)
 
 ### selectedClientFields
 
@@ -2305,7 +2305,7 @@ declare const selectedClientFields: (
 ) => readonly ClientTypeField[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-schema.ts#L100)
 
 ### selectedClientFieldsEffect
 
@@ -2326,7 +2326,7 @@ declare const selectedClientFieldsEffect: (
 ) => Effect.Effect<ReadonlyArray<ClientTypeField>, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-schema.ts#L66)
 
 ## `client-contract-schema.types.ts`
 
@@ -2340,7 +2340,7 @@ A projected JSON Schema fragment or an intentionally dynamic field.
 type ClientSchemaMetadata = JsonValue | { readonly kind: "dynamic" };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-schema.types.ts#L4)
 
 ### ClientTypeField (interface)
 
@@ -2356,7 +2356,7 @@ export interface ClientTypeField {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-contract-schema.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-contract-schema.types.ts#L7)
 
 ## `client-events.ts`
 
@@ -2370,7 +2370,7 @@ Projects durable agent journal records into bounded client lifecycle events whil
 declare const AgentClientEvent: AgentClientEvent;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-events.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-events.ts#L12)
 
 ### AgentProgressEvent
 
@@ -2380,7 +2380,7 @@ declare const AgentClientEvent: AgentClientEvent;
 declare const AgentProgressEvent: AgentProgressEvent;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-events.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-events.ts#L12)
 
 ### AgentToolEvent
 
@@ -2390,7 +2390,7 @@ declare const AgentProgressEvent: AgentProgressEvent;
 declare const AgentToolEvent: AgentToolEvent;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-events.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-events.ts#L12)
 
 ### agentClientEvents
 
@@ -2408,7 +2408,7 @@ const events = agentClientEvents(record);
 declare const agentClientEvents: (record: JournalRecord) => readonly AgentClientEvent[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-events.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-events.ts#L40)
 
 ### agentClientEventsEffect
 
@@ -2428,7 +2428,7 @@ declare const agentClientEventsEffect: (
 ) => Effect.Effect<ReadonlyArray<AgentClientEvent>, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-events.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-events.ts#L24)
 
 ## `client-tool-events.ts`
 
@@ -2445,7 +2445,7 @@ declare const toolClientEvents: (
 ) => readonly AgentClientEvent[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/client-tool-events.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/client-tool-events.ts#L6)
 
 ## `define-agent-build.ts`
 
@@ -2482,7 +2482,7 @@ declare const prepareAgentDescriptor: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-build.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-build.ts#L25)
 
 ## `define-agent-error.ts`
 
@@ -2496,7 +2496,7 @@ Tagged validation failure while copying an agent definition.
 declare class AgentDefinitionFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-error.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-error.ts#L4)
 
 ### agentDefinitionFailure
 
@@ -2514,7 +2514,7 @@ agentDefinitionFailure(new TypeError("invalid"));
 declare const agentDefinitionFailure: (cause: unknown) => AgentDefinitionFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-error.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-error.ts#L14)
 
 ## `define-agent-limits.ts`
 
@@ -2538,7 +2538,7 @@ const limits = copyAgentLimits({ maxSteps: 3, maxToolCalls: 2, timeoutMs: 1000 }
 declare const copyAgentLimits: (value: unknown) => AgentLimits;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-limits.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-limits.ts#L38)
 
 ### copyAgentLimitsEffect
 
@@ -2562,7 +2562,7 @@ declare const copyAgentLimitsEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-limits.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-limits.ts#L12)
 
 ## `define-agent-support.ts`
 
@@ -2586,7 +2586,7 @@ const instructions = copyAgentInstructions("Answer clearly");
 declare const copyAgentInstructions: (value: unknown) => AgentInstructions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-support.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-support.ts#L31)
 
 ### copyAgentInstructionsEffect
 
@@ -2606,7 +2606,7 @@ declare const copyAgentInstructionsEffect: (
 ) => Effect.Effect<AgentInstructions, AgentDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-support.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-support.ts#L16)
 
 ### isAgentInstructions
 
@@ -2624,7 +2624,7 @@ if (isAgentInstructions(value)) use(value);
 declare const isAgentInstructions: (value: unknown) => value is AgentInstructions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-support.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-support.ts#L63)
 
 ### isAgentInstructionsEffect
 
@@ -2642,7 +2642,7 @@ Effect.runSync(isAgentInstructionsEffect("Answer clearly"));
 declare const isAgentInstructionsEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-support.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-support.ts#L53)
 
 ## `define-agent-validation.ts`
 
@@ -2668,7 +2668,7 @@ assertAgentDescriptor(candidate);
 declare const assertAgentDescriptor: (value: unknown) => asserts value is AgentAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-validation.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-validation.ts#L75)
 
 ### assertAgentDescriptorEffect
 
@@ -2688,7 +2688,7 @@ declare const assertAgentDescriptorEffect: (
 ) => Effect.Effect<void, AgentDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-validation.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-validation.ts#L58)
 
 ### isAgentDescriptor
 
@@ -2706,7 +2706,7 @@ if (isAgentDescriptor(candidate)) use(candidate);
 declare const isAgentDescriptor: (value: unknown) => value is AgentAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-validation.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-validation.ts#L29)
 
 ### isAgentDescriptorEffect
 
@@ -2724,7 +2724,7 @@ Effect.runSync(isAgentDescriptorEffect(candidate));
 declare const isAgentDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-validation.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-validation.ts#L19)
 
 ### normalizeAgentModel
 
@@ -2746,7 +2746,7 @@ const model = normalizeAgentModel("openai:gpt");
 declare const normalizeAgentModel: (value: string | undefined) => string | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-validation.ts#L104)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-validation.ts#L104)
 
 ### normalizeAgentModelEffect
 
@@ -2766,7 +2766,7 @@ declare const normalizeAgentModelEffect: (
 ) => Effect.Effect<string | undefined, AgentDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-validation.ts#L88)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-validation.ts#L88)
 
 ## `define-agent.ts`
 
@@ -2784,8 +2784,8 @@ The original authoring validation or identity error.
 **Example**
 
 ```ts
-import { defineAgent } from "@relkit/app/agents";
-import { z } from "@relkit/app/schema";
+import { defineAgent } from "relkit/agents";
+import { z } from "relkit/schema";
 
 const support = defineAgent({
   id: "support",
@@ -2818,7 +2818,7 @@ declare const defineAgent: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L82)
 
 Since v0.4.0
 
@@ -2850,7 +2850,7 @@ Re-exports all named exports from the "./define-agent.types.js" module.
 export * from "./define-agent.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L17)
 
 ### AgentChatMapping
 
@@ -2860,7 +2860,7 @@ export * from "./define-agent.types.js";
 declare const AgentChatMapping: AgentChatMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L18)
 
 ### AgentClientPolicy
 
@@ -2870,7 +2870,7 @@ declare const AgentChatMapping: AgentChatMapping;
 declare const AgentClientPolicy: AgentClientPolicy<Guard, StateKey, Events>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L18)
 
 ### AgentControl
 
@@ -2880,7 +2880,7 @@ declare const AgentClientPolicy: AgentClientPolicy<Guard, StateKey, Events>;
 declare const AgentControl: AgentControl;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L18)
 
 ### assertAgentDescriptor
 
@@ -2890,7 +2890,7 @@ declare const AgentControl: AgentControl;
 declare const assertAgentDescriptor: (value: unknown) => asserts value is AgentAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L15)
 
 ### copyAgentLimits
 
@@ -2900,7 +2900,7 @@ declare const assertAgentDescriptor: (value: unknown) => asserts value is AgentA
 declare const copyAgentLimits: (value: unknown) => AgentLimits;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L16)
 
 ### copyAgentLimitsEffect
 
@@ -2916,7 +2916,7 @@ declare const copyAgentLimitsEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L16)
 
 ### defineAgentEffect
 
@@ -2946,7 +2946,7 @@ declare const defineAgentEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L24)
 
 ### isAgentDescriptor
 
@@ -2956,7 +2956,7 @@ declare const defineAgentEffect: <
 declare const isAgentDescriptor: (value: unknown) => value is AgentAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L15)
 
 ## `define-agent.types.ts`
 
@@ -2992,7 +2992,7 @@ export interface AgentDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L39)
 
 ### AgentInstructions (type alias)
 
@@ -3002,7 +3002,7 @@ export interface AgentDescriptor<
 type AgentInstructions = string | PromptTemplate | PromptInstructions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L24)
 
 ### AgentLimits (interface)
 
@@ -3018,7 +3018,7 @@ export interface AgentLimits {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L27)
 
 ### AgentToolReferences (type alias)
 
@@ -3032,7 +3032,7 @@ type AgentToolReferences<Tools extends readonly ToolRefAny[]> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L34)
 
 ### DefineAgentOptions (interface)
 
@@ -3062,7 +3062,7 @@ export interface DefineAgentOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.types.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L61)
 
 ### PromptInstructions (interface)
 
@@ -3077,7 +3077,7 @@ export interface PromptInstructions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L17)
 
 ### PromptTemplate (interface)
 
@@ -3090,7 +3090,7 @@ export interface PromptTemplate {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L12)
 
 ## `generated-function-error.ts`
 
@@ -3104,7 +3104,7 @@ Tagged invalid generated function identity or executor.
 declare class GeneratedAgentFunctionFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function-error.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function-error.ts#L4)
 
 ### generatedAgentFunctionFailure
 
@@ -3122,7 +3122,7 @@ generatedAgentFunctionFailure(new TypeError("invalid"));
 declare const generatedAgentFunctionFailure: (cause: unknown) => GeneratedAgentFunctionFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function-error.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function-error.ts#L14)
 
 ## `generated-function.ts`
 
@@ -3136,7 +3136,7 @@ Re-exports all named exports from the "./generated-function.types.js" module.
 export * from "./generated-function.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function.ts#L11)
 
 ### GENERATED_AGENT_FUNCTION_PREFIX
 
@@ -3146,7 +3146,7 @@ export * from "./generated-function.types.js";
 declare const GENERATED_AGENT_FUNCTION_PREFIX: "relkit.agent.";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function.ts#L13)
 
 ### GENERATED_AGENT_FUNCTION_SUFFIX
 
@@ -3156,7 +3156,7 @@ declare const GENERATED_AGENT_FUNCTION_PREFIX: "relkit.agent.";
 declare const GENERATED_AGENT_FUNCTION_SUFFIX: ".invoke";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function.ts#L14)
 
 ### GeneratedAgentFunctionUnboundError (class)
 
@@ -3170,7 +3170,7 @@ declare class GeneratedAgentFunctionUnboundError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function.ts#L17)
 
 ### code (property)
 
@@ -3180,7 +3180,7 @@ declare class GeneratedAgentFunctionUnboundError {
 readonly code: "RELKIT_GENERATED_FUNCTION_UNBOUND"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function.ts#L18)
 
 ### createGeneratedAgentFunction
 
@@ -3205,7 +3205,7 @@ declare const createGeneratedAgentFunction: (
 ) => GeneratedAgentFunction;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function.ts#L80)
 
 ### createGeneratedAgentFunctionEffect
 
@@ -3226,7 +3226,7 @@ declare const createGeneratedAgentFunctionEffect: (
 ) => Effect.Effect<GeneratedAgentFunction, GeneratedAgentFunctionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function.ts#L64)
 
 ### generatedAgentFunctionId
 
@@ -3248,7 +3248,7 @@ generatedAgentFunctionId("support");
 declare const generatedAgentFunctionId: (agentId: unknown) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function.ts#L46)
 
 ### generatedAgentFunctionIdEffect
 
@@ -3268,7 +3268,7 @@ declare const generatedAgentFunctionIdEffect: (
 ) => Effect.Effect<string, GeneratedAgentFunctionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function.ts#L31)
 
 ### isGeneratedAgentFunction
 
@@ -3286,7 +3286,7 @@ if (isGeneratedAgentFunction(candidate)) use(candidate);
 declare const isGeneratedAgentFunction: (value: unknown) => value is GeneratedAgentFunction;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function.ts#L128)
 
 ### isGeneratedAgentFunctionEffect
 
@@ -3306,7 +3306,7 @@ declare const isGeneratedAgentFunctionEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.ts#L118)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function.ts#L118)
 
 ## `generated-function.types.ts`
 
@@ -3320,7 +3320,7 @@ Optional executor bound when the generated function is registered.
 type GeneratedAgentExecutor = (input: unknown, context: unknown) => MaybePromise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function.types.ts#L12)
 
 ### GeneratedAgentFunction (type alias)
 
@@ -3333,7 +3333,7 @@ type GeneratedAgentFunction = ((...arguments_: readonly unknown[]) => MaybePromi
   GeneratedAgentFunctionMarker;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function.types.ts#L15)
 
 ### GeneratedAgentFunctionMarker (interface)
 
@@ -3350,7 +3350,7 @@ export interface GeneratedAgentFunctionMarker {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/generated-function.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/generated-function.types.ts#L4)
 
 ## `index.ts`
 
@@ -3367,7 +3367,7 @@ Re-exports all named exports from the "./agent-client.js" module.
 export * from "./agent-client.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L6)
 
 ### "./agent-telemetry.js" (namespace export)
 
@@ -3379,7 +3379,7 @@ Re-exports all named exports from the "./agent-telemetry.js" module.
 export * from "./agent-telemetry.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L12)
 
 ### "./approval.js" (namespace export)
 
@@ -3391,7 +3391,7 @@ Re-exports all named exports from the "./approval.js" module.
 export * from "./approval.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L8)
 
 ### "./client-events.js" (namespace export)
 
@@ -3403,7 +3403,7 @@ Re-exports all named exports from the "./client-events.js" module.
 export * from "./client-events.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L7)
 
 ### "./define-agent.js" (namespace export)
 
@@ -3415,7 +3415,7 @@ Re-exports all named exports from the "./define-agent.js" module.
 export * from "./define-agent.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L5)
 
 ### "./generated-function.js" (namespace export)
 
@@ -3427,7 +3427,7 @@ Re-exports all named exports from the "./generated-function.js" module.
 export * from "./generated-function.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L9)
 
 ### "./model-selection.js" (namespace export)
 
@@ -3439,7 +3439,7 @@ Re-exports all named exports from the "./model-selection.js" module.
 export * from "./model-selection.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L13)
 
 ### "./observability.js" (namespace export)
 
@@ -3451,7 +3451,7 @@ Re-exports all named exports from the "./observability.js" module.
 export * from "./observability.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L11)
 
 ### "./runtime-contract.types.js" (namespace export)
 
@@ -3463,7 +3463,7 @@ Re-exports all named exports from the "./runtime-contract.types.js" module.
 export * from "./runtime-contract.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L14)
 
 ### "./runtime-events.js" (namespace export)
 
@@ -3475,7 +3475,7 @@ Re-exports all named exports from the "./runtime-events.js" module.
 export * from "./runtime-events.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L10)
 
 ### "./state-control-requests.types.js" (namespace export)
 
@@ -3487,7 +3487,7 @@ Re-exports all named exports from the "./state-control-requests.types.js" module
 export * from "./state-control-requests.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L15)
 
 ### "./state-provider.types.js" (namespace export)
 
@@ -3499,7 +3499,7 @@ Re-exports all named exports from the "./state-provider.types.js" module.
 export * from "./state-provider.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L16)
 
 ### "./state-receipts.types.js" (namespace export)
 
@@ -3511,7 +3511,7 @@ Re-exports all named exports from the "./state-receipts.types.js" module.
 export * from "./state-receipts.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L17)
 
 ### "./state-thread-requests.types.js" (namespace export)
 
@@ -3523,7 +3523,7 @@ Re-exports all named exports from the "./state-thread-requests.types.js" module.
 export * from "./state-thread-requests.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L18)
 
 ### "./state.types.js" (namespace export)
 
@@ -3535,7 +3535,7 @@ Re-exports all named exports from the "./state.types.js" module.
 export * from "./state.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L19)
 
 ### "./thread-transition.js" (namespace export)
 
@@ -3547,7 +3547,7 @@ Re-exports all named exports from the "./thread-transition.js" module.
 export * from "./thread-transition.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/index.ts#L20)
 
 ## `model-selection-core.ts`
 
@@ -3571,7 +3571,7 @@ normalizeModelSelectorValue("openai:gpt");
 declare const normalizeModelSelectorValue: (value: unknown) => string | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection-core.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection-core.ts#L14)
 
 ### parseModelProviderConfigurationValue
 
@@ -3593,7 +3593,7 @@ parseModelProviderConfigurationValue(config);
 declare const parseModelProviderConfigurationValue: (value: unknown) => ModelProviderConfiguration;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection-core.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection-core.ts#L36)
 
 ### resolveModelSelectorValue
 
@@ -3618,7 +3618,7 @@ declare const resolveModelSelectorValue: (
 ) => ResolvedModelSelection;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection-core.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection-core.ts#L77)
 
 ## `model-selection-error.ts`
 
@@ -3632,7 +3632,7 @@ Recoverable Effect failure for invalid model selection.
 declare class ModelSelectionEffectError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection-error.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection-error.ts#L19)
 
 ### ModelSelectionError (class)
 
@@ -3653,7 +3653,7 @@ declare class ModelSelectionError { constructor(
   ) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection-error.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection-error.ts#L7)
 
 ### name (property)
 
@@ -3663,7 +3663,7 @@ declare class ModelSelectionError { constructor(
 readonly name: "ModelSelectionError"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection-error.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection-error.ts#L8)
 
 ### modelSelectionEffectError
 
@@ -3681,7 +3681,7 @@ modelSelectionEffectError(new ModelSelectionError("RELKIT_MODEL_SELECTOR_INVALID
 declare const modelSelectionEffectError: (cause: unknown) => ModelSelectionEffectError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection-error.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection-error.ts#L29)
 
 ## `model-selection.ts`
 
@@ -3695,7 +3695,7 @@ Re-exports all named exports from the "./model-selection.types.js" module.
 export * from "./model-selection.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection.ts#L18)
 
 ### ModelSelectionEffectError
 
@@ -3705,7 +3705,7 @@ export * from "./model-selection.types.js";
 declare const ModelSelectionEffectError: typeof ModelSelectionEffectError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection.ts#L17)
 
 ### ModelSelectionError
 
@@ -3715,7 +3715,7 @@ declare const ModelSelectionEffectError: typeof ModelSelectionEffectError;
 declare const ModelSelectionError: typeof ModelSelectionError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection.ts#L17)
 
 ### normalizeModelSelector
 
@@ -3737,7 +3737,7 @@ normalizeModelSelector("openai:gpt");
 declare const normalizeModelSelector: (value: unknown) => string | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection.ts#L37)
 
 ### normalizeModelSelectorEffect
 
@@ -3757,7 +3757,7 @@ declare const normalizeModelSelectorEffect: (
 ) => Effect.Effect<string | undefined, ModelSelectionEffectError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection.ts#L25)
 
 ### parseModelProviderConfiguration
 
@@ -3779,7 +3779,7 @@ parseModelProviderConfiguration(config);
 declare const parseModelProviderConfiguration: (value: unknown) => ModelProviderConfiguration;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection.ts#L61)
 
 ### parseModelProviderConfigurationEffect
 
@@ -3799,7 +3799,7 @@ declare const parseModelProviderConfigurationEffect: (
 ) => Effect.Effect<ModelProviderConfiguration, ModelSelectionEffectError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection.ts#L46)
 
 ### resolveModelSelector
 
@@ -3824,7 +3824,7 @@ declare const resolveModelSelector: (
 ) => ResolvedModelSelection;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection.ts#L87)
 
 ### resolveModelSelectorEffect
 
@@ -3845,7 +3845,7 @@ declare const resolveModelSelectorEffect: (
 ) => Effect.Effect<ResolvedModelSelection, ModelSelectionEffectError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection.ts#L71)
 
 ## `model-selection.types.ts`
 
@@ -3865,7 +3865,7 @@ export interface ModelProviderConfiguration {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection.types.ts#L9)
 
 ### ModelSelectionErrorCode (type alias)
 
@@ -3881,7 +3881,7 @@ type ModelSelectionErrorCode =
   | "RELKIT_MODEL_PROVIDER_DEFAULT_MISSING";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection.types.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection.types.ts#L2)
 
 ### ResolvedModelSelection (interface)
 
@@ -3897,7 +3897,7 @@ export interface ResolvedModelSelection {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-selection.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/model-selection.types.ts#L16)
 
 ## `observability.ts`
 
@@ -3911,7 +3911,7 @@ Re-exports all named exports from the "./observability.types.js" module.
 export * from "./observability.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L15)
 
 ### AGENT_OBSERVABILITY_PROTOCOL
 
@@ -3921,7 +3921,7 @@ export * from "./observability.types.js";
 declare const AGENT_OBSERVABILITY_PROTOCOL: "relkit.observability.hooks";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L17)
 
 ### AGENT_OBSERVABILITY_VERSION
 
@@ -3931,7 +3931,7 @@ declare const AGENT_OBSERVABILITY_PROTOCOL: "relkit.observability.hooks";
 declare const AGENT_OBSERVABILITY_VERSION: 1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L18)
 
 ### AgentCapturePolicy
 
@@ -3941,7 +3941,7 @@ declare const AGENT_OBSERVABILITY_VERSION: 1;
 declare const AgentCapturePolicy: AgentCapturePolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L14)
 
 ### AgentCapturePolicyError
 
@@ -3951,7 +3951,7 @@ declare const AgentCapturePolicy: AgentCapturePolicy;
 declare const AgentCapturePolicyError: typeof AgentCapturePolicyError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L12)
 
 ### AgentCaptureRecord
 
@@ -3961,7 +3961,7 @@ declare const AgentCapturePolicyError: typeof AgentCapturePolicyError;
 declare const AgentCaptureRecord: AgentCaptureRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L14)
 
 ### AgentSpanCapture
 
@@ -3971,7 +3971,7 @@ declare const AgentCaptureRecord: AgentCaptureRecord;
 declare const AgentSpanCapture: AgentSpanCapture;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L14)
 
 ### captureAgentContent
 
@@ -3984,7 +3984,7 @@ declare const captureAgentContent: (
 ) => AgentCaptureRecord | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L6)
 
 ### captureAgentContentEffect
 
@@ -3997,7 +3997,7 @@ declare const captureAgentContentEffect: (
 ) => Effect.Effect<AgentCaptureRecord | undefined, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L7)
 
 ### createAgentCapturePolicy
 
@@ -4009,7 +4009,7 @@ declare const createAgentCapturePolicy: (
 ) => AgentCapturePolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L8)
 
 ### createAgentCapturePolicyEffect
 
@@ -4021,7 +4021,7 @@ declare const createAgentCapturePolicyEffect: (
 ) => Effect.Effect<AgentCapturePolicy, AgentCapturePolicyError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L9)
 
 ### createAgentSpanCapture
 
@@ -4034,7 +4034,7 @@ declare const createAgentSpanCapture: (
 ) => AgentSpanCapture | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L10)
 
 ### createAgentSpanCaptureEffect
 
@@ -4051,7 +4051,7 @@ declare const createAgentSpanCaptureEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L11)
 
 ### emitAgentEdge
 
@@ -4072,7 +4072,7 @@ declare const emitAgentEdge: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L53)
 
 ### emitAgentEdgeEffect
 
@@ -4094,7 +4094,7 @@ declare const emitAgentEdgeEffect: (
 ) => Effect.Effect<void, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.ts#L27)
 
 ## `observability.types.ts`
 
@@ -4125,7 +4125,7 @@ type AgentEdgeRelationship =
   | "uses-provider-profile";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.types.ts#L7)
 
 ### AgentObservabilitySink (interface)
 
@@ -4155,7 +4155,7 @@ export interface AgentObservabilitySink {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.types.ts#L32)
 
 ### AgentObservedEdge (interface)
 
@@ -4177,7 +4177,7 @@ export interface AgentObservedEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.types.ts#L23)
 
 ### AgentRuntimeHooks (interface)
 
@@ -4203,7 +4203,7 @@ export interface AgentRuntimeHooks {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.types.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/observability.types.ts#L49)
 
 ## `runtime-contract.types.ts`
 
@@ -4222,7 +4222,7 @@ type AgentApprovalHandler = (
 ) => MaybePromise<ApprovalDecision>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-contract.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/runtime-contract.types.ts#L11)
 
 ### AgentContentSink (interface)
 
@@ -4237,7 +4237,7 @@ export interface AgentContentSink {
   readonly progressSinkForTool?: (tool: {
     readonly toolCallId: string;
     readonly toolId: string;
-  }) => import("@relkit/invocation").ProgressSink;
+  }) => import("../invocation/index.js").ProgressSink;
   readonly emitTool?: (
     value: {
       readonly toolCallId: string;
@@ -4252,7 +4252,7 @@ export interface AgentContentSink {
     signal: AbortSignal,
   ) => MaybePromise<void>;
   readonly emitMessage?: (
-    value: import("@relkit/contracts").BrowserMessage,
+    value: import("../contracts/index.js").BrowserMessage,
     signal: AbortSignal,
   ) => MaybePromise<void>;
   readonly emitWaiting?: (
@@ -4262,7 +4262,7 @@ export interface AgentContentSink {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-contract.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/runtime-contract.types.ts#L27)
 
 ### AgentConversationMessage (interface)
 
@@ -4277,7 +4277,7 @@ export interface AgentConversationMessage {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-contract.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/runtime-contract.types.ts#L21)
 
 ### AgentSteeringSource (interface)
 
@@ -4291,7 +4291,7 @@ export interface AgentSteeringSource {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-contract.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/runtime-contract.types.ts#L16)
 
 ## `runtime-events.ts`
 
@@ -4303,7 +4303,7 @@ export interface AgentSteeringSource {
 declare const AgentExecutionEvent: AgentExecutionEvent;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-events.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/runtime-events.ts#L1)
 
 ### AgentExecutionSnapshot
 
@@ -4313,7 +4313,7 @@ declare const AgentExecutionEvent: AgentExecutionEvent;
 declare const AgentExecutionSnapshot: AgentExecutionSnapshot;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-events.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/runtime-events.ts#L1)
 
 ## `state-control-requests.types.ts`
 
@@ -4327,7 +4327,7 @@ Shared state contracts live below execution and provider implementations.
 declare const AcceptControlRequest: AcceptControlRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-control-requests.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-control-requests.types.ts#L4)
 
 ### AdmitContinuationRequest
 
@@ -4337,7 +4337,7 @@ declare const AcceptControlRequest: AcceptControlRequest;
 declare const AdmitContinuationRequest: AdmitContinuationRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-control-requests.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-control-requests.types.ts#L15)
 
 ### ClaimControlRequest
 
@@ -4347,7 +4347,7 @@ declare const AdmitContinuationRequest: AdmitContinuationRequest;
 declare const ClaimControlRequest: ClaimControlRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-control-requests.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-control-requests.types.ts#L9)
 
 ### ContinuationIdentity
 
@@ -4357,7 +4357,7 @@ declare const ClaimControlRequest: ClaimControlRequest;
 declare const ContinuationIdentity: ContinuationIdentity;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-control-requests.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-control-requests.types.ts#L14)
 
 ### ControlLimits
 
@@ -4367,7 +4367,7 @@ declare const ContinuationIdentity: ContinuationIdentity;
 declare const ControlLimits: ControlLimits;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-control-requests.types.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-control-requests.types.ts#L3)
 
 ### ControlPage
 
@@ -4377,7 +4377,7 @@ declare const ControlLimits: ControlLimits;
 declare const ControlPage: ControlPage;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-control-requests.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-control-requests.types.ts#L7)
 
 ### LookupContinuationReceiptRequest
 
@@ -4387,7 +4387,7 @@ declare const ControlPage: ControlPage;
 declare const LookupContinuationReceiptRequest: LookupContinuationReceiptRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-control-requests.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-control-requests.types.ts#L16)
 
 ### LookupControlReceiptRequest
 
@@ -4397,7 +4397,7 @@ declare const LookupContinuationReceiptRequest: LookupContinuationReceiptRequest
 declare const LookupControlReceiptRequest: LookupControlReceiptRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-control-requests.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-control-requests.types.ts#L5)
 
 ### MarkControlEffectStartedRequest
 
@@ -4407,7 +4407,7 @@ declare const LookupControlReceiptRequest: LookupControlReceiptRequest;
 declare const MarkControlEffectStartedRequest: MarkControlEffectStartedRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-control-requests.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-control-requests.types.ts#L11)
 
 ### ReadControlsRequest
 
@@ -4417,7 +4417,7 @@ declare const MarkControlEffectStartedRequest: MarkControlEffectStartedRequest;
 declare const ReadControlsRequest: ReadControlsRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-control-requests.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-control-requests.types.ts#L6)
 
 ### RecoverAbandonedControlRequest
 
@@ -4427,7 +4427,7 @@ declare const ReadControlsRequest: ReadControlsRequest;
 declare const RecoverAbandonedControlRequest: RecoverAbandonedControlRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-control-requests.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-control-requests.types.ts#L13)
 
 ### RenewControlClaimRequest
 
@@ -4437,7 +4437,7 @@ declare const RecoverAbandonedControlRequest: RecoverAbandonedControlRequest;
 declare const RenewControlClaimRequest: RenewControlClaimRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-control-requests.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-control-requests.types.ts#L10)
 
 ### SettleControlRequest
 
@@ -4447,7 +4447,7 @@ declare const RenewControlClaimRequest: RenewControlClaimRequest;
 declare const SettleControlRequest: SettleControlRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-control-requests.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-control-requests.types.ts#L12)
 
 ### WaitForControlsRequest
 
@@ -4457,7 +4457,7 @@ declare const SettleControlRequest: SettleControlRequest;
 declare const WaitForControlsRequest: WaitForControlsRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-control-requests.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-control-requests.types.ts#L8)
 
 ## `state-provider.types.ts`
 
@@ -4471,7 +4471,7 @@ Shared state contracts live below execution and provider implementations.
 declare const AgentStateProvider: AgentStateProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-provider.types.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-provider.types.ts#L2)
 
 ## `state-receipts.types.ts`
 
@@ -4485,7 +4485,7 @@ Shared state contracts live below execution and provider implementations.
 declare const AcceptRunReceipt: AcceptRunReceipt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-receipts.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-receipts.types.ts#L4)
 
 ### CompletionReceipt
 
@@ -4495,7 +4495,7 @@ declare const AcceptRunReceipt: AcceptRunReceipt;
 declare const CompletionReceipt: CompletionReceipt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-receipts.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-receipts.types.ts#L6)
 
 ### ContinuationReceipt
 
@@ -4505,7 +4505,7 @@ declare const CompletionReceipt: CompletionReceipt;
 declare const ContinuationReceipt: ContinuationReceipt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-receipts.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-receipts.types.ts#L10)
 
 ### ContinuationReceiptLookup
 
@@ -4515,7 +4515,7 @@ declare const ContinuationReceipt: ContinuationReceipt;
 declare const ContinuationReceiptLookup: ContinuationReceiptLookup;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-receipts.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-receipts.types.ts#L13)
 
 ### ControlReceipt
 
@@ -4525,7 +4525,7 @@ declare const ContinuationReceiptLookup: ContinuationReceiptLookup;
 declare const ControlReceipt: ControlReceipt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-receipts.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-receipts.types.ts#L9)
 
 ### ControlReceiptLookup
 
@@ -4535,7 +4535,7 @@ declare const ControlReceipt: ControlReceipt;
 declare const ControlReceiptLookup: ControlReceiptLookup;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-receipts.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-receipts.types.ts#L12)
 
 ### CreateThreadReceipt
 
@@ -4545,7 +4545,7 @@ declare const ControlReceiptLookup: ControlReceiptLookup;
 declare const CreateThreadReceipt: CreateThreadReceipt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-receipts.types.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-receipts.types.ts#L3)
 
 ### InterruptionReceipt
 
@@ -4555,7 +4555,7 @@ declare const CreateThreadReceipt: CreateThreadReceipt;
 declare const InterruptionReceipt: InterruptionReceipt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-receipts.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-receipts.types.ts#L7)
 
 ### JournalReceipt
 
@@ -4565,7 +4565,7 @@ declare const InterruptionReceipt: InterruptionReceipt;
 declare const JournalReceipt: JournalReceipt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-receipts.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-receipts.types.ts#L5)
 
 ### RunReceiptLookup
 
@@ -4575,7 +4575,7 @@ declare const JournalReceipt: JournalReceipt;
 declare const RunReceiptLookup: RunReceiptLookup;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-receipts.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-receipts.types.ts#L11)
 
 ### SuspensionReceipt
 
@@ -4585,7 +4585,7 @@ declare const RunReceiptLookup: RunReceiptLookup;
 declare const SuspensionReceipt: SuspensionReceipt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-receipts.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-receipts.types.ts#L8)
 
 ## `state-thread-requests.types.ts`
 
@@ -4599,7 +4599,7 @@ Shared state contracts live below execution and provider implementations.
 declare const AcceptRunRequest: AcceptRunRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L10)
 
 ### AgentStateLimits
 
@@ -4609,7 +4609,7 @@ declare const AcceptRunRequest: AcceptRunRequest;
 declare const AgentStateLimits: AgentStateLimits;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L3)
 
 ### AppendJournalRequest
 
@@ -4619,7 +4619,7 @@ declare const AgentStateLimits: AgentStateLimits;
 declare const AppendJournalRequest: AppendJournalRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L17)
 
 ### ClaimRunRequest
 
@@ -4629,7 +4629,7 @@ declare const AppendJournalRequest: AppendJournalRequest;
 declare const ClaimRunRequest: ClaimRunRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L15)
 
 ### CompleteRunRequest
 
@@ -4639,7 +4639,7 @@ declare const ClaimRunRequest: ClaimRunRequest;
 declare const CompleteRunRequest: CompleteRunRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L18)
 
 ### CreateThreadRequest
 
@@ -4649,7 +4649,7 @@ declare const CompleteRunRequest: CompleteRunRequest;
 declare const CreateThreadRequest: CreateThreadRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L4)
 
 ### InterruptOwnedRunRequest
 
@@ -4659,7 +4659,7 @@ declare const CreateThreadRequest: CreateThreadRequest;
 declare const InterruptOwnedRunRequest: InterruptOwnedRunRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L20)
 
 ### JournalPage
 
@@ -4669,7 +4669,7 @@ declare const InterruptOwnedRunRequest: InterruptOwnedRunRequest;
 declare const JournalPage: JournalPage;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L13)
 
 ### ListThreadsRequest
 
@@ -4679,7 +4679,7 @@ declare const JournalPage: JournalPage;
 declare const ListThreadsRequest: ListThreadsRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L6)
 
 ### LoadThreadRequest
 
@@ -4689,7 +4689,7 @@ declare const ListThreadsRequest: ListThreadsRequest;
 declare const LoadThreadRequest: LoadThreadRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L5)
 
 ### LookupRunReceiptRequest
 
@@ -4699,7 +4699,7 @@ declare const LoadThreadRequest: LoadThreadRequest;
 declare const LookupRunReceiptRequest: LookupRunReceiptRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L11)
 
 ### ReadJournalRequest
 
@@ -4709,7 +4709,7 @@ declare const LookupRunReceiptRequest: LookupRunReceiptRequest;
 declare const ReadJournalRequest: ReadJournalRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L12)
 
 ### ReadSnapshotHistoryRequest
 
@@ -4719,7 +4719,7 @@ declare const ReadJournalRequest: ReadJournalRequest;
 declare const ReadSnapshotHistoryRequest: ReadSnapshotHistoryRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L8)
 
 ### RenewRunClaimRequest
 
@@ -4729,7 +4729,7 @@ declare const ReadSnapshotHistoryRequest: ReadSnapshotHistoryRequest;
 declare const RenewRunClaimRequest: RenewRunClaimRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L16)
 
 ### SnapshotHistoryPage
 
@@ -4739,7 +4739,7 @@ declare const RenewRunClaimRequest: RenewRunClaimRequest;
 declare const SnapshotHistoryPage: SnapshotHistoryPage;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L9)
 
 ### SuspendRunRequest
 
@@ -4749,7 +4749,7 @@ declare const SnapshotHistoryPage: SnapshotHistoryPage;
 declare const SuspendRunRequest: SuspendRunRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L19)
 
 ### ThreadList
 
@@ -4759,7 +4759,7 @@ declare const SuspendRunRequest: SuspendRunRequest;
 declare const ThreadList: ThreadList;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L7)
 
 ### WaitForJournalRequest
 
@@ -4769,7 +4769,7 @@ declare const ThreadList: ThreadList;
 declare const WaitForJournalRequest: WaitForJournalRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state-thread-requests.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state-thread-requests.types.ts#L14)
 
 ## `state.types.ts`
 
@@ -4781,7 +4781,7 @@ declare const WaitForJournalRequest: WaitForJournalRequest;
 declare const AgentObservation: AgentObservation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L2)
 
 ### AgentProgressScope
 
@@ -4791,7 +4791,7 @@ declare const AgentObservation: AgentObservation;
 declare const AgentProgressScope: AgentProgressScope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L3)
 
 ### AgentRequestScope
 
@@ -4801,7 +4801,7 @@ declare const AgentProgressScope: AgentProgressScope;
 declare const AgentRequestScope: AgentRequestScope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L4)
 
 ### AgentWaitingRequest
 
@@ -4811,7 +4811,7 @@ declare const AgentRequestScope: AgentRequestScope;
 declare const AgentWaitingRequest: AgentWaitingRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L5)
 
 ### AgentWaitingState
 
@@ -4821,7 +4821,7 @@ declare const AgentWaitingRequest: AgentWaitingRequest;
 declare const AgentWaitingState: AgentWaitingState;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L6)
 
 ### BrowserMessage
 
@@ -4831,7 +4831,7 @@ declare const AgentWaitingState: AgentWaitingState;
 declare const BrowserMessage: BrowserMessage;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L7)
 
 ### BrowserMessagePart
 
@@ -4841,7 +4841,7 @@ declare const BrowserMessage: BrowserMessage;
 declare const BrowserMessagePart: BrowserMessagePart;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L8)
 
 ### ControlClaim
 
@@ -4851,7 +4851,7 @@ declare const BrowserMessagePart: BrowserMessagePart;
 declare const ControlClaim: ControlClaim;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L9)
 
 ### ControlEffectOutcome
 
@@ -4861,7 +4861,7 @@ declare const ControlClaim: ControlClaim;
 declare const ControlEffectOutcome: ControlEffectOutcome;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L10)
 
 ### ControlRecord
 
@@ -4871,7 +4871,7 @@ declare const ControlEffectOutcome: ControlEffectOutcome;
 declare const ControlRecord: ControlRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L11)
 
 ### ControlStatus
 
@@ -4881,7 +4881,7 @@ declare const ControlRecord: ControlRecord;
 declare const ControlStatus: ControlStatus;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L12)
 
 ### ExecutionClaim
 
@@ -4891,7 +4891,7 @@ declare const ControlStatus: ControlStatus;
 declare const ExecutionClaim: ExecutionClaim;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L13)
 
 ### JournalCheckpoint
 
@@ -4901,7 +4901,7 @@ declare const ExecutionClaim: ExecutionClaim;
 declare const JournalCheckpoint: JournalCheckpoint;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L14)
 
 ### JournalRecord
 
@@ -4911,7 +4911,7 @@ declare const JournalCheckpoint: JournalCheckpoint;
 declare const JournalRecord: JournalRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L15)
 
 ### RunOwner
 
@@ -4921,7 +4921,7 @@ declare const JournalRecord: JournalRecord;
 declare const RunOwner: RunOwner;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L16)
 
 ### RunStatus
 
@@ -4931,7 +4931,7 @@ declare const RunOwner: RunOwner;
 declare const RunStatus: RunStatus;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L17)
 
 ### StoredApproval
 
@@ -4941,7 +4941,7 @@ declare const RunStatus: RunStatus;
 declare const StoredApproval: StoredApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L18)
 
 ### StoredRun
 
@@ -4951,7 +4951,7 @@ declare const StoredApproval: StoredApproval;
 declare const StoredRun: StoredRun;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L19)
 
 ### StoredRunRouting
 
@@ -4961,7 +4961,7 @@ declare const StoredRun: StoredRun;
 declare const StoredRunRouting: StoredRunRouting;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L20)
 
 ### StoredThread
 
@@ -4971,7 +4971,7 @@ declare const StoredRunRouting: StoredRunRouting;
 declare const StoredThread: StoredThread;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L21)
 
 ### ThreadListItem
 
@@ -4981,7 +4981,7 @@ declare const StoredThread: StoredThread;
 declare const ThreadListItem: ThreadListItem;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L22)
 
 ### ThreadSnapshot
 
@@ -4991,7 +4991,7 @@ declare const ThreadListItem: ThreadListItem;
 declare const ThreadSnapshot: ThreadSnapshot;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L23)
 
 ### ThreadStatus
 
@@ -5001,7 +5001,7 @@ declare const ThreadSnapshot: ThreadSnapshot;
 declare const ThreadStatus: ThreadStatus;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L24)
 
 ### ToolPartState
 
@@ -5011,7 +5011,7 @@ declare const ThreadStatus: ThreadStatus;
 declare const ToolPartState: ToolPartState;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/state.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/state.types.ts#L25)
 
 ## `thread-transition.ts`
 
@@ -5026,7 +5026,7 @@ telemetry boundary; provider implementations call the lower contracts owner.
 declare const AgentTransitionError: AgentTransitionError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/thread-transition.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/thread-transition.ts#L10)
 
 ### ThreadAction
 
@@ -5036,7 +5036,7 @@ declare const AgentTransitionError: AgentTransitionError;
 declare const ThreadAction: ThreadAction;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/thread-transition.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/thread-transition.ts#L10)
 
 ### ThreadTransition
 
@@ -5046,7 +5046,7 @@ declare const ThreadAction: ThreadAction;
 declare const ThreadTransition: ThreadTransition;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/thread-transition.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/thread-transition.ts#L10)
 
 ### decideThreadTransition
 
@@ -5061,7 +5061,7 @@ declare const decideThreadTransition: (
 ) => ThreadTransition;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/thread-transition.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/thread-transition.ts#L26)
 
 ### decideThreadTransitionEffect
 
@@ -5076,7 +5076,7 @@ declare const decideThreadTransitionEffect: (
 ) => Effect.Effect<ThreadTransition, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/thread-transition.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/thread-transition.ts#L17)
 
 ## `thread-transition.types.ts`
 
@@ -5090,7 +5090,7 @@ Shared state contracts live below execution and provider implementations.
 declare const AgentTransitionError: AgentTransitionError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/thread-transition.types.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/thread-transition.types.ts#L2)
 
 ### ThreadAction
 
@@ -5100,7 +5100,7 @@ declare const AgentTransitionError: AgentTransitionError;
 declare const ThreadAction: ThreadAction;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/thread-transition.types.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/thread-transition.types.ts#L2)
 
 ### ThreadTransition
 
@@ -5110,4 +5110,4 @@ declare const ThreadAction: ThreadAction;
 declare const ThreadTransition: ThreadTransition;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/thread-transition.types.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/thread-transition.types.ts#L2)

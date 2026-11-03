@@ -1,8 +1,8 @@
 /** Derives unchanged path/line/hash receipt keys and admits bounded legacy batches. */
 import { createHash } from "node:crypto";
 import { Effect } from "effect";
-import { validateLocalRecord } from "@relkit/observability/local/record";
-import type { LocalRecord } from "@relkit/observability/local/record";
+import { validateLocalRecord } from "relkit/observability/local/record";
+import type { LocalRecord } from "relkit/observability/local/record";
 import { duckdbError } from "./duckdb-error.js";
 import type { LegacyAppend } from "./import-history.types.js";
 import type { LegacyLineState } from "./import-history-lines.types.js";

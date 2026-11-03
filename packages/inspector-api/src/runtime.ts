@@ -1,11 +1,11 @@
 import type { RuntimeCollection } from "./runtime.types.js";
 export type { RuntimeCollection } from "./runtime.types.js";
 import { Effect, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { runInspectorPromise as runExecutionPromise } from "./native-edge.js";
 import { inspectorNativeJobsExecution as inspectorExecution } from "./jobs/native.service.js";
 import { nativeAttempt, projectionAttempt } from "./native-edge.js";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { eventRuntimeListEffect } from "./events-runtime.js";
 import { getJobRunEffect, listJobRunsEffect } from "./jobs/runs.js";
 import { runtimeJobSummaryEffect } from "./jobs/runtime-summary.js";

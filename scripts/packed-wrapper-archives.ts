@@ -8,13 +8,13 @@ import {
 } from "./pack-and-smoke-create-relkit-pack.js";
 import type { Manifest } from "./scaffold-process.types.js";
 
-/** Selects only actual packed runtime dependencies; missing first-party archives never use a registry fallback. */
+/** Selects the wrapper, the creator it runs for `relkit create` and their packed runtime dependencies; missing first-party archives never use a registry fallback. */
 export async function wrapperArchiveClosure(
   archives: ReadonlyMap<string, string>,
   manifests: ReadonlyMap<string, { readonly manifest: Manifest }>,
 ) {
   const selected = new Map<string, string>();
-  const pending = ["relkit"];
+  const pending = ["relkit", "create-relkit"];
   for (const name of pending) {
     if (selected.has(name)) continue;
     const archive = archives.get(name);
@@ -27,7 +27,6 @@ export async function wrapperArchiveClosure(
     }))
       if (manifests.has(dependency) && !selected.has(dependency)) pending.push(dependency);
   }
-  assert.equal(selected.has("create-relkit"), true, "Wrapper must delegate to its creator archive");
   assert.equal(
     selected.has("@relkit/cli"),
     false,

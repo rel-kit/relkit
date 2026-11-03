@@ -38,9 +38,8 @@
   },
   "dependencies": {
     "@duckdb/node-api": "1.5.5-r.4",
-    "@relkit/contracts": "workspace:*",
-    "@relkit/observability": "workspace:*",
-    "effect": "catalog:"
+    "effect": "catalog:",
+    "relkit": "workspace:*"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",

@@ -7,7 +7,7 @@ import {
   createBucketClient,
   type BucketProvider,
   type BucketPutOptions,
-} from "@relkit/buckets";
+} from "relkit/buckets";
 import { createDeepAgentBucketBackend } from "../src/deepagent-bucket-backend.ts";
 import { memoryBackend } from "./deepagent-bucket-backend.fixture.js";
 

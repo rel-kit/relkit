@@ -1,6 +1,6 @@
 ---
 title: Functions API
-description: Generated public TypeScript reference for @relkit/functions.
+description: Generated public TypeScript reference for relkit/functions.
 search:
   exclude: true
 sidebar:
@@ -42,7 +42,7 @@ const invoke: AgentClientFor<typeof agent> = async (input) => output;
 type AgentClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/client-maps.types.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L58)
 
 ### AgentClients (type alias)
 
@@ -62,7 +62,7 @@ type AgentClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/client-maps.types.ts#L151)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L151)
 
 ### BucketClientFor (type alias)
 
@@ -80,7 +80,7 @@ const client: BucketClientFor<typeof bucket> = buckets.uploads;
 type BucketClientFor<T> = BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/client-maps.types.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L112)
 
 ### BucketClients (type alias)
 
@@ -100,7 +100,7 @@ type BucketClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/client-maps.types.ts#L139)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L139)
 
 ### CacheClientFor (type alias)
 
@@ -118,7 +118,7 @@ const client: CacheClientFor<typeof cache> = caches.sessions;
 type CacheClientFor<T> = CacheClient<KeyOf<T>, ValueOf<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/client-maps.types.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L116)
 
 ### CacheClients (type alias)
 
@@ -138,7 +138,7 @@ type CacheClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/client-maps.types.ts#L145)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L145)
 
 ### EventClientFor (type alias)
 
@@ -167,7 +167,7 @@ type EventClientFor<T> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/client-maps.types.ts#L97)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L97)
 
 ### EventClients (type alias)
 
@@ -187,7 +187,7 @@ type EventClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/client-maps.types.ts#L133)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L133)
 
 ### JobClientFor (type alias)
 
@@ -213,7 +213,7 @@ type JobClientFor<T> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/client-maps.types.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L62)
 
 ### JobClients (type alias)
 
@@ -233,7 +233,7 @@ type JobClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/client-maps.types.ts#L121)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L121)
 
 ### TaskClientFor (type alias)
 
@@ -259,7 +259,7 @@ type TaskClientFor<T> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/client-maps.types.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L85)
 
 ### TaskClients (type alias)
 
@@ -279,7 +279,7 @@ type TaskClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/client-maps.types.ts#L127)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L127)
 
 ### TaskTriggerOptions (interface)
 
@@ -304,7 +304,7 @@ export interface TaskTriggerOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/client-maps.types.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L74)
 
 ## `clients.types.ts`
 
@@ -318,7 +318,7 @@ Re-exports all named exports from the "./client-maps.types.js" module.
 export * from "./client-maps.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.types.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L84)
 
 ### BucketClient
 
@@ -328,7 +328,7 @@ export * from "./client-maps.types.js";
 declare const BucketClient: BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.types.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L81)
 
 ### BucketObjectMetadata
 
@@ -338,7 +338,7 @@ declare const BucketClient: BucketClient;
 declare const BucketObjectMetadata: BucketObjectMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.types.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L81)
 
 ### BucketPutOptions
 
@@ -348,7 +348,7 @@ declare const BucketObjectMetadata: BucketObjectMetadata;
 declare const BucketPutOptions: BucketPutOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.types.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L81)
 
 ### CacheClient
 
@@ -358,7 +358,7 @@ declare const BucketPutOptions: BucketPutOptions;
 declare const CacheClient: CacheClient<Key, Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.types.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L82)
 
 ### CacheOperationOptions
 
@@ -368,7 +368,7 @@ declare const CacheClient: CacheClient<Key, Value>;
 declare const CacheOperationOptions: CacheOperationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.types.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L82)
 
 ### EventAttributeValue (type alias)
 
@@ -386,7 +386,7 @@ const value: EventAttributeValue = true;
 type EventAttributeValue = string | number | boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L44)
 
 ### EventPublishOptions (interface)
 
@@ -407,7 +407,7 @@ export interface EventPublishOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.types.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L65)
 
 ### EventPublishResult (interface)
 
@@ -431,7 +431,7 @@ export interface EventPublishResult<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.types.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L73)
 
 ### JobEnqueueOptions (interface)
 
@@ -451,7 +451,7 @@ export interface JobEnqueueOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L23)
 
 ### JobEnqueueResult (interface)
 
@@ -478,7 +478,7 @@ export interface JobEnqueueResult {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L30)
 
 ### JobState (type alias)
 
@@ -496,7 +496,7 @@ const state: JobState = "accepted";
 type JobState = "accepted" | "available" | "leased" | "delayed" | "completed" | "dead-lettered";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L6)
 
 ### JobStatus (interface)
 
@@ -520,7 +520,7 @@ export interface JobStatus {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L12)
 
 ## `define-error-validation.ts`
 
@@ -544,7 +544,7 @@ assertErrorSchema(z.string());
 declare const assertErrorSchema: (value: unknown) => asserts value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error-validation.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error-validation.ts#L100)
 
 ### assertErrorSchemaEffect
 
@@ -564,7 +564,7 @@ declare const assertErrorSchemaEffect: (
 ) => Effect.Effect<StandardSchemaV1<unknown, unknown>, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error-validation.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error-validation.ts#L77)
 
 ### isErrorDescriptor
 
@@ -582,7 +582,7 @@ if (isErrorDescriptor(value)) console.log(value.id);
 declare const isErrorDescriptor: (value: unknown) => value is ErrorDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error-validation.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error-validation.ts#L41)
 
 ### isErrorDescriptorEffect
 
@@ -602,7 +602,7 @@ declare const isErrorDescriptorEffect: (
 ) => Effect.Effect<boolean, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error-validation.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error-validation.ts#L14)
 
 ### isRecord
 
@@ -620,7 +620,7 @@ isRecord({ id: "one" });
 declare const isRecord: (value: unknown) => value is Record<PropertyKey, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error-validation.ts#L124)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error-validation.ts#L124)
 
 ### isRecordEffect
 
@@ -640,7 +640,7 @@ declare const isRecordEffect: (
 ) => Effect.Effect<boolean, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error-validation.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error-validation.ts#L109)
 
 ### validateErrorHttp
 
@@ -662,7 +662,7 @@ validateErrorHttp({ status: 404 });
 declare const validateErrorHttp: (http: ErrorHttpMapping | undefined) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error-validation.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error-validation.ts#L68)
 
 ### validateErrorHttpEffect
 
@@ -682,7 +682,7 @@ declare const validateErrorHttpEffect: (
 ) => Effect.Effect<void, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error-validation.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error-validation.ts#L50)
 
 ## `define-error.ts`
 
@@ -697,8 +697,8 @@ TypeError for invalid schema, retry, HTTP status, or message.
 **Example**
 
 ```ts
-import { defineError } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { defineError } from "relkit/functions";
+import { z } from "relkit/schema";
 const NotFound = defineError({
   id: "orders.not-found",
   data: z.object({ id: z.string() }),
@@ -715,7 +715,7 @@ declare const defineError: <const Id extends string, const DataSchema extends St
 ) => ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L206)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L206)
 
 Since v0.1.0
 
@@ -752,7 +752,7 @@ declare const defineErrorEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L90)
 
 Since v0.1.0
 
@@ -782,7 +782,7 @@ declare class DeclaredError<Id, Data> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L45)
 
 ### id (property)
 
@@ -792,7 +792,7 @@ declare class DeclaredError<Id, Data> {
 readonly id: Id
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L46)
 
 ### ref (property)
 
@@ -802,7 +802,7 @@ readonly id: Id
 readonly ref: ErrorRef<Id>
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L47)
 
 ### data (property)
 
@@ -812,7 +812,7 @@ readonly ref: ErrorRef<Id>
 readonly data: Data
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L48)
 
 ### retry (property)
 
@@ -822,7 +822,7 @@ readonly data: Data
 readonly retry: ErrorRetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L49)
 
 ### afterMs (property)
 
@@ -832,7 +832,7 @@ readonly retry: ErrorRetry
 readonly afterMs: number | undefined
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L50)
 
 ### http (property)
 
@@ -842,7 +842,7 @@ readonly afterMs: number | undefined
 readonly http: ErrorHttpMapping | undefined
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L51)
 
 ### DefineErrorOptions
 
@@ -852,7 +852,7 @@ readonly http: ErrorHttpMapping | undefined
 declare const DefineErrorOptions: DefineErrorOptions<Id, DataSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L35)
 
 ### ErrorDescriptor
 
@@ -862,7 +862,7 @@ declare const DefineErrorOptions: DefineErrorOptions<Id, DataSchema>;
 declare const ErrorDescriptor: ErrorDescriptor<Id, Data, DataSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L36)
 
 ### ErrorDescriptorAny
 
@@ -872,7 +872,7 @@ declare const ErrorDescriptor: ErrorDescriptor<Id, Data, DataSchema>;
 declare const ErrorDescriptorAny: ErrorDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L37)
 
 ### ErrorHttpMapping
 
@@ -882,7 +882,7 @@ declare const ErrorDescriptorAny: ErrorDescriptorAny;
 declare const ErrorHttpMapping: ErrorHttpMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L38)
 
 ### ErrorRef
 
@@ -892,7 +892,7 @@ declare const ErrorHttpMapping: ErrorHttpMapping;
 declare const ErrorRef: ErrorRef<Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L39)
 
 ### ErrorRetry
 
@@ -902,7 +902,7 @@ declare const ErrorRef: ErrorRef<Id>;
 declare const ErrorRetry: ErrorRetry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L33)
 
 ### ErrorRetryInput
 
@@ -912,7 +912,7 @@ declare const ErrorRetry: ErrorRetry;
 declare const ErrorRetryInput: ErrorRetryInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L33)
 
 ### NormalizedErrorRetry
 
@@ -922,7 +922,7 @@ declare const ErrorRetryInput: ErrorRetryInput;
 declare const NormalizedErrorRetry: NormalizedErrorRetry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L33)
 
 ### isErrorDescriptor
 
@@ -932,7 +932,7 @@ declare const NormalizedErrorRetry: NormalizedErrorRetry;
 declare const isErrorDescriptor: (value: unknown) => value is ErrorDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L31)
 
 ### isErrorDescriptorEffect
 
@@ -944,7 +944,7 @@ declare const isErrorDescriptorEffect: (
 ) => Effect.Effect<boolean, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L31)
 
 ## `define-error.types.ts`
 
@@ -973,7 +973,7 @@ export interface DefineErrorOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.types.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L47)
 
 ### ErrorDescriptor (interface)
 
@@ -1006,7 +1006,7 @@ export interface ErrorDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L24)
 
 ### ErrorDescriptorAny (type alias)
 
@@ -1018,7 +1018,7 @@ Any declared error descriptor for heterogeneous collections.
 type ErrorDescriptorAny = ErrorDescriptor<string, any, StandardSchemaV1<any, any>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.types.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L42)
 
 ### ErrorHttpMapping (interface)
 
@@ -1038,7 +1038,7 @@ export interface ErrorHttpMapping {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L9)
 
 ### ErrorRef (interface)
 
@@ -1059,7 +1059,7 @@ export interface ErrorRef<Id extends string = string> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-error.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L16)
 
 ## `define-function-inference.types.ts`
 
@@ -1085,7 +1085,7 @@ assertHook(() => {}, "onBefore");
 declare const assertHook: (value: unknown, name: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L63)
 
 ### assertHookEffect
 
@@ -1106,7 +1106,7 @@ declare const assertHookEffect: (
 ) => Effect.Effect<void, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L47)
 
 ### assertSchema
 
@@ -1128,7 +1128,7 @@ assertSchema(z.string(), "input");
 declare const assertSchema: (value: unknown, name: string) => asserts value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L97)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L97)
 
 ### assertSchemaEffect
 
@@ -1149,7 +1149,7 @@ declare const assertSchemaEffect: (
 ) => Effect.Effect<StandardSchemaV1<unknown, unknown>, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L73)
 
 ### copyDependencies
 
@@ -1161,7 +1161,7 @@ declare const copyDependencies: <D extends FunctionDependencies>(
 ) => D | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L9)
 
 ### copyDependenciesEffect
 
@@ -1173,7 +1173,7 @@ declare const copyDependenciesEffect: <D extends FunctionDependencies>(
 ) => Effect.Effect<D | undefined, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L10)
 
 ### copyPublishes
 
@@ -1185,7 +1185,7 @@ declare const copyPublishes: <Names extends readonly string[]>(
 ) => Names | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L11)
 
 ### copyPublishesEffect
 
@@ -1197,7 +1197,7 @@ declare const copyPublishesEffect: <Names extends readonly string[]>(
 ) => Effect.Effect<Names | undefined, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L12)
 
 ### functionTargetForReceiver
 
@@ -1222,7 +1222,7 @@ declare const functionTargetForReceiver: (
 ) => FunctionRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L136)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L136)
 
 ### functionTargetForReceiverEffect
 
@@ -1243,7 +1243,7 @@ declare const functionTargetForReceiverEffect: (
 ) => Effect.Effect<FunctionRefAny, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L107)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L107)
 
 ### validateLimit
 
@@ -1265,7 +1265,7 @@ validateLimit(5, "timeoutMs");
 declare const validateLimit: (value: number | undefined, name: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L37)
 
 ### validateLimitEffect
 
@@ -1286,7 +1286,7 @@ declare const validateLimitEffect: (
 ) => Effect.Effect<void, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L21)
 
 ## `define-function.ts`
 
@@ -1307,8 +1307,8 @@ TypeError for invalid definition inputs.
 **Example**
 
 ```ts
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 
 const greet = defineFunction({
   input: z.object({ name: z.string() }),
@@ -1329,7 +1329,7 @@ void greet;
 declare const defineFunction: DefineFunction;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L124)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L124)
 
 Since v0.1.0
 
@@ -1365,7 +1365,7 @@ Since v0.1.0
 declare const AgentClientFor: AgentClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L14)
 
 ### AgentClients
 
@@ -1375,7 +1375,7 @@ declare const AgentClientFor: AgentClientFor<T>;
 declare const AgentClients: AgentClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L15)
 
 ### AgentRef
 
@@ -1385,7 +1385,7 @@ declare const AgentClients: AgentClients<M>;
 declare const AgentRef: AgentRef<Id, InputSchema, OutputSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L16)
 
 ### AgentRefAny
 
@@ -1395,7 +1395,7 @@ declare const AgentRef: AgentRef<Id, InputSchema, OutputSchema>;
 declare const AgentRefAny: AgentRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L17)
 
 ### AuthContext
 
@@ -1405,7 +1405,7 @@ declare const AgentRefAny: AgentRefAny;
 declare const AuthContext: AuthContext<Session>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L18)
 
 ### BucketClient
 
@@ -1415,7 +1415,7 @@ declare const AuthContext: AuthContext<Session>;
 declare const BucketClient: BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L19)
 
 ### BucketClientFor
 
@@ -1425,7 +1425,7 @@ declare const BucketClient: BucketClient;
 declare const BucketClientFor: BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L20)
 
 ### BucketClients
 
@@ -1435,7 +1435,7 @@ declare const BucketClientFor: BucketClient;
 declare const BucketClients: BucketClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L21)
 
 ### BucketObjectMetadata
 
@@ -1445,7 +1445,7 @@ declare const BucketClients: BucketClients<M>;
 declare const BucketObjectMetadata: BucketObjectMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L22)
 
 ### BucketRef
 
@@ -1455,7 +1455,7 @@ declare const BucketObjectMetadata: BucketObjectMetadata;
 declare const BucketRef: BucketRef<Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L23)
 
 ### BucketRefAny
 
@@ -1465,7 +1465,7 @@ declare const BucketRef: BucketRef<Id>;
 declare const BucketRefAny: BucketRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L24)
 
 ### CacheClient
 
@@ -1475,7 +1475,7 @@ declare const BucketRefAny: BucketRefAny;
 declare const CacheClient: CacheClient<Key, Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L25)
 
 ### CacheClientFor
 
@@ -1485,7 +1485,7 @@ declare const CacheClient: CacheClient<Key, Value>;
 declare const CacheClientFor: CacheClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L26)
 
 ### CacheClients
 
@@ -1495,7 +1495,7 @@ declare const CacheClientFor: CacheClientFor<T>;
 declare const CacheClients: CacheClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L27)
 
 ### CacheOperationOptions
 
@@ -1505,7 +1505,7 @@ declare const CacheClients: CacheClients<M>;
 declare const CacheOperationOptions: CacheOperationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L28)
 
 ### CacheRef
 
@@ -1515,7 +1515,7 @@ declare const CacheOperationOptions: CacheOperationOptions;
 declare const CacheRef: CacheRef<Id, KeySchema, ValueSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L29)
 
 ### CacheRefAny
 
@@ -1525,7 +1525,7 @@ declare const CacheRef: CacheRef<Id, KeySchema, ValueSchema>;
 declare const CacheRefAny: CacheRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L30)
 
 ### DefineFunctionOptions
 
@@ -1543,7 +1543,7 @@ declare const DefineFunctionOptions: DefineFunctionOptions<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L32)
 
 ### DescriptorRef
 
@@ -1553,7 +1553,7 @@ declare const DefineFunctionOptions: DefineFunctionOptions<
 declare const DescriptorRef: DescriptorRef<Kind, Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L31)
 
 ### EventAttributeValue
 
@@ -1563,7 +1563,7 @@ declare const DescriptorRef: DescriptorRef<Kind, Id>;
 declare const EventAttributeValue: EventAttributeValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L35)
 
 ### EventClientFor
 
@@ -1573,7 +1573,7 @@ declare const EventAttributeValue: EventAttributeValue;
 declare const EventClientFor: EventClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L33)
 
 ### EventClients
 
@@ -1583,7 +1583,7 @@ declare const EventClientFor: EventClientFor<T>;
 declare const EventClients: EventClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L34)
 
 ### EventPublishOptions
 
@@ -1593,7 +1593,7 @@ declare const EventClients: EventClients<M>;
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L36)
 
 ### EventPublishResult
 
@@ -1603,7 +1603,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L37)
 
 ### EventRef
 
@@ -1613,7 +1613,7 @@ declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 declare const EventRef: EventRef<Id, InputSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L38)
 
 ### EventRefAny
 
@@ -1623,7 +1623,7 @@ declare const EventRef: EventRef<Id, InputSchema>;
 declare const EventRefAny: EventRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L39)
 
 ### FunctionContext
 
@@ -1633,7 +1633,7 @@ declare const EventRefAny: EventRefAny;
 declare const FunctionContext: FunctionContext<D, Publishes, Progress>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L40)
 
 ### FunctionDependencies
 
@@ -1643,7 +1643,7 @@ declare const FunctionContext: FunctionContext<D, Publishes, Progress>;
 declare const FunctionDependencies: FunctionDependencies;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L41)
 
 ### FunctionDescriptor
 
@@ -1664,7 +1664,7 @@ declare const FunctionDescriptor: FunctionDescriptor<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L42)
 
 ### FunctionRef
 
@@ -1674,7 +1674,7 @@ declare const FunctionDescriptor: FunctionDescriptor<
 declare const FunctionRef: FunctionRef<Id, Input, Output, Errors, InputSchema, OutputSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L43)
 
 ### FunctionRefAny
 
@@ -1684,7 +1684,7 @@ declare const FunctionRef: FunctionRef<Id, Input, Output, Errors, InputSchema, O
 declare const FunctionRefAny: FunctionRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L44)
 
 ### InvocationMetadata
 
@@ -1694,7 +1694,7 @@ declare const FunctionRefAny: FunctionRefAny;
 declare const InvocationMetadata: InvocationMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L45)
 
 ### InvocationSource
 
@@ -1704,7 +1704,7 @@ declare const InvocationMetadata: InvocationMetadata;
 declare const InvocationSource: InvocationSource;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L46)
 
 ### JobClientFor
 
@@ -1714,7 +1714,7 @@ declare const InvocationSource: InvocationSource;
 declare const JobClientFor: JobClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L48)
 
 ### JobClients
 
@@ -1724,7 +1724,7 @@ declare const JobClientFor: JobClientFor<T>;
 declare const JobClients: JobClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L49)
 
 ### JobEnqueueOptions
 
@@ -1734,7 +1734,7 @@ declare const JobClients: JobClients<M>;
 declare const JobEnqueueOptions: JobEnqueueOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L47)
 
 ### JobEnqueueResult
 
@@ -1744,7 +1744,7 @@ declare const JobEnqueueOptions: JobEnqueueOptions;
 declare const JobEnqueueResult: JobEnqueueResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L50)
 
 ### JobRef
 
@@ -1754,7 +1754,7 @@ declare const JobEnqueueResult: JobEnqueueResult;
 declare const JobRef: JobRef<Id, InputSchema, OutputSchema, Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L51)
 
 ### JobRefAny
 
@@ -1764,7 +1764,7 @@ declare const JobRef: JobRef<Id, InputSchema, OutputSchema, Task>;
 declare const JobRefAny: JobRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L52)
 
 ### JobState
 
@@ -1774,7 +1774,7 @@ declare const JobRefAny: JobRefAny;
 declare const JobState: JobState;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L53)
 
 ### JobStatus
 
@@ -1784,7 +1784,7 @@ declare const JobState: JobState;
 declare const JobStatus: JobStatus;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L54)
 
 ### PublicClock
 
@@ -1794,7 +1794,7 @@ declare const JobStatus: JobStatus;
 declare const PublicClock: PublicClock;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L58)
 
 ### PublicLogger
 
@@ -1804,7 +1804,7 @@ declare const PublicClock: PublicClock;
 declare const PublicLogger: PublicLogger;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L59)
 
 ### ResolvedApplicationEnv
 
@@ -1814,7 +1814,7 @@ declare const PublicLogger: PublicLogger;
 declare const ResolvedApplicationEnv: Readonly<Record<string, unknown>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L60)
 
 ### TaskClientFor
 
@@ -1824,7 +1824,7 @@ declare const ResolvedApplicationEnv: Readonly<Record<string, unknown>>;
 declare const TaskClientFor: TaskClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L55)
 
 ### TaskClients
 
@@ -1834,7 +1834,7 @@ declare const TaskClientFor: TaskClientFor<T>;
 declare const TaskClients: TaskClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L56)
 
 ### TaskTriggerOptions
 
@@ -1844,7 +1844,7 @@ declare const TaskClients: TaskClients<M>;
 declare const TaskTriggerOptions: TaskTriggerOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L57)
 
 ### defineFunctionEffect
 
@@ -1862,7 +1862,7 @@ Effect.runSync(defineFunctionEffect({ input, output, handler }));
 declare const defineFunctionEffect: DefineFunctionEffect;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L90)
 
 ## `define-function.types.ts`
 
@@ -1964,7 +1964,7 @@ export interface DefineFunction {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.types.ts#L27)
 
 ### DefineFunctionEffect (interface)
 
@@ -2054,7 +2054,7 @@ export interface DefineFunctionEffect {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.types.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.types.ts#L112)
 
 ### FunctionImplementationOptions (type alias)
 
@@ -2077,7 +2077,7 @@ type FunctionImplementationOptions = Omit<
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.types.ts#L6)
 
 ## `function-as-tool.types.ts`
 
@@ -2146,7 +2146,7 @@ type FunctionAsTool<
   : {});
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-as-tool.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-as-tool.types.ts#L35)
 
 ## `function-context.types.ts`
 
@@ -2166,7 +2166,7 @@ type Registry = ApplicationContextRegistry;
 type ApplicationContextRegistry = Relkit.ApplicationContextRegistry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-context.types.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L68)
 
 ### AuthContext (interface)
 
@@ -2190,7 +2190,7 @@ export interface AuthContext<Session = unknown> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-context.types.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L80)
 
 ### FunctionContext (type alias)
 
@@ -2212,10 +2212,10 @@ type FunctionContext<
 > = FunctionContextBase<D, Publishes> &
   ([Progress] extends [never]
     ? {}
-    : { readonly progress: import("@relkit/invocation").ProgressEmitter<Progress> });
+    : { readonly progress: import("../invocation/index.js").ProgressEmitter<Progress> });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-context.types.ts#L131)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L131)
 
 ### FunctionContextBase (interface)
 
@@ -2253,7 +2253,7 @@ export interface FunctionContextBase<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-context.types.ts#L106)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L106)
 
 ### FunctionDependencies (interface)
 
@@ -2277,7 +2277,7 @@ export interface FunctionDependencies {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-context.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L21)
 
 ### FunctionDependencyOptions (type alias)
 
@@ -2297,7 +2297,7 @@ type FunctionDependencyOptions<D extends FunctionDependencies> = "functions" ext
   : D;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-context.types.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L91)
 
 ### InvocationMetadata (type alias)
 
@@ -2315,7 +2315,7 @@ const metadata: InvocationMetadata = context.invocation;
 type InvocationMetadata = SharedInvocationMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-context.types.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L36)
 
 ### InvocationSource (type alias)
 
@@ -2333,7 +2333,7 @@ const source: InvocationSource = "tool";
 type InvocationSource = SharedInvocationSource;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-context.types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L32)
 
 ### KnownEventName (type alias)
 
@@ -2351,7 +2351,7 @@ type EventName = KnownEventName;
 type KnownEventName = Extract<keyof Relkit.EventRegistry, string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-context.types.ts#L98)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L98)
 
 ### PublicClock (type alias)
 
@@ -2369,7 +2369,7 @@ const clock: PublicClock = context.time;
 type PublicClock = SharedPublicClock;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-context.types.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L51)
 
 ### PublicLogger (type alias)
 
@@ -2387,7 +2387,7 @@ const logger: PublicLogger = context.log;
 type PublicLogger = SharedPublicLogger;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-context.types.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L47)
 
 ### PublicTrace (type alias)
 
@@ -2405,7 +2405,7 @@ const trace: PublicTrace = context.trace;
 type PublicTrace = SharedPublicTrace;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-context.types.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L55)
 
 ### ResolvedApplicationEnv (type alias)
 
@@ -2425,7 +2425,7 @@ type ResolvedApplicationEnv = keyof Relkit.ApplicationEnv extends never
   : Readonly<Relkit.ApplicationEnv>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-context.types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L40)
 
 ## `function-dependency-copy.ts`
 
@@ -2451,7 +2451,7 @@ declare const copyDependencies: <D extends FunctionDependencies>(
 ) => D | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-dependency-copy.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-dependency-copy.ts#L60)
 
 ### copyDependenciesEffect
 
@@ -2471,7 +2471,7 @@ declare const copyDependenciesEffect: <D extends FunctionDependencies>(
 ) => Effect.Effect<D | undefined, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-dependency-copy.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-dependency-copy.ts#L12)
 
 ### copyPublishes
 
@@ -2495,7 +2495,7 @@ declare const copyPublishes: <Names extends readonly string[]>(
 ) => Names | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-dependency-copy.ts#L101)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-dependency-copy.ts#L101)
 
 ### copyPublishesEffect
 
@@ -2515,7 +2515,7 @@ declare const copyPublishesEffect: <Names extends readonly string[]>(
 ) => Effect.Effect<Names | undefined, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-dependency-copy.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-dependency-copy.ts#L71)
 
 ## `function-descriptor-factory.ts`
 
@@ -2527,7 +2527,7 @@ declare const copyPublishesEffect: <Names extends readonly string[]>(
 declare const FunctionDescriptorFactoryOptions: FunctionDescriptorFactoryOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-factory.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-factory.ts#L18)
 
 ### createFunctionDescriptor
 
@@ -2549,7 +2549,7 @@ createFunctionDescriptor(options);
 declare const createFunctionDescriptor: (options: FunctionDescriptorFactoryOptions) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-factory.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-factory.ts#L78)
 
 ### createFunctionDescriptorEffect
 
@@ -2569,7 +2569,7 @@ declare const createFunctionDescriptorEffect: (
 ) => Effect.Effect<unknown, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-factory.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-factory.ts#L25)
 
 ## `function-descriptor-factory.types.ts`
 
@@ -2605,7 +2605,7 @@ export interface FunctionDescriptorFactoryOptions extends DescriptorMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-factory.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-factory.types.ts#L10)
 
 ## `function-descriptor-methods.ts`
 
@@ -2628,7 +2628,7 @@ declare const addCallableMethods: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-methods.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-methods.ts#L128)
 
 ### asGraphNodeEffect
 
@@ -2663,7 +2663,7 @@ declare const asGraphNodeEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-methods.ts#L106)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-methods.ts#L106)
 
 ### asToolEffect
 
@@ -2686,7 +2686,7 @@ declare const asToolEffect: (
 ) => Effect.Effect<FunctionToolDescriptor<string, FunctionRefAny>, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-methods.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-methods.ts#L66)
 
 ### invokeDescriptorEffect
 
@@ -2708,7 +2708,7 @@ declare const invokeDescriptorEffect: (
 ) => Effect.Effect<unknown, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-methods.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-methods.ts#L37)
 
 ## `function-descriptor.types.ts`
 
@@ -2771,7 +2771,7 @@ export interface DefineFunctionOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor.types.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L74)
 
 ### FunctionDescriptor (interface)
 
@@ -2836,7 +2836,7 @@ export interface FunctionDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L22)
 
 ### FunctionHandler (type alias)
 
@@ -2864,7 +2864,7 @@ type FunctionHandler<
 ) => MaybePromise<FunctionHandlerResult<Output, Errors>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor.types.ts#L121)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L121)
 
 ### FunctionLifecycleHook
 
@@ -2879,7 +2879,7 @@ declare const FunctionLifecycleHook: FunctionLifecycleHook<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L17)
 
 ## `function-graph-node.ts`
 
@@ -2899,7 +2899,7 @@ declare const FunctionAsGraphNode: FunctionAsGraphNode<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L30)
 
 ### FunctionGraphNodeDescriptor
 
@@ -2918,7 +2918,7 @@ declare const FunctionGraphNodeDescriptor: FunctionGraphNodeDescriptor<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L31)
 
 ### FunctionGraphNodeOptions
 
@@ -2928,7 +2928,7 @@ declare const FunctionGraphNodeDescriptor: FunctionGraphNodeDescriptor<
 declare const FunctionGraphNodeOptions: FunctionGraphNodeOptions<Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L32)
 
 ### RELKIT_FUNCTION_GRAPH_NODE
 
@@ -2946,7 +2946,7 @@ if (node[RELKIT_FUNCTION_GRAPH_NODE]) console.log(node.id);
 declare const RELKIT_FUNCTION_GRAPH_NODE: unique symbol;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L38)
 
 ### createFunctionGraphNode
 
@@ -2972,7 +2972,7 @@ declare const createFunctionGraphNode: (
 ) => FunctionGraphNodeDescriptor;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L130)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L130)
 
 ### createFunctionGraphNodeEffect
 
@@ -3007,7 +3007,7 @@ declare const createFunctionGraphNodeEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L69)
 
 ### invokeFunctionGraphNodeEffect
 
@@ -3028,7 +3028,7 @@ declare const invokeFunctionGraphNodeEffect: (
 ) => Effect.Effect<unknown, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L46)
 
 ### isFunctionGraphNode
 
@@ -3046,7 +3046,7 @@ if (isFunctionGraphNode(value)) console.log(value.id);
 declare const isFunctionGraphNode: (value: unknown) => value is FunctionGraphNodeDescriptor;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L163)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L163)
 
 ### isFunctionGraphNodeEffect
 
@@ -3066,7 +3066,7 @@ declare const isFunctionGraphNodeEffect: (
 ) => Effect.Effect<boolean, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L143)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L143)
 
 ## `function-graph-node.types.ts`
 
@@ -3126,7 +3126,7 @@ type FunctionAsGraphNode<
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.types.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.types.ts#L58)
 
 ### FunctionGraphNodeDescriptor (interface)
 
@@ -3178,7 +3178,7 @@ export interface FunctionGraphNodeDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.types.ts#L19)
 
 ### FunctionGraphNodeOptions (interface)
 
@@ -3198,7 +3198,7 @@ export interface FunctionGraphNodeOptions<Id extends string = string> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.types.ts#L12)
 
 ## `function-input-error.ts`
 
@@ -3230,7 +3230,7 @@ declare class FunctionInputError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-input-error.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-input-error.ts#L5)
 
 ## `function-lifecycle.types.ts`
 
@@ -3258,7 +3258,7 @@ type FunctionLifecycleHook<
 ) => MaybePromise<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-lifecycle.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-lifecycle.types.ts#L19)
 
 ### ProgressValue (type alias)
 
@@ -3278,7 +3278,7 @@ type ProgressValue<Schema extends StandardSchemaV1 | undefined> = Schema extends
   : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-lifecycle.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-lifecycle.types.ts#L10)
 
 ## `function-observability.ts`
 
@@ -3290,7 +3290,7 @@ type ProgressValue<Schema extends StandardSchemaV1 | undefined> = Schema extends
 declare const FunctionOperation: FunctionOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-observability.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L17)
 
 ### FunctionOperationError (class)
 
@@ -3311,7 +3311,7 @@ const error = new FunctionOperationError({
 declare class FunctionOperationError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-observability.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L24)
 
 ### FunctionTelemetry (class)
 
@@ -3329,7 +3329,7 @@ Effect.provide(streamOfEffect(schema), FunctionTelemetryLive);
 declare class FunctionTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-observability.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L32)
 
 ### FunctionTelemetryLive
 
@@ -3347,7 +3347,7 @@ Effect.runSync(Effect.provide(Effect.void, FunctionTelemetryLive));
 declare const FunctionTelemetryLive: Layer.Layer<FunctionTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-observability.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L46)
 
 ### FunctionTelemetryService
 
@@ -3357,7 +3357,7 @@ declare const FunctionTelemetryLive: Layer.Layer<FunctionTelemetry, never, never
 declare const FunctionTelemetryService: FunctionTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-observability.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L18)
 
 ### functionAttempt
 
@@ -3378,7 +3378,7 @@ declare const functionAttempt: <A>(
 ) => Effect.Effect<A, FunctionOperationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-observability.ts#L149)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L149)
 
 ### functionTry
 
@@ -3399,7 +3399,7 @@ declare const functionTry: <A>(
 ) => Effect.Effect<A, FunctionOperationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-observability.ts#L136)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L136)
 
 ### observeFunction
 
@@ -3420,7 +3420,7 @@ declare const observeFunction: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-observability.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L54)
 
 ### runFunctionPromise
 
@@ -3442,7 +3442,7 @@ await runFunctionPromise(Effect.succeed(1));
 declare const runFunctionPromise: <A, E>(effect: Effect.Effect<A, E>) => Promise<A>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-observability.ts#L106)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L106)
 
 ### runFunctionSync
 
@@ -3464,7 +3464,7 @@ runFunctionSync(Effect.succeed(1));
 declare const runFunctionSync: <A, E>(effect: Effect.Effect<A, E>) => A;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-observability.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L91)
 
 ## `function-observability.types.ts`
 
@@ -3522,7 +3522,7 @@ type FunctionOperation =
   | "tool.copy-hooks";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-observability.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.types.ts#L6)
 
 ### FunctionTelemetryService (interface)
 
@@ -3551,7 +3551,7 @@ export interface FunctionTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-observability.types.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.types.ts#L49)
 
 ## `function-ref.types.ts`
 
@@ -3578,7 +3578,7 @@ export interface AgentRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-ref.types.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L62)
 
 ### AgentRefAny (type alias)
 
@@ -3596,7 +3596,7 @@ const ref: AgentRefAny = agent;
 type AgentRefAny = AgentRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-ref.types.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L90)
 
 ### BucketRef (type alias)
 
@@ -3614,7 +3614,7 @@ const ref: BucketRef = bucket;
 type BucketRef<Id extends string = string> = DescriptorRef<"bucket", Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-ref.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L45)
 
 ### BucketRefAny (type alias)
 
@@ -3632,7 +3632,7 @@ const ref: BucketRefAny = bucket;
 type BucketRefAny = BucketRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-ref.types.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L82)
 
 ### CacheRef (interface)
 
@@ -3657,7 +3657,7 @@ export interface CacheRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-ref.types.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L50)
 
 ### CacheRefAny (type alias)
 
@@ -3675,7 +3675,7 @@ const ref: CacheRefAny = cache;
 type CacheRefAny = CacheRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-ref.types.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L86)
 
 ### DescriptorRef (interface)
 
@@ -3695,7 +3695,7 @@ export interface DescriptorRef<Kind extends DescriptorKind, Id extends string = 
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-ref.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L8)
 
 ### EventRef (interface)
 
@@ -3719,7 +3719,7 @@ export interface EventRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-ref.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L34)
 
 ### EventRefAny (type alias)
 
@@ -3737,7 +3737,7 @@ const ref: EventRefAny = event;
 type EventRefAny = EventRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-ref.types.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L78)
 
 ### FunctionRef (interface)
 
@@ -3769,7 +3769,7 @@ export interface FunctionRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-ref.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L15)
 
 ### FunctionRefAny (type alias)
 
@@ -3787,7 +3787,7 @@ const ref: FunctionRefAny = descriptor;
 type FunctionRefAny = FunctionRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-ref.types.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L74)
 
 ## `function-tool-approval.ts`
 
@@ -3817,7 +3817,7 @@ declare const resolveFunctionToolApprovalEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-approval.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-approval.ts#L20)
 
 ## `function-tool-errors.ts`
 
@@ -3837,7 +3837,7 @@ throw new FunctionToolApprovalDeniedError(request);
 declare class FunctionToolApprovalDeniedError { constructor(readonly approval: FunctionToolApprovalRequest) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-errors.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-errors.ts#L45)
 
 ### code (property)
 
@@ -3847,7 +3847,7 @@ declare class FunctionToolApprovalDeniedError { constructor(readonly approval: F
 readonly code: "RELKIT_APPROVAL_DENIED"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-errors.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-errors.ts#L46)
 
 ### FunctionToolApprovalRequiredError (class)
 
@@ -3865,7 +3865,7 @@ throw new FunctionToolApprovalRequiredError(request);
 declare class FunctionToolApprovalRequiredError { constructor(readonly approval: FunctionToolApprovalRequest) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-errors.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-errors.ts#L33)
 
 ### code (property)
 
@@ -3875,7 +3875,7 @@ declare class FunctionToolApprovalRequiredError { constructor(readonly approval:
 readonly code: "RELKIT_APPROVAL_REQUIRED"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-errors.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-errors.ts#L34)
 
 ### FunctionToolArgumentValidationError (class)
 
@@ -3895,7 +3895,7 @@ declare class FunctionToolArgumentValidationError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-errors.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-errors.ts#L7)
 
 ### code (property)
 
@@ -3905,7 +3905,7 @@ declare class FunctionToolArgumentValidationError {
 readonly code: "RELKIT_TOOL_ARGUMENT_VALIDATION"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-errors.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-errors.ts#L8)
 
 ### issues (property)
 
@@ -3915,7 +3915,7 @@ readonly code: "RELKIT_TOOL_ARGUMENT_VALIDATION"
 readonly issues: ReadonlyArray<StandardIssue>
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-errors.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-errors.ts#L9)
 
 ### FunctionToolOperationCancelledError (class)
 
@@ -3935,7 +3935,7 @@ declare class FunctionToolOperationCancelledError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-errors.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-errors.ts#L21)
 
 ### code (property)
 
@@ -3945,7 +3945,7 @@ declare class FunctionToolOperationCancelledError {
 readonly code: "ABORT_ERR"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-errors.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-errors.ts#L22)
 
 ## `function-tool-failures.ts`
 
@@ -3969,7 +3969,7 @@ Effect.catchTag(
 declare class FunctionToolApprovalDeniedFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-failures.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-failures.ts#L40)
 
 ### FunctionToolApprovalRequiredFailure (class)
 
@@ -3991,7 +3991,7 @@ Effect.catchTag(
 declare class FunctionToolApprovalRequiredFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-failures.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-failures.ts#L25)
 
 ### FunctionToolArgumentFailure (class)
 
@@ -4013,7 +4013,7 @@ Effect.catchTag(
 declare class FunctionToolArgumentFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-failures.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-failures.ts#L6)
 
 ### FunctionToolCancelledFailure (class)
 
@@ -4035,7 +4035,7 @@ Effect.catchTag(
 declare class FunctionToolCancelledFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-failures.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-failures.ts#L17)
 
 ## `function-tool-runtime.ts`
 
@@ -4047,7 +4047,7 @@ declare class FunctionToolCancelledFailure
 declare const FunctionToolApprovalDeniedError: typeof FunctionToolApprovalDeniedError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-runtime.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-runtime.ts#L38)
 
 ### FunctionToolApprovalDeniedFailure
 
@@ -4057,7 +4057,7 @@ declare const FunctionToolApprovalDeniedError: typeof FunctionToolApprovalDenied
 declare const FunctionToolApprovalDeniedFailure: typeof FunctionToolApprovalDeniedFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-runtime.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-runtime.ts#L44)
 
 ### FunctionToolApprovalRequiredError
 
@@ -4067,7 +4067,7 @@ declare const FunctionToolApprovalDeniedFailure: typeof FunctionToolApprovalDeni
 declare const FunctionToolApprovalRequiredError: typeof FunctionToolApprovalRequiredError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-runtime.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-runtime.ts#L39)
 
 ### FunctionToolApprovalRequiredFailure
 
@@ -4077,7 +4077,7 @@ declare const FunctionToolApprovalRequiredError: typeof FunctionToolApprovalRequ
 declare const FunctionToolApprovalRequiredFailure: typeof FunctionToolApprovalRequiredFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-runtime.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-runtime.ts#L45)
 
 ### FunctionToolArgumentFailure
 
@@ -4087,7 +4087,7 @@ declare const FunctionToolApprovalRequiredFailure: typeof FunctionToolApprovalRe
 declare const FunctionToolArgumentFailure: typeof FunctionToolArgumentFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-runtime.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-runtime.ts#L46)
 
 ### FunctionToolArgumentValidationError
 
@@ -4097,7 +4097,7 @@ declare const FunctionToolArgumentFailure: typeof FunctionToolArgumentFailure;
 declare const FunctionToolArgumentValidationError: typeof FunctionToolArgumentValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-runtime.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-runtime.ts#L40)
 
 ### FunctionToolCancelledFailure
 
@@ -4107,7 +4107,7 @@ declare const FunctionToolArgumentValidationError: typeof FunctionToolArgumentVa
 declare const FunctionToolCancelledFailure: typeof FunctionToolCancelledFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-runtime.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-runtime.ts#L47)
 
 ### FunctionToolOperationCancelledError
 
@@ -4117,7 +4117,7 @@ declare const FunctionToolCancelledFailure: typeof FunctionToolCancelledFailure;
 declare const FunctionToolOperationCancelledError: typeof FunctionToolOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-runtime.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-runtime.ts#L41)
 
 ### createFunctionToolInvoker
 
@@ -4146,7 +4146,7 @@ declare const createFunctionToolInvoker: <Target extends FunctionRefAny>(
 ) => Promise<InferOutput<Target["output"]>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-runtime.ts#L151)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-runtime.ts#L151)
 
 ### createFunctionToolInvokerEffect
 
@@ -4183,7 +4183,7 @@ declare const createFunctionToolInvokerEffect: <Target extends FunctionRefAny>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-runtime.ts#L129)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-runtime.ts#L129)
 
 ### invokeFunctionToolEffect
 
@@ -4217,7 +4217,7 @@ declare const invokeFunctionToolEffect: <Target extends FunctionRefAny>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-runtime.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-runtime.ts#L59)
 
 ## `function-tool-runtime.types.ts`
 
@@ -4248,7 +4248,7 @@ type FunctionToolRuntimeMetadata = Pick<
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-runtime.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-runtime.types.ts#L7)
 
 ### TargetSchema (type alias)
 
@@ -4266,7 +4266,7 @@ const schema: TargetSchema = target.input;
 type TargetSchema = FunctionRefAny["input"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-runtime.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-runtime.types.ts#L19)
 
 ## `function-tool-shape.ts`
 
@@ -4286,7 +4286,7 @@ hasOwn({ id: "one" }, "id");
 declare const hasOwn: (value: object, key: PropertyKey) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-shape.ts#L110)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-shape.ts#L110)
 
 ### hasOwnEffect
 
@@ -4307,7 +4307,7 @@ declare const hasOwnEffect: (
 ) => Effect.Effect<boolean, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-shape.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-shape.ts#L100)
 
 ### isErrorDescriptor
 
@@ -4325,7 +4325,7 @@ isErrorDescriptor(value);
 declare const isErrorDescriptor: (value: unknown) => value is ErrorDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-shape.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-shape.ts#L61)
 
 ### isErrorDescriptorEffect
 
@@ -4345,7 +4345,7 @@ declare const isErrorDescriptorEffect: (
 ) => Effect.Effect<boolean, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-shape.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-shape.ts#L42)
 
 ### isFunctionTarget
 
@@ -4363,7 +4363,7 @@ if (isFunctionTarget(value)) console.log(value.ref.id);
 declare const isFunctionTarget: (value: unknown) => value is FunctionRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-shape.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-shape.ts#L33)
 
 ### isFunctionTargetEffect
 
@@ -4383,7 +4383,7 @@ declare const isFunctionTargetEffect: (
 ) => Effect.Effect<boolean, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-shape.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-shape.ts#L12)
 
 ### isRecord
 
@@ -4401,7 +4401,7 @@ isRecord({ id: "one" });
 declare const isRecord: (value: unknown) => value is Record<PropertyKey, any>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-shape.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-shape.ts#L90)
 
 ### isRecordEffect
 
@@ -4421,7 +4421,7 @@ declare const isRecordEffect: (
 ) => Effect.Effect<boolean, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-shape.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-shape.ts#L75)
 
 ## `function-tool-validation.ts`
 
@@ -4447,7 +4447,7 @@ declare const copyFunctionToolHooks: (
 ) => Pick<FunctionToolOptions, "onBefore" | "onAfter">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-validation.ts#L148)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-validation.ts#L148)
 
 ### copyFunctionToolHooksEffect
 
@@ -4471,7 +4471,7 @@ declare const copyFunctionToolHooksEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-validation.ts#L120)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-validation.ts#L120)
 
 ### hasOwn
 
@@ -4481,7 +4481,7 @@ declare const copyFunctionToolHooksEffect: (
 declare const hasOwn: (value: object, key: PropertyKey) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-validation.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-validation.ts#L10)
 
 ### isErrorDescriptor
 
@@ -4491,7 +4491,7 @@ declare const hasOwn: (value: object, key: PropertyKey) => boolean;
 declare const isErrorDescriptor: (value: unknown) => value is ErrorDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-validation.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-validation.ts#L10)
 
 ### isFunctionTarget
 
@@ -4501,7 +4501,7 @@ declare const isErrorDescriptor: (value: unknown) => value is ErrorDescriptorAny
 declare const isFunctionTarget: (value: unknown) => value is FunctionRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-validation.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-validation.ts#L10)
 
 ### isRecord
 
@@ -4511,7 +4511,7 @@ declare const isFunctionTarget: (value: unknown) => value is FunctionRefAny;
 declare const isRecord: (value: unknown) => value is Record<PropertyKey, any>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-validation.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-validation.ts#L10)
 
 ### positiveInteger
 
@@ -4533,7 +4533,7 @@ positiveInteger(5, "timeoutMs");
 declare const positiveInteger: (value: unknown, name: string) => asserts value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-validation.ts#L111)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-validation.ts#L111)
 
 ### positiveIntegerEffect
 
@@ -4554,7 +4554,7 @@ declare const positiveIntegerEffect: (
 ) => Effect.Effect<number, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-validation.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-validation.ts#L94)
 
 ### requiredText
 
@@ -4576,7 +4576,7 @@ requiredText(" Read order ", "description");
 declare const requiredText: (value: unknown, name: string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-validation.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-validation.ts#L84)
 
 ### requiredTextEffect
 
@@ -4597,7 +4597,7 @@ declare const requiredTextEffect: (
 ) => Effect.Effect<string, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-validation.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-validation.ts#L68)
 
 ### validateApproval
 
@@ -4619,7 +4619,7 @@ validateApproval("always");
 declare const validateApproval: (value: unknown) => FunctionToolApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-validation.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-validation.ts#L58)
 
 ### validateApprovalEffect
 
@@ -4639,7 +4639,7 @@ declare const validateApprovalEffect: (
 ) => Effect.Effect<"never" | "on-write" | "always", FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-validation.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-validation.ts#L42)
 
 ### validateSideEffect
 
@@ -4661,7 +4661,7 @@ validateSideEffect("read");
 declare const validateSideEffect: (value: unknown) => FunctionToolSideEffect;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-validation.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-validation.ts#L33)
 
 ### validateSideEffectEffect
 
@@ -4681,7 +4681,7 @@ declare const validateSideEffectEffect: (
 ) => Effect.Effect<"none" | "read" | "write" | "external", FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool-validation.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool-validation.ts#L17)
 
 ## `function-tool.ts`
 
@@ -4695,7 +4695,7 @@ Re-exports all named exports from the "./function-tool.types.js" module.
 export * from "./function-tool.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.ts#L20)
 
 ### copyFunctionToolHooks
 
@@ -4707,7 +4707,7 @@ declare const copyFunctionToolHooks: (
 ) => Pick<FunctionToolOptions, "onBefore" | "onAfter">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.ts#L32)
 
 ### copyFunctionToolHooksEffect
 
@@ -4723,7 +4723,7 @@ declare const copyFunctionToolHooksEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.ts#L32)
 
 ### copyFunctionToolMetadata
 
@@ -4745,7 +4745,7 @@ copyFunctionToolMetadata({ description: "Get order", sideEffect: "read", approva
 declare const copyFunctionToolMetadata: (value: unknown) => FunctionToolMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.ts#L161)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.ts#L161)
 
 ### copyFunctionToolMetadataEffect
 
@@ -4765,7 +4765,7 @@ declare const copyFunctionToolMetadataEffect: (
 ) => Effect.Effect<FunctionToolMetadata, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.ts#L121)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.ts#L121)
 
 ### createFunctionTool
 
@@ -4794,7 +4794,7 @@ declare const createFunctionTool: <const Id extends string, const Target extends
 ) => FunctionToolDescriptor<Id, Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.ts#L110)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.ts#L110)
 
 ### createFunctionToolEffect
 
@@ -4824,7 +4824,7 @@ declare const createFunctionToolEffect: <
 ) => Effect.Effect<FunctionToolDescriptor<Id, Target>, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.ts#L38)
 
 ## `function-tool.types.ts`
 
@@ -4844,7 +4844,7 @@ const policy: FunctionToolApproval = "on-write";
 type FunctionToolApproval = "never" | "on-write" | "always";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L22)
 
 ### FunctionToolApprovalDecision (type alias)
 
@@ -4862,7 +4862,7 @@ const decision: FunctionToolApprovalDecision = "approved";
 type FunctionToolApprovalDecision = "approved" | "denied" | boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.types.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L73)
 
 ### FunctionToolApprovalRequest (interface)
 
@@ -4888,7 +4888,7 @@ export interface FunctionToolApprovalRequest {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.types.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L65)
 
 ### FunctionToolApprovalResolver (type alias)
 
@@ -4909,7 +4909,7 @@ type FunctionToolApprovalResolver = (
 ) => MaybePromise<FunctionToolApprovalDecision>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.types.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L80)
 
 ### FunctionToolContext (type alias)
 
@@ -4927,7 +4927,7 @@ const time = context.time;
 type FunctionToolContext = Pick<FunctionContext, "invocation" | "signal" | "env" | "log" | "time">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.types.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L36)
 
 ### FunctionToolCreateOptions (type alias)
 
@@ -4957,7 +4957,7 @@ type FunctionToolCreateOptions<
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.types.ts#L150)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L150)
 
 ### FunctionToolDescriptor (interface)
 
@@ -5016,7 +5016,7 @@ export interface FunctionToolDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.types.ts#L105)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L105)
 
 ### FunctionToolHook (type alias)
 
@@ -5037,7 +5037,7 @@ type FunctionToolHook<Value = unknown> = (
 ) => MaybePromise<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.types.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L46)
 
 ### FunctionToolInvokeOptions (interface)
 
@@ -5058,7 +5058,7 @@ export interface FunctionToolInvokeOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.types.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L87)
 
 ### FunctionToolMetadata (interface)
 
@@ -5086,7 +5086,7 @@ export interface FunctionToolMetadata extends DescriptorMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L26)
 
 ### FunctionToolOptions (interface)
 
@@ -5116,7 +5116,7 @@ export interface FunctionToolOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.types.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L53)
 
 ### FunctionToolSideEffect (type alias)
 
@@ -5134,7 +5134,7 @@ const effect: FunctionToolSideEffect = "read";
 type FunctionToolSideEffect = "none" | "read" | "write" | "external";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L18)
 
 ### FunctionToolTarget (type alias)
 
@@ -5159,7 +5159,7 @@ type FunctionToolTarget<Target extends FunctionRefAny> = FunctionRef<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.types.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L94)
 
 ## `handler-result.ts`
 
@@ -5173,7 +5173,7 @@ Re-exports all named exports from the "./handler-result.types.js" module.
 export * from "./handler-result.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/handler-result.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.ts#L6)
 
 ### fail
 
@@ -5198,7 +5198,7 @@ declare const fail: <const Descriptor extends ErrorDescriptorAny>(
 ) => FunctionFailure<DeclaredErrorOf<Descriptor>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/handler-result.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.ts#L35)
 
 ### failEffect
 
@@ -5223,7 +5223,7 @@ declare const failEffect: <const Descriptor extends ErrorDescriptorAny>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/handler-result.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.ts#L14)
 
 ## `handler-result.types.ts`
 
@@ -5243,7 +5243,7 @@ type NotFoundError = DeclaredErrorOf<typeof NotFound>;
 type DeclaredErrorOf<Descriptor extends ErrorDescriptorAny> = ReturnType<Descriptor["create"]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/handler-result.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.types.ts#L27)
 
 ### DeclaredErrorsOf (type alias)
 
@@ -5266,7 +5266,7 @@ type DeclaredErrorsOf<Descriptors extends readonly ErrorDescriptorAny[]> =
     : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/handler-result.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.types.ts#L34)
 
 ### FunctionEffectValue (interface)
 
@@ -5292,7 +5292,7 @@ export interface FunctionEffectValue<Output = unknown, Error = unknown, Requirem
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/handler-result.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.types.ts#L14)
 
 ### FunctionFailure (interface)
 
@@ -5313,7 +5313,7 @@ export interface FunctionFailure<Error extends globalThis.Error = globalThis.Err
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/handler-result.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.types.ts#L6)
 
 ### FunctionHandlerResult (type alias)
 
@@ -5338,7 +5338,7 @@ type FunctionHandlerResult<
   | FunctionEffectValue<Output, DeclaredErrorsOf<Errors>, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/handler-result.types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.types.ts#L44)
 
 ### FunctionHandlerValidation (type alias)
 
@@ -5366,7 +5366,7 @@ type FunctionHandlerValidation<Result, Output, Errors extends readonly ErrorDesc
     };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/handler-result.types.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.types.ts#L116)
 
 ## `index.ts`
 
@@ -5380,7 +5380,7 @@ Re-exports all named exports from the "./define-error.js" module.
 export * from "./define-error.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L1)
 
 ### "./define-function.js" (namespace export)
 
@@ -5392,7 +5392,7 @@ Re-exports all named exports from the "./define-function.js" module.
 export * from "./define-function.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L2)
 
 ### "./function-graph-node.js" (namespace export)
 
@@ -5404,7 +5404,7 @@ Re-exports all named exports from the "./function-graph-node.js" module.
 export * from "./function-graph-node.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L4)
 
 ### "./function-observability.js" (namespace export)
 
@@ -5416,7 +5416,7 @@ Re-exports all named exports from the "./function-observability.js" module.
 export * from "./function-observability.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L6)
 
 ### "./handler-result.js" (namespace export)
 
@@ -5428,7 +5428,7 @@ Re-exports all named exports from the "./handler-result.js" module.
 export * from "./handler-result.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L3)
 
 ### "./stream.js" (namespace export)
 
@@ -5440,7 +5440,7 @@ Re-exports all named exports from the "./stream.js" module.
 export * from "./stream.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L5)
 
 ### FunctionToolApproval
 
@@ -5450,7 +5450,7 @@ export * from "./stream.js";
 declare const FunctionToolApproval: FunctionToolApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L8)
 
 ### FunctionToolApprovalDecision
 
@@ -5460,7 +5460,7 @@ declare const FunctionToolApproval: FunctionToolApproval;
 declare const FunctionToolApprovalDecision: FunctionToolApprovalDecision;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L9)
 
 ### FunctionToolApprovalDeniedError
 
@@ -5470,7 +5470,7 @@ declare const FunctionToolApprovalDecision: FunctionToolApprovalDecision;
 declare const FunctionToolApprovalDeniedError: typeof FunctionToolApprovalDeniedError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L26)
 
 ### FunctionToolApprovalDeniedFailure
 
@@ -5480,7 +5480,7 @@ declare const FunctionToolApprovalDeniedError: typeof FunctionToolApprovalDenied
 declare const FunctionToolApprovalDeniedFailure: typeof FunctionToolApprovalDeniedFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L30)
 
 ### FunctionToolApprovalRequest
 
@@ -5490,7 +5490,7 @@ declare const FunctionToolApprovalDeniedFailure: typeof FunctionToolApprovalDeni
 declare const FunctionToolApprovalRequest: FunctionToolApprovalRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L10)
 
 ### FunctionToolApprovalRequiredError
 
@@ -5500,7 +5500,7 @@ declare const FunctionToolApprovalRequest: FunctionToolApprovalRequest;
 declare const FunctionToolApprovalRequiredError: typeof FunctionToolApprovalRequiredError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L27)
 
 ### FunctionToolApprovalRequiredFailure
 
@@ -5510,7 +5510,7 @@ declare const FunctionToolApprovalRequiredError: typeof FunctionToolApprovalRequ
 declare const FunctionToolApprovalRequiredFailure: typeof FunctionToolApprovalRequiredFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L31)
 
 ### FunctionToolApprovalResolver
 
@@ -5520,7 +5520,7 @@ declare const FunctionToolApprovalRequiredFailure: typeof FunctionToolApprovalRe
 declare const FunctionToolApprovalResolver: FunctionToolApprovalResolver;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L11)
 
 ### FunctionToolArgumentFailure
 
@@ -5530,7 +5530,7 @@ declare const FunctionToolApprovalResolver: FunctionToolApprovalResolver;
 declare const FunctionToolArgumentFailure: typeof FunctionToolArgumentFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L32)
 
 ### FunctionToolArgumentValidationError
 
@@ -5540,7 +5540,7 @@ declare const FunctionToolArgumentFailure: typeof FunctionToolArgumentFailure;
 declare const FunctionToolArgumentValidationError: typeof FunctionToolArgumentValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L28)
 
 ### FunctionToolCancelledFailure
 
@@ -5550,7 +5550,7 @@ declare const FunctionToolArgumentValidationError: typeof FunctionToolArgumentVa
 declare const FunctionToolCancelledFailure: typeof FunctionToolCancelledFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L33)
 
 ### FunctionToolContext
 
@@ -5560,7 +5560,7 @@ declare const FunctionToolCancelledFailure: typeof FunctionToolCancelledFailure;
 declare const FunctionToolContext: FunctionToolContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L14)
 
 ### FunctionToolDescriptor
 
@@ -5570,7 +5570,7 @@ declare const FunctionToolContext: FunctionToolContext;
 declare const FunctionToolDescriptor: FunctionToolDescriptor<Id, Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L12)
 
 ### FunctionToolHook
 
@@ -5580,7 +5580,7 @@ declare const FunctionToolDescriptor: FunctionToolDescriptor<Id, Target>;
 declare const FunctionToolHook: FunctionToolHook<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L15)
 
 ### FunctionToolInvokeOptions
 
@@ -5590,7 +5590,7 @@ declare const FunctionToolHook: FunctionToolHook<Value>;
 declare const FunctionToolInvokeOptions: FunctionToolInvokeOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L13)
 
 ### FunctionToolMetadata
 
@@ -5600,7 +5600,7 @@ declare const FunctionToolInvokeOptions: FunctionToolInvokeOptions;
 declare const FunctionToolMetadata: FunctionToolMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L16)
 
 ### FunctionToolOperationCancelledError
 
@@ -5610,7 +5610,7 @@ declare const FunctionToolMetadata: FunctionToolMetadata;
 declare const FunctionToolOperationCancelledError: typeof FunctionToolOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L29)
 
 ### FunctionToolOptions
 
@@ -5620,7 +5620,7 @@ declare const FunctionToolOperationCancelledError: typeof FunctionToolOperationC
 declare const FunctionToolOptions: FunctionToolOptions<Id, Input, Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L17)
 
 ### FunctionToolSideEffect
 
@@ -5630,7 +5630,7 @@ declare const FunctionToolOptions: FunctionToolOptions<Id, Input, Output>;
 declare const FunctionToolSideEffect: FunctionToolSideEffect;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L18)
 
 ### FunctionToolTarget
 
@@ -5640,7 +5640,7 @@ declare const FunctionToolSideEffect: FunctionToolSideEffect;
 declare const FunctionToolTarget: FunctionToolTarget<Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L19)
 
 ### copyFunctionToolHooks
 
@@ -5652,7 +5652,7 @@ declare const copyFunctionToolHooks: (
 ) => Pick<FunctionToolOptions, "onBefore" | "onAfter">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L21)
 
 ### copyFunctionToolHooksEffect
 
@@ -5668,7 +5668,7 @@ declare const copyFunctionToolHooksEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L21)
 
 ### createFunctionToolInvoker
 
@@ -5685,7 +5685,7 @@ declare const createFunctionToolInvoker: <Target extends FunctionRefAny>(
 ) => Promise<InferOutput<Target["output"]>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L23)
 
 ### createFunctionToolInvokerEffect
 
@@ -5714,7 +5714,7 @@ declare const createFunctionToolInvokerEffect: <Target extends FunctionRefAny>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L24)
 
 ### invokeFunctionToolEffect
 
@@ -5738,7 +5738,7 @@ declare const invokeFunctionToolEffect: <Target extends FunctionRefAny>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L25)
 
 ## `internal.ts`
 
@@ -5752,7 +5752,7 @@ Re-exports all named exports from the "./function-descriptor-factory.js" module.
 export * from "./function-descriptor-factory.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/internal.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/internal.ts#L1)
 
 ## `stream.ts`
 
@@ -5764,7 +5764,7 @@ export * from "./function-descriptor-factory.js";
 declare const StreamOutputSchema: StreamOutputSchema<ItemSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/stream.ts#L13)
 
 ### isStreamOutputSchema
 
@@ -5782,7 +5782,7 @@ if (isStreamOutputSchema(value)) console.log(value.item);
 declare const isStreamOutputSchema: (value: unknown) => value is StreamOutputSchema;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L92)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/stream.ts#L92)
 
 ### isStreamOutputSchemaEffect
 
@@ -5802,7 +5802,7 @@ declare const isStreamOutputSchemaEffect: (
 ) => Effect.Effect<boolean, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/stream.ts#L79)
 
 ### streamOf
 
@@ -5826,7 +5826,7 @@ declare const streamOf: <const ItemSchema extends StandardSchemaV1>(
 ) => StreamOutputSchema<ItemSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/stream.ts#L68)
 
 #### Backend and frontend example
 
@@ -5870,7 +5870,7 @@ declare const streamOfEffect: <const ItemSchema extends StandardSchemaV1>(
 ) => Effect.Effect<StreamOutputSchema<ItemSchema>, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/stream.ts#L20)
 
 ## `stream.types.ts`
 
@@ -5901,7 +5901,7 @@ export interface StreamOutputSchema<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/stream.types.ts#L6)
 
 ## `types.ts`
 
@@ -5915,7 +5915,7 @@ Re-exports all named exports from the "./function-context.types.js" module.
 export * from "./function-context.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L29)
 
 ### "./function-descriptor.types.js" (namespace export)
 
@@ -5927,7 +5927,7 @@ Re-exports all named exports from the "./function-descriptor.types.js" module.
 export * from "./function-descriptor.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L30)
 
 ### "./function-ref.types.js" (namespace export)
 
@@ -5939,7 +5939,7 @@ Re-exports all named exports from the "./function-ref.types.js" module.
 export * from "./function-ref.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L28)
 
 ### AgentClientFor
 
@@ -5949,7 +5949,7 @@ export * from "./function-ref.types.js";
 declare const AgentClientFor: AgentClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L3)
 
 ### AgentClients
 
@@ -5959,7 +5959,7 @@ declare const AgentClientFor: AgentClientFor<T>;
 declare const AgentClients: AgentClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L4)
 
 ### BucketClient
 
@@ -5969,7 +5969,7 @@ declare const AgentClients: AgentClients<M>;
 declare const BucketClient: BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L5)
 
 ### BucketClientFor
 
@@ -5979,7 +5979,7 @@ declare const BucketClient: BucketClient;
 declare const BucketClientFor: BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L6)
 
 ### BucketClients
 
@@ -5989,7 +5989,7 @@ declare const BucketClientFor: BucketClient;
 declare const BucketClients: BucketClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L7)
 
 ### BucketObjectMetadata
 
@@ -5999,7 +5999,7 @@ declare const BucketClients: BucketClients<M>;
 declare const BucketObjectMetadata: BucketObjectMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L8)
 
 ### CacheClient
 
@@ -6009,7 +6009,7 @@ declare const BucketObjectMetadata: BucketObjectMetadata;
 declare const CacheClient: CacheClient<Key, Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L9)
 
 ### CacheClientFor
 
@@ -6019,7 +6019,7 @@ declare const CacheClient: CacheClient<Key, Value>;
 declare const CacheClientFor: CacheClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L10)
 
 ### CacheClients
 
@@ -6029,7 +6029,7 @@ declare const CacheClientFor: CacheClientFor<T>;
 declare const CacheClients: CacheClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L11)
 
 ### CacheOperationOptions
 
@@ -6039,7 +6039,7 @@ declare const CacheClients: CacheClients<M>;
 declare const CacheOperationOptions: CacheOperationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L12)
 
 ### EventAttributeValue
 
@@ -6049,7 +6049,7 @@ declare const CacheOperationOptions: CacheOperationOptions;
 declare const EventAttributeValue: EventAttributeValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L15)
 
 ### EventClientFor
 
@@ -6059,7 +6059,7 @@ declare const EventAttributeValue: EventAttributeValue;
 declare const EventClientFor: EventClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L13)
 
 ### EventClients
 
@@ -6069,7 +6069,7 @@ declare const EventClientFor: EventClientFor<T>;
 declare const EventClients: EventClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L14)
 
 ### EventPublishOptions
 
@@ -6079,7 +6079,7 @@ declare const EventClients: EventClients<M>;
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L16)
 
 ### EventPublishResult
 
@@ -6089,7 +6089,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L17)
 
 ### JobClientFor
 
@@ -6099,7 +6099,7 @@ declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 declare const JobClientFor: JobClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L19)
 
 ### JobClients
 
@@ -6109,7 +6109,7 @@ declare const JobClientFor: JobClientFor<T>;
 declare const JobClients: JobClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L20)
 
 ### JobEnqueueOptions
 
@@ -6119,7 +6119,7 @@ declare const JobClients: JobClients<M>;
 declare const JobEnqueueOptions: JobEnqueueOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L18)
 
 ### JobEnqueueResult
 
@@ -6129,7 +6129,7 @@ declare const JobEnqueueOptions: JobEnqueueOptions;
 declare const JobEnqueueResult: JobEnqueueResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L21)
 
 ### JobRef
 
@@ -6139,7 +6139,7 @@ declare const JobEnqueueResult: JobEnqueueResult;
 declare const JobRef: JobRef<Id, InputSchema, OutputSchema, Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L1)
 
 ### JobRefAny
 
@@ -6149,7 +6149,7 @@ declare const JobRef: JobRef<Id, InputSchema, OutputSchema, Task>;
 declare const JobRefAny: JobRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L1)
 
 ### JobState
 
@@ -6159,7 +6159,7 @@ declare const JobRefAny: JobRefAny;
 declare const JobState: JobState;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L22)
 
 ### JobStatus
 
@@ -6169,7 +6169,7 @@ declare const JobState: JobState;
 declare const JobStatus: JobStatus;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L23)
 
 ### TaskClientFor
 
@@ -6179,7 +6179,7 @@ declare const JobStatus: JobStatus;
 declare const TaskClientFor: TaskClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L24)
 
 ### TaskClients
 
@@ -6189,7 +6189,7 @@ declare const TaskClientFor: TaskClientFor<T>;
 declare const TaskClients: TaskClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L25)
 
 ### TaskRef
 
@@ -6199,7 +6199,7 @@ declare const TaskClients: TaskClients<M>;
 declare const TaskRef: TaskRef<Id, InputSchema, OutputSchema, Errors>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L1)
 
 ### TaskRefAny
 
@@ -6209,7 +6209,7 @@ declare const TaskRef: TaskRef<Id, InputSchema, OutputSchema, Errors>;
 declare const TaskRefAny: TaskRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L1)
 
 ### TaskTriggerOptions
 
@@ -6219,7 +6219,7 @@ declare const TaskRefAny: TaskRefAny;
 declare const TaskTriggerOptions: TaskTriggerOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L26)
 
 ## `error-retry.types.ts`
 
@@ -6247,7 +6247,7 @@ const retry: ErrorRetry = "later";
 type ErrorRetry = "never" | "later";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/invocation/src/error-retry.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/error-retry.types.ts#L4)
 
 ### ErrorRetryInput (type alias)
 
@@ -6266,7 +6266,7 @@ const retry: ErrorRetryInput = { kind: "later", afterMs: 500 };
 type ErrorRetryInput = ErrorRetry | ErrorRetryLater;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/invocation/src/error-retry.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/error-retry.types.ts#L19)
 
 ### ErrorRetryLater (interface)
 
@@ -6288,7 +6288,7 @@ export interface ErrorRetryLater {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/invocation/src/error-retry.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/error-retry.types.ts#L10)
 
 ### NormalizedErrorRetry (interface)
 
@@ -6310,7 +6310,7 @@ export interface NormalizedErrorRetry {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/invocation/src/error-retry.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/error-retry.types.ts#L25)
 
 ## `identity-bind.ts`
 
@@ -6334,7 +6334,7 @@ bindDescriptorIdentity(descriptor, "tasks.run");
 declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: string) => T;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/invocation/src/identity-bind.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/identity-bind.ts#L47)
 
 ### bindDescriptorIdentityEffect
 
@@ -6355,7 +6355,7 @@ declare const bindDescriptorIdentityEffect: <T extends object>(
 ) => Effect.Effect<T, import("./identity-state.js").DescriptorIdentityFailure>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/invocation/src/identity-bind.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/identity-bind.ts#L18)
 
 ### bindDescriptorServiceMembers
 
@@ -6380,7 +6380,7 @@ declare const bindDescriptorServiceMembers: <T extends object>(
 ) => readonly T[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/invocation/src/identity-bind.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/identity-bind.ts#L99)
 
 ### bindDescriptorServiceMembersEffect
 
@@ -6401,7 +6401,7 @@ declare const bindDescriptorServiceMembersEffect: <T extends object>(
 ) => Effect.Effect<ReadonlyArray<T>, DescriptorIdentityFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/invocation/src/identity-bind.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/identity-bind.ts#L75)
 
 ### isDescriptorIdentityBound
 
@@ -6419,7 +6419,7 @@ isDescriptorIdentityBound(descriptor);
 declare const isDescriptorIdentityBound: (descriptor: object) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/invocation/src/identity-bind.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/identity-bind.ts#L65)
 
 ### isDescriptorIdentityBoundEffect
 
@@ -6439,4 +6439,4 @@ declare const isDescriptorIdentityBoundEffect: (
 ) => Effect.Effect<boolean, DescriptorIdentityFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/invocation/src/identity-bind.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/identity-bind.ts#L56)

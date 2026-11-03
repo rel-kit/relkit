@@ -1,5 +1,5 @@
 import { Cause, Effect, Exit, Fiber, Scope } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { childEnvironment, emit, emitFailure } from "./candidate-process.js";
 import { checkCandidateAbort } from "./candidate-validation.js";
 import type {

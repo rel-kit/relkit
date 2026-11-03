@@ -4,7 +4,7 @@
  * duplicate identities fail before any executable integration is imported.
  */
 import { Effect } from "effect";
-import type { RuntimeIntegrationPlanEntry } from "@relkit/contracts";
+import type { RuntimeIntegrationPlanEntry } from "relkit/contracts";
 import type { RuntimeIntegrationPackage } from "./normalize-types.js";
 import type { RuntimeIntegrationRequirement } from "./runtime-integration-telemetry.js";
 import {

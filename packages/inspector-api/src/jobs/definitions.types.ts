@@ -1,4 +1,4 @@
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 
 /** Pure projected definition selectors; absence never introduces a default filter. */
 export interface JobDefinitionFilters {

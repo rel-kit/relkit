@@ -2,7 +2,7 @@ import type {
   AgentResourceDependency,
   AgentSubagentTopology,
   AgentWorkflowTopology,
-} from "@relkit/graph";
+} from "relkit/graph";
 import { isRecord, refId, refKind } from "./normalize-utils.js";
 
 /**

@@ -1,7 +1,7 @@
 /** UI polling through the backend listener stays out of the terminal like the inspection loop. */
 import { expect, it } from "@effect/vitest";
 import { Deferred, Effect, Fiber, Layer, Ref } from "effect";
-import { ExecutionSuccessLogs } from "@relkit/contracts/operation";
+import { ExecutionSuccessLogs } from "relkit/contracts/operation";
 import {
   InspectionFiles,
   InspectionNative,

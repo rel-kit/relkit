@@ -1,6 +1,6 @@
 /** Shares the persistence envelope with capture accounting without importing native storage. */
-import type { EarlyRetainedRecord } from "@relkit/observability/early";
-import type { LocalRecord } from "@relkit/observability/local/record";
+import type { EarlyRetainedRecord } from "relkit/observability/early";
+import type { LocalRecord } from "relkit/observability/local/record";
 
 /**
  * Assigns one session/sequence receipt while preserving the original record and origin.

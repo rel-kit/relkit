@@ -1,5 +1,5 @@
 import { Cause, Effect, Exit, Layer, ManagedRuntime, Metric } from "effect";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
 import {
   CandidateVerification,
   createVerificationLayer,

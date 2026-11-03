@@ -96,7 +96,7 @@ test("adds AWS and Pulumi only when explicitly selected", async () => {
   );
   const config = await readFile(join(result.destination, "relkit.config.ts"), "utf8");
   expect(manifest.dependencies).toMatchObject({
-    "@relkit/app": appManifest.version,
+    relkit: appManifest.version,
     "@relkit/aws": awsManifest.version,
     "@relkit/pulumi": pulumiManifest.version,
   });

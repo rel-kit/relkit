@@ -5,7 +5,7 @@
  */
 import { Context, Effect, Layer } from "effect";
 import { startLocalWorkerEffect } from "./worker-client-effect.js";
-import type { LocalWorkerEffects } from "@relkit/observability/local/worker-contract";
+import type { LocalWorkerEffects } from "relkit/observability/local/worker-contract";
 
 /**
  * Injectable local worker operations. A Layer owns the worker process until

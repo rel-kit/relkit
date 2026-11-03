@@ -1,5 +1,5 @@
-import { canonicalJson } from "@relkit/contracts";
-import { assertDeploymentPlanVersion, type DeploymentPlan } from "@relkit/deploy";
+import { canonicalJson } from "relkit/contracts";
+import { assertDeploymentPlanVersion, type DeploymentPlan } from "relkit/deploy";
 
 export interface ResourceEntry {
   readonly kind: string;

@@ -3,14 +3,14 @@
  * services and publishes one diagnostic/artifact cohort. Registry writes retain
  * their existing ordering; typed adapter failures remain owned by checkProject.
  */
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import {
   checkConventions,
   extractDescriptors,
   normalizeCompilation,
   type GeneratedOutputs,
 } from "@relkit/compiler";
-import { sortDiagnostics } from "@relkit/diagnostics";
+import { sortDiagnostics } from "relkit/diagnostics";
 import { Effect } from "effect";
 import { cliTry } from "../cli-errors.js";
 import { CliCompiler } from "../services/compiler.service.js";

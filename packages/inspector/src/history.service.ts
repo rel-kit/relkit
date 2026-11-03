@@ -3,8 +3,8 @@ import { Cause, Context, Effect, Layer } from "effect";
 import type { InspectorHistoryOperations } from "./history.types.js";
 import { InspectorHistoryNative, historyNativeFailure } from "./history-native.service.js";
 import { validateHistoryReply } from "./history-reply.js";
-import { observeExecution } from "@relkit/contracts/operation";
-import { LocalWorkerError } from "@relkit/observability/local/worker-contract";
+import { observeExecution } from "relkit/contracts/operation";
+import { LocalWorkerError } from "relkit/observability/local/worker-contract";
 
 /** Persistent history opens only inside the standalone tool's Scope. */
 export class InspectorHistory extends Context.Service<

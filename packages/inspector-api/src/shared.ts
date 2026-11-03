@@ -15,8 +15,8 @@ import {
   normalizeSourceLocation,
   type JsonValue,
   type MaybePromise,
-} from "@relkit/contracts";
-import { redactRecord, type RedactionPolicy } from "@relkit/observability";
+} from "relkit/contracts";
+import { redactRecord, type RedactionPolicy } from "relkit/observability";
 
 /** Existing TypeError query-validation contract retained at synchronous compatibility edges. */
 export class InspectorQueryError extends TypeError {

@@ -1,7 +1,7 @@
 /** Exercises native graph definition effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
 import { END, START, StateSchema } from "@langchain/langgraph";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
 import { defineGraphNode } from "../src/define-graph-node.js";

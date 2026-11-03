@@ -3,13 +3,13 @@ import type {
   EventProvider,
   EventProviderResult,
   EventPublishOptions,
-} from "@relkit/events";
+} from "relkit/events";
 import type {
   EventInvocationContext,
   EventRuntimeProvider,
   EventTriggerBinding,
-} from "@relkit/engine";
-import type { EventNode } from "@relkit/graph";
+} from "relkit/engine";
+import type { EventNode } from "relkit/graph";
 import { assertResponse, awsRequest } from "./http.js";
 import { type AwsCredentials, text } from "./config.js";
 

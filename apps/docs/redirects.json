@@ -818,5 +818,10 @@
     "from": "/docs/storage/upload",
     "to": "/docs/modules/storage/upload",
     "status": 301
+  },
+  {
+    "from": "/docs/api/relkit",
+    "to": "/docs/modules/cli/automation",
+    "status": 301
   }
 ]

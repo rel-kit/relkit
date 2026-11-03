@@ -1,4 +1,4 @@
-import type { ExpectedClientIdentity } from "@relkit/contracts";
+import type { ExpectedClientIdentity } from "relkit/contracts";
 /** Existing content bounds and request authority for one named stream. */
 export interface JobStreamOptions {
   readonly runId: string;

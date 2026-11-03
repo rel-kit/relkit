@@ -3,7 +3,7 @@
 import type { ObservationRequest, InvocationOptions } from "./agent-hook.types.js";
 
 import { useCallback, useEffect, useState } from "react";
-import { runExecutionPromise } from "@relkit/contracts/operation";
+import { runExecutionPromise } from "relkit/contracts/operation";
 import { agentOperations, agentRuntime } from "./agent-runtime.js";
 import { isAcceptedAgentRun } from "./agent-operations.service.js";
 import { emptyAgentContent } from "./agent-observation.js";

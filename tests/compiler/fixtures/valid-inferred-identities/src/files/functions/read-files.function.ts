@@ -1,4 +1,4 @@
-import { defineFunction } from "@relkit/app";
+import { defineFunction } from "relkit";
 import { filesInput, filesOutput } from "../../platform/schemas.js";
 
 const readFiles = defineFunction({

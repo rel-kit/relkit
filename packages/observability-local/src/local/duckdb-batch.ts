@@ -1,7 +1,7 @@
 /** Composes validated receipt admission, explicit cursor allocation and insertion within one borrowed transaction. */
 import { Effect } from "effect";
-import type { RedactionPolicy } from "@relkit/observability";
-import type { LocalRecord } from "@relkit/observability/local/record";
+import type { RedactionPolicy } from "relkit/observability";
+import type { LocalRecord } from "relkit/observability/local/record";
 import type { DuckdbConnectionPort } from "./duckdb-driver.types.js";
 import { prepareDuckdbBatch } from "./duckdb-batch-prepare.js";
 import { admitDuckdbReceipts } from "./duckdb-batch-receipts.js";

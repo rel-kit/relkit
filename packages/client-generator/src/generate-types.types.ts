@@ -1,4 +1,4 @@
-import type { FunctionNode, GraphNode, HttpTriggerConfig } from "@relkit/graph";
+import type { FunctionNode, GraphNode, HttpTriggerConfig } from "relkit/graph";
 
 /** One decoded request mapping leaf.
  * @example const leaf: MappingLeaf = { inputPath: ["id"], outputPath: ["id"], kind: "path", optional: false, defaulted: false };
@@ -41,5 +41,5 @@ export type HttpGraphTrigger = Extract<GraphNode, { readonly kind: "trigger" }> 
   readonly triggerType: "http";
   readonly config: HttpTriggerConfig;
 };
-export type { ApplicationGraph, FunctionNode } from "@relkit/graph";
+export type { ApplicationGraph, FunctionNode } from "relkit/graph";
 export type { InputTree } from "./input-tree.types.js";

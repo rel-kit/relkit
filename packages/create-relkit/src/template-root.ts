@@ -1,4 +1,4 @@
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Effect } from "effect";

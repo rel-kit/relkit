@@ -6,12 +6,12 @@ import { fork } from "node:child_process";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { Effect } from "effect";
-import { ObservabilityQueryError } from "@relkit/observability";
-import { workerFailure } from "@relkit/observability/local/worker-contract";
+import { ObservabilityQueryError } from "relkit/observability";
+import { workerFailure } from "relkit/observability/local/worker-contract";
 import type {
   LocalWorkerEffects,
   LocalWorkerCommand,
-} from "@relkit/observability/local/worker-contract";
+} from "relkit/observability/local/worker-contract";
 import { createWorkerClientState } from "./worker-client-state.js";
 import { sendWorkerCommand, closeWorkerClient } from "./worker-client-send.js";
 

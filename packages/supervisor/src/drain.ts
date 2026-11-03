@@ -1,6 +1,6 @@
 import { Cause, Effect, Exit, Layer, ManagedRuntime, Metric } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { runExecutionSync } from "relkit/contracts/operation";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
 import { createDrainLayer, SupervisorDrainOwner } from "./drain-service.js";
 import { validateDrainOptions } from "./drain-validation.js";
 import { validateSupervisorToken } from "./state-machine-telemetry.js";

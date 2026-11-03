@@ -1,5 +1,5 @@
 import { Effect, Layer, ManagedRuntime } from "effect";
-import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionPromise, runExecutionSync } from "relkit/contracts/operation";
 
 /** Resource-free compatibility runner; operation scopes own all native resources. */
 const runtime = ManagedRuntime.make(Layer.empty);

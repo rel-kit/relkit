@@ -3,7 +3,7 @@
  * The fixture validates its sealed bytes through real snapshot policy with injected
  * file authority. Fault cases alter public responses, never execution authority.
  */
-import { API_VERSION } from "@relkit/contracts";
+import { API_VERSION } from "relkit/contracts";
 import { Effect, Layer } from "effect";
 import { DevSnapshots, devSnapshotsLive } from "../../src/dev-snapshot/snapshot.service.js";
 import { snapshotDigest } from "../../src/dev-snapshot/snapshot-fingerprint.js";

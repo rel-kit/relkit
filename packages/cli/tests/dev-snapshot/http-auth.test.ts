@@ -4,7 +4,7 @@
  * and redirect rejection through the same fetch seam used by SDK verification.
  */
 import { expect, it } from "@effect/vitest";
-import { API_BASE_PATH } from "@relkit/contracts";
+import { API_BASE_PATH } from "relkit/contracts";
 import { Effect, Exit } from "effect";
 import { ownedNativePromise } from "../../src/services/owned-promise.js";
 import { authProbeListener } from "./http-auth-fixture.js";

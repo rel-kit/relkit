@@ -36,6 +36,13 @@ export function lastSegment(expression: ts.Expression): string | undefined {
   return undefined;
 }
 
+/** Matches `relkit`, its subpaths and `@relkit/*` packages. */
+function isRelkitSpecifier(specifier: string): boolean {
+  return (
+    specifier === "relkit" || specifier.startsWith("relkit/") || specifier.startsWith("@relkit/")
+  );
+}
+
 /** Resolves named RelKit import aliases before classifying a factory call. */
 export function factoryName(expression: ts.Expression): string | undefined {
   const name = lastSegment(expression);
@@ -44,7 +51,7 @@ export function factoryName(expression: ts.Expression): string | undefined {
     if (
       !ts.isImportDeclaration(statement) ||
       !ts.isStringLiteral(statement.moduleSpecifier) ||
-      !statement.moduleSpecifier.text.startsWith("@relkit/")
+      !isRelkitSpecifier(statement.moduleSpecifier.text)
     )
       continue;
     const bindings = statement.importClause?.namedBindings;

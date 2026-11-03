@@ -2,9 +2,9 @@
  * Converts one checked reference into a native tool while preserving common-engine
  * execution, trace context and the deferred approval failure reader.
  */
-import { getJsonSchema } from "@relkit/schema";
-import { frameworkTrace } from "@relkit/invocation";
-import { isToolRef, type ToolDescriptor } from "@relkit/tools";
+import { getJsonSchema } from "relkit/schema";
+import { frameworkTrace } from "relkit/invocation";
+import { isToolRef, type ToolDescriptor } from "relkit/tools";
 import type { ClientTool, ServerTool } from "@langchain/core/tools";
 import { tool } from "langchain";
 import { Effect } from "effect";

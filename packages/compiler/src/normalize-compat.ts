@@ -1,10 +1,10 @@
-import { JsonValueError } from "@relkit/contracts";
+import { JsonValueError } from "relkit/contracts";
 import { observeCompiler } from "./observability.js";
 import { Effect } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 
 export type { SchemaEntry } from "./normalize-compat.types.js";
-import { canonicalJson, type JsonValue } from "@relkit/contracts";
+import { canonicalJson, type JsonValue } from "relkit/contracts";
 import { id, isRecord, refId } from "./normalize-utils.js";
 import type { NormalizeInput } from "./normalize-types.js";
 import { providerMaps } from "./normalize-graph-app.js";

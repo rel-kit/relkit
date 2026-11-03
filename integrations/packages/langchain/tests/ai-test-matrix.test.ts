@@ -1,12 +1,12 @@
 /** Exercises native ai test matrix behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
 import { describe, expect, test } from "vitest";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { defineAgent, invokeAgent } from "../src/index.ts";
 import {
   parseModelProviderConfiguration,
   resolveModelSelector,
-} from "@relkit/agents/internal/model-selection";
+} from "relkit/agents/internal/model-selection";
 import { createTestModel } from "./test-model.ts";
 
 const modelCases = [

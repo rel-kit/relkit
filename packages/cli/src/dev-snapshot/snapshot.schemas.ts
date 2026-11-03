@@ -5,7 +5,7 @@
  * decoding; decoding alone never grants execution authority.
  */
 import { Schema } from "effect";
-import { APPLICATION_LAYOUT_VERSION, InspectorConfigurationSchema } from "@relkit/contracts";
+import { APPLICATION_LAYOUT_VERSION, InspectorConfigurationSchema } from "relkit/contracts";
 
 /** Project-relative paths exclude traversal, drive letters, escapes and empty segments. */
 export const SnapshotPath = Schema.String.check(

@@ -51,22 +51,22 @@ async function seedDiscoveryProject(root: string) {
   await write(
     root,
     "relkit.config.ts",
-    `import { defineApp } from "@relkit/app/config";\nimport env from "@app/platform/env.js";\nimport { redis } from "@relkit/redis";\nexport default defineApp({ env, cache: { shared: redis() }, defaults: { cache: "shared" } });\n`,
+    `import { defineApp } from "relkit/config";\nimport env from "@app/platform/env.js";\nimport { redis } from "@relkit/redis";\nexport default defineApp({ env, cache: { shared: redis() }, defaults: { cache: "shared" } });\n`,
   );
   await write(
     root,
     "src/platform/env.ts",
-    `import { defineEnv } from "@relkit/app/config";\nexport default defineEnv({});\n`,
+    `import { defineEnv } from "relkit/config";\nexport default defineEnv({});\n`,
   );
   await write(
     root,
     "src/orders/service.ts",
-    `import { defineService } from "@relkit/app/services";\nimport listOrders from "./functions/list-orders.function.js";\nexport default defineService({ functions: { listOrders } });\n`,
+    `import { defineService } from "relkit/services";\nimport listOrders from "./functions/list-orders.function.js";\nexport default defineService({ functions: { listOrders } });\n`,
   );
   await write(
     root,
     "src/orders/functions/list-orders.function.ts",
-    `import { defineFunction } from "@relkit/app/functions";\nconst listOrders = defineFunction({ input: schema, output: schema, handler: async () => ({}) });\nexport default listOrders;\n`,
+    `import { defineFunction } from "relkit/functions";\nconst listOrders = defineFunction({ input: schema, output: schema, handler: async () => ({}) });\nexport default listOrders;\n`,
   );
   await write(
     root,
@@ -76,7 +76,7 @@ async function seedDiscoveryProject(root: string) {
   await write(
     root,
     "src/orders/prompts/support.prompt.ts",
-    `import { definePrompt } from "@relkit/app";\nexport default definePrompt("Help");\n`,
+    `import { definePrompt } from "relkit";\nexport default definePrompt("Help");\n`,
   );
 }
 /** Checks explicit and inherited provider planning against the same project. */

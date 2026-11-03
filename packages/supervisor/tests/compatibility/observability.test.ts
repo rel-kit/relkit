@@ -7,7 +7,7 @@ import {
   createObservabilityQuery,
   createObservabilitySegmentStore,
   createObservabilityStream,
-} from "@relkit/observability";
+} from "relkit/observability";
 import { createSupervisorObservability } from "../../src/observability.js";
 import { createSupervisorStateMachine } from "../../src/state-machine.js";
 import { generationFixture } from "../fixtures/observability.js";

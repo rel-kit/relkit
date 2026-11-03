@@ -1,6 +1,6 @@
 /** Serves bounded replay batches and explicit gaps without retaining subscriber queues. */
 import { Effect, Schema } from "effect";
-import type { EarlyRetentionOperations, EarlyRetainedRecord } from "@relkit/observability/early";
+import type { EarlyRetentionOperations, EarlyRetainedRecord } from "relkit/observability/early";
 import { InspectionConnectionError, rejectConnection } from "./connection-error.js";
 import { readInspectionBody } from "./bridge-body.js";
 import { inspectionReplayRecord } from "./replay-record.js";

@@ -1,4 +1,4 @@
-import type { TaskExecutionBinding, TaskExecutor } from "@relkit/jobs/adapter";
+import type { TaskExecutionBinding, TaskExecutor } from "relkit/jobs/adapter";
 import { Inngest } from "inngest";
 import type { Context, InngestFunction } from "inngest";
 import type { InngestTaskDefinition } from "./task-binding.js";

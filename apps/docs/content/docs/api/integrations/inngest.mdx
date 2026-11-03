@@ -119,7 +119,7 @@ export interface InngestOptions extends JobsServiceOptions {
   readonly signingKey?: SecretReference;
   readonly serveOrigin?: string | URL | TextReference;
   readonly appVersion?: string;
-  readonly native?: Readonly<Record<string, import("@relkit/contracts").JsonValue>>;
+  readonly native?: Readonly<Record<string, import("relkit/contracts").JsonValue>>;
 }
 ```
 

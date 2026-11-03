@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { defineError, defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { defineError, defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 import { handleTestRequest } from "../../src/application-http.ts";
 import { createTestRuntime, type TestRuntime } from "../../src/runtime.ts";
 import type { TestRoute } from "../../src/application-routes.ts";

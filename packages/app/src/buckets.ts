@@ -1,1 +1,1 @@
-export * from "@relkit/buckets";
+export * from "relkit/buckets";

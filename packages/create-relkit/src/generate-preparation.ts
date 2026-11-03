@@ -7,7 +7,7 @@
 
 import { join } from "node:path";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import type { CreateOptions } from "./options.js";
 import type { GenerateProjectContext } from "./generate-types.js";
 import { GeneratorProcess } from "./generator-process.js";

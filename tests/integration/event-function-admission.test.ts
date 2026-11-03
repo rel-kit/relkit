@@ -1,27 +1,16 @@
 import { expect, test } from "bun:test";
 import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
-import {
-  createFunctionRegistry,
-  invoke,
-  type InvocationTarget,
-} from "../../packages/engine/src/index.ts";
+import { createFunctionRegistry, invoke, type InvocationTarget } from "relkit/engine";
 import {
   bindFunctionEvents,
   defineEvent,
   defineEventFunction,
   isEventFunctionDescriptor,
-} from "../../packages/events/src/index.ts";
-import { defineFunction } from "../../packages/functions/src/index.ts";
-import {
-  createRegistrationPlan,
-  hashGraph,
-  type ApplicationGraph,
-} from "../../packages/graph/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
-import {
-  bindDescriptorIdentity,
-  getDescriptorIdentity,
-} from "../../packages/invocation/dist/index.js";
+} from "relkit/events";
+import { defineFunction } from "relkit/functions";
+import { createRegistrationPlan, hashGraph, type ApplicationGraph } from "relkit/graph";
+import { z } from "relkit/schema";
+import { bindDescriptorIdentity, getDescriptorIdentity } from "relkit/invocation";
 import {
   createTestRuntime,
   invokeFunction as invokeTestFunction,

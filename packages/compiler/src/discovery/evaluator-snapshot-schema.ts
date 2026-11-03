@@ -1,4 +1,4 @@
-import { canCarryStandardSchema, serializeJsonEffect, type JsonValue } from "@relkit/contracts";
+import { canCarryStandardSchema, serializeJsonEffect, type JsonValue } from "relkit/contracts";
 import {
   getJsonSchemaEffect,
   getSchemaMetadataEffect,
@@ -6,7 +6,7 @@ import {
   schemaLibraryVersion,
   SchemaProjectorLive,
   type StandardSchemaV1,
-} from "@relkit/schema";
+} from "relkit/schema";
 import { Effect } from "effect";
 import { createHash } from "node:crypto";
 import { observeCompiler } from "../observability.js";

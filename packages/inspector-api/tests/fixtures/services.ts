@@ -1,4 +1,4 @@
-import type { RunPage, RunSnapshot } from "@relkit/contracts/jobs";
+import type { RunPage, RunSnapshot } from "relkit/contracts/jobs";
 import type { InspectorActionRequest } from "../../src/actions.types.js";
 import type { ResolvedActiveGeneration } from "../../src/shared.types.js";
 import type { InspectorJobsBinding } from "../../src/jobs/jobs.types.js";

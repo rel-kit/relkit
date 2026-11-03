@@ -5,14 +5,11 @@ import {
   createJobClient,
   JobOperationCancelledError,
   type JobProvider,
-} from "../../packages/jobs/src/legacy.ts";
-import type { InvocationContext } from "../../packages/engine/src/index.ts";
-import type { RetryPolicy } from "../../packages/jobs/src/legacy.ts";
-import {
-  type JobIdempotencyDefinition,
-  type Scheduler,
-} from "../../packages/providers-local/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+} from "../../packages/relkit/src/jobs/legacy.ts";
+import type { InvocationContext } from "relkit/engine";
+import type { RetryPolicy } from "../../packages/relkit/src/jobs/legacy.ts";
+import { type JobIdempotencyDefinition, type Scheduler } from "relkit/providers-local";
+import { z } from "relkit/schema";
 import type { TestJobFake } from "../../packages/testing/src/index.ts";
 
 export interface JobInput {

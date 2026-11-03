@@ -1,6 +1,6 @@
 import { Effect, Layer, ManagedRuntime } from "effect";
-import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
-import { createBucketClient, type BucketProvider, type BucketPutOptions } from "@relkit/buckets";
+import { runExecutionPromise, runExecutionSync } from "relkit/contracts/operation";
+import { createBucketClient, type BucketProvider, type BucketPutOptions } from "relkit/buckets";
 import { TestBucketStorage, bucketStorageLayer } from "./bucket-storage.js";
 import type { BucketStorageService } from "./bucket-storage.types.js";
 import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";

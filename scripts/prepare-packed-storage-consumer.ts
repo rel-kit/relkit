@@ -82,7 +82,7 @@ function validatePackedStorageInstallation(
 ): void {
   assert.deepEqual(installation.missing, []);
   for (const installed of installation.instances) {
-    if (!installed.name.startsWith("@relkit/")) continue;
+    if (installed.name !== "relkit" && !installed.name.startsWith("@relkit/")) continue;
     assert.ok(
       candidate.tarballs.has(installed.name),
       `Unpacked first-party installation: ${installed.name}`,

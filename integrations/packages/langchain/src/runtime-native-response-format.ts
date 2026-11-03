@@ -2,10 +2,10 @@
  * Converts a validated RelKit output schema to the native structured response
  * strategy, preserving schema failures and disabling native silent recovery.
  */
-import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
+import { getJsonSchema, type StandardSchemaV1 } from "relkit/schema";
 import { providerStrategy, toolStrategy } from "langchain";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/internal/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import type { NativeModel } from "./runtime-loop.types.js";

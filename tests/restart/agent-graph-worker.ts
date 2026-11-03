@@ -3,10 +3,10 @@ import { access, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { SqliteSaver } from "../../integrations/packages/langchain/node_modules/@langchain/langgraph-checkpoint-sqlite/dist/index.js";
 import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
-import { createRegistrationPlan } from "../../packages/graph/src/index.ts";
-import { createLocalAgentStateProvider } from "../../packages/providers-local/src/index.ts";
-import { createOperationId } from "../../packages/realtime/src/index.ts";
-import { digest } from "../../packages/runtime-hono/src/agent-rpc-support.ts";
+import { createRegistrationPlan } from "relkit/graph";
+import { createLocalAgentStateProvider } from "relkit/providers-local";
+import { createOperationId } from "relkit/realtime";
+import { digest } from "../../packages/relkit/src/runtime-hono/agent-rpc-support.ts";
 import { createRestartGraph, waitForAgentStatus } from "./agent-graph-fixture.ts";
 import { resolveRestartStateRoot } from "./state-root.ts";
 import {

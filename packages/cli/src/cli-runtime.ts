@@ -4,8 +4,8 @@
  * unrelated runtime services merely to install invocation-level logging policy.
  */
 import { Cause, Effect, Layer, ManagedRuntime, type Scope } from "effect";
-import { observeExecution, runExecutionPromise } from "@relkit/contracts/operation";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { observeExecution, runExecutionPromise } from "relkit/contracts/operation";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
 import { cliOriginalError } from "./cli-errors.js";
 import { CliCleanup, cleanupLayer } from "./services/cleanup.service.js";
 import {

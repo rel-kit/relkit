@@ -1,6 +1,6 @@
 import { Effect, Schema, type ManagedRuntime } from "effect";
-import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
-import type { MaybePromise } from "@relkit/contracts";
+import { runExecutionPromise, runExecutionSync } from "relkit/contracts/operation";
+import type { MaybePromise } from "relkit/contracts";
 
 /** Typed native/validation boundary failure retaining the exact compatibility cause. */
 export class InspectorBoundaryError extends Schema.TaggedError<InspectorBoundaryError>()(

@@ -7,6 +7,6 @@ export interface ContractProcedureDocument {
   readonly output: unknown;
   readonly errors: readonly { readonly id: string; readonly schema: unknown }[];
 }
-export type { JsonValue } from "@relkit/contracts";
-export type { ApplicationGraph } from "@relkit/graph";
+export type { JsonValue } from "relkit/contracts";
+export type { ApplicationGraph } from "relkit/graph";
 export type { ClientRoute } from "./generate-types.types.js";

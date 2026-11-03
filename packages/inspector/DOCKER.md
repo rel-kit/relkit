@@ -42,7 +42,7 @@ Enable the application bridge explicitly. A fixed bridge port keeps a routing
 override valid after app restart; the UI has its own port:
 
 ```ts
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 
 export default defineApp({
   env: defineEnv({}),

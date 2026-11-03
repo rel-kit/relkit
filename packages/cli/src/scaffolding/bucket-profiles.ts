@@ -1,6 +1,6 @@
 /** Discovers bucket provider profile choices and validates their backend selections for existing-project resource planning. */
 
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";

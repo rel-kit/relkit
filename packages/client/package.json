@@ -59,12 +59,10 @@
     }
   },
   "dependencies": {
-    "@relkit/contracts": "workspace:*",
-    "@relkit/invocation": "workspace:*",
-    "@relkit/realtime": "workspace:*",
     "@orpc/client": "catalog:",
     "@orpc/contract": "catalog:",
-    "effect": "catalog:"
+    "effect": "catalog:",
+    "relkit": "workspace:*"
   },
   "peerDependencies": {
     "@opentelemetry/api": "1.9.1",
@@ -88,14 +86,14 @@
     }
   },
   "devDependencies": {
-    "@opentelemetry/api": "1.9.1",
     "@effect/vitest": "catalog:",
-    "vitest": "catalog:",
-    "@types/react": "catalog:",
+    "@opentelemetry/api": "1.9.1",
     "@orpc/tanstack-query": "2.0.0-beta.31",
     "@tanstack/query-core": "5.102.3",
     "@tanstack/react-query": "catalog:",
-    "react": "catalog:"
+    "@types/react": "catalog:",
+    "react": "catalog:",
+    "vitest": "catalog:"
   },
   "scripts": {
     "build": "tsc -b",

@@ -1,10 +1,10 @@
 import { expect, it } from "@effect/vitest";
 import { Cause, Deferred, Effect, Exit, Fiber, Layer, Metric } from "effect";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
 import { createProxyLayer, SupervisorProxyOwner } from "../../src/proxy-service.js";
 import { createSupervisorProxy } from "../../src/proxy.js";
 import { mockFetch } from "../fixtures/fetch.ts";
-import type { LogRecord } from "@relkit/runtime-effect/logger";
+import type { LogRecord } from "relkit/runtime-effect/logger";
 
 const token = { sourceToken: 1, generationToken: 1 };
 const quiet = createLoggerLayer({ human: false, json: false });

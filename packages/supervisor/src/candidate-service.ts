@@ -1,4 +1,4 @@
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { Cause, Context, Effect, Exit, Layer, Scope } from "effect";
 import { CandidatePlatform } from "./candidate-platform.js";
 import { startCompiledCandidate } from "./candidate-start.js";

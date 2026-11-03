@@ -1,4 +1,4 @@
-export type { AgentClientContractMetadata } from "@relkit/graph";
+export type { AgentClientContractMetadata } from "relkit/graph";
 
 /** Agent scope discriminator rendered in the public contract.
  * @example const scope: AgentScopeSource = { kind: "dynamic" };

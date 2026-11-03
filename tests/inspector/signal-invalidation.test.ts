@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import type { ObservabilityRecord } from "@relkit/observability";
+import type { ObservabilityRecord } from "relkit/observability";
 import { collectionChange } from "../../packages/inspector/src/collector-changes";
 import { signalEventTypes } from "../../apps/inspector/lib/signal-events";
 

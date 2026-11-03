@@ -1,4 +1,4 @@
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { clean } from "./normalize-graph-utils.js";
 import { middlewareForRouteEffect } from "./middleware-coverage.js";
 import { Effect } from "effect";

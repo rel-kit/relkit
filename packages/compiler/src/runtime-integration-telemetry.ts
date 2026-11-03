@@ -3,7 +3,7 @@ import type {
   RuntimeIntegrationGraph,
 } from "./runtime-integration-telemetry.types.js";
 export type { RuntimeIntegrationRequirement } from "./runtime-integration-telemetry.types.js";
-import { isStableId } from "@relkit/contracts";
+import { isStableId } from "relkit/contracts";
 import { Effect } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 

@@ -12,7 +12,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
 const service =
-  'import { defineService } from "@relkit/app/services"; export default defineService({});';
+  'import { defineService } from "relkit/services"; export default defineService({});';
 
 /**
  * Inspects source-only boundary diagnostics without running any candidate module.
@@ -129,7 +129,7 @@ const dynamicAcceptance = Effect.fn("BoundaryProbe.dynamic")(function* () {
     sources: [
       {
         fileName: "src/services/orders/functions/get.ts",
-        text: 'import { defineFunction } from "@relkit/app/functions"; export default defineFunction({});',
+        text: 'import { defineFunction } from "relkit/functions"; export default defineFunction({});',
       },
     ],
   });

@@ -89,14 +89,14 @@ export * from "./local/worker-client.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/index.ts#L2)
 
-### "@relkit/observability/local/record" (namespace export)
+### "relkit/observability/local/record" (namespace export)
 
-Re-exports all named exports from the "@relkit/observability/local/record" module.
+Re-exports all named exports from the "relkit/observability/local/record" module.
 
 **Signature**
 
 ```ts
-export * from "@relkit/observability/local/record";
+export * from "relkit/observability/local/record";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/index.ts#L8)
@@ -753,7 +753,7 @@ Re-exports all named exports from the "./types.types.js" module.
 export * from "./types.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.ts#L6)
 
 ### LocalRecordValidationError (class)
 
@@ -775,7 +775,7 @@ Effect.runSync(
 declare class LocalRecordValidationError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.ts#L16)
 
 ### recordTime
 
@@ -793,7 +793,7 @@ recordTime(logRecord);
 declare const recordTime: (record: ObservabilityRecord) => number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.ts#L135)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.ts#L135)
 
 ### recordTimeEffect
 
@@ -813,7 +813,7 @@ declare const recordTimeEffect: (
 ) => Effect.Effect<number, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.ts#L96)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.ts#L96)
 
 ### validateLocalRecord
 
@@ -835,7 +835,7 @@ validateLocalRecord(envelope);
 declare const validateLocalRecord: <Input>(value: Input) => asserts value is Input & LocalRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.ts#L115)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.ts#L115)
 
 ### validateLocalRecordEffect
 
@@ -855,7 +855,7 @@ declare const validateLocalRecordEffect: <Input>(
 ) => Effect.Effect<Input & LocalRecord, LocalRecordValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.ts#L54)
 
 ## `types.types.ts`
 
@@ -871,7 +871,7 @@ A stable origin assigned to local telemetry records.
 type LocalLogOrigin = "application" | "relkit" | "inspector";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.types.ts#L10)
 
 ### LocalRecord (interface)
 
@@ -893,7 +893,7 @@ export interface LocalRecord {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.types.ts#L18)
 
 ### LocalWorkerCommand (type alias)
 
@@ -924,7 +924,7 @@ type LocalWorkerCommand =
   | { readonly type: "flush" | "close" };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.types.ts#L31)
 
 ### LocalWorkerResponse (interface)
 
@@ -942,7 +942,7 @@ export interface LocalWorkerResponse {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.types.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.types.ts#L53)
 
 ### StoredLocalRecord (type alias)
 
@@ -957,7 +957,7 @@ type StoredLocalRecord = ObservabilityRecord & {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.types.ts#L25)
 
 ## `worker-client-error.ts`
 
@@ -983,7 +983,7 @@ Effect.runPromise(
 declare class LocalWorkerError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/worker-client-error.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/worker-client-error.ts#L13)
 
 ### WorkerTransportError (class)
 
@@ -998,7 +998,7 @@ declare class WorkerTransportError { constructor(
   ) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/worker-client-error.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/worker-client-error.ts#L25)
 
 ### workerFailure
 
@@ -1013,7 +1013,7 @@ declare const workerFailure: <Failure>(
 ) => LocalWorkerError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/worker-client-error.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/worker-client-error.ts#L35)
 
 ## `worker-client.types.ts`
 
@@ -1045,4 +1045,4 @@ export interface LocalWorkerEffects {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/worker-client.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/worker-client.types.ts#L14)

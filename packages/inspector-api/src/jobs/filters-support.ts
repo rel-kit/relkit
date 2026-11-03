@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { canonicalJson, type JsonValue } from "@relkit/contracts";
-import type { JobRunStatus } from "@relkit/contracts/jobs";
+import { canonicalJson, type JsonValue } from "relkit/contracts";
+import type { JobRunStatus } from "relkit/contracts/jobs";
 import { InspectorJobsError } from "./types.js";
 import type { InspectorCursor, InspectorRunFilters } from "./filters.js";
 

@@ -3,7 +3,7 @@
  */
 import { expect, test } from "bun:test";
 import { Database } from "bun:sqlite";
-import { defineRoute } from "@relkit/routes";
+import { defineRoute } from "relkit/routes";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { activateDrizzleService, defineDrizzleService } from "@relkit/drizzle";
 import {

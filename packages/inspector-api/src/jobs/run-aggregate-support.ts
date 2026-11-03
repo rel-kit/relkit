@@ -6,8 +6,8 @@ import type {
   Candidate,
 } from "./run-aggregate-support.types.js";
 export type { Checkpoint, AggregatePosition, Candidate } from "./run-aggregate-support.types.js";
-import type { JsonValue } from "@relkit/contracts";
-import type { RunSnapshot } from "@relkit/contracts/jobs";
+import type { JsonValue } from "relkit/contracts";
+import type { RunSnapshot } from "relkit/contracts/jobs";
 import type { NativeRunPage } from "./native.types.js";
 import { queryFilters, type InspectorCursor, type InspectorRunFilters } from "./filters.js";
 import { InspectorJobsError, type InspectorJobsBinding } from "./types.js";

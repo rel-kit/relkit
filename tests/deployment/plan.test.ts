@@ -6,9 +6,9 @@ import {
   diffDeploymentPlans,
   fromGraph,
   type DeploymentPlan,
-} from "../../packages/deploy/src/index.ts";
+} from "relkit/deploy";
 import { renderPulumiProgram } from "../../packages/deploy-pulumi/src/program.ts";
-import type { ApplicationGraph, GraphNode } from "../../packages/graph/src/index.ts";
+import type { ApplicationGraph, GraphNode } from "relkit/graph";
 
 const fixtureRoot = join(import.meta.dir, "..", "compiler", "fixtures");
 const goldenRoot = join(import.meta.dir, "golden");

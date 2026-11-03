@@ -1,5 +1,5 @@
 /** Coalesces UI invalidations without retaining another copy of committed records. */
-import type { ObservabilityRecord, ObservabilityStreamEventType } from "@relkit/observability";
+import type { ObservabilityRecord, ObservabilityStreamEventType } from "relkit/observability";
 
 /** Uses existing event names so current graph/history/job views refresh after commits. */
 export function collectionChange(record: ObservabilityRecord): ObservabilityStreamEventType {

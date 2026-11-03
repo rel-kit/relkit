@@ -22,9 +22,9 @@ test("Docker Jobs starters include the local orchestrator and documented config"
         await readFile(join(generated.destination, "package.json"), "utf8"),
       );
       expect(manifest.dependencies).toMatchObject({
-        "@relkit/docker": manifest.dependencies["@relkit/app"],
-        "@relkit/local": manifest.dependencies["@relkit/app"],
-        [`@relkit/${provider}`]: manifest.dependencies["@relkit/app"],
+        "@relkit/docker": manifest.dependencies["relkit"],
+        "@relkit/local": manifest.dependencies["relkit"],
+        [`@relkit/${provider}`]: manifest.dependencies["relkit"],
       });
       const config = await readFile(join(generated.destination, "relkit.config.ts"), "utf8");
       const example = resolve(

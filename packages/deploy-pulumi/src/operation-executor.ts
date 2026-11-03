@@ -3,7 +3,7 @@ import type {
   DeploymentInput,
   DeploymentProgramMaterialization,
   DeploymentResourceOperation,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 import * as pulumi from "@pulumi/pulumi";
 
 /** @experimental */

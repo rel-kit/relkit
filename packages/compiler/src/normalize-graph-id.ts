@@ -1,4 +1,4 @@
-import { graphId, isTaskBackedJob } from "@relkit/graph";
+import { graphId, isTaskBackedJob } from "relkit/graph";
 import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 import { refId, refKind } from "./normalize-utils.js";
 

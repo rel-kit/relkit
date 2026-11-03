@@ -1,6 +1,6 @@
 /** Creates isolated native deepagent bucket backend fixtures; each caller owns the returned model, state and provider observations. */
 
-import { createBucketClient, type BucketProvider, type BucketPutOptions } from "@relkit/buckets";
+import { createBucketClient, type BucketProvider, type BucketPutOptions } from "relkit/buckets";
 import { createDeepAgentBucketBackend } from "../src/deepagent-bucket-backend.ts";
 
 export interface StoredObject {

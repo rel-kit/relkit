@@ -1,7 +1,7 @@
 import { Clock, Context, Effect, Layer } from "effect";
-import { canonicalJson, type PendingOperationMetadata } from "@relkit/contracts";
-import { createOperationId } from "@relkit/realtime/operation-id";
-import { observeExecution } from "@relkit/contracts/operation";
+import { canonicalJson, type PendingOperationMetadata } from "relkit/contracts";
+import { createOperationId } from "relkit/realtime/operation-id";
+import { observeExecution } from "relkit/contracts/operation";
 import { nativeCall } from "../native-stream.js";
 import {
   PENDING_PREFIX,

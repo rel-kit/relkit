@@ -9,7 +9,7 @@ import {
   withSignalEffect,
 } from "../src/signal.js";
 import { defineAgent } from "../src/define-agent.js";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 
 const options = {
   agent: defineAgent({

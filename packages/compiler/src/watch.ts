@@ -1,4 +1,4 @@
-import { SourceLocationError } from "@relkit/contracts";
+import { SourceLocationError } from "relkit/contracts";
 import { Effect } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
@@ -9,7 +9,7 @@ export type {
   WatchDependencyIndex,
   WatchInvalidation,
 } from "./watch.types.js";
-import { normalizeSourcePath } from "@relkit/contracts";
+import { normalizeSourcePath } from "relkit/contracts";
 import type { NormalizedDescriptor } from "./normalize-types.js";
 
 export const WATCH_ARTIFACTS = Object.freeze([

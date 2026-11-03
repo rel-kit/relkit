@@ -1,6 +1,6 @@
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { runInspectorPromise as runExecutionPromise } from "../native-edge.js";
 import { aggregateRunsEffect } from "./run-aggregate.js";
 import { inspectorNativeJobsExecution } from "./native.service.js";

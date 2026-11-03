@@ -7,7 +7,7 @@ import {
   type DeploymentHostIntegration,
   type DeploymentIntegrationMetadata,
   type DeploymentPlan,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 import * as pulumi from "@pulumi/pulumi";
 import type { MockResourceArgs } from "@pulumi/pulumi/runtime/mocks";
 import {

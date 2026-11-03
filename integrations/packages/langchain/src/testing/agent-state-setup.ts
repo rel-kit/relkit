@@ -1,6 +1,6 @@
 /** Acquires one native test model and its trace, approval and cancellation state. */
 import { Effect, Ref } from "effect";
-import { SpanRuntime, spanSnapshot } from "@relkit/invocation";
+import { SpanRuntime, spanSnapshot } from "relkit/invocation";
 import { createIdSource, createFailures } from "@relkit/testing/internal/jobs-utils";
 import { createAgentApprovalState } from "./agent-approvals.js";
 import { createTestModel } from "./agents-model.js";

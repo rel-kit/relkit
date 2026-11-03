@@ -1,7 +1,7 @@
 /** Acquires the real receipt retry and event fixtures under one test-owned Effect scope. */
 import { Effect } from "effect";
-import { defineEvent, defineEventFunction } from "../../../packages/app/src/events.js";
-import { z } from "../../../packages/schema/src/index.js";
+import { defineEvent, defineEventFunction } from "../../../packages/relkit/src/app/events.js";
+import { z } from "relkit/schema";
 import {
   createTestBucketFake,
   createTestEvent,

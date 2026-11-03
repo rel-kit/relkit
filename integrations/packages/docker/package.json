@@ -48,7 +48,6 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@relkit/local-service": "workspace:*",
-    "@relkit/provider": "workspace:*"
+    "relkit": "workspace:*"
   }
 }

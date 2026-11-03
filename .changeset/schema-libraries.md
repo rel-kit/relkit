@@ -1,17 +1,6 @@
 ---
-"@relkit/schema": patch
-"@relkit/contracts": patch
+"relkit": patch
 "@relkit/compiler": patch
-"@relkit/functions": patch
-"@relkit/services": patch
-"@relkit/events": patch
-"@relkit/jobs": patch
-"@relkit/cache": patch
-"@relkit/realtime": patch
-"@relkit/routes": patch
-"@relkit/runtime-hono": patch
-"@relkit/tools": patch
-"@relkit/agents": patch
 "@relkit/testing": patch
 "@relkit/langchain": patch
 "@relkit/cli": patch

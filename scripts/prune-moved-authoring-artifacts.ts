@@ -9,7 +9,7 @@ import { movedModules as creator } from "./moved-artifacts/creator.js";
 import { movedModules as catalog } from "./moved-artifacts/catalog.js";
 
 const owners = {
-  agents: { root: "packages/agents", modules: agents },
+  agents: { root: "packages/relkit", modules: agents },
   testing: { root: "packages/testing", modules: testing },
   creator: { root: "packages/create-relkit", modules: creator },
   catalog: { root: "integrations/catalog", modules: catalog },

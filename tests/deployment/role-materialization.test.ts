@@ -5,8 +5,8 @@ import type {
   ConnectedBindingPlan,
   DeploymentPlan,
   InfrastructureOperationPlan,
-} from "../../packages/deploy/src/index.ts";
-import { diffDeploymentPlans } from "../../packages/deploy/src/diff.ts";
+} from "relkit/deploy";
+import { diffDeploymentPlans } from "../../packages/relkit/src/deploy/diff.ts";
 import { materializeDeploymentOperations } from "../../packages/deploy-pulumi/src/materialization.ts";
 import { materializePulumiDeployment } from "../../packages/deploy-pulumi/src/program.ts";
 import { awsAccess } from "../../integrations/packages/aws/src/access/index.ts";

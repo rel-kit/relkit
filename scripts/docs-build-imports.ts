@@ -18,7 +18,7 @@ export function isDocumentationBuildImport(source: string, target: string): bool
     return target === "scripts/workspace-packages.js";
   if (source === "apps/docs/scripts/maturity-table.ts") return target === "scripts/maturity.js";
   if (source === "apps/docs/scripts/installation-catalog.ts")
-    return target === "packages/runtime-hono/src/selected-transports.js";
+    return target === "packages/relkit/src/runtime-hono/selected-transports.js";
   const consumer =
     source === "apps/docs/scripts/check-installation-workflows.ts" ||
     /^apps\/docs\/scripts\/installation-workflow-[a-z-]+\.ts$/.test(source);

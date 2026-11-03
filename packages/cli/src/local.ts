@@ -6,7 +6,7 @@
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Effect, Schema, type Context } from "effect";
-import { runExecutionPromiseWith } from "@relkit/contracts/operation";
+import { runExecutionPromiseWith } from "relkit/contracts/operation";
 import {
   applyScaffoldPlan,
   generateProject,

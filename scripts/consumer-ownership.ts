@@ -6,7 +6,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { Effect, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { workspacePackageDirectories } from "./workspace-packages.js";
 import { resolveCatalogVersion } from "./catalog-manifest.js";
 import { inspectionNative } from "./consumer-installation-native.js";

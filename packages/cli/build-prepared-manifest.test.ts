@@ -3,13 +3,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { describe, expect, it } from "vitest";
-import { GRAPH_VERSION } from "@relkit/contracts";
-import type { ApplicationGraph } from "@relkit/graph";
+import { GRAPH_VERSION } from "relkit/contracts";
+import type { ApplicationGraph } from "relkit/graph";
 import { preparedRuntimeManifest } from "./src/commands/build-prepared-manifest.js";
 import { rebaseManifest } from "./src/commands/build-support.js";
 
 const source = `import runtimeActivationFingerprint from "./runtime-activation.json" with { type: "json" };
-import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/app/internal/runtime";
+import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "relkit/internal/runtime";
 import * as __relkit_module_0 from "../../relkit.config.ts";
 import * as __relkit_module_1 from "../../src/hello/functions/hello.function.ts";
 import * as __relkit_module_2 from "../../src/hello/service.ts";
@@ -79,7 +79,7 @@ describe("preparedRuntimeManifest", () => {
     expect(rebased).toContain(
       'import("..\\u002F..\\u002F..\\u002Fsrc\\u002Fhello\\u002Ffunctions\\u002Fhello.function.ts")',
     );
-    expect(rebased).toContain('from "@relkit/app/internal/runtime"');
+    expect(rebased).toContain('from "relkit/internal/runtime"');
   });
 
   it("partitions HTTP-only executable modules behind one single-flight loader", () => {

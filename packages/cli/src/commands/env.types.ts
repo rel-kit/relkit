@@ -1,4 +1,4 @@
-import type { EnvDefinition, EnvShape, EnvSource, EnvIssue } from "@relkit/config";
+import type { EnvDefinition, EnvShape, EnvSource, EnvIssue } from "relkit/config";
 
 /** Secret-free status of one declared environment field. */
 export type EnvStatus = "set" | "default" | "optional" | "missing" | "invalid";

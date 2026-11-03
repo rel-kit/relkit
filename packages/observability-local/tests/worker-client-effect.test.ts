@@ -3,11 +3,11 @@ import { ChildProcess, fork } from "node:child_process";
 import { EventEmitter } from "node:events";
 import { Effect, Fiber, Layer } from "effect";
 import { beforeEach, expect, test, vi } from "vitest";
-import { LocalWorkerError } from "@relkit/observability/local/worker-contract";
+import { LocalWorkerError } from "relkit/observability/local/worker-contract";
 import { startLocalWorkerEffect } from "../src/local/worker-client-effect.js";
 import { LocalWorkerService, localWorkerLayer } from "../src/local/worker-client-service.js";
 import { startLocalWorker } from "../src/local/worker-client.js";
-import { ObservabilityQueryError } from "@relkit/observability";
+import { ObservabilityQueryError } from "relkit/observability";
 
 vi.mock("node:child_process", async (importOriginal) => ({
   ...(await importOriginal<typeof import("node:child_process")>()),

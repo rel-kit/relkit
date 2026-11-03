@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { Effect, Layer, Schema } from "effect";
-import { canonicalJson } from "@relkit/contracts";
-import { createDiagnostic, type Diagnostic } from "@relkit/diagnostics";
+import { canonicalJson } from "relkit/contracts";
+import { createDiagnostic, type Diagnostic } from "relkit/diagnostics";
 import { GENERATED_ARTIFACT_FILES, JobsManifestSchema, type JobsManifest } from "@relkit/compiler";
 import { cliOriginalError } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";

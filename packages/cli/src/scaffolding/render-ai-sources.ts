@@ -65,7 +65,7 @@ export function agentSource(
 ): string {
   const imports = [
     `import { defineAgent } from "@relkit/langchain";`,
-    `import { z } from "@relkit/app/schema";`,
+    `import { z } from "relkit/schema";`,
     ...(model === undefined ? [`import { FakeToolCallingModel } from "langchain";`] : []),
     ...tools.map((tool) => sourceImport(tool.binding, tool.module, tool.exportKind)),
     ...(instructions.binding && instructions.module

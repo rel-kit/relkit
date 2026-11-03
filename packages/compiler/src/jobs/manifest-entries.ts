@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { runJobsSync } from "./compatibility.js";
 import { taskReferenceIdEffect } from "./reference.js";
 import type { ServiceGeneration } from "./manifest.types.js";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { providerMaps } from "../normalize-graph-app.js";
 import { clean } from "../normalize-graph-utils.js";
 import type { NormalizedDescriptor, NormalizationWork } from "../normalize-types.js";

@@ -1,7 +1,7 @@
 /** Proves cached checks and prepared receipts reject absent or stale layout interpretation identity. */
 import { expect, it } from "@effect/vitest";
 import { Effect, Schema } from "effect";
-import { APPLICATION_LAYOUT_VERSION } from "@relkit/contracts";
+import { APPLICATION_LAYOUT_VERSION } from "relkit/contracts";
 import { SnapshotTools } from "../../src/dev-snapshot/snapshot.schemas.js";
 import { tools } from "./validation-fixture.js";
 

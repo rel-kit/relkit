@@ -1,4 +1,4 @@
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { jobBindings } from "./services.js";
 import { InspectorJobsError, type InspectorJobsBinding } from "./types.js";
 import { isRecord, safeJson, type ResolvedActiveGeneration } from "../shared.js";

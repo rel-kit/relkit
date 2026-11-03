@@ -1,4 +1,4 @@
-import type { RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunSnapshot, RunWatchFrame } from "relkit/contracts/jobs";
 import { JobWatchAbortedError } from "./types.js";
 import type { Procedure } from "./reconcile.types.js";
 

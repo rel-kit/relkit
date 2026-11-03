@@ -1,4 +1,4 @@
-import type { RuntimeProviderContext, RuntimeProviderIntegration } from "@relkit/provider";
+import type { RuntimeProviderContext, RuntimeProviderIntegration } from "relkit/provider";
 import { createCloudflareKvCacheProvider } from "./kv.js";
 import { createCloudflareR2BucketProvider } from "./r2.js";
 

@@ -1,6 +1,6 @@
 import { Effect, Layer, ManagedRuntime, Metric } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { runExecutionSync } from "relkit/contracts/operation";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
 import { createActivationLayer, SupervisorActivation } from "./activation.js";
 import { ActivationTransitionError } from "./state-machine.schemas.js";
 import type { ActivationService } from "./activation.types.js";

@@ -2,7 +2,7 @@
 
 import { createHash } from "node:crypto";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/internal/agent-telemetry";
 import { createDeepAgentBucketBackendEffect } from "./deepagent-bucket-backend.js";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
 import type { DeepAgentBucketClient } from "./deepagent-bucket-files.js";

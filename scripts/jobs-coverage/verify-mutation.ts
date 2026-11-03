@@ -3,7 +3,7 @@ import type { MutationReport, MutationTarget } from "./verify-mutation.types.js"
 const categories = [
   {
     name: "tenant checks",
-    targets: [{ file: "packages/jobs/src/authorization-grant.ts", start: 26, end: 37 }],
+    targets: [{ file: "packages/relkit/src/jobs/authorization-grant.ts", start: 26, end: 37 }],
   },
   {
     name: "abort cleanup",
@@ -22,15 +22,15 @@ const categories = [
   },
   {
     name: "memory conversion",
-    targets: [{ file: "packages/jobs/src/task-policy-value.ts", start: 74, end: 88 }],
+    targets: [{ file: "packages/relkit/src/jobs/task-policy-value.ts", start: 74, end: 88 }],
   },
   {
     name: "retry-budget multiplication",
-    targets: [{ file: "packages/jobs/src/task-policy-value.ts", start: 113, end: 116 }],
+    targets: [{ file: "packages/relkit/src/jobs/task-policy-value.ts", start: 113, end: 116 }],
   },
   {
     name: "duration conversion",
-    targets: [{ file: "packages/jobs/src/duration.ts", start: 60, end: 88 }],
+    targets: [{ file: "packages/relkit/src/jobs/duration.ts", start: 60, end: 88 }],
   },
 ] satisfies readonly { readonly name: string; readonly targets: readonly MutationTarget[] }[];
 

@@ -4,9 +4,9 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { startLocalWorker } from "../src/local/worker-client";
-import { createLocalBatchQueue } from "@relkit/observability/local";
-import type { LocalRecord, StoredLocalRecord } from "@relkit/observability/local/record";
-import type { ObservabilityQueryPage } from "@relkit/observability";
+import { createLocalBatchQueue } from "relkit/observability/local";
+import type { LocalRecord, StoredLocalRecord } from "relkit/observability/local/record";
+import type { ObservabilityQueryPage } from "relkit/observability";
 
 const item = (
   key: string,

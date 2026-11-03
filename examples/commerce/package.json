@@ -12,7 +12,6 @@
     "build": "bun ../../packages/cli/dist/bin.js build"
   },
   "dependencies": {
-    "@scalar/hono-api-reference": "0.12.9",
     "@langchain/core": "catalog:",
     "@langchain/langgraph": "catalog:",
     "@relkit/app": "workspace:*",
@@ -29,18 +28,20 @@
     "@relkit/redis": "workspace:*",
     "@relkit/s3": "workspace:*",
     "@relkit/sentry": "workspace:*",
+    "@scalar/hono-api-reference": "0.12.9",
     "better-auth": "catalog:",
     "deepagents": "catalog:",
     "drizzle-orm": "catalog:",
     "langchain": "catalog:",
     "langsmith": "0.10.8",
+    "relkit": "workspace:*",
     "zod": "4.6.7"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20250121.0",
-    "@types/bun": "catalog:",
     "@relkit/cli": "workspace:*",
     "@relkit/testing": "workspace:*",
+    "@types/bun": "catalog:",
     "typescript": "catalog:"
   },
   "overrides": {

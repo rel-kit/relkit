@@ -2,7 +2,7 @@
 
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { Effect, Exit } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GenerateProjectError } from "./generate-types.js";
 import { GeneratorFileSystem } from "./generator-filesystem.js";
 import { domainError } from "./generator-errors.js";

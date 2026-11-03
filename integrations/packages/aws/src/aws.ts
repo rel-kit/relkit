@@ -5,7 +5,7 @@ import {
   type InfrastructureProviderSource,
   type ProviderAdapter,
   type ProviderCapability,
-} from "@relkit/provider";
+} from "relkit/provider";
 
 type S3Adapter = ProviderAdapter<ProviderCapability<"bucket">, "s3">;
 type RedisAdapter = ProviderAdapter<ProviderCapability<"cache">, "redis">;

@@ -10,7 +10,7 @@ import { scaffoldServiceBoundary } from "./scaffold-layout.js";
 import { domainError, domainTry } from "create-relkit/internal/generator-errors";
 import type { RenderedDatabase } from "./render-database.types.js";
 export type { RenderedDatabase } from "./render-database.types.js";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import {
   scaffoldErrors,

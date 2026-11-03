@@ -8,7 +8,7 @@ import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { Context, Effect, Layer, Ref, Schema } from "effect";
 import { mapErrorCause } from "../services/map-error-cause.js";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { DevSnapshotIoError, DevSnapshotRejected } from "./snapshot-error.js";
 import { SnapshotPath } from "./snapshot.schemas.js";
 import { ownedNativePromise } from "../services/owned-promise.js";

@@ -15,14 +15,14 @@ export function serverApplicationSource(input: ServerSourceEmission): string {
   const { agentSource } = input;
   return `const jobsRuntimeModule = (plan.jobs ?? []).length === 0
   ? undefined
-  : await import("@relkit/jobs");
+  : await import("relkit/jobs");
 const createJobsControls = jobsRuntimeModule?.createJobsControls;
 const createJobsRuntime = jobsRuntimeModule?.createJobsRuntime;
 const reconcileNativeSchedules = jobsRuntimeModule?.reconcileNativeSchedules;
 const runInJobsRuntime = jobsRuntimeModule?.runInJobsRuntime;
 const realtimeRuntimeModule = (plan.channels ?? []).length === 0
   ? undefined
-  : await import("@relkit/realtime");
+  : await import("relkit/realtime");
 const createProviderRealtimeDispatcher = realtimeRuntimeModule?.createProviderRealtimeDispatcher;
 const setActiveRealtimeDispatcher = realtimeRuntimeModule?.setActiveRealtimeDispatcher;
 const executableManifest = {

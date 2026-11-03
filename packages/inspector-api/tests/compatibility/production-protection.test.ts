@@ -1,8 +1,8 @@
 import type { ErrorResponse } from "../fixtures/json.types.ts";
 import { responseJson } from "../fixtures/json.ts";
 import { describe, expect, test } from "bun:test";
-import { API_BASE_PATH } from "@relkit/contracts";
-import { createObservabilityStream, type ObservabilityQuery } from "@relkit/observability";
+import { API_BASE_PATH } from "relkit/contracts";
+import { createObservabilityStream, type ObservabilityQuery } from "relkit/observability";
 import { Hono } from "hono";
 import {
   installInspectorEndpoints,

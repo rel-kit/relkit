@@ -9,7 +9,7 @@ import {
   canonicalJson,
   RUNTIME_ACTIVATION_FILE,
   RUNTIME_INTEGRATION_PLAN_FILE,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import { GENERATED_ARTIFACT_FILES } from "@relkit/compiler";
 import { cliOriginalError, cliTry, type CliAdapterError } from "../cli-errors.js";
 import { CliFileSystem } from "../services/filesystem.service.js";

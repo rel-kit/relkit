@@ -39,7 +39,7 @@ async function generatedProject(root: string, inspected: boolean) {
   );
   // Templates write contracts with Zod 4; borrow the workspace's installed copy.
   await symlink(
-    join(repository, "packages/schema/node_modules/zod"),
+    join(repository, "packages/relkit/node_modules/zod"),
     join(projectRoot, "node_modules/zod"),
     "dir",
   );
@@ -47,7 +47,7 @@ async function generatedProject(root: string, inspected: boolean) {
     if (name !== "create-relkit")
       await symlink(
         join(repository, "packages", name),
-        join(projectRoot, "node_modules/@relkit", name),
+        join(projectRoot, "node_modules", name === "relkit" ? name : `@relkit/${name}`),
         "dir",
       );
   }

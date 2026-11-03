@@ -9,8 +9,8 @@ import {
   type JobContract,
   type JobProcedureSelector,
 } from "@relkit/client/react";
-import type { PendingOperationMetadata } from "@relkit/contracts";
-import type { RunHandle } from "@relkit/contracts/jobs";
+import type { PendingOperationMetadata } from "relkit/contracts";
+import type { RunHandle } from "relkit/contracts/jobs";
 import type { JobRegistry } from "@relkit/client/jobs";
 
 declare module "@relkit/client/jobs" {
@@ -33,7 +33,7 @@ declare module "@relkit/client/react" {
   interface ClientRegistry {
     readonly "jobs.exportOrders.trigger": {
       readonly input: { readonly input: { readonly orderId: string } };
-      readonly output: import("@relkit/contracts/jobs").RunHandle;
+      readonly output: import("relkit/contracts/jobs").RunHandle;
       readonly error: Error;
       readonly operation: "mutation";
       readonly stream: false;
@@ -53,8 +53,8 @@ declare module "@relkit/client/react" {
     };
     readonly "jobs.exportOrders.runs.watch": {
       readonly input: { readonly runId: string };
-      readonly output: AsyncIterable<import("@relkit/contracts/jobs").RunWatchFrame>;
-      readonly item: import("@relkit/contracts/jobs").RunWatchFrame;
+      readonly output: AsyncIterable<import("relkit/contracts/jobs").RunWatchFrame>;
+      readonly item: import("relkit/contracts/jobs").RunWatchFrame;
       readonly error: Error;
       readonly operation: "query";
       readonly stream: true;

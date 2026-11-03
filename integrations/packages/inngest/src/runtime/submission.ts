@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
-import type { NativeSubmission, NativeReceipt, OperationContext } from "@relkit/jobs/adapter";
-import type { JobUnknownOutcome } from "@relkit/contracts/jobs";
+import type { NativeSubmission, NativeReceipt, OperationContext } from "relkit/jobs/adapter";
+import type { JobUnknownOutcome } from "relkit/contracts/jobs";
 import type { Inngest } from "inngest";
 import { eventIdFrom, eventNameFor } from "./support.js";
 import { rememberInngestRecord, type InngestRunMetadata } from "./runs.js";

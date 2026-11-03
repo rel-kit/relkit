@@ -9,7 +9,7 @@ import {
   type LocalServiceMaterializerRuntime,
   type LocalServicePlan,
   type CompositeLocalServiceRecipe,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import { createLocalProjectIdentity, createLocalServiceReconciler } from "./src/runtime/index.ts";
 
 const graphHash = "sha256:" + "1".repeat(64);

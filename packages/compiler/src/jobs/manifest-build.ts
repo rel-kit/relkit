@@ -6,8 +6,8 @@ import {
   JOBS_MANIFEST_PROTOCOL,
   JOBS_MANIFEST_VERSION,
   JOBS_PROTOCOL_VERSION,
-} from "@relkit/contracts/jobs";
-import { sortDiagnostics, type Diagnostic } from "@relkit/diagnostics";
+} from "relkit/contracts/jobs";
+import { sortDiagnostics, type Diagnostic } from "relkit/diagnostics";
 
 import { publicFingerprintEffect } from "./build-id.js";
 import {

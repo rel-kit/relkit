@@ -6,7 +6,7 @@
 import { closeSync, constants, openSync } from "node:fs";
 import { join } from "node:path";
 import { Effect, Schema } from "effect";
-import { ExecutionSuccessLogs, observeExecution } from "@relkit/contracts/operation";
+import { ExecutionSuccessLogs, observeExecution } from "relkit/contracts/operation";
 import { DevSnapshotIoError, DevSnapshotRejected } from "./snapshot-error.js";
 import { SnapshotPath } from "./snapshot.schemas.js";
 import { readSnapshotFileBytes, snapshotReadRoot } from "./snapshot-file-bytes.js";

@@ -129,7 +129,12 @@ export const scanSourceNode = Effect.fn("Discovery.scanSourceNode")(function* (
  * @returns No value.
  */
 function addImport(state: SourceScanState, specifier: string): void {
-  if (!specifier.startsWith("@relkit/")) return;
+  if (
+    specifier !== "relkit" &&
+    !specifier.startsWith("relkit/") &&
+    !specifier.startsWith("@relkit/")
+  )
+    return;
   state.imports.add(specifier);
   state.indicators.add("relkit-import");
 }

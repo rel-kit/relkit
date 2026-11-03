@@ -2,8 +2,8 @@
 
 import type { StateDefinitionInit } from "@langchain/langgraph";
 import type { ClientTool, ServerTool } from "@langchain/core/tools";
-import type { MaybePromise } from "@relkit/contracts";
-import type { ToolRefAny } from "@relkit/tools";
+import type { MaybePromise } from "relkit/contracts";
+import type { ToolRefAny } from "relkit/tools";
 import type { AgentMiddleware as NativeAgentMiddleware, InferSchemaValue } from "langchain";
 
 /** Native model object accepted by an agent descriptor. */

@@ -1,6 +1,6 @@
 /** Composes auth over a borrowed database without taking a second disposal authority. */
 import { generateBetterAuthOpenApi } from "@relkit/better-auth/drizzle";
-import { createHttpAuthRuntime } from "@relkit/runtime-hono";
+import { createHttpAuthRuntime } from "relkit/runtime-hono";
 import { Effect } from "effect";
 import type { TestRawRoute, TestRoute } from "./application-routes.js";
 import type {

@@ -1,12 +1,12 @@
 import type { SchedulePosition } from "./schedules.types.js";
 export type { ScheduleCheckpoint, SchedulePosition } from "./schedules.types.js";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { runInspectorPromise as runExecutionPromise } from "../native-edge.js";
 import { inspectorNativeJobsExecution as inspectorExecution } from "./native.service.js";
 import { nativeAttempt, projectionAttempt } from "../native-edge.js";
 import { InspectorNativeJobs } from "./native.service.js";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { decodeCursor, encodeCursor } from "./filters.js";
 import { authorizeJobs, jobBindings, operationContext } from "./services.js";
 import { InspectorJobsError } from "./types.js";

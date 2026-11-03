@@ -744,7 +744,7 @@ Acquires the controller factory once without opening native requests.
 
 ```ts
 import { Layer, ManagedRuntime } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionSync } from "relkit/contracts/operation";
 import { JobControllers, JobControllersLive } from "./controller.service.js";
 import { JobFeedRegistryLive } from "./feed-registry.service.js";
 export async function observeJob(client: unknown): Promise<void> {
@@ -924,7 +924,7 @@ Provides reference-counted feed sharing within complete security/protocol keys.
 
 ```ts
 import { Effect, ManagedRuntime } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionSync } from "relkit/contracts/operation";
 import { JobFeedRegistry, JobFeedRegistryLive } from "./feed-registry.service.js";
 export async function borrowJobFeed(client: unknown): Promise<void> {
   const owner = ManagedRuntime.make(JobFeedRegistryLive);
@@ -4079,7 +4079,7 @@ Browser progress projection with its canonical run or tool scope.
 **Signature**
 
 ```ts
-type AgentProgress = AgentProgressBase & import("@relkit/contracts").AgentProgressScope;
+type AgentProgress = AgentProgressBase & import("relkit/contracts").AgentProgressScope;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-hook-types.types.ts#L81)
@@ -7359,7 +7359,7 @@ Acquires one synchronous registry with scoped, lazy native workers.
 
 ```ts
 import { ManagedRuntime } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionSync } from "relkit/contracts/operation";
 import { RealtimeSessions, realtimeSessionsLayer } from "./realtime-session.service.js";
 export async function realtimeOwner(): Promise<void> {
   const owner = ManagedRuntime.make(realtimeSessionsLayer({}));
@@ -8400,7 +8400,7 @@ Acquires one link owner with a lazy, shared transport-selection decision.
 
 ```ts
 import { Effect, ManagedRuntime } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionSync } from "relkit/contracts/operation";
 import { ClientTransport, clientTransportLayer } from "./transport.service.js";
 export async function transportOwner(): Promise<void> {
   const owner = ManagedRuntime.make(clientTransportLayer(Effect.succeed({ call: async () => 1 })));

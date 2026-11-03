@@ -62,9 +62,6 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@relkit/buckets": "workspace:*",
-    "@relkit/cache": "workspace:*",
-    "@relkit/contracts": "workspace:*",
-    "@relkit/provider": "workspace:*"
+    "relkit": "workspace:*"
   }
 }

@@ -1,4 +1,4 @@
-import type { NativeSubmission } from "@relkit/jobs/adapter";
+import type { NativeSubmission } from "relkit/jobs/adapter";
 
 /** @experimental */
 export function triggerTaskIdentifier(

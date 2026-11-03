@@ -1,7 +1,7 @@
 import { resolve } from "node:path";
 import { Effect, Layer, Schema } from "effect";
-import { isStableId, type RuntimeIntegrationPlan } from "@relkit/contracts";
-import type { LocalServiceRecipeInput } from "@relkit/local-service";
+import { isStableId, type RuntimeIntegrationPlan } from "relkit/contracts";
+import type { LocalServiceRecipeInput } from "relkit/local-service";
 import { cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliProject, projectLiveLayer } from "../services/project.service.js";

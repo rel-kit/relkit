@@ -1,4 +1,4 @@
-import type { ChannelCheckpoint, PresenceSnapshot } from "@relkit/realtime";
+import type { ChannelCheckpoint, PresenceSnapshot } from "relkit/realtime";
 import type { Effect, Fiber } from "effect";
 
 /** Existing realtime external-store states. */

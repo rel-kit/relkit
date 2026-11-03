@@ -1,7 +1,7 @@
 /** Adapts the native descriptor ABI at this acceptance boundary without cloning its identity or parsing HTTP input early. */
-import { invokeFunction } from "../../../packages/runtime-hono/node_modules/@relkit/engine/dist/index.js";
+import { invokeFunction } from "relkit/engine";
 import type { StandaloneFunctionTarget } from "../../../packages/testing/src/index.ts";
-import type { HttpInvocationOptions } from "../../../packages/runtime-hono/src/index.ts";
+import type { HttpInvocationOptions } from "relkit/runtime-hono";
 
 /**
  * Passes the original descriptor through the existing engine's dynamic ABI.

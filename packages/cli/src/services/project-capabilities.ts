@@ -8,7 +8,7 @@ import { cleanupLayer } from "./cleanup.service.js";
 import {
   DependencySourceLive,
   SelectedDependenciesLive,
-} from "@relkit/provider/internal/dependencies";
+} from "relkit/provider/internal/dependencies";
 
 /** Invocation-owned project execution graph; service workflows never build this Layer themselves. */
 export const projectCapabilitiesLayer = Layer.mergeAll(

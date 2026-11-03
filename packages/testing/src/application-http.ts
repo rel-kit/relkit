@@ -1,6 +1,6 @@
 import type { TestRoute } from "./application-routes.js";
-import { InvocationValidationError } from "@relkit/engine";
-import { normalizeFailure, toPublicEnvelope } from "@relkit/runtime-effect";
+import { InvocationValidationError } from "relkit/engine";
+import { normalizeFailure, toPublicEnvelope } from "relkit/runtime-effect";
 import type { TestRuntime } from "./runtime.js";
 /**
  * Dispatches a matched route through existing engine validation and error mapping.

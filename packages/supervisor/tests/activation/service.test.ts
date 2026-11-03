@@ -1,7 +1,7 @@
 import { expect, it } from "@effect/vitest";
 import { Effect, Exit, Layer, Metric } from "effect";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
-import type { LogRecord } from "@relkit/runtime-effect/logger";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
+import type { LogRecord } from "relkit/runtime-effect/logger";
 import { createActivationLayer, SupervisorActivation } from "../../src/activation.js";
 import { createSupervisorStateMachine } from "../../src/state-machine.js";
 

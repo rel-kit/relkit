@@ -1,11 +1,11 @@
 import { join } from "node:path";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import {
   GENERATED_ARTIFACT_FILES,
   type GeneratedOutputs,
   type LoadedToolingConfig,
 } from "@relkit/compiler";
-import { createDiagnostic, sortDiagnostics, type Diagnostic } from "@relkit/diagnostics";
+import { createDiagnostic, sortDiagnostics, type Diagnostic } from "relkit/diagnostics";
 import { Effect } from "effect";
 import { cliOriginalError } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";

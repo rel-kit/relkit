@@ -1,5 +1,5 @@
-import { API_VERSION, isRuntimeActivationFingerprint } from "@relkit/contracts";
-import { observeExecution } from "@relkit/contracts/operation";
+import { API_VERSION, isRuntimeActivationFingerprint } from "relkit/contracts";
+import { observeExecution } from "relkit/contracts/operation";
 import { Clock, Context, Effect, Exit, Layer } from "effect";
 import { verifyActivationFingerprint } from "./verification-fingerprint.js";
 import { validateVerification, rejectVerification } from "./verification-errors.js";

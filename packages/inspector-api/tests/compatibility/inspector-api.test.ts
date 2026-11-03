@@ -1,7 +1,7 @@
 import type { CollectionResponse } from "../fixtures/json.types.ts";
 import { responseJson } from "../fixtures/json.ts";
 import { describe, expect, test } from "bun:test";
-import { API_BASE_PATH } from "@relkit/contracts";
+import { API_BASE_PATH } from "relkit/contracts";
 import { Hono } from "hono";
 import { installInspectorEndpoints } from "../../src/index.ts";
 

@@ -1,5 +1,5 @@
-import type { JsonValue } from "@relkit/contracts";
-import type { NamedStreamFrame } from "@relkit/contracts/jobs";
+import type { JsonValue } from "relkit/contracts";
+import type { NamedStreamFrame } from "relkit/contracts/jobs";
 import type { Effect } from "effect";
 import type { JobStreamOptions } from "./stream.types.js";
 /** Named stream acquisition, continuity and memory-bound ownership. */

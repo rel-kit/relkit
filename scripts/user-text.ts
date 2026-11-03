@@ -186,12 +186,12 @@ function isMessageArgument(parent: ts.Node, child: ts.Node): boolean {
 
 /**
  * Checks the error-code catalog's titles, causes and next steps, read from its source files.
- * @param root - Repository root.
- * @returns Findings located in the catalog files.
+ * @param root - Repository root. @returns Findings located in the catalog files.
  */
 function catalogFindings(root: string): UserTextFinding[] {
   const findings: UserTextFinding[] = [];
-  for (const path of new Bun.Glob("packages/diagnostics/src/codes/*.ts").scanSync({ cwd: root })) {
+  const codes = "packages/relkit/src/diagnostics/codes/*.ts";
+  for (const path of new Bun.Glob(codes).scanSync({ cwd: root })) {
     const source = readFileSync(join(root, path), "utf8");
     const file = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true);
     const regions: Region[] = [];

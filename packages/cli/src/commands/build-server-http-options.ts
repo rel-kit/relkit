@@ -3,7 +3,7 @@
  * policy, optional transport dependencies and internal cohort proof stay in
  * canonical order; these pure fragments acquire no resources themselves.
  */
-import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "relkit/contracts";
 import type { ServerSourceConfiguration } from "./build-server.types.js";
 
 /** Emits the complete application configuration without evaluating declarations.

@@ -29,9 +29,9 @@ test("resolves the packed Hono Bun leaf in Node and imports it only in Bun", asy
 
 /** Uses the normal owner pack producer and only the real Hono dependency needed by its unchanged Bun leaf. */
 async function packedHonoLeaf(root: string) {
-  const owner = resolve(import.meta.dirname, "../../packages/runtime-hono");
+  const owner = resolve(import.meta.dirname, "../../packages/relkit");
   const fixture = join(root, "fixture");
-  const packed = join(fixture, "node_modules/@relkit/runtime-hono");
+  const packed = join(fixture, "node_modules/relkit");
   const archive = await Effect.runPromise(
     Effect.flatMap(ScaffoldProcess, (process) => packExportPackage(process.run, owner, root)).pipe(
       Effect.provide(scaffoldProcessLayer),
@@ -42,12 +42,15 @@ async function packedHonoLeaf(root: string) {
     recursive: true,
   });
   const manifest = await Effect.runPromise(readExportManifest(packed));
-  const target = manifest.exports?.["./bun"];
-  expect(target).toEqual({ types: "./dist/bun.d.ts", import: "./dist/bun.js" });
+  const target = manifest.exports?.["./runtime-hono/bun"];
+  expect(target).toEqual({
+    types: "./dist/runtime-hono/bun.d.ts",
+    import: "./dist/runtime-hono/bun.js",
+  });
   await mkdir(fixture, { recursive: true });
   await writeFile(
     join(fixture, "expected-exports.json"),
-    JSON.stringify({ "@relkit/runtime-hono": { "./bun": target } }),
+    JSON.stringify({ relkit: { "./runtime-hono/bun": target } }),
   );
   await cp(
     resolve(import.meta.dirname, "../../tests/exports/fixture/resolve.mjs"),

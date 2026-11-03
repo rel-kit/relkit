@@ -1,9 +1,9 @@
 /** Verifies docs endpoints, generated contracts and invocation attribution after grouped moves. */
 import { expect } from "bun:test";
 import { Effect } from "effect";
-import { API_REFERENCE_PATH, OPENAPI_PATH } from "../../../packages/runtime-hono/src/index.ts";
+import { API_REFERENCE_PATH, OPENAPI_PATH } from "relkit/runtime-hono";
 import { generateClient } from "../../../packages/client-generator/src/index.ts";
-import { generateOpenApiJson } from "../../../packages/openapi/src/index.ts";
+import { generateOpenApiJson } from "relkit/openapi";
 import type { CommerceHttpFixture } from "./commerce-http.types.ts";
 /**
  * Checks native OpenAPI/Scalar responses and exact generated public contracts.

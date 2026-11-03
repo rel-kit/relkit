@@ -35,14 +35,13 @@
   "dependencies": {
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node-shared": "catalog:",
-    "@relkit/contracts": "workspace:*",
     "@relkit/inspector-api": "workspace:*",
-    "@relkit/observability": "workspace:*",
     "@relkit/observability-local": "workspace:*",
     "effect": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "relkit": "workspace:*"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",

@@ -10,14 +10,15 @@ test("packed observability installs and starts its managed Node/native worker", 
   const root = await mkdtemp(join(tmpdir(), "relkit-native-package-"));
   try {
     const tarballs: Record<string, string> = {};
-    for (const name of ["contracts", "observability", "observability-local"]) {
+    for (const name of ["relkit", "observability-local"]) {
       const artifacts = join(root, name);
       await mkdir(artifacts);
       await run(
         ["bun", "pm", "pack", "--ignore-scripts", "--destination", artifacts, "--quiet"],
         resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", name),
       );
-      tarballs[`@relkit/${name}`] = `file:${join(artifacts, (await readdir(artifacts))[0]!)}`;
+      tarballs[name === "relkit" ? name : `@relkit/${name}`] =
+        `file:${join(artifacts, (await readdir(artifacts))[0]!)}`;
     }
     await writeFile(
       join(root, "package.json"),

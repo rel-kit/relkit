@@ -1,14 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { GRAPH_VERSION } from "../../packages/contracts/src/index.ts";
-import { defineApp } from "../../packages/app/src/define-app.ts";
-import { defineEnv } from "../../packages/config/src/index.ts";
-import { defineEvent, defineEventFunction } from "../../packages/events/src/index.ts";
-import { defineFunction } from "../../packages/functions/src/index.ts";
-import { defineJob as defineLegacyJob } from "../../packages/jobs/src/legacy.ts";
-import { defineJob, defineTask } from "../../packages/jobs/src/index.ts";
-import { defineRoute, http } from "../../packages/routes/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
-import { hashGraph as canonicalGraphHash } from "../../packages/graph/src/index.ts";
+import { GRAPH_VERSION } from "relkit/contracts";
+import { defineApp } from "../../packages/relkit/src/app/define-app.ts";
+import { defineEnv } from "relkit/config";
+import { defineEvent, defineEventFunction } from "relkit/events";
+import { defineFunction } from "relkit/functions";
+import { defineJob as defineLegacyJob } from "../../packages/relkit/src/jobs/legacy.ts";
+import { defineJob, defineTask } from "relkit/jobs";
+import { defineRoute, http } from "relkit/routes";
+import { z } from "relkit/schema";
+import { hashGraph as canonicalGraphHash } from "relkit/graph";
 import {
   NORMALIZE_CODES,
   VALIDATION_PASSES,

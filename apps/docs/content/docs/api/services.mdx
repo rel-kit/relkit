@@ -1,6 +1,6 @@
 ---
 title: Services API
-description: Generated public TypeScript reference for @relkit/services.
+description: Generated public TypeScript reference for relkit/services.
 search:
   exclude: true
 sidebar:
@@ -36,9 +36,9 @@ TypeError for malformed local input, or the original identity/ID error.
 **Example**
 
 ```ts
-import { defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
-import { defineService } from "@relkit/services";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
+import { defineService } from "relkit/services";
 const lookup = defineFunction({
   input: z.string(),
   output: z.string(),
@@ -53,7 +53,7 @@ const orders = defineService({ id: "orders", functions: { lookup } });
 declare const defineService: DefineService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.ts#L114)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/define-service.ts#L114)
 
 Since v0.1.0
 
@@ -109,7 +109,7 @@ declare const defineServiceEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/define-service.ts#L29)
 
 ## `define-service.types.ts`
 
@@ -143,7 +143,7 @@ export interface DefineService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L122)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/define-service.types.ts#L122)
 
 ### DefineServiceOptions (interface)
 
@@ -173,7 +173,7 @@ export interface DefineServiceOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/define-service.types.ts#L102)
 
 ### ServiceDescriptor (type alias)
 
@@ -200,7 +200,7 @@ type ServiceDescriptor<
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/define-service.types.ts#L47)
 
 ### ServiceDescriptorAny (type alias)
 
@@ -220,7 +220,7 @@ function inspect(service: ServiceDescriptorAny) {
 type ServiceDescriptorAny = DescriptorBase<"service", string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/define-service.types.ts#L61)
 
 ### ServiceEventMap (type alias)
 
@@ -238,7 +238,7 @@ type Events = ServiceEventMap;
 type ServiceEventMap = Readonly<Record<string, EventDescriptorAny>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/define-service.types.ts#L13)
 
 ### ServiceEvents (type alias)
 
@@ -260,7 +260,7 @@ type ServiceEvents<Service> = Service extends {
   : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/define-service.types.ts#L75)
 
 ### ServiceFunctionMap (type alias)
 
@@ -278,7 +278,7 @@ type Functions = ServiceFunctionMap;
 type ServiceFunctionMap = Readonly<Record<string, FunctionRefAny>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/define-service.types.ts#L9)
 
 ### ServiceFunctions (type alias)
 
@@ -300,7 +300,7 @@ type ServiceFunctions<Service> = Service extends {
   : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/define-service.types.ts#L66)
 
 ### ServiceJobMap (type alias)
 
@@ -318,7 +318,7 @@ type Jobs = ServiceJobMap;
 type ServiceJobMap = Readonly<Record<string, JobDescriptorAny>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/define-service.types.ts#L21)
 
 ### ServiceJobs (type alias)
 
@@ -340,7 +340,7 @@ type ServiceJobs<Service> = Service extends {
   : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/define-service.types.ts#L93)
 
 ### ServiceTaskMap (type alias)
 
@@ -358,7 +358,7 @@ type Tasks = ServiceTaskMap;
 type ServiceTaskMap = Readonly<Record<string, TaskDescriptorAny>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/define-service.types.ts#L17)
 
 ### ServiceTasks (type alias)
 
@@ -380,7 +380,7 @@ type ServiceTasks<Service> = Service extends {
   : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.types.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/define-service.types.ts#L84)
 
 ## `descriptor-guards.ts`
 
@@ -404,7 +404,7 @@ assertServiceDescriptor(candidate);
 declare const assertServiceDescriptor: (value: unknown) => asserts value is ServiceDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/descriptor-guards.ts#L67)
 
 ### assertServiceDescriptorEffect
 
@@ -424,7 +424,7 @@ declare const assertServiceDescriptorEffect: (
 ) => Effect.Effect<ServiceDescriptorAny, ServiceValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/descriptor-guards.ts#L49)
 
 ### freezeServiceDescriptor
 
@@ -446,7 +446,7 @@ freezeServiceDescriptor(service);
 declare const freezeServiceDescriptor: <T extends ServiceDescriptorAny>(value: T) => T;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/descriptor-guards.ts#L93)
 
 ### freezeServiceDescriptorEffect
 
@@ -466,7 +466,7 @@ declare const freezeServiceDescriptorEffect: <T extends ServiceDescriptorAny>(
 ) => Effect.Effect<T, ServiceValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/descriptor-guards.ts#L76)
 
 ### isServiceDescriptor
 
@@ -484,7 +484,7 @@ isServiceDescriptor(candidate);
 declare const isServiceDescriptor: (value: unknown) => value is ServiceDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/descriptor-guards.ts#L40)
 
 ### isServiceDescriptorEffect
 
@@ -502,7 +502,7 @@ Effect.runSync(isServiceDescriptorEffect(candidate));
 declare const isServiceDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/descriptor-guards.ts#L15)
 
 ### serviceMemberEntries
 
@@ -520,7 +520,7 @@ serviceMemberEntries(service);
 declare const serviceMemberEntries: (service: ServiceDescriptorAny) => [string, unknown][];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L120)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/descriptor-guards.ts#L120)
 
 ### serviceMemberEntriesEffect
 
@@ -540,7 +540,7 @@ declare const serviceMemberEntriesEffect: (
 ) => Effect.Effect<Array<[string, unknown]>, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/descriptor-guards.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/descriptor-guards.ts#L102)
 
 ## `function-guards.ts`
 
@@ -560,7 +560,7 @@ isFunctionDescriptor(candidate);
 declare const isFunctionDescriptor: (value: unknown) => value is FunctionRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/function-guards.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/function-guards.ts#L34)
 
 ### isFunctionDescriptorEffect
 
@@ -578,7 +578,7 @@ Effect.runSync(isFunctionDescriptorEffect(candidate));
 declare const isFunctionDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/function-guards.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/function-guards.ts#L11)
 
 ## `guards.ts`
 
@@ -594,7 +594,7 @@ Re-exports all named exports from the "./descriptor-guards.js" module.
 export * from "./descriptor-guards.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/guards.ts#L2)
 
 ### "./function-guards.js" (namespace export)
 
@@ -606,7 +606,7 @@ Re-exports all named exports from the "./function-guards.js" module.
 export * from "./function-guards.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/guards.ts#L3)
 
 ### "./member-name.js" (namespace export)
 
@@ -618,7 +618,7 @@ Re-exports all named exports from the "./member-name.js" module.
 export * from "./member-name.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/guards.ts#L4)
 
 ### "./reference-guards.js" (namespace export)
 
@@ -630,7 +630,7 @@ Re-exports all named exports from the "./reference-guards.js" module.
 export * from "./reference-guards.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/guards.ts#L5)
 
 ## `index.ts`
 
@@ -644,7 +644,7 @@ Re-exports all named exports from the "./define-service.js" module.
 export * from "./define-service.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/index.ts#L1)
 
 ### "./guards.js" (namespace export)
 
@@ -656,7 +656,7 @@ Re-exports all named exports from the "./guards.js" module.
 export * from "./guards.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/index.ts#L2)
 
 ### "./service-context.js" (namespace export)
 
@@ -668,7 +668,7 @@ Re-exports all named exports from the "./service-context.js" module.
 export * from "./service-context.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/index.ts#L3)
 
 ### "./service-error.js" (namespace export)
 
@@ -680,7 +680,7 @@ Re-exports all named exports from the "./service-error.js" module.
 export * from "./service-error.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/index.ts#L4)
 
 ### "./service-observability.js" (namespace export)
 
@@ -692,7 +692,7 @@ Re-exports all named exports from the "./service-observability.js" module.
 export * from "./service-observability.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/index.ts#L5)
 
 ### "./types.js" (namespace export)
 
@@ -704,7 +704,7 @@ Re-exports all named exports from the "./types.js" module.
 export * from "./types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/index.ts#L6)
 
 ## `member-name.ts`
 
@@ -734,7 +734,7 @@ declare const RESERVED_SERVICE_MEMBER_NAMES: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/member-name.ts#L25)
 
 ### SERVICE_RESERVED_MEMBER_NAMES
 
@@ -762,7 +762,7 @@ declare const SERVICE_RESERVED_MEMBER_NAMES: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/member-name.ts#L6)
 
 ### assertServiceMemberName
 
@@ -784,7 +784,7 @@ assertServiceMemberName("lookup");
 declare const assertServiceMemberName: (value: unknown) => asserts value is string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L119)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/member-name.ts#L119)
 
 ### assertServiceMemberNameEffect
 
@@ -804,7 +804,7 @@ declare const assertServiceMemberNameEffect: (
 ) => Effect.Effect<string, ServiceValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/member-name.ts#L94)
 
 ### isReservedServiceMemberName
 
@@ -822,7 +822,7 @@ isReservedServiceMemberName(" id ");
 declare const isReservedServiceMemberName: (value: unknown) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/member-name.ts#L85)
 
 ### isReservedServiceMemberNameEffect
 
@@ -842,7 +842,7 @@ declare const isReservedServiceMemberNameEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/member-name.ts#L66)
 
 ### normalizeServiceMemberName
 
@@ -864,7 +864,7 @@ normalizeServiceMemberName(" lookup ");
 declare const normalizeServiceMemberName: (value: unknown) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/member-name.ts#L57)
 
 ### normalizeServiceMemberNameEffect
 
@@ -884,7 +884,7 @@ declare const normalizeServiceMemberNameEffect: (
 ) => Effect.Effect<string, ServiceValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/member-name.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/member-name.ts#L32)
 
 ## `reference-guards.ts`
 
@@ -908,7 +908,7 @@ assertServiceRef(candidate);
 declare const assertServiceRef: (value: unknown) => asserts value is ServiceRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/reference-guards.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/reference-guards.ts#L53)
 
 ### assertServiceRefEffect
 
@@ -928,7 +928,7 @@ declare const assertServiceRefEffect: (
 ) => Effect.Effect<ServiceRefAny, ServiceValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/reference-guards.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/reference-guards.ts#L36)
 
 ### isServiceRef
 
@@ -946,7 +946,7 @@ isServiceRef({ ref: createRef("service", "orders") });
 declare const isServiceRef: (value: unknown) => value is ServiceRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/reference-guards.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/reference-guards.ts#L27)
 
 ### isServiceRefEffect
 
@@ -964,7 +964,7 @@ Effect.runSync(isServiceRefEffect({ ref: createRef("service", "orders") }));
 declare const isServiceRefEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/reference-guards.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/reference-guards.ts#L12)
 
 ## `reference-guards.types.ts`
 
@@ -986,7 +986,7 @@ export interface ServiceRef<Id extends string = string> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/reference-guards.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/reference-guards.types.ts#L6)
 
 ### ServiceRefAny (type alias)
 
@@ -1006,7 +1006,7 @@ function inspect(value: ServiceRefAny) {
 type ServiceRefAny = ServiceRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/reference-guards.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/reference-guards.types.ts#L13)
 
 ## `service-context.ts`
 
@@ -1030,7 +1030,7 @@ freezeServiceContextValue({ enabled: true }, new WeakMap());
 declare const freezeServiceContextValue: (value: unknown, seen: WeakMap<object, object>) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-context.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/service-context.ts#L22)
 
 ### freezeServiceContextValueEffect
 
@@ -1051,7 +1051,7 @@ declare const freezeServiceContextValueEffect: (
 ) => Effect.Effect<unknown, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-context.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/service-context.ts#L10)
 
 ## `service-error.ts`
 
@@ -1071,7 +1071,7 @@ Effect.catchTag(defineServiceEffect(input), "ServiceValidationError", () => Effe
 declare class ServiceValidationError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-error.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/service-error.ts#L7)
 
 ## `service-members.ts`
 
@@ -1093,7 +1093,7 @@ declare const assertUniqueServiceMembersEffect: (
 ) => Effect.Effect<undefined, ServiceValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-members.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/service-members.ts#L47)
 
 ### copyServiceMembersEffect
 
@@ -1115,7 +1115,7 @@ declare const copyServiceMembersEffect: <T>(
 ) => Effect.Effect<Record<string, T>, ServiceValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-members.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/service-members.ts#L14)
 
 ## `service-members.types.ts`
 
@@ -1135,7 +1135,7 @@ const kind: ServiceMemberKind = "function";
 type ServiceMemberKind = "function" | "event" | "task" | "job";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-members.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/service-members.types.ts#L6)
 
 ### ServiceMemberValidator (type alias)
 
@@ -1153,7 +1153,7 @@ const valid: ServiceMemberValidator<number> = (value) => Effect.succeed(typeof v
 type ServiceMemberValidator<T> = (value: unknown) => Effect.Effect<boolean>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-members.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/service-members.types.ts#L13)
 
 ## `service-observability.ts`
 
@@ -1173,7 +1173,7 @@ Effect.provide(isServiceRefEffect(value), ServiceTelemetryLive);
 declare class ServiceTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-observability.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/service-observability.ts#L8)
 
 ### ServiceTelemetryLive
 
@@ -1191,7 +1191,7 @@ Effect.provide(isServiceRefEffect(value), ServiceTelemetryLive);
 declare const ServiceTelemetryLive: Layer.Layer<ServiceTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-observability.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/service-observability.ts#L15)
 
 ### observeService
 
@@ -1212,7 +1212,7 @@ declare const observeService: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-observability.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/service-observability.ts#L29)
 
 ### runServiceSync
 
@@ -1234,7 +1234,7 @@ runServiceSync(Effect.succeed(1));
 declare const runServiceSync: <A, E>(effect: Effect.Effect<A, E>) => A;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-observability.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/service-observability.ts#L68)
 
 ## `service-observability.types.ts`
 
@@ -1268,7 +1268,7 @@ type ServiceOperation =
   | "context.freeze";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-observability.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/service-observability.types.ts#L6)
 
 ### ServiceTelemetryService (interface)
 
@@ -1297,7 +1297,7 @@ export interface ServiceTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-observability.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/service-observability.types.ts#L25)
 
 ## `types.ts`
 
@@ -1313,7 +1313,7 @@ Re-exports all named exports from the "./define-service.types.js" module.
 export * from "./define-service.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/types.ts#L2)
 
 ### "./reference-guards.types.js" (namespace export)
 
@@ -1325,4 +1325,4 @@ Re-exports all named exports from the "./reference-guards.types.js" module.
 export * from "./reference-guards.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/services/types.ts#L3)

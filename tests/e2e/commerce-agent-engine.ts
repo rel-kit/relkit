@@ -1,7 +1,7 @@
 /** Dispatches browser fixture requests through native schemas, streaming and explicit local provider replacements. */
 import { invokeAgent } from "../../integrations/packages/langchain/src/index.ts";
-import type { HttpInvocationOptions } from "../../packages/runtime-hono/src/index.ts";
-import type { RealtimeDispatcher } from "../../packages/realtime/src/index.ts";
+import type { HttpInvocationOptions } from "relkit/runtime-hono";
+import type { RealtimeDispatcher } from "relkit/realtime";
 import announcements from "../../examples/commerce/src/services/announcements/channels/announcements.channel.ts";
 import postAnnouncement from "../../examples/commerce/src/services/announcements/functions/post-announcement.function.ts";
 import cancelOrder from "../../examples/commerce/src/services/orders/tools/cancel-order.tool.ts";

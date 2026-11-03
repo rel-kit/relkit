@@ -48,7 +48,7 @@ test("local create installs workspace links after jobs and final confirmation", 
   expect(result.output).not.toContain("Planned project");
   expect(await Bun.file(join(parent, "app/package.json")).exists()).toBe(true);
   const manifest = await Bun.file(join(parent, "app/package.json")).json();
-  expect(manifest.dependencies["@relkit/app"]).toBe("link:@relkit/app");
+  expect(manifest.dependencies["relkit"]).toBe("link:@relkit/app");
   const graph = Bun.file(join(parent, "app/.relkit/generated/application.graph.json"));
   expect(await graph.exists()).toBe(true);
   successful.add(parent);
@@ -67,7 +67,7 @@ test("local create preserves unrelated dependency versions when linking RelKit p
   await writeFile(
     join(root, "package.json"),
     `${JSON.stringify({
-      dependencies: { "@relkit/app": appManifest.version, hono: "4.11.7" },
+      dependencies: { relkit: appManifest.version, hono: "4.11.7" },
       devDependencies: { "@relkit/cli": cliManifest.version, typescript: "5.9.3" },
     })}\n`,
   );
@@ -75,13 +75,13 @@ test("local create preserves unrelated dependency versions when linking RelKit p
   const names = await useWorkspaceDependencies(root);
   const manifest = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
 
-  expect(names).toContain("@relkit/app");
+  expect(names).toContain("relkit");
   expect(names).toContain("@relkit/cli");
-  expect(names).toContain("@relkit/engine");
-  expect(manifest.dependencies).toEqual({ "@relkit/app": "link:@relkit/app", hono: "4.11.7" });
+  expect(names).toContain("relkit/engine");
+  expect(manifest.dependencies).toEqual({ relkit: "link:@relkit/app", hono: "4.11.7" });
   expect(manifest.devDependencies).toMatchObject({
     "@relkit/cli": "link:@relkit/cli",
-    "@relkit/engine": "link:@relkit/engine",
+    "relkit/engine": "link:@relkit/engine",
     typescript: "5.9.3",
   });
   successful.add(root);
@@ -91,7 +91,7 @@ test("doctor accepts local RelKit package links", async () => {
   const checks = await versionChecks(
     {
       packageManager: `bun@${Bun.version}`,
-      dependencies: { "@relkit/app": "link:@relkit/app" },
+      dependencies: { relkit: "link:@relkit/app" },
       devDependencies: { "@relkit/cli": "link:@relkit/cli", typescript: "5.9.3" },
     },
     process.cwd(),

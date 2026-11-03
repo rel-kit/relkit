@@ -3,7 +3,7 @@
  * Physical service roots determine suggestions; logical identity and registration
  * remain compiler responsibilities and no warning changes activation by itself.
  */
-import { createDiagnostic } from "@relkit/diagnostics";
+import { createDiagnostic } from "relkit/diagnostics";
 import {
   diagnosticLocation,
   recommendedPattern,

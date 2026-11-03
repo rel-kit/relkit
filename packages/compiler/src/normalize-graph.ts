@@ -2,11 +2,8 @@ import type { GraphCompilationFailure } from "./normalize-graph.types.js";
 import { Effect } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
-import { GRAPH_VERSION } from "@relkit/contracts";
-import {
-  canonicalizeGraphEffect,
-  hashGraphEffect as hashCanonicalGraphEffect,
-} from "@relkit/graph";
+import { GRAPH_VERSION } from "relkit/contracts";
+import { canonicalizeGraphEffect, hashGraphEffect as hashCanonicalGraphEffect } from "relkit/graph";
 import { buildGraphEdgesEffect } from "./normalize-graph-edges.js";
 import { buildGraphNodesEffect } from "./normalize-graph-nodes.js";
 import type { NormalizedGraph, NormalizationWork } from "./normalize-types.js";

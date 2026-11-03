@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, rename, rm, readFile, writeFile, symlink } from "node:f
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { Context, Effect, Layer, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { scaffoldNative } from "../../scripts/scaffold-native.js";
 import { scaffoldChild } from "../../scripts/scaffold-process.js";
 import { ScaffoldProcessFailure } from "../../scripts/scaffold-process.errors.js";

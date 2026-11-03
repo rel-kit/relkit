@@ -1,7 +1,7 @@
 /** Materializes one validated paired compiler deployment plan through real AWS role code and native Pulumi mocks without cloud access. */
 import { Effect, Schema } from "effect";
 import * as pulumi from "../../packages/deploy-pulumi/node_modules/@pulumi/pulumi/index.js";
-import { assertDeploymentPlanShape } from "../../packages/deploy/src/plan-validation.js";
+import { assertDeploymentPlanShape } from "../../packages/relkit/src/deploy/plan-validation.js";
 import { materializeDeploymentOperations } from "../../packages/deploy-pulumi/src/materialization.js";
 import { materializePulumiDeployment } from "../../packages/deploy-pulumi/src/program.js";
 import { awsAccess } from "../../integrations/packages/aws/src/access/index.js";

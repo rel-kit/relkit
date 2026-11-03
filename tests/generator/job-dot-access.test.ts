@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { GRAPH_VERSION } from "../../packages/contracts/src/index.ts";
-import type { ApplicationGraph } from "../../packages/graph/src/index.ts";
+import { GRAPH_VERSION } from "relkit/contracts";
+import type { ApplicationGraph } from "relkit/graph";
 import {
   generateClientRegistry,
   generateContract,

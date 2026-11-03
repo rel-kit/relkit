@@ -1,6 +1,6 @@
 /** Portable database contracts; native model database types belong to selected dialect entrypoints. */
 import type { Row, Insert, Update, BaseOperations } from "./operations.types.js";
-import type { DescriptorBase, MaybePromise } from "@relkit/contracts";
+import type { DescriptorBase, MaybePromise } from "relkit/contracts";
 import type { Table } from "drizzle-orm";
 import type { ZodType } from "zod";
 import type { ModelDescriptor, ModelExtensionMap } from "./model.types.js";

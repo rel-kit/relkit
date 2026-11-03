@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { cliTry } from "../cli-errors.js";
 import type { ProcessCapabilities } from "../services/process.types.js";
-import { HTTP_TRANSPORT_REQUIREMENTS } from "@relkit/runtime-hono/internal/prepared";
+import { HTTP_TRANSPORT_REQUIREMENTS } from "relkit/runtime-hono/internal/prepared";
 
 /**
  * Bundles one emitted server and preserves the native diagnostic on failure.
@@ -26,11 +26,13 @@ export const runBundleProcess = Effect.fn("Project.bundleProcess")(function* (
     ...external,
     ...HTTP_TRANSPORT_REQUIREMENTS.map((entry) => entry.package),
     "@relkit/langchain",
+    // The deprecated @relkit/app only re-exports relkit, so it stays external with it.
+    ...(external.includes("relkit") ? ["@relkit/app"] : []),
   ]);
   const optionalLeaves = [
-    "@relkit/runtime-hono/mcp",
-    "@relkit/runtime-hono/ag-ui",
-    "@relkit/runtime-hono/scalar",
+    "relkit/runtime-hono/mcp",
+    "relkit/runtime-hono/ag-ui",
+    "relkit/runtime-hono/scalar",
   ];
   const child = yield* processes.run({
     command: process.execPath,

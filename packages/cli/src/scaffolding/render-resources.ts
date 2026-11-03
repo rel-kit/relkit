@@ -1,7 +1,7 @@
 /** Plans resource descriptors and their selected provider configuration, retaining service-local paths and explicit backend dependencies. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import {
   scaffoldErrors,

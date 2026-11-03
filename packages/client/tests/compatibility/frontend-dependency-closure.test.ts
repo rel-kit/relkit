@@ -10,7 +10,7 @@ test("frontend client dependency closure excludes native agent runtimes", async 
   const manifests = await workspaceManifests();
   const closure = dependencyClosure("@relkit/client", manifests);
 
-  expect(closure.has("@relkit/agents")).toBe(false);
+  expect(closure.has("relkit/agents")).toBe(false);
   expect([...closure].filter((name) => nativeAgentPackage.test(name))).toEqual([]);
 });
 

@@ -3,7 +3,7 @@ import {
   JOBS_MANIFEST_PROTOCOL,
   JOBS_MANIFEST_VERSION,
   JOBS_PROTOCOL_VERSION,
-} from "@relkit/contracts/jobs";
+} from "relkit/contracts/jobs";
 
 /** Data-only executable task metadata; callback bodies never cross this boundary. */
 export const JobsManifestTask = Schema.Struct({

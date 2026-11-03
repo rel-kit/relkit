@@ -1,4 +1,4 @@
-import { API_BASE_PATH } from "@relkit/contracts";
+import { API_BASE_PATH } from "relkit/contracts";
 import { Effect, Layer, ManagedRuntime } from "effect";
 import { projectionAttempt, runInspectorPromise as runExecutionPromise } from "./native-edge.js";
 import { GRAPH_COLLECTIONS } from "./graph.js";

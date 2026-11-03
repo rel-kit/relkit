@@ -3,7 +3,7 @@
  * compares every contract field and edge while omitting only node provenance;
  * executable manifests and build hashes are validated separately.
  */
-import type { SourceLocation } from "@relkit/contracts";
+import type { SourceLocation } from "relkit/contracts";
 
 /** Common validated identity/provenance shared by every graph node variant. */
 export interface LayoutNode {

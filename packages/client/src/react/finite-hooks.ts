@@ -17,7 +17,7 @@ import {
   type UseSuspenseQueryOptions,
   type UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { runExecutionPromise } from "@relkit/contracts/operation";
+import { runExecutionPromise } from "relkit/contracts/operation";
 import { mutationOperations, mutationRuntime } from "./mutation-runtime.js";
 import { useRelkitClient } from "./context.js";
 import { relkitJobKey, relkitKey } from "./keys.js";

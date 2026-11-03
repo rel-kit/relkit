@@ -70,7 +70,7 @@ export const jobsGuideRelations = [
     api: ["jobs", "testing"],
     examples: [
       "examples/commerce/src/services/orders/tasks/export-orders.task.ts",
-      "packages/jobs/tests/task-policy.test.ts",
+      "packages/relkit/tests/jobs/task-policy.test.ts",
     ],
   },
   {
@@ -93,7 +93,7 @@ export const jobsGuideRelations = [
     api: ["jobs", "integrations/inngest", "integrations/effect-mq"],
     examples: [
       "examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts",
-      "packages/jobs/tests/schedule-reconciliation.test.ts",
+      "packages/relkit/tests/jobs/schedule-reconciliation.test.ts",
     ],
   },
   {
@@ -127,7 +127,7 @@ export const jobsGuideRelations = [
     path: "docs/modules/jobs/testing",
     api: ["jobs", "testing", "client"],
     examples: [
-      "packages/jobs/tests/task-wire.test.ts",
+      "packages/relkit/tests/jobs/task-wire.test.ts",
       "packages/client/tests/compatibility/jobs-watch.test.ts",
     ],
   },
@@ -135,7 +135,7 @@ export const jobsGuideRelations = [
     path: "docs/modules/jobs/migration",
     api: ["app", "jobs"],
     examples: [
-      "packages/jobs/tests/migration.test.ts",
+      "packages/relkit/tests/jobs/migration.test.ts",
       "apps/docs/examples/jobs/send-receipt.job.ts",
     ],
   },

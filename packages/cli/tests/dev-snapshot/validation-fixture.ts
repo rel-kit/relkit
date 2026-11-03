@@ -3,8 +3,8 @@
  * application code. The file Layer supplies explicit bytes and project paths;
  * tests can change either independently to model source edits and cache tampering.
  */
-import { GRAPH_VERSION, APPLICATION_LAYOUT_VERSION, canonicalJson } from "@relkit/contracts";
-import { hashGraph } from "@relkit/graph";
+import { GRAPH_VERSION, APPLICATION_LAYOUT_VERSION, canonicalJson } from "relkit/contracts";
+import { hashGraph } from "relkit/graph";
 import { Layer } from "effect";
 import { SnapshotFiles } from "../../src/dev-snapshot/snapshot-files.service.js";
 import {

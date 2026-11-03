@@ -1,4 +1,4 @@
-import type { ObservabilityQuery } from "@relkit/observability";
+import type { ObservabilityQuery } from "relkit/observability";
 import type { InspectorJobsBinding } from "../../src/jobs/types.js";
 
 /** Response projections whose fields are checked by the compatibility assertions. */

@@ -7,7 +7,7 @@ import { openDuckdbDatabaseEffect } from "../src/local/duckdb-database-effect.js
 import { duckdbDriverLayer } from "../src/local/duckdb-driver.js";
 import type { DuckdbConnectionPort } from "../src/local/duckdb-driver.types.js";
 import { createDuckdbQuery } from "../src/local/duckdb-query.js";
-import { ObservabilityQueryError } from "@relkit/observability";
+import { ObservabilityQueryError } from "relkit/observability";
 function connection(): DuckdbConnectionPort {
   return {
     run: async () => undefined,

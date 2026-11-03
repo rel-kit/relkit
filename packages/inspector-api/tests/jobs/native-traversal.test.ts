@@ -6,7 +6,7 @@ import { initialPosition } from "../../src/jobs/run-aggregate-support.js";
 import { InspectorJobsError } from "../../src/jobs/types.js";
 import { nativeAttempt } from "../../src/native-edge.js";
 import { emptyPage, generation, jobBinding, nativeGate } from "../fixtures/services.js";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { isRecord } from "../../src/shared.js";
 
 describe("Inspector finite native reads", () => {

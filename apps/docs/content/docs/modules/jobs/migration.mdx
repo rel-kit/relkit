@@ -18,11 +18,11 @@ The migration helper is exposed from the jobs package; run it against the previo
 activation. It reports identity, binding, schema, history, schedule, dedupe, and client-fingerprint changes.
 
 <include
-  source="packages/jobs/tests/migration.test.ts"
+  source="packages/relkit/tests/jobs/migration.test.ts"
   lang="ts"
-  meta='title="packages/jobs/tests/migration.test.ts"'
+  meta='title="packages/relkit/tests/jobs/migration.test.ts"'
 >
-  /_snippets/source/packages/jobs/tests/migration.test.ts
+  /_snippets/source/packages/relkit/tests/jobs/migration.test.ts
 </include>
 
 Diagnostics flag pinned/default-derived ID changes, implicit-to-explicit binding changes, task version or schema incompatibility, history and schedule changes, dedupe changes, and client fingerprint changes. Legacy aliases and function-target definitions must be explicit during the migration window; the compiler does not silently rewrite them.

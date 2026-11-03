@@ -1,4 +1,4 @@
-import type { RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunWatchFrame } from "relkit/contracts/jobs";
 import { acquireClientOwner } from "../client-owner.js";
 import { verifyWatchTerminal } from "./watch-feed-terminal.js";
 import { isTerminalRun, JobWatchAbortedError, type JobWatchOptions } from "./types.js";

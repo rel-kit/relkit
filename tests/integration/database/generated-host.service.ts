@@ -4,7 +4,7 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { Context, Effect, Layer, Scope } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { buildProject } from "../../../packages/cli/src/commands/build.js";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 import { scaffoldChild, signalScaffoldGroup } from "../../../scripts/scaffold-process.js";

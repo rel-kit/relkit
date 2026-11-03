@@ -21,7 +21,7 @@ export function jobSource(
   targetModule: string,
   profile?: string,
 ): string {
-  return `import { defineJob } from "@relkit/app/jobs/legacy";
+  return `import { defineJob } from "relkit/jobs/legacy";
 ${sourceImport(target.binding, targetModule, target.exportKind)}
 const ${artifact.binding} = defineJob({
   id: "${artifact.id}",
@@ -44,8 +44,8 @@ export function taskSource(
   version: string,
   execution: "durable" | "retryable",
 ): string {
-  return `import { defineTask } from "@relkit/app/tasks";
-import { z } from "@relkit/app/schema";
+  return `import { defineTask } from "relkit/tasks";
+import { z } from "relkit/schema";
 const ${artifact.binding} = defineTask({
   id: "${artifact.id}",
   version: "${version}",
@@ -80,7 +80,7 @@ export function taskJobSource(
     domain === undefined
       ? artifact.name.identifier
       : `${domain}${capitalize(artifact.name.identifier)}`;
-  return `import { defineJob } from "@relkit/app/jobs";
+  return `import { defineJob } from "relkit/jobs";
 ${sourceImport(target.binding, targetModule, target.exportKind)}
 const ${artifact.binding} = defineJob({
   id: "${artifact.id}",

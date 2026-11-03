@@ -1,1 +1,1 @@
-export * from "@relkit/schema";
+export * from "relkit/schema";

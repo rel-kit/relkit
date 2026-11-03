@@ -3,7 +3,7 @@
  * integrations. These bounded codecs mirror the versioned contract fields;
  * graph identity and registration uniqueness remain cohort policy checks.
  */
-import { RUNTIME_INTEGRATION_PLAN_VERSION } from "@relkit/contracts";
+import { RUNTIME_INTEGRATION_PLAN_VERSION } from "relkit/contracts";
 import { Schema } from "effect";
 import { SnapshotHash } from "./snapshot.schemas.js";
 

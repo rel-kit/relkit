@@ -121,8 +121,8 @@ export async function within<T>(promise: Promise<T>, timeoutMs: number): Promise
 
 /** @returns The original in-flight cancellation and telemetry flush handler source. */
 export function handlerSource(): string {
-  return `import { defineFunction } from "@relkit/app";
-import { z } from "@relkit/schema";
+  return `import { defineFunction } from "relkit";
+import { z } from "relkit/schema";
 
 const hello = defineFunction({
   id: "hello.say-hello",

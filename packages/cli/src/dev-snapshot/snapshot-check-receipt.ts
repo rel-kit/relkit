@@ -5,7 +5,7 @@
  */
 import crypto from "node:crypto";
 import { dirname, join, resolve } from "node:path";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import { Effect, Schema } from "effect";
 import { CliFileSystem } from "../services/filesystem.service.js";
 import { mapErrorCause } from "../services/map-error-cause.js";

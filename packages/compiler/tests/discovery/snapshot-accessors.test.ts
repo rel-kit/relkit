@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { Effect } from "effect";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { snapshotDescriptorEffect } from "../../src/discovery/evaluator-snapshot.js";
 
 describe("snapshot capability accessor boundaries", () => {

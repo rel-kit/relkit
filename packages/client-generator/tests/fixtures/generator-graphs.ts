@@ -1,5 +1,5 @@
-import { GRAPH_VERSION } from "@relkit/contracts";
-import type { ApplicationGraph } from "@relkit/graph";
+import { GRAPH_VERSION } from "relkit/contracts";
+import type { ApplicationGraph } from "relkit/graph";
 
 const stringSchema = { type: "string" };
 const input = {

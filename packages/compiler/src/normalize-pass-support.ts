@@ -1,5 +1,5 @@
-import { isDescriptor } from "@relkit/contracts";
-import { createDiagnostic } from "@relkit/diagnostics";
+import { isDescriptor } from "relkit/contracts";
+import { createDiagnostic } from "relkit/diagnostics";
 import type { ExtractedDescriptor } from "./discovery/extract.js";
 import { type NormalizedDescriptor, type NormalizationWork } from "./normalize-types.js";
 import { id, isDescriptorKindValue, isRecord, source } from "./normalize-utils.js";

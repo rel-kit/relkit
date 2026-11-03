@@ -1,4 +1,4 @@
-import { normalizeIdEffect } from "@relkit/contracts";
+import { normalizeIdEffect } from "relkit/contracts";
 import { Effect } from "effect";
 import { observeCompiler } from "../observability.js";
 import { runDiscoverySync } from "./discovery-sync.js";

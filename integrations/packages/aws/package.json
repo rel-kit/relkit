@@ -73,8 +73,7 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@relkit/deploy": "workspace:*",
-    "@relkit/provider": "workspace:*"
+    "relkit": "workspace:*"
   },
   "peerDependencies": {
     "@pulumi/aws": "catalog:"

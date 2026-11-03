@@ -1,1 +1,1 @@
-export * from "@relkit/services";
+export * from "relkit/services";

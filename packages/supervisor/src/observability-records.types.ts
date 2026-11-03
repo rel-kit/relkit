@@ -1,5 +1,5 @@
-import type { RuntimeActivationFingerprint } from "@relkit/contracts";
-import type { DiagnosticRecord, GenerationRecord } from "@relkit/observability";
+import type { RuntimeActivationFingerprint } from "relkit/contracts";
+import type { DiagnosticRecord, GenerationRecord } from "relkit/observability";
 import type { SupervisorCandidateToken } from "./state-machine.types.js";
 
 /** Selective lifecycle output with the existing SSE topic. */

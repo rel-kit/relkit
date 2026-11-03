@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { Hono } from "../../packages/inspector-api/node_modules/hono";
-import type { RunSnapshot } from "../../packages/contracts/src/jobs-run.ts";
+import type { RunSnapshot } from "../../packages/relkit/src/contracts/jobs-run.ts";
 import {
   installInspectorEndpoints,
   type InspectorJobsBinding,

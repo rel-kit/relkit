@@ -39,5 +39,5 @@ export interface ResolvedIntegrationPackageRole {
   readonly exportName: string;
   readonly resolvedPath: string;
   readonly packageRoot?: string;
-  readonly requirements?: readonly import("@relkit/contracts").IntegrationDependencyRequirement[];
+  readonly requirements?: readonly import("relkit/contracts").IntegrationDependencyRequirement[];
 }

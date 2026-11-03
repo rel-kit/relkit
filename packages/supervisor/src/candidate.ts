@@ -1,5 +1,5 @@
 import { Cause, Effect, Exit, Layer, ManagedRuntime, Metric } from "effect";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
 import { CandidatePlatformLive } from "./candidate-platform.js";
 import { createCandidateLayer, SupervisorCandidate } from "./candidate-service.js";
 import type { CandidateOptions, CompiledCandidate, StartedCandidate } from "./candidate.types.js";

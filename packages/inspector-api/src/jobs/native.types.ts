@@ -1,6 +1,6 @@
 import type { Effect } from "effect";
-import type { RunPage, RunSnapshot } from "@relkit/contracts/jobs";
-import type { JsonValue } from "@relkit/contracts";
+import type { RunPage, RunSnapshot } from "relkit/contracts/jobs";
+import type { JsonValue } from "relkit/contracts";
 import type { ResolvedActiveGeneration } from "../shared.js";
 import type { InspectorJobsBinding } from "./types.js";
 import type { AggregatePosition, Checkpoint } from "./run-aggregate-support.js";

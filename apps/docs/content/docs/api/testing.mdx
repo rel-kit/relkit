@@ -658,7 +658,7 @@ Creates an application owner with HTTP, deterministic runtime and provider servi
 **Example**
 
 ```ts
-import { defineEnv } from "@relkit/app/config";
+import { defineEnv } from "relkit/config";
 import { createTestApplication } from "@relkit/testing";
 async function testApplication(projectRoot: string): Promise<void> {
   const app = await createTestApplication({ env: defineEnv({}) }, { projectRoot });
@@ -1133,7 +1133,7 @@ export interface TestBucketFakeOptions {
   readonly stateRoot?: string;
   readonly clock?: () => number;
   readonly failures?: TestFailureControls;
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly maxObjectBytes?: number;
   readonly allowedContentTypes?: readonly string[];
 }
@@ -1485,7 +1485,7 @@ export interface TestCacheFakeOptions<
   readonly stateRoot?: string;
   readonly clock?: () => number;
   readonly failures?: TestFailureControls;
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly keySchema?: KeySchema;
   readonly valueSchema?: ValueSchema;
   readonly defaultTtlMs?: number;
@@ -1696,7 +1696,7 @@ Native authorities and Effect workflows owned by one event service Layer.
 
 ```ts
 export interface TestEventControlState {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly router: () => EventRouter;
   readonly log: () => { readonly close: () => Promise<void> };
   readonly open: Effect.Effect<void, unknown>;
@@ -2116,7 +2116,7 @@ Event publication contract, native consumers and deterministic fixture dependenc
 
 ```ts
 export interface TestEventOptions<Payload = unknown, Output = unknown> {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly event?: EventDescriptorAny;
   readonly events?: readonly EventDescriptorAny[];
   readonly eventId?: string;
@@ -2439,7 +2439,7 @@ Explicit clock, logger and provider replacement policy for one fake owner.
 
 ```ts
 export interface TestFakesOptions {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly clock?: () => number;
   readonly providers?: TestProviderReplacements;
 }
@@ -2925,7 +2925,7 @@ Explicit test origin, listener close policy and ownership callbacks.
 
 ```ts
 export interface TestHttpClientOptions {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly baseUrl?: string | URL;
   /** Registers client shutdown with the owning test runtime/application. */
   readonly registerClose?: (close: () => Promise<void>) => void;
@@ -3827,8 +3827,8 @@ Invokes a function descriptor through the engine's direct, transport-free path.
 **Example**
 
 ```ts
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 import { invokeFunction } from "@relkit/testing";
 
 export async function greetingExample(): Promise<string> {
@@ -4009,9 +4009,9 @@ export interface StandaloneFunctionTarget {
   readonly input: StandardSchemaV1;
   readonly output: StandardSchemaV1;
   readonly errors?: readonly { readonly id: string; readonly data: StandardSchemaV1 }[];
-  readonly dependencies?: import("@relkit/engine").DependencyDeclarations;
+  readonly dependencies?: import("relkit/engine").DependencyDeclarations;
   readonly publishes?: readonly string[];
-  readonly publications?: Readonly<Record<string, import("@relkit/engine").DependencyRefLike>>;
+  readonly publications?: Readonly<Record<string, import("relkit/engine").DependencyRefLike>>;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly handler: (...arguments_: readonly never[]) => MaybePromise<unknown>;
@@ -4457,7 +4457,7 @@ Durable native target, retry bounds and deterministic persistence dependencies.
 
 ```ts
 export interface TestJobOptions<Input = JsonValue, Output = unknown> {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly jobId?: string;
   readonly target: InvocationTarget<Input, Output>;
   readonly retry?: RetryPolicy;
@@ -4991,7 +4991,7 @@ Creates a small deterministic runtime for direct function tests.
 **Example**
 
 ```ts
-import { defineEnv } from "@relkit/app/config";
+import { defineEnv } from "relkit/config";
 import { createTestRuntime } from "@relkit/testing";
 
 export async function runtimeExample(): Promise<void> {
@@ -5113,7 +5113,7 @@ Constructs the native local agent state provider at an explicit test root.
 declare const createTestAgentStateProvider: (root: string) => AgentStateProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/state-providers.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/state-providers.ts#L20)
 
 ### createTestRealtimeProvider
 
@@ -5125,7 +5125,7 @@ Constructs the native local realtime provider at an explicit test root.
 declare const createTestRealtimeProvider: (root: string) => RealtimeProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/state-providers.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/state-providers.ts#L11)
 
 ## `state-root.ts`
 
@@ -5497,7 +5497,7 @@ Owned native jobs adapter with deterministic worker and snapshot test controls.
 ```ts
 export interface TestJobsAdapter extends JobsAdapterRuntime {
   readonly clock: TestClock;
-  readonly runNext: () => Promise<import("@relkit/jobs/adapter").NativeTaskWork | undefined>;
+  readonly runNext: () => Promise<import("relkit/jobs/adapter").NativeTaskWork | undefined>;
   readonly snapshot: (runId: string) => RunSnapshot;
 }
 ```
@@ -5512,7 +5512,7 @@ Deterministic native adapter time, failure injection and unknown-outcome policy.
 
 ```ts
 export interface TestJobsAdapterOptions {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly clock?: TestClock;
   readonly startTimeMs?: number;
   readonly service?: string;

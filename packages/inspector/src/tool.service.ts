@@ -16,7 +16,7 @@ import type { InspectorOptions } from "./options.types.js";
 import type { InspectorToolState } from "./tool-state.types.js";
 import { InspectorHistoryNative, InspectorHistoryNativeLive } from "./history-native.service.js";
 import { acquireLiveEvents } from "./live-events.js";
-import { ExecutionSuccessLogs, observeExecution } from "@relkit/contracts/operation";
+import { ExecutionSuccessLogs, observeExecution } from "relkit/contracts/operation";
 
 /** Native authority is captured once; every run owns an independent tool Scope. */
 export class InspectorTool extends Context.Service<InspectorTool>()("relkit/inspector/Tool", {

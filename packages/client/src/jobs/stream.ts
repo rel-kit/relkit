@@ -1,6 +1,6 @@
-import type { JsonValue } from "@relkit/contracts";
-import type { NamedStreamFrame } from "@relkit/contracts/jobs";
-import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
+import type { JsonValue } from "relkit/contracts";
+import type { NamedStreamFrame } from "relkit/contracts/jobs";
+import { runExecutionPromise, runExecutionSync } from "relkit/contracts/operation";
 import { ManagedRuntime } from "effect";
 import { JobContent, JobContentLive } from "./content.service.js";
 import type { JobStreamOptions } from "./stream.types.js";

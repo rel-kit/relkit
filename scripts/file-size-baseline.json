@@ -15,12 +15,12 @@
   "apps/inspector/app/trace-waterfall-detail.tsx": 488,
   "apps/inspector/lib/graph-views-flow-steps.ts": 256,
   "packages/compiler/src/normalize-output.ts": 251,
-  "packages/diagnostics/src/codes/cli.ts": 839,
-  "packages/diagnostics/src/codes/compiler.ts": 842,
-  "packages/diagnostics/src/codes/inspector.ts": 471,
-  "packages/diagnostics/src/codes/jobs.ts": 593,
-  "packages/diagnostics/src/codes/runtime.ts": 323,
-  "packages/runtime-hono/src/materialize-routes-utils.ts": 258,
+  "packages/relkit/src/diagnostics/codes/cli.ts": 839,
+  "packages/relkit/src/diagnostics/codes/compiler.ts": 842,
+  "packages/relkit/src/diagnostics/codes/inspector.ts": 471,
+  "packages/relkit/src/diagnostics/codes/jobs.ts": 593,
+  "packages/relkit/src/diagnostics/codes/runtime.ts": 323,
+  "packages/relkit/src/runtime-hono/materialize-routes-utils.ts": 258,
   "scripts/maturity.ts": 401,
   "scripts/user-text.ts": 270
 }

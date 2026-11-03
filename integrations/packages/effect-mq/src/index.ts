@@ -11,13 +11,13 @@ import {
   type ProviderAdapter,
   type ProviderBehavior,
   type ProviderConnectionValues,
-} from "@relkit/provider";
+} from "relkit/provider";
 import {
   serializeJobsServiceOptions,
   validateJobsServiceOptions,
   type JobsServiceBehavior,
   type JobsServiceOptions,
-} from "@relkit/jobs";
+} from "relkit/jobs";
 
 const job = defineProviderCapability("job");
 const retryable = defineProviderFeature(job, "retryable");
@@ -40,7 +40,7 @@ export interface EffectMqOptions extends JobsServiceOptions {
   readonly schema?: string;
   readonly tablePrefix?: string;
   readonly queue?: string;
-  readonly native?: Readonly<Record<string, import("@relkit/contracts").JsonValue>>;
+  readonly native?: Readonly<Record<string, import("relkit/contracts").JsonValue>>;
 }
 
 /** @experimental */

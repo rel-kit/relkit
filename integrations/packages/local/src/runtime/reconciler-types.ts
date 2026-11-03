@@ -4,7 +4,7 @@ import type {
   LocalServiceRecipeInput,
   LocalServiceState,
   LocalServiceWorkerArtifact,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import type { LocalProjectIdentity } from "./identity.js";
 import type { ProviderOverrideSummary } from "./provider-overrides.js";
 

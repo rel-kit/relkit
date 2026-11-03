@@ -1,5 +1,5 @@
-import { serializeJson, type JsonValue } from "@relkit/contracts";
-import type { LocalServiceInstance, ProviderOverrideState } from "@relkit/local-service";
+import { serializeJson, type JsonValue } from "relkit/contracts";
+import type { LocalServiceInstance, ProviderOverrideState } from "relkit/local-service";
 
 export function completeUnits(
   instance: LocalServiceInstance,

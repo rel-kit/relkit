@@ -9,9 +9,8 @@ import { discoverApplicationLayoutEffect } from "../src/discovery/application-la
 import { runLayoutProbe } from "./layout-probe-runner.js";
 
 const service =
-  'import { defineService } from "@relkit/app/services"; export default defineService({});';
-const fn =
-  'import { defineFunction } from "@relkit/app/functions"; export default defineFunction({});';
+  'import { defineService } from "relkit/services"; export default defineService({});';
+const fn = 'import { defineFunction } from "relkit/functions"; export default defineFunction({});';
 
 /** Verifies helper files do not register services or select a layout.
  * @returns Lazy assertions using compiler syntax facts and no live resources.

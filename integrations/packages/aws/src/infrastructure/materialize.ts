@@ -1,4 +1,4 @@
-import type { DeploymentInfrastructureIntegration } from "@relkit/deploy";
+import type { DeploymentInfrastructureIntegration } from "relkit/deploy";
 import { materializeRedis } from "./redis.js";
 import { materializeS3 } from "./s3.js";
 

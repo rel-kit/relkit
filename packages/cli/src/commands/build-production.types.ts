@@ -1,5 +1,5 @@
 /** Describes an already selected runtime package and its capability-specific peers. */
-import type { IntegrationDependencyRequirement } from "@relkit/contracts";
+import type { IntegrationDependencyRequirement } from "relkit/contracts";
 
 /** Compiler plan and specialized services share this metadata-only production selection. */
 export interface ProductionSelection {

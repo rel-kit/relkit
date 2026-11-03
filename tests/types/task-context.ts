@@ -1,5 +1,5 @@
-import { defineJob, defineTask } from "@relkit/jobs";
-import { z } from "@relkit/schema";
+import { defineJob, defineTask } from "relkit/jobs";
+import { z } from "relkit/schema";
 
 const durable = defineTask({
   id: "types.task-context",

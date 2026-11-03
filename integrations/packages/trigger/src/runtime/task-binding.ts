@@ -1,5 +1,5 @@
 import { createRequire } from "node:module";
-import type { TaskExecutor } from "@relkit/jobs/adapter";
+import type { TaskExecutor } from "relkit/jobs/adapter";
 import { bindingFrom, envelopeFrom, number, record, text } from "./task-binding-support.js";
 
 /** @experimental */

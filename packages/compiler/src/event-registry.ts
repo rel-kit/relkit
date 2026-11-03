@@ -4,7 +4,7 @@ import { observeCompiler } from "./observability.js";
 import type { EventRegistryGenerationOptions } from "./event-registry.types.js";
 export type { EventRegistryGenerationOptions } from "./event-registry.types.js";
 import { relative, resolve } from "node:path";
-import { normalizeSourcePath } from "@relkit/contracts";
+import { normalizeSourcePath } from "relkit/contracts";
 import type { ExtractedDescriptor } from "./discovery/extract.js";
 
 export const EVENT_REGISTRY_FILE = "event-registry.d.ts";

@@ -3,7 +3,7 @@
  * provider accepts this structural hydration result without making its own
  * declarations part of the server integration's dependency graph.
  */
-import type { ClientIdentityDocument } from "@relkit/contracts";
+import type { ClientIdentityDocument } from "relkit/contracts";
 import type { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import type { DehydratedState, QueryClient } from "@tanstack/query-core";
 import type { createClient } from "./transport.js";

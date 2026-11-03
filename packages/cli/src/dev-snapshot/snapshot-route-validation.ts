@@ -3,8 +3,8 @@
  * probe must identify a normal GET target, or the exact empty/example-free
  * graph table; data-only receipt claims never manufacture readiness authority.
  */
-import { canonicalJson } from "@relkit/contracts";
-import type { ApplicationGraph, TriggerNode } from "@relkit/graph";
+import { canonicalJson } from "relkit/contracts";
+import type { ApplicationGraph, TriggerNode } from "relkit/graph";
 import { Effect, Schema } from "effect";
 import { mapErrorCause } from "../services/map-error-cause.js";
 import { SnapshotRouteProjection } from "./snapshot.schemas.js";

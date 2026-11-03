@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import { isAbsolute, relative } from "node:path";
 import { resolveIntegrationPackageRole } from "@relkit/compiler";
-import { assertDeploymentPlanVersion } from "@relkit/deploy";
+import { assertDeploymentPlanVersion } from "relkit/deploy";
 import {
   materializeDeploymentOperations,
   materializePulumiDeployment,

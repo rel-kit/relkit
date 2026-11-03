@@ -1,6 +1,6 @@
 /** Lightweight capture borrows telemetry contracts and owns no persistent store. */
 import type { Effect } from "effect";
-import type { ObservabilityRecord, TelemetryConfiguration } from "@relkit/observability";
+import type { ObservabilityRecord, TelemetryConfiguration } from "relkit/observability";
 import type { InspectionConnectionError } from "./connection-error.js";
 
 /** Operations owned by one dev session, shared by its producers and private bridge. */

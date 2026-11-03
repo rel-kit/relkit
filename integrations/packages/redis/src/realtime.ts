@@ -4,7 +4,7 @@ import {
   defineProviderCapability,
   type ProviderAdapter,
   type ProviderBehavior,
-} from "@relkit/provider";
+} from "relkit/provider";
 import {
   assertRedisOptions,
   redisConnectionContract,

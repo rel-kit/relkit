@@ -1,5 +1,5 @@
-import type { JsonValue } from "@relkit/contracts";
-import type { LocalServicePlanEntry, ProviderOverrideState } from "@relkit/local-service";
+import type { JsonValue } from "relkit/contracts";
+import type { LocalServicePlanEntry, ProviderOverrideState } from "relkit/local-service";
 import { frozenResult } from "./reconciler-lifecycle.js";
 import { removeInstance } from "./reconciler-resource.js";
 import { sameBindings } from "./reconciler-support.js";

@@ -1,5 +1,5 @@
-import { defineChannel } from "@relkit/realtime";
-import { z } from "@relkit/schema";
+import { defineChannel } from "relkit/realtime";
+import { z } from "relkit/schema";
 
 const eventsOnly = defineChannel({
   id: "types.events-only",

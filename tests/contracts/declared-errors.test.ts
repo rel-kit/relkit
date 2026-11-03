@@ -1,11 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { defineError } from "../../packages/functions/src/index.ts";
-import {
-  bindDescriptorIdentity,
-  normalizeFailure,
-  toPublicEnvelope,
-} from "../../packages/invocation/dist/index.js";
-import { z } from "../../packages/schema/src/index.ts";
+import { defineError } from "relkit/functions";
+import { bindDescriptorIdentity, normalizeFailure, toPublicEnvelope } from "relkit/invocation";
+import { z } from "relkit/schema";
 
 const data = z.object({ reason: z.string() });
 

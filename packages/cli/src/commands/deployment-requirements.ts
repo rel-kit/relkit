@@ -4,7 +4,7 @@ import type { ResolvedIntegrationPackageRole } from "@relkit/compiler";
 import {
   SelectedDependencies,
   SelectedDependenciesLive,
-} from "@relkit/provider/internal/dependencies";
+} from "relkit/provider/internal/dependencies";
 import { cliAdapterError } from "../cli-errors.js";
 
 /** Retains the original resolution failure while presenting deployment diagnostics. */

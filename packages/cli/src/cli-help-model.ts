@@ -1,5 +1,5 @@
 /** Static CLI help metadata; rendering never evaluates projects or starts support services. */
-import { deepFreeze } from "@relkit/contracts";
+import { deepFreeze } from "relkit/contracts";
 import { argument, command, devLogOptions, option, title } from "./cli-help-builders.js";
 import type { CliHelpCommand, CliHelpModel } from "./cli-help-model.types.js";
 import { addHelp } from "./cli-help-add.js";

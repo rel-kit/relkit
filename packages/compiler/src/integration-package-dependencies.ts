@@ -4,7 +4,7 @@
  * metadata keeps existing integrations valid while producers migrate explicitly.
  */
 import { Effect, Schema } from "effect";
-import { IntegrationDependencyRequirements } from "@relkit/contracts";
+import { IntegrationDependencyRequirements } from "relkit/contracts";
 import { IntegrationPackageValidationError } from "./integration-package-errors.js";
 import { observeCompiler } from "./observability.js";
 

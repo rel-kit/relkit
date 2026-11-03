@@ -1,4 +1,4 @@
-import { canonicalJson, normalizeId } from "@relkit/contracts";
+import { canonicalJson, normalizeId } from "relkit/contracts";
 import type {
   RelkitEventBridgeRetryPolicy,
   RelkitEventBusArgs,

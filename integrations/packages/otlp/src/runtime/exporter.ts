@@ -4,7 +4,7 @@ import {
   type TelemetryExporterFactoryContext,
   type TelemetryExporterRuntime,
   type TelemetryExporterRuntimeStats,
-} from "@relkit/observability";
+} from "relkit/observability";
 import { createOtlpTransport, type OtlpSignal, type OtlpTransport } from "./transport.js";
 import {
   combinedSignal,

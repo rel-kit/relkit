@@ -7,7 +7,7 @@ import {
   approveApprovalEffect,
   denyApprovalEffect,
   type PendingApproval,
-} from "@relkit/agents/internal/approval";
+} from "relkit/agents/internal/approval";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import type { AgentApprovalHandler } from "./runtime.types.js";
 

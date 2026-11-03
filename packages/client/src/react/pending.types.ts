@@ -1,5 +1,5 @@
-import type { PendingOperationMetadata } from "@relkit/contracts";
-import type { JobUnknownOutcome } from "@relkit/contracts/jobs";
+import type { PendingOperationMetadata } from "relkit/contracts";
+import type { JobUnknownOutcome } from "relkit/contracts/jobs";
 import type { Effect } from "effect";
 
 /** Submission/recovery authority retained from the existing pending API. */

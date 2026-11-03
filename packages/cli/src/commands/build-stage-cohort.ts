@@ -6,7 +6,7 @@
 import { dirname, join } from "node:path";
 import { Effect, Schema } from "effect";
 import { createRuntimeActivationFingerprint, DEFAULT_TOOLING_CONFIG } from "@relkit/compiler";
-import { hashGraph, validateGraphShapeEffect, type ApplicationGraph } from "@relkit/graph";
+import { hashGraph, validateGraphShapeEffect, type ApplicationGraph } from "relkit/graph";
 import { cliAdapterError, cliTry } from "../cli-errors.js";
 import { CliFileSystem } from "../services/filesystem.service.js";
 import { selectedLocalServicePlan } from "./build-cohort.js";
@@ -14,7 +14,7 @@ import { parseJobsManifest } from "./build-jobs.js";
 import { rebaseManifest } from "./build-support.js";
 import { preparedRuntimeManifest } from "./build-prepared-manifest.js";
 import { captureProductionDependencies } from "./build-production-dependencies.js";
-import { selectedHttpCapabilities } from "@relkit/runtime-hono/internal/prepared";
+import { selectedHttpCapabilities } from "relkit/runtime-hono/internal/prepared";
 import type { BuildStageCohort, BuildStageInputs } from "./build.types.js";
 import { captureProductionRepairs } from "./build-production-repairs.js";
 

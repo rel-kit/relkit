@@ -1,5 +1,5 @@
 import type { Guard, Project } from "./resource-routes.types.js";
-import { API_BASE_PATH, type JsonValue } from "@relkit/contracts";
+import { API_BASE_PATH, type JsonValue } from "relkit/contracts";
 import type { Hono } from "hono";
 import { json, required, requiredParam } from "./router-utils.js";
 import type { ResolvedActiveGeneration } from "./shared.js";

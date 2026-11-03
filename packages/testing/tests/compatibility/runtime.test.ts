@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync, rmSync } from "node:fs";
-import { defineEnv, env } from "@relkit/config";
-import { z } from "@relkit/schema";
+import { defineEnv, env } from "relkit/config";
+import { z } from "relkit/schema";
 import { invokeFunction } from "../../src/index.ts";
 import { createTestRuntime } from "../fixtures/owned-compatibility.ts";
 

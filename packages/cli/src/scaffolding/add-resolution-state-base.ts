@@ -1,7 +1,7 @@
 /** Creates the initial add-resolution state from the normalized request and discovered project so explicit arguments remain authoritative. */
 
 import { Effect, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 import { parseAddArguments, type ParsedAddArguments } from "./add-options-parser.js";
 

@@ -6,7 +6,7 @@
  */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import type { CreateOptions } from "./options.js";
 import { validateCreateOptionsEffect } from "./validate.js";
 import { GenerateProjectError, type GenerateProjectContext } from "./generate-types.js";

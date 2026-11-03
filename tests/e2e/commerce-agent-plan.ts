@@ -1,5 +1,5 @@
 /** Projects maintained grouped source locations into the browser fixture's native registration contract. */
-import type { RegistrationPlan } from "../../packages/graph/src/index.ts";
+import type { RegistrationPlan } from "relkit/graph";
 import type { invokeAgent } from "../../integrations/packages/langchain/src/index.ts";
 export const AGENT_ID = "orders.order-support";
 

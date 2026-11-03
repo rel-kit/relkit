@@ -4,7 +4,7 @@ import type {
   TestEventRuntimeOptions,
 } from "./events-runtime.types.js";
 export type { TestEventRuntimeOptions } from "./events-runtime.types.js";
-import { type InvocationTarget } from "@relkit/engine";
+import { type InvocationTarget } from "relkit/engine";
 import {
   createEventClient,
   defineEvent,
@@ -12,9 +12,9 @@ import {
   type EventClient,
   type EventProvider,
   type UnknownEventEnvelope,
-} from "@relkit/events";
-import { z } from "@relkit/schema";
-import type { EventDeliveryResult, EventRouter } from "@relkit/providers-local";
+} from "relkit/events";
+import { z } from "relkit/schema";
+import type { EventDeliveryResult, EventRouter } from "relkit/providers-local";
 
 import { createEventTraceBridge } from "./events-runtime-utils.js";
 

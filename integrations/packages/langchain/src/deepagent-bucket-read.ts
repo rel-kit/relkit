@@ -2,7 +2,7 @@
 
 import type { ReadRawResult, ReadResult } from "deepagents";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/internal/agent-telemetry";
 import { DeepAgentBucket, deepAgentBucketLayer } from "./deepagent-bucket-service.js";
 import { readFileDataEffect } from "./deepagent-bucket-file-data.js";
 import {

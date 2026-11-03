@@ -1,20 +1,17 @@
 /** Exposes SDK-native agent authoring with inferred input and output types; validation and descriptor assembly are delegated to the integration's owning helpers. */
 
-import { createUnboundIdentityEffect } from "@relkit/invocation";
-import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
+import { createUnboundIdentityEffect } from "relkit/invocation";
+import type { InferInput, InferOutput, StandardSchemaV1 } from "relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
-import { isRecordEffect } from "@relkit/agents/internal/agent-validation-value";
+import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { isRecordEffect } from "relkit/agents/internal/agent-validation-value";
 import { prepareAgentDescriptor } from "./define-agent-build.js";
-import { agentDefinitionFailure } from "@relkit/agents/internal/define-agent-error";
+import { agentDefinitionFailure } from "relkit/agents/internal/define-agent-error";
 import type { AgentMiddleware, AgentTool } from "./define-agent-native.types.js";
 import type { AgentDescriptor, DefineAgentOptions } from "./define-agent.types.js";
 
 export { assertAgentDescriptor, isAgentDescriptor } from "./define-agent-validation.js";
-export {
-  copyAgentLimits,
-  copyAgentLimitsEffect,
-} from "@relkit/agents/internal/define-agent-limits";
+export { copyAgentLimits, copyAgentLimitsEffect } from "relkit/agents/internal/define-agent-limits";
 export type {
   AgentClientStateKey,
   AgentMiddleware,
@@ -28,7 +25,7 @@ export type {
   AgentChatMapping,
   AgentClientPolicy,
   AgentControl,
-} from "@relkit/agents/internal/agent-client";
+} from "relkit/agents/internal/agent-client";
 export type {
   AgentFilesystemBackend,
   AgentSubagent,
@@ -92,7 +89,7 @@ export const defineAgentEffect = Effect.fn("Agents.definition.define")(
  * @example
  * ```ts
  * import { defineAgent } from "@relkit/langchain";
- * import { z } from "@relkit/app/schema";
+ * import { z } from "relkit/schema";
  *
  * const support = defineAgent({
  *   id: "support",

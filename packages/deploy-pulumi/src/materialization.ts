@@ -10,9 +10,9 @@ import type {
   DeploymentIntegrationRole,
   DeploymentPlan,
   DeploymentProgramMaterialization,
-} from "@relkit/deploy";
-import { deploymentConfiguration } from "@relkit/deploy";
-import { assertDeploymentPlanVersion } from "@relkit/deploy";
+} from "relkit/deploy";
+import { deploymentConfiguration } from "relkit/deploy";
+import { assertDeploymentPlanVersion } from "relkit/deploy";
 import { nativeWorkerOperations } from "./worker-materialization.js";
 
 /** @experimental */

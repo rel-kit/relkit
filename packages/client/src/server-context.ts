@@ -7,7 +7,7 @@ import type {
   CreateRelkitServerContextOptions,
   RelkitServerContext,
 } from "./server-context.types.js";
-import type { ClientIdentityDocument } from "@relkit/contracts";
+import type { ClientIdentityDocument } from "relkit/contracts";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { dehydrate } from "@tanstack/query-core";
 import { createClient } from "./transport.js";

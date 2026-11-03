@@ -1,7 +1,7 @@
 /** Freezes the final scaffold plan after manifest ownership is settled. */
 
 import { Effect, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 import type { PlanBuilderState } from "./plan-builder.types.js";
 import { finalizeManifestEffect } from "./plan-builder-manifest.js";

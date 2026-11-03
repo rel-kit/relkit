@@ -1,5 +1,5 @@
 import { Cause, Effect, Exit, Layer, ManagedRuntime, Metric } from "effect";
-import { createLoggerLayer } from "@relkit/runtime-effect/logger";
+import { createLoggerLayer } from "relkit/runtime-effect/logger";
 import { createDrainLayer } from "./drain-service.js";
 import { validateDrainOptions } from "./drain-validation.js";
 import {

@@ -1,1 +1,1 @@
-export * from "@relkit/realtime";
+export * from "relkit/realtime";

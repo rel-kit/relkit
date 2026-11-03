@@ -5,7 +5,7 @@
  * reads retain the original containment authority and each receipt byte bound.
  */
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { DevSnapshotRejected } from "./snapshot-error.js";
 import { snapshotDigest } from "./snapshot-fingerprint.js";
 import type { SnapshotFileOperations } from "./snapshot-files.types.js";

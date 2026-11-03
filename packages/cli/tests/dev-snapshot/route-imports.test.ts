@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { GRAPH_VERSION } from "@relkit/contracts";
-import type { ApplicationGraph } from "@relkit/graph";
+import { GRAPH_VERSION } from "relkit/contracts";
+import type { ApplicationGraph } from "relkit/graph";
 import { snapshotRouteImports } from "../../src/dev-snapshot/snapshot-route-imports.js";
 
 const graph = {

@@ -1,7 +1,7 @@
 import {
   DEPLOYMENT_INTEGRATION_PROTOCOL_VERSION,
   type DeploymentHostIntegration,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 import { materializeAwsHost } from "./materialize.js";
 
 /** @experimental */

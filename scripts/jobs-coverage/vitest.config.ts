@@ -1,12 +1,12 @@
 import { defineConfig } from "vitest/config";
 
 const jobSources = [
-  "packages/jobs/src/duration.ts",
-  "packages/jobs/src/resolve-binding-support.ts",
-  "packages/jobs/src/resolve-binding.ts",
-  "packages/jobs/src/task-policy-value.ts",
-  "packages/jobs/src/task-policy-value-copy.ts",
-  "packages/jobs/src/trigger-validation.ts",
+  "packages/relkit/src/jobs/duration.ts",
+  "packages/relkit/src/jobs/resolve-binding-support.ts",
+  "packages/relkit/src/jobs/resolve-binding.ts",
+  "packages/relkit/src/jobs/task-policy-value.ts",
+  "packages/relkit/src/jobs/task-policy-value-copy.ts",
+  "packages/relkit/src/jobs/trigger-validation.ts",
   "packages/client/src/jobs/controller-state.ts",
   "packages/client/src/jobs/controller-support.ts",
   "packages/client/src/jobs/controller.ts",
@@ -29,7 +29,7 @@ export default defineConfig({
     maxWorkers: 1,
     disableConsoleIntercept: true,
     include: [
-      "packages/jobs/**/*.test.ts",
+      "packages/relkit/**/*.test.ts",
       "packages/client/tests/compatibility/jobs-watch.test.ts",
       "packages/client/tests/jobs/quality.test.ts",
       "packages/client/tests/jobs/support.test.ts",

@@ -1,16 +1,16 @@
 /** Exercises native runtime events behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
 import { describe, expect, test } from "vitest";
-import { defineFunction } from "@relkit/functions";
+import { defineFunction } from "relkit/functions";
 import {
   completeSpan,
   runInExecutionContext,
   SpanRuntime,
   startRootSpan,
   type SpanLifecycle,
-} from "@relkit/invocation";
-import { z } from "@relkit/schema";
-import { defineTool } from "@relkit/tools";
+} from "relkit/invocation";
+import { z } from "relkit/schema";
+import { defineTool } from "relkit/tools";
 import {
   ApprovalRequiredError,
   defineAgent,

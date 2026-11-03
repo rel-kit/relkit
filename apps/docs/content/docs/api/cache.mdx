@@ -1,6 +1,6 @@
 ---
 title: Cache API
-description: Generated public TypeScript reference for @relkit/cache.
+description: Generated public TypeScript reference for relkit/cache.
 search:
   exclude: true
 sidebar:
@@ -41,7 +41,7 @@ declare const runAbortableEffect: <A, E, R>(
 ) => Effect.Effect<A, E | CacheOperationCancelledError | CacheOperationTimeoutError, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-abort.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-abort.ts#L10)
 
 ## `client-effects.ts`
 
@@ -63,7 +63,7 @@ declare const deleteCacheEffect: (
 ) => Effect.Effect<void, CacheOperationError, CacheRuntime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-effects.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-effects.ts#L77)
 
 ### getCacheEffect
 
@@ -83,7 +83,7 @@ declare const getCacheEffect: (
 ) => Effect.Effect<unknown, CacheOperationError, CacheRuntime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-effects.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-effects.ts#L17)
 
 ### getOrSetCacheEffect
 
@@ -108,7 +108,7 @@ declare const getOrSetCacheEffect: (
 ) => Effect.Effect<unknown, CacheOperationError, CacheRuntime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-effects.ts#L126)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-effects.ts#L126)
 
 ### hasCacheEffect
 
@@ -128,7 +128,7 @@ declare const hasCacheEffect: (
 ) => Effect.Effect<boolean, CacheOperationError, CacheRuntime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-effects.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-effects.ts#L100)
 
 ### setCacheEffect
 
@@ -150,7 +150,7 @@ declare const setCacheEffect: (
 ) => Effect.Effect<void, CacheOperationError, CacheRuntime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-effects.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-effects.ts#L46)
 
 ## `client-errors.ts`
 
@@ -172,7 +172,7 @@ declare class CacheCapabilityError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L9)
 
 ### code (property)
 
@@ -182,7 +182,7 @@ declare class CacheCapabilityError {
 readonly code: "RELKIT_CACHE_CAPABILITY_UNSUPPORTED"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L13)
 
 ### CacheDependencyError (class)
 
@@ -202,7 +202,7 @@ declare class CacheDependencyError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L25)
 
 ### code (property)
 
@@ -212,7 +212,7 @@ declare class CacheDependencyError {
 readonly code: "RELKIT_CACHE_DEPENDENCY_UNDECLARED"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L29)
 
 ### CacheIncrementUnsupportedError (class)
 
@@ -232,7 +232,7 @@ declare class CacheIncrementUnsupportedError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L86)
 
 ### code (property)
 
@@ -242,7 +242,7 @@ declare class CacheIncrementUnsupportedError {
 readonly code: "RELKIT_CACHE_INCREMENT_UNSUPPORTED"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L90)
 
 ### CacheOperationCancelledError (class)
 
@@ -262,7 +262,7 @@ declare class CacheOperationCancelledError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L101)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L101)
 
 ### code (property)
 
@@ -272,7 +272,7 @@ declare class CacheOperationCancelledError {
 readonly code: "ABORT_ERR"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L105)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L105)
 
 ### CacheOperationTimeoutError (class)
 
@@ -292,7 +292,7 @@ declare class CacheOperationTimeoutError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L119)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L119)
 
 ### code (property)
 
@@ -302,7 +302,7 @@ declare class CacheOperationTimeoutError {
 readonly code: "ETIMEDOUT"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L123)
 
 ### CacheProviderError (class)
 
@@ -322,7 +322,7 @@ declare class CacheProviderError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L41)
 
 ### code (property)
 
@@ -332,7 +332,7 @@ declare class CacheProviderError {
 readonly code: "RELKIT_CACHE_PROVIDER_UNAVAILABLE"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L45)
 
 ### CacheProviderFailureError (class)
 
@@ -350,7 +350,7 @@ new CacheProviderFailureError({ operation: "get", cause: "offline" });
 declare class CacheProviderFailureError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L138)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L138)
 
 ### CacheSchemaValidationError (class)
 
@@ -371,7 +371,7 @@ declare class CacheSchemaValidationError { constructor(
   ) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L58)
 
 ### \_tag (property)
 
@@ -381,7 +381,7 @@ declare class CacheSchemaValidationError { constructor(
 readonly _tag: "CacheSchemaValidationError"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L59)
 
 ### code (property)
 
@@ -391,7 +391,7 @@ readonly _tag: "CacheSchemaValidationError"
 readonly code: "RELKIT_CACHE_SCHEMA_VALIDATION"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L60)
 
 ### CacheTtlPolicyError (class)
 
@@ -411,7 +411,7 @@ declare class CacheTtlPolicyError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L73)
 
 ### \_tag (property)
 
@@ -421,7 +421,7 @@ declare class CacheTtlPolicyError {
 readonly _tag: "CacheTtlPolicyError"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L74)
 
 ### code (property)
 
@@ -431,7 +431,7 @@ readonly _tag: "CacheTtlPolicyError"
 readonly code: "RELKIT_CACHE_TTL_POLICY"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L75)
 
 ### reason (property)
 
@@ -441,7 +441,7 @@ readonly code: "RELKIT_CACHE_TTL_POLICY"
 readonly reason: string
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L76)
 
 ### CacheValidationError (class)
 
@@ -459,7 +459,7 @@ new CacheValidationError({ reason: "Cache has must return a boolean" });
 declare class CacheValidationError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-errors.ts#L146)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-errors.ts#L146)
 
 ## `client-increment.ts`
 
@@ -483,7 +483,7 @@ declare const incrementCacheEffect: (
 ) => Effect.Effect<number, CacheOperationError, CacheRuntime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-increment.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-increment.ts#L19)
 
 ## `client-observability.ts`
 
@@ -503,7 +503,7 @@ Effect.provide(getCacheEffect("sku"), CacheTelemetryLive);
 declare class CacheTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-observability.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-observability.ts#L9)
 
 ### CacheTelemetryLive
 
@@ -521,7 +521,7 @@ Effect.provide(getCacheEffect("sku"), CacheTelemetryLive);
 declare const CacheTelemetryLive: Layer.Layer<CacheTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-observability.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-observability.ts#L15)
 
 ### observeCache
 
@@ -542,7 +542,7 @@ declare const observeCache: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-observability.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-observability.ts#L27)
 
 ## `client-observability.types.ts`
 
@@ -566,7 +566,7 @@ export interface CacheObservedEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-observability.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-observability.types.ts#L12)
 
 ### CacheObservedOperation (type alias)
 
@@ -585,7 +585,7 @@ type CacheObservedOperation =
   CacheOperation | "define" | "isDescriptor" | "assertDescriptor" | "createClient";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-observability.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-observability.types.ts#L7)
 
 ### CacheOperationObservation (interface)
 
@@ -615,7 +615,7 @@ export interface CacheOperationObservation {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-observability.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-observability.types.ts#L20)
 
 ### CacheTelemetryService (interface)
 
@@ -644,7 +644,7 @@ export interface CacheTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-observability.types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-observability.types.ts#L30)
 
 ## `client-operation.ts`
 
@@ -668,7 +668,7 @@ declare const invokeProvider: <A>(
 ) => Effect.Effect<Awaited<A>, CacheOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-operation.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.ts#L30)
 
 ### runCacheOperation
 
@@ -691,7 +691,7 @@ declare const runCacheOperation: <A>(
 ) => Effect.Effect<A, CacheOperationError, CacheRuntime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-operation.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.ts#L50)
 
 ## `client-operation.types.ts`
 
@@ -713,7 +713,7 @@ export interface CacheCapabilities {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-operation.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.types.ts#L34)
 
 ### CacheCapability (type alias)
 
@@ -731,7 +731,7 @@ const capability: CacheCapability = "increment";
 type CacheCapability = "increment";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-operation.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.types.ts#L11)
 
 ### CacheInvocation (interface)
 
@@ -767,7 +767,7 @@ export interface CacheInvocation<A> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-operation.types.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.types.ts#L112)
 
 ### CacheOperation (type alias)
 
@@ -785,7 +785,7 @@ const operation: CacheOperation = "get";
 type CacheOperation = "get" | "set" | "delete" | "has" | "getOrSet" | "increment";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-operation.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.types.ts#L7)
 
 ### CacheOperationContext (interface)
 
@@ -807,7 +807,7 @@ export interface CacheOperationContext {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-operation.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.types.ts#L26)
 
 ### CacheOperationOptions (interface)
 
@@ -827,7 +827,7 @@ export interface CacheOperationOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-operation.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.types.ts#L20)
 
 ### CacheOperationOutcome (type alias)
 
@@ -846,7 +846,7 @@ type CacheOperationOutcome =
   "success" | "provider-failure" | "cancelled" | "timeout" | "unsupported" | "validation-error";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-operation.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.types.ts#L15)
 
 ### CacheProvider (interface)
 
@@ -932,7 +932,7 @@ export interface CacheProvider {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-operation.types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.types.ts#L40)
 
 ## `client-runtime.ts`
 
@@ -955,7 +955,7 @@ Effect.provide(
 declare class CacheRuntime
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-runtime.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-runtime.ts#L12)
 
 ### asProviderEffect
 
@@ -975,7 +975,7 @@ declare const asProviderEffect: (
 ) => Effect.Effect<CacheProvider, CacheProviderError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-runtime.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-runtime.ts#L36)
 
 ### cacheRuntimeLayer
 
@@ -999,7 +999,7 @@ declare const cacheRuntimeLayer: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-runtime.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-runtime.ts#L20)
 
 ## `client-runtime.types.ts`
 
@@ -1028,7 +1028,7 @@ export interface CacheBridgeOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-runtime.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-runtime.types.ts#L7)
 
 ### CacheInvocationBridge (interface)
 
@@ -1054,7 +1054,7 @@ export interface CacheInvocationBridge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-runtime.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-runtime.types.ts#L16)
 
 ### CacheRuntimeService (interface)
 
@@ -1075,7 +1075,7 @@ export interface CacheRuntimeService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-runtime.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-runtime.types.ts#L28)
 
 ## `client-validation-effect.ts`
 
@@ -1099,7 +1099,7 @@ declare const normalizeTtlEffect: (
 ) => Effect.Effect<{ ttlMs: number } | undefined, CacheTtlPolicyError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-validation-effect.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-validation-effect.ts#L91)
 
 ### validateBooleanEffect
 
@@ -1119,7 +1119,7 @@ declare const validateBooleanEffect: (
 ) => Effect.Effect<boolean, CacheValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-validation-effect.ts#L125)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-validation-effect.ts#L125)
 
 ### validateClientIdentityEffect
 
@@ -1142,7 +1142,7 @@ declare const validateClientIdentityEffect: (
 ) => Effect.Effect<undefined, CacheValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-validation-effect.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-validation-effect.ts#L14)
 
 ### validateClientPolicyEffect
 
@@ -1165,7 +1165,7 @@ declare const validateClientPolicyEffect: (
 ) => Effect.Effect<undefined, CacheTtlPolicyError | CacheValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-validation-effect.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-validation-effect.ts#L27)
 
 ### validateIncrementDeltaEffect
 
@@ -1185,7 +1185,7 @@ declare const validateIncrementDeltaEffect: (
 ) => Effect.Effect<number, CacheValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-validation-effect.ts#L135)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-validation-effect.ts#L135)
 
 ### validatePolicyEffect
 
@@ -1206,7 +1206,7 @@ declare const validatePolicyEffect: (
 ) => Effect.Effect<undefined, CacheTtlPolicyError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-validation-effect.ts#L113)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-validation-effect.ts#L113)
 
 ### validateSchemaEffect
 
@@ -1228,7 +1228,7 @@ declare const validateSchemaEffect: (
 ) => Effect.Effect<unknown, CacheSchemaValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-validation-effect.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-validation-effect.ts#L69)
 
 ## `client.ts`
 
@@ -1242,7 +1242,7 @@ Re-exports all named exports from the "./client.types.js" module.
 export * from "./client.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L31)
 
 ### CacheCapabilityError
 
@@ -1252,7 +1252,7 @@ export * from "./client.types.js";
 declare const CacheCapabilityError: typeof CacheCapabilityError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L20)
 
 ### CacheDependencyError
 
@@ -1262,7 +1262,7 @@ declare const CacheCapabilityError: typeof CacheCapabilityError;
 declare const CacheDependencyError: typeof CacheDependencyError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L21)
 
 ### CacheIncrementUnsupportedError
 
@@ -1272,7 +1272,7 @@ declare const CacheDependencyError: typeof CacheDependencyError;
 declare const CacheIncrementUnsupportedError: typeof CacheIncrementUnsupportedError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L22)
 
 ### CacheOperationCancelledError
 
@@ -1282,7 +1282,7 @@ declare const CacheIncrementUnsupportedError: typeof CacheIncrementUnsupportedEr
 declare const CacheOperationCancelledError: typeof CacheOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L23)
 
 ### CacheOperationTimeoutError
 
@@ -1292,7 +1292,7 @@ declare const CacheOperationCancelledError: typeof CacheOperationCancelledError;
 declare const CacheOperationTimeoutError: typeof CacheOperationTimeoutError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L24)
 
 ### CacheProviderError
 
@@ -1302,7 +1302,7 @@ declare const CacheOperationTimeoutError: typeof CacheOperationTimeoutError;
 declare const CacheProviderError: typeof CacheProviderError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L25)
 
 ### CacheProviderFailureError
 
@@ -1312,7 +1312,7 @@ declare const CacheProviderError: typeof CacheProviderError;
 declare const CacheProviderFailureError: typeof CacheProviderFailureError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L26)
 
 ### CacheRuntime
 
@@ -1322,7 +1322,7 @@ declare const CacheProviderFailureError: typeof CacheProviderFailureError;
 declare const CacheRuntime: typeof CacheRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L40)
 
 ### CacheSchemaValidationError
 
@@ -1332,7 +1332,7 @@ declare const CacheRuntime: typeof CacheRuntime;
 declare const CacheSchemaValidationError: typeof CacheSchemaValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L27)
 
 ### CacheTelemetry
 
@@ -1342,7 +1342,7 @@ declare const CacheSchemaValidationError: typeof CacheSchemaValidationError;
 declare const CacheTelemetry: typeof CacheTelemetry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L41)
 
 ### CacheTelemetryLive
 
@@ -1352,7 +1352,7 @@ declare const CacheTelemetry: typeof CacheTelemetry;
 declare const CacheTelemetryLive: Layer.Layer<CacheTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L41)
 
 ### CacheTtlPolicyError
 
@@ -1362,7 +1362,7 @@ declare const CacheTelemetryLive: Layer.Layer<CacheTelemetry, never, never>;
 declare const CacheTtlPolicyError: typeof CacheTtlPolicyError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L28)
 
 ### CacheValidationError
 
@@ -1372,7 +1372,7 @@ declare const CacheTtlPolicyError: typeof CacheTtlPolicyError;
 declare const CacheValidationError: typeof CacheValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L29)
 
 ### cacheRuntimeLayer
 
@@ -1388,7 +1388,7 @@ declare const cacheRuntimeLayer: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L40)
 
 ### createCacheClient
 
@@ -1415,7 +1415,7 @@ declare const createCacheClient: <
 ) => CacheClient<InferInput<KeySchema>, InferOutput<ValueSchema>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L92)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L92)
 
 ### createCacheClientEffect
 
@@ -1442,7 +1442,7 @@ declare const createCacheClientEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L47)
 
 ### deleteCacheEffect
 
@@ -1454,7 +1454,7 @@ declare const deleteCacheEffect: (
 ) => Effect.Effect<void, CacheOperationError, CacheRuntime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L33)
 
 ### getCacheEffect
 
@@ -1466,7 +1466,7 @@ declare const getCacheEffect: (
 ) => Effect.Effect<unknown, CacheOperationError, CacheRuntime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L34)
 
 ### getOrSetCacheEffect
 
@@ -1480,7 +1480,7 @@ declare const getOrSetCacheEffect: (
 ) => Effect.Effect<unknown, CacheOperationError, CacheRuntime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L35)
 
 ### hasCacheEffect
 
@@ -1492,7 +1492,7 @@ declare const hasCacheEffect: (
 ) => Effect.Effect<boolean, CacheOperationError, CacheRuntime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L36)
 
 ### incrementCacheEffect
 
@@ -1506,7 +1506,7 @@ declare const incrementCacheEffect: (
 ) => Effect.Effect<number, CacheOperationError, CacheRuntime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L39)
 
 ### setCacheEffect
 
@@ -1520,7 +1520,7 @@ declare const setCacheEffect: (
 ) => Effect.Effect<void, CacheOperationError, CacheRuntime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.ts#L37)
 
 ## `client.types.ts`
 
@@ -1532,7 +1532,7 @@ declare const setCacheEffect: (
 declare const CacheBridgeOptions: CacheBridgeOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L162)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L162)
 
 ### CacheCapabilities
 
@@ -1542,7 +1542,7 @@ declare const CacheBridgeOptions: CacheBridgeOptions;
 declare const CacheCapabilities: CacheCapabilities;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L21)
 
 ### CacheCapability
 
@@ -1552,7 +1552,7 @@ declare const CacheCapabilities: CacheCapabilities;
 declare const CacheCapability: "increment";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L20)
 
 ### CacheClient (type alias)
 
@@ -1571,7 +1571,7 @@ type CacheClient<Key, Value> = CacheClientBase<Key, Value> &
   ([Value] extends [number] ? CacheNumericClient<Key, Value> : object);
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L87)
 
 ### CacheClientBase (interface)
 
@@ -1628,7 +1628,7 @@ export interface CacheClientBase<Key, Value> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L31)
 
 ### CacheClientOptions (interface)
 
@@ -1666,7 +1666,7 @@ export interface CacheClientOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L176)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L176)
 
 ### CacheDescriptorPolicy (interface)
 
@@ -1689,7 +1689,7 @@ export interface CacheDescriptorPolicy {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L167)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L167)
 
 ### CacheEffectClient (interface)
 
@@ -1762,7 +1762,7 @@ export interface CacheEffectClient<Key, Value> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L106)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L106)
 
 ### CacheInvocationBridge
 
@@ -1772,7 +1772,7 @@ export interface CacheEffectClient<Key, Value> {
 declare const CacheInvocationBridge: CacheInvocationBridge;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L162)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L162)
 
 ### CacheNumericClient (type alias)
 
@@ -1799,7 +1799,7 @@ type CacheNumericClient<Key, Value extends number> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L74)
 
 ### CacheObservedEdge
 
@@ -1809,7 +1809,7 @@ type CacheNumericClient<Key, Value extends number> = {
 declare const CacheObservedEdge: CacheObservedEdge;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L163)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L163)
 
 ### CacheOperation
 
@@ -1819,7 +1819,7 @@ declare const CacheObservedEdge: CacheObservedEdge;
 declare const CacheOperation: CacheOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L22)
 
 ### CacheOperationContext
 
@@ -1829,7 +1829,7 @@ declare const CacheOperation: CacheOperation;
 declare const CacheOperationContext: CacheOperationContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L23)
 
 ### CacheOperationError (type alias)
 
@@ -1857,7 +1857,7 @@ type CacheOperationError =
   | CacheValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L92)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L92)
 
 ### CacheOperationObservation
 
@@ -1867,7 +1867,7 @@ type CacheOperationError =
 declare const CacheOperationObservation: CacheOperationObservation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L163)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L163)
 
 ### CacheOperationOptions
 
@@ -1877,7 +1877,7 @@ declare const CacheOperationObservation: CacheOperationObservation;
 declare const CacheOperationOptions: CacheOperationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L24)
 
 ### CacheOperationOutcome
 
@@ -1887,7 +1887,7 @@ declare const CacheOperationOptions: CacheOperationOptions;
 declare const CacheOperationOutcome: CacheOperationOutcome;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L25)
 
 ### CacheProvider
 
@@ -1897,7 +1897,7 @@ declare const CacheOperationOutcome: CacheOperationOutcome;
 declare const CacheProvider: CacheProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L26)
 
 ## `define-cache-compat.ts`
 
@@ -1921,7 +1921,7 @@ runDescriptor(Effect.succeed(1));
 declare const runDescriptor: <A>(effect: Effect.Effect<A, CacheDescriptorError>) => A;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache-compat.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache-compat.ts#L10)
 
 ## `define-cache-error.ts`
 
@@ -1941,7 +1941,7 @@ new CacheDescriptorError({ reason: "Invalid cache descriptor" });
 declare class CacheDescriptorError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache-error.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache-error.ts#L6)
 
 ## `define-cache.ts`
 
@@ -1956,8 +1956,8 @@ TypeError for invalid options and IDs.
 **Example**
 
 ```ts
-import { defineCache } from "@relkit/cache";
-import { z } from "@relkit/schema";
+import { defineCache } from "relkit/cache";
+import { z } from "relkit/schema";
 const prices = defineCache({ id: "prices", key: z.string(), value: z.number() });
 ```
 
@@ -1973,7 +1973,7 @@ declare const defineCache: <
 ) => CacheDescriptor<Id, InferInput<KeySchema>, InferOutput<ValueSchema>, KeySchema, ValueSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L100)
 
 Since v0.1.0
 
@@ -1985,7 +1985,7 @@ Since v0.1.0
 declare const CacheDescriptor: CacheDescriptor<Id, Key, Value, KeySchema, ValueSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L19)
 
 ### CacheDescriptorAny
 
@@ -1995,7 +1995,7 @@ declare const CacheDescriptor: CacheDescriptor<Id, Key, Value, KeySchema, ValueS
 declare const CacheDescriptorAny: CacheDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L20)
 
 ### CacheDescriptorError
 
@@ -2005,7 +2005,7 @@ declare const CacheDescriptorAny: CacheDescriptorAny;
 declare const CacheDescriptorError: typeof CacheDescriptorError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L23)
 
 ### DefineCacheOptions
 
@@ -2015,7 +2015,7 @@ declare const CacheDescriptorError: typeof CacheDescriptorError;
 declare const DefineCacheOptions: DefineCacheOptions<Id, KeySchema, ValueSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L21)
 
 ### assertCacheDescriptor
 
@@ -2037,7 +2037,7 @@ assertCacheDescriptor(value);
 declare const assertCacheDescriptor: (value: unknown) => asserts value is CacheDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L148)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L148)
 
 ### assertCacheDescriptorEffect
 
@@ -2057,7 +2057,7 @@ declare const assertCacheDescriptorEffect: (
 ) => Effect.Effect<undefined, CacheDescriptorError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L133)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L133)
 
 ### defineCacheEffect
 
@@ -2085,7 +2085,7 @@ declare const defineCacheEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L29)
 
 ### isCacheDescriptor
 
@@ -2103,7 +2103,7 @@ if (isCacheDescriptor(value)) console.log(value.id);
 declare const isCacheDescriptor: (value: unknown) => value is CacheDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L125)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L125)
 
 ### isCacheDescriptorEffect
 
@@ -2121,7 +2121,7 @@ Effect.runSync(isCacheDescriptorEffect(value));
 declare const isCacheDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.ts#L114)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L114)
 
 ## `define-cache.types.ts`
 
@@ -2155,7 +2155,7 @@ export interface CacheDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.types.ts#L6)
 
 ### CacheDescriptorAny (type alias)
 
@@ -2173,7 +2173,7 @@ const value: CacheDescriptorAny = defineCache(options);
 type CacheDescriptorAny = CacheDescriptor<string, unknown, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.types.ts#L24)
 
 ### DefineCacheOptions (interface)
 
@@ -2206,7 +2206,7 @@ export interface DefineCacheOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/define-cache.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.types.ts#L28)
 
 ## `index.ts`
 
@@ -2220,7 +2220,7 @@ Re-exports all named exports from the "./client.js" module.
 export * from "./client.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/index.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/index.ts#L2)
 
 ### "./define-cache.js" (namespace export)
 
@@ -2232,4 +2232,4 @@ Re-exports all named exports from the "./define-cache.js" module.
 export * from "./define-cache.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/index.ts#L1)

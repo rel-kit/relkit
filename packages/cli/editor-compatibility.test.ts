@@ -19,19 +19,19 @@ test("the packaged plugin uses the editor's TypeScript for dynamic route inputs 
     await symlink(join(repository, "packages/app"), join(root, "node_modules/@relkit/app"));
     const functionFile = join(root, "src/users/example.function.ts");
     const routeFile = join(root, "src/routes/users/[id]/route.ts");
-    const valid = `import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+    const valid = `import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 export default defineFunction({ input: z.object({ value: z.string(), id: z.string() }),
 output: z.object({ value: z.string() }), handler: async ({ value }) => ({ value }) });`;
     await writeFile(functionFile, valid);
     await writeFile(
       join(root, "src/users/service.ts"),
-      `import { defineService } from "@relkit/app/services";
+      `import { defineService } from "relkit/services";
 import example from "./example.function.js";
 export default defineService({ functions: { example } });`,
     );
     const inferredRoute = `import service from "../../../users/service.js";
-import { defineServiceRoutes, http } from "@relkit/app/routes";
+import { defineServiceRoutes, http } from "relkit/routes";
 export const { GET } = defineServiceRoutes(service, { GET: { member: "example" } });`;
     let routeSource = inferredRoute;
     await writeFile(routeFile, routeSource);

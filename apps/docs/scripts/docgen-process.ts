@@ -2,6 +2,7 @@
 import { chmod, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
 import { basename, delimiter, join, resolve } from "node:path";
 import { Schema } from "effect";
+import { packageDirectory, sourceDirectory } from "./documentation-catalog.js";
 
 const root = resolve(import.meta.dir, "../../..");
 
@@ -46,7 +47,10 @@ async function prepare(
   selected?: readonly string[],
 ): Promise<void> {
   await mkdir(output, { recursive: true });
-  await symlink(resolve(root, directory, "node_modules"), resolve(output, "node_modules"));
+  await symlink(
+    resolve(root, packageDirectory(directory), "node_modules"),
+    resolve(output, "node_modules"),
+  );
   const checker = resolve(cwd, "check-examples.ts");
   await writeFile(
     checker,
@@ -59,7 +63,7 @@ async function prepare(
   const files = selected
     ? [
         ...new Bun.Glob("**/*.{ts,tsx,mts,cts}").scanSync({
-          cwd: resolve(root, directory, "src"),
+          cwd: resolve(root, sourceDirectory(directory)),
           absolute: true,
         }),
       ]
@@ -88,23 +92,23 @@ async function execute(cwd: string, directory: string, examples: string): Promis
     [
       resolve(root, "apps/docs/node_modules/.bin/docgen"),
       "--src",
-      resolve(root, directory, "src"),
+      resolve(root, sourceDirectory(directory)),
       "--homepage",
       "https://github.com/rel-kit/relkit",
       "--srcLink",
-      `https://github.com/rel-kit/relkit/blob/main/${directory}/src/`,
+      `https://github.com/rel-kit/relkit/blob/main/${sourceDirectory(directory)}/`,
       "--no-enforce-version",
       "--run-examples",
       "--examples-tsconfig-file",
       examples,
       "--parse-tsconfig-file",
-      resolve(root, directory, "tsconfig.json"),
+      resolve(root, packageDirectory(directory), "tsconfig.json"),
     ],
     {
       cwd,
       env: {
         ...process.env,
-        RELKIT_DOCGEN_SOURCE_ROOT: resolve(root, directory, "src"),
+        RELKIT_DOCGEN_SOURCE_ROOT: resolve(root, sourceDirectory(directory)),
         RELKIT_DOCGEN_TSC: resolve(root, "node_modules/.bin/tsc"),
         PATH: `${resolve(root, "apps/docs/node_modules/.bin")}${delimiter}${process.env.PATH ?? ""}`,
       },

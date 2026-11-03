@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { SourceLocationError } from "@relkit/contracts";
+import { SourceLocationError } from "relkit/contracts";
 import { Effect, Exit, Schema } from "effect";
 import * as ts from "typescript";
 import { prefilterSources, prefilterSourcesEffect } from "../../src/discovery/ast-prefilter.js";
@@ -23,10 +23,10 @@ describe("syntax discovery Effect contracts", () => {
       const scanned = yield* scanSourceEffect(
         "src/types.ts",
         `
-        import type { Service } from "@relkit/services";
-        import { type Descriptor } from "@relkit/contracts";
-        export type { Route } from "@relkit/routes";
-        export { type Constants } from "@relkit/config";
+        import type { Service } from "relkit/services";
+        import { type Descriptor } from "relkit/contracts";
+        export type { Route } from "relkit/routes";
+        export { type Constants } from "relkit/config";
       `,
       );
       expect(scanned.indicators).toEqual([]);
@@ -40,16 +40,16 @@ describe("syntax discovery Effect contracts", () => {
     Effect.gen(function* () {
       const text = `
         throw new Error("must never execute");
-        import "@relkit/functions";
-        const load = import("@relkit/config");
-        const other = require("@relkit/functions");
+        import "relkit/functions";
+        const load = import("relkit/config");
+        const other = require("relkit/functions");
         const fn = namespace.defineFunction({ handler() {} });
         Symbol.for("relkit.descriptor");
         export { default, value, type Type } from "./other.js";
         export default fn;
       `;
       const scanned = yield* scanSourceEffect("src/runtime.ts", text);
-      expect(scanned.imports).toEqual(["@relkit/config", "@relkit/functions"]);
+      expect(scanned.imports).toEqual(["relkit/config", "relkit/functions"]);
       expect(scanned.factories).toEqual(["defineFunction"]);
       expect(scanned.indicators).toEqual([
         "relkit-import",

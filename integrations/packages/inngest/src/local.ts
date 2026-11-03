@@ -2,7 +2,7 @@ import {
   LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,
   type CompositeLocalServiceRecipe,
   type LocalServiceRecipeOutputContext,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import { waitForInngestReadiness } from "./local-readiness.js";
 import { INNGEST_LOCAL_HEALTH_RETRIES } from "./local-timeouts.js";
 

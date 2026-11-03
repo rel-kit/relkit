@@ -1,7 +1,7 @@
 /** Verifies native authored ownership alongside portable lexical source normalization. */
 import { existsSync, realpathSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
-import { normalizeSourcePathEffect, serviceSource, SourceLocationError } from "@relkit/contracts";
+import { normalizeSourcePathEffect, serviceSource, SourceLocationError } from "relkit/contracts";
 import { Data, Effect } from "effect";
 import type { AstSourceModule } from "./ast-prefilter.types.js";
 import { observeCompiler } from "../observability.js";

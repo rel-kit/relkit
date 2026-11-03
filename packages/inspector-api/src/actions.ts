@@ -16,7 +16,7 @@ export type {
   InspectorActionEndpointOptions,
   InspectorActionRequest,
 } from "./actions.types.js";
-import { API_BASE_PATH } from "@relkit/contracts";
+import { API_BASE_PATH } from "relkit/contracts";
 import { errorResponse, json, negotiate } from "./router-utils.js";
 import { parseInspectorActionEffect } from "./actions-runtime.js";
 import type { InspectorActionResult } from "./actions-runtime.js";

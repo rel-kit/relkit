@@ -1,4 +1,4 @@
-import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "relkit/contracts";
 
 /** Pure lookup, health, and structured log adapters for the generated runtime host. */
 export const SERVER_RUNTIME_SUPPORT_SOURCE = `

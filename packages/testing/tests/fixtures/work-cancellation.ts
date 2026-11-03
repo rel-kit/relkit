@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { z } from "@relkit/schema";
-import { defineEventFunction } from "@relkit/events";
+import { z } from "relkit/schema";
+import { defineEventFunction } from "relkit/events";
 import { createTestJob } from "../../src/jobs.js";
 import { createTestEvent } from "../../src/events.js";
 

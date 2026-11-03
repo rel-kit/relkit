@@ -21,7 +21,7 @@ import {
   LOCAL_SERVICE_PLAN_VERSION,
   type LocalServiceInstance,
   type ProviderOverrideState,
-} from "../../packages/local-service/src/index.ts";
+} from "relkit/local-service";
 
 /** Owns the disposable project, containers and volumes even when an assertion fails.
  * @param run - Native assertions receiving only this fixture's services and bindings.

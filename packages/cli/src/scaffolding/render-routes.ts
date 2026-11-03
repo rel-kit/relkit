@@ -1,7 +1,7 @@
 /** Plans HTTP routes, middleware and transforms through typed scaffold filesystem authority. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import {
   scaffoldErrors,

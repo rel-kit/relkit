@@ -5,7 +5,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, expect, test } from "vitest";
-import { createDiagnostic, formatDiagnostic } from "@relkit/diagnostics";
+import { createDiagnostic, formatDiagnostic } from "relkit/diagnostics";
 import { errorLines, runCli } from "./src/main.js";
 
 const empty = await mkdtemp(join(tmpdir(), "relkit-error-presentation-"));

@@ -1,6 +1,6 @@
 /** Composes serialized append, retention configuration and checkpoint operations for one native history owner. */
 import { Effect, type Semaphore } from "effect";
-import type { RedactionPolicy, TelemetryLocalRetentionPolicy } from "@relkit/observability";
+import type { RedactionPolicy, TelemetryLocalRetentionPolicy } from "relkit/observability";
 import type { DuckdbConnectionPort } from "./duckdb-driver.types.js";
 import type { DuckdbStorageEffects } from "./duckdb-storage.types.js";
 import type { DuckdbStorageState } from "./duckdb-storage-state.types.js";

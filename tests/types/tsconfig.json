@@ -8,31 +8,124 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "paths": {
-      "@relkit/agents": ["packages/agents/src/index.ts"],
-      "@relkit/app": ["packages/app/src/index.ts"],
-      "@relkit/app/agents": ["packages/app/src/agents.ts"],
-      "@relkit/app/buckets": ["packages/app/src/buckets.ts"],
-      "@relkit/app/cache": ["packages/app/src/cache.ts"],
-      "@relkit/app/config": ["packages/app/src/config.ts"],
-      "@relkit/app/events": ["packages/app/src/events.ts"],
-      "@relkit/app/functions": ["packages/app/src/functions.ts"],
-      "@relkit/app/jobs": ["packages/app/src/jobs.ts"],
-      "@relkit/app/jobs/legacy": ["packages/app/src/jobs-legacy.ts"],
-      "@relkit/app/tasks": ["packages/app/src/tasks.ts"],
-      "@relkit/app/realtime": ["packages/app/src/realtime.ts"],
-      "@relkit/app/routes": ["packages/app/src/routes.ts"],
-      "@relkit/app/schema": ["packages/app/src/schema.ts"],
-      "@relkit/app/services": ["packages/app/src/services.ts"],
-      "@relkit/app/tools": ["packages/app/src/tools.ts"],
-      "@relkit/buckets": ["packages/buckets/src/index.ts"],
-      "@relkit/cache": ["packages/cache/src/index.ts"],
+      "relkit": ["packages/relkit/src/index.ts"],
+      "relkit/agents": ["packages/relkit/src/app/agents.ts"],
+      "relkit/agents/client-events": ["packages/relkit/src/agents/client-events.ts"],
+      "relkit/agents/internal/agent-client": ["packages/relkit/src/agents/agent-client.ts"],
+      "relkit/agents/internal/agent-telemetry": ["packages/relkit/src/agents/agent-telemetry.ts"],
+      "relkit/agents/internal/agent-validation": ["packages/relkit/src/agents/agent-validation.ts"],
+      "relkit/agents/internal/agent-validation-schema": [
+        "packages/relkit/src/agents/agent-validation-schema.ts"
+      ],
+      "relkit/agents/internal/agent-validation-value": [
+        "packages/relkit/src/agents/agent-validation-value.ts"
+      ],
+      "relkit/agents/internal/approval": ["packages/relkit/src/agents/approval.ts"],
+      "relkit/agents/internal/capture": ["packages/relkit/src/agents/capture.ts"],
+      "relkit/agents/internal/capture-policy": ["packages/relkit/src/agents/capture-policy.ts"],
+      "relkit/agents/internal/client-contract-schema.types": [
+        "packages/relkit/src/agents/client-contract-schema.types.ts"
+      ],
+      "relkit/agents/internal/client-events": ["packages/relkit/src/agents/client-events.ts"],
+      "relkit/agents/internal/define-agent-error": [
+        "packages/relkit/src/agents/define-agent-error.ts"
+      ],
+      "relkit/agents/internal/define-agent-limits": [
+        "packages/relkit/src/agents/define-agent-limits.ts"
+      ],
+      "relkit/agents/internal/define-agent-support": [
+        "packages/relkit/src/agents/define-agent-support.ts"
+      ],
+      "relkit/agents/internal/generated-function": [
+        "packages/relkit/src/agents/generated-function.ts"
+      ],
+      "relkit/agents/internal/model-selection": ["packages/relkit/src/agents/model-selection.ts"],
+      "relkit/agents/internal/observability": ["packages/relkit/src/agents/observability.ts"],
+      "relkit/agents/internal/runtime-events": ["packages/relkit/src/agents/runtime-events.ts"],
+      "relkit/agents/internal/state-control-requests.types": [
+        "packages/relkit/src/agents/state-control-requests.types.ts"
+      ],
+      "relkit/agents/internal/state-provider.types": [
+        "packages/relkit/src/agents/state-provider.types.ts"
+      ],
+      "relkit/agents/internal/state-receipts.types": [
+        "packages/relkit/src/agents/state-receipts.types.ts"
+      ],
+      "relkit/agents/internal/state-thread-requests.types": [
+        "packages/relkit/src/agents/state-thread-requests.types.ts"
+      ],
+      "relkit/agents/internal/state.types": ["packages/relkit/src/agents/state.types.ts"],
+      "relkit/agents/internal/thread-transition": [
+        "packages/relkit/src/agents/thread-transition.ts"
+      ],
+      "relkit/buckets": ["packages/relkit/src/app/buckets.ts"],
+      "relkit/cache": ["packages/relkit/src/app/cache.ts"],
+      "relkit/config": ["packages/relkit/src/app/config.ts"],
+      "relkit/config/internal/config": ["packages/relkit/src/config/internal/config.ts"],
+      "relkit/contracts": ["packages/relkit/src/contracts/index.ts"],
+      "relkit/contracts/jobs": ["packages/relkit/src/contracts/jobs.ts"],
+      "relkit/contracts/operation": ["packages/relkit/src/contracts/operation.ts"],
+      "relkit/deploy": ["packages/relkit/src/deploy/index.ts"],
+      "relkit/diagnostics": ["packages/relkit/src/diagnostics/index.ts"],
+      "relkit/diagnostics/codes": ["packages/relkit/src/diagnostics/codes/index.ts"],
+      "relkit/engine": ["packages/relkit/src/engine/index.ts"],
+      "relkit/engine/internal/server-runtime": [
+        "packages/relkit/src/engine/internal/server-runtime.ts"
+      ],
+      "relkit/events": ["packages/relkit/src/app/events.ts"],
+      "relkit/events/effect": ["packages/relkit/src/events/effect.ts"],
+      "relkit/functions": ["packages/relkit/src/app/functions.ts"],
+      "relkit/functions/internal": ["packages/relkit/src/functions/internal.ts"],
+      "relkit/graph": ["packages/relkit/src/graph/index.ts"],
+      "relkit/internal/runtime": ["packages/relkit/src/app/internal-runtime.ts"],
+      "relkit/invocation": ["packages/relkit/src/invocation/index.ts"],
+      "relkit/jobs": ["packages/relkit/src/app/jobs.ts"],
+      "relkit/jobs/adapter": ["packages/relkit/src/jobs/adapter.ts"],
+      "relkit/jobs/legacy": ["packages/relkit/src/app/jobs-legacy.ts"],
+      "relkit/jobs/server": ["packages/relkit/src/jobs/server.ts"],
+      "relkit/local-service": ["packages/relkit/src/local-service/index.ts"],
+      "relkit/observability": ["packages/relkit/src/observability/index.ts"],
+      "relkit/observability/early": ["packages/relkit/src/observability/early-records.service.ts"],
+      "relkit/observability/internal/query": [
+        "packages/relkit/src/observability/query-validation.ts"
+      ],
+      "relkit/observability/local": ["packages/relkit/src/observability/local/index.ts"],
+      "relkit/observability/local/protocol": [
+        "packages/relkit/src/observability/local/protocol.ts"
+      ],
+      "relkit/observability/local/queue": [
+        "packages/relkit/src/observability/local/batch-queue-effect.ts"
+      ],
+      "relkit/observability/local/record": ["packages/relkit/src/observability/local/types.ts"],
+      "relkit/observability/local/worker-contract": [
+        "packages/relkit/src/observability/local/worker-contract.ts"
+      ],
+      "relkit/observability/telemetry": ["packages/relkit/src/observability/telemetry.ts"],
+      "relkit/openapi": ["packages/relkit/src/openapi/index.ts"],
+      "relkit/provider": ["packages/relkit/src/provider/index.ts"],
+      "relkit/provider/internal/dependencies": [
+        "packages/relkit/src/provider/dependency-preflight.service.ts"
+      ],
+      "relkit/providers-local": ["packages/relkit/src/providers-local/index.ts"],
+      "relkit/realtime": ["packages/relkit/src/app/realtime.ts"],
+      "relkit/realtime/operation-id": ["packages/relkit/src/realtime/operation-id.ts"],
+      "relkit/routes": ["packages/relkit/src/app/routes.ts"],
+      "relkit/runtime-effect": ["packages/relkit/src/runtime-effect/index.ts"],
+      "relkit/runtime-effect/logger": ["packages/relkit/src/runtime-effect/logger.ts"],
+      "relkit/runtime-hono": ["packages/relkit/src/runtime-hono/index.ts"],
+      "relkit/runtime-hono/ag-ui": ["packages/relkit/src/runtime-hono/agent-protocol.ts"],
+      "relkit/runtime-hono/bun": ["packages/relkit/src/runtime-hono/bun.ts"],
+      "relkit/runtime-hono/internal/prepared": ["packages/relkit/src/runtime-hono/prepared-app.ts"],
+      "relkit/runtime-hono/mcp": ["packages/relkit/src/runtime-hono/mcp.ts"],
+      "relkit/runtime-hono/scalar": ["packages/relkit/src/runtime-hono/scalar.ts"],
+      "relkit/schema": ["packages/relkit/src/app/schema.ts"],
+      "relkit/services": ["packages/relkit/src/app/services.ts"],
+      "relkit/tasks": ["packages/relkit/src/app/tasks.ts"],
+      "relkit/tools": ["packages/relkit/src/app/tools.ts"],
       "@relkit/client": ["packages/client/src/index.ts"],
       "@relkit/client/jobs": ["packages/client/src/jobs/index.ts"],
       "@relkit/client/react": ["packages/client/src/react/index.ts"],
       "@relkit/cloudflare": ["integrations/packages/cloudflare/src/index.ts"],
-      "@relkit/config": ["packages/config/src/index.ts"],
-      "@relkit/contracts": ["packages/contracts/src/index.ts"],
-      "@relkit/contracts/jobs": ["packages/contracts/src/jobs.ts"],
       "@relkit/better-auth": ["packages/better-auth/src/index.ts"],
       "@relkit/better-auth/drizzle": ["packages/better-auth/src/drizzle.ts"],
       "@relkit/drizzle": ["packages/drizzle/src/index.ts"],
@@ -41,29 +134,17 @@
       "@relkit/drizzle/mysql": ["packages/drizzle/src/mysql.ts"],
       "@relkit/drizzle/internal": ["packages/drizzle/src/internal.ts"],
       "@relkit/docker": ["integrations/packages/docker/src/index.ts"],
-      "@relkit/events": ["packages/events/src/index.ts"],
-      "@relkit/functions": ["packages/functions/src/index.ts"],
-      "@relkit/functions/internal": ["packages/functions/src/internal.ts"],
-      "@relkit/jobs": ["packages/jobs/src/index.ts"],
-      "@relkit/jobs/adapter": ["packages/jobs/src/adapter.ts"],
-      "@relkit/jobs/legacy": ["packages/jobs/src/legacy.ts"],
-      "@relkit/jobs/server": ["packages/jobs/src/server.ts"],
-      "@relkit/local-service": ["packages/local-service/src/index.ts"],
       "@relkit/langchain": ["integrations/packages/langchain/src/index.ts"],
       "@relkit/langchain/testing": ["integrations/packages/langchain/src/testing/agents.ts"],
       "@relkit/testing": ["packages/testing/src/index.ts"],
       "@relkit/testing/drizzle": ["packages/testing/src/drizzle.ts"],
       "@relkit/testing/better-auth": ["packages/testing/src/better-auth.ts"],
-      "@relkit/provider": ["packages/provider/src/index.ts"],
-      "@relkit/realtime": ["packages/realtime/src/index.ts"],
       "@relkit/redis": ["integrations/packages/redis/src/index.ts"],
       "@relkit/s3": ["integrations/packages/s3/src/index.ts"],
-      "@relkit/routes": ["packages/routes/src/index.ts"],
-      "@relkit/schema": ["packages/schema/src/index.ts"],
-      "@relkit/services": ["packages/services/src/index.ts"],
-      "@relkit/tools": ["packages/tools/src/index.ts"],
       "@orpc/contract": ["packages/client/node_modules/@orpc/contract/dist/index.d.ts"],
-      "effect": ["packages/config/node_modules/effect/dist/index.d.ts"]
+      "effect": ["packages/relkit/node_modules/effect/dist/index.d.ts"],
+      "@relkit/app": ["packages/app/src/index.ts"],
+      "@relkit/app/*": ["packages/app/src/*.ts"]
     },
     "types": ["bun"]
   },

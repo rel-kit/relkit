@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { runJobsSync } from "./compatibility.js";
 import { observeJobs, recordJobsWorkload } from "./observability.js";
 import { taskReferenceIdEffect } from "./reference.js";
-import { serializeJsonEffect } from "@relkit/contracts";
+import { serializeJsonEffect } from "relkit/contracts";
 import { add } from "../normalize-pass-utils.js";
 import { isRecord } from "../normalize-utils.js";
 import {

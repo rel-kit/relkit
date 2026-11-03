@@ -1,5 +1,5 @@
-import type { ScheduleDefinition } from "@relkit/jobs";
-import type { TaskExecutor } from "@relkit/jobs/adapter";
+import type { ScheduleDefinition } from "relkit/jobs";
+import type { TaskExecutor } from "relkit/jobs/adapter";
 import { Inngest } from "inngest";
 import { serve } from "inngest/bun";
 import { mapInngestPolicy } from "./policy.js";

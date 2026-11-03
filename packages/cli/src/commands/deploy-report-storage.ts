@@ -1,7 +1,7 @@
 /** Publishes secret-safe deployment reports using only captured filesystem authority. */
 import { join } from "node:path";
 import { Effect, Schema } from "effect";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import { cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { CliFileSystem } from "../services/filesystem.service.js";

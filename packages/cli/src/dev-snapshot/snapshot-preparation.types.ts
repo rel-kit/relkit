@@ -4,8 +4,8 @@
  * the persisted receipt, and preparation never starts a listener or inspector.
  */
 import type { Effect } from "effect";
-import type { ApplicationGraph } from "@relkit/graph";
-import type { RuntimeActivationFingerprint } from "@relkit/contracts";
+import type { ApplicationGraph } from "relkit/graph";
+import type { RuntimeActivationFingerprint } from "relkit/contracts";
 import type { SnapshotTools, DevSnapshot } from "./snapshot.types.js";
 import type { DevSnapshotIoError, DevSnapshotRejected } from "./snapshot-error.js";
 import type { CliAdapterError } from "../cli-errors.js";

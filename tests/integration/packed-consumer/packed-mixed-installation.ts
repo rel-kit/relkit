@@ -91,7 +91,7 @@ export const auditPackedMixedClosure = Effect.fn("PackedMixed.auditClosure")(fun
   );
   assert.deepEqual(installation.missing, []);
   for (const instance of installation.instances) {
-    if (instance.name.startsWith("@relkit/")) {
+    if (instance.name === "relkit" || instance.name.startsWith("@relkit/")) {
       assert.ok(
         candidate.tarballs.has(instance.name),
         `Unpacked first-party owner ${instance.name}`,

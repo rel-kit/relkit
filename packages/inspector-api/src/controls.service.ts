@@ -1,5 +1,5 @@
 import { Cause, Context, Deferred, Effect, Exit, Layer, Ref, Scope } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { identity, type InspectorMode, type ResolvedActiveGeneration } from "./shared.js";
 import { InspectorActionError } from "./actions-errors.js";
 import { dispatchInspectorActionEffect } from "./actions-dispatch.js";

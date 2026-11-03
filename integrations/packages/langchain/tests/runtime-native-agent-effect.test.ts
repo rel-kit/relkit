@@ -1,6 +1,6 @@
 /** Exercises native runtime native agent effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { Effect, Layer, Result } from "effect";
 import { expect, test } from "vitest";
 import { defineAgent } from "../src/define-agent.js";

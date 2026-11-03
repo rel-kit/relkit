@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
 import { relative, resolve } from "node:path";
-import { normalizeSourcePath } from "@relkit/contracts";
+import { normalizeSourcePath } from "relkit/contracts";
 import type { ExtractedDescriptor } from "./discovery/extract.js";
 import type { ContextRegistryGenerationOptions } from "./context-registry.types.js";
 export type { ContextRegistryGenerationOptions } from "./context-registry.types.js";
@@ -36,19 +36,19 @@ export const generateContextRegistryEffect = Effect.fn("Compiler.generateContext
         : `    readonly database: import("@relkit/drizzle").DatabaseContext<${importType(database, output, root)}>;`,
       auth === undefined
         ? undefined
-        : `    readonly auth: import("@relkit/functions").AuthContext<import("@relkit/better-auth").InferBetterAuthSession<${importType(auth, output, root)}["handler"]>>;`,
+        : `    readonly auth: import("relkit/functions").AuthContext<import("@relkit/better-auth").InferBetterAuthSession<${importType(auth, output, root)}["handler"]>>;`,
       constants.length === 0
         ? undefined
-        : `    readonly constants: ${constants.map((entry) => `import("@relkit/app").ResolvedConstants<${importType(entry, output, root)}>`).join(" & ")};`,
+        : `    readonly constants: ${constants.map((entry) => `import("relkit").ResolvedConstants<${importType(entry, output, root)}>`).join(" & ")};`,
       prompts.length === 0
         ? undefined
-        : `    readonly prompts: { ${prompts.map((entry) => `readonly ${JSON.stringify(entry.exportName)}: import("@relkit/app").ResolvedPrompt<${importType(entry, output, root)}>`).join("; ")} };`,
+        : `    readonly prompts: { ${prompts.map((entry) => `readonly ${JSON.stringify(entry.exportName)}: import("relkit").ResolvedPrompt<${importType(entry, output, root)}>`).join("; ")} };`,
     ].filter((value): value is string => value !== undefined);
     return [
       ...(application === undefined
         ? []
         : [
-            `type RelkitApplicationEnv = import("@relkit/config").ResolvedEnv<${importType(application, output, root)}["env"]["shape"]>;`,
+            `type RelkitApplicationEnv = import("relkit/config").ResolvedEnv<${importType(application, output, root)}["env"]["shape"]>;`,
             "",
           ]),
       "declare global {",

@@ -15,11 +15,11 @@ import { memoryFileSystem } from "./generator-services.fixture.js";
 
 const root = "/memory/app";
 const files = {
-  [root + "/package.json"]: '{"dependencies":{"@relkit/app":"0.4.0"}}',
+  [root + "/package.json"]: '{"dependencies":{"relkit":"0.4.0"}}',
   [root + "/relkit.config.ts"]:
-    'import { defineApp } from "@relkit/app/config"; export default defineApp({});',
+    'import { defineApp } from "relkit/config"; export default defineApp({});',
   [root + "/src/hello/service.ts"]:
-    'import { defineService } from "@relkit/app/services"; export default defineService({});',
+    'import { defineService } from "relkit/services"; export default defineService({});',
   [root + "/value.ts"]: "original",
 };
 

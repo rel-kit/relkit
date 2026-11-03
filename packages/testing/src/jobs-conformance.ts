@@ -1,7 +1,7 @@
 import type { JobsConformanceFixture, JobsConformanceHarness } from "./jobs-conformance.types.js";
 export type { JobsConformanceFixture, JobsConformanceHarness } from "./jobs-conformance.types.js";
-import type { RunHandle } from "@relkit/contracts/jobs";
-import type { JobsAdapterRuntime, NativeSubmission, OperationContext } from "@relkit/jobs/adapter";
+import type { RunHandle } from "relkit/contracts/jobs";
+import type { JobsAdapterRuntime, NativeSubmission, OperationContext } from "relkit/jobs/adapter";
 import {
   createDeterministicJobsAdapter,
   type TestJobsAdapterOptions,

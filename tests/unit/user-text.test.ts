@@ -29,9 +29,9 @@ test("a fixture with an old spelling and a banned term fails with locations", as
     join(fixture, "packages/cli/src/run.ts"),
     'fail("RELKIT_X", "The cohort was rejected.");\nconst label = "cohort.json";\nconst name = "RELKIT";\n',
   );
-  await mkdir(join(fixture, "packages/diagnostics/src/codes"), { recursive: true });
+  await mkdir(join(fixture, "packages/relkit/src/diagnostics/codes"), { recursive: true });
   await writeFile(
-    join(fixture, "packages/diagnostics/src/codes/cli.ts"),
+    join(fixture, "packages/relkit/src/diagnostics/codes/cli.ts"),
     'export const cliCodes = [{ code: "RELKIT_X", title: "Bad `cohort`", happened: "Relkit failed.", fix: "Check the cohort." }];\n',
   );
   await cp(join(root, "WRITING.md"), join(fixture, "WRITING.md"));
@@ -42,9 +42,11 @@ test("a fixture with an old spelling and a banned term fails with locations", as
   expect(findings).toContain("apps/docs/content/docs/index.mdx 5 12 spelling Relkit");
   expect(findings).toContain("packages/cli/src/run.ts 1 23 banned-term cohort");
   expect(findings).toContain("packages/cli/src/run.ts 3 15 spelling RELKIT");
-  expect(findings).toContain("packages/diagnostics/src/codes/cli.ts 1 80 spelling Relkit");
-  expect(findings).toContain("packages/diagnostics/src/codes/cli.ts 1 113 banned-term cohort");
-  expect(findings.filter((finding) => finding.startsWith("packages/diagnostics"))).toHaveLength(2);
+  expect(findings).toContain("packages/relkit/src/diagnostics/codes/cli.ts 1 80 spelling Relkit");
+  expect(findings).toContain(
+    "packages/relkit/src/diagnostics/codes/cli.ts 1 113 banned-term cohort",
+  );
+  expect(findings.filter((finding) => finding.startsWith("packages/relkit"))).toHaveLength(2);
   expect(findings.some((finding) => finding.includes("tuple"))).toBe(false);
   expect(findings.some((finding) => finding.includes("Receipt"))).toBe(false);
   expect(findings.some((finding) => finding.includes("cohort.json"))).toBe(false);

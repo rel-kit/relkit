@@ -1,9 +1,9 @@
 /** Derives selected native service imports and immutable generated-server verification fragments.
  * Rendering acquires no SDK; runtime acquisition validates those selected dependencies before readiness.
  */
-import { LOCAL_SERVICE_PLAN_VERSION } from "@relkit/local-service";
-import type { ApplicationGraph } from "@relkit/graph";
-import type { RuntimeActivationFingerprint } from "@relkit/contracts";
+import { LOCAL_SERVICE_PLAN_VERSION } from "relkit/local-service";
+import type { ApplicationGraph } from "relkit/graph";
+import type { RuntimeActivationFingerprint } from "relkit/contracts";
 
 import type { ServerSourceOptions } from "./build-server.types.js";
 export type { ServerSourceOptions } from "./build-server.types.js";
@@ -71,7 +71,7 @@ function providerOverridesOptions(activation: RuntimeActivationFingerprint) {
     activation.providerOverridesGeneration === undefined
       ? ""
       : `import { lstatSync, readFileSync } from "node:fs";
-import { providerOverrideBindingValues } from "@relkit/local-service";`;
+import { providerOverrideBindingValues } from "relkit/local-service";`;
   const providerOverridesSource =
     activation.providerOverridesGeneration === undefined
       ? "const localBindingValues = undefined;"

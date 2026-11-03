@@ -1,6 +1,6 @@
 /** Owns a native pseudo-terminal, detached packed CLI child and bounded termination before terminal release. */
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { ScaffoldProcessFailure } from "./scaffold-process.errors.js";
 import { signalScaffoldGroup } from "./scaffold-process.js";
 import type {

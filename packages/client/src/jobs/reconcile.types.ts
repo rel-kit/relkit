@@ -1,4 +1,4 @@
-import type { ExpectedClientIdentity } from "@relkit/contracts";
+import type { ExpectedClientIdentity } from "relkit/contracts";
 
 /** A native job procedure callable preserving unknown request and result authority. */
 export type Procedure = (...args: readonly unknown[]) => unknown;

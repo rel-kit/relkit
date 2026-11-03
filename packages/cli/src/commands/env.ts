@@ -12,7 +12,7 @@ import {
   isRequired,
   type EnvCommandOptions,
 } from "./env-support.js";
-import { projectEnvEffect } from "@relkit/config";
+import { projectEnvEffect } from "relkit/config";
 import { Effect } from "effect";
 import { cliAdapterError, cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";

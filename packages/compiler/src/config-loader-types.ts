@@ -18,7 +18,7 @@ import {
   DEFAULT_INSPECTOR_CONFIGURATION,
   InspectorConfigurationSchema,
   InspectorConfigurationInputSchema,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 
 /** Validated TCP port shared by field-level readers and normalized records. */
 export const ConfigPort = Schema.Number.check(

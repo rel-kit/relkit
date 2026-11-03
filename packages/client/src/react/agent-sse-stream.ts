@@ -1,4 +1,4 @@
-import type { AgentObservation } from "@relkit/contracts";
+import type { AgentObservation } from "relkit/contracts";
 import { Effect, Stream } from "effect";
 import { nativeStream } from "../native-stream.js";
 

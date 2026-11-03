@@ -11,7 +11,7 @@ import {
   type ProviderAdapter,
   type ProviderBehavior,
   type ProviderConnectionValues,
-} from "@relkit/provider";
+} from "relkit/provider";
 
 const bucket = defineProviderCapability("bucket");
 const integration = defineIntegrationReference("s3");

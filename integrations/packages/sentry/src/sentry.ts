@@ -1,8 +1,8 @@
 import {
   defineTelemetryExporter,
   type TelemetryExporterDescriptor,
-} from "@relkit/observability/telemetry";
-import { isBindingValueRef, type BindingValueRef } from "@relkit/provider";
+} from "relkit/observability/telemetry";
+import { isBindingValueRef, type BindingValueRef } from "relkit/provider";
 
 type TextReference =
   | BindingValueRef<string, string, "string">

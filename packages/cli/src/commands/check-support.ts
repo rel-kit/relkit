@@ -3,8 +3,8 @@
  * The check service supplies source reads; this module preserves cancellation,
  * source locations and actionable current application configuration examples.
  */
-import { canonicalJson, RELKIT_DESCRIPTOR } from "@relkit/contracts";
-import { createDiagnostic, type Diagnostic } from "@relkit/diagnostics";
+import { canonicalJson, RELKIT_DESCRIPTOR } from "relkit/contracts";
+import { createDiagnostic, type Diagnostic } from "relkit/diagnostics";
 import { ConfigValidationError, type GeneratedOutputs } from "@relkit/compiler";
 import { Effect } from "effect";
 import { relative } from "node:path";

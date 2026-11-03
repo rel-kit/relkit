@@ -9,7 +9,7 @@ import type {
   NativeSubmission,
   NativeWatchRequest,
   OperationContext,
-} from "@relkit/jobs/adapter";
+} from "relkit/jobs/adapter";
 import type { EffectMqWorkerHandle, EffectMqWorkerRegistrationOptions } from "./worker.js";
 import { createEffectMqPostgresSchedules } from "./postgres-schedules.js";
 import { createEffectMqPostgresState, type EffectMqPostgresState } from "./postgres-state.js";

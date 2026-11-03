@@ -1,10 +1,10 @@
 /** Decodes invocation state and output values at the native runtime boundary before persisted or public projections consume them. */
 
-import type { StandardSchemaV1 } from "@relkit/schema";
+import type { StandardSchemaV1 } from "relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/internal/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
-import { canCarryStandardSchema } from "@relkit/contracts";
+import { canCarryStandardSchema } from "relkit/contracts";
 
 /** Resolves validators for selected public state keys.
  * @param sources - State schema sources in precedence order.

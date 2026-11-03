@@ -1,6 +1,6 @@
 import { mockFetch } from "../fixtures/fetch.ts";
 import { expect, test } from "bun:test";
-import { API_VERSION, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import { API_VERSION, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "relkit/contracts";
 import { createSupervisorStateMachine } from "../../src/state-machine.js";
 import { verifyCandidate, type CandidateVerificationCandidate } from "../../src/verification.js";
 

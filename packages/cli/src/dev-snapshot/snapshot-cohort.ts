@@ -4,9 +4,9 @@
  * descriptors or imports application code. Its result contains immutable graph
  * data for the existing supervisor, independent from a source working directory.
  */
-import { canonicalJson } from "@relkit/contracts";
-import { hashGraph, validateGraphShapeEffect } from "@relkit/graph";
-import type { ApplicationGraph } from "@relkit/graph";
+import { canonicalJson } from "relkit/contracts";
+import { hashGraph, validateGraphShapeEffect } from "relkit/graph";
+import type { ApplicationGraph } from "relkit/graph";
 import { Effect, Schema } from "effect";
 import { mapErrorCause } from "../services/map-error-cause.js";
 import { SnapshotActivation, SnapshotRouteImport } from "./snapshot.schemas.js";

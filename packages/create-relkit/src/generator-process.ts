@@ -1,7 +1,7 @@
 /** Provides the scoped native process adapter for creator workflows, joining exit and output drains before release or transactional rollback. */
 
 import { Cause, Context, Effect, Exit, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorProcessError, errorMessage } from "./generator-errors.js";
 import type { GeneratorCommandRunner, GeneratorProcessService } from "./generator-process.types.js";
 import { recordCleanupFailure } from "./generator-cleanup.js";

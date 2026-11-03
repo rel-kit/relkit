@@ -3,7 +3,7 @@
  * The existing supervisor verifies health and cohort first; this leaf additionally
  * checks the selected generation and every HTTP declaration before activation.
  */
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import { Cause, Effect, Schema } from "effect";
 import { cliAdapterError } from "../cli-errors.js";
 import { decodeSnapshotJson } from "./snapshot-json.js";

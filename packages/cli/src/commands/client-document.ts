@@ -1,5 +1,5 @@
 import { Schema } from "effect";
-import { CONTRACT_VERSION } from "@relkit/contracts";
+import { CONTRACT_VERSION } from "relkit/contracts";
 import {
   generateClientRegistryFromDocument,
   InvalidClientContract,

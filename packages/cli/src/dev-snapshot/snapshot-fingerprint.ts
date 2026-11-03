@@ -5,9 +5,9 @@
  * environment files are excluded by that authority before hashing.
  */
 import { createHash } from "node:crypto";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { SnapshotFiles } from "./snapshot-files.service.js";
 import { DevSnapshotRejected } from "./snapshot-error.js";
 import type { DevSnapshot, SnapshotMember } from "./snapshot.types.js";

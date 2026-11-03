@@ -17,7 +17,7 @@ import {
   type DescriptorKind,
   type SourceLocation,
   serviceSource,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 
 /**
  * Selects source naming rules for a descriptor's domain and kind.

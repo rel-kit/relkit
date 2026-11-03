@@ -5,7 +5,7 @@
  */
 import { timingSafeEqual } from "node:crypto";
 import { Effect, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { readInspectionBody } from "./bridge-body.js";
 import { InspectionConnectionError } from "./connection-error.js";
 import type { InspectionDescriptor } from "./protocol.types.js";

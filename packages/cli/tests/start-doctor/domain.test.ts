@@ -1,6 +1,6 @@
 import { expect, it } from "@effect/vitest";
-import { defineApp } from "@relkit/app/config";
-import { defineEnv } from "@relkit/config";
+import { defineApp } from "relkit/config";
+import { defineEnv } from "relkit/config";
 import { Deferred, Effect, Fiber, Layer, Logger, Ref } from "effect";
 import { TestClock } from "effect/testing";
 import { generatorFileSystemLive } from "create-relkit";

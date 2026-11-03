@@ -31,9 +31,9 @@ import {
   MANIFEST_VERSION,
   RUNTIME_INTEGRATION_PLAN_FILE,
   RUNTIME_INTEGRATION_PLAN_VERSION,
-} from "@relkit/contracts";
-import { JOBS_MANIFEST_VERSION } from "@relkit/contracts/jobs";
-import { LOCAL_SERVICE_PLAN_FILE, LOCAL_SERVICE_PLAN_VERSION } from "@relkit/local-service";
+} from "relkit/contracts";
+import { JOBS_MANIFEST_VERSION } from "relkit/contracts/jobs";
+import { LOCAL_SERVICE_PLAN_FILE, LOCAL_SERVICE_PLAN_VERSION } from "relkit/local-service";
 import type { GeneratedOutputs } from "./normalize-types.js";
 import { artifactIo, writeIfChangedEffect } from "./generated-artifacts-write.js";
 

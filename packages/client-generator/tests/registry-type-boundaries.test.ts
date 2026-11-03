@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { Effect } from "effect";
-import type { ChannelNode } from "@relkit/graph";
+import type { ChannelNode } from "relkit/graph";
 import { graph } from "./fixtures/generator-graphs.js";
 import { clientRoutes } from "../src/generate-types.js";
 import { channelRegistryTypeEffect, registryTypeEffect } from "../src/generate-registry-types.js";

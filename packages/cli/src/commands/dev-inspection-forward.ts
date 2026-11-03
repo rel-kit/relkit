@@ -82,14 +82,16 @@ export function firstPartyInspectionRequest(
   const headers = new Headers(request.headers);
   headers.set("origin", new URL(origin).origin);
   headers.delete("referer");
-  return new Request(url.href, {
+  // Streaming request bodies need `duplex`, which the DOM `RequestInit` type does not declare.
+  const init: RequestInit & { readonly duplex: "half" } = {
     method: request.method,
     headers,
     body: request.body,
     signal: request.signal,
     redirect: "manual",
     duplex: "half",
-  });
+  };
+  return new Request(url.href, init);
 }
 
 /**

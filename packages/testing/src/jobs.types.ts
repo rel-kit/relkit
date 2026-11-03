@@ -3,17 +3,17 @@ import type {
   InvocationHooks,
   InvocationTarget,
   JobRunResult,
-} from "@relkit/engine";
-import type { JobClient, JobProvider, RetryPolicy } from "@relkit/jobs/legacy";
+} from "relkit/engine";
+import type { JobClient, JobProvider, RetryPolicy } from "relkit/jobs/legacy";
 import type {
   JobAdmin,
   JobIdempotencyDefinition,
   JobQueueCounts,
   JobQueueEntry,
-} from "@relkit/providers-local";
+} from "relkit/providers-local";
 import type { TestClock } from "./runtime.js";
 import type { TestFailureControls } from "./fakes.js";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 
 /**
  * Durable native target, retry bounds and deterministic persistence dependencies.
@@ -21,7 +21,7 @@ import type { JsonValue } from "@relkit/contracts";
  * @typeParam Output - Output validated by the native target schema.
  */
 export interface TestJobOptions<Input = JsonValue, Output = unknown> {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly jobId?: string;
   readonly target: InvocationTarget<Input, Output>;
   readonly retry?: RetryPolicy;

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import type { NormalizedLocalServiceRecipe } from "@relkit/local-service";
+import type { NormalizedLocalServiceRecipe } from "relkit/local-service";
 import { workerStartOptions } from "./src/runtime/reconciler-worker.ts";
 
 test("worker containers see project packages where Bun resolves them without NODE_PATH", () => {

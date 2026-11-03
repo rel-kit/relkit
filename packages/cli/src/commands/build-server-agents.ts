@@ -3,7 +3,7 @@
  * validated graph. Graphs without agents acquire no language-model runtime;
  * agent graphs retain dependency validation, invocation and persistence release.
  */
-import type { ApplicationGraph } from "@relkit/graph";
+import type { ApplicationGraph } from "relkit/graph";
 import { SERVER_AGENT_REGISTRATION_SOURCE } from "./build-server-registration.js";
 import type { ServerAgentSource } from "./build-server.types.js";
 

@@ -1,6 +1,6 @@
 /** Constructs invocation failures with agent identity and native causes, including selected dependency failures and execution errors. */
 
-import type { StandardIssue } from "@relkit/schema";
+import type { StandardIssue } from "relkit/schema";
 
 /** Safe public failure fields; a non-enumerable native cause is private diagnostic data. @experimental */
 export class AgentRuntimeError extends Error {

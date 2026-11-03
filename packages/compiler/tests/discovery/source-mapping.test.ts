@@ -196,7 +196,7 @@ describe("discovery source capability", () => {
         yield* resolveImportEffect("src/barrel.ts", "../../outside", root, texts),
       ).toBeUndefined();
       expect(
-        yield* resolveImportEffect("src/barrel.ts", "@relkit/functions", root, texts),
+        yield* resolveImportEffect("src/barrel.ts", "relkit/functions", root, texts),
       ).toBeUndefined();
     }).pipe(
       Effect.provideService(DiscoverySourceReader, {

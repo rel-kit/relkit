@@ -1,7 +1,7 @@
 import { Effect, Exit, Layer, ManagedRuntime, Metric } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
-import { createLoggerLayer } from "@relkit/runtime-effect";
-import { redactRecord } from "@relkit/observability";
+import { observeExecution } from "relkit/contracts/operation";
+import { createLoggerLayer } from "relkit/runtime-effect";
+import { redactRecord } from "relkit/observability";
 import type { InspectorExecutionOwner, InspectorLoggingOptions } from "./execution.types.js";
 import { nativeAttempt, runInspectorPromise } from "./native-edge.js";
 

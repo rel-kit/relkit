@@ -1,7 +1,7 @@
 /** Pure browser-fixture configuration keeps public transport security and explicit local provider borrowing unchanged. */
-import type { AgentStateProvider } from "../../packages/agents/src/index.ts";
-import type { RealtimeProvider } from "../../packages/realtime/src/index.ts";
-import type { CreateAppOptions } from "../../packages/runtime-hono/src/index.ts";
+import type { AgentStateProvider } from "relkit/agents";
+import type { RealtimeProvider } from "relkit/realtime";
+import type { CreateAppOptions } from "relkit/runtime-hono";
 import { playwrightSelection } from "../../scripts/playwright-selection.js";
 
 /**

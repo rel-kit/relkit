@@ -5,8 +5,8 @@
  * persistent telemetry are started by this finite workflow.
  */
 import { join } from "node:path";
-import { canonicalJson } from "@relkit/contracts";
-import { observeExecution } from "@relkit/contracts/operation";
+import { canonicalJson } from "relkit/contracts";
+import { observeExecution } from "relkit/contracts/operation";
 import { Context, Effect, Layer } from "effect";
 import { ProductionManifest } from "../commands/build-production.schemas.js";
 import { decodeSnapshotJson } from "./snapshot-json.js";

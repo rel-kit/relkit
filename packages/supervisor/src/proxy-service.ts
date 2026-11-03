@@ -1,5 +1,5 @@
 import { Context, Effect, Layer, Ref, Result, Scope } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { drainResponse } from "./proxy-forward.js";
 import { proxyRequest } from "./proxy-request.js";
 import { normalizeTarget, sameToken } from "./proxy-validation.js";

@@ -3,7 +3,7 @@
 import { collectCompiledGraphStateEffect } from "./graph-runtime-stream-state.js";
 import { isInterrupted } from "@langchain/langgraph";
 import { Effect, Exit } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/internal/agent-telemetry";
 import { graphExecutionEffect } from "./define-graph.js";
 import { resumeCommandEffect, waitingInterruptsEffect } from "./graph-continuation.js";
 import type { GraphConfig } from "./graph-continuation.types.js";

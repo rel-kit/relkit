@@ -1,4 +1,4 @@
-import type { AgentClientContractMetadata } from "@relkit/graph";
+import type { AgentClientContractMetadata } from "relkit/graph";
 
 /** Minimal public agent shape accepted by the contract renderer.
  * @example const agent: AgentContractSource = { input: { type: "string" }, output: { type: "string" } };

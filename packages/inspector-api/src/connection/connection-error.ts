@@ -4,7 +4,7 @@
  * or rejected descriptor content, and decide recovery at their owning boundary.
  */
 import { Data, Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 /** Expected connection failure; no automatic mutation retry is implied. */
 export class InspectionConnectionError extends Data.TaggedError("InspectionConnectionError")<{

@@ -7,7 +7,7 @@ import { Effect } from "effect";
 import { duckdbError } from "./duckdb-error.js";
 import type { DuckdbConnectionPort } from "./duckdb-driver.types.js";
 import { importLocalHistoryEffect } from "./import-history-effect.js";
-import type { LocalRecord, StoredLocalRecord } from "@relkit/observability/local/record";
+import type { LocalRecord, StoredLocalRecord } from "relkit/observability/local/record";
 /**
  * Imports legacy NDJSON through the scoped Effect implementation.
  *

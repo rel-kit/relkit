@@ -4,18 +4,18 @@ import type { JobRuntimeState } from "./job-runtime.types.js";
 import type { JobHarnessService } from "./job-harness.types.js";
 import { Effect, Exit, Ref, Scope } from "effect";
 import { join } from "node:path";
-import { normalizeId, type JsonValue } from "@relkit/contracts";
-import { observeExecution } from "@relkit/contracts/operation";
-import { materializeJobs, type JobQueueHandle } from "@relkit/engine";
-import { createJobClient, type JobClient, type JobProvider } from "@relkit/jobs/legacy";
+import { normalizeId, type JsonValue } from "relkit/contracts";
+import { observeExecution } from "relkit/contracts/operation";
+import { materializeJobs, type JobQueueHandle } from "relkit/engine";
+import { createJobClient, type JobClient, type JobProvider } from "relkit/jobs/legacy";
 import {
   createJobAdmin,
   createJobQueue,
   createJobStore,
   type JobAdmin,
   type JobQueue,
-} from "@relkit/providers-local";
-import type { InvocationRunner } from "@relkit/runtime-effect";
+} from "relkit/providers-local";
+import type { InvocationRunner } from "relkit/runtime-effect";
 import { createDeterministicClock } from "./runtime-clock.js";
 import { createTestStateRoot } from "./state-root.js";
 import type { TestJobFake, TestJobOptions, TestJobCloseOptions } from "./jobs-types.js";

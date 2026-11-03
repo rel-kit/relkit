@@ -1,5 +1,5 @@
-import type { JsonValue } from "@relkit/contracts";
-import type { RunListQuery } from "@relkit/contracts/jobs";
+import type { JsonValue } from "relkit/contracts";
+import type { RunListQuery } from "relkit/contracts/jobs";
 
 /** Validated native run selectors and page bounds retained in signed cursor identity. */
 export interface InspectorRunFilters extends RunListQuery {

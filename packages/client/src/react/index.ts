@@ -14,7 +14,7 @@ export * from "./pending.js";
 export * from "./realtime-hook.js";
 export * from "./registry.js";
 export * from "./stream-hook.js";
-export type { CountPresence, MemberPresence } from "@relkit/realtime";
+export type { CountPresence, MemberPresence } from "relkit/realtime";
 export type {
   JobContract,
   JobClientField,

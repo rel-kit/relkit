@@ -1,7 +1,7 @@
 /** Projects existing services, resources and provider profiles into add choices from the discovered project without executing authored application code. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import { GeneratorPrompt, generatorPromptLayer } from "create-relkit/internal/generator-prompt";
 import { createClackPromptDriver } from "create-relkit/internal/prompt-driver";

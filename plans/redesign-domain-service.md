@@ -89,7 +89,7 @@ than introduce a parallel service system.
 The minimal proposed public contract is:
 
 ```ts
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 import * as functions from "./functions/index.js";
 import * as events from "./events/index.js";
 
@@ -380,7 +380,7 @@ The Better Auth base path is owned by the route tree, not the auth service.
 
 ```ts
 // src/routes/api/auth/[[...auth]]/route.ts
-import { defineRoute } from "@relkit/app/routes";
+import { defineRoute } from "relkit/routes";
 import auth from "@app/auth/service.js";
 
 export const ALL = defineRoute({
@@ -406,7 +406,7 @@ Proposed name: `defineServiceRoutes`, plural because one call can produce
 multiple route descriptors.
 
 ```ts
-import { defineServiceRoutes } from "@relkit/app/routes";
+import { defineServiceRoutes } from "relkit/routes";
 import { orders } from "@app/orders/service.js";
 
 export const { GET, POST } = defineServiceRoutes(orders, {

@@ -9,10 +9,10 @@ import {
   generateClientRegistryEffect,
   generateContractEffect,
 } from "@relkit/client-generator";
-import { canonicalJson, type RuntimeIntegrationPlan } from "@relkit/contracts";
-import { generateOpenApiJsonEffect } from "@relkit/openapi";
-import { canonicalGraphJsonEffect, type ApplicationGraph } from "@relkit/graph";
-import type { LocalServicePlan } from "@relkit/local-service";
+import { canonicalJson, type RuntimeIntegrationPlan } from "relkit/contracts";
+import { generateOpenApiJsonEffect } from "relkit/openapi";
+import { canonicalGraphJsonEffect, type ApplicationGraph } from "relkit/graph";
+import type { LocalServicePlan } from "relkit/local-service";
 import { createRuntimeActivationFingerprintEffect } from "./activation-fingerprint.js";
 import { type GeneratedManifest, generateManifestEffect } from "./generate-manifest.js";
 import { type GeneratedJobsManifest, generateJobsManifestEffect } from "./jobs/manifest.js";
@@ -207,7 +207,7 @@ function isTaskJob(descriptor: NormalizationWork["descriptors"][number]): boolea
  * @param value - Declared metadata inspected without coercion.
  * @returns True when the record carries compiler diagnostic code and severity.
  */
-function isDiagnostic(value: unknown): value is import("@relkit/diagnostics").Diagnostic {
+function isDiagnostic(value: unknown): value is import("relkit/diagnostics").Diagnostic {
   return isRecord(value) && typeof value.code === "string" && typeof value.severity === "string";
 }
 

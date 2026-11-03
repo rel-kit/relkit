@@ -4,7 +4,7 @@
  * so compiler workers and leases stay owned across subsequent safe generations.
  */
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { cliPromise } from "../cli-errors.js";
 import type { DevCompilerOptions } from "../commands/dev-local.types.js";
 import type { SnapshotFallbackOperations } from "./snapshot-fallback.types.js";

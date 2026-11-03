@@ -4,7 +4,7 @@ import { readFile, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { createPulumiWorkspace } from "../../packages/deploy-pulumi/src/workspace.ts";
 import * as pulumiImplementation from "../../packages/deploy-pulumi/src/index.ts";
-import { hashGraph, type ApplicationGraph } from "../../packages/graph/src/index.ts";
+import { hashGraph, type ApplicationGraph } from "relkit/graph";
 import type { PreviewState } from "./preview-command.ts";
 const fixtureGraph = JSON.parse(
   await readFile(

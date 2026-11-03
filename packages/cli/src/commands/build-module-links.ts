@@ -2,30 +2,13 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Effect } from "effect";
-import { DependencySource } from "@relkit/provider/internal/dependencies";
+import { DependencySource } from "relkit/provider/internal/dependencies";
 import { cliAdapterError } from "../cli-errors.js";
 import { cleanupEffect } from "../services/cleanup.service.js";
 import type { FileSystemCapabilities } from "../services/filesystem.types.js";
 
 /** These packages are fixed imports emitted by the framework server producer. */
-const FRAMEWORK_PACKAGES = [
-  "effect",
-  "@relkit/agents",
-  "@relkit/app",
-  "@relkit/config",
-  "@relkit/contracts",
-  "@relkit/engine",
-  "@relkit/graph",
-  "@relkit/inspector-api",
-  "@relkit/invocation",
-  "@relkit/jobs",
-  "@relkit/local-service",
-  "@relkit/observability",
-  "@relkit/provider",
-  "@relkit/realtime",
-  "@relkit/runtime-effect",
-  "@relkit/runtime-hono",
-] as const;
+const FRAMEWORK_PACKAGES = ["effect", "relkit", "@relkit/inspector-api"] as const;
 
 /**
  * Links fixed framework dependencies only; external integrations use native consumer resolution.

@@ -1,5 +1,5 @@
-import type { CacheOperationContext, CacheOperationOptions, CacheProvider } from "@relkit/cache";
-import { canonicalJson } from "@relkit/contracts";
+import type { CacheOperationContext, CacheOperationOptions, CacheProvider } from "relkit/cache";
+import { canonicalJson } from "relkit/contracts";
 
 /** @experimental */
 export interface CloudflareKvCacheOptions {

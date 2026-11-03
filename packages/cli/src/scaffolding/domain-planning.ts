@@ -9,7 +9,7 @@ import { domainError, domainTry } from "create-relkit/internal/generator-errors"
 import { scaffoldServiceBoundary } from "./scaffold-layout.js";
 import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
 
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 

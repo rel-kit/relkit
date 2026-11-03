@@ -100,13 +100,9 @@ export async function preparePackedAuth(
   await prepareAuthJobs(developer);
   const repair = await packedRepair(tarballs);
   const dependencies = Object.fromEntries(
-    [
-      "@relkit/app",
-      "@relkit/better-auth",
-      "@relkit/drizzle",
-      "@relkit/client",
-      "@relkit/local",
-    ].map((name) => [name, manifests.get(name)!.manifest.version]),
+    ["relkit", "@relkit/better-auth", "@relkit/drizzle", "@relkit/client", "@relkit/local"].map(
+      (name) => [name, manifests.get(name)!.manifest.version],
+    ),
   );
   Object.assign(dependencies, {
     "better-auth": repair.catalog.dependencies["better-auth"],

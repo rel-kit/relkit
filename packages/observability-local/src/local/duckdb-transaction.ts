@@ -1,6 +1,6 @@
 /** Commits one validated idempotent batch and retention atomically; failures retain rollback behavior. */
 import { Clock, Effect, Exit } from "effect";
-import type { LocalRecord, StoredLocalRecord } from "@relkit/observability/local/record";
+import type { LocalRecord, StoredLocalRecord } from "relkit/observability/local/record";
 import { appendDuckdbBatchEffect } from "./duckdb-batch.js";
 import { retainDuckdbRecords } from "./duckdb-retention.js";
 import { runDuckdbSql } from "./duckdb-sql.js";

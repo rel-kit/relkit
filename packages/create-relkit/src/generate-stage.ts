@@ -7,7 +7,7 @@
 
 import { basename, dirname, join } from "node:path";
 import { Cause, Effect, Exit, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "./generator-filesystem.js";
 import { cleanupStagedProjectEffect } from "./generate-files.js";
 import { recordCleanupFailure } from "./generator-cleanup.js";

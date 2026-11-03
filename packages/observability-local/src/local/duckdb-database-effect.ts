@@ -6,8 +6,8 @@
 import { chmod, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { Context, Effect, Layer, Semaphore } from "effect";
-import type { RedactionPolicy } from "@relkit/observability";
-import type { TelemetryLocalRetentionPolicy } from "@relkit/observability";
+import type { RedactionPolicy } from "relkit/observability";
+import type { TelemetryLocalRetentionPolicy } from "relkit/observability";
 import type { DuckdbDatabaseEffects } from "./duckdb-database.types.js";
 import { DuckdbDriverService } from "./duckdb-driver.js";
 import { duckdbError } from "./duckdb-error.js";

@@ -141,7 +141,7 @@ it.effect("restores cache TTL/version and retains writes after ambiguous acknowl
 
 it.effect("emits configured structured standalone logs without storing operation input", () =>
   Effect.gen(function* () {
-    const records: import("@relkit/runtime-effect").RedactedLogRecord[] = [];
+    const records: import("relkit/runtime-effect").RedactedLogRecord[] = [];
     const cache = createTestCacheFake({
       logger: {
         component: "testing",

@@ -1,7 +1,7 @@
 /** Owns scoped database/auth activation for a test application in either service layout. */
 import { activateBetterAuthService } from "@relkit/better-auth/drizzle";
 import { activateDrizzleService } from "@relkit/drizzle";
-import { observeExecution, runExecutionPromise } from "@relkit/contracts/operation";
+import { observeExecution, runExecutionPromise } from "relkit/contracts/operation";
 import { Context, Effect, Layer, ManagedRuntime } from "effect";
 import type { TestRoute } from "./application-routes.js";
 import { acquireApplicationAuth, nativeServiceError } from "./application-service-auth.js";

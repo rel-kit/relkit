@@ -1,4 +1,4 @@
-import type { API_VERSION, PROTOCOL_VERSION, MaybePromise } from "@relkit/contracts";
+import type { API_VERSION, PROTOCOL_VERSION, MaybePromise } from "relkit/contracts";
 import type { InspectorMode, ResolvedActiveGeneration } from "./shared.js";
 import type { InspectorActionIdentity } from "./actions-schema.types.js";
 import type { Effect } from "effect";

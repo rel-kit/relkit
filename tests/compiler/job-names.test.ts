@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { defineFunction } from "../../packages/functions/src/index.ts";
-import { defineJob, defineTask } from "../../packages/jobs/src/index.ts";
-import { defineRoute, http } from "../../packages/routes/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { defineFunction } from "relkit/functions";
+import { defineJob, defineTask } from "relkit/jobs";
+import { defineRoute, http } from "relkit/routes";
+import { z } from "relkit/schema";
 import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
 
 const source = { file: "src/orders/tasks/send.task.ts", line: 1, column: 1 } as const;

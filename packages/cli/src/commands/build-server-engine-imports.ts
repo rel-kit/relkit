@@ -1,5 +1,5 @@
 /** Selects engine operations from the accepted graph without acquiring providers. */
-import type { ApplicationGraph } from "@relkit/graph";
+import type { ApplicationGraph } from "relkit/graph";
 
 /**
  * Emits only engine operations required by this graph and inert unselected stubs.

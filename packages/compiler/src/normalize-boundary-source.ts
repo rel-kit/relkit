@@ -3,8 +3,8 @@
  * Literal static/dynamic edges receive the same policy; computed or unresolved
  * dynamic imports are reported as unproven rather than silently accepted.
  */
-import { applicationSourceLayer, type ApplicationLayout } from "@relkit/contracts";
-import { createDiagnostic } from "@relkit/diagnostics";
+import { applicationSourceLayer, type ApplicationLayout } from "relkit/contracts";
+import { createDiagnostic } from "relkit/diagnostics";
 import { Effect } from "effect";
 import * as ts from "typescript";
 import { SourceResolution } from "./source-resolution.service.js";

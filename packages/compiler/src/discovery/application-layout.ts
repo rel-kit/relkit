@@ -3,7 +3,7 @@
  * application modules. Shared contracts select roots; source normalization and
  * candidate detection remain compiler-owned and preserve typed path failures.
  */
-import { selectApplicationLayout } from "@relkit/contracts";
+import { selectApplicationLayout } from "relkit/contracts";
 import { Effect } from "effect";
 import { observeCompiler } from "../observability.js";
 import { runCompilerSync } from "../compatibility.js";

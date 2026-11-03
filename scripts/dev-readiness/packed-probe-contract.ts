@@ -13,7 +13,7 @@ import {
   GRAPH_VERSION,
   MANIFEST_VERSION,
   canonicalJson,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import { Effect, Schema } from "effect";
 import { ReadinessBenchmarkError } from "./benchmark-error.js";
 import {

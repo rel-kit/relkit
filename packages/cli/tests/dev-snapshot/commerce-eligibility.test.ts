@@ -19,10 +19,10 @@ it.effect("accepts audited SQLite metadata, native deferred clients, errors and 
       'import {mkdirSync} from "node:fs"; import {dirname} from "node:path"; export async function client(env: {path:string}) { mkdirSync(dirname(env.path), {recursive:true}); }',
       'import { defineDrizzleService } from "@relkit/drizzle"; import { Database } from "bun:sqlite"; import { drizzle } from "drizzle-orm/bun-sqlite"; import * as schema from "./schema/index.js"; export default defineDrizzleService({schema, client: ({env}) => drizzle({client: new Database(env.DATABASE_PATH)}), dispose: (db) => db.$client.close()});',
       'import { defineBetterAuthService } from "@relkit/better-auth"; export default defineBetterAuthService({baseURL: "http://127.0.0.1:3400", emailAndPassword: {enabled: true}});',
-      'import {defineError} from "@relkit/app/functions"; import {z} from "@relkit/app/schema"; export default defineError({id:"cart.denied", data:z.object({}), message:"Sign in", http:{status:401}});',
+      'import {defineError} from "relkit/functions"; import {z} from "relkit/schema"; export default defineError({id:"cart.denied", data:z.object({}), message:"Sign in", http:{status:401}});',
       "export async function owner(context: unknown) { return process.env.RUNTIME; }",
       'export const html = String.raw`<script>const value = "\\n";</script>`;',
-      'import {defineEnv, env} from "@relkit/app/config"; export default defineEnv({SECRET:env.secret(), URL:env.url().default(new URL("http://localhost:3400"))});',
+      'import {defineEnv, env} from "relkit/config"; export default defineEnv({SECRET:env.secret(), URL:env.url().default(new URL("http://localhost:3400"))});',
       'export * from "./schema/commerce.js";',
     ])
       expect(
@@ -62,7 +62,7 @@ it.effect(
         'import {dirname} from "node:path"; export const value = dirname(process.env.SECRET);',
         'import {mkdirSync} from "node:fs" with {type:"macro"}; import {defineDrizzleService} from "@relkit/drizzle"; export default defineDrizzleService({schema:{}, client:()=>mkdirSync("./private")});',
         'export * from "./schema.js" with {type:"macro"};',
-        'import {defineEnv,env} from "@relkit/app/config"; export default defineEnv({URL:env.url().default(new URL(process.env.URL))});',
+        'import {defineEnv,env} from "relkit/config"; export default defineEnv({URL:env.url().default(new URL(process.env.URL))});',
       ];
       for (const source of unsafe)
         expect(

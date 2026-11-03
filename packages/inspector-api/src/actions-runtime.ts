@@ -1,6 +1,6 @@
-import { normalizeId } from "@relkit/contracts";
+import { normalizeId } from "relkit/contracts";
 import { Effect, Layer, ManagedRuntime, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import {
   runInspectorPromise as runExecutionPromise,
   runInspectorSync as runExecutionSync,

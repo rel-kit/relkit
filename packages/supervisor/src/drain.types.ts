@@ -1,5 +1,5 @@
 import type { StartedCandidate } from "./candidate.types.js";
-import type { LoggerOptions } from "@relkit/runtime-effect/logger";
+import type { LoggerOptions } from "relkit/runtime-effect/logger";
 import type { SupervisorCandidateToken, SupervisorStateSnapshot } from "./state-machine.types.js";
 
 /** Closes a native resource. @returns Native settlement; zero-argument owners retain cancellation authority. */

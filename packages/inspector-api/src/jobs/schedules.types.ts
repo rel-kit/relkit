@@ -1,4 +1,4 @@
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import type { InspectorJobsBinding } from "./types.js";
 
 /** Signed schedule continuation state preserving exhaustion and native unavailability. */

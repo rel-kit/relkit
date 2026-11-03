@@ -29,7 +29,7 @@ export async function installedCliFixture(parent: string, artifactDirectory?: st
     tarballs = await loadReleaseTarballs(artifacts);
   }
   const manifests = await readManifests(resolve(import.meta.dir, "../.."));
-  const appVersion = (await readPackedManifest(tarballs.get("@relkit/app")!)).version;
+  const appVersion = (await readPackedManifest(tarballs.get("relkit")!)).version;
   const testingVersion = (await readPackedManifest(tarballs.get("@relkit/testing")!)).version;
   const packedCli = await readPackedManifest(tarballs.get("@relkit/cli")!);
   const server = await startRegistry(parent, tarballs, manifests);
@@ -165,7 +165,7 @@ export async function installedCliCommand(
 export async function assertInstalledManifest(fixture: InstalledCliFixture) {
   const manifest = JSON.parse(await readFile(join(fixture.project, "package.json"), "utf8"));
   expect(manifest.dependencies).toEqual({
-    "@relkit/app": fixture.appVersion,
+    relkit: fixture.appVersion,
     "@scalar/hono-api-reference": "0.12.9",
     effect: fixture.packedCli.dependencies?.effect,
   });

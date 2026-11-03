@@ -9,8 +9,8 @@ import {
   canonicalJson,
   RUNTIME_ACTIVATION_FILE,
   RUNTIME_INTEGRATION_PLAN_FILE,
-} from "@relkit/contracts";
-import { validateGraphShapeEffect, type ApplicationGraph, type TriggerNode } from "@relkit/graph";
+} from "relkit/contracts";
+import { validateGraphShapeEffect, type ApplicationGraph, type TriggerNode } from "relkit/graph";
 import { Effect, Schema } from "effect";
 import { mapErrorCause } from "../services/map-error-cause.js";
 import { DevSnapshotRejected } from "./snapshot-error.js";

@@ -2,7 +2,7 @@
  * Advertises native execution registrations to the existing verified integration
  * plan. Provider acquisition skips these execution-only capabilities.
  */
-import type { RuntimeIntegrationModuleMetadata } from "@relkit/contracts";
+import type { RuntimeIntegrationModuleMetadata } from "relkit/contracts";
 
 /** @experimental */
 export const runtimeIntegration = Object.freeze({

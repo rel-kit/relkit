@@ -1,4 +1,4 @@
-import { API_BASE_PATH } from "@relkit/contracts";
+import { API_BASE_PATH } from "relkit/contracts";
 import { INSPECTOR_ACTION_PATHS } from "./actions.js";
 import { GRAPH_COLLECTIONS } from "./graph.js";
 import { OBSERVABILITY_ENDPOINT_PATHS } from "./observability.js";

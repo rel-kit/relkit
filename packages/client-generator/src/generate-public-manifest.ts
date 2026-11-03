@@ -1,8 +1,8 @@
 import type { ApplicationGraph, ClientRoute } from "./generate-public-manifest.types.js";
 import { Effect } from "effect";
 import { makeGraphOperation } from "./generator-graph-operation.js";
-import { AGENT_PROTOCOL_CAPABILITY, CONTRACT_VERSION } from "@relkit/contracts";
-import { JOBS_PROTOCOL, JOBS_PROTOCOL_VERSION } from "@relkit/contracts/jobs";
+import { AGENT_PROTOCOL_CAPABILITY, CONTRACT_VERSION } from "relkit/contracts";
+import { JOBS_PROTOCOL, JOBS_PROTOCOL_VERSION } from "relkit/contracts/jobs";
 import { jobPathCalculations } from "./generate-job-paths.js";
 import { jobProcedureCalculations } from "./generate-job-procedures.js";
 import { registrySupportCalculations } from "./generate-registry-support.js";

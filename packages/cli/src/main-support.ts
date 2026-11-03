@@ -1,7 +1,7 @@
 /** Presents CLI output, help and terminal failures while keeping command cancellation scoped to its invocation; optional scaffold loading has a separate lazy owner. */
 
-import { canonicalJson } from "@relkit/contracts";
-import { diagnosticCode, diagnosticDocsUrl } from "@relkit/diagnostics/codes";
+import { canonicalJson } from "relkit/contracts";
+import { diagnosticCode, diagnosticDocsUrl } from "relkit/diagnostics/codes";
 import type { CliFailure, CliIo, CliReporter } from "./main-support-types.js";
 import manifest from "../package.json" with { type: "json" };
 import { findCliHelp, getCliHelpModel } from "./cli-help-model.js";

@@ -4,7 +4,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
-import type { LocalWorkerCommand, LocalWorkerResponse } from "@relkit/observability/local/record";
+import type { LocalWorkerCommand, LocalWorkerResponse } from "relkit/observability/local/record";
 import { createWorkerClientState, failWorkerClient } from "../src/local/worker-client-state.js";
 
 const entry = fileURLToPath(new URL("../src/local/duckdb-worker.ts", import.meta.url));

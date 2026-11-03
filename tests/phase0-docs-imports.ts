@@ -15,7 +15,7 @@ async function docsImport(source: string, target: string, allowed: boolean): Pro
   const files = {
     ...packageFiles([
       { path: "apps/docs", name: "@relkit/docs", source: "" },
-      { path: "packages/runtime-hono", name: "@relkit/runtime-hono", source: "" },
+      { path: "packages/relkit", name: "relkit/runtime-hono", source: "" },
     ]),
     [source]: `import ${JSON.stringify(relative)};`,
     [target.replace(/\.js$/, ".ts")]: "export {};",
@@ -33,7 +33,7 @@ async function docsImport(source: string, target: string, allowed: boolean): Pro
 test("docs build imports allow only the selected pure transport metadata leaf", () =>
   docsImport(
     "apps/docs/scripts/installation-catalog.ts",
-    "packages/runtime-hono/src/selected-transports.js",
+    "packages/relkit/src/runtime-hono/selected-transports.js",
     true,
   ));
 
@@ -50,14 +50,14 @@ test("the API audit reuses only the workspace package inventory helper", () =>
 test("materialized source includes are content, while the owning source stays checked", () =>
   docsImport(
     "apps/docs/content/_snippets/source/example.ts",
-    "packages/runtime-hono/src/create-app.js",
+    "packages/relkit/src/runtime-hono/create-app.js",
     true,
   ));
 
 for (const [source, target] of [
-  ["apps/docs/app/page.tsx", "packages/runtime-hono/src/selected-transports.js"],
+  ["apps/docs/app/page.tsx", "packages/relkit/src/runtime-hono/selected-transports.js"],
   ["apps/docs/app/page.tsx", "scripts/scaffold-process.js"],
-  ["apps/docs/scripts/installation-catalog.ts", "packages/runtime-hono/src/create-app.js"],
+  ["apps/docs/scripts/installation-catalog.ts", "packages/relkit/src/runtime-hono/create-app.js"],
   ["apps/docs/scripts/installation-workflow-project.ts", "scripts/release-check.js"],
   ["apps/docs/scripts/public-api-manifests.ts", "scripts/release-check.js"],
   ["apps/docs/app/page.tsx", "scripts/workspace-packages.js"],

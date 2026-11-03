@@ -1,6 +1,6 @@
-import type { JsonValue } from "@relkit/contracts";
-import type { NamedStreamFrame } from "@relkit/contracts/jobs";
-import { observeExecution } from "@relkit/contracts/operation";
+import type { JsonValue } from "relkit/contracts";
+import type { NamedStreamFrame } from "relkit/contracts/jobs";
+import { observeExecution } from "relkit/contracts/operation";
 import { Context, Effect, Exit, Layer, Stream } from "effect";
 import { nativeCall, nativeStream } from "../native-stream.js";
 import { resolveJobProcedure } from "./reconcile.js";

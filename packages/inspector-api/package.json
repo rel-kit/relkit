@@ -33,11 +33,9 @@
     }
   },
   "dependencies": {
-    "@relkit/contracts": "workspace:*",
-    "@relkit/observability": "workspace:*",
-    "@relkit/runtime-effect": "workspace:*",
+    "effect": "catalog:",
     "hono": "catalog:",
-    "effect": "catalog:"
+    "relkit": "workspace:*"
   },
   "scripts": {
     "build": "tsc -b",

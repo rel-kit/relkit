@@ -1,9 +1,9 @@
 import { createHash, randomUUID } from "node:crypto";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { nativeAttempt, runInspectorPromise, unwrapInspectorFailure } from "./native-edge.js";
 import { inspectorExecution } from "./execution.js";
-import { API_VERSION, PROTOCOL_VERSION, canonicalJson } from "@relkit/contracts";
+import { API_VERSION, PROTOCOL_VERSION, canonicalJson } from "relkit/contracts";
 import { isRecord, safeJson, type ResolvedActiveGeneration } from "./shared.js";
 import { InspectorActionError } from "./actions-errors.js";
 import { ACTION_REDACTION } from "./actions-projection.js";

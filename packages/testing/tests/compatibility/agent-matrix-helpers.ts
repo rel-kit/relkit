@@ -1,15 +1,15 @@
 /** Builds the retained selected-native helper matrix with explicit test ownership and cleanup. */
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { defineAgent } from "@relkit/langchain";
-import { invokeFunction, type InvocationParent, type InvocationTarget } from "@relkit/engine";
-import { defineError, defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { invokeFunction, type InvocationParent, type InvocationTarget } from "relkit/engine";
+import { defineError, defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 import {
   defineTool,
   type ToolDescriptor,
   type ToolEngine,
   type ToolEngineInvocation,
-} from "@relkit/tools";
+} from "relkit/tools";
 import { createTestAgent } from "../fixtures/owned-compatibility.ts";
 import type { TestAgentModelOptions, TestModelTurn } from "@relkit/langchain/testing";
 

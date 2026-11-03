@@ -61,7 +61,10 @@ export function isSnapshotFunctionImport(
         for (const element of clause.namedBindings.elements) {
           if (element.isTypeOnly) continue;
           const original = element.propertyName?.text ?? element.name.text;
-          if (imported === "@relkit/app/functions" && original === "defineFunction")
+          if (
+            (imported === "relkit/functions" || imported === "@relkit/app/functions") &&
+            original === "defineFunction"
+          )
             bindings.set(element.name.text, "defineFunction");
           else if (isSnapshotFunctionImport(imported, original, target, sources, seen))
             bindings.set(element.name.text, "function-descriptor");

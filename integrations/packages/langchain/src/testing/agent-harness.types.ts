@@ -3,7 +3,7 @@
 import type { Effect } from "effect";
 import type { TestAgent, TestAgentInvocationOptions } from "./agents-types.js";
 import type { AgentObservedEdge } from "../index.js";
-import type { spanSnapshot } from "@relkit/invocation";
+import type { spanSnapshot } from "relkit/invocation";
 import type { acquireAgentHarness } from "./agent-state-setup.js";
 
 /** Acquired native model, state and observer dependencies for one harness owner. */

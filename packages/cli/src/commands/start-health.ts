@@ -1,4 +1,4 @@
-import { API_BASE_PATH } from "@relkit/contracts";
+import { API_BASE_PATH } from "relkit/contracts";
 import { Clock, Effect } from "effect";
 import { cliAdapterError, cliOriginalError } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";

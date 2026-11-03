@@ -118,7 +118,7 @@ export interface TriggerOptions extends JobsServiceOptions {
   readonly projectRef?: string | TextReference;
   readonly secretKey?: SecretReference;
   readonly baseUrl?: string | URL | TextReference;
-  readonly native?: Readonly<Record<string, import("@relkit/contracts").JsonValue>>;
+  readonly native?: Readonly<Record<string, import("relkit/contracts").JsonValue>>;
 }
 ```
 
@@ -476,7 +476,7 @@ export interface TriggerRuntimeOptions {
 ```ts
 export interface TriggerWorkerRegistrationOptions {
   readonly definitions: readonly TriggerTaskDefinition[];
-  readonly executor: import("@relkit/jobs/adapter").TaskExecutor;
+  readonly executor: import("relkit/jobs/adapter").TaskExecutor;
   readonly startWorker?: boolean;
   readonly register?: (tasks: readonly unknown[]) => Promise<void> | void;
 }

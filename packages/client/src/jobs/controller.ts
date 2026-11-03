@@ -1,6 +1,6 @@
-import type { RunSnapshot } from "@relkit/contracts/jobs";
+import type { RunSnapshot } from "relkit/contracts/jobs";
 import { Layer, ManagedRuntime } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionSync } from "relkit/contracts/operation";
 import { reconnectAfterTeardown } from "./controller-support.js";
 import { JobControllers, JobControllersLive } from "./controller.service.js";
 import { JobFeedRegistryDefault } from "./watch.js";

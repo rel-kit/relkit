@@ -1,7 +1,7 @@
 import { createORPCClient } from "@orpc/client";
 import type { RouterContract, RouterContractClient } from "@orpc/contract";
 import { Effect, ManagedRuntime, type Scope } from "effect";
-import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionPromise, runExecutionSync } from "relkit/contracts/operation";
 import type { DefaultContract } from "./index.js";
 import type {
   CreateClientOptions,

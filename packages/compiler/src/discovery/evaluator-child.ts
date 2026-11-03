@@ -1,5 +1,5 @@
 import { observeCompiler } from "../observability.js";
-import { normalizeSourcePathEffect } from "@relkit/contracts";
+import { normalizeSourcePathEffect } from "relkit/contracts";
 import { realpathSync } from "node:fs";
 import { isAbsolute, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";

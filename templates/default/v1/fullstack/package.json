@@ -14,21 +14,22 @@
     "start": "NODE_ENV=production bun run --no-env-file .relkit/build/server/index.js"
   },
   "dependencies": {
+    "@ag-ui/core": "0.0.59",
+    "@langchain/core": "1.2.9",
     "@langchain/langgraph": "1.4.14",
     "@relkit/app": "0.8.4",
-    "@scalar/hono-api-reference": "0.12.9",
     "@relkit/client": "0.8.4",
+    "@relkit/langchain": "0.7.15",
     "@relkit/local": "0.7.14",
+    "@scalar/hono-api-reference": "0.12.9",
     "@tanstack/react-query": "5.102.3",
     "effect": "4.0.1",
     "langchain": "1.5.10",
+    "langsmith": "0.10.8",
     "next": "16.4.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "@relkit/langchain": "0.7.15",
-    "@langchain/core": "1.2.9",
-    "langsmith": "0.10.8",
-    "@ag-ui/core": "0.0.59",
+    "relkit": "0.8.8",
     "zod": "4.6.7"
   },
   "devDependencies": {

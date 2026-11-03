@@ -5,9 +5,9 @@
  */
 import { Cause, Context, Effect, Layer, Schema } from "effect";
 import { mapErrorCause } from "../services/map-error-cause.js";
-import { API_BASE_PATH } from "@relkit/contracts";
-import { canonicalJson } from "@relkit/contracts";
-import { observeExecution } from "@relkit/contracts/operation";
+import { API_BASE_PATH } from "relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
+import { observeExecution } from "relkit/contracts/operation";
 import { cliAdapterError } from "../cli-errors.js";
 import { ProductionManifest } from "../commands/build-production.schemas.js";
 import { SnapshotCandidateFiles } from "./snapshot-candidate-files.js";

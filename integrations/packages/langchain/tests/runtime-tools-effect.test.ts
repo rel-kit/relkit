@@ -2,9 +2,9 @@
 
 import { Effect } from "effect";
 import { expect, test } from "vitest";
-import { defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
-import { defineTool } from "@relkit/tools";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
+import { defineTool } from "relkit/tools";
 import { defineAgent } from "../src/define-agent.js";
 import {
   findModelToolEffect,

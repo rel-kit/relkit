@@ -2,7 +2,7 @@
 import {
   DEPLOYMENT_INTEGRATION_PROTOCOL_VERSION,
   type DeploymentIntegrationMetadata,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 
 /** @experimental */
 export const pulumiEngine = Object.freeze({

@@ -7,7 +7,7 @@ import {
   type ObservabilityQueryRequest,
   type ObservabilityStreamEventType,
   type ObservabilityStreamOverflow,
-} from "@relkit/observability";
+} from "relkit/observability";
 
 /**
  * Validates the supported bounded observation query parameters.

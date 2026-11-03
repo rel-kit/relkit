@@ -1,6 +1,6 @@
 /** Executes bounded native HTTP requests and decodes the real generated database/auth host's public response contracts. */
 import { Effect, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { ScaffoldProcessFailure } from "../../../scripts/scaffold-process.errors.js";
 import { GeneratedRecordResponse } from "./generated-host.schemas.js";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";

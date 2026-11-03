@@ -7,7 +7,7 @@ same declaration.
 
 ```ts
 import { defineAgent } from "@relkit/langchain";
-import { z } from "@relkit/app/schema";
+import { z } from "relkit/schema";
 import { FakeToolCallingModel, todoListMiddleware } from "langchain";
 import lookupOrder from "./lookup-order.tool.js";
 
@@ -36,11 +36,11 @@ Only allowlisted tools execute, and RelKit approval remains authoritative. Runti
 agent, model, and tool span metadata; prompts, results, secrets, and full tool content remain omitted
 unless bounded development-redacted capture is selected.
 
-Generic declarations remain available from `@relkit/app/agents`. Install this integration and its selected SDK peers for native execution; DeepAgents is required only for subagents, skills, memory files, a native backend or interrupt controls.
+Generic declarations remain available from `relkit/agents`. Install this integration and its selected SDK peers for native execution; DeepAgents is required only for subagents, skills, memory files, a native backend or interrupt controls.
 
 | API                                                                   | Import                      |
 | --------------------------------------------------------------------- | --------------------------- |
-| Generic `defineAgent`, RelKit refs, public events and state contracts | `@relkit/app/agents`        |
+| Generic `defineAgent`, RelKit refs, public events and state contracts | `relkit/agents`             |
 | Native `defineAgent`, model/tool/middleware types                     | `@relkit/langchain`         |
 | `defineGraph`, graph nodes/edges, native persistence resources        | `@relkit/langchain`         |
 | Explicit execution, dependency check and persistence release          | `@relkit/langchain/runtime` |

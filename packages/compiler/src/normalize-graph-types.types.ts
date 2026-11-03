@@ -1,4 +1,4 @@
-import type { GRAPH_VERSION, SourceLocation } from "@relkit/contracts";
+import type { GRAPH_VERSION, SourceLocation } from "relkit/contracts";
 
 /** Compiler node projection validated by the authoritative graph contract during canonicalization. */
 export interface GraphNode {

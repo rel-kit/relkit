@@ -3,13 +3,13 @@ import { expect, test } from "bun:test";
 import { oc } from "@orpc/contract";
 import { createAutoClient, createClient } from "../../src/index.ts";
 import { createServerClient } from "../../src/server.ts";
-import { SpanRuntime, runInExecutionContext, startRootSpan } from "@relkit/invocation";
+import { SpanRuntime, runInExecutionContext, startRootSpan } from "relkit/invocation";
 import {
   AGENT_CAPABILITY_HEADER,
   AGENT_CAPABILITY_VALUE,
   createSpanId,
   createTraceId,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 
 const schema = {
   "~standard": {

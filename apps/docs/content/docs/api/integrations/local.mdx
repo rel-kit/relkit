@@ -32,14 +32,14 @@ export * from "./providers.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L2)
 
-### "@relkit/local-service" (namespace export)
+### "relkit/local-service" (namespace export)
 
-Re-exports all named exports from the "@relkit/local-service" module.
+Re-exports all named exports from the "relkit/local-service" module.
 
 **Signature**
 
 ```ts
-export * from "@relkit/local-service";
+export * from "relkit/local-service";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L1)
@@ -1517,7 +1517,7 @@ Effect.catchTag("LocalServiceValidationFailure", ({ message }) => Effect.logWarn
 declare class LocalServiceValidationFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/local-service-errors.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/local-service-errors.ts#L7)
 
 ### LocalServiceVersionError (class)
 
@@ -1547,7 +1547,7 @@ declare class LocalServiceVersionError { constructor(
   ) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/local-service-errors.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/local-service-errors.ts#L33)
 
 ### LocalServiceVersionFailure (class)
 
@@ -1565,7 +1565,7 @@ Effect.catchTag("LocalServiceVersionFailure", ({ code }) => Effect.logWarning(co
 declare class LocalServiceVersionFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/local-service-errors.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/local-service-errors.ts#L15)
 
 ## `local-service-observability.ts`
 
@@ -1585,7 +1585,7 @@ Effect.provide(normalizeLocalServiceRecipeEffect(recipe), LocalServiceTelemetryL
 declare class LocalServiceTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/local-service-observability.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/local-service-observability.ts#L15)
 
 ### LocalServiceTelemetryLive
 
@@ -1605,7 +1605,7 @@ Effect.runSync(
 declare const LocalServiceTelemetryLive: Layer.Layer<LocalServiceTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/local-service-observability.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/local-service-observability.ts#L23)
 
 ### observeLocalService
 
@@ -1626,7 +1626,7 @@ declare const observeLocalService: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/local-service-observability.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/local-service-observability.ts#L39)
 
 ### runLocalService
 
@@ -1648,7 +1648,7 @@ runLocalService(Effect.succeed("ready"));
 declare const runLocalService: <A, E>(effect: Effect.Effect<A, E>) => A;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/local-service-observability.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/local-service-observability.ts#L78)
 
 ## `local-service-observability.types.ts`
 
@@ -1673,7 +1673,7 @@ type LocalServiceOperation =
   | "override.binding-values";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/local-service-observability.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/local-service-observability.types.ts#L6)
 
 ### LocalServiceTelemetryService (interface)
 
@@ -1702,7 +1702,7 @@ export interface LocalServiceTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/local-service-observability.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/local-service-observability.types.ts#L16)
 
 ## `protocol-version.ts`
 
@@ -1726,7 +1726,7 @@ assertLocalServicePlanVersion({ version: 1 });
 declare const assertLocalServicePlanVersion: (value: unknown) => asserts value is LocalServicePlan;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol-version.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol-version.ts#L108)
 
 ### assertLocalServicePlanVersionEffect
 
@@ -1746,7 +1746,7 @@ declare const assertLocalServicePlanVersionEffect: (
 ) => Effect.Effect<void, LocalServiceVersionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol-version.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol-version.ts#L47)
 
 ### assertLocalServiceStateVersion
 
@@ -1770,7 +1770,7 @@ declare const assertLocalServiceStateVersion: (
 ) => asserts value is LocalServiceState;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol-version.ts#L118)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol-version.ts#L118)
 
 ### assertLocalServiceStateVersionEffect
 
@@ -1790,7 +1790,7 @@ declare const assertLocalServiceStateVersionEffect: (
 ) => Effect.Effect<void, LocalServiceVersionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol-version.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol-version.ts#L67)
 
 ### assertProviderOverrideStateVersion
 
@@ -1814,7 +1814,7 @@ declare const assertProviderOverrideStateVersion: (
 ) => asserts value is ProviderOverrideState;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol-version.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol-version.ts#L128)
 
 ### assertProviderOverrideStateVersionEffect
 
@@ -1834,7 +1834,7 @@ declare const assertProviderOverrideStateVersionEffect: (
 ) => Effect.Effect<void, LocalServiceVersionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol-version.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol-version.ts#L87)
 
 ### checkVersionEffect
 
@@ -1866,7 +1866,7 @@ declare const checkVersionEffect: (
 ) => Effect.Effect<undefined, LocalServiceVersionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol-version.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol-version.ts#L25)
 
 ## `protocol.ts`
 
@@ -1880,7 +1880,7 @@ Version and artifact names for the local-service protocol.
 declare const LOCAL_SERVICE_PLAN_FILE: "local-services.plan.json";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.ts#L4)
 
 ### LOCAL_SERVICE_PLAN_VERSION
 
@@ -1890,7 +1890,7 @@ declare const LOCAL_SERVICE_PLAN_FILE: "local-services.plan.json";
 declare const LOCAL_SERVICE_PLAN_VERSION: 1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.ts#L3)
 
 ### LOCAL_SERVICE_PROTOCOL_VERSION
 
@@ -1902,7 +1902,7 @@ Version and artifact names for the local-service protocol.
 declare const LOCAL_SERVICE_PROTOCOL_VERSION: 1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.ts#L2)
 
 ### LOCAL_SERVICE_STATE_FILE
 
@@ -1912,7 +1912,7 @@ declare const LOCAL_SERVICE_PROTOCOL_VERSION: 1;
 declare const LOCAL_SERVICE_STATE_FILE: "local-services.state.json";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.ts#L6)
 
 ### LOCAL_SERVICE_STATE_VERSION
 
@@ -1922,7 +1922,7 @@ declare const LOCAL_SERVICE_STATE_FILE: "local-services.state.json";
 declare const LOCAL_SERVICE_STATE_VERSION: 1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.ts#L5)
 
 ### PROVIDER_OVERRIDE_STATE_FILE
 
@@ -1932,7 +1932,7 @@ declare const LOCAL_SERVICE_STATE_VERSION: 1;
 declare const PROVIDER_OVERRIDE_STATE_FILE: "provider-overrides.json";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.ts#L8)
 
 ### PROVIDER_OVERRIDE_STATE_VERSION
 
@@ -1942,7 +1942,7 @@ declare const PROVIDER_OVERRIDE_STATE_FILE: "provider-overrides.json";
 declare const PROVIDER_OVERRIDE_STATE_VERSION: 1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.ts#L7)
 
 ## `protocol.types.ts`
 
@@ -1970,7 +1970,7 @@ export interface LocalServiceBindingState {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.types.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.types.ts#L49)
 
 ### LocalServiceMaterializerMetadata (interface)
 
@@ -1996,7 +1996,7 @@ export interface LocalServiceMaterializerMetadata<IntegrationId extends string =
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.types.ts#L13)
 
 ### LocalServicePhase (type alias)
 
@@ -2014,7 +2014,7 @@ const phase: LocalServicePhase = "healthy";
 type LocalServicePhase = "pending" | "starting" | "healthy" | "unhealthy" | "stopped";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.types.ts#L44)
 
 ### LocalServicePlan (interface)
 
@@ -2036,7 +2036,7 @@ export interface LocalServicePlan {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.types.ts#L35)
 
 ### LocalServicePlanEntry (interface)
 
@@ -2062,7 +2062,7 @@ export interface LocalServicePlanEntry {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.types.ts#L22)
 
 ### LocalServiceState (interface)
 
@@ -2086,7 +2086,7 @@ export interface LocalServiceState {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.types.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.types.ts#L62)
 
 ### LocalServiceVersionErrorCode (type alias)
 
@@ -2107,7 +2107,7 @@ type LocalServiceVersionErrorCode =
   | "RELKIT_PROVIDER_OVERRIDE_STATE_VERSION_UNSUPPORTED";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.types.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.types.ts#L102)
 
 ### ProviderOverrideBinding (interface)
 
@@ -2128,7 +2128,7 @@ export interface ProviderOverrideBinding {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.types.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.types.ts#L73)
 
 ### ProviderOverrideExpectation (interface)
 
@@ -2154,7 +2154,7 @@ export interface ProviderOverrideExpectation {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.types.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.types.ts#L93)
 
 ### ProviderOverrideState (interface)
 
@@ -2179,7 +2179,7 @@ export interface ProviderOverrideState {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/protocol.types.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/protocol.types.ts#L81)
 
 ## `provider-overrides.ts`
 
@@ -2206,7 +2206,7 @@ declare const providerOverrideBindingValues: (
 ) => Readonly<Record<string, Readonly<Record<string, JsonValue>>>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/provider-overrides.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/provider-overrides.ts#L82)
 
 ### providerOverrideBindingValuesEffect
 
@@ -2231,7 +2231,7 @@ declare const providerOverrideBindingValuesEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/provider-overrides.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/provider-overrides.ts#L22)
 
 ## `recipe-normalize.ts`
 
@@ -2243,7 +2243,7 @@ declare const providerOverrideBindingValuesEffect: (
 declare const NormalizedLocalServiceRecipe: NormalizedLocalServiceRecipe;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe-normalize.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe-normalize.ts#L24)
 
 ### NormalizedLocalServiceUnit
 
@@ -2253,7 +2253,7 @@ declare const NormalizedLocalServiceRecipe: NormalizedLocalServiceRecipe;
 declare const NormalizedLocalServiceUnit: NormalizedLocalServiceUnit;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe-normalize.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe-normalize.ts#L25)
 
 ### normalizeLocalServiceRecipe
 
@@ -2277,7 +2277,7 @@ declare const normalizeLocalServiceRecipe: (
 ) => NormalizedLocalServiceRecipe;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe-normalize.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe-normalize.ts#L43)
 
 ### normalizeLocalServiceRecipeEffect
 
@@ -2331,7 +2331,7 @@ declare const normalizeLocalServiceRecipeEffect: (recipe: LocalServiceRecipeInpu
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe-normalize.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe-normalize.ts#L32)
 
 ## `recipe-normalize.types.ts`
 
@@ -2374,7 +2374,7 @@ export interface NormalizedLocalServiceRecipe {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe-normalize.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe-normalize.types.ts#L27)
 
 ### NormalizedLocalServiceUnit (interface)
 
@@ -2397,7 +2397,7 @@ export interface NormalizedLocalServiceUnit extends CompositeLocalServiceUnit {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe-normalize.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe-normalize.types.ts#L16)
 
 ## `recipe-runtime.types.ts`
 
@@ -2429,7 +2429,7 @@ export interface LocalServiceInstance {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe-runtime.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe-runtime.types.ts#L11)
 
 ### LocalServiceMaterializerRuntime (interface)
 
@@ -2514,7 +2514,7 @@ export interface LocalServiceMaterializerRuntime {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe-runtime.types.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe-runtime.types.ts#L51)
 
 ### LocalServiceStartRequest (interface)
 
@@ -2549,7 +2549,7 @@ export interface LocalServiceStartRequest {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe-runtime.types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe-runtime.types.ts#L29)
 
 ## `recipe.ts`
 
@@ -2565,7 +2565,7 @@ Re-exports all named exports from the "./recipe-runtime.types.js" module.
 export * from "./recipe-runtime.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.ts#L5)
 
 ### "./recipe.types.js" (namespace export)
 
@@ -2577,7 +2577,7 @@ Re-exports all named exports from the "./recipe.types.js" module.
 export * from "./recipe.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.ts#L4)
 
 ### LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION
 
@@ -2589,7 +2589,7 @@ Version used by composite recipes; single-container recipes remain on v1.
 declare const LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION: 2;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.ts#L2)
 
 ## `recipe.types.ts`
 
@@ -2636,7 +2636,7 @@ export interface CompositeLocalServiceRecipe<IntegrationId extends string = stri
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L121)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L121)
 
 ### CompositeLocalServiceUnit (interface)
 
@@ -2669,7 +2669,7 @@ export interface CompositeLocalServiceUnit {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L101)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L101)
 
 ### CompositeLocalServiceUnitKind (type alias)
 
@@ -2687,7 +2687,7 @@ const kind: CompositeLocalServiceUnitKind = "worker";
 type CompositeLocalServiceUnitKind = "container" | "init" | "worker";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L95)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L95)
 
 ### CompositeLocalServiceUnitVolume (interface)
 
@@ -2708,7 +2708,7 @@ export interface CompositeLocalServiceUnitVolume {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L68)
 
 ### CompositeLocalServiceVolume (interface)
 
@@ -2729,7 +2729,7 @@ export interface CompositeLocalServiceVolume {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L60)
 
 ### LocalServiceBindMount (interface)
 
@@ -2751,7 +2751,7 @@ export interface LocalServiceBindMount {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L76)
 
 ### LocalServiceGeneratedSecret (interface)
 
@@ -2772,7 +2772,7 @@ export interface LocalServiceGeneratedSecret {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L36)
 
 ### LocalServiceHealthCheck (interface)
 
@@ -2800,7 +2800,7 @@ export interface LocalServiceHealthCheck {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L19)
 
 ### LocalServiceLiteralEnvironment (interface)
 
@@ -2821,7 +2821,7 @@ export interface LocalServiceLiteralEnvironment {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L52)
 
 ### LocalServiceRecipe (interface)
 
@@ -2858,7 +2858,7 @@ export interface LocalServiceRecipe<IntegrationId extends string = string> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L159)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L159)
 
 ### LocalServiceRecipeInput (type alias)
 
@@ -2877,7 +2877,7 @@ type LocalServiceRecipeInput<IntegrationId extends string = string> =
   LocalServiceRecipe<IntegrationId> | CompositeLocalServiceRecipe<IntegrationId>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L152)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L152)
 
 ### LocalServiceRecipeOutputContext (interface)
 
@@ -2901,7 +2901,7 @@ export interface LocalServiceRecipeOutputContext {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L8)
 
 ### LocalServiceSecretEnvironment (interface)
 
@@ -2922,7 +2922,7 @@ export interface LocalServiceSecretEnvironment {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L44)
 
 ### LocalServiceVolume (interface)
 
@@ -2942,7 +2942,7 @@ export interface LocalServiceVolume {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L29)
 
 ### LocalServiceWorkerArtifact (interface)
 
@@ -2968,4 +2968,4 @@ export interface LocalServiceWorkerArtifact {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/local-service/src/recipe.types.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe.types.ts#L85)

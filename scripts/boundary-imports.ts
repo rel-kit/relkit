@@ -13,24 +13,25 @@ import type {
 export type { PackageManifest, Scope, ImportReference } from "./boundary-imports.types.js";
 
 export const publicApplicationPackages = new Set([
-  "@relkit/agents",
   "@relkit/app",
+  "relkit/agents",
+  "relkit",
   "@relkit/better-auth",
-  "@relkit/buckets",
-  "@relkit/cache",
+  "relkit/buckets",
+  "relkit/cache",
   "@relkit/client",
-  "@relkit/config",
+  "relkit/config",
   "@relkit/drizzle",
-  "@relkit/events",
-  "@relkit/functions",
+  "relkit/events",
+  "relkit/functions",
   "@relkit/integrations",
-  "@relkit/jobs",
-  "@relkit/realtime",
-  "@relkit/routes",
-  "@relkit/schema",
-  "@relkit/services",
+  "relkit/jobs",
+  "relkit/realtime",
+  "relkit/routes",
+  "relkit/schema",
+  "relkit/services",
   "@relkit/testing",
-  "@relkit/tools",
+  "relkit/tools",
 ]);
 
 export const descriptorPackages = new Set(
@@ -39,9 +40,9 @@ export const descriptorPackages = new Set(
       ![
         "@relkit/better-auth",
         "@relkit/client",
-        "@relkit/config",
+        "relkit/config",
         "@relkit/drizzle",
-        "@relkit/schema",
+        "relkit/schema",
         "@relkit/testing",
       ].includes(name),
   ),
@@ -50,32 +51,32 @@ export const descriptorPackages = new Set(
 export const internalRuntimePackages = new Set([
   "@relkit/cloud-aws",
   "@relkit/deploy-pulumi",
-  "@relkit/engine",
+  "relkit/engine",
   "@relkit/inspector-api",
-  "@relkit/invocation",
-  "@relkit/observability",
-  "@relkit/providers-local",
+  "relkit/invocation",
+  "relkit/observability",
+  "relkit/providers-local",
   "@relkit/providers-standard",
-  "@relkit/runtime-effect",
-  "@relkit/runtime-hono",
+  "relkit/runtime-effect",
+  "relkit/runtime-hono",
   "@relkit/supervisor",
 ]);
 
 /** Shared invocation contracts are internal, but descriptor packages may consume them. */
-export const dependencyNeutralPackages = new Set(["@relkit/invocation"]);
+export const dependencyNeutralPackages = new Set(["relkit/invocation"]);
 
 export const descriptorRuntimeDependencies = new Map<string, ReadonlySet<string>>([
-  ["@relkit/agents", new Set(["ai", "effect"])],
-  ["@relkit/app", new Set(["@relkit/observability/telemetry", "effect"])],
-  ["@relkit/buckets", new Set(["effect"])],
-  ["@relkit/cache", new Set(["effect"])],
-  ["@relkit/events", new Set(["effect"])],
-  ["@relkit/functions", new Set(["effect"])],
-  ["@relkit/jobs", new Set(["effect"])],
-  ["@relkit/realtime", new Set(["effect"])],
-  ["@relkit/routes", new Set(["effect", "hono"])],
-  ["@relkit/services", new Set(["effect"])],
-  ["@relkit/tools", new Set(["effect"])],
+  ["relkit/agents", new Set(["ai", "effect"])],
+  ["relkit", new Set(["relkit/observability/telemetry", "effect"])],
+  ["relkit/buckets", new Set(["effect"])],
+  ["relkit/cache", new Set(["effect"])],
+  ["relkit/events", new Set(["effect"])],
+  ["relkit/functions", new Set(["effect"])],
+  ["relkit/jobs", new Set(["effect"])],
+  ["relkit/realtime", new Set(["effect"])],
+  ["relkit/routes", new Set(["effect", "hono"])],
+  ["relkit/services", new Set(["effect"])],
+  ["relkit/tools", new Set(["effect"])],
 ]);
 
 export const nodeBuiltins = new Set(builtinModules.map((name) => name.replace(/^node:/, "")));
@@ -136,6 +137,27 @@ export function dependencyName(specifier: string): string | undefined {
   }
   const segments = specifier.split("/");
   return specifier.startsWith("@") ? segments.slice(0, 2).join("/") : segments[0];
+}
+
+/** Area-level owner of a module specifier: `relkit/<area>` for a `relkit` subpath.
+ * @param specifier - Bare import specifier. @returns The owning package or `relkit` area. */
+export function moduleOwnerName(specifier: string): string | undefined {
+  const dependency = dependencyName(specifier);
+  if (dependency !== "relkit" || specifier === "relkit") return dependency;
+  const area = specifier.split("/")[1]!;
+  if (area === "internal") return "relkit";
+  return `relkit/${area === "tasks" ? "jobs" : area}`;
+}
+
+/** `relkit` area that owns a file inside the merged package, if any.
+ * @param root - Repository root. @param file - Absolute file path.
+ * @returns `relkit` for the application area, `relkit/<area>` for the others. */
+export function relkitAreaOwner(root: string, file: string): string | undefined {
+  const match = /^packages\/relkit\/(?:src|tests)\/([^/]+)\//.exec(
+    relative(root, file).replaceAll("\\", "/"),
+  );
+  if (!match) return undefined;
+  return match[1] === "app" ? "relkit" : `relkit/${match[1]}`;
 }
 
 export function importReferences(sourceFile: ts.SourceFile): ImportReference[] {

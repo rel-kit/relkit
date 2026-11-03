@@ -3,7 +3,7 @@ import { Deferred, Effect, Fiber, Layer } from "effect";
 import { PendingOperations, pendingOperationsLayer } from "../../src/react/pending.service.js";
 import { PendingCapacityError } from "../../src/react/pending-errors.js";
 import { AgentOperations, AgentOperationsLive } from "../../src/react/agent-operations.service.js";
-import type { PendingOperationMetadata } from "@relkit/contracts";
+import type { PendingOperationMetadata } from "relkit/contracts";
 
 it.effect("simultaneous hashes cannot exceed capacity or persist transmitted inputs", () =>
   Effect.gen(function* () {

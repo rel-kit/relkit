@@ -1,4 +1,4 @@
-import { runExecutionPromise } from "@relkit/contracts/operation";
+import { runExecutionPromise } from "relkit/contracts/operation";
 import { agentOperations, agentRuntime } from "./agent-runtime.js";
 
 /**

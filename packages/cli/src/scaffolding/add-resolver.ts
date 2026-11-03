@@ -1,7 +1,7 @@
 /** Composes add discovery and interactive resolution into one request workflow, preserving typed cancellation and validation failures. */
 
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { normalizeAddRequest } from "./add-options.js";
 import { usage } from "./add-options-parser.js";
 import { resolveDomainOptionsEffect } from "./add-resolver-domain.js";

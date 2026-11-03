@@ -1,6 +1,6 @@
 import { runJobsSync } from "./compatibility.js";
 import { createHash } from "node:crypto";
-import { serializeJsonEffect, type JsonValue } from "@relkit/contracts";
+import { serializeJsonEffect, type JsonValue } from "relkit/contracts";
 import { Effect } from "effect";
 import type { NormalizedDescriptor, NormalizationWork } from "../normalize-types.js";
 import { isRecord, taskSchemaKey } from "../normalize-utils.js";

@@ -2,7 +2,7 @@ import { observeJobs } from "./observability.js";
 import { Effect } from "effect";
 import { runJobsSync } from "./compatibility.js";
 import { taskReferenceIdEffect } from "./reference.js";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { providerMaps, selectedProviderProfile } from "../normalize-graph-app.js";
 import type { NormalizedDescriptor, NormalizationWork } from "../normalize-types.js";
 import { isRecord } from "../normalize-utils.js";

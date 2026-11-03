@@ -1,4 +1,4 @@
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { Deferred, Effect, Exit, Ref, Scope } from "effect";
 import type { ProxyAdmission } from "./proxy.types.js";
 import type { ProxySocketData, ProxySocketState } from "./proxy-websocket.types.js";

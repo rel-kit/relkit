@@ -1,5 +1,5 @@
-import { StableIdError } from "@relkit/contracts";
-import { isStableId, normalizeId, type DescriptorKind } from "@relkit/contracts";
+import { StableIdError } from "relkit/contracts";
+import { isStableId, normalizeId, type DescriptorKind } from "relkit/contracts";
 
 /**
  * Recognizes nonnull nonarray objects for metadata inspection.

@@ -1,5 +1,5 @@
-import type { RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
-import type { NativeObservation, NativeWatchRequest, OperationContext } from "@relkit/jobs/adapter";
+import type { RunSnapshot, RunWatchFrame } from "relkit/contracts/jobs";
+import type { NativeObservation, NativeWatchRequest, OperationContext } from "relkit/jobs/adapter";
 
 /** @experimental */
 export interface InngestObservationOptions {

@@ -2,8 +2,8 @@ import type { JobsManifestGenerationFailure } from "./manifest.types.js";
 import { Effect } from "effect";
 import { runJobsSync } from "./compatibility.js";
 import { observeJobs, recordJobsWorkload } from "./observability.js";
-import { serializeJsonEffect } from "@relkit/contracts";
-import { createDiagnostic, type Diagnostic } from "@relkit/diagnostics";
+import { serializeJsonEffect } from "relkit/contracts";
+import { createDiagnostic, type Diagnostic } from "relkit/diagnostics";
 import { jobEntryEffect, taskEntryEffect } from "./manifest-entries.js";
 import { hashGraphEffect } from "../normalize-graph.js";
 import {

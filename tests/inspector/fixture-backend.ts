@@ -1,9 +1,9 @@
 import { Hono } from "../../packages/inspector-api/node_modules/hono";
 import { Schema } from "effect";
-import { telemetryRecordSchema } from "@relkit/observability/local/protocol";
+import { telemetryRecordSchema } from "relkit/observability/local/protocol";
 // @ts-expect-error The workspace package exposes this runtime subpath without a relative declaration path.
 import { cors } from "../../packages/inspector-api/node_modules/hono/dist/middleware/cors/index.js";
-import { PROTOCOL_VERSION } from "../../packages/contracts/src/index.ts";
+import { PROTOCOL_VERSION } from "relkit/contracts";
 import {
   assembleRequestExecution,
   createObservabilityStream,
@@ -11,7 +11,7 @@ import {
   type ObservabilityQueryRequest,
   type ObservabilityStream,
   type ObservabilityRecord,
-} from "../../packages/observability/src/index.ts";
+} from "relkit/observability";
 import {
   installInspectorEndpoints,
   type InspectorActionServices,

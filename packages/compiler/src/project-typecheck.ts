@@ -4,7 +4,7 @@
  * input journal that observes consumed declarations and negative resolution probes
  * without repeating the check or changing the compiler's diagnostic conversion.
  */
-import { createDiagnostic, type Diagnostic, type DiagnosticSeverity } from "@relkit/diagnostics";
+import { createDiagnostic, type Diagnostic, type DiagnosticSeverity } from "relkit/diagnostics";
 import { Effect, Option } from "effect";
 import { existsSync } from "node:fs";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";

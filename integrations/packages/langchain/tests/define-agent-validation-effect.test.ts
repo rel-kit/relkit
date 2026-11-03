@@ -2,7 +2,7 @@
 
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { defineAgent } from "../src/define-agent.js";
 import {
   assertAgentDescriptor,

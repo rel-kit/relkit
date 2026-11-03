@@ -1,6 +1,6 @@
 import { expect, it } from "@effect/vitest";
 import { Context, Effect, Layer, Logger, ManagedRuntime, Metric, References } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionSync } from "relkit/contracts/operation";
 import { acquireClientOwner } from "../../src/client-owner.js";
 import { ClientTransport, clientTransportLayer } from "../../src/transport.service.js";
 import { PendingOperations, pendingOperationsLayer } from "../../src/react/pending.service.js";

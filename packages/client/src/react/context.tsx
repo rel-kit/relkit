@@ -1,7 +1,7 @@
 "use client";
 /** Owns client/query context, identity isolation and realtime cleanup for one React provider tree. */
 
-import type { ClientIdentityDocument } from "@relkit/contracts";
+import type { ClientIdentityDocument } from "relkit/contracts";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import {
   hydrate,

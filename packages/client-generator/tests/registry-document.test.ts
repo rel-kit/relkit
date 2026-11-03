@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import { Effect } from "effect";
-import { GRAPH_VERSION } from "@relkit/contracts";
-import type { ApplicationGraph } from "@relkit/graph";
+import { GRAPH_VERSION } from "relkit/contracts";
+import type { ApplicationGraph } from "relkit/graph";
 import { graph } from "./fixtures/generator-graphs.js";
 import { clientRoutes } from "../src/generate-types.js";
 import {

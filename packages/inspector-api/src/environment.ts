@@ -1,4 +1,4 @@
-import { API_VERSION, type JsonValue } from "@relkit/contracts";
+import { API_VERSION, type JsonValue } from "relkit/contracts";
 import {
   identity,
   isRecord,
@@ -10,7 +10,7 @@ import {
 } from "./shared.js";
 import { InspectorGraphError } from "./graph.js";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { inspectorExecution } from "./execution.js";
 import { projectionAttempt, runInspectorSync } from "./native-edge.js";
 

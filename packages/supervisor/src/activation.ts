@@ -1,5 +1,5 @@
 import { Context, Effect, Exit, Layer, Ref, Result } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { planActivation, planCandidate, planDrain, planSourceChange } from "./activation-plan.js";
 import { ActivationTransitionError } from "./state-machine.schemas.js";
 import { validateSupervisorToken } from "./state-machine-telemetry.js";

@@ -1,13 +1,19 @@
 /** Maps public package identities and feature entrypoints to generated documentation. */
 export const apiPackageDefinitions = [
-  apiPackage("app", "Application", "@relkit/app", "packages/app", "core"),
-  apiPackage("config", "Configuration", "@relkit/config", "packages/config", "core"),
-  apiPackage("provider", "Provider authoring", "@relkit/provider", "packages/provider", "core"),
+  apiPackage("app", "Application", "relkit", "packages/relkit/src/app", "core"),
+  apiPackage("config", "Configuration", "relkit/config", "packages/relkit/src/config", "core"),
+  apiPackage(
+    "provider",
+    "Provider authoring",
+    "relkit/provider",
+    "packages/relkit/src/provider",
+    "core",
+  ),
   apiPackage(
     "providers-local",
     "Local providers",
-    "@relkit/providers-local",
-    "packages/providers-local",
+    "relkit/providers-local",
+    "packages/relkit/src/providers-local",
     "core",
   ),
   apiPackage(
@@ -25,19 +31,18 @@ export const apiPackageDefinitions = [
     "packages/create-relkit",
     "core",
   ),
-  apiPackage("relkit", "CLI launcher", "relkit", "packages/relkit", "core"),
-  apiPackage("schema", "Schema", "@relkit/schema", "packages/schema", "core"),
-  apiPackage("functions", "Functions", "@relkit/functions", "packages/functions", "core"),
-  apiPackage("services", "Services", "@relkit/services", "packages/services", "core"),
+  apiPackage("schema", "Schema", "relkit/schema", "packages/relkit/src/schema", "core"),
+  apiPackage("functions", "Functions", "relkit/functions", "packages/relkit/src/functions", "core"),
+  apiPackage("services", "Services", "relkit/services", "packages/relkit/src/services", "core"),
   apiPackage("drizzle", "Drizzle", "@relkit/drizzle", "packages/drizzle", "core"),
   apiPackage("better-auth", "Better Auth", "@relkit/better-auth", "packages/better-auth", "core"),
-  apiPackage("routes", "Routes", "@relkit/routes", "packages/routes", "core"),
-  apiPackage("events", "Events", "@relkit/events", "packages/events", "core"),
-  apiPackage("jobs", "Jobs", "@relkit/jobs", "packages/jobs", "core"),
-  apiPackage("buckets", "Buckets", "@relkit/buckets", "packages/buckets", "core"),
-  apiPackage("cache", "Cache", "@relkit/cache", "packages/cache", "core"),
-  apiPackage("tools", "Tools", "@relkit/tools", "packages/tools", "core"),
-  apiPackage("agents", "Agents", "@relkit/agents", "packages/agents", "core"),
+  apiPackage("routes", "Routes", "relkit/routes", "packages/relkit/src/routes", "core"),
+  apiPackage("events", "Events", "relkit/events", "packages/relkit/src/events", "core"),
+  apiPackage("jobs", "Jobs", "relkit/jobs", "packages/relkit/src/jobs", "core"),
+  apiPackage("buckets", "Buckets", "relkit/buckets", "packages/relkit/src/buckets", "core"),
+  apiPackage("cache", "Cache", "relkit/cache", "packages/relkit/src/cache", "core"),
+  apiPackage("tools", "Tools", "relkit/tools", "packages/relkit/src/tools", "core"),
+  apiPackage("agents", "Agents", "relkit/agents", "packages/relkit/src/agents", "core"),
   apiPackage(
     "integrations/langchain",
     "LangChain",
@@ -46,7 +51,7 @@ export const apiPackageDefinitions = [
     "integrations",
   ),
   apiPackage("client", "Client", "@relkit/client", "packages/client", "core"),
-  apiPackage("realtime", "Realtime", "@relkit/realtime", "packages/realtime", "core"),
+  apiPackage("realtime", "Realtime", "relkit/realtime", "packages/relkit/src/realtime", "core"),
   apiPackage("testing", "Testing", "@relkit/testing", "packages/testing", "core"),
   apiPackage(
     "inspector",
@@ -135,6 +140,18 @@ export const apiPackageDefinitions = [
     "integrations",
   ),
 ] as const;
+
+/** Source folder documented for a catalog directory: a `relkit` area is its own source folder.
+ * @param directory - Workspace package or `packages/relkit/src/<area>`. @returns Folder holding the sources. */
+export function sourceDirectory(directory: string): string {
+  return /^packages\/relkit\/src\/[^/]+$/.test(directory) ? directory : `${directory}/src`;
+}
+
+/** Workspace package that owns a catalog directory.
+ * @param directory - Workspace package or `packages/relkit/src/<area>`. @returns Package directory. */
+export function packageDirectory(directory: string): string {
+  return /^packages\/relkit\/src\/[^/]+$/.test(directory) ? "packages/relkit" : directory;
+}
 
 export type ApiPackage = (typeof apiPackageDefinitions)[number]["slug"];
 

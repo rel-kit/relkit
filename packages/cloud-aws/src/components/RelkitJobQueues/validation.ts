@@ -1,4 +1,4 @@
-import { assertJsonValue, canonicalJson, normalizeId, type JsonValue } from "@relkit/contracts";
+import { assertJsonValue, canonicalJson, normalizeId, type JsonValue } from "relkit/contracts";
 import type {
   RelkitJobQueuesArgs,
   RelkitJobQueueDefinition,

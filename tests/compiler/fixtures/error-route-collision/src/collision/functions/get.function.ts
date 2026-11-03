@@ -1,5 +1,5 @@
-import { defineFunction } from "@relkit/app";
-import { z } from "@relkit/schema";
+import { defineFunction } from "relkit";
+import { z } from "relkit/schema";
 
 const getOrder = defineFunction({
   id: "collision.get",

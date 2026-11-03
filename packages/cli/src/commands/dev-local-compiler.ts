@@ -1,6 +1,6 @@
 /** Owns the compiler bridge and captured session resources; generation stages live in dev-local-generation. */
 import { Deferred, Effect, Exit, Ref, Scope, Semaphore } from "effect";
-import type { RuntimeIntegrationPlan } from "@relkit/contracts";
+import type { RuntimeIntegrationPlan } from "relkit/contracts";
 import { observeCli } from "../cli-runtime.js";
 import { CliProject } from "../services/project.service.js";
 import { CliCompiler } from "../services/compiler.service.js";

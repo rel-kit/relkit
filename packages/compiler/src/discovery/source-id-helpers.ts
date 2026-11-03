@@ -7,7 +7,7 @@ import {
   normalizeIdEffect,
   normalizeSourcePathEffect,
   serviceIdentityPath,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import { Effect } from "effect";
 import { observeCompiler } from "../observability.js";
 import type { SourceFactoryKind } from "./source-facts-types.js";

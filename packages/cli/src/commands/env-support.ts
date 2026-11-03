@@ -7,7 +7,7 @@ import {
   type EnvProjection,
   type EnvShape,
   type EnvSource,
-} from "@relkit/config";
+} from "relkit/config";
 import { cliAdapterError } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliEnvironmentProject, environmentProjectLayer } from "./env-project.service.js";

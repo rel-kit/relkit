@@ -7,8 +7,8 @@ import { Effect, Semaphore } from "effect";
 import type { DuckdbConnectionPort } from "./duckdb-driver.types.js";
 import { makeDuckdbQueryEffect } from "./duckdb-query-effect.js";
 import { DuckdbQueryError } from "./duckdb-query-error.js";
-import { ObservabilityQueryError } from "@relkit/observability";
-import type { ObservabilityQueryRequest } from "@relkit/observability";
+import { ObservabilityQueryError } from "relkit/observability";
+import type { ObservabilityQueryRequest } from "relkit/observability";
 /**
  * Creates Promise query adapters for a scoped DuckDB connection.
  *

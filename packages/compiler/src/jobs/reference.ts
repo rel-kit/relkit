@@ -1,4 +1,4 @@
-import { normalizeIdEffect } from "@relkit/contracts";
+import { normalizeIdEffect } from "relkit/contracts";
 import { Effect } from "effect";
 import { isRecord } from "../normalize-utils.js";
 

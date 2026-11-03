@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createBindingValueRef, normalizeProviderSource } from "@relkit/provider";
+import { createBindingValueRef, normalizeProviderSource } from "relkit/provider";
 import { kv, r2 } from "./src/index.ts";
 import {
   createCloudflareKvCacheProvider,

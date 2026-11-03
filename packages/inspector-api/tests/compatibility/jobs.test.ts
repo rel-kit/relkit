@@ -6,8 +6,8 @@ import type {
 import { nativeFixture, responseJson } from "../fixtures/json.ts";
 import { describe, expect, test } from "bun:test";
 import { Hono } from "hono";
-import type { RunPage, RunSnapshot } from "@relkit/contracts/jobs";
-import { API_BASE_PATH } from "@relkit/contracts";
+import type { RunPage, RunSnapshot } from "relkit/contracts/jobs";
+import { API_BASE_PATH } from "relkit/contracts";
 import {
   installInspectorEndpoints,
   type InspectorJobsBinding,

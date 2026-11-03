@@ -117,7 +117,7 @@ for (const template of packedTemplates) {
     const dependencies = manifest[field];
     if (dependencies === undefined) continue;
     for (const name of Object.keys(dependencies)) {
-      if (name.startsWith("@relkit/") || name === "create-relkit") {
+      if (name.startsWith("@relkit/") || name === "create-relkit" || name === "relkit") {
         const dependencyVersion = versions.get(name);
         if (dependencyVersion === undefined)
           throw new Error(`Unknown template dependency: ${name}`);

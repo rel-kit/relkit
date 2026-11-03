@@ -3,7 +3,7 @@
  * This pure fragment acquires no resources; generated code delegates ownership
  * and expected runtime failures to the existing typed server host.
  */
-import { canonicalJson, RUNTIME_INTEGRATION_PLAN_VERSION } from "@relkit/contracts";
+import { canonicalJson, RUNTIME_INTEGRATION_PLAN_VERSION } from "relkit/contracts";
 import type { ServerSourceEmission } from "./build-server.types.js";
 import { serverRegistrationPlanSource } from "./build-server-plan.js";
 

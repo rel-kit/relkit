@@ -8,8 +8,8 @@ import { Context, Effect, Layer, Option } from "effect";
 import {
   DependencySource,
   type DependencySourceContract,
-} from "@relkit/provider/internal/dependencies";
-import { observeExecution } from "@relkit/contracts/operation";
+} from "relkit/provider/internal/dependencies";
+import { observeExecution } from "relkit/contracts/operation";
 import { SnapshotFiles } from "./snapshot-files.service.js";
 import { DevSnapshotRejected } from "./snapshot-error.js";
 import { SnapshotBundleInputs, SnapshotInstalledPackage } from "./snapshot-dependencies.schemas.js";

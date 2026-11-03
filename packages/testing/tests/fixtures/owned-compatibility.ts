@@ -1,7 +1,7 @@
 /** Tracks compatibility fixture acquisitions and releases them after every Bun test. */
 import { afterEach } from "bun:test";
 import { mkdtempSync as nativeMkdtemp, rmSync } from "node:fs";
-import { createJobsRuntime as nativeJobsRuntime } from "@relkit/jobs";
+import { createJobsRuntime as nativeJobsRuntime } from "relkit/jobs";
 import {
   createTestAgent as nativeAgent,
   createTestModel as nativeModel,

@@ -5,6 +5,8 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative, resolve, sep } from "node:path";
 import ts from "typescript";
+import { readPackageTiers, type PackageTier } from "./maturity-packages.js";
+export { readPackageTiers, type PackageTier } from "./maturity-packages.js";
 
 export type MaturityTier = "core" | "labs";
 
@@ -34,37 +36,38 @@ export const MATURITY_FEATURES: readonly MaturityFeature[] = [
   core(
     "Application model and compiler",
     [
+      "relkit",
       "@relkit/app",
-      "@relkit/contracts",
+      "relkit/contracts",
       "@relkit/compiler",
-      "@relkit/graph",
-      "@relkit/engine",
-      "@relkit/invocation",
-      "@relkit/diagnostics",
-      "@relkit/provider",
+      "relkit/graph",
+      "relkit/engine",
+      "relkit/invocation",
+      "relkit/diagnostics",
+      "relkit/provider",
       "@relkit/providers-standard",
-      "@relkit/runtime-effect",
+      "relkit/runtime-effect",
     ],
     ["/docs/learn/concepts/application"],
   ),
-  core("Functions", ["@relkit/functions"], ["/docs/learn/concepts/functions"]),
-  core("Services", ["@relkit/services"], ["/docs/modules/service"]),
-  core("Routes", ["@relkit/routes", "@relkit/runtime-hono"], ["/docs/modules/http"]),
-  core("Schemas", ["@relkit/schema", "@relkit/openapi"], ["/docs/learn/concepts/schemas"]),
-  core("Env and config", ["@relkit/config"], ["/docs/learn/concepts/environment"]),
-  core("Events", ["@relkit/events"], ["/docs/modules/events"]),
+  core("Functions", ["relkit/functions"], ["/docs/learn/concepts/functions"]),
+  core("Services", ["relkit/services"], ["/docs/modules/service"]),
+  core("Routes", ["relkit/routes", "relkit/runtime-hono"], ["/docs/modules/http"]),
+  core("Schemas", ["relkit/schema", "relkit/openapi"], ["/docs/learn/concepts/schemas"]),
+  core("Env and config", ["relkit/config"], ["/docs/learn/concepts/environment"]),
+  core("Events", ["relkit/events"], ["/docs/modules/events"]),
   core(
     "Jobs and schedules with local and Postgres backends",
-    ["@relkit/jobs", "@relkit/local", "@relkit/providers-local", "@relkit/local-service"],
+    ["relkit/jobs", "@relkit/local", "relkit/providers-local", "relkit/local-service"],
     ["/docs/modules/jobs"],
   ),
-  core("Cache", ["@relkit/cache", "@relkit/redis"], ["/docs/modules/caching"]),
-  core("Buckets", ["@relkit/buckets", "@relkit/s3"], ["/docs/modules/storage"]),
+  core("Cache", ["relkit/cache", "@relkit/redis"], ["/docs/modules/caching"]),
+  core("Buckets", ["relkit/buckets", "@relkit/s3"], ["/docs/modules/storage"]),
   core("Drizzle", ["@relkit/drizzle"], ["/docs/modules/database/drizzle"]),
   core("Better Auth", ["@relkit/better-auth"], ["/docs/modules/auth/better-auth"]),
   core(
     "Built-in telemetry",
-    ["@relkit/observability", "@relkit/observability-local"],
+    ["relkit/observability", "@relkit/observability-local"],
     ["/docs/modules/operations/observability"],
   ),
   core("Typed client", ["@relkit/client", "@relkit/client-generator"], ["/docs/modules/client"]),
@@ -80,18 +83,18 @@ export const MATURITY_FEATURES: readonly MaturityFeature[] = [
     ["/docs/modules/operations/inspector"],
   ),
   core("relkit mcp", ["@relkit/cli"], ["/docs/modules/ai/mcp"]),
-  core("Agent declarations and tools", ["@relkit/agents", "@relkit/tools"], ["/docs/modules/ai"]),
+  core("Agent declarations and tools", ["relkit/agents", "relkit/tools"], ["/docs/modules/ai"]),
   core("Bun and Node LTS runtimes", [], ["/docs/learn/local-development"]),
   core("Integration catalog", ["@relkit/integrations"], ["/docs/modules/integrations"]),
   core(
     "Docker deploy",
-    ["@relkit/docker", "@relkit/deploy"],
+    ["@relkit/docker", "relkit/deploy"],
     ["/docs/modules/deployment/local-docker"],
   ),
   core("Railway deploy", [], [], "Arrives with the production image."),
   labs(
     "Realtime",
-    ["@relkit/realtime"],
+    ["relkit/realtime"],
     [
       "/docs/modules/realtime",
       "/docs/modules/realtime/access",
@@ -133,44 +136,7 @@ export const MATURITY_FEATURES: readonly MaturityFeature[] = [
   labs("OTLP telemetry", ["@relkit/otlp"], ["/docs/api/integrations/otlp"]),
 ];
 
-/** A published workspace package and the tier its manifest declares. */
-export interface PackageTier {
-  readonly name: string;
-  readonly directory: string;
-  readonly tier: unknown;
-}
-
-const packageParents = ["packages", "integrations/packages"];
 const docsContent = "apps/docs/content";
-
-/**
- * Reads every published workspace manifest: `packages/*`, `integrations/packages/*` and
- * `integrations/catalog`. @param root - Repository root. @returns Packages in directory order.
- */
-export function readPackageTiers(root: string): PackageTier[] {
-  const directories = [
-    ...packageParents.flatMap((parent) =>
-      existsSync(join(root, parent))
-        ? readdirSync(join(root, parent))
-            .sort()
-            .map((name) => `${parent}/${name}`)
-        : [],
-    ),
-    "integrations/catalog",
-  ];
-  return directories.flatMap((directory) => {
-    const path = join(root, directory, "package.json");
-    if (!existsSync(path)) return [];
-    const manifest = JSON.parse(readFileSync(path, "utf8")) as {
-      name: string;
-      private?: boolean;
-      relkit?: { maturity?: unknown };
-    };
-    return manifest.private
-      ? []
-      : [{ name: manifest.name, directory, tier: manifest.relkit?.maturity }];
-  });
-}
 
 /** Lists the docs routes whose frontmatter sets `labs: true`.
  * @param root - Repository root. @returns Routes such as `/docs/modules/realtime`. */
@@ -211,7 +177,7 @@ export function untaggedLabsExports(
 ): { untagged: UntaggedExport[]; missingSources: string[] } {
   const missingSources: string[] = [];
   const entries = packages.flatMap((item) =>
-    publicEntries(root, item.directory).flatMap(({ subpath, file }) => {
+    publicEntries(root, item.directory, item.area).flatMap(({ subpath, file }) => {
       if (file) return [{ item, file }];
       missingSources.push(`${item.name} export "${subpath}" has no source file under src/`);
       return [];
@@ -236,7 +202,7 @@ export function untaggedLabsExports(
     const source = program.getSourceFile(file);
     const module = source && checker.getSymbolAtLocation(source);
     if (!module) continue;
-    const own = resolve(root, item.directory, "src") + sep;
+    const own = resolve(root, item.source) + sep;
     for (const exported of checker.getExportsOfModule(module)) {
       const symbol =
         exported.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(exported) : exported;
@@ -264,8 +230,8 @@ export function untaggedLabsExports(
  * @param root - Repository root. @param packages - Core packages to scan.
  * @returns `file:line` locations. */
 export function experimentalInCore(root: string, packages: readonly PackageTier[]): string[] {
-  return packages.flatMap(({ directory }) =>
-    sourceFiles(join(root, directory, "src")).flatMap((file) =>
+  return packages.flatMap(({ source }) =>
+    sourceFiles(join(root, source)).flatMap((file) =>
       readFileSync(file, "utf8")
         .split("\n")
         .flatMap((text, index) =>
@@ -339,12 +305,14 @@ function isExperimental(declaration: ts.Declaration): boolean {
 function publicEntries(
   root: string,
   directory: string,
+  area?: string,
 ): { subpath: string; file: string | undefined }[] {
   const manifest = JSON.parse(readFileSync(join(root, directory, "package.json"), "utf8")) as {
     exports?: Record<string, string | { types?: string; import?: string; default?: string }>;
   };
   return Object.entries(manifest.exports ?? {})
     .filter(([subpath]) => !subpath.split("/").includes("internal") && !subpath.endsWith(".json"))
+    .filter(([subpath]) => area === undefined || subpath.split("/")[1] === area)
     .map(([subpath, target]) => {
       const path =
         typeof target === "string"

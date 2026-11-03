@@ -4,7 +4,7 @@ import { observeCompiler } from "./observability.js";
 import type { RuntimeActivationFingerprintInput } from "./activation-fingerprint.types.js";
 export type { RuntimeActivationFingerprintInput } from "./activation-fingerprint.types.js";
 import { createHash } from "node:crypto";
-import { canonicalJson, type RuntimeActivationFingerprint } from "@relkit/contracts";
+import { canonicalJson, type RuntimeActivationFingerprint } from "relkit/contracts";
 
 /** Expected empty activation identity or artifact, preserving the legacy TypeError. */
 export class ActivationFingerprintError extends Schema.TaggedError<ActivationFingerprintError>()(

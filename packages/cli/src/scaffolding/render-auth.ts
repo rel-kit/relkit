@@ -5,7 +5,7 @@
  */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { scaffoldErrors, domainError, domainTry } from "create-relkit/internal/generator-errors";
 import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
 import { routePathToFilePath } from "@relkit/compiler";

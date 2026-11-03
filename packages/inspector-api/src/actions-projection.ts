@@ -1,4 +1,4 @@
-import { type JsonValue } from "@relkit/contracts";
+import { type JsonValue } from "relkit/contracts";
 import { isRecord, pick, safeJson } from "./shared.js";
 
 /** Existing action-specific public redaction rules applied before receipts and audit evidence cross the boundary. */

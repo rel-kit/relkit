@@ -4,7 +4,7 @@ import type {
   ProviderAdapterProjection,
   ProviderBindingNode,
   ProviderSourceProjection,
-} from "@relkit/graph";
+} from "relkit/graph";
 import { providerMaps } from "./normalize-graph-app.js";
 import {
   projectConnection,

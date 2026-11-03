@@ -1,7 +1,7 @@
 /** Plans service-local functions and tools with validated schemas and public service exports, preserving logical IDs and chosen exposure. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
 import {
   scaffoldErrors,

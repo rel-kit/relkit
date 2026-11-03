@@ -1,5 +1,5 @@
 /** Sequential line/import counters private to one legacy NDJSON source. */
-import type { LocalRecord } from "@relkit/observability/local/record";
+import type { LocalRecord } from "relkit/observability/local/record";
 
 /** Keeps file line identity stable across malformed rows and batch boundaries. */
 export interface LegacyLineState {

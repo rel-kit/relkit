@@ -36,25 +36,26 @@ async function packedCreatorEntries(root: string) {
   const repository = resolve(import.meta.dirname, "../..");
   const owner = join(repository, "packages/create-relkit");
   const fixture = join(root, "fixture");
-  for (const name of ["contracts", "create-relkit"]) {
+  for (const name of ["relkit", "create-relkit"]) {
     const archive = await Effect.runPromise(
       Effect.flatMap(ScaffoldProcess, (process) =>
         packExportPackage(process.run, join(repository, "packages", name), root),
       ).pipe(Effect.provide(scaffoldProcessLayer)),
     );
-    await unpackTarball(
-      archive,
-      join(fixture, "node_modules", name === "contracts" ? "@relkit/contracts" : name),
-    );
+    await unpackTarball(archive, join(fixture, "node_modules", name));
   }
   const manifest = await Effect.runPromise(
     readExportManifest(join(fixture, "node_modules/create-relkit")),
   );
   assertExportManifest(repository, owner, manifest);
-  const external = Object.keys(manifest.dependencies ?? {}).filter(
-    (name) => name !== "@relkit/contracts",
+  const core = await Effect.runPromise(readExportManifest(join(fixture, "node_modules/relkit")));
+  const external = Object.keys({ ...manifest.dependencies, ...core.dependencies }).filter(
+    (name) => name !== "relkit",
   );
-  await copyExternalDependencies(fixture, new Set(external), repository, [owner]);
+  await copyExternalDependencies(fixture, new Set(external), repository, [
+    owner,
+    join(repository, "packages/relkit"),
+  ]);
   await writeFile(
     join(fixture, "expected-exports.json"),
     JSON.stringify({ "create-relkit": manifest.exports }),

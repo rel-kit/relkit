@@ -1,6 +1,6 @@
 /** Reads optional doctor metadata and descriptor markers without loading native integrations. */
 import { Effect, Schema } from "effect";
-import { isDescriptor } from "@relkit/contracts";
+import { isDescriptor } from "relkit/contracts";
 import { cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.js";

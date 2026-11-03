@@ -1,4 +1,4 @@
-import { API_BASE_PATH } from "@relkit/contracts";
+import { API_BASE_PATH } from "relkit/contracts";
 import { Clock, Effect } from "effect";
 import type { CandidateProbeResponse, CandidateVerificationOptions } from "./verification.types.js";
 import { CandidateVerificationError } from "./verification-error.js";

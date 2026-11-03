@@ -4,8 +4,8 @@
  * until their reply or deadline, so one disconnected reader cannot abort writes.
  */
 import type { Schema } from "effect";
-import { WorkerTransportError } from "@relkit/observability/local/worker-contract";
-import type { LocalWorkerCommand } from "@relkit/observability/local/record";
+import { WorkerTransportError } from "relkit/observability/local/worker-contract";
+import type { LocalWorkerCommand } from "relkit/observability/local/record";
 import type { WorkerClientState, PendingWorkerCall } from "./worker-client-state.types.js";
 import { failWorkerClient, stopWorkerClient } from "./worker-client-state.js";
 

@@ -1,5 +1,5 @@
 import { observeCompiler } from "../observability.js";
-import { serializeJsonEffect } from "@relkit/contracts";
+import { serializeJsonEffect } from "relkit/contracts";
 import { Effect } from "effect";
 import { EVALUATOR_FRAME } from "./evaluator-protocol-schema.js";
 import { decodeEvaluatorResponse } from "./evaluator-protocol-validation.js";

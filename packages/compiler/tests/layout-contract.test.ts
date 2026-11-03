@@ -4,8 +4,8 @@
  * coordinates may disappear, and kind-qualified identities must stay distinct.
  */
 import { describe, expect, it } from "vitest";
-import type { ApplicationGraph } from "@relkit/graph";
-import { GRAPH_VERSION } from "@relkit/contracts";
+import type { ApplicationGraph } from "relkit/graph";
+import { GRAPH_VERSION } from "relkit/contracts";
 import { layoutContract } from "../src/layout-contract.js";
 
 /**

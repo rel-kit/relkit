@@ -11,7 +11,7 @@ import {
   type ConfigIssue,
 } from "./config-loader-types.js";
 import { Result, Schema } from "effect";
-import { normalizeInspectorConfiguration } from "@relkit/contracts";
+import { normalizeInspectorConfiguration } from "relkit/contracts";
 import { readRecord } from "./config-loader-utils.js";
 import { readBoolean, rejectUnknown } from "./config-loader-fields.js";
 

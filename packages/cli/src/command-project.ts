@@ -1,6 +1,6 @@
 /** Runs check/build through the existing project service and stable diagnostic presentation. */
 import { Effect } from "effect";
-import { formatDiagnosticsEffect } from "@relkit/diagnostics";
+import { formatDiagnosticsEffect } from "relkit/diagnostics";
 import { parseProjectArgs } from "./commands/project-args.js";
 import { CliProject } from "./services/project.service.js";
 import { cliValidation } from "./cli-errors.js";

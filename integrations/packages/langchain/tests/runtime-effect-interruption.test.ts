@@ -2,7 +2,7 @@
 
 import { Effect, Layer } from "effect";
 import { expect, test } from "vitest";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { END, START, StateSchema } from "@langchain/langgraph";
 import { defineAgent } from "../src/define-agent.js";
 import { defineGraph } from "../src/define-graph.js";

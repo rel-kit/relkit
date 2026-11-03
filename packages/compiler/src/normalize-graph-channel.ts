@@ -1,4 +1,4 @@
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { selectedProviderProfile } from "./normalize-graph-app.js";
 import { clean } from "./normalize-graph-utils.js";
 import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";

@@ -1,5 +1,5 @@
 import { Effect, Exit, Stream } from "effect";
-import { observeExecutionStream } from "@relkit/contracts/operation";
+import { observeExecutionStream } from "relkit/contracts/operation";
 
 /**
  * Suspends native work and passes the owning fiber's cancellation signal.

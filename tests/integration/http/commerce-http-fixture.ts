@@ -1,18 +1,14 @@
 /** Acquires the real grouped compiler projection and releases its route client on every outcome. */
 import { resolve } from "node:path";
 import { Effect, Schema } from "effect";
-import {
-  createRegistrationPlan,
-  validateGraphShape,
-  type ApplicationGraph,
-} from "../../../packages/graph/src/index.ts";
-import { createApp, type HttpInvocationOptions } from "../../../packages/runtime-hono/src/index.ts";
+import { createRegistrationPlan, validateGraphShape, type ApplicationGraph } from "relkit/graph";
+import { createApp, type HttpInvocationOptions } from "relkit/runtime-hono";
 import { createTestHttpClient } from "../../../packages/testing/src/index.ts";
 import { compileProject } from "../../compiler/fixture-runner.ts";
 import { commerceHttpEngine } from "./commerce-http-engine.ts";
 import { commerceHttpManifest } from "./commerce-http-manifest.ts";
 import type { CommerceHttpFixture } from "./commerce-http.types.ts";
-import { scalarReference } from "../../../packages/runtime-hono/src/scalar.ts";
+import { scalarReference } from "../../../packages/relkit/src/runtime-hono/scalar.ts";
 
 /** Owns only the native test client; compilation evaluates descriptors without acquiring providers. */
 export const commerceHttpFixture = Effect.gen(function* () {
