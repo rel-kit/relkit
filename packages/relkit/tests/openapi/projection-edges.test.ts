@@ -73,7 +73,7 @@ test("response projection handles wrapper schemas, duplicate no-content response
   expect(responses["203"]?.content?.["application/json"]?.schema).toEqual({ type: "boolean" });
   expect(responses["304"]?.content).toBeUndefined();
   expect(responses["422"]?.description).toBe("Validation error");
-  expect(responses["500"]?.content?.["application/json"]?.schema).toMatchObject({
+  expect(responses["500"]?.content?.["application/problem+json"]?.schema).toMatchObject({
     properties: { data: { type: "string" } },
   });
 });
@@ -169,7 +169,7 @@ test("request and response projections retain defaults for sparse metadata", () 
   );
   expect(responses["203"]?.content?.["application/json"]?.schema).toEqual({ type: "integer" });
   expect(responses["204"]?.content).toBeUndefined();
-  expect(responses["400"]?.content?.["application/json"]?.schema).toMatchObject({
+  expect(responses["400"]?.content?.["application/problem+json"]?.schema).toMatchObject({
     properties: { code: { const: "error" } },
   });
   expect(Object.keys(Effect.runSync(buildResponsesEffect(null, target)))).toEqual(["422"]);

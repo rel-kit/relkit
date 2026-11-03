@@ -51,6 +51,11 @@ open http://localhost:3000/_relkit/v1/api-reference
 Scalar renders the same protected document. Select an operation and verify parameters, request body,
 success response, declared errors, and validation response.
 
+Error responses use the `application/problem+json` media type. Each declared error gets its own
+problem schema, with its `code` and `type` fixed to the error's ID and `data` set to the error's data
+schema. The validation and rate-limit problems have schemas too. See
+[Read an error response](/docs/modules/http/responses#read-an-error-response).
+
 ## Trace a field back to source
 
 The dynamic order route demonstrates path mapping, a named transform, several HTTP methods, and

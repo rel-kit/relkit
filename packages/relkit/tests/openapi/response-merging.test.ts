@@ -24,7 +24,7 @@ test("duplicate 429 responses retain rate-limit headers with either merge order"
         "RateLimit-Reset",
         "Retry-After",
       ]);
-      expect(response?.content?.["application/json"]?.schema).toBeDefined();
+      expect(response?.content?.["application/problem+json"]?.schema).toBeDefined();
     }
   }
 });

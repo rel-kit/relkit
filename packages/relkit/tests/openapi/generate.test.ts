@@ -37,12 +37,18 @@ test("generates stable OpenAPI from route, function, error, mapping, and middlew
     required: ["sku"],
   });
   expect(operation?.responses["201"]?.content?.["application/json"]?.schema).toEqual(output);
-  expect(operation?.responses["404"]?.content?.["application/json"]?.schema).toMatchObject({
-    properties: { data: errorData, code: { const: "orders.not-found" } },
-    required: ["kind", "outcome", "code", "message", "data", "status", "retry"],
+  expect(operation?.responses["404"]?.content?.["application/problem+json"]?.schema).toMatchObject({
+    properties: {
+      type: { const: "/errors/orders.not-found" },
+      status: { const: 404 },
+      code: { const: "orders.not-found" },
+      data: errorData,
+    },
+    required: ["type", "title", "status", "code", "detail", "data"],
   });
-  expect(operation?.responses["422"]?.content?.["application/json"]?.schema).toMatchObject({
-    properties: { error: { const: "validation" }, issues: { type: "array" } },
+  expect(operation?.responses["422"]?.content?.["application/problem+json"]?.schema).toMatchObject({
+    properties: { code: { const: "validation" }, issues: { type: "array" } },
+    required: ["type", "title", "status", "code", "detail", "issues"],
   });
   expect(operation?.["x-relkit"].middleware).toEqual([
     { id: "orders.auth", targetFunctionId: "orders.authorize" },
@@ -177,8 +183,13 @@ test("documents rate-limit policy, safe body, and standard headers", () => {
       "Retry-After": {},
     },
     content: {
-      "application/json": {
-        schema: { properties: { error: { const: "rate-limit" }, retryAfterMs: {} } },
+      "application/problem+json": {
+        schema: {
+          properties: {
+            code: { const: "rate-limited" },
+            data: { properties: { retryAfterMs: {} } },
+          },
+        },
       },
     },
   });

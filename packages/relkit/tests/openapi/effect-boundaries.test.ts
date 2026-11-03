@@ -171,8 +171,8 @@ test("response projection merges statuses, omits no-content schema and adds vali
   });
   expect(responses["204"]?.content).toBeUndefined();
   expect(responses["422"]?.description).toBe("Validation error");
-  expect(responses["400"]?.content?.["application/json"]?.schema).toMatchObject({
-    properties: { code: { const: "other" }, retry: { enum: ["never", "later"] } },
+  expect(responses["400"]?.content?.["application/problem+json"]?.schema).toMatchObject({
+    properties: { type: { const: "/errors/other" }, code: { const: "other" } },
   });
 });
 test("service and tag Effects resolve explicit and synthetic services", () => {

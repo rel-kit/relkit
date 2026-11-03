@@ -28,7 +28,7 @@
           },
           "404": {
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "properties": {
                     "code": { "const": "orders.not-found", "type": "string" },
@@ -37,13 +37,13 @@
                       "required": ["orderId"],
                       "type": "object"
                     },
-                    "kind": { "const": "application", "type": "string" },
-                    "message": { "type": "string" },
-                    "outcome": { "const": "declared-error", "type": "string" },
-                    "retry": { "const": "never", "type": "string" },
-                    "status": { "const": 404, "type": "integer" }
+                    "detail": { "type": "string" },
+                    "status": { "const": 404, "type": "integer" },
+                    "title": { "type": "string" },
+                    "traceId": { "type": "string" },
+                    "type": { "const": "/errors/orders.not-found", "type": "string" }
                   },
-                  "required": ["kind", "outcome", "code", "message", "data", "status", "retry"],
+                  "required": ["type", "title", "status", "code", "detail", "data"],
                   "type": "object"
                 }
               }
@@ -52,10 +52,11 @@
           },
           "422": {
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
                   "properties": {
-                    "error": { "const": "validation", "type": "string" },
+                    "code": { "const": "validation", "type": "string" },
+                    "detail": { "type": "string" },
                     "issues": {
                       "items": {
                         "properties": {
@@ -70,9 +71,13 @@
                         "type": "object"
                       },
                       "type": "array"
-                    }
+                    },
+                    "status": { "maximum": 599, "minimum": 100, "type": "integer" },
+                    "title": { "type": "string" },
+                    "traceId": { "type": "string" },
+                    "type": { "const": "/errors/validation", "type": "string" }
                   },
-                  "required": ["error", "issues"],
+                  "required": ["type", "title", "status", "code", "detail", "issues"],
                   "type": "object"
                 }
               }

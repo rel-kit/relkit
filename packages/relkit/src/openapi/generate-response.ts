@@ -7,34 +7,59 @@ import type {
   OpenApiSchema,
 } from "./generate-response.types.js";
 
-const validationSchema: OpenApiSchema = {
-  type: "object",
-  required: ["error", "issues"],
-  properties: {
-    error: { const: "validation", type: "string" },
-    issues: {
-      type: "array",
-      items: {
-        type: "object",
-        required: ["code", "message", "path"],
-        properties: {
-          code: { type: "string" },
-          message: { type: "string" },
-          path: { type: "array", items: { anyOf: [{ type: "string" }, { type: "integer" }] } },
-        },
+const PROBLEM = "application/problem+json";
+
+/** The Problem Details body every RelKit error response has, narrowed by `fields`.
+ * @param required - Fields the narrowed problem always has, beyond the common ones.
+ * @param fields - Property schemas that replace or add to the common ones.
+ * @returns A JSON Schema for the problem body.
+ */
+function problemSchema(
+  required: readonly string[] = [],
+  fields: Readonly<Record<string, OpenApiSchema>> = {},
+): OpenApiSchema {
+  return {
+    type: "object",
+    required: ["type", "title", "status", "code", "detail", ...required],
+    properties: {
+      type: { type: "string" },
+      title: { type: "string" },
+      status: { type: "integer", minimum: 100, maximum: 599 },
+      code: { type: "string" },
+      detail: { type: "string" },
+      traceId: { type: "string" },
+      ...fields,
+    },
+  };
+}
+
+const validationSchema = problemSchema(["issues"], {
+  type: { const: "/errors/validation", type: "string" },
+  code: { const: "validation", type: "string" },
+  issues: {
+    type: "array",
+    items: {
+      type: "object",
+      required: ["code", "message", "path"],
+      properties: {
+        code: { type: "string" },
+        message: { type: "string" },
+        path: { type: "array", items: { anyOf: [{ type: "string" }, { type: "integer" }] } },
       },
     },
   },
-};
+});
 
-const rateLimitSchema: OpenApiSchema = {
-  type: "object",
-  required: ["error", "retryAfterMs"],
-  properties: {
-    error: { const: "rate-limit", type: "string" },
-    retryAfterMs: { type: "integer", minimum: 0 },
+const rateLimitSchema = problemSchema(["data"], {
+  type: { const: "/errors/rate-limited", type: "string" },
+  status: { const: 429, type: "integer" },
+  code: { const: "rate-limited", type: "string" },
+  data: {
+    type: "object",
+    required: ["retryAfterMs"],
+    properties: { retryAfterMs: { type: "integer", minimum: 0 } },
   },
-};
+});
 
 /** Project declared responses and the validation fallback for one function.
  * @param values - Serializable response declarations.
@@ -67,64 +92,47 @@ export const buildResponsesEffect = Effect.fn("OpenApi.buildResponses")(
                   ? errorSchema(entry, target)
                   : schemaValue(entry.schema);
           const rateLimited = status === "429" && String(entry.id).startsWith("rate-limit");
+          const problem = entry.kind !== "success" && Number(entry.status) >= 400;
           const next = makeResponse(
             rateLimited ? "Rate limit exceeded" : description(entry),
             status === "204" || status === "304"
               ? undefined
-              : (schema ?? (rateLimited ? rateLimitSchema : undefined)),
+              : (schema ?? (rateLimited ? rateLimitSchema : problem ? problemSchema() : undefined)),
             rateLimited,
+            problem ? PROBLEM : "application/json",
           );
           const previous = result[status];
           result[status] = previous === undefined ? next : mergeResponses(previous, next);
         }
-        if (!hasValidation) result["422"] = makeResponse("Validation error", validationSchema);
+        if (!hasValidation)
+          result["422"] = makeResponse("Validation error", validationSchema, false, PROBLEM);
         return result;
       }),
     ),
 );
 
-/** Project a declared application error using function metadata when available. */
+/** Project a declared application error as its own problem schema. */
 function errorSchema(entry: Record<string, unknown>, target: FunctionNode): OpenApiSchema {
   const errorId = typeof entry.errorId === "string" ? entry.errorId : String(entry.id ?? "error");
   const definition = Array.isArray(target.errors)
     ? target.errors.filter(isRecord).find((item) => item.id === errorId)
     : undefined;
-  const definitionHttp = isRecord(definition?.http) ? definition.http : undefined;
-  const status = typeof definitionHttp?.status === "number" ? definitionHttp.status : undefined;
-  const retry =
-    definition?.retry === "never" || definition?.retry === "later" ? definition.retry : undefined;
+  const status = typeof entry.status === "number" ? entry.status : undefined;
   const data =
     schemaValue(entry.schema) ??
     (definition === undefined ? undefined : schemaValue(definition.data));
-  return {
-    type: "object",
-    required: [
-      "kind",
-      "outcome",
-      "code",
-      "message",
-      ...(data === undefined ? [] : ["data"]),
-      ...(status === undefined ? [] : ["status"]),
-      "retry",
-    ],
-    properties: {
-      kind: { const: "application", type: "string" },
-      outcome: { const: "declared-error", type: "string" },
-      code: { const: errorId, type: "string" },
-      message: { type: "string" },
-      ...(data === undefined ? {} : { data }),
-      ...(status === undefined
-        ? { status: { type: "integer", minimum: 100, maximum: 599 } }
-        : { status: { const: status, type: "integer" } }),
-      retry: retry === undefined ? { enum: ["never", "later"] } : { const: retry, type: "string" },
-    },
-  };
+  return problemSchema(data === undefined ? [] : ["data"], {
+    type: { const: `/errors/${errorId}`, type: "string" },
+    ...(status === undefined ? {} : { status: { const: status, type: "integer" } }),
+    code: { const: errorId, type: "string" },
+    ...(data === undefined ? {} : { data }),
+  });
 }
 
 /** Merge duplicate status responses, including bodies and rate-limit headers. */
 function mergeResponses(left: OpenApiResponse, right: OpenApiResponse): OpenApiResponse {
-  const a = left.content?.["application/json"]?.schema;
-  const b = right.content?.["application/json"]?.schema;
+  const [type, a] = mediaSchema(left);
+  const [, b] = mediaSchema(right);
   const headers = { ...left.headers, ...right.headers };
   const responseHeaders = Object.keys(headers).length === 0 ? {} : { headers };
   if (!a || !b) {
@@ -137,20 +145,27 @@ function mergeResponses(left: OpenApiResponse, right: OpenApiResponse): OpenApiR
   }
   return {
     description: `${left.description}; ${right.description}`,
-    content: { "application/json": { schema: { oneOf: [a, b] } } },
+    content: { [type]: { schema: { oneOf: [a, b] } } },
     ...responseHeaders,
   };
 }
 
-/** Build a JSON response and optional standard rate-limit headers. */
+/** The media type and schema of a response's single body. */
+function mediaSchema(response: OpenApiResponse): [string, OpenApiSchema | undefined] {
+  const [type, media] = Object.entries(response.content ?? {})[0] ?? ["application/json"];
+  return [type, media?.schema];
+}
+
+/** Build a response with an optional body and standard rate-limit headers. */
 function makeResponse(
   description: string,
   schema?: OpenApiSchema,
   rateLimited = false,
+  mediaType = "application/json",
 ): OpenApiResponse {
   return {
     description,
-    ...(schema === undefined ? {} : { content: { "application/json": { schema } } }),
+    ...(schema === undefined ? {} : { content: { [mediaType]: { schema } } }),
     ...(rateLimited ? { headers: rateLimitHeaders } : {}),
   };
 }
