@@ -36,7 +36,7 @@ export const customizeDeploymentManifestEffect = Effect.fn(
       dependencies: { ...decoded.dependencies },
       scripts: { ...decoded.scripts },
     };
-    const version = manifest.dependencies["relkit"];
+    const version = manifest.dependencies["@relkit/app"];
     if (version === undefined)
       return yield* Effect.fail(
         domainError(

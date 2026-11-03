@@ -22,6 +22,8 @@ export const snapshotFactories = new Map([
   ["relkit/services", new Set(["defineService"])],
   ["relkit/routes", new Set(["defineRoute", "defineServiceRoutes"])],
   ["relkit/schema", new Set(["z"])],
+  // Templates define schemas with Zod 4; its builders construct values without side effects.
+  ["zod", new Set(["z"])],
   ["relkit/tasks", new Set(["defineTask"])],
   ["@relkit/local", new Set(["localAgentState", "localRealtime"])],
   ["langchain", new Set(["FakeToolCallingModel", "todoListMiddleware", "tool"])],

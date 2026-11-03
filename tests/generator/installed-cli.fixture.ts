@@ -164,10 +164,13 @@ export async function installedCliCommand(
 /** Reads the generated manifest without substituting a shared release version. */
 export async function assertInstalledManifest(fixture: InstalledCliFixture) {
   const manifest = JSON.parse(await readFile(join(fixture.project, "package.json"), "utf8"));
+  // Templates keep importing the deprecated @relkit/app until the migration codemod.
   expect(manifest.dependencies).toEqual({
+    "@relkit/app": expect.stringMatching(/^\d+\.\d+\.\d+$/),
     relkit: fixture.appVersion,
     "@scalar/hono-api-reference": "0.12.9",
     effect: fixture.packedCli.dependencies?.effect,
+    zod: expect.stringMatching(/^\d+\.\d+\.\d+$/),
   });
   expect(manifest.devDependencies["@relkit/cli"]).toBe(fixture.packedCli.version);
   expect(manifest.devDependencies["@relkit/testing"]).toBe(fixture.testingVersion);

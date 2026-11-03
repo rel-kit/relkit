@@ -117,7 +117,7 @@ export function sourceImport(
  * @returns Source importing defineService and declaring the normalized service ID.
  */
 export function serviceSource(domain: NormalizedArtifactName): string {
-  return `import { defineService } from "relkit/services";\n\nexport default defineService({ id: "${domain.idSegment}" });\n`;
+  return `import { defineService } from "@relkit/app/services";\n\nexport default defineService({ id: "${domain.idSegment}" });\n`;
 }
 
 /**
