@@ -88,12 +88,23 @@ function capability(
   });
   const route = mount !== undefined && isRecord(mount.value) ? mount.value : {};
   const path = typeof route.path === "string" ? route.path : "";
-  const database = work.descriptors.find(
-    (descriptor) => isRecord(descriptor.value) && descriptor.value.capability?.kind === "drizzle",
-  );
+  const custom = value.database === "custom";
+  const database = custom
+    ? undefined
+    : work.descriptors.find(
+        (descriptor) =>
+          isRecord(descriptor.value) && descriptor.value.capability?.kind === "drizzle",
+      );
+  // A route that mounts the handler decides the path; otherwise the instance's basePath does.
+  const basePath =
+    mount === undefined && typeof value.basePath === "string"
+      ? value.basePath
+      : path.replace(/\/\*[^/]+\??$/, "") || "/";
   return {
     kind: "better-auth",
-    basePath: path.replace(/\/\*[^/]+\??$/, "") || "/",
+    basePath,
     databaseServiceId: database?.id ?? "",
+    ...(mount === undefined && value.mount === true ? { mount: true } : {}),
+    ...(custom ? { database: "custom" } : {}),
   };
 }

@@ -29,8 +29,10 @@ export type AuthDatabase = DrizzleActivation<DrizzleServiceDescriptor<any, any, 
 
 /** Runtime dependencies captured once when constructing a native auth service. */
 export interface AuthConfiguration {
-  readonly options: BetterAuthServiceOptions;
-  readonly database: AuthDatabase;
+  /** Native options; an instance's options may carry their own `database` and `basePath`. */
+  readonly options: BetterAuthServiceOptions | BetterAuthOptions;
+  /** The Drizzle service; unused when the options bring their own `database`. */
+  readonly database: AuthDatabase | undefined;
   readonly basePath: string;
 }
 

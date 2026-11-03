@@ -101,27 +101,23 @@ function createDatabaseRegistration(node, services, env) {
 
 function createBetterAuthRegistration(node, services, database) {
   if (node === undefined) return undefined;
-  if (database === undefined) return Promise.reject(new Error("Better Auth requires Drizzle."));
   const service = services?.[node.id];
   if (service === undefined) return Promise.reject(new Error("Better Auth service is unavailable."));
+  // An instance that brings its own database needs no Drizzle service.
+  if (node.capability.database === "custom") return activateBetterAuthService(service, undefined, node.capability.basePath);
+  if (database === undefined) return Promise.reject(new Error("Better Auth requires Drizzle."));
   return database.then((active) => activateBetterAuthService(service, active, node.capability.basePath));
 }
 
-function createAuthRegistration(applicationGraph, routes = {}, authStartup) {
-  const brand = Symbol.for("relkit.better-auth.handler");
-  for (const [routeId, route] of Object.entries(routes)) {
-    if (route?.auth?.kind !== "better-auth") continue;
-    const registration = route.handler?.[brand];
-    if (registration?.kind !== "better-auth") throw new Error("Better Auth registration is unavailable.");
-    return createHttpAuthRuntime({
-      getOpenApiDocument: async () => generateBetterAuthOpenApi(await authStartup, specializedInstrumentation),
-      getSession: async (headers) => {
-        const auth = await authStartup;
-        return (await auth.api.getSession({ headers })) ?? null;
-      },
-    });
-  }
-  return undefined;
+function createAuthRegistration(node, authStartup) {
+  if (node === undefined || authStartup === undefined) return undefined;
+  return createHttpAuthRuntime({
+    getOpenApiDocument: async () => generateBetterAuthOpenApi(await authStartup, specializedInstrumentation),
+    getSession: async (headers) => {
+      const auth = await authStartup;
+      return (await auth.api.getSession({ headers })) ?? null;
+    },
+  });
 }
 
 `;

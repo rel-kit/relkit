@@ -127,6 +127,7 @@
       "@relkit/s3": ["integrations/packages/s3/src/index.ts"],
       "@orpc/contract": ["packages/client/node_modules/@orpc/contract/dist/index.d.ts"],
       "effect": ["packages/relkit/node_modules/effect/dist/index.d.ts"],
+      "better-auth": ["packages/better-auth/node_modules/better-auth/dist/index.d.mts"],
       "@relkit/app": ["packages/app/src/index.ts"],
       "@relkit/app/*": ["packages/app/src/*.ts"]
     },

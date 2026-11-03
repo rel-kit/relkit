@@ -49,7 +49,7 @@ const specializedInstrumentation = await Effect.runPromise(
 const databaseStartup = databaseNode === undefined ? undefined : runtimeOwner.resource("database", () => createDatabaseRegistration(databaseNode, runtimeManifest.services, values), (value) => value.close(), () => runtimeOwner.setReady("database", true));
 const authStartup = authNode === undefined ? undefined : runtimeOwner.resource("auth", () => createBetterAuthRegistration(authNode, runtimeManifest.services, databaseStartup), () => {}, () => runtimeOwner.setReady("auth", true));
 const authRequestStorage = new AsyncLocalStorage();
-const authRuntime = createAuthRegistration(graph, runtimeManifest.routes, authStartup);
+const authRuntime = createAuthRegistration(authNode, authStartup);
 const contextResolver = createApplicationContextResolver({
   constants: runtimeManifest.constants,
   prompts: runtimeManifest.prompts,

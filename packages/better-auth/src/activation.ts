@@ -3,7 +3,7 @@
  */
 import { drizzleInstrumentationOf, inheritNativeLeases } from "@relkit/drizzle/server";
 import type { Auth } from "better-auth";
-import { Effect, Layer, ManagedRuntime } from "effect";
+import { Context, Effect, Layer, ManagedRuntime } from "effect";
 import type { BetterAuthActivationOptions } from "./activation.types.js";
 import { AuthService, authLiveLayer, authNativeOf } from "./auth.service.js";
 import type {
@@ -22,7 +22,7 @@ export { authNativeAdapter } from "./auth-native-adapter.js";
  * Binds native auth to an acquired database and its declared ALL route.
  * @typeParam Options - Native configuration retained by the lazy declaration.
  * @param service - Shared acquisition captures the first database and route prefix.
- * @param database - Borrowed database; auth never owns or disposes it.
+ * @param database - Borrowed Drizzle database, or undefined when the options bring their own; auth never disposes it.
  * @param basePath - Route-derived prefix validated during acquisition.
  * @param options - Isolation leaves the descriptor handler target untouched.
  * @returns Native auth preserving options, session inference and endpoint properties.
@@ -41,16 +41,17 @@ export { authNativeAdapter } from "./auth-native-adapter.js";
  */
 export async function activateBetterAuthService<Options extends BetterAuthServiceOptions>(
   service: BetterAuthServiceDescriptor<Options>,
-  database: AuthDatabase,
+  database: AuthDatabase | undefined,
   basePath: string,
   options: BetterAuthActivationOptions = {},
 ): Promise<Auth<any>> {
   const state = runtimeOf(service);
   let owner = options.isolated === true ? undefined : state.activation;
   if (owner === undefined) {
-    if (!Reflect.has(database, Symbol.for("relkit.drizzle.service")))
+    if (database !== undefined && !Reflect.has(database, Symbol.for("relkit.drizzle.service")))
       throw new TypeError("Drizzle activation is missing its service");
-    const instrumentation = drizzleInstrumentationOf(database);
+    const instrumentation =
+      database === undefined ? Context.empty() : drizzleInstrumentationOf(database);
     // Captured diagnostics apply both during Layer acquisition and subsequent native calls.
     owner = ManagedRuntime.make(
       // ManagedRuntime builds in a separate fiber. Inherit the native parent's

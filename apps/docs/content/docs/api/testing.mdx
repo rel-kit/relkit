@@ -457,7 +457,32 @@ Acquires the optional native auth handler and its protection runtime.
 ```ts
 declare const acquireApplicationAuth: (
   platform: ApplicationServicesPlatform,
-  declaration: BetterAuthServiceDescriptor<BetterAuthServiceOptions> | undefined,
+  declaration:
+    | BetterAuthServiceDescriptor<
+        BetterAuthServiceOptions,
+        {
+          session: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            userId: string;
+            expiresAt: Date;
+            token: string;
+            ipAddress?: string | null | undefined;
+            userAgent?: string | null | undefined;
+          };
+          user: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            email: string;
+            emailVerified: boolean;
+            name: string;
+            image?: string | null | undefined;
+          };
+        }
+      >
+    | undefined,
   database: DrizzleActivation<DrizzleServiceDescriptor<any, any, any, any>> | undefined,
   routes: ReadonlyArray<TestRoute>,
 ) => Effect.Effect<Pick<TestApplicationServices, "auth" | "authHandler">, Error, never>;

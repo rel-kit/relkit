@@ -7,6 +7,7 @@
 import type { HttpTriggerRegistration } from "../graph/index.js";
 import type { Context, Hono } from "hono";
 import { registerRouteAuth } from "./auth.js";
+import { mountBetterAuth } from "./better-auth-mount.js";
 import { installHttpLogging } from "./http-logging.js";
 import {
   announceRoute,
@@ -48,6 +49,7 @@ export function materializeRestRoutes(app: Hono, options: RouteMaterializationOp
       }
     }
   }
+  mountBetterAuth(app, options);
 }
 
 /** Installs a callable raw declaration without trusting its output shape.

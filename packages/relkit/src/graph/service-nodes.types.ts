@@ -53,6 +53,10 @@ export type ServiceCapability =
       readonly kind: "better-auth";
       readonly basePath: string;
       readonly databaseServiceId: string;
+      /** RelKit mounts the handler at `basePath`; false when a route mounts it, or nothing does. */
+      readonly mount?: boolean;
+      /** `custom` when the Better Auth instance brings its own database. */
+      readonly database?: "drizzle" | "custom";
     };
 
 /**

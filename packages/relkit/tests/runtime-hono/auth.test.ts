@@ -121,3 +121,56 @@ test("Better Auth endpoints never require a session", async () => {
   expect(response.status).toBe(200);
   expect(await response.text()).toBe("auth endpoint");
 });
+
+test("a Better Auth service is mounted at its base path unless mount is false", async () => {
+  const handled: string[] = [];
+  const plan = (mount: boolean) =>
+    ({
+      graphHash: "sha256:auth-mount",
+      functions: [],
+      httpTriggers: [],
+      queues: [],
+      schedules: [],
+      eventTriggers: [],
+      buckets: [],
+      caches: [],
+      tools: [],
+      agents: [],
+      channels: [],
+      middlewares: [],
+      services: [
+        {
+          kind: "service",
+          id: "auth",
+          source,
+          capability: { kind: "better-auth", basePath: "/api/auth", databaseServiceId: "", mount },
+        },
+      ],
+    }) as unknown as RegistrationPlan;
+  const mounted = (mount: boolean) => {
+    const app = new Hono();
+    materializeRoutes(app, {
+      plan: plan(mount),
+      manifest: {
+        ...runtimeCohort("sha256:auth-mount"),
+        functions: {},
+        middleware: {},
+        requestTransforms: {},
+        services: {
+          auth: {
+            handler: async (request: Request) => {
+              handled.push(new URL(request.url).pathname);
+              return new Response("auth");
+            },
+          },
+        },
+      } satisfies RuntimeManifest,
+      engine: { invoke: async () => ({}) },
+    });
+    return app;
+  };
+  expect(await (await mounted(true).request("/api/auth/get-session")).text()).toBe("auth");
+  expect((await mounted(true).request("/api/auth")).status).toBe(200);
+  expect((await mounted(false).request("/api/auth/get-session")).status).toBe(404);
+  expect(handled).toEqual(["/api/auth/get-session", "/api/auth"]);
+});

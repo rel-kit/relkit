@@ -40,7 +40,10 @@ export const validateProviderSingletonsEffect = Effect.fn("Compiler.validateProv
         "At most one Better Auth capability may be registered.",
       );
     }
-    if (auth.length === 0)
+    const authService = work.descriptors.some(
+      (entry) => isRecord(entry.value) && entry.value.capability?.kind === "better-auth",
+    );
+    if (auth.length === 0 && !authService)
       for (const descriptor of work.descriptors)
         if (
           descriptor.kind === "route" &&
@@ -51,7 +54,7 @@ export const validateProviderSingletonsEffect = Effect.fn("Compiler.validateProv
             work,
             descriptor,
             NORMALIZE_CODES.routeAuthUnavailable,
-            'This route sets auth: "required", but the application mounts no Better Auth route.',
+            'This route sets auth: "required", but the application has no Better Auth service.',
           );
   },
   (effect, work) =>

@@ -7,7 +7,7 @@ import {
   observeSpecializedOperation,
   redactSpecializedTrace,
 } from "@relkit/drizzle/server";
-import type { Auth } from "better-auth";
+import type { Auth, BetterAuthOptions } from "better-auth";
 import { Context, Effect, Layer, Schema } from "effect";
 import { AuthFailure } from "./auth.errors.js";
 import { AuthFactory, authFactoryLiveLayer } from "./auth.factory.js";
@@ -63,23 +63,18 @@ function acquireAuth(configuration: AuthConfiguration) {
           }),
       ),
     );
-    const declaration = databaseServiceOf(configuration.database);
-    const database = drizzleRuntimeOf(declaration);
     const factory = yield* AuthFactory;
     yield* checkNativeAuthDependencies();
-    const { drizzleAdapter } = yield* nativePromise(
-      "auth.acquire",
-      () => import("better-auth/adapters/drizzle"),
-    );
-    const { drizzle: adapterOptions, ...options } = configuration.options;
+    const {
+      drizzle: adapterOptions,
+      database: ownDatabase,
+      basePath: _basePath,
+      ...options
+    } = configuration.options as BetterAuthOptions & { readonly drizzle?: object };
     const native = yield* factory.create({
       ...options,
       basePath: configuration.basePath,
-      database: drizzleAdapter(configuration.database.client, {
-        ...(adapterOptions ?? {}),
-        schema: adapterOptions?.schema ?? database.schema,
-        provider: database.dialect,
-      }),
+      database: ownDatabase ?? (yield* drizzleDatabase(configuration.database, adapterOptions)),
     });
     // Better Auth starts async plugin initialization eagerly; retain the borrow until it settles.
     yield* nativePromise("auth.acquire", () => native.$context);
@@ -87,8 +82,35 @@ function acquireAuth(configuration: AuthConfiguration) {
   });
 }
 
+/** Builds the default adapter over the application's Drizzle service. */
+function drizzleDatabase(database: AuthDatabase | undefined, adapterOptions: object | undefined) {
+  return Effect.gen(function* () {
+    if (database === undefined)
+      return yield* new AuthFailure({
+        operation: "auth.acquire",
+        cause: new TypeError(
+          "Better Auth needs a database: set database in its options or add a Drizzle service.",
+        ),
+      });
+    const runtime = drizzleRuntimeOf(databaseServiceOf(database));
+    const { drizzleAdapter } = yield* nativePromise(
+      "auth.acquire",
+      () => import("better-auth/adapters/drizzle"),
+    );
+    const options = (adapterOptions ?? {}) as { readonly schema?: Record<string, unknown> };
+    return drizzleAdapter(database.client, {
+      ...options,
+      schema: options.schema ?? runtime.schema,
+      provider: runtime.dialect,
+    });
+  });
+}
+
 /** Applies the same admission and redaction boundary to both native call surfaces. */
-function createService(native: Auth<any>, database: AuthDatabase): AuthServiceInterface {
+function createService(
+  native: Auth<any>,
+  database: AuthDatabase | undefined,
+): AuthServiceInterface {
   const service = AuthService.of({
     handler: Effect.fn("AuthService.handler")((request) =>
       observeSpecializedOperation(
