@@ -2,7 +2,7 @@
 import { Effect } from "effect";
 import { ObservabilityQueryError } from "relkit/observability";
 import type { ObservabilityQueryRequest } from "relkit/observability";
-import { response, validate } from "relkit/observability/internal/query";
+import { response, validate } from "relkit/observability/query";
 import { duckdbQueryPlan } from "./duckdb-query-plan.js";
 import { duckdbError } from "./duckdb-error.js";
 import { duckdbQueryError } from "./duckdb-query-error.js";

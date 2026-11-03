@@ -6,7 +6,7 @@ import {
   coalesceSpans,
   MAX_EXECUTION_RECORDS,
 } from "relkit/observability";
-import { response, validate } from "relkit/observability/internal/query";
+import { response, validate } from "relkit/observability/query";
 import { duckdbError } from "./duckdb-error.js";
 import { duckdbQueryError } from "./duckdb-query-error.js";
 import { observeDuckdb } from "./duckdb-metrics.js";

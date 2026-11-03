@@ -2,7 +2,7 @@
 
 import { dirname, relative } from "node:path";
 import { Effect, Ref } from "effect";
-import type { GeneratorFileSystemService } from "create-relkit/internal/generator-filesystem.types";
+import type { GeneratorFileSystemService } from "create-relkit/generator-filesystem.types";
 import type { MemoryFileState, RequiredFile } from "./generator-services.fixture.types.js";
 
 /** Builds the mutation portion of the original test filesystem service.

@@ -4,7 +4,7 @@ import type { AnyStateSchema, BaseCheckpointSaver, BaseStore } from "@langchain/
 import type { DescriptorBase, DescriptorMetadata } from "relkit/contracts";
 import type { AgentRef, FunctionGraphNodeDescriptor } from "relkit/functions";
 import type { InferInput, InferOutput, StandardSchemaV1 } from "relkit/schema";
-import type { AgentClientPolicy, AgentControl } from "relkit/agents/internal/agent-client";
+import type { AgentClientPolicy, AgentControl } from "relkit/agents/agent-client";
 import type { AgentLimits } from "./define-agent.types.js";
 import type { GraphNodeAny } from "./define-graph-node.js";
 import type { GraphEdgeBuilder, GraphEdgeOperation } from "./graph-edges.js";

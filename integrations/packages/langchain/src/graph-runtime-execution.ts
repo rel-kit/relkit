@@ -2,7 +2,7 @@
 
 import { currentInvocationScope, runInInvocationScope } from "relkit/invocation";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { compileGraphEffect } from "./graph-compile.js";
 import { graphConfigEffect } from "./graph-continuation.js";
 import { resolveGraphPersistenceEffect } from "./graph-persistence.js";

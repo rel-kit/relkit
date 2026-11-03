@@ -19,7 +19,7 @@
       "@relkit/client/react": ["../../packages/client/src/react/index.ts"],
       "@relkit/client/tanstack-query": ["../../packages/client/src/tanstack-query.ts"],
       "@relkit/client/jobs": ["../../packages/client/src/jobs/index.ts"],
-      "@relkit/drizzle/internal": ["../../packages/drizzle/src/internal.ts"],
+      "@relkit/drizzle/server": ["../../packages/drizzle/src/server.ts"],
       "@relkit/drizzle/sqlite": ["../../packages/drizzle/src/sqlite.ts"],
       "@relkit/drizzle/pg": ["../../packages/drizzle/src/pg.ts"],
       "@relkit/drizzle/mysql": ["../../packages/drizzle/src/mysql.ts"],

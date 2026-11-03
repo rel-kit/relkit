@@ -12,7 +12,7 @@ export type {
   ManagedGeneration,
 } from "./runtime.types.js";
 import { Context, Effect, Layer, ManagedRuntime } from "effect";
-import { resolveEnvWithEffectEffect } from "../config/internal/config.js";
+import { resolveEnvWithEffectEffect } from "../config/resolution.js";
 import type { EnvDefinition, EnvShape, EnvSource, ResolvedEnv } from "../config/index.js";
 import {
   validateGenerationOptions,

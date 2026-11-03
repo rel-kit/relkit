@@ -1,6 +1,6 @@
 /** Projects native agent and graph schemas into serializable client metadata; SDK-specific inspection remains inside this integration before the generic contract is published. This companion preserves the native input and output types without starting runtime work. */
 
-import type { AgentClientPolicy } from "relkit/agents/internal/agent-client";
+import type { AgentClientPolicy } from "relkit/agents/agent-client";
 import type { ClientSchemaMetadata, ClientTypeField } from "./client-contract-schema.js";
 import type { AgentMiddleware, AgentTool } from "./define-agent-native.js";
 import type { GraphWorkflow } from "./graph-workflow.js";

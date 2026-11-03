@@ -2,8 +2,8 @@
 
 import type { BrowserMessage } from "relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
-import type { AgentExecutionEvent } from "relkit/agents/internal/runtime-events";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import type { AgentExecutionEvent } from "relkit/agents/runtime-events";
 import type { MessageState } from "./runtime-native-messages.types.js";
 
 /** Per-invocation accumulator of streamed native assistant message parts.

@@ -2,8 +2,8 @@
 
 import type { JsonValue } from "relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
-import { ApprovalRequiredError } from "relkit/agents/internal/approval";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { ApprovalRequiredError } from "relkit/agents/approval";
 import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import { agentInvocationFailure } from "./runtime-effect-error.js";

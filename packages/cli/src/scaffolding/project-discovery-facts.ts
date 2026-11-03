@@ -10,7 +10,7 @@ import * as ts from "typescript";
 import type { ProjectDiscovery } from "./project-discovery-types.js";
 import { readAppDiscovery } from "./project-discovery-app.js";
 import { collectProjectArtifacts } from "./project-discovery-artifacts.js";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 
 /**
  * Converts authored syntax into layout-aware scaffold discovery records.

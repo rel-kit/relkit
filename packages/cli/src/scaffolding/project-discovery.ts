@@ -3,10 +3,10 @@
 import { join, resolve } from "node:path";
 import { Context, Effect, Layer } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import { domainError, domainTry } from "create-relkit/internal/generator-errors";
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { domainError, domainTry } from "create-relkit/generator-errors";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
 import { discoveryFacts } from "./project-discovery-facts.js";
 import type { ProjectDiscoveryService } from "./project-discovery.service.types.js";
 import type { ProjectDiscovery } from "./project-discovery-types.js";

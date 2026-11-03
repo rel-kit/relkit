@@ -6,13 +6,9 @@
 
 import { Effect } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
-import { scaffoldErrors, domainError, domainTry } from "create-relkit/internal/generator-errors";
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
-import {
-  ADD_FAILURE_CODES,
-  AddScaffoldError,
-  type AddRequest,
-} from "create-relkit/internal/add-types";
+import { scaffoldErrors, domainError, domainTry } from "create-relkit/generator-errors";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
+import { ADD_FAILURE_CODES, AddScaffoldError, type AddRequest } from "create-relkit/add-types";
 import { normalizeArtifactName } from "./add-name.js";
 import { serviceSource, type DomainTarget } from "./domain-planning.js";
 import { scaffoldServiceBoundary } from "./scaffold-layout.js";

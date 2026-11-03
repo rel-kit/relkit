@@ -3,7 +3,7 @@
 import { StateSchema, type AnyStateSchema } from "@langchain/langgraph";
 import { getJsonSchema, type StandardSchemaV1 } from "relkit/schema";
 import { Effect, Metric, Schema } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { AgentRuntimeError } from "./runtime-errors.js";
 
 const selectionCount = Metric.counter("relkit.agents.graph_state.selection.total");

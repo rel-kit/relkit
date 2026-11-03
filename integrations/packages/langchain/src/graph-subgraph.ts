@@ -3,8 +3,8 @@
 import { normalizeId } from "relkit/contracts";
 import type { StandardSchemaV1 } from "relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
-import { isRecordEffect } from "relkit/agents/internal/agent-validation-value";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { isRecordEffect } from "relkit/agents/agent-validation-value";
 import type { GraphDescriptor } from "./define-graph.js";
 import { graphNodeValidationFailure } from "./graph-node-validation-error.js";
 import { copyGraphNodeEndsEffect } from "./graph-node-validation.js";

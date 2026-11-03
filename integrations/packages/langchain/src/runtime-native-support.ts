@@ -1,7 +1,7 @@
 /** Resolves native execution support, including optional DeepAgents loading, preserving initialization and nested dependency errors as invocation causes. */
 
 import { Context, Effect, Layer } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import type { AgentDescriptor } from "./define-agent.js";
 import { hasDeepAgentCapabilities } from "./define-agent-deep.js";
 import { agentInvocationFailure } from "./runtime-effect-error.js";

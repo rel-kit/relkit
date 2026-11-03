@@ -3,8 +3,8 @@
 import { isLangChainTool } from "@langchain/core/tools";
 import { isToolRef, type ToolRefAny } from "relkit/tools";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
-import { agentDefinitionFailure } from "relkit/agents/internal/define-agent-error";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { agentDefinitionFailure } from "relkit/agents/define-agent-error";
 import type { AgentTool, NativeAgentTool } from "./define-agent-native.types.js";
 
 /** Validates and freezes RelKit and native agent tools in input order.

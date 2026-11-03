@@ -6,7 +6,7 @@ import { defineAgent, invokeAgent } from "../src/index.ts";
 import {
   parseModelProviderConfiguration,
   resolveModelSelector,
-} from "relkit/agents/internal/model-selection";
+} from "relkit/agents/model-selection";
 import { createTestModel } from "./test-model.ts";
 
 const modelCases = [

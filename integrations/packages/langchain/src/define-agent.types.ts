@@ -3,11 +3,7 @@
 import type { DescriptorBase, DescriptorMetadata } from "relkit/contracts";
 import type { AgentRef } from "relkit/functions";
 import type { StandardSchemaV1 } from "relkit/schema";
-import type {
-  AgentChatMapping,
-  AgentClientPolicy,
-  AgentControl,
-} from "relkit/agents/internal/agent-client";
+import type { AgentChatMapping, AgentClientPolicy, AgentControl } from "relkit/agents/agent-client";
 import type { AgentClientContractMetadata } from "./client-contract-metadata.js";
 import type {
   AgentClientStateKey,

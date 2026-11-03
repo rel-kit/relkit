@@ -16,8 +16,8 @@ test("production lifecycle is exported by the runtime owner", () => {
     readFileSync(resolve(repository, "packages/relkit/package.json"), "utf8"),
   );
   expect(manifest.exports).toMatchObject({
-    "./engine/internal/server-runtime": {
-      import: "./dist/engine/internal/server-runtime.js",
+    "./engine/server-runtime": {
+      import: "./dist/engine/server-runtime.js",
     },
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { defineEnv, env } from "../../src/config/index.js";
-import { resolveEnvWithEffect } from "../../src/config/internal/config.js";
+import { resolveEnvWithEffect } from "../../src/config/resolution.js";
 
 describe("Effect config provider bridge", () => {
   test("resolves explicit provider values, preserving empty strings", async () => {

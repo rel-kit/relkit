@@ -17,7 +17,7 @@ export function serverImportsSource(input: ServerSourceEmission): string {
   const { agentSource, options } = input;
   const { providerOverridesImport, specializedImports, localServicesImport, jobsManifestImport } =
     options;
-  const httpImport = `import { createPreparedApp, createHttpAuthRuntime, createHttpSpanRuntime, instrumentHttpRequest } from "relkit/runtime-hono/internal/prepared";`;
+  const httpImport = `import { createPreparedApp, createHttpAuthRuntime, createHttpSpanRuntime, instrumentHttpRequest } from "relkit/runtime-hono/prepared";`;
   let planImport = `import { createRegistrationPlan } from "relkit/graph";`;
   if (input.configuration.httpApplication === "prepared") {
     planImport = `import { deepFreeze } from "relkit/contracts";`;
@@ -27,10 +27,10 @@ export function serverImportsSource(input: ServerSourceEmission): string {
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { Effect } from "effect";
-import { createServerRuntimeHost } from "relkit/engine/internal/server-runtime";
+import { createServerRuntimeHost } from "relkit/engine/server-runtime";
 ${providerOverridesImport}
 ${agentSource.imports}
-import { createApplicationContextResolver } from "relkit/internal/runtime";
+import { createApplicationContextResolver } from "relkit/host";
 import { resolveEnv } from "relkit/config";
 ${specializedImports}
 import { ${engine.imports} } from "relkit/engine";

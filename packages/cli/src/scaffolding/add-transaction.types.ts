@@ -1,16 +1,16 @@
 /** Acquires file and lock snapshots before applying an immutable scaffold plan; commit, rollback and cleanup retain the original transaction owner. This companion contains the shared planning contracts without executing work. */
 
 import type { Effect } from "effect";
-import type { AddResult, ScaffoldPlan } from "create-relkit/internal/add-types";
+import type { AddResult, ScaffoldPlan } from "create-relkit/add-types";
 import type {
   GeneratorDomainError,
   GeneratorIoError,
   GeneratorProcessError,
-} from "create-relkit/internal/generator-errors";
+} from "create-relkit/generator-errors";
 import type {
   GeneratorCommandResult,
   GeneratorCommandRunner,
-} from "create-relkit/internal/generator-process.types";
+} from "create-relkit/generator-process.types";
 
 /** Existing command-runner result compatibility surface. */
 export interface AddCommandResult extends GeneratorCommandResult {}

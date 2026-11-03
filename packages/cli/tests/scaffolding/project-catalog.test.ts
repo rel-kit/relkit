@@ -3,10 +3,10 @@
 import { expect, test } from "bun:test";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { ADD_FAILURE_CODES } from "create-relkit/internal/add-types";
+import { ADD_FAILURE_CODES } from "create-relkit/add-types";
 import { mergeScaffoldManifest } from "../../src/scaffolding/plan-manifest.js";
 import { resolveProjectDependencies } from "../../src/scaffolding/project-catalog.js";
-import { SCAFFOLD_DEPENDENCIES } from "create-relkit/internal/scaffold-catalog";
+import { SCAFFOLD_DEPENDENCIES } from "create-relkit/scaffold-catalog";
 import { patchBuilder, withProject } from "./dependency-patches.fixture.js";
 
 test("resolves default and named workspace catalogs while retaining authored aliases", async () => {

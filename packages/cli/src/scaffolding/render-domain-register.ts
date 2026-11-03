@@ -4,7 +4,7 @@ import { observeExecution } from "relkit/contracts/operation";
 import type { DomainTarget, DomainArtifact } from "./domain-planning.js";
 import { PlanBuilder } from "./plan-builder.js";
 import { Effect } from "effect";
-import { runGeneratorSync } from "create-relkit/internal/generator-runtime";
+import { runGeneratorSync } from "create-relkit/generator-runtime";
 
 /**
  * Registers a rendered artifact through the existing synchronous planning API.

@@ -9,9 +9,9 @@
 
 import { Effect } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
-import { scaffoldErrors } from "create-relkit/internal/generator-errors";
-import type { AddRequest } from "create-relkit/internal/add-types";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
+import { scaffoldErrors } from "create-relkit/generator-errors";
+import type { AddRequest } from "create-relkit/add-types";
 import { PlanBuilder } from "./plan-builder.js";
 import { addFactoryObjectMember } from "./source-edit.js";
 

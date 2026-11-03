@@ -41,7 +41,7 @@ for (const development of [false, true]) {
     ));
 }
 
-const source = `import { selectedHttpCapabilities } from "relkit/runtime-hono/internal/prepared";
+const source = `import { selectedHttpCapabilities } from "relkit/runtime-hono/prepared";
 console.log(JSON.stringify(selectedHttpCapabilities({mcp:{enabled:true},agUi:true,apiDocs:{ui:"scalar",mode:"production",enabledInProduction:true}})));
 console.log(import.meta.resolve("relkit/runtime-hono/mcp"));
 console.log(import.meta.resolve("relkit/runtime-hono/ag-ui"));
@@ -55,7 +55,7 @@ console.log(import.meta.resolve("relkit/runtime-hono/scalar"));
  */
 function bundleSource(helper: string, server: string, root: string, development: boolean): string {
   return `import { Effect, Layer } from "effect";
-import { DependencySourceLive } from "relkit/provider/internal/dependencies";
+import { DependencySourceLive } from "relkit/provider/dependencies";
 import { bundleServerEffect } from ${JSON.stringify(join(helper, "commands/build-support.ts"))};
 import { fileSystemLayer } from ${JSON.stringify(join(helper, "services/filesystem.service.ts"))};
 import { processLayer } from ${JSON.stringify(join(helper, "services/process.service.ts"))};

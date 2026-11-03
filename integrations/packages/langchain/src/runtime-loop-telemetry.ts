@@ -3,7 +3,7 @@
 import type { ProtocolEvent } from "@langchain/langgraph";
 import { frameworkTrace } from "relkit/invocation";
 import { relkitToolRefs } from "./define-agent-native.js";
-import { emitAgentEdge } from "relkit/agents/internal/observability";
+import { emitAgentEdge } from "relkit/agents/observability";
 import type { AgentRuntimeOptions } from "./runtime.js";
 import { findModelTool } from "./runtime-tools.js";
 

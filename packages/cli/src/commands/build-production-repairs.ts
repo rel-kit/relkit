@@ -1,6 +1,6 @@
 /** Captures only selected release-owned repair bytes for portable production installs. */
 import { Effect } from "effect";
-import { readDrizzlePatch } from "create-relkit/internal/dependency-patches";
+import { readDrizzlePatch } from "create-relkit/dependency-patches";
 import { cliAdapterError } from "../cli-errors.js";
 
 /** Exact release patch bytes copied into the same accepted production cohort. */

@@ -2,7 +2,7 @@
 
 import * as ts from "typescript";
 
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 /**
  * Requires exactly one factory call with a static object argument.
  * @param file - TypeScript SourceFile AST.

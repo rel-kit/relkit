@@ -1,7 +1,7 @@
 /** Validates native node input, output and optional resume schemas in authoring order before handler or identity construction; schema failures retain their existing graph-node boundary. */
 
 import { Effect } from "effect";
-import { assertAgentSchemaEffect } from "relkit/agents/internal/agent-validation-schema";
+import { assertAgentSchemaEffect } from "relkit/agents/agent-validation-schema";
 import type { GraphNodeAny } from "./define-graph-node.types.js";
 import { graphNodeValidationFailure } from "./graph-node-validation-error.js";
 

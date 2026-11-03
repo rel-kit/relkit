@@ -2,7 +2,7 @@
 
 import { posix } from "node:path";
 import * as ts from "typescript";
-import type { DatabaseDialect } from "create-relkit/internal/add-types";
+import type { DatabaseDialect } from "create-relkit/add-types";
 import { readFactoryObject, staticPropertyName } from "./source-edit.js";
 
 /**

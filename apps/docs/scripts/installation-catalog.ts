@@ -8,7 +8,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { selectedIntegrationRequirements } from "relkit/contracts";
 import { resolveCatalogVersion } from "create-relkit/catalog-resolution";
-import { scaffoldDependency } from "create-relkit/internal/scaffold-catalog";
+import { scaffoldDependency } from "create-relkit/scaffold-catalog";
 import { Effect, Schema } from "effect";
 import { HTTP_TRANSPORT_REQUIREMENTS } from "../../../packages/relkit/src/runtime-hono/selected-transports.js";
 import { apiPackageDefinitions, packageDirectory } from "./documentation-catalog.js";

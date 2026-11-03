@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { generateProject, planCreate } from "create-relkit";
-import { prepareProjectDependencyPatch } from "create-relkit/internal/dependency-patches";
+import { prepareProjectDependencyPatch } from "create-relkit/dependency-patches";
 import {
   root,
   withFixture,

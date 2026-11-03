@@ -36,9 +36,9 @@
       "types": "./dist/config.d.ts",
       "import": "./dist/config.js"
     },
-    "./internal/runtime": {
-      "types": "./dist/internal-runtime.d.ts",
-      "import": "./dist/internal-runtime.js"
+    "./host": {
+      "types": "./dist/host.d.ts",
+      "import": "./dist/host.js"
     },
     "./routes": {
       "types": "./dist/routes.d.ts",

@@ -2,7 +2,7 @@
 
 import { getJsonSchema } from "relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import type { GraphDescriptor } from "./define-graph.js";
 import { isGraphNodeDescriptor } from "./define-graph-node.js";
 import { isSubgraphNode, subgraphForNode } from "./graph-subgraph.js";

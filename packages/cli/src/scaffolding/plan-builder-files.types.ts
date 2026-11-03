@@ -1,11 +1,8 @@
 /** Builds the file operations recorded by the request-local plan builder, preserving create versus update collision rules. This companion contains the shared planning contracts without executing work. */
 
 import type { Effect } from "effect";
-import type { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import type {
-  GeneratorDomainError,
-  GeneratorIoError,
-} from "create-relkit/internal/generator-errors";
+import type { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import type { GeneratorDomainError, GeneratorIoError } from "create-relkit/generator-errors";
 
 /** File-planning capabilities retaining their exact native read requirement. */
 export interface PlanBuilderFileOperations {

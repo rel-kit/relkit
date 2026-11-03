@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { Effect, Schema } from "effect";
 import { packPackages } from "../pack-and-smoke-create-relkit-pack.js";
 import { packAll } from "../release-check-artifacts.js";
-import { ownedNativePromise } from "@relkit/cli/internal/tooling";
+import { ownedNativePromise } from "@relkit/cli/tooling";
 import type { Manifest } from "../pack-and-smoke-create-relkit-support.js";
 
 /**

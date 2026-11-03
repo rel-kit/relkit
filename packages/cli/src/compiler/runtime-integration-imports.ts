@@ -57,7 +57,7 @@ export const generateRuntimeIntegrationImportsEffect = Effect.fn(
     // Match the emitted module's native import ancestry after production relocation.
     const preflight = `import { Effect } from "effect";
 import { fileURLToPath } from "node:url";
-import { checkIntegrationDependencies, SelectedDependenciesLive, initializeIntegration } from "relkit/internal/runtime";
+import { checkIntegrationDependencies, SelectedDependenciesLive, initializeIntegration } from "relkit/host";
 await Effect.runPromise(checkIntegrationDependencies(${sourceJson(JSON.stringify(selectedPlan))}, { projectRoot: fileURLToPath(new URL(".", import.meta.url)), phase: "runtime" }).pipe(Effect.provide(SelectedDependenciesLive)));
 `;
     return `${preflight}${imports.join("\n")}\n\nexport const runtimeIntegrationModules = [\n${entries.join("\n")}\n] as const;\n`;

@@ -5,10 +5,7 @@
  * Preparation owns checking/publication epochs and immutable artifact capture.
  */
 import { Context, Effect, Layer, Option } from "effect";
-import {
-  DependencySource,
-  type DependencySourceContract,
-} from "relkit/provider/internal/dependencies";
+import { DependencySource, type DependencySourceContract } from "relkit/provider/dependencies";
 import { observeExecution } from "relkit/contracts/operation";
 import { SnapshotFiles } from "./snapshot-files.service.js";
 import { DevSnapshotRejected } from "./snapshot-error.js";

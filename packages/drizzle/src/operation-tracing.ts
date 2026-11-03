@@ -32,7 +32,7 @@ const operations = new Set([
  * @example
  * ```ts
  * import { Effect } from "effect";
- * import { observeSpecializedOperation } from "@relkit/drizzle/internal";
+ * import { observeSpecializedOperation } from "@relkit/drizzle/server";
  * await Effect.runPromise(observeSpecializedOperation("auth.session", Effect.succeed(null)));
  * ```
  */

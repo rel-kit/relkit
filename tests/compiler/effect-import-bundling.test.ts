@@ -7,8 +7,8 @@ import { expect, test } from "bun:test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect } from "effect";
-import { ownedNativePromise } from "@relkit/cli/internal/tooling";
-import { narrowEffectImports, narrowEffectImportPlugin } from "@relkit/cli/internal/tooling";
+import { ownedNativePromise } from "@relkit/cli/tooling";
+import { narrowEffectImports, narrowEffectImportPlugin } from "@relkit/cli/tooling";
 
 test("keeps unsupported imports and narrows aliases plus type-only named imports", () => {
   for (const source of [

@@ -3,17 +3,12 @@
 import { observeExecution } from "relkit/contracts/operation";
 import { dirname, join, resolve } from "node:path";
 import { Effect, Schema } from "effect";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
-import { resolveCatalogVersion } from "create-relkit/internal/catalog-resolution";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import {
-  domainError,
-  domainTry,
-  errorMessage,
-  hasErrno,
-} from "create-relkit/internal/generator-errors";
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
-import { JsonObject } from "create-relkit/internal/project-manifest.schemas";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
+import { resolveCatalogVersion } from "create-relkit/catalog-resolution";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { domainError, domainTry, errorMessage, hasErrno } from "create-relkit/generator-errors";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
+import { JsonObject } from "create-relkit/project-manifest.schemas";
 
 /**
  * Resolves authored Bun aliases without replacing declarations or hiding filesystem authority.

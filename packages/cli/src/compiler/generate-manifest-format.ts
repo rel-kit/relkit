@@ -111,7 +111,7 @@ function frameworkImports(
   return [
     'import runtimeActivationFingerprint from "./runtime-activation.json" with { type: "json" };',
     identityBindings.length > 0
-      ? 'import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "relkit/internal/runtime";'
+      ? 'import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "relkit/host";'
       : "",
     [...functions.values()].some((value) =>
       value.startsWith("__relkit_createGeneratedAgentFunction("),

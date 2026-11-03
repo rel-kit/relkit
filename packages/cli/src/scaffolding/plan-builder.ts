@@ -2,12 +2,12 @@
 
 import { relative } from "node:path";
 
-import { type ScaffoldPlan } from "create-relkit/internal/add-types";
+import { type ScaffoldPlan } from "create-relkit/add-types";
 import type { DiscoveredArtifact, DiscoveredProfile } from "./project-discovery-types.js";
-import type { ScaffoldDependencyName } from "create-relkit/internal/scaffold-catalog";
+import type { ScaffoldDependencyName } from "create-relkit/scaffold-catalog";
 import type { PlannedArtifactInput } from "./plan-builder.types.js";
 
-import { runGeneratorPromise, runGeneratorSync } from "create-relkit/internal/generator-runtime";
+import { runGeneratorPromise, runGeneratorSync } from "create-relkit/generator-runtime";
 
 import { PlanBuilderEffects } from "./plan-builder-effects.js";
 

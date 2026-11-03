@@ -3,13 +3,13 @@
 import { finishPlannedRequest } from "./plan-builder-finish.js";
 import { Effect, Ref } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
-import { type AddRequest } from "create-relkit/internal/add-types";
+import { type AddRequest } from "create-relkit/add-types";
 import type {
   DiscoveredArtifact,
   DiscoveredProfile,
   ProjectDiscovery,
 } from "./project-discovery-types.js";
-import type { ScaffoldDependencyName } from "create-relkit/internal/scaffold-catalog";
+import type { ScaffoldDependencyName } from "create-relkit/scaffold-catalog";
 import type { PlanBuilderState, PlannedArtifactInput } from "./plan-builder.types.js";
 
 import { planBuilderFiles } from "./plan-builder-files.js";

@@ -2,16 +2,12 @@
 
 import { isDescriptor } from "relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
-import { agentDefinitionFailure } from "relkit/agents/internal/define-agent-error";
-import { isAgentInstructions } from "relkit/agents/internal/define-agent-support";
-import {
-  isAgentSchema,
-  isPositiveInteger,
-  isRecord,
-} from "relkit/agents/internal/agent-validation";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { agentDefinitionFailure } from "relkit/agents/define-agent-error";
+import { isAgentInstructions } from "relkit/agents/define-agent-support";
+import { isAgentSchema, isPositiveInteger, isRecord } from "relkit/agents/agent-validation";
 import { isAgentModel } from "./define-agent-native.js";
-import { normalizeModelSelector } from "relkit/agents/internal/model-selection";
+import { normalizeModelSelector } from "relkit/agents/model-selection";
 import type { AgentDescriptor } from "./define-agent.js";
 import type { AgentModel } from "./define-agent-native.js";
 

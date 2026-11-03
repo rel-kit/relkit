@@ -3,10 +3,10 @@
 import type { GraphDescriptor, GraphNodeLike } from "./define-graph.js";
 import { isGraphNodeDescriptor } from "./define-graph-node.js";
 import { isSubgraphNode, subgraphForNode } from "./graph-subgraph.js";
-import type { AgentWaitingRequest } from "relkit/agents/internal/state.types";
+import type { AgentWaitingRequest } from "relkit/agents/state.types";
 import { validateValue } from "./runtime-utils.js";
 import { Effect, Result } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { graphContinuationFailure } from "./graph-continuation-error.js";
 
 /** Validates one or more graph continuation replies with bounded concurrency.

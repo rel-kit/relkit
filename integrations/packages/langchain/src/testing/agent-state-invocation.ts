@@ -1,7 +1,7 @@
 /** Runs native invocations under the harness-owned span and cancellation lifetime. */
 import { Ref } from "effect";
 import { completeSpan, runInExecutionContext, startRootSpan } from "relkit/invocation";
-import { combineSignals } from "@relkit/testing/internal/runtime-clock";
+import { combineSignals } from "@relkit/testing/runtime-clock";
 import { invokeAgent } from "../index.js";
 import type { AgentHarnessDependencies } from "./agent-harness.types.js";
 import type {

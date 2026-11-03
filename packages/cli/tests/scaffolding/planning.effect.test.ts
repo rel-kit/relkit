@@ -8,9 +8,9 @@ import {
   projectDiscoveryLive,
 } from "../../src/scaffolding/project-discovery.js";
 import { PlanBuilder } from "../../src/scaffolding/plan-builder.js";
-import { publicFailure } from "create-relkit/internal/generator-errors";
-import { GeneratorPaths } from "create-relkit/internal/generator-paths";
-import { canonicalizeMissingPathEffect } from "create-relkit/internal/validate-paths";
+import { publicFailure } from "create-relkit/generator-errors";
+import { GeneratorPaths } from "create-relkit/generator-paths";
+import { canonicalizeMissingPathEffect } from "create-relkit/validate-paths";
 import { memoryFileSystem } from "./generator-services.fixture.js";
 
 const root = "/memory/app";

@@ -3,13 +3,13 @@ import { expect } from "bun:test";
 import { createHash } from "node:crypto";
 import { chmod, mkdir, readFile, stat, symlink, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { ADD_FAILURE_CODES } from "create-relkit/internal/add-types";
+import { ADD_FAILURE_CODES } from "create-relkit/add-types";
 
 import {
   planDependencyPatch,
   prepareProjectDependencyPatch,
   readDrizzlePatch,
-} from "create-relkit/internal/dependency-patches";
+} from "create-relkit/dependency-patches";
 import { patchBuilder, withProject } from "./dependency-patches.fixture.js";
 
 /** Verifies that uses the central version and byte-identical canonical patch asset.

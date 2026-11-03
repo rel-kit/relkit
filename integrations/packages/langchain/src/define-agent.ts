@@ -3,15 +3,15 @@
 import { createUnboundIdentityEffect } from "relkit/invocation";
 import type { InferInput, InferOutput, StandardSchemaV1 } from "relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
-import { isRecordEffect } from "relkit/agents/internal/agent-validation-value";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { isRecordEffect } from "relkit/agents/agent-validation-value";
 import { prepareAgentDescriptor } from "./define-agent-build.js";
-import { agentDefinitionFailure } from "relkit/agents/internal/define-agent-error";
+import { agentDefinitionFailure } from "relkit/agents/define-agent-error";
 import type { AgentMiddleware, AgentTool } from "./define-agent-native.types.js";
 import type { AgentDescriptor, DefineAgentOptions } from "./define-agent.types.js";
 
 export { assertAgentDescriptor, isAgentDescriptor } from "./define-agent-validation.js";
-export { copyAgentLimits, copyAgentLimitsEffect } from "relkit/agents/internal/define-agent-limits";
+export { copyAgentLimits, copyAgentLimitsEffect } from "relkit/agents/define-agent-limits";
 export type {
   AgentClientStateKey,
   AgentMiddleware,
@@ -21,11 +21,7 @@ export type {
   AgentTool,
   NativeAgentTool,
 } from "./define-agent-native.types.js";
-export type {
-  AgentChatMapping,
-  AgentClientPolicy,
-  AgentControl,
-} from "relkit/agents/internal/agent-client";
+export type { AgentChatMapping, AgentClientPolicy, AgentControl } from "relkit/agents/agent-client";
 export type {
   AgentFilesystemBackend,
   AgentSubagent,

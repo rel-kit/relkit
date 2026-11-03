@@ -4,10 +4,10 @@ import type { LangGraphRunnableConfig } from "@langchain/langgraph";
 import { normalizeId } from "relkit/contracts";
 import type { InferOutput, StandardSchemaV1 } from "relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
-import { isAgentSchemaEffect } from "relkit/agents/internal/agent-validation-schema";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { isAgentSchemaEffect } from "relkit/agents/agent-validation-schema";
 import { validateGraphNodeSchemasEffect } from "./graph-node-schema-validation.js";
-import { isRecordEffect } from "relkit/agents/internal/agent-validation-value";
+import { isRecordEffect } from "relkit/agents/agent-validation-value";
 import type {
   DefineGraphNodeOptions,
   GraphNodeAny,

@@ -41,7 +41,7 @@ export function nativeCall<A>(operation: string, run: () => A | PromiseLike<A>) 
  * @example
  * ```ts
  * import { Effect, Layer, ManagedRuntime } from "effect";
- * import { runDrizzlePromise } from "@relkit/drizzle/internal";
+ * import { runDrizzlePromise } from "@relkit/drizzle/server";
  * const owner = ManagedRuntime.make(Layer.empty);
  * try { await runDrizzlePromise(owner, Effect.succeed(1)); }
  * finally { await owner.dispose(); }

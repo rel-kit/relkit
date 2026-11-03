@@ -2,7 +2,7 @@
 import { copyFile, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect } from "effect";
-import { buildCatalogDependency } from "create-relkit/internal/build-catalog";
+import { buildCatalogDependency } from "create-relkit/build-catalog";
 import { inspectionNative } from "../../../scripts/consumer-installation-native.js";
 import {
   installWorkflowGuide,

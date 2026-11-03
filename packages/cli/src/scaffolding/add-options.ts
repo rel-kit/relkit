@@ -1,11 +1,7 @@
 /** Builds normalized existing-project add requests from CLI arguments and enforces headless requirements before interactive resolution. */
 
 import { domainRequest, executionRequest } from "./add-options-domain.js";
-import {
-  type AddRequest,
-  type AddRequestBase,
-  type RouteMethod,
-} from "create-relkit/internal/add-types";
+import { type AddRequest, type AddRequestBase, type RouteMethod } from "create-relkit/add-types";
 import {
   choice,
   many,

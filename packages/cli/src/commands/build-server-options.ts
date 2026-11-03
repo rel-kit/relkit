@@ -26,7 +26,7 @@ export function serverSourceOptions(
       ? 'import { activateBetterAuthService, generateBetterAuthOpenApi } from "@relkit/better-auth/drizzle";'
       : undefined,
     serviceCapabilities.includes("drizzle")
-      ? 'import { activateDrizzleService } from "@relkit/drizzle/internal";'
+      ? 'import { activateDrizzleService } from "@relkit/drizzle/server";'
       : undefined,
   ]
     .filter((value) => value !== undefined)

@@ -12,7 +12,7 @@ export default defineConfig({
         "src/functions/**/*.types.ts",
         "src/functions/types.ts",
         "src/functions/index.ts",
-        "src/functions/internal.ts",
+        "src/functions/descriptor-factory.ts",
       ],
       reporter: ["text", "json-summary"],
       reportsDirectory: "coverage/functions",

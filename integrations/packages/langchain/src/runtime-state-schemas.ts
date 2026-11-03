@@ -2,7 +2,7 @@
 
 import type { StandardSchemaV1 } from "relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { canCarryStandardSchema } from "relkit/contracts";
 

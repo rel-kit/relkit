@@ -2,7 +2,7 @@
 
 import type { ToolDescriptor, ToolSource } from "relkit/tools";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 
 /** Produces a bounded model-facing name for one tool ID.
  * @param id - RelKit tool ID.

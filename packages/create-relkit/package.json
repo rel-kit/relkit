@@ -40,99 +40,95 @@
       "types": "./dist/launcher.d.ts",
       "import": "./dist/launcher.js"
     },
-    "./internal/add-transaction-files": {
+    "./add-transaction-files": {
       "types": "./dist/add-transaction-files.d.ts",
       "import": "./dist/add-transaction-files.js"
     },
-    "./internal/add-types": {
+    "./add-types": {
       "types": "./dist/add-types.d.ts",
       "import": "./dist/add-types.js"
     },
-    "./internal/build-catalog": {
+    "./build-catalog": {
       "types": "./dist/build-catalog.d.ts",
       "import": "./dist/build-catalog.js"
     },
-    "./internal/catalog-resolution": {
-      "types": "./dist/catalog-resolution.d.ts",
-      "import": "./dist/catalog-resolution.js"
-    },
-    "./internal/dependency-patch-installation": {
+    "./dependency-patch-installation": {
       "types": "./dist/dependency-patch-installation.d.ts",
       "import": "./dist/dependency-patch-installation.js"
     },
-    "./internal/dependency-patches": {
+    "./dependency-patches": {
       "types": "./dist/dependency-patches.d.ts",
       "import": "./dist/dependency-patches.js"
     },
-    "./internal/generate": {
+    "./generate": {
       "types": "./dist/generate.d.ts",
       "import": "./dist/generate.js"
     },
-    "./internal/generate-process": {
+    "./generate-process": {
       "types": "./dist/generate-process.d.ts",
       "import": "./dist/generate-process.js"
     },
-    "./internal/generator-cleanup": {
+    "./generator-cleanup": {
       "types": "./dist/generator-cleanup.d.ts",
       "import": "./dist/generator-cleanup.js"
     },
-    "./internal/generator-errors": {
+    "./generator-errors": {
       "types": "./dist/generator-errors.d.ts",
       "import": "./dist/generator-errors.js"
     },
-    "./internal/generator-filesystem": {
+    "./generator-filesystem": {
       "types": "./dist/generator-filesystem.d.ts",
       "import": "./dist/generator-filesystem.js"
     },
-    "./internal/generator-filesystem.types": {
+    "./generator-filesystem.types": {
       "types": "./dist/generator-filesystem.types.d.ts",
       "import": "./dist/generator-filesystem.types.js"
     },
-    "./internal/generator-paths": {
+    "./generator-paths": {
       "types": "./dist/generator-paths.d.ts",
       "import": "./dist/generator-paths.js"
     },
-    "./internal/generator-process": {
+    "./generator-process": {
       "types": "./dist/generator-process.d.ts",
       "import": "./dist/generator-process.js"
     },
-    "./internal/generator-process.types": {
+    "./generator-process.types": {
       "types": "./dist/generator-process.types.d.ts",
       "import": "./dist/generator-process.types.js"
     },
-    "./internal/generator-prompt": {
+    "./generator-prompt": {
       "types": "./dist/generator-prompt.d.ts",
       "import": "./dist/generator-prompt.js"
     },
-    "./internal/generator-runtime": {
+    "./generator-runtime": {
       "types": "./dist/generator-runtime.d.ts",
       "import": "./dist/generator-runtime.js"
     },
-    "./internal/options": {
+    "./options": {
       "types": "./dist/options.d.ts",
       "import": "./dist/options.js"
     },
-    "./internal/project-manifest.schemas": {
+    "./project-manifest.schemas": {
       "types": "./dist/project-manifest.schemas.d.ts",
       "import": "./dist/project-manifest.schemas.js"
     },
-    "./internal/prompt-driver": {
+    "./prompt-driver": {
       "types": "./dist/prompt-driver.d.ts",
       "import": "./dist/prompt-driver.js"
     },
-    "./internal/prompt-driver.types": {
+    "./prompt-driver.types": {
       "types": "./dist/prompt-driver.types.d.ts",
       "import": "./dist/prompt-driver.types.js"
     },
-    "./internal/scaffold-catalog": {
+    "./scaffold-catalog": {
       "types": "./dist/scaffold-catalog.d.ts",
       "import": "./dist/scaffold-catalog.js"
     },
-    "./internal/scaffold-catalog.types": {
+    "./scaffold-catalog.types": {
       "types": "./dist/scaffold-catalog.types.d.ts",
       "import": "./dist/scaffold-catalog.types.js"
     },
-    "./internal/validate-paths": {
+    "./validate-paths": {
       "types": "./dist/validate-paths.d.ts",
       "import": "./dist/validate-paths.js"
     },

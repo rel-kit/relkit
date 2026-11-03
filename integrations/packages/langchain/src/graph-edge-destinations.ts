@@ -4,7 +4,7 @@
  */
 import { END, START, Send } from "@langchain/langgraph";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { graphDefinitionFailure } from "./define-graph-error.js";
 
 /** Checks native route targets against registered nodes.

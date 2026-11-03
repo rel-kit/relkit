@@ -9,7 +9,7 @@ import {
   parseModelProviderConfigurationEffect,
   resolveModelSelector,
   resolveModelSelectorEffect,
-} from "relkit/agents/internal/model-selection";
+} from "relkit/agents/model-selection";
 import { z } from "relkit/schema";
 
 const configuration = parseModelProviderConfiguration({

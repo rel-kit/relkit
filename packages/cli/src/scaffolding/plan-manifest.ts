@@ -1,16 +1,13 @@
 /** Merges selected add dependencies and scripts into project metadata, preserving existing values and applying feature-owned auth repair checks before serialization. */
 
 import { Schema } from "effect";
-import {
-  JsonObject,
-  ScaffoldManifestSchema,
-} from "create-relkit/internal/project-manifest.schemas";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { JsonObject, ScaffoldManifestSchema } from "create-relkit/project-manifest.schemas";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 import {
   bundledIntegration,
   SCAFFOLD_DEPENDENCIES,
   type ScaffoldDependencyName,
-} from "create-relkit/internal/scaffold-catalog";
+} from "create-relkit/scaffold-catalog";
 import type { ScaffoldManifest, ScaffoldManifestMerge } from "./plan-manifest.types.js";
 import { repairSelectedAuthManifest } from "./auth-manifest-repair.js";
 

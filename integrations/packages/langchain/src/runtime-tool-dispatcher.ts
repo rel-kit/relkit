@@ -8,7 +8,7 @@ import {
 } from "relkit/invocation";
 import type { ToolEngine, ToolEngineInvocation } from "relkit/tools";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import type { RuntimeToolOptions } from "./runtime-tool-events.types.js";
 
 /** Creates a nested function dispatcher with stable agent parent context.

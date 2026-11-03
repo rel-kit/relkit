@@ -9,7 +9,7 @@ import {
 } from "../../src/config/index.js";
 import { createEnvBuilder } from "../../src/config/env-builder.js";
 import { createEnvRef } from "../../src/config/env-ref.js";
-import { resolveEnvWithEffectEffect } from "../../src/config/internal/config.js";
+import { resolveEnvWithEffectEffect } from "../../src/config/resolution.js";
 import { resolveField } from "../../src/config/resolve-helpers.js";
 
 describe("environment resolution boundaries", () => {

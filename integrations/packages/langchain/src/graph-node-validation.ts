@@ -4,7 +4,7 @@ import { Command, END, START, isCommand } from "@langchain/langgraph";
 import { normalizeId } from "relkit/contracts";
 import type { InferOutput, StandardSchemaV1 } from "relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import type { GraphNodeAny, GraphNodeResult } from "./define-graph-node.js";
 import { graphNodeValidationFailure } from "./graph-node-validation-error.js";
 import {

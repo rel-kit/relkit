@@ -2,7 +2,7 @@
 import { expect, it } from "@effect/vitest";
 import { Effect, Layer } from "effect";
 import { canonicalJson } from "relkit/contracts";
-import { DependencySource, SelectedDependenciesLayer } from "relkit/provider/internal/dependencies";
+import { DependencySource, SelectedDependenciesLayer } from "relkit/provider/dependencies";
 import { captureProductionDependencies } from "../src/commands/build-production-dependencies.js";
 
 const source = Layer.succeed(DependencySource, {

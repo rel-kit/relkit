@@ -5,7 +5,7 @@ import { assertEndpoint, copyDestinations, addUnique } from "./graph-edge-destin
 import { END, START, type LangGraphRunnableConfig } from "@langchain/langgraph";
 import type { MaybePromise } from "relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { graphDefinitionFailure } from "./define-graph-error.js";
 import type { GraphEdgeBuilder, GraphEdgeOperation } from "./graph-edges.types.js";
 

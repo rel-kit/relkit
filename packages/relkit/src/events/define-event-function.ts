@@ -1,5 +1,5 @@
 import { isDescriptor, normalizeId } from "../contracts/index.js";
-import { createFunctionDescriptor } from "../functions/internal.js";
+import { createFunctionDescriptor } from "../functions/descriptor-factory.js";
 import { z } from "../schema/index.js";
 import { Effect, Option } from "effect";
 import type {

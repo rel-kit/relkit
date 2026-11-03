@@ -14,7 +14,7 @@ import {
   startRegistry,
 } from "../pack-and-smoke-create-relkit-pack.js";
 import { runCommand } from "../pack-and-smoke-create-relkit-support.js";
-import { ownedNativePromise } from "@relkit/cli/internal/tooling";
+import { ownedNativePromise } from "@relkit/cli/tooling";
 import { packBaselineArtifacts } from "./packed-artifacts.js";
 
 /**

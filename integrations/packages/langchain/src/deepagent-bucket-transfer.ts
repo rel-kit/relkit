@@ -2,7 +2,7 @@
 
 import type { FileDownloadResponse, FileUploadResponse } from "deepagents";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
 import { DeepAgentBucket, deepAgentBucketLayer } from "./deepagent-bucket-service.js";
 import { putFileDataEffect } from "./deepagent-bucket-file-data.js";

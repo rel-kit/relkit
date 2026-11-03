@@ -7,7 +7,7 @@
 import { resolve, relative } from "node:path";
 import { readdir, rm } from "node:fs/promises";
 import { Effect } from "effect";
-import { ownedNativePromise, narrowEffectImportPlugin } from "@relkit/cli/internal/tooling";
+import { ownedNativePromise, narrowEffectImportPlugin } from "@relkit/cli/tooling";
 
 /**
  * Bundles one command boundary while keeping its documented lazy imports external.

@@ -1,8 +1,8 @@
 /** Projects native agent and graph schemas into serializable client metadata; SDK-specific inspection remains inside this integration before the generic contract is published. */
 
-import type { AgentClientPolicy } from "relkit/agents/internal/agent-client";
+import type { AgentClientPolicy } from "relkit/agents/agent-client";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import {
   clientSchemaMetadata,
   dynamicClientSchema,
@@ -11,7 +11,7 @@ import {
   type ClientSchemaMetadata,
   type ClientTypeField,
 } from "./client-contract-schema.js";
-import { agentDefinitionFailure } from "relkit/agents/internal/define-agent-error";
+import { agentDefinitionFailure } from "relkit/agents/define-agent-error";
 import { graphDefinitionFailure } from "./define-graph-error.js";
 import type { GraphWorkflow } from "./graph-workflow.js";
 import type {

@@ -2,7 +2,7 @@
 
 import { Command } from "@langchain/langgraph";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { graphExecution, type GraphDescriptor } from "./define-graph.js";
 import { graphContinuationFailure } from "./graph-continuation-error.js";
 import type { CompiledGraph, GraphConfig } from "./graph-continuation.types.js";

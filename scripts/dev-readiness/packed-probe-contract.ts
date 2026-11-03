@@ -21,8 +21,8 @@ import {
   snapshotFilesLive,
   SnapshotPointer,
   DevSnapshot,
-} from "@relkit/cli/internal/tooling";
-import type { SnapshotFileOperations } from "@relkit/cli/internal/tooling";
+} from "@relkit/cli/tooling";
+import type { SnapshotFileOperations } from "@relkit/cli/tooling";
 
 /**
  * Selects a real application response from the installed portable snapshot.

@@ -4,7 +4,7 @@
  * factories stay lazy and source rendering never opens a database client.
  */
 
-import type { DatabaseDialect } from "create-relkit/internal/add-types";
+import type { DatabaseDialect } from "create-relkit/add-types";
 import { dirname } from "node:path";
 
 /**

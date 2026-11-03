@@ -1383,197 +1383,6 @@ export * from "./main.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/index.ts#L2)
 
-## `tooling.ts`
-
-Exposes finite native ownership, byte identities and import policy to
-repository tooling through a declared package boundary. These exports acquire
-no CLI session; callers own cancellation, compilation and publication scopes.
-
-### DevSnapshot
-
-**Signature**
-
-```ts
-declare const DevSnapshot: Struct<{
-  readonly version: Literal<1>;
-  readonly fingerprint: String;
-  readonly graphHash: String;
-  readonly graphFile: String;
-  readonly activationFile: String;
-  readonly manifestFile: String;
-  readonly runtimeIntegrationsFile: String;
-  readonly jobsManifestFile: optionalKey<String>;
-  readonly localServicesFile: optionalKey<String>;
-  readonly entrypoint: String;
-  readonly importIndex: String;
-  readonly activation: Struct<{
-    readonly graphHash: String;
-    readonly manifestHash: String;
-    readonly jobsManifestHash: optionalKey<String>;
-    readonly runtimeIntegrationsPlanHash: String;
-    readonly localServicesPlanHash: optionalKey<String>;
-    readonly schemaLibrariesHash: optionalKey<String>;
-  }>;
-  readonly tools: Struct<{
-    readonly layout: Literal<1>;
-    readonly bun: String;
-    readonly effect: String;
-    readonly typescript: String;
-    readonly relkit: String;
-    readonly platform: Literals<
-      readonly ["darwin-arm64", "darwin-x64", "linux-arm64", "linux-x64"]
-    >;
-  }>;
-  readonly inspector: optionalKey<
-    Struct<{
-      readonly enabled: Boolean;
-      readonly connection: Struct<{ readonly host: String; readonly port: Number }>;
-      readonly maxPreviewBytes: Number;
-    }>
-  >;
-  readonly ports: optionalKey<Struct<{ readonly backend: Number }>>;
-  readonly readiness: Union<
-    readonly [
-      Struct<{
-        readonly kind: Literal<"route">;
-        readonly path: String;
-        readonly status: Literal<200>;
-        readonly body: String;
-      }>,
-      Struct<{ readonly kind: Literal<"graph">; readonly routeTableHash: String }>,
-    ]
-  >;
-  readonly inputs: $Array<
-    Struct<{ readonly path: String; readonly hash: String; readonly bytes: Number }>
-  >;
-  readonly typecheckInputs: Struct<{
-    readonly files: $Array<
-      Struct<{ readonly path: String; readonly hash: String; readonly bytes: Number }>
-    >;
-    readonly observations: $Array<
-      Union<
-        readonly [
-          Struct<{
-            readonly kind: Literals<readonly ["fileExists", "directoryExists"]>;
-            readonly path: Union<readonly [String, Literal<".">]>;
-            readonly exists: Boolean;
-          }>,
-          Struct<{
-            readonly kind: Literals<readonly ["directories", "entries"]>;
-            readonly path: Union<readonly [String, Literal<".">]>;
-            readonly entries: $Array<String>;
-          }>,
-        ]
-      >
-    >;
-  }>;
-  readonly dependencies: $Array<
-    Struct<{
-      readonly name: String;
-      readonly version: String;
-      readonly root: String;
-      readonly members: $Array<
-        Struct<{ readonly path: String; readonly hash: String; readonly bytes: Number }>
-      >;
-    }>
-  >;
-  readonly artifacts: $Array<
-    Struct<{ readonly path: String; readonly hash: String; readonly bytes: Number }>
-  >;
-  readonly routeImports: $Array<
-    Struct<{ readonly routeId: String; readonly members: $Array<String> }>
-  >;
-}>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/internal/tooling.ts#L14)
-
-### SnapshotFileOperations
-
-**Signature**
-
-```ts
-declare const SnapshotFileOperations: SnapshotFileOperations;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/internal/tooling.ts#L13)
-
-### SnapshotFiles
-
-**Signature**
-
-```ts
-declare const SnapshotFiles: typeof SnapshotFiles;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/internal/tooling.ts#L12)
-
-### SnapshotPointer
-
-**Signature**
-
-```ts
-declare const SnapshotPointer: Struct<{
-  readonly version: Literal<1>;
-  readonly generation: String;
-}>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/internal/tooling.ts#L14)
-
-### narrowEffectImportPlugin
-
-**Signature**
-
-```ts
-declare const narrowEffectImportPlugin: () => Bun.BunPlugin;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/internal/tooling.ts#L9)
-
-### narrowEffectImports
-
-**Signature**
-
-```ts
-declare const narrowEffectImports: (source: string, path: string) => string;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/internal/tooling.ts#L8)
-
-### ownedNativePromise
-
-**Signature**
-
-```ts
-declare const ownedNativePromise: <A>(
-  operation: string,
-  run: (signal: AbortSignal) => PromiseLike<A>,
-) => Effect<Awaited<A>, CliAdapterError, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/internal/tooling.ts#L6)
-
-### snapshotDigest
-
-**Signature**
-
-```ts
-declare const snapshotDigest: (bytes: Uint8Array | string) => string;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/internal/tooling.ts#L11)
-
-### snapshotFilesLive
-
-**Signature**
-
-```ts
-declare const snapshotFilesLive: Layer<SnapshotFiles, never, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/internal/tooling.ts#L12)
-
 ## `main-generator.ts`
 
 Lazily loads CLI-owned scaffolding after command selection, validates the retained generator facade and preserves the public unavailable-API diagnostic.
@@ -2119,7 +1928,7 @@ declare const normalizeAddRequest: (
 ) => AddRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-options.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-options.ts#L31)
 
 ## `add-output.ts`
 
@@ -2871,7 +2680,7 @@ declare const resolveProjectDependencies: (
 ) => Promise<Readonly<Record<string, string>>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/project-catalog.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/project-catalog.ts#L44)
 
 ### resolveProjectDependenciesEffect
 
@@ -2890,7 +2699,7 @@ declare const resolveProjectDependenciesEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/project-catalog.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/project-catalog.ts#L19)
 
 ## `project-discovery-types.ts`
 
@@ -3097,7 +2906,7 @@ declare const renderDatabase: (
 ) => Promise<RenderedDatabase>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/render-database.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/render-database.ts#L89)
 
 ### renderDatabaseEffect
 
@@ -3117,7 +2926,7 @@ declare const renderDatabaseEffect: (
 ) => Effect.Effect<RenderedDatabase, GeneratorDomainError | GeneratorIoError, GeneratorFileSystem>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/render-database.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/render-database.ts#L37)
 
 ## `render-database.types.ts`
 
@@ -3358,20 +3167,193 @@ export * from "./watcher.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/supervisor/index.ts#L2)
 
-## `proxy-request.ts`
+## `tooling.ts`
 
-### proxyRequest
+Exposes finite native ownership, byte identities and import policy to
+repository tooling through a declared package boundary. These exports acquire
+no CLI session; callers own cancellation, compilation and publication scopes.
 
-Owns one admitted generation through headers and the complete body lifetime.
+### DevSnapshot
 
 **Signature**
 
 ```ts
-declare const proxyRequest: (
-  request: Request,
-  admission: ProxyAdmission,
-  fetcher: typeof fetch,
-) => Effect.Effect<Response, unknown, never>;
+declare const DevSnapshot: Struct<{
+  readonly version: Literal<1>;
+  readonly fingerprint: String;
+  readonly graphHash: String;
+  readonly graphFile: String;
+  readonly activationFile: String;
+  readonly manifestFile: String;
+  readonly runtimeIntegrationsFile: String;
+  readonly jobsManifestFile: optionalKey<String>;
+  readonly localServicesFile: optionalKey<String>;
+  readonly entrypoint: String;
+  readonly importIndex: String;
+  readonly activation: Struct<{
+    readonly graphHash: String;
+    readonly manifestHash: String;
+    readonly jobsManifestHash: optionalKey<String>;
+    readonly runtimeIntegrationsPlanHash: String;
+    readonly localServicesPlanHash: optionalKey<String>;
+    readonly schemaLibrariesHash: optionalKey<String>;
+  }>;
+  readonly tools: Struct<{
+    readonly layout: Literal<1>;
+    readonly bun: String;
+    readonly effect: String;
+    readonly typescript: String;
+    readonly relkit: String;
+    readonly platform: Literals<
+      readonly ["darwin-arm64", "darwin-x64", "linux-arm64", "linux-x64"]
+    >;
+  }>;
+  readonly inspector: optionalKey<
+    Struct<{
+      readonly enabled: Boolean;
+      readonly connection: Struct<{ readonly host: String; readonly port: Number }>;
+      readonly maxPreviewBytes: Number;
+    }>
+  >;
+  readonly ports: optionalKey<Struct<{ readonly backend: Number }>>;
+  readonly readiness: Union<
+    readonly [
+      Struct<{
+        readonly kind: Literal<"route">;
+        readonly path: String;
+        readonly status: Literal<200>;
+        readonly body: String;
+      }>,
+      Struct<{ readonly kind: Literal<"graph">; readonly routeTableHash: String }>,
+    ]
+  >;
+  readonly inputs: $Array<
+    Struct<{ readonly path: String; readonly hash: String; readonly bytes: Number }>
+  >;
+  readonly typecheckInputs: Struct<{
+    readonly files: $Array<
+      Struct<{ readonly path: String; readonly hash: String; readonly bytes: Number }>
+    >;
+    readonly observations: $Array<
+      Union<
+        readonly [
+          Struct<{
+            readonly kind: Literals<readonly ["fileExists", "directoryExists"]>;
+            readonly path: Union<readonly [String, Literal<".">]>;
+            readonly exists: Boolean;
+          }>,
+          Struct<{
+            readonly kind: Literals<readonly ["directories", "entries"]>;
+            readonly path: Union<readonly [String, Literal<".">]>;
+            readonly entries: $Array<String>;
+          }>,
+        ]
+      >
+    >;
+  }>;
+  readonly dependencies: $Array<
+    Struct<{
+      readonly name: String;
+      readonly version: String;
+      readonly root: String;
+      readonly members: $Array<
+        Struct<{ readonly path: String; readonly hash: String; readonly bytes: Number }>
+      >;
+    }>
+  >;
+  readonly artifacts: $Array<
+    Struct<{ readonly path: String; readonly hash: String; readonly bytes: Number }>
+  >;
+  readonly routeImports: $Array<
+    Struct<{ readonly routeId: String; readonly members: $Array<String> }>
+  >;
+}>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/supervisor/proxy-request.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L11)
+
+### SnapshotFileOperations
+
+**Signature**
+
+```ts
+declare const SnapshotFileOperations: SnapshotFileOperations;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L10)
+
+### SnapshotFiles
+
+**Signature**
+
+```ts
+declare const SnapshotFiles: typeof SnapshotFiles;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L9)
+
+### SnapshotPointer
+
+**Signature**
+
+```ts
+declare const SnapshotPointer: Struct<{
+  readonly version: Literal<1>;
+  readonly generation: String;
+}>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L11)
+
+### narrowEffectImportPlugin
+
+**Signature**
+
+```ts
+declare const narrowEffectImportPlugin: () => Bun.BunPlugin;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L7)
+
+### narrowEffectImports
+
+**Signature**
+
+```ts
+declare const narrowEffectImports: (source: string, path: string) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L7)
+
+### ownedNativePromise
+
+**Signature**
+
+```ts
+declare const ownedNativePromise: <A>(
+  operation: string,
+  run: (signal: AbortSignal) => PromiseLike<A>,
+) => Effect<Awaited<A>, CliAdapterError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L6)
+
+### snapshotDigest
+
+**Signature**
+
+```ts
+declare const snapshotDigest: (bytes: Uint8Array | string) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L8)
+
+### snapshotFilesLive
+
+**Signature**
+
+```ts
+declare const snapshotFilesLive: Layer<SnapshotFiles, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L9)

@@ -4,7 +4,7 @@ import {
   checkIntegrationDependencies,
   SelectedDependenciesLive,
   initializeIntegration,
-} from "../../src/app/internal-runtime.js";
+} from "../../src/app/host.js";
 import * as provider from "../../src/provider/dependency-preflight.service.js";
 
 it("preserves selected dependency helper identity through the app runtime facade", () => {

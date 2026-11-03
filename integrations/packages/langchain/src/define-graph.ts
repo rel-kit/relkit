@@ -4,8 +4,8 @@ import type { AnyStateSchema } from "@langchain/langgraph";
 import { createUnboundIdentityEffect } from "relkit/invocation";
 import type { StandardSchemaV1 } from "relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
-import { isRecordEffect } from "relkit/agents/internal/agent-validation-value";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { isRecordEffect } from "relkit/agents/agent-validation-value";
 import { prepareGraphDescriptor } from "./define-graph-build.js";
 import { graphDefinitionFailure } from "./define-graph-error.js";
 import type {

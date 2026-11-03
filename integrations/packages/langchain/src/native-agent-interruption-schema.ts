@@ -2,7 +2,7 @@
 
 import type { JsonValue } from "relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import type {
   DecisionType,
   HitlRequest,

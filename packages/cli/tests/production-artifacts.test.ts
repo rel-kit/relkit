@@ -36,7 +36,7 @@ test("ordinary production emission gives the lazy inspector an assignable bindin
   const source = serverImportsSource(emission);
   expect(source).toContain("let InspectorQueryError;");
   expect(source).not.toContain('from "relkit/inspector-api"');
-  expect(source).toContain('from "relkit/engine/internal/server-runtime"');
+  expect(source).toContain('from "relkit/engine/server-runtime"');
 });
 
 test("build metadata names the emitted JavaScript entrypoint", () => {

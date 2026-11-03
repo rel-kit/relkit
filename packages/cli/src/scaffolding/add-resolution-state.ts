@@ -2,10 +2,10 @@
 
 import { Effect } from "effect";
 
-import { generatorPromptLayer } from "create-relkit/internal/generator-prompt";
-import { createClackPromptDriver } from "create-relkit/internal/prompt-driver";
-import { runGeneratorPromise, runGeneratorSync } from "create-relkit/internal/generator-runtime";
-import type { PromptOption } from "create-relkit/internal/prompt-driver.types";
+import { generatorPromptLayer } from "create-relkit/generator-prompt";
+import { createClackPromptDriver } from "create-relkit/prompt-driver";
+import { runGeneratorPromise, runGeneratorSync } from "create-relkit/generator-runtime";
+import type { PromptOption } from "create-relkit/prompt-driver.types";
 
 import { AddResolutionStateBase } from "./add-resolution-state-base.js";
 

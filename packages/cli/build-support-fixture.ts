@@ -61,7 +61,7 @@ export const createBuildSupportFixture = Effect.fn("BuildSupportTest.create")(fu
           "-e",
           `
 import { Effect, Layer } from "effect";
-import { DependencySourceLive } from "relkit/provider/internal/dependencies";
+import { DependencySourceLive } from "relkit/provider/dependencies";
 import { bundleServerEffect } from ${JSON.stringify(helper)};
 import { fileSystemLayer } from ${JSON.stringify(join(root, "cli/src/services/filesystem.service.ts"))};
 import { processLayer } from ${JSON.stringify(join(root, "cli/src/services/process.service.ts"))};

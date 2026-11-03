@@ -4,7 +4,7 @@
  */
 import { Effect, Ref } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
-import { combineSignals } from "@relkit/testing/internal/runtime-clock";
+import { combineSignals } from "@relkit/testing/runtime-clock";
 import type { ModelScriptOwnedState } from "./agents-model.types.js";
 import type { TestAgentModelCall, TestAgentModelOptions, TestModelTurn } from "./agents-types.js";
 

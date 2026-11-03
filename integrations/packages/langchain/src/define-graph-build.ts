@@ -3,8 +3,8 @@
 import type { AnyStateSchema } from "@langchain/langgraph";
 import { createDescriptorBase, normalizeId } from "relkit/contracts";
 import type { StandardSchemaV1 } from "relkit/schema";
-import { copyAgentClientPolicy, copyAgentControls } from "relkit/agents/internal/agent-client";
-import { assertAgentSchema } from "relkit/agents/internal/agent-validation";
+import { copyAgentClientPolicy, copyAgentControls } from "relkit/agents/agent-client";
+import { assertAgentSchema } from "relkit/agents/agent-validation";
 import { copyAgentLimits } from "./define-agent.js";
 import { prepareGraphDefinition } from "./graph-definition.js";
 import type { GraphEdgeBuilder } from "./graph-edges.js";

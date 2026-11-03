@@ -4,8 +4,8 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { PlanBuilder } from "../../src/scaffolding/plan-builder.js";
-import { SCAFFOLD_DEPENDENCIES } from "create-relkit/internal/scaffold-catalog";
-import type { ScaffoldDependencyName } from "create-relkit/internal/scaffold-catalog.types";
+import { SCAFFOLD_DEPENDENCIES } from "create-relkit/scaffold-catalog";
+import type { ScaffoldDependencyName } from "create-relkit/scaffold-catalog.types";
 
 export async function withProject(
   run: (root: string) => Promise<void>,

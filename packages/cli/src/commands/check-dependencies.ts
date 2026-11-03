@@ -6,7 +6,7 @@
 import { Effect, Schema } from "effect";
 import { prefilterSources } from "../compiler/index.js";
 import { IntegrationDependencyRequirements } from "relkit/contracts";
-import { SelectedDependencies } from "relkit/provider/internal/dependencies";
+import { SelectedDependencies } from "relkit/provider/dependencies";
 import { CliCompiler } from "../services/compiler.service.js";
 import { cliAdapterError, cliTry } from "../cli-errors.js";
 import type { CheckSource } from "./check.types.js";

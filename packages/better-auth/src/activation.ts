@@ -1,7 +1,7 @@
 /** Binds lazy auth declarations to shared or isolated managed native owners.
  * Failed shared acquisition is evicted; successful owners borrow the database lifecycle and preserve native settlement.
  */
-import { drizzleInstrumentationOf, inheritNativeLeases } from "@relkit/drizzle/internal";
+import { drizzleInstrumentationOf, inheritNativeLeases } from "@relkit/drizzle/server";
 import type { Auth } from "better-auth";
 import { Effect, Layer, ManagedRuntime } from "effect";
 import type { BetterAuthActivationOptions } from "./activation.types.js";

@@ -4,25 +4,25 @@ import { Effect } from "effect";
 
 import { observeExecution } from "relkit/contracts/operation";
 
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
 
-import { GeneratorPrompt, generatorPromptLayer } from "create-relkit/internal/generator-prompt";
+import { GeneratorPrompt, generatorPromptLayer } from "create-relkit/generator-prompt";
 
-import { createClackPromptDriver } from "create-relkit/internal/prompt-driver";
+import { createClackPromptDriver } from "create-relkit/prompt-driver";
 
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
   type GeneratorPromptError,
-} from "create-relkit/internal/generator-errors";
+} from "create-relkit/generator-errors";
 
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
 
 import { AddResolutionState } from "./add-resolution-state.js";
 
 import type { ProjectDiscovery } from "./project-discovery-types.js";
-import type { AddKind } from "create-relkit/internal/add-types";
+import type { AddKind } from "create-relkit/add-types";
 
 /** Platform kinds identified by their project, path, or singleton role instead of a name. */
 const NAMELESS_KINDS: ReadonlySet<AddKind> = new Set(["database", "auth", "route", "inspector"]);

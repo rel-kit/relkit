@@ -2,12 +2,12 @@
 
 import type { ProtocolEvent } from "@langchain/langgraph";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { publicToolValueEffect } from "./runtime-native-public-tools.js";
 import type { AgentContentSink } from "./runtime.types.js";
 import { signalFailure, withSignal } from "./signal.js";
-import type { ToolPartState } from "relkit/agents/internal/state.types";
+import type { ToolPartState } from "relkit/agents/state.types";
 
 /** Emits public lifecycle updates for a native tool event.
  * @param event - Native event.

@@ -7,7 +7,7 @@ import {
   ADD_FAILURE_CODES,
   type ScaffoldPlan,
   type ScaffoldVerification,
-} from "create-relkit/internal/add-types";
+} from "create-relkit/add-types";
 
 import type { ApplyScaffoldContext } from "./add-transaction.types.js";
 

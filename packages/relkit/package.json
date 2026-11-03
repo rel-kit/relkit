@@ -38,95 +38,91 @@
       "types": "./dist/agents/client-events.d.ts",
       "import": "./dist/agents/client-events.js"
     },
-    "./agents/internal/agent-client": {
+    "./agents/agent-client": {
       "types": "./dist/agents/agent-client.d.ts",
       "import": "./dist/agents/agent-client.js"
     },
-    "./agents/internal/agent-telemetry": {
+    "./agents/agent-telemetry": {
       "types": "./dist/agents/agent-telemetry.d.ts",
       "import": "./dist/agents/agent-telemetry.js"
     },
-    "./agents/internal/agent-validation": {
+    "./agents/agent-validation": {
       "types": "./dist/agents/agent-validation.d.ts",
       "import": "./dist/agents/agent-validation.js"
     },
-    "./agents/internal/agent-validation-schema": {
+    "./agents/agent-validation-schema": {
       "types": "./dist/agents/agent-validation-schema.d.ts",
       "import": "./dist/agents/agent-validation-schema.js"
     },
-    "./agents/internal/agent-validation-value": {
+    "./agents/agent-validation-value": {
       "types": "./dist/agents/agent-validation-value.d.ts",
       "import": "./dist/agents/agent-validation-value.js"
     },
-    "./agents/internal/approval": {
+    "./agents/approval": {
       "types": "./dist/agents/approval.d.ts",
       "import": "./dist/agents/approval.js"
     },
-    "./agents/internal/capture": {
+    "./agents/capture": {
       "types": "./dist/agents/capture.d.ts",
       "import": "./dist/agents/capture.js"
     },
-    "./agents/internal/capture-policy": {
+    "./agents/capture-policy": {
       "types": "./dist/agents/capture-policy.d.ts",
       "import": "./dist/agents/capture-policy.js"
     },
-    "./agents/internal/client-contract-schema.types": {
+    "./agents/client-contract-schema.types": {
       "types": "./dist/agents/client-contract-schema.types.d.ts",
       "import": "./dist/agents/client-contract-schema.types.js"
     },
-    "./agents/internal/client-events": {
-      "types": "./dist/agents/client-events.d.ts",
-      "import": "./dist/agents/client-events.js"
-    },
-    "./agents/internal/define-agent-error": {
+    "./agents/define-agent-error": {
       "types": "./dist/agents/define-agent-error.d.ts",
       "import": "./dist/agents/define-agent-error.js"
     },
-    "./agents/internal/define-agent-limits": {
+    "./agents/define-agent-limits": {
       "types": "./dist/agents/define-agent-limits.d.ts",
       "import": "./dist/agents/define-agent-limits.js"
     },
-    "./agents/internal/define-agent-support": {
+    "./agents/define-agent-support": {
       "types": "./dist/agents/define-agent-support.d.ts",
       "import": "./dist/agents/define-agent-support.js"
     },
-    "./agents/internal/generated-function": {
+    "./agents/generated-function": {
       "types": "./dist/agents/generated-function.d.ts",
       "import": "./dist/agents/generated-function.js"
     },
-    "./agents/internal/model-selection": {
+    "./agents/model-selection": {
       "types": "./dist/agents/model-selection.d.ts",
       "import": "./dist/agents/model-selection.js"
     },
-    "./agents/internal/observability": {
+    "./agents/observability": {
       "types": "./dist/agents/observability.d.ts",
       "import": "./dist/agents/observability.js"
     },
-    "./agents/internal/runtime-events": {
+    "./agents/runtime-events": {
       "types": "./dist/agents/runtime-events.d.ts",
       "import": "./dist/agents/runtime-events.js"
     },
-    "./agents/internal/state-control-requests.types": {
+    "./agents/state-control-requests.types": {
       "types": "./dist/agents/state-control-requests.types.d.ts",
       "import": "./dist/agents/state-control-requests.types.js"
     },
-    "./agents/internal/state-provider.types": {
+    "./agents/state-provider.types": {
       "types": "./dist/agents/state-provider.types.d.ts",
       "import": "./dist/agents/state-provider.types.js"
     },
-    "./agents/internal/state-receipts.types": {
+    "./agents/state-receipts.types": {
       "types": "./dist/agents/state-receipts.types.d.ts",
       "import": "./dist/agents/state-receipts.types.js"
     },
-    "./agents/internal/state-thread-requests.types": {
+    "./agents/state-thread-requests.types": {
       "types": "./dist/agents/state-thread-requests.types.d.ts",
       "import": "./dist/agents/state-thread-requests.types.js"
     },
-    "./agents/internal/state.types": {
+    "./agents/state.types": {
       "types": "./dist/agents/state.types.d.ts",
       "import": "./dist/agents/state.types.js"
     },
-    "./agents/internal/thread-transition": {
+    "./agents/thread-transition": {
       "types": "./dist/agents/thread-transition.d.ts",
       "import": "./dist/agents/thread-transition.js"
     },
@@ -142,9 +138,9 @@
       "types": "./dist/app/config.d.ts",
       "import": "./dist/app/config.js"
     },
-    "./config/internal/config": {
-      "types": "./dist/config/internal/config.d.ts",
-      "import": "./dist/config/internal/config.js"
+    "./config/resolution": {
+      "types": "./dist/config/resolution.d.ts",
+      "import": "./dist/config/resolution.js"
     },
     "./contracts": {
       "types": "./dist/contracts/index.d.ts",
@@ -174,9 +170,9 @@
       "types": "./dist/engine/index.d.ts",
       "import": "./dist/engine/index.js"
     },
-    "./engine/internal/server-runtime": {
-      "types": "./dist/engine/internal/server-runtime.d.ts",
-      "import": "./dist/engine/internal/server-runtime.js"
+    "./engine/server-runtime": {
+      "types": "./dist/engine/server-runtime.d.ts",
+      "import": "./dist/engine/server-runtime.js"
     },
     "./events": {
       "types": "./dist/app/events.d.ts",
@@ -190,9 +186,9 @@
       "types": "./dist/app/functions.d.ts",
       "import": "./dist/app/functions.js"
     },
-    "./functions/internal": {
-      "types": "./dist/functions/internal.d.ts",
-      "import": "./dist/functions/internal.js"
+    "./functions/descriptor-factory": {
+      "types": "./dist/functions/descriptor-factory.d.ts",
+      "import": "./dist/functions/descriptor-factory.js"
     },
     "./graph": {
       "types": "./dist/graph/index.d.ts",
@@ -206,9 +202,9 @@
       "types": "./dist/inspector-api/connection.d.ts",
       "import": "./dist/inspector-api/connection.js"
     },
-    "./internal/runtime": {
-      "types": "./dist/app/internal-runtime.d.ts",
-      "import": "./dist/app/internal-runtime.js"
+    "./host": {
+      "types": "./dist/app/host.d.ts",
+      "import": "./dist/app/host.js"
     },
     "./invocation": {
       "types": "./dist/invocation/index.d.ts",
@@ -242,7 +238,7 @@
       "types": "./dist/observability/early-records.service.d.ts",
       "import": "./dist/observability/early-records.service.js"
     },
-    "./observability/internal/query": {
+    "./observability/query": {
       "types": "./dist/observability/query-validation.d.ts",
       "import": "./dist/observability/query-validation.js"
     },
@@ -278,7 +274,7 @@
       "types": "./dist/provider/index.d.ts",
       "import": "./dist/provider/index.js"
     },
-    "./provider/internal/dependencies": {
+    "./provider/dependencies": {
       "types": "./dist/provider/dependency-preflight.service.d.ts",
       "import": "./dist/provider/dependency-preflight.service.js"
     },
@@ -318,7 +314,7 @@
       "types": "./dist/runtime-hono/bun.d.ts",
       "import": "./dist/runtime-hono/bun.js"
     },
-    "./runtime-hono/internal/prepared": {
+    "./runtime-hono/prepared": {
       "types": "./dist/runtime-hono/prepared-app.d.ts",
       "import": "./dist/runtime-hono/prepared-app.js"
     },

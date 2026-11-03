@@ -4,13 +4,13 @@ import { Effect } from "effect";
 
 import { observeExecution } from "relkit/contracts/operation";
 
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
 
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
-} from "create-relkit/internal/generator-errors";
+} from "create-relkit/generator-errors";
 
 import { PlanBuilder } from "./plan-builder.js";
 

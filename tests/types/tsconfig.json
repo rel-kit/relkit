@@ -11,57 +11,43 @@
       "relkit": ["packages/relkit/src/index.ts"],
       "relkit/agents": ["packages/relkit/src/app/agents.ts"],
       "relkit/agents/client-events": ["packages/relkit/src/agents/client-events.ts"],
-      "relkit/agents/internal/agent-client": ["packages/relkit/src/agents/agent-client.ts"],
-      "relkit/agents/internal/agent-telemetry": ["packages/relkit/src/agents/agent-telemetry.ts"],
-      "relkit/agents/internal/agent-validation": ["packages/relkit/src/agents/agent-validation.ts"],
-      "relkit/agents/internal/agent-validation-schema": [
+      "relkit/agents/agent-client": ["packages/relkit/src/agents/agent-client.ts"],
+      "relkit/agents/agent-telemetry": ["packages/relkit/src/agents/agent-telemetry.ts"],
+      "relkit/agents/agent-validation": ["packages/relkit/src/agents/agent-validation.ts"],
+      "relkit/agents/agent-validation-schema": [
         "packages/relkit/src/agents/agent-validation-schema.ts"
       ],
-      "relkit/agents/internal/agent-validation-value": [
+      "relkit/agents/agent-validation-value": [
         "packages/relkit/src/agents/agent-validation-value.ts"
       ],
-      "relkit/agents/internal/approval": ["packages/relkit/src/agents/approval.ts"],
-      "relkit/agents/internal/capture": ["packages/relkit/src/agents/capture.ts"],
-      "relkit/agents/internal/capture-policy": ["packages/relkit/src/agents/capture-policy.ts"],
-      "relkit/agents/internal/client-contract-schema.types": [
+      "relkit/agents/approval": ["packages/relkit/src/agents/approval.ts"],
+      "relkit/agents/capture": ["packages/relkit/src/agents/capture.ts"],
+      "relkit/agents/capture-policy": ["packages/relkit/src/agents/capture-policy.ts"],
+      "relkit/agents/client-contract-schema.types": [
         "packages/relkit/src/agents/client-contract-schema.types.ts"
       ],
-      "relkit/agents/internal/client-events": ["packages/relkit/src/agents/client-events.ts"],
-      "relkit/agents/internal/define-agent-error": [
-        "packages/relkit/src/agents/define-agent-error.ts"
-      ],
-      "relkit/agents/internal/define-agent-limits": [
-        "packages/relkit/src/agents/define-agent-limits.ts"
-      ],
-      "relkit/agents/internal/define-agent-support": [
-        "packages/relkit/src/agents/define-agent-support.ts"
-      ],
-      "relkit/agents/internal/generated-function": [
-        "packages/relkit/src/agents/generated-function.ts"
-      ],
-      "relkit/agents/internal/model-selection": ["packages/relkit/src/agents/model-selection.ts"],
-      "relkit/agents/internal/observability": ["packages/relkit/src/agents/observability.ts"],
-      "relkit/agents/internal/runtime-events": ["packages/relkit/src/agents/runtime-events.ts"],
-      "relkit/agents/internal/state-control-requests.types": [
+      "relkit/agents/client-events": ["packages/relkit/src/agents/client-events.ts"],
+      "relkit/agents/define-agent-error": ["packages/relkit/src/agents/define-agent-error.ts"],
+      "relkit/agents/define-agent-limits": ["packages/relkit/src/agents/define-agent-limits.ts"],
+      "relkit/agents/define-agent-support": ["packages/relkit/src/agents/define-agent-support.ts"],
+      "relkit/agents/generated-function": ["packages/relkit/src/agents/generated-function.ts"],
+      "relkit/agents/model-selection": ["packages/relkit/src/agents/model-selection.ts"],
+      "relkit/agents/observability": ["packages/relkit/src/agents/observability.ts"],
+      "relkit/agents/runtime-events": ["packages/relkit/src/agents/runtime-events.ts"],
+      "relkit/agents/state-control-requests.types": [
         "packages/relkit/src/agents/state-control-requests.types.ts"
       ],
-      "relkit/agents/internal/state-provider.types": [
-        "packages/relkit/src/agents/state-provider.types.ts"
-      ],
-      "relkit/agents/internal/state-receipts.types": [
-        "packages/relkit/src/agents/state-receipts.types.ts"
-      ],
-      "relkit/agents/internal/state-thread-requests.types": [
+      "relkit/agents/state-provider.types": ["packages/relkit/src/agents/state-provider.types.ts"],
+      "relkit/agents/state-receipts.types": ["packages/relkit/src/agents/state-receipts.types.ts"],
+      "relkit/agents/state-thread-requests.types": [
         "packages/relkit/src/agents/state-thread-requests.types.ts"
       ],
-      "relkit/agents/internal/state.types": ["packages/relkit/src/agents/state.types.ts"],
-      "relkit/agents/internal/thread-transition": [
-        "packages/relkit/src/agents/thread-transition.ts"
-      ],
+      "relkit/agents/state.types": ["packages/relkit/src/agents/state.types.ts"],
+      "relkit/agents/thread-transition": ["packages/relkit/src/agents/thread-transition.ts"],
       "relkit/buckets": ["packages/relkit/src/app/buckets.ts"],
       "relkit/cache": ["packages/relkit/src/app/cache.ts"],
       "relkit/config": ["packages/relkit/src/app/config.ts"],
-      "relkit/config/internal/config": ["packages/relkit/src/config/internal/config.ts"],
+      "relkit/config/resolution": ["packages/relkit/src/config/resolution.ts"],
       "relkit/contracts": ["packages/relkit/src/contracts/index.ts"],
       "relkit/contracts/jobs": ["packages/relkit/src/contracts/jobs.ts"],
       "relkit/contracts/operation": ["packages/relkit/src/contracts/operation.ts"],
@@ -69,15 +55,15 @@
       "relkit/diagnostics": ["packages/relkit/src/diagnostics/index.ts"],
       "relkit/diagnostics/codes": ["packages/relkit/src/diagnostics/codes/index.ts"],
       "relkit/engine": ["packages/relkit/src/engine/index.ts"],
-      "relkit/engine/internal/server-runtime": [
-        "packages/relkit/src/engine/internal/server-runtime.ts"
-      ],
+      "relkit/engine/server-runtime": ["packages/relkit/src/engine/server-runtime.ts"],
       "relkit/events": ["packages/relkit/src/app/events.ts"],
       "relkit/events/effect": ["packages/relkit/src/events/effect.ts"],
       "relkit/functions": ["packages/relkit/src/app/functions.ts"],
-      "relkit/functions/internal": ["packages/relkit/src/functions/internal.ts"],
+      "relkit/functions/descriptor-factory": [
+        "packages/relkit/src/functions/descriptor-factory.ts"
+      ],
       "relkit/graph": ["packages/relkit/src/graph/index.ts"],
-      "relkit/internal/runtime": ["packages/relkit/src/app/internal-runtime.ts"],
+      "relkit/host": ["packages/relkit/src/app/host.ts"],
       "relkit/invocation": ["packages/relkit/src/invocation/index.ts"],
       "relkit/jobs": ["packages/relkit/src/app/jobs.ts"],
       "relkit/jobs/adapter": ["packages/relkit/src/jobs/adapter.ts"],
@@ -86,9 +72,7 @@
       "relkit/local-service": ["packages/relkit/src/local-service/index.ts"],
       "relkit/observability": ["packages/relkit/src/observability/index.ts"],
       "relkit/observability/early": ["packages/relkit/src/observability/early-records.service.ts"],
-      "relkit/observability/internal/query": [
-        "packages/relkit/src/observability/query-validation.ts"
-      ],
+      "relkit/observability/query": ["packages/relkit/src/observability/query-validation.ts"],
       "relkit/observability/local": ["packages/relkit/src/observability/local/index.ts"],
       "relkit/observability/local/protocol": [
         "packages/relkit/src/observability/local/protocol.ts"
@@ -103,7 +87,7 @@
       "relkit/observability/telemetry": ["packages/relkit/src/observability/telemetry.ts"],
       "relkit/openapi": ["packages/relkit/src/openapi/index.ts"],
       "relkit/provider": ["packages/relkit/src/provider/index.ts"],
-      "relkit/provider/internal/dependencies": [
+      "relkit/provider/dependencies": [
         "packages/relkit/src/provider/dependency-preflight.service.ts"
       ],
       "relkit/providers-local": ["packages/relkit/src/providers-local/index.ts"],
@@ -115,7 +99,7 @@
       "relkit/runtime-hono": ["packages/relkit/src/runtime-hono/index.ts"],
       "relkit/runtime-hono/ag-ui": ["packages/relkit/src/runtime-hono/agent-protocol.ts"],
       "relkit/runtime-hono/bun": ["packages/relkit/src/runtime-hono/bun.ts"],
-      "relkit/runtime-hono/internal/prepared": ["packages/relkit/src/runtime-hono/prepared-app.ts"],
+      "relkit/runtime-hono/prepared": ["packages/relkit/src/runtime-hono/prepared-app.ts"],
       "relkit/runtime-hono/mcp": ["packages/relkit/src/runtime-hono/mcp.ts"],
       "relkit/runtime-hono/scalar": ["packages/relkit/src/runtime-hono/scalar.ts"],
       "relkit/schema": ["packages/relkit/src/app/schema.ts"],
@@ -132,7 +116,7 @@
       "@relkit/drizzle/sqlite": ["packages/drizzle/src/sqlite.ts"],
       "@relkit/drizzle/pg": ["packages/drizzle/src/pg.ts"],
       "@relkit/drizzle/mysql": ["packages/drizzle/src/mysql.ts"],
-      "@relkit/drizzle/internal": ["packages/drizzle/src/internal.ts"],
+      "@relkit/drizzle/server": ["packages/drizzle/src/server.ts"],
       "@relkit/docker": ["integrations/packages/docker/src/index.ts"],
       "@relkit/langchain": ["integrations/packages/langchain/src/index.ts"],
       "@relkit/langchain/testing": ["integrations/packages/langchain/src/testing/agents.ts"],

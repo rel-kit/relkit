@@ -6,7 +6,7 @@
 
 import { Effect } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
-import { scaffoldErrors } from "create-relkit/internal/generator-errors";
+import { scaffoldErrors } from "create-relkit/generator-errors";
 import {
   renderErrorEffect,
   renderEventEffect,
@@ -18,7 +18,7 @@ import {
 import { serviceRequest, serviceTaskExecution } from "./render-service-requests.js";
 import type { PlanBuilder } from "./plan-builder.js";
 import type { DomainArtifact, DomainTarget } from "./domain-planning.types.js";
-import type { ServiceInclude } from "create-relkit/internal/add-types";
+import type { ServiceInclude } from "create-relkit/add-types";
 import type { ServicePrimaryArtifacts } from "./render-service.types.js";
 
 /**

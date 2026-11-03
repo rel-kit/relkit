@@ -2,14 +2,14 @@
 
 import { createDescriptorBase, normalizeId } from "relkit/contracts";
 import type { InferInput, InferOutput, StandardSchemaV1 } from "relkit/schema";
-import { copyAgentInstructions } from "relkit/agents/internal/define-agent-support";
+import { copyAgentInstructions } from "relkit/agents/define-agent-support";
 import { agentClientContractMetadata } from "./client-contract-metadata.js";
-import { assertAgentSchema } from "relkit/agents/internal/agent-validation";
+import { assertAgentSchema } from "relkit/agents/agent-validation";
 import {
   copyAgentChat,
   copyAgentClientPolicy,
   copyAgentControls,
-} from "relkit/agents/internal/agent-client";
+} from "relkit/agents/agent-client";
 import {
   copyAgentMiddleware,
   copyAgentTools,
@@ -19,7 +19,7 @@ import {
 } from "./define-agent-native.js";
 import { normalizeAgentModel } from "./define-agent-validation.js";
 import { copyDeepAgentCapabilities } from "./define-agent-deep.js";
-import { copyAgentLimits } from "relkit/agents/internal/define-agent-limits";
+import { copyAgentLimits } from "relkit/agents/define-agent-limits";
 import type { AgentDescriptor, DefineAgentOptions } from "./define-agent.types.js";
 
 /** Validates agent options and returns an assembler for a resolved identity.

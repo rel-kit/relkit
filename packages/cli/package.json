@@ -51,9 +51,9 @@
       "types": "./dist/cli-help-model.d.ts",
       "import": "./dist/cli-help-model.js"
     },
-    "./internal/tooling": {
-      "types": "./dist/internal/tooling.d.ts",
-      "import": "./dist/internal/tooling.js"
+    "./tooling": {
+      "types": "./dist/tooling.d.ts",
+      "import": "./dist/tooling.js"
     },
     "./scaffolding": {
       "types": "./dist/scaffolding/index.d.ts",
@@ -62,10 +62,6 @@
     "./supervisor": {
       "types": "./dist/supervisor/index.d.ts",
       "import": "./dist/supervisor/index.js"
-    },
-    "./supervisor/internal/request": {
-      "types": "./dist/supervisor/proxy-request.d.ts",
-      "import": "./dist/supervisor/proxy-request.js"
     }
   },
   "dependencies": {

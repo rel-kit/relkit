@@ -83,6 +83,11 @@ The review's starting map is adjusted where the dependency graph requires it:
   `@relkit/app` exported.
 - Until the section 12 codemod migrates them, examples, templates and docs keep importing
   `@relkit/app`, which becomes the thin re-export of `relkit` that the deprecated final release ships.
+- The former `internal/*` subpaths lose their `internal` segment (for example `relkit/host` for the
+  generated server's runtime host, `@relkit/drizzle/server`, `relkit/agents/<module>`). They stay
+  published because the CLI, the Inspector and integrations import them, and
+  `scripts/first-party-exports.ts` lists them so the API reference and Labs checks treat them as
+  first-party-only, not as supported application imports.
 
 - **Alternative:** keep `@relkit/app` as the core name. Rejected: longer imports and it keeps the
   "which RelKit am I on?" problem.

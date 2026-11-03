@@ -1,7 +1,7 @@
 /** Verifies production bundling resolves its actual installed consumer context. */
 import { expect, it } from "@effect/vitest";
 import { Effect, Exit, Layer } from "effect";
-import { DependencySource } from "relkit/provider/internal/dependencies";
+import { DependencySource } from "relkit/provider/dependencies";
 import { bundleServerEffect } from "../../src/commands/build-support.js";
 import { cleanupLayer } from "../../src/services/cleanup.service.js";
 import { CliProcess } from "../../src/services/process.service.js";

@@ -3,7 +3,7 @@ import {
   inheritNativeLeases,
   runSpecializedTrace,
   squashDrizzleCause,
-} from "@relkit/drizzle/internal";
+} from "@relkit/drizzle/server";
 import { Cause, Effect, Exit, type ManagedRuntime } from "effect";
 import { AuthFailure } from "./auth.errors.js";
 

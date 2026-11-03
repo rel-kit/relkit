@@ -1,5 +1,5 @@
 /** Borrows database admission and resolves its existing native declaration brand. */
-import { drizzleRuntimeOf, withDrizzleSqliteWork, withDrizzleWork } from "@relkit/drizzle/internal";
+import { drizzleRuntimeOf, withDrizzleSqliteWork, withDrizzleWork } from "@relkit/drizzle/server";
 import type { Effect } from "effect";
 import type { AuthDatabase } from "./auth.types.js";
 

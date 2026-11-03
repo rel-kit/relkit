@@ -2,7 +2,7 @@
 
 import type { LanguageModelLike } from "@langchain/core/language_models/base";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import { agentModelResolutionFailure } from "./runtime-model-error.js";
 import type {

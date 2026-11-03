@@ -5,7 +5,7 @@ import { responseFormatEffect } from "./runtime-native-response-format.js";
 import type { LanguageModelLike } from "@langchain/core/language_models/base";
 import type { AnyAgentMiddleware } from "langchain";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import type { AgentDescriptor } from "./define-agent.js";
 import { hasDeepAgentCapabilities } from "./define-agent-deep.js";
 import { resolveAgentPersistenceEffect } from "./graph-persistence.js";

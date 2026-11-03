@@ -35,10 +35,6 @@
       "types": "./dist/observability-local/index.d.ts",
       "import": "./dist/observability-local/index.js"
     },
-    "./observability-local/internal/local-worker": {
-      "types": "./dist/observability-local/local/duckdb-worker.d.ts",
-      "import": "./dist/observability-local/local/duckdb-worker.js"
-    },
     "./observability-local/worker": {
       "types": "./dist/observability-local/local/worker.d.ts",
       "import": "./dist/observability-local/local/worker.js"

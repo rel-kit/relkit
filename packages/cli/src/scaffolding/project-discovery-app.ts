@@ -12,7 +12,7 @@ import {
 } from "./project-discovery-app-helpers.js";
 import { dirname, join, resolve } from "node:path";
 import * as ts from "typescript";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 import type { DiscoveredProfile } from "./project-discovery-types.js";
 import { readFactoryObject, staticPropertyName } from "./source-edit.js";
 /** Provider capabilities recognized in static app configuration. */

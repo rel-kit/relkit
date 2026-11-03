@@ -1,5 +1,5 @@
 import { expect, it } from "@effect/vitest";
-import { DrizzleFailure } from "@relkit/drizzle/internal";
+import { DrizzleFailure } from "@relkit/drizzle/server";
 import { Cause, Effect, Layer, ManagedRuntime } from "effect";
 import { runAuthPromise } from "../../src/activation.js";
 import { AuthFailure } from "../../src/auth.errors.js";

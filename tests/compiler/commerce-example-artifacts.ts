@@ -30,7 +30,7 @@ export function assertCommerceArtifacts(run: FixtureCompilation): void {
     "provider.realtime.default",
   ]);
   assertRuntimeIntegrations(run);
-  expect(run.manifest).toContain('from "relkit/internal/runtime";');
+  expect(run.manifest).toContain('from "relkit/host";');
   expect(run.manifest).toContain('from "relkit/agents";');
   expect(run.manifest).not.toMatch(/from "@relkit\/(?:agents|events|invocation)"/);
   expect(run.manifest).not.toContain("providerFactories");

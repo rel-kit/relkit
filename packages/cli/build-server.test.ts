@@ -68,7 +68,7 @@ test("generated runtime carries and verifies its activation fingerprint", () => 
 function assertRuntimeOwnership(source: string): void {
   expect(source).toContain('process.env.RELKIT_WORKER_ROLE ?? "worker"');
   expect(source).toContain('!== "api"');
-  expect(source).toContain('from "relkit/engine/internal/server-runtime"');
+  expect(source).toContain('from "relkit/engine/server-runtime"');
   expect(source).not.toContain("@relkit/cli/");
   expect(source).toContain('runtimeOwner.retry("native-job-registration"');
   expect(source).not.toContain("while (!stopping)");

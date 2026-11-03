@@ -2716,7 +2716,7 @@ assertAgentDescriptor(candidate);
 declare const assertAgentDescriptor: (value: unknown) => asserts value is AgentAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-validation.ts#L83)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-validation.ts#L79)
 
 ### assertAgentDescriptorEffect
 
@@ -2736,7 +2736,7 @@ declare const assertAgentDescriptorEffect: (
 ) => Effect.Effect<void, AgentDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-validation.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-validation.ts#L61)
 
 ### isAgentDescriptor
 
@@ -2754,7 +2754,7 @@ if (isAgentDescriptor(candidate)) use(candidate);
 declare const isAgentDescriptor: (value: unknown) => value is AgentAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-validation.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-validation.ts#L32)
 
 ### isAgentDescriptorEffect
 
@@ -2772,7 +2772,7 @@ Effect.runSync(isAgentDescriptorEffect(candidate));
 declare const isAgentDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-validation.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-validation.ts#L21)
 
 ### normalizeAgentModel
 
@@ -2794,7 +2794,7 @@ const model = normalizeAgentModel("openai:gpt");
 declare const normalizeAgentModel: (value: AgentModel | undefined) => AgentModel | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-validation.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-validation.ts#L108)
 
 ### normalizeAgentModelEffect
 
@@ -2818,7 +2818,7 @@ declare const normalizeAgentModelEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-validation.ts#L96)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-validation.ts#L92)
 
 ## `define-agent.ts`
 
@@ -2871,7 +2871,7 @@ declare const defineAgent: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L104)
 
 Since v0.4.0
 
@@ -2899,7 +2899,7 @@ Since v0.4.0
 declare const AgentChatMapping: AgentChatMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L24)
 
 ### AgentClientPolicy
 
@@ -2909,7 +2909,7 @@ declare const AgentChatMapping: AgentChatMapping;
 declare const AgentClientPolicy: AgentClientPolicy<Guard, StateKey, Events>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L24)
 
 ### AgentClientStateKey
 
@@ -2929,7 +2929,7 @@ declare const AgentClientStateKey: AgentClientStateKey<Middleware>;
 declare const AgentControl: AgentControl;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L24)
 
 ### AgentDescriptor
 
@@ -2947,7 +2947,7 @@ declare const AgentDescriptor: AgentDescriptor<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L31)
 
 ### AgentFilesystemBackend
 
@@ -2957,7 +2957,7 @@ declare const AgentDescriptor: AgentDescriptor<
 declare const AgentFilesystemBackend: AgentFilesystemBackend;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L26)
 
 ### AgentInstructions
 
@@ -2967,7 +2967,7 @@ declare const AgentFilesystemBackend: AgentFilesystemBackend;
 declare const AgentInstructions: AgentInstructions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L32)
 
 ### AgentLimits
 
@@ -2977,7 +2977,7 @@ declare const AgentInstructions: AgentInstructions;
 declare const AgentLimits: AgentLimits;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L33)
 
 ### AgentMiddleware
 
@@ -3027,7 +3027,7 @@ declare const AgentModelFactory: AgentModelFactory<Environment>;
 declare const AgentSubagent: AgentSubagent;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L27)
 
 ### AgentTool
 
@@ -3047,7 +3047,7 @@ declare const AgentTool: AgentTool;
 declare const DeepAgentCapabilities: DeepAgentCapabilities;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L28)
 
 ### DefineAgentOptions
 
@@ -3063,7 +3063,7 @@ declare const DefineAgentOptions: DefineAgentOptions<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L34)
 
 ### NativeAgentTool
 
@@ -3083,7 +3083,7 @@ declare const NativeAgentTool: NativeAgentTool;
 declare const PromptInstructions: PromptInstructions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L35)
 
 ### PromptTemplate
 
@@ -3093,7 +3093,7 @@ declare const PromptInstructions: PromptInstructions;
 declare const PromptTemplate: PromptTemplate;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L36)
 
 ### assertAgentDescriptor
 
@@ -3124,7 +3124,7 @@ declare const copyAgentLimitsEffect: (
   value: unknown,
 ) => Effect.Effect<
   Readonly<{ maxSteps: number; maxToolCalls: number; timeoutMs: number }>,
-  import("relkit/agents/internal/define-agent-error").AgentDefinitionFailure,
+  import("relkit/agents/define-agent-error").AgentDefinitionFailure,
   never
 >;
 ```
@@ -3169,7 +3169,7 @@ declare const defineAgentEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L45)
 
 ### isAgentDescriptor
 
@@ -3216,7 +3216,7 @@ export interface AgentDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L41)
 
 ### AgentInstructions (type alias)
 
@@ -3226,7 +3226,7 @@ export interface AgentDescriptor<
 type AgentInstructions = string | PromptTemplate | PromptInstructions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L31)
 
 ### AgentLimits (interface)
 
@@ -3240,7 +3240,7 @@ export interface AgentLimits {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L34)
 
 ### DefineAgentOptions (interface)
 
@@ -3270,7 +3270,7 @@ export interface DefineAgentOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L67)
 
 ### PromptInstructions (interface)
 
@@ -3285,7 +3285,7 @@ export interface PromptInstructions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L23)
 
 ### PromptTemplate (interface)
 
@@ -3298,7 +3298,7 @@ export interface PromptTemplate {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L17)
 
 ## `define-graph-build.ts`
 
@@ -7189,170 +7189,170 @@ export * from "./runtime.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L20)
 
-### "relkit/agents/internal/agent-client" (namespace export)
+### "relkit/agents/agent-client" (namespace export)
 
-Re-exports all named exports from the "relkit/agents/internal/agent-client" module.
+Re-exports all named exports from the "relkit/agents/agent-client" module.
 
 **Signature**
 
 ```ts
-export * from "relkit/agents/internal/agent-client";
+export * from "relkit/agents/agent-client";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L15)
 
-### "relkit/agents/internal/agent-telemetry" (namespace export)
+### "relkit/agents/agent-telemetry" (namespace export)
 
-Re-exports all named exports from the "relkit/agents/internal/agent-telemetry" module.
+Re-exports all named exports from the "relkit/agents/agent-telemetry" module.
 
 **Signature**
 
 ```ts
-export * from "relkit/agents/internal/agent-telemetry";
+export * from "relkit/agents/agent-telemetry";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L25)
 
-### "relkit/agents/internal/approval" (namespace export)
+### "relkit/agents/approval" (namespace export)
 
-Re-exports all named exports from the "relkit/agents/internal/approval" module.
+Re-exports all named exports from the "relkit/agents/approval" module.
 
 **Signature**
 
 ```ts
-export * from "relkit/agents/internal/approval";
+export * from "relkit/agents/approval";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L17)
 
-### "relkit/agents/internal/client-events" (namespace export)
+### "relkit/agents/client-events" (namespace export)
 
-Re-exports all named exports from the "relkit/agents/internal/client-events" module.
+Re-exports all named exports from the "relkit/agents/client-events" module.
 
 **Signature**
 
 ```ts
-export * from "relkit/agents/internal/client-events";
+export * from "relkit/agents/client-events";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L16)
 
-### "relkit/agents/internal/generated-function" (namespace export)
+### "relkit/agents/generated-function" (namespace export)
 
-Re-exports all named exports from the "relkit/agents/internal/generated-function" module.
+Re-exports all named exports from the "relkit/agents/generated-function" module.
 
 **Signature**
 
 ```ts
-export * from "relkit/agents/internal/generated-function";
+export * from "relkit/agents/generated-function";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L18)
 
-### "relkit/agents/internal/model-selection" (namespace export)
+### "relkit/agents/model-selection" (namespace export)
 
-Re-exports all named exports from the "relkit/agents/internal/model-selection" module.
+Re-exports all named exports from the "relkit/agents/model-selection" module.
 
 **Signature**
 
 ```ts
-export * from "relkit/agents/internal/model-selection";
+export * from "relkit/agents/model-selection";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L26)
 
-### "relkit/agents/internal/observability" (namespace export)
+### "relkit/agents/observability" (namespace export)
 
-Re-exports all named exports from the "relkit/agents/internal/observability" module.
+Re-exports all named exports from the "relkit/agents/observability" module.
 
 **Signature**
 
 ```ts
-export * from "relkit/agents/internal/observability";
+export * from "relkit/agents/observability";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L24)
 
-### "relkit/agents/internal/runtime-events" (namespace export)
+### "relkit/agents/runtime-events" (namespace export)
 
-Re-exports all named exports from the "relkit/agents/internal/runtime-events" module.
+Re-exports all named exports from the "relkit/agents/runtime-events" module.
 
 **Signature**
 
 ```ts
-export * from "relkit/agents/internal/runtime-events";
+export * from "relkit/agents/runtime-events";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L23)
 
-### "relkit/agents/internal/state-control-requests.types" (namespace export)
+### "relkit/agents/state-control-requests.types" (namespace export)
 
-Re-exports all named exports from the "relkit/agents/internal/state-control-requests.types" module.
+Re-exports all named exports from the "relkit/agents/state-control-requests.types" module.
 
 **Signature**
 
 ```ts
-export * from "relkit/agents/internal/state-control-requests.types";
+export * from "relkit/agents/state-control-requests.types";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L27)
 
-### "relkit/agents/internal/state-provider.types" (namespace export)
+### "relkit/agents/state-provider.types" (namespace export)
 
-Re-exports all named exports from the "relkit/agents/internal/state-provider.types" module.
+Re-exports all named exports from the "relkit/agents/state-provider.types" module.
 
 **Signature**
 
 ```ts
-export * from "relkit/agents/internal/state-provider.types";
+export * from "relkit/agents/state-provider.types";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L28)
 
-### "relkit/agents/internal/state-receipts.types" (namespace export)
+### "relkit/agents/state-receipts.types" (namespace export)
 
-Re-exports all named exports from the "relkit/agents/internal/state-receipts.types" module.
+Re-exports all named exports from the "relkit/agents/state-receipts.types" module.
 
 **Signature**
 
 ```ts
-export * from "relkit/agents/internal/state-receipts.types";
+export * from "relkit/agents/state-receipts.types";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L29)
 
-### "relkit/agents/internal/state-thread-requests.types" (namespace export)
+### "relkit/agents/state-thread-requests.types" (namespace export)
 
-Re-exports all named exports from the "relkit/agents/internal/state-thread-requests.types" module.
+Re-exports all named exports from the "relkit/agents/state-thread-requests.types" module.
 
 **Signature**
 
 ```ts
-export * from "relkit/agents/internal/state-thread-requests.types";
+export * from "relkit/agents/state-thread-requests.types";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L30)
 
-### "relkit/agents/internal/state.types" (namespace export)
+### "relkit/agents/state.types" (namespace export)
 
-Re-exports all named exports from the "relkit/agents/internal/state.types" module.
+Re-exports all named exports from the "relkit/agents/state.types" module.
 
 **Signature**
 
 ```ts
-export * from "relkit/agents/internal/state.types";
+export * from "relkit/agents/state.types";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L31)
 
-### "relkit/agents/internal/thread-transition" (namespace export)
+### "relkit/agents/thread-transition" (namespace export)
 
-Re-exports all named exports from the "relkit/agents/internal/thread-transition" module.
+Re-exports all named exports from the "relkit/agents/thread-transition" module.
 
 **Signature**
 
 ```ts
-export * from "relkit/agents/internal/thread-transition";
+export * from "relkit/agents/thread-transition";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/index.ts#L32)
@@ -11316,7 +11316,7 @@ Resolves a pending tool approval for an invocation. @experimental
 
 ```ts
 type AgentApprovalHandler = (
-  approval: import("relkit/agents/internal/approval").PendingApproval,
+  approval: import("relkit/agents/approval").PendingApproval,
 ) => MaybePromise<ApprovalDecision>;
 ```
 
@@ -11340,13 +11340,13 @@ export interface AgentContentSink {
     value: {
       readonly toolCallId: string;
       readonly toolId: string;
-      readonly state: import("relkit/agents/internal/state.types").ToolPartState;
+      readonly state: import("relkit/agents/state.types").ToolPartState;
       readonly value?: unknown;
     },
     signal: AbortSignal,
   ) => MaybePromise<void>;
   readonly emitEvent?: (
-    value: import("relkit/agents/internal/runtime-events").AgentExecutionEvent,
+    value: import("relkit/agents/runtime-events").AgentExecutionEvent,
     signal: AbortSignal,
   ) => MaybePromise<void>;
   readonly emitMessage?: (
@@ -11354,10 +11354,7 @@ export interface AgentContentSink {
     signal: AbortSignal,
   ) => MaybePromise<void>;
   readonly emitWaiting?: (
-    value: Omit<
-      import("relkit/agents/internal/state.types").AgentWaitingState,
-      "revision" | "runId"
-    >,
+    value: Omit<import("relkit/agents/state.types").AgentWaitingState, "revision" | "runId">,
     signal: AbortSignal,
   ) => MaybePromise<void>;
 }
@@ -11403,7 +11400,7 @@ export interface AgentInvocationOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.types.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.types.ts#L82)
 
 ### AgentRuntime (interface)
 
@@ -11420,7 +11417,7 @@ export interface AgentRuntime {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.types.ts#L101)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.types.ts#L98)
 
 ### AgentRuntimeBaseOptions (interface)
 
@@ -11446,7 +11443,7 @@ export interface AgentRuntimeBaseOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.types.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.types.ts#L60)
 
 ### AgentRuntimeOptions (type alias)
 
@@ -11460,7 +11457,7 @@ type AgentRuntimeOptions = AgentRuntimeBaseOptions & {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.types.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime.types.ts#L77)
 
 ### AgentSteeringSource (interface)
 
@@ -12622,7 +12619,7 @@ Network-free model identity, hanging behavior and explicit logging policy. @expe
 ```ts
 export interface TestAgentModelOptions {
   readonly logger?: NonNullable<
-    Parameters<typeof import("@relkit/testing/internal/testing-owner").testingLoggerLayer>[0]
+    Parameters<typeof import("@relkit/testing/testing-owner").testingLoggerLayer>[0]
   >;
   readonly provider?: string;
   readonly modelId?: string;
@@ -12641,7 +12638,7 @@ Native agent, tool engine, model script and capture dependencies.
 ```ts
 export interface TestAgentOptions<Agent extends TestAgentDescriptor = TestAgentDescriptor> {
   readonly logger?: NonNullable<
-    Parameters<typeof import("@relkit/testing/internal/testing-owner").testingLoggerLayer>[0]
+    Parameters<typeof import("@relkit/testing/testing-owner").testingLoggerLayer>[0]
   >;
   readonly agent: Agent;
   readonly tools: AgentRuntimeOptions["tools"];

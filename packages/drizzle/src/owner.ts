@@ -34,7 +34,7 @@ export const owners = new WeakMap<object, OwnerBinding>();
  * import { ManagedRuntime } from "effect";
  * import { sqliteTable, integer } from "drizzle-orm/sqlite-core";
  * import { defineDrizzleService } from "@relkit/drizzle";
- * import { DrizzleOwner, drizzleOwnerLayer, drizzleRuntimeOf } from "@relkit/drizzle/internal";
+ * import { DrizzleOwner, drizzleOwnerLayer, drizzleRuntimeOf } from "@relkit/drizzle/server";
  * const records = sqliteTable("records", { id: integer().primaryKey() });
  * const declaration = drizzleRuntimeOf(defineDrizzleService({ schema: { records }, client: () => ({}) }));
  * const owner = ManagedRuntime.make(drizzleOwnerLayer(declaration, {}));
@@ -129,7 +129,7 @@ export const makeDrizzleOwner = Effect.fn("Drizzle.owner")((client: unknown) =>
  * ```ts
  * import { Effect } from "effect";
  * import { activateDrizzleService } from "@relkit/drizzle";
- * import { withDrizzleWork } from "@relkit/drizzle/internal";
+ * import { withDrizzleWork } from "@relkit/drizzle/server";
  * function borrowedWork(active: Awaited<ReturnType<typeof activateDrizzleService>>) {
  *   return withDrizzleWork(active, Effect.succeed(1));
  * }

@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { Effect, Schema } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
 import { ReadinessBenchmarkError } from "./benchmark-error.js";
-import { snapshotDigest } from "@relkit/cli/internal/tooling";
+import { snapshotDigest } from "@relkit/cli/tooling";
 
 /**
  * Resolves the literal Bun executable and installed CLI plus all package tarballs.

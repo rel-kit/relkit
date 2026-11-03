@@ -7,7 +7,7 @@
  */
 import { resolve } from "node:path";
 import { rm } from "node:fs/promises";
-import { ownedNativePromise } from "@relkit/cli/internal/tooling";
+import { ownedNativePromise } from "@relkit/cli/tooling";
 import { Effect, Layer } from "effect";
 import { preparePackedFixture } from "./dev-readiness/packed-fixture.js";
 import { packedStartRequest, measurePackedSet } from "./dev-readiness/benchmark-packed-measure.js";

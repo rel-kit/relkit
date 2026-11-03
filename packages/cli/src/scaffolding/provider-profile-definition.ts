@@ -1,6 +1,6 @@
 /** Builds provider profile source definitions and their imports from the selected backend so generated configuration has one explicit integration owner. */
 
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 
 import { providerDefinitions, type ProviderDefinition } from "./provider-planning-definitions.js";
 

@@ -1,6 +1,6 @@
 /** Applies the official Better Auth fetch repair only when native auth is selected. */
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
-import { buildCatalogDependency } from "create-relkit/internal/build-catalog";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
+import { buildCatalogDependency } from "create-relkit/build-catalog";
 import type { ScaffoldManifest } from "./plan-manifest.types.js";
 import { Schema } from "effect";
 

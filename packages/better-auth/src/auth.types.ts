@@ -5,7 +5,7 @@ import type {
   DrizzleActivation,
   DrizzleServiceDescriptor,
   DrizzleFailure,
-} from "@relkit/drizzle/internal";
+} from "@relkit/drizzle/server";
 import type { Auth, BetterAuthOptions } from "better-auth";
 import type { DrizzleAdapterConfig } from "better-auth/adapters/drizzle";
 import type { Effect, ManagedRuntime } from "effect";

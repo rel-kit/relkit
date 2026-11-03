@@ -1,6 +1,6 @@
 /** Parses callable, event and service add requests using the existing finite validators. */
 
-import type { AddRequest, AddRequestBase, ServiceInclude } from "create-relkit/internal/add-types";
+import type { AddRequest, AddRequestBase, ServiceInclude } from "create-relkit/add-types";
 import {
   choice,
   many,

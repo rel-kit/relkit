@@ -1,6 +1,6 @@
 import { Effect, Layer } from "effect";
 import { it } from "@effect/vitest";
-import { resolveEnvWithEffectEffect } from "../../src/config/internal/config.js";
+import { resolveEnvWithEffectEffect } from "../../src/config/resolution.js";
 import { describe, expect, test } from "vitest";
 import { defineEnv } from "../../src/config/index.js";
 import {

@@ -3,7 +3,7 @@
 import { executionDeadline } from "./signal-deadline.js";
 import type { MaybePromise } from "relkit/contracts";
 import { Context, Effect, Layer } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import type {

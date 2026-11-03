@@ -1,7 +1,7 @@
 /** Captures original packed response contracts and retains every sequential native measurement and separate restart preparation. */
 import { Effect } from "effect";
 import { rm } from "node:fs/promises";
-import { ownedNativePromise } from "@relkit/cli/internal/tooling";
+import { ownedNativePromise } from "@relkit/cli/tooling";
 import { createPackedProject, type preparePackedFixture } from "./packed-fixture.js";
 import { ReadinessBenchmark } from "./benchmark.service.js";
 import { benchmarkReportEffect } from "./benchmark-report.js";

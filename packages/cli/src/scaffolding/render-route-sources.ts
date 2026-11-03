@@ -1,6 +1,6 @@
 /** Renders HTTP source declarations using the selected physical service boundary. */
 
-import type { RouteMethod } from "create-relkit/internal/add-types";
+import type { RouteMethod } from "create-relkit/add-types";
 import { sourceModule } from "./domain-artifact.js";
 
 /**

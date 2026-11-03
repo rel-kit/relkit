@@ -6,7 +6,7 @@
 
 import type { SourceFactoryKind } from "../compiler/index.js";
 import type { ApplicationLayout } from "relkit/contracts";
-import type { DatabaseDialect } from "create-relkit/internal/add-types";
+import type { DatabaseDialect } from "create-relkit/add-types";
 
 /**
  * Statically discovered service member name and referenced binding.

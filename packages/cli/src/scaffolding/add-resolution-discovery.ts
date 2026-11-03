@@ -2,18 +2,18 @@
 
 import { Effect } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import { GeneratorPrompt, generatorPromptLayer } from "create-relkit/internal/generator-prompt";
-import { createClackPromptDriver } from "create-relkit/internal/prompt-driver";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { GeneratorPrompt, generatorPromptLayer } from "create-relkit/generator-prompt";
+import { createClackPromptDriver } from "create-relkit/prompt-driver";
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
   type GeneratorPromptError,
-} from "create-relkit/internal/generator-errors";
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+} from "create-relkit/generator-errors";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
 import { normalizeArtifactName } from "./add-name.js";
-import type { AddKind } from "create-relkit/internal/add-types";
+import type { AddKind } from "create-relkit/add-types";
 import { AddResolutionState, label } from "./add-resolution-state.js";
 import type {
   DiscoveredArtifact,

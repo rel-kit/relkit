@@ -2,11 +2,11 @@
 
 import { Context, Effect, Layer } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import { scaffoldErrors } from "create-relkit/internal/generator-errors";
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { scaffoldErrors } from "create-relkit/generator-errors";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
 import type { ScaffoldPlanningService } from "./add-plan.types.js";
-import type { AddRequest, ScaffoldPlan } from "create-relkit/internal/add-types";
+import type { AddRequest, ScaffoldPlan } from "create-relkit/add-types";
 import { resolveDomainEffect } from "./domain-planning.js";
 import { PlanBuilder } from "./plan-builder.js";
 import { ProjectDiscoveryServiceTag, projectDiscoveryLive } from "./project-discovery.js";

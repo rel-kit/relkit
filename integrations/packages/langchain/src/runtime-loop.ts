@@ -4,8 +4,8 @@
  */
 import { runAgentLoopCore } from "./runtime-loop-execution.js";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
-import type { AgentCapturePolicy } from "relkit/agents/internal/observability";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import type { AgentCapturePolicy } from "relkit/agents/observability";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import type { AgentLoopOptions, NativeModel } from "./runtime-loop.types.js";
 

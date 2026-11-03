@@ -5,7 +5,7 @@
  */
 
 import { dirname } from "node:path";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 
 import { normalizeArtifactName, type NormalizedArtifactName } from "./add-name.js";
 

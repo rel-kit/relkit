@@ -6,7 +6,7 @@ import {
   nativeCall,
   observeSpecializedOperation,
   redactSpecializedTrace,
-} from "@relkit/drizzle/internal";
+} from "@relkit/drizzle/server";
 import type { Auth } from "better-auth";
 import { Context, Effect, Layer, Schema } from "effect";
 import { AuthFailure } from "./auth.errors.js";

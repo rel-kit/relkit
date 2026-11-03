@@ -5,6 +5,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative, resolve, sep } from "node:path";
 import ts from "typescript";
+import { firstPartyExports } from "./first-party-exports.js";
 import { readPackageTiers, type PackageTier } from "./maturity-packages.js";
 export { readPackageTiers, type PackageTier } from "./maturity-packages.js";
 
@@ -161,7 +162,7 @@ export interface UntaggedExport {
 
 /**
  * Finds exports declared inside Labs packages that lack `@experimental`. Re-exports of another
- * package's declarations are checked where they are declared. `/internal` subpaths are skipped.
+ * package's declarations are checked where they are declared. First-party-only entry points are skipped.
  * @param root - Repository root. @param packages - Labs packages to scan.
  * @returns Untagged exports and entries whose source could not be found.
  */
@@ -302,10 +303,14 @@ function publicEntries(
   area?: string,
 ): { subpath: string; file: string | undefined }[] {
   const manifest = JSON.parse(readFileSync(join(root, directory, "package.json"), "utf8")) as {
+    name: string;
     exports?: Record<string, string | { types?: string; import?: string; default?: string }>;
   };
   return Object.entries(manifest.exports ?? {})
-    .filter(([subpath]) => !subpath.split("/").includes("internal") && !subpath.endsWith(".json"))
+    .filter(
+      ([subpath]) =>
+        !firstPartyExports.has(manifest.name + subpath.slice(1)) && !subpath.endsWith(".json"),
+    )
     .filter(([subpath]) => area === undefined || subpath.split("/")[1] === area)
     .map(([subpath, target]) => {
       const path =

@@ -2,7 +2,7 @@
 
 import type { StandardSchemaV1 } from "relkit/schema";
 import { Effect, Result } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { validateValueEffect } from "./runtime-utils.js";
 
 /** Projects selected state keys from direct or nested native updates.

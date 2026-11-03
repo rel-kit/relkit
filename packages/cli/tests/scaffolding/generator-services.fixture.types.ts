@@ -1,7 +1,7 @@
 /** Describes the concrete file content, mode and checked lookup shared by one isolated scaffolding filesystem fixture; all service methods receive the same request-owned Ref. */
 
 import type { Effect, Ref } from "effect";
-import type { GeneratorIoError } from "create-relkit/internal/generator-errors";
+import type { GeneratorIoError } from "create-relkit/generator-errors";
 
 /** Stored text and native permission bits, copied when the fixture updates its Map. */
 export interface MemoryFileValue {

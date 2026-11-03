@@ -1705,6 +1705,78 @@ export * from "../functions/index.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/functions.ts#L1)
 
+## `host.ts`
+
+Exposes the framework-owned descriptor identity and application context wiring
+needed by emitted hosts, including selected dependency preflight. Re-exports
+preserve identity while resolving framework dependencies from their owning app.
+
+### SelectedDependenciesLive
+
+**Signature**
+
+```ts
+declare const SelectedDependenciesLive: Layer<SelectedDependencies, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L10)
+
+### bindDescriptorIdentity
+
+**Signature**
+
+```ts
+declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: string) => T;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L6)
+
+### checkIntegrationDependencies
+
+**Signature**
+
+```ts
+declare const checkIntegrationDependencies: (
+  plan: RuntimeIntegrationPlan,
+  options: {
+    readonly projectRoot: string;
+    readonly phase: IntegrationDependencyPhase;
+    readonly manager?: DependencyPackageManager;
+  },
+) => Effect<
+  Array<Array<InstalledPackageIdentity>>,
+  DependencyResolutionFailure | SelectedDependencyFailure,
+  SelectedDependencies
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L9)
+
+### createApplicationContextResolver
+
+**Signature**
+
+```ts
+declare const createApplicationContextResolver: (
+  options: ApplicationContextOptions,
+) => ApplicationContextResolver;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L7)
+
+### initializeIntegration
+
+**Signature**
+
+```ts
+declare const initializeIntegration: <Module>(
+  packageName: string,
+  load: () => Promise<Module>,
+) => Effect<Module, SelectedDependencyInitializationFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L11)
+
 ## `index.ts`
 
 ### "../agents/index.js" (namespace export)
@@ -1964,78 +2036,6 @@ declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: stri
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L10)
-
-## `internal-runtime.ts`
-
-Exposes the framework-owned descriptor identity and application context wiring
-needed by emitted hosts, including selected dependency preflight. Re-exports
-preserve identity while resolving framework dependencies from their owning app.
-
-### SelectedDependenciesLive
-
-**Signature**
-
-```ts
-declare const SelectedDependenciesLive: Layer<SelectedDependencies, never, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/internal-runtime.ts#L10)
-
-### bindDescriptorIdentity
-
-**Signature**
-
-```ts
-declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: string) => T;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/internal-runtime.ts#L6)
-
-### checkIntegrationDependencies
-
-**Signature**
-
-```ts
-declare const checkIntegrationDependencies: (
-  plan: RuntimeIntegrationPlan,
-  options: {
-    readonly projectRoot: string;
-    readonly phase: IntegrationDependencyPhase;
-    readonly manager?: DependencyPackageManager;
-  },
-) => Effect<
-  Array<Array<InstalledPackageIdentity>>,
-  DependencyResolutionFailure | SelectedDependencyFailure,
-  SelectedDependencies
->;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/internal-runtime.ts#L9)
-
-### createApplicationContextResolver
-
-**Signature**
-
-```ts
-declare const createApplicationContextResolver: (
-  options: ApplicationContextOptions,
-) => ApplicationContextResolver;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/internal-runtime.ts#L7)
-
-### initializeIntegration
-
-**Signature**
-
-```ts
-declare const initializeIntegration: <Module>(
-  packageName: string,
-  load: () => Promise<Module>,
-) => Effect<Module, SelectedDependencyInitializationFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/internal-runtime.ts#L11)
 
 ## `jobs-legacy.ts`
 

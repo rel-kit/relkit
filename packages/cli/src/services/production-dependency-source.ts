@@ -2,7 +2,7 @@
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Effect } from "effect";
-import type { DependencySourceContract } from "relkit/provider/internal/dependencies";
+import type { DependencySourceContract } from "relkit/provider/dependencies";
 
 /**
  * Resolves selected packages from consumers, with one fixed framework owner exception.

@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { cliTry } from "../cli-errors.js";
 import type { ProcessCapabilities } from "../services/process.types.js";
-import { HTTP_TRANSPORT_REQUIREMENTS } from "relkit/runtime-hono/internal/prepared";
+import { HTTP_TRANSPORT_REQUIREMENTS } from "relkit/runtime-hono/prepared";
 
 /**
  * Bundles one emitted server and preserves the native diagnostic on failure.

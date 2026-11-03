@@ -6,7 +6,7 @@ import type {
   DeepAgentBucketMetadata,
 } from "./deepagent-bucket-files.types.js";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
 import { DeepAgentBucket, deepAgentBucketLayer } from "./deepagent-bucket-service.js";
 import { bucketKey, filePath, virtualPath } from "./deepagent-bucket-files.js";

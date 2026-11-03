@@ -5,8 +5,8 @@
 import { normalizeId } from "relkit/contracts";
 import { frameworkTrace } from "relkit/invocation";
 import { Effect } from "effect";
-import { createAgentCapturePolicyEffect } from "relkit/agents/internal/capture-policy";
-import { generatedAgentFunctionId } from "relkit/agents/internal/generated-function";
+import { createAgentCapturePolicyEffect } from "relkit/agents/capture-policy";
+import { generatedAgentFunctionId } from "relkit/agents/generated-function";
 import { signalFailure, validateValue, withSignal } from "./runtime-utils.js";
 import { acquireExecutionSignalEffect, ExecutionSignalClockLive } from "./signal.js";
 import { agentInvocationFailure } from "./runtime-effect-error.js";

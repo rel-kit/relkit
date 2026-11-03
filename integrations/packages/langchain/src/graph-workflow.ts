@@ -3,7 +3,7 @@
 import { END, START } from "@langchain/langgraph";
 import type { JsonValue } from "relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { isFunctionGraphNode, type FunctionGraphNodeDescriptor } from "relkit/functions";
 import { getJsonSchema, type StandardSchemaV1 } from "relkit/schema";
 import type { GraphNodeAny } from "./define-graph-node.js";

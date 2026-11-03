@@ -2,11 +2,8 @@
 
 import type { Effect } from "effect";
 import type { ProjectDiscovery } from "./project-discovery-types.js";
-import type {
-  GeneratorDomainError,
-  GeneratorIoError,
-} from "create-relkit/internal/generator-errors";
-import type { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import type { GeneratorDomainError, GeneratorIoError } from "create-relkit/generator-errors";
+import type { GeneratorFileSystem } from "create-relkit/generator-filesystem";
 
 /** Facts needed to establish physical bucket ownership. */
 export type BucketDiscovery = Pick<ProjectDiscovery, "projectRoot" | "artifacts" | "profiles">;

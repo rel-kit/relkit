@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { applyScaffoldPlan } from "../../src/scaffolding/add-transaction.js";
 import { normalizeAddRequest } from "../../src/scaffolding/add-options.js";
-import { AddScaffoldError, type ScaffoldPlan } from "create-relkit/internal/add-types";
+import { AddScaffoldError, type ScaffoldPlan } from "create-relkit/add-types";
 import {
   installerServer,
   prepareInstaller,

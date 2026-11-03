@@ -3,16 +3,16 @@
 import { agentOptionsEffect } from "./add-resolver-agent.js";
 import { Effect } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import { GeneratorPrompt, generatorPromptLayer } from "create-relkit/internal/generator-prompt";
-import { createClackPromptDriver } from "create-relkit/internal/prompt-driver";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { GeneratorPrompt, generatorPromptLayer } from "create-relkit/generator-prompt";
+import { createClackPromptDriver } from "create-relkit/prompt-driver";
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
   type GeneratorPromptError,
-} from "create-relkit/internal/generator-errors";
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+} from "create-relkit/generator-errors";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
 import { artifactOptions, artifacts, selectedDomain } from "./add-resolution-discovery.js";
 import { AddResolutionState, choices } from "./add-resolution-state.js";
 import type { ProjectDiscovery } from "./project-discovery-types.js";

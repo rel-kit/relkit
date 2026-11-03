@@ -46,7 +46,6 @@ function ownExports(directoryName: string, packageName?: string): ReleaseExports
       [".", rootExport],
       ...appSubpaths.map((subpath) => {
         if (subpath === "jobs/legacy") return [`./${subpath}`, leaf("jobs-legacy")];
-        if (subpath === "internal/runtime") return [`./${subpath}`, leaf("internal-runtime")];
         return [`./${subpath}`, leaf(subpath)];
       }),
     ]);

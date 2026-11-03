@@ -2,8 +2,8 @@
 
 import { validate, type InferOutput, type StandardSchemaV1 } from "relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
-import { isRecord } from "relkit/agents/internal/agent-validation";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { isRecord } from "relkit/agents/agent-validation";
 import { graphNodeValidationFailure } from "./graph-node-validation-error.js";
 
 /** Checks that native command destinations were declared by the node.

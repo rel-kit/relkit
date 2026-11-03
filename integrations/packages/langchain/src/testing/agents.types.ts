@@ -13,7 +13,7 @@ import type {
 import type { spanSnapshot } from "relkit/invocation";
 import type { JsonValue } from "relkit/contracts";
 import type { InferInput, InferOutput } from "relkit/schema";
-import type { TestFailureControls } from "@relkit/testing/internal/fakes";
+import type { TestFailureControls } from "@relkit/testing/fakes";
 
 /** Native agent descriptor vocabulary retained by public test inference. @experimental */
 export type TestAgentDescriptor = AgentDescriptor<string, unknown, unknown>;
@@ -39,7 +39,7 @@ export type TestModelTurn =
 /** Network-free model identity, hanging behavior and explicit logging policy. @experimental */
 export interface TestAgentModelOptions {
   readonly logger?: NonNullable<
-    Parameters<typeof import("@relkit/testing/internal/testing-owner").testingLoggerLayer>[0]
+    Parameters<typeof import("@relkit/testing/testing-owner").testingLoggerLayer>[0]
   >;
   readonly provider?: string;
   readonly modelId?: string;
@@ -73,7 +73,7 @@ export interface TestAgentModel {
  */
 export interface TestAgentOptions<Agent extends TestAgentDescriptor = TestAgentDescriptor> {
   readonly logger?: NonNullable<
-    Parameters<typeof import("@relkit/testing/internal/testing-owner").testingLoggerLayer>[0]
+    Parameters<typeof import("@relkit/testing/testing-owner").testingLoggerLayer>[0]
   >;
   readonly agent: Agent;
   readonly tools: AgentRuntimeOptions["tools"];

@@ -27,23 +27,23 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./internal/fakes": {
+    "./fakes": {
       "types": "./dist/fakes.d.ts",
       "import": "./dist/fakes.js"
     },
-    "./internal/jobs-utils": {
+    "./jobs-utils": {
       "types": "./dist/jobs-utils.d.ts",
       "import": "./dist/jobs-utils.js"
     },
-    "./internal/runtime-clock": {
+    "./runtime-clock": {
       "types": "./dist/runtime-clock.d.ts",
       "import": "./dist/runtime-clock.js"
     },
-    "./internal/testing-owner": {
+    "./testing-owner": {
       "types": "./dist/testing-owner.d.ts",
       "import": "./dist/testing-owner.js"
     },
-    "./internal/work-ownership": {
+    "./work-ownership": {
       "types": "./dist/work-ownership.d.ts",
       "import": "./dist/work-ownership.js"
     },

@@ -2,7 +2,7 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Effect } from "effect";
-import { DependencySource } from "relkit/provider/internal/dependencies";
+import { DependencySource } from "relkit/provider/dependencies";
 import { cliAdapterError } from "../cli-errors.js";
 import { cleanupEffect } from "../services/cleanup.service.js";
 import type { FileSystemCapabilities } from "../services/filesystem.types.js";

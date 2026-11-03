@@ -3,9 +3,9 @@
 import type { ProtocolEvent } from "@langchain/langgraph";
 import type { StandardSchemaV1 } from "relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
-import type { AgentExecutionEvent } from "relkit/agents/internal/runtime-events";
+import type { AgentExecutionEvent } from "relkit/agents/runtime-events";
 import { publicToolValue } from "./runtime-native-public-tools.js";
 import { selectedStateEffect } from "./runtime-native-public-state.js";
 import type { NativeExecutionContext } from "./runtime-native-public.types.js";

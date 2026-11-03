@@ -14,7 +14,7 @@ import { parseJobsManifest } from "./build-jobs.js";
 import { rebaseManifest } from "./build-support.js";
 import { preparedRuntimeManifest } from "./build-prepared-manifest.js";
 import { captureProductionDependencies } from "./build-production-dependencies.js";
-import { selectedHttpCapabilities } from "relkit/runtime-hono/internal/prepared";
+import { selectedHttpCapabilities } from "relkit/runtime-hono/prepared";
 import type { BuildStageCohort, BuildStageInputs } from "./build.types.js";
 import { captureProductionRepairs } from "./build-production-repairs.js";
 

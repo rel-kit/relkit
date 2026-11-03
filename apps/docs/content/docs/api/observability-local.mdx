@@ -527,12 +527,6 @@ declare const makeDuckdbWorkerEffect: () => Effect.Effect<
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-effect.ts#L20)
 
-## `duckdb-worker.ts`
-
-Owns duckdb worker for the optional local history store.
-Shared records and query contracts come from lightweight observability; native
-handles and worker lifetimes remain owned by this storage package.
-
 ## `worker-client-effect.ts`
 
 Acquires the optional isolated Node worker and exposes shared structural effects.

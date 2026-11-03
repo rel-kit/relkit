@@ -11,7 +11,7 @@ import { buildCapabilitiesLayer } from "./project-capabilities.js";
 import type { ProjectCapabilities } from "./project.types.js";
 import { SnapshotFiles, snapshotFilesLive } from "../dev-snapshot/snapshot-files.service.js";
 import { checkProjectWithCurrentReceiptEffect } from "../dev-snapshot/snapshot-check-execution.js";
-import { DependencySource, SelectedDependencies } from "relkit/provider/internal/dependencies";
+import { DependencySource, SelectedDependencies } from "relkit/provider/dependencies";
 
 /** Project authoring domain; compilation/build resources belong to individual operation scopes. */
 export class CliProject extends Context.Service<CliProject, ProjectCapabilities>()(

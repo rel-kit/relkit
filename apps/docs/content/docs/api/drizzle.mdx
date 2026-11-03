@@ -41,7 +41,7 @@ declare const activateDrizzleService: <
 ) => Promise<DrizzleActivation<Service>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activate.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activate.ts#L9)
 
 ## `activation.ts`
 
@@ -248,7 +248,7 @@ Executes a compatibility edge retaining original native rejection identity.
 
 ```ts
 import { Effect, Layer, ManagedRuntime } from "effect";
-import { runDrizzlePromise } from "@relkit/drizzle/internal";
+import { runDrizzlePromise } from "@relkit/drizzle/server";
 const owner = ManagedRuntime.make(Layer.empty);
 try {
   await runDrizzlePromise(owner, Effect.succeed(1));
@@ -592,241 +592,6 @@ declare const defineModel: <
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L7)
-
-## `internal.ts`
-
-Server-only runtime ownership, typed failures and borrowed-work composition.
-
-### DrizzleActivation
-
-**Signature**
-
-```ts
-declare const DrizzleActivation: DrizzleActivation<Service>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L6)
-
-### DrizzleFailure
-
-**Signature**
-
-```ts
-declare const DrizzleFailure: typeof DrizzleFailure;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L9)
-
-### DrizzleOwner
-
-**Signature**
-
-```ts
-declare const DrizzleOwner: typeof DrizzleOwner;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L11)
-
-### DrizzleOwnerInterface
-
-**Signature**
-
-```ts
-declare const DrizzleOwnerInterface: DrizzleOwnerInterface;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L18)
-
-### DrizzleServiceDescriptor
-
-**Signature**
-
-```ts
-declare const DrizzleServiceDescriptor: DrizzleServiceDescriptor<Id, Client, Schema, Models>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L8)
-
-### activateDrizzleService
-
-**Signature**
-
-```ts
-declare const activateDrizzleService: <
-  Service extends DrizzleServiceDescriptor<any, any, any, any>,
->(
-  service: Service,
-  env: Readonly<Record<string, unknown>>,
-  options?: DrizzleActivationOptions,
-) => Promise<DrizzleActivation<Service>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L5)
-
-### drizzleInstrumentationOf
-
-**Signature**
-
-```ts
-declare const drizzleInstrumentationOf: (activation: object) => Context<never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L14)
-
-### drizzleOwnerLayer
-
-**Signature**
-
-```ts
-declare const drizzleOwnerLayer: (
-  declaration: DrizzleServiceRuntime,
-  env: Readonly<Record<string, unknown>>,
-) => Layer<DrizzleOwner, DrizzleFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L12)
-
-### drizzleRuntimeOf
-
-**Signature**
-
-```ts
-declare const drizzleRuntimeOf: (value: object) => DrizzleServiceRuntime;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L7)
-
-### inheritNativeLeases
-
-**Signature**
-
-```ts
-declare const inheritNativeLeases: <A, E, R>(effect: Effect<A, E, R>) => Effect<A, E, R>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L21)
-
-### nativeCall
-
-**Signature**
-
-```ts
-declare const nativeCall: <A>(
-  operation: string,
-  run: () => A | PromiseLike<A>,
-) => Effect<A, DrizzleFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L9)
-
-### observeSpecializedOperation
-
-**Signature**
-
-```ts
-declare const observeSpecializedOperation: <A, E, R>(
-  operation: `database.${string}` | `auth.${string}`,
-  effect: Effect<A, E, R>,
-) => Effect<A, E, R>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L17)
-
-### operationEffect
-
-**Signature**
-
-```ts
-declare const operationEffect: (
-  binding: ModelBinding,
-  name: string,
-  args: unknown,
-) => Effect<unknown, DrizzleFailure>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L19)
-
-### redactSpecializedTrace
-
-**Signature**
-
-```ts
-declare const redactSpecializedTrace: <A, E, R>(
-  effect: Effect<A, E, R>,
-) => Effect<A, E, Exclude<R, never>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L22)
-
-### runDrizzlePromise
-
-**Signature**
-
-```ts
-declare const runDrizzlePromise: <A, E, R, ER>(
-  runtime: ManagedRuntime<R, ER>,
-  effect: Effect<A, E, R>,
-  options?: RunOptions,
-) => Promise<A>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L9)
-
-### runDrizzleWorkPromise
-
-**Signature**
-
-```ts
-declare const runDrizzleWorkPromise: <A, E>(activation: object, effect: Effect<A, E>) => Promise<A>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L15)
-
-### runSpecializedTrace
-
-**Signature**
-
-```ts
-declare const runSpecializedTrace: <A>(operation: string, run: () => Promise<A>) => Promise<A>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L17)
-
-### squashDrizzleCause
-
-**Signature**
-
-```ts
-declare const squashDrizzleCause: <E>(cause: Cause<E>) => unknown;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L9)
-
-### withDrizzleSqliteWork
-
-**Signature**
-
-```ts
-declare const withDrizzleSqliteWork: <A, E, R>(
-  activation: object,
-  effect: Effect<A, E, R>,
-) => Effect<A, E | DrizzleFailure, R>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L20)
-
-### withDrizzleWork
-
-**Signature**
-
-```ts
-declare const withDrizzleWork: <A, E, R>(
-  activation: object,
-  effect: Effect<A, E, R>,
-) => Effect<A, E | DrizzleFailure, R>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L13)
 
 ## `metadata.ts`
 
@@ -1317,7 +1082,7 @@ Observes specialized work once through the configured caller sinks.
 
 ```ts
 import { Effect } from "effect";
-import { observeSpecializedOperation } from "@relkit/drizzle/internal";
+import { observeSpecializedOperation } from "@relkit/drizzle/server";
 await Effect.runPromise(observeSpecializedOperation("auth.session", Effect.succeed(null)));
 ```
 
@@ -1357,7 +1122,7 @@ Compose a page with an existing owner and table binding
 ```ts
 import { Effect } from "effect";
 import type { ManagedRuntime } from "effect";
-import { DrizzleFailure, DrizzleOwner, operationEffect, runDrizzlePromise } from "@relkit/drizzle/internal";
+import { DrizzleFailure, DrizzleOwner, operationEffect, runDrizzlePromise } from "@relkit/drizzle/server";
 function page(owner: ManagedRuntime.ManagedRuntime<DrizzleOwner, DrizzleFailure>, binding: Parameters<typeof operationEffect>[0]) {
   return runDrizzlePromise(owner, Effect.gen(function* () {
     const service = yield* DrizzleOwner;
@@ -1782,7 +1547,7 @@ Acquires one client into a Layer scope.
 import { ManagedRuntime } from "effect";
 import { sqliteTable, integer } from "drizzle-orm/sqlite-core";
 import { defineDrizzleService } from "@relkit/drizzle";
-import { DrizzleOwner, drizzleOwnerLayer, drizzleRuntimeOf } from "@relkit/drizzle/internal";
+import { DrizzleOwner, drizzleOwnerLayer, drizzleRuntimeOf } from "@relkit/drizzle/server";
 const records = sqliteTable("records", { id: integer().primaryKey() });
 const declaration = drizzleRuntimeOf(
   defineDrizzleService({ schema: { records }, client: () => ({}) }),
@@ -1866,7 +1631,7 @@ Compose work with an existing activation
 ```ts
 import { Effect } from "effect";
 import { activateDrizzleService } from "@relkit/drizzle";
-import { withDrizzleWork } from "@relkit/drizzle/internal";
+import { withDrizzleWork } from "@relkit/drizzle/server";
 function borrowedWork(active: Awaited<ReturnType<typeof activateDrizzleService>>) {
   return withDrizzleWork(active, Effect.succeed(1));
 }
@@ -2162,6 +1927,241 @@ export interface TableMetadata {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/runtime-types.ts#L14)
+
+## `server.ts`
+
+Server-only runtime ownership, typed failures and borrowed-work composition.
+
+### DrizzleActivation
+
+**Signature**
+
+```ts
+declare const DrizzleActivation: DrizzleActivation<Service>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L6)
+
+### DrizzleFailure
+
+**Signature**
+
+```ts
+declare const DrizzleFailure: typeof DrizzleFailure;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L9)
+
+### DrizzleOwner
+
+**Signature**
+
+```ts
+declare const DrizzleOwner: typeof DrizzleOwner;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L11)
+
+### DrizzleOwnerInterface
+
+**Signature**
+
+```ts
+declare const DrizzleOwnerInterface: DrizzleOwnerInterface;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L18)
+
+### DrizzleServiceDescriptor
+
+**Signature**
+
+```ts
+declare const DrizzleServiceDescriptor: DrizzleServiceDescriptor<Id, Client, Schema, Models>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L8)
+
+### activateDrizzleService
+
+**Signature**
+
+```ts
+declare const activateDrizzleService: <
+  Service extends DrizzleServiceDescriptor<any, any, any, any>,
+>(
+  service: Service,
+  env: Readonly<Record<string, unknown>>,
+  options?: DrizzleActivationOptions,
+) => Promise<DrizzleActivation<Service>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L5)
+
+### drizzleInstrumentationOf
+
+**Signature**
+
+```ts
+declare const drizzleInstrumentationOf: (activation: object) => Context<never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L14)
+
+### drizzleOwnerLayer
+
+**Signature**
+
+```ts
+declare const drizzleOwnerLayer: (
+  declaration: DrizzleServiceRuntime,
+  env: Readonly<Record<string, unknown>>,
+) => Layer<DrizzleOwner, DrizzleFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L12)
+
+### drizzleRuntimeOf
+
+**Signature**
+
+```ts
+declare const drizzleRuntimeOf: (value: object) => DrizzleServiceRuntime;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L7)
+
+### inheritNativeLeases
+
+**Signature**
+
+```ts
+declare const inheritNativeLeases: <A, E, R>(effect: Effect<A, E, R>) => Effect<A, E, R>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L21)
+
+### nativeCall
+
+**Signature**
+
+```ts
+declare const nativeCall: <A>(
+  operation: string,
+  run: () => A | PromiseLike<A>,
+) => Effect<A, DrizzleFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L9)
+
+### observeSpecializedOperation
+
+**Signature**
+
+```ts
+declare const observeSpecializedOperation: <A, E, R>(
+  operation: `database.${string}` | `auth.${string}`,
+  effect: Effect<A, E, R>,
+) => Effect<A, E, R>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L17)
+
+### operationEffect
+
+**Signature**
+
+```ts
+declare const operationEffect: (
+  binding: ModelBinding,
+  name: string,
+  args: unknown,
+) => Effect<unknown, DrizzleFailure>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L19)
+
+### redactSpecializedTrace
+
+**Signature**
+
+```ts
+declare const redactSpecializedTrace: <A, E, R>(
+  effect: Effect<A, E, R>,
+) => Effect<A, E, Exclude<R, never>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L22)
+
+### runDrizzlePromise
+
+**Signature**
+
+```ts
+declare const runDrizzlePromise: <A, E, R, ER>(
+  runtime: ManagedRuntime<R, ER>,
+  effect: Effect<A, E, R>,
+  options?: RunOptions,
+) => Promise<A>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L9)
+
+### runDrizzleWorkPromise
+
+**Signature**
+
+```ts
+declare const runDrizzleWorkPromise: <A, E>(activation: object, effect: Effect<A, E>) => Promise<A>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L15)
+
+### runSpecializedTrace
+
+**Signature**
+
+```ts
+declare const runSpecializedTrace: <A>(operation: string, run: () => Promise<A>) => Promise<A>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L17)
+
+### squashDrizzleCause
+
+**Signature**
+
+```ts
+declare const squashDrizzleCause: <E>(cause: Cause<E>) => unknown;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L9)
+
+### withDrizzleSqliteWork
+
+**Signature**
+
+```ts
+declare const withDrizzleSqliteWork: <A, E, R>(
+  activation: object,
+  effect: Effect<A, E, R>,
+) => Effect<A, E | DrizzleFailure, R>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L20)
+
+### withDrizzleWork
+
+**Signature**
+
+```ts
+declare const withDrizzleWork: <A, E, R>(
+  activation: object,
+  effect: Effect<A, E, R>,
+) => Effect<A, E | DrizzleFailure, R>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L13)
 
 ## `service.ts`
 

@@ -2,9 +2,9 @@
 
 import type { JsonValue } from "relkit/contracts";
 import { Effect, Metric, Schema } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import type { GraphWaitingInterrupt } from "./graph-interruption.types.js";
-import type { AgentWaitingRequest } from "relkit/agents/internal/state.types";
+import type { AgentWaitingRequest } from "relkit/agents/state.types";
 
 export type { GraphWaitingInterrupt } from "./graph-interruption.types.js";
 

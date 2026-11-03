@@ -7,7 +7,7 @@ import { Effect, Layer } from "effect";
 import { DEFAULT_TOOLING_CONFIG } from "../src/compiler/index.js";
 import { GRAPH_VERSION } from "relkit/contracts";
 import { hashGraph } from "relkit/graph";
-import { DependencySource, SelectedDependenciesLayer } from "relkit/provider/internal/dependencies";
+import { DependencySource, SelectedDependenciesLayer } from "relkit/provider/dependencies";
 import { fileSystemLayer } from "../src/services/filesystem.service.js";
 import { loadBuildStageCohort } from "../src/commands/build-stage-cohort.js";
 

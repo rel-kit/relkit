@@ -8,8 +8,8 @@ import {
   runExecutionPromise,
   runExecutionSync,
 } from "relkit/contracts/operation";
-import { disposeTestingOwner, testingLoggerLayer } from "@relkit/testing/internal/testing-owner";
-import { combineSignals } from "@relkit/testing/internal/runtime-clock";
+import { disposeTestingOwner, testingLoggerLayer } from "@relkit/testing/testing-owner";
+import { combineSignals } from "@relkit/testing/runtime-clock";
 import type { AgentHarnessService } from "./agent-harness.types.js";
 
 import { createTestModel } from "./agents-model.js";

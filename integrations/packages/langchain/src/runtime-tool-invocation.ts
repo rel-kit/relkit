@@ -10,7 +10,7 @@ import {
 } from "relkit/invocation";
 import type { ToolDescriptor, ToolEngine, ToolEngineInvocation } from "relkit/tools";
 import { Effect } from "effect";
-import { ApprovalDeniedError } from "relkit/agents/internal/approval";
+import { ApprovalDeniedError } from "relkit/agents/approval";
 import { agentInvocationFailure, type AgentInvocationFailure } from "./runtime-effect-error.js";
 import { createAgentInvocationDispatcherEffect } from "./runtime-tool-dispatcher.js";
 import { emitToolEffect, resolveAgentApproval } from "./runtime-tool-events.js";

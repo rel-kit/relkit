@@ -5,7 +5,7 @@
 import { getJsonSchema, type StandardSchemaV1 } from "relkit/schema";
 import { providerStrategy, toolStrategy } from "langchain";
 import { Effect } from "effect";
-import { observeAgent } from "relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import type { NativeModel } from "./runtime-loop.types.js";

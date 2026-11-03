@@ -8,7 +8,7 @@ import {
   nativeCall,
   observeSpecializedOperation,
   squashDrizzleCause,
-} from "@relkit/drizzle/internal";
+} from "@relkit/drizzle/server";
 import type { JsonValue } from "relkit/contracts";
 import type { Auth } from "better-auth";
 import { Cause, Context, Effect, Exit, Layer } from "effect";

@@ -2,6 +2,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import { Schema } from "effect";
+import { firstPartyExports } from "../../../scripts/first-party-exports.js";
 import { workspacePackageDirectories } from "../../../scripts/workspace-packages.js";
 import { PublicApiManifest } from "./public-api.schemas.js";
 import type { PublicImport } from "./public-api.types.js";
@@ -71,7 +72,7 @@ export function publicManifests(root: string): PublicImport[] {
         /unsupported internal|^internal |^empty compatibility|^deprecated/i.test(
           manifest.description,
         ) ||
-        /\/internal(?:\/|$)/.test(subpath) ||
+        firstPartyExports.has(manifest.name + (subpath === "." ? "" : subpath.slice(1))) ||
         (manifest.name === "relkit" && INTERNAL_RELKIT_AREAS.has(subpath.split("/")[1] ?? "")) ||
         (manifest.name !== "@relkit/inspector" &&
           MERGED_AREAS[manifest.name]?.includes(subpath.split("/")[1] ?? "") === true),

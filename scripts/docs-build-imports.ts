@@ -15,7 +15,9 @@ const consumerHelpers = new Set([
  */
 export function isDocumentationBuildImport(source: string, target: string): boolean {
   if (source === "apps/docs/scripts/public-api-manifests.ts")
-    return target === "scripts/workspace-packages.js";
+    return (
+      target === "scripts/workspace-packages.js" || target === "scripts/first-party-exports.js"
+    );
   if (source === "apps/docs/scripts/maturity-table.ts") return target === "scripts/maturity.js";
   if (source === "apps/docs/scripts/installation-catalog.ts")
     return target === "packages/relkit/src/runtime-hono/selected-transports.js";

@@ -1,14 +1,14 @@
 /**
  * Defines pure authoring and integration subpath inventories for release checks.
  * Export rendering owns conditions and dist mappings; these lists authorize only
- * intentional entry points, including the prepared server's internal app leaf.
+ * intentional entry points, including the prepared server's host leaf.
  */
 
-/** Application authoring and internal runtime leaves required by packed manifests. */
+/** Application authoring and host runtime leaves required by packed manifests. */
 export const appSubpaths = [
   "schema",
   "config",
-  "internal/runtime",
+  "host",
   "routes",
   "functions",
   "events",

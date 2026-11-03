@@ -1,6 +1,6 @@
 /** Normalizes selected resource options into the add request consumed by provider and artifact planners, preserving explicit author choices. */
 
-import type { AddRequest } from "create-relkit/internal/add-types";
+import type { AddRequest } from "create-relkit/add-types";
 import { choice, one, optional, usage } from "./add-options-parser.js";
 
 /**

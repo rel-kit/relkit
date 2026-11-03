@@ -4,7 +4,7 @@
  * fallback authorities import lazily when the existing supervisor receives edits.
  */
 import { Layer } from "effect";
-import { DependencySourceLive } from "relkit/provider/internal/dependencies";
+import { DependencySourceLive } from "relkit/provider/dependencies";
 import { devSessionCapabilitiesLayer } from "../commands/dev-session-engine.js";
 import { snapshotFilesLive } from "./snapshot-files.service.js";
 import { snapshotEpochsLive } from "./snapshot-epoch.service.js";

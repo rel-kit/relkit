@@ -16,7 +16,7 @@ import type { SnapshotCompilationOperations } from "./snapshot-compilation.types
 import { SnapshotFiles } from "./snapshot-files.service.js";
 import { checkSnapshotProjectEffect } from "./snapshot-check-execution.js";
 import { readSnapshotCheckReceipt } from "./snapshot-check-receipt.js";
-import { DependencySource, SelectedDependencies } from "relkit/provider/internal/dependencies";
+import { DependencySource, SelectedDependencies } from "relkit/provider/dependencies";
 
 /** Preparation-only compiler authority, replaceable through the same test Layer contract. */
 export class SnapshotCompilation extends Context.Service<

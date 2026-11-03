@@ -18,7 +18,7 @@ export function assertGuardedRuntimeImports(
   const preflight = "await Effect.runPromise(checkIntegrationDependencies(";
   const completion = ".pipe(Effect.provide(SelectedDependenciesLive)));";
   const preflightEnd = source.indexOf(completion);
-  expect(source).toContain('from "relkit/internal/runtime";');
+  expect(source).toContain('from "relkit/host";');
   expect(source).not.toContain('from "@relkit/provider/');
   expect(source.split(preflight)).toHaveLength(2);
   expect(preflightEnd).toBeGreaterThan(source.indexOf(preflight));
@@ -26,10 +26,10 @@ export function assertGuardedRuntimeImports(
   expect(source).toContain('projectRoot: fileURLToPath(new URL(".", import.meta.url))');
   expect(source).toContain('phase: "runtime"');
   expect(
-    [...source.matchAll(/(?:from|import)\s+["'](@?relkit\/[^"']+\/runtime)["']/g)].map(
+    [...source.matchAll(/(?:from|import)\s+["'](relkit\/host|@?relkit\/[^"']+\/runtime)["']/g)].map(
       (match) => match[1],
     ),
-  ).toEqual(["relkit/internal/runtime"]);
+  ).toEqual(["relkit/host"]);
   const modules = new Map(
     registrations.map((entry) => [
       JSON.stringify([entry.packageName, entry.packageVersion, entry.exportName]),

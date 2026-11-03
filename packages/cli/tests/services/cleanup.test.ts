@@ -1,7 +1,7 @@
 /** Verifies build failures and published artifacts retain separate cleanup evidence. */
 import { expect, it } from "@effect/vitest";
 import { Effect, Exit, Layer } from "effect";
-import { DependencySourceLive } from "relkit/provider/internal/dependencies";
+import { DependencySourceLive } from "relkit/provider/dependencies";
 import { CliAdapterError } from "../../src/cli-errors.js";
 import { CliCleanup, cleanupLayer } from "../../src/services/cleanup.service.js";
 import { CliProcess } from "../../src/services/process.service.js";

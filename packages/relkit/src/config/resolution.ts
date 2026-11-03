@@ -1,12 +1,12 @@
 import { Config, ConfigProvider, Effect, Option } from "effect";
-import { observeConfig } from "../config-observability.js";
-import type { EnvDefinition, EnvShape } from "../env.types.js";
+import { observeConfig } from "./config-observability.js";
+import type { EnvDefinition, EnvShape } from "./env.types.js";
 import {
   EnvResolutionError,
   resolveEnvEffect,
   type EnvSource,
   type ResolvedEnv,
-} from "../resolve.js";
+} from "./resolve.js";
 
 /** Resolve through an explicit Effect ConfigProvider.
  * @param definition - Value-free field declaration.

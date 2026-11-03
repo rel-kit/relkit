@@ -6,14 +6,14 @@ import {
   modelScriptReplaceEffect,
 } from "./agents-model-operations.js";
 import { ScriptedChatModel } from "./agents-model-native.js";
-import { combineSignals } from "@relkit/testing/internal/runtime-clock";
+import { combineSignals } from "@relkit/testing/runtime-clock";
 import { Context, Effect, Layer, ManagedRuntime, Ref } from "effect";
 import {
   observeExecution,
   runExecutionPromise,
   runExecutionSync,
 } from "relkit/contracts/operation";
-import { disposeTestingOwner, testingLoggerLayer } from "@relkit/testing/internal/testing-owner";
+import { disposeTestingOwner, testingLoggerLayer } from "@relkit/testing/testing-owner";
 
 import type { ModelScriptService, RuntimeTestAgentModel } from "./agents-model.types.js";
 
