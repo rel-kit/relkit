@@ -59,7 +59,8 @@ for (const failure of ["none", "performance", "measurement", "report", "final-ch
       join(root, "packages/create-relkit/src/create-capabilities.ts"),
       "utf8",
     );
-    const restartPath = join(fixture, entry.restartEvidence);
+    const restartPath = join(fixture, "test-results/evidence", entry.restartEvidence);
+    const summaryPath = join(fixture, "docs/evidence/create-capabilities/9.9.9.md");
     try {
       await mkdir(dirname(sourcePath), { recursive: true });
       await writeFile(sourcePath, source);
@@ -91,6 +92,9 @@ for (const failure of ["none", "performance", "measurement", "report", "final-ch
         await certifyCreation(fixture, fixtureEntry, run);
         expect(calls).toHaveLength(5);
         expect(JSON.parse(await readFile(restartPath, "utf8")).fixture.version).toBe("9.9.9");
+        expect(await readFile(summaryPath, "utf8")).toContain(
+          "# create-relkit 9.9.9 creation evidence",
+        );
       } else {
         await expect(
           certifyCreation(
@@ -102,7 +106,10 @@ for (const failure of ["none", "performance", "measurement", "report", "final-ch
         ).rejects.toThrow();
         expect(await readFile(sourcePath, "utf8")).toBe(source);
         expect(await readFile(restartPath, "utf8")).toBe("previous report bytes\n");
-        expect(await Bun.file(join(fixture, entry.freshEvidence)).exists()).toBe(false);
+        expect(
+          await Bun.file(join(fixture, "test-results/evidence", entry.freshEvidence)).exists(),
+        ).toBe(false);
+        expect(await Bun.file(summaryPath).exists()).toBe(false);
       }
     } finally {
       await rm(fixture, { recursive: true, force: true });

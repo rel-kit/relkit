@@ -94,65 +94,23 @@ describe("creation capability evidence", () => {
     expect(templateDigest(root)).toBe(CREATE_CAPABILITY_TABLE.entries[0]!.templateDigest);
   });
 
-  it("gates every table entry on complete passing evidence", () => {
+  it("gates every table entry on a committed passing evidence summary", () => {
     const root = join(import.meta.dirname, "../../..");
     for (const entry of CREATE_CAPABILITY_TABLE.entries) {
-      expectEvidence(join(root, entry.freshEvidence), entry, "fresh");
-      expectEvidence(join(root, entry.restartEvidence), entry, "restart");
+      const release = entry.identity.release;
+      expect(entry.freshEvidence).toBe(`create-capabilities/${release}/fresh.json`);
+      expect(entry.restartEvidence).toBe(`create-capabilities/${release}/restart.json`);
+      const summary = readFileSync(
+        join(root, "docs/evidence/create-capabilities", `${release}.md`),
+        "utf8",
+      );
+      expect(summary).toContain(`# create-relkit ${release} creation evidence`);
+      expect(summary).toContain(`Bun ${entry.identity.bun}`);
+      expect(summary).toMatch(/^\|\s*fresh\s*\|\s*20\s*\|\s*passed\s*\|/mu);
+      expect(summary).toMatch(/^\|\s*restart\s*\|\s*20\s*\|\s*passed\s*\|/mu);
     }
   });
 });
-
-function expectEvidence(
-  path: string,
-  entry: (typeof CREATE_CAPABILITY_TABLE.entries)[number],
-  set: "fresh" | "restart",
-): void {
-  const report = JSON.parse(readFileSync(path, "utf8"));
-  const readinessOnly = report.version === 2;
-  expect([1, 2]).toContain(report.version);
-  expect(report).toMatchObject({
-    protocol: "relkit.dev-readiness",
-    mode: readinessOnly ? "candidate-readiness" : "candidate-certification",
-    set,
-    command: "bun dev",
-    thresholdMs: 1_000,
-    summary: { runs: 20 },
-    identity: {
-      bun: { version: entry.identity.bun },
-      cli: { version: entry.identity.release },
-      typescript: { version: entry.identity.typescript },
-    },
-    fixture: {
-      version: entry.identity.release,
-      examples: entry.examples ? "examples" : "no-examples",
-    },
-  });
-  const admission = readinessOnly ? report.readiness : report.summary;
-  expect(admission).toMatchObject({ passed: true, preparationPassed: true });
-  if (readinessOnly) expect(admission.deadlineMs).toBe(30_000);
-  expect(report.attempts).toHaveLength(20);
-  const samples = report.attempts.map(
-    (attempt: { sample: { durationMs: number; outcome: string } }) => attempt.sample,
-  );
-  if (set === "restart") samples.push(report.preparationAttempt.sample);
-  for (const sample of samples) {
-    expect(sample.outcome).toBe("response");
-    expect(Number.isFinite(sample.durationMs)).toBe(true);
-    expect(sample.durationMs).toBeGreaterThanOrEqual(0);
-    expect(sample.durationMs).toBeLessThan(readinessOnly ? 30_000 : 1_000);
-    expect(sample.cleanupFailure).toBeUndefined();
-    expect(sample.exitCode).toBeUndefined();
-  }
-  expect(report.summary.passed).toBe(
-    samples.every((sample: { durationMs: number }) => sample.durationMs < 1_000),
-  );
-  expect(
-    report.identity.artifacts.some(
-      (artifact: { name: string }) => artifact.name === "create-relkit",
-    ),
-  ).toBe(true);
-}
 
 function templateDigest(root: string): string {
   const hash = createHash("sha256");

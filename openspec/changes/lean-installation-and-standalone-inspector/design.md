@@ -50,7 +50,7 @@ These paths do not permit agent execution SDKs in inspector tooling. The final p
 
 ### Mandatory use-effect guidance
 
-Every future code change is guided by [use-effect](/Users/mustafaelsayed/.codex/skills/use-effect/SKILL.md), its binding references/prerequisites, repository [Effect guidance](/Users/mustafaelsayed/Workspace/relkit/.agents/skills/effect/SKILL.md), root/nearest `AGENTS.md` and [boundary guidance](/Users/mustafaelsayed/Workspace/relkit/.agents/skills/konsistent-config/SKILL.md). Read task-specific references before coding; this is not satisfied by adding imports.
+Every future code change is guided by [use-effect](../../../.agents/skills/use-effect/SKILL.md), its binding references/prerequisites, repository [Effect guidance](../../../.agents/skills/effect/SKILL.md), root/nearest `AGENTS.md` and [boundary guidance](../../../.agents/skills/konsistent-config/SKILL.md). Read task-specific references before coding; this is not satisfied by adding imports.
 
 Use cohesive Context services, service-owned construction, typed Effect methods/workflows, live/test Layers and scoped execution where responsibilities warrant them. Effect owns state, failures, concurrency, retries and acquired resources; public ordinary TypeScript authoring, pure helpers, UI presentation and thin SDK/Promise adapters retain appropriate boundaries. Do not wrap unchanged Promise orchestration in nominal services.
 

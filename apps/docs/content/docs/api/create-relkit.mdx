@@ -815,9 +815,9 @@ export interface CreateCapabilityEvidence extends CreateCapabilityTuple {
   readonly identity: CreateCapabilityIdentity;
   /** SHA-256 over ordered template paths and their complete bytes. */
   readonly templateDigest: string;
-  /** Repository-relative complete 20-attempt fresh report. */
+  /** Complete 20-attempt fresh report, relative to the release's evidence reports. */
   readonly freshEvidence: string;
-  /** Repository-relative complete 20-attempt restart report. */
+  /** Complete 20-attempt restart report, relative to the release's evidence reports. */
   readonly restartEvidence: string;
 }
 ```

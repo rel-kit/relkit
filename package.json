@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "turbo run dev",
-    "check": "bun run scripts/check-boundaries.ts && bun run scripts/maturity.ts",
+    "check": "bun run scripts/check-boundaries.ts && bun run scripts/maturity.ts && bun run scripts/repository-hygiene.ts && bun run scripts/agent-skills.ts && bun run scripts/dependency-policy.ts && bun run scripts/file-size.ts",
     "typecheck": "tsc -b --pretty false && bun packages/cli/dist/bin.js check --project-root examples/commerce --json",
     "lint": "bun run scripts/lint.ts",
     "lint:fix": "bun x eslint --fix eslint.config.mjs apps/docs/postcss.config.mjs apps/inspector/postcss.config.mjs scripts/jobs-coverage/stryker.config.mjs && bun run lint",

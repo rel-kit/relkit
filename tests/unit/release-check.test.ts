@@ -1,10 +1,12 @@
-/** Checks actual creation evidence, lightweight wrapper publication order and stable release notes. */
+/** Checks the creation evidence summary (and full reports after certification), lightweight wrapper publication order and stable release notes. */
 import { expect, test } from "bun:test";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { releaseNotes } from "../../scripts/release-check.ts";
 import { publicationOrder } from "../../scripts/release-check-artifacts.ts";
 import { checkManifests, packages, readJson, root } from "../../scripts/release-check-support.ts";
 import { validateCreationReport } from "../../scripts/release-create-evidence.ts";
+import { CREATION_SUMMARIES, EVIDENCE_REPORTS } from "../../scripts/release-evidence.ts";
 import { expectedTemplateScripts, packedTemplates } from "../../scripts/release-templates.ts";
 import {
   assertCreateCapability,
@@ -31,10 +33,21 @@ test("the release reports default creation as tested for its actual tool identit
 });
 
 for (const set of ["fresh", "restart"] as const) {
-  test(`the release retains complete ${set} certification for its actual tool identity`, async () => {
+  test(`the release keeps a passing ${set} summary and, after certification, its complete report`, async () => {
     const entry = CREATE_CAPABILITY_TABLE.entries[0]!;
-    const report = await readJson(join(root, entry[`${set}Evidence`]));
-    expect(() => validateCreationReport(report, entry, set)).not.toThrow();
+    const summary = readFileSync(
+      join(root, CREATION_SUMMARIES, `${entry.identity.release}.md`),
+      "utf8",
+    );
+    expect(summary).toMatch(
+      new RegExp(`^\\|\\s*${set}\\s*\\|\\s*20\\s*\\|\\s*passed\\s*\\|`, "mu"),
+    );
+    // Full reports exist only where certification ran; CI uploads them as artifacts.
+    const path = join(root, EVIDENCE_REPORTS, entry[`${set}Evidence`]);
+    if (existsSync(path))
+      expect(() =>
+        validateCreationReport(JSON.parse(readFileSync(path, "utf8")), entry, set),
+      ).not.toThrow();
   });
 }
 

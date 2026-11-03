@@ -57,10 +57,11 @@ jobs:
           name: create-certification-${{ github.sha }}
           path: |
             packages/create-relkit/src/create-capabilities.ts
-            docs/evidence/create-capabilities/${{ steps.identity.outputs.version }}/fresh.json
-            docs/evidence/create-capabilities/${{ steps.identity.outputs.version }}/restart.json
+            docs/evidence/create-capabilities/${{ steps.identity.outputs.version }}.md
+            test-results/evidence/create-capabilities/${{ steps.identity.outputs.version }}/fresh.json
+            test-results/evidence/create-capabilities/${{ steps.identity.outputs.version }}/restart.json
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 90
       - name: Preserve failed certification reports
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -254,6 +255,61 @@ jobs:
           bun run test:docs
           bun --cwd=apps/docs run build
 
+  quickstart-changes:
+    name: Detect quickstart changes
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: diff
+        name: Check whether the quickstart or what it runs changed
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          pattern='^(CONTRIBUTING\.md|package\.json|bun\.lock|turbo\.json|scripts/(build|contributor-quickstart)\.ts|\.github/workflows/checks\.yml)$'
+          if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -qE "$pattern"; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  contributor-quickstart:
+    name: Contributor quickstart
+    needs: quickstart-changes
+    if: >-
+      !cancelled() &&
+      (github.event_name != 'pull_request' || needs.quickstart-changes.outputs.changed == 'true')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    env:
+      TURBO_CONCURRENCY: "1"
+      VITEST_MAX_WORKERS: "1"
+      NODE_OPTIONS: --max-old-space-size=2048
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - name: Run the CONTRIBUTING quickstart in this clean checkout
+        run: bun scripts/contributor-quickstart.ts
+
   dependency-review:
     name: Dependency review
     if: github.event_name == 'pull_request' && github.event.repository.visibility == 'public'
@@ -329,6 +385,8 @@ jobs:
         release-readiness,
         creation-changes,
         creation-canary,
+        quickstart-changes,
+        contributor-quickstart,
       ]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -344,6 +402,8 @@ jobs:
       DEPENDENCY_UPDATE_RESULT: ${{ needs.dependency-update.result }}
       CREATION_CHANGES_RESULT: ${{ needs.creation-changes.result }}
       CREATION_CANARY_RESULT: ${{ needs.creation-canary.result }}
+      QUICKSTART_CHANGES_RESULT: ${{ needs.quickstart-changes.result }}
+      CONTRIBUTOR_QUICKSTART_RESULT: ${{ needs.contributor-quickstart.result }}
     steps:
       - name: Require fast safety jobs
         run: |
@@ -357,6 +417,8 @@ jobs:
           test "$DEPENDENCY_UPDATE_RESULT" = success -o "$DEPENDENCY_UPDATE_RESULT" = skipped
           test "$CREATION_CHANGES_RESULT" = success || test "$CREATION_CHANGES_RESULT" = skipped
           test "$CREATION_CANARY_RESULT" = success || test "$CREATION_CANARY_RESULT" = skipped
+          test "$QUICKSTART_CHANGES_RESULT" = success || test "$QUICKSTART_CHANGES_RESULT" = skipped
+          test "$CONTRIBUTOR_QUICKSTART_RESULT" = success || test "$CONTRIBUTOR_QUICKSTART_RESULT" = skipped
 
   dispatch-release:
     name: Dispatch release after manual main CI

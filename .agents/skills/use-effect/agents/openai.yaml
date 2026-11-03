@@ -1,0 +1,4 @@
+interface:
+  display_name: "Use Effect"
+  short_description: "Effect services, Context, typed errors, and lifetimes"
+  default_prompt: "Use $use-effect to implement the requested feature or refactor the supplied path using Effect domain services with explicit Context requirements and typed tagged-error policies while implementing the requested behavior, preserving existing contracts except for requested changes, and maintaining observable interruptible workflows, live/test layers, organized types/schemas, and checked documentation and tests."

@@ -44,7 +44,7 @@ export function consumerBenchmarkOptions(
     repository,
     manager,
     output: resolve(
-      option(args, "--output") ?? `${repository}/docs/evidence/lean-install/${stage}.json`,
+      option(args, "--output") ?? `${repository}/test-results/evidence/lean-install/${stage}.json`,
     ),
     inventoryOnly: args.includes("--inventory-only"),
     retainInstallations: args.includes("--retain-installations"),

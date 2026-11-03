@@ -93,6 +93,6 @@ test("the pull request template and CONTRIBUTING record the feature freeze", asy
   const template = await readFile(join(root, ".github/pull_request_template.md"), "utf8");
   expect(template).toMatch(/new feature area[^\n]*approved OpenSpec change/iu);
   const contributing = await readFile(join(root, "CONTRIBUTING.md"), "utf8");
-  expect(contributing).toContain("## Feature freeze until 1.0");
+  expect(contributing).toContain("## Stop-doing rules until 1.0");
   expect(contributing).toContain("https://relkit.dev/docs/maturity");
 });
