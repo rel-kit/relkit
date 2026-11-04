@@ -146,7 +146,7 @@ not tasks of this change.
 - [x] 13.8 Make `relkit dev --prepare` a finite check without snapshots and update the `--no-install` next steps, and verify the post-install workflow test
 - [x] 13.9 Delete the snapshot cache (`packages/cli/src/dev-snapshot`, including `snapshot-commerce-eligibility.ts`) once the budgets hold, and verify the first-start budget test passes without it
 - [x] 13.10 Enforce the reload and memory budgets in CI, and verify the job fails on an injected-delay fixture
-- [ ] 13.11 Document how the dev loop reloads and when it restarts, and verify the docs build
+- [x] 13.11 Document how the dev loop reloads and when it restarts, and verify the docs build
 
 ## 14. Node runtime (#10, Tier 1)
 
