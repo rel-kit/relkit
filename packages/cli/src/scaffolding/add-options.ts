@@ -20,6 +20,8 @@ const SIDE_EFFECTS = ["none", "read", "write", "external"] as const;
 const APPROVALS = ["never", "on-write", "always"] as const;
 /** Supported database dialects. */
 const DIALECTS = ["sqlite", "postgresql", "mysql"] as const;
+/** Providers `relkit add jobs` and `relkit add events` can select. */
+const PROVIDERS = ["postgres", "local"] as const;
 /** Supported route methods. */
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"] as const;
 /**
@@ -126,6 +128,15 @@ function platformRequest(
     case "inspector":
       if (parsed.positional !== undefined) usage("inspector does not accept a name.");
       return { ...common, kind: "inspector" };
+    case "jobs":
+    case "events":
+      if (parsed.positional !== undefined) usage(`${parsed.kind} does not accept a name.`);
+      return {
+        ...common,
+        kind: parsed.kind,
+        provider: choice(one(values, "provider"), "provider", PROVIDERS, "local")!,
+        ...optional("profile", one(values, "profile")),
+      };
   }
 }
 

@@ -158,7 +158,8 @@ export function defaultProviderProfile(
   provider?: string,
   source?: "docker" | "connected" | "aws",
 ): string {
-  if (provider === "cloudflare-kv" || provider === "cloudflare-r2") return provider;
+  if (provider === "cloudflare-kv" || provider === "cloudflare-r2" || provider === "postgres")
+    return provider;
   if (source === "connected") return capability === "cache" ? "redis" : "s3";
   if (source === "aws") return "aws";
   return "local";

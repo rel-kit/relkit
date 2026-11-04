@@ -79,4 +79,5 @@ export const integrationSubpaths: Readonly<Record<string, readonly string[]>> = 
   "@relkit/inngest": ["runtime", "local-recipe", "deployment"],
   "@relkit/trigger": ["runtime", "local-recipe", "deployment"],
   "@relkit/effect-mq": ["runtime", "local-recipe", "deployment"],
+  "@relkit/postgres": ["runtime", "drizzle"],
 };

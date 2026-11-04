@@ -177,7 +177,7 @@ not tasks of this change.
 - [x] 16.3 Implement durable events with per-consumer delivery and the transactional outbox through Drizzle, and verify rollback and partial-failure tests
 - [x] 16.4 Implement one run per schedule occurrence with a unique occurrence key, and verify a two-instance test
 - [x] 16.5 Support workers in the web process and as a separate role, and verify both modes in tests
-- [ ] 16.6 Add `relkit add jobs --provider postgres` and the events equivalent as transactional edits, and verify the add tests including rollback
+- [x] 16.6 Add `relkit add jobs --provider postgres` and the events equivalent as transactional edits, and verify the add tests including rollback
 - [ ] 16.7 Make production builds warn when jobs, events or schedules use the local filesystem provider, and verify the build warning test
 - [ ] 16.8 Document the Postgres backend, at-least-once delivery and idempotency keys, and verify the docs examples compile
 

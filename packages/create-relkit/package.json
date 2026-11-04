@@ -213,6 +213,7 @@
       "@relkit/inngest": "0.8.3",
       "@relkit/trigger": "0.8.3",
       "@relkit/effect-mq": "0.8.3",
+      "@relkit/postgres": "0.1.0",
       "@relkit/better-auth": "0.8.4",
       "@relkit/cloudflare": "0.7.14",
       "@relkit/drizzle": "0.8.3",
@@ -269,6 +270,11 @@
       {
         "id": "otlp",
         "package": "@relkit/otlp",
+        "maturity": "labs"
+      },
+      {
+        "id": "postgres",
+        "package": "@relkit/postgres",
         "maturity": "labs"
       },
       {

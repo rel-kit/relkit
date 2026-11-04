@@ -255,6 +255,13 @@ Decided while applying section 16 (maintainer, 2026-11-05):
   authored URL. Not verified here: a full `relkit build` and `relkit start` of an application on
   this provider; the worker-mode tests build the providers through the same runtime integration
   the server uses, with a child process as the worker instance.
+- **`relkit add jobs` and `relkit add events` add provider profiles.** They take
+  `--provider postgres|local` (default `local`) and `--profile` (default: the provider name), and
+  reuse the add transaction: the profile in `relkit.config.ts`, `@relkit/postgres` in
+  `package.json` and the `DATABASE_URL` secret in the env module are planned together, installed
+  and verified, and restored byte for byte when any step fails. The new profile becomes the
+  default only when the app has none; otherwise a warning names the existing default, so the
+  command never re-routes existing jobs or events silently.
 
 ### D11. Problem Details errors (#13 a, b)
 

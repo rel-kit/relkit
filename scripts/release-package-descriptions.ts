@@ -24,6 +24,7 @@ export const descriptions: Record<string, string> = {
   "@relkit/inngest": "Inngest durable-jobs integration for RelKit.",
   "@relkit/trigger": "Trigger.dev jobs integration for RelKit.",
   "@relkit/effect-mq": "Effect MQ retryable-jobs integration for RelKit.",
+  "@relkit/postgres": "Durable Postgres jobs, events and schedules for RelKit.",
   "create-relkit": POSITIONING,
   relkit: POSITIONING,
 };
