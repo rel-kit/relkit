@@ -18,6 +18,52 @@ For configuration and examples, read [Runtime schemas](/docs/learn/concepts/sche
 
 For a complete workflow, follow [upload product images](/guides/storage/upload-product-images).
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### z
+
+**Signature**
+
+```ts
+declare const z: ZBuilder;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L1)
+
+### validate
+
+Validates with a Standard Schema v1 compatible validator.
+
+**Throws**
+
+TypeError when the validator does not implement Standard Schema v1.
+
+**Example**
+
+```ts
+import { validate, z } from "relkit/schema";
+
+const result = await validate(z.string(), "ready");
+if (!("value" in result)) throw new Error("validation failed");
+```
+
+**Signature**
+
+```ts
+declare const validate: <S extends StandardSchemaV1>(
+  schema: S,
+  value: InferInput<S>,
+) => StandardResult<InferOutput<S>> | Promise<StandardResult<InferOutput<S>>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L56)
+
+Since v0.1.0
+
+## Complete reference
+
 <include>/_snippets/generated/exports/schema.mdx</include>
 
 ## `builder-composites.ts`
@@ -1494,16 +1540,6 @@ declare const validateSyncEffect: <S extends StandardSchemaV1>(
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L14)
-
-### z
-
-**Signature**
-
-```ts
-declare const z: ZBuilder;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L1)
 
 ## `json-schema-effect.ts`
 
@@ -4391,36 +4427,6 @@ export interface SchemaValidatorService {
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema-effect.types.ts#L8)
 
 ## `standard-schema.ts`
-
-### validate
-
-Validates with a Standard Schema v1 compatible validator.
-
-**Throws**
-
-TypeError when the validator does not implement Standard Schema v1.
-
-**Example**
-
-```ts
-import { validate, z } from "relkit/schema";
-
-const result = await validate(z.string(), "ready");
-if (!("value" in result)) throw new Error("validation failed");
-```
-
-**Signature**
-
-```ts
-declare const validate: <S extends StandardSchemaV1>(
-  schema: S,
-  value: InferInput<S>,
-) => StandardResult<InferOutput<S>> | Promise<StandardResult<InferOutput<S>>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L56)
-
-Since v0.1.0
 
 ### InferInput
 

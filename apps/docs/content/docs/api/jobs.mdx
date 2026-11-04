@@ -20,6 +20,133 @@ For configuration and examples, read [quickstart](/docs/modules/jobs/quickstart)
 
 [Trigger and observe a job](/docs/modules/jobs/clients#use-from-react) shows the client side of this capability.
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### defineTask
+
+Declares a typed immutable task with an execution contract and handler.
+
+**Throws**
+
+Original validation error for invalid definitions.
+
+**Example**
+
+```ts
+import { defineTask } from "relkit/jobs";
+import { z } from "relkit/schema";
+const echo = defineTask({
+  id: "echo",
+  version: "1",
+  input: z.string(),
+  output: z.string(),
+  execution: "retryable",
+  handler: async (input) => input,
+});
+```
+
+**Signature**
+
+```ts
+declare const defineTask: <
+  const Id extends string,
+  const Version extends string,
+  const InputSchema extends StandardSchemaV1,
+  const OutputSchema extends StandardSchemaV1,
+  const Dependencies extends TaskDependencies = {},
+  const Errors extends readonly ErrorDescriptorAny[] = readonly [],
+  const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
+  const Streams extends TaskStreamSchemas = {},
+  const Execution extends TaskExecution = "durable",
+>(
+  options: DefineTaskOptions<
+    Id,
+    Version,
+    InputSchema,
+    OutputSchema,
+    Dependencies,
+    Errors,
+    ProgressSchema,
+    Streams,
+    Execution
+  >,
+) => TaskDescriptor<
+  Id,
+  Version,
+  InputSchema,
+  OutputSchema,
+  Dependencies,
+  Errors,
+  ProgressSchema,
+  Streams,
+  Execution
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L75)
+
+Since v0.4.1
+
+### defineJob
+
+Binds a task to an immutable job descriptor.
+
+**Throws**
+
+Original validation error for invalid definitions.
+
+**Example**
+
+```ts
+import { defineJob, defineTask } from "relkit/jobs";
+import { z } from "relkit/schema";
+const echo = defineTask({
+  id: "echo",
+  version: "1",
+  input: z.string(),
+  output: z.string(),
+  execution: "retryable",
+  handler: async (input) => input,
+});
+const echoJob = defineJob({ name: "echoJob", task: echo });
+```
+
+**Signature**
+
+```ts
+declare const defineJob: <
+  const Name extends string,
+  const Task extends TaskDescriptorAny,
+  const Id extends string = Name,
+>(
+  options: DefineJobOptions<Name, Task, Id>,
+) => JobDescriptor<Name, Id, Task>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L48)
+
+Since v0.4.1
+
+#### Backend and frontend example
+
+**Backend** — these maintained files define the operation used by the frontend below.
+
+<include
+  source="examples/commerce/src/services/orders/jobs/export-orders.job.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders/jobs/export-orders.job.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/orders/jobs/export-orders.job.ts
+</include>
+
+**Frontend**
+
+<include>/_frontend/job.mdx</include>
+
+## Complete reference
+
 <include>/_snippets/generated/exports/jobs.mdx</include>
 
 ## `adapter-methods.ts`
@@ -4487,62 +4614,6 @@ declare const isJobDescriptorValue: (value: unknown) => value is JobDescriptorAn
 
 ## `define-job.ts`
 
-### defineJob
-
-Binds a task to an immutable job descriptor.
-
-**Throws**
-
-Original validation error for invalid definitions.
-
-**Example**
-
-```ts
-import { defineJob, defineTask } from "relkit/jobs";
-import { z } from "relkit/schema";
-const echo = defineTask({
-  id: "echo",
-  version: "1",
-  input: z.string(),
-  output: z.string(),
-  execution: "retryable",
-  handler: async (input) => input,
-});
-const echoJob = defineJob({ name: "echoJob", task: echo });
-```
-
-**Signature**
-
-```ts
-declare const defineJob: <
-  const Name extends string,
-  const Task extends TaskDescriptorAny,
-  const Id extends string = Name,
->(
-  options: DefineJobOptions<Name, Task, Id>,
-) => JobDescriptor<Name, Id, Task>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L48)
-
-Since v0.4.1
-
-#### Backend and frontend example
-
-**Backend** — these maintained files define the operation used by the frontend below.
-
-<include
-  source="examples/commerce/src/services/orders/jobs/export-orders.job.ts"
-  lang="ts"
-  meta='title="examples/commerce/src/services/orders/jobs/export-orders.job.ts"'
->
-  /_snippets/source/examples/commerce/src/services/orders/jobs/export-orders.job.ts
-</include>
-
-**Frontend**
-
-<include>/_frontend/job.mdx</include>
-
 ### JobDefinitionFailure (class)
 
 Expected job definition failure, retaining the original validation error.
@@ -4994,71 +5065,6 @@ declare const isTaskDescriptorValue: (value: unknown) => value is TaskDescriptor
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task-value.ts#L175)
 
 ## `define-task.ts`
-
-### defineTask
-
-Declares a typed immutable task with an execution contract and handler.
-
-**Throws**
-
-Original validation error for invalid definitions.
-
-**Example**
-
-```ts
-import { defineTask } from "relkit/jobs";
-import { z } from "relkit/schema";
-const echo = defineTask({
-  id: "echo",
-  version: "1",
-  input: z.string(),
-  output: z.string(),
-  execution: "retryable",
-  handler: async (input) => input,
-});
-```
-
-**Signature**
-
-```ts
-declare const defineTask: <
-  const Id extends string,
-  const Version extends string,
-  const InputSchema extends StandardSchemaV1,
-  const OutputSchema extends StandardSchemaV1,
-  const Dependencies extends TaskDependencies = {},
-  const Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-  const Streams extends TaskStreamSchemas = {},
-  const Execution extends TaskExecution = "durable",
->(
-  options: DefineTaskOptions<
-    Id,
-    Version,
-    InputSchema,
-    OutputSchema,
-    Dependencies,
-    Errors,
-    ProgressSchema,
-    Streams,
-    Execution
-  >,
-) => TaskDescriptor<
-  Id,
-  Version,
-  InputSchema,
-  OutputSchema,
-  Dependencies,
-  Errors,
-  ProgressSchema,
-  Streams,
-  Execution
->;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L75)
-
-Since v0.4.1
 
 ### TaskDefinitionFailure (class)
 

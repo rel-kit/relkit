@@ -18,6 +18,83 @@ For configuration and examples, read [testing](/docs/modules/operations/testing)
 
 For a complete workflow, follow [from express or hono](/guides/migrate/from-express-or-hono), [cache product prices](/guides/caching/cache-product-prices), [build an offline agent](/guides/ai/build-an-offline-agent).
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### invokeFunction
+
+Invokes a function descriptor through the engine's direct, transport-free path.
+
+**Example**
+
+```ts
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
+import { invokeFunction } from "@relkit/testing";
+
+export async function greetingExample(): Promise<string> {
+  const greet = defineFunction({
+    id: "greet",
+    input: z.string(),
+    output: z.string(),
+    handler: async (name) => `Hello ${name}`,
+  });
+  return invokeFunction(greet, "Ada");
+}
+```
+
+**Signature**
+
+```ts
+declare const invokeFunction: <
+  const Target extends StandaloneFunctionTarget,
+  Context extends { readonly signal: AbortSignal } = FunctionContextOf<Target>,
+>(
+  target: Target,
+  input: FunctionInput<Target>,
+  options?: InvokeFunctionOptions<Context>,
+) => Promise<FunctionOutput<Target>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L52)
+
+Since v0.1.0
+
+### createTestApplication
+
+Creates an application owner with HTTP, deterministic runtime and provider services.
+
+**Example**
+
+```ts
+import { defineEnv } from "relkit/config";
+import { createTestApplication } from "@relkit/testing";
+async function testApplication(projectRoot: string): Promise<void> {
+  const app = await createTestApplication({ env: defineEnv({}) }, { projectRoot });
+  try {
+    await app.http.get("/");
+  } finally {
+    await app.close();
+  }
+}
+```
+
+**Signature**
+
+```ts
+declare const createTestApplication: (
+  app: { readonly env: object },
+  options?: TestApplicationOptions,
+) => Promise<TestApplication>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L32)
+
+Since v0.1.0
+
+## Complete reference
+
 <include>/_snippets/generated/exports/testing.mdx</include>
 
 ## `application-acquisition.ts`
@@ -687,38 +764,6 @@ type TestServiceActivator = (
 ## `application.ts`
 
 General test application ownership with explicitly selected capability helpers.
-
-### createTestApplication
-
-Creates an application owner with HTTP, deterministic runtime and provider services.
-
-**Example**
-
-```ts
-import { defineEnv } from "relkit/config";
-import { createTestApplication } from "@relkit/testing";
-async function testApplication(projectRoot: string): Promise<void> {
-  const app = await createTestApplication({ env: defineEnv({}) }, { projectRoot });
-  try {
-    await app.http.get("/");
-  } finally {
-    await app.close();
-  }
-}
-```
-
-**Signature**
-
-```ts
-declare const createTestApplication: (
-  app: { readonly env: object },
-  options?: TestApplicationOptions,
-) => Promise<TestApplication>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L32)
-
-Since v0.1.0
 
 ### TestApplication
 
@@ -3930,45 +3975,6 @@ declare const runJobsConformance: (
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L57)
 
 ## `invoke-function.ts`
-
-### invokeFunction
-
-Invokes a function descriptor through the engine's direct, transport-free path.
-
-**Example**
-
-```ts
-import { defineFunction } from "relkit/functions";
-import { z } from "relkit/schema";
-import { invokeFunction } from "@relkit/testing";
-
-export async function greetingExample(): Promise<string> {
-  const greet = defineFunction({
-    id: "greet",
-    input: z.string(),
-    output: z.string(),
-    handler: async (name) => `Hello ${name}`,
-  });
-  return invokeFunction(greet, "Ada");
-}
-```
-
-**Signature**
-
-```ts
-declare const invokeFunction: <
-  const Target extends StandaloneFunctionTarget,
-  Context extends { readonly signal: AbortSignal } = FunctionContextOf<Target>,
->(
-  target: Target,
-  input: FunctionInput<Target>,
-  options?: InvokeFunctionOptions<Context>,
-) => Promise<FunctionOutput<Target>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L52)
-
-Since v0.1.0
 
 ### FunctionContextOf
 

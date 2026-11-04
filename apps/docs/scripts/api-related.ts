@@ -75,6 +75,12 @@ export function referenceOverview(): string {
   ].join("\n\n");
 }
 
+/** Names the most-used APIs of a package, in the order its guides present them.
+ * @param slug - Reference package route. @returns Unique symbol names, empty when none are cataloged. */
+export function authoringNames(slug: string): string[] {
+  return authoringLinks(slug).map((link) => link.slice(1, link.indexOf("]")));
+}
+
 /** Links symbols to their defining package, including integration APIs cataloged with application setup.
  * @param slug - Reference package route. @returns Unique links to existing generated symbol headings. */
 function authoringLinks(slug: string): string[] {

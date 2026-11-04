@@ -15,6 +15,46 @@ sidebar:
 
 For configuration and examples, read [effect](/docs/modules/service/effect).
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### defineApp
+
+Defines one immutable application topology synchronously.
+
+**Throws**
+
+The original validation error for invalid options.
+
+**Example**
+
+```ts
+import { defineApp } from "relkit";
+import { defineEnv } from "relkit/config";
+const app = defineApp({ env: defineEnv({}), server: { port: 3000 } });
+```
+
+**Signature**
+
+```ts
+declare const defineApp: <
+  const Shape extends EnvShape,
+  const Providers extends AppProviderInputs,
+  const Exporters extends TelemetryExporterMap = Readonly<
+    Record<string, TelemetryExporterDescriptor<string, string, object>>
+  >,
+>(
+  options: DefineAppOptions<Shape, Providers, Exporters>,
+) => ApplicationDescriptor<Shape, Providers, Exporters>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L110)
+
+Since v0.2.0
+
+## Complete reference
+
 <include>/_snippets/generated/exports/effect.mdx</include>
 
 ## `agents.ts`
@@ -1302,40 +1342,6 @@ export interface ResolvedApplicationContext {
 Constructs immutable application descriptors without acquiring providers or
 optional tools. Shared bridge validation rejects obsolete inspection settings;
 the synchronous facade preserves original validation errors for authors.
-
-### defineApp
-
-Defines one immutable application topology synchronously.
-
-**Throws**
-
-The original validation error for invalid options.
-
-**Example**
-
-```ts
-import { defineApp } from "relkit";
-import { defineEnv } from "relkit/config";
-const app = defineApp({ env: defineEnv({}), server: { port: 3000 } });
-```
-
-**Signature**
-
-```ts
-declare const defineApp: <
-  const Shape extends EnvShape,
-  const Providers extends AppProviderInputs,
-  const Exporters extends TelemetryExporterMap = Readonly<
-    Record<string, TelemetryExporterDescriptor<string, string, object>>
-  >,
->(
-  options: DefineAppOptions<Shape, Providers, Exporters>,
-) => ApplicationDescriptor<Shape, Providers, Exporters>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L110)
-
-Since v0.2.0
 
 ### "./define-app.types.js" (namespace export)
 

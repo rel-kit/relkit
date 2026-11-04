@@ -18,6 +18,102 @@ For configuration and examples, read [events](/docs/modules/events), [domains](/
 
 For a complete workflow, follow [react to order events](/guides/events/react-to-order-events).
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### defineEvent
+
+Defines a versioned event contract used by publishers and event functions.
+
+**Throws**
+
+TypeError when the contract is malformed.
+
+**Example**
+
+```ts
+import { defineEvent } from "relkit/events";
+import { z } from "relkit/schema";
+
+const created = defineEvent({ id: "orders.created", input: z.object({ orderId: z.string() }) });
+void created;
+```
+
+**Signature**
+
+```ts
+declare const defineEvent: <
+  const Id extends string,
+  const Version extends number = 1,
+  const InputSchema extends StandardSchemaV1 = StandardSchemaV1<unknown, unknown>,
+>(
+  options: DefineEventOptions<Id, Version, InputSchema>,
+) => EventDescriptor<Id, Version, InferOutput<InputSchema>, InputSchema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L46)
+
+Since v0.1.0
+
+### defineEventFunction
+
+Defines an independent event-only consumer with inferred input and void success.
+Event IDs are supplied by the application's generated EventRegistry.
+
+**Throws**
+
+TypeError for malformed options.
+
+**Example**
+
+```ts
+import { defineEvent, defineEventFunction } from "relkit/events";
+import { z } from "relkit/schema";
+
+const orderCreated = defineEvent({
+  id: "orders.created",
+  input: z.object({ orderId: z.string() }),
+});
+
+// The application normally generates this declaration with `relkit check`.
+declare global {
+  namespace Relkit {
+    interface EventRegistry {
+      "orders.created": typeof orderCreated;
+    }
+  }
+}
+
+const receipt = defineEventFunction({
+  id: "receipt.send",
+  event: "orders.created",
+  handler: async () => {},
+});
+```
+
+**Signature**
+
+```ts
+declare const defineEventFunction: <
+  const Id extends string,
+  const Event extends EventName,
+  const Dependencies extends FunctionDependencies = {},
+  const Options extends EventFunctionCallOptions<Id, Event, Dependencies> =
+    EventFunctionCallOptions<Id, Event, Dependencies>,
+>(
+  options: EventFunctionCallOptions<Id, Event, Dependencies> &
+    Options &
+    EventFunctionValidation<NoInfer<Options>>,
+) => EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L59)
+
+Since v0.1.0
+
+## Complete reference
+
 <include>/_snippets/generated/exports/events.mdx</include>
 
 ## `client-errors.ts`
@@ -1967,62 +2063,6 @@ declare const StandardSchemaV1: StandardSchemaV1<TInput, TOutput>;
 
 ## `define-event-function.ts`
 
-### defineEventFunction
-
-Defines an independent event-only consumer with inferred input and void success.
-Event IDs are supplied by the application's generated EventRegistry.
-
-**Throws**
-
-TypeError for malformed options.
-
-**Example**
-
-```ts
-import { defineEvent, defineEventFunction } from "relkit/events";
-import { z } from "relkit/schema";
-
-const orderCreated = defineEvent({
-  id: "orders.created",
-  input: z.object({ orderId: z.string() }),
-});
-
-// The application normally generates this declaration with `relkit check`.
-declare global {
-  namespace Relkit {
-    interface EventRegistry {
-      "orders.created": typeof orderCreated;
-    }
-  }
-}
-
-const receipt = defineEventFunction({
-  id: "receipt.send",
-  event: "orders.created",
-  handler: async () => {},
-});
-```
-
-**Signature**
-
-```ts
-declare const defineEventFunction: <
-  const Id extends string,
-  const Event extends EventName,
-  const Dependencies extends FunctionDependencies = {},
-  const Options extends EventFunctionCallOptions<Id, Event, Dependencies> =
-    EventFunctionCallOptions<Id, Event, Dependencies>,
->(
-  options: EventFunctionCallOptions<Id, Event, Dependencies> &
-    Options &
-    EventFunctionValidation<NoInfer<Options>>,
-) => EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L59)
-
-Since v0.1.0
-
 ### defineEventFunctionEffect
 
 Defines an event-only function in Effect.
@@ -2218,40 +2258,6 @@ declare const FunctionDependencies: FunctionDependencies;
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L8)
 
 ## `define-event.ts`
-
-### defineEvent
-
-Defines a versioned event contract used by publishers and event functions.
-
-**Throws**
-
-TypeError when the contract is malformed.
-
-**Example**
-
-```ts
-import { defineEvent } from "relkit/events";
-import { z } from "relkit/schema";
-
-const created = defineEvent({ id: "orders.created", input: z.object({ orderId: z.string() }) });
-void created;
-```
-
-**Signature**
-
-```ts
-declare const defineEvent: <
-  const Id extends string,
-  const Version extends number = 1,
-  const InputSchema extends StandardSchemaV1 = StandardSchemaV1<unknown, unknown>,
->(
-  options: DefineEventOptions<Id, Version, InputSchema>,
-) => EventDescriptor<Id, Version, InferOutput<InputSchema>, InputSchema>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L46)
-
-Since v0.1.0
 
 ### DefineEventOptions
 

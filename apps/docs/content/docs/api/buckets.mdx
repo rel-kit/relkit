@@ -17,6 +17,43 @@ For configuration and examples, read [define](/docs/modules/storage/define), [or
 
 For a complete workflow, follow [upload product images](/guides/storage/upload-product-images).
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### defineBucket
+
+Defines a managed object store with explicit visibility and bounded upload policy.
+
+**Throws**
+
+TypeError when the authoring input is invalid.
+
+**Example**
+
+```ts
+import { defineBucket } from "relkit/buckets";
+const assets = defineBucket({
+  id: "assets",
+  visibility: "public",
+  maxObjectBytes: 1_048_576,
+});
+```
+
+**Signature**
+
+```ts
+declare const defineBucket: <const Id extends string>(
+  options: DefineBucketOptions<Id>,
+) => BucketDescriptor<Id>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.ts#L36)
+
+Since v0.1.0
+
+## Complete reference
+
 <include>/_snippets/generated/exports/buckets.mdx</include>
 
 ## `bucket-validation-error.ts`
@@ -1632,37 +1669,6 @@ type BucketOperationOutcome =
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L11)
 
 ## `define-bucket.ts`
-
-### defineBucket
-
-Defines a managed object store with explicit visibility and bounded upload policy.
-
-**Throws**
-
-TypeError when the authoring input is invalid.
-
-**Example**
-
-```ts
-import { defineBucket } from "relkit/buckets";
-const assets = defineBucket({
-  id: "assets",
-  visibility: "public",
-  maxObjectBytes: 1_048_576,
-});
-```
-
-**Signature**
-
-```ts
-declare const defineBucket: <const Id extends string>(
-  options: DefineBucketOptions<Id>,
-) => BucketDescriptor<Id>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.ts#L36)
-
-Since v0.1.0
 
 ### "./define-bucket.types.js" (namespace export)
 

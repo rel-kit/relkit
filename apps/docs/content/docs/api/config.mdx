@@ -17,6 +17,39 @@ For configuration and examples, read [Environment contracts](/docs/learn/concept
 
 For a complete workflow, follow [upload product images](/guides/storage/upload-product-images).
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### defineEnv
+
+Build a declaration synchronously for existing callers.
+
+**Throws**
+
+TypeError for a reserved name or invalid builder.
+
+**Example**
+
+```ts
+import { defineEnv, env } from "relkit/config";
+const environment = defineEnv({ MODE: env.string().default("development") });
+```
+
+**Signature**
+
+```ts
+declare const defineEnv: <const S extends EnvShape>(
+  shape: S & { readonly PORT?: never; readonly RELKIT_ENV?: never },
+) => EnvDefinition<S>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L105)
+
+Since v0.1.0
+
+## Complete reference
+
 <include>/_snippets/generated/exports/config.mdx</include>
 
 ## `config-observability.ts`
@@ -932,33 +965,6 @@ readonly name: "EnvResolutionError"
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-resolution-error.ts#L11)
 
 ## `env.ts`
-
-### defineEnv
-
-Build a declaration synchronously for existing callers.
-
-**Throws**
-
-TypeError for a reserved name or invalid builder.
-
-**Example**
-
-```ts
-import { defineEnv, env } from "relkit/config";
-const environment = defineEnv({ MODE: env.string().default("development") });
-```
-
-**Signature**
-
-```ts
-declare const defineEnv: <const S extends EnvShape>(
-  shape: S & { readonly PORT?: never; readonly RELKIT_ENV?: never },
-) => EnvDefinition<S>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L105)
-
-Since v0.1.0
 
 ### BindingValueRef
 

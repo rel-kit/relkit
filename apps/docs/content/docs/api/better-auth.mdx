@@ -21,6 +21,66 @@ For a complete workflow, follow [email password sign in](/guides/auth/email-pass
 
 [Sign in from the browser](/docs/modules/auth/clients) shows the client side of this capability.
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### defineBetterAuthService
+
+Defines the authentication service from the application's own Better Auth instance.
+
+**Example**
+
+```ts
+import { betterAuth } from "better-auth";
+import { defineBetterAuthService } from "@relkit/better-auth";
+export const auth = betterAuth({ emailAndPassword: { enabled: true } });
+export default defineBetterAuthService({ auth });
+```
+
+**Signature**
+
+```ts
+declare const defineBetterAuthService: {
+  <const Instance extends BetterAuthInstance>(
+    options: BetterAuthInstanceServiceOptions<Instance>,
+  ): BetterAuthServiceDescriptor<BetterAuthServiceOptions, Instance["$Infer"]["Session"]>;
+  <const Options extends BetterAuthServiceOptions>(
+    options: Options,
+  ): BetterAuthServiceDescriptor<Options>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L64)
+
+Since v0.9.0
+
+#### Backend and frontend example
+
+**Backend** — these maintained files define the operation used by the frontend below.
+
+<include
+  source="examples/auth-drizzle/src/services/auth/better-auth.ts"
+  lang="ts"
+  meta='title="examples/auth-drizzle/src/services/auth/better-auth.ts"'
+>
+  /_snippets/source/examples/auth-drizzle/src/services/auth/better-auth.ts
+</include>
+
+<include
+  source="examples/auth-drizzle/src/services/auth/service.ts"
+  lang="ts"
+  meta='title="examples/auth-drizzle/src/services/auth/service.ts"'
+>
+  /_snippets/source/examples/auth-drizzle/src/services/auth/service.ts
+</include>
+
+**Frontend**
+
+<include>/_frontend/auth.mdx</include>
+
+## Complete reference
+
 <include>/_snippets/generated/exports/better-auth.mdx</include>
 
 ## `activation.ts`
@@ -854,60 +914,6 @@ declare const generateBetterAuthOpenApi: (
 ## `index.ts`
 
 Lazy authentication authoring; select /drizzle for native database activation. @packageDocumentation
-
-### defineBetterAuthService
-
-Defines the authentication service from the application's own Better Auth instance.
-
-**Example**
-
-```ts
-import { betterAuth } from "better-auth";
-import { defineBetterAuthService } from "@relkit/better-auth";
-export const auth = betterAuth({ emailAndPassword: { enabled: true } });
-export default defineBetterAuthService({ auth });
-```
-
-**Signature**
-
-```ts
-declare const defineBetterAuthService: {
-  <const Instance extends BetterAuthInstance>(
-    options: BetterAuthInstanceServiceOptions<Instance>,
-  ): BetterAuthServiceDescriptor<BetterAuthServiceOptions, Instance["$Infer"]["Session"]>;
-  <const Options extends BetterAuthServiceOptions>(
-    options: Options,
-  ): BetterAuthServiceDescriptor<Options>;
-};
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L64)
-
-Since v0.9.0
-
-#### Backend and frontend example
-
-**Backend** — these maintained files define the operation used by the frontend below.
-
-<include
-  source="examples/auth-drizzle/src/services/auth/better-auth.ts"
-  lang="ts"
-  meta='title="examples/auth-drizzle/src/services/auth/better-auth.ts"'
->
-  /_snippets/source/examples/auth-drizzle/src/services/auth/better-auth.ts
-</include>
-
-<include
-  source="examples/auth-drizzle/src/services/auth/service.ts"
-  lang="ts"
-  meta='title="examples/auth-drizzle/src/services/auth/service.ts"'
->
-  /_snippets/source/examples/auth-drizzle/src/services/auth/service.ts
-</include>
-
-**Frontend**
-
-<include>/_frontend/auth.mdx</include>
 
 ### BETTER_AUTH_HANDLER
 

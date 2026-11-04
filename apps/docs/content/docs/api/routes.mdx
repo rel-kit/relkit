@@ -22,9 +22,70 @@ For a complete workflow, follow [from express or hono](/guides/migrate/from-expr
 
 [Call a defined route](/docs/modules/http/define#use-from-the-frontend) shows the client side of this capability.
 
-<include>/_snippets/generated/exports/routes.mdx</include>
+## Most-used APIs
 
-## `define-middleware.ts`
+These entries carry each API's contract and example. The complete reference follows.
+
+### defineRoute
+
+Defines one HTTP method exported by a nested `route.ts` module.
+
+The compiler derives the method from the named export and the path from the
+file. Omit `id` for a source-derived route identity, and omit `request` and
+`responses` when schema-based inference represents the transport; explicit
+mappings replace inference completely. Matching path names map into reusable
+function input.
+
+**Throws**
+
+TypeError for invalid authoring input.
+
+**Example**
+
+````ts
+A GET route with inferred path and query input
+```ts
+import { defineFunction } from "relkit/functions"
+import { defineRoute } from "relkit/routes"
+import { z } from "relkit/schema"
+
+const listOrders = defineFunction({
+  id: "orders.list",
+  input: z.object({ status: z.string().optional() }),
+  output: z.object({ count: z.number().int() }),
+  handler: async () => ({ count: 0 })
+})
+
+export const GET = defineRoute({ target: listOrders })
+````
+
+````
+
+**Signature**
+
+```ts
+declare const defineRoute: { <const Id extends string, const Handler extends RawRouteOptions<Id>["handler"]>(options: RawRouteOptions<Id, Handler>): RawRouteDescriptor<Id, Handler>; <const Id extends string, const Target extends FunctionRefAny, const Request extends HttpRequestMapping | undefined = undefined>(options: FunctionRouteOptions<Id, Target, Request>): FunctionRouteDescriptor<Id, Target, Request>; }
+````
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-route.ts#L103)
+
+Since v0.1.0
+
+#### Backend and frontend example
+
+**Backend** — these maintained files define the operation used by the frontend below.
+
+<include
+  source="templates/default/v1/api/src/routes/echo/route.ts"
+  lang="ts"
+  meta='title="templates/default/v1/api/src/routes/echo/route.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/routes/echo/route.ts
+</include>
+
+**Frontend**
+
+<include>/_frontend/echo.mdx</include>
 
 ### defineMiddleware
 
@@ -59,6 +120,12 @@ declare const defineMiddleware: (
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L72)
 
 Since v0.1.0
+
+## Complete reference
+
+<include>/_snippets/generated/exports/routes.mdx</include>
+
+## `define-middleware.ts`
 
 ### MiddlewareContext
 
@@ -261,67 +328,6 @@ type MiddlewareHandler = (
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.types.ts#L21)
 
 ## `define-route.ts`
-
-### defineRoute
-
-Defines one HTTP method exported by a nested `route.ts` module.
-
-The compiler derives the method from the named export and the path from the
-file. Omit `id` for a source-derived route identity, and omit `request` and
-`responses` when schema-based inference represents the transport; explicit
-mappings replace inference completely. Matching path names map into reusable
-function input.
-
-**Throws**
-
-TypeError for invalid authoring input.
-
-**Example**
-
-````ts
-A GET route with inferred path and query input
-```ts
-import { defineFunction } from "relkit/functions"
-import { defineRoute } from "relkit/routes"
-import { z } from "relkit/schema"
-
-const listOrders = defineFunction({
-  id: "orders.list",
-  input: z.object({ status: z.string().optional() }),
-  output: z.object({ count: z.number().int() }),
-  handler: async () => ({ count: 0 })
-})
-
-export const GET = defineRoute({ target: listOrders })
-````
-
-````
-
-**Signature**
-
-```ts
-declare const defineRoute: { <const Id extends string, const Handler extends RawRouteOptions<Id>["handler"]>(options: RawRouteOptions<Id, Handler>): RawRouteDescriptor<Id, Handler>; <const Id extends string, const Target extends FunctionRefAny, const Request extends HttpRequestMapping | undefined = undefined>(options: FunctionRouteOptions<Id, Target, Request>): FunctionRouteDescriptor<Id, Target, Request>; }
-````
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-route.ts#L103)
-
-Since v0.1.0
-
-#### Backend and frontend example
-
-**Backend** — these maintained files define the operation used by the frontend below.
-
-<include
-  source="templates/default/v1/api/src/routes/echo/route.ts"
-  lang="ts"
-  meta='title="templates/default/v1/api/src/routes/echo/route.ts"'
->
-  /_snippets/source/templates/default/v1/api/src/routes/echo/route.ts
-</include>
-
-**Frontend**
-
-<include>/_frontend/echo.mdx</include>
 
 ### "./route.types.js" (namespace export)
 

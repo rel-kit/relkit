@@ -17,6 +17,53 @@ For configuration and examples, read [tools](/docs/modules/ai/tools), [organizat
 
 For a complete workflow, follow [build an offline agent](/guides/ai/build-an-offline-agent).
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### defineTool
+
+Defines a frozen, handler-free tool view over one function.
+
+**Throws**
+
+TypeError for malformed target, metadata, or ID.
+
+**Example**
+
+```ts
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
+import { defineTool } from "relkit/tools";
+const lookup = defineFunction({
+  id: "orders.lookup",
+  input: z.string(),
+  output: z.string(),
+  handler: (id) => id,
+});
+const tool = defineTool({
+  id: "orders.lookup-tool",
+  target: lookup,
+  description: "Read order",
+  sideEffect: "read",
+  approval: "never",
+});
+```
+
+**Signature**
+
+```ts
+declare const defineTool: <const Id extends string, const Target extends FunctionRefAny>(
+  options: DefineToolOptions<Id, Target>,
+) => ToolDescriptor<Id, Target>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L137)
+
+Since v0.1.0
+
+## Complete reference
+
 <include>/_snippets/generated/exports/tools.mdx</include>
 
 ## `define-tool-predicates.ts`
@@ -501,47 +548,6 @@ declare const validateSideEffectEffect: (
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L86)
 
 ## `define-tool.ts`
-
-### defineTool
-
-Defines a frozen, handler-free tool view over one function.
-
-**Throws**
-
-TypeError for malformed target, metadata, or ID.
-
-**Example**
-
-```ts
-import { defineFunction } from "relkit/functions";
-import { z } from "relkit/schema";
-import { defineTool } from "relkit/tools";
-const lookup = defineFunction({
-  id: "orders.lookup",
-  input: z.string(),
-  output: z.string(),
-  handler: (id) => id,
-});
-const tool = defineTool({
-  id: "orders.lookup-tool",
-  target: lookup,
-  description: "Read order",
-  sideEffect: "read",
-  approval: "never",
-});
-```
-
-**Signature**
-
-```ts
-declare const defineTool: <const Id extends string, const Target extends FunctionRefAny>(
-  options: DefineToolOptions<Id, Target>,
-) => ToolDescriptor<Id, Target>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L137)
-
-Since v0.1.0
 
 ### "./define-tool.types.js" (namespace export)
 
