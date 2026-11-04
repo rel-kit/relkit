@@ -241,6 +241,7 @@
     "installation",
     "/_snippets/generated/installations/inspector.mdx"
   ],
+  "docs/modules/operations/mcp": ["update", "continuation", "/docs/modules/operations/inspector"],
   "docs/modules/operations/observability": [
     "update",
     "installation",
