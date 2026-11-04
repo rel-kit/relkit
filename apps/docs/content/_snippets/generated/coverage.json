@@ -318,6 +318,11 @@
       "examples": ["templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"]
     },
     {
+      "path": "docs/modules/jobs/providers/postgres",
+      "api": ["jobs", "integrations/postgres"],
+      "examples": ["integrations/packages/postgres/tests/jobs-conformance.test.ts"]
+    },
+    {
       "path": "docs/modules/jobs/providers/comparison",
       "api": ["jobs"],
       "examples": ["tests/jobs/compatibility/evidence/capability-matrix.json"]

@@ -12,6 +12,7 @@
     { "path": "./integrations/packages/effect-mq" },
     { "path": "./integrations/packages/local" },
     { "path": "./integrations/packages/otlp" },
+    { "path": "./integrations/packages/postgres" },
     { "path": "./integrations/packages/pulumi" },
     { "path": "./integrations/packages/redis" },
     { "path": "./integrations/packages/s3" },

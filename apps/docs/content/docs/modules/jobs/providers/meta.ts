@@ -3,6 +3,6 @@ import { defineMeta } from "blume";
 export default defineMeta({
   title: "Job providers",
   icon: "plug",
-  pages: ["index", "comparison", "inngest", "trigger", "effect-mq"],
+  pages: ["index", "comparison", "inngest", "trigger", "effect-mq", "postgres"],
   display: "page",
 });

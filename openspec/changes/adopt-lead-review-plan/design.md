@@ -192,6 +192,39 @@ web process for single-instance apps or as a separate worker role. The first imp
 evaluates wrapping an existing Postgres queue library behind the provider interface; either way, the
 shared jobs and events conformance suites decide.
 
+Decided while applying section 16 (maintainer, 2026-11-05):
+
+- **The backend is RelKit's own SQL on `@effect/sql-pg`, not a wrapped queue library.** A spike
+  wrapped pg-boss 10.4 behind the jobs fixture steps against Postgres 16 (graphile-worker 0.16
+  was evaluated from its source). Measured: pg-boss `retry` re-queues the same job ID instead of
+  creating a linked run, a second `cancel` resolves silently instead of reporting
+  `already-terminal`, `singletonKey` on a standard queue does not deduplicate, and an expired
+  lease on an active job was still `active` 70 seconds later because recovery waits for its
+  maintenance interval. graphile-worker hard-codes a four-hour lock timeout. Neither has
+  per-consumer event delivery, and both own their schema migrations and add the `pg` driver,
+  while their transactional enqueue needs a `pg` client rather than the caller's Drizzle
+  transaction. Wrapping would keep only the `SKIP LOCKED` claim query. `@effect/sql-pg` is already
+  in the catalog. The in-repo spike is `integrations/packages/postgres/tests/jobs-conformance.test.ts`,
+  which runs every `runJobsConformance` fixture against the adapter.
+- **The runtime creates its tables.** On first use each namespace (`schema`, `tablePrefix`)
+  applies idempotent `create ... if not exists` DDL inside a transaction holding an advisory lock,
+  so instances starting together create it once. Applications that own migrations apply the same
+  statements from `postgresBackendSql()`.
+- **Five stored states, ten public ones.** Rows store `queued`, `running`, `completed`, `failed`
+  or `cancelled`; `delayed` and `retrying` are derived from the eligibility time and attempt
+  count when read. A run that fails on its last permitted attempt, or with `retry: "never"`, ends
+  `failed` and dead-lettered, reported as `nativeDiagnosticCode: RELKIT_JOB_DEAD_LETTERED`;
+  `retry` creates a new run that is unique per (original run, retry identity).
+- **An expired lease counts as an attempt.** Another worker re-claims the run while the task's
+  `retry.maxAttempts` allows; otherwise it ends failed with `RELKIT_JOB_LEASE_EXPIRED`. Every
+  settlement is fenced on the claim's owner token, so a worker that lost its lease cannot
+  overwrite the next attempt. Workers renew leases every third of `leaseMs` (default 30 s), and
+  the renewal reports cancellation requests, which abort the attempt's signal.
+- **Deduplication follows the deterministic adapter.** The dedupe key is (job, idempotency key,
+  occurrence identity), unique per service and scope. A submission whose commit outcome is unknown
+  returns `RELKIT_JOB_SUBMISSION_UNKNOWN` with `retry-with-same-key` recovery when it had an
+  idempotency key, else `inspect-native`. Durable sleep is reported unsupported.
+
 ### D11. Problem Details errors (#13 a, b)
 
 Every error response becomes `application/problem+json` with `type` (`/errors/<code>`), `title`,

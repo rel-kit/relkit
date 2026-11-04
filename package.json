@@ -36,6 +36,7 @@
     "test:container": "bun x turbo run build --filter=relkit && bun run scripts/test-container.ts",
     "test:local-docker": "RELKIT_TEST_DOCKER=1 bun test ./tests/integration/local-docker-services.test.ts ./tests/integration/storage-outage.test.ts",
     "test:security": "bun test ./tests/security",
+    "test:postgres": "bun test --timeout 60000 integrations/packages/postgres/tests",
     "test:jobs:unit": "bun test packages/testing/tests/compatibility/test-jobs-adapter.test.ts && bun x vitest run --maxWorkers=1 --no-file-parallelism --exclude=apps/docs/** --exclude=.claude/** packages/relkit/tests/jobs packages/relkit/tests/providers-local",
     "test:jobs:types": "bun x tsc -p tests/types/tsconfig.json --pretty false",
     "test:jobs:contracts": "bun test packages/testing/tests/compatibility/canonical-admission.test.ts && bun x vitest run --maxWorkers=1 --no-file-parallelism packages/relkit/tests/jobs/task-wire.test.ts packages/relkit/tests/jobs/authoring-boundaries.test.ts",

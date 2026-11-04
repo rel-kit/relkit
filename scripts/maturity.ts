@@ -122,6 +122,11 @@ export const MATURITY_FEATURES: readonly MaturityFeature[] = [
     ["/docs/modules/jobs/providers/effect-mq", "/docs/api/integrations/effect-mq"],
   ),
   labs(
+    "Postgres durable backend",
+    ["@relkit/postgres"],
+    ["/docs/modules/jobs/providers/postgres", "/docs/api/integrations/postgres"],
+  ),
+  labs(
     "Agent adapters (LangChain and DeepAgents)",
     ["@relkit/langchain"],
     ["/docs/modules/ai/native-runtime", "/docs/api/integrations/langchain"],

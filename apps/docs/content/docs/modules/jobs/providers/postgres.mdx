@@ -1,0 +1,36 @@
+---
+title: Postgres
+description: Run durable jobs and schedules on your own Postgres database.
+pagination: false
+sidebar:
+  icon: database
+labs: true
+---
+
+`@relkit/postgres` stores jobs and schedules in Postgres tables, so pending work survives restarts
+and redeploys and is shared by every instance that connects to the same database. Workers lease
+runs with `FOR UPDATE SKIP LOCKED`, so two workers never run the same attempt at the same time.
+
+## Select the provider
+
+```ts
+import { defineApp, env } from "relkit/config";
+import { postgresJob } from "@relkit/postgres";
+
+export default defineApp({
+  id: "orders",
+  providers: {
+    jobs: { default: postgresJob({ url: env.secret("DATABASE_URL") }) },
+  },
+});
+```
+
+The runtime creates its tables on first start. `RELKIT_POSTGRES_URL` overrides the authored URL.
+
+## Leases, retries and dead letters
+
+A worker holds a lease on each run it executes and renews it while the task runs. If the worker
+stops, the lease expires (30 seconds by default, `leaseMs`) and another worker runs the attempt
+again under the task's retry policy. A run that fails after its last permitted attempt ends
+`failed` with the diagnostic code `RELKIT_JOB_DEAD_LETTERED`; list failed runs to inspect them and
+call `retry` to start a new run from the same input.
