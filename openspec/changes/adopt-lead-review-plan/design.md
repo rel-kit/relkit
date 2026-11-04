@@ -347,6 +347,18 @@ Decided while applying section 27 (maintainer, 2026-11-05):
 
 - **Template `start`.** Every template runs `relkit start`. The direct JavaScript command stays
   documented for a production root that has no CLI installed (the AWS guide).
+- **Fresh clones type-check because the two generated type files are committed.** The template
+  `tsconfig.json` lists `.relkit/generated/route-module-checks.ts` and
+  `.relkit/generated/context-registry.d.ts` under `files` (the fullstack web project also reads
+  `client-registry.d.ts`), and `.gitignore` excluded all of `.relkit/`, so a clone failed with TS6053. The templates' `.gitignore` now ignores everything under
+  `.relkit/` except those files (three for fullstack), which are deterministic, contain no machine paths and are
+  refreshed by `relkit check` and `relkit dev`. This keeps the `tsconfig.json` shape that the
+  development snapshot's eligibility schema audits, and keeps typed `context` on a fresh clone,
+  which a tolerant `include` would lose. The proof is `scripts/fresh-clone-typecheck.ts`: it creates
+  a project from the packed candidate, commits it, clones the commit, installs and runs the
+  `typecheck` script. The CI job lives in `checks.yml` (the workflow named CI, which runs on pull
+  requests), not in `ci.yml`, which is the release workflow that runs only after main. It runs for
+  every template whenever creation, templates or the script change, and `ci-gate` requires it.
 - **`relkit check` is documented as running top-level code.** The CLI page lists what the
   evaluator child blocks (listening sockets, child processes, unapproved network, writes outside the
   generated directory, live timers, direct output), states that the child gets an empty environment

@@ -270,7 +270,7 @@ not tasks of this change.
 ## 27. Findings follow-ups (plan section 8.5)
 
 - [x] 27.1 Make template `start` scripts run `relkit start`, and verify the template creation tests
-- [ ] 27.2 Make generated projects type-check after a fresh clone and install, and verify `tsc --noEmit` in a fresh-clone CI job
+- [x] 27.2 Make generated projects type-check after a fresh clone and install, and verify `tsc --noEmit` in a fresh-clone CI job
 - [x] 27.3 Document that `relkit check` runs application top-level code and which side effects it blocks, and verify the docs build
 - [x] 27.4 Document at-least-once delivery, re-runs after recovery and idempotency keys in the jobs guide, and the ephemeral event queue's overflow behavior in the events guide, and verify the examples compile
 - [x] 27.5 Curate the API reference so each page leads with the most-used APIs and examples while keeping the complete reference, and verify the jobs page ordering in a docs test
