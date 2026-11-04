@@ -10,6 +10,7 @@ import type { CheckResult } from "./check-result.types.js";
 import type { JobsManifest, LoadedToolingConfig } from "../compiler/index.js";
 import type { ApplicationGraph } from "relkit/graph";
 import type { ProductionRepairs } from "./build-production-repairs.js";
+import type { RuntimeName } from "relkit/runtime";
 
 /** Build inputs; an injected check remains the established public compatibility seam. */
 export interface BuildOptions extends CheckOptions {
@@ -21,6 +22,8 @@ export interface BuildOptions extends CheckOptions {
    */
   readonly check?: (options: CheckOptions) => Promise<CheckResult>;
   readonly providerOverridesGeneration?: string;
+  /** Runtime the production server and container run on; defaults to Bun. */
+  readonly runtime?: RuntimeName;
   /** Internal preparation requests Bun's consumed-input inventory beside the entrypoint. */
   readonly bundleInputInventory?: "bun.inputs.json";
 }
@@ -51,6 +54,8 @@ export interface BuildManifestInputs {
   readonly activationFingerprint: RuntimeActivationFingerprint;
   readonly hasJobs: boolean;
   readonly hasLocalServices: boolean;
+  /** Recorded only for a non-default runtime, so Bun manifests stay unchanged. */
+  readonly runtime?: RuntimeName;
   readonly tooling: Pick<LoadedToolingConfig, "server" | "inspector">;
 }
 

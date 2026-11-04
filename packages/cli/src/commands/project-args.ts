@@ -21,6 +21,7 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
   let verbose = false;
   let noColor = false;
   let prepare = false;
+  let runtime: "bun" | "node" | undefined;
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index]!;
     if (argument === "--project-root") projectRoot = value(args, ++index, argument, command);
@@ -36,7 +37,12 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
     } else if (argument === "--verbose" && command === "dev") verbose = true;
     else if (argument === "--no-color" && command === "dev") noColor = true;
     else if (argument === "--prepare" && command === "dev") prepare = true;
-    else if (argument === "--log-level" && command === "dev") {
+    else if (argument === "--runtime" && command === "build") {
+      const selected = value(args, ++index, argument, command);
+      if (selected !== "bun" && selected !== "node")
+        throw fail("RELKIT_BUILD_USAGE", "--runtime must be bun or node.", 2);
+      runtime = selected;
+    } else if (argument === "--log-level" && command === "dev") {
       const selected = value(args, ++index, argument, command);
       if (!Schema.is(minimumLogLevelSchema)(selected))
         throw fail("RELKIT_DEV_USAGE", "Unknown log level.", 2);
@@ -57,6 +63,7 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
     verbose,
     noColor,
     ...(prepare ? { prepare } : {}),
+    ...(runtime === undefined ? {} : { runtime }),
   };
 }
 

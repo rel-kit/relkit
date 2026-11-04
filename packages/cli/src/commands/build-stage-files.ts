@@ -74,6 +74,7 @@ export const writeBuildServer = Effect.fn("Project.buildServer")(function* (
       Schema.decodeUnknownSync(Schema.Json)(JSON.parse(outputs.clientContract || "{}")),
       {
         ...cohort.tooling.server,
+        ...(input.options.runtime === undefined ? {} : { runtime: input.options.runtime }),
         maxPreviewBytes: cohort.tooling.inspector.maxPreviewBytes,
         inspectorEnabled: development && cohort.tooling.inspector.enabled,
         jobsAdministration: development && cohort.jobsManifest !== undefined,
@@ -129,12 +130,17 @@ export const writeBuildMetadata = Effect.fn("Project.buildMetadata")(function* (
       activationFingerprint: cohort.activationFingerprint,
       hasJobs: cohort.jobsManifest !== undefined,
       hasLocalServices: cohort.localServicesPlanSource !== undefined,
+      ...(input.options.runtime === "node" ? { runtime: "node" as const } : {}),
       tooling: cohort.tooling,
     }),
   );
   yield* files.writeText(
     join(input.stage, "Dockerfile"),
-    dockerfile(cohort.jobsManifest !== undefined, cohort.productionRepairs.assets.length > 0),
+    dockerfile(
+      cohort.jobsManifest !== undefined,
+      cohort.productionRepairs.assets.length > 0,
+      input.options.runtime,
+    ),
   );
   yield* files.writeText(
     join(input.stage, ".dockerignore"),

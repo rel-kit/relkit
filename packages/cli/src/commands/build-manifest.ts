@@ -26,6 +26,7 @@ export function buildManifest(input: BuildManifestInputs): string {
     graphHash: input.graphHash,
     activationFingerprint: input.activationFingerprint,
     graphFile: "application.graph.json",
+    ...(input.runtime === undefined ? {} : { runtime: input.runtime }),
     ...(input.hasJobs ? { jobsManifestFile: GENERATED_ARTIFACT_FILES.jobsManifest } : {}),
     runtimeManifestFile: "server/runtime.manifest.ts",
     runtimeActivationFile: `server/${RUNTIME_ACTIVATION_FILE}`,

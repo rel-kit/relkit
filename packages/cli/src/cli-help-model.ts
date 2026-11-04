@@ -78,7 +78,10 @@ const root = command(
         },
       ),
       command("build", "Build the checked graph, manifest, OpenAPI, and client", "relkit build", {
-        options: [projectRoot],
+        options: [
+          projectRoot,
+          option("runtime", "choice", "Runtime the production server runs on", [], ["bun", "node"]),
+        ],
       }),
       command("start", "Start a built application", "relkit start", {
         options: [projectRoot, option("port", "integer", "Application port")],

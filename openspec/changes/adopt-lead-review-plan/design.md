@@ -186,6 +186,13 @@ Decided while applying section 14 (maintainer, 2026-11-05):
   subprocess and glob code, and the `node:` imports of `relkit` areas) are counted per file in
   `scripts/portability-baseline.json`; a file's count may only shrink, and
   `--update-baseline` only lowers counts.
+- **`relkit build --runtime node` keeps Bun for installs.** The bundle targets Node and the server
+  imports `relkit/runtime/node`; Node 22 has no `import.meta.main`, so the Node entry point compares
+  `import.meta.url` with `process.argv[1]`. The Node Dockerfile is two-stage: the pinned Bun image
+  runs `bun install --production`, which applies the selected `patchedDependencies` that npm does
+  not support, and a pinned `node:24.22.0-bookworm-slim` image runs `node server/index.js` as the
+  `node` user. `manifest.json` gains `"runtime": "node"` only for Node builds, so Bun builds stay
+  byte-identical. `relkit dev` and `relkit start` still run on Bun.
 
 ### D8. TypeScript 7 (#11)
 

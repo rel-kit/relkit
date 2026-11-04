@@ -4,6 +4,7 @@ import { Effect } from "effect";
 import { cliTry } from "../cli-errors.js";
 import type { ProcessCapabilities } from "../services/process.types.js";
 import { HTTP_TRANSPORT_REQUIREMENTS } from "relkit/runtime-hono/prepared";
+import type { RuntimeName } from "relkit/runtime";
 
 /**
  * Bundles one emitted server and preserves the native diagnostic on failure.
@@ -12,6 +13,8 @@ import { HTTP_TRANSPORT_REQUIREMENTS } from "relkit/runtime-hono/prepared";
  * @param root - Consuming project resolution context.
  * @param development - Whether to retain inline source maps.
  * @param inventory - Prepared capsule inventory filename and chunk selection.
+ * @param external - Selected packages left external by the bundler.
+ * @param runtime - Bundle target; Node bundles resolve Node built-ins instead of Bun's.
  * @returns Completion after the child and output readers have physically settled.
  */
 export const runBundleProcess = Effect.fn("Project.bundleProcess")(function* (
@@ -21,6 +24,7 @@ export const runBundleProcess = Effect.fn("Project.bundleProcess")(function* (
   development: boolean,
   inventory?: "bun.inputs.json",
   external: readonly string[] = [],
+  runtime: RuntimeName = "bun",
 ) {
   const externalPackages = new Set([
     ...external,
@@ -38,7 +42,7 @@ export const runBundleProcess = Effect.fn("Project.bundleProcess")(function* (
     command: process.execPath,
     args: [
       "build",
-      "--target=bun",
+      `--target=${runtime}`,
       "--format=esm",
       ...[...externalPackages].flatMap((name) => [`--external=${name}`, `--external=${name}/*`]),
       ...optionalLeaves.map((name) => `--external=${name}`),
