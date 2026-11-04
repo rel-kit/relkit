@@ -21,7 +21,6 @@
     "@relkit/langchain": "0.7.15",
     "@relkit/local": "0.7.14",
     "@scalar/hono-api-reference": "0.12.9",
-    "effect": "4.0.1",
     "langchain": "1.5.10",
     "langsmith": "0.10.8",
     "relkit": "0.8.8",

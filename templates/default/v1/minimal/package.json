@@ -17,7 +17,6 @@
   "dependencies": {
     "@relkit/app": "0.8.4",
     "@scalar/hono-api-reference": "0.12.9",
-    "effect": "4.0.1",
     "relkit": "0.8.8",
     "zod": "4.6.7"
   },

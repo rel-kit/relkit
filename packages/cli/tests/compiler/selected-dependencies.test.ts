@@ -79,7 +79,8 @@ it("preflight is emitted before statically traceable executable imports", () => 
   const source = generateRuntimeIntegrationImports(plan);
   expect(source).toContain('from "relkit/host";');
   expect(source).not.toContain('from "@relkit/provider/');
-  expect(source.indexOf("checkIntegrationDependencies")).toBeLessThan(
+  expect(source).not.toContain('from "effect"');
+  expect(source.indexOf("checkRuntimeIntegrations")).toBeLessThan(
     source.indexOf('await import("@relkit/langchain/runtime")'),
   );
   expect(source).not.toContain("import * as __relkit_runtime");

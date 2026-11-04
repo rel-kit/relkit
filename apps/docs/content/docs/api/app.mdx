@@ -1736,16 +1736,6 @@ Exposes the framework-owned descriptor identity and application context wiring
 needed by emitted hosts, including selected dependency preflight. Re-exports
 preserve identity while resolving framework dependencies from their owning app.
 
-### SelectedDependenciesLive
-
-**Signature**
-
-```ts
-declare const SelectedDependenciesLive: Layer<SelectedDependencies, never, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L10)
-
 ### bindDescriptorIdentity
 
 **Signature**
@@ -1756,23 +1746,15 @@ declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: stri
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L6)
 
-### checkIntegrationDependencies
+### checkRuntimeIntegrations
 
 **Signature**
 
 ```ts
-declare const checkIntegrationDependencies: (
+declare const checkRuntimeIntegrations: (
   plan: RuntimeIntegrationPlan,
-  options: {
-    readonly projectRoot: string;
-    readonly phase: IntegrationDependencyPhase;
-    readonly manager?: DependencyPackageManager;
-  },
-) => Effect<
-  Array<Array<InstalledPackageIdentity>>,
-  DependencyResolutionFailure | SelectedDependencyFailure,
-  SelectedDependencies
->;
+  options: { readonly projectRoot: string; readonly phase: IntegrationDependencyPhase },
+) => Promise<void>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L9)
@@ -1789,18 +1771,18 @@ declare const createApplicationContextResolver: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L7)
 
-### initializeIntegration
+### loadRuntimeIntegration
 
 **Signature**
 
 ```ts
-declare const initializeIntegration: <Module>(
+declare const loadRuntimeIntegration: <Module>(
   packageName: string,
   load: () => Promise<Module>,
-) => Effect<Module, SelectedDependencyInitializationFailure, never>;
+) => Promise<Module>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L10)
 
 ## `index.ts`
 

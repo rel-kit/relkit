@@ -78,5 +78,7 @@ export function case4Generation() {
   expect(source.match(/await import\(/g)).toHaveLength(2);
   expect(source).toContain('await import("@relkit/cloudflare/runtime")');
   expect(source).toContain('await import("@relkit/redis/runtime")');
-  expect(source.indexOf("await Effect.runPromise")).toBeLessThan(source.indexOf("await import("));
+  expect(source.indexOf("await checkRuntimeIntegrations(")).toBeLessThan(
+    source.indexOf("await import("),
+  );
 }

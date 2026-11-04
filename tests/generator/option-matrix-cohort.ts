@@ -108,7 +108,6 @@ function verifyGeneratedManifest(
     relkit: relkitManifest.version,
     "@scalar/hono-api-reference": "0.12.9",
     zod: "4.6.7",
-    effect: workspaceManifest.catalog.effect,
     ...(template === "tasks"
       ? {
           "@relkit/docker": creatorManifest.relkit.providerVersions["@relkit/docker"],

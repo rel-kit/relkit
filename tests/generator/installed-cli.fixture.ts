@@ -169,7 +169,6 @@ export async function assertInstalledManifest(fixture: InstalledCliFixture) {
     "@relkit/app": expect.stringMatching(/^\d+\.\d+\.\d+$/),
     relkit: fixture.appVersion,
     "@scalar/hono-api-reference": "0.12.9",
-    effect: fixture.packedCli.dependencies?.effect,
     zod: expect.stringMatching(/^\d+\.\d+\.\d+$/),
   });
   expect(manifest.devDependencies["@relkit/cli"]).toBe(fixture.packedCli.version);

@@ -37,7 +37,7 @@ export const generateRuntimeIntegrationImportsEffect = Effect.fn(
       specifierEffect(entry).pipe(
         Effect.map(
           (value) =>
-            `const __relkit_runtime_${index} = await Effect.runPromise(initializeIntegration(${sourceJson(JSON.stringify(entry.packageName))}, async () => await import(${sourceJson(JSON.stringify(value))})));`,
+            `const __relkit_runtime_${index} = await loadRuntimeIntegration(${sourceJson(JSON.stringify(entry.packageName))}, async () => await import(${sourceJson(JSON.stringify(value))}));`,
         ),
       ),
     );
@@ -55,10 +55,10 @@ export const generateRuntimeIntegrationImportsEffect = Effect.fn(
       ),
     };
     // Match the emitted module's native import ancestry after production relocation.
-    const preflight = `import { Effect } from "effect";
-import { fileURLToPath } from "node:url";
-import { checkIntegrationDependencies, SelectedDependenciesLive, initializeIntegration } from "relkit/host";
-await Effect.runPromise(checkIntegrationDependencies(${sourceJson(JSON.stringify(selectedPlan))}, { projectRoot: fileURLToPath(new URL(".", import.meta.url)), phase: "runtime" }).pipe(Effect.provide(SelectedDependenciesLive)));
+    // The module imports only Promise APIs from relkit/host, so applications need no `effect`.
+    const preflight = `import { fileURLToPath } from "node:url";
+import { checkRuntimeIntegrations, loadRuntimeIntegration } from "relkit/host";
+await checkRuntimeIntegrations(${sourceJson(JSON.stringify(selectedPlan))}, { projectRoot: fileURLToPath(new URL(".", import.meta.url)), phase: "runtime" });
 `;
     return `${preflight}${imports.join("\n")}\n\nexport const runtimeIntegrationModules = [\n${entries.join("\n")}\n] as const;\n`;
   },

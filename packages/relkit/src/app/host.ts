@@ -6,7 +6,6 @@
 export { bindDescriptorIdentity } from "../invocation/index.js";
 export { createApplicationContextResolver } from "./context-resolver.js";
 export {
-  checkIntegrationDependencies,
-  SelectedDependenciesLive,
-  initializeIntegration,
-} from "../provider/dependency-preflight.service.js";
+  checkRuntimeIntegrations,
+  loadRuntimeIntegration,
+} from "../provider/dependency-runtime.js";
