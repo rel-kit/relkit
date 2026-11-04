@@ -16,6 +16,7 @@ import { runtimeCohort } from "../../packages/relkit/tests/runtime-hono/test-coh
 import { AGENT_ID, commerceAgentPlan } from "./commerce-agent-plan.js";
 import { commerceAgentEngine } from "./commerce-agent-engine.js";
 import { commerceAgentRuntimeSettings } from "./commerce-agent-settings.js";
+import { withDevContract } from "./commerce-dev-contract.js";
 
 const manifestSchema = Schema.Struct({ publicFingerprint: Schema.String });
 
@@ -32,22 +33,25 @@ class CommerceAgentServer extends Context.Service<CommerceAgentServer>()(
       const app = yield* Effect.acquireRelease(fixtureApp(stateRoot), (app) =>
         Effect.promise(() => app.close()),
       );
+      const contract = withDevContract((request) =>
+        app.fetch(
+          new Request(request, {
+            signal: AbortSignal.any([request.signal, closing.signal]),
+          }),
+        ),
+      );
       const server = yield* Effect.acquireRelease(
         Effect.sync(() =>
           Bun.serve({
             hostname: "127.0.0.1",
             port: Number(process.env.RELKIT_COMMERCE_FIXTURE_PORT ?? 4010),
-            fetch: (request) =>
-              app.fetch(
-                new Request(request, {
-                  signal: AbortSignal.any([request.signal, closing.signal]),
-                }),
-              ),
+            fetch: (request) => contract.fetch(request),
           }),
         ),
         (server) =>
           Effect.promise(async () => {
             closing.abort();
+            contract.close();
             await server.stop(true);
           }),
       );

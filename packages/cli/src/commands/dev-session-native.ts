@@ -5,6 +5,7 @@ import {
   createSupervisorProxy,
   createSupervisorStateMachine,
 } from "../supervisor/index.js";
+import { createContractPublisher } from "../supervisor/contract-publish.js";
 import type { DevSessionState } from "./dev-session.types.js";
 import type { DevOptions, DevLog } from "./dev.types.js";
 
@@ -26,9 +27,11 @@ export function createDevNativeSession(
       Ref.getUnsafe(state).fingerprints.get(token.generationToken) ??
       Ref.getUnsafe(state).fingerprint,
   });
+  const contracts = createContractPublisher();
   const stateMachine = createSupervisorStateMachine({
     onTelemetry: (event) => {
       observability.emit(event);
+      contracts.observe(event);
       log({
         level: event.type === "outcome" && event.outcome.endsWith("failed") ? "error" : "info",
         event: `supervisor.${event.type}`,
@@ -45,7 +48,7 @@ export function createDevNativeSession(
     intercept: (request) => {
       if (isPrivateInspectionPath(new URL(request.url).pathname))
         return Promise.resolve(new Response("Not found", { status: 404 }));
-      return options.intercept?.(request);
+      return contracts.intercept(request) ?? options.intercept?.(request);
     },
     ...(options.hostname === undefined ? {} : { hostname: options.hostname }),
     ...(options.stablePort === undefined ? {} : { port: options.stablePort }),
@@ -54,7 +57,7 @@ export function createDevNativeSession(
         .drains.get(`${token.sourceToken}:${token.generationToken}`)
         ?.track(token),
   });
-  return { observability, stateMachine, proxy };
+  return { observability, stateMachine, proxy, contracts };
 }
 
 /** Keeps core readiness, identity, jobs RPC and selected public transports independent. */

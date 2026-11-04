@@ -358,6 +358,24 @@ Decided while applying section 11 (maintainer, 2026-11-05):
   `canonicalJson`, `createOperationId`, the contract events path) are copied into
   `packages/client/src/wire.ts`, and `tests/compatibility/wire.test.ts` checks each against
   `relkit/contracts`.
+- **Development contract channel.** The channel is the backend's public development port, the
+  one the frontend already calls. The supervisor's stable proxy serves
+  `GET /_relkit/v1/client/contract-events` itself (through its existing `intercept` option), so
+  the stream outlives generation switches and never holds a retiring generation's drain open.
+  `packages/cli/src/supervisor/contract-publish.ts` holds the publisher; it listens to the
+  supervisor's `switch-succeeded` telemetry and sends a `contract` event, and
+  `commands/dev-session-native.ts` wires it in with three lines, leaving the supervisor
+  otherwise untouched for section 13. The event carries only the generation number;
+  `RelkitClientProvider` answers it, and the `ready` event on every reconnect, by re-reading the
+  identity document, so the new public fingerprint changes the query scope and queries refetch.
+  Once the stream has connected, the provider trusts the backend's fingerprint over the one
+  compiled into the frontend and no longer reports `application-updated`; outside `relkit dev`
+  the stream answers 404 and the old check stays. The runtime `api` proxy needs no reload, and
+  types follow because the frontend includes the regenerated `client-registry.d.ts`.
+- **Browser proof.** The commerce browser fixture mounts the same publisher plus a test-only
+  endpoint that switches the reported fingerprint; `tests/e2e-commerce/contract-reload.spec.ts`
+  checks that the page re-reads its identity, refetches under the new contract, shows no restart
+  alert and still posts. With the provider's subscription disabled the test fails.
 
 ### D16. Agent adapters (#22)
 

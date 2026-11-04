@@ -23,6 +23,7 @@ import { createClient } from "../transport.js";
 import { clearPendingOperations, pendingScopeKey } from "./pending.js";
 import { RealtimeManager } from "./realtime-manager.js";
 import { borrowViewOwner } from "./view-owner.js";
+import { followContractEvents, followsContractEvents } from "./contract-events.js";
 import {
   browserOrigin,
   compiledFingerprint,
@@ -53,6 +54,9 @@ export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNod
   const [queryClient] = useState(() => props.queryClient ?? new QueryClient());
   const [identity, setIdentity] = useState<ClientIdentityDocument>();
   const [failed, setFailed] = useState(false);
+  // Development only: the backend announces contract changes, and the client adopts them.
+  const [contractRevision, setContractRevision] = useState(0);
+  const [liveContract, setLiveContract] = useState(false);
   const previous = useRef<string | undefined>(undefined);
   const previousPendingScope = useRef<string | undefined>(undefined);
   const realtimeOwners = useRef(new WeakMap<object, object>());
@@ -100,6 +104,22 @@ export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNod
     [realtime],
   );
   useEffect(() => {
+    if (!followsContractEvents()) return;
+    const controller = new AbortController();
+    void followContractEvents(
+      baseUrl,
+      {
+        changed: () => setContractRevision((revision) => revision + 1),
+        // Once followed, the stream stays the authority even while it reconnects.
+        live: (connected) => {
+          if (connected) setLiveContract(true);
+        },
+      },
+      controller.signal,
+    );
+    return () => controller.abort();
+  }, [baseUrl]);
+  useEffect(() => {
     const controller = new AbortController();
     setFailed(false);
     void loadIdentity(baseUrl, props.credentials ?? "include", controller.signal)
@@ -133,8 +153,9 @@ export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNod
     props.hydratedState,
     props.identityKey,
     queryClient,
+    contractRevision,
   ]);
-  const compiled = compiledFingerprint();
+  const compiled = liveContract ? undefined : compiledFingerprint();
   const status = failed
     ? "error"
     : identity === undefined
