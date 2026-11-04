@@ -482,6 +482,7 @@
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
+        "@modelcontextprotocol/client": "2.3.0",
         "@relkit/local": "workspace:*",
         "@relkit/pulumi": "workspace:*",
         "vitest": "catalog:",
