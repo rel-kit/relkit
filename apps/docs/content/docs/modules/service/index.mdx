@@ -68,7 +68,8 @@ function. Add the other directories only when the domain needs those capabilitie
 
 The compiler discovers exported descriptors, checks their relationships, and produces an application
 graph and runtime manifest. The runtime, Inspector, and deployment tooling use that checked model.
-Application authors use ordinary TypeScript descriptors; no Effect imports are required.
+Application authors use ordinary TypeScript descriptors; no Effect imports are required. If you
+use Effect, a handler can return one; see [Write functions with Effect](/docs/modules/service/effect).
 
 Existing flat `src/<name>/service.ts` apps remain supported. Scaffolding preserves their detected
 layout, while empty projects default to grouped. Keep one boundary shape throughout the app;

@@ -102,7 +102,7 @@ not tasks of this change.
 - [x] 9.2 Tighten the declaration scanner again so the root entry and generated application declarations expose no Effect types, and verify it fails on a leaking fixture
 - [x] 9.3 Move the Effect usage in generated `runtime-integrations.ts` into the runtime so applications need no direct `effect` dependency, and verify a generated app builds and runs without `effect` in its manifest
 - [x] 9.4 Keep Effect-returning handlers on the same cancellation, tracing and error mapping as Promise handlers, and verify engine tests that run both side by side
-- [ ] 9.5 Document returning Effects and the `relkit/effect` entry point, and verify the doc examples compile
+- [x] 9.5 Document returning Effects and the `relkit/effect` entry point, and verify the doc examples compile
 
 ## 10. One way to do each thing and the runtime handle (#15)
 

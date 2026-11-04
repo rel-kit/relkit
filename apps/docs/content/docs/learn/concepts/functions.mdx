@@ -76,6 +76,10 @@ handler uses. Event publication is separate: list exact event IDs in `publishes`
 Use the supplied context, honor its abort signal, and return the declared output. Let unexpected defects
 cross RelKit's safe boundary rather than converting them into unstable public errors.
 
+A handler can also return an Effect when your application already uses Effect. RelKit runs it with the
+same cancellation, timeouts, tracing and error handling; see
+[Write functions with Effect](/docs/modules/service/effect).
+
 ### Hooks and transport policy
 
 `onBefore` transforms validated input before the handler. `onAfter` transforms successful output before final

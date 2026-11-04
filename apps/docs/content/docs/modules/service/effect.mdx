@@ -46,7 +46,9 @@ it with the same cancellation, timeout, tracing and error handling as an `async`
 
 `relkit/effect` holds the Effect form of each `relkit` function, such as `defineFunctionEffect`,
 `defineRouteEffect`, `failEffect` and `streamOfEffect`. Each returns an Effect that builds the same
-descriptor or failure as the Promise-based function. The `relkit` entry point itself has no Effect
-types. See the [Effect API reference](/docs/api/effect) for the full list.
+descriptor or failure as the Promise-based function. `callToolEffect(tool, input)` and
+`callGraphNodeEffect(node, input)` are the Effect forms of a tool's or graph node's `invoke`. The
+`relkit` entry point itself has no Effect types. See the [Effect API reference](/docs/api/effect)
+for the full list.
 
 <include>/_snippets/generated/related/docs-modules-service-effect.mdx</include>
