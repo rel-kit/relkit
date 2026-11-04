@@ -1,4 +1,5 @@
 /** Checks the agent adapter interface and `defineAgent`'s `runtime` and model profile typing. */
+import { aiSdk } from "@relkit/ai-sdk";
 import { langchain } from "@relkit/langchain";
 import { todoListMiddleware } from "langchain";
 import { defineAgent } from "relkit/agents";
@@ -68,11 +69,20 @@ const agent = defineAgent({
 });
 const adapterId: "langchain" = agent.runtime.adapterId;
 void adapterId;
+// The same agent swaps adapters without other edits.
+const swapped = defineAgent({
+  id: "types.swapped",
+  runtime: aiSdk(),
+  model: "default",
+  ...portable,
+});
+const swappedId: "ai-sdk" = swapped.runtime.adapterId;
+void swappedId;
 
 // @ts-expect-error Agents require a runtime adapter.
 defineAgent({ id: "types.no-runtime", ...portable });
 // @ts-expect-error Native models go in the adapter's options; `model` names a profile.
-defineAgent({ id: "types.native-model", runtime: langchain(), model: {}, ...portable });
+defineAgent({ id: "types.native-model", runtime: aiSdk(), model: {}, ...portable });
 // @ts-expect-error Middleware is a LangChain option, not a portable field.
 defineAgent({ id: "types.middleware", runtime: langchain(), middleware: [], ...portable });
 
@@ -86,6 +96,14 @@ const tied = defineAgent({
 });
 const middleware: readonly [ReturnType<typeof todoListMiddleware>] = tied.middleware;
 void middleware;
+defineAgent({
+  id: "types.untied",
+  runtime: aiSdk(),
+  ...portable,
+  stateProfile: "default",
+  // @ts-expect-error The AI SDK adapter exposes no middleware state.
+  client: { public: true, state: ["todos"] },
+});
 
 type LangchainValue = ReturnType<typeof langchain>;
 const value: AgentRuntimeAdapter<"langchain", unknown, object, string> = {} as LangchainValue;
