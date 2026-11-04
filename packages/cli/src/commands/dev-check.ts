@@ -146,7 +146,13 @@ async function stopWorker(worker: DevCheckerWorker): Promise<void> {
   } catch (error) {
     if (!(error instanceof Error && "code" in error && error.code === "ESRCH")) throw error;
   }
-  await Promise.race([exited, Bun.sleep(5_000)]);
+  // A cleared timer, so a worker that exits at once does not hold the process for the deadline.
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  await Promise.race([
+    exited,
+    new Promise<void>((resolve) => (timer = setTimeout(resolve, 5_000))),
+  ]);
+  clearTimeout(timer);
   child.removeAllListeners();
   child.stderr?.removeAllListeners();
 }
