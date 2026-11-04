@@ -210,7 +210,7 @@ not tasks of this change.
 - [x] 19.6 Evaluate MCP elicitation for approval-required tools on `/mcp`, record the decision, and return an actionable coded error when approval is not possible, and verify the error test
 - [ ] 19.7 Add Inspector UI actions for publishing and replaying events, triggering jobs and retrying or cancelling event deliveries, and verify browser tests
 - [ ] 19.8 Add the Inspector page that lists MCP-exposed tools and calls them, and verify a browser test that calls a tool and opens its trace
-- [ ] 19.9 Run the agent evaluations in release readiness and record the pass rate as a CI output, and verify the pull request's run records it
+- [x] 19.9 Run the agent evaluations in release readiness and record the pass rate as a CI output, and verify the pull request's run records it
 - [ ] 19.10 Document setting up `relkit mcp` for coding agents, and verify the docs build
 
 ## 20. Metrics and launch (#21)
