@@ -9,6 +9,10 @@ import { isRecord, refId } from "./normalize-utils.js";
 import { graphIdForDescriptor, graphIdForReference } from "./normalize-graph-id.js";
 
 const dependencyEdges: Readonly<Record<string, string>> = {
+  functions: "calls-function",
+  events: "publishes-event",
+  channels: "triggers-channel",
+  databases: "uses-database",
   tasks: "triggers-task",
   jobs: "enqueues-job",
   buckets: "uses-bucket",
@@ -141,7 +145,7 @@ export function addDependencyEdges(
  * @returns The graph edge kind for the dependency group, or undefined.
  */
 function taskDependencyEdge(name: string): string | undefined {
-  return ({ tasks: "triggers-task", jobs: "triggers-job" } as Record<string, string>)[name];
+  return name === "jobs" ? "triggers-job" : dependencyEdges[name];
 }
 
 /**

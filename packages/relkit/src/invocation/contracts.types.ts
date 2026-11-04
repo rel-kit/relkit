@@ -64,6 +64,7 @@ export interface InvocationTarget<
   readonly errors?: readonly InvocationErrorDefinition[];
   readonly publications?: Readonly<Record<string, unknown>>;
   readonly publishes?: readonly string[];
+  readonly dependencies?: Readonly<Record<string, Readonly<Record<string, unknown>>>>;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   /** Transforms validated input before the handler runs.

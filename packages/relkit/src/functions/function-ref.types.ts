@@ -88,3 +88,32 @@ export type CacheRefAny = CacheRef;
  * @example const ref: AgentRefAny = agent;
  */
 export type AgentRefAny = AgentRef;
+
+/** Parameter and event schemas for a channel reference.
+ * @example const ref: ChannelRef = channel;
+ */
+export interface ChannelRef<
+  Id extends string = string,
+  ParamsSchema extends StandardSchemaV1 = StandardSchemaV1,
+  Events extends Readonly<Record<string, StandardSchemaV1>> = Readonly<
+    Record<string, StandardSchemaV1>
+  >,
+> extends DescriptorRef<"channel", Id> {
+  readonly params: ParamsSchema;
+  readonly events: Events;
+  readonly presence?: unknown;
+}
+
+/** Stable reference to a database service whose context the handler receives.
+ * @example const ref: DatabaseRef = database;
+ */
+export type DatabaseRef<Id extends string = string> = DescriptorRef<"service", Id>;
+
+/** Broad channel reference for heterogeneous collections.
+ * @example const ref: ChannelRefAny = channel;
+ */
+export type ChannelRefAny = ChannelRef;
+/** Broad database reference for heterogeneous collections.
+ * @example const ref: DatabaseRefAny = database;
+ */
+export type DatabaseRefAny = DatabaseRef;

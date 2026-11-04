@@ -19,6 +19,8 @@ export const GRAPH_EDGE_KINDS = [
   "triggers-task",
   "publishes-event",
   "listens-to-event",
+  "triggers-channel",
+  "uses-database",
   "uses-bucket",
   "uses-cache",
   "invokes-agent",

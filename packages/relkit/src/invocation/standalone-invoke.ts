@@ -154,6 +154,9 @@ export function invokeStandaloneEffect<
                 env: options.env ?? {},
                 time,
                 publishes: request.target.publishes ?? [],
+                ...(request.target.dependencies === undefined
+                  ? {}
+                  : { dependencies: request.target.dependencies }),
                 ...(options.logger === undefined ? {} : { logger: options.logger }),
                 ...(options.clients === undefined ? {} : { clients: options.clients }),
                 ...(progress === undefined ? {} : { progress: progress.emitter }),

@@ -73,7 +73,7 @@ Acquires the sole database and releases it exactly once with the returned owner.
 declare const activateDrizzleTestServices: TestServiceActivator;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-drizzle-services.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-drizzle-services.ts#L22)
 
 ## `application-errors.ts`
 
@@ -553,7 +553,7 @@ Owns scoped database/auth activation for a test application in either service la
 declare const ApplicationServicesPlatform: ApplicationServicesPlatform;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L18)
 
 ### TestApplicationServices
 
@@ -563,7 +563,7 @@ declare const ApplicationServicesPlatform: ApplicationServicesPlatform;
 declare const TestApplicationServices: TestApplicationServices;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L19)
 
 ### TestServices (class)
 
@@ -575,7 +575,7 @@ Database and authentication authorities whose lifetime follows their Layer.
 declare class TestServices
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L40)
 
 ### TestServicesPlatform (class)
 
@@ -587,7 +587,7 @@ Native activation dependencies acquired once per application owner.
 declare class TestServicesPlatform
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L22)
 
 ### TestServicesPlatformLive
 
@@ -599,7 +599,7 @@ Live native adapters; no database or auth client is acquired by this Layer.
 declare const TestServicesPlatformLive: Layer.Layer<TestServicesPlatform, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L91)
 
 ### activateTestServices
 
@@ -615,7 +615,7 @@ declare const activateTestServices: (
 ) => Promise<TestApplicationServices>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L118)
 
 ### testServicesLayer
 
@@ -631,7 +631,7 @@ declare const testServicesLayer: (
 ) => Layer.Layer<TestServices, Error, TestServicesPlatform>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L103)
 
 ## `application-services.types.ts`
 

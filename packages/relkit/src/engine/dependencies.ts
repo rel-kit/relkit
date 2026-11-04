@@ -6,7 +6,13 @@ import type {
   DependencyClientBuildOptions,
   DependencyClientMaps,
 } from "./dependencies.types.js";
-import { createClient, dependencyId, edgeKind, guardedMap } from "./dependency-clients.js";
+import {
+  createClient,
+  declaredDependencies,
+  dependencyId,
+  edgeKind,
+  guardedMap,
+} from "./dependency-clients.js";
 import { runEngineSync } from "./engine-runtime.js";
 export type {
   DependencyBridge,
@@ -27,9 +33,12 @@ export { DependencyAccessError, DependencyNotConfiguredError } from "./dependenc
 
 /** Client families exposed by guarded invocation contexts. */
 export const DEPENDENCY_CATEGORIES = [
+  "functions",
   "tasks",
   "jobs",
   "events",
+  "channels",
+  "databases",
   "buckets",
   "cache",
   "agents",
@@ -47,28 +56,21 @@ export function buildDependencyClients(
 
 /** Compose buildDependencyClients with the caller's Effect diagnostics and dependencies.
  * @param options - Explicit operation configuration.
- * @returns A lazy Effect yielding guarded client maps; unsupported event dependencies fail with TypeError.
+ * @returns A lazy Effect yielding guarded client maps.
  */
 export const buildDependencyClientsEffect = Effect.fn("Engine.buildDependencyClients")(
   (options: DependencyClientBuildOptions) =>
     observeExecution(
       "engine",
       "buildDependencyClients",
-      Effect.gen(function* () {
-        if (options.dependencies !== undefined && Object.hasOwn(options.dependencies, "events")) {
-          return yield* Effect.fail(
-            new TypeError("Event dependencies are not supported; declare publishes instead"),
-          );
-        }
-        return Object.freeze({
-          tasks: buildCategory("tasks", options),
-          jobs: buildCategory("jobs", options),
-          events: buildCategory("events", options),
-          buckets: buildCategory("buckets", options),
-          cache: buildCategory("cache", options),
-          agents: buildCategory("agents", options),
-        });
-      }),
+      Effect.sync(
+        () =>
+          Object.freeze(
+            Object.fromEntries(
+              DEPENDENCY_CATEGORIES.map((category) => [category, buildCategory(category, options)]),
+            ),
+          ) as DependencyClientMaps,
+      ),
     ),
 );
 
@@ -81,8 +83,7 @@ function buildCategory(
   category: DependencyCategory,
   options: DependencyClientBuildOptions,
 ): Readonly<Record<string, unknown>> {
-  const declarations =
-    category === "events" ? (options.publications ?? {}) : (options.dependencies?.[category] ?? {});
+  const declarations = declaredDependencies(category, options);
   const sources = options.sources?.[category] ?? {};
   const clients: Record<string, unknown> = Object.create(null);
   for (const [name, declaration] of Object.entries(declarations)) {

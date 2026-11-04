@@ -151,3 +151,31 @@ export type CacheClients<M> = {
 export type AgentClients<M> = {
   readonly [Name in keyof NonNullable<M> & string]: AgentClientFor<NonNullable<M>[Name]>;
 };
+
+/** Typed callable client for a function declared under `dependencies.functions`.
+ * @param input - Function input inferred from its schema.
+ * @returns Output inferred from the function schema.
+ * @example const price: FunctionClientFor<typeof priceOrder> = context.functions.priceOrder;
+ */
+export type FunctionClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
+/** Named function clients projected from dependencies.
+ * @example const functions: FunctionClients<typeof dependencies.functions> = context.functions;
+ */
+export type FunctionClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: FunctionClientFor<NonNullable<M>[Name]>;
+};
+/** Handler context of a database service declared under `dependencies.databases`.
+ * Database integrations map their service descriptors through `Relkit.DatabaseContexts`.
+ * @example const db: DatabaseClientFor<typeof database> = context.databases.main;
+ */
+export type DatabaseClientFor<T> = [
+  Relkit.DatabaseContexts<T>[keyof Relkit.DatabaseContexts<T>],
+] extends [never]
+  ? Readonly<Record<string, unknown>>
+  : Relkit.DatabaseContexts<T>[keyof Relkit.DatabaseContexts<T>];
+/** Named database contexts projected from dependencies.
+ * @example const databases: DatabaseClients<typeof dependencies.databases> = context.databases;
+ */
+export type DatabaseClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: DatabaseClientFor<NonNullable<M>[Name]>;
+};

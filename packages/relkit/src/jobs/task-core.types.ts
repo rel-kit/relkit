@@ -6,9 +6,16 @@ import type {
   BucketRefAny,
   CacheClients,
   CacheRefAny,
+  ChannelRefAny,
+  DatabaseClients,
+  DatabaseRefAny,
   EventClients,
+  EventRefAny,
+  FunctionClients,
+  FunctionRefAny,
   ResolvedApplicationEnv,
 } from "../functions/index.js";
+import type { ChannelClients } from "../realtime/channel-client.types.js";
 import type {
   InvocationMetadata,
   PublicClock,
@@ -77,6 +84,10 @@ type RegisteredContext<
 
 /** Resources a task explicitly declares before it can be executed. */
 export interface TaskDependencies {
+  readonly functions?: Readonly<Record<string, FunctionRefAny>>;
+  readonly events?: Readonly<Record<string, EventRefAny>>;
+  readonly channels?: Readonly<Record<string, ChannelRefAny>>;
+  readonly databases?: Readonly<Record<string, DatabaseRefAny>>;
   readonly tasks?: Readonly<Record<string, TaskRefAny>>;
   readonly jobs?: Readonly<Record<string, JobRefAny>>;
   readonly agents?: Readonly<Record<string, AgentRefAny>>;
@@ -111,12 +122,16 @@ export interface TaskContextBase<
   readonly log: PublicLogger;
   readonly trace: PublicTrace;
   readonly time: PublicClock;
+  readonly functions: FunctionClients<Dependencies["functions"]>;
   readonly tasks: TaskClients<Dependencies["tasks"]>;
   readonly jobs: JobTriggerClients<Dependencies["jobs"]>;
+  readonly channels: ChannelClients<Dependencies["channels"]>;
+  readonly databases: DatabaseClients<Dependencies["databases"]>;
   readonly agents: AgentClients<Dependencies["agents"]>;
   readonly buckets: BucketClients<Dependencies["buckets"]>;
   readonly cache: CacheClients<Dependencies["cache"]>;
-  readonly events: EventClients<PublishedEventMap<Publishes>>;
+  readonly events: EventClients<PublishedEventMap<Publishes>> &
+    EventClients<Dependencies["events"]>;
   readonly database: RegisteredContext<"database", Readonly<Record<string, never>>>;
   readonly auth: RegisteredContext<"auth", TaskAuthContext>;
   readonly constants: RegisteredContext<"constants", Readonly<Record<string, never>>>;

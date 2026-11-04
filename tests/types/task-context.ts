@@ -15,8 +15,8 @@ const durable = defineTask({
     await context.progress.emit(1);
     await context.streams.text.emit("ready");
     await context.sleep("1 second", { key: "wait" });
-    // @ts-expect-error task contexts expose declared task clients, not functions
-    context.functions;
+    // @ts-expect-error tasks reach only the functions they declare
+    context.functions.missing;
     // @ts-expect-error undeclared published events are not available
     context.events.missing;
     void runId;

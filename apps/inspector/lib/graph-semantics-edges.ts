@@ -23,6 +23,7 @@ export const EDGE_SEMANTICS: Readonly<Record<string, EdgeSemantics>> = {
   "uses-tool": { group: "ai", label: "uses tool", reverse: "used by" },
   "exposes-as-tool": { group: "ai", label: "exposed as", reverse: "runs" },
   "uses-table": { group: "data", label: "uses", reverse: "used by" },
+  "uses-database": { group: "data", label: "uses", reverse: "used by" },
   "uses-bucket": { group: "data", label: "stores in", reverse: "stores" },
   "uses-cache": { group: "data", label: "caches in", reverse: "caches" },
   "publishes-event": { group: "event", label: "publishes", reverse: "published by" },

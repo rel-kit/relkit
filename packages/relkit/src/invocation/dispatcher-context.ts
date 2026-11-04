@@ -7,6 +7,8 @@ import type {
   ManagedDependencySources,
 } from "./dispatcher-categories.types.js";
 import { createLocalStructuredLogger } from "./local-logger.js";
+import type { InvocationTarget } from "./contracts.types.js";
+import { dispatchInvocation } from "./dispatcher.js";
 import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
 
 /** Public error for accessing a managed client absent from standalone configuration.
@@ -56,18 +58,36 @@ export function makeStandaloneContextEffect<Context extends { readonly signal: A
         options.env,
         options.time,
       );
-      const installManagedMaps = options.factory === undefined || options.clients !== undefined;
-      const managedMaps = installManagedMaps ? yield* createManagedMapsEffect(options.clients) : {};
+      const installManagedMaps =
+        options.factory === undefined ||
+        options.clients !== undefined ||
+        options.dependencies !== undefined;
+      const managedMaps = installManagedMaps
+        ? yield* createManagedMapsEffect(declaredSources(options))
+        : {};
+      const eventSource =
+        options.clients?.events ?? (base as { events?: Readonly<Record<string, unknown>> }).events;
       const events = yield* configuredMapEffect(
         "events",
-        Object.fromEntries(
-          options.publishes.flatMap((id) => {
+        Object.fromEntries([
+          ...options.publishes.flatMap((id) =>
+            eventSource !== undefined && Object.hasOwn(eventSource, id)
+              ? [[id, eventSource[id]]]
+              : [],
+          ),
+          ...Object.entries(options.dependencies?.events ?? {}).flatMap(([name, event]) => {
+            const id = refIdOf(event);
             const source =
-              options.clients?.events ??
-              (base as { events?: Readonly<Record<string, unknown>> }).events;
-            return source !== undefined && Object.hasOwn(source, id) ? [[id, source[id]]] : [];
+              eventSource === undefined
+                ? undefined
+                : Object.hasOwn(eventSource, name)
+                  ? eventSource[name]
+                  : id !== undefined && Object.hasOwn(eventSource, id)
+                    ? eventSource[id]
+                    : undefined;
+            return source === undefined ? [] : [[name, source]];
           }),
-        ),
+        ]),
       );
       return Object.freeze({
         ...base,
@@ -97,6 +117,30 @@ export async function makeStandaloneContext<Context extends { readonly signal: A
     if (cause instanceof ContextFactoryFailure) throw cause.cause;
     throw cause;
   }
+}
+
+/** Adds declared functions, which run through the standalone kernel, to configured clients.
+ * @param options - Standalone context options.
+ * @returns Client sources keyed by managed category.
+ */
+function declaredSources(
+  options: Pick<StandaloneContextOptions<{ readonly signal: AbortSignal }>, "clients" | "dependencies">,
+): ManagedDependencySources {
+  const declared = options.dependencies?.functions;
+  if (declared === undefined) return options.clients ?? {};
+  const functions = Object.fromEntries(
+    Object.entries(declared).map(([name, target]) => [
+      name,
+      (input: unknown) => dispatchInvocation({ target: target as InvocationTarget, input }),
+    ]),
+  );
+  return { ...options.clients, functions: { ...functions, ...options.clients?.functions } };
+}
+
+/** Reads a descriptor reference ID without validating it. */
+function refIdOf(value: unknown): string | undefined {
+  const ref = (value as { readonly ref?: { readonly id?: unknown } } | undefined)?.ref;
+  return typeof ref?.id === "string" ? ref.id : undefined;
 }
 
 /** Builds managed category maps sequentially; mapping is pure and bounded.

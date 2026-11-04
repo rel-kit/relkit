@@ -188,3 +188,14 @@ export type DatabaseContext<Service extends DrizzleServiceDescriptor<any, any, a
     >;
   };
 };
+
+declare global {
+  namespace Relkit {
+    /** Maps a Drizzle service declared under `dependencies.databases` to its handler context. */
+    interface DatabaseContexts<Service> {
+      readonly drizzle: Service extends DrizzleServiceDescriptor<any, any, any, any>
+        ? DatabaseContext<Service>
+        : never;
+    }
+  }
+}

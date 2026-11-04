@@ -29,6 +29,7 @@ import {
 } from "./channel-operations.js";
 import type { ChannelTriggerOptions } from "./dispatch.types.js";
 export type * from "./channel.types.js";
+export type * from "./channel-client.types.js";
 export { getChannelPresenceEffect, triggerChannelEffect };
 /** Constructs a typed channel descriptor through validated Effect operations.
  * @param options - Authored channel options.

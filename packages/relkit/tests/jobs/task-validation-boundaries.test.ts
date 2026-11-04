@@ -19,7 +19,7 @@ test("task dependency declarations reject unsupported shapes before binding", ()
 
   const invalid = [
     null,
-    { functions: {} },
+    { functions: { price: { ref: { kind: "task", id: "x" } } } },
     { unrecognized: {} },
     { tasks: null },
     { tasks: { "bad name": {} } },

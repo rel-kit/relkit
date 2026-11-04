@@ -4,6 +4,19 @@ import { Effect } from "effect";
 import type { FunctionDependencies } from "./types.js";
 import { functionTry, runFunctionSync } from "./function-observability.js";
 
+/** Descriptor kind each dependency map holds. */
+const dependencyKinds: Readonly<Record<keyof FunctionDependencies, DescriptorKind>> = {
+  functions: "function",
+  events: "event",
+  channels: "channel",
+  databases: "service",
+  tasks: "task",
+  jobs: "job",
+  buckets: "bucket",
+  cache: "cache",
+  agents: "agent",
+};
+
 /** Validates and freezes a dependency map through Effect.
  * @param dependencies - Optional named dependencies.
  * @returns Frozen copy or tagged validation failure.
@@ -15,25 +28,14 @@ export const copyDependenciesEffect = Effect.fn("functions.function.copy-depende
   ): Effect.Effect<D | undefined, import("./function-observability.js").FunctionOperationError> =>
     functionTry("function.copy-dependencies", () => {
       if (dependencies === undefined) return undefined;
-      if (Object.hasOwn(dependencies, "functions")) {
-        throw new FunctionInputError(
-          "Function dependencies are not supported; use descriptor.invoke",
-        );
-      }
-      if (Object.hasOwn(dependencies, "events")) {
-        throw new FunctionInputError(
-          "Event dependencies are not supported; declare publishes instead",
-        );
+      if (!isRecord(dependencies))
+        throw new FunctionInputError("Function dependencies must be an object");
+      for (const name of Object.keys(dependencies)) {
+        if (!Object.hasOwn(dependencyKinds, name))
+          throw new FunctionInputError(`Unsupported function dependency map "${name}"`);
       }
       const result: Record<string, unknown> = {};
-      const kinds: Readonly<Record<string, DescriptorKind>> = {
-        tasks: "task",
-        jobs: "job",
-        buckets: "bucket",
-        cache: "cache",
-        agents: "agent",
-      };
-      for (const [name, kind] of Object.entries(kinds)) {
+      for (const [name, kind] of Object.entries(dependencyKinds)) {
         const map = dependencies[name as keyof FunctionDependencies];
         if (map === undefined) continue;
         if (!isRecord(map))
@@ -43,6 +45,10 @@ export const copyDependenciesEffect = Effect.fn("functions.function.copy-depende
           if (!isRecord(target) || !isRef(target.ref, kind)) {
             throw new FunctionInputError(`Invalid ${name} dependency "${client}"`);
           }
+          if (name === "functions" && target.invocationMode === "event-only")
+            throw new FunctionInputError(
+              `Function dependency "${client}" is event-only and cannot be called`,
+            );
           copied[client] = target;
         }
         result[name] = Object.freeze(copied);

@@ -183,9 +183,7 @@ export function validateTargets(
           ))) ||
       !isRecord(target.input) ||
       !isRecord(target.output) ||
-      JSON.stringify(
-        Object.keys(isRecord(target.publications) ? target.publications : {}).sort(),
-      ) !== JSON.stringify(publications)
+      JSON.stringify(declaredPublications(target)) !== JSON.stringify(publications)
     ) {
       issues.push({
         code: "RELKIT_MANIFEST_HANDLER_INVALID",
@@ -197,6 +195,21 @@ export function validateTargets(
     }
   }
   return Object.freeze(targets);
+}
+
+/** List the event IDs a target publishes: bound publications and `dependencies.events`.
+ * @returns Sorted unique event IDs.
+ * @param target - Registered executable target.
+ */
+function declaredPublications(target: Record<string, unknown>): readonly string[] {
+  const events = isRecord(target.dependencies) ? target.dependencies.events : undefined;
+  const dependencyIds = Object.values(isRecord(events) ? events : {}).flatMap((event) =>
+    isRecord(event) && isRecord(event.ref) && typeof event.ref.id === "string"
+      ? [event.ref.id]
+      : [],
+  );
+  const bound = Object.keys(isRecord(target.publications) ? target.publications : {});
+  return [...new Set([...bound, ...dependencyIds])].sort();
 }
 
 /** Recognize non-null object records before reading native fields.

@@ -44,6 +44,8 @@ describe("graph model", () => {
       "triggers-task",
       "publishes-event",
       "listens-to-event",
+      "triggers-channel",
+      "uses-database",
       "uses-bucket",
       "uses-cache",
       "invokes-agent",

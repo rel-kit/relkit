@@ -112,15 +112,29 @@ export function jobGraphNode(
  */
 export function dependencyMetadata(value: unknown): JsonValue {
   const cleaned = clean(value);
-  if (!isRecord(value) || !isRecord(value.agents) || !isRecord(cleaned)) return cleaned;
-  const agents = Object.fromEntries(
-    Object.entries(value.agents).flatMap(([name, agent]) => {
-      const id = refId(agent);
-      return id === undefined ? [] : [[name, { ref: { kind: "agent", id } }]];
-    }),
-  );
-  return { ...cleaned, agents };
+  if (!isRecord(value) || !isRecord(cleaned)) return cleaned;
+  const projected: Record<string, JsonValue> = {};
+  for (const [category, kind] of Object.entries(referenceCategories)) {
+    const map = value[category];
+    if (!isRecord(map)) continue;
+    projected[category] = Object.fromEntries(
+      Object.entries(map).flatMap(([name, target]) => {
+        const id = refId(target);
+        return id === undefined ? [] : [[name, { ref: { kind, id } }]];
+      }),
+    );
+  }
+  return { ...cleaned, ...projected };
 }
+
+/** Dependency maps recorded in the graph as references rather than whole descriptors. */
+const referenceCategories: Readonly<Record<string, string>> = {
+  functions: "function",
+  events: "event",
+  channels: "channel",
+  databases: "service",
+  agents: "agent",
+};
 
 /**
  * Retains a nonempty textual metadata value without coercion.

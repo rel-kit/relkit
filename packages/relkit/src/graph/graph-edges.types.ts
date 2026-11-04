@@ -61,6 +61,8 @@ export type GraphEdge =
   | GraphEdgeBase<"triggers-task">
   | GraphEdgeBase<"publishes-event">
   | GraphEdgeBase<"listens-to-event">
+  | GraphEdgeBase<"triggers-channel">
+  | GraphEdgeBase<"uses-database">
   | GraphEdgeBase<"uses-bucket">
   | GraphEdgeBase<"uses-cache">
   | GraphEdgeBase<"invokes-agent">

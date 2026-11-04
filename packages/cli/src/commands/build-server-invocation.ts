@@ -89,7 +89,8 @@ async function invocationContext({ invocation, signal, env, time }, spanId) {
   const database = databaseStartup === undefined
     ? Object.freeze({})
     : (await databaseStartup).context;
-  return { invocation, signal, env, time, auth, log, trace: publicTrace, database, ...resolved };
+  const databases = databaseNode === undefined ? Object.freeze({}) : Object.freeze({ [databaseNode.id]: database });
+  return { invocation, signal, env, time, auth, log, trace: publicTrace, database, databases, ...resolved };
 }
 
 function createDatabaseRegistration(node, services, env) {

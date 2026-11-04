@@ -1,5 +1,5 @@
 import type { DependencyCategory } from "./dependencies.js";
-import { DependencyAccessError } from "./dependency-clients.js";
+import { DependencyAccessError } from "./dependency-errors.js";
 
 /** Freeze declared client names and reject access to undeclared dependencies.
  * @returns A frozen lookup that throws DependencyAccessError for undeclared names.

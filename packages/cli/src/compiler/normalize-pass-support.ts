@@ -93,6 +93,10 @@ export function dependencyKind(category: string): string {
   return (
     (
       {
+        functions: "function",
+        events: "event",
+        channels: "channel",
+        databases: "service",
         jobs: "job",
         tasks: "task",
         buckets: "bucket",

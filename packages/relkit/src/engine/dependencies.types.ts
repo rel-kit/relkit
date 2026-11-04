@@ -6,7 +6,7 @@ import type { StandardSchemaV1 } from "../schema/index.js";
 import type { DEPENDENCY_CATEGORIES } from "./dependencies.js";
 import type { InvocationErrorDefinition } from "./invoke-types.js";
 
-/** Supported declared client families; events use publications rather than dependencies. */
+/** Supported declared client families. */
 export type DependencyCategory = (typeof DEPENDENCY_CATEGORIES)[number];
 
 /** Authored or manifest-bound dependency identity and invocation metadata. */
@@ -26,13 +26,14 @@ export interface DependencyRefLike {
   readonly dependencies?: DependencyDeclarations;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
+  readonly invocationMode?: "callable" | "event-only";
+  readonly params?: StandardSchemaV1;
+  readonly events?: Readonly<Record<string, StandardSchemaV1>>;
 }
 
 /** Declared capabilities allowed in a handler's guarded context. */
 export type DependencyDeclarations = Partial<{
-  readonly [Category in Exclude<DependencyCategory, "events">]: Readonly<
-    Record<string, DependencyRefLike>
-  >;
+  readonly [Category in DependencyCategory]: Readonly<Record<string, DependencyRefLike>>;
 }>;
 
 /** Runtime provider/client values keyed by names declared on a function. */

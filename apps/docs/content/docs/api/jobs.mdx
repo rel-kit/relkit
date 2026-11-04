@@ -16209,7 +16209,7 @@ declare const DurationInput:
   | `${number} milliseconds`;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L38)
 
 ### InputOf
 
@@ -16219,7 +16219,7 @@ declare const DurationInput:
 declare const InputOf: InputOf<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L60)
 
 ### JobDescriptorForThisTask
 
@@ -16229,7 +16229,7 @@ declare const InputOf: InputOf<T>;
 declare const JobDescriptorForThisTask: JobDescriptorForThisTask<Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L31)
 
 ### JobTriggerClients
 
@@ -16239,7 +16239,7 @@ declare const JobDescriptorForThisTask: JobDescriptorForThisTask<Task>;
 declare const JobTriggerClients: JobTriggerClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L61)
 
 ### MemoryInput (type alias)
 
@@ -16251,7 +16251,7 @@ Human-readable MiB or GiB memory quantity for task resources.
 type MemoryInput = `${number} MiB` | `${number} GiB`;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L70)
 
 ### NormalizedTaskRetryPolicy
 
@@ -16261,7 +16261,7 @@ type MemoryInput = `${number} MiB` | `${number} GiB`;
 declare const NormalizedTaskRetryPolicy: NormalizedTaskRetryPolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L42)
 
 ### OutputOf
 
@@ -16271,7 +16271,7 @@ declare const NormalizedTaskRetryPolicy: NormalizedTaskRetryPolicy;
 declare const OutputOf: OutputOf<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L62)
 
 ### PublishedEventName (type alias)
 
@@ -16283,7 +16283,7 @@ Event names registered for the application.
 type PublishedEventName = Extract<keyof Relkit.EventRegistry, string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L72)
 
 ### RunResultOptions
 
@@ -16293,7 +16293,7 @@ type PublishedEventName = Extract<keyof Relkit.EventRegistry, string>;
 declare const RunResultOptions: RunResultOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L32)
 
 ### ServerTriggerOptions
 
@@ -16303,7 +16303,7 @@ declare const RunResultOptions: RunResultOptions;
 declare const ServerTriggerOptions: ServerTriggerOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L33)
 
 ### TaskAuthContext
 
@@ -16313,7 +16313,7 @@ declare const ServerTriggerOptions: ServerTriggerOptions;
 declare const TaskAuthContext: TaskAuthContext<Session>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L40)
 
 ### TaskClientFor
 
@@ -16323,7 +16323,7 @@ declare const TaskAuthContext: TaskAuthContext<Session>;
 declare const TaskClientFor: TaskClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L63)
 
 ### TaskClients
 
@@ -16333,7 +16333,7 @@ declare const TaskClientFor: TaskClientFor<T>;
 declare const TaskClients: TaskClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L64)
 
 ### TaskConcurrency
 
@@ -16343,7 +16343,7 @@ declare const TaskClients: TaskClients<M>;
 declare const TaskConcurrency: TaskConcurrency<InputKey>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L44)
 
 ### TaskContext (type alias)
 
@@ -16371,7 +16371,7 @@ type TaskContext<
   ([keyof Streams] extends [never] ? {} : { readonly streams: TaskStreamEmitters<Streams> });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L131)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L146)
 
 ### TaskContextBase (interface)
 
@@ -16391,12 +16391,16 @@ export interface TaskContextBase<
   readonly log: PublicLogger;
   readonly trace: PublicTrace;
   readonly time: PublicClock;
+  readonly functions: FunctionClients<Dependencies["functions"]>;
   readonly tasks: TaskClients<Dependencies["tasks"]>;
   readonly jobs: JobTriggerClients<Dependencies["jobs"]>;
+  readonly channels: ChannelClients<Dependencies["channels"]>;
+  readonly databases: DatabaseClients<Dependencies["databases"]>;
   readonly agents: AgentClients<Dependencies["agents"]>;
   readonly buckets: BucketClients<Dependencies["buckets"]>;
   readonly cache: CacheClients<Dependencies["cache"]>;
-  readonly events: EventClients<PublishedEventMap<Publishes>>;
+  readonly events: EventClients<PublishedEventMap<Publishes>> &
+    EventClients<Dependencies["events"]>;
   readonly database: RegisteredContext<"database", Readonly<Record<string, never>>>;
   readonly auth: RegisteredContext<"auth", TaskAuthContext>;
   readonly constants: RegisteredContext<"constants", Readonly<Record<string, never>>>;
@@ -16405,7 +16409,7 @@ export interface TaskContextBase<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L103)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L114)
 
 ### TaskDependencies (interface)
 
@@ -16415,6 +16419,10 @@ Resources a task explicitly declares before it can be executed.
 
 ```ts
 export interface TaskDependencies {
+  readonly functions?: Readonly<Record<string, FunctionRefAny>>;
+  readonly events?: Readonly<Record<string, EventRefAny>>;
+  readonly channels?: Readonly<Record<string, ChannelRefAny>>;
+  readonly databases?: Readonly<Record<string, DatabaseRefAny>>;
   readonly tasks?: Readonly<Record<string, TaskRefAny>>;
   readonly jobs?: Readonly<Record<string, JobRefAny>>;
   readonly agents?: Readonly<Record<string, AgentRefAny>>;
@@ -16423,7 +16431,7 @@ export interface TaskDependencies {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L86)
 
 ### TaskExecution (type alias)
 
@@ -16435,7 +16443,7 @@ Whether a task uses durable or retryable execution.
 type TaskExecution = "durable" | "retryable";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L68)
 
 ### TaskHookContext (type alias)
 
@@ -16450,7 +16458,7 @@ type TaskHookContext<
 > = TaskContextBase<Dependencies, Publishes>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L150)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L165)
 
 ### TaskProgressEmitter
 
@@ -16460,7 +16468,7 @@ type TaskHookContext<
 declare const TaskProgressEmitter: TaskProgressEmitter<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L48)
 
 ### TaskProgressInput
 
@@ -16470,7 +16478,7 @@ declare const TaskProgressEmitter: TaskProgressEmitter<Value>;
 declare const TaskProgressInput: TaskProgressInput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L51)
 
 ### TaskProgressOutput
 
@@ -16480,7 +16488,7 @@ declare const TaskProgressInput: TaskProgressInput<Schema>;
 declare const TaskProgressOutput: TaskProgressOutput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L52)
 
 ### TaskResources
 
@@ -16490,7 +16498,7 @@ declare const TaskProgressOutput: TaskProgressOutput<Schema>;
 declare const TaskResources: TaskResources;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L43)
 
 ### TaskRetryPolicy
 
@@ -16500,7 +16508,7 @@ declare const TaskResources: TaskResources;
 declare const TaskRetryPolicy: TaskRetryPolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L41)
 
 ### TaskRunContext (interface)
 
@@ -16524,7 +16532,7 @@ export interface TaskRunContext {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L88)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L99)
 
 ### TaskSleepOptions
 
@@ -16534,7 +16542,7 @@ export interface TaskRunContext {
 declare const TaskSleepOptions: TaskSleepOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L45)
 
 ### TaskStreamEmitter
 
@@ -16544,7 +16552,7 @@ declare const TaskSleepOptions: TaskSleepOptions;
 declare const TaskStreamEmitter: TaskStreamEmitter<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L49)
 
 ### TaskStreamEmitters
 
@@ -16554,7 +16562,7 @@ declare const TaskStreamEmitter: TaskStreamEmitter<Value>;
 declare const TaskStreamEmitters: TaskStreamEmitters<Streams>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L55)
 
 ### TaskStreamFrames
 
@@ -16564,7 +16572,7 @@ declare const TaskStreamEmitters: TaskStreamEmitters<Streams>;
 declare const TaskStreamFrames: TaskStreamFrames<Streams>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L56)
 
 ### TaskStreamInput
 
@@ -16574,7 +16582,7 @@ declare const TaskStreamFrames: TaskStreamFrames<Streams>;
 declare const TaskStreamInput: TaskStreamInput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L53)
 
 ### TaskStreamItem
 
@@ -16584,7 +16592,7 @@ declare const TaskStreamInput: TaskStreamInput<Schema>;
 declare const TaskStreamItem: TaskStreamItem<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L50)
 
 ### TaskStreamOutput
 
@@ -16594,7 +16602,7 @@ declare const TaskStreamItem: TaskStreamItem<Schema>;
 declare const TaskStreamOutput: TaskStreamOutput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L54)
 
 ### TaskStreamSchemas (type alias)
 
@@ -16606,7 +16614,7 @@ Named item schemas used to validate task stream emissions.
 type TaskStreamSchemas = Readonly<Record<string, StandardSchemaV1>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L143)
 
 ### TaskTriggerOptions
 
@@ -16616,7 +16624,7 @@ type TaskStreamSchemas = Readonly<Record<string, StandardSchemaV1>>;
 declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L34)
 
 ### TriggerOptions
 
@@ -16626,7 +16634,7 @@ declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
 declare const TriggerOptions: TriggerOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L35)
 
 ## `task-definition-inference.types.ts`
 
@@ -19283,7 +19291,7 @@ copyErrors([notFoundError]);
 declare const copyErrors: (value: unknown) => readonly ErrorDescriptorAny[] | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-validation-value-copy.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-validation-value-copy.ts#L57)
 
 ### copyStreams
 
@@ -19305,7 +19313,7 @@ copyStreams({ events: eventSchema });
 declare const copyStreams: (value: unknown) => TaskStreamSchemas | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-validation-value-copy.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-validation-value-copy.ts#L73)
 
 ## `task-validation-value.ts`
 

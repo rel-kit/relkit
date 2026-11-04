@@ -17,10 +17,11 @@ export function copyDependencies<Dependencies extends TaskDependencies>(
 ): Dependencies | undefined {
   if (value === undefined) return undefined;
   if (!isRecord(value)) throw new TypeError("Task dependencies must be an object");
-  if (hasOwn(value, "functions") || hasOwn(value, "events")) {
-    throw new TypeError("Task dependencies support tasks, jobs, agents, buckets, and cache only");
-  }
   const kinds = {
+    functions: "function",
+    events: "event",
+    channels: "channel",
+    databases: "service",
     tasks: "task",
     jobs: "job",
     agents: "agent",

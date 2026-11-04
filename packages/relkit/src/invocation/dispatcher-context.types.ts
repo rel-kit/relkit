@@ -85,5 +85,6 @@ export interface StandaloneContextOptions<Context extends { readonly signal: Abo
   readonly logger?: PublicLogger;
   readonly clients?: ManagedDependencySources;
   readonly publishes: readonly string[];
+  readonly dependencies?: Readonly<Record<string, Readonly<Record<string, unknown>>>>;
   readonly progress?: ProgressEmitter;
 }

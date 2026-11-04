@@ -202,8 +202,8 @@ lookup.invoke({ orderId: "order-1" });
 // @ts-expect-error a function's output is validated and cannot be treated as an arbitrary string
 const invalidOutput: Promise<string> = lookup.invoke({ rawId: "order-1" });
 void invalidOutput;
-// @ts-expect-error function clients were removed; use descriptor.invoke
-narrowed.functions;
+// @ts-expect-error a function not declared on the function is unavailable
+narrowed.functions.missing;
 // @ts-expect-error the job client is named by the dependency map
 narrowed.jobs.missing;
 // @ts-expect-error a bucket not declared on the function is unavailable
@@ -214,11 +214,11 @@ defineFunction({
   input: z.object({}),
   output: z.object({}),
   dependencies: {
-    // @ts-expect-error function dependencies were removed; use descriptor.invoke
     functions: {
       wrong: {
         ref: {
-          kind: "function",
+          // @ts-expect-error a function dependency must reference a function
+          kind: "task",
           id: "types.inference-cache",
         },
         input: z.object({}),

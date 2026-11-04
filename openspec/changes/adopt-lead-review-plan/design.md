@@ -259,6 +259,22 @@ the active application from asynchronous invocation context and never from a pro
 errors to the descriptors that require explicit IDs; the codemod writes the previously inferred ID so
 public error codes do not change.
 
+Decisions taken during section 10 (maintainer, 2026-11-04):
+
+- **Repository code moves by hand.** Each section 10 task rewrites the repository's examples,
+  templates and bundled skill docs to the remaining form, so build, check, typecheck and the
+  generator suite stay green. Section 12 still builds and fixture-tests a `relkit migrate` rule for
+  every removed form; task 12.3 then finds nothing left for these rules in the repository.
+- **The default database needs no declaration.** `ctx.database` keeps referring to the default
+  Drizzle service. Declaring `dependencies.databases: { analytics }` adds `ctx.databases.analytics`
+  and a `uses-database` edge; task 18.6 adds the typing for several Drizzle services. Channels get a
+  `triggers-channel` edge. Database integrations map a service descriptor to its handler context
+  through the `Relkit.DatabaseContexts` interface, so `relkit` stays free of Drizzle types.
+- **Handle keys follow services and IDs.** The runtime handle groups functions, events, tasks and
+  jobs by service and member name (`relkit.functions.orders.priceOrder`), keys buckets, caches,
+  channels and agents by their explicit ID, and exposes the default database as `database` and every
+  Drizzle service as `databases.<service>`.
+
 ### D15. Typed client (#16)
 
 The generator emits an `api` object that mirrors services and routes; hooks take its properties. The

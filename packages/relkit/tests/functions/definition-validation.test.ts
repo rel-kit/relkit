@@ -127,12 +127,18 @@ describe("function definition validation", () => {
     expect(copyPublishes([" orders.created "])).toEqual(["orders.created"]);
     expect(() => copyPublishes(["orders.created", "orders.created"])).toThrow("must be unique");
     expect(() => copyPublishes([""])).toThrow("non-empty event IDs");
-    expect(() => copyDependencies({ functions: {} } as never)).toThrow(
-      "Function dependencies are not supported",
+    expect(copyDependencies({ functions: {}, events: {}, channels: {}, databases: {} })).toEqual({
+      functions: {},
+      events: {},
+      channels: {},
+      databases: {},
+    });
+    expect(() => copyDependencies({ services: {} } as never)).toThrow(
+      'Unsupported function dependency map "services"',
     );
-    expect(() => copyDependencies({ events: {} } as never)).toThrow(
-      "Event dependencies are not supported",
-    );
+    expect(() =>
+      copyDependencies({ functions: { price: { ref: { kind: "task", id: "x" } } } } as never),
+    ).toThrow("Invalid functions dependency");
     expect(() => copyDependencies({ buckets: 1 } as never)).toThrow("must be an object");
     expect(() => copyDependencies({ buckets: { uploads: {} } } as never)).toThrow(
       "Invalid buckets dependency",

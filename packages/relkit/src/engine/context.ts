@@ -2,11 +2,11 @@ import { observeExecution } from "../runtime-effect/index.js";
 import { Effect } from "effect";
 import type { ContextBuildOptions, InvocationContextBase } from "./context.types.js";
 import type { DependencyClientSources } from "./dependencies.js";
-import { buildDependencyClientsEffect } from "./dependencies.js";
+import { buildDependencyClientsEffect, DEPENDENCY_CATEGORIES } from "./dependencies.js";
 import { runEngineSync } from "./engine-runtime.js";
 export type { ContextBuildOptions, InvocationContextBase } from "./context.types.js";
 
-/** Replaces the six client maps with frozen maps derived only from declarations.
+/** Replaces the client maps with frozen maps derived only from declarations.
  * @typeParam Context - Handler context carrying cancellation authority.
  * @returns The frozen base context with guarded dependency maps and optional trigger/progress fields.
  * @param base - Base handler context before guarded client maps are installed.
@@ -35,7 +35,7 @@ export const createContextEffect = Effect.fn("Engine.createContext")(
           ownerId: options.ownerId,
           ...(options.dependencies === undefined ? {} : { dependencies: options.dependencies }),
           ...(options.publications === undefined ? {} : { publications: options.publications }),
-          sources: options.clients ?? sourceMaps(base as unknown as InvocationContextBase),
+          sources: { ...sourceMaps(base as unknown as InvocationContextBase), ...options.clients },
           ...(options.bridge === undefined ? {} : { bridge: options.bridge }),
           ...(options.signal === undefined ? {} : { signal: options.signal }),
           ...(options.deadline === undefined ? {} : { deadline: options.deadline }),
@@ -59,12 +59,7 @@ export const createContextEffect = Effect.fn("Engine.createContext")(
         });
         return Object.freeze({
           ...base,
-          tasks: clients.tasks,
-          jobs: clients.jobs,
-          events: clients.events,
-          buckets: clients.buckets,
-          cache: clients.cache,
-          agents: clients.agents,
+          ...clients,
           ...(options.trigger === undefined ? {} : { trigger: options.trigger }),
           ...(options.progress === undefined ? {} : { progress: options.progress }),
         }) as Context;
@@ -78,22 +73,9 @@ export const createContextEffect = Effect.fn("Engine.createContext")(
  */
 function sourceMaps(base: InvocationContextBase): DependencyClientSources {
   const value = base as InvocationContextBase & Record<string, unknown>;
-  return {
-    ...(value.tasks === undefined
-      ? {}
-      : { tasks: value.tasks as Readonly<Record<string, unknown>> }),
-    ...(value.jobs === undefined ? {} : { jobs: value.jobs as Readonly<Record<string, unknown>> }),
-    ...(value.events === undefined
-      ? {}
-      : { events: value.events as Readonly<Record<string, unknown>> }),
-    ...(value.buckets === undefined
-      ? {}
-      : { buckets: value.buckets as Readonly<Record<string, unknown>> }),
-    ...(value.cache === undefined
-      ? {}
-      : { cache: value.cache as Readonly<Record<string, unknown>> }),
-    ...(value.agents === undefined
-      ? {}
-      : { agents: value.agents as Readonly<Record<string, unknown>> }),
-  };
+  return Object.fromEntries(
+    DEPENDENCY_CATEGORIES.flatMap((category) =>
+      value[category] === undefined ? [] : [[category, value[category]]],
+    ),
+  ) as DependencyClientSources;
 }

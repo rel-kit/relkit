@@ -27,16 +27,23 @@ export const validateDependenciesEffect = Effect.fn("Compiler.validateDependenci
       for (const reference of Object.values(refs)) {
         const targetId = refId(reference);
         const targetKind = refKind(reference);
-        if (
-          targetId === undefined ||
-          targetKind !== dependencyKind(category) ||
-          work.referencesByKind.get(targetKind)?.has(targetId) !== true
-        ) {
+        const target =
+          targetId === undefined || targetKind === undefined
+            ? undefined
+            : work.referencesByKind.get(targetKind)?.get(targetId);
+        if (target === undefined || targetKind !== dependencyKind(category)) {
           add(
             work,
             descriptor,
             NORMALIZE_CODES.missingTarget,
             `Dependency ${category} does not resolve to a known descriptor.`,
+          );
+        } else if (category === "databases" && !isDatabaseService(target)) {
+          add(
+            work,
+            descriptor,
+            NORMALIZE_CODES.missingTarget,
+            `Dependency databases entry "${target.id}" is not a database service.`,
           );
         }
       }
@@ -80,3 +87,13 @@ export {
   normalizeRetry,
   normalizeSchedule,
 } from "./normalize-policy-validation.js";
+
+/**
+ * Recognizes a service that supplies a database context.
+ * @param descriptor - Normalized service descriptor.
+ * @returns True for a Drizzle service.
+ */
+function isDatabaseService(descriptor: NormalizedDescriptor): boolean {
+  const value = isRecord(descriptor.value) ? descriptor.value : {};
+  return isRecord(value.capability) && value.capability.kind === "drizzle";
+}

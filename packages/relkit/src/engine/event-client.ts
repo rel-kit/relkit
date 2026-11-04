@@ -1,6 +1,7 @@
 import { createEventClient, type EventObservedEdge } from "../events/index.js";
 import type { ObservedEdge } from "../graph/index.js";
 import type { DependencyClientBuildOptions } from "./dependencies.js";
+import { declaredDependencies } from "./dependency-identity.js";
 
 /** Bridge declared event publication with the active producer propagation context.
  * @returns A declared event publication client with invocation propagation.
@@ -15,7 +16,7 @@ export function createEventDependencyClient(
   options: DependencyClientBuildOptions,
   eventId: string,
 ): unknown {
-  const declaration = options.publications?.[name];
+  const declaration = declaredDependencies("events", options)[name];
   return createEventClient({
     ownerId: options.ownerId,
     eventId,

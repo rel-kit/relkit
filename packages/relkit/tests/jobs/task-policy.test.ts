@@ -44,7 +44,7 @@ test("rejects unsupported task policy combinations and unsafe bounds", () => {
   expect(() =>
     defineTask({ ...base, tags: Array.from({ length: TASK_MAX_TAGS + 1 }, () => "tag") }),
   ).toThrow();
-  expect(() => defineTask({ ...base, dependencies: { functions: {} } as never })).toThrow();
+  expect(() => defineTask({ ...base, dependencies: { services: {} } as never })).toThrow();
 });
 
 test("requires an identity-preserving wire schema for transformed input", () => {

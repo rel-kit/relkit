@@ -22,6 +22,72 @@ For configuration and examples, read [realtime](/docs/modules/realtime), [access
 
 <include>/_snippets/generated/exports/realtime.mdx</include>
 
+## `channel-client.types.ts`
+
+### ChannelClientFor (type alias)
+
+Typed client for a channel declared under `dependencies.channels`.
+
+**Example**
+
+```ts
+await context.channels.orderUpdates.trigger({ orderId }, "changed", { status });
+```
+
+**Signature**
+
+```ts
+type ChannelClientFor<T> = {
+  /** Validates and publishes one event through the application's realtime provider.
+   * @param params - Channel parameters.
+   * @param event - One of the declared event names.
+   * @param payload - Input for the selected event schema.
+   * @param options - Optional idempotency key.
+   * @returns A trigger receipt or validation/provider rejection.
+   * @example await context.channels.orderUpdates.trigger({ orderId }, "changed", { status });
+   */
+  readonly trigger: <Name extends Extract<keyof EventsOf<T>, string>>(
+    params: ParamsOf<T>,
+    event: Name,
+    payload: InferInput<EventsOf<T>[Name]>,
+    options?: { readonly idempotencyKey?: OperationId },
+  ) => Promise<TriggerReceipt>;
+} & ([NonNullable<PresenceOf<T>>] extends [never]
+  ? {}
+  : {
+      /** Reads validated presence through the application's realtime provider.
+       * @param params - Channel parameters.
+       * @returns Count or member presence.
+       * @example await context.channels.orderUpdates.getPresence({ orderId });
+       */
+      readonly getPresence: (
+        params: ParamsOf<T>,
+      ) => Promise<PresenceResult<NonNullable<PresenceOf<T>>>>;
+    });
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-client.types.ts#L27)
+
+### ChannelClients (type alias)
+
+Named channel clients projected from dependencies.
+
+**Example**
+
+```ts
+const channels: ChannelClients<typeof dependencies.channels> = context.channels;
+```
+
+**Signature**
+
+```ts
+type ChannelClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: ChannelClientFor<NonNullable<M>[Name]>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-client.types.ts#L59)
+
 ## `channel-operations.ts`
 
 ### getChannelPresenceEffect
@@ -521,7 +587,7 @@ declare const defineChannel: <
 ) => ChannelDescriptor<Id, ParamsSchema, Events, Client, Presence>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L134)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L135)
 
 Since v0.4.0
 
@@ -540,6 +606,18 @@ Since v0.4.0
 **Frontend**
 
 <include>/_frontend/channel.mdx</include>
+
+### "./channel-client.types.js" (namespace export)
+
+Re-exports all named exports from the "./channel-client.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./channel-client.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L32)
 
 ### "./channel.types.js" (namespace export)
 
@@ -581,7 +659,7 @@ declare const defineChannelEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L40)
 
 ### getChannelPresenceEffect
 
@@ -598,7 +676,7 @@ declare const getChannelPresenceEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L33)
 
 ### isChannelDescriptor
 
@@ -616,7 +694,7 @@ isChannelDescriptor(channel);
 declare const isChannelDescriptor: (value: unknown) => value is ChannelDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L166)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L167)
 
 ### isChannelDescriptorEffect
 
@@ -634,7 +712,7 @@ Effect.runSync(isChannelDescriptorEffect(channel));
 declare const isChannelDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L153)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L154)
 
 ### triggerChannelEffect
 
@@ -654,7 +732,7 @@ declare const triggerChannelEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L33)
 
 ## `channel.types.ts`
 

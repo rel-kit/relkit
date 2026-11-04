@@ -5,20 +5,37 @@ import type {
   InvocationMetadata as SharedInvocationMetadata,
   InvocationSource as SharedInvocationSource,
 } from "../invocation/index.js";
+import type { ChannelClients } from "../realtime/channel-client.types.js";
 import type {
   AgentClients,
   BucketClients,
   CacheClients,
+  DatabaseClients,
   EventClients,
+  FunctionClients,
   JobClients,
   TaskClients,
 } from "./clients.types.js";
-import type { AgentRefAny, BucketRefAny, CacheRefAny, JobRefAny, TaskRefAny } from "./types.js";
+import type {
+  AgentRefAny,
+  BucketRefAny,
+  CacheRefAny,
+  ChannelRefAny,
+  DatabaseRefAny,
+  EventRefAny,
+  FunctionRefAny,
+  JobRefAny,
+  TaskRefAny,
+} from "./types.js";
 
-/** Allowed resources a function may declare.
- * @example const dependencies: FunctionDependencies = { buckets: { uploads } };
+/** Everything a function may call, declared once; handlers reach each through `ctx.<kind>.<name>`.
+ * @example const dependencies: FunctionDependencies = { functions: { priceOrder }, buckets: { uploads } };
  */
 export interface FunctionDependencies {
+  readonly functions?: Readonly<Record<string, FunctionRefAny>>;
+  readonly events?: Readonly<Record<string, EventRefAny>>;
+  readonly channels?: Readonly<Record<string, ChannelRefAny>>;
+  readonly databases?: Readonly<Record<string, DatabaseRefAny>>;
   readonly tasks?: Readonly<Record<string, TaskRefAny>>;
   readonly jobs?: Readonly<Record<string, JobRefAny>>;
   readonly buckets?: Readonly<Record<string, BucketRefAny>>;
@@ -59,6 +76,8 @@ declare global {
     interface ApplicationEnv {}
     interface ApplicationContextRegistry {}
     interface EventRegistry {}
+    /** Database integrations add one entry mapping their service descriptor to its context. */
+    interface DatabaseContexts<Service> {}
   }
 }
 
@@ -85,12 +104,10 @@ export interface AuthContext<Session = unknown> {
   readonly getSession: () => Promise<Session | null>;
 }
 
-/** Rejects unsupported function dependency declarations.
+/** Function dependency declarations accepted by `defineFunction`.
  * @example type Allowed = FunctionDependencyOptions<FunctionDependencies>;
  */
-export type FunctionDependencyOptions<D extends FunctionDependencies> = "functions" extends keyof D
-  ? never
-  : D;
+export type FunctionDependencyOptions<D extends FunctionDependencies> = D;
 
 /** Registered event names accepted by publishes.
  * @example type EventName = KnownEventName;
@@ -113,9 +130,12 @@ export interface FunctionContextBase<
   readonly log: PublicLogger;
   readonly time: PublicClock;
   readonly trace: PublicTrace;
+  readonly functions: FunctionClients<D["functions"]>;
   readonly tasks: TaskClients<D["tasks"]>;
   readonly jobs: JobClients<D["jobs"]>;
-  readonly events: EventClients<PublishedEventMap<Publishes>>;
+  readonly events: EventClients<PublishedEventMap<Publishes>> & EventClients<D["events"]>;
+  readonly channels: ChannelClients<D["channels"]>;
+  readonly databases: DatabaseClients<D["databases"]>;
   readonly buckets: BucketClients<D["buckets"]>;
   readonly cache: CacheClients<D["cache"]>;
   readonly agents: AgentClients<D["agents"]>;

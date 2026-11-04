@@ -1,7 +1,6 @@
 import { createBucketClient } from "../buckets/index.js";
 import type { MaybePromise } from "../contracts/index.js";
 import type { GraphEdge, ObservedEdge } from "../graph/index.js";
-import { getDescriptorIdentity } from "../invocation/index.js";
 import { createCacheDependencyClient } from "./cache-client.js";
 import type {
   DependencyBridgeOptions,
@@ -10,85 +9,27 @@ import type {
   DependencyRefLike,
 } from "./dependencies.js";
 import { notify } from "./edge-hooks.js";
+import {
+  createChannelDependencyClient,
+  createDatabaseDependencyClient,
+  createFunctionDependencyClient,
+} from "./dependency-call-clients.js";
+import { dependencyId, dependencyIdFromClient, edgeKinds } from "./dependency-identity.js";
 import { createEventDependencyClient } from "./event-client.js";
 import { createJobDependencyClient } from "./job-client.js";
 import { createTaskDependencyClient } from "./task-client.js";
 export { guardedMap } from "./dependency-clients-guard.js";
+export { runDependency } from "./dependency-run.js";
+import { runDependency } from "./dependency-run.js";
+export {
+  declaredDependencies,
+  dependencyId,
+  dependencyIdFromClient,
+  edgeKind,
+} from "./dependency-identity.js";
 
-/** Compatibility error raised when a handler accesses an undeclared client. */
-export class DependencyAccessError extends TypeError {
-  readonly category: DependencyCategory;
-  readonly dependencyName: string;
-  /** Retain the stable public diagnostic fields for this compatibility error.
-   * @param category - Declared client capability family.
-   * @param name - Declared operation, dependency or field name.
-   * @returns undefined
-   */
-  constructor(category: DependencyCategory, name: string) {
-    super(`Dependency "${category}.${name}" is not declared on this function`);
-    this.name = "DependencyAccessError";
-    this.category = category;
-    this.dependencyName = name;
-  }
-}
-
-/** Compatibility error raised when a declared client has no runtime source. */
-export class DependencyNotConfiguredError extends Error {
-  /** Retain the stable public diagnostic fields for this compatibility error.
-   * @param category - Declared client capability family.
-   * @param name - Declared operation, dependency or field name.
-   * @returns undefined
-   */
-  constructor(category: DependencyCategory, name: string) {
-    super(`Dependency "${category}.${name}" has no active client`);
-    this.name = "DependencyNotConfiguredError";
-  }
-}
-
-const edgeKinds: Readonly<Record<DependencyCategory, GraphEdge["kind"]>> = {
-  tasks: "triggers-task",
-  jobs: "enqueues-job",
-  events: "publishes-event",
-  buckets: "uses-bucket",
-  cache: "uses-cache",
-  agents: "invokes-agent",
-};
-
-const refKinds: Readonly<Record<DependencyCategory, string>> = {
-  tasks: "task",
-  jobs: "job",
-  events: "event",
-  buckets: "bucket",
-  cache: "cache",
-  agents: "agent",
-};
-
-/** Map a client family to the corresponding declared graph edge.
- * @returns The corresponding declared graph relationship.
- * @param category - Declared client capability family.
- */
-export function edgeKind(category: DependencyCategory): GraphEdge["kind"] {
-  return edgeKinds[category] as GraphEdge["kind"];
-}
-
-/** Resolve authored or manifest-bound dependency identity.
- * @returns The manifest-bound or authored stable dependency identity.
- * @param category - Declared client capability family.
- * @param name - Declared operation, dependency or field name.
- * @param value - Native value being validated or projected.
- */
-export function dependencyId(
-  category: DependencyCategory,
-  name: string,
-  value: DependencyRefLike,
-): string {
-  const reference = value.ref ?? value;
-  const id = value.ref === undefined ? getDescriptorIdentity(value) : reference.id;
-  if (reference.kind !== refKinds[category] || typeof id !== "string" || id.length === 0) {
-    throw new TypeError(`Invalid ${category} dependency "${name}"`);
-  }
-  return id;
-}
+export { DependencyAccessError, DependencyNotConfiguredError } from "./dependency-errors.js";
+import { DependencyNotConfiguredError } from "./dependency-errors.js";
 
 /** Select the native dependency adapter for a declared client family.
  * @returns A guarded native adapter for the declared capability family.
@@ -103,7 +44,14 @@ export function createClient(
   source: unknown,
   options: DependencyClientBuildOptions,
 ): unknown {
+  const id = dependencyIdFromClient(options, category, name);
   switch (category) {
+    case "functions":
+      return createFunctionDependencyClient(name, source, options, id);
+    case "channels":
+      return createChannelDependencyClient(name, source, options);
+    case "databases":
+      return createDatabaseDependencyClient(name, source);
     case "tasks":
       return createTaskDependencyClient(
         name,
@@ -194,50 +142,4 @@ function wrapCallable(
       return (source as (value: unknown) => MaybePromise<unknown>)(input);
     });
   };
-}
-
-/** Evaluate a native dependency call with operation metadata and cancellation.
- * @typeParam A - Successful operation result.
- * @returns A Promise of the original native capability result.
- * @param options - Explicit configuration and dependencies for this operation.
- * @param category - Declared client capability family.
- * @param name - Declared operation, dependency or field name.
- * @param operation - Declared method name included in dependency span metadata.
- * @param work - Lazy native callback invoked with its original receiver and arguments.
- */
-export function runDependency<A>(
-  options: DependencyClientBuildOptions,
-  category: DependencyCategory,
-  name: string,
-  operation: string,
-  work: () => MaybePromise<A>,
-): Promise<A> {
-  notify(options.onObservedEdge, {
-    relationship: edgeKinds[category] as ObservedEdge["relationship"],
-    from: options.ownerId,
-    to: dependencyIdFromClient(options, category, name),
-  });
-  const bridgeOptions: DependencyBridgeOptions = {
-    name: `relkit.dependency.${category}.${name}.${operation}`,
-    attributes: { "relkit.dependency.category": category, "relkit.dependency.name": name },
-  };
-  return options.bridge === undefined
-    ? Promise.resolve().then(work)
-    : options.bridge.run(work, bridgeOptions);
-}
-
-/** Resolve the declared identity used for dependency tracing.
- * @returns The declared stable dependency identity.
- * @param options - Explicit configuration and dependencies for this operation.
- * @param category - Declared client capability family.
- * @param name - Declared operation, dependency or field name.
- */
-function dependencyIdFromClient(
-  options: DependencyClientBuildOptions,
-  category: DependencyCategory,
-  name: string,
-): string {
-  const declaration =
-    category === "events" ? options.publications?.[name] : options.dependencies?.[category]?.[name];
-  return declaration === undefined ? name : dependencyId(category, name, declaration);
 }
