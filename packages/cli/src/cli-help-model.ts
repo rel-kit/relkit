@@ -53,11 +53,7 @@ const root = command(
       command("dev", "Run the app and its selected development features", "relkit dev", {
         options: [
           projectRoot,
-          option(
-            "prepare",
-            "boolean",
-            "Prepare a validated dev snapshot and exit without a server",
-          ),
+          option("prepare", "boolean", "Check the project and exit without starting a server"),
           option("port", "integer", "Application port"),
           option(
             "inspector-port",

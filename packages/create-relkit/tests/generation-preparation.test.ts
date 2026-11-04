@@ -5,7 +5,7 @@
  * untouched. These tests do not claim packed runtime or timing acceptance.
  */
 import { afterEach, expect, test } from "bun:test";
-import { access, mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { generateProject } from "../src/generate.js";
@@ -18,35 +18,7 @@ afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
 });
 
-test("finite preparation is the only compiler command and its artifact survives atomic rename", async () => {
-  const root = await temporaryRoot();
-  const executed: string[][] = [];
-  const result = await generateProject(normalizeCreateOptions(["prepared", "--no-git"]), {
-    cwd: root,
-    templateRoot,
-    relkitExecutable: "relkit",
-    commandRunner: async (command, stage) => {
-      executed.push([...command]);
-      expect((await readdir(root)).includes("prepared")).toBe(false);
-      if (command[1] === "dev") {
-        await mkdir(join(stage, ".relkit/dev-snapshot"), { recursive: true });
-        await writeFile(
-          join(stage, ".relkit/dev-snapshot/prepared-test.json"),
-          '{"portable":true}\n',
-        );
-      }
-      return { exitCode: 0 };
-    },
-  });
-  expect(executed.map((command) => command[1])).toEqual(["install", "doctor", "dev"]);
-  expect(executed[2]?.slice(1, 4)).toEqual(["dev", "--prepare", "--project-root"]);
-  expect(
-    await readFile(join(result.destination, ".relkit/dev-snapshot/prepared-test.json"), "utf8"),
-  ).toBe('{"portable":true}\n');
-  expect((await readdir(root)).filter((name) => name.startsWith(".prepared-relkit-"))).toEqual([]);
-});
-
-test("a project the snapshot cannot capture is checked instead of prepared", async () => {
+test("the finite check is the only compiler command and creation publishes after it", async () => {
   const root = await temporaryRoot();
   const executed: string[][] = [];
   const result = await generateProject(normalizeCreateOptions(["prepared", "--no-git"]), {
@@ -55,34 +27,14 @@ test("a project the snapshot cannot capture is checked instead of prepared", asy
     relkitExecutable: "relkit",
     commandRunner: async (command) => {
       executed.push([...command]);
-      return command[1] === "dev"
-        ? { exitCode: 1, stderr: "Development snapshot ineligible during compilation.dynamic." }
-        : { exitCode: 0 };
+      expect((await readdir(root)).includes("prepared")).toBe(false);
+      return { exitCode: 0 };
     },
   });
-  expect(executed.map((command) => command[1])).toEqual(["install", "doctor", "dev", "check"]);
-  expect(executed[3]?.slice(1, 3)).toEqual(["check", "--project-root"]);
+  expect(executed.map((command) => command[1])).toEqual(["install", "doctor", "dev"]);
+  expect(executed[2]?.slice(1, 4)).toEqual(["dev", "--prepare", "--project-root"]);
   expect(result.installed).toBe(true);
-});
-
-test("a failing check after an ineligible preparation still refuses creation", async () => {
-  const root = await temporaryRoot();
-  await expect(
-    generateProject(normalizeCreateOptions(["prepared", "--no-git"]), {
-      cwd: root,
-      templateRoot,
-      relkitExecutable: "relkit",
-      commandRunner: async (command) => {
-        if (command[1] === "dev")
-          return {
-            exitCode: 1,
-            stderr: "Development snapshot ineligible during compilation.dynamic.",
-          };
-        return command[1] === "check" ? { exitCode: 1, stderr: "invalid source" } : { exitCode: 0 };
-      },
-    }),
-  ).rejects.toMatchObject({ code: "RELKIT_CREATE_CHECK_FAILED" });
-  expect(await readdir(root)).toEqual([]);
+  expect((await readdir(root)).filter((name) => name.startsWith(".prepared-relkit-"))).toEqual([]);
 });
 
 test("preparation rejection cleans its private stage and preserves an existing empty destination", async () => {
@@ -116,7 +68,7 @@ test("no-install performs no preparation subprocess and reports the finite workf
     },
   );
   expect(result.warnings[0]?.message).toContain("relkit dev --prepare");
-  await expect(access(join(result.destination, ".relkit/dev-snapshot"))).rejects.toThrow();
+  await expect(access(join(result.destination, ".relkit"))).rejects.toThrow();
 });
 
 /** Allocates and registers a root owned only by this suite.

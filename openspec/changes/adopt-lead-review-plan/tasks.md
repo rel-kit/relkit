@@ -143,8 +143,8 @@ not tasks of this change.
 - [x] 13.5 Run type-checking as a parallel watch process that streams diagnostics to the CLI and Inspector without blocking reloads, and verify a type error does not block a reload
 - [x] 13.6 Stop running the production bundler in dev, and verify no bundle is written on save
 - [x] 13.7 Keep last-known-good serving for evaluation and graph errors, and verify the syntax-error test
-- [ ] 13.8 Make `relkit dev --prepare` a finite check without snapshots and update the `--no-install` next steps, and verify the post-install workflow test
-- [ ] 13.9 Delete the snapshot cache (`packages/cli/src/dev-snapshot`, including `snapshot-commerce-eligibility.ts`) once the budgets hold, and verify the first-start budget test passes without it
+- [x] 13.8 Make `relkit dev --prepare` a finite check without snapshots and update the `--no-install` next steps, and verify the post-install workflow test
+- [x] 13.9 Delete the snapshot cache (`packages/cli/src/dev-snapshot`, including `snapshot-commerce-eligibility.ts`) once the budgets hold, and verify the first-start budget test passes without it
 - [ ] 13.10 Enforce the reload and memory budgets in CI, and verify the job fails on an injected-delay fixture
 - [ ] 13.11 Document how the dev loop reloads and when it restarts, and verify the docs build
 

@@ -43,7 +43,7 @@ export const generationResult = Effect.fn("ProjectGeneration.result")(
               {
                 code: "validation-skipped",
                 message:
-                  "Install dependencies, then run bunx --no-install relkit dev --prepare before bun dev. Preparation includes the source check.",
+                  "Install dependencies, then check the project with bunx --no-install relkit dev --prepare before bun run dev.",
               },
             ]
           : [],

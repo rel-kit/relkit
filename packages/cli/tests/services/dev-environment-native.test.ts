@@ -10,7 +10,6 @@ import { join } from "node:path";
 import { Effect, Schedule } from "effect";
 import { cliPromise } from "../../src/cli-errors.js";
 import { CliDevSupervisor, devSupervisorLayer } from "../../src/services/dev-supervisor.service.js";
-import { isSnapshotEpochPathRelevant } from "../../src/dev-snapshot/snapshot-epoch-path.js";
 
 /** Owns one native fixture root until all candidates close. */
 const fixture = Effect.acquireRelease(
@@ -79,22 +78,6 @@ test(
     ),
   15_000,
 );
-
-test("prepared epochs observe runtime dotenv repairs but ignore examples and generated state", () => {
-  for (const path of [
-    ".env",
-    ".env.local",
-    ".env.development",
-    ".env.production",
-    ".env.test",
-    ".env.development.local",
-    ".env.production.local",
-    ".env.test.local",
-  ])
-    expect(isSnapshotEpochPathRelevant(path), path).toBe(true);
-  for (const path of [".env.example", ".env.sample", ".relkit/state/file", ".git/index"])
-    expect(isSnapshotEpochPathRelevant(path), path).toBe(false);
-});
 
 test("application preloads execute once in the candidate and never in the dotenv helper", () =>
   Effect.runPromise(

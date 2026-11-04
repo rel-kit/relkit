@@ -29,22 +29,16 @@ export const pruneCliOutput = Effect.fn("CliBuild.pruneRetired")(function* (outp
       }),
     { concurrency: 4, discard: true },
   );
+  // The development snapshot cache was removed; its whole output directory is retired.
   const snapshot = join(output, "dev-snapshot");
-  const previousEntries = yield* scaffoldNative("cli.snapshot-output-list", () =>
-    optionalEntries(snapshot),
+  const snapshotOutput = yield* scaffoldNative("cli.snapshot-output-stat", () =>
+    optionalStat(snapshot),
   );
-  for (const entry of previousEntries) {
-    if (
-      ![
-        "dev-telemetry-operation.js",
-        "dev-telemetry-native.service.js",
-        "duckdb-worker.js",
-      ].includes(entry.name.replace(/\.map$/, ""))
-    )
-      continue;
-    if (!entry.isFile() || entry.isSymbolicLink()) return yield* unsafe(join(snapshot, entry.name));
+  if (snapshotOutput) {
+    if (!snapshotOutput.isDirectory() || snapshotOutput.isSymbolicLink())
+      return yield* unsafe(snapshot);
     yield* scaffoldNative("cli.retired-snapshot-output-remove", () =>
-      rm(join(snapshot, entry.name)),
+      rm(snapshot, { recursive: true }),
     );
   }
   const inspector = join(output, "inspector");
