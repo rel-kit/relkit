@@ -136,7 +136,7 @@ not tasks of this change.
 
 ## 13. Development loop (#9; benchmarks in phase 2, reload in phase 3)
 
-- [ ] 13.1 Generate benchmark apps with 10, 100 and 500 functions and a script that measures save-to-serving p95 and `relkit check` peak memory against `tsc`, and verify the script reports both metrics
+- [x] 13.1 Generate benchmark apps with 10, 100 and 500 functions and a script that measures save-to-serving p95 and `relkit check` peak memory against `tsc`, and verify the script reports both metrics
 - [ ] 13.2 Run the benchmarks in release readiness and build the benchmarks page with the measuring host from that CI output, and verify the pull request's run produces the numbers and the docs build shows them
 - [ ] 13.3 Keep one warm evaluator per dev session that re-evaluates only changed modules and their dependents through `invalidateWatchDependencies`, and verify tests that unchanged modules are not re-imported
 - [ ] 13.4 Swap the handler table atomically when configuration, providers and route shape are unchanged and fall back to blue/green otherwise, and verify the process stays the same on a handler edit and restarts on a binding change
