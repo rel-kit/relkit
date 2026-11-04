@@ -28,7 +28,9 @@ export const stageBuildEffect = Effect.fn("Project.stageBuild")(
     yield* writeBuildServer(input, cohort);
     // Development runs server/index.ts directly, so a save never runs the production bundler;
     // the generation keeps the framework links the bundler would otherwise have resolved.
-    if (input.options.mode === "development")
+    // Only a generation with local Docker job workers is bundled, because they run index.js.
+    const development = input.options.mode === "development";
+    if (development && input.options.developmentBundle !== true)
       yield* linkFrameworkModules(
         yield* CliFileSystem,
         join(cohort.serverDirectory, "node_modules"),
@@ -38,7 +40,7 @@ export const stageBuildEffect = Effect.fn("Project.stageBuild")(
       yield* bundleServerEffect(
         cohort.serverDirectory,
         input.projectRoot,
-        false,
+        development,
         input.options.bundleInputInventory,
         Object.keys(cohort.productionDependencies),
       );

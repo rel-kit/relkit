@@ -196,7 +196,11 @@ Decided while applying section 13 (maintainer, 2026-11-05):
   serving files section 14 owns.
 - **Development runs the generated TypeScript.** A development build skips `bun build` and links
   `effect` and `relkit` into the generation's `server/node_modules` (the links the bundler used
-  to create temporarily), and the dev entrypoint is `server/index.ts`.
+  to create temporarily), and the dev entrypoint is `server/index.ts`. The one exception is a
+  generation with local Docker job workers (inngest, effect-mq, trigger): their containers run
+  the generation's `server/index.js` with only the generation and `node_modules` mounted, so that
+  generation is still bundled, and it is never swapped in place, because the workers would keep
+  the old handlers.
 - **Types report through the session log.** `tsc --watch` (or the project's `tsgo`) runs for the
   session; each finished pass is logged as `dev.typecheck.failed` with up to 20 diagnostics, or
   `dev.typecheck.passed`. The session log feeds both the terminal and the Inspector's log records,
