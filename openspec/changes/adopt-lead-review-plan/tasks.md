@@ -250,7 +250,7 @@ not tasks of this change.
 - [x] 24.3 Port the LangChain integration onto the interface as `langchain({ ... })` with its native options, and verify its existing tests pass
 - [x] 24.4 Build the shared agent conformance suite (tools, approvals, threads, streaming, access rules, traces), and verify the LangChain adapter passes it
 - [x] 24.5 Implement the Vercel AI SDK adapter as an optional package, and verify it passes the conformance suite and that apps without it install no AI SDK package
-- [ ] 24.6 Supply the `model` capability from profiles bound in `relkit.config.ts`, and verify a profile rebind test
+- [x] 24.6 Supply the `model` capability from profiles bound in `relkit.config.ts`, and verify a profile rebind test
 - [ ] 24.7 Mark adapters and graph workflows Labs and update the agent docs and agent template, and verify the docs and template tests
 
 ## 25. Provider-author kit (#19)

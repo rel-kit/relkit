@@ -112,6 +112,11 @@
               "capability": "agent-deep",
               "adapterId": "deepagents",
               "protocolVersion": 1
+            },
+            {
+              "capability": "model",
+              "adapterId": "langchain-model",
+              "protocolVersion": 1
             }
           ]
         }
@@ -122,7 +127,8 @@
           "supportedRange": "1.2.9",
           "installSection": "dependencies",
           "capabilities": [
-            "agent-execution"
+            "agent-execution",
+            "model"
           ],
           "phases": [
             "check",
@@ -148,7 +154,8 @@
           "supportedRange": "1.5.10",
           "installSection": "dependencies",
           "capabilities": [
-            "agent-execution"
+            "agent-execution",
+            "model"
           ],
           "phases": [
             "check",
