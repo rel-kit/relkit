@@ -262,6 +262,10 @@ Decided while applying section 16 (maintainer, 2026-11-05):
   and verified, and restored byte for byte when any step fails. The new profile becomes the
   default only when the app has none; otherwise a warning names the existing default, so the
   command never re-routes existing jobs or events silently.
+- **The local-provider warning comes from the compiled graph.** `relkit build` adds one
+  `RELKIT_BUILD_LOCAL_DURABLE_PROVIDER` warning per jobs or events profile whose adapter belongs
+  to `@relkit/local` and that a job, schedule, event or event trigger uses. The build still
+  succeeds; development (`relkit dev`) does not warn.
 
 ### D11. Problem Details errors (#13 a, b)
 

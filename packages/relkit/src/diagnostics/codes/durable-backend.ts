@@ -3,6 +3,13 @@ import type { DiagnosticCodeEntry } from "./codes.types.js";
 
 export const durableBackendCodes = [
   {
+    code: "RELKIT_BUILD_LOCAL_DURABLE_PROVIDER",
+    title: "Production build uses the local provider for durable work",
+    happened:
+      "`relkit build` found jobs, schedules or events whose profile uses the local filesystem provider, which keeps their state in `.relkit/state` on one machine. A production instance loses that state on redeploy and does not share it with other instances.",
+    fix: "Select a durable provider for the profile, for example with `relkit add jobs --provider postgres` or `relkit add events --provider postgres`. The build still succeeds; this is a warning.",
+  },
+  {
     code: "RELKIT_JOB_DEAD_LETTERED",
     title: "Job run moved to the dead-letter state",
     happened:
