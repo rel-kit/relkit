@@ -7,7 +7,7 @@ import { defineServiceRoutes, http } from "@relkit/app/routes";
 import { z } from "zod";
 import orders from "../../services/orders/service.js";
 
-export const { GET, POST } = defineServiceRoutes(orders, {
+export default defineServiceRoutes(orders, {
   GET: "searchOrders",
   POST: {
     member: "createOrder",

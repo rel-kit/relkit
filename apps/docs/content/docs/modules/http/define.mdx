@@ -108,8 +108,8 @@ mapping and a `201` success status. Both forms produce the same kind of checked 
 
 <include>/_frontend/orders.mdx</include>
 
-Keep the exported destructuring form. Supported keys are `GET`, `POST`, `PUT`, `PATCH`, `DELETE`,
-`HEAD`, and `OPTIONS`; do not rename the bindings, add a rest binding, or use a default export.
+Export the map as the route module's default export. Supported keys are `GET`, `POST`, `PUT`,
+`PATCH`, `DELETE`, `HEAD`, and `OPTIONS`.
 `ALL` is reserved for [raw handlers](/docs/modules/http/raw-handlers), not `defineServiceRoutes`.
 
 Several route files can use the same service. Individual `defineRoute` exports in one file can target

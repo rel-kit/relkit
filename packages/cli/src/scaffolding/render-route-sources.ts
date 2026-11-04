@@ -20,7 +20,7 @@ export function serviceRouteSource(
   return `import { defineServiceRoutes } from "@relkit/app/routes";
 import ${binding} from "${sourceModule(servicePath)}";
 
-export const { ${methods.join(", ")} } = defineServiceRoutes(${binding}, {
+export default defineServiceRoutes(${binding}, {
 ${methods.map((method) => `  ${method}: "${maps[method]}",`).join("\n")}
 });
 `;

@@ -56,7 +56,11 @@ export const extractDescriptorsEffect = Effect.fn("discovery.extract.descriptors
             ),
             (exported) =>
               Effect.gen(function* () {
-                const sourceEntry = locations.get(entryKey(moduleFile, exported.exportName));
+                const sourceEntry =
+                  locations.get(entryKey(moduleFile, exported.exportName)) ??
+                  (exported.container === undefined
+                    ? undefined
+                    : locations.get(entryKey(moduleFile, exported.container)));
                 const location =
                   sourceEntry?.source ??
                   (yield* createSourceLocationEffect(moduleFile, 1, 1, root));
@@ -129,6 +133,7 @@ const findReferenceEffect = Effect.fn("discovery.extract.reference")(function* (
       (reference) =>
         reference.module === module.file &&
         reference.exportName === exported.exportName &&
+        reference.container === exported.container &&
         reference.descriptorId === exported.descriptor.id &&
         reference.kind === exported.descriptor.kind,
     ) ??
@@ -138,6 +143,7 @@ const findReferenceEffect = Effect.fn("discovery.extract.reference")(function* (
       kind: exported.descriptor.kind,
       module: module.file,
       exportName: exported.exportName,
+      ...(exported.container === undefined ? {} : { container: exported.container }),
     })
   );
 });

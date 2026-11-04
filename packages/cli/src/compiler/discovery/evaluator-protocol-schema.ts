@@ -67,6 +67,8 @@ export const EvaluatorManifestReference = Schema.Struct({
   kind: Schema.String,
   module: Schema.String,
   exportName: Schema.String,
+  /** Export holding the descriptor under `exportName`, such as a default route map. */
+  container: Schema.optionalKey(Schema.String),
 });
 
 /** Directional schema provenance serialized without executable validators. */
@@ -94,6 +96,8 @@ export const EvaluatorDescriptorSnapshot = Schema.Struct({
 export const EvaluatorExportSnapshot = Schema.Struct({
   exportName: Schema.String,
   descriptor: EvaluatorDescriptorSnapshot,
+  /** Export holding the descriptor under `exportName`, such as a default route map. */
+  container: Schema.optionalKey(Schema.String),
 });
 
 /** One successfully imported module and its executable references. */

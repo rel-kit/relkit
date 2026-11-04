@@ -53,7 +53,7 @@ Use `defineServiceRoutes` when the methods in a route file belong to one service
   /_snippets/source/examples/commerce/src/routes/orders/route.ts
 </include>
 
-The file supplies `/orders`. The exported `GET` and `POST` names supply the methods. `GET` selects the
+The file supplies `/orders`. The `GET` and `POST` keys of the default-exported map supply the methods. `GET` selects the
 public `searchOrders` function by member name. `POST` selects `createOrder`, explicitly maps headers
 and body fields into its domain input, and sets the successful response status to `201`.
 
@@ -65,9 +65,8 @@ Use a string member name when inferred request/response mapping fits. Use an obj
 you need explicit mapping, status, limits, or other function-route options. Explicit request mappings
 replace inference rather than partially extending it. See [request mapping](/docs/modules/http/requests).
 
-Keep the exported destructuring form shown above. `defineServiceRoutes` does not support renamed
-method bindings, rest bindings, a default export, or methods named after business operations. Supported
-methods are `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, and `OPTIONS`.
+Export the map as the route module's default export, as shown above. Its keys are HTTP methods, not
+business operations: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, and `OPTIONS`.
 
 ## Choose the URL independently of the domain
 

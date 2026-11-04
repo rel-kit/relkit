@@ -14,7 +14,6 @@ export const ROUTE_MODULE_METHODS = new Set([
 export interface RouteSourceFinding {
   readonly node: ts.Node;
   readonly message: string;
-  readonly replacement?: string;
 }
 
 export function isRouteModule(file: string): boolean {
@@ -77,24 +76,10 @@ export function routeSourceFindings(
           callee.name.text === "defineServiceRoutes";
       if (!serviceRoutes) continue;
       if (!exported || !typescript.isObjectBindingPattern(declaration.name)) {
-        const name = typescript.isIdentifier(declaration.name) ? declaration.name.text : undefined;
-        const options = initializer.arguments[1];
-        const canFix =
-          exported &&
-          name &&
-          name !== "ALL" &&
-          ROUTE_MODULE_METHODS.has(name) &&
-          options &&
-          typescript.isObjectLiteralExpression(options) &&
-          options.properties.some(
-            (entry) =>
-              entry.name && typescript.isIdentifier(entry.name) && entry.name.text === name,
-          );
         findings.push({
           node: declaration.name,
           message:
-            "defineServiceRoutes returns a method table. Export its descriptors with `export const { GET } = defineServiceRoutes(...)`.",
-          ...(canFix ? { replacement: `{ ${name} }` } : {}),
+            "defineServiceRoutes returns a method table. Export it from the route module with `export default defineServiceRoutes(...)`.",
         });
         continue;
       }

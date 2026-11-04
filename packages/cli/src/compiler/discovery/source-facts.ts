@@ -3,6 +3,7 @@ import * as ts from "typescript";
 import { Effect } from "effect";
 import { runDiscoverySync } from "./discovery-sync.js";
 import { factoryForEffect, membersForEffect } from "./source-facts-factory.js";
+import { serviceRouteMapExports } from "./source-facts-route-map.js";
 import {
   exportFactEffect,
   hasModifier,
@@ -170,6 +171,8 @@ export const readFactsEffect = Effect.fn("Discovery.readFacts")(
                 ? { position, ...(factory === undefined ? {} : { factory }) }
                 : yield* exportFactEffect(local),
             );
+            for (const [method, fact] of serviceRouteMapExports(expression, factory, sourceFile))
+              if (!exports.has(method)) exports.set(method, fact);
           }
           if (!ts.isExportDeclaration(statement) || statement.isTypeOnly) return;
           const module =

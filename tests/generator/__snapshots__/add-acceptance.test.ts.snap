@@ -389,7 +389,7 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
         "import { defineServiceRoutes } from "@relkit/app/routes";",
         "import billing from "@app/services/billing/service.js";",
         "",
-        "export const { GET } = defineServiceRoutes(billing, {",
+        "export default defineServiceRoutes(billing, {",
         "  GET: "example",",
         "});",
         "",

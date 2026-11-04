@@ -2,4 +2,4 @@
 import { defineServiceRoutes } from "@relkit/app/routes";
 import orders from "../../../services/orders/service.js";
 
-export const { GET } = defineServiceRoutes(orders, { GET: "searchOrders" });
+export default defineServiceRoutes(orders, { GET: "searchOrders" });

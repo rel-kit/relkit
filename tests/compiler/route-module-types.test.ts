@@ -155,7 +155,7 @@ export const GET = defineServiceRoutes(service, { GET: "example" });`,
   });
 });
 
-test("source rules recognize import aliases, namespaces and wrapped expressions with a precise fix", () => {
+test("source rules recognize import aliases, namespaces and wrapped expressions", () => {
   for (const [imported, callee] of [
     ['import { defineServiceRoutes as routes } from "relkit/routes";', "routes"],
     ['import { defineServiceRoutes as routes } from "relkit";', "routes"],
@@ -170,7 +170,7 @@ test("source rules recognize import aliases, namespaces and wrapped expressions 
     );
     const findings = routeSourceFindings(source);
     expect(findings).toHaveLength(1);
-    expect(findings[0]?.replacement).toBe("{ GET }");
+    expect(findings[0]?.message).toContain("export default defineServiceRoutes(...)");
     expect(source.getLineAndCharacterOfPosition(findings[0]!.node.getStart(source))).toEqual({
       line: 2,
       character: 13,
@@ -183,6 +183,13 @@ test("source rules recognize import aliases, namespaces and wrapped expressions 
     true,
   );
   expect(routeSourceFindings(local)).toEqual([]);
+  const map = ts.createSourceFile(
+    "src/routes/users/route.ts",
+    'import { defineServiceRoutes } from "relkit/routes";\nexport default defineServiceRoutes(service, { GET: "example" });',
+    ts.ScriptTarget.Latest,
+    true,
+  );
+  expect(routeSourceFindings(map)).toEqual([]);
 });
 
 test("route validators sort, deduplicate and support custom output directories", () => {

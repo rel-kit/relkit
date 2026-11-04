@@ -3310,7 +3310,8 @@ declare const prepareRouteValue: (
 ### RouteModuleContract (type alias)
 
 Expected types for a route module's exports, used by generated module validators.
-Rejects untyped exports and requires at least one named HTTP method.
+Rejects untyped exports and requires at least one HTTP method: a named export, or a
+`defineServiceRoutes` map exported as the default.
 
 **Signature**
 
@@ -3318,13 +3319,15 @@ Rejects untyped exports and requires at least one named HTTP method.
 type RouteModuleContract<Module, Parameters extends string = never> = keyof Module extends never
   ? { readonly __relkit_route_method_required: never }
   : {
-      readonly [Method in keyof Module]: Method extends RouteModuleMethod
-        ? CheckedRoute<Module[Method], Method, Parameters>
-        : never;
+      readonly [Method in keyof Module]: Method extends "default"
+        ? CheckedMethods<Module[Method], Parameters>
+        : Method extends RouteModuleMethod
+          ? CheckedRoute<Module[Method], Method, Parameters>
+          : never;
     };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-module.types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-module.types.ts#L36)
 
 ### RouteModuleMethod (type alias)
 

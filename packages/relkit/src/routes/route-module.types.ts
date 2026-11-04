@@ -22,9 +22,16 @@ type CheckedRoute<Value, Method, Parameters extends string> = 0 extends 1 & Valu
       : RouteDescriptor<string>
     : { readonly __relkit_missing_path_input: MissingPathInput<Value, Parameters> };
 
+type CheckedMethods<Methods, Parameters extends string> = {
+  readonly [Method in keyof Methods]: Method extends ServiceRouteMethod
+    ? CheckedRoute<Methods[Method], Method, Parameters>
+    : never;
+};
+
 /**
  * Expected types for a route module's exports, used by generated module validators.
- * Rejects untyped exports and requires at least one named HTTP method.
+ * Rejects untyped exports and requires at least one HTTP method: a named export, or a
+ * `defineServiceRoutes` map exported as the default.
  */
 export type RouteModuleContract<
   Module,
@@ -32,7 +39,9 @@ export type RouteModuleContract<
 > = keyof Module extends never
   ? { readonly __relkit_route_method_required: never }
   : {
-      readonly [Method in keyof Module]: Method extends RouteModuleMethod
-        ? CheckedRoute<Module[Method], Method, Parameters>
-        : never;
+      readonly [Method in keyof Module]: Method extends "default"
+        ? CheckedMethods<Module[Method], Parameters>
+        : Method extends RouteModuleMethod
+          ? CheckedRoute<Module[Method], Method, Parameters>
+          : never;
     };

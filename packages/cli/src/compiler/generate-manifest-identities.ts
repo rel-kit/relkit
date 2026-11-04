@@ -60,15 +60,11 @@ function descriptorBindings(
   if (reference === undefined) return [];
   const module = modulePath(reference.module, input);
   if (module === undefined || bindings.has(module) === false) return [];
-  const entries: IdentityBinding[] = [
-    {
-      module,
-      exportName: reference.exportName,
-      path: [],
-      id: descriptor.id,
-    },
-  ];
-  collectNested(descriptor.value, [], module, reference.exportName, entries, new Set());
+  // A descriptor inside a default route map is reached as `module.default.<METHOD>`.
+  const exportName = reference.container ?? reference.exportName;
+  const base = reference.container === undefined ? [] : [reference.exportName];
+  const entries: IdentityBinding[] = [{ module, exportName, path: base, id: descriptor.id }];
+  collectNested(descriptor.value, base, module, exportName, entries, new Set());
   return entries;
 }
 

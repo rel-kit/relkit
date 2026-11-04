@@ -20,12 +20,23 @@ export function routeModuleFindings(
   const exports = module ? checker.getTypeOfSymbolAtLocation(module, source).getProperties() : [];
   const findings: RouteSourceFinding[] = [];
   let methods = 0;
-  for (const entry of exports) {
+  const entries = exports.flatMap((entry) => {
     const symbol =
       (entry.flags & typescript.SymbolFlags.Alias) !== 0 ? checker.getAliasedSymbol(entry) : entry;
-    if ((symbol.flags & typescript.SymbolFlags.Value) === 0) continue;
+    if ((symbol.flags & typescript.SymbolFlags.Value) === 0) return [];
     const node = entry.declarations?.find((node) => node.getSourceFile() === source) ?? source;
     const type = checker.getTypeOfSymbolAtLocation(symbol, node);
+    // A default export is a `defineServiceRoutes` map; each of its methods is a route.
+    if (entry.name !== "default") return [{ name: entry.name, node, type, inMap: false }];
+    return type.getProperties().map((method) => ({
+      name: method.name,
+      node,
+      type: checker.getTypeOfSymbolAtLocation(method, node),
+      inMap: true,
+    }));
+  });
+  for (const { name, node, type, inMap } of entries) {
+    const entry = { name };
     if (!ROUTE_MODULE_METHODS.has(entry.name)) {
       findings.push({
         node,
@@ -42,7 +53,8 @@ export function routeModuleFindings(
       });
       continue;
     }
-    const expected = contract?.getProperty(entry.name);
+    // The generated module contract checks a default map's methods itself.
+    const expected = inMap ? undefined : contract?.getProperty(entry.name);
     const valid =
       isRoute(type, node, checker, entry.name === "ALL", typescript) &&
       (!expected ||

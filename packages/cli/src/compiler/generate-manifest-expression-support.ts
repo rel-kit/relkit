@@ -29,7 +29,7 @@ export function executableExpression(
   const module = modulePath(reference, input);
   const binding = module === undefined ? undefined : bindings.get(module);
   if (binding === undefined) return undefined;
-  const value = `${binding.alias}[${JSON.stringify(reference.exportName)}]`;
+  const value = `${binding.alias}${reference.container === undefined ? "" : `[${JSON.stringify(reference.container)}]`}[${JSON.stringify(reference.exportName)}]`;
   return property === "descriptor" ? value : `${value}.${property}`;
 }
 

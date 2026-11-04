@@ -1,4 +1,5 @@
 import { isDescriptorEffect } from "relkit/contracts";
+import { SERVICE_ROUTE_METHODS } from "relkit/routes";
 import { Effect } from "effect";
 import { observeCompiler } from "../observability.js";
 import { runDiscoverySync } from "./discovery-sync.js";
@@ -17,6 +18,11 @@ import type {
   EvaluatorSideEffect,
 } from "./evaluator-protocol.types.js";
 import { snapshotDescriptorEffect } from "./evaluator-snapshot.js";
+
+/** Recognizes a filesystem route module. */
+function isRouteModuleFile(file: string): boolean {
+  return /(?:^|\/)route\.[cm]?[jt]sx?$/.test(file);
+}
 import type { SnapshotDescriptorLike } from "./evaluator-snapshot.types.js";
 import { isSnapshotErrorDescriptorEffect } from "./evaluator-snapshot-capabilities.js";
 
@@ -56,6 +62,41 @@ export const snapshotModuleEffect = Effect.fn("Discovery.snapshotEvaluatorModule
         }),
       { discard: true },
     );
+    // A route module may export its `defineServiceRoutes` map as the default export; each method
+    // in it is a route, read as `module.default.<METHOD>`.
+    const map = module.default;
+    if (isRouteModuleFile(candidate.file) && map !== null && typeof map === "object")
+      yield* Effect.forEach(
+        Object.keys(map)
+          .filter(
+            (method) =>
+              (SERVICE_ROUTE_METHODS as readonly string[]).includes(method) &&
+              !Object.hasOwn(module, method),
+          )
+          .sort(),
+        (exportName) =>
+          Effect.gen(function* () {
+            const value = yield* selectCompilerDescriptor(
+              (map as Record<string, unknown>)[exportName],
+            );
+            if (value === undefined) return;
+            const descriptor = yield* snapshotDescriptorEffect(value);
+            exports.push(
+              EvaluatorExportSnapshot.make({ exportName, descriptor, container: "default" }),
+            );
+            manifestReferences.push(
+              ReferenceSchema.make({
+                generationId: request.generationId,
+                descriptorId: descriptor.id,
+                kind: descriptor.kind,
+                module: candidate.file,
+                exportName,
+                container: "default",
+              }),
+            );
+          }),
+        { discard: true },
+      );
     return ModuleSchema.make({
       file: candidate.file,
       exports: Object.freeze(exports),

@@ -72,31 +72,31 @@ __relkit_bindDescriptorIdentity(__relkit_module_4["GET"]["target"], "navigation.
 __relkit_bindDescriptorIdentity(__relkit_module_5["GET"], "route.get.files.catch-all-parts");
 __relkit_bindDescriptorIdentity(__relkit_module_5["GET"]["target"], "navigation.browse-path");
 __relkit_bindDescriptorIdentity(__relkit_module_6["default"], "order-auth");
-__relkit_bindDescriptorIdentity(__relkit_module_7["DELETE"], "route.delete.orders.by-order-id");
-__relkit_bindDescriptorIdentity(__relkit_module_7["DELETE"]["target"], "orders.delete-order");
-__relkit_bindDescriptorIdentity(__relkit_module_7["GET"], "route.get.orders.by-order-id");
-__relkit_bindDescriptorIdentity(__relkit_module_7["GET"]["target"], "orders.get-order");
-__relkit_bindDescriptorIdentity(__relkit_module_7["GET"]["target"]["errors"][0], "orders.not-found");
-__relkit_bindDescriptorIdentity(__relkit_module_7["HEAD"], "route.head.orders.by-order-id");
-__relkit_bindDescriptorIdentity(__relkit_module_7["HEAD"]["target"], "orders.get-order");
-__relkit_bindDescriptorIdentity(__relkit_module_7["HEAD"]["target"]["errors"][0], "orders.not-found");
-__relkit_bindDescriptorIdentity(__relkit_module_7["OPTIONS"], "route.options.orders.by-order-id");
-__relkit_bindDescriptorIdentity(__relkit_module_7["OPTIONS"]["target"], "orders.get-order");
-__relkit_bindDescriptorIdentity(__relkit_module_7["OPTIONS"]["target"]["errors"][0], "orders.not-found");
-__relkit_bindDescriptorIdentity(__relkit_module_7["PATCH"], "route.patch.orders.by-order-id");
-__relkit_bindDescriptorIdentity(__relkit_module_7["PATCH"]["target"], "orders.update-order");
-__relkit_bindDescriptorIdentity(__relkit_module_7["PATCH"]["target"]["dependencies"]["channels"]["orderUpdates"], "orders.updates");
-__relkit_bindDescriptorIdentity(__relkit_module_7["PUT"], "route.put.orders.by-order-id");
-__relkit_bindDescriptorIdentity(__relkit_module_7["PUT"]["target"], "orders.update-order");
-__relkit_bindDescriptorIdentity(__relkit_module_7["PUT"]["target"]["dependencies"]["channels"]["orderUpdates"], "orders.updates");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["DELETE"], "route.delete.orders.by-order-id");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["DELETE"]["target"], "orders.delete-order");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["GET"], "route.get.orders.by-order-id");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["GET"]["target"], "orders.get-order");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["GET"]["target"]["errors"][0], "orders.not-found");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["HEAD"], "route.head.orders.by-order-id");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["HEAD"]["target"], "orders.get-order");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["HEAD"]["target"]["errors"][0], "orders.not-found");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["OPTIONS"], "route.options.orders.by-order-id");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["OPTIONS"]["target"], "orders.get-order");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["OPTIONS"]["target"]["errors"][0], "orders.not-found");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["PATCH"], "route.patch.orders.by-order-id");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["PATCH"]["target"], "orders.update-order");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["PATCH"]["target"]["dependencies"]["channels"]["orderUpdates"], "orders.updates");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["PUT"], "route.put.orders.by-order-id");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["PUT"]["target"], "orders.update-order");
+__relkit_bindDescriptorIdentity(__relkit_module_7["default"]["PUT"]["target"]["dependencies"]["channels"]["orderUpdates"], "orders.updates");
 __relkit_bindDescriptorIdentity(__relkit_module_8["POST"], "orders.export");
-__relkit_bindDescriptorIdentity(__relkit_module_9["GET"], "route.get.orders");
-__relkit_bindDescriptorIdentity(__relkit_module_9["GET"]["target"], "orders.search-orders");
-__relkit_bindDescriptorIdentity(__relkit_module_9["POST"], "route.post.orders");
-__relkit_bindDescriptorIdentity(__relkit_module_9["POST"]["target"], "orders.create-order");
-__relkit_bindDescriptorIdentity(__relkit_module_9["POST"]["target"]["dependencies"]["cache"]["prices"], "orders.prices");
-__relkit_bindDescriptorIdentity(__relkit_module_10["GET"], "route.get.orders.search");
-__relkit_bindDescriptorIdentity(__relkit_module_10["GET"]["target"], "orders.search-orders");
+__relkit_bindDescriptorIdentity(__relkit_module_9["default"]["GET"], "route.get.orders");
+__relkit_bindDescriptorIdentity(__relkit_module_9["default"]["GET"]["target"], "orders.search-orders");
+__relkit_bindDescriptorIdentity(__relkit_module_9["default"]["POST"], "route.post.orders");
+__relkit_bindDescriptorIdentity(__relkit_module_9["default"]["POST"]["target"], "orders.create-order");
+__relkit_bindDescriptorIdentity(__relkit_module_9["default"]["POST"]["target"]["dependencies"]["cache"]["prices"], "orders.prices");
+__relkit_bindDescriptorIdentity(__relkit_module_10["default"]["GET"], "route.get.orders.search");
+__relkit_bindDescriptorIdentity(__relkit_module_10["default"]["GET"]["target"], "orders.search-orders");
 __relkit_bindDescriptorIdentity(__relkit_module_11["GET"], "route.get.reports.by-report-id");
 __relkit_bindDescriptorIdentity(__relkit_module_11["GET"]["target"], "orders.stream-order-report");
 __relkit_bindDescriptorIdentity(__relkit_module_12["default"], "orders.normalize-id");
@@ -188,7 +188,7 @@ __relkit_bindDescriptorIdentity(__relkit_module_54["default"]["databaseUsers"], 
 
 export const manifestContractVersion = 10 as const;
 export const manifestGeneratorVersion = 7 as const;
-export const manifestGraphHash = "sha256:096452ae82fae905e1e13bf167f30585517dc0dcad90e507f7b84069398a1ace" as const;
+export const manifestGraphHash = "sha256:3de75ce767521acd816afeef9a6b2b0fada343ff416ac349b537324bc288fba7" as const;
 export const runtimeIntegrationsPlanReference = { version: 1, fileName: "runtime-integrations.plan.json", graphHash: manifestGraphHash } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,
@@ -200,7 +200,7 @@ export const runtimeManifest = {
   agents: { "orders.order-deep": __relkit_module_27["default"], "orders.order-review": __relkit_module_28["default"], "orders.order-support": __relkit_module_29["default"] },
   channels: { "announcements.feed": __relkit_module_16["default"], "orders.updates": __relkit_module_33["default"] },
   tools: { "orders.cancel-order": __relkit_module_47["default"], "orders.lookup-order": __relkit_module_48["default"] },
-  routes: { "orders.export": __relkit_module_8["POST"], "route.delete.orders.by-order-id": __relkit_module_7["DELETE"], "route.get.account.profile": __relkit_module_1["GET"], "route.get.announcements": __relkit_module_2["GET"], "route.get.database.users": __relkit_module_3["GET"], "route.get.docs.optional-catch-all-parts": __relkit_module_4["GET"], "route.get.files.catch-all-parts": __relkit_module_5["GET"], "route.get.orders": __relkit_module_9["GET"], "route.get.orders.by-order-id": __relkit_module_7["GET"], "route.get.orders.search": __relkit_module_10["GET"], "route.get.reports.by-report-id": __relkit_module_11["GET"], "route.head.orders.by-order-id": __relkit_module_7["HEAD"], "route.options.orders.by-order-id": __relkit_module_7["OPTIONS"], "route.patch.orders.by-order-id": __relkit_module_7["PATCH"], "route.post.announcements": __relkit_module_2["POST"], "route.post.orders": __relkit_module_9["POST"], "route.post.uploads": __relkit_module_13["POST"], "route.put.orders.by-order-id": __relkit_module_7["PUT"] },
+  routes: { "orders.export": __relkit_module_8["POST"], "route.delete.orders.by-order-id": __relkit_module_7["default"]["DELETE"], "route.get.account.profile": __relkit_module_1["GET"], "route.get.announcements": __relkit_module_2["GET"], "route.get.database.users": __relkit_module_3["GET"], "route.get.docs.optional-catch-all-parts": __relkit_module_4["GET"], "route.get.files.catch-all-parts": __relkit_module_5["GET"], "route.get.orders": __relkit_module_9["default"]["GET"], "route.get.orders.by-order-id": __relkit_module_7["default"]["GET"], "route.get.orders.search": __relkit_module_10["default"]["GET"], "route.get.reports.by-report-id": __relkit_module_11["GET"], "route.head.orders.by-order-id": __relkit_module_7["default"]["HEAD"], "route.options.orders.by-order-id": __relkit_module_7["default"]["OPTIONS"], "route.patch.orders.by-order-id": __relkit_module_7["default"]["PATCH"], "route.post.announcements": __relkit_module_2["POST"], "route.post.orders": __relkit_module_9["default"]["POST"], "route.post.uploads": __relkit_module_13["POST"], "route.put.orders.by-order-id": __relkit_module_7["default"]["PUT"] },
   constants: {  },
   prompts: {  },
   services: { "account": __relkit_module_15["default"], "announcements": __relkit_module_19["default"], "assets": __relkit_module_22["default"], "auth": __relkit_module_23["default"], "database": __relkit_module_24["default"], "navigation": __relkit_module_26["default"], "orders": __relkit_module_44["default"], "receipts": __relkit_module_52["default"], "users": __relkit_module_54["default"] },

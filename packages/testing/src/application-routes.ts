@@ -34,8 +34,12 @@ export async function loadTestRoutes(root: string): Promise<readonly TestRoute[]
     const module = (await import(pathToFileURL(join(directory, file)).href)) as Readonly<
       Record<string, unknown>
     >;
+    // A default export is a `defineServiceRoutes` map; named exports take precedence over it.
+    const map = module.default as Readonly<Record<string, unknown>> | undefined;
     for (const method of methods) {
-      const route = module[method];
+      const route =
+        module[method] ??
+        (method !== "ALL" && map !== null && typeof map === "object" ? map[method] : undefined);
       if (method === "ALL" && isRawRoute(route)) {
         loaded.push({ route: normalizeRawRoute(route, parsed), parsed });
       } else if (isRoute(route)) {

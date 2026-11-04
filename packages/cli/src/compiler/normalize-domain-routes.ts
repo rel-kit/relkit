@@ -145,9 +145,7 @@ function validateServiceRouteBindings(work: NormalizationWork, file: string, tex
         severity: "error",
         message: finding.message,
         location: { file, line: position.line + 1, column: position.character + 1 },
-        ...(finding.replacement
-          ? { suggestion: `Replace the binding with ${finding.replacement}.` }
-          : {}),
+        suggestion: "Write `export default defineServiceRoutes(service, { GET: ... })`.",
       }),
     );
   }

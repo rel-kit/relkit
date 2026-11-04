@@ -58,45 +58,6 @@ export default function initialize(modules: EditorModules): ts.server.PluginModu
           })),
         ];
       };
-      /** Adds the destructuring fix only for an overlapping RelKit finding.
-       * @param file - Requested source file.
-       * @param start - Start of the editor selection.
-       * @param end - End of the editor selection.
-       * @param codes - Diagnostic codes selected for fixing.
-       * @param format - Host formatting options passed through unchanged.
-       * @param preferences - Host code-fix preferences passed through unchanged.
-       * @returns Existing host fixes followed by applicable RelKit fixes.
-       */
-      proxy.getCodeFixesAtPosition = (file, start, end, codes, format, preferences) => {
-        const fixes = service.getCodeFixesAtPosition(file, start, end, codes, format, preferences);
-        if (!codes.includes(ROUTE_DIAGNOSTIC)) return fixes;
-        const source = service.getProgram()?.getSourceFile(file);
-        if (!source) return fixes;
-        return [
-          ...fixes,
-          ...routeSourceFindings(source, typescript).flatMap(({ node, replacement }) =>
-            replacement && node.getStart(source) < end && node.end > start
-              ? [
-                  {
-                    fixName: "relkit-destructure-service-routes",
-                    description: "Destructure the HTTP method from the service route table",
-                    changes: [
-                      {
-                        fileName: file,
-                        textChanges: [
-                          {
-                            span: { start: node.getStart(source), length: node.getWidth(source) },
-                            newText: replacement,
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ]
-              : [],
-          ),
-        ];
-      };
       return proxy;
     },
   };

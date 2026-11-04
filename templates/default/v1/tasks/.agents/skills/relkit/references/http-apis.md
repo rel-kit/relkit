@@ -42,7 +42,7 @@ export const ALL = defineRoute({ handler: auth.handler });
 import { defineServiceRoutes } from "@relkit/app/routes";
 import orders from "@app/services/orders/service.js";
 
-export const { GET, POST } = defineServiceRoutes(orders, {
+export default defineServiceRoutes(orders, {
   GET: "listOrders",
   POST: { member: "createOrder", successStatus: 201 },
 });

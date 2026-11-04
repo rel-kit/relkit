@@ -64,7 +64,7 @@ function descriptorExpression(
     const binding = bindings.get(normalizeSourcePath(reference.module, input.projectRoot));
     return binding === undefined
       ? undefined
-      : `${binding.alias}[${JSON.stringify(reference.exportName)}]`;
+      : `${binding.alias}${reference.container === undefined ? "" : `[${JSON.stringify(reference.container)}]`}[${JSON.stringify(reference.exportName)}]`;
   } catch (error) {
     if (!(error instanceof SourceLocationError)) throw error;
     return undefined;
