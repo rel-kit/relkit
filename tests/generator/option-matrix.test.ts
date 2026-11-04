@@ -64,7 +64,7 @@ test("reports only the create milestones that run", async () => {
     "Installing dependencies...",
     "Initializing Git repository...",
     "Checking prerequisites...",
-    "Checking and preparing development snapshot...",
+    "Checking the project...",
   ]);
 
   const minimal: string[] = [];
