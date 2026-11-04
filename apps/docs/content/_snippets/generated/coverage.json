@@ -1060,6 +1060,11 @@
       "examples": ["tests/e2e/inspector-redesign.spec.ts"]
     },
     {
+      "path": "docs/modules/operations/mcp",
+      "api": ["cli-api", "inspector"],
+      "examples": ["packages/cli/tests/commands/mcp.test.ts"]
+    },
+    {
       "path": "docs/modules/operations/realtime-agents-streaming",
       "api": ["realtime", "agents", "client"],
       "examples": ["tests/runtime-rpc/runtime-hono/realtime-rpc.test.ts"]

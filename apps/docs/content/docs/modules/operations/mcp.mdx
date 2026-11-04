@@ -1,0 +1,109 @@
+---
+title: Coding agents with relkit mcp
+description: Connect Claude Code, Cursor or Codex to your running development session with relkit mcp, and use its graph, diagnostics, trace, invoke, check and add tools.
+sidebar:
+  icon: bot
+---
+
+`relkit mcp` lets a coding agent work with your running application. It is an MCP server that
+talks to the agent over stdio. It finds the project's running `relkit dev` session and calls the
+[Inspector API](/docs/api/inspector-protocol) with that session's private token. The agent sees the
+same graph, diagnostics, logs and traces as the Inspector, and it can run `relkit check` and
+`relkit add` for you.
+
+`relkit mcp` runs only in development. It is part of `@relkit/cli`, which production builds do not
+include, and it connects only to a local development session.
+
+## Before you start
+
+1. Enable the Inspector bridge once. `relkit add inspector` sets `inspector: { enabled: true }` in
+   `relkit.config.ts`; see [Inspector](/docs/modules/operations/inspector).
+2. Start the development server and leave it running:
+
+   ```sh title="Terminal"
+   bun run relkit dev
+   ```
+
+3. Configure your agent to start `relkit mcp` in the project directory, as shown below.
+
+If no session is running, `relkit mcp` exits with
+[`RELKIT_MCP_NO_SESSION`](/docs/errors/relkit-mcp-no-session) and tells you to start `relkit dev`.
+When `relkit dev` restarts, restart the MCP server from your agent so it connects to the new
+session.
+
+## Claude Code
+
+Add the server from the project directory:
+
+```sh title="Terminal"
+claude mcp add relkit --scope project -- bun run relkit mcp
+```
+
+This writes `.mcp.json` in the project, which you can commit so the whole team gets the server:
+
+```json title=".mcp.json"
+{
+  "mcpServers": {
+    "relkit": { "command": "bun", "args": ["run", "relkit", "mcp"] }
+  }
+}
+```
+
+Run `/mcp` in Claude Code to check that `relkit` is connected.
+
+## Cursor
+
+Create `.cursor/mcp.json` in the project:
+
+```json title=".cursor/mcp.json"
+{
+  "mcpServers": {
+    "relkit": { "command": "bun", "args": ["run", "relkit", "mcp"] }
+  }
+}
+```
+
+Open **Cursor Settings → MCP** and check that `relkit` lists its tools.
+
+## Codex
+
+Codex keeps MCP servers in `~/.codex/config.toml`, outside the project, so give the project
+directory explicitly:
+
+```toml title="~/.codex/config.toml"
+[mcp_servers.relkit]
+command = "bun"
+args = ["run", "--cwd", "/path/to/your-app", "relkit", "mcp"]
+```
+
+Or add it from a terminal:
+
+```sh title="Terminal"
+codex mcp add relkit -- bun run --cwd /path/to/your-app relkit mcp
+```
+
+## Tools
+
+| Tool              | What it does                                                                                   |
+| ----------------- | ---------------------------------------------------------------------------------------------- |
+| `graph`           | Reads the whole graph, one collection (`routes`, `functions`, `events`, ...), or one entry.    |
+| `diagnostics`     | Reads the current generation's diagnostics, each with its `RELKIT_*` code and source location. |
+| `requests`        | Lists recent requests, newest first; `failedOnly` keeps failures only.                         |
+| `request_trace`   | Reads one request's record, logs and trace spans, by request ID or trace ID.                   |
+| `invoke_function` | Runs a function with an input through the same engine as a route.                              |
+| `check`           | Runs `relkit check` and returns its result or diagnostics.                                     |
+| `add`             | Runs `relkit add <kind> [name]`; when any step fails, every file it touched is restored.       |
+
+Every tool returns JSON. A failed call returns `isError` with a `RELKIT_*` code the agent can look
+up. `requests` and `request_trace` see requests that the session still buffers when the server
+starts, and every request after that.
+
+A typical loop for a failing route: the agent calls `requests` with `failedOnly`, reads the failure
+with `request_trace`, edits the code, then calls `check` and `invoke_function` to confirm the fix.
+
+## Tools that need approval
+
+The application's own `/mcp` endpoint, which exposes tools you declare with `mcp: true`, does not
+run a tool whose `approval` policy requires a person to approve each call. It returns
+[`RELKIT_MCP_APPROVAL_REQUIRED`](/docs/errors/relkit-mcp-approval-required) with the steps to
+approve the call instead.
