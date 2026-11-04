@@ -14,10 +14,13 @@ import { JobWatchAbortedError, type JobWatchOptions } from "./types.js";
  * @returns A registry whose `close` joins every retained native feed.
  * @example
  * ```ts
- * const registry = createJobFeedRegistry();
- * const borrow = registry.borrowView(client, "job", { runId: "run" });
- * try { await borrow.feed.addLease("view", () => undefined); }
- * finally { await borrow.releaseView(); await registry.close(); }
+ * import { createJobFeedRegistry } from "./feed-registry.service.js";
+ * export async function watchOnce(client: Parameters<ReturnType<typeof createJobFeedRegistry>["borrowView"]>[0]) {
+ *   const registry = createJobFeedRegistry();
+ *   const borrow = registry.borrowView(client, "job", { runId: "run" });
+ *   try { await borrow.feed.addLease("view", () => undefined); }
+ *   finally { await borrow.releaseView(); await registry.close(); }
+ * }
  * ```
  * @see tests/jobs/registry.test.ts for checked native cleanup.
  */

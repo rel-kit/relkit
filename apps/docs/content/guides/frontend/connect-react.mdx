@@ -88,8 +88,10 @@ Next.js plugin, and any additional entries your application already uses:
 </Tab>
 </Tabs>
 
-Your editor should now offer `GET /hello` as a selector and an optional `name` string as its input.
-If the selector is missing, check the backend URL, the pull output, and the TypeScript `include` list.
+Your editor should now offer `api.hello.greet` on the `api` object from `@relkit/client`, with an
+optional `name` string as its input. The property comes from the route's target function,
+`hello.greet`. If it is missing, check the backend URL, the pull output, and the TypeScript `include`
+list.
 
 </Step>
 <Step icon="plug">
@@ -155,8 +157,8 @@ If your app adds sign-in, forward its [auth mount](/docs/modules/client/authenti
 
 ## 4. Render the typed response
 
-`RelkitClientProvider` owns the connection and query cache; `useRoute` calls the generated
-operation with domain input. Both frameworks use the same component.
+`RelkitClientProvider` owns the connection and query cache; `useRoute` takes a route from the `api`
+object and calls it with domain input. Both frameworks use the same component.
 
 <Tabs syncKey="frontend-framework" hash={false}>
 <Tab title="Vite" icon="zap">
@@ -185,7 +187,7 @@ Render it from your page. Keep your existing `app/layout.tsx`, including its `<h
 </include>
 
 Keep React hooks in the Client Component. For calls from a Node.js Server Component or Route Handler,
-use [`createClient`](/docs/modules/client/transports) with an explicit backend URL and the appropriate
+use [`createApi`](/docs/modules/client/transports) with an explicit backend URL and the appropriate
 request identity. The `/server` and `/server/react` helpers require Bun; see
 [server rendering](/docs/modules/client/ssr) before selecting a server-side API.
 
@@ -193,7 +195,7 @@ request identity. The `/server` and `/server/react` helpers require Bun; see
 </Tabs>
 
 `greeting.data.message` is inferred from the backend function's output schema. No shared handwritten
-response interface is needed. The `GET /hello` selector identifies that route, but the client sends
+response interface is needed. `api.hello.greet` identifies that route, but the client sends
 RPC over `/rpc`; it does not construct a REST query string. Raw handlers are not generated operations.
 
 </Step>
@@ -234,10 +236,11 @@ Stop the backend and reload to check the connection error message.
 </Tab>
 </Tabs>
 
-After changing the public backend contract, run `client pull` again, typecheck, and restart the
-frontend dev server so the plugin loads the new fingerprint. Use `client check` before a frontend
-build. A fingerprint mismatch blocks new typed work with `application-updated`; coordinate frontend
-and backend releases instead of bypassing the check.
+While the backend runs under `relkit dev`, the provider follows its contract changes. When you
+change a route, the page keeps working without a frontend restart. Run `client pull` again to update
+the types, then typecheck. Use `client check` before a frontend build. Outside development, a
+fingerprint mismatch blocks new typed work with `application-updated`; coordinate frontend and
+backend releases instead of bypassing the check.
 
 </Step>
 </Steps>
@@ -248,7 +251,7 @@ Each module documents its backend declaration next to the corresponding frontend
 
 | Backend capability                    | Frontend entry point                                             | Continue with                                                                                             |
 | ------------------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `defineRoute` / `defineServiceRoutes` | `useRoute`, `useRouteMutation`, or `createClient`                | [Call a defined route](/docs/modules/http/define#use-from-the-frontend)                                   |
+| `defineRoute` / `defineServiceRoutes` | `useRoute`, `useRouteMutation`, or `createApi`                   | [Call a defined route](/docs/modules/http/define#use-from-the-frontend)                                   |
 | `streamOf` route output               | `useStream`                                                      | [Consume a response stream](/docs/modules/http/streaming#use-from-the-frontend)                           |
 | `defineJob` with a client policy      | `useJobTrigger`, `useJobRun`, or the generated `client.jobs` API | [Trigger and observe a job](/docs/modules/jobs/quickstart#use-this-job-from-the-frontend)                 |
 | Agent with a client policy            | `useAgent`                                                       | [Run an agent](/docs/modules/ai/agents#use-this-agent-from-the-frontend)                                  |

@@ -1,5 +1,6 @@
 "use client";
 
+import { api } from "@relkit/client";
 import { useAgent, useRoute } from "@relkit/client/react";
 import { agentThreadIds } from "./agent-config";
 
@@ -17,7 +18,7 @@ function interruptQuestion(value: unknown): string {
 }
 
 export default function Page() {
-  const greeting = useRoute("route.get.hello", { input: { name: "RelKit" } });
+  const greeting = useRoute(api.hello.hello, { input: { name: "RelKit" } });
   const assistant = useAgent("hello.assistant");
   const review = useAgent("hello.review");
 

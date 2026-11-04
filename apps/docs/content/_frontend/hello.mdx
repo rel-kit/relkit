@@ -1,6 +1,6 @@
 After [frontend setup and contract pull](/guides/frontend/connect-react), render the Hello route
-through its generated `GET /hello` selector. `name` and `data.message` are inferred from the
-backend function's schemas:
+through `api.hello.greet`. The property comes from the route's target function, `hello.greet`.
+`name` and `data.message` are inferred from the backend function's schemas:
 
 <include
   source="apps/docs/examples/frontend/app.tsx"

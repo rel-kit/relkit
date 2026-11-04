@@ -71,7 +71,8 @@ Test both forms, especially when middleware or authentication depends on the pat
 
 When `id` is omitted, RelKit derives it from the method and normalized URL. For example,
 `GET /orders/:orderId` becomes `route.get.orders.by-order-id`, and `GET /` becomes `route.get.root`.
-Changing a path or method changes that inferred identity. Route IDs also name generated-client operations.
+Changing a path or method changes that inferred identity. Route IDs also key the low-level
+`createClient` client; the `api` object names routes after their target function instead.
 
 An explicit `id` can preserve operation identity during a move, but it does not preserve the old URL.
 Review both URL compatibility and generated-client compatibility when renaming routes.

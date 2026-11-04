@@ -14,7 +14,7 @@ export async function prefetchGreeting(request: Request, baseUrl: string) {
     const input = { name: "RelKit" };
     const scope = server.dehydrate().scope;
     await queryClient.prefetchQuery({
-      queryKey: relkitKey(scope, "query", "GET /hello", input),
+      queryKey: relkitKey(scope, "query", "hello.greet", input),
       queryFn: () => server.client["route.get.hello"](input),
       staleTime: 30_000,
     });

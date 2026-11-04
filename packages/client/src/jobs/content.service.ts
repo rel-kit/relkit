@@ -15,8 +15,11 @@ import type { JobContentService } from "./content.types.js";
  * @see packages/client/tests/compatibility/jobs-watch.test.ts for continuity assertions.
  * @example
  * ```ts
- * const frames = await jobContent.open(client, "exports", { runId, name: "text" });
- * for await (const frame of frames) console.log(frame.kind);
+ * import { jobContent } from "./content.service.js";
+ * export async function printFrames(client: Parameters<typeof jobContent.open>[0]) {
+ *   const frames = await jobContent.open(client, "exports", { runId: "run", name: "text" });
+ *   for await (const frame of frames) console.log(frame.kind);
+ * }
  * ```
  */
 export const jobContent: JobContentService = {

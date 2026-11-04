@@ -28,8 +28,10 @@ export const api: ClientApi = branch([], () => undefined) as ClientApi;
  * passed to the React hooks.
  * @example
  * ```ts
- * const backend = createApi({ baseUrl: "http://127.0.0.1:3000" });
- * const order = await backend.orders.getOrder({ orderId: "o1" });
+ * import { createApi } from "@relkit/client";
+ * export const backend = createApi({ baseUrl: "http://127.0.0.1:3000" });
+ * // With the generated client-registry.d.ts included:
+ * // const order = await backend.orders.getOrder({ orderId: "o1" });
  * ```
  * @category Client
  */

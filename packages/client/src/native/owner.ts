@@ -2,9 +2,13 @@
  * Owns a set of running operations so that closing the owner aborts them and waits for them.
  * @example
  * ```ts
- * const owner = createWorkOwner();
- * const result = owner.run((signal) => fetch(url, { signal }));
- * await owner.close(); // aborts the fetch and waits for it to settle
+ * import { createWorkOwner } from "./owner.js";
+ * export async function fetchUntilClosed(url: string) {
+ *   const owner = createWorkOwner();
+ *   const result = owner.run((signal: AbortSignal) => fetch(url, { signal }));
+ *   await owner.close(); // aborts the fetch and waits for it to settle
+ *   return result;
+ * }
  * ```
  */
 export interface WorkOwner {

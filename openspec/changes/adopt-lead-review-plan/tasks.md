@@ -123,7 +123,7 @@ not tasks of this change.
 - [x] 11.2 Make hooks take `api` properties instead of string keys and put `code`, `status` and `data` in the error union, and verify type tests that narrow on `code`
 - [x] 11.3 Remove the runtime `effect` dependency from the browser client, and verify a bundle analysis shows no Effect runtime
 - [x] 11.4 Publish backend contract changes to frontends during development so they update without a restart, and verify with a browser test on `examples/commerce-web`
-- [ ] 11.5 Update `examples/commerce-web`, the fullstack template and the client docs to the new call style, and verify their tests and docs examples
+- [x] 11.5 Update `examples/commerce-web`, the fullstack template and the client docs to the new call style, and verify their tests and docs examples
 
 ## 12. Migration, beta and release
 

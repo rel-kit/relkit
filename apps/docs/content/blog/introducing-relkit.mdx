@@ -427,14 +427,15 @@ export default function App() {
 
 By default the provider talks to the same origin, which works nicely with a Vite or Next.js dev proxy. If your backend lives on another origin, pass `baseUrl` to the provider. For production builds, add `relkit()` to your Vite config or `withRelkit()` to your Next.js config so the frontend knows exactly which backend version it was built for.
 
-That’s it. Every route, job, agent and channel is now typed, with autocomplete on the route names:
+That’s it. Every route, job, agent and channel is now typed. Routes live on an `api` object shaped like your services, so autocomplete walks you from `api.orders` to `getOrder`:
 
 ```tsx
+import { api } from "@relkit/client";
 import { useRelkitClient, useRoute, useRouteMutation } from "@relkit/client/react";
 export function Orders() {
   const { status } = useRelkitClient();
-  const order = useRoute("GET /orders/:orderId", { input: { orderId: "order-1" } });
-  const create = useRouteMutation("POST /orders");
+  const order = useRoute(api.orders.getOrder, { input: { orderId: "order-1" } });
+  const create = useRouteMutation(api.orders.createOrder);
   if (order.isPending) return <p>Loading…</p>;
   return (
     <button
@@ -447,9 +448,9 @@ export function Orders() {
 }
 ```
 
-Inputs, outputs and errors all come from your backend’s schemas. Change a field on the backend and TypeScript tells the frontend right away. And `relkit client check` in CI catches any drift before you ship. No more "hey, what does this endpoint return?" messages :)
+Inputs, outputs and errors all come from your backend’s schemas. Change a field on the backend and TypeScript tells the frontend right away. Errors are typed too: check `error.code === "orders.not-found"` and TypeScript knows the error's `data`. Under `relkit dev`, the page even picks up a changed contract without a frontend restart. And `relkit client check` in CI catches any drift before you ship. No more "hey, what does this endpoint return?" messages :)
 
-Not using React? The same typed client works without it: `createClient` from `@relkit/client` runs in any TypeScript app, in the browser or on another server (on Bun, `createServerClient` also forwards tracing). And because every route is plain REST described by OpenAPI, a mobile app or a service written in any language can call your backend too.
+Not using React? The same typed client works without it: `createApi` from `@relkit/client` gives you the same `api` tree with every route callable (`await backend.orders.createOrder(input)`). It runs in any TypeScript app, in the browser or on another server (on Bun, `createServerClient` also forwards tracing). And because every route is plain REST described by OpenAPI, a mobile app or a service written in any language can call your backend too.
 
 ## Realtime
 
@@ -515,7 +516,7 @@ export const GET = defineRoute({
 });
 ```
 
-And on the frontend, `useStream("GET /reports/:reportId")` gives you `start()`, `cancel()` and typed `items`. Every streamed item is validated against the schema. Even streams don't get to skip the rules.
+And on the frontend, `useStream(api.orders.streamOrderReport)` gives you `start()`, `cancel()` and typed `items`. Every streamed item is validated against the schema. Even streams don't get to skip the rules.
 
 ## Jobs
 

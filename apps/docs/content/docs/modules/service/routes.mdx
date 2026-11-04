@@ -107,8 +107,9 @@ catch-all route; `ALL` is not a method accepted by `defineServiceRoutes`.
 
 <include>/_frontend/hello.mdx</include>
 
-`defineServiceRoutes` produces the same client contracts per exported method: `GET /orders` uses
-[`useRoute`](/docs/modules/client/routes), while `POST /orders` uses
+`defineServiceRoutes` produces the same client contracts per exported method. Each route appears on
+the `api` object under its target function: `GET /orders` becomes `api.orders.searchOrders` for
+[`useRoute`](/docs/modules/client/routes), while `POST /orders` becomes `api.orders.createOrder` for
 [`useRouteMutation`](/docs/modules/client/mutations). The input remains the target function's input;
 explicit HTTP header or body mappings do not construct RPC input. Only exposing a service member
 does not make it a browser operation: it needs a client-exposed route.

@@ -15,13 +15,13 @@ Call a backend operation from React using the contract generated from your appli
 
 ## Query finite routes
 
-`useRoute`, `useInfiniteRoute`, `useSuspenseRoute`, and `useRouteUtils` accept only finite exposed
-routes. Inputs, outputs, errors, selection, page parameters, signals, and query options are inferred
-from generated declarations.
+`useRoute`, `useInfiniteRoute`, `useSuspenseRoute`, and `useRouteUtils` take a route from the
+generated `api` object. They accept only finite exposed routes. Inputs, outputs, errors, selection,
+page parameters, signals, and query options are inferred from generated declarations.
 
-The [Hello route](/docs/modules/service/routes#when-to-use-defineroute) generates `GET /hello`.
-Import `useRoute` and `useRelkitClient` from `@relkit/client/react`, then render this component
-under the provider from the [Frontend guide](/guides/frontend/connect-react):
+The minimal starter's Hello route targets the function `hello.greet`, so its `api` property is
+`api.hello.greet`. Import `api` from `@relkit/client` and the hooks from `@relkit/client/react`, then
+render this component under the provider from the [Frontend guide](/guides/frontend/connect-react):
 
 <include
   source="apps/docs/examples/frontend/app.tsx#greeting"
@@ -31,9 +31,40 @@ under the provider from the [Frontend guide](/guides/frontend/connect-react):
   /_snippets/source/apps/docs/examples/frontend/app--greeting.tsx
 </include>
 
-The input and `data.message` follow the backend's schemas. An invalid selector or input fails
-typechecking after the generated declarations are included. `GET /hello` is the procedure selector;
-the client still uses RPC rather than constructing a REST request.
+The input and `data.message` follow the backend's schemas. An unknown route or invalid input fails
+typechecking after the generated declarations are included. The client still uses RPC rather than
+constructing a REST request.
+
+## Name routes
+
+A route's `api` path is its target function ID with each part in camelCase. The first part is the
+service: `orders.search-orders` becomes `api.orders.searchOrders`.
+
+When several routes target one function, the first one keeps the name. Routes are ordered by
+method (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`) and then by path. The others
+add their method, such as `api.orders.getOrderHead`. When the method repeats, they add their static
+path segments without a leading service name instead: `GET /orders/search` becomes
+`api.orders.searchOrdersSearch`.
+
+## Handle errors
+
+A route's error is a union keyed by `code`. Each error the route declares has its own `code`,
+`status`, and `data`. Anything else has a `code` from a fixed list, such as `NOT_FOUND`,
+`UNAUTHORIZED`, or `INTERNAL_SERVER_ERROR`, or `NETWORK_ERROR` when no response arrived. Check `code`
+to narrow `status` and `data`. In the commerce example, `api.orders.getOrder` declares
+`orders.not-found` with status 404 and `{ orderId }` data:
+
+```tsx title="src/Order.tsx — component body"
+const order = useRoute(api.orders.getOrder, { input: { orderId } });
+
+if (order.error?.code === "orders.not-found") {
+  return <p role="alert">No order {order.error.data.orderId}.</p>;
+}
+if (order.error) return <p role="alert">{order.error.message}</p>;
+```
+
+Narrow on `code` rather than `instanceof ORPCError`. The union names every code the route can fail
+with, and TypeScript checks each comparison.
 
 ## Choose query helpers
 
@@ -57,7 +88,7 @@ for the same requirement when prefetching.
 
 ## Keep streams separate
 
-Routes with streaming output are deliberately absent from these selectors. Use `useStream` instead.
+These hooks do not accept routes with streaming output. Pass those to `useStream` instead.
 Routes marked `client: false` have neither a route-ID RPC procedure nor a URL alias.
 
 <include>/_snippets/generated/related/docs-modules-client-routes.mdx</include>

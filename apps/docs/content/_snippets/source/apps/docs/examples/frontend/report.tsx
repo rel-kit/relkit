@@ -1,13 +1,14 @@
 "use client";
 
 /** Consumes the commerce report route as a cancellable typed stream inside the client provider. */
+import { api } from "@relkit/client";
 import { useRelkitClient, useStream } from "@relkit/client/react";
 
 /** Starts one report explicitly and displays its validated progress items.
  * @returns Start/cancel controls and visible progress or stream failure. */
 export function Report() {
   const { status } = useRelkitClient();
-  const report = useStream("GET /reports/:reportId");
+  const report = useStream(api.orders.streamOrderReport);
 
   return (
     <section>

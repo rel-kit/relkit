@@ -49,15 +49,16 @@ export default defineFunction({
 
 The `trigger()` receipt confirms the provider accepted the append; it does not prove delivery to every browser. If a database write and publication must be atomic, use an outbox in the database transaction. A retryable publish can pass a RelKit-issued `idempotencyKey` as the fourth argument.
 
-In a React client with `@relkit/client`, subscribe using the generated channel registry:
+In a React client with `@relkit/client`, subscribe using the generated channel registry. Channels keep their declared ID; routes come from the generated `api` object, named after their target function ID in camelCase. This example assumes a `GET /announcements` route that targets `announcements.get-announcements`:
 
 ```tsx
 "use client";
 
+import { api } from "@relkit/client";
 import { useChannel, useRoute } from "@relkit/client/react";
 
 export default function Announcements() {
-  const announcements = useRoute("GET /announcements", { input: {} });
+  const announcements = useRoute(api.announcements.getAnnouncements, { input: {} });
   const channel = useChannel("announcements.feed", {
     params: {},
     on: { posted: () => void announcements.refetch() },

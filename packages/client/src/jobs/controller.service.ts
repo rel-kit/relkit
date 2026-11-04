@@ -14,9 +14,13 @@ let nextControllerId = 1;
  * @returns A resource-free factory of passive external-store views.
  * @example
  * ```ts
- * const factory = createJobControllers(createJobFeedRegistry());
- * const view = factory.view(client, "job", { runId: "run" });
- * try { await view.connect(); } finally { await view.dispose(); }
+ * import { createJobControllers } from "./controller.service.js";
+ * import { createJobFeedRegistry } from "./feed-registry.service.js";
+ * export async function connectOnce(client: Parameters<ReturnType<typeof createJobControllers>["view"]>[0]) {
+ *   const factory = createJobControllers(createJobFeedRegistry());
+ *   const view = factory.view(client, "job", { runId: "run" });
+ *   try { await view.connect(); } finally { await view.dispose(); }
+ * }
  * ```
  */
 export function createJobControllers(registry: JobFeedRegistryService): JobControllerFactory {

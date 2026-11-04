@@ -1,6 +1,7 @@
 "use client";
 
 /** Renders the minimal backend's greeting through the pulled registry and a same-origin client provider. */
+import { api } from "@relkit/client";
 import { RelkitClientProvider, useRelkitClient, useRoute } from "@relkit/client/react";
 
 // #region greeting
@@ -8,10 +9,10 @@ import { RelkitClientProvider, useRelkitClient, useRoute } from "@relkit/client/
  * @returns Loading, connection failure, request failure, or the successful greeting. */
 export function Greeting() {
   const { status } = useRelkitClient();
-  const greeting = useRoute("GET /hello", { input: { name: "RelKit" } });
+  const greeting = useRoute(api.hello.greet, { input: { name: "RelKit" } });
 
   if (status === "application-updated") {
-    return <p role="alert">The API changed. Pull its contract and restart the frontend.</p>;
+    return <p role="alert">The API changed. Pull its contract and rebuild the frontend.</p>;
   }
   if (status === "error") return <p role="alert">Cannot connect to the API.</p>;
   if (greeting.isError) return <p role="alert">{greeting.error.message}</p>;

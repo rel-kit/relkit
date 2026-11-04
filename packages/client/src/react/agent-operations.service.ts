@@ -18,9 +18,13 @@ import type {
  * @returns Resource-free operations; each observation owns its own requests.
  * @example
  * ```ts
+ * import { createAgentOperations } from "./agent-operations.service.js";
  * import { pendingOperations } from "./pending.service.js";
- * const operations = createAgentOperations(pendingOperations);
- * await operations.reconcile(client, scopeKey, "support.echo", signal);
+ * type Client = Parameters<ReturnType<typeof createAgentOperations>["reconcile"]>[0];
+ * export async function reconcile(client: Client, scopeKey: string, signal: AbortSignal) {
+ *   const operations = createAgentOperations(pendingOperations);
+ *   await operations.reconcile(client, scopeKey, "support.echo", signal);
+ * }
  * ```
  */
 export function createAgentOperations(pending: PendingOperationService): AgentOperationsService {

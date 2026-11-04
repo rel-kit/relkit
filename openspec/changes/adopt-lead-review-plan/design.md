@@ -376,6 +376,14 @@ Decided while applying section 11 (maintainer, 2026-11-05):
   endpoint that switches the reported fingerprint; `tests/e2e-commerce/contract-reload.spec.ts`
   checks that the page re-reads its identity, refetches under the new contract, shows no restart
   alert and still posts. With the provider's subscription disabled the test fails.
+- **Consumers.** The repository's own frontends move by hand: `examples/commerce-web`
+  (`api.orders.searchOrders`, `api.announcements.getAnnouncements`, `postAnnouncement`,
+  `api.orders.streamOrderReport`), the fullstack template (`api.hello.hello`), and the docs
+  examples, which follow the backend each one targets (the minimal starter's `hello.greet`
+  gives `api.hello.greet`). The starter skill references change in the minimal template, which
+  `tests/generator/skill-consistency.test.ts` treats as the source, and are copied to the other
+  starters; that changes the minimal template's bytes, so the pinned `templateDigest` in
+  `packages/create-relkit/src/create-capabilities.ts` is updated, as earlier template changes did.
 
 ### D16. Agent adapters (#22)
 

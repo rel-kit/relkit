@@ -32,11 +32,12 @@ contract pulled into the caller, this function sends domain input and returns `{
 
 Call `echoMessage(window.location.origin, "Hello from the frontend")` behind a same-origin proxy,
 or pass your configured backend origin. Handle the returned Promise's rejection in your UI.
-The pulled contract exposes `client["route.post.echo"]`. React hooks also accept the `POST /echo`
-selector through their generated registry. The call uses `/rpc` and returns the function output;
-it does not return an HTTP `Response`.
+`createApi` returns the same tree as the `api` object, with every route callable. The Echo route
+targets the function `echo.echo`, so you call `backend.echo.echo(input)`. React hooks take the same
+`api.echo.echo` property. The call uses `/rpc` and returns the function output; it does not return an
+HTTP `Response`.
 
-`createClient` configures transport; it does not perform the identity handshake. This example first
+`createApi` configures transport; it does not perform the identity handshake. This example first
 loads the current browser identity, validates its scope and session epoch, and sends them with the
 mutation. The React provider manages that handshake for hooks. Server callers must forward the same
 request credentials to both requests; [Bun's server context](/docs/modules/client/ssr) does this for you.
@@ -45,11 +46,12 @@ submitting again. Do not bypass the identity headers or automatically retry a wr
 
 ## Choose a transport
 
-All three factories are exported from `@relkit/client` and use the same generated contract:
+These factories are exported from `@relkit/client` and use the same generated contract:
 
 | Factory                                                           | Use it for                                   | Configuration and behavior                                                                                         |
 | ----------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| [`createClient`](/docs/api/client#createclient)                   | Finite HTTP calls and supported HTTP streams | `baseUrl`, request-time `headers`, `credentials`, and an optional `fetch`.                                         |
+| [`createApi`](/docs/api/client#createapi)                         | Finite HTTP calls and supported HTTP streams | `baseUrl`, request-time `headers`, `credentials`, and an optional `fetch`.                                         |
+| [`createClient`](/docs/api/client#createclient)                   | Tests and tools that need the raw client     | The same options. Returns the low-level oRPC client, keyed by route ID such as `route.post.echo`.                  |
 | [`createWebSocketClient`](/docs/api/client#createwebsocketclient) | A backend with WebSocket RPC enabled         | `baseUrl`, an optional WebSocket constructor, and `establishmentTimeoutMs`. Connection establishment is lazy.      |
 | [`createAutoClient`](/docs/api/client#createautoclient)           | WebSocket preference with HTTP fallback      | Combines the transport options. Fallback applies to connection establishment, not replay of an accepted operation. |
 
@@ -70,13 +72,15 @@ separate origins need [matching cookie and CORS configuration](/docs/modules/aut
 | `@relkit/client/server/tanstack-query` | [`createRelkitServerContext`](/docs/api/client#createrelkitservercontext)                          | [Request-scoped hydration](/docs/modules/client/ssr)                                    |
 | `@relkit/client/jobs`                  | [`watchJobRun`](/docs/api/client#watchjobrun), [`watchJobStream`](/docs/api/client#watchjobstream) | [Accepted job runs](/docs/modules/jobs/clients)                                         |
 
-The server leaves are Bun-only exports. Use the base `createClient` in other server runtimes.
+The server leaves are Bun-only exports. Use `createApi` in other server runtimes.
 Query integration is opt-in and has its own [peer installation](/docs/modules/client/routes#choose-query-helpers).
 
 ## Handle errors and resource lifetimes
 
-Catch [`ORPCError`](/docs/api/client#all-exported-apis) for RPC failures and inspect its code and data.
-Do not treat a missing response to a write as proof that the write failed. Follow
+A rejected call has a `code`, `status`, and `data`. Check `code` to tell a declared error such as
+`orders.not-found` from a common one such as `UNAUTHORIZED`, or from `NETWORK_ERROR` when no response
+arrived. Checking `code` narrows `status` and `data`, so prefer it to `instanceof ORPCError`. See
+[handle errors](/docs/modules/client/routes#handle-errors). Do not treat a missing response to a write as proof that the write failed. Follow
 [uncertain-outcome recovery](/docs/modules/client/offline) before resubmitting.
 
 Pass cancellation signals to calls that need them, finish or cancel stream iteration, and dispose
