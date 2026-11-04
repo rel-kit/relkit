@@ -2,6 +2,7 @@ import { access, mkdir } from "node:fs/promises";
 import { Context, Layer } from "effect";
 import { cleanupCandidate, resolvePort, terminate } from "./candidate-process.js";
 import { captureOutput } from "./candidate-output.js";
+import { dispatchCandidateMessage } from "./candidate-ipc.js";
 import type { CandidatePlatformService } from "./candidate-service.types.js";
 
 /** Acquired native boundary, with identical live/test platform contracts. */
@@ -28,6 +29,8 @@ export const CandidatePlatformLive = Layer.succeed(
         stdin: "ignore",
         stdout: "pipe",
         stderr: "pipe",
+        // The dev reload path swaps a running candidate's handler table over this channel.
+        ipc: (message, subprocess) => dispatchCandidateMessage(subprocess, message),
         ...(options.signal === undefined ? {} : { signal: options.signal }),
       }),
     stop: terminate,

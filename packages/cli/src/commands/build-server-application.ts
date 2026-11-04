@@ -57,7 +57,16 @@ const contextResolver = createApplicationContextResolver({
   env: values,
 });
 ${agentSource.startup}
-const registry = createFunctionRegistry(graph, executableManifest);
+// The handler table lets \`relkit dev\` swap handlers in place; production never installs the hook.
+const handlerTable = createHandlerTable(createFunctionRegistry(graph, executableManifest), executableManifest);
+const registry = handlerTable.registry;
+if (environment !== "production" && process.env.RELKIT_DEV_RELOAD === "1") installDevelopmentReload({
+  projectRoot: process.cwd(),
+  serverDirectory: import.meta.dir,
+  table: handlerTable,
+  runtimeManifest,
+  createRegistry: (nextGraph, nextManifest) => createFunctionRegistry(nextGraph, nextManifest),
+});
 let nativeJobsRuntimes = new Map();
 const nativeJobWorkerRegistrations = new Set();
 const nativeJobWorkerReadyHandles = new Set();

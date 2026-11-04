@@ -54,6 +54,7 @@ const acquireCommandSession = Effect.fn("Dev.acquireCommandSession")(function* (
     installSignalHandlers: false,
     inspector: ports.inspector,
     compile: compiler.compile,
+    reload: compiler.reloadEffect,
     localServicesEffect: compiler.closeEffect,
     sourceChangedEffect: () => compiler.invalidateEffect,
     candidateStopTimeoutMs: 30_000,
@@ -61,6 +62,8 @@ const acquireCommandSession = Effect.fn("Dev.acquireCommandSession")(function* (
     terminal,
     environment: {
       RELKIT_DEV_LOGS: "1",
+      // Installs the generated server's handler-table reload hook (see relkit/host).
+      RELKIT_DEV_RELOAD: "1",
       RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS: process.env.RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS ?? "15000",
       ...telemetry.environment,
     },

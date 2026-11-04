@@ -4,6 +4,7 @@ import type { InspectorConfiguration } from "relkit/contracts";
 import type { Effect } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { CheckResult } from "./check-result.types.js";
+import type { DevReload } from "../dev-reload/reload.types.js";
 
 /** Existing manual compiler facade expected by the supervisor SDK. */
 export interface DevLocalCompiler {
@@ -35,6 +36,8 @@ export interface EffectDevLocalCompiler {
   readonly compileEffect: (
     request: CandidateCompileRequest,
   ) => Effect.Effect<Awaited<ReturnType<CandidateCompile>>, CliAdapterError>;
+  /** Offers one save to the in-place handler swap before the blue/green path. */
+  readonly reloadEffect: DevReload;
   /** Advances import epochs and replaces this session's success-only recipe cache. */
   readonly invalidateEffect: Effect.Effect<void>;
   /** Interrupts workers, joins native resource cleanup and closes admission exactly once. */

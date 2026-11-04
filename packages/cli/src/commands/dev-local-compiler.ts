@@ -1,6 +1,7 @@
 /** Owns the compiler bridge and captured session resources; generation stages live in dev-local-generation. */
 import { Deferred, Effect, Exit, Ref, Scope, Semaphore } from "effect";
 import type { RuntimeIntegrationPlan } from "relkit/contracts";
+import type { CheckResult } from "./check-result.types.js";
 import { observeCli } from "../cli-runtime.js";
 import { CliProject } from "../services/project.service.js";
 import { CliCompiler } from "../services/compiler.service.js";
@@ -10,6 +11,7 @@ import { CliCleanup, cleanupEffect } from "../services/cleanup.service.js";
 import { makeDevRecipeCacheEffect } from "./dev-recipe-cache.js";
 import { makeDevCompilerBridgeEffect } from "./dev-compiler-bridge.js";
 import { compileDevGenerationEffect } from "./dev-local-generation.js";
+import { makeDevReload } from "../dev-reload/reload.js";
 import type { EffectLocalServiceOwner } from "./dev-local-runtime.types.js";
 import type { DevCompilerOptions, EffectDevLocalCompiler } from "./dev-local.types.js";
 import type {
@@ -54,9 +56,12 @@ export const makeDevLocalCompilerEffect = Effect.fn("Dev.localCompiler")(
       cleanup: capabilities.cleanup,
     });
     yield* Effect.addFinalizer(() => closeEffect);
+    const reload = makeDevReload(options, state, capabilities.project);
     return {
       compile: bridge.compile,
       compileEffect,
+      // Reloads share the compile permit, so a swap and a blue/green build never interleave.
+      reloadEffect: (request) => serial.withPermits(1)(reload(request)),
       invalidateEffect: state.invalidateEffect,
       closeEffect,
     } satisfies EffectDevLocalCompiler;
@@ -127,6 +132,7 @@ const generationState = Effect.fn("Dev.generationState")(function* (
     closing: yield* Ref.make(false),
     initialCheck,
     invalidateEffect,
+    checks: yield* Ref.make<ReadonlyMap<number, CheckResult>>(new Map()),
   } satisfies DevGenerationState;
 });
 

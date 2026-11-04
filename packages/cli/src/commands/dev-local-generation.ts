@@ -55,6 +55,11 @@ export const compileDevGenerationEffect = Effect.fn("Dev.compileGeneration")(fun
       throw new Error(formatDevDiagnostics(options.projectRoot, built.diagnostics, options.color));
     });
   local = yield* activateGenerationWorkers(options, state, checked, request, local);
+  // Later saves compare against this check to decide whether they can swap in place.
+  yield* Ref.update(
+    state.checks,
+    (checks) => new Map([...[...checks].slice(-4), [request.token.generationToken, checked]]),
+  );
   return generationReceipt(local, inspection);
 });
 

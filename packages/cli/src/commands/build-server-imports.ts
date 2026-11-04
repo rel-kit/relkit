@@ -30,7 +30,7 @@ import { Effect } from "effect";
 import { createServerRuntimeHost } from "relkit/engine/server-runtime";
 ${providerOverridesImport}
 ${agentSource.imports}
-import { createApplicationContextResolver } from "relkit/host";
+import { createApplicationContextResolver, createHandlerTable, installDevelopmentReload } from "relkit/host";
 import { resolveEnv } from "relkit/config";
 ${specializedImports}
 import { ${engine.imports} } from "relkit/engine";

@@ -22,6 +22,8 @@ export interface DevGenerationState {
     Effect.Effect<CheckResult | undefined, CliAdapterError> | undefined
   >;
   readonly invalidateEffect: Effect.Effect<void>;
+  /** Accepted check of each built generation, keyed by generation token; reloads compare against it. */
+  readonly checks: Ref.Ref<ReadonlyMap<number, CheckResult>>;
 }
 
 /** One compiler's admission and shared shutdown completion. */
