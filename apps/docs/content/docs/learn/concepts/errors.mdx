@@ -32,13 +32,14 @@ For every scaffolding flag, see the [error command reference](/docs/api/cli#relk
   /_snippets/source/examples/commerce/src/services/orders/errors/order-not-found.error.ts
 </include>
 
-The `id` is the durable contract used by graphs, clients, traces, and matching. `data` limits the details callers
+Every declared error needs an `id`. It becomes the public `code` in API responses, and graphs, clients and
+traces use it to match the failure, so keep it stable when the file moves. `data` limits the details callers
 may receive. `http.status` contributes a typed HTTP response, while `retry` tells durable delivery whether another
 attempt could help.
 
-Register the descriptor in a function's `errors` list and throw the constructed declared value; returning it
-works the same way. Do not convert every caught exception into a declared error; callers should depend only on
-failures the domain promises.
+Register the descriptor in a function's `errors` list and return the constructed error from the handler, as the
+lookup example below does. Do not convert every caught exception into a declared error; callers should depend
+only on failures the domain promises.
 
 A function may declare an error its handler never raises. To catch stale declarations, turn on the
 `unusedErrors` check in `relkit.config.ts`, and `relkit check` warns about each one:
@@ -54,7 +55,7 @@ as unused.
 
 ## Verify the public contract
 
-The order lookup function uses the declared error when no record exists:
+The order lookup function returns the declared error when no record exists:
 
 <include
   source="examples/commerce/src/services/orders/functions/get-order.function.ts"

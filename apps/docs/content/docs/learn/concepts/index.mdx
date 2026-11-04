@@ -20,6 +20,26 @@ maintaining separate descriptions of the application.
   >
     Use defineApp to connect the server, environment, and integrations in relkit.config.ts.
   </Card>
+  <Card title="Functions" href="/docs/learn/concepts/functions" icon="braces" arrow>
+    Define reusable behavior with validated input, output, errors, and dependencies.
+  </Card>
+  <Card title="Runtime schemas" href="/docs/learn/concepts/schemas" icon="shapes" arrow>
+    Validate every value that crosses an application boundary.
+  </Card>
+  <Card title="Declared errors" href="/docs/learn/concepts/errors" icon="circle-alert" arrow>
+    Give expected failures a stable code, data, and HTTP status.
+  </Card>
+  <Card title="Invocation context" href="/docs/learn/concepts/context" icon="workflow" arrow>
+    Declare what a function calls under dependencies and reach it through context.
+  </Card>
+  <Card
+    title="Code outside handlers"
+    href="/docs/learn/concepts/runtime-handle"
+    icon="terminal"
+    arrow
+  >
+    Use getRelkit in routes, middleware, and startup code, and createRelkit in scripts.
+  </Card>
   <Card
     title="Environment contracts"
     href="/docs/learn/concepts/environment"
@@ -28,20 +48,12 @@ maintaining separate descriptions of the application.
   >
     Use defineEnv to declare typed values, defaults, and secrets.
   </Card>
-  <Card title="Functions" href="/docs/learn/concepts/functions" icon="braces" arrow>
-    Define reusable behavior with validated input, output, errors, and dependencies.
-  </Card>
-  <Card title="Schemas and errors" href="/docs/learn/concepts/schemas" icon="list-checks" arrow>
-    Keep runtime boundaries explicit and failures safe for callers.
-  </Card>
-  <Card title="Context and environment" href="/docs/learn/concepts/context" icon="workflow" arrow>
-    Use invocation-scoped capabilities and typed runtime configuration.
-  </Card>
 </CardGroup>
 
 Start with the application model and functions. Schemas define values crossing a boundary; declared errors
-define expected failures. Context grants one invocation access to its approved capabilities, while the
-environment contract resolves process configuration before handlers run.
+define expected failures. Context gives one invocation the clients it declares, and a runtime handle gives
+the same clients to code outside handlers. The environment contract resolves process configuration before
+handlers run.
 
 ## One source, many consumers
 

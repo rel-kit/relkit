@@ -64,7 +64,16 @@ test("keeps Core concepts near Start and retires the duplicate Async section", a
   ]);
   expect(guideGroups.find(({ directory }) => directory === "docs/learn/concepts")).toMatchObject({
     title: "Core concepts",
-    pages: ["index", "application", "functions", "schemas", "errors", "context", "environment"],
+    pages: [
+      "index",
+      "application",
+      "functions",
+      "schemas",
+      "errors",
+      "context",
+      "runtime-handle",
+      "environment",
+    ],
   });
   expect(
     guideGroups.find(({ directory }) => directory === "docs/modules/operations"),

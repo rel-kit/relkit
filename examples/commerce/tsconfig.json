@@ -18,6 +18,6 @@
     "forceConsistentCasingInFileNames": true
   },
   "files": [".relkit/generated/event-registry.d.ts", ".relkit/generated/context-registry.d.ts"],
-  "include": ["src/**/*.ts", "tests/**/*.ts", "relkit.config.ts"],
+  "include": ["src/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts", "relkit.config.ts"],
   "exclude": ["node_modules", ".relkit"]
 }

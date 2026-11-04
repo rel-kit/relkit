@@ -10,7 +10,7 @@ contract, integration bindings, server policy, telemetry, Inspector, and optiona
 handlers do not import this file.
 
 Use [defineApp](/docs/api/app#defineapp) from `@relkit/app/config` to declare this configuration.
-`defineConfig` is no longer exported by RelKit. The environment declaration comes from
+The environment declaration comes from
 [defineEnv](/docs/api/config#defineenv), explained in [Environment contracts](/docs/learn/concepts/environment).
 
 ## Configure the application with defineApp [#read-the-generated-configuration]
@@ -61,7 +61,8 @@ appear to have a new owner.
 
 Configuration describes topology. It must not open a database connection, call a remote API, start a server,
 or create cloud resources during module import. Integration constructors describe bindings; runtimes activate
-their clients only after the graph has passed validation.
+their clients only after the graph has passed validation. Work that must run once when the application starts
+goes in `server.onStart`; see [Code outside handlers](/docs/learn/concepts/runtime-handle#run-code-at-startup).
 
 Use each layer for one responsibility:
 

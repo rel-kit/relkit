@@ -1,5 +1,5 @@
 /** Checks the demonstration order authorization function before forwarding matching HTTP requests; denial returns 401. */
-import { getRelkit } from "@relkit/app";
+import { getRelkit } from "relkit";
 import { defineMiddleware } from "@relkit/app/routes";
 
 const orderAuth = defineMiddleware("/orders/*", async (context, next) => {

@@ -17,6 +17,7 @@
   "docs/learn/concepts/functions": ["retain", "concept", ""],
   "docs/learn/concepts/index": ["update", "concept", ""],
   "docs/learn/concepts/schemas": ["retain", "concept", ""],
+  "docs/learn/concepts/runtime-handle": ["update", "concept", ""],
   "docs/learn/create-an-app": ["update", "concept", ""],
   "docs/learn/first-route": ["retain", "continuation", "/docs/learn/create-an-app"],
   "docs/learn/index": ["update", "concept", ""],

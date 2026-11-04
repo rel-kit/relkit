@@ -115,7 +115,7 @@ not tasks of this change.
 - [x] 10.7 Require explicit IDs for errors with a source-located diagnostic when one is missing, and verify compiler tests
 - [x] 10.8 Remove the duplicates and aliases — the legacy `defineJob` and `jobs/legacy` entry and runtime paths, the second `defineAgent`, the `job` key, `getJsonSchema`/`toJsonSchema`, builder `void`/`undefined`, `defineTransform`/`defineRequestTransform` and the job `profile` alias — and verify type tests and that the legacy job runtime code is deleted
 - [x] 10.9 Let route modules export a `defineServiceRoutes` map without destructuring and remove the editor plugin's destructuring quick fix, and verify compiler and editor tests
-- [ ] 10.10 Rewrite the concept docs to show one pattern per concept, and verify the docs examples compile
+- [x] 10.10 Rewrite the concept docs to show one pattern per concept, and verify the docs examples compile
 
 ## 11. Client call style (#16, first part)
 

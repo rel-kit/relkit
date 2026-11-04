@@ -1,59 +1,68 @@
 ---
 title: Invocation context
-description: Use invocation metadata, cancellation, time, logging, environment, and declared clients without globals.
+description: Declare everything a function calls under dependencies, then reach each one through its context.
 sidebar:
   icon: workflow
 ---
 
-A function's second parameter, `context`, gives that invocation access to logging, time, cancellation, and its declared resources. RelKit builds it from the checked graph, so a function
-receives common runtime capabilities plus typed clients for only the resources it declares. Never store context
+A function's second parameter, `context`, gives that invocation access to logging, time, cancellation, and
+the resources it declares. RelKit builds it from the checked graph for each invocation. Never store context
 in a module variable or reuse it after the invocation completes.
 
-## Use declared clients
+## Declare dependencies, then call through context [#use-declared-clients]
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
-  This larger commerce reference assumes its selected cache is installed and bound. When adapting it
-  to a minimal app, complete [cache setup](/guides/caching/cache-product-prices) first. Declaring a
-  context edge does not install an adapter or native SDK.
+  This example declares a cache, an event and a realtime channel. Each one needs its integration
+  installed and bound before the app runs; for the cache, complete [cache
+  setup](/guides/caching/cache-product-prices) first. Declaring a dependency does not install an
+  adapter or native SDK.
 </Callout>
 
-<include
-  source="examples/commerce/src/services/orders/functions/create-order.function.ts"
-  lang="ts"
-  meta='title="examples/commerce/src/services/orders/functions/create-order.function.ts"'
->
-  /_snippets/source/examples/commerce/src/services/orders/functions/create-order.function.ts
-</include>
-
-This function declares the `prices` cache, so its handler receives `context.cache.prices`. Merely importing a
-cache or putting it in the same domain does not grant access.
-
-Event publication uses the same `dependencies` object. Import the event descriptor and declare it under `events`:
+A function lists everything its handler calls under `dependencies`. Each key you choose becomes a client
+with the same name under `context`:
 
 <include
-  source="apps/docs/examples/events/create-order.function.ts"
+  source="apps/docs/examples/context/create-order.function.ts"
   lang="ts"
-  meta='title="apps/docs/examples/events/create-order.function.ts"'
+  meta='title="src/services/orders/functions/create-order.function.ts"'
 >
-  /_snippets/source/apps/docs/examples/events/create-order.function.ts
+  /_snippets/source/apps/docs/examples/context/create-order.function.ts
 </include>
 
-The key you choose, `orderCreated`, becomes available under `context.events`. An undeclared event is not on
-`context.events`, so the type check fails before the app runs.
+`priceOrder` is declared under `functions`, so the handler calls `context.functions.priceOrder(...)`. The
+call keeps validation, deadlines, cancellation, tracing, and causation. `relkit check` draws a graph edge
+for every declaration, and the type check fails when a handler reaches for something it did not declare.
+
+Each dependency kind has one client shape:
+
+| Declare under | Call it from the handler                                                  |
+| ------------- | ------------------------------------------------------------------------- |
+| `functions`   | `await context.functions.priceOrder(input)`                               |
+| `events`      | `await context.events.orderCreated.publish(payload)`                      |
+| `channels`    | `await context.channels.orderUpdates.trigger(params, "created", payload)` |
+| `tasks`       | `await context.tasks.exportOrders.trigger(input)` returns a run handle    |
+| `jobs`        | `await context.jobs.sendReceipt.trigger(input)` returns a run handle      |
+| `cache`       | `await context.cache.prices.get(key)`                                     |
+| `buckets`     | `await context.buckets.receipts.put(key, bytes)`                          |
+| `databases`   | `context.databases.analytics`, the models of that database service        |
+| `agents`      | `await context.agents.orderSupport(input)`                                |
+
+The application's default database is `context.database`. It needs no declaration. Declare other database
+services under `databases`.
 
 ## Know the common context
 
-| Value                                          | Use it for                                                                      |
-| ---------------------------------------------- | ------------------------------------------------------------------------------- |
-| `invocation`                                   | ID, trace, correlation, source, attempt, timing, deadline, and service metadata |
-| `signal`                                       | Cancelling work and passing cancellation to lower-level calls                   |
-| `env`                                          | Values resolved by the application's typed environment contract                 |
-| `log`                                          | Structured, invocation-correlated records                                       |
-| `trace`                                        | Child spans, point-in-time events, and attributes on the active span            |
-| `time`                                         | Testable `now()` and abort-aware `sleep()` behavior                             |
-| `functions`, `events`, `channels`, `databases` | Clients authorized by declarations on the function                              |
-| `tasks`, `jobs`, `buckets`, `cache`, `agents`  | Clients authorized by declarations on the function                              |
-| `database`, `auth`, `constants`, `prompts`     | Registered application context supplied by specialized integrations             |
+Every invocation also receives these values, with no declaration:
+
+| Value                                      | Use it for                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------------- |
+| `invocation`                               | ID, trace, correlation, source, attempt, timing, deadline, and service metadata |
+| `signal`                                   | Cancelling work and passing cancellation to lower-level calls                   |
+| `env`                                      | Values resolved by the application's typed environment contract                 |
+| `log`                                      | Structured, invocation-correlated records                                       |
+| `trace`                                    | Child spans, point-in-time events, and attributes on the active span            |
+| `time`                                     | Testable `now()` and abort-aware `sleep()` behavior                             |
+| `database`, `auth`, `constants`, `prompts` | Registered application context supplied by specialized integrations             |
 
 There is no service middleware or `context.service`. A service exposes public functions and events; it does not
 inject handler state. Database and Auth are specialized application context integrations, documented in
@@ -62,6 +71,9 @@ inject handler state. Database and Auth are specialized application context inte
 RelKit traces routes, functions, declared clients, jobs, events, tools, and agents automatically. Use
 `context.trace` only for application work the runtime cannot infer. See [Observability](/docs/modules/operations/observability#add-application-trace-detail)
 for the three tracing operations and an executable example.
+
+Raw routes, middleware, startup code and scripts have no `context`. They reach the same clients through a
+runtime handle; see [Code outside handlers](/docs/learn/concepts/runtime-handle).
 
 ## Add access safely
 
@@ -77,8 +89,7 @@ Follow its guide and choose the integration profile in `relkit.config.ts`.
 
 ### Declare the graph edge
 
-Add the descriptor under the matching `dependencies` key, such as `functions`, `events`, `channels`, or
-`databases`.
+Add the descriptor under the matching `dependencies` key from the table above.
 
 </Step>
 <Step>
@@ -90,7 +101,8 @@ bun run check
 bun run test
 ```
 
-Provider-backed unit and application tests should receive explicit deterministic fakes.
+Expect `check` to pass with the new edge in the graph. Provider-backed unit and application tests should
+receive explicit deterministic fakes.
 
 </Step>
 </Steps>

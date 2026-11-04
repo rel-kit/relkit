@@ -52,6 +52,7 @@ export const guideGroups = [
     "schemas",
     "errors",
     "context",
+    "runtime-handle",
     "environment",
   ]),
   serviceGuideGroup,
@@ -197,7 +198,15 @@ const relations = [
   relation(
     "docs/learn/concepts/context",
     ["functions"],
-    ["examples/commerce/src/services/orders/functions/create-order.function.ts"],
+    ["apps/docs/examples/context/create-order.function.ts"],
+  ),
+  relation(
+    "docs/learn/concepts/runtime-handle",
+    ["functions"],
+    [
+      "examples/commerce/scripts/seed.ts",
+      "examples/commerce/src/routes/middleware/order-auth.middleware.ts",
+    ],
   ),
   relation(
     "docs/learn/concepts/environment",

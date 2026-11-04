@@ -10,8 +10,7 @@ expected errors, the dependencies its handler uses, and one handler. Routes, job
 event consumers, tools, agents, and direct calls all enter the same invocation engine.
 
 Functions remain request- or event-scoped operations. When work must outlive the initiating request, define a
-[task](/docs/modules/jobs/tasks) and expose it through a [task-first job](/docs/modules/jobs/quickstart); do not turn a
-function target into a durable worker by adding queue fields.
+[task](/docs/modules/jobs/tasks) and run it through a [job](/docs/modules/jobs/quickstart).
 
 ## Scaffold a callable function
 
@@ -25,8 +24,8 @@ This creates `src/services/orders/functions/send-receipt.function.ts` and expose
 `src/services/orders/service.ts`. The placeholder accepts and returns a string `value`; replace its schemas
 and handler with your domain behavior. Its stable ID is `orders.send-receipt`.
 
-Pass `--internal` to omit public service exposure. Use `--create-service orders` instead of
-`--service orders` only if the domain does not exist. No test files are generated.
+Pass `--internal` to keep the function out of the public service. If the `orders` service does not exist
+yet, pass `--create-service orders` in place of `--service orders`. No test files are generated.
 
 For every scaffolding flag, see the [function command reference](/docs/api/cli#relkit-add-function-name).
 
@@ -41,10 +40,9 @@ For every scaffolding flag, see the [function command reference](/docs/api/cli#r
 </include>
 
 The handler receives validated input. Its return value is validated before the invocation succeeds. The example
-declares `priceOrder` under `dependencies.functions` and calls it with `context.functions.priceOrder(...)`. A
-function can call another function only when it declares the call under `dependencies.functions`. The nested
-operation keeps validation, deadlines, cancellation, tracing, and causation. Calling another descriptor's handler
-directly bypasses that contract.
+declares `priceOrder` under `dependencies.functions` and calls it with `context.functions.priceOrder(...)`.
+A function calls another function only through a declaration like this one. The nested call keeps
+validation, deadlines, cancellation, tracing, and causation.
 
 ### Use this function from the frontend
 
@@ -65,30 +63,26 @@ member to `POST /orders`:
 
 ### Start with input and output
 
-Put a schema beside its only consumer, or in the owning domain when several descriptors share it. Keep
-transport fields such as cookies and raw headers in the route unless they are genuine domain input.
+Put a schema beside its only consumer. Move it into the owning domain when several descriptors share it.
+Keep transport fields such as cookies and raw headers in the route unless they are genuine domain input.
 
 ### Declare failures and capabilities
 
-List only errors callers are expected to handle. Under `dependencies`, declare only the functions, events,
-channels, databases, tasks, jobs, buckets, caches, and agents the handler uses. The handler reaches each one
-through `context`, such as `context.events.orderCreated.publish(order)`. The default database stays available as
-`context.database` without a declaration.
+List only the [errors](/docs/learn/concepts/errors) callers are expected to handle. Declare everything the
+handler calls under `dependencies` and reach it through `context`, such as
+`context.events.orderCreated.publish(order)`. [Invocation context](/docs/learn/concepts/context) lists every
+dependency kind and its client.
 
 ### Implement transport-independent behavior
 
 Use the supplied context, honor its abort signal, and return the declared output. Let unexpected defects
 cross RelKit's safe boundary rather than converting them into unstable public errors.
 
-A handler can also return an Effect when your application already uses Effect. RelKit runs it with the
-same cancellation, timeouts, tracing and error handling; see
-[Write functions with Effect](/docs/modules/service/effect).
-
 ### Hooks and transport policy
 
 `onBefore` transforms validated input before the handler. `onAfter` transforms successful output before final
-output validation. Use hooks only for function policy that must apply to every invocation source; use HTTP
-middleware for request-native policy.
+output validation. Hooks hold function policy that applies to every invocation source. Policy that depends on
+the HTTP request, such as headers or cookies, belongs in [HTTP middleware](/docs/modules/http/middleware).
 
 ## Test the operation directly
 

@@ -1,0 +1,100 @@
+---
+title: Code outside handlers
+description: Reach functions, the database, agents and other clients from raw routes, middleware, startup code and scripts through a runtime handle.
+sidebar:
+  icon: terminal
+---
+
+Function handlers reach their dependencies through [`context`](/docs/learn/concepts/context). Raw routes,
+middleware, startup code and scripts have no `context`. They use a runtime handle instead: an object with
+typed clients for the whole application.
+
+| Where the code runs                                | Get the handle with          |
+| -------------------------------------------------- | ---------------------------- |
+| Inside the running app, outside a function handler | `getRelkit()`                |
+| A script, seeder or another framework              | `await createRelkit(config)` |
+
+Both come from `relkit`. Calls through a handle get the same validation and telemetry as calls
+from a handler. The Inspector shows them with the invocation source `system`.
+
+## Read the handle's keys
+
+The handle groups functions, events, tasks and jobs by service ID, then member name. It keys caches, buckets,
+channels and agents by their ID:
+
+| Client                 | Example                                                                   |
+| ---------------------- | ------------------------------------------------------------------------- |
+| Function               | `await relkit.functions.orders.getOrder({ orderId })`                     |
+| Event                  | `await relkit.events.orders.orderCreated.publish(payload)`                |
+| Task or job            | `await relkit.jobs.orders.exportOrders.trigger(input)`                    |
+| Default database       | `await relkit.database.users.findMany()`                                  |
+| Other database service | `relkit.databases.analytics`                                              |
+| Cache                  | `await relkit.cache["orders.prices"].get(key)`                            |
+| Bucket                 | `await relkit.buckets["receipts.objects"].get(key)`                       |
+| Channel                | `await relkit.channels["orders.updates"].trigger(params, event, payload)` |
+| Agent                  | `await relkit.agents["orders.order-support"](input)`                      |
+
+## Inside the running app: getRelkit
+
+Call `getRelkit()` in raw routes, middleware and `server.onStart`. This middleware calls the Orders service's
+`authorizeOrder` function before each matching request:
+
+<include
+  source="examples/commerce/src/routes/middleware/order-auth.middleware.ts"
+  lang="ts"
+  meta='title="src/routes/middleware/order-auth.middleware.ts"'
+>
+  /_snippets/source/examples/commerce/src/routes/middleware/order-auth.middleware.ts
+</include>
+
+`getRelkit()` reads the application from the current request or startup call. Anywhere else, such as a
+script or a test that started no application, it throws
+[`RELKIT_APPLICATION_NOT_RUNNING`](/docs/errors/relkit-application-not-running).
+
+### Run code at startup
+
+Put startup work in `server.onStart` in `relkit.config.ts`. It runs once, after the application's providers
+are ready and before the server accepts requests:
+
+```ts title="relkit.config.ts"
+import { defineApp } from "@relkit/app/config";
+import { getRelkit } from "relkit";
+import env from "@app/platform/env.js";
+
+export default defineApp({
+  env,
+  server: {
+    onStart: async () => {
+      const users = await getRelkit().database.users.findMany({ limit: 1 });
+      if (users.length === 0) console.warn("No users yet. Run the seed script.");
+    },
+  },
+});
+```
+
+If `onStart` rejects, the application does not start.
+
+## In a script: createRelkit
+
+`createRelkit(config)` starts the built application without an HTTP listener, event consumers or job
+workers. Pass the default export of `relkit.config.ts`. This seed script writes a user row, calls a function
+and asks an agent, then closes the handle:
+
+<include source="examples/commerce/scripts/seed.ts" lang="ts" meta='title="scripts/seed.ts"'>
+  /_snippets/source/examples/commerce/scripts/seed.ts
+</include>
+
+`createRelkit` loads `.relkit/build`, so build the application before running the script. From the
+application root:
+
+```sh title="Terminal"
+bun run relkit build
+bun scripts/seed.ts
+```
+
+Expect the agent's answer in the terminal, then the script exits. `close()` releases every provider the
+handle started; without it, open connections keep the process running. Without a build, `createRelkit`
+throws [`RELKIT_APPLICATION_BUILD_UNAVAILABLE`](/docs/errors/relkit-application-build-unavailable). Run
+`relkit build` again after changing the application.
+
+<include>/_snippets/generated/related/docs-learn-concepts-runtime-handle.mdx</include>

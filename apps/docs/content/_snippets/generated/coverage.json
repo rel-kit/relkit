@@ -409,7 +409,15 @@
     {
       "path": "docs/learn/concepts/context",
       "api": ["functions"],
-      "examples": ["examples/commerce/src/services/orders/functions/create-order.function.ts"]
+      "examples": ["apps/docs/examples/context/create-order.function.ts"]
+    },
+    {
+      "path": "docs/learn/concepts/runtime-handle",
+      "api": ["functions"],
+      "examples": [
+        "examples/commerce/scripts/seed.ts",
+        "examples/commerce/src/routes/middleware/order-auth.middleware.ts"
+      ]
     },
     {
       "path": "docs/learn/concepts/environment",
