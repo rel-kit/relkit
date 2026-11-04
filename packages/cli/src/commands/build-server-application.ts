@@ -48,6 +48,7 @@ const specializedInstrumentation = await Effect.runPromise(
   ),
 );
 const databaseStartup = databaseNode === undefined ? undefined : runtimeOwner.resource("database", () => createDatabaseRegistration(databaseNode, runtimeManifest.services, values), (value) => value.close(), () => runtimeOwner.setReady("database", true));
+const otherDatabaseStartups = databaseNodes.filter((node) => node !== databaseNode).map((node) => [node.id, runtimeOwner.resource("database:" + node.id, () => createDatabaseRegistration(node, runtimeManifest.services, values), (value) => value.close())]);
 const authStartup = authNode === undefined ? undefined : runtimeOwner.resource("auth", () => createBetterAuthRegistration(authNode, runtimeManifest.services, databaseStartup), () => {}, () => runtimeOwner.setReady("auth", true));
 const authRequestStorage = new AsyncLocalStorage();
 const authRuntime = createAuthRegistration(authNode, authStartup);

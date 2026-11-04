@@ -67,16 +67,19 @@ function validateSpecializedServices(work: NormalizationWork): void {
       "Only one Better Auth service is supported.",
     );
   }
-  if (database.length > 1) {
-    add(work, database[1]!, NORMALIZE_CODES.domain, "Only one Drizzle service is supported.");
-  }
-  if (auth.length > 0 && database.length !== 1) {
+  const defaults = database.filter(
+    (descriptor) => isRecord(descriptor.value) && descriptor.value.capability?.default === true,
+  );
+  if (database.length > 1 && defaults.length !== 1) {
     add(
       work,
-      auth[0]!,
+      defaults[1] ?? database[1]!,
       NORMALIZE_CODES.domain,
-      "Better Auth requires exactly one Drizzle service.",
+      "Several Drizzle services need exactly one with default: true; it becomes ctx.database and the Better Auth database.",
     );
+  }
+  if (auth.length > 0 && database.length === 0) {
+    add(work, auth[0]!, NORMALIZE_CODES.domain, "Better Auth requires a Drizzle service.");
   }
 }
 

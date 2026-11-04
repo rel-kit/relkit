@@ -24,7 +24,9 @@ export const generateContextRegistryEffect = Effect.fn("Compiler.generateContext
     const root = resolve(options.projectRoot);
     const output = resolve(root, options.generatedDirectory ?? ".relkit/generated");
     const application = descriptors.find((entry) => entry.descriptor.kind === "app");
-    const database = descriptors.find((entry) => hasCapability(entry, "drizzle"));
+    const databases = descriptors.filter((entry) => hasCapability(entry, "drizzle"));
+    const database =
+      databases.find((entry) => hasCapability(entry, "drizzle", true)) ?? databases[0];
     const auth = descriptors.find((entry) => hasCapability(entry, "better-auth"));
     const constants = descriptors.filter((entry) => entry.descriptor.kind === "constants");
     const prompts = descriptors.filter((entry) => entry.descriptor.kind === "prompt");
@@ -144,14 +146,15 @@ function handleRegistries(
   root: string,
   identities: ReadonlyMap<string, string> | undefined,
 ): readonly string[] {
-  const sections: readonly (readonly [string, string, (entry: ExtractedDescriptor) => boolean])[] = [
-    ["HandleServices", "service", () => true],
-    ["HandleDatabases", "service", (entry) => hasCapability(entry, "drizzle")],
-    ["HandleCaches", "cache", () => true],
-    ["HandleBuckets", "bucket", () => true],
-    ["HandleChannels", "channel", () => true],
-    ["HandleAgents", "agent", () => true],
-  ];
+  const sections: readonly (readonly [string, string, (entry: ExtractedDescriptor) => boolean])[] =
+    [
+      ["HandleServices", "service", () => true],
+      ["HandleDatabases", "service", (entry) => hasCapability(entry, "drizzle")],
+      ["HandleCaches", "cache", () => true],
+      ["HandleBuckets", "bucket", () => true],
+      ["HandleChannels", "channel", () => true],
+      ["HandleAgents", "agent", () => true],
+    ];
   return sections.flatMap(([name, kind, include]) => [
     `    interface ${name} {`,
     ...registryEntries(descriptors, kind, output, root, include, identities),
@@ -185,7 +188,12 @@ export function resolvedIdentities(
     descriptors.flatMap((descriptor) =>
       descriptor.reference === undefined
         ? []
-        : [[identityKey(descriptor.reference.module, descriptor.exportName), descriptor.id] as const],
+        : [
+            [
+              identityKey(descriptor.reference.module, descriptor.exportName),
+              descriptor.id,
+            ] as const,
+          ],
     ),
   );
 }
@@ -223,10 +231,11 @@ function importPath(output: string, root: string, module: string): string {
  * @param kind - Descriptor or syntax category.
  * @returns True when the descriptor requires the selected context capability.
  */
-function hasCapability(entry: ExtractedDescriptor, kind: string): boolean {
-  if (entry.descriptor.kind !== "service") return false;
-  const metadata = entry.descriptor.metadata;
-  return isRecord(metadata) && isRecord(metadata.capability) && metadata.capability.kind === kind;
+function hasCapability(entry: ExtractedDescriptor, kind: string, isDefault = false): boolean {
+  const metadata = entry.descriptor.kind === "service" ? entry.descriptor.metadata : undefined;
+  const capability = isRecord(metadata) ? metadata.capability : undefined;
+  if (!isRecord(capability) || capability.kind !== kind) return false;
+  return !isDefault || capability.default === true;
 }
 
 /**

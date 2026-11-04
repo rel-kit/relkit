@@ -95,7 +95,7 @@ async function invocationContext({ invocation, signal, env, time }, spanId) {
   const database = databaseStartup === undefined
     ? Object.freeze({})
     : (await databaseStartup).context;
-  const databases = databaseNode === undefined ? Object.freeze({}) : Object.freeze({ [databaseNode.id]: database });
+  const databases = await activeDatabases();
   return { invocation, signal, env, time, auth, log, trace: publicTrace, database, databases, ...resolved };
 }
 
@@ -112,10 +112,20 @@ function relkitHandle() {
       ...(authRuntime?.resolveAccess === undefined ? {} : { resolveAccess: authRuntime.resolveAccess }),
       descriptors: { channels: runtimeManifest.channels ?? {}, agents: runtimeManifest.agents ?? {}, cache: refs("cache", plan.caches), buckets: refs("bucket", plan.buckets) },
       sources: createDependencySources(providerRegistry),
-      ...(database === undefined ? {} : { database, databases: { [databaseNode.id]: database } }),
+      ...(database === undefined ? {} : { database }),
+      databases: await activeDatabases(),
     });
   })();
   return relkitHandle.promise;
+}
+
+/** Every Drizzle service's context keyed by service ID, for ctx.databases and the handle. */
+async function activeDatabases() {
+  const entries = await Promise.all([
+    ...(databaseNode === undefined ? [] : [databaseStartup.then((active) => [databaseNode.id, active.context])]),
+    ...otherDatabaseStartups.map(([id, startup]) => startup.then((active) => [id, active.context])),
+  ]);
+  return Object.freeze(Object.fromEntries(entries));
 }
 
 function createDatabaseRegistration(node, services, env) {

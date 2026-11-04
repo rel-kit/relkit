@@ -18,5 +18,6 @@ export const SERVER_PROVIDER_SOURCE = `const providerStartup = runtimeOwner.reso
   return undefined;
 });
 void databaseStartup?.catch(() => {});
+for (const [, startup] of otherDatabaseStartups) void startup.catch(() => {});
 void authStartup?.catch(() => {});
 `;

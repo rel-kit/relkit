@@ -80,9 +80,12 @@ export function defineDrizzleService<
     ),
     dialect: inspection.dialect,
   };
+  if (options.default !== undefined && typeof options.default !== "boolean")
+    throw new TypeError("Drizzle service default must be a boolean");
   const capability = Object.freeze({
     kind: "drizzle" as const,
     dialect: inspection.dialect,
+    ...(options.default === true ? { default: true as const } : {}),
     tables: Object.freeze(
       Object.entries(tables).map(([name, table]) =>
         Object.freeze({
