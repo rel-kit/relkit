@@ -76,9 +76,9 @@ export const packageLeafExports: Readonly<Record<string, ReleaseExports>> = {
   },
   "better-auth": { "./react": esm("react"), "./drizzle": esm("drizzle") },
   realtime: { "./operation-id": esm("operation-id") },
+  runtime: { "./bun": esm("bun/index"), "./node": esm("node/index") },
   "runtime-hono": {
     "./prepared": esm("prepared-app"),
-    "./bun": esm("bun"),
     "./mcp": esm("mcp"),
     "./ag-ui": esm("agent-protocol"),
     "./scalar": esm("scalar"),
