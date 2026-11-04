@@ -35,4 +35,3 @@ export const nodeRuntime: RuntimeAdapter = Object.freeze({
   }),
   environment: processEnvironment,
 });
-

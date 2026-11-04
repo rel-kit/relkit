@@ -36,7 +36,9 @@ describe.each([
       expect(page.headers.get("content-type")).toMatch(/^text\/html/);
       const etag = page.headers.get("etag");
       expect(etag).toMatch(/^"[0-9a-f]+-[0-9a-f]+"$/);
-      expect((await fetch(`${base}/docs/index.html`, { headers: { "if-none-match": etag! } })).status).toBe(304);
+      expect(
+        (await fetch(`${base}/docs/index.html`, { headers: { "if-none-match": etag! } })).status,
+      ).toBe(304);
       const ranged = await fetch(`${base}/docs/index.html`, { headers: { range: "bytes=4-7" } });
       expect([ranged.status, await ranged.text(), ranged.headers.get("content-range")]).toEqual([
         206,
@@ -103,7 +105,10 @@ async function start(executable: string, runtime: string) {
     clearTimeout(force);
   };
   const port = await new Promise<number>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error(`${runtime} fixture did not start. ${diagnostics}`)), 15_000);
+    const timer = setTimeout(
+      () => reject(new Error(`${runtime} fixture did not start. ${diagnostics}`)),
+      15_000,
+    );
     child.once("exit", (code) => {
       clearTimeout(timer);
       reject(new Error(`${runtime} fixture exited ${code}: ${diagnostics}`));

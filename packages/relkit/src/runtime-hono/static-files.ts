@@ -17,9 +17,10 @@ export function installStaticFiles(app: Hono, options: StaticFilesOptions | unde
   const root = resolve(options.root);
   let files: Promise<RuntimeFiles | undefined> | undefined;
   app.on(["GET", "HEAD"], "*", async (context, next) => {
-    files ??= options.files === undefined
-      ? currentRuntime().then((runtime) => runtime.files)
-      : Promise.resolve(options.files);
+    files ??=
+      options.files === undefined
+        ? currentRuntime().then((runtime) => runtime.files)
+        : Promise.resolve(options.files);
     const available = await files;
     if (available === undefined) return next();
     const path = safePath(root, new URL(context.req.url).pathname);

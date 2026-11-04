@@ -13,7 +13,9 @@ export function detectRuntime(): RuntimeName {
  * @param name - Runtime to load; defaults to the detected runtime.
  * @returns The adapter.
  */
-export async function loadRuntimeAdapter(name: RuntimeName = detectRuntime()): Promise<RuntimeAdapter> {
+export async function loadRuntimeAdapter(
+  name: RuntimeName = detectRuntime(),
+): Promise<RuntimeAdapter> {
   if (name === "bun") return (await import("./bun/index.js")).bunRuntime;
   return (await import("./node/index.js")).nodeRuntime;
 }
