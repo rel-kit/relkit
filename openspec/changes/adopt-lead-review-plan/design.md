@@ -325,6 +325,48 @@ tools wrap Inspector API endpoints and the CLI's `check` and `add` transactions.
 exclude it by construction because it lives in `@relkit/cli`. The application's `/mcp` endpoint
 evaluates MCP elicitation for approval-required tools and otherwise returns an actionable coded error.
 
+Decided while applying section 19 (maintainer, 2026-11-05):
+
+- The Inspector API reference is generated from a real router installation:
+  `inspectorApiReference()` in `relkit/inspector-api` installs the endpoints on a throwaway Hono
+  app and reads its registered routes, then adds the bridge's own endpoints
+  (`INSPECTION_BRIDGE_ENDPOINTS`, now also used by the bridge handler). The docs page
+  `/docs/api/inspector-protocol` is generated from it, and a docs test checks that every
+  advertised path and bridge endpoint has a row with its version and authentication. Paths are
+  versioned `v1` (`x-relkit-api-version: 1`); bridge endpoints are protocol 1. History endpoints
+  (logs, requests, traces, stream) are documented as served by the Inspector, because the bridge
+  refuses them.
+- `relkit mcp` discovers sessions itself instead of depending on `@relkit/inspector`: it reads
+  `.relkit/connections` through `InspectionFiles`, keeps descriptors of the same project whose
+  handshake proves the same project and session, and fails with `RELKIT_MCP_NO_SESSION` (none) or
+  `RELKIT_MCP_SESSION_AMBIGUOUS` (several) before writing any MCP output. It uses
+  `@modelcontextprotocol/server` 2.3.0, now a dependency of `@relkit/cli`, loaded only when the
+  `mcp` command runs.
+- A request's logs and trace come from the bridge's record buffer: `relkit mcp` is a named
+  collector (`x-relkit-inspection-consumer: relkit-mcp-<uuid>`) that acknowledges what it reads,
+  so it never releases records the Inspector has not stored. It sees what the session still
+  buffers when it starts plus every later record; it does not read the Inspector's DuckDB
+  history.
+- `check` and `add` run this CLI as a child process with `--json` and no terminal. `add` keeps
+  its existing transaction, so "transactional add" means the add command's own rollback; the MCP
+  tool refuses `--json` and `--project-root` in `options`.
+- Elicitation on `/mcp` is not used yet. The endpoint creates a stateless server per HTTP request,
+  so a tool call cannot stay open while the client answers an elicitation request on a later
+  request; the stateless input-request flow in the 2.3 SDK is not supported by the clients we
+  test. An approval-required tool returns `RELKIT_MCP_APPROVAL_REQUIRED` (text and structured
+  content with the docs link) and does not run. Revisit when `/mcp` keeps sessions.
+- The Inspector action API gains `job.trigger`, `event.publish` and `event.replay`
+  (`/actions/jobs/:id/trigger`, `/actions/events/:id/publish`, `/actions/events/:id/replay`),
+  dispatched to optional `trigger`, `publish` and `replay` methods on the existing jobs and events
+  action services. A generation without them answers `RELKIT_INSPECTOR_ACTION_UNSUPPORTED`, as
+  retry and cancel already did.
+- Agent evaluations need a model to run, which costs money, so CI does not start agents. The
+  release-readiness `agent-evals` job runs the deterministic skill packaging check and computes
+  the pass rate from the graded runs in `tests/agent-evals/results` (each now has a `verdict`); a
+  run passes only when both its semantic review and its technical checks pass. The rate is a job
+  output and the `agent-eval-pass-rate` output of the release-readiness workflow, ready for the
+  metrics page in section 20.
+
 ### D18. Governance and plain language (#3, #5, #7, #8, stop-doing)
 
 - A writing guide plus checks: a spelling check for the product name, a banned-term check for user
