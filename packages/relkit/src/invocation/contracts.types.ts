@@ -17,7 +17,7 @@ export type {
  * @example const source: InvocationSource = "http";
  */
 export type InvocationSource =
-  "direct" | "http" | "job" | "event-delivery" | "event-replay" | "tool" | "agent";
+  "direct" | "http" | "job" | "event-delivery" | "event-replay" | "tool" | "agent" | "system";
 /** Protocol ID kind used by an invocation ID source.
  * @example const kind: InvocationKind = "trace";
  */

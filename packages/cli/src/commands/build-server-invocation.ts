@@ -102,7 +102,7 @@ function relkitHandle() {
     const refs = (kind, nodes) => Object.fromEntries((nodes ?? []).map((node) => [node.id, { ref: { kind, id: node.id } }]));
     return createRuntimeHandle({
       services: runtimeManifest.services ?? {},
-      invoke: (functionId, input) => invokeHttp({ functionId, input, source: "direct" }),
+      invoke: (functionId, input) => invokeHttp({ functionId, input, source: "system" }),
       descriptors: { channels: runtimeManifest.channels ?? {}, agents: runtimeManifest.agents ?? {}, cache: refs("cache", plan.caches), buckets: refs("bucket", plan.buckets) },
       sources: createDependencySources(providerRegistry),
       ...(database === undefined ? {} : { database, databases: { [databaseNode.id]: database } }),

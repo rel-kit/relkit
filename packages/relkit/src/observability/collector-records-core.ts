@@ -134,7 +134,7 @@ function correlation(value: RecordLike): Record<string, string> {
   return result;
 }
 function sourceValue(value: unknown): SpanRecord["source"] | undefined {
-  const sources = "direct http job event-delivery event-replay tool agent".split(" ");
+  const sources = "direct http job event-delivery event-replay tool agent system".split(" ");
   return sources.includes(String(value)) ? (value as SpanRecord["source"]) : undefined;
 }
 function outcome(value: unknown): SpanRecord["outcome"] | undefined {

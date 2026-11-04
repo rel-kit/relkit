@@ -29,7 +29,15 @@ defineFunction({
   output,
   handler: (_value, context) => {
     const invocationId: string = context.invocation.id;
-    const source: "direct" | "http" | "job" | "event-delivery" | "event-replay" | "tool" | "agent" =
+    const source:
+      | "direct"
+      | "http"
+      | "job"
+      | "event-delivery"
+      | "event-replay"
+      | "tool"
+      | "agent"
+      | "system" =
       context.invocation.source;
     const signal: AbortSignal = context.signal;
     const environment = context.env;

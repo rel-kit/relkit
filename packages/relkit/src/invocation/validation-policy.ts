@@ -19,7 +19,7 @@ export function assertSourceEffect(value: string): Effect.Effect<void, Invocatio
     "validation.source",
     Effect.gen(function* () {
       if (
-        !("direct http job event-delivery event-replay tool agent" as string)
+        !("direct http job event-delivery event-replay tool agent system" as string)
           .split(" ")
           .includes(value)
       )

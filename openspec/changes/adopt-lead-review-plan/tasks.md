@@ -110,7 +110,7 @@ not tasks of this change.
 - [x] 10.2 Remove `publishes`, descriptor `.invoke()` and channel `.trigger()` from the public API, and verify type tests reject the old forms
 - [x] 10.3 Implement `getRelkit()` from asynchronous invocation context with a coded error when no application is running, and verify tests in raw routes, middleware, startup hooks and a bare script
 - [x] 10.4 Implement `createRelkit(config)` and `close()` so only the graph's required providers activate, and verify a seed-script test leaves no listener or worker running
-- [ ] 10.5 Record runtime-handle calls with source `system` in traces and the Inspector, and verify a trace test
+- [x] 10.5 Record runtime-handle calls with source `system` in traces and the Inspector, and verify a trace test
 - [ ] 10.6 Verify with a concurrency test that two handles in one process each use only their own application
 - [ ] 10.7 Require explicit IDs for errors with a source-located diagnostic when one is missing, and verify compiler tests
 - [ ] 10.8 Remove the duplicates and aliases — the legacy `defineJob` and `jobs/legacy` entry and runtime paths, the second `defineAgent`, the `job` key, `getJsonSchema`/`toJsonSchema`, builder `void`/`undefined`, `defineTransform`/`defineRequestTransform` and the job `profile` alias — and verify type tests and that the legacy job runtime code is deleted

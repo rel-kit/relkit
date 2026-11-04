@@ -24,7 +24,7 @@ export type ObservabilitySignal =
 
 /** The runtime boundary that began an invocation. */
 export type InvocationSource =
-  "direct" | "http" | "job" | "event-delivery" | "event-replay" | "tool" | "agent";
+  "direct" | "http" | "job" | "event-delivery" | "event-replay" | "tool" | "agent" | "system";
 
 /** Invocation outcomes, including provider failures. */
 export type InvocationOutcome = RequestOutcome | "provider-failure";

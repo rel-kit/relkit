@@ -40,6 +40,9 @@ export const verifyGeneratedHost = Effect.fn("GeneratedHost.verify")(function* (
   expect((yield* host.read("releases.txt")).trim().split("\n")).toHaveLength(2);
   expect(stopped.output).not.toContain("host-password-123");
   expect(stopped.output).not.toContain("generated-host-test-secret-at-least-32-bytes");
+  expect(yield* host.read(".relkit/build/server/index.ts")).toContain(
+    'invokeHttp({ functionId, input, source: "system" })',
+  );
   const seeded = yield* scaffoldNative("generated.host.seed", () =>
     runSeedScript(host.root, host.environment),
   );
