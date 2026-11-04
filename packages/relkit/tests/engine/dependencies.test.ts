@@ -64,7 +64,7 @@ describe("declared dependency clients", () => {
       },
     };
     const sources: DependencyClientSources = {
-      jobs: { send: { enqueue: async (input: unknown) => ({ input }) } },
+      jobs: { send: { trigger: async (input: unknown) => ({ input }) } },
       events: { "orders.created": { publish: async (payload: unknown) => ({ payload }) } },
       buckets: { files: { put: async () => undefined, get: async () => new Uint8Array() } },
       cache: { prices: { get: async () => 3, set: async () => undefined } },
@@ -92,7 +92,7 @@ describe("declared dependency clients", () => {
       },
     });
 
-    await (clients.jobs.send as { enqueue: (input: unknown) => Promise<unknown> }).enqueue({});
+    await (clients.jobs.send as { trigger: (input: unknown) => Promise<unknown> }).trigger({});
     await (
       clients.events["orders.created"] as { publish: (input: unknown) => Promise<unknown> }
     ).publish({});
@@ -153,9 +153,9 @@ describe("declared dependency clients", () => {
       dependencies: { jobs: { send: ref("job", "orders.send") } },
       handler: async (_input, context) => {
         const clients = context as unknown as {
-          readonly jobs: { readonly send: { enqueue: (input: unknown) => Promise<unknown> } };
+          readonly jobs: { readonly send: { trigger: (input: unknown) => Promise<unknown> } };
         };
-        await clients.jobs.send.enqueue({});
+        await clients.jobs.send.trigger({});
         expect(() => (context.jobs as Record<string, unknown>).missing).toThrow(
           DependencyAccessError,
         );
@@ -168,7 +168,7 @@ describe("declared dependency clients", () => {
       {},
       {
         effectRunner: runner,
-        clients: { jobs: { "orders.send": { enqueue: async () => ({}) } } },
+        clients: { jobs: { "orders.send": { trigger: async () => ({}) } } },
         hooks: {
           onDeclaredEdge: (edge) => {
             declared.push(edge);

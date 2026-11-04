@@ -2,7 +2,7 @@ import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";
 import { runBunFixture } from "../fixtures/bun-process.js";
 
-it.effect("joins real native job/event work before restart and close", () =>
+it.effect("joins real native event work before close", () =>
   Effect.gen(function* () {
     const result = yield* runBunFixture(
       new URL("../fixtures/work-cancellation.ts", import.meta.url).pathname,

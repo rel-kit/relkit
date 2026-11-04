@@ -124,11 +124,8 @@ test("returns typed descriptor failures and preserves synchronous messages", () 
 
 test("defines an application in Effect with typed failures", () => {
   const env = defineEnv({});
-  const app = Effect.runSync(
-    defineAppEffect({ env, server: { port: 3000 }, compatibility: { legacyJobs: true } }),
-  );
+  const app = Effect.runSync(defineAppEffect({ env, server: { port: 3000 } }));
   expect(app.server?.port).toBe(3000);
-  expect(app.compatibility.legacyJobs).toBe(true);
   const invalid = Effect.runSync(
     Effect.result(defineAppEffect({ env, unexpected: true } as never)),
   );
@@ -147,14 +144,15 @@ test("defines an application in Effect with typed failures", () => {
   const thrown = Effect.runSync(Effect.result(defineAppEffect(poisoned as never)));
   expect(Result.isFailure(thrown)).toBe(true);
   if (Result.isFailure(thrown)) expect(thrown.failure.message).toBe("bad metadata");
-  expect(() => defineApp({ env, jobs: {} as never, job: {} as never })).toThrow(
-    "cannot specify both",
-  );
+  expect(() => defineApp({ env, job: {} } as never)).toThrow('Unknown defineApp option "job"');
   expect(() => defineApp({ env, defaults: { unexpected: "x" } as never })).toThrow(
     "Unknown default capability",
   );
-  expect(() => defineApp({ env, compatibility: { legacyJobs: "yes" } as never })).toThrow(
-    "must be a boolean",
+  expect(() => defineApp({ env, defaults: { job: "default" } } as never)).toThrow(
+    "Unknown default capability",
+  );
+  expect(() => defineApp({ env, compatibility: { legacyJobs: true } } as never)).toThrow(
+    'Unknown defineApp option "compatibility"',
   );
 });
 

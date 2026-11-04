@@ -1,4 +1,4 @@
-import type { JobNode, TaskJobNode } from "../graph/index.js";
+import type { TaskJobNode } from "../graph/index.js";
 import type { JobWorkerDeploymentPlan } from "./plan.js";
 import { byLogical, isManaged, nodes } from "./from-graph-validation.js";
 import { accessActions } from "./from-graph-providers.js";
@@ -6,33 +6,9 @@ import { base, type PlanContext } from "./from-graph-context.js";
 
 export function jobs(context: PlanContext) {
   return nodes(context.graph.nodes, "job")
-    .filter((job): job is JobNode => isManaged(context.providers, "job", job.profile))
-    .map((job) =>
-      "executionModel" in job && job.executionModel === "task"
-        ? taskJob(context, job)
-        : legacyJob(context, job),
-    )
+    .filter((job): job is TaskJobNode => isManaged(context.providers, "job", job.profile))
+    .map((job) => taskJob(context, job))
     .sort(byLogical);
-}
-
-function legacyJob(context: PlanContext, job: JobNode) {
-  if (!("targetFunctionId" in job)) throw new TypeError(`Legacy job "${job.id}" has no target.`);
-  return {
-    ...base(
-      context,
-      job.id,
-      "job",
-      "job",
-      job.profile,
-      accessActions(context.providers.get(`provider.job.${job.profile}`)!),
-    ),
-    targetFunctionId: job.targetFunctionId,
-    profile: job.profile,
-    ...(defined(job.retry) ? { retry: job.retry } : {}),
-    ...(defined(job.timeoutMs) ? { timeoutMs: job.timeoutMs } : {}),
-    ...(defined(job.concurrency) ? { concurrency: job.concurrency } : {}),
-    ...(defined(job.idempotency) ? { idempotency: job.idempotency } : {}),
-  };
 }
 
 function taskJob(context: PlanContext, job: TaskJobNode) {
@@ -56,7 +32,7 @@ function taskJob(context: PlanContext, job: TaskJobNode) {
     serviceGeneration,
     profile: job.profile,
     ...(defined(job.policy) ? { policy: job.policy } : {}),
-    ...(defined(job.schedules ?? job.schedule) ? { schedules: job.schedules ?? job.schedule } : {}),
+    ...(defined(job.schedules) ? { schedules: job.schedules } : {}),
     worker: workerPlan(job, buildId, serviceGeneration),
   };
 }

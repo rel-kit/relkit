@@ -11,7 +11,6 @@ export type {
   FunctionHookNode,
   HookNode,
   JobNode,
-  LegacyJobNode,
   TaskHookNode,
   TaskJobNode,
   TaskNode,

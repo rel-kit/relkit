@@ -89,11 +89,7 @@ export const eventSourceDiagnosticsEffect = Effect.fn("Compiler.eventSourceDiagn
                 );
               }
             }
-            if (
-              ["defineRoute", "defineJob", "defineTool", "defineService", "defineAgent"].includes(
-                name,
-              )
-            ) {
+            if (["defineRoute", "defineTool", "defineService", "defineAgent"].includes(name)) {
               const check = (item: ts.Node): void => {
                 if (ts.isPropertyAssignment(item)) {
                   check(item.initializer);

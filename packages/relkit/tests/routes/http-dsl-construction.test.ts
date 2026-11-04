@@ -2,8 +2,6 @@ import { describe, expect, test } from "vitest";
 import { Effect } from "effect";
 import { z } from "../../src/schema/index.js";
 import {
-  defineRequestTransform,
-  defineRequestTransformEffect,
   defineTransform,
   defineTransformEffect,
   http,
@@ -101,10 +99,6 @@ describe("HTTP mapping construction", () => {
     expect(descriptor.ref.id).toBe("text.upper");
     expect(Object.isFrozen(descriptor)).toBe(true);
     expect(defineTransform({ id: "text.lower", schema }).id).toBe("text.lower");
-    expect(defineRequestTransform({ id: "text.title", schema }).id).toBe("text.title");
-    expect(Effect.runSync(defineRequestTransformEffect({ id: "text.trim", schema })).id).toBe(
-      "text.trim",
-    );
     const generated = defineTransform({ schema, title: "Text", description: "Text transform" });
     expect(generated.title).toBe("Text");
     expect(generated.description).toBe("Text transform");

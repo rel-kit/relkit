@@ -2,12 +2,7 @@ import type { BucketClient } from "../buckets/index.js";
 import type { CacheClient } from "../cache/index.js";
 import type { RunHandle } from "../contracts/jobs.js";
 import type { InferInput, InferOutput, StandardSchemaV1 } from "../schema/index.js";
-import type {
-  EventPublishOptions,
-  EventPublishResult,
-  JobEnqueueOptions,
-  JobEnqueueResult,
-} from "./clients.types.js";
+import type { EventPublishOptions, EventPublishResult } from "./clients.types.js";
 
 type InputOf<T> = T extends { readonly input: infer S }
   ? S extends StandardSchemaV1
@@ -56,17 +51,17 @@ type ValueOf<T> = T extends { readonly value: infer S }
  * @example const invoke: AgentClientFor<typeof agent> = async (input) => output;
  */
 export type AgentClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
-/** Typed enqueue client for a job descriptor.
- * @example const client: JobClientFor<typeof job> = jobs.myJob;
+/** Typed trigger client for a job descriptor.
+ * @example const client: JobClientFor<typeof job> = jobs.sendReceipt;
  */
 export type JobClientFor<T> = {
-  /** Enqueues a job invocation.
-   * @param input - Job input.
-   * @param options - Optional correlation metadata.
-   * @returns Acceptance receipt.
-   * @example await jobs.send.enqueue(input);
+  /** Triggers a run of the job's task.
+   * @param input - Task input.
+   * @param options - Optional scheduling and idempotency controls.
+   * @returns Handle for the new run.
+   * @example await jobs.sendReceipt.trigger(input);
    */
-  enqueue(input: InputOf<T>, options?: JobEnqueueOptions): Promise<JobEnqueueResult>;
+  trigger(input: InputOf<T>, options?: TaskTriggerOptions): Promise<RunHandle>;
 };
 /** Scheduling and idempotency options for a task.
  * @example await tasks.send.trigger(input, { operationId: "send-1" });

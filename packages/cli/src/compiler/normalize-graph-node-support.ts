@@ -10,13 +10,13 @@ import { isRecord, refId, taskSchemaKey } from "./normalize-utils.js";
 import { computeJobBuildIdEffect, serviceGenerationForEffect } from "./jobs/build-id.js";
 
 /**
- * Projects legacy or task-backed job execution and compatibility metadata.
+ * Projects task-backed job execution and compatibility metadata.
  * @param base - Stable graph identity and source provenance shared by the job node.
  * @param value - Declared metadata inspected without coercion.
  * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
  * @param work - Invocation-owned normalization state, indexes, and diagnostics.
  * @param application - Application descriptor metadata.
- * @returns A lazy effect that projects legacy or task-backed job execution and compatibility metadata; unexpected access failures remain defects.
+ * @returns A lazy effect that projects task-backed job execution and compatibility metadata; unexpected access failures remain defects.
  * @see {@link normalizeCompilationEffect} for shared lazy composition and the execution boundary.
  */
 export const jobGraphNodeEffect = Effect.fn("Compiler.jobGraphNode")(
@@ -49,9 +49,7 @@ export const jobGraphNodeEffect = Effect.fn("Compiler.jobGraphNode")(
         taskId,
         taskVersion,
         ...(buildId === undefined ? {} : { buildId }),
-        profile:
-          selectedProviderProfile(application, "job", text(value.service ?? value.profile)) ??
-          "default",
+        profile: selectedProviderProfile(application, "job", text(value.service)) ?? "default",
         serviceGeneration: yield* serviceGenerationForEffect(work, descriptor),
         implicit: value.implicit === true,
         default: value.default === true,
@@ -62,7 +60,7 @@ export const jobGraphNodeEffect = Effect.fn("Compiler.jobGraphNode")(
         progress: schema(work, descriptor, "progress"),
         streams: clean(value.streams),
         policy: clean(value.policy ?? { admission: value.admission }),
-        schedules: clean(value.schedules ?? value.schedule),
+        schedules: clean(value.schedules),
         admission: clean(value.admission),
         client: clean(value.client),
         capabilities: clean(value.capabilities),
@@ -72,14 +70,15 @@ export const jobGraphNodeEffect = Effect.fn("Compiler.jobGraphNode")(
     return {
       ...base,
       kind: "job",
+      executionModel: "task",
+      name: typeof value.name === "string" ? value.name : "",
+      jobId: descriptor.id,
+      taskId: "",
+      taskVersion: "",
+      profile: "default",
+      implicit: false,
+      default: false,
       input: schema(work, descriptor, "input"),
-      targetFunctionId: refId(value.target) ?? "",
-      profile: selectedProviderProfile(application, "job", text(value.profile)) ?? "default",
-      retry: clean(value.retry),
-      timeoutMs: clean(value.timeoutMs),
-      concurrency: clean(value.concurrency),
-      schedule: clean(value.schedule),
-      idempotency: clean(value.idempotency),
     };
   },
   (effect, base, value, descriptor, work, application) =>
@@ -87,7 +86,7 @@ export const jobGraphNodeEffect = Effect.fn("Compiler.jobGraphNode")(
 );
 
 /**
- * Projects legacy or task-backed job execution and compatibility metadata.
+ * Projects task-backed job execution and compatibility metadata.
  * @param base - Stable graph identity and source provenance shared by the job node.
  * @param value - Declared metadata inspected without coercion.
  * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
@@ -134,9 +133,7 @@ export function dependencyMetadata(value: unknown): JsonValue {
  */
 export function publishedEvents(value: unknown): JsonValue {
   const events = isRecord(value) && isRecord(value.events) ? value.events : {};
-  return [
-    ...new Set(Object.values(events).flatMap((event) => refId(event) ?? [])),
-  ].sort();
+  return [...new Set(Object.values(events).flatMap((event) => refId(event) ?? []))].sort();
 }
 
 /** Dependency maps recorded in the graph as references rather than whole descriptors. */

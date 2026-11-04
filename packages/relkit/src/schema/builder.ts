@@ -53,8 +53,7 @@ export const s: ZBuilder = {
       primitiveSchema("null", (value): value is null => value === null),
     ),
   file: fileSchema,
-  undefined: undefinedSchema,
-  void: undefinedSchema,
+  void: voidSchema,
   literal: literalSchema,
   object: objectSchema,
   array: arraySchema,
@@ -102,8 +101,8 @@ function literalSchema<T extends string | number | boolean | null | undefined>(
   );
 }
 
-function undefinedSchema(): Schema<undefined, undefined> {
-  return buildSchema("builder.undefined", () =>
+function voidSchema(): Schema<undefined, undefined> {
+  return buildSchema("builder.void", () =>
     createSchema(
       (value, path) => (value === undefined ? { value } : issue("Expected undefined", path)),
       { jsonSchema: () => ({ "x-relkit-void": true }) },

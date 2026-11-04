@@ -20,7 +20,7 @@ export interface ProviderRequirement {
   readonly profile: string;
   readonly bindingId: string;
   readonly binding: ProviderBindingNode;
-  readonly executionModel?: "task" | "legacy-function";
+  readonly executionModel?: "task";
   readonly source?: SourceLocation;
 }
 

@@ -1,10 +1,6 @@
 import { expect, test } from "vitest";
 import { Effect, Layer } from "effect";
-import {
-  diagnoseJobMigration,
-  diagnoseJobMigrationEffect,
-  diagnoseLegacyCompatibilityEffect,
-} from "../../src/jobs/migration.ts";
+import { diagnoseJobMigration, diagnoseJobMigrationEffect } from "../../src/jobs/migration.ts";
 import { sameEffect } from "../../src/jobs/migration-support.ts";
 import { JobsTelemetry } from "../../src/jobs/jobs-observability.ts";
 
@@ -35,7 +31,7 @@ test("Effect migration path preserves diagnostics and ordering", async () => {
   expect(await Effect.runPromise(sameEffect(["a"], ["b"]))).toBe(false);
 });
 
-test("legacy diagnostics and telemetry use the Effect path", async () => {
+test("migration diagnostics are observed through jobs telemetry", async () => {
   const seen: string[] = [];
   const layer = Layer.succeed(
     JobsTelemetry,
@@ -46,19 +42,8 @@ test("legacy diagnostics and telemetry use the Effect path", async () => {
       },
     }),
   );
-  const diagnostics = await Effect.runPromise(
-    Effect.provide(
-      diagnoseLegacyCompatibilityEffect({
-        usesFunctionTarget: true,
-        legacyJobsEnabled: false,
-        legacyKeys: ["job"],
-      }),
-      layer,
-    ),
+  await Effect.runPromise(
+    Effect.provide(diagnoseJobMigrationEffect(previous, { ...previous, taskVersion: "2" }), layer),
   );
-  expect(diagnostics.map((item) => item.code)).toEqual([
-    "LEGACY_JOBS_DISABLED",
-    "LEGACY_ALIAS_DEPRECATED",
-  ]);
-  expect(seen).toEqual(["migration.legacy"]);
+  expect(seen).toEqual(["migration.diagnose"]);
 });

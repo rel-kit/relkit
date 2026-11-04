@@ -756,13 +756,6 @@ export const cliCodes = [
     fix: "Run `relkit migrate layout` with `--write` or `--rollback <path>`, not both.",
   },
   {
-    code: "RELKIT_LEGACY_JOBS_DISABLED",
-    title: "Legacy jobs are not enabled",
-    happened:
-      "Your app defines a job in the older function-target style, which is turned off by default.",
-    fix: "Move the job to the current job definition style, or set `defineApp({ compatibility: { legacyJobs: true } })` while you migrate.",
-  },
-  {
     code: "RELKIT_LOCAL_CHECK_FAILED",
     title: "Project check failed before starting local services",
     happened: "`relkit local` checks your project first, and the check failed.",

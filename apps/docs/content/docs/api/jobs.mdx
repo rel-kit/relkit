@@ -2206,1313 +2206,6 @@ type JobsCapabilitySupport = "native" | "adapter" | "unsupported" | "unverified"
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/capabilities.types.ts#L2)
 
-## `client-abort.ts`
-
-### JobClientAbortFailure (class)
-
-Cancelled, timed out, or failed client enqueue, with the original cause.
-
-**Example**
-
-```ts
-if (error instanceof JobClientAbortFailure) console.log(error.message);
-```
-
-**Signature**
-
-```ts
-declare class JobClientAbortFailure
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-abort.ts#L8)
-
-### runAbortable
-
-Promise compatibility adapter for abortable client work.
-
-**Throws**
-
-The original cancellation, timeout, or provider error.
-
-**Example**
-
-```ts
-await runAbortable(signal, undefined, () => Promise.resolve("ok"));
-```
-
-**Signature**
-
-```ts
-declare const runAbortable: <A>(
-  signal: AbortSignal,
-  deadlineMs: number | undefined,
-  work: (signal: AbortSignal) => Promise<A>,
-) => Promise<A>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-abort.ts#L77)
-
-### runAbortableEffect
-
-Runs client work with an Effect owned abort listener and deadline.
-
-**Example**
-
-```ts
-Effect.runPromise(runAbortableEffect(signal, undefined, () => Promise.resolve("ok")));
-```
-
-**Signature**
-
-```ts
-declare const runAbortableEffect: <A>(
-  signal: AbortSignal,
-  deadlineMs: number | undefined,
-  work: (signal: AbortSignal) => Promise<A>,
-) => Effect.Effect<Awaited<A>, JobClientAbortFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-abort.ts#L19)
-
-## `client-abort.types.ts`
-
-Cancellation and deadline state owned by one client enqueue.
-
-### JobClientAbortRegistration (interface)
-
-Cancellation and deadline state owned by one client enqueue.
-
-**Signature**
-
-```ts
-export interface JobClientAbortRegistration {
-  readonly stopped: Promise<Error>;
-  readonly failure: () => Error | undefined;
-  readonly dispose: () => void;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-abort.types.ts#L2)
-
-## `client-errors.ts`
-
-### JobDependencyError (class)
-
-A job call crossed an undeclared function dependency boundary.
-
-**Example**
-
-```ts
-new JobDependencyError("billing.charge");
-```
-
-**Signature**
-
-```ts
-declare class JobDependencyError { constructor(readonly jobId: string) }
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-errors.ts#L39)
-
-### code (property)
-
-**Signature**
-
-```ts
-readonly code: "RELKIT_JOB_DEPENDENCY_UNDECLARED"
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-errors.ts#L40)
-
-### JobInputValidationError (class)
-
-Invalid caller input with the schema issues retained for clients.
-
-**Example**
-
-```ts
-new JobInputValidationError(issues);
-```
-
-**Signature**
-
-```ts
-declare class JobInputValidationError { constructor(readonly issues: readonly StandardIssue[]) }
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-errors.ts#L6)
-
-### code (property)
-
-**Signature**
-
-```ts
-readonly code: "RELKIT_JOB_INPUT_VALIDATION"
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-errors.ts#L7)
-
-### JobOperationCancelledError (class)
-
-Caller cancellation before the job operation completed.
-
-**Example**
-
-```ts
-new JobOperationCancelledError();
-```
-
-**Signature**
-
-```ts
-declare class JobOperationCancelledError {
-  constructor();
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-errors.ts#L51)
-
-### code (property)
-
-**Signature**
-
-```ts
-readonly code: "ABORT_ERR"
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-errors.ts#L52)
-
-### JobOperationTimeoutError (class)
-
-A job client operation exceeded its configured timeout.
-
-**Example**
-
-```ts
-new JobOperationTimeoutError();
-```
-
-**Signature**
-
-```ts
-declare class JobOperationTimeoutError {
-  constructor();
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-errors.ts#L62)
-
-### code (property)
-
-**Signature**
-
-```ts
-readonly code: "ETIMEDOUT"
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-errors.ts#L63)
-
-### JobProfileError (class)
-
-Requested job provider profile is absent from client configuration.
-
-**Example**
-
-```ts
-new JobProfileError("primary");
-```
-
-**Signature**
-
-```ts
-declare class JobProfileError { constructor(readonly profile: string) }
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-errors.ts#L17)
-
-### code (property)
-
-**Signature**
-
-```ts
-readonly code: "RELKIT_JOB_PROFILE_UNKNOWN"
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-errors.ts#L18)
-
-### JobProviderError (class)
-
-The selected provider does not implement job enqueue.
-
-**Example**
-
-```ts
-new JobProviderError();
-```
-
-**Signature**
-
-```ts
-declare class JobProviderError {
-  constructor();
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-errors.ts#L28)
-
-### code (property)
-
-**Signature**
-
-```ts
-readonly code: "RELKIT_JOB_PROVIDER_UNAVAILABLE"
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-errors.ts#L29)
-
-## `client-utils-error.ts`
-
-### ClientUtilityFailure (class)
-
-Expected client helper failure with its original compatibility error.
-
-**Example**
-
-```ts
-if (error instanceof ClientUtilityFailure) console.log(error.message);
-```
-
-**Signature**
-
-```ts
-declare class ClientUtilityFailure
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-error.ts#L6)
-
-## `client-utils-output.ts`
-
-### normalizeResult
-
-Synchronous provider receipt normalizer.
-
-**Throws**
-
-Original normalization error.
-
-**Example**
-
-```ts
-normalizeResult(receipt, "default", undefined);
-```
-
-**Signature**
-
-```ts
-declare const normalizeResult: (
-  value: JobProviderResult | undefined,
-  profile: string,
-  correlationId: string | undefined,
-) => JobEnqueueResult;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-output.ts#L36)
-
-### normalizeResultEffect
-
-Normalizes a provider receipt in Effect.
-
-**Example**
-
-```ts
-Effect.runSync(normalizeResultEffect(receipt, "default", undefined));
-```
-
-**Signature**
-
-```ts
-declare const normalizeResultEffect: (
-  value: JobProviderResult | undefined,
-  profile: string,
-  correlationId: string | undefined,
-) => Effect.Effect<JobEnqueueResult, ClientUtilityFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-output.ts#L18)
-
-### notify
-
-Synchronous client edge hook notification.
-
-**Example**
-
-```ts
-notify(onEdge, edge);
-```
-
-**Signature**
-
-```ts
-declare const notify: <T>(
-  hook: ((value: T) => void) | undefined,
-  value: T,
-  enabled?: boolean,
-) => void;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-output.ts#L68)
-
-### notifyEffect
-
-Delivers a client edge hook without changing enqueue outcome in Effect.
-
-**Example**
-
-```ts
-Effect.runSync(notifyEffect(onEdge, edge));
-```
-
-**Signature**
-
-```ts
-declare const notifyEffect: <T>(
-  hook: ((value: T) => void) | undefined,
-  value: T,
-  enabled?: boolean | undefined,
-) => Effect.Effect<void, never, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-output.ts#L54)
-
-### resolveCorrelation
-
-Synchronous correlation id resolver.
-
-**Throws**
-
-Original callback error.
-
-**Example**
-
-```ts
-resolveCorrelation(() => "request");
-```
-
-**Signature**
-
-```ts
-declare const resolveCorrelation: (value: JobClientOptions["correlationId"]) => string | undefined;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-output.ts#L92)
-
-### resolveCorrelationEffect
-
-Resolves a configured correlation id in Effect.
-
-**Example**
-
-```ts
-Effect.runSync(resolveCorrelationEffect(() => "request"));
-```
-
-**Signature**
-
-```ts
-declare const resolveCorrelationEffect: (
-  value: string | (() => string | undefined) | undefined,
-) => Effect.Effect<string | undefined, ClientUtilityFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-output.ts#L76)
-
-## `client-utils-validation.ts`
-
-### assertOptionalText
-
-Synchronous optional client text assertion.
-
-**Throws**
-
-TypeError for invalid text.
-
-**Example**
-
-```ts
-assertOptionalText("request", "correlationId");
-```
-
-**Signature**
-
-```ts
-declare const assertOptionalText: (value: unknown, name: string) => void;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-validation.ts#L128)
-
-### assertOptionalTextEffect
-
-Validates optional client text in Effect.
-
-**Example**
-
-```ts
-Effect.runSync(assertOptionalTextEffect("request", "correlationId"));
-```
-
-**Signature**
-
-```ts
-declare const assertOptionalTextEffect: (
-  value: unknown,
-  name: string,
-) => Effect.Effect<void, ClientUtilityFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-validation.ts#L111)
-
-### assertOptions
-
-Synchronous enqueue options assertion.
-
-**Throws**
-
-TypeError for invalid options.
-
-**Example**
-
-```ts
-assertOptions({ correlationId: "request" });
-```
-
-**Signature**
-
-```ts
-declare const assertOptions: (
-  value: unknown,
-) => asserts value is { readonly correlationId?: string };
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-validation.ts#L99)
-
-### assertOptionsEffect
-
-Validates enqueue options in Effect.
-
-**Example**
-
-```ts
-Effect.runSync(assertOptionsEffect({ correlationId: "request" }));
-```
-
-**Signature**
-
-```ts
-declare const assertOptionsEffect: (
-  value: unknown,
-) => Effect.Effect<void, ClientUtilityFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-validation.ts#L84)
-
-### parseInput
-
-Promise compatibility input validator.
-
-**Throws**
-
-Original input validation error.
-
-**Example**
-
-```ts
-await parseInput(z.string(), "value");
-```
-
-**Signature**
-
-```ts
-declare const parseInput: (
-  schema: StandardSchemaV1 | undefined,
-  input: unknown,
-) => Promise<unknown>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-validation.ts#L71)
-
-### parseInputEffect
-
-Validates client input against an optional schema in Effect.
-
-**Example**
-
-```ts
-Effect.runPromise(parseInputEffect(z.string(), "value"));
-```
-
-**Signature**
-
-```ts
-declare const parseInputEffect: (
-  schema: StandardSchemaV1<unknown, unknown> | undefined,
-  input: unknown,
-) => Effect.Effect<unknown, ClientUtilityFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-validation.ts#L54)
-
-### resolveProvider
-
-Synchronous provider resolver.
-
-**Throws**
-
-Original profile or provider error.
-
-**Example**
-
-```ts
-resolveProvider(source, "default", undefined);
-```
-
-**Signature**
-
-```ts
-declare const resolveProvider: (
-  source: unknown,
-  profile: string,
-  resolveProfile: ((profile: string) => unknown) | undefined,
-) => JobProvider;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-validation.ts#L37)
-
-### resolveProviderEffect
-
-Resolves a job provider in Effect.
-
-**Example**
-
-```ts
-Effect.runSync(resolveProviderEffect(source, "default"));
-```
-
-**Signature**
-
-```ts
-declare const resolveProviderEffect: (
-  source: unknown,
-  profile: string,
-  resolveProfile: ((profile: string) => unknown) | undefined,
-) => Effect.Effect<JobProvider, ClientUtilityFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-validation.ts#L19)
-
-## `client-utils-value.ts`
-
-### assertOptionalTextValue
-
-Requires a present optional text field to be nonempty.
-
-**Throws**
-
-TypeError for nontext or blank text.
-
-**Example**
-
-```ts
-assertOptionalTextValue("request-1", "correlationId");
-```
-
-**Signature**
-
-```ts
-declare const assertOptionalTextValue: (value: unknown, name: string) => void;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-value.ts#L117)
-
-### assertOptionsValue
-
-Validates the client enqueue options shape and correlation identifier.
-
-**Throws**
-
-TypeError for missing object shape or invalid correlation text.
-
-**Example**
-
-```ts
-assertOptionsValue({ correlationId: "request-1" });
-```
-
-**Signature**
-
-```ts
-declare const assertOptionsValue: (
-  value: unknown,
-) => asserts value is { readonly correlationId?: string };
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-value.ts#L104)
-
-### normalizeResultValue
-
-Normalizes a provider acceptance into the public enqueue receipt.
-
-**Example**
-
-```ts
-normalizeResultValue(result, "primary", "request-1");
-```
-
-**Signature**
-
-```ts
-declare const normalizeResultValue: (
-  value: JobProviderResult | undefined,
-  profile: string,
-  correlationId: string | undefined,
-) => JobEnqueueResult;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-value.ts#L52)
-
-### notifyValue
-
-Calls an optional observer without letting hook errors change acceptance.
-
-**Example**
-
-```ts
-notifyValue(onAccepted, receipt);
-```
-
-**Signature**
-
-```ts
-declare const notifyValue: <T>(
-  hook: ((value: T) => void) | undefined,
-  value: T,
-  enabled?: boolean,
-) => void;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-value.ts#L76)
-
-### parseInputValue
-
-Validates authored client input before enqueueing.
-
-**Throws**
-
-JobInputValidationError for schema issues.
-
-**Example**
-
-```ts
-await parseInputValue(schema, { id: "one" });
-```
-
-**Signature**
-
-```ts
-declare const parseInputValue: (
-  schema: StandardSchemaV1 | undefined,
-  input: unknown,
-) => Promise<unknown>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-value.ts#L36)
-
-### resolveCorrelationValue
-
-Resolves a literal or lazy client correlation identifier.
-
-**Example**
-
-```ts
-resolveCorrelationValue(() => "request-1");
-```
-
-**Signature**
-
-```ts
-declare const resolveCorrelationValue: (
-  value: JobClientOptions["correlationId"],
-) => string | undefined;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-value.ts#L93)
-
-### resolveProviderValue
-
-Resolves an enqueue provider from a named profile or explicit resolver.
-
-**Throws**
-
-JobProfileError or JobProviderError when unavailable.
-
-**Example**
-
-```ts
-resolveProviderValue(providers, "primary", undefined);
-```
-
-**Signature**
-
-```ts
-declare const resolveProviderValue: (
-  source: unknown,
-  profile: string,
-  resolveProfile: ((profile: string) => unknown) | undefined,
-) => JobProvider;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils-value.ts#L13)
-
-## `client-utils.ts`
-
-### "./client-utils-output.js" (namespace export)
-
-Re-exports all named exports from the "./client-utils-output.js" module.
-
-**Signature**
-
-```ts
-export * from "./client-utils-output.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils.ts#L2)
-
-### "./client-utils-validation.js" (namespace export)
-
-Re-exports all named exports from the "./client-utils-validation.js" module.
-
-**Signature**
-
-```ts
-export * from "./client-utils-validation.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils.ts#L1)
-
-### ClientUtilityFailure
-
-**Signature**
-
-```ts
-declare const ClientUtilityFailure: typeof ClientUtilityFailure;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils.ts#L4)
-
-### JobClientAbortFailure
-
-**Signature**
-
-```ts
-declare const JobClientAbortFailure: typeof JobClientAbortFailure;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils.ts#L3)
-
-### runAbortable
-
-**Signature**
-
-```ts
-declare const runAbortable: <A>(
-  signal: AbortSignal,
-  deadlineMs: number | undefined,
-  work: (signal: AbortSignal) => Promise<A>,
-) => Promise<A>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils.ts#L3)
-
-### runAbortableEffect
-
-**Signature**
-
-```ts
-declare const runAbortableEffect: <A>(
-  signal: AbortSignal,
-  deadlineMs: number | undefined,
-  work: (signal: AbortSignal) => Promise<A>,
-) => Effect<Awaited<A>, JobClientAbortFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client-utils.ts#L3)
-
-## `client.ts`
-
-### EffectJobClient
-
-**Signature**
-
-```ts
-declare const EffectJobClient: EffectJobClient<Input>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L32)
-
-### JobClient
-
-**Signature**
-
-```ts
-declare const JobClient: JobClient<Input>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L31)
-
-### JobClientFailure (class)
-
-Expected client setup or enqueue failure, preserving its original cause.
-
-**Example**
-
-```ts
-if (error instanceof JobClientFailure) console.log(error.message);
-```
-
-**Signature**
-
-```ts
-declare class JobClientFailure
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L52)
-
-### JobClientOptions
-
-**Signature**
-
-```ts
-declare const JobClientOptions: JobClientOptions;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L30)
-
-### JobDeclaredEdge
-
-**Signature**
-
-```ts
-declare const JobDeclaredEdge: JobDeclaredEdge;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L28)
-
-### JobDependencyError
-
-**Signature**
-
-```ts
-declare const JobDependencyError: typeof JobDependencyError;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L38)
-
-### JobEnqueueOptions
-
-**Signature**
-
-```ts
-declare const JobEnqueueOptions: JobEnqueueOptions;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L17)
-
-### JobEnqueueResult
-
-**Signature**
-
-```ts
-declare const JobEnqueueResult: JobEnqueueResult;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L18)
-
-### JobInputValidationError
-
-**Signature**
-
-```ts
-declare const JobInputValidationError: typeof JobInputValidationError;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L35)
-
-### JobInvocationBridge
-
-**Signature**
-
-```ts
-declare const JobInvocationBridge: JobInvocationBridge;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L27)
-
-### JobInvocationBridgeOptions
-
-**Signature**
-
-```ts
-declare const JobInvocationBridgeOptions: JobInvocationBridgeOptions;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L26)
-
-### JobObservedEdge
-
-**Signature**
-
-```ts
-declare const JobObservedEdge: JobObservedEdge;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L29)
-
-### JobOperationCancelledError
-
-**Signature**
-
-```ts
-declare const JobOperationCancelledError: typeof JobOperationCancelledError;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L39)
-
-### JobOperationContext
-
-**Signature**
-
-```ts
-declare const JobOperationContext: JobOperationContext;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L23)
-
-### JobOperationTimeoutError
-
-**Signature**
-
-```ts
-declare const JobOperationTimeoutError: typeof JobOperationTimeoutError;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L40)
-
-### JobProfileError
-
-**Signature**
-
-```ts
-declare const JobProfileError: typeof JobProfileError;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L36)
-
-### JobProvider
-
-**Signature**
-
-```ts
-declare const JobProvider: JobProvider;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L24)
-
-### JobProviderError
-
-**Signature**
-
-```ts
-declare const JobProviderError: typeof JobProviderError;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L37)
-
-### JobProviderResult
-
-**Signature**
-
-```ts
-declare const JobProviderResult: JobProviderResult;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L25)
-
-### JobState
-
-**Signature**
-
-```ts
-declare const JobState: JobState;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L19)
-
-### JobStatus
-
-**Signature**
-
-```ts
-declare const JobStatus: JobStatus;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L20)
-
-### createJobClient
-
-Synchronous compatibility client factory.
-
-**Throws**
-
-The original invalid profile or provider error.
-
-**Example**
-
-```ts
-createJobClient(options);
-```
-
-**Signature**
-
-```ts
-declare const createJobClient: (options: JobClientOptions) => EffectJobClient;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L76)
-
-### createJobClientEffect
-
-Creates a jobs enqueue client in Effect.
-
-**Example**
-
-```ts
-Effect.runSync(createJobClientEffect(options));
-```
-
-**Signature**
-
-```ts
-declare const createJobClientEffect: (
-  options: JobClientOptions,
-) => Effect.Effect<EffectJobClient<unknown>, JobClientFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.ts#L60)
-
-## `client.types.ts`
-
-### EffectJobClient (interface)
-
-A client whose enqueue operation is directly available in Effect.
-
-**Signature**
-
-```ts
-export interface EffectJobClient<Input = unknown> extends JobClient<Input> {
-  readonly enqueueEffect: (
-    input: Input,
-    options?: JobEnqueueOptions,
-  ) => Effect.Effect<JobEnqueueResult, JobClientFailure>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.types.ts#L84)
-
-### JobClient (interface)
-
-Client operations exposed for a job through its provider.
-
-**Signature**
-
-```ts
-export interface JobClient<Input = unknown> {
-  readonly enqueue: (input: Input, options?: JobEnqueueOptions) => Promise<JobEnqueueResult>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.types.ts#L80)
-
-### JobClientOptions (interface)
-
-Options accepted for job client operations.
-
-**Signature**
-
-```ts
-export interface JobClientOptions {
-  readonly ownerId: string;
-  readonly jobId: string;
-  readonly source: unknown;
-  readonly inputSchema?: StandardSchemaV1;
-  readonly profile?: string;
-  readonly resolveProfile?: (profile: string) => unknown;
-  readonly bridge?: JobInvocationBridge;
-  readonly signal?: () => AbortSignal;
-  readonly deadline?: () => number | undefined;
-  readonly correlationId?: string | (() => string | undefined);
-  readonly declared?: boolean;
-  readonly onDeclaredEdge?: (edge: JobDeclaredEdge) => void;
-  readonly onObservedEdge?: (edge: JobObservedEdge) => void;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.types.ts#L64)
-
-### JobClientState (interface)
-
-Resolved dependencies shared by a client's enqueue operations.
-
-**Signature**
-
-```ts
-export interface JobClientState {
-  readonly options: JobClientOptions;
-  readonly ownerId: string;
-  readonly jobId: string;
-  readonly profile: string;
-  readonly declared: boolean;
-  readonly provider: JobProvider;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.types.ts#L91)
-
-### JobDeclaredEdge (interface)
-
-Declared dependency between a task and job.
-
-**Signature**
-
-```ts
-export interface JobDeclaredEdge {
-  readonly kind: "enqueues-job";
-  readonly from: string;
-  readonly to: string;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.types.ts#L52)
-
-### JobInvocationBridge (interface)
-
-Bridge for invoking jobs from a task execution context.
-
-**Signature**
-
-```ts
-export interface JobInvocationBridge {
-  readonly run: <A>(
-    operation: () => MaybePromise<A>,
-    options?: JobInvocationBridgeOptions,
-  ) => Promise<A>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.types.ts#L45)
-
-### JobInvocationBridgeOptions (interface)
-
-Options accepted for job invocation bridge operations.
-
-**Signature**
-
-```ts
-export interface JobInvocationBridgeOptions {
-  readonly name: string;
-  readonly attributes: Readonly<Record<string, unknown>>;
-  readonly signal: AbortSignal;
-  readonly kind?: "producer";
-  readonly input?: unknown;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.types.ts#L37)
-
-### JobObservedEdge (interface)
-
-Job edge recorded during a concrete invocation.
-
-**Signature**
-
-```ts
-export interface JobObservedEdge {
-  readonly relationship: "enqueues-job";
-  readonly from: string;
-  readonly to: string;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.types.ts#L58)
-
-### JobOperationContext (interface)
-
-Trusted job, scope, and signal data available during a client operation.
-
-**Signature**
-
-```ts
-export interface JobOperationContext {
-  readonly operation: "enqueue";
-  readonly signal: AbortSignal;
-  readonly profile: string;
-  readonly deadlineMs?: number;
-  readonly correlationId?: string;
-  readonly propagation?: TracePropagation;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.types.ts#L7)
-
-### JobProvider (interface)
-
-Provider callback used to resolve the jobs runtime.
-
-**Signature**
-
-```ts
-export interface JobProvider {
-  readonly enqueue: (
-    input: unknown,
-    options: JobEnqueueOptions,
-    context: JobOperationContext,
-  ) => MaybePromise<JobProviderResult>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.types.ts#L16)
-
-### JobProviderResult (type alias)
-
-Runtime or handle returned by the job provider.
-
-**Signature**
-
-```ts
-type JobProviderResult = Pick<JobEnqueueResult, "instanceId" | "accepted"> &
-  Partial<
-    Pick<
-      JobEnqueueResult,
-      | "status"
-      | "profile"
-      | "correlationId"
-      | "duplicate"
-      | "idempotencyKey"
-      | "idempotencyExpiresAt"
-    >
-  >;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/client.types.ts#L24)
-
 ## `control-errors.ts`
 
 ### JobControlUnknownError (class)
@@ -5770,47 +4463,9 @@ declare const defineJobValue: <
 ) => JobDescriptor<Name, Id, Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job-value.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job-value.ts#L58)
 
 Since v0.4.1
-
-### JOB_PROFILE_DEPRECATED_CODE
-
-Diagnostic code used when the one-release profile spelling is consumed as service.
-
-**Example**
-
-```ts
-JOB_PROFILE_DEPRECATED_CODE === "RELKIT_JOB_PROFILE_DEPRECATED";
-```
-
-**Signature**
-
-```ts
-declare const JOB_PROFILE_DEPRECATED_CODE: "RELKIT_JOB_PROFILE_DEPRECATED";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job-value.ts#L17)
-
-### RetryJitter
-
-**Signature**
-
-```ts
-declare const RetryJitter: RetryJitter;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job-value.ts#L19)
-
-### RetryPolicy
-
-**Signature**
-
-```ts
-declare const RetryPolicy: RetryPolicy;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job-value.ts#L19)
 
 ### isJobDescriptorValue
 
@@ -5828,7 +4483,7 @@ isJobDescriptorValue(candidate);
 declare const isJobDescriptorValue: (value: unknown) => value is JobDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job-value.ts#L122)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job-value.ts#L113)
 
 ## `define-job.ts`
 
@@ -5868,7 +4523,7 @@ declare const defineJob: <
 ) => JobDescriptor<Name, Id, Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L48)
 
 Since v0.4.1
 
@@ -5888,16 +4543,6 @@ Since v0.4.1
 
 <include>/_frontend/job.mdx</include>
 
-### JOB_PROFILE_DEPRECATED_CODE
-
-**Signature**
-
-```ts
-declare const JOB_PROFILE_DEPRECATED_CODE: "RELKIT_JOB_PROFILE_DEPRECATED";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L6)
-
 ### JobDefinitionFailure (class)
 
 Expected job definition failure, retaining the original validation error.
@@ -5914,7 +4559,7 @@ if (error instanceof JobDefinitionFailure) console.log(error.message);
 declare class JobDefinitionFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L10)
 
 ### RetryJitter
 
@@ -5924,7 +4569,7 @@ declare class JobDefinitionFailure
 declare const RetryJitter: RetryJitter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L6)
 
 ### RetryPolicy
 
@@ -5934,7 +4579,7 @@ declare const RetryJitter: RetryJitter;
 declare const RetryPolicy: RetryPolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L6)
 
 ### assertJobDescriptor
 
@@ -5956,7 +4601,7 @@ assertJobDescriptor(job);
 declare const assertJobDescriptor: (value: unknown) => asserts value is JobDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L97)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L96)
 
 ### assertJobDescriptorEffect
 
@@ -5976,7 +4621,7 @@ declare const assertJobDescriptorEffect: (
 ) => Effect.Effect<undefined, JobDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L81)
 
 ### defineJobEffect
 
@@ -6000,7 +4645,7 @@ declare const defineJobEffect: <
 ) => Effect.Effect<JobDescriptor<Name, Id, Task>, JobDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L19)
 
 ### isJobDescriptor
 
@@ -6018,7 +4663,7 @@ if (isJobDescriptor(value)) console.log(value.name);
 declare const isJobDescriptor: (value: unknown) => value is JobDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L73)
 
 ### isJobDescriptorEffect
 
@@ -6036,7 +4681,7 @@ Effect.runSync(isJobDescriptorEffect(value));
 declare const isJobDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L62)
 
 ## `define-task-support.ts`
 
@@ -8871,23 +7516,23 @@ declare const JobScheduleClient: JobScheduleClient<Definition>;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L34)
 
-### JobServiceSelection (type alias)
+### JobServiceSelection (interface)
 
-Mutually exclusive service and deprecated profile selectors.
+Jobs service that runs the job.
 
 **Signature**
 
 ```ts
-type JobServiceSelection =
-  | { readonly service?: string; readonly profile?: never }
-  | { readonly service?: never; readonly profile?: string };
+export interface JobServiceSelection {
+  readonly service?: string;
+}
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L99)
 
 ### RetryJitter (type alias)
 
-Jitter strategy for the compatibility retry policy.
+Jitter strategy for a retry policy.
 
 **Signature**
 
@@ -8899,7 +7544,7 @@ type RetryJitter = "none" | "full" | "equal";
 
 ### RetryPolicy (interface)
 
-Compatibility retry attempts, delays, multiplier, and jitter.
+Retry attempts, delays, multiplier, and jitter for event delivery.
 
 **Signature**
 
@@ -9121,7 +7766,6 @@ type JobsOperation =
   | "identity.scheduleOccurrence"
   | "instant.is"
   | "instant.assert"
-  | "retry.validate"
   | "control.write"
   | "canonical.assertProjection"
   | "taskSupport.copyStrings"
@@ -9131,7 +7775,6 @@ type JobsOperation =
   | "taskSupport.isRecord"
   | "taskObservation.copy"
   | "migration.diagnose"
-  | "migration.legacy"
   | "authorization.authorize"
   | "authorization.grant"
   | "authorization.operation"
@@ -9172,7 +7815,6 @@ type JobsOperation =
   | "control.cancel"
   | "control.retry"
   | "control.result"
-  | "legacy.defineJob"
   | "authorization.createCursor"
   | "authorization.readCursor"
   | "runLocator.create"
@@ -9190,9 +7832,6 @@ type JobsOperation =
   | "schedule.copyDefinitions"
   | "binding.resolve"
   | "runtime.resolveBinding"
-  | "client.runAbortable"
-  | "client.create"
-  | "client.enqueue"
   | "task.createProgressEmitter"
   | "task.createStreamEmitter"
   | "task.emitProgress"
@@ -9216,13 +7855,6 @@ type JobsOperation =
   | "task.define"
   | "task.isDescriptor"
   | "task.assertDescriptor"
-  | "client.resolveProvider"
-  | "client.parseInput"
-  | "client.assertOptions"
-  | "client.assertOptionalText"
-  | "client.normalizeResult"
-  | "client.notify"
-  | "client.resolveCorrelation"
   | "taskValidation.assertSchema"
   | "taskValidation.normalizeVersion"
   | "taskValidation.inputWire"
@@ -9305,310 +7937,7 @@ export interface JobsTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/jobs-observability.types.ts#L176)
-
-## `legacy-define-job.ts`
-
-### DefineJobOptions
-
-**Signature**
-
-```ts
-declare const DefineJobOptions: DefineJobOptions<Id, InputSchema, Target>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.ts#L26)
-
-### IdempotencyDefinition
-
-**Signature**
-
-```ts
-declare const IdempotencyDefinition: IdempotencyDefinition<Input>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.ts#L24)
-
-### JobDescriptor
-
-**Signature**
-
-```ts
-declare const JobDescriptor: JobDescriptor<Id, Input, InputSchema, Target>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.ts#L25)
-
-### LegacyJobValidationError (class)
-
-Invalid legacy job authoring options.
-
-**Example**
-
-```ts
-if (error instanceof LegacyJobValidationError) console.log(error.message);
-```
-
-**Signature**
-
-```ts
-declare class LegacyJobValidationError
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.ts#L33)
-
-### RetryJitter
-
-**Signature**
-
-```ts
-declare const RetryJitter: RetryJitter;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.ts#L20)
-
-### RetryPolicy
-
-**Signature**
-
-```ts
-declare const RetryPolicy: RetryPolicy;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.ts#L21)
-
-### ScheduleDefinition
-
-**Signature**
-
-```ts
-declare const ScheduleDefinition: ScheduleDefinition<Input>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.ts#L23)
-
-### ScheduleOverlap
-
-**Signature**
-
-```ts
-declare const ScheduleOverlap: ScheduleOverlap;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.ts#L22)
-
-### defineJob
-
-Synchronous compatibility adapter for legacy job authoring.
-
-**Throws**
-
-TypeError when the authored job is invalid.
-
-**Example**
-
-```ts
-defineJob(options);
-```
-
-**Signature**
-
-```ts
-declare const defineJob: <
-  const Id extends string,
-  const InputSchema extends StandardSchemaV1,
-  const Target extends FunctionRefAny,
->(
-  options: DefineJobOptions<Id, InputSchema, Target>,
-) => JobDescriptor<Id, InferInput<InputSchema>, InputSchema, Target>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.ts#L68)
-
-### defineJobEffect
-
-Defines a legacy function backed job in Effect.
-
-**Example**
-
-```ts
-Effect.runSync(defineJobEffect(options));
-```
-
-**Signature**
-
-```ts
-declare const defineJobEffect: <
-  const Id extends string,
-  const InputSchema extends StandardSchemaV1,
-  const Target extends FunctionRefAny,
->(
-  options: DefineJobOptions<Id, InputSchema, Target>,
-) => Effect.Effect<
-  JobDescriptor<Id, InferInput<InputSchema>, InputSchema, Target>,
-  LegacyJobValidationError,
-  never
->;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.ts#L42)
-
-## `legacy-define-job.types.ts`
-
-### DefineJobOptions (interface)
-
-Options accepted for define job operations.
-
-**Signature**
-
-```ts
-export interface DefineJobOptions<
-  Id extends string,
-  InputSchema extends StandardSchemaV1,
-  Target extends FunctionRefAny,
-> extends DescriptorMetadata {
-  readonly id: Id;
-  readonly input: InputSchema;
-  readonly target: Target;
-  readonly profile?: string;
-  readonly retry: RetryPolicy;
-  readonly timeoutMs?: number;
-  readonly concurrency?: number;
-  readonly schedule?: readonly ScheduleDefinition<InferInput<InputSchema>>[];
-  readonly idempotency?: IdempotencyDefinition<InferInput<InputSchema>>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.types.ts#L49)
-
-### IdempotencyDefinition (interface)
-
-Legacy deduplication key and retention policy.
-
-**Signature**
-
-```ts
-export interface IdempotencyDefinition<Input = unknown> {
-  readonly key: IdempotencyKey<Input>;
-  readonly retentionMs: number;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.types.ts#L28)
-
-### JobDescriptor (interface)
-
-Validated job definition and its task-specific trigger operation.
-
-**Signature**
-
-```ts
-export interface JobDescriptor<
-  Id extends string,
-  Input,
-  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
-  Target extends FunctionRefAny = FunctionRefAny,
-> extends DescriptorBase<"job", Id> {
-  readonly input: InputSchema;
-  readonly target: Target;
-  readonly profile?: string;
-  readonly retry: RetryPolicy;
-  readonly timeoutMs?: number;
-  readonly concurrency?: number;
-  readonly schedule?: readonly ScheduleDefinition<Input>[];
-  readonly idempotency?: IdempotencyDefinition<Input>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.types.ts#L33)
-
-### RetryJitter (type alias)
-
-Jitter strategy retained for legacy job retry policy.
-
-**Signature**
-
-```ts
-type RetryJitter = "none" | "full" | "equal";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.types.ts#L5)
-
-### RetryPolicy (interface)
-
-Legacy retry attempts, backoff, and jitter settings.
-
-**Signature**
-
-```ts
-export interface RetryPolicy {
-  readonly maxAttempts: number;
-  readonly initialDelayMs: number;
-  readonly maxDelayMs: number;
-  readonly multiplier: number;
-  readonly jitter: RetryJitter;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.types.ts#L7)
-
-### ScheduleDefinition (interface)
-
-Legacy schedule timing and overlap configuration.
-
-**Signature**
-
-```ts
-export interface ScheduleDefinition<Input = JsonValue> {
-  readonly id: string;
-  readonly cron: string;
-  readonly timezone: string;
-  readonly input: Input;
-  readonly overlap: ScheduleOverlap;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.types.ts#L17)
-
-### ScheduleOverlap (type alias)
-
-Legacy policy for simultaneous schedule occurrences.
-
-**Signature**
-
-```ts
-type ScheduleOverlap = "skip" | "allow";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy-define-job.types.ts#L15)
-
-## `legacy.ts`
-
-Explicit one-release compatibility surface for function-target enqueue jobs.
-
-### "./client.js" (namespace export)
-
-Re-exports all named exports from the "./client.js" module.
-
-**Signature**
-
-```ts
-export * from "./client.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy.ts#L3)
-
-### "./legacy-define-job.js" (namespace export)
-
-Re-exports all named exports from the "./legacy-define-job.js" module.
-
-**Signature**
-
-```ts
-export * from "./legacy-define-job.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/legacy.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/jobs-observability.types.ts#L163)
 
 ## `migration-support.ts`
 
@@ -9631,9 +7960,7 @@ declare const breakingEffect: (
     | "TASK_VERSION_CHANGED"
     | "TASK_INPUT_SCHEMA_CHANGED"
     | "DEDUPE_SCOPE_CHANGED"
-    | "PUBLIC_CLIENT_FINGERPRINT_CHANGED"
-    | "LEGACY_JOBS_DISABLED"
-    | "LEGACY_ALIAS_CONFLICT",
+    | "PUBLIC_CLIENT_FINGERPRINT_CHANGED",
   message: string,
 ) => Effect.Effect<JobMigrationDiagnostic, never, never>;
 ```
@@ -9659,7 +7986,7 @@ declare const sameEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration-support.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration-support.ts#L30)
 
 ## `migration.ts`
 
@@ -9671,7 +7998,7 @@ declare const sameEffect: (
 declare const JobBindingMigration: JobBindingMigration;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L7)
 
 ### JobMigrationDiagnostic
 
@@ -9681,7 +8008,7 @@ declare const JobBindingMigration: JobBindingMigration;
 declare const JobMigrationDiagnostic: JobMigrationDiagnostic;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L8)
 
 ### JobMigrationSeverity
 
@@ -9691,7 +8018,7 @@ declare const JobMigrationDiagnostic: JobMigrationDiagnostic;
 declare const JobMigrationSeverity: JobMigrationSeverity;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L9)
 
 ### JobMigrationSnapshot
 
@@ -9701,17 +8028,7 @@ declare const JobMigrationSeverity: JobMigrationSeverity;
 declare const JobMigrationSnapshot: JobMigrationSnapshot;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L14)
-
-### LegacyCompatibilitySnapshot
-
-**Signature**
-
-```ts
-declare const LegacyCompatibilitySnapshot: LegacyCompatibilitySnapshot;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L10)
 
 ### diagnoseJobMigration
 
@@ -9736,7 +8053,7 @@ declare const diagnoseJobMigration: (
 ) => readonly JobMigrationDiagnostic[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L111)
 
 ### diagnoseJobMigrationEffect
 
@@ -9757,51 +8074,7 @@ declare const diagnoseJobMigrationEffect: (
 ) => Effect.Effect<ReadonlyArray<JobMigrationDiagnostic>, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L24)
-
-### diagnoseLegacyCompatibility
-
-Synchronous legacy compatibility diagnostic adapter.
-
-**Throws**
-
-A runtime defect if the Effect cannot execute synchronously.
-
-**Example**
-
-```ts
-diagnoseLegacyCompatibility(snapshot);
-```
-
-**Signature**
-
-```ts
-declare const diagnoseLegacyCompatibility: (
-  snapshot: LegacyCompatibilitySnapshot,
-) => readonly JobMigrationDiagnostic[];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L176)
-
-### diagnoseLegacyCompatibilityEffect
-
-Diagnoses legacy configuration aliases in Effect.
-
-**Example**
-
-```ts
-Effect.runSync(diagnoseLegacyCompatibilityEffect(snapshot));
-```
-
-**Signature**
-
-```ts
-declare const diagnoseLegacyCompatibilityEffect: (
-  snapshot: LegacyCompatibilitySnapshot,
-) => Effect.Effect<ReadonlyArray<JobMigrationDiagnostic>, never, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L19)
 
 ## `migration.types.ts`
 
@@ -9837,10 +8110,7 @@ export interface JobMigrationDiagnostic {
     | "HISTORICAL_RUNS_PINNED"
     | "SCHEDULE_TARGET_CHANGED"
     | "DEDUPE_SCOPE_CHANGED"
-    | "PUBLIC_CLIENT_FINGERPRINT_CHANGED"
-    | "LEGACY_JOBS_DISABLED"
-    | "LEGACY_ALIAS_CONFLICT"
-    | "LEGACY_ALIAS_DEPRECATED";
+    | "PUBLIC_CLIENT_FINGERPRINT_CHANGED";
   readonly severity: JobMigrationSeverity;
   readonly breaking: boolean;
   readonly message: string;
@@ -9886,23 +8156,6 @@ export interface JobMigrationSnapshot {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.types.ts#L8)
-
-### LegacyCompatibilitySnapshot (interface)
-
-Legacy and replacement configuration keys involved in migration.
-
-**Signature**
-
-```ts
-export interface LegacyCompatibilitySnapshot {
-  readonly usesFunctionTarget: boolean;
-  readonly legacyJobsEnabled: boolean;
-  readonly legacyKeys?: readonly ("job" | "defaults.job" | "profile")[];
-  readonly newKeys?: readonly ("jobs" | "defaults.jobs" | "service")[];
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.types.ts#L46)
 
 ## `resolve-binding-error.ts`
 
@@ -10254,98 +8507,6 @@ export interface ResolvedTaskBinding {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/resolve-binding.types.ts#L18)
-
-## `retry-policy.ts`
-
-### RetryPolicyValidationError (class)
-
-An invalid authored legacy retry policy.
-
-**Example**
-
-```ts
-new RetryPolicyValidationError({ reason: "retry.maxAttempts must be positive" });
-```
-
-**Signature**
-
-```ts
-declare class RetryPolicyValidationError
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/retry-policy.ts#L8)
-
-### validateRetry
-
-Synchronous legacy retry policy validator.
-
-**Throws**
-
-TypeError when any retry field is invalid.
-
-**Example**
-
-```ts
-validateRetry({ maxAttempts: 2, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" });
-```
-
-**Signature**
-
-```ts
-declare const validateRetry: (value: LegacyRetryPolicy) => LegacyRetryPolicy;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/retry-policy.ts#L46)
-
-### validateRetryEffect
-
-Validates legacy retry policy fields in Effect.
-
-**Example**
-
-```ts
-Effect.runPromise(
-  validateRetryEffect({
-    maxAttempts: 2,
-    initialDelayMs: 0,
-    maxDelayMs: 0,
-    multiplier: 1,
-    jitter: "none",
-  }),
-);
-```
-
-**Signature**
-
-```ts
-declare const validateRetryEffect: (value: RetryPolicy) => Effect.Effect<
-  Readonly<{
-    maxAttempts: number;
-    initialDelayMs: number;
-    maxDelayMs: number;
-    multiplier: number;
-    jitter: RetryJitter;
-  }>,
-  RetryPolicyValidationError,
-  never
->;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/retry-policy.ts#L18)
-
-## `retry-policy.types.ts`
-
-### LegacyRetryPolicy (type alias)
-
-Legacy authored retry policy accepted by the validation boundary.
-
-**Signature**
-
-```ts
-type LegacyRetryPolicy = RetryPolicy;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/retry-policy.types.ts#L4)
 
 ## `run-id-codec.ts`
 

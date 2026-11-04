@@ -26,11 +26,10 @@ export function serverEngineImports(graph: ApplicationGraph) {
     ...(hasJobs ? ["createTaskExecutor"] : []),
     "invoke",
     ...(hasEvents ? ["materializeEvents"] : []),
-    ...(hasJobs ? ["materializeJobs"] : []),
     "parseInfrastructureBindingValues",
     "runWithRelkit",
   ].join(", ");
-  const stubs = `${hasJobs ? "" : "const createTaskExecutor = () => undefined;\nconst materializeJobs = async () => undefined;"}
+  const stubs = `${hasJobs ? "" : "const createTaskExecutor = () => undefined;"}
 ${hasEvents ? "" : "const materializeEvents = async () => undefined;"}`;
   return { imports, stubs };
 }

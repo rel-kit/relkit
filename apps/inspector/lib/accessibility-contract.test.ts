@@ -33,7 +33,7 @@ describe("inspector accessibility contract", () => {
   test("critical actions use semantic groups and an accessible modal confirmation", async () => {
     const [dialog, jobs, tools, layout, shell] = await Promise.all([
       source("confirmation-dialog.tsx"),
-      source("jobs/job-actions.tsx"),
+      source("jobs/runs/[runId]/run-detail-client.tsx"),
       source("tool-approval-actions.tsx"),
       source("layout.tsx"),
       source("inspector-shell.tsx"),
@@ -44,8 +44,7 @@ describe("inspector accessibility contract", () => {
     expect(dialog).toContain("onCancel");
     expect(dialog).toContain("Cancel");
     expect(jobs).toContain('role="group"');
-    expect(jobs).toContain("Retry dead letter");
-    expect(jobs).toContain("ConfirmationDialog");
+    expect(jobs).toContain("Retry as new run");
     expect(jobs).not.toContain("window.confirm");
     expect(tools).toContain('role="group"');
     expect(tools).toContain("Approve");

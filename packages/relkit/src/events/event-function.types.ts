@@ -5,7 +5,7 @@ import type {
   FunctionDependencies,
   FunctionHandlerResult,
 } from "../functions/index.js";
-import type { RetryPolicy } from "../jobs/legacy.js";
+import type { RetryPolicy } from "../jobs/job.types.js";
 import type { InferOutput } from "../schema/index.js";
 import type {
   EventDescriptorByName,

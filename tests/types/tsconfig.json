@@ -67,7 +67,6 @@
       "relkit/invocation": ["packages/relkit/src/invocation/index.ts"],
       "relkit/jobs": ["packages/relkit/src/app/jobs.ts"],
       "relkit/jobs/adapter": ["packages/relkit/src/jobs/adapter.ts"],
-      "relkit/jobs/legacy": ["packages/relkit/src/app/jobs-legacy.ts"],
       "relkit/jobs/server": ["packages/relkit/src/jobs/server.ts"],
       "relkit/local-service": ["packages/relkit/src/local-service/index.ts"],
       "relkit/observability": ["packages/relkit/src/observability/index.ts"],

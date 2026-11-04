@@ -2,7 +2,6 @@ import { isEnvRef, type EnvDefinition, type EnvShape } from "../config/index.js"
 import { normalizeId } from "../contracts/index.js";
 import { Effect, Result, Schema } from "effect";
 import { observeApp } from "./app-observability.js";
-import type { AppCompatibilityConfig } from "./define-app.types.js";
 
 /** Expected invalid application input with the original cause preserved.
  * @example if (error._tag === "AppValidationFailure") console.error(error.message);
@@ -74,82 +73,6 @@ export const deriveApplicationIdEffect = Effect.fn("App.deriveApplicationId")(
  */
 export function deriveApplicationId(packageName: string): string {
   return runValidation(deriveApplicationIdEffect(packageName));
-}
-
-/** Normalizes the legacy jobs compatibility flag in Effect.
- * @param value - Optional compatibility configuration.
- * @returns A frozen flag object or AppValidationFailure.
- * @example Effect.runSync(normalizeCompatibilityEffect({ legacyJobs: true }));
- */
-export const normalizeCompatibilityEffect = Effect.fn("App.normalizeCompatibility")(
-  (value: AppCompatibilityConfig | undefined) =>
-    observeApp(
-      "compatibility.normalize",
-      Effect.try({
-        try: () => {
-          if (value === undefined) return Object.freeze({ legacyJobs: false });
-          if (
-            !isRecord(value) ||
-            (value.legacyJobs !== undefined && typeof value.legacyJobs !== "boolean")
-          )
-            throw new TypeError("defineApp compatibility.legacyJobs must be a boolean");
-          return Object.freeze({ legacyJobs: value.legacyJobs === true });
-        },
-        catch: validationFailure,
-      }),
-    ),
-);
-
-/** Synchronous compatibility normalizer.
- * @param value - Optional compatibility configuration.
- * @returns A frozen legacy-jobs flag object.
- * @throws TypeError for an invalid compatibility flag.
- * @example normalizeCompatibility({ legacyJobs: true });
- */
-export function normalizeCompatibility(value: AppCompatibilityConfig | undefined): {
-  readonly legacyJobs: boolean;
-} {
-  return runValidation(normalizeCompatibilityEffect(value));
-}
-
-/** Rejects simultaneous current and legacy aliases in Effect.
- * @param value - Record containing optional aliases.
- * @param primary - Current alias name.
- * @param legacy - Legacy alias name.
- * @param label - Diagnostic context.
- * @returns Void or AppValidationFailure.
- * @example Effect.runSync(assertExclusiveAliasEffect(options, "jobs", "job", "defineApp"));
- */
-export const assertExclusiveAliasEffect = Effect.fn("App.assertExclusiveAlias")(
-  (value: Record<string, unknown>, primary: string, legacy: string, label: string) =>
-    observeApp(
-      "alias.assertExclusive",
-      Effect.try({
-        try: () => {
-          if (value[primary] !== undefined && value[legacy] !== undefined)
-            throw new TypeError(`${label} cannot specify both "${primary}" and "${legacy}"`);
-        },
-        catch: validationFailure,
-      }),
-    ),
-);
-
-/** Synchronous alias exclusivity adapter.
- * @param value - Record containing optional aliases.
- * @param primary - Current alias name.
- * @param legacy - Legacy alias name.
- * @param label - Diagnostic context.
- * @returns Nothing when aliases are exclusive.
- * @throws TypeError when both aliases are present.
- * @example assertExclusiveAlias(options, "jobs", "job", "defineApp");
- */
-export function assertExclusiveAlias(
-  value: Record<string, unknown>,
-  primary: string,
-  legacy: string,
-  label: string,
-): void {
-  runValidation(assertExclusiveAliasEffect(value, primary, legacy, label));
 }
 
 /** Maps known synchronous validation errors into the typed channel. */

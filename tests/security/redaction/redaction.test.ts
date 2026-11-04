@@ -8,13 +8,7 @@ import {
   type LogRecord,
 } from "relkit/observability";
 import { secrets, flowInput, source } from "./redaction-records.fixture.js";
-import {
-  emitLoggerRecord,
-  flushTelemetry,
-  runAgent,
-  runJob,
-  runEvent,
-} from "./redaction-flows.fixture.js";
+import { emitLoggerRecord, flushTelemetry, runAgent, runEvent } from "./redaction-flows.fixture.js";
 import { createHttpRuntime, assertNoSecrets } from "./redaction-runtime.fixture.js";
 import { persistAndQuery, assertEndpointRedaction } from "./redaction-evidence.fixture.js";
 test("recursively finds no synthetic secret in observable flows or sinks", async () => {
@@ -40,7 +34,6 @@ async function captureObservableFlows() {
   const jsonLogs: LogRecord[] = [];
   await emitLoggerRecord(collector, terminal, jsonLogs);
   const agentTrace = await runAgent(collector);
-  await runJob(collector);
   await runEvent(collector);
   await flushTelemetry();
   const runtime = createHttpRuntime(collector);
@@ -61,9 +54,6 @@ async function captureObservableFlows() {
   expect(agentTrace.spans.some((span) => span.name.startsWith("relkit.agent.security.agent"))).toBe(
     true,
   );
-  expect(
-    flowRecords.some((record) => record.signal === "invocation" && record.source === "job"),
-  ).toBe(true);
   expect(
     flowRecords.some(
       (record) => record.signal === "invocation" && record.source === "event-delivery",

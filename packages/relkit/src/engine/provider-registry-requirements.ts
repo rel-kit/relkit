@@ -93,9 +93,7 @@ function graphProviderRequirement(
     profile: binding.profile,
     bindingId: binding.id,
     binding,
-    ...(consumer?.kind !== "job"
-      ? {}
-      : { executionModel: consumer.executionModel === "task" ? "task" : "legacy-function" }),
+    ...(consumer?.kind !== "job" ? {} : { executionModel: "task" as const }),
     source: consumer!.source,
   };
 }

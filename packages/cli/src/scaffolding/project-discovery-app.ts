@@ -84,7 +84,6 @@ function readProfiles(object: ts.ObjectLiteralExpression): DiscoveredProfile[] {
           ),
           isDefault:
             defaultValue(defaults, capability === "job" ? "jobs" : capability) === name ||
-            (capability === "job" && defaultValue(defaults, "job") === name) ||
             (direct && name === "default"),
         },
       ];

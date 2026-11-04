@@ -21,7 +21,6 @@ test("generates public jobs from graph and serialized contract with stable paths
   expect(contract).toContain('"runs": {');
   expect(contract).toContain("RunWatchFrame");
   expect(contract).not.toContain("hiddenJob");
-  expect(contract).not.toContain("legacyJob");
 
   const document = JSON.parse(generateClientContractDocument(graph, "sha256:graph")) as {
     jobs: readonly {
@@ -107,15 +106,6 @@ function jobGraph(): ApplicationGraph {
         implicit: true,
         default: true,
         input: { type: "string" },
-      },
-      {
-        kind: "job",
-        id: "legacy.job",
-        source: { file: "src/jobs/legacy.ts", line: 1, column: 1 },
-        executionModel: "legacy-function",
-        input: { type: "string" },
-        targetFunctionId: "legacy.handler",
-        profile: "local",
       },
     ],
     edges: [],

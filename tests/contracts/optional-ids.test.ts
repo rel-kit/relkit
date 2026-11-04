@@ -6,7 +6,6 @@ import { defineCache } from "relkit/cache";
 import { defineEvent } from "relkit/events";
 import { defineError, defineFunction } from "relkit/functions";
 import { createUnboundIdentity, isUnboundIdentity } from "relkit/invocation";
-import { defineJob } from "../../packages/relkit/src/jobs/legacy.ts";
 import { defineMiddleware, defineRoute, defineTransform, http } from "relkit/routes";
 import { defineService } from "relkit/services";
 import { defineTool } from "relkit/tools";
@@ -70,18 +69,6 @@ describe("optional authoring IDs", () => {
   test("keeps durable identities mandatory at runtime", () => {
     expect(defineApp({ env: defineEnv({}) }).kind).toBe("app");
     expect(() => defineEvent({ version: 1, input } as never)).toThrow("Invalid stable ID");
-    expect(() =>
-      defineJob({
-        input,
-        target: defineFunction({
-          id: "orders.target",
-          input,
-          output,
-          handler: async () => ({ ok: true }),
-        }),
-        retry: { maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
-      } as never),
-    ).toThrow("Invalid stable ID");
     expect(() => defineBucket({ visibility: "private" } as never)).toThrow("Invalid stable ID");
     expect(() => defineCache({ key: input, value: output } as never)).toThrow("Invalid stable ID");
   });

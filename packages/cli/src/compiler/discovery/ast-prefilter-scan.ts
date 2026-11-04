@@ -36,7 +36,6 @@ const KNOWN_FACTORIES = new Set([
   "defineGraph",
   "defineChannel",
   "defineTransform",
-  "defineRequestTransform",
   "defineMiddleware",
   "defineService",
 ]);

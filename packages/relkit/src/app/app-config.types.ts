@@ -37,10 +37,3 @@ export interface ServerConfig {
  * @example const inspector: InspectorConfig = { enabled: true };
  */
 export interface InspectorConfig extends InspectorConfigurationInput {}
-
-/** Transitional compatibility switches for application authoring.
- * @example const compatibility: AppCompatibilityConfig = { legacyJobs: true };
- */
-export interface AppCompatibilityConfig {
-  readonly legacyJobs?: boolean;
-}

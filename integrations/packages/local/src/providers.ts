@@ -44,7 +44,7 @@ export function localEvent(options: LocalProviderOptions = {}): LocalEventAdapte
 }
 
 /**
- * Defines the durable filesystem queue provider for unscheduled local jobs.
+ * Defines the local durable jobs provider that runs task-backed jobs from files.
  *
  * @example
  * ```ts

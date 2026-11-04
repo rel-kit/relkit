@@ -33,19 +33,8 @@ export interface JobMigrationDiagnostic {
     | "HISTORICAL_RUNS_PINNED"
     | "SCHEDULE_TARGET_CHANGED"
     | "DEDUPE_SCOPE_CHANGED"
-    | "PUBLIC_CLIENT_FINGERPRINT_CHANGED"
-    | "LEGACY_JOBS_DISABLED"
-    | "LEGACY_ALIAS_CONFLICT"
-    | "LEGACY_ALIAS_DEPRECATED";
+    | "PUBLIC_CLIENT_FINGERPRINT_CHANGED";
   readonly severity: JobMigrationSeverity;
   readonly breaking: boolean;
   readonly message: string;
-}
-
-/** Legacy and replacement configuration keys involved in migration. */
-export interface LegacyCompatibilitySnapshot {
-  readonly usesFunctionTarget: boolean;
-  readonly legacyJobsEnabled: boolean;
-  readonly legacyKeys?: readonly ("job" | "defaults.job" | "profile")[];
-  readonly newKeys?: readonly ("jobs" | "defaults.jobs" | "service")[];
 }

@@ -1,6 +1,6 @@
 ---
 title: Migration
-description: Move legacy function-target jobs to task-first jobs safely.
+description: Change jobs and tasks without losing durable identity.
 pagination: false
 sidebar:
   icon: git-branch
@@ -8,9 +8,9 @@ sidebar:
 
 Preserve durable job and task identities when changing application source or provider configuration. Preserve the existing public job ID, task ID, version, input schema, output schema, dedupe scope, schedule identity, and client fingerprint unless the change is intentional.
 
-This is a one-release compatibility window. Legacy function-target definitions, `.enqueue()` producers,
-and the deprecated `profile` spelling remain available only when explicitly enabled; new code must use a
-task-first definition and `service` selection. Upgrade every RelKit package to the same release before changing the
+Every job binds a task with `defineJob({ name, task })` from `relkit/jobs`, selects its jobs service with
+`service`, and is triggered with `.trigger()`. Function-target jobs, `.enqueue()` and the `profile` spelling were
+removed in 0.9; `relkit migrate` rewrites them. Upgrade every RelKit package to the same release before changing the
 application graph; all RelKit packages share one version.
 
 The migration helper is exposed from the jobs package; run it against the previous and next snapshots before
@@ -24,7 +24,7 @@ activation. It reports identity, binding, schema, history, schedule, dedupe, and
   /_snippets/source/packages/relkit/tests/jobs/migration.test.ts
 </include>
 
-Diagnostics flag pinned/default-derived ID changes, implicit-to-explicit binding changes, task version or schema incompatibility, history and schedule changes, dedupe changes, and client fingerprint changes. Legacy aliases and function-target definitions must be explicit during the migration window; the compiler does not silently rewrite them.
+Diagnostics flag pinned/default-derived ID changes, implicit-to-explicit binding changes, task version or schema incompatibility, history and schedule changes, dedupe changes, and client fingerprint changes.
 
 Roll out a compatible worker first, register the task-first definition, wait for readiness, then activate new triggers. Keep the old definition and worker generation until historical runs are terminal. If the input or output contract is incompatible, use a new task version or a new public job ID and document the boundary.
 

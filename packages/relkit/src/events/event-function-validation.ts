@@ -1,5 +1,5 @@
 import { normalizeId } from "../contracts/index.js";
-import type { RetryPolicy } from "../jobs/legacy.js";
+import type { RetryPolicy } from "../jobs/job.types.js";
 import type { EventDelivery } from "./event-function.types.js";
 import { Effect } from "effect";
 import { EventDefinitionError } from "./event-errors.js";

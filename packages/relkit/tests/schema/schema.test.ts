@@ -97,7 +97,7 @@ describe("@relkit/schema", () => {
 
   test("projects void outputs without pretending undefined is JSON", () => {
     expect(validateSync(z.void(), undefined)).toEqual({ value: undefined });
-    expect(getJsonSchema(z.undefined())).toEqual({
+    expect(getJsonSchema(z.void())).toEqual({
       ok: true,
       schema: { "x-relkit-void": true },
     });

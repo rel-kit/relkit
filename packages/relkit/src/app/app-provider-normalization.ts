@@ -21,7 +21,7 @@ export const normalizeProvidersEffect = Effect.fn("App.normalizeProviders")(
     Effect.gen(function* () {
       const result: Partial<Record<AppProviderCapability, NormalizedProviderProfiles>> = {};
       for (const capability of APP_PROVIDER_CAPABILITIES) {
-        const input = capability === "job" ? (options.jobs ?? options.job) : options[capability];
+        const input = capability === "job" ? options.jobs : options[capability];
         if (input !== undefined)
           result[capability] = yield* Effect.try({
             try: () =>
@@ -51,7 +51,10 @@ export const normalizeDefaultsEffect = Effect.fn("App.normalizeDefaults")(
       const result: Partial<Record<AppProviderCapability, string>> = {};
       for (const [rawCapability, selected] of Object.entries(defaults ?? {})) {
         const capability = rawCapability === "jobs" ? "job" : rawCapability;
-        if (!APP_PROVIDER_CAPABILITIES.includes(capability as AppProviderCapability))
+        if (
+          rawCapability === "job" ||
+          !APP_PROVIDER_CAPABILITIES.includes(capability as AppProviderCapability)
+        )
           return yield* Effect.fail(
             failure(new TypeError(`Unknown default capability "${capability}"`)),
           );

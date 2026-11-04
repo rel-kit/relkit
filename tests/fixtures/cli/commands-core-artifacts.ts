@@ -50,10 +50,8 @@ export function assertBuildArtifacts(artifacts: readonly string[]): void {
   for (const text of [
     "createObservabilityRuntime",
     "materializeEvents",
-    "materializeJobs",
     "createJobsRuntime",
     "startNativeJobWorker",
-    "RELKIT_LEGACY_JOBS_DISABLED",
     "formatHumanLog(record)",
     'source: request.source ?? "http"',
     "SIGTERM",

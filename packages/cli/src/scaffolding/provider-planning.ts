@@ -38,7 +38,7 @@ export const ensureProviderProfileEffect = Effect.fn("Scaffold.ensureProviderPro
     capability: ProviderCapability,
     options: EnsureProfileOptions = {},
   ): Effect.fn.Return<string, GeneratorDomainError | GeneratorIoError, GeneratorFileSystem> {
-    const configCapability = capability === "job" && options.legacy !== true ? "jobs" : capability;
+    const configCapability = capability === "job" ? "jobs" : capability;
     const profiles = builder.profiles.filter((item) => item.capability === capability);
     const explicitSource = options.provider !== undefined || options.source !== undefined;
     if (options.requested) {

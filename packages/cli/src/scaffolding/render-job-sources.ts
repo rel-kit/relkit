@@ -8,31 +8,6 @@ type ArtifactReference = {
 };
 
 /**
- * Renders job Source as source text without executing user modules.
- * @param artifact - Normalized artifact identity, source path, binding and export metadata.
- * @param target - Discovered domain or artifact target.
- * @param targetModule - Source module specifier of the referenced callable or task.
- * @param profile - Selected provider profile.
- * @returns Legacy function-targeted job descriptor source with optional provider selection.
- */
-export function jobSource(
-  artifact: DomainArtifact,
-  target: ArtifactReference,
-  targetModule: string,
-  profile?: string,
-): string {
-  return `import { defineJob } from "@relkit/app/jobs/legacy";
-${sourceImport(target.binding, targetModule, target.exportKind)}
-const ${artifact.binding} = defineJob({
-  id: "${artifact.id}",
-  input: ${target.binding}.input,
-  target: ${target.binding},${profile ? `\n  profile: "${profile}",` : ""}
-  retry: { maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
-});
-export default ${artifact.binding};
-`;
-}
-/**
  * Renders task Source as source text without executing user modules.
  * @param artifact - Normalized artifact identity, source path, binding and export metadata.
  * @param version - Task version included in the generated descriptor.

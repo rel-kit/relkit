@@ -111,7 +111,7 @@ const ${artifact.binding} = defineEventFunction({
 export default ${artifact.binding};
 `;
 }
-export { jobSource, taskSource, taskJobSource } from "./render-job-sources.js";
+export { taskSource, taskJobSource } from "./render-job-sources.js";
 /**
  * Renders prompt Source as source text without executing user modules.
  * @param artifact - Normalized artifact identity, source path, binding and export metadata.

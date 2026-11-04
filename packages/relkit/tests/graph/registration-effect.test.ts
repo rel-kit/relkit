@@ -11,7 +11,7 @@ import type { GraphNode } from "../../src/graph/index.js";
 import { functionNode, graph, source } from "./graph-fixtures.js";
 const functionWithDomain = functionNode({ domainId: "orders.service" });
 describe("registration planning Effects", () => {
-  test("projects schedule triggers, queues, and legacy job schedules in order", () => {
+  test("projects schedule and queue triggers in order", () => {
     const nodes = [
       functionWithDomain,
       {
@@ -38,41 +38,11 @@ describe("registration planning Effects", () => {
         targetFunctionId: "orders.create",
         config: { queue: "orders" },
       },
-      {
-        kind: "job",
-        id: "orders.legacy",
-        source,
-        targetFunctionId: "orders.create",
-        profile: "default",
-        schedule: [{ cron: "1 * * * *" }, { id: "named", cron: "2 * * * *" }],
-      },
-      {
-        kind: "job",
-        id: "orders.unscheduled",
-        source,
-        targetFunctionId: "orders.create",
-        profile: "default",
-        schedule: null,
-      },
     ];
     const plan = Effect.runSync(createRegistrationPlanEffect(graph(nodes)));
-    expect(plan.schedules.map(({ id }) => id)).toEqual([
-      "orders.daily",
-      "orders.hourly",
-      "orders.legacy:0",
-      "orders.legacy:named",
-    ]);
-    expect(plan.schedules.map(({ jobId }) => jobId)).toEqual([
-      "orders.refresh",
-      "orders.create",
-      "orders.legacy",
-      "orders.legacy",
-    ]);
-    expect(plan.queues.map(({ id }) => id)).toEqual([
-      "orders.legacy",
-      "orders.unscheduled",
-      "orders.queue-trigger",
-    ]);
+    expect(plan.schedules.map(({ id }) => id)).toEqual(["orders.daily", "orders.hourly"]);
+    expect(plan.schedules.map(({ jobId }) => jobId)).toEqual(["orders.refresh", "orders.create"]);
+    expect(plan.queues.map(({ id }) => id)).toEqual(["orders.queue-trigger"]);
     expect(plan.functions[0]?.serviceId).toBe("orders.service");
     expect(createRegistrationPlan(graph(nodes))).toEqual(plan);
   });

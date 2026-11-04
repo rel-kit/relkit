@@ -8,7 +8,6 @@ import type {
   EventTriggerConfig,
   FunctionNode,
   HttpTriggerConfig,
-  LegacyJobNode,
   MiddlewareNode,
   ToolNode,
   TaskJobNode,
@@ -46,11 +45,11 @@ export type TaskRegistration = TaskNode;
  */
 export type JobRegistration = TaskJobNode;
 /**
- * Legacy queue or queue trigger registration.
+ * Queue trigger registration.
  * @remarks The planner emits this shape without acquiring runtime resources.
  * @example const inspect = (value: QueueRegistration): void => { console.log(value); };
  */
-export type QueueRegistration = LegacyJobNode | TriggerNode<"queue", JsonValue>;
+export type QueueRegistration = TriggerNode<"queue", JsonValue>;
 /**
  * Schedule binding associated with a job.
  * @remarks The planner emits this shape without acquiring runtime resources.
@@ -126,9 +125,9 @@ export interface RegistrationPlan {
   readonly graphHash: string;
   readonly functions: readonly FunctionRegistration[];
   readonly httpTriggers: readonly HttpTriggerRegistration[];
-  /** Task registrations are intentionally separate from legacy queues. */
+  /** Task registrations. */
   readonly tasks?: readonly TaskRegistration[];
-  /** Task-backed job bindings are intentionally separate from legacy queues. */
+  /** Task-backed job bindings. */
   readonly jobs?: readonly JobRegistration[];
   readonly queues: readonly QueueRegistration[];
   readonly schedules: readonly ScheduleRegistration[];

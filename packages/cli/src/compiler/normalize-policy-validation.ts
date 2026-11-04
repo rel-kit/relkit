@@ -82,18 +82,3 @@ export function normalizeRetry(value: Record<string, any>): Record<string, any> 
     jitter: typeof value.jitter === "string" ? value.jitter.trim().toLowerCase() : value.jitter,
   };
 }
-
-/**
- * Normalizes a declared schedule's primitive metadata.
- * @param value - Declared metadata inspected without coercion.
- * @returns Normalized schedule metadata, retaining unsupported values for validation.
- */
-export function normalizeSchedule(value: unknown): unknown {
-  if (!isRecord(value)) return value;
-  return {
-    ...value,
-    id: id(value.id) ?? text(value.id) ?? value.id,
-    cron: typeof value.cron === "string" ? value.cron.trim().replace(/\s+/g, " ") : value.cron,
-    timezone: text(value.timezone) ?? value.timezone,
-  };
-}

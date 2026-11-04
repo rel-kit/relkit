@@ -39,12 +39,21 @@ function createDependencySources(providerRegistry) {
     agents: Object.fromEntries(plan.agents.map((node) => [node.id, registry.get(\`relkit.agent.\${node.id}.invoke\`)])),
     buckets: Object.fromEntries(plan.buckets.map((node) => [node.id, provider(providerRegistry, "bucket", node.profile)])),
     cache: Object.fromEntries(plan.caches.map((node) => [node.id, provider(providerRegistry, "cache", node.profile)])),
-    jobs: Object.fromEntries([
-      ...plan.queues.filter((node) => node.kind === "job").map((node) => [node.id, materializedJobs?.jobs.get(node.id)]),
-      ...(plan.jobs ?? []).map((node) => [node.id, runtimeManifest.jobs?.[node.id]]),
-    ]),
+    jobs: Object.fromEntries((plan.jobs ?? []).map((node) => [node.id, jobTriggerSource(node)])),
     tasks: Object.fromEntries(Object.entries(runtimeManifest.tasks ?? {})),
     events: Object.fromEntries((plan.events ?? []).map((node) => [node.id, provider(providerRegistry, "event", node.profile)])),
+  };
+}
+
+function jobTriggerSource(node) {
+  const descriptor = runtimeManifest.jobs?.[node.id];
+  if (descriptor === undefined) return undefined;
+  return {
+    trigger: (input, options) => {
+      const runtime = nativeJobsRuntimes.get(node.profile);
+      if (runtime === undefined) throw new Error(\`Jobs service "\${node.profile}" is not running.\`);
+      return submitJob(descriptor, input, options, runtime);
+    },
   };
 }
 

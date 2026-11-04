@@ -96,7 +96,6 @@ export type CompilerOperation =
   | "isEvaluatorRequest"
   | "isEvaluatorResponse"
   | "isSnapshotErrorDescriptor"
-  | "jobCompatible"
   | "jobGraphNode"
   | "loadConfig"
   | "makeOutputs"

@@ -1,5 +1,5 @@
 import type { UnknownEventEnvelope } from "../../events/index.js";
-import type { RetryPolicy } from "../../jobs/legacy.js";
+import type { RetryPolicy } from "../../jobs/job.types.js";
 import type { JobFailureMetadata, JobQueueCounts } from "../jobs/queue-utils.js";
 import type { JobStoreBoundary } from "../jobs/store.js";
 import type { EventDeliveryRecord } from "./router-records.js";

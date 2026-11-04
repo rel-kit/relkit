@@ -6,8 +6,6 @@ import { Effect, Layer } from "effect";
 import {
   EventMaterializationLive,
   EventMaterializationService,
-  JobMaterializationLive,
-  JobMaterializationService,
   TaskExecutionLive,
   TaskExecutionService,
 } from "../../src/engine/execution.service.js";
@@ -29,14 +27,11 @@ const plan: RegistrationPlan = {
 };
 const engine = { invoke: async () => undefined };
 
-it.effect("composes live event and job services with explicit native dependencies", () =>
+it.effect("composes the live event service with explicit native dependencies", () =>
   Effect.gen(function* () {
     const events = yield* (yield* EventMaterializationService).materialize({ plan, engine });
-    const jobs = yield* (yield* JobMaterializationService).materialize({ plan, engine });
     expect(events.triggers.size).toBe(0);
-    expect(jobs.jobs.size).toBe(0);
-    expect(yield* Effect.promise(() => jobs.runDue())).toEqual([]);
-  }).pipe(Effect.provide(Layer.mergeAll(EventMaterializationLive, JobMaterializationLive))),
+  }).pipe(Effect.provide(EventMaterializationLive)),
 );
 
 it.effect("substitutes event materialization at the service boundary", () =>

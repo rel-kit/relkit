@@ -62,7 +62,6 @@ export type { DefineServiceOptions, ServiceDescriptor, ServiceRef } from "./app/
 // Routes and middleware
 export {
   defineMiddleware,
-  defineRequestTransform,
   defineRoute,
   defineServiceRoutes,
   defineTransform,
@@ -104,8 +103,6 @@ export type {
   DefineTaskOptions,
   DurationInput,
   JobDescriptor,
-  JobEnqueueOptions,
-  JobEnqueueResult,
   ScheduleDefinition,
   TaskContext,
   TaskDescriptor,

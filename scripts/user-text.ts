@@ -2,7 +2,7 @@
  * Checks user-facing text against WRITING.md: the product is spelled "RelKit", and prose does not
  * use internal process terms. Code blocks, inline code and identifiers are not prose.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import ts from "typescript";
 
@@ -53,7 +53,7 @@ export function userTextFiles(root: string): {
   const tracked = Bun.spawnSync(["git", "ls-files", "-co", "--exclude-standard"], { cwd: root })
     .stdout.toString()
     .split("\n")
-    .filter(Boolean);
+    .filter((path) => path !== "" && existsSync(join(root, path)));
   const markdown = tracked.filter(
     (path) =>
       /\.mdx?$/u.test(path) &&

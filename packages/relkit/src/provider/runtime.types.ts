@@ -10,7 +10,7 @@ export interface RuntimeProviderContext {
   readonly bindingId: string;
   readonly capability: string;
   readonly profile: string;
-  readonly executionModel?: "task" | "legacy-function";
+  readonly executionModel?: "task";
   readonly behavior: JsonValue;
   readonly connection: Readonly<Record<string, JsonValue>>;
   readonly signal?: AbortSignal;

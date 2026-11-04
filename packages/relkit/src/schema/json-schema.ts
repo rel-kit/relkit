@@ -48,12 +48,6 @@ export function getJsonSchema(
 }
 
 /**
- * Alias for callers that describe projection as a conversion.
- * @example toJsonSchema(z.string());
- */
-export const toJsonSchema = getJsonSchema;
-
-/**
  * Narrows a successful projection result.
  * @param result - Projection result to inspect.
  * @returns Whether the result contains a JSON Schema.

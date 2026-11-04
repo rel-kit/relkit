@@ -2524,58 +2524,6 @@ export * from "./events.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/aws/src/cloud-aws/runtime/index.ts#L2)
 
-### "./jobs.js" (namespace export)
-
-Re-exports all named exports from the "./jobs.js" module.
-
-**Signature**
-
-```ts
-export * from "./jobs.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/aws/src/cloud-aws/runtime/index.ts#L3)
-
-## `jobs.ts`
-
-### AwsJobOptions (interface)
-
-**Signature**
-
-```ts
-export interface AwsJobOptions {
-  readonly region: string;
-  readonly queueUrl?: unknown;
-  readonly endpoint?: unknown;
-  readonly credentials?: AwsCredentials;
-  readonly fetch?: typeof globalThis.fetch | undefined;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/aws/src/cloud-aws/runtime/jobs.ts#L8)
-
-### AwsJobProvider (interface)
-
-**Signature**
-
-```ts
-export interface AwsJobProvider extends JobProvider {
-  readonly createQueue: (context: JobQueueFactoryContext) => JobQueueHandle;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/aws/src/cloud-aws/runtime/jobs.ts#L17)
-
-### createSqsJobProvider
-
-**Signature**
-
-```ts
-declare const createSqsJobProvider: (options: AwsJobOptions) => AwsJobProvider;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/aws/src/cloud-aws/runtime/jobs.ts#L22)
-
 ## `environment.ts`
 
 ### containerEnvironment

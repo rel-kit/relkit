@@ -80,17 +80,14 @@ function validateNodeUnsafe(value: unknown, root: string | undefined, index: num
       fail(`Task "${value.id}" execution is invalid.`);
   }
   if (value.kind === "job") {
-    if (value.executionModel === "task") {
-      if (!nonEmpty(value.name)) fail(`Graph nodes[${index}].name is invalid.`);
-      validateId(value.jobId, `Graph nodes[${index}].jobId`);
-      validateId(value.taskId, `Graph nodes[${index}].taskId`);
-      if (!nonEmpty(value.taskVersion)) fail(`Graph nodes[${index}].taskVersion is invalid.`);
-      if (!nonEmpty(value.profile)) fail(`Graph nodes[${index}].profile is invalid.`);
-      if (typeof value.implicit !== "boolean" || typeof value.default !== "boolean")
-        fail(`Graph nodes[${index}] task binding flags are invalid.`);
-    } else if (value.executionModel !== undefined && value.executionModel !== "legacy-function") {
-      fail(`Graph nodes[${index}].executionModel is invalid.`);
-    }
+    if (value.executionModel !== "task") fail(`Graph nodes[${index}].executionModel is invalid.`);
+    if (!nonEmpty(value.name)) fail(`Graph nodes[${index}].name is invalid.`);
+    validateId(value.jobId, `Graph nodes[${index}].jobId`);
+    validateId(value.taskId, `Graph nodes[${index}].taskId`);
+    if (!nonEmpty(value.taskVersion)) fail(`Graph nodes[${index}].taskVersion is invalid.`);
+    if (!nonEmpty(value.profile)) fail(`Graph nodes[${index}].profile is invalid.`);
+    if (typeof value.implicit !== "boolean" || typeof value.default !== "boolean")
+      fail(`Graph nodes[${index}] task binding flags are invalid.`);
   }
   if (value.kind === "event" || value.kind === "error") validateExposure(value.exposure, index);
   if (value.kind === "agent") {

@@ -73,18 +73,6 @@ async function resolveRateLimitStore(storeId) {
   if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
   return provider(providerRegistry, "cache", cache.profile);
 }
-function queueProvider(providerRegistry, context) {
-  const value = provider(providerRegistry, "job", context.profile);
-  if (value === null || typeof value !== "object" || typeof value.createQueue !== "function")
-    throw new Error(\`Job provider profile "\${context.profile}" cannot materialize queues.\`);
-  return value.createQueue(context);
-}
-async function startJobWorker(jobs) {
-  await runtimeOwner.worker("job-worker", async () => {
-      await jobs.tick(new Date());
-      await runtimeOwner.each([...jobs.jobs.keys()], (jobId) => jobs.runNext(jobId));
-  });
-}
 function errorCode(error) {
   if (error !== null && typeof error === "object" && typeof error.code === "string") return error.code;
   if (error !== null && typeof error === "object" && error.name === "EnvResolutionError") return "RELKIT_ENVIRONMENT_INVALID";

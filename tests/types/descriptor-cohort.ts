@@ -6,7 +6,7 @@ import { defineCache } from "relkit/cache";
 import { defineEnv, env, type EnvRef } from "relkit/config";
 import { defineEvent, defineEventFunction, type EventEnvelope } from "relkit/events";
 import { defineError, defineFunction } from "relkit/functions";
-import { defineJob } from "relkit/jobs/legacy";
+import { defineJob, defineTask } from "relkit/jobs";
 import { defineRoute, http } from "relkit/routes";
 import { z, type InferInput, type InferOutput } from "relkit/schema";
 import { defineTool } from "relkit/tools";
@@ -27,12 +27,14 @@ const child = defineFunction({
 });
 import { eventCreated } from "./descriptor-events.fixture.js";
 export { eventCreated, eventChanged } from "./descriptor-events.fixture.js";
-const job = defineJob({
-  id: "types.job",
+const childTask = defineTask({
+  id: "types.child-task",
+  version: "1",
   input,
-  target: child,
-  retry: { maxAttempts: 2, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
+  output,
+  handler: async () => ({ ok: true }),
 });
+const job = defineJob({ id: "types.job", name: "typesJob", task: childTask });
 const bucket = defineBucket({ id: "types.bucket", visibility: "private" });
 const cache = defineCache({
   id: "types.cache",
@@ -75,7 +77,7 @@ const parent = defineFunction({
   },
   handler: async (value, context) => {
     const childResult: InferOutput<typeof output> = await context.functions.child({ id: value.id });
-    const queued = await context.jobs.job.enqueue({ id: value.id });
+    const queued = await context.jobs.job.trigger({ id: value.id });
     const published = await context.events.created.publish({ orderId: value.id });
     const object = await context.buckets.bucket.get("orders/1");
     const cached: { price: number } | undefined = await context.cache.cache.get({

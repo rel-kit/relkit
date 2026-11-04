@@ -10,8 +10,6 @@ export const SERVER_PROVIDER_SOURCE = `const providerStartup = runtimeOwner.reso
   if ((plan.channels ?? []).length > 0) setActiveRealtimeDispatcher(createProviderRealtimeDispatcher({ applicationId: graph.appId, environment, generationId, publicFingerprint, provider: (profile) => provider(value, "realtime", profile) }));
   // An embedded handle starts no event consumers or job workers.
   if (relkitMode.embedded !== true) await materializeEvents({ plan, providerRegistry: value, engine: { invoke: invokeHttp } });
-  materializedJobs = await materializeJobs({ plan, engine: { invoke: invokeHttp }, createQueue: (context) => queueProvider(value, context), spanRuntime });
-  if (plan.queues.length > 0 && relkitMode.embedded !== true) await startJobWorker(materializedJobs);
   nativeJobsRuntimes = await createNativeJobsRuntimes(value);
   if (relkitMode.embedded !== true) await startNativeJobWorker(nativeJobsRuntimes);
   await runtimeOwner.providerDelay();

@@ -7,7 +7,7 @@ import type {
   RetryOptions,
 } from "./retry.types.js";
 import { canonicalJson, deepFreeze } from "../../contracts/index.js";
-import type { RetryPolicy } from "../../jobs/legacy.js";
+import type { RetryPolicy } from "../../jobs/job.types.js";
 import { normalizeFailure, toPublicEnvelope } from "../../runtime-effect/index.js";
 import {
   JobQueueStateError,

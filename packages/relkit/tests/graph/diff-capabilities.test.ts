@@ -26,10 +26,16 @@ describe("graph capability compatibility", () => {
           kind: "job",
           id: "orders.job",
           source,
+          executionModel: "task",
+          name: "ordersJob",
+          jobId: "orders.job",
+          taskId: "orders.task",
+          taskVersion: "1",
+          implicit: false,
+          default: true,
           input: {},
-          targetFunctionId: "orders.create",
           profile: "default",
-          retry: { maxAttempts: 1 },
+          policy: { maxAttempts: 1 },
         },
         { kind: "bucket", id: "orders.bucket", source, profile: "default", visibility: "private" },
         { kind: "cache", id: "orders.cache", source, key: {}, value: {}, profile: "default" },
@@ -91,7 +97,7 @@ describe("graph capability compatibility", () => {
             ...node,
             config: { ...(node.config as Record<string, JsonValue>), path: "/orders/:id" },
           };
-        if (node.kind === "job") return { ...node, retry: { maxAttempts: 2 } };
+        if (node.kind === "job") return { ...node, policy: { maxAttempts: 2 } };
         if (node.kind === "bucket") return { ...node, profile: "archive" };
         if (node.kind === "cache") return { ...node, profile: "archive" };
         if (node.kind === "tool") return { ...node, approval: "always" as const };

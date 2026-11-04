@@ -226,10 +226,6 @@
       "types": "./dist/jobs/adapter.d.ts",
       "import": "./dist/jobs/adapter.js"
     },
-    "./jobs/legacy": {
-      "types": "./dist/app/jobs-legacy.d.ts",
-      "import": "./dist/app/jobs-legacy.js"
-    },
     "./jobs/server": {
       "types": "./dist/jobs/server.d.ts",
       "import": "./dist/jobs/server.js"

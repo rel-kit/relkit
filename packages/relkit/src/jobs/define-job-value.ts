@@ -11,12 +11,6 @@ import type {
 import { validateJobName } from "./job-name.js";
 import type { TaskDescriptorAny } from "./task-types.js";
 import { submitJob } from "./submission.js";
-/** Diagnostic code used when the one-release profile spelling is consumed as service.
- * @example JOB_PROFILE_DEPRECATED_CODE === "RELKIT_JOB_PROFILE_DEPRECATED";
- */
-export const JOB_PROFILE_DEPRECATED_CODE = "RELKIT_JOB_PROFILE_DEPRECATED" as const;
-/** Legacy retry shapes remain type-only available until the compatibility move. */
-export type { RetryJitter, RetryPolicy } from "./job.types.js";
 const forbiddenJobFields = [
   "handler",
   "target",
@@ -70,15 +64,13 @@ export function defineJobValue<
   for (const field of forbiddenJobFields) {
     if (hasOwn(options, field)) throw new TypeError(`Jobs cannot own task field ${field}`);
   }
-  if (hasOwn(options, "service") && hasOwn(options, "profile")) {
-    throw new TypeError('Job options cannot specify both "service" and deprecated "profile"');
+  if (hasOwn(options, "profile")) {
+    throw new TypeError('Job option "profile" is not supported; use "service"');
   }
   const name = validateJobName(options.name) as Name;
   assertTaskDescriptor(options.task);
   const id = normalizeId(options.id ?? name) as unknown as Id;
-  const profile = options.profile === undefined ? undefined : normalizeId(options.profile);
-  const serviceValue = options.service ?? profile;
-  const service = serviceValue === undefined ? undefined : normalizeId(serviceValue);
+  const service = options.service === undefined ? undefined : normalizeId(options.service);
   const canonicalInput = options.task.inputWire ?? options.task.input;
   const schedules = copySchedules(options.schedules, {
     callerSchema: options.task.input,
@@ -102,7 +94,6 @@ export function defineJobValue<
     execution: options.task.execution,
     ...(options.task.observation === undefined ? {} : { observation: options.task.observation }),
     ...(service === undefined ? {} : { service }),
-    ...(profile === undefined ? {} : { profile }),
     ...(options.default === undefined ? {} : { default: options.default }),
     ...(schedules === undefined ? {} : { schedules }),
     ...(admission === undefined ? {} : { admission }),

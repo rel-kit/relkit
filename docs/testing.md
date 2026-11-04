@@ -77,7 +77,7 @@ replacements fail before the test application becomes ready; `RELKIT_ENV=test`
 does not change provider selection.
 
 Use `createTestCacheFake` and `createTestBucketFake` for deterministic resource
-behavior, `createTestJob` and `createTestEvent` for async delivery contracts, and a
+behavior, `createTestJobsAdapter` for task-backed jobs, `createTestEvent` for event delivery, and a
 scripted native LangChain model for agents. Explicit protocol integration tests
 may instead opt into configured adapters. Tests that exercise restart and recovery
 should use a disposable state directory and assert durable duplicate behavior

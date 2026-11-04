@@ -45,10 +45,7 @@ function ownExports(directoryName: string, packageName?: string): ReleaseExports
   if (directoryName === "app")
     return Object.fromEntries([
       [".", rootExport],
-      ...appSubpaths.map((subpath) => {
-        if (subpath === "jobs/legacy") return [`./${subpath}`, leaf("jobs-legacy")];
-        return [`./${subpath}`, leaf(subpath)];
-      }),
+      ...appSubpaths.map((subpath) => [`./${subpath}`, leaf(subpath)]),
     ]);
   return { ".": rootExport, ...packageLeafExports[directoryName] };
 }

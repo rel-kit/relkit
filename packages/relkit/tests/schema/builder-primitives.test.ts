@@ -14,7 +14,8 @@ describe("primitive schema builders", () => {
     expect(getJsonSchema(z.boolean())).toEqual({ ok: true, schema: { type: "boolean" } });
     expect(z.null().parse(null)).toBeNull();
     expect(z.null().safeParse(undefined)).toMatchObject({ issues: [{ message: "Expected null" }] });
-    expect(z.undefined().parse(undefined)).toBeUndefined();
+    expect(z.void().parse(undefined)).toBeUndefined();
+    expect("undefined" in z).toBe(false);
     expect(z.void().safeParse(1)).toMatchObject({ issues: [{ message: "Expected undefined" }] });
     expect(z.literal("ready").parse("ready")).toBe("ready");
     expect(z.literal(0).safeParse(-0)).toMatchObject({ issues: [{ message: "Expected 0" }] });

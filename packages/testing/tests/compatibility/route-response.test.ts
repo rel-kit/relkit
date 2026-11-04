@@ -5,7 +5,7 @@ import { defineRoute } from "relkit/routes";
 import { z } from "relkit/schema";
 import { handleTestRequest } from "../../src/application-http.ts";
 import type { TestRoute } from "../../src/application-routes.ts";
-import { createTestJob } from "../../src/index.ts";
+import { invokeFunction } from "../../src/index.ts";
 import { createTestRuntime } from "../../src/runtime.ts";
 
 const createOrder = defineFunction({
@@ -53,19 +53,8 @@ test("the route sets 201, Location and a cookie from the function's output", asy
   }
 });
 
-test("the same function runs from a job and returns only its output", async () => {
-  const job = await createTestJob({
-    jobId: "orders.create-later",
-    // The job harness types plain targets; a function descriptor is one at run time.
-    target: createOrder as unknown as Parameters<typeof createTestJob>[0]["target"],
-    retry: { maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
+test("the same function called directly returns only its output", async () => {
+  await expect(invokeFunction(createOrder, { sku: "b2" })).resolves.toEqual({
+    orderId: "order-b2",
   });
-  try {
-    await job.enqueue({ sku: "b2" });
-    await expect(job.drain()).resolves.toMatchObject([
-      { state: "completed", value: { orderId: "order-b2" } },
-    ]);
-  } finally {
-    await job.close();
-  }
 });

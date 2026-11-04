@@ -128,7 +128,7 @@ function makeBinding(
   const job = typeof jobOrName === "string" ? undefined : jobOrName;
   const name = typeof jobOrName === "string" ? jobOrName : jobOrName.name;
   const jobId = jobIdOverride ?? (typeof jobOrName === "string" ? jobOrName : jobOrName.id);
-  const requested = job?.service ?? job?.profile ?? options.defaultProfile;
+  const requested = job?.service ?? options.defaultProfile;
   const profile = selectProfile(requested, options.profiles, jobId);
   return {
     taskId,

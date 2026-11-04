@@ -1,5 +1,5 @@
 import type { JsonValue, MaybePromise } from "../../contracts/index.js";
-import type { RetryPolicy } from "../../jobs/legacy.js";
+import type { RetryPolicy } from "../../jobs/job.types.js";
 import type { JobFailureMetadata, JobQueueState } from "../jobs/queue-utils.js";
 import type { EVENT_ADMIN_PROTOCOL, EVENT_ADMIN_VERSION } from "./admin-contracts.js";
 

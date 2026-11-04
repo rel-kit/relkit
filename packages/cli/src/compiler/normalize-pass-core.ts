@@ -4,7 +4,7 @@ import { observeCompiler } from "./observability.js";
 import { extractDescriptorsEffect } from "./discovery/extract.js";
 import { DiscoverySourceReader, nodeSourceReader } from "./discovery/source-map-source.js";
 import { id, isRecord, locationFor, profile, text } from "./normalize-utils.js";
-import { add, normalizeRetry, normalizeSchedule, toDescriptor } from "./normalize-pass-utils.js";
+import { add, normalizeRetry, toDescriptor } from "./normalize-pass-utils.js";
 import { bindRouteFileEffect } from "./normalize-route-file.js";
 import { inferRouteContractEffect } from "./normalize-route-inference.js";
 import { normalizeEventFunctionsEffect } from "./normalize-event-function.js";
@@ -143,7 +143,6 @@ export const passNormalizeEffect = Effect.fn("Compiler.passNormalize")(
             } else value.model = model;
           }
           if (isRecord(value.retry)) value.retry = normalizeRetry(value.retry);
-          if (Array.isArray(value.schedule)) value.schedule = value.schedule.map(normalizeSchedule);
           if (isRecord(value.idempotency))
             value.idempotency = {
               ...value.idempotency,

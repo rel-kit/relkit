@@ -63,7 +63,6 @@ it("keeps Effect forms out of the root and in relkit/effect", () => {
     "defineJobEffect",
     "defineMiddlewareEffect",
     "definePromptEffect",
-    "defineRequestTransformEffect",
     "defineRouteEffect",
     "defineServiceEffect",
     "defineServiceRoutesEffect",

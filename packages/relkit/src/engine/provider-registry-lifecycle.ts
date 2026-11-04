@@ -1,4 +1,4 @@
-import { assertJobsAdapterRuntime, isJobsAdapterRuntime } from "../jobs/adapter.js";
+import { assertJobsAdapterRuntime } from "../jobs/adapter.js";
 import {
   ProviderBindingResolutionError,
   type RuntimeProviderRegistration,
@@ -19,24 +19,16 @@ import { optional } from "./provider-registry-validation.js";
  * @param requirement - Verified logical-resource provider requirement.
  */
 export function validateRuntimeValue(value: unknown, requirement: ProviderRequirement): void {
-  if (requirement.executionModel === "task") {
-    try {
-      assertJobsAdapterRuntime(value);
-    } catch (error) {
-      throw issue(
-        "RELKIT_PROVIDER_RUNTIME_INVALID",
-        requirement,
-        error instanceof Error ? error.message : "Task jobs provider is not a native jobs adapter.",
-      );
-    }
-    return;
-  }
-  if (requirement.executionModel === "legacy-function" && isJobsAdapterRuntime(value))
+  if (requirement.executionModel !== "task") return;
+  try {
+    assertJobsAdapterRuntime(value);
+  } catch (error) {
     throw issue(
       "RELKIT_PROVIDER_RUNTIME_INVALID",
       requirement,
-      `Legacy job binding "${requirement.bindingId}" cannot use a task jobs adapter.`,
+      error instanceof Error ? error.message : "Task jobs provider is not a native jobs adapter.",
     );
+  }
 }
 
 /** Resolve a requirement's explicit connection configuration.

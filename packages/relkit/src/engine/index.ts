@@ -6,7 +6,6 @@ export * from "./infrastructure-binding-values.js";
 export * from "./invoke.js";
 export * from "./lifecycle.js";
 export * from "./materialize-events.js";
-export * from "./materialize-jobs.js";
 export * from "./observability.js";
 export * from "./provider-binding-resolution.js";
 export * from "./provider-registry.js";

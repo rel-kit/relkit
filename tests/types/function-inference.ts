@@ -8,7 +8,7 @@ import { defineError, defineFunction, defineFunctionEffect } from "relkit/functi
 import { defineBucket } from "relkit/buckets";
 import { defineCache } from "relkit/cache";
 import { defineEvent } from "relkit/events";
-import { defineJob } from "relkit/jobs/legacy";
+import { defineJob, defineTask } from "relkit/jobs";
 import { z, type InferInput, type InferOutput } from "relkit/schema";
 import { defineTool } from "relkit/tools";
 
@@ -85,11 +85,17 @@ defineFunctionEffect({
 });
 
 const jobInput = z.object({ rawId: z.string() });
+const sendReceiptTask = defineTask({
+  id: "types.inference-task",
+  version: "1",
+  input: jobInput,
+  output: z.object({ sent: z.boolean() }),
+  handler: async () => ({ sent: true }),
+});
 const sendReceipt = defineJob({
   id: "types.inference-job",
-  input: jobInput,
-  target: lookup,
-  retry: { maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
+  name: "sendReceipt",
+  task: sendReceiptTask,
 });
 export const orderCreated = defineEvent({
   id: "types.inference-event",
@@ -124,6 +130,8 @@ const createOrder = defineFunction({
     const produced = await context.cache.prices.getOrSet({ sku: input.sku }, () => 100);
     await context.cache.prices.set({ sku: input.sku }, produced);
     await context.events.orderCreated.publish({ orderId: input.orderId });
+    await context.jobs.sendReceipt.trigger({ rawId: input.orderId });
+    // @ts-expect-error job clients trigger task runs; there is no enqueue
     await context.jobs.sendReceipt.enqueue({ rawId: input.orderId });
     await context.buckets.receiptBucket.put("orders/1.json", new Uint8Array());
     const names: readonly string[] = await context.buckets.receiptBucket.list();

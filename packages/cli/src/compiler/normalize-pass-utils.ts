@@ -85,7 +85,6 @@ export {
   validateRetryEffect,
   validateRetry,
   normalizeRetry,
-  normalizeSchedule,
 } from "./normalize-policy-validation.js";
 
 /**

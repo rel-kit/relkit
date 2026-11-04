@@ -87,7 +87,7 @@ export const validateJobNamesEffect = Effect.fn("Jobs.validateJobNames")(
               work,
               descriptor,
               NORMALIZE_CODES.jobTask,
-              "New jobs cannot target functions; bind a task instead.",
+              "Jobs cannot target functions; bind a task instead.",
             );
           }
           if (value.default === true && taskId !== undefined) {

@@ -36,12 +36,7 @@ export {
   isSchemaTransformed,
   isSchemaTransformedEffect,
 } from "./schema-metadata.js";
-export {
-  getJsonSchema,
-  isJsonSchemaAvailable,
-  toJsonSchema,
-  JSON_SCHEMA_UNAVAILABLE,
-} from "./json-schema.js";
+export { getJsonSchema, isJsonSchemaAvailable, JSON_SCHEMA_UNAVAILABLE } from "./json-schema.js";
 export type {
   JsonSchema,
   JsonSchemaAvailable,

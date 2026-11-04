@@ -56,7 +56,6 @@ const prepareSources = Effect.fn("RestartLayout.prepare")(function* (root: strin
     symlink(join(repository, "node_modules"), join(root, "node_modules"), "dir"),
   );
   for (const file of [
-    "jobs-worker.ts",
     "agent-graph-worker.ts",
     "agent-graph-fixture.ts",
     "agent-graph-runtime.fixture.ts",
@@ -82,7 +81,7 @@ const moveSources = Effect.fn("RestartLayout.move")((root: string) =>
  * Runs the original native probe at its actual flat or grouped physical path.
  * @param root - Exclusive source and persistent-state root.
  * @param grouped - Whether the whole boundary has moved.
- * @param kind - Native job, Node/SQLite agent or PostgreSQL schedule probe.
+ * @param kind - Node/SQLite agent or PostgreSQL schedule probe.
  * @param args - Original worker's exact native arguments after its state root.
  * @param environment - Explicit invocation-only provider configuration.
  * @returns Exit and fully joined bounded output; SIGKILL is retained as a nonzero outcome.
@@ -91,14 +90,12 @@ const runWorker = Effect.fn("RestartLayout.worker")(
   function* (
     root: string,
     grouped: boolean,
-    kind: "job" | "agent" | "effect-mq",
+    kind: "agent" | "effect-mq",
     args: readonly string[],
     environment?: Readonly<Record<string, string>>,
   ) {
     const agent = kind === "agent";
-    let workerName = "jobs-worker.ts";
-    if (agent) workerName = "agent-graph-worker.ts";
-    else if (kind === "effect-mq") workerName = "layout-move-effect-mq-worker.ts";
+    const workerName = agent ? "agent-graph-worker.ts" : "layout-move-effect-mq-worker.ts";
     const worker = join(root, grouped ? "src/services/jobs" : "src/jobs", workerName);
     const mode = args[0];
     if (!mode)

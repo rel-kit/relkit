@@ -10,7 +10,7 @@ import { defineBucket, isBucketDescriptor } from "relkit/buckets";
 import { defineCache, isCacheDescriptor } from "relkit/cache";
 import { defineAgent, isAgentDescriptor } from "relkit/agents";
 import { defineEvent, isEventDescriptor } from "relkit/events";
-import { defineJob } from "../../packages/relkit/src/jobs/legacy.ts";
+import { defineJob, defineTask } from "relkit/jobs";
 import {
   defineMiddleware,
   defineRoute,
@@ -111,12 +111,14 @@ describe.serial("Phase 2 descriptor cohort", () => {
       defaultTtlMs: 1_000,
       maxTtlMs: 10_000,
     });
-    const job = defineJob({
-      id: "orders.reconcile",
+    const reconcile = defineTask({
+      id: "orders.reconcile-task",
+      version: "1",
       input,
-      target: lookup,
-      retry: { maxAttempts: 3, initialDelayMs: 10, maxDelayMs: 100, multiplier: 2, jitter: "none" },
+      output,
+      handler: async () => ({ ok: true }),
     });
+    const job = defineJob({ id: "orders.reconcile", name: "reconcileOrders", task: reconcile });
     const agentTool = defineTool({
       id: "orders.lookup-tool",
       target: lookup,
@@ -261,56 +263,6 @@ describe.serial("Phase 2 descriptor cohort", () => {
     expect(JSON.stringify(app.cache)).toContain("CACHE_URL");
     expect(Object.isFrozen(app)).toBe(true);
     expect(Object.isFrozen(app.cache.profiles.default)).toBe(true);
-  });
-
-  test("validates job policies and omits executable handlers", () => {
-    const job = defineJob({
-      id: "orders.scheduled-reconcile",
-      input,
-      target: lookup,
-      profile: "default",
-      retry: {
-        maxAttempts: 4,
-        initialDelayMs: 100,
-        maxDelayMs: 1_000,
-        multiplier: 2,
-        jitter: "full",
-      },
-      timeoutMs: 5_000,
-      concurrency: 2,
-      schedule: [
-        {
-          id: "hourly",
-          cron: "0 * * * *",
-          timezone: "UTC",
-          input: { id: "scheduled" },
-          overlap: "skip",
-        },
-      ],
-      idempotency: { key: "id", retentionMs: 60_000 },
-    });
-
-    expect(job.profile).toBe("default");
-    expect(job.schedule?.[0]?.input).toEqual({ id: "scheduled" });
-    expect(job.idempotency).toEqual({ key: "id", retentionMs: 60_000 });
-    expect(Object.prototype.hasOwnProperty.call(job, "handler")).toBe(false);
-    expect(Object.isFrozen(job.retry)).toBe(true);
-    expect(Object.isFrozen(job.schedule)).toBe(true);
-
-    const invalid = (retry: Record<string, unknown>) =>
-      defineJob({ id: "invalid.job", input, target: lookup, retry } as never);
-    expect(() =>
-      invalid({ maxAttempts: 0, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" }),
-    ).toThrow();
-    expect(() =>
-      invalid({ maxAttempts: 1, initialDelayMs: 2, maxDelayMs: 1, multiplier: 1, jitter: "none" }),
-    ).toThrow();
-    expect(() =>
-      invalid({ maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 1, multiplier: 0, jitter: "none" }),
-    ).toThrow();
-    expect(() =>
-      invalid({ maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 1, multiplier: 1, jitter: "bad" }),
-    ).toThrow();
   });
 
   test("keeps bucket/cache contracts logical and tools/agents handler-free", () => {

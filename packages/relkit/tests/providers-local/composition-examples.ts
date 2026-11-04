@@ -19,26 +19,10 @@ import {
 } from "../../src/providers-local/jobs/native.service.js";
 import { LocalEventService, localEventLayer } from "../../src/providers-local/events/provider.js";
 import { CacheTest, RealtimeTest } from "./effect/fixtures.js";
-import { LocalSchedulerService, schedulerLayer } from "../../src/providers-local/jobs/scheduler.js";
 import {
-  LocalLegacyJobService,
-  legacyJobLayer,
   LocalObservabilityService,
   localObservabilityLayer,
 } from "../../src/providers-local/runtime-capabilities.service.js";
-
-/** Checked scheduler setup owns registrations but starts no automatic worker. */
-export const scheduledWork = Effect.gen(function* () {
-  const scheduler = yield* LocalSchedulerService;
-  return yield* scheduler.runDue();
-}).pipe(Effect.provide(schedulerLayer()));
-
-/** Checked legacy profile setup closes acquired journals with its Layer scope. */
-export const legacyQueue = (root: string) =>
-  Effect.gen(function* () {
-    const jobs = yield* LocalLegacyJobService;
-    return yield* jobs.createQueue({ jobId: "example" });
-  }).pipe(Effect.provide(legacyJobLayer(root, "demo")));
 
 /** The sink is intentionally uninstrumented to avoid recursive collection. */
 export const collectedRecords = Effect.gen(function* () {

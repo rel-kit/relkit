@@ -13,7 +13,6 @@ export function job(value: unknown, path: string): void {
       "capabilities",
       "tags",
       "metadata",
-      "targetFunctionId",
       "executionModel",
       "jobId",
       "name",
@@ -21,10 +20,6 @@ export function job(value: unknown, path: string): void {
       "taskVersion",
       "buildId",
       "serviceGeneration",
-      "retry",
-      "timeoutMs",
-      "concurrency",
-      "idempotency",
       "policy",
       "schedules",
       "worker",
@@ -34,15 +29,10 @@ export function job(value: unknown, path: string): void {
   for (const key of ["id", "logicalName", "bindingId", "profile", "configurationNames"])
     if (key === "configurationNames") strings(item[key], `${path}.${key}`);
     else text(item[key], `${path}.${key}`);
-  if (item.executionModel === "task") {
-    for (const key of ["jobId", "name", "taskId", "taskVersion", "buildId", "serviceGeneration"])
-      text(item[key], `${path}.${key}`);
-    if (Object.hasOwn(item, "targetFunctionId"))
-      invalid(path, "mixes task and legacy target fields");
-    worker(item.worker, `${path}.worker`);
-  } else if (item.executionModel !== undefined && item.executionModel !== "legacy-function") {
-    invalid(`${path}.executionModel`, "is unsupported");
-  }
+  if (item.executionModel !== "task") invalid(`${path}.executionModel`, 'must be "task"');
+  for (const key of ["jobId", "name", "taskId", "taskVersion", "buildId", "serviceGeneration"])
+    text(item[key], `${path}.${key}`);
+  worker(item.worker, `${path}.worker`);
 }
 
 function worker(value: unknown, path: string): void {

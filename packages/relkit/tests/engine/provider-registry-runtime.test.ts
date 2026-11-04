@@ -68,7 +68,9 @@ test("keeps cache, bucket, job, event, and model profiles independent", async ()
                   return { id: selector ?? context.profile, model: {} };
                 },
               }
-            : { profile: context.profile },
+            : context.capability === "job"
+              ? jobsAdapter()
+              : { profile: context.profile },
       };
     }),
   );
@@ -369,44 +371,20 @@ test("requires the native jobs marker for task-backed jobs", async () => {
   ).rejects.toMatchObject({ code: "RELKIT_PROVIDER_RUNTIME_INVALID" });
 });
 
-test("rejects a task adapter for legacy jobs", async () => {
-  const binding = provider("job", "legacy-runtime");
-  const legacyJob = {
-    kind: "job" as const,
-    id: "job.legacy-runtime",
-    source,
-    input: null,
-    targetFunctionId: "jobs.target",
-    profile: "legacy-runtime",
+/** A minimal native jobs adapter accepted for task-backed job bindings. */
+function jobsAdapter() {
+  return {
+    kind: "jobs-adapter-runtime",
+    protocolVersion: 1,
+    capabilities: { service: "native", features: {} },
+    submit: async () => ({}),
+    get: async () => ({}),
+    list: async () => ({}),
+    observe: () => (async function* () {})(),
+    cancel: async () => ({}),
+    close: async () => undefined,
   };
-  const applicationGraph: ApplicationGraph = {
-    contractVersion: GRAPH_VERSION,
-    appId: "registry-legacy-test",
-    nodes: [binding, legacyJob],
-    edges: [{ kind: "uses-provider-profile", from: legacyJob.id, to: binding.id }],
-  };
-  await expect(
-    createProviderRegistry({
-      generationId: "generation.legacy-invalid",
-      graph: applicationGraph,
-      runtimeIntegrationModules: modules([
-        registration("job", "redis", () => ({
-          value: {
-            kind: "jobs-adapter-runtime",
-            protocolVersion: 1,
-            capabilities: { service: "native", features: {} },
-            submit: async () => ({}),
-            get: async () => ({}),
-            list: async () => ({}),
-            observe: () => (async function* () {})(),
-            cancel: async () => ({}),
-            close: async () => undefined,
-          },
-        })),
-      ]),
-    }),
-  ).rejects.toMatchObject({ code: "RELKIT_PROVIDER_RUNTIME_INVALID" });
-});
+}
 
 function graph(
   providers: readonly ProviderBindingNode[],
@@ -433,7 +411,18 @@ function logicalNode(binding: ProviderBindingNode, index: number): GraphNode {
     case "cache":
       return { ...base, kind: "cache", key: null, value: null };
     case "job":
-      return { ...base, kind: "job", input: null, targetFunctionId: "jobs.target" };
+      return {
+        ...base,
+        kind: "job",
+        executionModel: "task",
+        name: `job${index}`,
+        jobId: base.id,
+        taskId: "jobs.task",
+        taskVersion: "1",
+        implicit: true,
+        default: true,
+        input: null,
+      };
     case "event":
       return { ...base, kind: "event", version: 1, input: null };
     case "model":

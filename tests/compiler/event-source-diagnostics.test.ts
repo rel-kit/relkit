@@ -10,7 +10,7 @@ test("reports source-located event function option, result, capability, and targ
     import { defineEventFunction as reaction } from "relkit/events";
     import { defineError } from "relkit/functions";
     import { Effect } from "../../packages/relkit/node_modules/effect/dist/index.js";
-    import { defineJob } from "../../packages/relkit/src/jobs/legacy.js";
+    import { defineTool } from "relkit/tools";
     import { z } from "relkit/schema";
     const consumer = reaction({ id: "consumer", event: "created" as never, handler: () => {} });
     consumer.invoke({});
@@ -22,7 +22,7 @@ test("reports source-located event function option, result, capability, and targ
     reaction({ id: "effect_error", event: "created" as never, errors: [failed], handler: () => Effect.fail(failed.create(null)) });
     reaction({ id: "declared_error", event: "created" as never, errors: [failed], handler: () => failed.create(null) });
     reaction({ id: "bad_effect", event: "created" as never, handler: () => Effect.succeed(1) });
-    defineJob({ id: "invalid_job", input: z.unknown(), target: consumer } as any);
+    defineTool({ id: "invalid_tool", target: consumer } as any);
   `;
   const options: ts.CompilerOptions = {
     target: ts.ScriptTarget.ESNext,
@@ -56,5 +56,5 @@ test("reports source-located event function option, result, capability, and targ
     expect(diagnostic.suggestion).toBeTruthy();
   }
   expect(diagnostics[0]?.message).toContain("consumer");
-  expect(diagnostics.at(-1)?.message).toContain("invalid_job");
+  expect(diagnostics.at(-1)?.message).toContain("invalid_tool");
 });

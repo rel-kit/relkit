@@ -35,7 +35,6 @@ const FACTORIES: Readonly<Record<string, FactoryDefinition>> = Object.freeze({
   defineMiddleware: { kind: "middleware", idOptional: true },
   defineService: { kind: "service", idOptional: true },
   defineTransform: { kind: "transform", idOptional: true },
-  defineRequestTransform: { kind: "transform", idOptional: true },
 });
 
 /**

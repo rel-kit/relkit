@@ -1,5 +1,5 @@
 import { canonicalJson, type JsonValue } from "../../contracts/index.js";
-import type { RetryPolicy } from "../../jobs/legacy.js";
+import type { RetryPolicy } from "../../jobs/job.types.js";
 import { readEntry } from "../jobs/queue-entry.js";
 import { normalizeEnvelope } from "./router-records.js";
 

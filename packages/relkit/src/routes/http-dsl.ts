@@ -75,21 +75,6 @@ export function defineTransform<const Id extends string, const Schema extends St
   return runRouteSync(defineTransformEffect(options));
 }
 
-/** Alias for request transform definitions.
- * @param options - Transform schema and metadata.
- * @returns Frozen transform descriptor.
- * @throws TypeError for invalid transform input.
- * @example defineRequestTransform({ schema });
- */
-export const defineRequestTransform = defineTransform;
-
-/** Effect alias for request transform definitions.
- * @param options - Transform schema and metadata.
- * @returns Descriptor or tagged invalid-input failure.
- * @example Effect.runSync(defineRequestTransformEffect({ schema }));
- */
-export const defineRequestTransformEffect = defineTransformEffect;
-
 function defineTransformValue<const Id extends string, const Schema extends StandardSchemaV1>(
   options: DefineTransformOptions<Id, Schema>,
   identity: string,

@@ -18,11 +18,14 @@ const task = defineTask({
 });
 
 test("task and job descriptors preserve the new authoring boundaries", () => {
-  const job = defineJob({ name: "sendEmail", task, profile: "local" });
+  const job = defineJob({ name: "sendEmail", task, service: "local" });
   expect(task.execution).toBe("retryable");
   expect(Object.isFrozen(task)).toBe(true);
   expect(job).toMatchObject({ name: "sendEmail", id: "sendEmail", service: "local" });
-  expect(job.profile).toBe("local");
+  expect(job).not.toHaveProperty("profile");
+  expect(() => defineJob({ name: "byProfile", task, profile: "local" } as never)).toThrow(
+    'Job option "profile" is not supported; use "service"',
+  );
   expect(() => defineJob({ name: "bad-name", task })).toThrow();
   expect(() => defineJob({ name: "functionTarget", task: (() => undefined) as never })).toThrow();
 });

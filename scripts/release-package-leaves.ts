@@ -43,7 +43,7 @@ export const packageLeafExports: Readonly<Record<string, ReleaseExports>> = {
   "runtime-effect": { "./logger": esm("logger") },
   "inspector-api": { "./connection": esm("connection") },
   events: { "./effect": esm("effect") },
-  jobs: { "./adapter": esm("adapter"), "./server": esm("server"), "./legacy": esm("legacy") },
+  jobs: { "./adapter": esm("adapter"), "./server": esm("server") },
   cli: {
     "./scaffolding": esm("scaffolding/index"),
     "./help": esm("cli-help-model"),

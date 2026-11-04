@@ -1,10 +1,12 @@
-/** Checks that the forms replaced by `dependencies` no longer type-check: descriptor `.invoke()`,
+/** Checks that removed forms no longer type-check: descriptor `.invoke()`, the schema aliases,
  * channel `.trigger()` and `.getPresence()`, and the `publishes` option.
  */
 import { defineEvent } from "relkit/events";
 import { defineFunction } from "relkit/functions";
 import { defineTask } from "relkit/jobs";
 import { defineChannel } from "relkit/realtime";
+import * as routes from "relkit/routes";
+import * as schema from "relkit/schema";
 import { z } from "relkit/schema";
 
 const priceOrder = defineFunction({
@@ -26,6 +28,12 @@ const orderUpdates = defineChannel({
   presence: "count",
 });
 
+// @ts-expect-error the schema builder keeps void() for "no result"
+void z.undefined();
+// @ts-expect-error getJsonSchema is the one JSON Schema projection
+void schema.toJsonSchema;
+// @ts-expect-error defineTransform is the one transform constructor
+void routes.defineRequestTransform;
 // @ts-expect-error functions are called through ctx.functions or the runtime handle
 void priceOrder.invoke({ quantity: 1 });
 // @ts-expect-error channels are triggered through ctx.channels

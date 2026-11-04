@@ -36,9 +36,9 @@ test("places the frontend beside the exact API without consuming the following e
   expect(result.match(/#### Backend and frontend example/g)).toHaveLength(1);
 });
 
-test("does not attach task-first clients to a same-named legacy job factory", () => {
-  const source = "## `legacy-define-job.ts`\n\n### defineJob\n\nLegacy contract.";
-  expect(withFrontendExample(source, "packages/relkit/src/jobs/legacy-define-job.ts")).toBe(source);
+test("attaches the job client example only to the defineJob source file", () => {
+  const source = "## `define-job-value.ts`\n\n### defineJob\n\nInternal contract.";
+  expect(withFrontendExample(source, "packages/relkit/src/jobs/define-job-value.ts")).toBe(source);
   expect(withFrontendExample(source, "packages/relkit/src/jobs/define-job.ts")).toContain(
     "/_frontend/job.mdx",
   );

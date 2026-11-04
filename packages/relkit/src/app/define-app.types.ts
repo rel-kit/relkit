@@ -1,7 +1,7 @@
 import type { EnvDefinition, EnvShape } from "../config/index.js";
 import type { DescriptorBase, DescriptorMetadata, JsonValue } from "../contracts/index.js";
 import type { TelemetryConfiguration, TelemetryExporterMap } from "../observability/telemetry.js";
-import type { AppCompatibilityConfig, InspectorConfig, ServerConfig } from "./app-config.types.js";
+import type { InspectorConfig, ServerConfig } from "./app-config.types.js";
 import type {
   AppProviderDefaults,
   AppProviderInputs,
@@ -9,12 +9,7 @@ import type {
   NormalizedProviders,
 } from "./app-provider.types.js";
 
-export type {
-  ApiDocsConfig,
-  ServerConfig,
-  InspectorConfig,
-  AppCompatibilityConfig,
-} from "./app-config.types.js";
+export type { ApiDocsConfig, ServerConfig, InspectorConfig } from "./app-config.types.js";
 export type {
   AppProviderCapability,
   AppProviderInputs,
@@ -53,7 +48,6 @@ export type DefineAppOptions<
     readonly id?: string;
     readonly env: EnvDefinition<Shape>;
     readonly defaults?: AppProviderDefaults<Providers>;
-    readonly compatibility?: AppCompatibilityConfig;
     readonly telemetry?: AppTelemetryConfig<Exporters>;
     readonly server?: ServerConfig;
     readonly inspector?: InspectorConfig;
@@ -72,7 +66,6 @@ export type ApplicationDescriptor<
   NormalizedProviders<Providers> & {
     readonly env: EnvDefinition<Shape>;
     readonly defaults: NormalizedAppProviderDefaults<Providers>;
-    readonly compatibility: { readonly legacyJobs: boolean };
     readonly telemetry?: AppTelemetryConfig<Exporters>;
     readonly server?: ServerConfig;
     readonly inspector?: InspectorConfig;

@@ -310,23 +310,11 @@ export const jobsCodes = [
     fix: "Check the job's state first, then choose an action that applies to it.",
   },
   {
-    code: "RELKIT_JOB_DEPENDENCY_UNDECLARED",
-    title: "Job is not declared on this function",
-    happened: "A function enqueued a job that is not listed in its dependencies.",
-    fix: "Add the job to the function's `dependencies` so RelKit knows the function may enqueue it.",
-  },
-  {
     code: "RELKIT_JOB_FAILURE",
     title: "Job failed with an undeclared error",
     happened:
       "The job failed with an error that is not in its declared `errors`, so RelKit shows a generic failure instead of the details.",
     fix: "Check the job's logs for the real error. To show it to callers, add that error to the job's `errors` and throw it from the handler.",
-  },
-  {
-    code: "RELKIT_JOB_INPUT_VALIDATION",
-    title: "Job input does not match its schema",
-    happened: "The input passed when enqueuing the job failed the job's input schema.",
-    fix: "Check the listed issues and change the input to match the job's input schema.",
   },
   {
     code: "RELKIT_JOB_LOCATOR_INVALID",
@@ -341,18 +329,6 @@ export const jobsCodes = [
     happened:
       "RelKit asked the job provider for the run's status, but the provider did not answer in time.",
     fix: "Check that the job provider is running and reachable, then try again. Raise the timeout if the provider is slow.",
-  },
-  {
-    code: "RELKIT_JOB_PROFILE_UNKNOWN",
-    title: "Job profile is not configured",
-    happened: "The job client asked for a provider profile that is not in its configuration.",
-    fix: "Add the profile to the jobs provider configuration, or use the name of a profile that already exists.",
-  },
-  {
-    code: "RELKIT_JOB_PROVIDER_UNAVAILABLE",
-    title: "Job provider cannot enqueue jobs",
-    happened: "The selected job provider does not implement enqueue.",
-    fix: "Configure a jobs provider that supports enqueue, or update the provider package to a version that does.",
   },
   {
     code: "RELKIT_JOB_QUEUE_STATE_INVALID",

@@ -60,26 +60,6 @@ export interface ApiDocsConfig {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L10)
 
-### AppCompatibilityConfig (interface)
-
-Transitional compatibility switches for application authoring.
-
-**Example**
-
-```ts
-const compatibility: AppCompatibilityConfig = { legacyJobs: true };
-```
-
-**Signature**
-
-```ts
-export interface AppCompatibilityConfig {
-  readonly legacyJobs?: boolean;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L44)
-
 ### InspectorConfig (interface)
 
 Development bridge selection; installing or running the UI is independent.
@@ -212,9 +192,7 @@ type AppOperation =
   | "define"
   | "env.isDefinition"
   | "id.derive"
-  | "compatibility.normalize"
   | "runtimeMetadata.normalize"
-  | "alias.assertExclusive"
   | "constants.define"
   | "prompt.define"
   | "context.create"
@@ -250,7 +228,7 @@ export interface AppTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-observability.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-observability.types.ts#L24)
 
 ## `app-provider-capabilities.ts`
 
@@ -296,7 +274,7 @@ declare const copyEffect: <Value>(
 ) => Effect.Effect<Value, AppValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider-normalization.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider-normalization.ts#L77)
 
 ### normalizeDefaultsEffect
 
@@ -402,12 +380,12 @@ type AppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
   [Capability in Exclude<AppProviderCapability, "job">]?: ProfileFor<Providers, Capability>;
 }> & {
   readonly jobs?: ProfileFor<Providers, "job">;
-  /** @deprecated Use `jobs`. */
-  readonly job?: ProfileFor<Providers, "job">;
+  /** Removed: the jobs default is spelled `jobs`. */
+  readonly job?: never;
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L54)
 
 ### AppProviderInputs (interface)
 
@@ -425,10 +403,7 @@ const providers: AppProviderInputs = { cache: redisAdapter };
 export interface AppProviderInputs {
   readonly bucket?: CapabilityInput<"bucket">;
   readonly cache?: CapabilityInput<"cache">;
-  /** Public plural spelling for the jobs provider capability. */
   readonly jobs?: CapabilityInput<"job">;
-  /** @deprecated Use `jobs`. */
-  readonly job?: CapabilityInput<"job">;
   readonly event?: CapabilityInput<"event">;
   readonly model?: CapabilityInput<"model">;
   readonly realtime?: CapabilityInput<"realtime">;
@@ -456,7 +431,7 @@ type NormalizedAppProviderDefaults<Providers extends AppProviderInputs> = Readon
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L65)
 
 ### NormalizedProviders (type alias)
 
@@ -480,7 +455,7 @@ type NormalizedProviders<Providers extends AppProviderInputs> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L72)
 
 ## `app-runtime-metadata.ts`
 
@@ -538,57 +513,7 @@ if (error._tag === "AppValidationFailure") console.error(error.message);
 declare class AppValidationFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L10)
-
-### assertExclusiveAlias
-
-Synchronous alias exclusivity adapter.
-
-**Throws**
-
-TypeError when both aliases are present.
-
-**Example**
-
-```ts
-assertExclusiveAlias(options, "jobs", "job", "defineApp");
-```
-
-**Signature**
-
-```ts
-declare const assertExclusiveAlias: (
-  value: Record<string, unknown>,
-  primary: string,
-  legacy: string,
-  label: string,
-) => void;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L146)
-
-### assertExclusiveAliasEffect
-
-Rejects simultaneous current and legacy aliases in Effect.
-
-**Example**
-
-```ts
-Effect.runSync(assertExclusiveAliasEffect(options, "jobs", "job", "defineApp"));
-```
-
-**Signature**
-
-```ts
-declare const assertExclusiveAliasEffect: (
-  value: Record<string, unknown>,
-  primary: string,
-  legacy: string,
-  label: string,
-) => Effect.Effect<void, AppValidationFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L9)
 
 ### deriveApplicationId
 
@@ -610,7 +535,7 @@ deriveApplicationId("@acme/orders");
 declare const deriveApplicationId: (packageName: string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L74)
 
 ### deriveApplicationIdEffect
 
@@ -630,7 +555,7 @@ declare const deriveApplicationIdEffect: (
 ) => Effect.Effect<StableId, AppValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L54)
 
 ### isEnvDefinition
 
@@ -648,7 +573,7 @@ if (isEnvDefinition(value)) console.log(value.shape);
 declare const isEnvDefinition: (value: unknown) => value is EnvDefinition<EnvShape>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L45)
 
 ### isEnvDefinitionEffect
 
@@ -666,51 +591,7 @@ Effect.runSync(isEnvDefinitionEffect(value));
 declare const isEnvDefinitionEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L20)
-
-### normalizeCompatibility
-
-Synchronous compatibility normalizer.
-
-**Throws**
-
-TypeError for an invalid compatibility flag.
-
-**Example**
-
-```ts
-normalizeCompatibility({ legacyJobs: true });
-```
-
-**Signature**
-
-```ts
-declare const normalizeCompatibility: (value: AppCompatibilityConfig | undefined) => {
-  readonly legacyJobs: boolean;
-};
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L109)
-
-### normalizeCompatibilityEffect
-
-Normalizes the legacy jobs compatibility flag in Effect.
-
-**Example**
-
-```ts
-Effect.runSync(normalizeCompatibilityEffect({ legacyJobs: true }));
-```
-
-**Signature**
-
-```ts
-declare const normalizeCompatibilityEffect: (
-  value: AppCompatibilityConfig | undefined,
-) => Effect.Effect<Readonly<{ legacyJobs: boolean }>, AppValidationFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L19)
 
 ## `buckets.ts`
 
@@ -1452,7 +1333,7 @@ declare const defineApp: <
 ) => ApplicationDescriptor<Shape, Providers, Exporters>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L130)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L110)
 
 Since v0.2.0
 
@@ -1466,7 +1347,7 @@ Re-exports all named exports from the "./define-app.types.js" module.
 export * from "./define-app.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L25)
 
 ### APP_PROVIDER_CAPABILITIES
 
@@ -1484,7 +1365,7 @@ declare const APP_PROVIDER_CAPABILITIES: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L26)
 
 ### defineAppEffect
 
@@ -1510,7 +1391,7 @@ declare const defineAppEffect: <
 ) => Effect.Effect<ApplicationDescriptor<Shape, Providers, Exporters>, AppValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L49)
 
 ## `define-app.types.ts`
 
@@ -1522,7 +1403,7 @@ declare const defineAppEffect: <
 declare const ApiDocsConfig: ApiDocsConfig;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L12)
 
 ### AppCheckConfig (interface)
 
@@ -1543,17 +1424,7 @@ export interface AppCheckConfig {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L39)
-
-### AppCompatibilityConfig
-
-**Signature**
-
-```ts
-declare const AppCompatibilityConfig: AppCompatibilityConfig;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L34)
 
 ### AppDeploymentConfig (type alias)
 
@@ -1571,7 +1442,7 @@ const deployment: AppDeploymentConfig = { engine: "pulumi" };
 type AppDeploymentConfig = Readonly<Record<string, JsonValue>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L29)
 
 ### AppProviderCapability
 
@@ -1582,7 +1453,7 @@ declare const AppProviderCapability:
   "bucket" | "cache" | "job" | "event" | "model" | "realtime" | "agent-state";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L14)
 
 ### AppProviderDefaults
 
@@ -1592,7 +1463,7 @@ declare const AppProviderCapability:
 declare const AppProviderDefaults: AppProviderDefaults<Providers>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L16)
 
 ### AppProviderInputs
 
@@ -1602,7 +1473,7 @@ declare const AppProviderDefaults: AppProviderDefaults<Providers>;
 declare const AppProviderInputs: AppProviderInputs;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L15)
 
 ### AppTelemetryConfig (type alias)
 
@@ -1621,7 +1492,7 @@ type AppTelemetryConfig<Exporters extends TelemetryExporterMap = TelemetryExport
   TelemetryConfiguration<Exporters>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L23)
 
 ### ApplicationDescriptor (type alias)
 
@@ -1644,7 +1515,6 @@ type ApplicationDescriptor<
   NormalizedProviders<Providers> & {
     readonly env: EnvDefinition<Shape>;
     readonly defaults: NormalizedAppProviderDefaults<Providers>;
-    readonly compatibility: { readonly legacyJobs: boolean };
     readonly telemetry?: AppTelemetryConfig<Exporters>;
     readonly server?: ServerConfig;
     readonly inspector?: InspectorConfig;
@@ -1653,7 +1523,7 @@ type ApplicationDescriptor<
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L61)
 
 ### DefineAppOptions (type alias)
 
@@ -1677,7 +1547,6 @@ type DefineAppOptions<
     readonly id?: string;
     readonly env: EnvDefinition<Shape>;
     readonly defaults?: AppProviderDefaults<Providers>;
-    readonly compatibility?: AppCompatibilityConfig;
     readonly telemetry?: AppTelemetryConfig<Exporters>;
     readonly server?: ServerConfig;
     readonly inspector?: InspectorConfig;
@@ -1686,7 +1555,7 @@ type DefineAppOptions<
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L42)
 
 ### InspectorConfig
 
@@ -1696,7 +1565,7 @@ type DefineAppOptions<
 declare const InspectorConfig: InspectorConfig;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L12)
 
 ### NormalizedAppProviderDefaults
 
@@ -1714,7 +1583,7 @@ declare const NormalizedAppProviderDefaults: Readonly<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L17)
 
 ### ServerConfig
 
@@ -1724,7 +1593,7 @@ declare const NormalizedAppProviderDefaults: Readonly<{
 declare const ServerConfig: ServerConfig;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L12)
 
 ## `effect.ts`
 
@@ -1813,7 +1682,7 @@ declare const defineAgentEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L31)
 
 ### defineAppEffect
 
@@ -1843,7 +1712,7 @@ declare const defineBucketEffect: <const Id extends string>(
 ) => Effect<BucketDescriptor<Id>, BucketValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L28)
 
 ### defineCacheEffect
 
@@ -1863,7 +1732,7 @@ declare const defineCacheEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L29)
 
 ### defineChannelEffect
 
@@ -1885,7 +1754,7 @@ declare const defineChannelEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L27)
 
 ### defineConstantsEffect
 
@@ -1955,7 +1824,7 @@ declare const defineJobEffect: <
 ) => Effect<JobDescriptor<Name, Id, Task>, JobDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L26)
 
 ### defineMiddlewareEffect
 
@@ -1983,21 +1852,6 @@ declare const definePromptEffect: <const Value extends PromptValue>(
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L7)
 
-### defineRequestTransformEffect
-
-**Signature**
-
-```ts
-declare const defineRequestTransformEffect: <
-  const Id extends string,
-  const Schema extends StandardSchemaV1,
->(
-  options: DefineTransformOptions<Id, Schema>,
-) => Effect<HttpTransformDescriptor<Id, Schema>, RouteOperationError, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L21)
-
 ### defineRouteEffect
 
 **Signature**
@@ -2017,7 +1871,7 @@ declare const defineRouteEffect: {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L21)
 
 ### defineServiceEffect
 
@@ -2067,7 +1921,7 @@ declare const defineServiceRoutesEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L22)
 
 ### defineTaskEffect
 
@@ -2113,7 +1967,7 @@ declare const defineTaskEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L26)
 
 ### defineToolEffect
 
@@ -2125,7 +1979,7 @@ declare const defineToolEffect: <const Id extends string, const Target extends F
 ) => Effect<ToolDescriptor<Id, Target>, ToolOperationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L30)
 
 ### defineTransformEffect
 
@@ -2140,7 +1994,7 @@ declare const defineTransformEffect: <
 ) => Effect<HttpTransformDescriptor<Id, Schema>, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L23)
 
 ### failEffect
 
@@ -2240,7 +2094,7 @@ declare const httpEffects: {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L24)
 
 ### streamOfEffect
 
@@ -2606,20 +2460,6 @@ declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: stri
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L13)
-
-## `jobs-legacy.ts`
-
-### "../jobs/legacy.js" (namespace export)
-
-Re-exports all named exports from the "../jobs/legacy.js" module.
-
-**Signature**
-
-```ts
-export * from "../jobs/legacy.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/jobs-legacy.ts#L1)
 
 ## `jobs.ts`
 

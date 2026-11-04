@@ -20,6 +20,7 @@ const createJobsControls = jobsRuntimeModule?.createJobsControls;
 const createJobsRuntime = jobsRuntimeModule?.createJobsRuntime;
 const reconcileNativeSchedules = jobsRuntimeModule?.reconcileNativeSchedules;
 const runInJobsRuntime = jobsRuntimeModule?.runInJobsRuntime;
+const submitJob = jobsRuntimeModule?.submitJob;
 const realtimeRuntimeModule = (plan.channels ?? []).length === 0
   ? undefined
   : await import("relkit/realtime");
@@ -57,7 +58,6 @@ const contextResolver = createApplicationContextResolver({
 });
 ${agentSource.startup}
 const registry = createFunctionRegistry(graph, executableManifest);
-let materializedJobs;
 let nativeJobsRuntimes = new Map();
 const nativeJobWorkerRegistrations = new Set();
 const nativeJobWorkerReadyHandles = new Set();

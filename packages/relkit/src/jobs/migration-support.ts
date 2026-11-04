@@ -15,8 +15,6 @@ export const breakingEffect = Effect.fn("Jobs.migrationBreaking")(function* (
     | "TASK_INPUT_SCHEMA_CHANGED"
     | "DEDUPE_SCOPE_CHANGED"
     | "PUBLIC_CLIENT_FINGERPRINT_CHANGED"
-    | "LEGACY_JOBS_DISABLED"
-    | "LEGACY_ALIAS_CONFLICT"
   >,
   message: string,
 ): Generator<never, JobMigrationDiagnostic, never> {

@@ -18,7 +18,6 @@ export {
 export { defineServiceEffect } from "../services/index.js";
 export {
   defineMiddlewareEffect,
-  defineRequestTransformEffect,
   defineRouteEffect,
   defineServiceRoutesEffect,
   defineTransformEffect,

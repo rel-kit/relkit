@@ -1,4 +1,4 @@
-import type { RetryPolicy } from "../../jobs/legacy.js";
+import type { RetryPolicy } from "../../jobs/job.types.js";
 import type { UnknownEventEnvelope } from "../../events/index.js";
 import type { EventContractInput } from "./admin-contracts.js";
 import type { EventLogInput, EventLogRecord } from "./log.js";

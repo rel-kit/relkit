@@ -10,7 +10,7 @@ import {
 } from "relkit/engine";
 import { type LogRecord, type ObservabilityCollector } from "relkit/observability";
 import { createTestAgent } from "../../../integrations/packages/langchain/src/testing/agents.js";
-import { createTestEvent, createTestJob } from "../../../packages/testing/src/index.ts";
+import { createTestEvent } from "../../../packages/testing/src/index.ts";
 import {
   createLoggerLayer,
   type HumanLogSink,
@@ -75,22 +75,6 @@ export async function runAgent(collector: ObservabilityCollector) {
     return trace;
   } finally {
     await harness.close();
-  }
-}
-
-export async function runJob(collector: ObservabilityCollector): Promise<void> {
-  const job = await createTestJob({
-    jobId: "security.job",
-    target: flowTarget("security.job"),
-    retry,
-    hooks: hooks(collector),
-  });
-  try {
-    await job.enqueue(flowInput);
-    await job.drain();
-    assertNoSecrets("job admin API", job.admin.query());
-  } finally {
-    await job.close();
   }
 }
 

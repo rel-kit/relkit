@@ -1,8 +1,6 @@
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { z } from "relkit/schema";
 import { defineEventFunction } from "relkit/events";
-import { createTestJob } from "../../src/jobs.js";
 import { createTestEvent } from "../../src/events.js";
 
 /**
@@ -29,30 +27,6 @@ function blockedWork() {
         else signal.addEventListener("abort", cancel, { once: true });
       }),
   };
-}
-
-const jobWork = blockedWork();
-const job = await createTestJob({
-  target: {
-    id: "test.blocked-job",
-    input: z.object({}),
-    output: z.void(),
-    handler: (_input, context) => jobWork.run(context.signal),
-  },
-});
-try {
-  await job.enqueue({});
-  const pending = job.runNext();
-  const settled = Promise.allSettled([pending]);
-  await jobWork.started;
-  await job.restart();
-  assert.equal(jobWork.isAborted(), true);
-  await settled;
-  await job.close();
-  await assert.rejects(job.enqueue({}), /closed/);
-  assert.equal(existsSync(job.stateRoot), false);
-} finally {
-  await job.close();
 }
 
 const eventWork = blockedWork();

@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { materializeEvents, type EventRuntimeProvider } from "relkit/engine";
 
-import type { RetryPolicy } from "relkit/jobs/legacy";
+import type { RetryPolicy } from "relkit/jobs";
 import { createEventLog, createEventRouter, type EventRouter } from "relkit/providers-local";
 
 import { createEventInvoker } from "./events-runtime-utils.js";

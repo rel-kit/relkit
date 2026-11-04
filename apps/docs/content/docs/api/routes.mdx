@@ -1839,56 +1839,6 @@ declare const assertResponseEffect: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L28)
 
-### defineRequestTransform
-
-Alias for request transform definitions.
-
-**Throws**
-
-TypeError for invalid transform input.
-
-**Example**
-
-```ts
-defineRequestTransform({ schema });
-```
-
-**Signature**
-
-```ts
-declare const defineRequestTransform: <
-  const Id extends string,
-  const Schema extends StandardSchemaV1,
->(
-  options: DefineTransformOptions<Id, Schema>,
-) => HttpTransformDescriptor<Id, Schema>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L84)
-
-### defineRequestTransformEffect
-
-Effect alias for request transform definitions.
-
-**Example**
-
-```ts
-Effect.runSync(defineRequestTransformEffect({ schema }));
-```
-
-**Signature**
-
-```ts
-declare const defineRequestTransformEffect: <
-  const Id extends string,
-  const Schema extends StandardSchemaV1,
->(
-  options: DefineTransformOptions<Id, Schema>,
-) => Effect.Effect<HttpTransformDescriptor<Id, Schema>, RouteOperationError, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L91)
-
 ### defineTransform
 
 Defines a serializable HTTP transform.
@@ -1952,7 +1902,7 @@ const request = http.input({ id: http.path("id") });
 declare const http: HttpDsl;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L131)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L116)
 
 ### httpEffects
 
@@ -2145,7 +2095,7 @@ isTransformRef(transform);
 declare const isTransformRef: (value: unknown) => value is HttpTransformRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L108)
 
 ### isTransformRefEffect
 
@@ -2165,7 +2115,7 @@ declare const isTransformRefEffect: (
 ) => Effect.Effect<boolean, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L114)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L99)
 
 ## `http-dsl.types.ts`
 

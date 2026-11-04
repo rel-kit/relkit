@@ -14,17 +14,6 @@ export type {
   JobStoreSnapshot,
 } from "./jobs/store.js";
 export * from "./jobs/retry.js";
-export { compileSchedule, createScheduler, ScheduleValidationError } from "./jobs/scheduler.js";
-export type {
-  CompiledSchedule,
-  ScheduleEnqueueContext,
-  ScheduleEnqueue,
-  SchedulerRegistration,
-  SchedulerClock,
-  SchedulerOptions,
-  ScheduleRun,
-  Scheduler,
-} from "./jobs/scheduler.js";
 export * from "./jobs/admin.js";
 export * from "./events/log.js";
 export * from "./events/router.js";

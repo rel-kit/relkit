@@ -42,7 +42,7 @@ const invoke: AgentClientFor<typeof agent> = async (input) => output;
 type AgentClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L53)
 
 ### AgentClients (type alias)
 
@@ -62,7 +62,7 @@ type AgentClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L151)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L146)
 
 ### BucketClientFor (type alias)
 
@@ -80,7 +80,7 @@ const client: BucketClientFor<typeof bucket> = buckets.uploads;
 type BucketClientFor<T> = BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L107)
 
 ### BucketClients (type alias)
 
@@ -100,7 +100,7 @@ type BucketClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L139)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L134)
 
 ### CacheClientFor (type alias)
 
@@ -118,7 +118,7 @@ const client: CacheClientFor<typeof cache> = caches.sessions;
 type CacheClientFor<T> = CacheClient<KeyOf<T>, ValueOf<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L111)
 
 ### CacheClients (type alias)
 
@@ -138,7 +138,7 @@ type CacheClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L145)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L140)
 
 ### DatabaseClientFor (type alias)
 
@@ -161,7 +161,7 @@ type DatabaseClientFor<T> = [Relkit.DatabaseContexts<T>[keyof Relkit.DatabaseCon
   : Relkit.DatabaseContexts<T>[keyof Relkit.DatabaseContexts<T>];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L171)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L166)
 
 ### DatabaseClients (type alias)
 
@@ -181,7 +181,7 @@ type DatabaseClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L179)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L174)
 
 ### EventClientFor (type alias)
 
@@ -210,7 +210,7 @@ type EventClientFor<T> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L97)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L92)
 
 ### EventClients (type alias)
 
@@ -230,7 +230,7 @@ type EventClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L133)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L128)
 
 ### FunctionClientFor (type alias)
 
@@ -248,7 +248,7 @@ const price: FunctionClientFor<typeof priceOrder> = context.functions.priceOrder
 type FunctionClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L160)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L155)
 
 ### FunctionClients (type alias)
 
@@ -268,33 +268,33 @@ type FunctionClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L164)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L159)
 
 ### JobClientFor (type alias)
 
-Typed enqueue client for a job descriptor.
+Typed trigger client for a job descriptor.
 
 **Example**
 
 ```ts
-const client: JobClientFor<typeof job> = jobs.myJob;
+const client: JobClientFor<typeof job> = jobs.sendReceipt;
 ```
 
 **Signature**
 
 ```ts
 type JobClientFor<T> = {
-  /** Enqueues a job invocation.
-   * @param input - Job input.
-   * @param options - Optional correlation metadata.
-   * @returns Acceptance receipt.
-   * @example await jobs.send.enqueue(input);
+  /** Triggers a run of the job's task.
+   * @param input - Task input.
+   * @param options - Optional scheduling and idempotency controls.
+   * @returns Handle for the new run.
+   * @example await jobs.sendReceipt.trigger(input);
    */
-  enqueue(input: InputOf<T>, options?: JobEnqueueOptions): Promise<JobEnqueueResult>;
+  trigger(input: InputOf<T>, options?: TaskTriggerOptions): Promise<RunHandle>;
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L57)
 
 ### JobClients (type alias)
 
@@ -314,7 +314,7 @@ type JobClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L121)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L116)
 
 ### TaskClientFor (type alias)
 
@@ -340,7 +340,7 @@ type TaskClientFor<T> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L80)
 
 ### TaskClients (type alias)
 
@@ -360,7 +360,7 @@ type TaskClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L127)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L122)
 
 ### TaskTriggerOptions (interface)
 
@@ -385,7 +385,7 @@ export interface TaskTriggerOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L69)
 
 ## `clients.types.ts`
 
@@ -399,7 +399,7 @@ Re-exports all named exports from the "./client-maps.types.js" module.
 export * from "./client-maps.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L46)
 
 ### BucketClient
 
@@ -409,7 +409,7 @@ export * from "./client-maps.types.js";
 declare const BucketClient: BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L43)
 
 ### BucketObjectMetadata
 
@@ -419,7 +419,7 @@ declare const BucketClient: BucketClient;
 declare const BucketObjectMetadata: BucketObjectMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L43)
 
 ### BucketPutOptions
 
@@ -429,7 +429,7 @@ declare const BucketObjectMetadata: BucketObjectMetadata;
 declare const BucketPutOptions: BucketPutOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L43)
 
 ### CacheClient
 
@@ -439,7 +439,7 @@ declare const BucketPutOptions: BucketPutOptions;
 declare const CacheClient: CacheClient<Key, Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L44)
 
 ### CacheOperationOptions
 
@@ -449,7 +449,7 @@ declare const CacheClient: CacheClient<Key, Value>;
 declare const CacheOperationOptions: CacheOperationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L44)
 
 ### EventAttributeValue (type alias)
 
@@ -467,7 +467,7 @@ const value: EventAttributeValue = true;
 type EventAttributeValue = string | number | boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L6)
 
 ### EventPublishOptions (interface)
 
@@ -488,7 +488,7 @@ export interface EventPublishOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L27)
 
 ### EventPublishResult (interface)
 
@@ -512,96 +512,7 @@ export interface EventPublishResult<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L73)
-
-### JobEnqueueOptions (interface)
-
-Options for enqueuing a job.
-
-**Example**
-
-```ts
-await jobs.enqueue(input, { correlationId: "trace-1" });
-```
-
-**Signature**
-
-```ts
-export interface JobEnqueueOptions {
-  readonly correlationId?: string;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L23)
-
-### JobEnqueueResult (interface)
-
-Receipt returned when a job is accepted.
-
-**Example**
-
-```ts
-const receipt: JobEnqueueResult = await jobs.enqueue(input);
-```
-
-**Signature**
-
-```ts
-export interface JobEnqueueResult {
-  readonly instanceId: string;
-  readonly accepted: true;
-  readonly duplicate?: boolean;
-  readonly idempotencyKey?: string;
-  readonly idempotencyExpiresAt?: number;
-  readonly status: Extract<JobState, "accepted">;
-  readonly profile: string;
-  readonly correlationId?: string;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L30)
-
-### JobState (type alias)
-
-Lifecycle state of a queued job.
-
-**Example**
-
-```ts
-const state: JobState = "accepted";
-```
-
-**Signature**
-
-```ts
-type JobState = "accepted" | "available" | "leased" | "delayed" | "completed" | "dead-lettered";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L6)
-
-### JobStatus (interface)
-
-Snapshot of one queued job.
-
-**Example**
-
-```ts
-const status: JobStatus = await jobs.status(id);
-```
-
-**Signature**
-
-```ts
-export interface JobStatus {
-  readonly instanceId: string;
-  readonly state: JobState;
-  readonly profile: string;
-  readonly attempt: number;
-  readonly correlationId?: string;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L35)
 
 ## `create-relkit.ts`
 
@@ -1498,7 +1409,7 @@ void welcome;
 declare const defineFunction: DefineFunction;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L136)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L132)
 
 Since v0.1.0
 
@@ -1961,7 +1872,7 @@ declare const InvocationSource: InvocationSource;
 declare const JobClientFor: JobClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L55)
 
 ### JobClients
 
@@ -1971,27 +1882,7 @@ declare const JobClientFor: JobClientFor<T>;
 declare const JobClients: JobClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L57)
-
-### JobEnqueueOptions
-
-**Signature**
-
-```ts
-declare const JobEnqueueOptions: JobEnqueueOptions;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L55)
-
-### JobEnqueueResult
-
-**Signature**
-
-```ts
-declare const JobEnqueueResult: JobEnqueueResult;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L56)
 
 ### JobRef
 
@@ -2001,7 +1892,7 @@ declare const JobEnqueueResult: JobEnqueueResult;
 declare const JobRef: JobRef<Id, InputSchema, OutputSchema, Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L57)
 
 ### JobRefAny
 
@@ -2011,27 +1902,7 @@ declare const JobRef: JobRef<Id, InputSchema, OutputSchema, Task>;
 declare const JobRefAny: JobRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L60)
-
-### JobState
-
-**Signature**
-
-```ts
-declare const JobState: JobState;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L61)
-
-### JobStatus
-
-**Signature**
-
-```ts
-declare const JobStatus: JobStatus;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L58)
 
 ### PublicClock
 
@@ -2041,7 +1912,7 @@ declare const JobStatus: JobStatus;
 declare const PublicClock: PublicClock;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L62)
 
 ### PublicLogger
 
@@ -2051,7 +1922,7 @@ declare const PublicClock: PublicClock;
 declare const PublicLogger: PublicLogger;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L63)
 
 ### ResolvedApplicationEnv
 
@@ -2061,7 +1932,7 @@ declare const PublicLogger: PublicLogger;
 declare const ResolvedApplicationEnv: Readonly<Record<string, unknown>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L64)
 
 ### TaskClientFor
 
@@ -2071,7 +1942,7 @@ declare const ResolvedApplicationEnv: Readonly<Record<string, unknown>>;
 declare const TaskClientFor: TaskClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L59)
 
 ### TaskClients
 
@@ -2081,7 +1952,7 @@ declare const TaskClientFor: TaskClientFor<T>;
 declare const TaskClients: TaskClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L60)
 
 ### TaskTriggerOptions
 
@@ -2091,7 +1962,7 @@ declare const TaskClients: TaskClients<M>;
 declare const TaskTriggerOptions: TaskTriggerOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L61)
 
 ### defineFunctionEffect
 
@@ -2109,7 +1980,7 @@ Effect.runSync(defineFunctionEffect({ input, output, handler }));
 declare const defineFunctionEffect: DefineFunctionEffect;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L98)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L94)
 
 ## `define-function.types.ts`
 
@@ -6503,7 +6374,7 @@ Re-exports all named exports from the "./function-context.types.js" module.
 export * from "./function-context.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L29)
 
 ### "./function-descriptor.types.js" (namespace export)
 
@@ -6515,7 +6386,7 @@ Re-exports all named exports from the "./function-descriptor.types.js" module.
 export * from "./function-descriptor.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L30)
 
 ### "./function-ref.types.js" (namespace export)
 
@@ -6527,7 +6398,7 @@ Re-exports all named exports from the "./function-ref.types.js" module.
 export * from "./function-ref.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L28)
 
 ### AgentClientFor
 
@@ -6727,7 +6598,7 @@ declare const FunctionClients: FunctionClients<M>;
 declare const JobClientFor: JobClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L22)
 
 ### JobClients
 
@@ -6737,27 +6608,7 @@ declare const JobClientFor: JobClientFor<T>;
 declare const JobClients: JobClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L24)
-
-### JobEnqueueOptions
-
-**Signature**
-
-```ts
-declare const JobEnqueueOptions: JobEnqueueOptions;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L22)
-
-### JobEnqueueResult
-
-**Signature**
-
-```ts
-declare const JobEnqueueResult: JobEnqueueResult;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L23)
 
 ### JobRef
 
@@ -6779,26 +6630,6 @@ declare const JobRefAny: JobRefAny;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L1)
 
-### JobState
-
-**Signature**
-
-```ts
-declare const JobState: JobState;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L26)
-
-### JobStatus
-
-**Signature**
-
-```ts
-declare const JobStatus: JobStatus;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L27)
-
 ### TaskClientFor
 
 **Signature**
@@ -6807,7 +6638,7 @@ declare const JobStatus: JobStatus;
 declare const TaskClientFor: TaskClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L24)
 
 ### TaskClients
 
@@ -6817,7 +6648,7 @@ declare const TaskClientFor: TaskClientFor<T>;
 declare const TaskClients: TaskClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L25)
 
 ### TaskRef
 
@@ -6847,7 +6678,7 @@ declare const TaskRefAny: TaskRefAny;
 declare const TaskTriggerOptions: TaskTriggerOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L26)
 
 ## `error-retry.types.ts`
 

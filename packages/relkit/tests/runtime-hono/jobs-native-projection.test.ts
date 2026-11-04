@@ -39,7 +39,7 @@ it.effect("projects actual native admission identities through get and watch val
       (directory) => Effect.promise(() => rm(directory, { recursive: true, force: true })),
     );
     const adapter = yield* Effect.acquireRelease(
-      Effect.sync(() => createLocalJobProvider(root, "local", "task")),
+      Effect.sync(() => createLocalJobProvider(root, "local")),
       (provider) => Effect.promise(() => provider.close()),
     );
     const task = defineTask({

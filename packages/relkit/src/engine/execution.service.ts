@@ -1,11 +1,9 @@
 import { Context, Effect, Layer } from "effect";
 import type {
   EventMaterializationOperations,
-  JobMaterializationOperations,
   TaskExecutionOperations,
 } from "./execution.service.types.js";
 import { materializeEventsEffect } from "./materialize-events.js";
-import { materializeJobsEffect } from "./materialize-jobs.js";
 import { executeTaskEffect } from "./task-executor.js";
 
 /** Event registration authority with replaceable provider dependencies.
@@ -23,22 +21,6 @@ export class EventMaterializationService extends Context.Service<
   EventMaterializationService,
   EventMaterializationOperations
 >()("@relkit/engine/Events") {}
-
-/** Legacy job queue/schedule binding authority.
- * @example
- * ```ts
- * const register = (options: JobMaterializationOptions) => Effect.runPromise(
- *   Effect.gen(function* () {
- *     return yield* (yield* JobMaterializationService).materialize(options);
- *   }).pipe(Effect.provide(JobMaterializationLive)));
- * ```
- * @remarks Queues and schedules stay provider-owned. The live layer and empty-plan
- * result are checked in tests/domain-layers.test.ts.
- */
-export class JobMaterializationService extends Context.Service<
-  JobMaterializationService,
-  JobMaterializationOperations
->()("@relkit/engine/Jobs") {}
 
 /** Native task envelope and execution authority.
  * @example
@@ -61,14 +43,6 @@ export const EventMaterializationLive = Layer.effect(
   EventMaterializationService,
   Effect.gen(function* () {
     return EventMaterializationService.of({ materialize: materializeEventsEffect });
-  }),
-);
-
-/** Live legacy job operations; queues retain authoritative retry state. */
-export const JobMaterializationLive = Layer.effect(
-  JobMaterializationService,
-  Effect.gen(function* () {
-    return JobMaterializationService.of({ materialize: materializeJobsEffect });
   }),
 );
 

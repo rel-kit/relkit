@@ -15,7 +15,6 @@ export const appSubpaths = [
   "realtime",
   "agents",
   "jobs",
-  "jobs/legacy",
   "tasks",
   "cache",
   "tools",

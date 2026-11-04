@@ -58,7 +58,7 @@ function schedules(context: PlanContext) {
   return nodes(context.graph.nodes, "job")
     .filter((job) => isManaged(context.providers, "job", job.profile))
     .flatMap((job) => {
-      const value = "schedules" in job ? (job.schedules ?? job.schedule) : job.schedule;
+      const value = job.schedules;
       if (!Array.isArray(value)) return [];
       return value.map((schedule, index) => ({
         ...base(

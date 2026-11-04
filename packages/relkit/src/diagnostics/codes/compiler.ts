@@ -17,25 +17,11 @@ export const compilerCodes = [
     fix: "Pass `tools` as an array of tools made with `defineTool`, and check that each one is exported from a file under `src/`.",
   },
   {
-    code: "RELKIT_APP_CONFIG_ALIAS",
-    title: "App sets both jobs and job",
-    happened:
-      "`defineApp` sets both `jobs` and the older `job` option, or both `defaults.jobs` and `defaults.job`, so RelKit cannot tell which one to use.",
-    fix: "Keep `jobs` (or `defaults.jobs`) and remove the singular `job` option.",
-  },
-  {
     code: "RELKIT_APP_DUPLICATE",
     title: "More than one app config is exported",
     happened:
       "Your project exports more than one `defineApp` config. A RelKit app has exactly one.",
     fix: "Keep a single `defineApp` export in `relkit.config.ts` and remove the others.",
-  },
-  {
-    code: "RELKIT_APP_LEGACY_JOB_ALIAS",
-    title: "Singular job option is deprecated",
-    happened:
-      "`defineApp` uses the singular `job` or `defaults.job` option. It still works for now but will be removed.",
-    fix: "Rename `job` to `jobs` and `defaults.job` to `defaults.jobs` in `defineApp`.",
   },
   {
     code: "RELKIT_AUTH_DUPLICATE",
@@ -301,13 +287,6 @@ export const compilerCodes = [
     fix: "Run `relkit build` again and deploy all of its output together.",
   },
   {
-    code: "RELKIT_IDEMPOTENCY_INVALID",
-    title: "Idempotency settings are invalid",
-    happened:
-      "The `idempotency` option is not an object, has no `key`, or has a `retentionMs` that is not a positive number.",
-    fix: "Set `idempotency` to an object with a non-empty `key` and a positive `retentionMs`.",
-  },
-  {
     code: "RELKIT_ERROR_ID_REQUIRED",
     title: "Error has no ID",
     happened:
@@ -355,19 +334,6 @@ export const compilerCodes = [
     fix: "Choose a jobs service that supports the feature named in the error, or remove that requirement from the task.",
   },
   {
-    code: "RELKIT_JOB_INPUT_INCOMPATIBLE",
-    title: "Job input does not match its target",
-    happened: "A job's input schema does not fit the input of the function or task it runs.",
-    fix: "Change the job input so it matches the target's input schema, then run `relkit check`.",
-  },
-  {
-    code: "RELKIT_JOB_MATERIALIZATION_INVALID",
-    title: "Jobs could not be set up at startup",
-    happened:
-      "When the app started, a job, queue or schedule pointed at something unknown, was registered twice, or had no queue or scheduler provider.",
-    fix: "Run `relkit check` to find the job problem, check the jobs provider in your app config, then rebuild with `relkit build`.",
-  },
-  {
     code: "RELKIT_JOB_NAME_INVALID",
     title: "Job name is invalid or taken",
     happened: "A job's name is not valid, or another job already uses it.",
@@ -379,13 +345,6 @@ export const compilerCodes = [
     happened:
       "A job's `client` option is not an object, lists no operations, or names an operation or field that is not supported.",
     fix: "Set `client.operations` to a non-empty list of supported operations and use only supported `client.fields`.",
-  },
-  {
-    code: "RELKIT_JOB_PROFILE_DEPRECATED",
-    title: "Job profile option is deprecated",
-    happened:
-      "A job uses the `profile` option, which has been renamed to `service`. Setting both is an error.",
-    fix: "Rename `profile` to `service` in `defineJob`.",
   },
   {
     code: "RELKIT_JOB_REPLAY_ADVISORY",
@@ -530,7 +489,7 @@ export const compilerCodes = [
     title: "Request transform is not found",
     happened:
       "A route uses a request transform RelKit cannot find, or a named transform is never used.",
-    fix: "Define the transform with `defineRequestTransform` and reference it from a route, or remove the unused transform.",
+    fix: "Define the transform with `defineTransform` and reference it from a route, or remove the unused transform.",
   },
   {
     code: "RELKIT_MODEL_PROVIDER_CONFIGURATION_INVALID",
@@ -784,13 +743,6 @@ export const compilerCodes = [
     title: "Two integrations provide the same feature",
     happened: "Two installed integration packages register the same capability and adapter.",
     fix: "Remove one of the integration packages named in the error so each feature has one provider.",
-  },
-  {
-    code: "RELKIT_SCHEDULE_INVALID",
-    title: "Schedule is invalid",
-    happened:
-      "A schedule is not in a list, repeats an ID, or lacks a five-field cron expression, a timezone, an overlap policy or JSON input.",
-    fix: 'Give each schedule a unique `id`, a five-field `cron`, a `timezone`, `overlap` of `"skip"` or `"allow"`, and JSON `input`.',
   },
   {
     code: "RELKIT_SCHEMA_UNAVAILABLE",

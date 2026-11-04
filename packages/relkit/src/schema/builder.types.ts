@@ -71,12 +71,6 @@ export interface ZBuilder {
    */
   file(options?: FileSchemaOptions): FileSchema;
   /**
-   * Builds an undefined validator.
-   * @returns An undefined schema.
-   * @example z.undefined().parse(undefined);
-   */
-  undefined(): Schema<undefined, undefined>;
-  /**
    * Builds a void-result validator.
    * @returns An undefined schema.
    * @example z.void().parse(undefined);

@@ -14,8 +14,9 @@ describe("registration planning", () => {
     expect(first.httpTriggers.map(({ id }) => id)).toEqual(["orders.route"]);
     expect(first.httpTriggers[0]).toMatchObject({ serviceId: "orders" });
     expect(first.eventTriggers.map(({ id }) => id)).toEqual(["orders.listener"]);
-    expect(first.queues.map(({ id }) => id)).toEqual(["orders.refresh"]);
-    expect(first.schedules.map(({ id }) => id)).toEqual(["orders.refresh:hourly"]);
+    expect(first.jobs?.map(({ id }) => id)).toEqual(["orders.refresh"]);
+    expect(first.queues).toEqual([]);
+    expect(first.schedules).toEqual([]);
     expect(first.buckets.map(({ id }) => id)).toEqual(["orders.files"]);
     expect(first.caches.map(({ id }) => id)).toEqual(["orders.cache"]);
     expect(first.tools.map(({ id }) => id)).toEqual(["orders.lookup-tool"]);
@@ -54,7 +55,7 @@ describe("registration planning", () => {
     ]);
   });
 
-  test("keeps task registrations out of legacy queues and schedules", () => {
+  test("projects tasks and task-backed jobs as their own registrations", () => {
     const input = graph();
     const task = {
       kind: "task" as const,
@@ -83,9 +84,9 @@ describe("registration planning", () => {
     const plan = createRegistrationPlan({ ...input, nodes: [...input.nodes, task, job] });
 
     expect(plan.tasks?.map(({ taskId }) => taskId)).toEqual(["orders.refresh-task"]);
-    expect(plan.jobs?.map(({ jobId }) => jobId)).toEqual(["orders.refresh-job"]);
-    expect(plan.queues.map(({ id }) => id)).toEqual(["orders.refresh"]);
-    expect(plan.schedules.map(({ id }) => id)).toEqual(["orders.refresh:hourly"]);
+    expect(plan.jobs?.map(({ jobId }) => jobId)).toEqual(["orders.refresh", "orders.refresh-job"]);
+    expect(plan.queues).toEqual([]);
+    expect(plan.schedules).toEqual([]);
   });
 });
 

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { observeGraph, runGraph } from "./graph-observability.js";
 import type { JsonValue } from "../contracts/index.js";
-import type { GraphNode, LegacyJobNode, TriggerNode } from "./model.js";
+import type { GraphNode, TriggerNode } from "./model.js";
 import type {
   EventTriggerRegistration,
   HttpTriggerRegistration,
@@ -56,11 +56,7 @@ function addNodeUnsafe(
       addTrigger(plan, node, serviceIds);
       return;
     case "job":
-      if (node.executionModel === "task") plan.jobs.push(node);
-      else {
-        plan.queues.push(node);
-        addSchedules(plan.schedules, node);
-      }
+      plan.jobs.push(node);
       return;
     case "task":
       plan.tasks.push(node);
@@ -110,13 +106,6 @@ function addTrigger(
   else if (node.triggerType === "queue")
     plan.queues.push(node as unknown as TriggerNode<"queue", JsonValue>);
   else plan.schedules.push(scheduleFromTrigger(node));
-}
-function addSchedules(output: MutableRegistrationPlan["schedules"], node: LegacyJobNode): void {
-  if (!Array.isArray(node.schedule)) return;
-  node.schedule.forEach((schedule, index) => {
-    const id = isRecord(schedule) && typeof schedule.id === "string" ? schedule.id : String(index);
-    output.push({ id: `${node.id}:${id}`, source: node.source, jobId: node.id, schedule });
-  });
 }
 function scheduleFromTrigger(node: TriggerNode): MutableRegistrationPlan["schedules"][number] {
   const config = isRecord(node.config) ? node.config : {};

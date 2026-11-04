@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { diagnoseJobMigration, diagnoseLegacyCompatibility } from "../../src/jobs/index.ts";
+import { diagnoseJobMigration } from "../../src/jobs/index.ts";
 
 const base = {
   name: "exportOrders",
@@ -41,25 +41,4 @@ test("explains identity, binding, schema, history, and client migration hazards"
     "HISTORICAL_RUNS_PINNED",
   ]);
   expect(diagnostics.every((diagnostic) => diagnostic.message.length > 0)).toBe(true);
-});
-
-test("keeps legacy execution explicitly gated and aliases exclusive", () => {
-  expect(
-    diagnoseLegacyCompatibility({ usesFunctionTarget: true, legacyJobsEnabled: false })[0]?.code,
-  ).toBe("LEGACY_JOBS_DISABLED");
-  expect(
-    diagnoseLegacyCompatibility({
-      usesFunctionTarget: true,
-      legacyJobsEnabled: true,
-      legacyKeys: ["job"],
-      newKeys: ["jobs"],
-    })[0]?.code,
-  ).toBe("LEGACY_ALIAS_CONFLICT");
-  expect(
-    diagnoseLegacyCompatibility({
-      usesFunctionTarget: false,
-      legacyJobsEnabled: false,
-      legacyKeys: ["defaults.job"],
-    })[0]?.code,
-  ).toBe("LEGACY_ALIAS_DEPRECATED");
 });

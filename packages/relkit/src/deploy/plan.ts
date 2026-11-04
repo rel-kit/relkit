@@ -69,23 +69,17 @@ export interface HttpDeploymentPlan {
 }
 
 export interface JobDeploymentPlan extends DeploymentCapabilityPlan {
-  /** Present only for the one-release legacy function-target form. */
-  readonly targetFunctionId?: string;
-  readonly executionModel?: "legacy-function" | "task";
-  readonly jobId?: string;
-  readonly name?: string;
-  readonly taskId?: string;
-  readonly taskVersion?: string;
-  readonly buildId?: string;
-  readonly serviceGeneration?: string;
+  readonly executionModel: "task";
+  readonly jobId: string;
+  readonly name: string;
+  readonly taskId: string;
+  readonly taskVersion: string;
+  readonly buildId: string;
+  readonly serviceGeneration: string;
   readonly profile: string;
-  readonly retry?: JsonValue;
-  readonly timeoutMs?: number;
-  readonly concurrency?: number;
-  readonly idempotency?: JsonValue;
   readonly policy?: JsonValue;
   readonly schedules?: JsonValue;
-  readonly worker?: JobWorkerDeploymentPlan;
+  readonly worker: JobWorkerDeploymentPlan;
 }
 
 export interface JobWorkerDeploymentPlan {

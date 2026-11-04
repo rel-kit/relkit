@@ -15,12 +15,7 @@ import { observeApp } from "./app-observability.js";
 import { APP_PROVIDER_CAPABILITIES } from "./app-provider-capabilities.js";
 import { normalizeDefaultsEffect, normalizeProvidersEffect } from "./app-provider-normalization.js";
 import { normalizeAppRuntimeMetadataEffect } from "./app-runtime-metadata.js";
-import {
-  AppValidationFailure,
-  assertExclusiveAliasEffect,
-  isEnvDefinitionEffect,
-  normalizeCompatibilityEffect,
-} from "./app-validation.js";
+import { AppValidationFailure, isEnvDefinitionEffect } from "./app-validation.js";
 import type {
   ApplicationDescriptor,
   AppProviderInputs,
@@ -37,13 +32,12 @@ const OPTION_KEYS = new Set([
   "tags",
   "env",
   "defaults",
-  "compatibility",
   "telemetry",
   "server",
   "inspector",
   "deployment",
   "check",
-  ...APP_PROVIDER_CAPABILITIES,
+  ...APP_PROVIDER_CAPABILITIES.filter((capability) => capability !== "job"),
   "jobs",
 ]);
 
@@ -67,18 +61,6 @@ export const defineAppEffect = Effect.fn("App.defineApp")(
           return yield* invalid("RelKit app requires an environment definition");
         for (const key of Object.keys(options))
           if (!OPTION_KEYS.has(key)) return yield* invalid(`Unknown defineApp option "${key}"`);
-        yield* assertExclusiveAliasEffect(
-          { jobs: options.jobs, job: options.job },
-          "jobs",
-          "job",
-          "defineApp",
-        );
-        yield* assertExclusiveAliasEffect(
-          options.defaults ?? {},
-          "jobs",
-          "job",
-          "defineApp defaults",
-        );
         const providers = yield* normalizeProvidersEffect(options);
         const defaults = yield* normalizeDefaultsEffect(providers, options.defaults);
         const id =
@@ -87,7 +69,6 @@ export const defineAppEffect = Effect.fn("App.defineApp")(
           try: () => createDescriptorBase("app", id, options),
           catch: fromCause,
         });
-        const compatibility = yield* normalizeCompatibilityEffect(options.compatibility);
         const telemetry =
           options.telemetry === undefined
             ? undefined
@@ -101,7 +82,6 @@ export const defineAppEffect = Effect.fn("App.defineApp")(
         return deepFreeze({
           ...base,
           env: options.env,
-          compatibility,
           ...providers,
           defaults,
           ...(telemetry === undefined ? {} : { telemetry }),

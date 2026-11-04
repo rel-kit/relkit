@@ -27,7 +27,6 @@ const openapiDocument = ${canonicalJson(openapi)};
 const clientContractDocument = ${canonicalJson(clientContract)};
 const publicFingerprint = clientContractDocument.publicFingerprint ?? graphHash;
 ${serverRegistrationPlanSource(input)}
-if (runtimeManifest.application?.compatibility?.legacyJobs !== true && plan.queues.some((node) => node.kind === "job" && (node.executionModel === undefined || node.executionModel === "legacy-function"))) throw new Error("RELKIT_LEGACY_JOBS_DISABLED");
 const artifactHash = (value) => "sha256:" + createHash("sha256").update(JSON.stringify(value) + "\\n").digest("hex");
 if (plan.graphHash !== graphHash) throw new Error("Runtime graph hash verification failed.");
 if (JSON.stringify(runtimeManifest.activationFingerprint) !== JSON.stringify(activationFingerprint)) throw new Error("Runtime activation fingerprint verification failed.");

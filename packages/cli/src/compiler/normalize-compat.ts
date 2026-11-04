@@ -133,50 +133,12 @@ export function mappingCompatible(mapping: unknown, target: unknown): string | u
 }
 
 /**
- * Checks whether legacy job input matches its target function contract.
- * @param input - Compiler input and source provenance.
- * @param target - Target contract or metadata being checked.
- * @returns A lazy effect that checks whether legacy job input matches its target function contract; unexpected access failures remain defects.
- * @see {@link normalizeCompilationEffect} for shared lazy composition and the execution boundary.
- */
-export const jobCompatibleEffect = Effect.fn("Compiler.jobCompatible")(
-  function* (input: unknown, target: unknown) {
-    const inputSchema = yield* schemaEffect(input);
-    const targetSchema = yield* schemaEffect(target);
-    if (!inputSchema.ok || !targetSchema.ok) return undefined;
-    return (yield* schemaEquivalentEffect(input, target))
-      ? undefined
-      : "job input schema differs from target input schema";
-  },
-  (effect, input, target) => observeCompiler("normalization", "jobCompatible", effect, () => ({})),
-);
-
-/**
- * Checks whether legacy job input matches its target function contract.
- * @param input - Compiler input and source provenance.
- * @param target - Target contract or metadata being checked.
- * @returns An incompatibility message, or undefined when the job input is compatible.
- */
-export function jobCompatible(input: unknown, target: unknown): string | undefined {
-  return runCompilerSync(jobCompatibleEffect(input, target));
-}
-
-/**
  * Reads the referenced executable target identity.
  * @param value - Declared metadata inspected without coercion.
  * @returns The declared target reference ID, or undefined.
  */
 export function targetId(value: unknown): string | undefined {
   return refId(value);
-}
-
-/**
- * Checks a cron expression against supported lexical syntax.
- * @param value - Declared metadata inspected without coercion.
- * @returns True when schedule text has an accepted cron-like field count.
- */
-export function cronLike(value: unknown): boolean {
-  return typeof value === "string" && value.trim().split(/\s+/).length === 5;
 }
 
 /**

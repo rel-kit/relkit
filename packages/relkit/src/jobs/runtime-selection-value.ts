@@ -54,12 +54,7 @@ export function resolveBindingValue(
     configuredJob?.task.version,
     taskVersionOf(task),
   );
-  const profile = firstText(
-    selected?.profile,
-    candidateText(chosen, "profile"),
-    configuredJob?.profile,
-    "default",
-  );
+  const profile = firstText(selected?.profile, candidateText(chosen, "profile"), "default");
   const service = firstText(selected?.service, configuredJob?.service, options.service, profile);
   const serviceGeneration = firstText(
     selected?.serviceGeneration,

@@ -12,7 +12,7 @@ export type SchemaOperation =
   | "builder.unknown"
   | "builder.any"
   | "builder.null"
-  | "builder.undefined"
+  | "builder.void"
   | "builder.literal"
   | "builder.object"
   | "builder.array"

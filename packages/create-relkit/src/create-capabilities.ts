@@ -42,7 +42,7 @@ const entries: readonly CreateCapabilityEvidence[] = Object.freeze([
       template: "default/v1/minimal",
       snapshotProtocol: 1,
     }),
-    templateDigest: "ed98505bf7705f3026cf6a94ca8c1886097cd739bb757a253b9efc9652265158",
+    templateDigest: "c081f640aa596c56f08d2013068c5a43aae5382d7a8319d64eaf10688e257714",
     freshEvidence: "create-capabilities/0.8.8/fresh.json",
     restartEvidence: "create-capabilities/0.8.8/restart.json",
   }),

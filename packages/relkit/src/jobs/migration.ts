@@ -1,18 +1,13 @@
 import { Effect } from "effect";
 import { observeJobs } from "./jobs-observability.js";
 import { breakingEffect, sameEffect } from "./migration-support.js";
-import type {
-  JobMigrationDiagnostic,
-  JobMigrationSnapshot,
-  LegacyCompatibilitySnapshot,
-} from "./migration.types.js";
+import type { JobMigrationDiagnostic, JobMigrationSnapshot } from "./migration.types.js";
 
 export type {
   JobBindingMigration,
   JobMigrationDiagnostic,
   JobMigrationSeverity,
   JobMigrationSnapshot,
-  LegacyCompatibilitySnapshot,
 } from "./migration.types.js";
 
 /** Diagnoses identity and contract changes between two job snapshots in Effect.
@@ -118,63 +113,4 @@ export function diagnoseJobMigration(
   next: JobMigrationSnapshot,
 ): readonly JobMigrationDiagnostic[] {
   return Effect.runSync(diagnoseJobMigrationEffect(previous, next));
-}
-
-/** Diagnoses legacy configuration aliases in Effect.
- * @param snapshot - Legacy and replacement key usage.
- * @returns An Effect of ordered diagnostics with no typed error.
- * @example Effect.runSync(diagnoseLegacyCompatibilityEffect(snapshot));
- */
-export const diagnoseLegacyCompatibilityEffect = Effect.fn("Jobs.diagnoseLegacyCompatibility")(
-  function* (snapshot: LegacyCompatibilitySnapshot) {
-    const diagnostics: JobMigrationDiagnostic[] = [];
-    const legacyKeys = snapshot.legacyKeys ?? [];
-    const newKeys = snapshot.newKeys ?? [];
-    if (snapshot.usesFunctionTarget && !snapshot.legacyJobsEnabled) {
-      diagnostics.push(
-        yield* breakingEffect(
-          "LEGACY_JOBS_DISABLED",
-          "Function-target jobs require compatibility.legacyJobs=true during the one-release migration window.",
-        ),
-      );
-    }
-    if (
-      legacyKeys.some((key) =>
-        key === "job"
-          ? newKeys.includes("jobs")
-          : key === "defaults.job"
-            ? newKeys.includes("defaults.jobs")
-            : newKeys.includes("service"),
-      )
-    ) {
-      diagnostics.push(
-        yield* breakingEffect(
-          "LEGACY_ALIAS_CONFLICT",
-          "Legacy job/profile aliases cannot be combined with their new spellings.",
-        ),
-      );
-    } else if (legacyKeys.length > 0) {
-      diagnostics.push({
-        code: "LEGACY_ALIAS_DEPRECATED",
-        severity: "warning",
-        breaking: false,
-        message:
-          "Legacy job configuration aliases are accepted for one release; migrate to jobs/defaults.jobs/service.",
-      });
-    }
-    return Object.freeze(diagnostics);
-  },
-  (effect) => observeJobs("migration.legacy", effect),
-);
-
-/** Synchronous legacy compatibility diagnostic adapter.
- * @param snapshot - Legacy and replacement key usage.
- * @returns Ordered immutable diagnostics.
- * @throws A runtime defect if the Effect cannot execute synchronously.
- * @example diagnoseLegacyCompatibility(snapshot);
- */
-export function diagnoseLegacyCompatibility(
-  snapshot: LegacyCompatibilitySnapshot,
-): readonly JobMigrationDiagnostic[] {
-  return Effect.runSync(diagnoseLegacyCompatibilityEffect(snapshot));
 }

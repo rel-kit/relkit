@@ -45,9 +45,9 @@ export type {
 
 export type { RunResultOptions, ServerTriggerOptions, TriggerOptions } from "./trigger.types.js";
 
-/** Jitter strategy for the compatibility retry policy. */
+/** Jitter strategy for a retry policy. */
 export type RetryJitter = "none" | "full" | "equal";
-/** Compatibility retry attempts, delays, multiplier, and jitter. */
+/** Retry attempts, delays, multiplier, and jitter for event delivery. */
 export interface RetryPolicy {
   readonly maxAttempts: number;
   readonly initialDelayMs: number;
@@ -95,10 +95,10 @@ export type JobClientAccess<Streams extends TaskStreamSchemas = TaskStreamSchema
       readonly streams?: readonly (keyof Streams & string)[];
     };
 
-/** Mutually exclusive service and deprecated profile selectors. */
-export type JobServiceSelection =
-  | { readonly service?: string; readonly profile?: never }
-  | { readonly service?: never; readonly profile?: string };
+/** Jobs service that runs the job. */
+export interface JobServiceSelection {
+  readonly service?: string;
+}
 
 type StreamsOf<Task extends TaskDescriptorAny> = [NonNullable<Task["streams"]>] extends [never]
   ? {}

@@ -3,14 +3,10 @@ import { Effect, Layer, Metric, Result } from "effect";
 import { expect, test } from "vitest";
 import {
   AppValidationFailure,
-  assertExclusiveAlias,
-  assertExclusiveAliasEffect,
   deriveApplicationId,
   deriveApplicationIdEffect,
   isEnvDefinition,
   isEnvDefinitionEffect,
-  normalizeCompatibility,
-  normalizeCompatibilityEffect,
 } from "../../src/app/app-validation.js";
 import { AppTelemetry } from "../../src/app/app-observability.js";
 
@@ -45,36 +41,6 @@ test("derives stable IDs and retains original errors for synchronous callers", (
     expect(invalid.failure._tag).toBe("AppValidationFailure");
   }
   expect(() => deriveApplicationId("@")).toThrow("Invalid stable ID");
-});
-
-test("normalizes compatibility and rejects invalid flags and aliases", () => {
-  expect(Effect.runSync(normalizeCompatibilityEffect(undefined))).toEqual({ legacyJobs: false });
-  expect(normalizeCompatibility({ legacyJobs: true })).toEqual({ legacyJobs: true });
-  expect(Object.isFrozen(normalizeCompatibility({}))).toBe(true);
-  const invalid = Effect.runSync(
-    Effect.result(normalizeCompatibilityEffect({ legacyJobs: "yes" } as never)),
-  );
-  expect(Result.isFailure(invalid)).toBe(true);
-  if (Result.isFailure(invalid)) expect(invalid.failure._tag).toBe("AppValidationFailure");
-  expect(() => normalizeCompatibility({ legacyJobs: "yes" } as never)).toThrow("must be a boolean");
-  const poisoned = Object.defineProperty({}, "legacyJobs", {
-    get: () => {
-      throw "invalid getter";
-    },
-  });
-  const thrown = Effect.runSync(Effect.result(normalizeCompatibilityEffect(poisoned)));
-  expect(Result.isFailure(thrown)).toBe(true);
-  if (Result.isFailure(thrown)) expect(thrown.failure.message).toBe("invalid getter");
-  expect(
-    Effect.runSync(assertExclusiveAliasEffect({ jobs: 1 }, "jobs", "job", "defineApp")),
-  ).toBeUndefined();
-  const alias = Effect.runSync(
-    Effect.result(assertExclusiveAliasEffect({ jobs: 1, job: 2 }, "jobs", "job", "defineApp")),
-  );
-  expect(Result.isFailure(alias)).toBe(true);
-  expect(() => assertExclusiveAlias({ jobs: 1, job: 2 }, "jobs", "job", "defineApp")).toThrow(
-    'cannot specify both "jobs" and "job"',
-  );
 });
 
 test("records success, failure, and duration metrics with bounded labels", () => {

@@ -3,7 +3,6 @@ import { observeJobs } from "./jobs-observability.js";
 import { defineJobValue, isJobDescriptorValue } from "./define-job-value.js";
 import type { DefineJobOptions, JobDescriptor, JobDescriptorAny } from "./job.types.js";
 import type { TaskDescriptorAny } from "./task-types.js";
-export { JOB_PROFILE_DEPRECATED_CODE } from "./define-job-value.js";
 export type { RetryJitter, RetryPolicy } from "./job.types.js";
 /** Expected job definition failure, retaining the original validation error.
  * @example if (error instanceof JobDefinitionFailure) console.log(error.message);

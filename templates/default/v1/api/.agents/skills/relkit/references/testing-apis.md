@@ -49,7 +49,7 @@ Use `app.http.request`, `get`, or other client methods to assert status, body, a
 
 ## Provider and feature tests
 
-- `createTestCacheFake`, `createTestBucketFake`, `createTestJobFake`, and `createTestEventFake` provide owned, inspectable test dependencies. `createTestFakes` groups native clients. Close any separately created fake after use. Replace every configured provider profile the graph needs, not only the one under direct assertion.
+- `createTestCacheFake`, `createTestBucketFake`, and `createTestEventFake` provide owned, inspectable test dependencies. `createTestFakes` groups native clients. Close any separately created fake after use. Replace every configured provider profile the graph needs, not only the one under direct assertion.
 - `createTestHttpClient` exercises a standalone in-memory HTTP application. Use `createTestApplication` when route discovery and service wiring matter. `createTestRealtimeProvider` and `createTestAgentStateProvider` supply local stateful provider replacements.
 - Import `createTestModel`, `createTestAgent`, and `assertAgentTrace` from `@relkit/langchain/testing` for deterministic native agent execution. Use scripted responses and inspect tool calls or traces instead of live model calls or sleeps.
 - For jobs, assert behavior beyond the descriptor shape: input/output, accepted run handle, progress, retry or cancellation policy, and idempotency where applicable. Use the test job adapter or fake appropriate to the contract.

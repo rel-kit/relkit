@@ -34,9 +34,7 @@ Every error and warning RelKit prints starts with a `RELKIT_*` code and ends wit
 | [`RELKIT_AGENT_TIMEOUT`](/docs/errors/relkit-agent-timeout)                                                                   | Agent run timed out                                                |
 | [`RELKIT_AGENT_TOOL_INVALID`](/docs/errors/relkit-agent-tool-invalid)                                                         | Agent tool is invalid                                              |
 | [`RELKIT_AGENT_TOOL_LIMIT`](/docs/errors/relkit-agent-tool-limit)                                                             | Agent hit its tool-call limit                                      |
-| [`RELKIT_APP_CONFIG_ALIAS`](/docs/errors/relkit-app-config-alias)                                                             | App sets both jobs and job                                         |
 | [`RELKIT_APP_DUPLICATE`](/docs/errors/relkit-app-duplicate)                                                                   | More than one app config is exported                               |
-| [`RELKIT_APP_LEGACY_JOB_ALIAS`](/docs/errors/relkit-app-legacy-job-alias)                                                     | Singular job option is deprecated                                  |
 | [`RELKIT_APPLICATION_BUILD_UNAVAILABLE`](/docs/errors/relkit-application-build-unavailable)                                   | No build for createRelkit                                          |
 | [`RELKIT_APPLICATION_NOT_RUNNING`](/docs/errors/relkit-application-not-running)                                               | No application is running                                          |
 | [`RELKIT_APPROVAL_DENIED`](/docs/errors/relkit-approval-denied)                                                               | Tool call was denied                                               |
@@ -219,7 +217,6 @@ Every error and warning RelKit prints starts with a `RELKIT_*` code and ends wit
 | [`RELKIT_GRAPH_VERSION_UNSUPPORTED`](/docs/errors/relkit-graph-version-unsupported)                                           | Application graph version is not supported                         |
 | [`RELKIT_ID_INFERENCE_AMBIGUOUS`](/docs/errors/relkit-id-inference-ambiguous)                                                 | ID cannot be worked out from the source                            |
 | [`RELKIT_ID_INVALID`](/docs/errors/relkit-id-invalid)                                                                         | ID is not valid                                                    |
-| [`RELKIT_IDEMPOTENCY_INVALID`](/docs/errors/relkit-idempotency-invalid)                                                       | Idempotency settings are invalid                                   |
 | [`RELKIT_INNGEST_EVENT_INVALID`](/docs/errors/relkit-inngest-event-invalid)                                                   | Inngest event is missing RelKit data                               |
 | [`RELKIT_INNGEST_SCHEDULE_DEFINITION_INVALID`](/docs/errors/relkit-inngest-schedule-definition-invalid)                       | Inngest schedule is incomplete                                     |
 | [`RELKIT_INPUT_VALIDATION`](/docs/errors/relkit-input-validation)                                                             | Input is invalid                                                   |
@@ -276,19 +273,12 @@ Every error and warning RelKit prints starts with a `RELKIT_*` code and ends wit
 | [`RELKIT_JOB_CAPABILITY_UNSUPPORTED`](/docs/errors/relkit-job-capability-unsupported)                                         | Jobs service lacks a needed feature                                |
 | [`RELKIT_JOB_CONTROL_UNKNOWN`](/docs/errors/relkit-job-control-unknown)                                                       | Job control result is unknown                                      |
 | [`RELKIT_JOB_CURSOR_INVALID`](/docs/errors/relkit-job-cursor-invalid)                                                         | Job cursor is invalid                                              |
-| [`RELKIT_JOB_DEPENDENCY_UNDECLARED`](/docs/errors/relkit-job-dependency-undeclared)                                           | Job is not declared on this function                               |
 | [`RELKIT_JOB_FAILURE`](/docs/errors/relkit-job-failure)                                                                       | Job failed with an undeclared error                                |
-| [`RELKIT_JOB_INPUT_INCOMPATIBLE`](/docs/errors/relkit-job-input-incompatible)                                                 | Job input does not match its target                                |
-| [`RELKIT_JOB_INPUT_VALIDATION`](/docs/errors/relkit-job-input-validation)                                                     | Job input does not match its schema                                |
 | [`RELKIT_JOB_LOCATOR_INVALID`](/docs/errors/relkit-job-locator-invalid)                                                       | Run ID is not valid                                                |
-| [`RELKIT_JOB_MATERIALIZATION_INVALID`](/docs/errors/relkit-job-materialization-invalid)                                       | Jobs could not be set up at startup                                |
 | [`RELKIT_JOB_NAME_INVALID`](/docs/errors/relkit-job-name-invalid)                                                             | Job name is invalid or taken                                       |
 | [`RELKIT_JOB_OBSERVATION_TIMEOUT`](/docs/errors/relkit-job-observation-timeout)                                               | Reading job status timed out                                       |
 | [`RELKIT_JOB_OPERATION_EXPOSURE_INVALID`](/docs/errors/relkit-job-operation-exposure-invalid)                                 | Job client settings are invalid                                    |
-| [`RELKIT_JOB_PROFILE_DEPRECATED`](/docs/errors/relkit-job-profile-deprecated)                                                 | Job profile option is deprecated                                   |
-| [`RELKIT_JOB_PROFILE_UNKNOWN`](/docs/errors/relkit-job-profile-unknown)                                                       | Job profile is not configured                                      |
 | [`RELKIT_JOB_PROTOCOL_UNSUPPORTED`](/docs/errors/relkit-job-protocol-unsupported)                                             | Jobs protocol version not supported                                |
-| [`RELKIT_JOB_PROVIDER_UNAVAILABLE`](/docs/errors/relkit-job-provider-unavailable)                                             | Job provider cannot enqueue jobs                                   |
 | [`RELKIT_JOB_PUBLIC_CONTRACT_STALE`](/docs/errors/relkit-job-public-contract-stale)                                           | Client job contract is out of date                                 |
 | [`RELKIT_JOB_QUEUE_STATE_INVALID`](/docs/errors/relkit-job-queue-state-invalid)                                               | Local job queue is damaged                                         |
 | [`RELKIT_JOB_RECEIPT_INVALID`](/docs/errors/relkit-job-receipt-invalid)                                                       | Job provider returned an invalid confirmation                      |
@@ -334,7 +324,6 @@ Every error and warning RelKit prints starts with a `RELKIT_*` code and ends wit
 | [`RELKIT_LAYOUT_RECOVERY_CONFLICT`](/docs/errors/relkit-layout-recovery-conflict)                                             | Rollback kept a later edit                                         |
 | [`RELKIT_LAYOUT_TYPECHECK_FAILED`](/docs/errors/relkit-layout-typecheck-failed)                                               | Type check failed during layout migration                          |
 | [`RELKIT_LAYOUT_USAGE`](/docs/errors/relkit-layout-usage)                                                                     | Invalid relkit migrate arguments                                   |
-| [`RELKIT_LEGACY_JOBS_DISABLED`](/docs/errors/relkit-legacy-jobs-disabled)                                                     | Legacy jobs are not enabled                                        |
 | [`RELKIT_LOCAL_CHECK_FAILED`](/docs/errors/relkit-local-check-failed)                                                         | Project check failed before starting local services                |
 | [`RELKIT_LOCAL_FAILED`](/docs/errors/relkit-local-failed)                                                                     | relkit local could not finish                                      |
 | [`RELKIT_LOCAL_INVALID`](/docs/errors/relkit-local-invalid)                                                                   | Local services setup is invalid                                    |
@@ -435,7 +424,6 @@ Every error and warning RelKit prints starts with a `RELKIT_*` code and ends wit
 | [`RELKIT_RUNTIME_INTEGRATION_PLAN_REFERENCE_INVALID`](/docs/errors/relkit-runtime-integration-plan-reference-invalid)         | Integration plan does not match the build                          |
 | [`RELKIT_RUNTIME_INTEGRATION_PLAN_VERSION_UNSUPPORTED`](/docs/errors/relkit-runtime-integration-plan-version-unsupported)     | Runtime integration plan version is not supported                  |
 | [`RELKIT_RUNTIME_INTEGRATION_REGISTRATION_DUPLICATE`](/docs/errors/relkit-runtime-integration-registration-duplicate)         | Two integrations provide the same feature                          |
-| [`RELKIT_SCHEDULE_INVALID`](/docs/errors/relkit-schedule-invalid)                                                             | Schedule is invalid                                                |
 | [`RELKIT_SCHEMA_UNAVAILABLE`](/docs/errors/relkit-schema-unavailable)                                                         | Schema has no JSON Schema                                          |
 | [`RELKIT_SERVICE_LAYOUT`](/docs/errors/relkit-service-layout)                                                                 | Service files are in the wrong place                               |
 | [`RELKIT_SOURCE_LOCATION_INVALID`](/docs/errors/relkit-source-location-invalid)                                               | Source location is invalid                                         |

@@ -79,8 +79,7 @@ function classifyFunction(
   return fields.length === 0 ? "informational" : "potentially-breaking";
 }
 function classifyJob(fields: readonly string[]): GraphDiffClassification {
-  if (fields.some((field) => ["input", "targetFunctionId", "idempotency"].includes(field)))
-    return "breaking";
+  if (fields.includes("input")) return "breaking";
   return fields.length === 0 ? "informational" : "potentially-breaking";
 }
 function classifyResource(

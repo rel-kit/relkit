@@ -12,7 +12,7 @@ import type {
   UnknownEventEnvelope,
 } from "relkit/events";
 
-import type { RetryPolicy } from "relkit/jobs/legacy";
+import type { RetryPolicy } from "relkit/jobs";
 import type { EventDeliveryResult, EventDeliveryLedgerRecord } from "relkit/providers-local";
 import type { StandardSchemaV1 } from "relkit/schema";
 import type { TestFailureControls } from "./fakes.js";

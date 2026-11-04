@@ -11,12 +11,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/jobs/**/*.ts"],
-      exclude: [
-        "src/jobs/**/*.types.ts",
-        "src/jobs/index.ts",
-        "src/jobs/legacy.ts",
-        "src/jobs/task-types.ts",
-      ],
+      exclude: ["src/jobs/**/*.types.ts", "src/jobs/index.ts", "src/jobs/task-types.ts"],
       excludeAfterRemap: true,
       reporter: ["text", "json", "lcov"],
       reportsDirectory: "coverage/jobs",

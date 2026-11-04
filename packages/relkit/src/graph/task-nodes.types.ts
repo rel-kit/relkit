@@ -46,8 +46,6 @@ export interface TaskJobNode extends GraphNodeBase<"job"> {
   readonly streams?: JsonValue;
   readonly policy?: JsonValue;
   readonly schedules?: JsonValue;
-  /** @deprecated Legacy materializers may still inspect the singular field. */
-  readonly schedule?: JsonValue;
   readonly admission?: JsonValue;
   readonly client?: JsonValue;
   readonly capabilities?: JsonValue;
@@ -55,28 +53,11 @@ export interface TaskJobNode extends GraphNodeBase<"job"> {
 }
 
 /**
- * Legacy job binding that invokes a function.
- * @remarks IDs and source locations follow the versioned graph contract.
- * @example const inspect = (value: LegacyJobNode): void => { console.log(value); };
- */
-export interface LegacyJobNode extends GraphNodeBase<"job"> {
-  readonly executionModel?: "legacy-function";
-  readonly input: JsonValue;
-  readonly targetFunctionId: string;
-  readonly profile: string;
-  readonly retry?: JsonValue;
-  readonly timeoutMs?: number;
-  readonly concurrency?: number;
-  readonly schedule?: JsonValue;
-  readonly idempotency?: JsonValue;
-}
-
-/**
- * Either task-backed or legacy job projection.
+ * Job projection; every job binds a task.
  * @remarks IDs and source locations follow the versioned graph contract.
  * @example const inspect = (value: JobNode): void => { console.log(value); };
  */
-export type JobNode = TaskJobNode | LegacyJobNode;
+export type JobNode = TaskJobNode;
 
 /**
  * Lifecycle hook owned by a function or tool.
