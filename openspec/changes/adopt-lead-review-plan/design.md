@@ -234,15 +234,20 @@ Decided while applying section 9 (maintainer choice, 2026-11-04):
   subpath; the constants, prompt and context-resolver names that only the root exported move to
   `relkit/config` and `relkit/host`.
 - `relkit/effect` holds the Effect form of each root API: `failEffect`, `streamOfEffect`,
-  `httpEffects`, the `define*Effect` functions, and `invokeFunctionToolEffect` and
-  `invokeFunctionGraphNodeEffect`, which replace the `invokeEffect` members that public descriptor
-  types drop. Internal Effect helpers stay on their area subpath. A handler-context Effect service
-  and test layers do not exist yet and are not part of section 9.
+  `httpEffects`, the `define*Effect` functions, and `callToolEffect` and `callGraphNodeEffect`,
+  which replace the `invokeEffect` members that public descriptor types drop. Internal Effect
+  helpers stay on their area subpath. A handler-context Effect service and test layers do not
+  exist yet and are not part of section 9.
+- `failEffect` fails the Effect with the declared error. It used to succeed with a
+  `FunctionFailure` wrapper, which an Effect handler's type check rejects.
 - Measured before the change: the root had 1,205 exports, 368 of which reached a type declared in
   `effect`. Among the curated names only three causes leaked: `InspectorConfig` derived from an
   Effect Schema type (`defineApp`), and the `invokeEffect` member on tool descriptors
-  (`defineFunction` through its tool view, and `defineTool`). Section 9.2 removes them and replaces
-  the file-based scan of the root with a walk of its exported types.
+  (`defineFunction` through its tool view, and `defineTool`). Section 9.2 removes them and adds a
+  walk of the root's exported types, and of the types generated registry declarations name, to the
+  declaration scan. Since section 7 the root's file-based scan had covered every area under
+  `dist/`, including internal ones that were never scanned as packages; it now covers `dist/app`,
+  and each public area stays its own entry.
 
 ### D14. Dependencies and runtime handle (#15)
 

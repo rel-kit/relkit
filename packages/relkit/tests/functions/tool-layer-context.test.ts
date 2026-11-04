@@ -6,6 +6,7 @@ import { defineFunction } from "../../src/functions/define-function.js";
 import { createFunctionToolInvokerEffect } from "../../src/functions/function-tool-runtime.js";
 import { createFunctionToolEffect } from "../../src/functions/function-tool.js";
 import { asToolEffect } from "../../src/functions/function-descriptor-methods.js";
+import { callToolEffect } from "../../src/functions/descriptor-effects.js";
 import {
   FunctionTelemetry,
   type FunctionOperation,
@@ -93,7 +94,7 @@ test("an Effect-created tool retains its dispatcher", async () => {
     }),
   );
   await expect(
-    Effect.runPromise(Effect.provide(tool.invokeEffect({ id: "one" }), invokeLayer)),
+    Effect.runPromise(Effect.provide(callToolEffect(tool, { id: "one" }), invokeLayer)),
   ).resolves.toEqual({ id: "layer" });
   expect(dispatches).toBe(1);
 });
@@ -148,7 +149,7 @@ test("a derived tool resolves the dispatcher at invocation time", async () => {
   );
   const tool = await Effect.runPromise(asToolEffect(target, target, target.tool));
   await expect(
-    Effect.runPromise(Effect.provide(tool.invokeEffect({ id: "one" }), layer)),
+    Effect.runPromise(Effect.provide(callToolEffect(tool, { id: "one" }), layer)),
   ).resolves.toEqual({ id: "invocation-layer" });
   await expect(tool.invoke({ id: "one" })).resolves.toEqual({ id: "handler" });
 });

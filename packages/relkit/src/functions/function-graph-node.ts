@@ -29,6 +29,7 @@ import type {
 export type {
   FunctionAsGraphNode,
   FunctionGraphNodeDescriptor,
+  FunctionGraphNodeInvokeEffect,
   FunctionGraphNodeOptions,
 } from "./function-graph-node.types.js";
 

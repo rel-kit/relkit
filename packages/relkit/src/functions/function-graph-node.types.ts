@@ -34,14 +34,6 @@ export interface FunctionGraphNodeDescriptor<
   readonly output: OutputSchema;
   readonly errors?: Errors;
   readonly dependencies?: Dependencies;
-  /** Invokes the source function using services supplied when the Effect runs.
-   * @param input - Value accepted by the source input schema.
-   * @returns Validated output or a tagged dispatch failure.
-   * @example yield* node.invokeEffect({ id: "one" });
-   */
-  readonly invokeEffect: (
-    input: InferInput<InputSchema>,
-  ) => Effect.Effect<Output, FunctionOperationError>;
   /** Invokes the source function through the common dispatcher.
    * @param input - Value accepted by the source input schema.
    * @returns Validated output or an invocation rejection.
@@ -51,6 +43,15 @@ export interface FunctionGraphNodeDescriptor<
   readonly __input?: Input;
   readonly __output?: Output;
 }
+
+/** Effect form of a graph node's invoke adapter. It stays off `FunctionGraphNodeDescriptor` so the
+ * descriptor type carries no Effect types; `callGraphNodeEffect` in `relkit/effect` calls it.
+ * @example const run: FunctionGraphNodeInvokeEffect = (input) => callGraphNodeEffect(node, input);
+ */
+export type FunctionGraphNodeInvokeEffect<
+  Output = unknown,
+  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
+> = (input: InferInput<InputSchema>) => Effect.Effect<Output, FunctionOperationError>;
 
 /** Overloads for creating a graph view with a derived or explicit ID.
  * @example const node = fn.asGraphNode({ id: "lookup" });

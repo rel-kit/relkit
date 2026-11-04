@@ -49,6 +49,8 @@ it("keeps Effect forms out of the root and in relkit/effect", () => {
   expect(recorded.values.filter((name) => /Effects?$|Live$|Layer$/.test(name))).toEqual([]);
   expect(Object.keys(effect).sort()).toEqual([
     "FunctionOperationError",
+    "callGraphNodeEffect",
+    "callToolEffect",
     "defineAgentEffect",
     "defineAppEffect",
     "defineBucketEffect",
@@ -70,8 +72,6 @@ it("keeps Effect forms out of the root and in relkit/effect", () => {
     "defineTransformEffect",
     "failEffect",
     "httpEffects",
-    "invokeFunctionGraphNodeEffect",
-    "invokeFunctionToolEffect",
     "streamOfEffect",
   ]);
 });

@@ -2,6 +2,12 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { agentProviderPropertyOffsets } from "./public-declaration-agent";
 import { nonFunctionHandlers } from "./public-declaration-ast";
+import {
+  effectTypeLeaks,
+  generatedDeclarationFiles,
+  generatedProject,
+  generateProjectDeclarations,
+} from "./public-declaration-effect";
 
 /** Public declaration entry points: a package and one export subpath. */
 const publicEntries = [
@@ -30,8 +36,8 @@ const internalAreaFile =
   /\/packages\/relkit\/dist\/(?:providers-local|runtime-effect|runtime-hono|engine|observability\/(?!telemetry(?:-config\.types)?\.d\.ts$))/;
 
 const forbiddenSymbols = [
-  // Native Effect constructors and injectable services are documented public APIs.
-  // Framework and provider implementations remain forbidden below.
+  // Area subpaths may document native Effect constructors and services. The `relkit` root and
+  // generated application declarations may not reach any Effect type; `effectTypeLeaks` checks them.
   ["Hono", /\bHono(?:Context|Request|Response)?\b/g],
   ["Next.js", /\bNext(?:JS|\.js)?\b/g],
   ["Pulumi", /\bPulumi\b|from ["'](?:pulumi|@pulumi\/)[^"']*["']/g],
@@ -101,8 +107,12 @@ export function scanPublicDeclarations(root: string): DeclarationLeak[] {
   const leaks: DeclarationLeak[] = [];
   for (const [packagePath, subpath] of publicEntries) {
     const entry = declarationEntry(root, packagePath, subpath);
-    // Each entry is scanned within its own folder, as each former package was.
-    const scope = dirname(entry);
+    // Each entry is scanned within its own folder, as each former package was. The `relkit` root
+    // re-exports the application facade in `dist/app`; each area it reaches is its own entry.
+    const scope =
+      packagePath === "packages/relkit" && subpath === "."
+        ? resolve(root, packagePath, "dist/app")
+        : dirname(entry);
     const pending = [entry];
     const visited = new Set<string>();
     while (pending.length > 0) {
@@ -139,6 +149,29 @@ export function scanPublicDeclarations(root: string): DeclarationLeak[] {
       }
     }
   }
+  leaks.push(
+    ...effectTypeLeaks({ root, entries: [declarationEntry(root, "packages/relkit", ".")] }),
+  );
+  return sortLeaks(leaks);
+}
+
+/**
+ * Scans the declarations `relkit check` generated for a project for Effect types.
+ * @param root - Repository root, for relative paths in findings.
+ * @param projectRoot - Application whose `.relkit/generated` declarations are scanned.
+ * @returns Every generated reference that reaches an Effect type.
+ */
+export function scanGeneratedDeclarations(root: string, projectRoot: string): DeclarationLeak[] {
+  const generated = resolve(projectRoot, ".relkit/generated");
+  const references = generatedDeclarationFiles
+    .map((file) => resolve(generated, file))
+    .filter((file) => existsSync(file));
+  if (references.length === 0)
+    throw new Error(`No generated declarations in ${relative(root, generated)}; run relkit check.`);
+  return sortLeaks(effectTypeLeaks({ root, references }));
+}
+
+function sortLeaks(leaks: DeclarationLeak[]): DeclarationLeak[] {
   return leaks.sort((left, right) =>
     `${left.file}:${left.line}:${left.column}:${left.symbol}`.localeCompare(
       `${right.file}:${right.line}:${right.column}:${right.symbol}`,
@@ -182,7 +215,11 @@ async function emitDeclarations(root: string): Promise<void> {
 async function main(): Promise<void> {
   const root = resolve(process.argv[2] ?? resolve(import.meta.dir, ".."));
   await emitDeclarations(root);
-  const leaks = scanPublicDeclarations(root);
+  await generateProjectDeclarations(root);
+  const leaks = [
+    ...scanPublicDeclarations(root),
+    ...scanGeneratedDeclarations(root, resolve(root, generatedProject)),
+  ];
   if (leaks.length > 0) {
     for (const leak of leaks) {
       console.error(
@@ -191,7 +228,9 @@ async function main(): Promise<void> {
     }
     throw new Error(`Public declaration scan failed with ${leaks.length} forbidden symbol(s).`);
   }
-  console.log(`Public declaration scan passed (${publicEntries.length} entry points).`);
+  console.log(
+    `Public declaration scan passed (${publicEntries.length} entry points and ${generatedProject}'s generated declarations).`,
+  );
 }
 
 if (import.meta.main) {

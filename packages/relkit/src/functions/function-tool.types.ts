@@ -115,24 +115,6 @@ export interface FunctionToolDescriptor<
   readonly mcp: boolean;
   readonly onBefore?: FunctionToolHook<InferInput<Target["input"]>>;
   readonly onAfter?: FunctionToolHook<InferOutput<Target["output"]>>;
-  /** Invokes the target using services supplied when the Effect runs.
-   * @param input - Tool argument value.
-   * @param options - Optional cancellation and approval controls.
-   * @returns Validated output or a tagged tool failure.
-   * @example yield* tool.invokeEffect({ id: "one" });
-   */
-  readonly invokeEffect: (
-    input: InferInput<Target["input"]>,
-    options?: FunctionToolInvokeOptions,
-  ) => Effect.Effect<
-    InferOutput<Target["output"]>,
-    | FunctionOperationError
-    | FunctionToolArgumentFailure
-    | FunctionToolCancelledFailure
-    | FunctionToolApprovalRequiredFailure
-    | FunctionToolApprovalDeniedFailure,
-    SchemaValidator
-  >;
   /** Invokes the target through the common tool and function runtime.
    * @param input - Tool argument value.
    * @param options - Optional cancellation and approval controls.
@@ -144,6 +126,22 @@ export interface FunctionToolDescriptor<
     options?: FunctionToolInvokeOptions,
   ) => Promise<InferOutput<Target["output"]>>;
 }
+/** Effect form of a tool's invoke adapter. It stays off `FunctionToolDescriptor` so the descriptor
+ * type carries no Effect types; `callToolEffect` in `relkit/effect` calls it.
+ * @example const run: FunctionToolInvokeEffect<typeof fn> = (input) => callToolEffect(tool, input);
+ */
+export type FunctionToolInvokeEffect<Target extends FunctionRefAny = FunctionRefAny> = (
+  input: InferInput<Target["input"]>,
+  options?: FunctionToolInvokeOptions,
+) => Effect.Effect<
+  InferOutput<Target["output"]>,
+  | FunctionOperationError
+  | FunctionToolArgumentFailure
+  | FunctionToolCancelledFailure
+  | FunctionToolApprovalRequiredFailure
+  | FunctionToolApprovalDeniedFailure,
+  SchemaValidator
+>;
 /** Target and metadata required to construct a tool.
  * @example const options: FunctionToolCreateOptions<"lookup", typeof fn> = { id: "lookup", target: fn, description: "Lookup", sideEffect: "read", approval: "never" };
  */

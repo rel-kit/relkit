@@ -2,6 +2,7 @@ export * from "./define-error.js";
 export * from "./define-function.js";
 export * from "./handler-result.js";
 export * from "./function-graph-node.js";
+export { callGraphNodeEffect, callToolEffect } from "./descriptor-effects.js";
 export * from "./stream.js";
 export * from "./function-observability.js";
 export type {
@@ -10,6 +11,7 @@ export type {
   FunctionToolApprovalRequest,
   FunctionToolApprovalResolver,
   FunctionToolDescriptor,
+  FunctionToolInvokeEffect,
   FunctionToolInvokeOptions,
   FunctionToolContext,
   FunctionToolHook,

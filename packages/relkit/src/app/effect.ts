@@ -11,8 +11,8 @@ export {
   defineFunctionEffect,
   failEffect,
   FunctionOperationError,
-  invokeFunctionGraphNodeEffect,
-  invokeFunctionToolEffect,
+  callGraphNodeEffect,
+  callToolEffect,
   streamOfEffect,
 } from "../functions/index.js";
 export { defineServiceEffect } from "../services/index.js";

@@ -1728,6 +1728,51 @@ declare const FunctionOperationError: typeof FunctionOperationError;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L13)
 
+### callGraphNodeEffect
+
+**Signature**
+
+```ts
+declare const callGraphNodeEffect: <
+  Id extends string,
+  FunctionId extends string,
+  Input,
+  Output,
+  Errors extends readonly ErrorDescriptorAny[],
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+  Dependencies extends FunctionDependencies,
+>(
+  node: FunctionGraphNodeDescriptor<
+    Id,
+    FunctionId,
+    Input,
+    Output,
+    Errors,
+    InputSchema,
+    OutputSchema,
+    Dependencies
+  >,
+  input: InferInput<InputSchema>,
+) => Effect<Output, FunctionOperationError>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L14)
+
+### callToolEffect
+
+**Signature**
+
+```ts
+declare const callToolEffect: <const Id extends string, const Target extends FunctionRefAny>(
+  tool: FunctionToolDescriptor<Id, Target>,
+  input: InferInput<Target["input"]>,
+  options?: FunctionToolInvokeOptions,
+) => ReturnType<FunctionToolInvokeEffect<Target>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L15)
+
 ### defineAgentEffect
 
 **Signature**
@@ -2185,43 +2230,6 @@ declare const httpEffects: {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L25)
-
-### invokeFunctionGraphNodeEffect
-
-**Signature**
-
-```ts
-declare const invokeFunctionGraphNodeEffect: (
-  target: FunctionRefAny,
-  input: unknown,
-) => Effect<unknown, FunctionOperationError, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L14)
-
-### invokeFunctionToolEffect
-
-**Signature**
-
-```ts
-declare const invokeFunctionToolEffect: <Target extends FunctionRefAny>(
-  target: Target,
-  metadata: FunctionToolRuntimeMetadata,
-  input: InferInput<Target["input"]>,
-  options?: FunctionToolInvokeOptions | undefined,
-  identity?: object | undefined,
-) => Effect<
-  InferOutput<Target["output"]>,
-  | FunctionOperationError
-  | FunctionToolCancelledFailure
-  | FunctionToolArgumentFailure
-  | FunctionToolApprovalRequiredFailure
-  | FunctionToolApprovalDeniedFailure,
-  SchemaValidator
->;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L15)
 
 ### streamOfEffect
 

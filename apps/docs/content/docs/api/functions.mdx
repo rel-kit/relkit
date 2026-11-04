@@ -2079,6 +2079,72 @@ type FunctionImplementationOptions = Omit<
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.types.ts#L6)
 
+## `descriptor-effects.ts`
+
+Effect forms of the `invoke` adapters on tool descriptors and graph nodes. The descriptor types
+expose only the Promise `invoke`; these read the Effect adapter each descriptor carries.
+
+### callGraphNodeEffect
+
+Invokes a function's graph node as an Effect through the common dispatcher.
+
+**Example**
+
+```ts
+const output = yield * callGraphNodeEffect(node, { id: "one" });
+```
+
+**Signature**
+
+```ts
+declare const callGraphNodeEffect: <
+  Id extends string,
+  FunctionId extends string,
+  Input,
+  Output,
+  Errors extends readonly ErrorDescriptorAny[],
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+  Dependencies extends FunctionDependencies,
+>(
+  node: FunctionGraphNodeDescriptor<
+    Id,
+    FunctionId,
+    Input,
+    Output,
+    Errors,
+    InputSchema,
+    OutputSchema,
+    Dependencies
+  >,
+  input: InferInput<InputSchema>,
+) => Effect.Effect<Output, FunctionOperationError>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/descriptor-effects.ts#L43)
+
+### callToolEffect
+
+Invokes a tool as an Effect, with the services the tool needs supplied when it runs.
+
+**Example**
+
+```ts
+const output = yield * callToolEffect(lookupOrder, { id: "one" });
+```
+
+**Signature**
+
+```ts
+declare const callToolEffect: <const Id extends string, const Target extends FunctionRefAny>(
+  tool: FunctionToolDescriptor<Id, Target>,
+  input: InferInput<Target["input"]>,
+  options?: FunctionToolInvokeOptions,
+) => ReturnType<FunctionToolInvokeEffect<Target>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/descriptor-effects.ts#L27)
+
 ## `descriptor-factory.ts`
 
 ### "./function-descriptor-factory.js" (namespace export)
@@ -2934,6 +3000,16 @@ declare const FunctionGraphNodeDescriptor: FunctionGraphNodeDescriptor<
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L31)
 
+### FunctionGraphNodeInvokeEffect
+
+**Signature**
+
+```ts
+declare const FunctionGraphNodeInvokeEffect: FunctionGraphNodeInvokeEffect<Output, InputSchema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L32)
+
 ### FunctionGraphNodeOptions
 
 **Signature**
@@ -2942,7 +3018,7 @@ declare const FunctionGraphNodeDescriptor: FunctionGraphNodeDescriptor<
 declare const FunctionGraphNodeOptions: FunctionGraphNodeOptions<Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L33)
 
 ### RELKIT_FUNCTION_GRAPH_NODE
 
@@ -2960,7 +3036,7 @@ if (node[RELKIT_FUNCTION_GRAPH_NODE]) console.log(node.id);
 declare const RELKIT_FUNCTION_GRAPH_NODE: unique symbol;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L39)
 
 ### createFunctionGraphNode
 
@@ -2986,7 +3062,7 @@ declare const createFunctionGraphNode: (
 ) => FunctionGraphNodeDescriptor;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L130)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L131)
 
 ### createFunctionGraphNodeEffect
 
@@ -3021,7 +3097,7 @@ declare const createFunctionGraphNodeEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L70)
 
 ### invokeFunctionGraphNodeEffect
 
@@ -3042,7 +3118,7 @@ declare const invokeFunctionGraphNodeEffect: (
 ) => Effect.Effect<unknown, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L47)
 
 ### isFunctionGraphNode
 
@@ -3060,7 +3136,7 @@ if (isFunctionGraphNode(value)) console.log(value.id);
 declare const isFunctionGraphNode: (value: unknown) => value is FunctionGraphNodeDescriptor;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L163)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L164)
 
 ### isFunctionGraphNodeEffect
 
@@ -3080,7 +3156,7 @@ declare const isFunctionGraphNodeEffect: (
 ) => Effect.Effect<boolean, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L143)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L144)
 
 ## `function-graph-node.types.ts`
 
@@ -3140,7 +3216,7 @@ type FunctionAsGraphNode<
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.types.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.types.ts#L59)
 
 ### FunctionGraphNodeDescriptor (interface)
 
@@ -3173,14 +3249,6 @@ export interface FunctionGraphNodeDescriptor<
   readonly output: OutputSchema;
   readonly errors?: Errors;
   readonly dependencies?: Dependencies;
-  /** Invokes the source function using services supplied when the Effect runs.
-   * @param input - Value accepted by the source input schema.
-   * @returns Validated output or a tagged dispatch failure.
-   * @example yield* node.invokeEffect({ id: "one" });
-   */
-  readonly invokeEffect: (
-    input: InferInput<InputSchema>,
-  ) => Effect.Effect<Output, FunctionOperationError>;
   /** Invokes the source function through the common dispatcher.
    * @param input - Value accepted by the source input schema.
    * @returns Validated output or an invocation rejection.
@@ -3193,6 +3261,28 @@ export interface FunctionGraphNodeDescriptor<
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.types.ts#L19)
+
+### FunctionGraphNodeInvokeEffect (type alias)
+
+Effect form of a graph node's invoke adapter. It stays off `FunctionGraphNodeDescriptor` so the
+descriptor type carries no Effect types; `callGraphNodeEffect` in `relkit/effect` calls it.
+
+**Example**
+
+```ts
+const run: FunctionGraphNodeInvokeEffect = (input) => callGraphNodeEffect(node, input);
+```
+
+**Signature**
+
+```ts
+type FunctionGraphNodeInvokeEffect<
+  Output = unknown,
+  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
+> = (input: InferInput<InputSchema>) => Effect.Effect<Output, FunctionOperationError>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.types.ts#L51)
 
 ### FunctionGraphNodeOptions (interface)
 
@@ -4971,7 +5061,7 @@ type FunctionToolCreateOptions<
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L150)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L148)
 
 ### FunctionToolDescriptor (interface)
 
@@ -4999,24 +5089,6 @@ export interface FunctionToolDescriptor<
   readonly mcp: boolean;
   readonly onBefore?: FunctionToolHook<InferInput<Target["input"]>>;
   readonly onAfter?: FunctionToolHook<InferOutput<Target["output"]>>;
-  /** Invokes the target using services supplied when the Effect runs.
-   * @param input - Tool argument value.
-   * @param options - Optional cancellation and approval controls.
-   * @returns Validated output or a tagged tool failure.
-   * @example yield* tool.invokeEffect({ id: "one" });
-   */
-  readonly invokeEffect: (
-    input: InferInput<Target["input"]>,
-    options?: FunctionToolInvokeOptions,
-  ) => Effect.Effect<
-    InferOutput<Target["output"]>,
-    | FunctionOperationError
-    | FunctionToolArgumentFailure
-    | FunctionToolCancelledFailure
-    | FunctionToolApprovalRequiredFailure
-    | FunctionToolApprovalDeniedFailure,
-    SchemaValidator
-  >;
   /** Invokes the target through the common tool and function runtime.
    * @param input - Tool argument value.
    * @param options - Optional cancellation and approval controls.
@@ -5052,6 +5124,36 @@ type FunctionToolHook<Value = unknown> = (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L46)
+
+### FunctionToolInvokeEffect (type alias)
+
+Effect form of a tool's invoke adapter. It stays off `FunctionToolDescriptor` so the descriptor
+type carries no Effect types; `callToolEffect` in `relkit/effect` calls it.
+
+**Example**
+
+```ts
+const run: FunctionToolInvokeEffect<typeof fn> = (input) => callToolEffect(tool, input);
+```
+
+**Signature**
+
+```ts
+type FunctionToolInvokeEffect<Target extends FunctionRefAny = FunctionRefAny> = (
+  input: InferInput<Target["input"]>,
+  options?: FunctionToolInvokeOptions,
+) => Effect.Effect<
+  InferOutput<Target["output"]>,
+  | FunctionOperationError
+  | FunctionToolArgumentFailure
+  | FunctionToolCancelledFailure
+  | FunctionToolApprovalRequiredFailure
+  | FunctionToolApprovalDeniedFailure,
+  SchemaValidator
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L133)
 
 ### FunctionToolInvokeOptions (interface)
 
@@ -5425,7 +5527,7 @@ Re-exports all named exports from the "./function-observability.js" module.
 export * from "./function-observability.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L7)
 
 ### "./handler-result.js" (namespace export)
 
@@ -5449,7 +5551,7 @@ Re-exports all named exports from the "./stream.js" module.
 export * from "./stream.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L6)
 
 ### FunctionToolApproval
 
@@ -5459,7 +5561,7 @@ export * from "./stream.js";
 declare const FunctionToolApproval: FunctionToolApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L9)
 
 ### FunctionToolApprovalDecision
 
@@ -5469,7 +5571,7 @@ declare const FunctionToolApproval: FunctionToolApproval;
 declare const FunctionToolApprovalDecision: FunctionToolApprovalDecision;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L10)
 
 ### FunctionToolApprovalDeniedError
 
@@ -5479,7 +5581,7 @@ declare const FunctionToolApprovalDecision: FunctionToolApprovalDecision;
 declare const FunctionToolApprovalDeniedError: typeof FunctionToolApprovalDeniedError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L28)
 
 ### FunctionToolApprovalDeniedFailure
 
@@ -5489,7 +5591,7 @@ declare const FunctionToolApprovalDeniedError: typeof FunctionToolApprovalDenied
 declare const FunctionToolApprovalDeniedFailure: typeof FunctionToolApprovalDeniedFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L32)
 
 ### FunctionToolApprovalRequest
 
@@ -5499,7 +5601,7 @@ declare const FunctionToolApprovalDeniedFailure: typeof FunctionToolApprovalDeni
 declare const FunctionToolApprovalRequest: FunctionToolApprovalRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L11)
 
 ### FunctionToolApprovalRequiredError
 
@@ -5509,7 +5611,7 @@ declare const FunctionToolApprovalRequest: FunctionToolApprovalRequest;
 declare const FunctionToolApprovalRequiredError: typeof FunctionToolApprovalRequiredError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L29)
 
 ### FunctionToolApprovalRequiredFailure
 
@@ -5519,7 +5621,7 @@ declare const FunctionToolApprovalRequiredError: typeof FunctionToolApprovalRequ
 declare const FunctionToolApprovalRequiredFailure: typeof FunctionToolApprovalRequiredFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L33)
 
 ### FunctionToolApprovalResolver
 
@@ -5529,7 +5631,7 @@ declare const FunctionToolApprovalRequiredFailure: typeof FunctionToolApprovalRe
 declare const FunctionToolApprovalResolver: FunctionToolApprovalResolver;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L12)
 
 ### FunctionToolArgumentFailure
 
@@ -5539,7 +5641,7 @@ declare const FunctionToolApprovalResolver: FunctionToolApprovalResolver;
 declare const FunctionToolArgumentFailure: typeof FunctionToolArgumentFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L34)
 
 ### FunctionToolArgumentValidationError
 
@@ -5549,7 +5651,7 @@ declare const FunctionToolArgumentFailure: typeof FunctionToolArgumentFailure;
 declare const FunctionToolArgumentValidationError: typeof FunctionToolArgumentValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L30)
 
 ### FunctionToolCancelledFailure
 
@@ -5559,7 +5661,7 @@ declare const FunctionToolArgumentValidationError: typeof FunctionToolArgumentVa
 declare const FunctionToolCancelledFailure: typeof FunctionToolCancelledFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L35)
 
 ### FunctionToolContext
 
@@ -5569,7 +5671,7 @@ declare const FunctionToolCancelledFailure: typeof FunctionToolCancelledFailure;
 declare const FunctionToolContext: FunctionToolContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L16)
 
 ### FunctionToolDescriptor
 
@@ -5579,7 +5681,7 @@ declare const FunctionToolContext: FunctionToolContext;
 declare const FunctionToolDescriptor: FunctionToolDescriptor<Id, Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L13)
 
 ### FunctionToolHook
 
@@ -5589,7 +5691,17 @@ declare const FunctionToolDescriptor: FunctionToolDescriptor<Id, Target>;
 declare const FunctionToolHook: FunctionToolHook<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L17)
+
+### FunctionToolInvokeEffect
+
+**Signature**
+
+```ts
+declare const FunctionToolInvokeEffect: FunctionToolInvokeEffect<Target>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L14)
 
 ### FunctionToolInvokeOptions
 
@@ -5599,7 +5711,7 @@ declare const FunctionToolHook: FunctionToolHook<Value>;
 declare const FunctionToolInvokeOptions: FunctionToolInvokeOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L15)
 
 ### FunctionToolMetadata
 
@@ -5609,7 +5721,7 @@ declare const FunctionToolInvokeOptions: FunctionToolInvokeOptions;
 declare const FunctionToolMetadata: FunctionToolMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L18)
 
 ### FunctionToolOperationCancelledError
 
@@ -5619,7 +5731,7 @@ declare const FunctionToolMetadata: FunctionToolMetadata;
 declare const FunctionToolOperationCancelledError: typeof FunctionToolOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L31)
 
 ### FunctionToolOptions
 
@@ -5629,7 +5741,7 @@ declare const FunctionToolOperationCancelledError: typeof FunctionToolOperationC
 declare const FunctionToolOptions: FunctionToolOptions<Id, Input, Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L19)
 
 ### FunctionToolSideEffect
 
@@ -5639,7 +5751,7 @@ declare const FunctionToolOptions: FunctionToolOptions<Id, Input, Output>;
 declare const FunctionToolSideEffect: FunctionToolSideEffect;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L20)
 
 ### FunctionToolTarget
 
@@ -5649,7 +5761,52 @@ declare const FunctionToolSideEffect: FunctionToolSideEffect;
 declare const FunctionToolTarget: FunctionToolTarget<Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L21)
+
+### callGraphNodeEffect
+
+**Signature**
+
+```ts
+declare const callGraphNodeEffect: <
+  Id extends string,
+  FunctionId extends string,
+  Input,
+  Output,
+  Errors extends readonly ErrorDescriptorAny[],
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+  Dependencies extends FunctionDependencies,
+>(
+  node: FunctionGraphNodeDescriptor<
+    Id,
+    FunctionId,
+    Input,
+    Output,
+    Errors,
+    InputSchema,
+    OutputSchema,
+    Dependencies
+  >,
+  input: InferInput<InputSchema>,
+) => Effect<Output, FunctionOperationError>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L5)
+
+### callToolEffect
+
+**Signature**
+
+```ts
+declare const callToolEffect: <const Id extends string, const Target extends FunctionRefAny>(
+  tool: FunctionToolDescriptor<Id, Target>,
+  input: InferInput<Target["input"]>,
+  options?: FunctionToolInvokeOptions,
+) => ReturnType<FunctionToolInvokeEffect<Target>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L5)
 
 ### copyFunctionToolHooks
 
@@ -5661,7 +5818,7 @@ declare const copyFunctionToolHooks: (
 ) => Pick<FunctionToolOptions, "onBefore" | "onAfter">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L23)
 
 ### copyFunctionToolHooksEffect
 
@@ -5677,7 +5834,7 @@ declare const copyFunctionToolHooksEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L23)
 
 ### createFunctionToolInvoker
 
@@ -5694,7 +5851,7 @@ declare const createFunctionToolInvoker: <Target extends FunctionRefAny>(
 ) => Promise<InferOutput<Target["output"]>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L25)
 
 ### createFunctionToolInvokerEffect
 
@@ -5723,7 +5880,7 @@ declare const createFunctionToolInvokerEffect: <Target extends FunctionRefAny>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L26)
 
 ### invokeFunctionToolEffect
 
@@ -5747,7 +5904,7 @@ declare const invokeFunctionToolEffect: <Target extends FunctionRefAny>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L27)
 
 ## `stream.ts`
 

@@ -2,7 +2,12 @@ import { describe, expect, expectTypeOf, test } from "vitest";
 import { bindDescriptorIdentity, DispatcherBoundary } from "../../src/invocation/index.js";
 import { z } from "../../src/schema/index.js";
 import { Cause, Effect, Exit, Layer } from "effect";
-import { defineFunction, isFunctionGraphNode, streamOf } from "../../src/functions/index.js";
+import {
+  defineFunction,
+  callGraphNodeEffect,
+  isFunctionGraphNode,
+  streamOf,
+} from "../../src/functions/index.js";
 import {
   createFunctionGraphNodeEffect,
   invokeFunctionGraphNodeEffect,
@@ -131,7 +136,7 @@ test("a graph view invokes with the dispatcher supplied at call time", async () 
     fallback: () => dispatcher,
   });
   await expect(
-    Effect.runPromise(Effect.provide(node.invokeEffect({ id: "one" }), layer)),
+    Effect.runPromise(Effect.provide(callGraphNodeEffect(node, { id: "one" }), layer)),
   ).resolves.toEqual({ id: "layer" });
   await expect(node.invoke({ id: "one" })).resolves.toEqual({ id: "handler" });
 });
