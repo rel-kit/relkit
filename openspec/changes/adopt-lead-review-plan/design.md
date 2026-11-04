@@ -200,6 +200,20 @@ Decided while applying section 14 (maintainer, 2026-11-05):
   `relkit build --runtime <bun|node>`, starts the server with the chosen executable and runs
   `bun test tests/integration` against it. The test runner stays Bun; the server under test is
   the one that changes runtime.
+- **Integrations pick their client per runtime, at load time.** `@relkit/redis` sends every
+  command through a small native-client interface: `Bun.RedisClient` on Bun (unchanged) and
+  `ioredis` 5 on Node, both without retries or an offline queue. `@relkit/sentry` imports
+  `@sentry/bun` or `@sentry/node`; the integration's dependency list names both (same version,
+  and `@sentry/bun` already depends on `@sentry/node`), because the requirement schema has no
+  runtime field yet. `@relkit/drizzle/sqlite` gains `openSqliteDatabase(path)`, which uses
+  `bun:sqlite` on Bun and `node:sqlite` on Node; `node:sqlite` is unflagged from Node 22.13 and
+  prints an experimental warning on Node 22 and 24. Conformance modules are plain JavaScript that
+  import the built packages, so the same file runs under `bun` and `node`; Redis runs against a
+  Docker Redis behind `RELKIT_TEST_DOCKER=1`.
+- **Not moved in section 14:** `relkit add database --dialect sqlite` still writes a `bun:sqlite`
+  service, because the dev snapshot import policy that section 13 removes allow-lists exactly
+  those imports; switching the scaffold to `openSqliteDatabase` is a follow-up once that lands.
+  The AWS Valkey client (`@relkit/aws`) still imports `RedisClient` from `bun` and stays Bun-only.
 
 ### D8. TypeScript 7 (#11)
 

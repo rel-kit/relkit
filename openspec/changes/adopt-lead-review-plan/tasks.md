@@ -153,7 +153,7 @@ not tasks of this change.
 - [x] 14.1 Define the runtime adapter interface and move Bun-specific serving, static files, WebSocket upgrade and crypto into the Bun adapter, and verify the existing HTTP tests pass
 - [x] 14.2 Implement the Node adapter on Hono's Node server, and verify the `api` template's HTTP suite passes on Node 22 and 24
 - [x] 14.3 Add `relkit build --runtime node` producing a Node server and container image, and verify the production build runs on Node
-- [ ] 14.4 Replace `Bun.RedisClient` with a portable client on Node and choose Sentry and SQLite clients per runtime, and verify the Redis, SQLite and Sentry conformance tests on Bun and Node
+- [x] 14.4 Replace `Bun.RedisClient` with a portable client on Node and choose Sentry and SQLite clients per runtime, and verify the Redis, SQLite and Sentry conformance tests on Bun and Node
 - [ ] 14.5 Make `create-relkit` and the CLI run on Node with npm and pnpm, and verify `npx create-relkit` against the packed candidate from a local registry and `npm run dev` in a CI job without Bun
 - [x] 14.6 Add a portability check that rejects runtime-specific APIs outside adapters, and verify it fails on a fixture
 - [ ] 14.7 List Bun and Node ranges in every framework package's `engines`, and verify the manifest check

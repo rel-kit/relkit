@@ -3,6 +3,8 @@ import type { SQLiteAsyncDatabase } from "drizzle-orm/sqlite-core/async/db";
 import { defineModel as defineNativeModel } from "./model.js";
 import type { DefineModel } from "./model.types.js";
 export * from "./index.js";
+export { openSqliteDatabase } from "./sqlite-client/index.js";
+export type { SqliteDatabase, SqliteDatabaseConfig } from "./sqlite-client/index.js";
 
 /** Native database injected into model extensions for the selected dialect. */
 export type DialectDatabase = Omit<SQLiteAsyncDatabase<any, any, any>, "query">;

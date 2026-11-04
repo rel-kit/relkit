@@ -62,12 +62,6 @@
   "integrations/packages/pulumi/src/deploy-pulumi/workspace.ts": {
     "node": 4
   },
-  "integrations/packages/redis/src/runtime/client.ts": {
-    "bun": 1
-  },
-  "integrations/packages/redis/src/runtime/state-store.ts": {
-    "bun": 2
-  },
   "integrations/packages/trigger/src/runtime/sdk-native-support.ts": {
     "node": 1
   },
