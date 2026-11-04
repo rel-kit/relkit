@@ -155,7 +155,7 @@ not tasks of this change.
 - [ ] 14.3 Add `relkit build --runtime node` producing a Node server and container image, and verify the production build runs on Node
 - [ ] 14.4 Replace `Bun.RedisClient` with a portable client on Node and choose Sentry and SQLite clients per runtime, and verify the Redis, SQLite and Sentry conformance tests on Bun and Node
 - [ ] 14.5 Make `create-relkit` and the CLI run on Node with npm and pnpm, and verify `npx create-relkit` against the packed candidate from a local registry and `npm run dev` in a CI job without Bun
-- [ ] 14.6 Add a portability check that rejects runtime-specific APIs outside adapters, and verify it fails on a fixture
+- [x] 14.6 Add a portability check that rejects runtime-specific APIs outside adapters, and verify it fails on a fixture
 - [ ] 14.7 List Bun and Node ranges in every framework package's `engines`, and verify the manifest check
 - [ ] 14.8 Add Node to the pull-request runtime matrix and the nightly creation canary, and verify a deliberate Node failure blocks a pull request
 - [ ] 14.9 Document runtime tiers and running on Node, and verify the docs build

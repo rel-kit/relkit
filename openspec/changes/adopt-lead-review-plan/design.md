@@ -176,6 +176,16 @@ Decided while applying section 14 (maintainer, 2026-11-05):
   files open their bodies through `files`, and the inspector bridge listens through `serve`. The
   generated server imports the selected adapter as `relkitRuntime`. Node's listener has no body
   limit of its own, so RelKit's `maxBodyBytes` middleware alone limits bodies there.
+- **The portability check is a shrink-only baseline.** `scripts/portability.ts`, wired into
+  `bun run check`, parses package sources and rejects `Bun.*` references, `bun`/`bun:*` imports and
+  `node:` imports outside adapters. Adapters are files under a `bun/` or `node/` directory or named
+  `*.bun.ts`/`*.node.ts`. `Bun.*` is checked in every package; `node:` is checked only in packages
+  that run inside applications, because the CLI, the creator, `@relkit/testing` and the inspector
+  tool only run on Tier 1 runtimes, where `node:` modules are portable. Call sites that existed when
+  the check landed (the dev supervisor and snapshot code that section 13 rewrites, the CLI's
+  subprocess and glob code, and the `node:` imports of `relkit` areas) are counted per file in
+  `scripts/portability-baseline.json`; a file's count may only shrink, and
+  `--update-baseline` only lowers counts.
 
 ### D8. TypeScript 7 (#11)
 

@@ -89,6 +89,7 @@ and CI run. Rules without a check are advisory and say so.
 | No committed bug-fix reports, raw evidence or machine-specific paths; `docs/` < 5 MB | `bun scripts/repository-hygiene.ts` in `bun run check`      |
 | Agent skills apply to packages, tools or paths this repository uses                  | `bun scripts/agent-skills.ts` in `bun run check`            |
 | Pre-release and patched dependencies are listed with an owner and an exit plan       | `bun scripts/dependency-policy.ts` in `bun run check`       |
+| `Bun.*` and `node:` code stays in runtime adapters; older call sites may only shrink | `bun scripts/portability.ts` in `bun run check`             |
 | Publishable changes carry a Changeset                                                | **Changeset coverage** job (CI)                             |
 | Pull requests pass `CI Gate` before merge                                            | Branch protection on `main`                                 |
 | This quickstart works from a clean checkout                                          | **Contributor quickstart** job (CI)                         |
