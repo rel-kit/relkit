@@ -60,6 +60,8 @@ export interface InvocationTarget<
   Context extends { readonly signal: AbortSignal } = InvocationContext,
 > extends SharedInvocationTarget<Input, Output, Context> {
   readonly dependencies?: DependencyDeclarations;
+  /** Who may call the target; checked before its handler for every invocation source. */
+  readonly access?: import("../contracts/index.js").AccessRule<never, unknown>;
 }
 
 /** Shared execution identity, ancestry, attempt and deadline metadata. */
@@ -150,6 +152,8 @@ export interface InvokeOptions<
   readonly triggerLimit?: number;
   readonly attempt?: number;
   readonly parent?: InvocationParent;
+  /** The caller access rules decide about; inherited from the parent, `system` for handle calls. */
+  readonly principal?: import("../contracts/index.js").AccessPrincipalSource;
   readonly taskAncestry?: TaskAncestry;
   readonly correlationId?: string;
   readonly traceId?: string;

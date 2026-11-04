@@ -130,3 +130,66 @@ test("MCP with auth required rejects callers without a session before any tool r
   expect(calls).toHaveLength(1);
   await client.close();
 });
+
+test("an MCP tool call runs the target's access rule against the caller's session", async () => {
+  const { createHttpAuthRuntime } =
+    await import("../../../packages/relkit/src/runtime-hono/auth.ts");
+  const { invokeFunction, sessionPrincipalSource } =
+    await import("../../../packages/relkit/src/engine/index.ts");
+  const { defineFunction } = await import("../../../packages/relkit/src/app/index.ts");
+  const adminEcho = defineFunction({
+    id: "echo",
+    input,
+    output,
+    access: { roles: ["admin"] },
+    handler: async ({ value }) => ({ echoed: value }),
+  });
+  const plan = toolPlan([tool("echo", true, "never")]);
+  const build = (session: unknown) =>
+    createApp({
+      plan,
+      manifest: {
+        ...runtimeCohort(plan.graphHash),
+        functions: {},
+        middleware: {},
+        requestTransforms: {},
+        tools: Object.fromEntries(
+          plan.tools.map((entry) => [entry.id, { target: { input, output } }]),
+        ),
+      },
+      mcp: { enabled: true, auth: "required" },
+      auth: createHttpAuthRuntime({ getSession: async () => session }),
+      engine: {
+        // What the generated server does: the caller is the request's session.
+        invoke: async (options) =>
+          invokeFunction(adminEcho as never, options.input, {
+            source: options.source ?? "tool",
+            principal: sessionPrincipalSource(
+              async () => (await options.auth?.getSession()) ?? null,
+            ),
+          }),
+      },
+    });
+  const call = async (session: unknown) => {
+    const client = new Client({ name: "test", version: "1" });
+    await client.connect(
+      new StreamableHTTPClientTransport(new URL("http://localhost/mcp"), {
+        fetch: appFetch(build(session)),
+      }),
+    );
+    try {
+      return await client.callTool({ name: "echo", arguments: { value: "hi" } });
+    } finally {
+      await client.close();
+    }
+  };
+  expect(await call({ user: { role: "admin" } })).toEqual(
+    expect.objectContaining({ structuredContent: { echoed: "hi" } }),
+  );
+  expect(await call({ user: { role: "member" } })).toEqual(
+    expect.objectContaining({
+      isError: true,
+      content: [expect.objectContaining({ text: "access-denied" })],
+    }),
+  );
+});

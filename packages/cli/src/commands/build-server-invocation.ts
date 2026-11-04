@@ -10,6 +10,11 @@ async function invokeHttp(request) {
   if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
   const target = request.target ?? targetFor(request.functionId);
   let invocationSpanId;
+  // Handle calls run as system unless relkit.as(session) supplied a user; others use the session.
+  const callerAuth = request.auth ?? authRequestStorage.getStore();
+  const principal = request.principal ?? (request.source === "system" || callerAuth === undefined
+    ? undefined
+    : sessionPrincipalSource(() => callerAuth.getSession(), authRuntime?.resolveAccess));
   const execute = () => {
     const run = () => invoke({
       input: request.input,
@@ -27,6 +32,7 @@ async function invokeHttp(request) {
       clients: createDependencySources(providerRegistry),
       serviceId: graph.nodes.find((node) => node.kind === "function" && node.id === request.functionId)?.domainId,
       ...(request.parent === undefined ? {} : { parent: request.parent }),
+      ...(principal === undefined ? {} : { principal }),
       ...(request.inputSchema === undefined ? {} : { inputSchema: request.inputSchema }),
       ...(request.outputSchema === undefined ? {} : { outputSchema: request.outputSchema }),
       ...(request.errors === undefined ? {} : { errors: request.errors }),
@@ -102,7 +108,8 @@ function relkitHandle() {
     const refs = (kind, nodes) => Object.fromEntries((nodes ?? []).map((node) => [node.id, { ref: { kind, id: node.id } }]));
     return createRuntimeHandle({
       services: runtimeManifest.services ?? {},
-      invoke: (functionId, input) => invokeHttp({ functionId, input, source: "system" }),
+      invoke: (functionId, input, call) => invokeHttp({ functionId, input, source: "system", ...(call?.principal === undefined ? {} : { principal: call.principal }) }),
+      ...(authRuntime?.resolveAccess === undefined ? {} : { resolveAccess: authRuntime.resolveAccess }),
       descriptors: { channels: runtimeManifest.channels ?? {}, agents: runtimeManifest.agents ?? {}, cache: refs("cache", plan.caches), buckets: refs("bucket", plan.buckets) },
       sources: createDependencySources(providerRegistry),
       ...(database === undefined ? {} : { database, databases: { [databaseNode.id]: database } }),

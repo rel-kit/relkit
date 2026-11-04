@@ -1,3 +1,4 @@
+import { isAccessFailureId } from "../contracts/index.js";
 import { Cause, Data, Effect, Exit } from "effect";
 import { validate } from "../schema/index.js";
 import { InvocationValidationError } from "./contracts.js";
@@ -126,6 +127,8 @@ export function validateDeclaredErrorEffect(
     "validation.declared-error",
     Effect.gen(function* () {
       if (error instanceof InvocationValidationError || error.kind !== "application") return error;
+      // Access rules raise built-in failures that no function declares.
+      if (isAccessFailureId(error.id)) return error;
       const checked = yield* Effect.exit(
         Effect.tryPromise({
           try: async () => {

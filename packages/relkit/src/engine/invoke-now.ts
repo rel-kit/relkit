@@ -121,6 +121,7 @@ export async function invokeNow<
                       record,
                       controller.signal,
                       deadlineMs,
+                      options.principal,
                     );
                     value = (yield* enginePromise(() =>
                       runInInvocationScope(

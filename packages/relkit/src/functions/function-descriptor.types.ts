@@ -1,4 +1,9 @@
-import type { DescriptorBase, DescriptorMetadata, MaybePromise } from "../contracts/index.js";
+import type {
+  AccessRule,
+  DescriptorBase,
+  DescriptorMetadata,
+  MaybePromise,
+} from "../contracts/index.js";
 import type { InferOutput, StandardSchemaV1 } from "../schema/index.js";
 import type { ErrorDescriptorAny } from "./define-error.js";
 import type { FunctionToolMetadata } from "./function-tool.js";
@@ -34,6 +39,7 @@ export interface FunctionDescriptor<
     FunctionRef<Id, Input, Output, Errors, InputSchema, OutputSchema> {
   readonly dependencies?: FunctionDependencyOptions<Dependencies>;
   readonly invocationMode: "callable";
+  readonly access?: AccessRule<Input>;
   readonly progress?: ProgressSchema;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
@@ -75,20 +81,14 @@ export interface DefineFunctionOptions<
   readonly output: OutputSchema;
   readonly errors?: Errors;
   readonly dependencies?: Dependencies;
+  /** Who may call the function: roles, permissions or a predicate, checked for every caller. */
+  readonly access?: AccessRule<InferOutput<InputSchema>>;
   readonly progress?: ProgressSchema;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly tool?: FunctionToolMetadata;
-  readonly onBefore?: FunctionLifecycleHook<
-    InferOutput<InputSchema>,
-    Dependencies,
-    ProgressSchema
-  >;
-  readonly onAfter?: FunctionLifecycleHook<
-    InferOutput<OutputSchema>,
-    Dependencies,
-    ProgressSchema
-  >;
+  readonly onBefore?: FunctionLifecycleHook<InferOutput<InputSchema>, Dependencies, ProgressSchema>;
+  readonly onAfter?: FunctionLifecycleHook<InferOutput<OutputSchema>, Dependencies, ProgressSchema>;
   readonly handler: FunctionHandler<
     InferOutput<InputSchema>,
     InferOutput<OutputSchema>,
