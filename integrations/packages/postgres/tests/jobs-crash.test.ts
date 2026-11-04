@@ -36,7 +36,7 @@ function instance(service: string, leaseMs = 150): PostgresJobsRuntime {
 
 describe.skipIf(postgres === undefined)("Postgres jobs under faults", () => {
   test("a worker that stops mid-run loses its lease and another worker retries", async () => {
-    const [crashed, survivor] = [instance("crash-a"), instance("crash-a")];
+    const [crashed, survivor] = [instance("crash-a", 1_000), instance("crash-a", 1_000)];
     const context = contextFor("crash-a");
     const run = (await crashed.submit(
       submission(1, { policy: threeAttempts }),

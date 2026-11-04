@@ -184,7 +184,7 @@ declare const ADD_FAILURE_CODES: Readonly<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L165)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L175)
 
 ### ADD_KINDS
 
@@ -213,6 +213,8 @@ declare const ADD_KINDS: readonly [
   "database",
   "auth",
   "inspector",
+  "jobs",
+  "events",
 ];
 ```
 
@@ -228,7 +230,7 @@ Stable public diagnostic category of AddScaffoldError.
 type AddFailureCode = (typeof ADD_FAILURE_CODES)[keyof typeof ADD_FAILURE_CODES];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L175)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L185)
 
 ### AddKind (type alias)
 
@@ -240,7 +242,7 @@ Supported relkit add artifact discriminant.
 type AddKind = (typeof ADD_KINDS)[number];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L26)
 
 ### AddRequest (type alias)
 
@@ -317,10 +319,16 @@ type AddRequest =
       readonly basePath: string;
     })
   /** Enables the development bridge and installs the project-local inspector UI. */
-  | (AddRequestBase & { readonly kind: "inspector" });
+  | (AddRequestBase & { readonly kind: "inspector" })
+  /** Adds a jobs or events provider profile, defaulting to it when no default exists. */
+  | (AddRequestBase & {
+      readonly kind: "jobs" | "events";
+      readonly provider: DurableProvider;
+      readonly profile?: string;
+    });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L54)
 
 ### AddRequestBase (interface)
 
@@ -337,7 +345,7 @@ export interface AddRequestBase {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L39)
 
 ### AddResult (interface)
 
@@ -360,7 +368,7 @@ export interface AddResult {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L152)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L162)
 
 ### AddScaffoldError (class)
 
@@ -375,7 +383,7 @@ declare class AddScaffoldError { constructor(
   ) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L177)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L187)
 
 ### exitCode (property)
 
@@ -385,7 +393,7 @@ declare class AddScaffoldError { constructor(
 readonly exitCode: 1 | 2 | 130
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L178)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L188)
 
 ### DatabaseDialect (type alias)
 
@@ -395,6 +403,18 @@ Supported database dialect for Drizzle and authentication scaffolds.
 
 ```ts
 type DatabaseDialect = "sqlite" | "postgresql" | "mysql";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L37)
+
+### DurableProvider (type alias)
+
+Provider a `relkit add jobs` or `relkit add events` request selects.
+
+**Signature**
+
+```ts
+type DurableProvider = "postgres" | "local";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L33)
@@ -409,7 +429,7 @@ Supported HTTP method used by generated route mappings.
 type RouteMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L35)
 
 ### ScaffoldFileOperation (interface)
 
@@ -426,7 +446,7 @@ export interface ScaffoldFileOperation {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L125)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L135)
 
 ### ScaffoldPlan (interface)
 
@@ -452,7 +472,7 @@ export interface ScaffoldPlan {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L132)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L142)
 
 ### ScaffoldVerification (type alias)
 
@@ -466,7 +486,7 @@ type ScaffoldVerification =
   | { readonly status: "skipped"; readonly reason: string; readonly command: string };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L148)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L158)
 
 ### ScaffoldWarning (interface)
 
@@ -481,7 +501,7 @@ export interface ScaffoldWarning {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L120)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L130)
 
 ### ServiceInclude (type alias)
 
@@ -492,11 +512,11 @@ Artifact kinds that can be included in a generic service scaffold.
 ```ts
 type ServiceInclude = Exclude<
   AddKind,
-  "service" | "database" | "auth" | "inspector" | "middleware" | "transform"
+  "service" | "database" | "auth" | "inspector" | "jobs" | "events" | "middleware" | "transform"
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/add-types.ts#L28)
 
 ## `build-catalog.ts`
 
@@ -3243,6 +3263,7 @@ declare const SCAFFOLD_DEPENDENCIES: Readonly<{
   "@relkit/drizzle": { version: string; section: "dependencies" };
   "@relkit/local": { version: string; section: "dependencies" };
   "@relkit/langchain": { version: string; section: "dependencies" };
+  "@relkit/postgres": { version: string; section: "dependencies" };
   "@relkit/pulumi": { version: string; section: "dependencies" };
   "@relkit/redis": { version: string; section: "dependencies" };
   "@relkit/s3": { version: string; section: "dependencies" };
@@ -3286,6 +3307,7 @@ declare const ScaffoldDependencyName:
   | "langchain"
   | "@relkit/langchain"
   | "@relkit/local"
+  | "@relkit/postgres"
   | "@relkit/pulumi"
   | "@relkit/redis"
   | "@relkit/s3"
@@ -3331,7 +3353,7 @@ Selects one supported dependency from the release's portable scaffold catalog.
 declare const scaffoldDependency: (name: ScaffoldDependencyName) => ScaffoldDependency;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L71)
 
 ## `scaffold-catalog.types.ts`
 

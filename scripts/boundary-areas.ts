@@ -19,6 +19,8 @@ const protocolAreas: ReadonlySet<string> = new Set([
 const integrationAreas: ReadonlyMap<string, ReadonlySet<string>> = new Map([
   ["@relkit/local", new Set(["providers-local"])],
   ["@relkit/redis", new Set(["providers-local"])],
+  // The Postgres backend implements the event provider and reuses the local retry classification.
+  ["@relkit/postgres", new Set(["events", "providers-local"])],
   ["@relkit/langchain", new Set(["functions", "invocation", "schema", "tools"])],
   // The AWS deployment components run the engine against the application graph.
   ["@relkit/aws", new Set(["engine", "events", "graph"])],

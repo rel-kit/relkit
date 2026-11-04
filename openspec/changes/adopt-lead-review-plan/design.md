@@ -224,6 +224,18 @@ Decided while applying section 16 (maintainer, 2026-11-05):
   occurrence identity), unique per service and scope. A submission whose commit outcome is unknown
   returns `RELKIT_JOB_SUBMISSION_UNKNOWN` with `retry-with-same-key` recovery when it had an
   idempotency key, else `inspect-native`. Durable sleep is reported unsupported.
+- **Events fan out when they are written.** Registering a durable trigger records a consumer row
+  (profile, trigger, event ID, version). Publishing is one statement that inserts the outbox row
+  and one delivery per registered consumer, so `@relkit/postgres/drizzle`'s
+  `outbox(tx).publish(event, payload)` commits or discards the event and every delivery with the
+  caller's transaction, and needs no relay process. A consumer registered later does not receive
+  events published before it. Each delivery is leased, retried under the trigger's retry policy
+  (`planRetry`, the local provider's classification) and dead-lettered on its own. Ephemeral
+  triggers run in-process after a provider `publish` and are not persisted; the outbox only
+  serves durable consumers.
+- **The outbox binds JSON as text.** It casts the envelope with `::text::jsonb`, because Bun's SQL
+  driver JSON-encodes a string bound directly to a `jsonb` parameter and would store a jsonb
+  string; the cast keeps every Drizzle Postgres driver writing the same object.
 
 ### D11. Problem Details errors (#13 a, b)
 

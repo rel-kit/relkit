@@ -30,6 +30,10 @@
     "./runtime": {
       "types": "./dist/runtime/index.d.ts",
       "import": "./dist/runtime/index.js"
+    },
+    "./drizzle": {
+      "types": "./dist/drizzle/index.d.ts",
+      "import": "./dist/drizzle/index.js"
     }
   },
   "relkit": {

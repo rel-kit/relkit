@@ -6,3 +6,5 @@ export { PostgresRunNotFoundError } from "./jobs-controls.js";
 export type { PostgresJobWorker } from "./jobs-worker.js";
 export { occurrenceIdentity } from "./schedules-tick.js";
 export type { ClaimedOccurrence } from "./schedules-tick.js";
+export { createPostgresEventProvider } from "./events-provider.js";
+export type * from "./events-provider.types.js";
