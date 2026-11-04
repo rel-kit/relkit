@@ -1,7 +1,8 @@
 /** Runs Promise and Effect handlers side by side through the engine and compares what callers see. */
 import { Effect } from "effect";
 import { describe, expect, test } from "vitest";
-import { defineError, defineFunction } from "../../src/app/index.js";
+import { defineError, defineFunction, fail } from "../../src/app/index.js";
+import { failEffect } from "../../src/app/effect.js";
 import type { ProtocolId } from "../../src/contracts/index.js";
 import { invokeFunction, type InvocationCompletion } from "../../src/engine/invoke.js";
 import { z } from "../../src/schema/index.js";
@@ -123,6 +124,14 @@ describe("Promise and Effect handlers", () => {
       id: "orders.sold-out",
       data: { sku: "tea" },
     });
+  });
+
+  test("map fail and failEffect to the same application failure", async () => {
+    const outcome = await expectSameOutcome({
+      promise: async ({ sku }) => fail(soldOut, { sku }),
+      effect: ({ sku }) => failEffect(soldOut, { sku }),
+    });
+    expect(outcome.error).toMatchObject({ kind: "application", id: "orders.sold-out" });
   });
 
   test("map an undeclared failure to the same internal failure", async () => {

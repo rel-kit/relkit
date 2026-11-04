@@ -9,6 +9,7 @@ export default defineMeta({
     "cli",
     "app",
     "config",
+    "effect",
     "provider",
     "providers-local",
     "observability-local",

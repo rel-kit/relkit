@@ -14,7 +14,7 @@ sidebar:
 - [defineFunction](/docs/api/functions#definefunction)
 - [defineError](/docs/api/functions#defineerror)
 
-For configuration and examples, read [Functions](/docs/learn/concepts/functions), [Declared errors](/docs/learn/concepts/errors), [migration](/docs/modules/service/migration).
+For configuration and examples, read [Functions](/docs/learn/concepts/functions), [Declared errors](/docs/learn/concepts/errors), [effect](/docs/modules/service/effect).
 
 For a complete workflow, follow [from express or hono](/guides/migrate/from-express-or-hono), [upload product images](/guides/storage/upload-product-images), [connect react](/guides/frontend/connect-react), [cache product prices](/guides/caching/cache-product-prices), [react to order events](/guides/events/react-to-order-events), [register users in a transaction](/guides/database/register-users-in-a-transaction).
 
@@ -5212,16 +5212,17 @@ declare const fail: <const Descriptor extends ErrorDescriptorAny>(
 ) => FunctionFailure<DeclaredErrorOf<Descriptor>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.ts#L32)
 
 ### failEffect
 
-Creates a typed application failure in the Effect error channel.
+Fails an Effect with a declared error, for handlers written with Effect.
+Invalid error data is a defect, as when `fail` throws inside a Promise handler.
 
 **Example**
 
 ```ts
-Effect.runSync(failEffect(NotFound, { id: "one" }));
+if (!order) return yield * failEffect(NotFound, { id: "one" });
 ```
 
 **Signature**
@@ -5230,14 +5231,10 @@ Effect.runSync(failEffect(NotFound, { id: "one" }));
 declare const failEffect: <const Descriptor extends ErrorDescriptorAny>(
   descriptor: Descriptor,
   data: Parameters<Descriptor["create"]>[0],
-) => Effect.Effect<
-  FunctionFailure<ReturnType<Descriptor["create"]>>,
-  FunctionOperationError,
-  never
->;
+) => Effect.Effect<never, DeclaredErrorOf<Descriptor>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/handler-result.ts#L15)
 
 ## `handler-result.types.ts`
 
@@ -6309,132 +6306,3 @@ export interface NormalizedErrorRetry {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/error-retry.types.ts#L25)
-
-## `identity-bind.ts`
-
-### bindDescriptorIdentity
-
-Synchronous canonical identity binding adapter.
-
-**Throws**
-
-DescriptorIdentityError or TypeError for invalid identity.
-
-**Example**
-
-```ts
-bindDescriptorIdentity(descriptor, "tasks.run");
-```
-
-**Signature**
-
-```ts
-declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: string) => T;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/identity-bind.ts#L47)
-
-### bindDescriptorIdentityEffect
-
-Binds a canonical descriptor identity without mutating the descriptor.
-
-**Example**
-
-```ts
-Effect.runSync(bindDescriptorIdentityEffect(descriptor, "tasks.run"));
-```
-
-**Signature**
-
-```ts
-declare const bindDescriptorIdentityEffect: <T extends object>(
-  descriptor: T,
-  id: string,
-) => Effect.Effect<T, import("./identity-state.js").DescriptorIdentityFailure>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/identity-bind.ts#L18)
-
-### bindDescriptorServiceMembers
-
-Synchronous service member binding adapter.
-
-**Throws**
-
-DescriptorIdentityError when a member belongs to another service.
-
-**Example**
-
-```ts
-bindDescriptorServiceMembers([member], service);
-```
-
-**Signature**
-
-```ts
-declare const bindDescriptorServiceMembers: <T extends object>(
-  descriptors: readonly T[],
-  service: object & DescriptorIdentitySource,
-) => readonly T[];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/identity-bind.ts#L99)
-
-### bindDescriptorServiceMembersEffect
-
-Associates descriptor members with one service without changing them.
-
-**Example**
-
-```ts
-Effect.runSync(bindDescriptorServiceMembersEffect([member], service));
-```
-
-**Signature**
-
-```ts
-declare const bindDescriptorServiceMembersEffect: <T extends object>(
-  descriptors: readonly T[],
-  service: object & DescriptorIdentitySource,
-) => Effect.Effect<ReadonlyArray<T>, DescriptorIdentityFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/identity-bind.ts#L75)
-
-### isDescriptorIdentityBound
-
-Synchronous bound check adapter.
-
-**Example**
-
-```ts
-isDescriptorIdentityBound(descriptor);
-```
-
-**Signature**
-
-```ts
-declare const isDescriptorIdentityBound: (descriptor: object) => boolean;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/identity-bind.ts#L65)
-
-### isDescriptorIdentityBoundEffect
-
-Checks if a descriptor has an explicit canonical binding.
-
-**Example**
-
-```ts
-Effect.runSync(isDescriptorIdentityBoundEffect(descriptor));
-```
-
-**Signature**
-
-```ts
-declare const isDescriptorIdentityBoundEffect: (
-  descriptor: object,
-) => Effect.Effect<boolean, DescriptorIdentityFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/identity-bind.ts#L56)

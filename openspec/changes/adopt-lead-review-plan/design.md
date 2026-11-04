@@ -222,6 +222,28 @@ again for the root entry. Generated `runtime-integrations.ts` moves its Effect u
 runtime, so applications no longer depend on `effect` directly. Handler result types keep accepting
 Effects.
 
+Decided while applying section 9 (maintainer choice, 2026-11-04):
+
+- The root is a curated list, not a filtered `export *`. `packages/relkit/src/index.ts` names each
+  export: the `define*` functions, `fail`, `streamOf`, `http`, `env`, `DeclaredError`, and the
+  option, descriptor, context and client types an application writes against (115 names). A name
+  belongs in the root only if an application uses it and it is Promise-based; runtime internals,
+  validators, protocol records and telemetry stay on their `relkit/<area>` subpath, which keeps
+  exporting everything it exported before. An export-list snapshot test records the root, so
+  adding a name is a reviewed change. The 1,090 names that leave the root stay importable from a
+  subpath; the constants, prompt and context-resolver names that only the root exported move to
+  `relkit/config` and `relkit/host`.
+- `relkit/effect` holds the Effect form of each root API: `failEffect`, `streamOfEffect`,
+  `httpEffects`, the `define*Effect` functions, and `invokeFunctionToolEffect` and
+  `invokeFunctionGraphNodeEffect`, which replace the `invokeEffect` members that public descriptor
+  types drop. Internal Effect helpers stay on their area subpath. A handler-context Effect service
+  and test layers do not exist yet and are not part of section 9.
+- Measured before the change: the root had 1,205 exports, 368 of which reached a type declared in
+  `effect`. Among the curated names only three causes leaked: `InspectorConfig` derived from an
+  Effect Schema type (`defineApp`), and the `invokeEffect` member on tool descriptors
+  (`defineFunction` through its tool view, and `defineTool`). Section 9.2 removes them and replaces
+  the file-based scan of the root with a walk of its exported types.
+
 ### D14. Dependencies and runtime handle (#15)
 
 `dependencies` gains `functions`, `events`, `channels` and `databases`, and the compiler builds call

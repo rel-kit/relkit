@@ -754,6 +754,18 @@ export * from "./app-validation.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/config.ts#L1)
 
+### "./context-descriptors.js" (namespace export)
+
+Re-exports all named exports from the "./context-descriptors.js" module.
+
+**Signature**
+
+```ts
+export * from "./context-descriptors.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/config.ts#L6)
+
 ### "./define-app.js" (namespace export)
 
 Re-exports all named exports from the "./define-app.js" module.
@@ -1702,6 +1714,529 @@ declare const ServerConfig: ServerConfig;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L14)
 
+## `effect.ts`
+
+The Effect form of each root API, for applications written with Effect. Handlers may return an
+Effect without importing anything from here; these helpers build descriptors and failures as
+Effects instead of plain values.
+
+### FunctionOperationError
+
+**Signature**
+
+```ts
+declare const FunctionOperationError: typeof FunctionOperationError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L13)
+
+### defineAgentEffect
+
+**Signature**
+
+```ts
+declare const defineAgentEffect: <
+  const Id extends string,
+  const InputSchema extends StandardSchemaV1,
+  const OutputSchema extends StandardSchemaV1,
+  const Tools extends readonly ToolRefAny[],
+>(
+  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools>,
+) => Effect<
+  AgentDescriptor<
+    Id,
+    InferInput<InputSchema>,
+    InferOutput<OutputSchema>,
+    InputSchema,
+    OutputSchema,
+    Tools
+  >,
+  AgentDefinitionFailure,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L32)
+
+### defineAppEffect
+
+**Signature**
+
+```ts
+declare const defineAppEffect: <
+  const Shape extends EnvShape,
+  const Providers extends AppProviderInputs,
+  const Exporters extends TelemetryExporterMap = Readonly<
+    Record<string, TelemetryExporterDescriptor<string, string, object>>
+  >,
+>(
+  options: DefineAppOptions<Shape, Providers, Exporters>,
+) => Effect<ApplicationDescriptor<Shape, Providers, Exporters>, AppValidationFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L6)
+
+### defineBucketEffect
+
+**Signature**
+
+```ts
+declare const defineBucketEffect: <const Id extends string>(
+  options: DefineBucketOptions<Id>,
+) => Effect<BucketDescriptor<Id>, BucketValidationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L29)
+
+### defineCacheEffect
+
+**Signature**
+
+```ts
+declare const defineCacheEffect: <
+  const Id extends string,
+  const KeySchema extends StandardSchemaV1,
+  const ValueSchema extends StandardSchemaV1,
+>(
+  options: DefineCacheOptions<Id, KeySchema, ValueSchema>,
+) => Effect<
+  CacheDescriptor<Id, InferInput<KeySchema>, InferOutput<ValueSchema>, KeySchema, ValueSchema>,
+  CacheDescriptorError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L30)
+
+### defineChannelEffect
+
+**Signature**
+
+```ts
+declare const defineChannelEffect: <
+  const Id extends string,
+  const ParamsSchema extends StandardSchemaV1,
+  const Events extends Readonly<Record<string, StandardSchemaV1>>,
+  const Client extends ChannelClientPolicy<ChannelGuard<InferOutput<ParamsSchema>>> | undefined,
+  const Presence extends ChannelPresence<InferOutput<ParamsSchema>> | undefined = undefined,
+>(
+  options: DefineChannelOptions<Id, ParamsSchema, Events, Client, Presence>,
+) => Effect<
+  ChannelDescriptor<Id, ParamsSchema, Events, Client, Presence>,
+  ChannelValidationError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L28)
+
+### defineConstantsEffect
+
+**Signature**
+
+```ts
+declare const defineConstantsEffect: <const Values extends ConstantsShape>(
+  values: Values,
+  options?: ContextDescriptorOptions | undefined,
+) => Effect<ConstantsDescriptor<Values>, ContextDescriptorFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L7)
+
+### defineEnvEffect
+
+**Signature**
+
+```ts
+declare const defineEnvEffect: <const S extends EnvShape>(
+  shape: S & { readonly PORT?: never; readonly RELKIT_ENV?: never },
+) => Effect<EnvDefinition<S>, ConfigValidationError>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L8)
+
+### defineErrorEffect
+
+**Signature**
+
+```ts
+declare const defineErrorEffect: <
+  const Id extends string,
+  const DataSchema extends StandardSchemaV1,
+>(
+  options: DefineErrorOptions<Id, DataSchema>,
+) => Effect<
+  ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema>,
+  FunctionOperationError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L10)
+
+### defineFunctionEffect
+
+**Signature**
+
+```ts
+declare const defineFunctionEffect: DefineFunctionEffect;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L11)
+
+### defineJobEffect
+
+**Signature**
+
+```ts
+declare const defineJobEffect: <
+  const Name extends string,
+  const Task extends TaskDescriptorAny,
+  const Id extends string = Name,
+>(
+  options: DefineJobOptions<Name, Task, Id>,
+) => Effect<JobDescriptor<Name, Id, Task>, JobDefinitionFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L27)
+
+### defineMiddlewareEffect
+
+**Signature**
+
+```ts
+declare const defineMiddlewareEffect: (
+  path: string,
+  handler: MiddlewareHandler,
+) => Effect<MiddlewareDescriptor<string>, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L20)
+
+### definePromptEffect
+
+**Signature**
+
+```ts
+declare const definePromptEffect: <const Value extends PromptValue>(
+  value: Value,
+  options?: ContextDescriptorOptions | undefined,
+) => Effect<PromptDescriptor<Value>, ContextDescriptorFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L7)
+
+### defineRequestTransformEffect
+
+**Signature**
+
+```ts
+declare const defineRequestTransformEffect: <
+  const Id extends string,
+  const Schema extends StandardSchemaV1,
+>(
+  options: DefineTransformOptions<Id, Schema>,
+) => Effect<HttpTransformDescriptor<Id, Schema>, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L21)
+
+### defineRouteEffect
+
+**Signature**
+
+```ts
+declare const defineRouteEffect: {
+  <const Id extends string, const Handler extends RawRouteOptions<Id>["handler"]>(
+    options: RawRouteOptions<Id, Handler>,
+  ): Effect<RawRouteDescriptor<Id, Handler>, RouteOperationError>;
+  <
+    const Id extends string,
+    const Target extends FunctionRefAny,
+    const Request extends HttpRequestMapping | undefined = undefined,
+  >(
+    options: FunctionRouteOptions<Id, Target, Request>,
+  ): Effect<FunctionRouteDescriptor<Id, Target, Request>, RouteOperationError>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L22)
+
+### defineServiceEffect
+
+**Signature**
+
+```ts
+declare const defineServiceEffect: <
+  const Id extends string,
+  const Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
+  const Events extends ServiceEventMap = Readonly<Record<never, never>>,
+  const Tasks extends ServiceTaskMap = Readonly<Record<never, never>>,
+  const Jobs extends ServiceJobMap = Readonly<Record<never, never>>,
+>(
+  options: DefineServiceOptions<Id, Functions, Events, Tasks, Jobs>,
+) => Effect<ServiceDescriptor<Id, Functions, Events, Tasks, Jobs>, ServiceValidationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L18)
+
+### defineServiceRoutesEffect
+
+**Signature**
+
+```ts
+declare const defineServiceRoutesEffect: <
+  const Service extends ServiceDescriptor<string, any, any>,
+  const Options extends Partial<Readonly<Record<ServiceRouteMethod, ServiceRouteEntry<Service>>>>,
+>(
+  service: Service,
+  options: Options & Record<Exclude<keyof Options, ServiceRouteMethod>, never>,
+) => Effect<
+  Readonly<{
+    [Method in keyof Options]: FunctionRouteDescriptor<
+      string,
+      Extract<
+        ServiceFunctions<Service>[Extract<
+          EntryName<Options[Method]>,
+          Extract<keyof ServiceFunctions<Service>, string>
+        >],
+        FunctionRefAny
+      >,
+      EntryRequest<Options[Method]>
+    >;
+  }>,
+  RouteOperationError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L23)
+
+### defineTaskEffect
+
+**Signature**
+
+```ts
+declare const defineTaskEffect: <
+  const Id extends string,
+  const Version extends string,
+  const InputSchema extends StandardSchemaV1,
+  const OutputSchema extends StandardSchemaV1,
+  const Dependencies extends TaskDependencies = {},
+  const Errors extends readonly ErrorDescriptorAny[] = readonly [],
+  const Publishes extends readonly PublishedEventName[] = readonly [],
+  const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
+  const Streams extends Readonly<Record<string, StandardSchemaV1<unknown, unknown>>> = {},
+  const Execution extends TaskExecution = "durable",
+>(
+  options: DefineTaskOptions<
+    Id,
+    Version,
+    InputSchema,
+    OutputSchema,
+    Dependencies,
+    Errors,
+    Publishes,
+    ProgressSchema,
+    Streams,
+    Execution
+  >,
+) => Effect<
+  TaskDescriptor<
+    Id,
+    Version,
+    InputSchema,
+    OutputSchema,
+    Dependencies,
+    Errors,
+    Publishes,
+    ProgressSchema,
+    Streams,
+    Execution
+  >,
+  TaskDefinitionFailure,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L27)
+
+### defineToolEffect
+
+**Signature**
+
+```ts
+declare const defineToolEffect: <const Id extends string, const Target extends FunctionRefAny>(
+  options: DefineToolOptions<Id, Target>,
+) => Effect<ToolDescriptor<Id, Target>, ToolOperationFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L31)
+
+### defineTransformEffect
+
+**Signature**
+
+```ts
+declare const defineTransformEffect: <
+  const Id extends string,
+  const Schema extends StandardSchemaV1,
+>(
+  options: DefineTransformOptions<Id, Schema>,
+) => Effect<HttpTransformDescriptor<Id, Schema>, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L24)
+
+### failEffect
+
+**Signature**
+
+```ts
+declare const failEffect: <const Descriptor extends ErrorDescriptorAny>(
+  descriptor: Descriptor,
+  data: Parameters<Descriptor["create"]>[0],
+) => Effect<never, DeclaredErrorOf<Descriptor>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L12)
+
+### httpEffects
+
+**Signature**
+
+```ts
+declare const httpEffects: {
+  constant: <const V extends JsonValue>(
+    value: V,
+  ) => Effect<HttpConstantMapping<V>, RouteOperationError, never>;
+  optional: <const M extends HttpMappingNode>(
+    value: M,
+  ) => Effect<HttpOptionalMapping<M>, RouteOperationError, never>;
+  default: <const M extends HttpMappingNode, const V extends JsonValue>(
+    value: M,
+    fallback: V,
+  ) => Effect<HttpDefaultMapping<M, V>, RouteOperationError, never>;
+  transform: <const T extends HttpTransformRef | string, const M extends HttpMappingNode>(
+    transform: T,
+    value?: M | undefined,
+  ) => Effect<HttpTransformMapping<TransformOutput<T>>, RouteOperationError, never>;
+  success: (
+    status: number,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect<HttpResponseMapping, RouteOperationError, never>;
+  error: (
+    errorId: string,
+    status: number,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect<HttpResponseMapping, RouteOperationError, never>;
+  validationError: (
+    status?: number | undefined,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect<HttpResponseMapping, RouteOperationError, never>;
+  response: (
+    id: string,
+    status: number,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect<HttpResponseMapping, RouteOperationError, never>;
+  continue: () => Effect<ContinueMapping, RouteOperationError, never>;
+  respond: (
+    response: string | HttpResponseMapping,
+    body?: HttpMappingNode | undefined,
+  ) => Effect<RespondMapping, RouteOperationError, never>;
+  input: <const S extends HttpMappingShape>(
+    fields: S,
+  ) => Effect<HttpInputMapping<S>, RouteOperationError, never>;
+  nested: <const S extends HttpMappingShape>(
+    fields: S,
+  ) => Effect<HttpNestedMapping<S>, RouteOperationError, never>;
+  path: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+  pathSegments: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+  query: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+  header: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+  cookie: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+  body: (
+    name?: string | undefined,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+  wholeBody: () => Effect<HttpWholeBodyMapping<unknown>, RouteOperationError, never>;
+  multipart: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+  multipartAll: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L25)
+
+### invokeFunctionGraphNodeEffect
+
+**Signature**
+
+```ts
+declare const invokeFunctionGraphNodeEffect: (
+  target: FunctionRefAny,
+  input: unknown,
+) => Effect<unknown, FunctionOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L14)
+
+### invokeFunctionToolEffect
+
+**Signature**
+
+```ts
+declare const invokeFunctionToolEffect: <Target extends FunctionRefAny>(
+  target: Target,
+  metadata: FunctionToolRuntimeMetadata,
+  input: InferInput<Target["input"]>,
+  options?: FunctionToolInvokeOptions | undefined,
+  identity?: object | undefined,
+) => Effect<
+  InferOutput<Target["output"]>,
+  | FunctionOperationError
+  | FunctionToolCancelledFailure
+  | FunctionToolArgumentFailure
+  | FunctionToolApprovalRequiredFailure
+  | FunctionToolApprovalDeniedFailure,
+  SchemaValidator
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L15)
+
+### streamOfEffect
+
+**Signature**
+
+```ts
+declare const streamOfEffect: <const ItemSchema extends StandardSchemaV1>(
+  item: ItemSchema,
+) => Effect<StreamOutputSchema<ItemSchema>, FunctionOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L16)
+
 ## `events.ts`
 
 ### "../events/index.js" (namespace export)
@@ -1736,6 +2271,38 @@ Exposes the framework-owned descriptor identity and application context wiring
 needed by emitted hosts, including selected dependency preflight. Re-exports
 preserve identity while resolving framework dependencies from their owning app.
 
+### "./context-resolver.js" (namespace export)
+
+Re-exports all named exports from the "./context-resolver.js" module.
+
+**Signature**
+
+```ts
+export * from "./context-resolver.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L9)
+
+### AppConstantRunner
+
+**Signature**
+
+```ts
+declare const AppConstantRunner: typeof AppConstantRunner;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L10)
+
+### AppConstantRunnerLive
+
+**Signature**
+
+```ts
+declare const AppConstantRunnerLive: Layer<AppConstantRunner, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L10)
+
 ### bindDescriptorIdentity
 
 **Signature**
@@ -1757,19 +2324,7 @@ declare const checkRuntimeIntegrations: (
 ) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L9)
-
-### createApplicationContextResolver
-
-**Signature**
-
-```ts
-declare const createApplicationContextResolver: (
-  options: ApplicationContextOptions,
-) => ApplicationContextResolver;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L12)
 
 ### loadRuntimeIntegration
 
@@ -1782,9 +2337,12 @@ declare const loadRuntimeIntegration: <Module>(
 ) => Promise<Module>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L13)
 
 ## `index.ts`
+
+The surface the `relkit` root had before it became a curated list. The curated root picks its
+names from here, and the deprecated `@relkit/app` re-exports all of it as `relkit/app`.
 
 ### "../agents/index.js" (namespace export)
 
@@ -1796,7 +2354,7 @@ Re-exports all named exports from the "../agents/index.js" module.
 export * from "../agents/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L8)
 
 ### "../buckets/index.js" (namespace export)
 
@@ -1808,7 +2366,7 @@ Re-exports all named exports from the "../buckets/index.js" module.
 export * from "../buckets/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L9)
 
 ### "../cache/index.js" (namespace export)
 
@@ -1820,7 +2378,7 @@ Re-exports all named exports from the "../cache/index.js" module.
 export * from "../cache/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L10)
 
 ### "../events/index.js" (namespace export)
 
@@ -1832,7 +2390,7 @@ Re-exports all named exports from the "../events/index.js" module.
 export * from "../events/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L11)
 
 ### "../functions/index.js" (namespace export)
 
@@ -1844,7 +2402,7 @@ Re-exports all named exports from the "../functions/index.js" module.
 export * from "../functions/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L12)
 
 ### "../jobs/index.js" (namespace export)
 
@@ -1856,7 +2414,7 @@ Re-exports all named exports from the "../jobs/index.js" module.
 export * from "../jobs/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L19)
 
 ### "../realtime/index.js" (namespace export)
 
@@ -1868,7 +2426,7 @@ Re-exports all named exports from the "../realtime/index.js" module.
 export * from "../realtime/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L22)
 
 ### "../routes/index.js" (namespace export)
 
@@ -1880,7 +2438,7 @@ Re-exports all named exports from the "../routes/index.js" module.
 export * from "../routes/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L23)
 
 ### "../services/index.js" (namespace export)
 
@@ -1892,7 +2450,7 @@ Re-exports all named exports from the "../services/index.js" module.
 export * from "../services/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L24)
 
 ### "../tools/index.js" (namespace export)
 
@@ -1904,7 +2462,7 @@ Re-exports all named exports from the "../tools/index.js" module.
 export * from "../tools/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L25)
 
 ### "./config.js" (namespace export)
 
@@ -1916,19 +2474,7 @@ Re-exports all named exports from the "./config.js" module.
 export * from "./config.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L1)
-
-### "./context-descriptors.js" (namespace export)
-
-Re-exports all named exports from the "./context-descriptors.js" module.
-
-**Signature**
-
-```ts
-export * from "./context-descriptors.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L5)
 
 ### "./context-resolver.js" (namespace export)
 
@@ -1940,7 +2486,7 @@ Re-exports all named exports from the "./context-resolver.js" module.
 export * from "./context-resolver.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L6)
 
 ### "./tasks.js" (namespace export)
 
@@ -1952,7 +2498,7 @@ Re-exports all named exports from the "./tasks.js" module.
 export * from "./tasks.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L21)
 
 ### AppConstantRunner
 
@@ -1962,7 +2508,7 @@ export * from "./tasks.js";
 declare const AppConstantRunner: typeof AppConstantRunner;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L7)
 
 ### AppConstantRunnerLive
 
@@ -1972,7 +2518,7 @@ declare const AppConstantRunner: typeof AppConstantRunner;
 declare const AppConstantRunnerLive: Layer<AppConstantRunner, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L7)
 
 ### EventAttributeValue
 
@@ -1982,7 +2528,7 @@ declare const AppConstantRunnerLive: Layer<AppConstantRunner, never, never>;
 declare const EventAttributeValue: EventAttributeValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L15)
 
 ### EventPublishOptions
 
@@ -1992,7 +2538,7 @@ declare const EventAttributeValue: EventAttributeValue;
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L16)
 
 ### EventPublishResult
 
@@ -2002,7 +2548,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L17)
 
 ### TaskClientFor
 
@@ -2012,7 +2558,7 @@ declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 declare const TaskClientFor: TaskClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L20)
 
 ### TaskClients
 
@@ -2022,7 +2568,7 @@ declare const TaskClientFor: TaskClientFor<T>;
 declare const TaskClients: TaskClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L20)
 
 ### TaskTriggerOptions
 
@@ -2032,7 +2578,7 @@ declare const TaskClients: TaskClients<M>;
 declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L20)
 
 ### bindDescriptorIdentity
 
@@ -2042,7 +2588,7 @@ declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
 declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: string) => T;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L13)
 
 ## `jobs-legacy.ts`
 

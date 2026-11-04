@@ -3,11 +3,15 @@ import { expect, it } from "vitest";
 import * as host from "../../src/app/host.js";
 import { SelectedDependencyInitializationFailure } from "../../src/provider/dependency-preflight.service.js";
 
-it("exposes only Promise helpers for selected integrations", () => {
+it("exposes Promise helpers for selected integrations and the context resolver", () => {
   expect(Object.keys(host).sort()).toEqual([
+    "AppConstantRunner",
+    "AppConstantRunnerLive",
+    "ContextResolutionFailure",
     "bindDescriptorIdentity",
     "checkRuntimeIntegrations",
     "createApplicationContextResolver",
+    "createApplicationContextResolverEffect",
     "loadRuntimeIntegration",
   ]);
 });

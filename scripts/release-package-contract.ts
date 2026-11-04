@@ -8,6 +8,7 @@ import {
   integrationSubpaths,
   mergedAreas,
   relkitAreas,
+  relkitFacadeSubpaths,
 } from "./release-package-contract-tables.js";
 import { packageLeafExports } from "./release-package-leaves.js";
 import type { ReleaseExports } from "./release-package-contract.types.js";
@@ -70,6 +71,8 @@ function relkitExports(): ReleaseExports {
   const entries = Object.entries(areaExports(relkitAreas));
   for (const [key, value] of Object.entries(expectedExports("app")))
     entries.push([key, key === "." ? rootExport : inArea(value, "app")]);
+  for (const [subpath, file] of Object.entries(relkitFacadeSubpaths))
+    entries.push([`./${subpath}`, inArea(leaf(file), "app")]);
   return Object.fromEntries(entries);
 }
 

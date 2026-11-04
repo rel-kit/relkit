@@ -36,6 +36,8 @@ export const firstPartyExports: ReadonlySet<string> = new Set([
   "create-relkit/scaffold-catalog",
   "create-relkit/scaffold-catalog.types",
   "create-relkit/validate-paths",
+  // The deprecated @relkit/app re-exports the former relkit root from here.
+  "relkit/app",
   "relkit/agents/agent-client",
   "relkit/agents/agent-telemetry",
   "relkit/agents/agent-validation",

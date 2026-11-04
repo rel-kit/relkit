@@ -42,15 +42,22 @@ describe("Effect authoring boundaries", () => {
     );
   });
 
-  test("creates a handler failure through Effect", async () => {
+  test("fails an Effect with the declared error", async () => {
     const NotFound = defineError({
       id: "orders.not-found",
       data: z.object({ id: z.string() }),
       message: "Missing order",
     });
-    const failure = await Effect.runPromise(failEffect(NotFound, { id: "one" }));
-    expect(failure._tag).toBe("FunctionFailure");
-    expect(failure.error.message).toBe("Missing order");
+    const failure = await Effect.runPromise(Effect.flip(failEffect(NotFound, { id: "one" })));
+    expect(failure).toBeInstanceOf(NotFound);
+    expect(failure.message).toBe("Missing order");
+    expect(failure.data).toEqual({ id: "one" });
+    const invalid = await Effect.runPromise(
+      Effect.exit(failEffect(NotFound, { id: 1 } as unknown as { id: string })),
+    );
+    expect(
+      invalid._tag === "Failure" && invalid.cause.reasons.some((reason) => reason._tag === "Die"),
+    ).toBe(true);
     expect(fail(NotFound, { id: "two" }).error.message).toBe("Missing order");
   });
 

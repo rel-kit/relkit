@@ -2,6 +2,7 @@
 export const apiPackageDefinitions = [
   apiPackage("app", "Application", "relkit", "packages/relkit/src/app", "core"),
   apiPackage("config", "Configuration", "relkit/config", "packages/relkit/src/config", "core"),
+  apiPackage("effect", "Effect", "relkit/effect", "packages/relkit/src/app", "core"),
   apiPackage(
     "provider",
     "Provider authoring",

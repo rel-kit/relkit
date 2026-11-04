@@ -268,6 +268,7 @@
   "docs/modules/realtime/recovery": ["update", "continuation", "/docs/modules/realtime/providers"],
   "docs/modules/service/define": ["update", "continuation", "/docs/learn/create-an-app"],
   "docs/modules/service/domains": ["retain", "concept", ""],
+  "docs/modules/service/effect": ["update", "continuation", "/docs/learn/create-an-app"],
   "docs/modules/service/first-service": ["update", "continuation", "/docs/learn/first-route"],
   "docs/modules/service/index": ["update", "concept", ""],
   "docs/modules/service/migration": ["retain", "concept", ""],

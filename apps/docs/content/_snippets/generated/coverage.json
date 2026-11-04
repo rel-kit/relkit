@@ -417,6 +417,11 @@
       "examples": ["templates/default/v1/api/src/platform/env.ts"]
     },
     {
+      "path": "docs/modules/service/effect",
+      "api": ["effect", "functions"],
+      "examples": ["apps/docs/examples/effect/get-order.function.ts"]
+    },
+    {
       "path": "docs/modules/service/migration",
       "api": ["services", "functions"],
       "examples": ["packages/cli/tests/migration/layout.probe.ts"]

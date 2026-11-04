@@ -12,12 +12,18 @@ export const serviceGuideGroup = {
     "organization",
     "define",
     "context-values",
+    "effect",
     "routes",
     "migration",
   ],
 } as const;
 
 export const serviceGuideRelations = [
+  {
+    path: "docs/modules/service/effect",
+    api: ["effect", "functions"],
+    examples: ["apps/docs/examples/effect/get-order.function.ts"],
+  },
   {
     path: "docs/modules/service/migration",
     api: ["services", "functions"],

@@ -22,6 +22,7 @@ export const publicApplicationPackages = new Set([
   "@relkit/client",
   "relkit/config",
   "@relkit/drizzle",
+  "relkit/effect",
   "relkit/events",
   "relkit/functions",
   "relkit/jobs",

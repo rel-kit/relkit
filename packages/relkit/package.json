@@ -126,6 +126,10 @@
       "types": "./dist/agents/thread-transition.d.ts",
       "import": "./dist/agents/thread-transition.js"
     },
+    "./app": {
+      "types": "./dist/app/index.d.ts",
+      "import": "./dist/app/index.js"
+    },
     "./buckets": {
       "types": "./dist/app/buckets.d.ts",
       "import": "./dist/app/buckets.js"
@@ -173,6 +177,10 @@
     "./engine/server-runtime": {
       "types": "./dist/engine/server-runtime.d.ts",
       "import": "./dist/engine/server-runtime.js"
+    },
+    "./effect": {
+      "types": "./dist/app/effect.d.ts",
+      "import": "./dist/app/effect.js"
     },
     "./events": {
       "types": "./dist/app/events.d.ts",

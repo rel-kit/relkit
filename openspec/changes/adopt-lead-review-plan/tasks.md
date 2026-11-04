@@ -98,7 +98,7 @@ not tasks of this change.
 
 ## 9. Effect boundary (#14)
 
-- [ ] 9.1 Limit the `relkit` root to Promise APIs and move the Effect helpers to `relkit/effect`, and verify with an export-list snapshot
+- [x] 9.1 Limit the `relkit` root to Promise APIs and move the Effect helpers to `relkit/effect`, and verify with an export-list snapshot
 - [ ] 9.2 Tighten the declaration scanner again so the root entry and generated application declarations expose no Effect types, and verify it fails on a leaking fixture
 - [x] 9.3 Move the Effect usage in generated `runtime-integrations.ts` into the runtime so applications need no direct `effect` dependency, and verify a generated app builds and runs without `effect` in its manifest
 - [x] 9.4 Keep Effect-returning handlers on the same cancellation, tracing and error mapping as Promise handlers, and verify engine tests that run both side by side

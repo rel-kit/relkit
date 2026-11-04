@@ -4,7 +4,10 @@
  * preserve identity while resolving framework dependencies from their owning app.
  */
 export { bindDescriptorIdentity } from "../invocation/index.js";
-export { createApplicationContextResolver } from "./context-resolver.js";
+// The context resolver and its constant runner were exported only by the `relkit` root before it
+// became a curated list.
+export * from "./context-resolver.js";
+export { AppConstantRunner, AppConstantRunnerLive } from "./context-resolution-service.js";
 export {
   checkRuntimeIntegrations,
   loadRuntimeIntegration,

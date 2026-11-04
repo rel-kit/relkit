@@ -11,12 +11,13 @@ sidebar:
 
 Find a package below, then use its **All exported APIs** table to jump to any value or type.
 
-The export-map audit covers **36 supported packages**, **89 import paths**, and **2686 distinct declarations**. Aliases point to the same declaration.
+The export-map audit covers **37 supported packages**, **90 import paths**, and **2676 distinct declarations**. Aliases point to the same declaration.
 
 | Reference                                                      | Supported imports                                                                                                                                                                                                           | Start here                                                          |
 | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | [Application](/docs/api/app#public-imports)                    | `relkit`                                                                                                                                                                                                                    | [Usage and examples](/docs/learn/concepts/application)              |
 | [Configuration](/docs/api/config#public-imports)               | `relkit/config`                                                                                                                                                                                                             | [Usage and examples](/docs/learn/concepts/environment)              |
+| [Effect](/docs/api/effect#public-imports)                      | `relkit/effect`                                                                                                                                                                                                             | [Usage and examples](/docs/modules/service/effect)                  |
 | [Provider authoring](/docs/api/provider#public-imports)        | `relkit/provider`                                                                                                                                                                                                           | [Usage and examples](/docs/modules/integrations/provider-authoring) |
 | [Local providers](/docs/api/providers-local#public-imports)    | `relkit/providers-local`                                                                                                                                                                                                    | [Usage and examples](/docs/modules/integrations/local-providers)    |
 | [Local history](/docs/api/observability-local#public-imports)  | `@relkit/inspector/observability-local`, `@relkit/inspector/observability-local/worker`                                                                                                                                     | [Usage and examples](/docs/modules/operations/inspector)            |
@@ -113,6 +114,7 @@ The following packages are explicitly described as internal or empty compatibili
 - `relkit/agents/state-thread-requests.types`
 - `relkit/agents/state.types`
 - `relkit/agents/thread-transition`
+- `relkit/app`
 - `relkit/config/resolution`
 - `relkit/contracts`
 - `relkit/deploy`

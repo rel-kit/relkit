@@ -23,6 +23,12 @@ export const appSubpaths = [
   "services",
 ] as const;
 
+/**
+ * Entry points only `relkit` publishes from its application facade: `relkit/app` is the former root
+ * that the deprecated `@relkit/app` re-exports, and `relkit/effect` holds the Effect forms.
+ */
+export const relkitFacadeSubpaths = { app: "index", effect: "effect" } as const;
+
 /** Former packages merged into `relkit`; each keeps its exports under `relkit/<area>`. */
 export const relkitAreas = [
   "agents",

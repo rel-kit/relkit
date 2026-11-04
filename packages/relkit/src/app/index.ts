@@ -1,5 +1,8 @@
+/**
+ * The surface the `relkit` root had before it became a curated list. The curated root picks its
+ * names from here, and the deprecated `@relkit/app` re-exports all of it as `relkit/app`.
+ */
 export * from "./config.js";
-export * from "./context-descriptors.js";
 export * from "./context-resolver.js";
 export { AppConstantRunner, AppConstantRunnerLive } from "./context-resolution-service.js";
 export * from "../agents/index.js";
