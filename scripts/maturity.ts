@@ -51,7 +51,11 @@ export const MATURITY_FEATURES: readonly MaturityFeature[] = [
   ),
   core("Functions", ["relkit/functions"], ["/docs/learn/concepts/functions"]),
   core("Services", ["relkit/services"], ["/docs/modules/service"]),
-  core("Routes", ["relkit/routes", "relkit/runtime-hono"], ["/docs/modules/http"]),
+  core(
+    "Routes",
+    ["relkit/routes", "relkit/runtime-hono", "relkit/runtime"],
+    ["/docs/modules/http"],
+  ),
   core("Schemas", ["relkit/schema", "relkit/openapi"], ["/docs/learn/concepts/schemas"]),
   core("Env and config", ["relkit/config"], ["/docs/learn/concepts/environment"]),
   core("Events", ["relkit/events"], ["/docs/modules/events"]),

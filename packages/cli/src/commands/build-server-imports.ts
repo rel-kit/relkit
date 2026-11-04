@@ -7,6 +7,7 @@ import { RUNTIME_INTEGRATION_PLAN_FILE } from "relkit/contracts";
 import { SERVER_BOOTSTRAP_SOURCE } from "./build-server-bootstrap.js";
 import { serverEngineImports } from "./build-server-engine-imports.js";
 import type { ServerSourceEmission } from "./build-server.types.js";
+import type { RuntimeName } from "relkit/runtime";
 
 /**
  * Emits this stage from the same complete compilation result as every neighbor.
@@ -40,7 +41,7 @@ import { currentExecutionContext, publicTrace } from "relkit/invocation";
 import { createObservabilityRuntime, createTelemetryExporterFanout } from "relkit/observability";
 import { consoleHumanSink, createLoggerLayer, formatHumanLog, stdoutJsonSink, redactFailureDetail } from "relkit/runtime-effect";
 ${httpImport}
-import { honoWebSocket, upgradeWebSocket } from "relkit/runtime-hono/bun";
+${runtimeImport(input.configuration.runtime ?? "bun")}
 import runtimeIntegrationsPlan from "./${RUNTIME_INTEGRATION_PLAN_FILE}" with { type: "json" };
 import { runtimeIntegrationModules } from "./runtime-integrations.ts";
 ${localServicesImport}
@@ -50,4 +51,22 @@ ${SERVER_BOOTSTRAP_SOURCE}
 ${engine.stubs}
 
 `;
+}
+
+/**
+ * Imports the selected runtime adapter, which serves HTTP and upgrades WebSockets.
+ * @param runtime - Runtime the server is emitted for.
+ * @returns Import and binding source for `relkitRuntime` and `upgradeWebSocket`.
+ */
+function runtimeImport(runtime: RuntimeName): string {
+  const entryPoint =
+    runtime === "node"
+      ? `
+import { realpathSync } from "node:fs";
+import { pathToFileURL } from "node:url";
+// Node 22 has no import.meta.main; the entry point is the module the process was started with.
+const relkitEntryPoint = process.argv[1] !== undefined && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href;`
+      : "\nconst relkitEntryPoint = import.meta.main;";
+  return `import { ${runtime}Runtime as relkitRuntime } from "relkit/runtime/${runtime}";
+const { upgradeWebSocket } = relkitRuntime;${entryPoint}`;
 }

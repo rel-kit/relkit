@@ -34,6 +34,7 @@ const INTERNAL_RELKIT_AREAS = new Set([
   "local-service",
   "observability",
   "openapi",
+  "runtime",
   "runtime-effect",
   "runtime-hono",
 ]);

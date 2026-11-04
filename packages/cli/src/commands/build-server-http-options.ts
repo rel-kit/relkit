@@ -116,7 +116,10 @@ const HTTP_OPTIONAL_TRANSPORT_SOURCE = `  ...((plan.channels ?? []).length === 0
 function internalHttpOptionsSource(configuration: ServerSourceConfiguration): string {
   return `  mcp: { enabled: ${String(configuration.mcp)}${configuration.mcpAuth === undefined ? "" : `, auth: "${configuration.mcpAuth}"`} },
   agUi: ${String(configuration.agUi ?? false)},
-  staticFiles: { root: process.env.RELKIT_PUBLIC_ROOT ?? new URL("../public", import.meta.url).pathname },
+  staticFiles: {
+    root: process.env.RELKIT_PUBLIC_ROOT ?? new URL("../public", import.meta.url).pathname,
+    ...(relkitRuntime.files === undefined ? {} : { files: relkitRuntime.files }),
+  },
   rateLimitRuntime: { resolveStore: resolveRateLimitStore },
   ...(authRuntime === undefined ? {} : { auth: authRuntime }),
   internalEndpoints: {

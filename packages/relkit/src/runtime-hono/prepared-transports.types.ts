@@ -1,12 +1,11 @@
 /**
- * Defines the checked transport-loader seam and Bun Fetch facade. Applications
+ * Defines the checked transport-loader seam and runtime Fetch facade. Applications
  * borrow request/server context per call; one generation owns module loading and
  * closes it before retiring its immutable execution capsule.
  */
 import type { Effect } from "effect";
 import type { Hono } from "hono";
-import type { BunWebSocketData } from "hono/bun";
-import type { Server } from "bun";
+import type { RuntimeRequestBindings } from "../runtime/index.js";
 import type { CreateAppOptions } from "./create-app.types.js";
 import type { HttpBoundaryError } from "./http-effect.js";
 import type { SelectedHttpTransports } from "./selected-transports.service.js";
@@ -36,12 +35,12 @@ export interface PreparedTransportOperations {
   readonly load: () => Effect.Effect<Hono, HttpBoundaryError>;
 }
 
-/** Native Bun boundary; release physically joins outstanding module evaluation. */
+/** Runtime boundary; release physically joins outstanding module evaluation. */
 export interface PreparedHttpApplication {
   readonly app: Hono;
   readonly fetch: (
     request: Request,
-    server?: Server<BunWebSocketData>,
+    bindings?: RuntimeRequestBindings,
   ) => Response | Promise<Response>;
   readonly close: () => Promise<void>;
 }

@@ -2,7 +2,8 @@ import { Effect, Layer } from "effect";
 import type { Context, Hono } from "hono";
 import { relative, resolve, sep } from "node:path";
 import { runHttp } from "./http-effect.js";
-import { StaticFiles, StaticFilesLive, StaticFileSystemLive } from "./static-file-service.js";
+import { currentRuntime, type RuntimeFile, type RuntimeFiles } from "../runtime/index.js";
+import { StaticFiles, StaticFilesLive, staticFileSystemLayer } from "./static-file-service.js";
 import type { StaticFilesOptions } from "./static-files.types.js";
 export type { StaticFilesOptions } from "./static-files.types.js";
 
@@ -14,10 +15,16 @@ export type { StaticFilesOptions } from "./static-files.types.js";
 export function installStaticFiles(app: Hono, options: StaticFilesOptions | undefined): void {
   if (options === undefined) return;
   const root = resolve(options.root);
+  let files: Promise<RuntimeFiles | undefined> | undefined;
   app.on(["GET", "HEAD"], "*", async (context, next) => {
+    files ??= options.files === undefined
+      ? currentRuntime().then((runtime) => runtime.files)
+      : Promise.resolve(options.files);
+    const available = await files;
+    if (available === undefined) return next();
     const path = safePath(root, new URL(context.req.url).pathname);
     if (path === undefined) return context.notFound();
-    const file = await publicFile(root, path);
+    const file = await publicFile(available, root, path);
     if (file === undefined) return next();
     return fileResponse(context, file);
   });
@@ -45,15 +52,20 @@ function safePath(root: string, pathname: string): string | undefined {
 }
 
 /** Finds an existing confined file through the static-file service.
+ * @param files - Runtime filesystem access that opens the file body.
  * @param root - Configured filesystem root that bounds served files.
  * @param path - Ordered validation path or confined resource path.
- * @returns The existing confined Bun file, or undefined when no public file matches.
+ * @returns The existing confined file, or undefined when no public file matches.
  */
-async function publicFile(root: string, path: string): Promise<Bun.BunFile | undefined> {
+async function publicFile(
+  files: RuntimeFiles,
+  root: string,
+  path: string,
+): Promise<RuntimeFile | undefined> {
   return runHttp(
     Effect.gen(function* () {
       return yield* (yield* StaticFiles).find(root, path);
-    }).pipe(Effect.provide(StaticFilesLive.pipe(Layer.provide(StaticFileSystemLive)))),
+    }).pipe(Effect.provide(StaticFilesLive.pipe(Layer.provide(staticFileSystemLayer(files))))),
   );
 }
 
@@ -62,8 +74,9 @@ async function publicFile(root: string, path: string): Promise<Bun.BunFile | und
  * @param file - Confined native file selected by the static-file service.
  * @returns A full, partial, not-modified or unsatisfiable-range response for the request.
  */
-async function fileResponse(context: Context, file: Bun.BunFile): Promise<Response> {
-  const etag = `"${file.size.toString(16)}-${file.lastModified.toString(16)}"`;
+async function fileResponse(context: Context, opened: RuntimeFile): Promise<Response> {
+  const file = opened.blob;
+  const etag = `"${file.size.toString(16)}-${opened.lastModified.toString(16)}"`;
   const headers = new Headers({
     "accept-ranges": "bytes",
     "content-type": file.type || "application/octet-stream",

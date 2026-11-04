@@ -164,6 +164,19 @@ Node server; the Workers adapter exports a fetch handler with no filesystem. `re
 standard Redis client on Node, an HTTP-based Redis client for Workers, and a per-runtime SQLite
 driver. A portability check bans `Bun.*` and `node:` imports outside adapters.
 
+Decided while applying section 14 (maintainer, 2026-11-05):
+
+- **Adapters live in `relkit/runtime`.** `relkit/runtime` holds the `RuntimeAdapter` contract
+  (`serve`, `upgradeWebSocket`, `files`, `crypto`, `environment`, with `files` undefined for a
+  runtime without a filesystem) and `currentRuntime()`, which picks the adapter from
+  `process.versions.bun`. `relkit/runtime/bun` wraps `Bun.serve`, Hono's Bun WebSocket handler,
+  `Bun.file` and `Bun.SHA256`; `relkit/runtime/node` uses `@hono/node-server` 2.x, whose built-in
+  WebSocket support runs on `ws`, plus `fs.openAsBlob` and `node:crypto`. `relkit/runtime-hono/bun`
+  goes away. The request path passes the adapter's per-request bindings through unchanged, static
+  files open their bodies through `files`, and the inspector bridge listens through `serve`. The
+  generated server imports the selected adapter as `relkitRuntime`. Node's listener has no body
+  limit of its own, so RelKit's `maxBodyBytes` middleware alone limits bodies there.
+
 ### D8. TypeScript 7 (#11)
 
 Generated declaration files (`route-module-checks.ts`, context and event registries) carry every type

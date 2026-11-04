@@ -27,7 +27,7 @@ ${serverJobsAdministrationSource(configuration)}
 }
 `;
   const dispatchSource =
-    "runWithRelkit(await relkitHandle(), () => preparedApplication.fetch(request, bunServer))";
+    "runWithRelkit(await relkitHandle(), () => preparedApplication.fetch(request, bindings))";
   return `const internalEndpointsEnabled = environment !== "production";
 const httpMiddlewareOptions = {
   generationId, graphHash, observability: telemetry, spanRuntime, maxBodyBytes: ${configuration.maxBodyBytes},
@@ -44,11 +44,10 @@ ${serverHttpOptionsSource(configuration)}${applicationSource}
 if (relkitMode.embedded === true) return { handle: await relkitHandle(), close: closeEmbedded };
 const onStart = application.server?.onStart;
 if (typeof onStart === "function") await runWithRelkit(await relkitHandle(), () => onStart());
-server = Bun.serve({
+server = await relkitRuntime.serve({
   hostname: "0.0.0.0",
   port: Number(process.env.PORT ?? 3000),
-  websocket: honoWebSocket,
-  fetch: (request, bunServer) => instrumentHttpRequest(request, httpMiddlewareOptions, async (request) => {
+  fetch: (request, bindings) => instrumentHttpRequest(request, httpMiddlewareOptions, async (request) => {
     const path = new URL(request.url).pathname;
     if (path === "/_relkit/v1/health/live") return healthResponse("ok");
     if (path === "/_relkit/v1/health/ready")
