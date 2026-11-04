@@ -284,6 +284,11 @@ Decisions taken during section 10 (maintainer, 2026-11-04):
   { root })` calls it with `{ embedded: true }`, which skips the HTTP listener, `onStart`, event
   consumers, job workers and signal handlers and returns the handle with `close()`. Scripts need a
   prior `relkit build`; a missing or older build fails with `RELKIT_APPLICATION_BUILD_UNAVAILABLE`.
+- **Handles are isolated except for realtime.** Each `createRelkit` call activates its own
+  runtime, registry and providers, and a test runs two applications concurrently in one process.
+  The realtime dispatcher is still set process-wide by `setActiveRealtimeDispatcher`, so two
+  handles that both trigger channels share the last one set; moving it into invocation context is
+  a follow-up.
 - **Only function descriptors lose `.invoke()`.** Tool descriptors and function graph nodes keep
   their `invoke` adapter, because agent adapters such as LangChain call it.
 
