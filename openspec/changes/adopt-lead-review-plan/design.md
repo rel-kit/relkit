@@ -360,6 +360,16 @@ Decided while applying section 19 (maintainer, 2026-11-05):
   dispatched to optional `trigger`, `publish` and `replay` methods on the existing jobs and events
   action services. A generation without them answers `RELKIT_INSPECTOR_ACTION_UNSUPPORTED`, as
   retry and cancel already did.
+- The generated development server does not wire `trigger`, `publish` or `replay` yet: the jobs
+  controls it builds have no start operation, and replaying needs a publication's payload, which
+  the event providers do not keep. Until the host wires them, these actions answer
+  `RELKIT_INSPECTOR_ACTION_UNSUPPORTED` in a real application and the Inspector shows that code;
+  the browser tests drive them against the Inspector fixture. This is a follow-up for the jobs
+  and events owners.
+- `function.invoke` now generates a W3C trace ID, passes it to the invocation (the generated host
+  forwards it to the engine) and returns it beside the output, so the Inspector's MCP tools page
+  opens the call's trace. The page calls a tool by invoking its target function through the
+  action API; tools whose approval policy needs a person stay disabled there, matching `/mcp`.
 - Agent evaluations need a model to run, which costs money, so CI does not start agents. The
   release-readiness `agent-evals` job runs the deterministic skill packaging check and computes
   the pass rate from the graded runs in `tests/agent-evals/results` (each now has a `verdict`); a

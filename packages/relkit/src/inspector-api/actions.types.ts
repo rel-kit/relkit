@@ -21,6 +21,8 @@ export type InspectorActionName =
 export interface InspectorFunctionActionRequest extends InspectorActionIdentity {
   readonly functionId: string;
   readonly input: unknown;
+  /** W3C trace ID the invocation should record, so the Inspector can open its trace. */
+  readonly traceId?: string;
   readonly signal?: AbortSignal;
 }
 
