@@ -1,11 +1,12 @@
 import { publicTrace } from "../invocation/index.js";
-import type { MiddlewareContext, MiddlewareDescriptor } from "../routes/index.js";
+import type { MiddlewareDescriptor, MiddlewareServices } from "../routes/index.js";
 import { createPublicClockEffect } from "../runtime-effect/index.js";
 import type { Context, Hono, Next } from "hono";
 import { runHttp } from "./http-effect.js";
 import { getEntry, isRecord } from "./materialize-routes-utils.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import { getRequestState } from "./middleware.js";
+import { withProvide } from "./middleware-data.js";
 import { failureOutcome, recordDetail } from "./request-record-utils.js";
 
 /** Registers declared middleware deterministically before materialized routes.
@@ -40,7 +41,11 @@ function createMiddlewareHandler(
         descriptor.handler(
           context,
           next,
-          await middlewareContext(middlewareId, context.req.raw, state, options),
+          withProvide(
+            await middlewareContext(middlewareId, context.req.raw, state, options),
+            descriptor,
+            context.req.raw,
+          ),
         ),
       );
       recordDetail(state?.requestRecord, {
@@ -75,7 +80,7 @@ async function middlewareContext(
   request: Request,
   state: ReturnType<typeof getRequestState>,
   options: RouteMaterializationOptions,
-): Promise<MiddlewareContext> {
+): Promise<MiddlewareServices> {
   const signal = state?.signal ?? new AbortController().signal;
   if (options.middlewareContext !== undefined) {
     return options.middlewareContext({

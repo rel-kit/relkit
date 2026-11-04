@@ -10,7 +10,7 @@ import type {
 } from "./http-dsl.types.js";
 import { assertSchemaValue } from "./http-dsl-value-validation.js";
 import { httpEffects } from "./http-dsl-operations.js";
-import { isTransformRefValue } from "./http-dsl-values.js";
+import { httpValue, isTransformRefValue } from "./http-dsl-values.js";
 import {
   RouteInputError,
   measureRoute,
@@ -133,6 +133,10 @@ export const http: HttpDsl = {
     runRouteSync(httpEffects.multipart(name, options))) as HttpDsl["multipart"],
   multipartAll: ((name: string, options?: HttpSourceOptions) =>
     runRouteSync(httpEffects.multipartAll(name, options))) as HttpDsl["multipartAll"],
+  from: ((middleware: unknown, field: string) =>
+    runRouteSync(
+      routeTry("dsl.from", () => httpValue.from(middleware as never, field as never)),
+    )) as HttpDsl["from"],
   constant: (value) => runRouteSync(httpEffects.constant(value)),
   optional: (value) => runRouteSync(httpEffects.optional(value)),
   default: (value, fallback) => runRouteSync(httpEffects.default(value, fallback)),

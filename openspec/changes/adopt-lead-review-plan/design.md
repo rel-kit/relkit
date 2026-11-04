@@ -242,6 +242,20 @@ Decided while applying section 18 (maintainer, 2026-11-05):
   `session` apiKey cookie scheme (`better-auth.session_token`) and `security: [{ session: [] }]` to
   operations whose route requires a session or whose function has an access rule, with 401 and 403
   problem responses. The Inspector reads the same graph fields in its graph and route views.
+- **Typed middleware provides by field.** `defineMiddleware(path, { provides, handler })` gives the
+  handler `relkit.provide(data)`, which validates the data against `provides` (a failure is a 500,
+  because the server produced it) and stores it on the request. `http.from(middleware, field)` is a
+  serializable `{ kind: "middleware", name }` mapping typed from the middleware's schema; the
+  runtime reads the field from the request, the function's input schema validates it again, and
+  the client generator and OpenAPI leave it out. The mapping names the field, not the middleware's
+  source-derived ID, so a route reads whichever typed middleware on its path provided it.
+  `defineMiddleware(path, handler)` keeps the Hono signature.
+- **Several databases need one default.** `defineDrizzleService({ default: true })` marks the
+  service that `ctx.database`, the handle's `database` and Better Auth use. One service is the
+  default without the flag; with several, check requires exactly one flag. The generated server
+  activates every Drizzle service and fills `ctx.databases` and the handle's `databases` with all of
+  them. Migrations and `relkit db` commands still act on the default service; per-service migration
+  tooling is a follow-up.
 - **`relkit.as(session)`** returns a handle of the same shape whose function calls run as that
   session's user. The trace source stays `system`; the principal is the user's.
 

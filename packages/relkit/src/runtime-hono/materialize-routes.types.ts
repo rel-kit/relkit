@@ -3,7 +3,7 @@ import type { UpgradeWebSocket } from "hono/ws";
 import type { GENERATOR_VERSION, MANIFEST_VERSION, MaybePromise } from "../contracts/index.js";
 import type { HttpTriggerRegistration, RegistrationPlan } from "../graph/index.js";
 import type { RequestRecordSink } from "../observability/index.js";
-import type { MiddlewareContext } from "../routes/index.js";
+import type { MiddlewareServices } from "../routes/index.js";
 import type { MappingValue, RequestMappingOptions } from "./request-mapping.js";
 import type { RateLimitRuntimeOptions } from "./rate-limit.js";
 import type { HttpAuthInvocation, HttpAuthRuntime } from "./auth.js";
@@ -121,5 +121,5 @@ export interface RouteMaterializationOptions {
     readonly auth?: HttpAuthInvocation;
     readonly requestId?: string;
     readonly traceId?: string;
-  }) => MaybePromise<MiddlewareContext>;
+  }) => MaybePromise<MiddlewareServices>;
 }

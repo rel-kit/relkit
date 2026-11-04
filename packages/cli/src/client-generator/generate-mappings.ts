@@ -61,6 +61,8 @@ const visitMapping: (
     );
     return;
   }
+  // Middleware fields come from the server, so the client never sends them.
+  if (document.kind === "middleware") return;
   result.push({
     inputPath: path,
     outputPath:
