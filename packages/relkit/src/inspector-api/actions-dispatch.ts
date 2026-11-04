@@ -8,6 +8,7 @@ import { safeJson, type ResolvedActiveGeneration } from "./shared.js";
 import { InspectorActionError } from "./actions-errors.js";
 import { ACTION_REDACTION, projectAdmin, projectApproval } from "./actions-projection.js";
 import { assertActionState, assertProtocol, bounded, reason } from "./actions-utils.js";
+import { START_ACTIONS, dispatchStartActionEffect } from "./actions-dispatch-start.js";
 import type {
   InspectorActionRequest,
   InspectorActionServices,
@@ -57,6 +58,8 @@ export const dispatchInspectorActionEffect = Effect.fn("Inspector.dispatchInspec
       );
       return { output: safeJson(value, ACTION_REDACTION) };
     }
+    if (START_ACTIONS.has(request.action))
+      return yield* dispatchStartActionEffect(request, actions);
     if (request.action.startsWith("job.")) {
       const service = actions.jobs;
       yield* projectionAttempt(() => assertProtocol(service, "relkit.jobs.admin"));
