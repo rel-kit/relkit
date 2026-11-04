@@ -6,6 +6,7 @@ import { cleanupEffect } from "../services/cleanup.service.js";
 import { CliFileSystem } from "../services/filesystem.service.js";
 import { acquireDevSessionEffect } from "./dev.js";
 import { acquireDevCommandSupport } from "./dev-command-support.js";
+import { acquireTypecheckWatch } from "../dev-reload/typecheck-watch.js";
 import type { DevSession } from "./dev-session.js";
 import type { DevCommandSessionState, DevCommandSupport } from "./dev-command-session.types.js";
 
@@ -21,6 +22,9 @@ export const runDevCommandSession = Effect.fn("Dev.runCommandSession")(
         const support = yield* acquireDevCommandSupport(state);
         const session = yield* acquireCommandSession(state, support);
         yield* installCommandHangup(session);
+        // Types are reported by a parallel watch process; reloads never wait for it.
+        if (process.env.RELKIT_DEV_TYPECHECK !== "0")
+          yield* acquireTypecheckWatch(state.projectRoot, session.log);
         yield* session.nativeEngine.watch;
         yield* session.nativeEngine.wait;
       }),
