@@ -1,4 +1,6 @@
 [
+  "/docs/api/agent-adapters",
+  "/docs/api/integrations/ai-sdk",
   "/docs/api/integrations/aws",
   "/docs/api/integrations/cloudflare",
   "/docs/api/integrations/effect-mq",
@@ -9,6 +11,7 @@
   "/docs/api/integrations/sentry",
   "/docs/api/integrations/trigger",
   "/docs/api/realtime",
+  "/docs/modules/ai/adapters",
   "/docs/modules/ai/graphs-persistence",
   "/docs/modules/ai/native-runtime",
   "/docs/modules/deployment/aws",

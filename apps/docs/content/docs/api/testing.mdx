@@ -20,6 +20,201 @@ For a complete workflow, follow [from express or hono](/guides/migrate/from-expr
 
 <include>/_snippets/generated/exports/testing.mdx</include>
 
+## `agents-conformance-fixture.ts`
+
+Builds the conformance agent, its tools, a recording engine, state, trace and access hooks.
+
+### ConformanceRun (interface)
+
+Everything one case observes.
+
+**Signature**
+
+```ts
+export interface ConformanceRun {
+  readonly execution: AgentAdapterExecution;
+  readonly engineCalls: { readonly functionId: string; readonly input: unknown }[];
+  readonly accessRequests: AgentAccessRequest[];
+  readonly spans: { readonly span: string; outcome?: "ok" | "error" }[];
+  readonly threads: Map<string, AgentThreadState>;
+  readonly resolvedProfiles: (string | undefined)[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance-fixture.ts#L45)
+
+### conformanceRun
+
+Creates one agent execution with recording hooks.
+
+**Signature**
+
+```ts
+declare const conformanceRun: (
+  options: AgentConformanceOptions,
+  turns: readonly AgentConformanceTurn[],
+  access?: AgentAccessCheck,
+) => ConformanceRun;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance-fixture.ts#L61)
+
+### lookupTool
+
+**Signature**
+
+```ts
+declare const lookupTool: ToolDescriptor<"conformance.lookup">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance-fixture.ts#L29)
+
+### refundTool
+
+**Signature**
+
+```ts
+declare const refundTool: ToolDescriptor<"conformance.refund">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance-fixture.ts#L36)
+
+## `agents-conformance.ts`
+
+Shared agent adapter conformance suite. Every first-party adapter runs the same cases: tools
+through the engine, approvals, durable threads, AG-UI streaming, access rules, traces and model
+profiles. A case rejects with a description of the first broken expectation.
+
+### "./agents-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./agents-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./agents-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.ts#L15)
+
+### AGENT_CONFORMANCE_CASES
+
+The cases every adapter passes.
+
+**Signature**
+
+```ts
+declare const AGENT_CONFORMANCE_CASES: ReadonlyArray<AgentConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.ts#L18)
+
+### createAgentConformanceHarness
+
+Creates the conformance harness for one adapter.
+
+**Example**
+
+```ts
+import { createAgentAdapterRuntime, defineAgentRuntime } from "relkit/agent-adapters";
+import { createAgentConformanceHarness } from "@relkit/testing/agents-conformance";
+
+const harness = createAgentConformanceHarness({
+  adapter: () => defineAgentRuntime({ adapterId: "echo", integrationId: "echo", options: {} }),
+  runtime: createAgentAdapterRuntime({
+    adapterId: "echo",
+    turn: async () => ({ text: "", toolCalls: [] }),
+  }),
+  scriptedModel: () => ({}),
+});
+// In a test file: for (const item of harness.cases) test(item.description, () => harness.run(item.id));
+console.log(harness.cases.map((item) => item.id));
+```
+
+**Signature**
+
+```ts
+declare const createAgentConformanceHarness: (
+  options: AgentConformanceOptions,
+) => AgentConformanceHarness;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.ts#L60)
+
+## `agents-conformance.types.ts`
+
+Inputs and results of the shared agent adapter conformance suite.
+
+### AgentConformanceCase (interface)
+
+One conformance case.
+
+**Signature**
+
+```ts
+export interface AgentConformanceCase {
+  readonly id:
+    "tools" | "approvals" | "threads" | "streaming" | "access-rules" | "traces" | "model-profiles";
+  readonly description: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L26)
+
+### AgentConformanceHarness (interface)
+
+Cases plus a runner that rejects when the adapter breaks a case.
+
+**Signature**
+
+```ts
+export interface AgentConformanceHarness {
+  readonly cases: readonly AgentConformanceCase[];
+  readonly run: (caseId: AgentConformanceCase["id"]) => Promise<void>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L33)
+
+### AgentConformanceOptions (interface)
+
+What an adapter supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface AgentConformanceOptions {
+  /** Creates the agent's `runtime` value, such as `langchain()`. */
+  readonly adapter: () => AgentRuntimeAdapterAny;
+  /** The adapter's runtime half, exported from its runtime entry. */
+  readonly runtime: AgentAdapterRuntime;
+  /** Builds the adapter's native scripted model from neutral turns. */
+  readonly scriptedModel: (turns: readonly AgentConformanceTurn[]) => unknown;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L16)
+
+### AgentConformanceTurn (interface)
+
+One scripted model turn, written once for every adapter.
+
+**Signature**
+
+```ts
+export interface AgentConformanceTurn {
+  readonly text?: string;
+  readonly toolCalls?: readonly {
+    readonly id: string;
+    /** Model-facing tool name, such as `conformance_lookup` or `relkit_output`. */
+    readonly name: string;
+    readonly input: unknown;
+  }[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L5)
+
 ## `application-acquisition.ts`
 
 Acquires the general runtime and explicitly selected application services in one scope.

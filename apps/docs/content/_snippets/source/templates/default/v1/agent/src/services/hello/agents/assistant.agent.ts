@@ -1,5 +1,6 @@
 /** Runs an offline greeting agent with RelKit/native tools, todo middleware and public state observation. */
-import { defineAgent } from "@relkit/langchain";
+import { defineAgent } from "@relkit/app/agents";
+import { langchain } from "@relkit/langchain";
 import { z } from "zod";
 import { FakeToolCallingModel, todoListMiddleware, tool } from "langchain";
 import lookup from "@app/services/hello/tools/lookup.tool.js";
@@ -12,31 +13,33 @@ export const uppercase = tool(async ({ text }: { readonly text: string }) => tex
 
 export default defineAgent({
   id: "hello.assistant",
+  runtime: langchain({
+    model: new FakeToolCallingModel({
+      toolCalls: [
+        [
+          {
+            name: "write_todos",
+            args: { todos: [{ content: "Answer the greeting", status: "completed" }] },
+            id: "todo-1",
+          },
+        ],
+        [
+          {
+            name: "relkit_output",
+            args: { value: { answer: "Hello from the offline LangChain model." } },
+            id: "output-1",
+          },
+        ],
+      ],
+    }),
+    middleware: [todoListMiddleware()],
+    tools: [uppercase],
+  }),
 
   input: z.object({ message: z.string().min(1) }),
   output: z.object({ answer: z.string() }),
-
-  model: new FakeToolCallingModel({
-    toolCalls: [
-      [
-        {
-          name: "write_todos",
-          args: { todos: [{ content: "Answer the greeting", status: "completed" }] },
-          id: "todo-1",
-        },
-      ],
-      [
-        {
-          name: "relkit_output",
-          args: { value: { answer: "Hello from the offline LangChain model." } },
-          id: "output-1",
-        },
-      ],
-    ],
-  }),
   instructions: "Answer greeting questions with the available tools.",
-  tools: [lookup, uppercase],
-  middleware: [todoListMiddleware()],
+  tools: [lookup],
   stateProfile: "default",
   client: {
     public: true,

@@ -1668,17 +1668,11 @@ declare const defineAgentEffect: <
   const InputSchema extends StandardSchemaV1,
   const OutputSchema extends StandardSchemaV1,
   const Tools extends readonly ToolRefAny[],
+  const Runtime extends AgentRuntimeAdapterAny,
 >(
-  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools>,
+  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools, Runtime>,
 ) => Effect<
-  AgentDescriptor<
-    Id,
-    InferInput<InputSchema>,
-    InferOutput<OutputSchema>,
-    InputSchema,
-    OutputSchema,
-    Tools
-  >,
+  AgentDefinition<Id, InputSchema, OutputSchema, Tools, Runtime>,
   AgentDefinitionFailure,
   never
 >;

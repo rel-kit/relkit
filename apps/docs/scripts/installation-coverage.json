@@ -25,6 +25,7 @@
   "docs/learn/protect-orders": ["update", "continuation", "/docs/modules/auth/better-auth"],
   "docs/learn/save-orders": ["update", "continuation", "/docs/modules/database/define"],
   "docs/learn/test-orders": ["update", "continuation", "/docs/learn/protect-orders"],
+  "docs/modules/ai/adapters": ["update", "continuation", "/docs/modules/ai/agents"],
   "docs/modules/ai/agents": [
     "update",
     "installation",

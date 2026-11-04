@@ -1,5 +1,6 @@
 /** Delegates offline inventory checks to an inherited-model specialist using shared persistence and a private bucket workspace. */
-import { defineAgent } from "@relkit/langchain";
+import { defineAgent } from "@relkit/app/agents";
+import { langchain } from "@relkit/langchain";
 import { supportInput, supportOutput } from "../../../platform/schemas.js";
 import agentWorkspace from "../buckets/agent-workspace.bucket.js";
 import lookupOrder from "../tools/lookup-order.tool.js";
@@ -8,6 +9,7 @@ import { orderCheckpoints, orderMemory } from "./order-agent-persistence.js";
 
 const inventorySpecialist = defineAgent({
   id: "inventory-specialist",
+  runtime: langchain(),
   description: "Checks inventory delegated by the commerce assistant.",
   input: supportInput,
   output: supportOutput,
@@ -17,18 +19,20 @@ const inventorySpecialist = defineAgent({
 });
 
 const orderDeep = defineAgent({
+  runtime: langchain({
+    model: createCommerceModel("deep"),
+    subagents: [inventorySpecialist],
+    // Seed these paths in the workspace bucket to inject team-specific guidance.
+    skills: ["/skills/commerce/"],
+    memory: ["/AGENTS.md"],
+    backend: agentWorkspace,
+    checkpointer: orderCheckpoints,
+    store: orderMemory,
+  }),
   input: supportInput,
   output: supportOutput,
-  model: createCommerceModel("deep"),
   instructions: "Delegate inventory checks to the specialist and return its conclusion.",
   tools: [],
-  subagents: [inventorySpecialist],
-  // Seed these paths in the workspace bucket to inject team-specific guidance.
-  skills: ["/skills/commerce/"],
-  memory: ["/AGENTS.md"],
-  backend: agentWorkspace,
-  checkpointer: orderCheckpoints,
-  store: orderMemory,
   limits: { maxSteps: 6, maxToolCalls: 4, timeoutMs: 60_000 },
   stateProfile: "agents",
   client: { public: true },

@@ -122,9 +122,15 @@ export const MATURITY_FEATURES: readonly MaturityFeature[] = [
     ["/docs/modules/jobs/providers/effect-mq", "/docs/api/integrations/effect-mq"],
   ),
   labs(
-    "Agent adapters (LangChain and DeepAgents)",
-    ["@relkit/langchain"],
-    ["/docs/modules/ai/native-runtime", "/docs/api/integrations/langchain"],
+    "Agent adapters (LangChain, DeepAgents and AI SDK)",
+    ["relkit/agent-adapters", "@relkit/langchain", "@relkit/ai-sdk"],
+    [
+      "/docs/modules/ai/adapters",
+      "/docs/modules/ai/native-runtime",
+      "/docs/api/agent-adapters",
+      "/docs/api/integrations/langchain",
+      "/docs/api/integrations/ai-sdk",
+    ],
   ),
   labs("Graph workflows", ["@relkit/langchain"], ["/docs/modules/ai/graphs-persistence"]),
   labs("Sentry telemetry", ["@relkit/sentry"], ["/docs/api/integrations/sentry"]),
