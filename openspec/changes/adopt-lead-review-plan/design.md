@@ -344,6 +344,20 @@ Decided while applying section 11 (maintainer, 2026-11-05):
   public API. Channel, agent and job hooks keep their declared IDs, because those are not routes
   and the `api` object mirrors routes only; `useRouteMutation` no longer triggers jobs, which
   `useJobTrigger` does.
+- **No Effect in the browser.** Every module the browser entries reach (`@relkit/client`,
+  `/react`, `/jobs`, `/tanstack-query`) is plain Promise and `AbortSignal` code: services became
+  objects, scopes became `createWorkOwner` (abort everything, then wait), streams became async
+  generators over `iterateNative`. `effect` and `@effect/vitest` leave the package's
+  dependencies. The Bun-only `/server` entries still reach Effect through `relkit`, which is
+  fine there. `packages/client/scripts/browser-bundle.ts` bundles the browser entries for a
+  browser target and lists every module that imports `effect`; `tests/browser-bundle.test.ts`
+  requires the list to be empty. The minified bundle went from 157.6 KiB to 114.5 KiB.
+- **What the browser client gave up.** It no longer emits Effect execution logs and metrics
+  (`rpc.invoke`, `pending.*`, `agent.observe`, `jobs.observe` and the rest); server-side tracing
+  is unchanged. The few runtime values it took from `relkit` (agent capability constants,
+  `canonicalJson`, `createOperationId`, the contract events path) are copied into
+  `packages/client/src/wire.ts`, and `tests/compatibility/wire.test.ts` checks each against
+  `relkit/contracts`.
 
 ### D16. Agent adapters (#22)
 

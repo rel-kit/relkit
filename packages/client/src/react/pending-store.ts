@@ -21,36 +21,49 @@ export function pendingEntryKey(scopeKey: string, operationId: string): string {
  * Persists metadata best-effort without persisting transmitted requests.
  * @param key - Existing canonical identity key.
  * @param value - Original input or payload; its identity is retained where required.
+ * @param storage - Storage accessor; defaults to browser session storage.
  * @returns Nothing; the existing owned state or publication is updated.
  */
-export function writePendingStorage(key: string, value: PendingOperationMetadata): void {
+export function writePendingStorage(
+  key: string,
+  value: PendingOperationMetadata,
+  storage: PendingStorage = sessionStorageValue,
+): void {
   try {
-    sessionStorageValue()?.setItem(key, JSON.stringify(value));
+    storage()?.setItem(key, JSON.stringify(value));
   } catch {}
 }
 
 /**
  * Removes persisted receipt metadata without surfacing unavailable browser storage.
  * @param key - Existing canonical identity key.
+ * @param storage - Storage accessor; defaults to browser session storage.
  * @returns Nothing; the existing owned state or publication is updated.
  */
-export function removePendingStorage(key: string): void {
+export function removePendingStorage(
+  key: string,
+  storage: PendingStorage = sessionStorageValue,
+): void {
   try {
-    sessionStorageValue()?.removeItem(key);
+    storage()?.removeItem(key);
   } catch {}
 }
 
 /**
  * Recovers selectively validated metadata while isolating malformed entries.
  * @param scopeKey - Complete serialized identity scope.
+ * @param storage - Storage accessor; defaults to browser session storage.
  * @returns Recovered operation metadata indexed by receipt identity.
  */
-export function readPendingStorage(scopeKey: string): Map<string, PendingOperationMetadata> {
+export function readPendingStorage(
+  scopeKey: string,
+  storage: PendingStorage = sessionStorageValue,
+): Map<string, PendingOperationMetadata> {
   const result = new Map<string, PendingOperationMetadata>();
-  const target = sessionStorageValue();
+  const target = storage();
   if (target === undefined) return result;
   try {
-    for (const key of Object.keys(target)) {
+    for (const key of storageKeys(target)) {
       if (!key.startsWith(`${PENDING_PREFIX}${scopeKey}.`)) continue;
       try {
         const value = JSON.parse(target.getItem(key) ?? "null") as PendingOperationMetadata;
@@ -66,13 +79,17 @@ export function readPendingStorage(scopeKey: string): Map<string, PendingOperati
 /**
  * Retires all persisted receipt metadata in one complete identity scope.
  * @param scopeKey - Complete serialized identity scope.
+ * @param storage - Storage accessor; defaults to browser session storage.
  * @returns Nothing; the existing owned state or publication is updated.
  */
-export function clearPendingStorage(scopeKey: string): void {
-  const target = sessionStorageValue();
+export function clearPendingStorage(
+  scopeKey: string,
+  storage: PendingStorage = sessionStorageValue,
+): void {
+  const target = storage();
   if (target === undefined) return;
   try {
-    for (const key of Object.keys(target)) {
+    for (const key of storageKeys(target)) {
       if (key.startsWith(`${PENDING_PREFIX}${scopeKey}.`)) {
         try {
           target.removeItem(key);
@@ -83,10 +100,27 @@ export function clearPendingStorage(scopeKey: string): void {
 }
 
 /**
+ * Lists every key of a storage area before any of them is removed.
+ * @param target - Storage area.
+ * @returns A snapshot of its keys.
+ */
+function storageKeys(target: Storage): string[] {
+  const keys: string[] = [];
+  for (let index = 0; index < target.length; index += 1) {
+    const key = target.key(index);
+    if (key !== null) keys.push(key);
+  }
+  return keys;
+}
+
+/** Reads the storage that persists pending metadata, or undefined when unavailable. */
+export type PendingStorage = () => Storage | undefined;
+
+/**
  * Reads browser session storage without throwing when access is unavailable.
  * @returns Accessible session storage, or undefined when unavailable.
  */
-function sessionStorageValue(): Storage | undefined {
+export function sessionStorageValue(): Storage | undefined {
   try {
     return globalThis.sessionStorage;
   } catch {

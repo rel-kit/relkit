@@ -1,13 +1,12 @@
 import type { AgentObservation } from "relkit/contracts";
-import { Effect, Stream } from "effect";
-import { nativeStream } from "../native-stream.js";
 
 /**
- * Transfers a native response reader into a scoped Effect parser and iterator edge.
+ * Parses a native SSE response body into canonical agent observations.
  * @param body - Native response body owned by this observation.
  * @param controller - Request owner; cleanup never aborts a borrowed caller controller.
- * @param borrowed - Optional borrowed caller signal.
- * @returns One iterator whose return/throw cancels a pending reader before joining scope.
+ * @param borrowed - Optional borrowed caller signal; its abort cancels the reader.
+ * @returns One iterator whose return/throw cancels a pending reader before finishing; EOF and
+ * parse failures release the reader too.
  */
 export function agentSseObservations(
   body: ReadableStream<Uint8Array>,
@@ -15,8 +14,6 @@ export function agentSseObservations(
   borrowed?: AbortSignal,
 ): AsyncIterable<AgentObservation> {
   const reader = body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
   let closing: Promise<void> | undefined;
   const cleanup = (): Promise<void> =>
     (closing ??= (async () => {
@@ -39,49 +36,56 @@ export function agentSseObservations(
   };
   borrowed?.addEventListener("abort", abort, { once: true });
   if (borrowed?.aborted) abort();
-  const native: AsyncIterator<Uint8Array> = {
-    next: async () => {
-      const next = await reader.read();
-      return next.done ? { done: true, value: undefined } : { done: false, value: next.value };
-    },
-    return: async () => {
-      await cleanup();
-      return { done: true, value: undefined };
-    },
+  const read = async (): Promise<Uint8Array | undefined> => {
+    const next = await reader.read();
+    return next.done ? undefined : next.value;
   };
-  const parsed = nativeStream("agent.sse.frames", async () => native, controller.signal).pipe(
-    Stream.mapEffect((bytes) =>
-      Effect.try({
-        try: () => {
-          buffer += decoder.decode(bytes, { stream: true }).replace(/\r\n/g, "\n");
-          const values: AgentObservation[] = [];
-          let boundary = buffer.indexOf("\n\n");
-          while (boundary >= 0) {
-            const value = decodeObservation(buffer.slice(0, boundary));
-            buffer = buffer.slice(boundary + 2);
-            if (value !== undefined) values.push(value);
-            boundary = buffer.indexOf("\n\n");
-          }
-          return values;
-        },
-        catch: (cause) => cause,
-      }),
-    ),
-    Stream.flatMap((values) => Stream.fromIterable(values)),
-  );
-  const iterator = Stream.toAsyncIterable(parsed)[Symbol.asyncIterator]();
+  const iterator = parseObservations(read, cleanup);
+  // A generator that has not started skips its finally on return, so clean up explicitly.
   const adapted: AsyncIterator<AgentObservation> = {
     next: () => iterator.next(),
     return: async () => {
       await cleanup();
-      return await iterator.return!();
+      return await iterator.return();
     },
-    throw: async (error) => {
+    throw: async (error: unknown) => {
       await cleanup();
-      return await iterator.throw!(error);
+      return await iterator.throw(error);
     },
   };
   return { [Symbol.asyncIterator]: () => adapted };
+}
+
+/**
+ * Reads SSE blocks and yields each observation they carry.
+ * @param read - Reads the next chunk from the locked body reader; undefined at EOF.
+ * @param cleanup - Releases the reader and its request; called on every exit.
+ * @returns Observations in arrival order.
+ */
+async function* parseObservations(
+  read: () => Promise<Uint8Array | undefined>,
+  cleanup: () => Promise<void>,
+): AsyncGenerator<AgentObservation, void, undefined> {
+  const decoder = new TextDecoder();
+  let buffer = "";
+  try {
+    while (true) {
+      const bytes = await read();
+      if (bytes === undefined) return;
+      buffer += decoder.decode(bytes, { stream: true }).replace(/\r\n/g, "\n");
+      const values: AgentObservation[] = [];
+      let boundary = buffer.indexOf("\n\n");
+      while (boundary >= 0) {
+        const value = decodeObservation(buffer.slice(0, boundary));
+        buffer = buffer.slice(boundary + 2);
+        if (value !== undefined) values.push(value);
+        boundary = buffer.indexOf("\n\n");
+      }
+      yield* values;
+    }
+  } finally {
+    await cleanup();
+  }
 }
 
 /**

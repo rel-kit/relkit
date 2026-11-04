@@ -110,3 +110,9 @@ function camelCase(value: string): string {
 function pascalCase(value: string): string {
   return `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
 }
+
+/**
+ * Development-only stream on the backend's public port that tells frontends when the
+ * backend's client contract may have changed, so they reload it without a restart.
+ */
+export const CLIENT_CONTRACT_EVENTS_PATH = "/_relkit/v1/client/contract-events";

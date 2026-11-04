@@ -22,8 +22,7 @@ import type {
 } from "../jobs/job-registry-derived.types.js";
 import { useRelkitClient } from "./context.js";
 import { relkitJobKey } from "./keys.js";
-import { runExecutionPromise } from "relkit/contracts/operation";
-import { mutationOperations, mutationRuntime } from "./mutation-runtime.js";
+import { submitMutation } from "./mutation-runtime.js";
 import { pendingScopeKey } from "./pending.js";
 import { procedureUtils } from "./procedure.js";
 import { RelkitWriteError } from "./write-error.js";
@@ -73,23 +72,20 @@ export function useJobTrigger<Name extends JobTriggerName, Context = unknown>(
       if (offline()) throw new RelkitWriteError("not-sent", "The browser is offline.");
       const prepared = prepareJobRequest(input, runtime.identity!, mutationContext);
       const scopeKey = pendingScopeKey(scope);
-      return (await runExecutionPromise(
-        mutationRuntime,
-        mutationOperations.submit(
-          scopeKey,
-          "job-trigger",
-          name,
-          prepared.value,
-          {},
-          {
-            operationId: prepared.operationId,
-            retainRequest: true,
-            ...(prepared.idempotencyKey === undefined
-              ? {}
-              : { idempotencyKey: prepared.idempotencyKey }),
-          },
-          () => original(prepared.value, mutationContext),
-        ),
+      return (await submitMutation(
+        scopeKey,
+        "job-trigger",
+        name,
+        prepared.value,
+        {},
+        {
+          operationId: prepared.operationId,
+          retainRequest: true,
+          ...(prepared.idempotencyKey === undefined
+            ? {}
+            : { idempotencyKey: prepared.idempotencyKey }),
+        },
+        () => original(prepared.value, mutationContext),
       )) as JobTriggerOutputFor<Name>;
     },
     mutationKey: runtime.scope
@@ -195,17 +191,14 @@ function useJobControl<
       if (offline()) throw new RelkitWriteError("not-sent", "The browser is offline.");
       const scopeKey = pendingScopeKey(scope);
       const operationId = readOperationId(input);
-      return (await runExecutionPromise(
-        mutationRuntime,
-        mutationOperations.submit(
-          scopeKey,
-          "mutation",
-          `jobs.${name}.runs.${operation}`,
-          input,
-          controlReferences(input),
-          operationId === undefined ? {} : { operationId },
-          () => original(input, mutationContext),
-        ),
+      return (await submitMutation(
+        scopeKey,
+        "mutation",
+        `jobs.${name}.runs.${operation}`,
+        input,
+        controlReferences(input),
+        operationId === undefined ? {} : { operationId },
+        () => original(input, mutationContext),
       )) as Output;
     },
     mutationKey: runtime.scope

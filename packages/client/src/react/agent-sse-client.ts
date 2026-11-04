@@ -1,4 +1,4 @@
-import { AGENT_CAPABILITY_HEADER, AGENT_CAPABILITY_VALUE } from "relkit/contracts";
+import { AGENT_CAPABILITY_HEADER, AGENT_CAPABILITY_VALUE } from "../wire.js";
 import { ORPCError } from "@orpc/client";
 import type { ClientHeaders } from "../index.types.js";
 import { agentSseObservations } from "./agent-sse-stream.js";

@@ -1,10 +1,6 @@
 import { RPCLink } from "@orpc/client/fetch";
 import { RPCLink as WebSocketRPCLink } from "@orpc/client/websocket";
-import {
-  AGENT_CAPABILITY_HEADER,
-  AGENT_CAPABILITY_QUERY,
-  AGENT_CAPABILITY_VALUE,
-} from "relkit/contracts";
+import { AGENT_CAPABILITY_HEADER, AGENT_CAPABILITY_QUERY, AGENT_CAPABILITY_VALUE } from "./wire.js";
 import type {
   ClientHeaders,
   CreateClientOptions,

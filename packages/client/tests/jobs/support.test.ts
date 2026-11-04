@@ -1,5 +1,4 @@
-import { expect, test } from "@effect/vitest";
-import { vi } from "vitest";
+import { expect, test, vi } from "vitest";
 import { stateFromFeedEvent } from "../../src/jobs/controller-state.ts";
 import {
   freeze,
