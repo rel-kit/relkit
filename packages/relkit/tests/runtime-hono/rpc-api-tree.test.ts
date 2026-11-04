@@ -66,6 +66,7 @@ test("route procedures are mounted at their typed-client API paths", async () =>
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ json: { orderId: "o1" } }),
       }),
+      { context: {} as never },
     );
     return result.response?.status;
   };
