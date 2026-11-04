@@ -245,6 +245,16 @@ Decided while applying section 16 (maintainer, 2026-11-05):
   claims the occurrence without a run while an earlier run of the schedule is queued or running.
   Re-upserting a schedule with unchanged timing keeps its pending occurrence, so a redeploy neither
   skips nor repeats one.
+- **Worker modes reuse `RELKIT_WORKER_ROLE`.** The generated server already drives an adapter's
+  pull `worker` from its job loop and skips it in the `api` role, and passes `startWorker: false` to
+  `registerWorker` there. The Postgres runtime starts its scheduler from `registerWorker` and its
+  event consumers when the role is `worker` (the default), so a single instance runs everything in
+  the web process, and a deployment can run web instances with `RELKIT_WORKER_ROLE=api` beside
+  one or more `worker` instances of the same build. Jobs and events providers of one process that
+  name the same database and namespace share one pool. `RELKIT_POSTGRES_URL` overrides the
+  authored URL. Not verified here: a full `relkit build` and `relkit start` of an application on
+  this provider; the worker-mode tests build the providers through the same runtime integration
+  the server uses, with a child process as the worker instance.
 
 ### D11. Problem Details errors (#13 a, b)
 

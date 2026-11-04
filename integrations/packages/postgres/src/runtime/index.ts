@@ -8,3 +8,5 @@ export { occurrenceIdentity } from "./schedules-tick.js";
 export type { ClaimedOccurrence } from "./schedules-tick.js";
 export { createPostgresEventProvider } from "./events-provider.js";
 export type * from "./events-provider.types.js";
+export { runtimeIntegration, workerRole } from "./integration.js";
+export type { PostgresWorkerRole } from "./integration.js";
