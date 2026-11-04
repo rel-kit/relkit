@@ -137,7 +137,7 @@ not tasks of this change.
 ## 13. Development loop (#9; benchmarks in phase 2, reload in phase 3)
 
 - [x] 13.1 Generate benchmark apps with 10, 100 and 500 functions and a script that measures save-to-serving p95 and `relkit check` peak memory against `tsc`, and verify the script reports both metrics
-- [ ] 13.2 Run the benchmarks in release readiness and build the benchmarks page with the measuring host from that CI output, and verify the pull request's run produces the numbers and the docs build shows them
+- [x] 13.2 Run the benchmarks in release readiness and build the benchmarks page with the measuring host from that CI output, and verify the pull request's run produces the numbers and the docs build shows them
 - [x] 13.3 Keep one warm evaluator per dev session that re-evaluates only changed modules and their dependents through `invalidateWatchDependencies`, and verify tests that unchanged modules are not re-imported
 - [x] 13.4 Swap the handler table atomically when configuration, providers and route shape are unchanged and fall back to blue/green otherwise, and verify the process stays the same on a handler edit and restarts on a binding change
 - [x] 13.5 Run type-checking as a parallel watch process that streams diagnostics to the CLI and Inspector without blocking reloads, and verify a type error does not block a reload
@@ -145,7 +145,7 @@ not tasks of this change.
 - [x] 13.7 Keep last-known-good serving for evaluation and graph errors, and verify the syntax-error test
 - [x] 13.8 Make `relkit dev --prepare` a finite check without snapshots and update the `--no-install` next steps, and verify the post-install workflow test
 - [x] 13.9 Delete the snapshot cache (`packages/cli/src/dev-snapshot`, including `snapshot-commerce-eligibility.ts`) once the budgets hold, and verify the first-start budget test passes without it
-- [ ] 13.10 Enforce the reload and memory budgets in CI, and verify the job fails on an injected-delay fixture
+- [x] 13.10 Enforce the reload and memory budgets in CI, and verify the job fails on an injected-delay fixture
 - [ ] 13.11 Document how the dev loop reloads and when it restarts, and verify the docs build
 
 ## 14. Node runtime (#10, Tier 1)

@@ -72,3 +72,20 @@ test("passes only when every size meets its reload and memory budget", () => {
   expect(violation?.message).toContain("test CPU");
   expect(budgetViolations(passing.slice(0, 2), host)[0]?.metric).toBe("missing");
 });
+
+test("the budget gate fails on the injected-delay fixture and names the value and host", () => {
+  const gate = Bun.spawnSync(
+    [
+      process.execPath,
+      "scripts/check-dev-loop-budgets.ts",
+      "--report",
+      "scripts/tests/fixtures/dev-loop-injected-delay.json",
+    ],
+    { cwd: root },
+  );
+  expect(gate.exitCode).toBe(1);
+  const stderr = gate.stderr.toString();
+  expect(stderr).toContain("100 functions: reload p95 1450.0 ms is not below 1000 ms");
+  expect(stderr).toContain("Injected-delay fixture");
+  expect(stderr.match(/Budget missed/g)).toHaveLength(1);
+});
