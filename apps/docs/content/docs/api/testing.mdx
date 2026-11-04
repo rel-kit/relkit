@@ -444,6 +444,37 @@ type TestRoute = TestFunctionRoute | TestRawRoute;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L38)
 
+## `application-server.ts`
+
+Points a test application's HTTP client at an already running server, so an application's HTTP
+suite can run against its production build on any runtime. Requests without an `Origin` get the
+server's own, as a browser on the app would send. Only `http` and `close` are available; members
+that need the in-process application throw when read.
+
+### TEST_SERVER_URL_VARIABLE
+
+Environment variable that selects a running server for `createTestApplication`.
+
+**Signature**
+
+```ts
+declare const TEST_SERVER_URL_VARIABLE: "RELKIT_TEST_SERVER_URL";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-server.ts#L14)
+
+### serverTestApplication
+
+Creates a test application whose HTTP client sends requests to a running server.
+
+**Signature**
+
+```ts
+declare const serverTestApplication: (server: string | URL) => TestApplication;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-server.ts#L21)
+
 ## `application-service-auth.ts`
 
 Composes auth over a borrowed database without taking a second disposal authority.
@@ -716,7 +747,7 @@ declare const createTestApplication: (
 ) => Promise<TestApplication>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L35)
 
 Since v0.1.0
 
@@ -728,7 +759,7 @@ Since v0.1.0
 declare const TestApplication: TestApplication;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L14)
 
 ### TestApplicationHarness
 
@@ -738,7 +769,7 @@ declare const TestApplication: TestApplication;
 declare const TestApplicationHarness: typeof TestApplicationHarness;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L10)
 
 ### TestApplicationOptions
 
@@ -748,7 +779,7 @@ declare const TestApplicationHarness: typeof TestApplicationHarness;
 declare const TestApplicationOptions: TestApplicationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L14)
 
 ### TestApplicationPlatform
 
@@ -758,7 +789,7 @@ declare const TestApplicationOptions: TestApplicationOptions;
 declare const TestApplicationPlatform: typeof TestApplicationPlatform;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L11)
 
 ### TestApplicationPlatformLive
 
@@ -768,7 +799,7 @@ declare const TestApplicationPlatform: typeof TestApplicationPlatform;
 declare const TestApplicationPlatformLive: Layer.Layer<TestApplicationPlatform, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L12)
 
 ### testApplicationLayer
 
@@ -783,7 +814,7 @@ declare const testApplicationLayer: (
 ) => Layer.Layer<TestApplicationHarness, unknown, TestApplicationPlatform>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L66)
 
 ## `application.types.ts`
 

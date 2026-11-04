@@ -11,14 +11,12 @@ export type { SqliteDatabase, SqliteDatabaseConfig } from "./sqlite-client.types
  * @returns The Drizzle database; close it with `database.$client.close()`.
  * @example
  * ```ts
- * import { defineDrizzleService } from "@relkit/drizzle";
  * import { openSqliteDatabase } from "@relkit/drizzle/sqlite";
+ * import { sql } from "drizzle-orm";
  *
- * export default defineDrizzleService({
- *   schema: {},
- *   client: ({ env }) => openSqliteDatabase(env.DATABASE_PATH ?? ".relkit/state/app.db"),
- *   dispose: (database) => database.$client.close(),
- * });
+ * const database = await openSqliteDatabase(":memory:");
+ * try { console.assert((await database.all(sql`select 1 as one`)).length === 1) }
+ * finally { database.$client.close() }
  * ```
  * @category Database
  * @since 0.9.0

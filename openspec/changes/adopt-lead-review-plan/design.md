@@ -231,6 +231,16 @@ Decided while applying section 14 (maintainer, 2026-11-05):
   canary gains a `node-canary` job for every template on Node 22 and 24: it creates with the
   published creator, builds with `--runtime node` and serves on Node until liveness answers. Until
   a release ships `relkit build --runtime`, that job notes the missing option and passes.
+- **Task 14.5 stays open.** The creator and the CLI still need Bun: `create-relkit` installs with
+  `bun install` (its output schema names that command) and writes Bun scripts and
+  `packageManager: bun@1.3.10` into templates; the `relkit` launcher runs the CLI under Bun; the
+  compiler's evaluator and the dev supervisor spawn, serve and evaluate TypeScript through Bun; and
+  `relkit build` bundles with `bun build`. The evaluator and supervisor are being rewritten in
+  section 13, so moving them waits for that work. Running the CLI on Node also needs a TypeScript
+  loader for application sources and another bundler. The production server already runs on
+  Node through `relkit build --runtime node`.
+- **Docs:** `/docs/modules/deployment/runtimes` lists the tiers, the Bun-only packages, building,
+  running and testing on Node, the Node container image and the per-runtime integration clients.
 
 ### D8. TypeScript 7 (#11)
 

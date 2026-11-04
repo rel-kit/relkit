@@ -1100,6 +1100,11 @@
       "examples": ["templates/default/v1/minimal/relkit.config.ts"]
     },
     {
+      "path": "docs/modules/deployment/runtimes",
+      "api": ["app", "testing", "drizzle", "integrations/redis", "integrations/sentry"],
+      "examples": ["templates/default/v1/api/relkit.config.ts"]
+    },
+    {
       "path": "docs/modules/deployment/aws",
       "api": [
         "app",
