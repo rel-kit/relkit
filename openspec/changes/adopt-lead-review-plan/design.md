@@ -341,6 +341,58 @@ A release workflow gathers the plan's metrics from CI (creation canary, runtime 
 agent evals, Railway deploy test) and publishes a metrics page; newcomer timings come from a scripted
 walkthrough. The launch checklist reads the same page.
 
+### D20. Findings follow-ups (plan section 8.5)
+
+Decided while applying section 27 (maintainer, 2026-11-05):
+
+- **Template `start`.** Every template runs `relkit start`. The direct JavaScript command stays
+  documented for a production root that has no CLI installed (the AWS guide).
+- **`relkit check` is documented as running top-level code.** The CLI page lists what the
+  evaluator child blocks (listening sockets, child processes, unapproved network, writes outside the
+  generated directory, live timers, direct output), states that the child gets an empty environment
+  and a 10 second deadline, and says plainly that it is an accident guard, not a sandbox.
+  `relkit.config.ts` runs unguarded in the CLI process. The allowlists and the deadline are options
+  of the programmatic check, not CLI flags.
+- **Delivery semantics are documented from the code.** Durable event and job delivery is at least
+  once. The local jobs provider moves `running` runs back to `queued` when its journal opens, and an
+  expired queue lease (30 s) frees an entry. The ephemeral event "queue" is a concurrency gate with
+  capacity 100 per event function and no backlog: the newest event is dropped and reported as
+  `status: "dropped"`, `dropReason: "capacity"`. The scaffold flag says `transient` while
+  `defineEventFunction` accepts `ephemeral`; the docs name both and the mismatch is left for the
+  scaffolding owner.
+- **API reference curation moves entries, it does not copy them.** Each generated page leads with
+  its most-used APIs (the names in the feature catalog), including their examples, under "Most-used
+  APIs", followed by "Complete reference" with the export table and the file-ordered entries. An
+  entry that appears under several files moves once, preferring the one with an example, so heading
+  anchors stay unique and links keep working.
+- **Typed test HTTP client.** `TestHttpRequest` takes `<Body = unknown, Json = unknown>`: `Body` types
+  `response.json()` and `Json` types a new `json` request shorthand that serializes the body and
+  sets the content type. The default is `unknown`, not `any`, so a test narrows before reading
+  fields. The type is a declaration; the harness does not validate it. `TestProblemResponse` types
+  the Problem Details body. Deriving bodies from route declarations is left until the client's call
+  style (D15) settles.
+- **OpenTelemetry semantic conventions and metrics.** Findings: spans already use `http.route`,
+  `http.response.status_code`, `error.type` and `code.function.name`, with `relkit.*` for the rest;
+  they lack `http.request.method`, `url.*` and `server.*`, and jobs, events, databases and agents
+  carry no `messaging.*`, `db.*` or `gen_ai.*` attributes. Internal Effect metrics use Prometheus-style
+  names (`relkit_observability_*_total`) and nothing exports them; the OTLP exporter sends traces
+  and logs only.
+  - Adopt the stable HTTP semantic conventions for request spans and metrics now. Keep `relkit.*`
+    attributes next to them. Adopt `messaging.*`, `db.*` and `gen_ai.*` only once the matching
+    conventions are stable.
+  - Export metrics over OTLP/HTTP JSON from the existing exporter, without the OpenTelemetry SDK. The
+    exporter already owns batching, retries, redaction and the dependency budget, and the SDK would
+    add a large dependency tree to a Labs package. The first metric is
+    `http.server.request.duration`, a histogram in seconds with the semantic-convention bucket
+    bounds, cumulative temporality, grouped by method, route, status code and error type.
+  - Count metrics from every completed request record before trace sampling, so sampling does not
+    skew them. The exporter must therefore receive records ahead of the sampler, or a separate
+    aggregator must; that wiring is future work in `packages/relkit/src/observability`.
+  - The spike in `integrations/packages/otlp/metrics-spike.test.ts` aggregates request records into
+    that histogram and posts it to an in-process OTLP/HTTP receiver. It checks the path
+    (`/v1/metrics`), the payload shape, the bucket counts, the attributes, and that unfinished
+    requests are skipped. It does not change the exporter's public API.
+
 ## Risks / Trade-offs
 
 - [The breaking release is large and could stall other work] → Publish a beta first; keep additive
