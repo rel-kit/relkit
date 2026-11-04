@@ -31,6 +31,10 @@
       "types": "./dist/fakes.d.ts",
       "import": "./dist/fakes.js"
     },
+    "./agents-conformance": {
+      "types": "./dist/agents-conformance.d.ts",
+      "import": "./dist/agents-conformance.js"
+    },
     "./jobs-utils": {
       "types": "./dist/jobs-utils.d.ts",
       "import": "./dist/jobs-utils.js"
