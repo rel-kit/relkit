@@ -266,6 +266,11 @@ Decided while applying section 16 (maintainer, 2026-11-05):
   `RELKIT_BUILD_LOCAL_DURABLE_PROVIDER` warning per jobs or events profile whose adapter belongs
   to `@relkit/local` and that a job, schedule, event or event trigger uses. The build still
   succeeds; development (`relkit dev`) does not warn.
+- **Docs examples are compiled sources.** The provider page (`docs/modules/jobs/providers/postgres`)
+  and the at-least-once section of `docs/modules/jobs/retries-and-idempotency` include
+  `apps/docs/examples/postgres/*.ts`, which the docs `tsc` checks. Retry policies are read as the
+  task form (`initialDelay`, `maxDelay`, `factor`) or the millisecond form (`initialDelayMs`,
+  `maxDelayMs`, `multiplier`).
 
 ### D11. Problem Details errors (#13 a, b)
 

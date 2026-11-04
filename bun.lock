@@ -72,6 +72,7 @@
         "@relkit/inngest": "workspace:*",
         "@relkit/local": "workspace:*",
         "@relkit/otlp": "workspace:*",
+        "@relkit/postgres": "workspace:*",
         "@relkit/pulumi": "workspace:*",
         "@relkit/redis": "workspace:*",
         "@relkit/s3": "workspace:*",

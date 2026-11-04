@@ -136,7 +136,11 @@ const relations = [
   relation(
     "docs/modules/jobs/providers/postgres",
     ["jobs", "integrations/postgres"],
-    ["integrations/packages/postgres/tests/jobs-conformance.test.ts"],
+    [
+      "apps/docs/examples/postgres/config.ts",
+      "apps/docs/examples/postgres/place-order.ts",
+      "integrations/packages/postgres/tests/jobs-conformance.test.ts",
+    ],
   ),
   ...["comparison", "inngest", "trigger", "effect-mq"].map((page) =>
     relation(

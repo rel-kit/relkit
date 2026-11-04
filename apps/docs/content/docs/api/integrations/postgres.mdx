@@ -810,6 +810,16 @@ declare const PostgresRunNotFoundError: typeof PostgresRunNotFoundError;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/index.ts#L5)
 
+### PostgresWorkerRole
+
+**Signature**
+
+```ts
+declare const PostgresWorkerRole: PostgresWorkerRole;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/index.ts#L12)
+
 ### createPostgresEventProvider
 
 **Signature**
@@ -853,6 +863,26 @@ declare const openPostgresDatabase: (options: PostgresDatabaseOptions) => Postgr
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/index.ts#L1)
+
+### runtimeIntegration
+
+**Signature**
+
+```ts
+declare const runtimeIntegration: RuntimeProviderIntegration<"postgres">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/index.ts#L11)
+
+### workerRole
+
+**Signature**
+
+```ts
+declare const workerRole: (value?: string | undefined) => PostgresWorkerRole;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/index.ts#L11)
 
 ## `integration.ts`
 

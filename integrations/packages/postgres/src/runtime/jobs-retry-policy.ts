@@ -63,7 +63,8 @@ export function retryDelay(
   if (attempt >= positiveInteger(retry.maxAttempts, 1)) return undefined;
   const initial = durationMillis(retry.initialDelayMs ?? retry.initialDelay, 0);
   const maximum = durationMillis(retry.maxDelayMs ?? retry.maxDelay, Math.max(initial, 1));
-  const factor = typeof retry.multiplier === "number" ? retry.multiplier : 1;
+  // Task policies say `factor`; event-style policies say `multiplier`.
+  const factor = numberOr(retry.multiplier, numberOr(retry.factor, 1));
   const base = Math.min(maximum, initial * Math.pow(Math.max(1, factor), Math.max(0, attempt - 1)));
   const delay = retry.jitter === "full" ? Math.floor(random() * (base + 1)) : Math.floor(base);
   return Math.max(failure.afterMs ?? 0, delay);
@@ -106,4 +107,14 @@ function durationMillis(value: JsonValue | undefined, fallback: number): number 
  */
 function positiveInteger(value: JsonValue | undefined, fallback: number): number {
   return typeof value === "number" && Number.isSafeInteger(value) && value >= 1 ? value : fallback;
+}
+
+/**
+ * Reads a finite number.
+ * @param value - Policy value.
+ * @param fallback - Value used when absent or not a finite number.
+ * @returns The number.
+ */
+function numberOr(value: JsonValue | undefined, fallback: number): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }

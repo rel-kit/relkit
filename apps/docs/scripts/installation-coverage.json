@@ -197,6 +197,11 @@
     "/_snippets/generated/installations/effect-mq.mdx"
   ],
   "docs/modules/jobs/providers/index": ["retain", "concept", ""],
+  "docs/modules/jobs/providers/postgres": [
+    "update",
+    "continuation",
+    "/docs/modules/jobs/quickstart"
+  ],
   "docs/modules/jobs/providers/inngest": [
     "update",
     "installation",

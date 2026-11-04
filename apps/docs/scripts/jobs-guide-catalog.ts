@@ -70,6 +70,7 @@ export const jobsGuideRelations = [
     api: ["jobs", "testing"],
     examples: [
       "examples/commerce/src/services/orders/tasks/export-orders.task.ts",
+      "apps/docs/examples/postgres/charge-order.job.ts",
       "packages/relkit/tests/jobs/task-policy.test.ts",
     ],
   },

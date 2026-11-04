@@ -320,7 +320,11 @@
     {
       "path": "docs/modules/jobs/providers/postgres",
       "api": ["jobs", "integrations/postgres"],
-      "examples": ["integrations/packages/postgres/tests/jobs-conformance.test.ts"]
+      "examples": [
+        "apps/docs/examples/postgres/config.ts",
+        "apps/docs/examples/postgres/place-order.ts",
+        "integrations/packages/postgres/tests/jobs-conformance.test.ts"
+      ]
     },
     {
       "path": "docs/modules/jobs/providers/comparison",
@@ -607,6 +611,7 @@
       "api": ["jobs", "testing"],
       "examples": [
         "examples/commerce/src/services/orders/tasks/export-orders.task.ts",
+        "apps/docs/examples/postgres/charge-order.job.ts",
         "packages/relkit/tests/jobs/task-policy.test.ts"
       ]
     },

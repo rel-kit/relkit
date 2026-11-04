@@ -102,13 +102,9 @@ export function newlyDocumentedSources(
   slug: string,
 ): readonly string[] | undefined {
   if (
-    ![
-      "provider",
-      "providers-local",
-      "observability-local",
-      "cli-api",
-      "create-relkit",
-    ].includes(slug)
+    !["provider", "providers-local", "observability-local", "cli-api", "create-relkit"].includes(
+      slug,
+    )
   )
     return undefined;
   const definition = apiPackageDefinitions.find((entry) => entry.slug === slug)!;

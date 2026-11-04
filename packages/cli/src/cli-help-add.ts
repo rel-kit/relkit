@@ -45,7 +45,7 @@ const named = (
  * @returns The pure command node.
  */
 const durableProvider = (name: "jobs" | "events", description: string) =>
-  command(name, description, `relkit add ${name} --provider <postgres|local>`, {
+  command(name, description, `relkit add ${name}`, {
     options: [
       projectRoot,
       option("no-install", "boolean", "Do not install newly required packages"),
