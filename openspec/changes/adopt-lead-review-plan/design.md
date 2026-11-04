@@ -214,6 +214,15 @@ Decided while applying section 14 (maintainer, 2026-11-05):
   service, because the dev snapshot import policy that section 13 removes allow-lists exactly
   those imports; switching the scaffold to `openSqliteDatabase` is a follow-up once that lands.
   The AWS Valkey client (`@relkit/aws`) still imports `RedisClient` from `bun` and stays Bun-only.
+- **`engines` comes from one table.** `scripts/package-engines.ts` gives every published package
+  `bun: ">=1.3.10"` and, unless it is listed as Bun-only, `node: ">=22.13.0"` (the first Node 22
+  with `node:sqlite` unflagged); release sync writes it and the release check compares it. The
+  Bun-only list names its reason: `@relkit/cli` and `create-relkit` until task 14.5's work lands
+  everywhere they spawn and serve, `@relkit/testing` for its in-process transpiler, and
+  `@relkit/aws` for its Valkey client. A unit test fails when a Bun-only package has no Bun call
+  site left in the portability baseline, so the list cannot outlive its reason. The inspector keeps
+  its Next.js range, `node: ">=20.9.0"`. `@relkit/docker` moved to `node:child_process` so it can
+  list Node.
 
 ### D8. TypeScript 7 (#11)
 
