@@ -236,6 +236,15 @@ Decided while applying section 16 (maintainer, 2026-11-05):
 - **The outbox binds JSON as text.** It casts the envelope with `::text::jsonb`, because Bun's SQL
   driver JSON-encodes a string bound directly to a `jsonb` parameter and would store a jsonb
   string; the cast keeps every Drizzle Postgres driver writing the same object.
+- **One run per occurrence comes from the occurrence key, not from locking alone.** A scheduler
+  pass locks due schedule rows with `FOR UPDATE SKIP LOCKED`, inserts each occurrence into a table
+  keyed on (service, schedule ID, occurrence time), enqueues the run in the same transaction with
+  occurrence identity `<schedule>@<time>`, and advances the pending occurrence. A contender holding
+  a stale pending occurrence loses on the key. `misfire` defaults to `latest`; `skip` drops
+  occurrences more than a minute late; `all` catches up at most 100 per pass. `overlap: "skip"`
+  claims the occurrence without a run while an earlier run of the schedule is queued or running.
+  Re-upserting a schedule with unchanged timing keeps its pending occurrence, so a redeploy neither
+  skips nor repeats one.
 
 ### D11. Problem Details errors (#13 a, b)
 
