@@ -234,6 +234,13 @@ jobs:
         run: node node_modules/vitest/vitest.mjs run --config packages/relkit/tests/runtime/vitest.config.ts
       - name: Run the api template's HTTP suite against its production build
         run: bun scripts/runtime-http-suite.ts --runtime "${{ matrix.runtime.kind }}"
+      - name: Run Redis, Sentry and SQLite conformance on Bun and this Node
+        if: matrix.runtime.kind == 'node'
+        env:
+          RELKIT_TEST_DOCKER: "1"
+        run: |
+          bun test integrations/packages/redis/tests/runtime-conformance.test.ts integrations/packages/sentry/tests/runtime-conformance.test.ts
+          node node_modules/vitest/vitest.mjs run packages/drizzle/tests/runtime-conformance.test.ts
 
   inspector-container:
     name: Standalone inspector container
@@ -415,6 +422,7 @@ jobs:
         dependency-update,
         static,
         types-and-tests,
+        runtime-http,
         inspector-container,
         docs-installations,
         dependency-review,
@@ -430,6 +438,7 @@ jobs:
     env:
       STATIC_RESULT: ${{ needs.static.result }}
       TYPES_RESULT: ${{ needs.types-and-tests.result }}
+      RUNTIME_HTTP_RESULT: ${{ needs.runtime-http.result }}
       INSPECTOR_CONTAINER_RESULT: ${{ needs.inspector-container.result }}
       DOCS_INSTALLATIONS_RESULT: ${{ needs.docs-installations.result }}
       DEPENDENCY_REVIEW_RESULT: ${{ needs.dependency-review.result }}
@@ -445,6 +454,7 @@ jobs:
         run: |
           test "$STATIC_RESULT" = success
           test "$TYPES_RESULT" = success
+          test "$RUNTIME_HTTP_RESULT" = success
           test "$INSPECTOR_CONTAINER_RESULT" = success
           test "$DOCS_INSTALLATIONS_RESULT" = success
           test "$DEPENDENCY_REVIEW_RESULT" = success || test "$DEPENDENCY_REVIEW_RESULT" = skipped

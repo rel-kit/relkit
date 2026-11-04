@@ -223,6 +223,14 @@ Decided while applying section 14 (maintainer, 2026-11-05):
   site left in the portability baseline, so the list cannot outlive its reason. The inspector keeps
   its Next.js range, `node: ">=20.9.0"`. `@relkit/docker` moved to `node:child_process` so it can
   list Node.
+- **The runtime matrix gates merges through the CI Gate.** The `runtime-http` job runs the
+  adapter test and the `api` HTTP suite on Bun 1.3.10, Node 22 and Node 24, and the Node legs also
+  run the Redis, Sentry and SQLite conformance runners (each spawns both runtimes). The CI Gate
+  requires the job's result to be `success`, and a unit test runs the gate's shell step with that
+  result set to `failure`, `cancelled` or `skipped` to show each one blocks. The nightly creation
+  canary gains a `node-canary` job for every template on Node 22 and 24: it creates with the
+  published creator, builds with `--runtime node` and serves on Node until liveness answers. Until
+  a release ships `relkit build --runtime`, that job notes the missing option and passes.
 
 ### D8. TypeScript 7 (#11)
 
