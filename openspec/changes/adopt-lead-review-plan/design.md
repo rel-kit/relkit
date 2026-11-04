@@ -310,6 +310,41 @@ client's transport: evaluate oRPC's OpenAPI-based link against the needs for dat
 files and streams before writing a custom fetch layer, and move off the oRPC 2.0 beta under the
 dependency policy.
 
+Decided while applying section 11 (maintainer, 2026-11-05):
+
+- **Names.** A route's `api` path is its target function ID with each segment in camelCase, so
+  the first segment is the service: `orders.price-order` is `api.orders.priceOrder`. When several
+  routes target one function, the first by method (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
+  and then path keeps the name; the others add their method (`getOrderHead`), or their static
+  path segments when the method repeats (`searchOrdersSearch` for `GET /orders/search`), and a
+  number as the last resort. `clientApiPaths` in `relkit/contracts` holds the rule, and both the
+  generator and the RPC transport call it, so they cannot disagree.
+- **What is generated.** `client-registry.d.ts` augments a `ClientApi` interface on
+  `@relkit/client` with the service and route tree; the runtime `api` value exported by
+  `@relkit/client` (and re-exported by the generated `client.ts`) is a lazy proxy whose
+  properties are route references. Frontends therefore keep including only the generated
+  declaration file, a route the backend adds is usable without a new runtime module, and a
+  pulled contract (`relkit client pull`) renders the same tree from the document.
+- **Transport until REST.** The RPC router mounts every route procedure a second time under
+  `api.<service>.<name>`, next to the trigger-ID and `METHOD /path` names, so the client reaches
+  a route by its API path with no lookup table. Section 23 replaces this transport; the `api`
+  object stays.
+- **Calls.** Hooks take `api` properties. `createApi(options)` returns the same tree with every
+  route callable (`await backend.orders.priceOrder(input)`); its routes can also be passed to the
+  hooks. `createClient` keeps returning the raw oRPC client for tests and tools.
+- **Errors.** A route's error type is one `RelkitDeclaredError<code, status, data>` per declared
+  error plus `RelkitUndeclaredError`, whose `code` is a closed list (the oRPC common codes, the
+  identity and idempotency codes, and `NETWORK_ERROR` for a request that got no response), so
+  checking `code` narrows `status` and `data`. Hooks and `createApi` wrap a failure without a
+  code in `RelkitNetworkError`; mutations add `RelkitWriteError`, which now carries
+  `WRITE_NOT_SENT` or `WRITE_OUTCOME_UNKNOWN`.
+- **Scope of the hook change.** The route hooks (`useRoute`, `useSuspenseRoute`,
+  `useRouteMutation`, `useInfiniteRoute`, `useRouteUtils`, `useStream`) take `api` properties
+  and no longer accept strings; the route string selectors and their helper types leave the
+  public API. Channel, agent and job hooks keep their declared IDs, because those are not routes
+  and the `api` object mirrors routes only; `useRouteMutation` no longer triggers jobs, which
+  `useJobTrigger` does.
+
 ### D16. Agent adapters (#22)
 
 The adapter interface covers run, stream, resume and stop; tool calls bridged to the common engine;

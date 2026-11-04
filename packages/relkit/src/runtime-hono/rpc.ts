@@ -15,6 +15,8 @@ import { jobsErrorStatuses, jobsProcedures } from "./jobs/rpc.js";
 import { getEntry, isRecord } from "./materialize-routes-utils.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import { realtimeProcedures } from "./realtime-rpc.js";
+import { CLIENT_API_ROOT } from "../contracts/client-api.js";
+import { rpcApiTree } from "./rpc-api-tree.js";
 import { assertExpectedIdentity, assertRpcSecurity } from "./rpc-identity.js";
 import {
   createRpcMiddlewareContext,
@@ -76,10 +78,16 @@ export function createRpcRouter(options: RouteMaterializationOptions): {
     IDEMPOTENCY_CONFLICT: 409,
     IDEMPOTENCY_WINDOW_EXPIRED: 409,
   };
+  const procedures = new Map(
+    triggers.flatMap((trigger) => {
+      const value = procedure(trigger, options);
+      return value === undefined ? [] : [[trigger.id, value] as const];
+    }),
+  );
   const router = {
     ...Object.fromEntries(
       triggers.flatMap((trigger) => {
-        const value = procedure(trigger, options);
+        const value = procedures.get(trigger.id);
         return value === undefined
           ? []
           : [...new Set([trigger.id, `${trigger.config.method} ${trigger.config.path}`])].map(
@@ -87,6 +95,7 @@ export function createRpcRouter(options: RouteMaterializationOptions): {
             );
       }),
     ),
+    [CLIENT_API_ROOT]: rpcApiTree(triggers, procedures),
     ...realtimeProcedures(options),
     ...agentProcedures(options),
     ...jobsProcedures(options),

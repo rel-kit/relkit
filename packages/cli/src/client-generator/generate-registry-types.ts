@@ -4,6 +4,7 @@ import { makeGeneratorOperation } from "./generator-operation.js";
 import { agentContractCalculations } from "./generate-agent-contract-types.js";
 import { schemaCalculations } from "./generate-schema.js";
 import { recordCalculation } from "./generate-schema-render.js";
+import { apiErrorUnion, type ApiErrorType } from "./generate-api-tree.js";
 /** Renders a React client contract type for a channel.
  * @param channel - Public channel node.
  * @returns An Effect yielding its events and presence type; it has no expected failure.
@@ -43,19 +44,31 @@ function agentRegistryTypeCore(agent: AgentNode): Effect.Effect<string> {
 function registryTypeCore(route: ClientRoute): Effect.Effect<string> {
   return Effect.gen(function* () {
     const input = yield* schemaCalculations.typeEffect(route.target.input);
-    const errors: string[] = [];
-    for (const entry of route.responses)
-      if (entry.kind === "error") errors.push(yield* schemaCalculations.typeEffect(entry.schema));
-    const error = errors.length === 0 ? "Error" : errors.join(" | ");
+    const errors: ApiErrorType[] = [];
+    for (const value of Array.isArray(route.target.errors) ? route.target.errors : []) {
+      const declared = yield* recordCalculation(value);
+      if (typeof declared?.id !== "string") continue;
+      const mapped = route.responses.find(
+        (entry) => entry.kind === "error" && (entry.errorId ?? entry.id) === declared.id,
+      );
+      const http = yield* recordCalculation(declared.http);
+      const status = mapped?.status ?? (typeof http?.status === "number" ? http.status : undefined);
+      errors.push({
+        code: declared.id,
+        ...(status === undefined ? {} : { status }),
+        data: yield* schemaCalculations.typeEffect(declared.data),
+      });
+    }
+    const error = apiErrorUnion(errors);
     const operation =
       route.trigger.config.client === false
         ? "query"
         : (route.trigger.config.client?.operation ?? "query");
     const output = yield* recordCalculation(route.target.output);
     if (output?.kind === "stream") {
-      return `import("@relkit/client/react").ClientStreamContract<${input}, ${yield* schemaCalculations.typeEffect(output.item)}, ${error}> & { readonly operation: ${JSON.stringify(operation)} }`;
+      return `import("@relkit/client").ClientStreamContract<${input}, ${yield* schemaCalculations.typeEffect(output.item)}, ${error}> & { readonly operation: ${JSON.stringify(operation)} }`;
     }
-    return `import("@relkit/client/react").ClientRouteContract<${input}, ${yield* schemaCalculations.typeEffect(route.target.output)}, ${error}> & { readonly operation: ${JSON.stringify(operation)} }`;
+    return `import("@relkit/client").ClientRouteContract<${input}, ${yield* schemaCalculations.typeEffect(route.target.output)}, ${error}> & { readonly operation: ${JSON.stringify(operation)} }`;
   });
 }
 const channelRegistryTypeOperation = makeGeneratorOperation(

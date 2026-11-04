@@ -33,7 +33,9 @@ test("generates stable manifests, fingerprints, and graph registry entries", () 
   expect(Effect.runSync(publicManifestEffect(first))).toMatchObject({
     protocol: "relkit.client-manifest",
   });
-  expect(Effect.runSync(generateClientRegistryEffect(first))).toContain('readonly "orders.get"');
+  const registry = Effect.runSync(generateClientRegistryEffect(first));
+  expect(registry).toContain('readonly "orders": {');
+  expect(registry).toContain('readonly "get": import("@relkit/client").ApiRoute<');
   const streaming = {
     ...first,
     nodes: first.nodes.map((node) =>
@@ -56,7 +58,7 @@ test("renders document routes, streams, channels, agents, and jobs", () => {
       },
       {
         name: "events.listen",
-        route: { operation: "mutation" },
+        route: { operation: "mutation", method: "POST", path: "/events" },
         input: {},
         output: { kind: "stream", item: { type: "boolean" } },
       },
@@ -90,7 +92,8 @@ test("renders document routes, streams, channels, agents, and jobs", () => {
     ],
   };
   const text = Effect.runSync(generateClientRegistryFromDocumentEffect(document));
-  expect(text).toContain('readonly "GET /orders/:id"');
+  expect(text).toContain('readonly "get": import("@relkit/client").ApiRoute<');
+  expect(text).toContain('readonly "listen": import("@relkit/client").ApiRoute<');
   expect(text).toContain("ClientStreamContract");
   expect(text).toContain('readonly "updates"');
   expect(text).toContain('readonly "assistant"');
@@ -109,14 +112,18 @@ test("renders document routes, streams, channels, agents, and jobs", () => {
 });
 test("uses safe defaults for absent document sections and malformed outputs", () => {
   expect(Effect.runSync(generateClientRegistryFromDocumentEffect({}))).toContain(
-    "interface ClientRegistry",
+    "interface ClientApi",
   );
   const output = Effect.runSync(
     generateClientRegistryFromDocumentEffect({
-      procedures: [{ name: "broken.output", input: {}, output: null }],
+      procedures: [
+        { name: "broken.output", selector: "GET /broken", input: {}, output: null },
+        { name: "relkit.agent.run", input: {}, output: {} },
+      ],
     }),
   );
-  expect(output).toContain('readonly "broken.output"');
+  expect(output).toContain('readonly "output": import("@relkit/client").ApiRoute<');
+  expect(output).not.toContain("relkit.agent.run");
   expect(output).toContain("ClientRouteContract");
   const input = graph(false);
   const nullOutput = {

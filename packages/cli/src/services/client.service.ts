@@ -118,7 +118,7 @@ export const clientLayer = Layer.effect(
             ["contract.ts", contract],
             [
               "client.ts",
-              'export { createClient, ORPCError } from "@relkit/client";\nexport { contract } from "./contract.js";\n',
+              'export { api, createApi, createClient, ORPCError } from "@relkit/client";\nexport { contract } from "./contract.js";\n',
             ],
             ["client-registry.d.ts", registry],
             ["client-manifest.json", clientManifest(document)],

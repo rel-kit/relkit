@@ -1,7 +1,6 @@
 import {
   useRoute,
   useRouteMutation,
-  useStream,
   useJobCancel,
   useJobRetry,
   useJobRun,
@@ -67,9 +66,8 @@ declare const registry: JobRegistry;
 void selectors;
 void registry.exportOrders.trigger;
 
-useRouteMutation("jobs.exportOrders.trigger").mutate({ input: { orderId: "order-1" } });
-useRoute("jobs.exportOrders.runs.get", { input: { runId: "run-1" } });
-useStream("jobs.exportOrders.runs.watch", { input: { runId: "run-1" } });
+// @ts-expect-error route hooks take api properties; jobs use the job hooks
+useRouteMutation("jobs.exportOrders.trigger");
 useJobTrigger("exportOrders").mutate({ input: { orderId: "order-1" } });
 useJobRun("exportOrders", { runId: "run-1", enabled: false }).run?.status;
 useJobCancel("exportOrders").mutate({ runId: "run-1", operationId: "operation-1" });
