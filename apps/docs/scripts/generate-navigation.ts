@@ -72,6 +72,7 @@ const groups = [
       "index",
       "public",
       "cli",
+      "inspector-protocol",
       ...apiPackageDefinitions.filter(({ group }) => group === "core").map(({ slug }) => slug),
       "integrations",
     ],

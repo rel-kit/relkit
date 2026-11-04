@@ -7,6 +7,7 @@ export default defineMeta({
     "index",
     "public",
     "cli",
+    "inspector-protocol",
     "app",
     "config",
     "effect",

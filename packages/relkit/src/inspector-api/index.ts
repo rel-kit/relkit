@@ -21,6 +21,7 @@ export { streamResponse } from "./observability-stream.js";
 export { installJobsAdministrationEndpoints } from "./jobs-administration.js";
 export { InspectorEndpointError, negotiateHeaders } from "./router-utils.js";
 export * from "./actions.js";
+export * from "./protocol-reference.js";
 export * from "./resource-explorer.js";
 export * from "./jobs/types.js";
 export * from "./jobs/filters.js";

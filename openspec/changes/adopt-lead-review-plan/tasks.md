@@ -202,7 +202,7 @@ not tasks of this change.
 
 ## 19. relkit mcp and the Inspector (#18)
 
-- [ ] 19.1 Document the Inspector API as a versioned development protocol, and verify the reference lists every endpoint with its version and authentication
+- [x] 19.1 Document the Inspector API as a versioned development protocol, and verify the reference lists every endpoint with its version and authentication
 - [ ] 19.2 Implement `relkit mcp` over stdio using session discovery and the session token, with a coded error when no session runs, and verify tests
 - [ ] 19.3 Add MCP tools for graph queries, diagnostics, a request's logs and trace, function invocation, `check` and transactional `add`, and verify each tool in tests
 - [ ] 19.4 Verify with a build scan that production builds contain no `relkit mcp` entry point

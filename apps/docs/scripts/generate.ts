@@ -11,6 +11,7 @@ import { getCliHelpModel, type CliHelpCommand } from "@relkit/cli/help";
 import { apiPackageDefinitions } from "./documentation-catalog.js";
 import { renderApi } from "./generate-api.js";
 import { generateErrorPages } from "./generate-error-pages.js";
+import { renderInspectorApiReference } from "./generate-inspector-api.js";
 import { generateGuides } from "./generate-guides.js";
 import { generateInstallations } from "./generate-installations.js";
 import { contentFiles, pruneGenerated } from "./generation-files.js";
@@ -49,6 +50,7 @@ async function main(): Promise<void> {
   await emit("_snippets/generated/api-overview.mdx", referenceOverview());
   await emit("_snippets/generated/maturity.mdx", maturityTables());
   await emit("docs/api/cli.mdx", renderCliReference(cliModel));
+  await emit("docs/api/inspector-protocol.mdx", await renderInspectorApiReference());
   await generateErrorPages(root, content, emit);
   const pages = (await contentFiles(content)).filter(
     (path) =>
