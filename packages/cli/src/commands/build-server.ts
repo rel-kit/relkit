@@ -14,6 +14,19 @@ import { SERVER_TELEMETRY_SOURCE } from "./build-server-telemetry.js";
 import { serverApplicationSource } from "./build-server-application.js";
 import { SERVER_PROVIDER_SOURCE } from "./build-server-provider.js";
 import { serverTailSource } from "./build-server-tail.js";
+
+/** Opens the activation function; `createRelkit` calls it with `{ embedded: true }`. */
+const EMBEDDED_ACTIVATION_START = `/**
+ * Activates the application. Run directly, it serves HTTP and runs workers until a signal stops it;
+ * embedded by \`createRelkit\`, it activates providers only and returns the runtime handle.
+ */
+export async function activateRelkitApplication(relkitMode = { embedded: false }) {
+`;
+
+/** Closes the activation function and starts the server when this module is the entry point. */
+const EMBEDDED_ACTIVATION_END = `}
+if (import.meta.main) await activateRelkitApplication();
+`;
 /**
  * Emits the Bun entrypoint shared by dev, start, and the production container.
  * @param graph - Validated application graph.
@@ -51,10 +64,12 @@ export function serverSource(
   };
   return [
     serverImportsSource(input),
+    EMBEDDED_ACTIVATION_START,
     serverIdentitySource(input),
     SERVER_TELEMETRY_SOURCE,
     serverApplicationSource(input),
     SERVER_PROVIDER_SOURCE,
     serverTailSource(input),
+    EMBEDDED_ACTIVATION_END,
   ].join("");
 }

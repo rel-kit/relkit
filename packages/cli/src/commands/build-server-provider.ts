@@ -8,11 +8,12 @@ export const SERVER_PROVIDER_SOURCE = `const providerStartup = runtimeOwner.reso
   ? createProviderRegistry({ generationId, graph, runtimeIntegrationModules, bindingValues: sourceValues, localBindingValues, infrastructureBindingValues, signal })
   : Promise.reject(environmentResolution.error), (value) => value.dispose(), async (value) => {
   if ((plan.channels ?? []).length > 0) setActiveRealtimeDispatcher(createProviderRealtimeDispatcher({ applicationId: graph.appId, environment, generationId, publicFingerprint, provider: (profile) => provider(value, "realtime", profile) }));
-  await materializeEvents({ plan, providerRegistry: value, engine: { invoke: invokeHttp } });
+  // An embedded handle starts no event consumers or job workers.
+  if (relkitMode.embedded !== true) await materializeEvents({ plan, providerRegistry: value, engine: { invoke: invokeHttp } });
   materializedJobs = await materializeJobs({ plan, engine: { invoke: invokeHttp }, createQueue: (context) => queueProvider(value, context), spanRuntime });
-  if (plan.queues.length > 0) await startJobWorker(materializedJobs);
+  if (plan.queues.length > 0 && relkitMode.embedded !== true) await startJobWorker(materializedJobs);
   nativeJobsRuntimes = await createNativeJobsRuntimes(value);
-  await startNativeJobWorker(nativeJobsRuntimes);
+  if (relkitMode.embedded !== true) await startNativeJobWorker(nativeJobsRuntimes);
   await runtimeOwner.providerDelay();
   runtimeOwner.setReady("provider", true);
 }, "application", false).catch((error) => {

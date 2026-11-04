@@ -17,9 +17,14 @@ export type { ServerSourceConfiguration } from "./build-server.types.js";
  * @returns Source with the existing health, status, admission, and client contracts.
  */
 export function serverHttpSource(configuration: ServerSourceConfiguration): string {
-  const applicationSource = `const preparedApplication = await runtimeOwner.resource("http.application", async () => createPreparedApp(httpApplicationOptions, ${preparedInspectorSource(configuration)}), (value) => value.close());
-const app = preparedApplication.app;
+  const applicationSource = `let preparedApplication;
+let app;
+let server;
+if (relkitMode.embedded !== true) {
+preparedApplication = await runtimeOwner.resource("http.application", async () => createPreparedApp(httpApplicationOptions, ${preparedInspectorSource(configuration)}), (value) => value.close());
+app = preparedApplication.app;
 ${serverJobsAdministrationSource(configuration)}
+}
 `;
   const dispatchSource =
     "runWithRelkit(await relkitHandle(), () => preparedApplication.fetch(request, bunServer))";
@@ -36,9 +41,10 @@ const httpMiddlewareOptions = {
   } }),
 };
 ${serverHttpOptionsSource(configuration)}${applicationSource}
+if (relkitMode.embedded === true) return { handle: await relkitHandle(), close: closeEmbedded };
 const onStart = application.server?.onStart;
 if (typeof onStart === "function") await runWithRelkit(await relkitHandle(), () => onStart());
-const server = Bun.serve({
+server = Bun.serve({
   hostname: "0.0.0.0",
   port: Number(process.env.PORT ?? 3000),
   websocket: honoWebSocket,

@@ -279,6 +279,11 @@ Decisions taken during section 10 (maintainer, 2026-11-04):
   accepts requests, inside the handle's context so `getRelkit()` works there.
 - **Task 10.3 lands before 10.2.** Commerce's order middleware calls a function outside any
   handler, so it needs `getRelkit()` before descriptor `.invoke()` can go.
+- **`createRelkit` loads the built server.** The generated `.relkit/build/server/index.js` exports
+  `activateRelkitApplication(mode)` and runs it itself only as the entry point. `createRelkit(config,
+  { root })` calls it with `{ embedded: true }`, which skips the HTTP listener, `onStart`, event
+  consumers, job workers and signal handlers and returns the handle with `close()`. Scripts need a
+  prior `relkit build`; a missing or older build fails with `RELKIT_APPLICATION_BUILD_UNAVAILABLE`.
 - **Only function descriptors lose `.invoke()`.** Tool descriptors and function graph nodes keep
   their `invoke` adapter, because agent adapters such as LangChain call it.
 

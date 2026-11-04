@@ -12,6 +12,7 @@ import { defineFunction } from "../../src/app/index.js";
 import { defineEvent } from "../../src/events/index.js";
 import { z } from "../../src/schema/index.js";
 import { defineService } from "../../src/services/index.js";
+import { createRelkit } from "../../src/functions/create-relkit.js";
 import {
   ApplicationNotRunningError,
   createRuntimeHandle,
@@ -100,6 +101,20 @@ try { getRelkit(); } catch (error) { console.log(error.code); }
     try {
       const { stdout } = await execute("bun", ["run", script]);
       expect(stdout.trim()).toBe("RELKIT_APPLICATION_NOT_RUNNING");
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  test("createRelkit needs the application's configuration and a build", async () => {
+    await expect(createRelkit({ ref: { kind: "service" } } as never)).rejects.toThrow(
+      "defineApp",
+    );
+    const directory = await mkdtemp(join(tmpdir(), "relkit-create-"));
+    try {
+      await expect(
+        createRelkit({ ref: { kind: "app" } }, { root: directory }),
+      ).rejects.toMatchObject({ code: "RELKIT_APPLICATION_BUILD_UNAVAILABLE" });
     } finally {
       await rm(directory, { recursive: true, force: true });
     }

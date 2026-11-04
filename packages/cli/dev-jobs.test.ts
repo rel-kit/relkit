@@ -56,6 +56,6 @@ test("only selected development jobs emit eager native administration", () => {
   const selected = serverHttpSource({ ...config, jobsAdministration: true });
   expect(selected).toContain("installJobsAdministrationEndpoints");
   expect(selected.indexOf("installJobsAdministrationEndpoints")).toBeLessThan(
-    selected.indexOf("const server = Bun.serve"),
+    selected.indexOf("server = Bun.serve("),
   );
 });

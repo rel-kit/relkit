@@ -72,25 +72,26 @@ export const startGeneratedHost = Effect.fn("GeneratedHost.start")(
       });
     const port = yield* Effect.scoped(scaffoldPort);
     const baseURL = `http://127.0.0.1:${port}`;
+    const environment = {
+      NODE_ENV: "test",
+      DATABASE_PATH: join(root, "test.sqlite"),
+      BETTER_AUTH_URL: baseURL,
+      BETTER_AUTH_SECRET: "generated-host-test-secret-at-least-32-bytes",
+      RELKIT_TEST_RELEASES: join(root, "releases.txt"),
+      RELKIT_TEST_ON_START: join(root, "on-start.json"),
+      RELKIT_DRAIN_TIMEOUT_MS: "5000",
+      RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS: "1000",
+    };
     const child = yield* scaffoldChild({
       cwd: root,
       args: ["run", "--no-env-file", ".relkit/build/server/index.js"],
-      env: {
-        PORT: String(port),
-        NODE_ENV: "test",
-        DATABASE_PATH: join(root, "test.sqlite"),
-        BETTER_AUTH_URL: baseURL,
-        BETTER_AUTH_SECRET: "generated-host-test-secret-at-least-32-bytes",
-        RELKIT_TEST_RELEASES: join(root, "releases.txt"),
-        RELKIT_TEST_ON_START: join(root, "on-start.json"),
-        RELKIT_DRAIN_TIMEOUT_MS: "5000",
-        RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS: "1000",
-      },
+      env: { ...environment, PORT: String(port) },
     });
     yield* awaitHost(child, baseURL);
     return {
       root,
       baseURL,
+      environment,
       request: (path: string, options?: RequestInit) => generatedRequest(baseURL, path, options),
       records: (mode: string) => generatedRecords(baseURL, mode),
       stop: stopHost(child),

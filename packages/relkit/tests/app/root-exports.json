@@ -1,6 +1,7 @@
 {
   "values": [
     "DeclaredError",
+    "createRelkit",
     "defineAgent",
     "defineApp",
     "defineBucket",
@@ -46,6 +47,7 @@
     "ChannelDescriptor",
     "ChannelTriggerOptions",
     "ConstantsDescriptor",
+    "CreateRelkitOptions",
     "DeclaredErrorOf",
     "DeclaredErrorsOf",
     "DefineAgentOptions",
@@ -108,6 +110,7 @@
     "ServiceDescriptor",
     "ServiceRef",
     "ServiceRoutesOptions",
+    "StandaloneRelkitHandle",
     "StreamOutputSchema",
     "TaskClientFor",
     "TaskContext",

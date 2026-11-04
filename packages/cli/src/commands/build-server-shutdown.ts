@@ -15,13 +15,23 @@ function flushTelemetry() {
   return typeof flush === "function" ? Promise.resolve(flush()) : Promise.resolve();
 }
 
-async function shutdown() {
+async function releaseRuntime() {
   await runtimeOwner.shutdown(async () => {
     spanRuntime.close();
     ${agentRelease}
   }, async () => {
     await runtimeOwner.cleanup("telemetry.flush", flushTelemetry);
   });
+}
+
+/** Releases an embedded handle's providers without stopping the process. */
+async function closeEmbedded() {
+  closeEmbedded.done ??= releaseRuntime();
+  await closeEmbedded.done;
+}
+
+async function shutdown() {
+  await releaseRuntime();
   await server.stop(true);
   process.exit(0);
 }

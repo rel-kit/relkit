@@ -5,6 +5,8 @@ export * from "./function-graph-node.js";
 export { callGraphNodeEffect, callToolEffect } from "./descriptor-effects.js";
 export * from "./stream.js";
 export { ApplicationNotRunningError, getRelkit } from "./runtime-handle.js";
+export { ApplicationBuildUnavailableError, createRelkit } from "./create-relkit.js";
+export type { CreateRelkitOptions, StandaloneRelkitHandle } from "./create-relkit.js";
 export type * from "./runtime-handle.types.js";
 export * from "./function-observability.js";
 export type {

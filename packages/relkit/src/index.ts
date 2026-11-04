@@ -19,8 +19,8 @@ export type {
 } from "./app/index.js";
 
 // Code outside function handlers
-export { getRelkit } from "./app/index.js";
-export type { RelkitHandle } from "./app/index.js";
+export { createRelkit, getRelkit } from "./app/index.js";
+export type { CreateRelkitOptions, RelkitHandle, StandaloneRelkitHandle } from "./app/index.js";
 
 // Functions and errors
 export { DeclaredError, defineError, defineFunction, fail, streamOf } from "./app/index.js";

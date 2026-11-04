@@ -603,6 +603,103 @@ export interface JobStatus {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L12)
 
+## `create-relkit.ts`
+
+`createRelkit(config)`: a runtime handle for scripts, seeders and other frameworks. It runs the
+built application's activation with no HTTP listener, event consumers or job workers.
+
+### ApplicationBuildUnavailableError (class)
+
+Raised when `createRelkit` finds no usable build of the application.
+
+**Signature**
+
+```ts
+declare class ApplicationBuildUnavailableError {
+  constructor(entry: string, reason: string);
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/create-relkit.ts#L27)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "RELKIT_APPLICATION_BUILD_UNAVAILABLE"
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/create-relkit.ts#L28)
+
+### CreateRelkitOptions (interface)
+
+Options for `createRelkit`.
+
+**Signature**
+
+```ts
+export interface CreateRelkitOptions {
+  /** Project root that holds `.relkit/build`; defaults to the current directory. */
+  readonly root?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/create-relkit.ts#L10)
+
+### StandaloneRelkitHandle (type alias)
+
+A runtime handle that owns its providers until `close()` releases them.
+
+**Example**
+
+```ts
+const relkit = await createRelkit(config);
+await relkit.close();
+```
+
+**Signature**
+
+```ts
+type StandaloneRelkitHandle = RelkitHandle & {
+  /** Releases the providers the handle started; calling it again does nothing.
+   * @returns Completion after every provider is released.
+   * @example await relkit.close();
+   */
+  readonly close: () => Promise<void>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/create-relkit.ts#L18)
+
+### createRelkit
+
+Starts a runtime handle for code that runs outside the application, such as a seed script.
+Only the providers the application's graph needs are activated; nothing listens for requests.
+
+**Throws**
+
+ApplicationBuildUnavailableError when the build is missing or predates `createRelkit`.
+
+**Example**
+
+```ts
+const relkit = await createRelkit(config);
+await relkit.database.orders.insert({ data: { id: "o1", totalCents: 100 } });
+await relkit.close();
+```
+
+**Signature**
+
+```ts
+declare const createRelkit: (
+  config: { readonly ref: { readonly kind: "app" } },
+  options?: CreateRelkitOptions,
+) => Promise<StandaloneRelkitHandle>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/create-relkit.ts#L49)
+
 ## `define-error-validation.ts`
 
 ### assertErrorSchema
@@ -5632,7 +5729,7 @@ Re-exports all named exports from the "./function-observability.js" module.
 export * from "./function-observability.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L11)
 
 ### "./handler-result.js" (namespace export)
 
@@ -5656,7 +5753,7 @@ Re-exports all named exports from the "./runtime-handle.types.js" module.
 export * from "./runtime-handle.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L10)
 
 ### "./stream.js" (namespace export)
 
@@ -5670,6 +5767,16 @@ export * from "./stream.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L6)
 
+### ApplicationBuildUnavailableError
+
+**Signature**
+
+```ts
+declare const ApplicationBuildUnavailableError: typeof ApplicationBuildUnavailableError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L8)
+
 ### ApplicationNotRunningError
 
 **Signature**
@@ -5680,6 +5787,16 @@ declare const ApplicationNotRunningError: typeof ApplicationNotRunningError;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L7)
 
+### CreateRelkitOptions
+
+**Signature**
+
+```ts
+declare const CreateRelkitOptions: CreateRelkitOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L9)
+
 ### FunctionToolApproval
 
 **Signature**
@@ -5688,7 +5805,7 @@ declare const ApplicationNotRunningError: typeof ApplicationNotRunningError;
 declare const FunctionToolApproval: FunctionToolApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L13)
 
 ### FunctionToolApprovalDecision
 
@@ -5698,7 +5815,7 @@ declare const FunctionToolApproval: FunctionToolApproval;
 declare const FunctionToolApprovalDecision: FunctionToolApprovalDecision;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L14)
 
 ### FunctionToolApprovalDeniedError
 
@@ -5708,7 +5825,7 @@ declare const FunctionToolApprovalDecision: FunctionToolApprovalDecision;
 declare const FunctionToolApprovalDeniedError: typeof FunctionToolApprovalDeniedError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L32)
 
 ### FunctionToolApprovalDeniedFailure
 
@@ -5718,7 +5835,7 @@ declare const FunctionToolApprovalDeniedError: typeof FunctionToolApprovalDenied
 declare const FunctionToolApprovalDeniedFailure: typeof FunctionToolApprovalDeniedFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L36)
 
 ### FunctionToolApprovalRequest
 
@@ -5728,7 +5845,7 @@ declare const FunctionToolApprovalDeniedFailure: typeof FunctionToolApprovalDeni
 declare const FunctionToolApprovalRequest: FunctionToolApprovalRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L15)
 
 ### FunctionToolApprovalRequiredError
 
@@ -5738,7 +5855,7 @@ declare const FunctionToolApprovalRequest: FunctionToolApprovalRequest;
 declare const FunctionToolApprovalRequiredError: typeof FunctionToolApprovalRequiredError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L33)
 
 ### FunctionToolApprovalRequiredFailure
 
@@ -5748,7 +5865,7 @@ declare const FunctionToolApprovalRequiredError: typeof FunctionToolApprovalRequ
 declare const FunctionToolApprovalRequiredFailure: typeof FunctionToolApprovalRequiredFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L37)
 
 ### FunctionToolApprovalResolver
 
@@ -5758,7 +5875,7 @@ declare const FunctionToolApprovalRequiredFailure: typeof FunctionToolApprovalRe
 declare const FunctionToolApprovalResolver: FunctionToolApprovalResolver;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L16)
 
 ### FunctionToolArgumentFailure
 
@@ -5768,7 +5885,7 @@ declare const FunctionToolApprovalResolver: FunctionToolApprovalResolver;
 declare const FunctionToolArgumentFailure: typeof FunctionToolArgumentFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L38)
 
 ### FunctionToolArgumentValidationError
 
@@ -5778,7 +5895,7 @@ declare const FunctionToolArgumentFailure: typeof FunctionToolArgumentFailure;
 declare const FunctionToolArgumentValidationError: typeof FunctionToolArgumentValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L34)
 
 ### FunctionToolCancelledFailure
 
@@ -5788,7 +5905,7 @@ declare const FunctionToolArgumentValidationError: typeof FunctionToolArgumentVa
 declare const FunctionToolCancelledFailure: typeof FunctionToolCancelledFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L39)
 
 ### FunctionToolContext
 
@@ -5798,7 +5915,7 @@ declare const FunctionToolCancelledFailure: typeof FunctionToolCancelledFailure;
 declare const FunctionToolContext: FunctionToolContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L20)
 
 ### FunctionToolDescriptor
 
@@ -5808,7 +5925,7 @@ declare const FunctionToolContext: FunctionToolContext;
 declare const FunctionToolDescriptor: FunctionToolDescriptor<Id, Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L17)
 
 ### FunctionToolHook
 
@@ -5818,7 +5935,7 @@ declare const FunctionToolDescriptor: FunctionToolDescriptor<Id, Target>;
 declare const FunctionToolHook: FunctionToolHook<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L21)
 
 ### FunctionToolInvokeEffect
 
@@ -5828,7 +5945,7 @@ declare const FunctionToolHook: FunctionToolHook<Value>;
 declare const FunctionToolInvokeEffect: FunctionToolInvokeEffect<Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L18)
 
 ### FunctionToolInvokeOptions
 
@@ -5838,7 +5955,7 @@ declare const FunctionToolInvokeEffect: FunctionToolInvokeEffect<Target>;
 declare const FunctionToolInvokeOptions: FunctionToolInvokeOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L19)
 
 ### FunctionToolMetadata
 
@@ -5848,7 +5965,7 @@ declare const FunctionToolInvokeOptions: FunctionToolInvokeOptions;
 declare const FunctionToolMetadata: FunctionToolMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L22)
 
 ### FunctionToolOperationCancelledError
 
@@ -5858,7 +5975,7 @@ declare const FunctionToolMetadata: FunctionToolMetadata;
 declare const FunctionToolOperationCancelledError: typeof FunctionToolOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L35)
 
 ### FunctionToolOptions
 
@@ -5868,7 +5985,7 @@ declare const FunctionToolOperationCancelledError: typeof FunctionToolOperationC
 declare const FunctionToolOptions: FunctionToolOptions<Id, Input, Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L23)
 
 ### FunctionToolSideEffect
 
@@ -5878,7 +5995,7 @@ declare const FunctionToolOptions: FunctionToolOptions<Id, Input, Output>;
 declare const FunctionToolSideEffect: FunctionToolSideEffect;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L24)
 
 ### FunctionToolTarget
 
@@ -5888,7 +6005,17 @@ declare const FunctionToolSideEffect: FunctionToolSideEffect;
 declare const FunctionToolTarget: FunctionToolTarget<Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L25)
+
+### StandaloneRelkitHandle
+
+**Signature**
+
+```ts
+declare const StandaloneRelkitHandle: StandaloneRelkitHandle;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L9)
 
 ### callGraphNodeEffect
 
@@ -5945,7 +6072,7 @@ declare const copyFunctionToolHooks: (
 ) => Pick<FunctionToolOptions, "onBefore" | "onAfter">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L27)
 
 ### copyFunctionToolHooksEffect
 
@@ -5961,7 +6088,7 @@ declare const copyFunctionToolHooksEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L27)
 
 ### createFunctionToolInvoker
 
@@ -5978,7 +6105,7 @@ declare const createFunctionToolInvoker: <Target extends FunctionRefAny>(
 ) => Promise<InferOutput<Target["output"]>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L29)
 
 ### createFunctionToolInvokerEffect
 
@@ -6007,7 +6134,20 @@ declare const createFunctionToolInvokerEffect: <Target extends FunctionRefAny>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L30)
+
+### createRelkit
+
+**Signature**
+
+```ts
+declare const createRelkit: (
+  config: { readonly ref: { readonly kind: "app" } },
+  options?: CreateRelkitOptions,
+) => Promise<StandaloneRelkitHandle>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L8)
 
 ### getRelkit
 
@@ -6041,7 +6181,7 @@ declare const invokeFunctionToolEffect: <Target extends FunctionRefAny>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L31)
 
 ## `runtime-handle.ts`
 
