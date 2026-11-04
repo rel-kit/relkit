@@ -5,15 +5,6 @@
   "integrations/packages/aws/src/cloud-aws/components/common.ts": {
     "node": 1
   },
-  "integrations/packages/docker/src/runtime/docker-health.ts": {
-    "node": 1
-  },
-  "integrations/packages/docker/src/runtime/docker-inspect.ts": {
-    "node": 1
-  },
-  "integrations/packages/docker/src/runtime/docker-runner.ts": {
-    "bun": 2
-  },
   "integrations/packages/inngest/src/local-readiness.ts": {
     "node": 1
   },

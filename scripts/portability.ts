@@ -20,8 +20,12 @@ export type PortabilityBaseline = Readonly<
   Record<string, Partial<Record<PortabilityKind, number>>>
 >;
 
-/** Packages that only run as tools on Bun or Node, where `node:` imports are portable. */
+/**
+ * Packages that only run as tools on Bun or Node, where `node:` imports are portable. The Docker
+ * integration runs local services for the CLI and never inside an application server.
+ */
 export const TOOLING_PACKAGES: ReadonlySet<string> = new Set([
+  "integrations/packages/docker",
   "packages/cli",
   "packages/create-relkit",
   "packages/inspector",
