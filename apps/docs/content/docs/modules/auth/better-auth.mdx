@@ -10,7 +10,7 @@ Use `defineBetterAuthService` to add Better Auth credentials, accounts, and sess
 the application's Drizzle connection first, and passes that native client to Better Auth's Drizzle
 adapter. Better Auth handles credentials, accounts, sessions, and its HTTP protocol.
 
-The current integration requires exactly one Drizzle service, one Better Auth service, and one
+The current integration uses the default Drizzle service, one Better Auth service, and one
 filesystem `ALL` catch-all mount for that auth handler. Do not construct a second connection for auth
 or register the descriptor as a member of an ordinary `defineService`.
 

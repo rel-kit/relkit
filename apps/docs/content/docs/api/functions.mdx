@@ -2241,6 +2241,34 @@ export * from "./function-descriptor-factory.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/descriptor-factory.ts#L1)
 
+## `function-access.ts`
+
+Validates and copies a function's `access` rule.
+
+### copyAccess
+
+Checks the shape of an access rule and returns a frozen copy.
+
+**Throws**
+
+FunctionInputError for a rule that is not roles, permissions and a predicate.
+
+**Example**
+
+```ts
+copyAccess({ roles: ["admin"] });
+```
+
+**Signature**
+
+```ts
+declare const copyAccess: (
+  access: AccessRule<never, unknown> | undefined,
+) => AccessRule<never, unknown> | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-access.ts#L11)
+
 ## `function-as-tool.types.ts`
 
 ### FunctionAsTool (type alias)
@@ -2650,7 +2678,7 @@ declare const rejectPublishes: (publishes: unknown) => void;
 declare const FunctionDescriptorFactoryOptions: FunctionDescriptorFactoryOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-factory.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-factory.ts#L19)
 
 ### createFunctionDescriptor
 
@@ -2672,7 +2700,7 @@ createFunctionDescriptor(options);
 declare const createFunctionDescriptor: (options: FunctionDescriptorFactoryOptions) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-factory.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-factory.ts#L80)
 
 ### createFunctionDescriptorEffect
 
@@ -2692,7 +2720,7 @@ declare const createFunctionDescriptorEffect: (
 ) => Effect.Effect<unknown, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-factory.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-factory.ts#L26)
 
 ## `function-descriptor-factory.types.ts`
 
@@ -2718,6 +2746,7 @@ export interface FunctionDescriptorFactoryOptions extends DescriptorMetadata {
   readonly handler: (...args: any[]) => unknown;
   readonly errors?: readonly ErrorDescriptorAny[];
   readonly dependencies?: FunctionDependencies;
+  readonly access?: AccessRule<never, unknown>;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly tool?: FunctionToolMetadata;
@@ -2842,6 +2871,8 @@ export interface DefineFunctionOptions<
   readonly output: OutputSchema;
   readonly errors?: Errors;
   readonly dependencies?: Dependencies;
+  /** Who may call the function: roles, permissions or a predicate, checked for every caller. */
+  readonly access?: AccessRule<InferOutput<InputSchema>>;
   readonly progress?: ProgressSchema;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
@@ -2858,7 +2889,7 @@ export interface DefineFunctionOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L71)
 
 ### FunctionDescriptor (interface)
 
@@ -2889,6 +2920,7 @@ export interface FunctionDescriptor<
     FunctionRef<Id, Input, Output, Errors, InputSchema, OutputSchema> {
   readonly dependencies?: FunctionDependencyOptions<Dependencies>;
   readonly invocationMode: "callable";
+  readonly access?: AccessRule<Input>;
   readonly progress?: ProgressSchema;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
@@ -2915,7 +2947,7 @@ export interface FunctionDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L26)
 
 ### FunctionHandler (type alias)
 
@@ -2952,7 +2984,7 @@ type FunctionHandler<
 declare const FunctionLifecycleHook: FunctionLifecycleHook<Value, Dependencies, ProgressSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L21)
 
 ## `function-graph-node.ts`
 
@@ -6171,10 +6203,32 @@ export interface RelkitHandle {
   readonly buckets: BucketClients<Relkit.HandleBuckets>;
   readonly channels: ChannelClients<Relkit.HandleChannels>;
   readonly agents: AgentClients<Relkit.HandleAgents>;
+  /** Returns a handle whose function calls run as the session's user instead of `system`, so
+   * that user's roles and permissions decide every access rule.
+   * @param session - A session, such as one from `auth.api.getSession`.
+   * @returns A handle bound to that user.
+   * @example await relkit.as(session).functions.orders.refundOrder({ orderId });
+   */
+  readonly as: (session: AccessSession) => RelkitHandle;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/runtime-handle.types.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/runtime-handle.types.ts#L58)
+
+### RuntimeHandleCallOptions (interface)
+
+Options for one call through the handle.
+
+**Signature**
+
+```ts
+export interface RuntimeHandleCallOptions {
+  /** Caller access rules decide about; omitted for `system`. */
+  readonly principal?: AccessPrincipalSource;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/runtime-handle.types.ts#L79)
 
 ### RuntimeHandleInvoke (type alias)
 
@@ -6183,10 +6237,14 @@ Calls one function of the running application on behalf of the handle.
 **Signature**
 
 ```ts
-type RuntimeHandleInvoke = (functionId: string, input: unknown) => Promise<unknown>;
+type RuntimeHandleInvoke = (
+  functionId: string,
+  input: unknown,
+  options?: RuntimeHandleCallOptions,
+) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/runtime-handle.types.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/runtime-handle.types.ts#L85)
 
 ### RuntimeHandleOptions (interface)
 
@@ -6208,10 +6266,12 @@ export interface RuntimeHandleOptions {
   readonly sources?: Readonly<Record<string, Readonly<Record<string, unknown>>>>;
   readonly database?: unknown;
   readonly databases?: Readonly<Record<string, unknown>>;
+  /** Reads roles and permissions for `relkit.as(session)`, such as from Better Auth organizations. */
+  readonly resolveAccess?: AccessResolver;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/runtime-handle.types.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/runtime-handle.types.ts#L92)
 
 ## `stream.ts`
 

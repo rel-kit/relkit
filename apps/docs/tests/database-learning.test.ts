@@ -88,7 +88,7 @@ test("uses application workflows and Drizzle Kit rather than SQL bootstrap or te
 test("states validation, override, transaction, and lifecycle boundaries", async () => {
   expect(read("index")).toContain("MongoDB and Prisma integrations are planned");
   expect(read("index")).not.toContain("defineDrizzleService");
-  expect(read("drizzle")).toContain("Only one Drizzle service");
+  expect(read("drizzle")).toContain("Mark one with `default: true`");
   expect(read("define")).toContain("does not replace this custom client factory");
   expect(read("schema")).toContain("does not automatically run these Zod schemas");
   expect(read("queries")).toContain("not a native atomic conflict");

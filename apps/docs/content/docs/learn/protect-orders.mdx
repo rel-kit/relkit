@@ -83,8 +83,8 @@ configuration below. Better Auth's own options go here:
   /_snippets/source/apps/docs/examples/orders-tutorial/steps/auth/src/services/auth/service.ts
 </include>
 
-Then mark both Orders routes with `auth: "required"`. A signed-out request gets `401` before any
-middleware or the function runs:
+Then protect both Orders routes. Each takes one line on the route, `auth: "required"`, and a
+signed-out request gets `401` before any middleware or the function runs:
 
 <include
   source="apps/docs/examples/orders-tutorial/steps/auth/src/routes/orders/route.ts"
