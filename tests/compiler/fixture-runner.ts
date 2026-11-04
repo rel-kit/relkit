@@ -29,6 +29,7 @@ export const COMPILER_FIXTURES = Object.freeze([
   "warning-wrong-suffix",
   "error-duplicate-id",
   "error-ambiguous-id",
+  "error-missing-error-id",
   "error-inferred-collision",
   "error-route-collision",
   "error-missing-target",

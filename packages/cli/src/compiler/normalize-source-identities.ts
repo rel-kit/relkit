@@ -51,7 +51,10 @@ export const normalizeSourceIdentitiesEffect = Effect.fn("Compiler.normalizeSour
         Effect.gen(function* () {
           if (!entry.inferred) return;
           const resolved = yield* deriveEffect(entry.descriptor, work);
+          if (entry.descriptor.kind === "error")
+            reportErrorIdRequired(work, entry.descriptor, resolved);
           if (resolved === undefined) {
+            if (entry.descriptor.kind === "error") return;
             add(
               work,
               entry.descriptor,
@@ -68,6 +71,16 @@ export const normalizeSourceIdentitiesEffect = Effect.fn("Compiler.normalizeSour
         }),
       { discard: true },
     );
+    // Errors declared inside another definition's file; a standalone error was reported above.
+    for (const { descriptor } of candidates.filter((entry) => entry.descriptor.kind !== "error"))
+      for (const binding of descriptor.facts?.errorBindings ?? [])
+        if (binding.id === "omitted")
+          reportErrorIdRequired(
+            work,
+            descriptor,
+            yield* encodeErrorIdEffect(descriptor.source.file, binding.binding),
+            binding.binding,
+          );
     yield* addServiceMemberIdentitiesEffect(candidates, identities);
     yield* addNestedErrorIdentitiesEffect(candidates, identities);
     return descriptors.map((descriptor, index) => {
@@ -113,6 +126,33 @@ export function normalizeSourceIdentities(
   descriptors: readonly NormalizedDescriptor[],
 ): NormalizedDescriptor[] {
   return runCompilerSync(normalizeSourceIdentitiesEffect(work, descriptors));
+}
+
+/**
+ * Reports an error declared without an ID; an error's ID is its public code.
+ * @param work - Invocation-owned normalization state, indexes, and diagnostics.
+ * @param descriptor - Error, or the descriptor that declares the error inline.
+ * @param suggested - The ID earlier versions inferred, which keeps the public code unchanged.
+ * @param binding - Local name of an error declared inside another definition's file.
+ * @returns Nothing; appends one diagnostic.
+ */
+function reportErrorIdRequired(
+  work: NormalizationWork,
+  descriptor: NormalizedDescriptor,
+  suggested: string | undefined,
+  binding?: string,
+): void {
+  add(
+    work,
+    descriptor,
+    NORMALIZE_CODES.errorIdRequired,
+    `${binding === undefined ? "defineError" : `Error "${binding}"`} needs an explicit id, because an error's ID is its public code.`,
+    "error",
+    undefined,
+    suggested === undefined
+      ? "Add an id to defineError."
+      : `Add id: "${suggested}" to defineError to keep its current public code.`,
+  );
 }
 
 /**

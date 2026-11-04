@@ -1,0 +1,22 @@
+[
+  {
+    "code": "RELKIT_ERROR_ID_REQUIRED",
+    "column": 23,
+    "descriptorId": "unbound.fixture",
+    "file": "src/orders/errors/not-found.error.ts",
+    "line": 4,
+    "message": "defineError needs an explicit id, because an error's ID is its public code.",
+    "severity": "error",
+    "suggestion": "Add id: \"orders.not-found.NotFoundError\" to defineError to keep its current public code."
+  },
+  {
+    "code": "RELKIT_ERROR_ID_REQUIRED",
+    "column": 16,
+    "descriptorId": "unbound.fixture",
+    "file": "src/orders/functions/get-order.function.ts",
+    "line": 10,
+    "message": "Error \"InvalidError\" needs an explicit id, because an error's ID is its public code.",
+    "severity": "error",
+    "suggestion": "Add id: \"orders.functions.get-order-function.InvalidError\" to defineError to keep its current public code."
+  }
+]

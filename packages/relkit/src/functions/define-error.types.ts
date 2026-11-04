@@ -48,7 +48,8 @@ export interface DefineErrorOptions<
   Id extends string,
   DataSchema extends StandardSchemaV1,
 > extends DescriptorMetadata {
-  readonly id?: Id;
+  /** The error's public code; required because it must not change when the file moves. */
+  readonly id: Id;
   readonly data: DataSchema;
   readonly message: string | ((data: InferOutput<DataSchema>) => string);
   readonly http?: ErrorHttpMapping;

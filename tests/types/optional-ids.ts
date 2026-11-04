@@ -31,8 +31,11 @@ const task = defineTask({
 });
 
 const optionalFunction = defineFunction({ input, output, handler: async () => ({ ok: true }) });
-const optionalError = defineError({ data: input, message: "Invalid" });
+// @ts-expect-error an error's ID is its public code, so it is required
+defineError({ data: input, message: "Invalid" });
+const optionalError = defineError({ id: "types.invalid", data: input, message: "Invalid" });
 const optionalDelayedError = defineError({
+  id: "types.retry-later",
   data: input,
   message: "Retry later",
   retry: { kind: "later", afterMs: 1_000 },

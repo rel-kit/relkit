@@ -308,6 +308,13 @@ export const compilerCodes = [
     fix: "Set `idempotency` to an object with a non-empty `key` and a positive `retentionMs`.",
   },
   {
+    code: "RELKIT_ERROR_ID_REQUIRED",
+    title: "Error has no ID",
+    happened:
+      "A `defineError` call has no `id`. An error's ID is the public `code` in API responses, so it must not change when the file moves.",
+    fix: "Add the `id` the message suggests; it is the ID earlier versions inferred, so clients see the same code.",
+  },
+  {
     code: "RELKIT_ID_INFERENCE_AMBIGUOUS",
     title: "ID cannot be worked out from the source",
     happened:

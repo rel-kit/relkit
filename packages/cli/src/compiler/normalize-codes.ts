@@ -47,6 +47,7 @@ export const NORMALIZE_CODES = Object.freeze({
   providerReleaseSource: "RELKIT_PROVIDER_RELEASE_SOURCE_REQUIRED",
   bucketProfileDuplicate: "RELKIT_BUCKET_PROFILE_DUPLICATE",
   identityAmbiguous: "RELKIT_ID_INFERENCE_AMBIGUOUS",
+  errorIdRequired: "RELKIT_ERROR_ID_REQUIRED",
   source: "RELKIT_SOURCE_LOCATION_INVALID",
   collision: "RELKIT_ROUTE_COLLISION",
   handler: "RELKIT_MANIFEST_HANDLER_MISSING",

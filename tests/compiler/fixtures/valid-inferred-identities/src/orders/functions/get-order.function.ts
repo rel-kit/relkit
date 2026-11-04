@@ -2,6 +2,7 @@ import { defineError, defineFunction } from "relkit";
 import { errorData, orderInput, orderOutput } from "../../platform/schemas.js";
 
 const InvalidError = defineError({
+  id: "orders.functions.get-order-function.InvalidError",
   data: errorData,
   message: ({ orderId }) => `Invalid order ${orderId}`,
   http: { status: 400 },
