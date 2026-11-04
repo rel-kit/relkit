@@ -269,7 +269,7 @@ not tasks of this change.
 
 ## 27. Findings follow-ups (plan section 8.5)
 
-- [ ] 27.1 Make template `start` scripts run `relkit start`, and verify the template creation tests
+- [x] 27.1 Make template `start` scripts run `relkit start`, and verify the template creation tests
 - [ ] 27.2 Make generated projects type-check after a fresh clone and install, and verify `tsc --noEmit` in a fresh-clone CI job
 - [ ] 27.3 Document that `relkit check` runs application top-level code and which side effects it blocks, and verify the docs build
 - [ ] 27.4 Document at-least-once delivery, re-runs after recovery and idempotency keys in the jobs guide, and the ephemeral event queue's overflow behavior in the events guide, and verify the examples compile

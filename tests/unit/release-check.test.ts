@@ -14,14 +14,12 @@ import {
   CREATE_CAPABILITY_TABLE,
 } from "../../packages/create-relkit/src/create-capabilities.ts";
 
-test("release template contracts preserve canonical emitted-JavaScript startup", async () => {
+test("release template contracts start the built server through relkit start", async () => {
   for (const template of packedTemplates) {
     const manifest = await readJson(join(root, "templates/default/v1", template, "package.json"));
     const scripts = expectedTemplateScripts(template);
     expect(scripts).toEqual(manifest.scripts);
-    expect(scripts.start).toBe(
-      "NODE_ENV=production bun run --no-env-file .relkit/build/server/index.js",
-    );
+    expect(manifest.scripts.start).toBe("relkit start");
   }
 });
 

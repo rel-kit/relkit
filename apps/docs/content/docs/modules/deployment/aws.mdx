@@ -48,8 +48,8 @@ NODE_ENV=production bun run --no-env-file .relkit/build/server/index.js
 ```
 
 The framework runtime is bundled. This production installation does not need the development CLI,
-compiler, Inspector application, or unselected SDKs. `relkit start` remains a convenience command
-where the CLI is installed; the generated `start` script uses the JavaScript command above.
+compiler, Inspector application, or unselected SDKs. The generated `start` script runs `relkit start`, which needs the CLI that development installs. A
+production application root without the CLI uses the JavaScript command above.
 
 Supply required application environment values through the process environment. Startup does not
 automatically read dotenv files, and build output does not inline their values. `PORT` overrides the
