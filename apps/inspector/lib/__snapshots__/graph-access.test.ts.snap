@@ -1,0 +1,19 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`a route shows its auth requirement and its function's access rule 1`] = `
+{
+  "middleware": [],
+  "role": true,
+  "rule": {
+    "permissions": [
+      "orders:refund",
+    ],
+    "predicate": true,
+    "roles": [
+      "admin",
+    ],
+  },
+  "session": true,
+  "summary": "roles admin · permissions orders:refund · allow predicate",
+}
+`;

@@ -7,6 +7,7 @@ import {
   isProtected,
   routeAccess,
 } from "../../lib/graph-hierarchy";
+import { describeAccessRule } from "../../lib/graph-hierarchy-access";
 import {
   listenedEventId,
   routeMethod,
@@ -43,13 +44,18 @@ function AccessSection({
         items={[
           ["Session", access.session ? "Required (401 without one)" : "Not required"],
           ["Role", access.role ? "Checked (403 when not allowed)" : "Not checked"],
+          ...(access.rule === undefined
+            ? []
+            : ([["Access rule", describeAccessRule(access.rule)]] as const)),
           [
             "Enforced by",
             access.middleware.length > 0
               ? "Middleware before the handler"
-              : checked
-                ? "The handler, through context.auth"
-                : "Nothing",
+              : access.rule !== undefined
+                ? "The engine, for every caller"
+                : checked
+                  ? "The handler, through context.auth"
+                  : "Nothing",
           ],
         ]}
       />

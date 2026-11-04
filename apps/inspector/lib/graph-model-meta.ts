@@ -12,6 +12,7 @@ const metaKeys = new Set([
   "input",
   "output",
   "errors",
+  "access",
   "publishes",
   "dependencies",
   "invocationMode",

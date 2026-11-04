@@ -237,6 +237,11 @@ Decided while applying section 18 (maintainer, 2026-11-05):
   accepts anonymous callers. Background code that should act as the application calls
   `getRelkit()` (system); code that should act as a user calls `relkit.as(session)`. Carrying the
   enqueuing user's session through durable queues is not part of section 18.
+- **Protection is projected, not re-derived.** The graph records a function's rule as
+  `access: { roles, permissions, predicate: true }`; predicates are not serialized. OpenAPI adds a
+  `session` apiKey cookie scheme (`better-auth.session_token`) and `security: [{ session: [] }]` to
+  operations whose route requires a session or whose function has an access rule, with 401 and 403
+  problem responses. The Inspector reads the same graph fields in its graph and route views.
 - **`relkit.as(session)`** returns a handle of the same shape whose function calls run as that
   session's user. The trace source stays `system`; the principal is the user's.
 

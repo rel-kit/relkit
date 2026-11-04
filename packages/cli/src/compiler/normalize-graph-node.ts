@@ -14,6 +14,7 @@ import { agentNodeData } from "./normalize-graph-agent.js";
 import type { GraphNode, NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 import { isRecord, refId } from "./normalize-utils.js";
 import { graphIdForDescriptor } from "./normalize-graph-id.js";
+import { accessMetadata } from "./normalize-graph-access.js";
 import {
   dependencyMetadata,
   publishedEvents,
@@ -82,6 +83,9 @@ export const graphNodeForEffect = Effect.fn("Compiler.graphNodeFor")(
             ? {}
             : { progress: schema(work, descriptor, "progress") }),
           errors: clean(value.errors),
+          ...(accessMetadata(value.access) === undefined
+            ? {}
+            : { access: accessMetadata(value.access) }),
           dependencies: dependencyMetadata(value.dependencies),
           publishes: publishedEvents(value.dependencies),
           timeoutMs: clean(value.timeoutMs),

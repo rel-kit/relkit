@@ -8,6 +8,7 @@ import { Effect, Result } from "effect";
 import { OpenApiGenerationError } from "./generate-error.js";
 import { observeOpenApi } from "./generate-observability.js";
 import { serviceContextEffect, serviceForEffect } from "./generate-services.js";
+import { SESSION_SECURITY, SESSION_SECURITY_SCHEME } from "./generate-security.js";
 import { documentTagsEffect } from "./generate-tags.js";
 import { buildOperationEffect, openApiPathEffect } from "./generate-utils.js";
 import type {
@@ -109,6 +110,9 @@ export const generateOpenApiEffect = Effect.fn("OpenApi.generate")((graph: Appli
         jsonSchemaDialect: "https://json-schema.org/draft/2020-12/schema",
         ...(tags.length === 0 ? {} : { tags }),
         paths,
+        ...(usesSession(paths)
+          ? { components: { securitySchemes: { [SESSION_SECURITY]: SESSION_SECURITY_SCHEME } } }
+          : {}),
         "x-relkit": {
           version: CONTRACT_VERSION,
           contractVersion: CONTRACT_VERSION,
@@ -186,4 +190,11 @@ function isHttpTrigger(node: GraphNode): node is HttpGraphTrigger {
 /** Check for a non-array object. */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+/** Whether any operation requires the session security scheme. */
+function usesSession(paths: Readonly<Record<string, OpenApiPathItem>>): boolean {
+  return Object.values(paths).some((item) =>
+    Object.values(item).some((operation) => operation?.security !== undefined),
+  );
 }

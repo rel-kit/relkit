@@ -1,0 +1,73 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`a route with auth required and an access rule declares the session requirement 1`] = `
+{
+  "components": {
+    "securitySchemes": {
+      "session": {
+        "description": "Better Auth session cookie set by signing in.",
+        "in": "cookie",
+        "name": "better-auth.session_token",
+        "type": "apiKey",
+      },
+    },
+  },
+  "forbidden": "The caller does not pass the access rule",
+  "relkit": {
+    "access": {
+      "permissions": [
+        "orders:read",
+      ],
+      "predicate": true,
+      "roles": [
+        "admin",
+      ],
+    },
+    "auth": "required",
+  },
+  "security": [
+    {
+      "session": [],
+    },
+  ],
+  "unauthorized": {
+    "content": {
+      "application/problem+json": {
+        "schema": {
+          "properties": {
+            "code": {
+              "type": "string",
+            },
+            "detail": {
+              "type": "string",
+            },
+            "status": {
+              "maximum": 599,
+              "minimum": 100,
+              "type": "integer",
+            },
+            "title": {
+              "type": "string",
+            },
+            "traceId": {
+              "type": "string",
+            },
+            "type": {
+              "type": "string",
+            },
+          },
+          "required": [
+            "type",
+            "title",
+            "status",
+            "code",
+            "detail",
+          ],
+          "type": "object",
+        },
+      },
+    },
+    "description": "No signed-in session",
+  },
+}
+`;

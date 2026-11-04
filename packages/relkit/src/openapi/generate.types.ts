@@ -52,8 +52,11 @@ export interface OpenApiOperation {
     readonly content: Readonly<Record<string, OpenApiMediaType>>;
   };
   readonly responses: Readonly<Record<string, OpenApiResponse>>;
+  readonly security?: readonly Readonly<Record<string, readonly string[]>>[];
   readonly "x-relkit": {
     readonly routeId: string;
+    readonly auth?: "required";
+    readonly access?: JsonValue;
     readonly functionId?: string;
     readonly serviceId?: string;
     readonly middleware: readonly {
@@ -74,6 +77,16 @@ export interface OpenApiPathItem {
   readonly [method: string]: OpenApiOperation | undefined;
 }
 
+/** An OpenAPI security scheme.
+ * @example const scheme: OpenApiSecurityScheme = { type: "apiKey", in: "cookie", name: "session" };
+ */
+export interface OpenApiSecurityScheme {
+  readonly type: "apiKey";
+  readonly in: "cookie" | "header";
+  readonly name: string;
+  readonly description?: string;
+}
+
 /** Complete deterministic OpenAPI 3.1 projection of a RelKit graph.
  * @example const document: OpenApiDocument = generateOpenApi(graph);
  */
@@ -83,6 +96,9 @@ export interface OpenApiDocument {
   readonly jsonSchemaDialect: string;
   readonly tags?: readonly OpenApiTag[];
   readonly paths: Readonly<Record<string, OpenApiPathItem>>;
+  readonly components?: {
+    readonly securitySchemes: Readonly<Record<string, OpenApiSecurityScheme>>;
+  };
   readonly "x-relkit": {
     readonly version: number;
     readonly contractVersion: number;
