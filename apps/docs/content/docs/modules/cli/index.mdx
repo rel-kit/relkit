@@ -40,14 +40,14 @@ The generated project includes package scripts for common commands. Run these fr
 | Stage              | Command              | What happens                                                      | Continue with                                                                |
 | ------------------ | -------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | Add a capability   | `bun run relkit add` | Choose files, their owning service, and any required packages.    | [Add application files](/docs/modules/cli/add-artifacts)                     |
-| Validate structure | `bun run check`      | Check application descriptors and their relationships.            | [`relkit check`](/docs/api/cli#relkit-check)                                 |
+| Validate structure | `bun run check`      | Check application descriptors and their relationships.            | [How `relkit check` works](/docs/modules/cli/check)                          |
 | Check TypeScript   | `bun run typecheck`  | Check source and generated types with TypeScript.                 | [CLI walkthrough](/guides/cli/create-and-build-an-api#check-the-application) |
 | Test behavior      | `bun run test`       | Run the application's tests.                                      | [Testing](/docs/modules/operations/testing)                                  |
 | Develop            | `bun run dev`        | Prepare the application, start the server, and watch for changes. | [`relkit dev`](/docs/api/cli#relkit-dev)                                     |
 | Build              | `bun run build`      | Write the production output into `.relkit/build`.                 | [`relkit build`](/docs/api/cli#relkit-build)                                 |
 | Run the build      | `bun run start`      | Start the built server.                                           | [`relkit start`](/docs/api/cli#relkit-start)                                 |
 
-`check` validates structure; `typecheck` checks types; tests verify behavior. Run all three when changing application code. Build before starting production output, and stop the development server before starting another server on the same port.
+`check` validates structure and runs your modules' top-level code ([what it blocks](/docs/modules/cli/check)); `typecheck` checks types; tests verify behavior. Run all three when changing application code. Build before starting production output, and stop the development server before starting another server on the same port.
 
 ## Choose a practical task
 

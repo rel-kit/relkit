@@ -1132,6 +1132,11 @@
       "examples": ["templates/default/v1/api/src/services/orders/service.ts"]
     },
     {
+      "path": "docs/modules/cli/check",
+      "api": ["app"],
+      "examples": ["packages/cli/src/commands/check-evaluation.ts"]
+    },
+    {
       "path": "docs/modules/cli/automation",
       "api": ["cli-api", "create-relkit"],
       "examples": ["apps/docs/examples/public-api/tooling.ts"]

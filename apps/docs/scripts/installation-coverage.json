@@ -293,6 +293,7 @@
     "/guides/storage/upload-product-images"
   ],
   "docs/modules/cli/add-artifacts": ["update", "concept", ""],
+  "docs/modules/cli/check": ["update", "concept", ""],
   "docs/modules/cli/create-an-app": ["update", "concept", ""],
   "docs/modules/cli/index": ["update", "concept", ""],
   "docs/modules/cli/relkit-create-untested": ["update", "concept", ""],

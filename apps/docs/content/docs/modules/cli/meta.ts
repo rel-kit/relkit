@@ -3,6 +3,13 @@ import { defineMeta } from "blume";
 export default defineMeta({
   title: "CLI",
   icon: "terminal",
-  pages: ["index", "create-an-app", "add-artifacts", "automation", "relkit-create-untested"],
+  pages: [
+    "index",
+    "create-an-app",
+    "add-artifacts",
+    "check",
+    "automation",
+    "relkit-create-untested",
+  ],
   display: "page",
 });
