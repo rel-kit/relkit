@@ -28,7 +28,7 @@ in a module variable or reuse it after the invocation completes.
 This function declares the `prices` cache, so its handler receives `context.cache.prices`. Merely importing a
 cache or putting it in the same domain does not grant access.
 
-Event publication uses an explicit `publishes` list rather than `dependencies`:
+Event publication uses the same `dependencies` object. Import the event descriptor and declare it under `events`:
 
 <include
   source="apps/docs/examples/events/create-order.function.ts"
@@ -38,7 +38,8 @@ Event publication uses an explicit `publishes` list rather than `dependencies`:
   /_snippets/source/apps/docs/examples/events/create-order.function.ts
 </include>
 
-The exact event ID becomes available under `context.events`; publishing any undeclared ID fails the checked edge.
+The key you choose, `orderCreated`, becomes available under `context.events`. An undeclared event is not on
+`context.events`, so the type check fails before the app runs.
 
 ## Know the common context
 
@@ -50,7 +51,8 @@ The exact event ID becomes available under `context.events`; publishing any unde
 | `log`                                          | Structured, invocation-correlated records                                       |
 | `trace`                                        | Child spans, point-in-time events, and attributes on the active span            |
 | `time`                                         | Testable `now()` and abort-aware `sleep()` behavior                             |
-| `jobs`, `events`, `buckets`, `cache`, `agents` | Clients authorized by declarations on the function                              |
+| `functions`, `events`, `channels`, `databases` | Clients authorized by declarations on the function                              |
+| `tasks`, `jobs`, `buckets`, `cache`, `agents`  | Clients authorized by declarations on the function                              |
 | `database`, `auth`, `constants`, `prompts`     | Registered application context supplied by specialized integrations             |
 
 There is no service middleware or `context.service`. A service exposes public functions and events; it does not
@@ -75,8 +77,8 @@ Follow its guide and choose the integration profile in `relkit.config.ts`.
 
 ### Declare the graph edge
 
-Add the descriptor under the matching `dependencies` key. For publication, add the exact event ID to
-`publishes`.
+Add the descriptor under the matching `dependencies` key, such as `functions`, `events`, `channels`, or
+`databases`.
 
 </Step>
 <Step>

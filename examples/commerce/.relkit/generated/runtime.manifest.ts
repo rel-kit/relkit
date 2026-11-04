@@ -64,6 +64,7 @@ __relkit_bindDescriptorIdentity(__relkit_module_2["GET"], "route.get.announcemen
 __relkit_bindDescriptorIdentity(__relkit_module_2["GET"]["target"], "announcements.get-announcements");
 __relkit_bindDescriptorIdentity(__relkit_module_2["POST"], "route.post.announcements");
 __relkit_bindDescriptorIdentity(__relkit_module_2["POST"]["target"], "announcements.post-announcement");
+__relkit_bindDescriptorIdentity(__relkit_module_2["POST"]["target"]["dependencies"]["channels"]["announcements"], "announcements.feed");
 __relkit_bindDescriptorIdentity(__relkit_module_3["GET"], "route.get.database.users");
 __relkit_bindDescriptorIdentity(__relkit_module_3["GET"]["target"], "users.database-users");
 __relkit_bindDescriptorIdentity(__relkit_module_4["GET"], "route.get.docs.optional-catch-all-parts");
@@ -84,8 +85,10 @@ __relkit_bindDescriptorIdentity(__relkit_module_7["OPTIONS"]["target"], "orders.
 __relkit_bindDescriptorIdentity(__relkit_module_7["OPTIONS"]["target"]["errors"][0], "orders.not-found");
 __relkit_bindDescriptorIdentity(__relkit_module_7["PATCH"], "route.patch.orders.by-order-id");
 __relkit_bindDescriptorIdentity(__relkit_module_7["PATCH"]["target"], "orders.update-order");
+__relkit_bindDescriptorIdentity(__relkit_module_7["PATCH"]["target"]["dependencies"]["channels"]["orderUpdates"], "orders.updates");
 __relkit_bindDescriptorIdentity(__relkit_module_7["PUT"], "route.put.orders.by-order-id");
 __relkit_bindDescriptorIdentity(__relkit_module_7["PUT"]["target"], "orders.update-order");
+__relkit_bindDescriptorIdentity(__relkit_module_7["PUT"]["target"]["dependencies"]["channels"]["orderUpdates"], "orders.updates");
 __relkit_bindDescriptorIdentity(__relkit_module_8["POST"], "orders.export");
 __relkit_bindDescriptorIdentity(__relkit_module_9["GET"], "route.get.orders");
 __relkit_bindDescriptorIdentity(__relkit_module_9["GET"]["target"], "orders.search-orders");
@@ -106,9 +109,11 @@ __relkit_bindDescriptorIdentity(__relkit_module_15["default"]["accountSession"],
 __relkit_bindDescriptorIdentity(__relkit_module_16["default"], "announcements.feed");
 __relkit_bindDescriptorIdentity(__relkit_module_17["default"], "announcements.get-announcements");
 __relkit_bindDescriptorIdentity(__relkit_module_18["default"], "announcements.post-announcement");
+__relkit_bindDescriptorIdentity(__relkit_module_18["default"]["dependencies"]["channels"]["announcements"], "announcements.feed");
 __relkit_bindDescriptorIdentity(__relkit_module_19["default"], "announcements");
 __relkit_bindDescriptorIdentity(__relkit_module_19["default"]["getAnnouncements"], "announcements.get-announcements");
 __relkit_bindDescriptorIdentity(__relkit_module_19["default"]["postAnnouncement"], "announcements.post-announcement");
+__relkit_bindDescriptorIdentity(__relkit_module_19["default"]["postAnnouncement"]["dependencies"]["channels"]["announcements"], "announcements.feed");
 __relkit_bindDescriptorIdentity(__relkit_module_20["default"], "assets.objects");
 __relkit_bindDescriptorIdentity(__relkit_module_21["default"], "assets.upload-assets");
 __relkit_bindDescriptorIdentity(__relkit_module_21["default"]["dependencies"]["buckets"]["assets"], "assets.objects");
@@ -139,6 +144,7 @@ __relkit_bindDescriptorIdentity(__relkit_module_38["default"]["errors"][0], "ord
 __relkit_bindDescriptorIdentity(__relkit_module_39["default"], "orders.search-orders");
 __relkit_bindDescriptorIdentity(__relkit_module_40["default"], "orders.stream-order-report");
 __relkit_bindDescriptorIdentity(__relkit_module_41["default"], "orders.update-order");
+__relkit_bindDescriptorIdentity(__relkit_module_41["default"]["dependencies"]["channels"]["orderUpdates"], "orders.updates");
 __relkit_bindDescriptorIdentity(__relkit_module_42["default"], "orders.cleanup");
 __relkit_bindDescriptorIdentity(__relkit_module_42["default"]["task"], "orders.cleanup");
 __relkit_bindDescriptorIdentity(__relkit_module_43["default"], "orders.export-orders");
@@ -159,6 +165,7 @@ __relkit_bindDescriptorIdentity(__relkit_module_44["default"]["getOrder"]["error
 __relkit_bindDescriptorIdentity(__relkit_module_44["default"]["searchOrders"], "orders.search-orders");
 __relkit_bindDescriptorIdentity(__relkit_module_44["default"]["streamOrderReport"], "orders.stream-order-report");
 __relkit_bindDescriptorIdentity(__relkit_module_44["default"]["updateOrder"], "orders.update-order");
+__relkit_bindDescriptorIdentity(__relkit_module_44["default"]["updateOrder"]["dependencies"]["channels"]["orderUpdates"], "orders.updates");
 __relkit_bindDescriptorIdentity(__relkit_module_45["default"], "orders.cleanup");
 __relkit_bindDescriptorIdentity(__relkit_module_46["default"], "orders.export-orders");
 __relkit_bindDescriptorIdentity(__relkit_module_47["default"], "orders.cancel-order");
@@ -181,7 +188,7 @@ __relkit_bindDescriptorIdentity(__relkit_module_54["default"]["databaseUsers"], 
 
 export const manifestContractVersion = 10 as const;
 export const manifestGeneratorVersion = 7 as const;
-export const manifestGraphHash = "sha256:1f60628aabed6c088215c276e669e22580b28dabe2c2c63a0e100340cefbe1da" as const;
+export const manifestGraphHash = "sha256:096452ae82fae905e1e13bf167f30585517dc0dcad90e507f7b84069398a1ace" as const;
 export const runtimeIntegrationsPlanReference = { version: 1, fileName: "runtime-integrations.plan.json", graphHash: manifestGraphHash } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,

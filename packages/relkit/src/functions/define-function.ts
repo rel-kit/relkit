@@ -102,9 +102,9 @@ export const defineFunctionEffect: DefineFunctionEffect = defineFunctionOperatio
  *
  * The `id` is optional for source-scoped functions; the compiler derives it from the
  * source/export hierarchy. Durable resources keep explicit IDs. The handler receives
- * validated reusable input and an invocation-scoped context. Use `descriptor.invoke(input)`
- * for nested calls so the
- * common engine preserves validation, service policy, limits, and telemetry.
+ * validated reusable input and an invocation-scoped context. Declare every function it calls
+ * under `dependencies.functions` and call it through `context.functions`, so the common engine
+ * preserves validation, service policy, limits, and telemetry.
  *
  * @param options - Function schemas, handler, and metadata.
  * @returns Frozen callable descriptor.
@@ -122,9 +122,13 @@ export const defineFunctionEffect: DefineFunctionEffect = defineFunctionOperatio
  *     return { message: `Hello, ${name}!` }
  *   }
  * })
- * const result = await greet.invoke({ name: "Ada" })
- * void result
- * void greet
+ * const welcome = defineFunction({
+ *   input: z.object({ name: z.string() }),
+ *   output: z.object({ message: z.string() }),
+ *   dependencies: { functions: { greet } },
+ *   handler: ({ name }, context) => context.functions.greet({ name })
+ * })
+ * void welcome
  * ```
  * @category Functions
  * @since 0.1.0

@@ -1,6 +1,12 @@
 import { describe, expect, test } from "vitest";
 import { z } from "../../src/schema/index.js";
-import { defineChannel, runWithRealtimeDispatcher } from "../../src/realtime/index.js";
+import { Effect } from "effect";
+import {
+  defineChannel,
+  getChannelPresenceEffect,
+  runWithRealtimeDispatcher,
+  triggerChannelEffect,
+} from "../../src/realtime/index.js";
 
 describe("defineChannel", () => {
   test("distinguishes internal, public, and protected declarations", () => {
@@ -102,10 +108,14 @@ test("backend methods validate values and dispatch through the bound generation 
     }),
   };
   await runWithRealtimeDispatcher(dispatcher, () =>
-    channel.trigger({ orderId: "order-1" }, "changed", { status: "paid" }),
+    Effect.runPromise(
+      triggerChannelEffect(channel, { orderId: "order-1" }, "changed", { status: "paid" }),
+    ),
   );
   expect(calls).toEqual(["changed"]);
   expect(
-    await runWithRealtimeDispatcher(dispatcher, () => channel.getPresence({ orderId: "order-1" })),
+    await runWithRealtimeDispatcher(dispatcher, () =>
+      Effect.runPromise(getChannelPresenceEffect(channel, { orderId: "order-1" })),
+    ),
   ).toMatchObject({ connections: 1 });
 });

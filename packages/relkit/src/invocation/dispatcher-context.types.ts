@@ -74,7 +74,7 @@ export interface LocalEffectLogger extends LocalStructuredLogger {
 
 /** Inputs for assembling a standalone context and managed dependency maps.
  * Optional client maps expose only configured dependencies to the handler.
- * @example const context = await makeStandaloneContext({ record, signal, env, time, publishes: [] });
+ * @example const context = await makeStandaloneContext({ record, signal, env, time });
  */
 export interface StandaloneContextOptions<Context extends { readonly signal: AbortSignal }> {
   readonly factory?: InvocationContextFactory<Context>;
@@ -84,7 +84,6 @@ export interface StandaloneContextOptions<Context extends { readonly signal: Abo
   readonly time: PublicClock;
   readonly logger?: PublicLogger;
   readonly clients?: ManagedDependencySources;
-  readonly publishes: readonly string[];
   readonly dependencies?: Readonly<Record<string, Readonly<Record<string, unknown>>>>;
   readonly progress?: ProgressEmitter;
 }

@@ -18,7 +18,6 @@ export function generatedFunctionNode(
   return {
     kind: "function",
     invocationMode: "callable",
-    publishes: [],
     id: generated.functionId,
     source: descriptor.source,
     ...(descriptor.domainId === undefined ? {} : { domainId: descriptor.domainId }),

@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { createStandaloneDispatcher, RelkitStreamError } from "../../src/invocation/index.js";
+import {
+  createStandaloneDispatcher,
+  dispatchInvocation,
+  RelkitStreamError,
+} from "../../src/invocation/index.js";
 import { z, type StandardSchemaV1 } from "../../src/schema/index.js";
 import { defineFunction, streamOf } from "../../src/functions/index.js";
 
@@ -63,7 +67,7 @@ describe("streamOf invocation", () => {
         yield "ok";
       },
     });
-    const stream = await target.invoke({});
+    const stream = await dispatchInvocation({ target, input: {} });
     const first = stream[Symbol.asyncIterator]();
     const second = stream[Symbol.asyncIterator]();
     expect(await first.next()).toEqual({ value: "ok", done: false });
@@ -80,9 +84,9 @@ describe("streamOf invocation", () => {
         yield 1 as never;
       },
     });
-    await expect((await invalid.invoke({}))[Symbol.asyncIterator]().next()).rejects.toThrow(
-      "Stream item validation failed",
-    );
+    await expect(
+      (await dispatchInvocation({ target: invalid, input: {} }))[Symbol.asyncIterator]().next(),
+    ).rejects.toThrow("Stream item validation failed");
 
     const oversized = defineFunction({
       id: "reports.large",
@@ -92,10 +96,10 @@ describe("streamOf invocation", () => {
         yield "x".repeat(1024 * 1024);
       },
     });
-    await expect((await oversized.invoke({}))[Symbol.asyncIterator]().next()).rejects.toMatchObject(
-      {
-        code: "RELKIT_STREAM_ITEM_TOO_LARGE",
-      },
-    );
+    await expect(
+      (await dispatchInvocation({ target: oversized, input: {} }))[Symbol.asyncIterator]().next(),
+    ).rejects.toMatchObject({
+      code: "RELKIT_STREAM_ITEM_TOO_LARGE",
+    });
   });
 });

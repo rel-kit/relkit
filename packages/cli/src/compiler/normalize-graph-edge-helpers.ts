@@ -96,25 +96,6 @@ export function addEventEdges(
 }
 
 /**
- * Adds publication edges for declared events.
- * @param add - Graph edge accumulator owned by this operation.
- * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
- * @param publishes - Declared event publication references.
- * @returns Nothing; updates only the supplied diagnostics, indexes, or accumulators.
- */
-export function addPublicationEdges(
-  add: GraphEdgeAdder,
-  descriptor: NormalizedDescriptor,
-  publishes: unknown,
-): void {
-  if (!Array.isArray(publishes)) return;
-  for (const eventId of publishes) {
-    if (typeof eventId === "string")
-      add("publishes-event", graphIdForDescriptor(descriptor), eventId);
-  }
-}
-
-/**
  * Adds typed graph edges for declared descriptor dependencies.
  * @param add - Graph edge accumulator owned by this operation.
  * @param descriptor - Normalized descriptor whose identity and metadata are inspected.

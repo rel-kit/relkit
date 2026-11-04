@@ -8,8 +8,7 @@ import { functionTry, runFunctionSync } from "./function-observability.js";
 export {
   copyDependencies,
   copyDependenciesEffect,
-  copyPublishes,
-  copyPublishesEffect,
+  rejectPublishes,
 } from "./function-dependency-copy.js";
 
 /** Checks a function limit through Effect.

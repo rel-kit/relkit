@@ -2068,7 +2068,7 @@ type NormalizedTrigger<Output> = TestEventTriggerOptions<Output> & {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L119)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L118)
 
 ### TestEventCloseOptions (interface)
 
@@ -2082,7 +2082,7 @@ export interface TestEventCloseOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L69)
 
 ### TestEventDeliveryAttempt (interface)
 
@@ -2096,7 +2096,7 @@ export interface TestEventDeliveryAttempt extends EventDeliveryResult {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L74)
 
 ### TestEventFake (interface)
 
@@ -2131,7 +2131,7 @@ export interface TestEventFake<Payload = unknown, Output = unknown> extends Even
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L83)
 
 ### TestEventInvocation (type alias)
 
@@ -2143,7 +2143,7 @@ Native invocation request consumed by an event target fixture.
 type TestEventInvocation = EventInvocationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L113)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L112)
 
 ### TestEventOptions (interface)
 
@@ -2155,7 +2155,6 @@ Event publication contract, native consumers and deterministic fixture dependenc
 export interface TestEventOptions<Payload = unknown, Output = unknown> {
   readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly event?: EventDescriptorAny;
-  readonly events?: readonly EventDescriptorAny[];
   readonly eventId?: string;
   readonly version?: number;
   readonly payloadSchema?: StandardSchemaV1;
@@ -2194,7 +2193,7 @@ Native accepted publication receipt retained by the public event fixture.
 type TestEventPublishResult = EventPublishResult<string, number, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L110)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L109)
 
 ### TestEventTriggerOptions (interface)
 
@@ -3983,7 +3982,7 @@ type FunctionContextOf<Target> =
     : InvocationContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L44)
 
 ### FunctionInput (type alias)
 
@@ -3997,7 +3996,7 @@ type FunctionInput<Target extends { readonly input: StandardSchemaV1 }> = InferI
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L28)
 
 ### FunctionOutput (type alias)
 
@@ -4011,7 +4010,7 @@ type FunctionOutput<Target extends { readonly output: StandardSchemaV1 }> = Infe
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L36)
 
 ### InvokeFunctionOptions (interface)
 
@@ -4032,7 +4031,7 @@ export interface InvokeFunctionOptions<Context extends { readonly signal: AbortS
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L55)
 
 ### StandaloneFunctionTarget (interface)
 
@@ -4047,7 +4046,6 @@ export interface StandaloneFunctionTarget {
   readonly output: StandardSchemaV1;
   readonly errors?: readonly { readonly id: string; readonly data: StandardSchemaV1 }[];
   readonly dependencies?: import("relkit/engine").DependencyDeclarations;
-  readonly publishes?: readonly string[];
   readonly publications?: Readonly<Record<string, import("relkit/engine").DependencyRefLike>>;
   readonly timeoutMs?: number;
   readonly concurrency?: number;

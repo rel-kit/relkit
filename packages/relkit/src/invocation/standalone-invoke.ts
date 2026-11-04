@@ -153,7 +153,6 @@ export function invokeStandaloneEffect<
                 signal: controller.signal,
                 env: options.env ?? {},
                 time,
-                publishes: request.target.publishes ?? [],
                 ...(request.target.dependencies === undefined
                   ? {}
                   : { dependencies: request.target.dependencies }),

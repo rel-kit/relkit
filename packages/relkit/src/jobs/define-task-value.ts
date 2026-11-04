@@ -56,7 +56,6 @@ export function defineTaskValue<
   const OutputSchema extends StandardSchemaV1,
   const Dependencies extends TaskDependencies = {},
   const Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  const Publishes extends readonly PublishedEventName[] = readonly [],
   const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   const Streams extends TaskStreamSchemas = {},
   const Execution extends TaskExecution = "durable",
@@ -68,7 +67,6 @@ export function defineTaskValue<
     OutputSchema,
     Dependencies,
     Errors,
-    Publishes,
     ProgressSchema,
     Streams,
     Execution
@@ -80,7 +78,6 @@ export function defineTaskValue<
   OutputSchema,
   Dependencies,
   Errors,
-  Publishes,
   ProgressSchema,
   Streams,
   Execution
@@ -117,7 +114,10 @@ export function defineTaskValue<
     options.maxElapsed === undefined ? undefined : duration(options.maxElapsed, "maxElapsed", true);
   const errors = copyErrors(options.errors);
   const dependencies = copyDependencies<Dependencies>(options.dependencies);
-  const publishes = copyStrings(options.publishes, "publishes");
+  if ((options as { readonly publishes?: unknown }).publishes !== undefined)
+    throw new TypeError(
+      "`publishes` was removed; declare each event under `dependencies.events` and publish it with `ctx.events.<name>.publish(payload)`",
+    );
   const tags = copyTaskTags(options.tags);
   const resources = copyResources(options.resources);
   const concurrency = copyConcurrency(options.concurrency, options.inputWire ?? options.input);
@@ -139,7 +139,6 @@ export function defineTaskValue<
     output: options.output,
     ...(errors === undefined ? {} : { errors }),
     ...(dependencies === undefined ? {} : { dependencies }),
-    ...(publishes === undefined ? {} : { publishes }),
     ...(progress === undefined ? {} : { progress }),
     ...(streams === undefined ? {} : { streams }),
     ...(observation === undefined ? {} : { observation }),
@@ -163,7 +162,6 @@ export function defineTaskValue<
     OutputSchema,
     Dependencies,
     Errors,
-    Publishes,
     ProgressSchema,
     Streams,
     Execution

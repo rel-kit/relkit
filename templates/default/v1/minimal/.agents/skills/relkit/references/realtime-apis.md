@@ -36,8 +36,9 @@ export default defineFunction({
   id: "announcements.post",
   input: z.object({ message: z.string().min(1) }),
   output: z.object({ accepted: z.literal(true) }),
-  handler: async ({ message }) => {
-    await announcements.trigger({}, "posted", {
+  dependencies: { channels: { announcements } },
+  handler: async ({ message }, ctx) => {
+    await ctx.channels.announcements.trigger({}, "posted", {
       message,
       postedAt: new Date().toISOString(),
     });

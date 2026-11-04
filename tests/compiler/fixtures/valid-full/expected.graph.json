@@ -530,7 +530,6 @@
         ],
         "type": "object"
       },
-      "publishes": [],
       "source": {
         "column": 22,
         "file": "src/orders/agents/order-support.agent.ts",

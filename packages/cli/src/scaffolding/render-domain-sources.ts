@@ -23,12 +23,21 @@ export function functionSource(
           ),
         ]
       : []),
+    ...(relationships.event
+      ? [
+          sourceImport(
+            relationships.event.binding,
+            sourceModule(relationships.event.path),
+            relationships.event.exportKind,
+          ),
+        ]
+      : []),
   ];
   return `${imports.join("\n")}\n\nconst ${artifact.binding} = defineFunction({
   id: "${artifact.id}",
   input: z.object({ value: z.string().default("example") }),
-  output: z.object({ value: z.string() }),${relationships.error ? `\n  errors: [${relationships.error.binding}],` : ""}${relationships.event ? `\n  publishes: ["${relationships.event.id}"],` : ""}
-  handler: async ({ value }, context) => {${relationships.error ? `\n    if (value === "error") return ${relationships.error.binding}.create({ message: "Example failure" });` : ""}${relationships.event ? `\n    await context.events["${relationships.event.id}"].publish({ value });` : ""}
+  output: z.object({ value: z.string() }),${relationships.error ? `\n  errors: [${relationships.error.binding}],` : ""}${relationships.event ? `\n  dependencies: { events: { ${relationships.event.binding} } },` : ""}
+  handler: async ({ value }, context) => {${relationships.error ? `\n    if (value === "error") return ${relationships.error.binding}.create({ message: "Example failure" });` : ""}${relationships.event ? `\n    await context.events.${relationships.event.binding}.publish({ value });` : ""}
     return { value };
   },
 });

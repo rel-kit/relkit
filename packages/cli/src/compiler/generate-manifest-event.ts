@@ -17,21 +17,12 @@ export function functionEventTargetExpression(
   input: ManifestGenerationInput,
 ): string | undefined {
   const value = isRecord(descriptor.value) ? descriptor.value : {};
-  const publishes = Array.isArray(value.publishes)
-    ? value.publishes.filter((eventId): eventId is string => typeof eventId === "string")
-    : [];
-  if (value.invocationMode !== "event-only" && publishes.length === 0) return undefined;
+  if (value.invocationMode !== "event-only" || typeof value.event !== "string") return undefined;
   const target = descriptorExpression(descriptor, bindings, input);
-  const consumed =
-    value.invocationMode === "event-only" && typeof value.event === "string"
-      ? eventExpression(value.event, bindings, input)
-      : "undefined";
-  const contracts = publishes.map((eventId) => eventExpression(eventId, bindings, input));
-  return target === undefined ||
-    consumed === undefined ||
-    contracts.some((entry) => entry === undefined)
+  const consumed = eventExpression(value.event, bindings, input);
+  return target === undefined || consumed === undefined
     ? undefined
-    : `__relkit_bindFunctionEvents(${target}, ${consumed}, [${contracts.join(", ")}])`;
+    : `__relkit_bindFunctionEvents(${target}, ${consumed})`;
 }
 
 /**

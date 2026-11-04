@@ -98,7 +98,6 @@ export type DirectTaskInvoker = (request: DirectTaskRequest) => MaybePromise<unk
 export interface DependencyClientBuildOptions {
   readonly ownerId: string;
   readonly dependencies?: DependencyDeclarations;
-  readonly publications?: Readonly<Record<string, DependencyRefLike>>;
   readonly sources?: DependencyClientSources;
   readonly bridge?: DependencyBridge;
   readonly signal?: () => AbortSignal;

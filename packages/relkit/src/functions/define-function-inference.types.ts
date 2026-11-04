@@ -17,7 +17,6 @@ export type FunctionCallOptions<
   InputSchema extends StandardSchemaV1,
   OutputSchema extends StandardSchemaV1,
   Dependencies extends FunctionDependencies,
-  Publishes extends readonly Extract<keyof Relkit.EventRegistry, string>[],
   ProgressSchema extends StandardSchemaV1 | undefined,
 > = Omit<
   DefineFunctionOptions<
@@ -26,26 +25,25 @@ export type FunctionCallOptions<
     OutputSchema,
     Dependencies,
     readonly ErrorDescriptorAny[],
-    Publishes,
     ProgressSchema
   >,
   "handler" | "onBefore" | "onAfter"
 > & {
+  /** Removed: declare each event under `dependencies.events` instead. */
+  readonly publishes?: never;
   readonly onBefore?: FunctionLifecycleHook<
     InferOutput<InputSchema>,
     Dependencies,
-    Publishes,
     ProgressSchema
   >;
   readonly onAfter?: FunctionLifecycleHook<
     InferOutput<OutputSchema>,
     Dependencies,
-    Publishes,
     ProgressSchema
   >;
   readonly handler: (
     input: InferOutput<InputSchema>,
-    context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
+    context: FunctionContext<Dependencies, ProgressValue<ProgressSchema>>,
   ) => unknown;
 };
 

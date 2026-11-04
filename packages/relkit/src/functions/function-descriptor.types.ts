@@ -1,5 +1,5 @@
 import type { DescriptorBase, DescriptorMetadata, MaybePromise } from "../contracts/index.js";
-import type { InferInput, InferOutput, StandardSchemaV1 } from "../schema/index.js";
+import type { InferOutput, StandardSchemaV1 } from "../schema/index.js";
 import type { ErrorDescriptorAny } from "./define-error.js";
 import type { FunctionToolMetadata } from "./function-tool.js";
 import type { FunctionAsTool } from "./function-as-tool.types.js";
@@ -12,7 +12,6 @@ import type {
   FunctionContext,
   FunctionDependencies,
   FunctionDependencyOptions,
-  KnownEventName,
 } from "./function-context.types.js";
 export type { FunctionLifecycleHook } from "./function-lifecycle.types.js";
 
@@ -28,7 +27,6 @@ export interface FunctionDescriptor<
   InputSchema extends StandardSchemaV1 = StandardSchemaV1,
   OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
   ToolMetadata extends FunctionToolMetadata | undefined = undefined,
-  Publishes extends readonly KnownEventName[] = readonly [],
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 >
   extends
@@ -36,20 +34,13 @@ export interface FunctionDescriptor<
     FunctionRef<Id, Input, Output, Errors, InputSchema, OutputSchema> {
   readonly dependencies?: FunctionDependencyOptions<Dependencies>;
   readonly invocationMode: "callable";
-  readonly publishes?: Publishes;
   readonly progress?: ProgressSchema;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly tool?: ToolMetadata;
-  readonly onBefore?: FunctionLifecycleHook<Input, Dependencies, Publishes, ProgressSchema>;
-  readonly onAfter?: FunctionLifecycleHook<Output, Dependencies, Publishes, ProgressSchema>;
-  readonly handler: FunctionHandler<Input, Output, Dependencies, Errors, Publishes, ProgressSchema>;
-  /** Invokes this function through the common runtime.
-   * @param input - Value accepted by the input schema.
-   * @returns Validated output, rejecting with an invocation error on failure.
-   * @example await descriptor.invoke({ id: "one" });
-   */
-  readonly invoke: (input: InferInput<InputSchema>) => Promise<Output>;
+  readonly onBefore?: FunctionLifecycleHook<Input, Dependencies, ProgressSchema>;
+  readonly onAfter?: FunctionLifecycleHook<Output, Dependencies, ProgressSchema>;
+  readonly handler: FunctionHandler<Input, Output, Dependencies, Errors, ProgressSchema>;
   /** Creates a tool view when the output is not a stream.
    * @param options - Optional tool metadata overriding the declared metadata.
    * @returns A tool descriptor derived from this function.
@@ -77,7 +68,6 @@ export interface DefineFunctionOptions<
   OutputSchema extends StandardSchemaV1,
   Dependencies extends FunctionDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  Publishes extends readonly KnownEventName[] = readonly [],
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 > extends DescriptorMetadata {
   readonly id?: Id;
@@ -85,7 +75,6 @@ export interface DefineFunctionOptions<
   readonly output: OutputSchema;
   readonly errors?: Errors;
   readonly dependencies?: Dependencies;
-  readonly publishes?: Publishes;
   readonly progress?: ProgressSchema;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
@@ -93,13 +82,11 @@ export interface DefineFunctionOptions<
   readonly onBefore?: FunctionLifecycleHook<
     InferOutput<InputSchema>,
     Dependencies,
-    Publishes,
     ProgressSchema
   >;
   readonly onAfter?: FunctionLifecycleHook<
     InferOutput<OutputSchema>,
     Dependencies,
-    Publishes,
     ProgressSchema
   >;
   readonly handler: FunctionHandler<
@@ -107,7 +94,6 @@ export interface DefineFunctionOptions<
     InferOutput<OutputSchema>,
     Dependencies,
     Errors,
-    Publishes,
     ProgressSchema
   >;
 }
@@ -123,9 +109,8 @@ export type FunctionHandler<
   Output,
   Dependencies extends FunctionDependencies,
   Errors extends readonly ErrorDescriptorAny[] = readonly ErrorDescriptorAny[],
-  Publishes extends readonly KnownEventName[] = readonly [],
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 > = (
   input: Input,
-  context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
+  context: FunctionContext<Dependencies, ProgressValue<ProgressSchema>>,
 ) => MaybePromise<FunctionHandlerResult<Output, Errors>>;

@@ -59,13 +59,12 @@ describe("testing runtime foundation", () => {
         buckets: {
           assets: { ref: { kind: "bucket", id: "testing.assets" } },
         },
-      },
-      publishes: ["testing.notice"],
-      publications: {
-        "testing.notice": {
-          ref: { kind: "event", id: "testing.notice" },
-          version: 1,
-          input: z.object({ message: z.string() }),
+        events: {
+          notice: {
+            ref: { kind: "event", id: "testing.notice" },
+            version: 1,
+            input: z.object({ message: z.string() }),
+          },
         },
       },
       handler: async (
@@ -77,11 +76,11 @@ describe("testing runtime foundation", () => {
             };
           };
           readonly events: {
-            readonly "testing.notice": { publish(value: unknown): Promise<unknown> };
+            readonly notice: { publish(value: unknown): Promise<unknown> };
           };
         },
       ) => {
-        const result = (await context.events["testing.notice"].publish(input)) as {
+        const result = (await context.events.notice.publish(input)) as {
           readonly accepted: boolean;
         };
         await context.buckets.assets.put(

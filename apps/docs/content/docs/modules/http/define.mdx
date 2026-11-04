@@ -79,7 +79,7 @@ Use `defineRoute` for one method-to-function mapping:
 </include>
 
 This is `POST /echo`. Omit `request` and `responses` when the input schema and output describe ordinary
-JSON correctly. The descriptor selects behavior; it does not call `echo.echo.invoke()` at module load.
+JSON correctly. The descriptor selects behavior; it does not call the `echo` function at module load.
 
 A target must be an ordinary callable function exposed by a service. An event contract, event-only
 subscriber, tool, or agent is not a route target. To expose agent behavior, use a public

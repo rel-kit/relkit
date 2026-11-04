@@ -98,8 +98,9 @@ The path and HTTP method come from `src/routes/orders/route.ts`. The route selec
 `createOrder` operation and returns `201` after it succeeds. The service exposes `createOrder` and
 `priceOrder` from the Orders domain.
 
-`createOrder` validates `orderId`, `sku`, and a positive integer `quantity`, then invokes `priceOrder`.
-That function owns the price rule. The route stays small so the same behavior can serve other callers.
+`createOrder` validates `orderId`, `sku`, and a positive integer `quantity`, then calls `priceOrder`
+through `context.functions.priceOrder`. It can make that call because it declares `priceOrder` under
+`dependencies.functions`. That function owns the price rule. The route stays small so the same behavior can serve other callers.
 
 ```text
 POST /orders → route → Orders service → createOrder → priceOrder → validated JSON

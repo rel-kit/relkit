@@ -28,14 +28,21 @@ import calculateQuote from "./functions/calculate-quote.function.js";
 export default defineService({ functions: { calculateQuote } });
 ```
 
-An orders function can call the public pricing contract. For a pure calculation that needs no provider state:
+An orders function can call the public pricing contract. It declares the function under `dependencies.functions` and calls it through its context:
 
 ```ts
 import pricing from "@app/services/pricing/service.js";
 
-// Inside an orders function handler:
-const quote = await pricing.calculateQuote.invoke({ sku, quantity });
-// Apply the order's acceptance rules to the validated quote.
+export default defineFunction({
+  input,
+  output,
+  dependencies: { functions: { calculateQuote: pricing.calculateQuote } },
+  handler: async ({ sku, quantity }, ctx) => {
+    const quote = await ctx.functions.calculateQuote({ sku, quantity });
+    // Apply the order's acceptance rules to the validated quote.
+    return quote;
+  },
+});
 ```
 
 Use the installed declarations for the calculation's actual input/output. Do not import `pricing/functions/*`, call a foreign handler, or expose the same function as a member of two services. A route for orders targets the orders service; separate URLs alone do not establish domain boundaries.
@@ -44,7 +51,7 @@ For an asynchronous reaction, orders owns and exposes `orders.created`; a consum
 
 ### Invariants and transactions
 
-Name one owner for a command's consistency rules. For example, accepting an order and reserving stock may require one atomic decision. A service call followed by a second write is not proof of an atomic transaction, and `.invoke()` must not be assumed to inherit the caller's transaction or resources.
+Name one owner for a command's consistency rules. For example, accepting an order and reserving stock may require one atomic decision. A service call followed by a second write is not proof of an atomic transaction, and a call through `ctx.functions` must not be assumed to inherit the caller's transaction or resources.
 
 Inspect installed transaction/invocation behavior before composing provider-backed commands. Choose a supported transaction coordinator or keep tightly coupled invariants within one cohesive owner. Define narrow public operations for other domains; do not duplicate another domain's rules or silently write its owned state from arbitrary helpers. Use events for reactions that can occur after commit, with an outbox when publication must survive a crash. Events alone do not preserve synchronous atomicity.
 
@@ -87,7 +94,7 @@ The service also accepts `events`, `tasks`, and `jobs` maps. Its members appear 
 
 Each `service.ts` constructs and exports exactly one runtime service value. Keep ordinary helpers and error descriptors inside their owning domain; expose callable operations through the service's `functions` map. Do not re-export helpers or descriptors from a specialized database or auth `service.ts`.
 
-Within a domain, import a sibling function directly. Across domains and from routes, import the other domain's `service.ts`. Invoke a function descriptor with `await service.greet.invoke(input)`; do not call its handler directly. Leave an internal function out of the service map. Tools, agents, caches, buckets, and event-only functions are not service members.
+Within a domain, import a sibling function directly. Across domains and from routes, import the other domain's `service.ts`. Declare a function you call under `dependencies.functions` and call it with `await ctx.functions.greet(input)`; do not call its handler directly. Code outside handlers, such as raw routes and middleware, uses `getRelkit().functions.<service>.<member>(input)`. Leave an internal function out of the service map. Tools, agents, caches, buckets, and event-only functions are not service members.
 
 ## `defineEvent` and `defineEventFunction`
 
@@ -114,7 +121,7 @@ declare global {
 export default orderCreated;
 ```
 
-Expose it through `defineService({ events: { orderCreated } })` when other domains need it. A publisher declares the exact ID in `publishes: ["orders.created"]` and calls `await context.events["orders.created"].publish({ orderId })`.
+Expose it through `defineService({ events: { orderCreated } })` when other domains need it. A publisher declares the event under `dependencies: { events: { orderCreated } }` and calls `await ctx.events.orderCreated.publish({ orderId })`.
 
 An event-only consumer in `src/services/notifications/functions/` reacts without returning a result to its publisher:
 

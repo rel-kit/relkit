@@ -64,7 +64,6 @@ export interface DefineTaskOptions<
   OutputSchema extends StandardSchemaV1,
   Dependencies extends TaskDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  Publishes extends readonly PublishedEventName[] = readonly [],
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   Streams extends TaskStreamSchemas = {},
   Execution extends TaskExecution = "durable",
@@ -77,7 +76,6 @@ export interface DefineTaskOptions<
   readonly errors?: Errors;
   readonly execution?: Execution;
   readonly dependencies?: ValidTaskDependencies<Dependencies>;
-  readonly publishes?: Publishes;
   readonly progress?: ProgressSchema;
   readonly streams?: Streams;
   readonly observation?: TaskObservation<Streams, ProgressSchema>;
@@ -87,9 +85,9 @@ export interface DefineTaskOptions<
   readonly maxDuration?: DurationInput;
   readonly maxElapsed?: DurationInput;
   readonly logging?: TaskLogging;
-  readonly onStart?: TaskStartHook<InputSchema, Dependencies, Publishes>;
-  readonly onSuccess?: TaskSuccessHook<OutputSchema, Dependencies, Publishes>;
-  readonly onFailure?: TaskFailureHook<Dependencies, Publishes>;
+  readonly onStart?: TaskStartHook<InputSchema, Dependencies>;
+  readonly onSuccess?: TaskSuccessHook<OutputSchema, Dependencies>;
+  readonly onFailure?: TaskFailureHook<Dependencies>;
   readonly handler: TaskHandler<
     InputSchema,
     OutputSchema,
@@ -97,8 +95,7 @@ export interface DefineTaskOptions<
     Dependencies,
     Errors,
     ProgressSchema,
-    Streams,
-    Publishes
+    Streams
   >;
 }
 
@@ -110,7 +107,6 @@ export interface TaskDescriptor<
   OutputSchema extends StandardSchemaV1,
   Dependencies extends TaskDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  Publishes extends readonly string[] = readonly [],
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   Streams extends TaskStreamSchemas = {},
   Execution extends TaskExecution = TaskExecution,
@@ -120,7 +116,6 @@ export interface TaskDescriptor<
   readonly execution: Execution;
   readonly inputWire?: StandardSchemaV1<InferOutput<InputSchema>, InferOutput<InputSchema>>;
   readonly dependencies?: Dependencies;
-  readonly publishes?: Publishes;
   readonly progress?: ProgressSchema;
   readonly streams?: Streams;
   readonly observation?: TaskObservation<Streams, ProgressSchema>;
@@ -130,9 +125,9 @@ export interface TaskDescriptor<
   readonly maxDuration?: DurationInput;
   readonly maxElapsed?: DurationInput;
   readonly logging?: TaskLogging;
-  readonly onStart?: TaskStartHook<InputSchema, Dependencies, Publishes>;
-  readonly onSuccess?: TaskSuccessHook<OutputSchema, Dependencies, Publishes>;
-  readonly onFailure?: TaskFailureHook<Dependencies, Publishes>;
+  readonly onStart?: TaskStartHook<InputSchema, Dependencies>;
+  readonly onSuccess?: TaskSuccessHook<OutputSchema, Dependencies>;
+  readonly onFailure?: TaskFailureHook<Dependencies>;
   readonly handler: TaskHandler<
     InputSchema,
     OutputSchema,
@@ -140,8 +135,7 @@ export interface TaskDescriptor<
     Dependencies,
     Errors,
     ProgressSchema,
-    Streams,
-    Publishes
+    Streams
   >;
   readonly trigger: (
     input: InferInput<InputSchema>,
@@ -156,7 +150,6 @@ export type TaskDescriptorAny = DescriptorBase<"task", string> &
     readonly execution: TaskExecution;
     readonly inputWire?: StandardSchemaV1 | undefined;
     readonly dependencies?: TaskDependencies | undefined;
-    readonly publishes?: readonly string[] | undefined;
     readonly progress?: StandardSchemaV1 | undefined;
     readonly streams?: TaskStreamSchemas | undefined;
     readonly observation?: TaskObservation | undefined;

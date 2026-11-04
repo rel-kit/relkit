@@ -87,7 +87,7 @@ const progressInput: TaskProgressInput<typeof transformedOutput> = "7";
 const progressOutput: TaskProgressOutput<typeof transformedOutput> = 7;
 const streamInput: TaskStreamInput<typeof transformedOutput> = "7";
 const streamOutput: TaskStreamOutput<typeof transformedOutput> = 7;
-const successHook: TaskSuccessHook<typeof transformedOutput, {}, []> = async (value) => {
+const successHook: TaskSuccessHook<typeof transformedOutput, {}> = async (value) => {
   const canonical: number = value;
   void canonical;
 };
@@ -98,8 +98,7 @@ type DirectionalHandler = TaskHandler<
   {},
   readonly [],
   undefined,
-  {},
-  readonly []
+  {}
 >;
 void callerInput;
 void canonicalInput;

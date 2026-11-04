@@ -127,6 +127,18 @@ export function dependencyMetadata(value: unknown): JsonValue {
   return { ...cleaned, ...projected };
 }
 
+/**
+ * Lists the event IDs declared under `dependencies.events`, sorted.
+ * @param value - Declared dependency maps inspected without coercion.
+ * @returns Published event IDs.
+ */
+export function publishedEvents(value: unknown): JsonValue {
+  const events = isRecord(value) && isRecord(value.events) ? value.events : {};
+  return [
+    ...new Set(Object.values(events).flatMap((event) => refId(event) ?? [])),
+  ].sort();
+}
+
 /** Dependency maps recorded in the graph as references rather than whole descriptors. */
 const referenceCategories: Readonly<Record<string, string>> = {
   functions: "function",

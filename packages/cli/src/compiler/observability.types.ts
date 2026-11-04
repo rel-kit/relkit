@@ -160,7 +160,6 @@ export type CompilerOperation =
   | "validateProviderProfile"
   | "validateProviderReleaseSources"
   | "validateProviderSingletons"
-  | "validatePublishes"
   | "validateRateLimit"
   | "validateRateLimitStore"
   | "validateServiceFile"

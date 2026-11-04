@@ -6298,7 +6298,6 @@ declare const defineTaskValue: <
   const OutputSchema extends StandardSchemaV1,
   const Dependencies extends TaskDependencies = {},
   const Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  const Publishes extends readonly PublishedEventName[] = readonly [],
   const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   const Streams extends TaskStreamSchemas = {},
   const Execution extends TaskExecution = "durable",
@@ -6310,7 +6309,6 @@ declare const defineTaskValue: <
     OutputSchema,
     Dependencies,
     Errors,
-    Publishes,
     ProgressSchema,
     Streams,
     Execution
@@ -6322,7 +6320,6 @@ declare const defineTaskValue: <
   OutputSchema,
   Dependencies,
   Errors,
-  Publishes,
   ProgressSchema,
   Streams,
   Execution
@@ -6349,7 +6346,7 @@ isTaskDescriptorValue(candidate);
 declare const isTaskDescriptorValue: (value: unknown) => value is TaskDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task-value.ts#L177)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task-value.ts#L175)
 
 ## `define-task.ts`
 
@@ -6386,7 +6383,6 @@ declare const defineTask: <
   const OutputSchema extends StandardSchemaV1,
   const Dependencies extends TaskDependencies = {},
   const Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  const Publishes extends readonly PublishedEventName[] = readonly [],
   const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   const Streams extends TaskStreamSchemas = {},
   const Execution extends TaskExecution = "durable",
@@ -6398,7 +6394,6 @@ declare const defineTask: <
     OutputSchema,
     Dependencies,
     Errors,
-    Publishes,
     ProgressSchema,
     Streams,
     Execution
@@ -6410,14 +6405,13 @@ declare const defineTask: <
   OutputSchema,
   Dependencies,
   Errors,
-  Publishes,
   ProgressSchema,
   Streams,
   Execution
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L75)
 
 Since v0.4.1
 
@@ -6459,7 +6453,7 @@ assertTaskDescriptor(task);
 declare const assertTaskDescriptor: (value: unknown) => asserts value is TaskDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L158)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L153)
 
 ### assertTaskDescriptorEffect
 
@@ -6479,7 +6473,7 @@ declare const assertTaskDescriptorEffect: (
 ) => Effect.Effect<undefined, TaskDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L141)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L136)
 
 ### defineTaskEffect
 
@@ -6501,7 +6495,6 @@ declare const defineTaskEffect: <
   const OutputSchema extends StandardSchemaV1,
   const Dependencies extends TaskDependencies = {},
   const Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  const Publishes extends readonly PublishedEventName[] = readonly [],
   const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   const Streams extends Readonly<Record<string, StandardSchemaV1<unknown, unknown>>> = {},
   const Execution extends TaskExecution = "durable",
@@ -6513,7 +6506,6 @@ declare const defineTaskEffect: <
     OutputSchema,
     Dependencies,
     Errors,
-    Publishes,
     ProgressSchema,
     Streams,
     Execution
@@ -6526,7 +6518,6 @@ declare const defineTaskEffect: <
     OutputSchema,
     Dependencies,
     Errors,
-    Publishes,
     ProgressSchema,
     Streams,
     Execution
@@ -6554,7 +6545,7 @@ if (isTaskDescriptor(value)) console.log(value.id);
 declare const isTaskDescriptor: (value: unknown) => value is TaskDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L133)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L128)
 
 ### isTaskDescriptorEffect
 
@@ -6572,7 +6563,7 @@ Effect.runSync(isTaskDescriptorEffect(value));
 declare const isTaskDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L122)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L117)
 
 ## `duration.ts`
 
@@ -16357,8 +16348,7 @@ type TaskContext<
   Dependencies extends TaskDependencies = {},
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   Streams extends TaskStreamSchemas = {},
-  Publishes extends readonly string[] = readonly [],
-> = TaskContextBase<Dependencies, Publishes> &
+> = TaskContextBase<Dependencies> &
   (Execution extends "durable"
     ? {
         readonly sleep: (duration: DurationInput, options: TaskSleepOptions) => Promise<void>;
@@ -16371,7 +16361,7 @@ type TaskContext<
   ([keyof Streams] extends [never] ? {} : { readonly streams: TaskStreamEmitters<Streams> });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L146)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L140)
 
 ### TaskContextBase (interface)
 
@@ -16380,10 +16370,7 @@ Common invocation context shared by task handlers and hooks.
 **Signature**
 
 ```ts
-export interface TaskContextBase<
-  Dependencies extends TaskDependencies = {},
-  Publishes extends readonly string[] = readonly [],
-> {
+export interface TaskContextBase<Dependencies extends TaskDependencies = {}> {
   readonly run: TaskRunContext;
   readonly invocation: InvocationMetadata;
   readonly signal: AbortSignal;
@@ -16399,8 +16386,7 @@ export interface TaskContextBase<
   readonly agents: AgentClients<Dependencies["agents"]>;
   readonly buckets: BucketClients<Dependencies["buckets"]>;
   readonly cache: CacheClients<Dependencies["cache"]>;
-  readonly events: EventClients<PublishedEventMap<Publishes>> &
-    EventClients<Dependencies["events"]>;
+  readonly events: EventClients<Dependencies["events"]>;
   readonly database: RegisteredContext<"database", Readonly<Record<string, never>>>;
   readonly auth: RegisteredContext<"auth", TaskAuthContext>;
   readonly constants: RegisteredContext<"constants", Readonly<Record<string, never>>>;
@@ -16409,7 +16395,7 @@ export interface TaskContextBase<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L114)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L110)
 
 ### TaskDependencies (interface)
 
@@ -16431,7 +16417,7 @@ export interface TaskDependencies {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L82)
 
 ### TaskExecution (type alias)
 
@@ -16452,13 +16438,10 @@ Invocation context visible to task lifecycle hooks.
 **Signature**
 
 ```ts
-type TaskHookContext<
-  Dependencies extends TaskDependencies = {},
-  Publishes extends readonly string[] = readonly [],
-> = TaskContextBase<Dependencies, Publishes>;
+type TaskHookContext<Dependencies extends TaskDependencies = {}> = TaskContextBase<Dependencies>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L165)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L158)
 
 ### TaskProgressEmitter
 
@@ -16532,7 +16515,7 @@ export interface TaskRunContext {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L95)
 
 ### TaskSleepOptions
 
@@ -16614,7 +16597,7 @@ Named item schemas used to validate task stream emissions.
 type TaskStreamSchemas = Readonly<Record<string, StandardSchemaV1>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L143)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L137)
 
 ### TaskTriggerOptions
 
@@ -16735,13 +16718,13 @@ Hook invoked after task execution fails.
 **Signature**
 
 ```ts
-type TaskFailureHook<
-  Dependencies extends TaskDependencies,
-  Publishes extends readonly string[] = readonly [],
-> = (error: unknown, context: TaskHookContext<Dependencies, Publishes>) => Promise<void>;
+type TaskFailureHook<Dependencies extends TaskDependencies> = (
+  error: unknown,
+  context: TaskHookContext<Dependencies>,
+) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L49)
 
 ### TaskHandler (type alias)
 
@@ -16758,10 +16741,9 @@ type TaskHandler<
   Errors extends readonly ErrorDescriptorAny[],
   ProgressSchema extends StandardSchemaV1 | undefined,
   Streams extends TaskStreamSchemas,
-  Publishes extends readonly string[],
 > = (
   input: InferOutput<InputSchema>,
-  context: TaskContext<Execution, Dependencies, ProgressSchema, Streams, Publishes>,
+  context: TaskContext<Execution, Dependencies, ProgressSchema, Streams>,
 ) => MaybePromise<TaskHandlerResult<InferInput<OutputSchema>, Errors>>;
 ```
 
@@ -16778,7 +16760,7 @@ type TaskHandlerResult<Output, Errors extends readonly ErrorDescriptorAny[]> =
   Output | DeclaredErrorsOf<Errors> | FunctionFailure<DeclaredErrorsOf<Errors>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L27)
 
 ### TaskLogging (interface)
 
@@ -16793,7 +16775,7 @@ export interface TaskLogging {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L63)
 
 ### TaskObservation (interface)
 
@@ -16811,7 +16793,7 @@ export interface TaskObservation<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L54)
 
 ### TaskStartHook (type alias)
 
@@ -16820,17 +16802,13 @@ Hook invoked before task execution begins.
 **Signature**
 
 ```ts
-type TaskStartHook<
-  InputSchema extends StandardSchemaV1,
-  Dependencies extends TaskDependencies,
-  Publishes extends readonly string[] = readonly [],
-> = (
+type TaskStartHook<InputSchema extends StandardSchemaV1, Dependencies extends TaskDependencies> = (
   input: InferOutput<InputSchema>,
-  context: TaskHookContext<Dependencies, Publishes>,
+  context: TaskHookContext<Dependencies>,
 ) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L31)
 
 ### TaskSuccessHook (type alias)
 
@@ -16842,14 +16820,10 @@ Hook invoked after a task completes successfully.
 type TaskSuccessHook<
   OutputSchema extends StandardSchemaV1,
   Dependencies extends TaskDependencies,
-  Publishes extends readonly string[] = readonly [],
-> = (
-  output: InferOutput<OutputSchema>,
-  context: TaskHookContext<Dependencies, Publishes>,
-) => Promise<void>;
+> = (output: InferOutput<OutputSchema>, context: TaskHookContext<Dependencies>) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L40)
 
 ## `task-definition.types.ts`
 
@@ -16867,7 +16841,6 @@ export interface DefineTaskOptions<
   OutputSchema extends StandardSchemaV1,
   Dependencies extends TaskDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  Publishes extends readonly PublishedEventName[] = readonly [],
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   Streams extends TaskStreamSchemas = {},
   Execution extends TaskExecution = "durable",
@@ -16880,7 +16853,6 @@ export interface DefineTaskOptions<
   readonly errors?: Errors;
   readonly execution?: Execution;
   readonly dependencies?: ValidTaskDependencies<Dependencies>;
-  readonly publishes?: Publishes;
   readonly progress?: ProgressSchema;
   readonly streams?: Streams;
   readonly observation?: TaskObservation<Streams, ProgressSchema>;
@@ -16890,9 +16862,9 @@ export interface DefineTaskOptions<
   readonly maxDuration?: DurationInput;
   readonly maxElapsed?: DurationInput;
   readonly logging?: TaskLogging;
-  readonly onStart?: TaskStartHook<InputSchema, Dependencies, Publishes>;
-  readonly onSuccess?: TaskSuccessHook<OutputSchema, Dependencies, Publishes>;
-  readonly onFailure?: TaskFailureHook<Dependencies, Publishes>;
+  readonly onStart?: TaskStartHook<InputSchema, Dependencies>;
+  readonly onSuccess?: TaskSuccessHook<OutputSchema, Dependencies>;
+  readonly onFailure?: TaskFailureHook<Dependencies>;
   readonly handler: TaskHandler<
     InputSchema,
     OutputSchema,
@@ -16900,8 +16872,7 @@ export interface DefineTaskOptions<
     Dependencies,
     Errors,
     ProgressSchema,
-    Streams,
-    Publishes
+    Streams
   >;
 }
 ```
@@ -16942,7 +16913,6 @@ export interface TaskDescriptor<
   OutputSchema extends StandardSchemaV1,
   Dependencies extends TaskDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  Publishes extends readonly string[] = readonly [],
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   Streams extends TaskStreamSchemas = {},
   Execution extends TaskExecution = TaskExecution,
@@ -16952,7 +16922,6 @@ export interface TaskDescriptor<
   readonly execution: Execution;
   readonly inputWire?: StandardSchemaV1<InferOutput<InputSchema>, InferOutput<InputSchema>>;
   readonly dependencies?: Dependencies;
-  readonly publishes?: Publishes;
   readonly progress?: ProgressSchema;
   readonly streams?: Streams;
   readonly observation?: TaskObservation<Streams, ProgressSchema>;
@@ -16962,9 +16931,9 @@ export interface TaskDescriptor<
   readonly maxDuration?: DurationInput;
   readonly maxElapsed?: DurationInput;
   readonly logging?: TaskLogging;
-  readonly onStart?: TaskStartHook<InputSchema, Dependencies, Publishes>;
-  readonly onSuccess?: TaskSuccessHook<OutputSchema, Dependencies, Publishes>;
-  readonly onFailure?: TaskFailureHook<Dependencies, Publishes>;
+  readonly onStart?: TaskStartHook<InputSchema, Dependencies>;
+  readonly onSuccess?: TaskSuccessHook<OutputSchema, Dependencies>;
+  readonly onFailure?: TaskFailureHook<Dependencies>;
   readonly handler: TaskHandler<
     InputSchema,
     OutputSchema,
@@ -16972,8 +16941,7 @@ export interface TaskDescriptor<
     Dependencies,
     Errors,
     ProgressSchema,
-    Streams,
-    Publishes
+    Streams
   >;
   readonly trigger: (
     input: InferInput<InputSchema>,
@@ -16982,7 +16950,7 @@ export interface TaskDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L106)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L103)
 
 ### TaskDescriptorAny (type alias)
 
@@ -16997,7 +16965,6 @@ type TaskDescriptorAny = DescriptorBase<"task", string> &
     readonly execution: TaskExecution;
     readonly inputWire?: StandardSchemaV1 | undefined;
     readonly dependencies?: TaskDependencies | undefined;
-    readonly publishes?: readonly string[] | undefined;
     readonly progress?: StandardSchemaV1 | undefined;
     readonly streams?: TaskStreamSchemas | undefined;
     readonly observation?: TaskObservation | undefined;
@@ -17015,14 +16982,14 @@ type TaskDescriptorAny = DescriptorBase<"task", string> &
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L153)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L147)
 
 ### TaskFailureHook
 
 **Signature**
 
 ```ts
-declare const TaskFailureHook: TaskFailureHook<Dependencies, Publishes>;
+declare const TaskFailureHook: TaskFailureHook<Dependencies>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L39)
@@ -17039,8 +17006,7 @@ declare const TaskHandler: TaskHandler<
   Dependencies,
   Errors,
   ProgressSchema,
-  Streams,
-  Publishes
+  Streams
 >;
 ```
 
@@ -17111,7 +17077,7 @@ declare const TaskRawHandlerOutput: TaskRawHandlerOutput<T>;
 **Signature**
 
 ```ts
-declare const TaskStartHook: TaskStartHook<InputSchema, Dependencies, Publishes>;
+declare const TaskStartHook: TaskStartHook<InputSchema, Dependencies>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L44)
@@ -17121,7 +17087,7 @@ declare const TaskStartHook: TaskStartHook<InputSchema, Dependencies, Publishes>
 **Signature**
 
 ```ts
-declare const TaskSuccessHook: TaskSuccessHook<OutputSchema, Dependencies, Publishes>;
+declare const TaskSuccessHook: TaskSuccessHook<OutputSchema, Dependencies>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L45)

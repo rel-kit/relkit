@@ -69,13 +69,8 @@ export function makeStandaloneContextEffect<Context extends { readonly signal: A
         options.clients?.events ?? (base as { events?: Readonly<Record<string, unknown>> }).events;
       const events = yield* configuredMapEffect(
         "events",
-        Object.fromEntries([
-          ...options.publishes.flatMap((id) =>
-            eventSource !== undefined && Object.hasOwn(eventSource, id)
-              ? [[id, eventSource[id]]]
-              : [],
-          ),
-          ...Object.entries(options.dependencies?.events ?? {}).flatMap(([name, event]) => {
+        Object.fromEntries(
+          Object.entries(options.dependencies?.events ?? {}).flatMap(([name, event]) => {
             const id = refIdOf(event);
             const source =
               eventSource === undefined
@@ -87,7 +82,7 @@ export function makeStandaloneContextEffect<Context extends { readonly signal: A
                     : undefined;
             return source === undefined ? [] : [[name, source]];
           }),
-        ]),
+        ),
       );
       return Object.freeze({
         ...base,

@@ -34,13 +34,6 @@ export const validateEventCompatibilityEffect = Effect.fn("Compiler.validateEven
             }
           }
           if (descriptor.kind === "function") yield* validateEventFunctionEffect(work, descriptor);
-          if (descriptor.kind === "task") {
-            yield* validatePublishesEffect(
-              work,
-              descriptor,
-              isRecord(descriptor.value) ? descriptor.value.publishes : undefined,
-            );
-          }
           if (descriptor.kind === "event-trigger") validateEventTrigger(work, descriptor);
         }),
       { discard: true },
@@ -68,14 +61,13 @@ export function validateEventCompatibility(work: NormalizationWork): void {
  * Checks event-only function metadata against its event contract.
  * @param work - Invocation-owned normalization state, indexes, and diagnostics.
  * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
- * @returns A lazy effect updating diagnostics; publication validation composes in the caller's runtime.
+ * @returns A lazy effect updating diagnostics.
  */
 const validateEventFunctionEffect = Effect.fnUntraced(function* (
   work: NormalizationWork,
   descriptor: NormalizedDescriptor,
 ) {
   const value = isRecord(descriptor.value) ? descriptor.value : {};
-  yield* validatePublishesEffect(work, descriptor, value.publishes);
   if (value.invocationMode !== "event-only") return;
   const eventId = value.event;
   if (typeof eventId !== "string" || !work.referencesByKind.get("event")?.has(eventId)) {
@@ -127,76 +119,3 @@ function validateEventTrigger(work: NormalizationWork, descriptor: NormalizedDes
   }
 }
 
-/**
- * Checks publication references against declared event contracts.
- * @param work - Invocation-owned descriptors, indexes, and diagnostics.
- * @param descriptor - Descriptor whose contract is checked.
- * @param publishes - Declared publishes for the validation.
- * @returns A lazy effect yielding the checked result; findings append to the workspace diagnostics.
- * @remarks Unexpected metadata access failures remain defects.
- * @see {@link normalizeCompilationEffect} for ordered stage composition.
- */
-export const validatePublishesEffect = Effect.fn("Compiler.validatePublishes")(
-  function* (work: NormalizationWork, descriptor: NormalizedDescriptor, publishes: unknown) {
-    const owner = descriptor.kind === "task" ? "Task" : "Function";
-    if (publishes === undefined) return;
-    if (!Array.isArray(publishes)) {
-      add(
-        work,
-        descriptor,
-        NORMALIZE_CODES.publishes,
-        `${owner} "${descriptor.id}" publishes must be an array.`,
-      );
-      return;
-    }
-    const seen = new Set<string>();
-    for (const entry of publishes) {
-      if (typeof entry !== "string" || !work.referencesByKind.get("event")?.has(entry)) {
-        add(
-          work,
-          descriptor,
-          NORMALIZE_CODES.publishes,
-          `${owner} "${descriptor.id}" publishes unknown event "${String(entry)}".`,
-          "error",
-          undefined,
-          "Use a registered event ID in publishes.",
-        );
-        continue;
-      }
-      if (seen.has(entry)) {
-        add(
-          work,
-          descriptor,
-          NORMALIZE_CODES.publishesDuplicate,
-          `${owner} "${descriptor.id}" publishes event "${entry}" more than once.`,
-          "error",
-          undefined,
-          `Remove the duplicate "${entry}" entry from publishes.`,
-        );
-      }
-      seen.add(entry);
-    }
-  },
-  (effect, work, descriptor, publishes) =>
-    observeCompiler("normalization", "validatePublishes", effect, () => ({
-      descriptors: work.descriptors.length,
-      diagnostics: work.diagnostics.length,
-    })),
-);
-
-/**
- * Checks publication references against declared event contracts.
- * @param work - Invocation-owned descriptors, indexes, and diagnostics.
- * @param descriptor - Descriptor whose contract is checked.
- * @param publishes - Declared publishes for the validation.
- * @returns The checked result after executing the Effect at the compatibility boundary.
- * @remarks Unexpected metadata access failures remain defects.
- * @see {@link normalizeCompilationEffect} for ordered stage composition.
- */
-export function validatePublishes(
-  work: NormalizationWork,
-  descriptor: NormalizedDescriptor,
-  publishes: unknown,
-): void {
-  return runCompilerSync(validatePublishesEffect(work, descriptor, publishes));
-}

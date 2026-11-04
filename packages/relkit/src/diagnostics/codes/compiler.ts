@@ -268,19 +268,6 @@ export const compilerCodes = [
     fix: "Define the event with `defineEvent`, or fix the name so it matches an event that exists.",
   },
   {
-    code: "RELKIT_EVENT_PUBLICATION_DUPLICATE",
-    title: "Event is listed twice in publishes",
-    happened: "A function lists the same event more than once in `publishes`.",
-    fix: "Remove the duplicate entry from `publishes`.",
-  },
-  {
-    code: "RELKIT_EVENT_PUBLICATION_UNKNOWN",
-    title: "Published event is not defined",
-    happened:
-      "A function's `publishes` option is not an array, or it lists an event that is not defined in your app.",
-    fix: "Make `publishes` an array of events defined with `defineEvent`.",
-  },
-  {
     code: "RELKIT_EVENT_TARGET_INCOMPATIBLE",
     title: "Event trigger targets a regular function",
     happened: "An event trigger points at a function that is not an event function.",

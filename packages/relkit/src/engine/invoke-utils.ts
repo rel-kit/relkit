@@ -50,24 +50,17 @@ export function resolveTarget<Input, Output, Context extends { readonly signal: 
   };
 }
 
-/** Validate publication declarations and preserve the descriptor's bound identity.
+/** Preserve the descriptor's bound identity.
  * @typeParam Input - Validated handler input type.
  * @typeParam Output - Validated handler output type.
  * @typeParam Context - Handler context carrying cancellation authority.
- * @returns The identity-bound target; malformed publications throw TypeError.
+ * @returns The identity-bound target.
  * @param target - Declared target whose schema and metadata govern execution.
  */
 export function canonicalTarget<Input, Output, Context extends { readonly signal: AbortSignal }>(
   target: InvocationTarget<Input, Output, Context>,
 ): InvocationTarget<Input, Output, Context> {
   const id = getDescriptorIdentity(target);
-  for (const [eventId, event] of Object.entries(target.publications ?? {})) {
-    if (!target.publishes?.includes(eventId) || (event.ref?.id ?? event.id) !== eventId) {
-      throw new TypeError(
-        `Function "${id}" has an undeclared publication "${eventId}"; declare its exact ID in publishes.`,
-      );
-    }
-  }
   return target.id === id ? target : { ...target, id };
 }
 

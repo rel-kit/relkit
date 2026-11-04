@@ -48,7 +48,7 @@ export interface ChannelReplay {
   readonly retentionMs: number;
   readonly maxEvents: number;
 }
-/** A typed channel descriptor with backend publication methods.
+/** A typed channel descriptor; functions reach it through `dependencies.channels`.
  * @example const channel: ChannelDescriptorAny = defineChannel(options);
  * @experimental
  */
@@ -65,38 +65,7 @@ export type ChannelDescriptor<
   readonly client?: Client;
   readonly replay?: ChannelReplay;
   readonly presence?: Presence;
-  /** Validates and publishes one event through the bound dispatcher.
-   * @param params - Schema input for channel parameters.
-   * @param event - One of the declared event names.
-   * @param payload - Input for the selected event schema.
-   * @param options - Optional idempotency key.
-   * @returns A trigger receipt or validation/provider rejection.
-   * @example await channel.trigger({ orderId: "o1" }, "changed", { status: "paid" });
-   */
-  readonly trigger: <Name extends Extract<keyof Events, string>>(
-    params: InferInput<ParamsSchema>,
-    event: Name,
-    payload: InferInput<Events[Name]>,
-    options?: { readonly idempotencyKey?: OperationId },
-  ) => Promise<TriggerReceipt>;
-} & ([Presence] extends [undefined]
-    ? {}
-    : {
-        /** Reads validated presence through the bound dispatcher.
-         * @param params - Schema input for channel parameters.
-         * @returns Count or member presence, or a validation/provider rejection.
-         * @example await channel.getPresence({ orderId: "o1" });
-         */
-        readonly getPresence: (
-          params: InferInput<ParamsSchema>,
-        ) => Promise<PresenceResult<Presence>>;
-      });
-/** Maps a presence policy to its observable result. */
-type PresenceResult<Presence> = Presence extends "count"
-  ? CountPresence
-  : Presence extends MemberPresenceDescriptor<infer Schema>
-    ? MemberPresence<InferOutput<Schema>>
-    : never;
+};
 /** Erased descriptor type retained for existing public API consumers.
  * @example const channel: ChannelDescriptorAny = registry.get("news");
  * @experimental
@@ -109,7 +78,6 @@ export type ChannelDescriptorAny = ChannelDescriptor<
   ChannelPresence | undefined
 >;
 /** Descriptor data read by provider and transport boundaries.
- * Typed trigger methods remain on ChannelDescriptor; providers read only this data.
  * @example const data: ChannelDescriptorData = defineChannel(options);
  * @experimental
  */

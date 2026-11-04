@@ -9,7 +9,7 @@ import {
 import { createFunctionDescriptor } from "../../src/functions/function-descriptor-factory.js";
 import {
   copyDependencies,
-  copyPublishes,
+  rejectPublishes,
   validateLimit,
 } from "../../src/functions/define-function-validation.js";
 import { FunctionOperationError } from "../../src/functions/function-observability.js";
@@ -122,11 +122,10 @@ describe("function definition validation", () => {
     ).toThrow("Stream-output functions cannot declare tool metadata");
   });
 
-  test("copies valid dependency and publish lists, and rejects bad entries", () => {
+  test("copies valid dependency maps, rejects bad entries and the removed publish list", () => {
     expect(copyDependencies(undefined)).toBeUndefined();
-    expect(copyPublishes([" orders.created "])).toEqual(["orders.created"]);
-    expect(() => copyPublishes(["orders.created", "orders.created"])).toThrow("must be unique");
-    expect(() => copyPublishes([""])).toThrow("non-empty event IDs");
+    expect(() => rejectPublishes(undefined)).not.toThrow();
+    expect(() => rejectPublishes(["orders.created"])).toThrow("`publishes` was removed");
     expect(copyDependencies({ functions: {}, events: {}, channels: {}, databases: {} })).toEqual({
       functions: {},
       events: {},

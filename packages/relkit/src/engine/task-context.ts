@@ -112,7 +112,6 @@ export const materializeTaskContextEffect = Effect.fn("Engine.materializeTaskCon
             dependencies: options.task
               .dependencies as unknown as import("./dependencies.js").DependencyDeclarations,
           }),
-      ...(options.publications === undefined ? {} : { publications: options.publications }),
       ...(options.clients === undefined ? {} : { clients: options.clients }),
       ...(options.invokeTask === undefined ? {} : { invokeTask: options.invokeTask }),
     });

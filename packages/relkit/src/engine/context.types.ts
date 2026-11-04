@@ -19,7 +19,6 @@ export interface InvocationContextBase {
 export interface ContextBuildOptions {
   readonly ownerId: string;
   readonly dependencies?: DependencyDeclarations;
-  readonly publications?: Readonly<Record<string, import("./dependencies.js").DependencyRefLike>>;
   readonly clients?: DependencyClientSources;
   readonly bridge?: DependencyBridge;
   readonly signal?: () => AbortSignal;

@@ -20,5 +20,4 @@ export interface TaskContextMaterializationOptions {
   ) => Promise<TaskContextBase> | TaskContextBase;
   readonly clients?: DependencyClientSources;
   readonly invokeTask?: DirectTaskInvoker;
-  readonly publications?: Readonly<Record<string, import("./dependencies.js").DependencyRefLike>>;
 }

@@ -27,15 +27,14 @@ export type ErrorListOf<Options> = Options extends {
 export type EventFunctionCallOptions<
   Id extends string,
   Event extends EventName,
-  Publishes extends readonly EventName[],
   Dependencies extends FunctionDependencies,
 > = Omit<
-  DefineEventFunctionOptions<Id, Event, Publishes, Dependencies, readonly ErrorDescriptorAny[]>,
+  DefineEventFunctionOptions<Id, Event, Dependencies, readonly ErrorDescriptorAny[]>,
   "handler"
 > & {
   readonly handler: (
     input: EventInputByName<Event>,
-    context: EventFunctionContext<Event, Publishes, Dependencies>,
+    context: EventFunctionContext<Event, Dependencies>,
   ) => unknown;
 };
 

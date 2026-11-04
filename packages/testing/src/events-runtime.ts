@@ -51,15 +51,10 @@ export async function createTestEventRuntime<Payload, Output>(
   const contract =
     options.event ??
     defineEvent({ id: eventId, version, input: options.payloadSchema ?? z.unknown() });
-  const contracts = [contract, ...(options.events ?? [])];
   const targets = new Map(
     triggers.map(({ target }) => [
       target.id,
-      bindFunctionEvents(
-        target,
-        contract,
-        contracts.filter((event) => target.publishes?.includes(event.id)),
-      ) as unknown as InvocationTarget<unknown, unknown>,
+      bindFunctionEvents(target, contract) as unknown as InvocationTarget<unknown, unknown>,
     ]),
   );
   const workState = Ref.makeUnsafe<EventRuntimeState>({

@@ -81,37 +81,37 @@ This generates a file you then fill in, something like this:
 ```ts
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "zod";
+import orderCreated from "../events/order-created.event.js";
 const createOrder = defineFunction({
   input: z.object({}),
   output: z.object({}),
-  publishes: ["orders.created"],
+  dependencies: { events: { orderCreated } },
   handler: async (input, context) => {
     const order = {};
-    await context.events["orders.created"].publish(order);
+    await context.events.orderCreated.publish(order);
     return order;
   },
 });
 export default createOrder;
 ```
 
-Fill `input` and `output` with your own schemas; they're validated on every call, and `publishes` is how a function declares, up front, which events it's allowed to send. No surprise side effects.
+Fill `input` and `output` with your own schemas; they're validated on every call, and `dependencies` is how a function declares, up front, everything it calls: the events it sends, the functions it uses, its caches and its database. No surprise side effects.
 
 You can use the same function in different places:
 
-- Inside its own domain, call it directly: `createOrder.invoke({ ... })`
-- From another domain, go through its service: `orders.createOrder.invoke({ ... })`
+- From another function, declare it under `dependencies.functions` and call `context.functions.createOrder({ ... })`
 - From HTTP, give it to a route as a target: `defineRoute({ target: orders.createOrder })`
 
 And since it’s just a function, testing it doesn’t need a server: `invokeFunction(orders.createOrder, { ... })` from `@relkit/testing` and you're done.
 
-Functions aren’t locked inside handlers either. A function is just a module you import, so any backend code in your app can call it, and it still goes through the same validation, timeouts and tracing as an HTTP request:
+Functions aren’t locked inside handlers either. Code outside a handler, such as middleware or a raw route, gets the running application with `getRelkit()`, and its calls go through the same validation, timeouts and tracing as an HTTP request:
 
 ```ts
-import orders from "@app/services/orders/service.js";
-const order = await orders.createOrder.invoke({});
+import { getRelkit } from "relkit";
+const order = await getRelkit().functions.orders.createOrder({});
 ```
 
-The same goes for other pieces: start a job with `orders.exportOrders.trigger(input)` or push a live update with `orderStatus.trigger(...)`, straight from a route or any other backend code. The one thing that stays inside a function is resource access. Caches, buckets and the database reach you through the function’s `context`, so every access is declared and shows up in the graph.
+Inside a function, everything it touches, from caches and buckets to the database, other functions, events and live updates, reaches it through its `context` and is declared under `dependencies`, so every call shows up in the graph.
 
 ## Routes
 
@@ -253,7 +253,7 @@ Reading files back is just as friendly: `get`, `head`, `exists`, `list`, `delete
 
 ## Events
 
-Remember `publishes: ["orders.created"]` in our first function? Here's the other side of it.
+Remember `dependencies: { events: { orderCreated } }` in our first function? Here's the other side of it.
 
 An event says “something happened”, and other functions can react to it without the original operation waiting for them. Perfect for “send a confirmation email” or “record analytics” kinds of work.
 
@@ -468,10 +468,10 @@ export default defineChannel({
 });
 ```
 
-The backend triggers an update:
+A backend function declares the channel under `dependencies: { channels: { orderStatus } }` and triggers an update:
 
 ```ts
-await orderStatus.trigger({ orderId }, "updated", { status: "shipped" });
+await context.channels.orderStatus.trigger({ orderId }, "updated", { status: "shipped" });
 ```
 
 And the browser listens, with fully typed callbacks:

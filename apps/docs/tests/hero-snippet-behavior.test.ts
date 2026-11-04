@@ -137,6 +137,7 @@ test("order events connect a schema-valid publication to a durable subscriber", 
   const { default: publisher } = await evaluateSnippet("event-usage", {
     z,
     defineFunction: (options: unknown) => options,
+    orderCreated: event,
   });
   const deliveries: unknown[] = [];
   const logs: unknown[] = [];
@@ -144,7 +145,7 @@ test("order events connect a schema-valid publication to a durable subscriber", 
     { orderId: "order-1", quantity: 2 },
     {
       events: {
-        [event.id]: {
+        orderCreated: {
           publish: async (payload: unknown) => {
             const validated = event.input.parse(payload);
             deliveries.push(validated);
@@ -180,7 +181,7 @@ test("scheduled export uses the current job API and valid task input", async () 
   expect(schedule.timezone).toBe("UTC");
 });
 
-test("checkout invokes order hooks through the shared runtime", async () => {
+test("checkout calls order hooks through the shared runtime", async () => {
   const logs: unknown[] = [];
   const { default: createOrder } = await evaluateSnippet("function-be", { z, defineFunction });
   const { default: checkout } = await evaluateSnippet("function-usage", {

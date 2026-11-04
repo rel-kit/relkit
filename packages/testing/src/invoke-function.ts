@@ -169,10 +169,7 @@ function freezeEnv(
  * @returns True when a declared dependency needs an engine client.
  */
 function hasDependencies(target: StandaloneFunctionTarget): boolean {
-  return (
-    (target.publishes?.length ?? 0) > 0 ||
-    Object.values(target.dependencies ?? {}).some(
-      (category) => category !== undefined && Object.keys(category).length > 0,
-    )
+  return Object.values(target.dependencies ?? {}).some(
+    (category) => category !== undefined && Object.keys(category).length > 0,
   );
 }

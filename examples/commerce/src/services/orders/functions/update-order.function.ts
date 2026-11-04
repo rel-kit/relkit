@@ -6,9 +6,10 @@ import orderUpdates from "../channels/order-updates.channel.js";
 const updateOrder = defineFunction({
   input: orderMutationInput,
   output: orderLookupOutput,
-  handler: async ({ orderId, state }) => {
+  dependencies: { channels: { orderUpdates } },
+  handler: async ({ orderId, state }, context) => {
     const result = { orderId, status: state, totalCents: 1_000 };
-    await orderUpdates.trigger({ orderId }, "status.changed", result);
+    await context.channels.orderUpdates.trigger({ orderId }, "status.changed", result);
     return result;
   },
 });

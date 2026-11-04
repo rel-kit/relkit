@@ -62,8 +62,6 @@ export interface InvocationTarget<
   readonly output: StandardSchemaV1;
   readonly progress?: StandardSchemaV1;
   readonly errors?: readonly InvocationErrorDefinition[];
-  readonly publications?: Readonly<Record<string, unknown>>;
-  readonly publishes?: readonly string[];
   readonly dependencies?: Readonly<Record<string, Readonly<Record<string, unknown>>>>;
   readonly timeoutMs?: number;
   readonly concurrency?: number;

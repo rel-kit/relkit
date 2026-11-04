@@ -150,7 +150,6 @@ const executeTaskWorkflow = Effect.fn("Engine.executeTask.workflow")(function* (
           ...(options.context === undefined ? {} : { context: options.context }),
           ...(options.clients === undefined ? {} : { clients: options.clients }),
           invokeTask: taskInvoker,
-          ...(options.publications === undefined ? {} : { publications: options.publications }),
         }),
     },
     taskLifecycle: {

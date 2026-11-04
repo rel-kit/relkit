@@ -23,7 +23,7 @@ const record: InvocationRecord = {
 const time: PublicClock = { now: () => new Date(100), sleep: async () => undefined };
 
 describe("standalone context Effect", () => {
-  test("installs configured maps and filters published event clients", async () => {
+  test("installs configured maps and filters declared event clients", async () => {
     const signal = new AbortController().signal;
     const context = await Effect.runPromise(
       makeStandaloneContextEffect({
@@ -31,7 +31,7 @@ describe("standalone context Effect", () => {
         signal,
         env: { mode: "test" },
         time,
-        publishes: ["events.posted"],
+        dependencies: { events: { posted: { ref: { kind: "event", id: "events.posted" } } } },
         clients: {
           cache: { main: { ping: true } },
           events: { "events.posted": { emit: true }, "events.hidden": { emit: false } },
@@ -39,7 +39,7 @@ describe("standalone context Effect", () => {
       }),
     );
     expect((context as any).cache.main).toEqual({ ping: true });
-    expect((context as any).events["events.posted"]).toEqual({ emit: true });
+    expect((context as any).events.posted).toEqual({ emit: true });
     expect(() => (context as any).events["events.hidden"]).toThrow(DependencyNotConfiguredError);
     expect(Object.isFrozen(context)).toBe(true);
   });
@@ -70,7 +70,6 @@ describe("standalone context Effect", () => {
       signal: new AbortController().signal,
       env: {},
       time,
-      publishes: [],
     };
     await expect(makeStandaloneContext(options)).rejects.toBe(cause);
   });

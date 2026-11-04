@@ -47,9 +47,10 @@ const lookup = defineFunction({
       : { orderId: input.orderId, totalCents: 100 },
 });
 
+declare const lookupContext: FunctionContext<{ functions: { lookup: typeof lookup } }>;
 const detachedLookup: (
   input: InferInput<typeof transformedInput>,
-) => Promise<InferOutput<typeof lookup.output>> = lookup.invoke;
+) => Promise<InferOutput<typeof lookup.output>> = lookupContext.functions.lookup;
 const detachedLookupResult = detachedLookup({ rawId: "order-1" });
 void detachedLookupResult;
 
@@ -65,15 +66,15 @@ const lookupEffect = defineFunctionEffect({
 });
 const effectLookup = Effect.runSync(lookupEffect);
 const effectLookupId: "types.inference-effect-lookup" = effectLookup.id;
-const effectLookupResult: Promise<InferOutput<typeof lookupOutput>> = effectLookup.invoke({
-  rawId: "order-1",
-});
+declare const effectContext: FunctionContext<{ functions: { effectLookup: typeof effectLookup } }>;
+const effectLookupResult: Promise<InferOutput<typeof lookupOutput>> =
+  effectContext.functions.effectLookup({ rawId: "order-1" });
 const effectLookupErrorId: "types.inference-not-found" | undefined = effectLookup.errors?.[0]?.id;
 void effectLookupId;
 void effectLookupResult;
 void effectLookupErrorId;
 // @ts-expect-error the Effect descriptor accepts rawId, not the transformed orderId
-effectLookup.invoke({ orderId: "order-1" });
+effectContext.functions.effectLookup({ orderId: "order-1" });
 
 defineFunctionEffect({
   id: "types.inference-effect-invalid-output",
@@ -103,6 +104,8 @@ const prices = defineCache({
 });
 
 const dependencies = {
+  functions: { lookup },
+  events: { orderCreated },
   jobs: { sendReceipt },
   buckets: { receiptBucket },
   cache: { prices },
@@ -113,15 +116,14 @@ const createOrder = defineFunction({
   input: z.object({ orderId: z.string(), sku: z.string() }),
   output: z.object({ totalCents: z.number() }),
   dependencies,
-  publishes: ["types.inference-event"],
   handler: async (input, context) => {
-    const lookupResult: InferOutput<typeof lookup.output> = await lookup.invoke({
+    const lookupResult: InferOutput<typeof lookup.output> = await context.functions.lookup({
       rawId: input.orderId,
     });
     const price: number | undefined = await context.cache.prices.get({ sku: input.sku });
     const produced = await context.cache.prices.getOrSet({ sku: input.sku }, () => 100);
     await context.cache.prices.set({ sku: input.sku }, produced);
-    await context.events["types.inference-event"].publish({ orderId: input.orderId });
+    await context.events.orderCreated.publish({ orderId: input.orderId });
     await context.jobs.sendReceipt.enqueue({ rawId: input.orderId });
     await context.buckets.receiptBucket.put("orders/1.json", new Uint8Array());
     const names: readonly string[] = await context.buckets.receiptBucket.list();
@@ -192,15 +194,15 @@ lookup.asTool();
 
 type NarrowedContext = FunctionContext<typeof dependencies>;
 declare const narrowed: NarrowedContext;
-const narrowedResult: Promise<InferOutput<typeof lookup.output>> = lookup.invoke({
+const narrowedResult: Promise<InferOutput<typeof lookup.output>> = narrowed.functions.lookup({
   rawId: "order-1",
 });
 void narrowedResult;
 
 // @ts-expect-error transformed function input accepts rawId, not the output property orderId
-lookup.invoke({ orderId: "order-1" });
+narrowed.functions.lookup({ orderId: "order-1" });
 // @ts-expect-error a function's output is validated and cannot be treated as an arbitrary string
-const invalidOutput: Promise<string> = lookup.invoke({ rawId: "order-1" });
+const invalidOutput: Promise<string> = narrowed.functions.lookup({ rawId: "order-1" });
 void invalidOutput;
 // @ts-expect-error a function not declared on the function is unavailable
 narrowed.functions.missing;

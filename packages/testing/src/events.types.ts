@@ -40,7 +40,6 @@ export interface TestEventTriggerOptions<Output = unknown> {
 export interface TestEventOptions<Payload = unknown, Output = unknown> {
   readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly event?: EventDescriptorAny;
-  readonly events?: readonly EventDescriptorAny[];
   readonly eventId?: string;
   readonly version?: number;
   readonly payloadSchema?: StandardSchemaV1;

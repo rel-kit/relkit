@@ -39,7 +39,7 @@ describe("event functions", () => {
         seen.push(input, context.trigger);
       },
     });
-    const target = bindFunctionEvents(consumer, event, []) as InvocationTarget;
+    const target = bindFunctionEvents(consumer, event) as InvocationTarget;
     for (const source of ["event-delivery", "event-replay"] as const) {
       await invoke({ target, input: { orderId: "abc" }, source, trigger: { kind: "event" } });
     }
@@ -59,19 +59,19 @@ describe("event functions", () => {
     ).rejects.toHaveProperty("code", "RELKIT_INPUT_VALIDATION");
   });
 
-  test("binds only declared publications and validates before provider submission", async () => {
+  test("binds only declared event dependencies and validates before provider submission", async () => {
     const published: unknown[] = [];
     const publisher = defineFunction({
       id: "create_order",
       input: z.unknown(),
       output: z.void(),
-      publishes: ["order_created" as never],
+      dependencies: { events: { orderCreated: event } },
       handler: async (input, context) => {
         expect(() => Reflect.get(context.events, "other_event")).toThrow("not declared");
-        await (context.events as any).order_created.publish(input);
+        await context.events.orderCreated.publish(input as { orderId: string });
       },
     });
-    const target = bindFunctionEvents(publisher, undefined, [event]) as InvocationTarget;
+    const target = bindFunctionEvents(publisher, undefined) as InvocationTarget;
     const clients = {
       events: {
         order_created: {
@@ -88,6 +88,18 @@ describe("event functions", () => {
     expect(published).toHaveLength(1);
   });
 
+  test("rejects the removed publishes option", () => {
+    expect(() =>
+      defineFunction({
+        id: "legacy_publisher",
+        input: z.unknown(),
+        output: z.void(),
+        publishes: ["order_created"],
+        handler: () => {},
+      } as never),
+    ).toThrow("`publishes` was removed");
+  });
+
   test("consumers publish follow-up events and can explicitly republish their consumed event", async () => {
     const receipt = defineEvent({
       id: "receipt_requested",
@@ -97,10 +109,10 @@ describe("event functions", () => {
     const consumer = defineEventFunction({
       id: "followup",
       event: "order_created" as never,
-      publishes: ["order_created" as never, "receipt_requested" as never],
+      dependencies: { events: { orderCreated: event, receiptRequested: receipt } },
       handler: async (input, context) => {
-        await (context.events as any).order_created.publish(input);
-        await (context.events as any).receipt_requested.publish(input);
+        await context.events.orderCreated.publish(input);
+        await context.events.receiptRequested.publish(input);
       },
     });
     const clients = {
@@ -117,7 +129,7 @@ describe("event functions", () => {
       ),
     };
     await invoke({
-      target: bindFunctionEvents(consumer, event, [event, receipt]) as unknown as InvocationTarget,
+      target: bindFunctionEvents(consumer, event) as unknown as InvocationTarget,
       source: "event-delivery",
       input: { orderId: "a" },
       clients,
@@ -132,7 +144,7 @@ describe("event functions", () => {
       },
     });
     await invoke({
-      target: bindFunctionEvents(empty, event, []) as unknown as InvocationTarget,
+      target: bindFunctionEvents(empty, event) as unknown as InvocationTarget,
       source: "event-delivery",
       input: { orderId: "a" },
       clients,

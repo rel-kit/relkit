@@ -1,6 +1,9 @@
 import { describe, expect, test } from "vitest";
 import {
   DispatcherBoundary,
+  InvocationDispatchFailure,
+  dispatchInvocation,
+  dispatchInvocationEffect,
   type InvocationDispatchRequest,
   type InvocationDispatcher,
 } from "../../src/invocation/index.js";
@@ -10,7 +13,6 @@ import { defineFunction } from "../../src/functions/define-function.js";
 import {
   asGraphNodeEffect,
   asToolEffect,
-  invokeDescriptorEffect,
 } from "../../src/functions/function-descriptor-methods.js";
 import { FunctionOperationError } from "../../src/functions/function-observability.js";
 
@@ -18,7 +20,7 @@ const input = z.object({ id: z.string() });
 const output = z.object({ id: z.string() });
 
 describe("callable descriptor Effect methods", () => {
-  test("uses a supplied dispatcher boundary for direct invocation", async () => {
+  test("dispatches a function descriptor through a supplied dispatcher boundary", async () => {
     const requests: unknown[] = [];
     const dispatcher: InvocationDispatcher = {
       dispatch: async <Input, Output, Context extends { readonly signal: AbortSignal }>(
@@ -38,12 +40,15 @@ describe("callable descriptor Effect methods", () => {
       output,
       handler: () => ({ id: "handler" }),
     });
+    expect("invoke" in fn).toBe(false);
     const result = await Effect.runPromise(
-      Effect.provide(invokeDescriptorEffect(fn, fn, { id: "one" }), boundary),
+      Effect.provide(dispatchInvocationEffect({ target: fn, input: { id: "one" } }), boundary),
     );
     expect(result).toEqual({ id: "layer" });
     expect(requests).toHaveLength(1);
-    await expect(fn.invoke({ id: "two" })).resolves.toEqual({ id: "handler" });
+    await expect(dispatchInvocation({ target: fn, input: { id: "two" } })).resolves.toEqual({
+      id: "handler",
+    });
   });
 
   test("preserves dispatch failure in the tagged Effect channel", async () => {
@@ -63,13 +68,15 @@ describe("callable descriptor Effect methods", () => {
       handler: ({ id }) => ({ id }),
     });
     const exit = await Effect.runPromiseExit(
-      Effect.provide(invokeDescriptorEffect(fn, fn, { id: "one" }), boundary),
+      Effect.provide(dispatchInvocationEffect({ target: fn, input: { id: "one" } }), boundary),
     );
     expect(Exit.isFailure(exit)).toBe(true);
     if (Exit.isFailure(exit)) {
       const failure = Cause.squash(exit.cause);
-      expect(failure).toBeInstanceOf(FunctionOperationError);
-      expect((failure as FunctionOperationError).cause).toEqual(new TypeError("dispatch failed"));
+      expect(failure).toBeInstanceOf(InvocationDispatchFailure);
+      expect((failure as InvocationDispatchFailure).cause).toEqual(
+        new TypeError("dispatch failed"),
+      );
     }
   });
 

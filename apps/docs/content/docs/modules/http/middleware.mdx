@@ -38,6 +38,11 @@ For every middleware scaffolding flag, see the [middleware command reference](/d
 The middleware reads a header, delegates the decision to a public function, and returns `401` when
 denied. It calls `next()` only when processing should continue.
 
+Middleware is not a function handler, so it has no `context.functions`. It reaches application code
+through `getRelkit()`, which groups functions by service ID and member name:
+`getRelkit().functions.orders.authorizeOrder(...)`. `getRelkit()` works only inside the running
+application.
+
 <Callout type="warning" title="This example is not token verification">
   The commerce authorization function only checks for a `Bearer ` prefix. It demonstrates the
   control flow, not production authentication. Use a verified session or credential validation for
@@ -46,7 +51,8 @@ denied. It calls `next()` only when processing should continue.
 
 The handler receives the Hono `context`, `next`, and a RelKit context containing `signal`, `env`,
 `auth`, `log`, and `time`. It does not receive the route target's validated input or its dependency clients.
-Call public service functions for domain behavior rather than importing their private implementation.
+Call public service functions through `getRelkit()` for domain behavior rather than importing their private
+implementation.
 
 ## Choose the match scope
 

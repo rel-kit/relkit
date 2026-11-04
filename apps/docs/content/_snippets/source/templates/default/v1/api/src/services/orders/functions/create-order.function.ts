@@ -1,4 +1,4 @@
-/** Validates order input, invokes the service-local pricing function, and returns the calculated order. */
+/** Validates order input, calls the declared pricing function, and returns the calculated order. */
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "zod";
 import priceOrder from "@app/services/orders/functions/price-order.function.js";
@@ -18,9 +18,9 @@ const orderOutput = z.object({
 const createOrder = defineFunction({
   input: orderInput,
   output: orderOutput,
-
-  handler: async (input) => {
-    const { totalCents } = await priceOrder.invoke({ quantity: input.quantity });
+  dependencies: { functions: { priceOrder } },
+  handler: async (input, context) => {
+    const { totalCents } = await context.functions.priceOrder({ quantity: input.quantity });
     const order = {
       orderId: input.orderId,
       sku: input.sku,

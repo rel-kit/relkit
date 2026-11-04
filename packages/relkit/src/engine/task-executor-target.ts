@@ -20,8 +20,6 @@ export function taskTarget(
     ...(task.dependencies === undefined
       ? {}
       : { dependencies: task.dependencies as unknown as DependencyDeclarations }),
-    ...(options.publications === undefined ? {} : { publications: options.publications }),
-    ...(task.publishes === undefined ? {} : { publishes: task.publishes }),
     handler: (input, context) =>
       (task.handler as (value: never, context: TaskContextBase) => unknown)(
         input as never,

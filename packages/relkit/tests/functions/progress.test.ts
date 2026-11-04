@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { createStandaloneDispatcher } from "../../src/invocation/index.js";
+import { createStandaloneDispatcher, dispatchInvocation } from "../../src/invocation/index.js";
 import { z } from "../../src/schema/index.js";
 import { defineFunction } from "../../src/functions/index.js";
 
@@ -15,7 +15,7 @@ describe("function progress", () => {
         return "done";
       },
     });
-    expect(await target.invoke({})).toBe("done");
+    expect(await dispatchInvocation({ target, input: {} })).toBe("done");
   });
 
   test("delivers validated records to an explicit sink", async () => {
@@ -53,6 +53,6 @@ describe("function progress", () => {
         return "done";
       },
     });
-    expect(await target.invoke({})).toBe("done");
+    expect(await dispatchInvocation({ target, input: {} })).toBe("done");
   });
 });

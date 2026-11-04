@@ -22,12 +22,7 @@ import {
 } from "./channel-policy.js";
 import { ChannelValidationError } from "./realtime-errors.js";
 import { observeRealtime } from "./realtime-observability.js";
-import {
-  getChannelPresenceEffect,
-  runChannelPromise,
-  triggerChannelEffect,
-} from "./channel-operations.js";
-import type { ChannelTriggerOptions } from "./dispatch.types.js";
+import { getChannelPresenceEffect, triggerChannelEffect } from "./channel-operations.js";
 export type * from "./channel.types.js";
 export type * from "./channel-client.types.js";
 export { getChannelPresenceEffect, triggerChannelEffect };
@@ -91,21 +86,6 @@ export const defineChannelEffect = Effect.fn("Realtime.defineChannel")(
           reason: error instanceof Error ? error.message : "Invalid channel descriptor",
         }),
     });
-    Object.defineProperty(descriptor, "trigger", {
-      enumerable: false,
-      value: (
-        params: unknown,
-        event: string,
-        payload: unknown,
-        triggerOptions?: ChannelTriggerOptions,
-      ) =>
-        runChannelPromise(triggerChannelEffect(descriptor, params, event, payload, triggerOptions)),
-    });
-    if (presence !== undefined)
-      Object.defineProperty(descriptor, "getPresence", {
-        enumerable: false,
-        value: (params: unknown) => runChannelPromise(getChannelPresenceEffect(descriptor, params)),
-      });
     return deepFreeze(descriptor) as unknown as ChannelDescriptor<
       Id,
       ParamsSchema,

@@ -104,7 +104,7 @@ service: callers use `orders.createOrder` and `orders.orderCreated`, not
 `orders.functions.createOrder` or `orders.events.orderCreated`.
 
 Members are the original descriptors, not copies. A function exposed through a service retains its
-identity, input and output schemas, declared errors, and `.invoke()` behavior. Changing the local import
+identity, input and output schemas, declared errors, and call behavior. Changing the local import
 name does not create a new operation.
 
 ## Use public functions from the frontend
@@ -124,8 +124,9 @@ before calling them from the browser. These are the same Orders members declared
 
 ## Decide what stays internal
 
-Leave a function out of the service if only its own domain uses it. It is still discovered and can be
-called by other functions in that domain. A helper does not become public just because its module
+Leave a function out of the service if only its own domain uses it. It is still discovered, and other
+functions in that domain can call it after declaring it under `dependencies.functions`. A helper does
+not become public just because its module
 exports it in TypeScript.
 
 Do not put caches, buckets, tools, agents, or plain helper values into the member maps. A task/job member
@@ -141,9 +142,15 @@ or a switch controlling MCP tool visibility.
 
 ## Use another domain's service
 
-Import `@app/services/orders/service.js`, then invoke a member such as
-`orders.getOrder.invoke({ orderId: "order-1" })` from your function handler. Use `.invoke()`, not
-`.handler()`, so the call goes through the common validation and execution boundary.
+Import `@app/services/orders/service.js` and declare the member your function calls under
+`dependencies.functions`, such as `dependencies: { functions: { getOrder: orders.getOrder } }`. Then call
+`await context.functions.getOrder({ orderId: "order-1" })` from your function handler. A function can call
+another function only when it declares the call under `dependencies.functions`. Do not call `.handler()`
+directly; `context.functions` sends the call through the common validation and execution boundary.
+
+Raw routes and middleware are not function handlers. They reach application code through `getRelkit()`
+from `relkit`, which groups functions by service ID and member name:
+`await getRelkit().functions.orders.getOrder({ orderId: "order-1" })`.
 
 Within Orders, import other Orders modules directly rather than importing the service back into its
 own implementation. Across domains, import the service rather than a private function path.
@@ -165,9 +172,10 @@ as your own service member.
 
 ## Keep runtime access explicit
 
-Service membership does not provide a cache, bucket, job client, or agent client. Those remain explicit
-function dependencies. Event publication uses `publishes` and `context.events[eventId].publish(...)`.
-Exposing an event in `service.events` at definition time does not authorize a function to publish it.
+Service membership does not provide a function, event, channel, cache, bucket, job, or agent client. Those
+remain explicit function dependencies. To publish an event, declare it under `dependencies.events` and call
+`context.events.orderCreated.publish(...)`. Exposing an event in `service.events` at definition time does not
+authorize a function to publish it.
 
 There is no general service lifecycle, service middleware, or `context.service` API. Put HTTP policy in
 [route middleware](/docs/modules/http/middleware). Put rules that must apply to every invocation in function

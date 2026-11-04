@@ -1166,7 +1166,7 @@ assertHook(() => {}, "onBefore");
 declare const assertHook: (value: unknown, name: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L62)
 
 ### assertHookEffect
 
@@ -1187,7 +1187,7 @@ declare const assertHookEffect: (
 ) => Effect.Effect<void, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L46)
 
 ### assertSchema
 
@@ -1209,7 +1209,7 @@ assertSchema(z.string(), "input");
 declare const assertSchema: (value: unknown, name: string) => asserts value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L97)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L96)
 
 ### assertSchemaEffect
 
@@ -1230,7 +1230,7 @@ declare const assertSchemaEffect: (
 ) => Effect.Effect<StandardSchemaV1<unknown, unknown>, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L72)
 
 ### copyDependencies
 
@@ -1256,30 +1256,6 @@ declare const copyDependenciesEffect: <D extends FunctionDependencies>(
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L10)
 
-### copyPublishes
-
-**Signature**
-
-```ts
-declare const copyPublishes: <Names extends readonly string[]>(
-  publishes: Names | undefined,
-) => Names | undefined;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L11)
-
-### copyPublishesEffect
-
-**Signature**
-
-```ts
-declare const copyPublishesEffect: <Names extends readonly string[]>(
-  publishes: Names | undefined,
-) => Effect.Effect<Names | undefined, FunctionOperationError, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L12)
-
 ### functionTargetForReceiver
 
 Resolves a method receiver to a callable function descriptor.
@@ -1303,7 +1279,7 @@ declare const functionTargetForReceiver: (
 ) => FunctionRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L136)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L135)
 
 ### functionTargetForReceiverEffect
 
@@ -1324,7 +1300,17 @@ declare const functionTargetForReceiverEffect: (
 ) => Effect.Effect<FunctionRefAny, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L107)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L106)
+
+### rejectPublishes
+
+**Signature**
+
+```ts
+declare const rejectPublishes: (publishes: unknown) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L11)
 
 ### validateLimit
 
@@ -1346,7 +1332,7 @@ validateLimit(5, "timeoutMs");
 declare const validateLimit: (value: number | undefined, name: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L36)
 
 ### validateLimitEffect
 
@@ -1367,7 +1353,7 @@ declare const validateLimitEffect: (
 ) => Effect.Effect<void, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L20)
 
 ## `define-function.ts`
 
@@ -1377,9 +1363,9 @@ Defines the graph-visible executable unit shared by HTTP, background, tool, and 
 
 The `id` is optional for source-scoped functions; the compiler derives it from the
 source/export hierarchy. Durable resources keep explicit IDs. The handler receives
-validated reusable input and an invocation-scoped context. Use `descriptor.invoke(input)`
-for nested calls so the
-common engine preserves validation, service policy, limits, and telemetry.
+validated reusable input and an invocation-scoped context. Declare every function it calls
+under `dependencies.functions` and call it through `context.functions`, so the common engine
+preserves validation, service policy, limits, and telemetry.
 
 **Throws**
 
@@ -1399,9 +1385,13 @@ const greet = defineFunction({
     return { message: `Hello, ${name}!` };
   },
 });
-const result = await greet.invoke({ name: "Ada" });
-void result;
-void greet;
+const welcome = defineFunction({
+  input: z.object({ name: z.string() }),
+  output: z.object({ message: z.string() }),
+  dependencies: { functions: { greet } },
+  handler: ({ name }, context) => context.functions.greet({ name }),
+});
+void welcome;
 ```
 
 **Signature**
@@ -1410,7 +1400,7 @@ void greet;
 declare const defineFunction: DefineFunction;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L132)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L136)
 
 Since v0.1.0
 
@@ -1679,7 +1669,6 @@ declare const DefineFunctionOptions: DefineFunctionOptions<
   OutputSchema,
   Dependencies,
   Errors,
-  Publishes,
   ProgressSchema
 >;
 ```
@@ -1791,7 +1780,7 @@ declare const FunctionClients: FunctionClients<M>;
 **Signature**
 
 ```ts
-declare const FunctionContext: FunctionContext<D, Publishes, Progress>;
+declare const FunctionContext: FunctionContext<D, Progress>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L48)
@@ -1820,7 +1809,6 @@ declare const FunctionDescriptor: FunctionDescriptor<
   InputSchema,
   OutputSchema,
   ToolMetadata,
-  Publishes,
   ProgressSchema
 >;
 ```
@@ -2051,17 +2039,10 @@ export interface DefineFunction {
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-    const Publishes extends readonly Extract<keyof Relkit.EventRegistry, string>[] = readonly [],
-    const Options extends FunctionCallOptions<
-      Id,
-      InputSchema,
-      OutputSchema,
-      {},
-      Publishes,
-      ProgressSchema
-    > = FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes, ProgressSchema>,
+    const Options extends FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> =
+      FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema>,
   >(
-    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes, ProgressSchema> &
+    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> &
       Options &
       FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> & {
         readonly dependencies?: never;
@@ -2075,7 +2056,6 @@ export interface DefineFunction {
     InputSchema,
     OutputSchema,
     ToolMetadataOf<Options>,
-    Publishes,
     ProgressSchema
   >;
 
@@ -2090,24 +2070,15 @@ export interface DefineFunction {
     const OutputSchema extends StandardSchemaV1,
     const Dependencies extends FunctionDependencies,
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-    const Publishes extends readonly Extract<keyof Relkit.EventRegistry, string>[] = readonly [],
     const Options extends FunctionCallOptions<
       Id,
       InputSchema,
       OutputSchema,
       Dependencies,
-      Publishes,
       ProgressSchema
-    > = FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, Publishes, ProgressSchema>,
+    > = FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema>,
   >(
-    options: FunctionCallOptions<
-      Id,
-      InputSchema,
-      OutputSchema,
-      Dependencies,
-      Publishes,
-      ProgressSchema
-    > &
+    options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema> &
       Options &
       FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>>,
   ): FunctionDescriptor<
@@ -2119,7 +2090,6 @@ export interface DefineFunction {
     InputSchema,
     OutputSchema,
     ToolMetadataOf<Options>,
-    Publishes,
     ProgressSchema
   >;
 }
@@ -2140,17 +2110,10 @@ export interface DefineFunctionEffect {
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-    const Publishes extends readonly Extract<keyof Relkit.EventRegistry, string>[] = readonly [],
-    const Options extends FunctionCallOptions<
-      Id,
-      InputSchema,
-      OutputSchema,
-      {},
-      Publishes,
-      ProgressSchema
-    > = FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes, ProgressSchema>,
+    const Options extends FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> =
+      FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema>,
   >(
-    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes, ProgressSchema> &
+    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> &
       Options &
       FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> & {
         readonly dependencies?: never;
@@ -2165,7 +2128,6 @@ export interface DefineFunctionEffect {
       InputSchema,
       OutputSchema,
       ToolMetadataOf<Options>,
-      Publishes,
       ProgressSchema
     >,
     FunctionOperationError
@@ -2177,24 +2139,15 @@ export interface DefineFunctionEffect {
     const OutputSchema extends StandardSchemaV1,
     const Dependencies extends FunctionDependencies,
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-    const Publishes extends readonly Extract<keyof Relkit.EventRegistry, string>[] = readonly [],
     const Options extends FunctionCallOptions<
       Id,
       InputSchema,
       OutputSchema,
       Dependencies,
-      Publishes,
       ProgressSchema
-    > = FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, Publishes, ProgressSchema>,
+    > = FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema>,
   >(
-    options: FunctionCallOptions<
-      Id,
-      InputSchema,
-      OutputSchema,
-      Dependencies,
-      Publishes,
-      ProgressSchema
-    > &
+    options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema> &
       Options &
       FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>>,
   ): Effect.Effect<
@@ -2207,7 +2160,6 @@ export interface DefineFunctionEffect {
       InputSchema,
       OutputSchema,
       ToolMetadataOf<Options>,
-      Publishes,
       ProgressSchema
     >,
     FunctionOperationError
@@ -2215,7 +2167,7 @@ export interface DefineFunctionEffect {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.types.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.types.ts#L105)
 
 ### FunctionImplementationOptions (type alias)
 
@@ -2448,15 +2400,14 @@ const run = async (_input: unknown, context: FunctionContext) => context.time.no
 ```ts
 type FunctionContext<
   D extends FunctionDependencies = {},
-  Publishes extends readonly KnownEventName[] = readonly [],
   Progress = never,
-> = FunctionContextBase<D, Publishes> &
+> = FunctionContextBase<D> &
   ([Progress] extends [never]
     ? {}
     : { readonly progress: import("../invocation/index.js").ProgressEmitter<Progress> });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L151)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L142)
 
 ### FunctionContextBase (interface)
 
@@ -2471,10 +2422,7 @@ const env = context.env;
 **Signature**
 
 ```ts
-export interface FunctionContextBase<
-  D extends FunctionDependencies = {},
-  Publishes extends readonly KnownEventName[] = readonly [],
-> {
+export interface FunctionContextBase<D extends FunctionDependencies = {}> {
   readonly invocation: InvocationMetadata;
   readonly signal: AbortSignal;
   readonly env: ResolvedApplicationEnv;
@@ -2484,7 +2432,7 @@ export interface FunctionContextBase<
   readonly functions: FunctionClients<D["functions"]>;
   readonly tasks: TaskClients<D["tasks"]>;
   readonly jobs: JobClients<D["jobs"]>;
-  readonly events: EventClients<PublishedEventMap<Publishes>> & EventClients<D["events"]>;
+  readonly events: EventClients<D["events"]>;
   readonly channels: ChannelClients<D["channels"]>;
   readonly databases: DatabaseClients<D["databases"]>;
   readonly buckets: BucketClients<D["buckets"]>;
@@ -2497,7 +2445,7 @@ export interface FunctionContextBase<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L115)
 
 ### FunctionDependencies (interface)
 
@@ -2580,24 +2528,6 @@ type InvocationSource = SharedInvocationSource;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L49)
-
-### KnownEventName (type alias)
-
-Registered event names accepted by publishes.
-
-**Example**
-
-```ts
-type EventName = KnownEventName;
-```
-
-**Signature**
-
-```ts
-type KnownEventName = Extract<keyof Relkit.EventRegistry, string>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L115)
 
 ### PublicClock (type alias)
 
@@ -2719,49 +2649,27 @@ declare const copyDependenciesEffect: <D extends FunctionDependencies>(
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-dependency-copy.ts#L25)
 
-### copyPublishes
+### rejectPublishes
 
-Copies and validates published event IDs.
+Rejects the removed `publishes` option with the form that replaces it.
 
 **Throws**
 
-TypeError for duplicate or empty IDs.
+FunctionInputError when the option is present.
 
 **Example**
 
 ```ts
-copyPublishes(["orders.created"]);
+rejectPublishes(options.publishes);
 ```
 
 **Signature**
 
 ```ts
-declare const copyPublishes: <Names extends readonly string[]>(
-  publishes: Names | undefined,
-) => Names | undefined;
+declare const rejectPublishes: (publishes: unknown) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-dependency-copy.ts#L107)
-
-### copyPublishesEffect
-
-Validates a published event list through Effect.
-
-**Example**
-
-```ts
-Effect.runSync(copyPublishesEffect(["orders.created"]));
-```
-
-**Signature**
-
-```ts
-declare const copyPublishesEffect: <Names extends readonly string[]>(
-  publishes: Names | undefined,
-) => Effect.Effect<Names | undefined, FunctionOperationError, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-dependency-copy.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-dependency-copy.ts#L78)
 
 ## `function-descriptor-factory.ts`
 
@@ -2795,7 +2703,7 @@ createFunctionDescriptor(options);
 declare const createFunctionDescriptor: (options: FunctionDescriptorFactoryOptions) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-factory.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-factory.ts#L77)
 
 ### createFunctionDescriptorEffect
 
@@ -2841,7 +2749,6 @@ export interface FunctionDescriptorFactoryOptions extends DescriptorMetadata {
   readonly handler: (...args: any[]) => unknown;
   readonly errors?: readonly ErrorDescriptorAny[];
   readonly dependencies?: FunctionDependencies;
-  readonly publishes?: readonly string[];
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly tool?: FunctionToolMetadata;
@@ -2874,7 +2781,7 @@ declare const addCallableMethods: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-methods.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-methods.ts#L87)
 
 ### asGraphNodeEffect
 
@@ -2909,7 +2816,7 @@ declare const asGraphNodeEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-methods.ts#L106)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-methods.ts#L65)
 
 ### asToolEffect
 
@@ -2932,29 +2839,7 @@ declare const asToolEffect: (
 ) => Effect.Effect<FunctionToolDescriptor<string, FunctionRefAny>, FunctionOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-methods.ts#L66)
-
-### invokeDescriptorEffect
-
-Invokes a callable descriptor through the Effect dispatcher.
-
-**Example**
-
-```ts
-Effect.runPromise(invokeDescriptorEffect(fn, fn, { id: "one" }));
-```
-
-**Signature**
-
-```ts
-declare const invokeDescriptorEffect: (
-  receiver: unknown,
-  descriptor: FunctionRefAny,
-  input: unknown,
-) => Effect.Effect<unknown, FunctionOperationError, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-methods.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-methods.ts#L25)
 
 ## `function-descriptor.types.ts`
 
@@ -2981,7 +2866,6 @@ export interface DefineFunctionOptions<
   OutputSchema extends StandardSchemaV1,
   Dependencies extends FunctionDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  Publishes extends readonly KnownEventName[] = readonly [],
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 > extends DescriptorMetadata {
   readonly id?: Id;
@@ -2989,35 +2873,23 @@ export interface DefineFunctionOptions<
   readonly output: OutputSchema;
   readonly errors?: Errors;
   readonly dependencies?: Dependencies;
-  readonly publishes?: Publishes;
   readonly progress?: ProgressSchema;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly tool?: FunctionToolMetadata;
-  readonly onBefore?: FunctionLifecycleHook<
-    InferOutput<InputSchema>,
-    Dependencies,
-    Publishes,
-    ProgressSchema
-  >;
-  readonly onAfter?: FunctionLifecycleHook<
-    InferOutput<OutputSchema>,
-    Dependencies,
-    Publishes,
-    ProgressSchema
-  >;
+  readonly onBefore?: FunctionLifecycleHook<InferOutput<InputSchema>, Dependencies, ProgressSchema>;
+  readonly onAfter?: FunctionLifecycleHook<InferOutput<OutputSchema>, Dependencies, ProgressSchema>;
   readonly handler: FunctionHandler<
     InferOutput<InputSchema>,
     InferOutput<OutputSchema>,
     Dependencies,
     Errors,
-    Publishes,
     ProgressSchema
   >;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L65)
 
 ### FunctionDescriptor (interface)
 
@@ -3041,7 +2913,6 @@ export interface FunctionDescriptor<
   InputSchema extends StandardSchemaV1 = StandardSchemaV1,
   OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
   ToolMetadata extends FunctionToolMetadata | undefined = undefined,
-  Publishes extends readonly KnownEventName[] = readonly [],
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 >
   extends
@@ -3049,20 +2920,13 @@ export interface FunctionDescriptor<
     FunctionRef<Id, Input, Output, Errors, InputSchema, OutputSchema> {
   readonly dependencies?: FunctionDependencyOptions<Dependencies>;
   readonly invocationMode: "callable";
-  readonly publishes?: Publishes;
   readonly progress?: ProgressSchema;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly tool?: ToolMetadata;
-  readonly onBefore?: FunctionLifecycleHook<Input, Dependencies, Publishes, ProgressSchema>;
-  readonly onAfter?: FunctionLifecycleHook<Output, Dependencies, Publishes, ProgressSchema>;
-  readonly handler: FunctionHandler<Input, Output, Dependencies, Errors, Publishes, ProgressSchema>;
-  /** Invokes this function through the common runtime.
-   * @param input - Value accepted by the input schema.
-   * @returns Validated output, rejecting with an invocation error on failure.
-   * @example await descriptor.invoke({ id: "one" });
-   */
-  readonly invoke: (input: InferInput<InputSchema>) => Promise<Output>;
+  readonly onBefore?: FunctionLifecycleHook<Input, Dependencies, ProgressSchema>;
+  readonly onAfter?: FunctionLifecycleHook<Output, Dependencies, ProgressSchema>;
+  readonly handler: FunctionHandler<Input, Output, Dependencies, Errors, ProgressSchema>;
   /** Creates a tool view when the output is not a stream.
    * @param options - Optional tool metadata overriding the declared metadata.
    * @returns A tool descriptor derived from this function.
@@ -3082,7 +2946,7 @@ export interface FunctionDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L21)
 
 ### FunctionHandler (type alias)
 
@@ -3102,30 +2966,24 @@ type FunctionHandler<
   Output,
   Dependencies extends FunctionDependencies,
   Errors extends readonly ErrorDescriptorAny[] = readonly ErrorDescriptorAny[],
-  Publishes extends readonly KnownEventName[] = readonly [],
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 > = (
   input: Input,
-  context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
+  context: FunctionContext<Dependencies, ProgressValue<ProgressSchema>>,
 ) => MaybePromise<FunctionHandlerResult<Output, Errors>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L121)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L107)
 
 ### FunctionLifecycleHook
 
 **Signature**
 
 ```ts
-declare const FunctionLifecycleHook: FunctionLifecycleHook<
-  Value,
-  Dependencies,
-  Publishes,
-  ProgressSchema
->;
+declare const FunctionLifecycleHook: FunctionLifecycleHook<Value, Dependencies, ProgressSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L16)
 
 ## `function-graph-node.ts`
 
@@ -3520,15 +3378,14 @@ const hook: FunctionLifecycleHook<Input, {}, []> = (value) => value;
 type FunctionLifecycleHook<
   Value,
   Dependencies extends FunctionDependencies = {},
-  Publishes extends readonly KnownEventName[] = readonly [],
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 > = (
   value: Value,
-  context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
+  context: FunctionContext<Dependencies, ProgressValue<ProgressSchema>>,
 ) => MaybePromise<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-lifecycle.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-lifecycle.types.ts#L18)
 
 ### ProgressValue (type alias)
 
@@ -3548,7 +3405,7 @@ type ProgressValue<Schema extends StandardSchemaV1 | undefined> = Schema extends
   : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-lifecycle.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-lifecycle.types.ts#L9)
 
 ## `function-observability.ts`
 

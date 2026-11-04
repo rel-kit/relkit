@@ -99,7 +99,6 @@ export async function runHandler<
         return createContext(base, {
           ownerId: target.id,
           ...(target.dependencies === undefined ? {} : { dependencies: target.dependencies }),
-          ...(target.publications === undefined ? {} : { publications: target.publications }),
           ...(options.clients === undefined ? {} : { clients: options.clients }),
           bridge,
           signal: () => signalRef.current,

@@ -59,15 +59,14 @@ import {
 export function defineEventFunction<
   const Id extends string,
   const Event extends EventName,
-  const Publishes extends readonly EventName[] = readonly [],
   const Dependencies extends FunctionDependencies = {},
-  const Options extends EventFunctionCallOptions<Id, Event, Publishes, Dependencies> =
-    EventFunctionCallOptions<Id, Event, Publishes, Dependencies>,
+  const Options extends EventFunctionCallOptions<Id, Event, Dependencies> =
+    EventFunctionCallOptions<Id, Event, Dependencies>,
 >(
-  options: EventFunctionCallOptions<Id, Event, Publishes, Dependencies> &
+  options: EventFunctionCallOptions<Id, Event, Dependencies> &
     Options &
     EventFunctionValidation<NoInfer<Options>>,
-): EventFunctionDescriptor<Id, Event, Publishes, Dependencies, ErrorListOf<Options>> {
+): EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>> {
   try {
     return runEventSync(defineEventFunctionEffect(options));
   } catch (error) {
@@ -84,16 +83,15 @@ export function defineEventFunction<
 export function defineEventFunctionEffect<
   const Id extends string,
   const Event extends EventName,
-  const Publishes extends readonly EventName[] = readonly [],
   const Dependencies extends FunctionDependencies = {},
-  const Options extends EventFunctionCallOptions<Id, Event, Publishes, Dependencies> =
-    EventFunctionCallOptions<Id, Event, Publishes, Dependencies>,
+  const Options extends EventFunctionCallOptions<Id, Event, Dependencies> =
+    EventFunctionCallOptions<Id, Event, Dependencies>,
 >(
-  options: EventFunctionCallOptions<Id, Event, Publishes, Dependencies> &
+  options: EventFunctionCallOptions<Id, Event, Dependencies> &
     Options &
     EventFunctionValidation<NoInfer<Options>>,
 ): Effect.Effect<
-  EventFunctionDescriptor<Id, Event, Publishes, Dependencies, ErrorListOf<Options>>,
+  EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>,
   EventDefinitionError
 > {
   return observeEvent(
@@ -123,7 +121,7 @@ export function defineEventFunctionEffect<
             input: z.unknown(),
             output: z.void(),
             descriptorFields: { event, delivery, profile, retry },
-          }) as EventFunctionDescriptor<Id, Event, Publishes, Dependencies, ErrorListOf<Options>>,
+          }) as EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>,
         catch: (cause) =>
           new EventDefinitionError({
             message: cause instanceof Error ? cause.message : "Invalid event function",

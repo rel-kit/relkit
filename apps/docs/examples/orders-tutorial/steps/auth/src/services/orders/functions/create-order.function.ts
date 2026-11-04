@@ -15,10 +15,11 @@ export default defineFunction({
     quantity: z.number().int().positive(),
     totalCents: z.number().int().nonnegative(),
   }),
+  dependencies: { functions: { priceOrder } },
   handler: async (input, context) => {
     const session = await context.auth.getSession();
     if (session === null) throw new Error("Authentication required");
-    const { totalCents } = await priceOrder.invoke({ quantity: input.quantity });
+    const { totalCents } = await context.functions.priceOrder({ quantity: input.quantity });
     const saved = await context.database.orders.insert({
       data: { ...input, totalCents, ownerId: session.user.id },
     });

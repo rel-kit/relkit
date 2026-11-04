@@ -18,10 +18,9 @@ export type TaskHandler<
   Errors extends readonly ErrorDescriptorAny[],
   ProgressSchema extends StandardSchemaV1 | undefined,
   Streams extends TaskStreamSchemas,
-  Publishes extends readonly string[],
 > = (
   input: InferOutput<InputSchema>,
-  context: TaskContext<Execution, Dependencies, ProgressSchema, Streams, Publishes>,
+  context: TaskContext<Execution, Dependencies, ProgressSchema, Streams>,
 ) => MaybePromise<TaskHandlerResult<InferInput<OutputSchema>, Errors>>;
 
 /** Allowed output and declared failure forms returned by a task handler. */
@@ -32,27 +31,24 @@ export type TaskHandlerResult<Output, Errors extends readonly ErrorDescriptorAny
 export type TaskStartHook<
   InputSchema extends StandardSchemaV1,
   Dependencies extends TaskDependencies,
-  Publishes extends readonly string[] = readonly [],
 > = (
   input: InferOutput<InputSchema>,
-  context: TaskHookContext<Dependencies, Publishes>,
+  context: TaskHookContext<Dependencies>,
 ) => Promise<void>;
 
 /** Hook invoked after a task completes successfully. */
 export type TaskSuccessHook<
   OutputSchema extends StandardSchemaV1,
   Dependencies extends TaskDependencies,
-  Publishes extends readonly string[] = readonly [],
 > = (
   output: InferOutput<OutputSchema>,
-  context: TaskHookContext<Dependencies, Publishes>,
+  context: TaskHookContext<Dependencies>,
 ) => Promise<void>;
 
 /** Hook invoked after task execution fails. */
 export type TaskFailureHook<
   Dependencies extends TaskDependencies,
-  Publishes extends readonly string[] = readonly [],
-> = (error: unknown, context: TaskHookContext<Dependencies, Publishes>) => Promise<void>;
+> = (error: unknown, context: TaskHookContext<Dependencies>) => Promise<void>;
 
 /** Visibility settings for progress and named streams. */
 export interface TaskObservation<

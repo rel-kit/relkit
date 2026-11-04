@@ -56,7 +56,9 @@ Several tabs from the same signed-in member count as several connections but one
 
 ## Inspect presence from backend code
 
-For a channel that declares presence, call `channel.getPresence(params)`. The return type matches the declaration: count-only channels cannot access member fields, and channels without presence do not have this method.
+For a channel that declares presence, declare it under the function's `dependencies.channels`, then call
+`context.channels.orderUpdates.getPresence(params)`. Outside a function handler, use
+`getRelkit().channels["orders.updates"].getPresence(params)` from `relkit`, keyed by the channel ID. The return type matches the declaration: count-only channels cannot access member fields, and channels without presence do not have this method.
 
 The read is side-effect free. It does not subscribe, acquire or renew a lease, emit join or leave activity, or change connection and member counts. It uses the same partition authorization and member-list limit as browser observation.
 

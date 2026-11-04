@@ -71,10 +71,6 @@ export type MemoryInput = `${number} MiB` | `${number} GiB`;
 /** Event names registered for the application. */
 export type PublishedEventName = Extract<keyof Relkit.EventRegistry, string>;
 
-type PublishedEventMap<Names extends readonly string[]> = {
-  readonly [Name in Extract<Names[number], PublishedEventName>]: Relkit.EventRegistry[Name];
-};
-
 type RegisteredContext<
   Key extends PropertyKey,
   Fallback,
@@ -113,7 +109,6 @@ export interface TaskRunContext {
 /** Common invocation context shared by task handlers and hooks. */
 export interface TaskContextBase<
   Dependencies extends TaskDependencies = {},
-  Publishes extends readonly string[] = readonly [],
 > {
   readonly run: TaskRunContext;
   readonly invocation: InvocationMetadata;
@@ -130,8 +125,7 @@ export interface TaskContextBase<
   readonly agents: AgentClients<Dependencies["agents"]>;
   readonly buckets: BucketClients<Dependencies["buckets"]>;
   readonly cache: CacheClients<Dependencies["cache"]>;
-  readonly events: EventClients<PublishedEventMap<Publishes>> &
-    EventClients<Dependencies["events"]>;
+  readonly events: EventClients<Dependencies["events"]>;
   readonly database: RegisteredContext<"database", Readonly<Record<string, never>>>;
   readonly auth: RegisteredContext<"auth", TaskAuthContext>;
   readonly constants: RegisteredContext<"constants", Readonly<Record<string, never>>>;
@@ -148,8 +142,7 @@ export type TaskContext<
   Dependencies extends TaskDependencies = {},
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   Streams extends TaskStreamSchemas = {},
-  Publishes extends readonly string[] = readonly [],
-> = TaskContextBase<Dependencies, Publishes> &
+> = TaskContextBase<Dependencies> &
   (Execution extends "durable"
     ? {
         readonly sleep: (duration: DurationInput, options: TaskSleepOptions) => Promise<void>;
@@ -164,5 +157,4 @@ export type TaskContext<
 /** Invocation context visible to task lifecycle hooks. */
 export type TaskHookContext<
   Dependencies extends TaskDependencies = {},
-  Publishes extends readonly string[] = readonly [],
-> = TaskContextBase<Dependencies, Publishes>;
+> = TaskContextBase<Dependencies>;

@@ -72,9 +72,9 @@ describe("declared dependency clients", () => {
     };
     const clients = buildDependencyClients({
       ownerId: "orders.handle",
-      publications: { "orders.created": ref("event", "orders.created") },
       dependencies: {
         jobs: { send: ref("job", "orders.send") },
+        events: { "orders.created": ref("event", "orders.created") },
         buckets: { files: ref("bucket", "orders.files") },
         cache: { prices: ref("cache", "orders.prices") },
         agents: { summarize: ref("agent", "orders.summarize") },

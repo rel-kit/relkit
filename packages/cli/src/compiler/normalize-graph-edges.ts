@@ -9,7 +9,6 @@ import {
   addEventEdges,
   addHookEdges,
   addProviderEdge,
-  addPublicationEdges,
   addRouteEdgesEffect,
   addToolEdges,
   isTargetingDescriptor,
@@ -65,7 +64,6 @@ export const buildGraphEdgesEffect = Effect.fn("Compiler.buildGraphEdges")(
           if (descriptor.kind === "service") addServiceEdges(add, descriptor, value, work);
           if (descriptor.kind === "function") {
             addDependencyEdges(add, descriptor, value.dependencies, work);
-            addPublicationEdges(add, descriptor, value.publishes);
             if (Array.isArray(value.errors)) {
               for (const error of value.errors) {
                 const errorId = refId(error);
@@ -75,7 +73,6 @@ export const buildGraphEdgesEffect = Effect.fn("Compiler.buildGraphEdges")(
           }
           if (descriptor.kind === "task") {
             addDependencyEdges(add, descriptor, value.dependencies, work);
-            addPublicationEdges(add, descriptor, value.publishes);
           }
           if (
             descriptor.kind === "function" ||

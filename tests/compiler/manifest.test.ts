@@ -151,7 +151,7 @@ describe("runtime manifest generation", () => {
       { graphHash, descriptors: [] },
       new Map(),
       new Map(),
-      new Map([["orders.created", "__relkit_bindFunctionEvents(target, consumed, published)"]]),
+      new Map([["orders.created", "__relkit_bindFunctionEvents(target, consumed)"]]),
       new Map(),
       new Map(),
       new Map(),

@@ -86,8 +86,8 @@ in the same folder does not grant access automatically.
   /_snippets/source/examples/commerce/src/services/orders/functions/create-order.function.ts
 </include>
 
-Here, `dependencies.cache` supplies `context.cache.prices`. Event publishers separately declare
-`publishes` before using `context.events`; see [publish an event](/docs/modules/events/publish).
+Here, `dependencies.cache` supplies `context.cache.prices`. Event publishers declare the event under
+`dependencies.events` before using `context.events`; see [publish an event](/docs/modules/events/publish).
 Neither permission is configured in `service.ts`. The price cache is an
 Orders implementation detail, while `createOrder` can be a public operation.
 

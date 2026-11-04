@@ -51,9 +51,8 @@ export interface EventFunctionTrigger<Event extends EventName = EventName> {
  */
 export interface EventFunctionContext<
   Event extends EventName,
-  Publishes extends readonly EventName[] = readonly [],
   Dependencies extends FunctionDependencies = {},
-> extends FunctionContext<Dependencies, Publishes> {
+> extends FunctionContext<Dependencies> {
   readonly trigger: EventFunctionTrigger<Event>;
 }
 
@@ -62,12 +61,11 @@ export interface EventFunctionContext<
  */
 export type EventFunctionHandler<
   Event extends EventName,
-  Publishes extends readonly EventName[],
   Dependencies extends FunctionDependencies,
   Errors extends readonly ErrorDescriptorAny[],
 > = (
   input: EventInputByName<Event>,
-  context: EventFunctionContext<Event, Publishes, Dependencies>,
+  context: EventFunctionContext<Event, Dependencies>,
 ) => MaybePromise<FunctionHandlerResult<void, Errors>>;
 
 /** Definition options for a versioned event consumer.
@@ -76,7 +74,6 @@ export type EventFunctionHandler<
 export interface DefineEventFunctionOptions<
   Id extends string,
   Event extends EventName,
-  Publishes extends readonly EventName[] = readonly [],
   Dependencies extends FunctionDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
 > extends DescriptorMetadata {
@@ -87,18 +84,17 @@ export interface DefineEventFunctionOptions<
   readonly retry?: Partial<EventRetryPolicy>;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
-  readonly publishes?: Publishes;
   readonly dependencies?: Dependencies;
   readonly errors?: Errors;
   readonly onBefore?: (
     input: EventInputByName<Event>,
-    context: EventFunctionContext<Event, Publishes, Dependencies>,
+    context: EventFunctionContext<Event, Dependencies>,
   ) => MaybePromise<EventInputByName<Event>>;
   readonly onAfter?: (
     output: void,
-    context: EventFunctionContext<Event, Publishes, Dependencies>,
+    context: EventFunctionContext<Event, Dependencies>,
   ) => MaybePromise<void>;
-  readonly handler: EventFunctionHandler<Event, Publishes, Dependencies, Errors>;
+  readonly handler: EventFunctionHandler<Event, Dependencies, Errors>;
   readonly input?: never;
   readonly output?: never;
   readonly tool?: never;
@@ -111,7 +107,6 @@ export interface DefineEventFunctionOptions<
 export interface EventFunctionDescriptor<
   Id extends string = string,
   Event extends EventName = EventName,
-  Publishes extends readonly EventName[] = readonly [],
   Dependencies extends FunctionDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly ErrorDescriptorAny[],
 > extends DescriptorBase<"function", Id> {
@@ -122,10 +117,9 @@ export interface EventFunctionDescriptor<
   readonly retry: EventRetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
-  readonly publishes?: Publishes;
   readonly dependencies?: Dependencies;
   readonly errors?: Errors;
-  readonly handler: EventFunctionHandler<Event, Publishes, Dependencies, Errors>;
+  readonly handler: EventFunctionHandler<Event, Dependencies, Errors>;
   readonly invoke?: never;
   readonly asTool?: never;
   readonly __input?: InferOutput<EventDescriptorByName<Event>["input"]>;
@@ -142,6 +136,5 @@ export interface EventFunctionDescriptorAny extends DescriptorBase<"function"> {
   readonly retry: EventRetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
-  readonly publishes?: readonly string[];
   readonly handler: (...args: never[]) => unknown;
 }

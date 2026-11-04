@@ -39,7 +39,7 @@ export function edgeKind(category: DependencyCategory): GraphEdge["kind"] {
   return edgeKinds[category];
 }
 
-/** Collect the declarations of one client family; events also include ID-keyed publications.
+/** Collect the declarations of one client family.
  * @returns Declarations keyed by the name the handler uses.
  * @param category - Declared client capability family.
  * @param options - Explicit configuration and dependencies for this operation.
@@ -48,8 +48,7 @@ export function declaredDependencies(
   category: DependencyCategory,
   options: DependencyClientBuildOptions,
 ): Readonly<Record<string, DependencyRefLike>> {
-  const declared = options.dependencies?.[category] ?? {};
-  return category === "events" ? { ...options.publications, ...declared } : declared;
+  return options.dependencies?.[category] ?? {};
 }
 
 /** Resolve authored or manifest-bound dependency identity.

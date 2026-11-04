@@ -197,7 +197,7 @@ export function validateTargets(
   return Object.freeze(targets);
 }
 
-/** List the event IDs a target publishes: bound publications and `dependencies.events`.
+/** List the event IDs a target declares under `dependencies.events`.
  * @returns Sorted unique event IDs.
  * @param target - Registered executable target.
  */
@@ -208,8 +208,7 @@ function declaredPublications(target: Record<string, unknown>): readonly string[
       ? [event.ref.id]
       : [],
   );
-  const bound = Object.keys(isRecord(target.publications) ? target.publications : {});
-  return [...new Set([...bound, ...dependencyIds])].sort();
+  return [...new Set(dependencyIds)].sort();
 }
 
 /** Recognize non-null object records before reading native fields.

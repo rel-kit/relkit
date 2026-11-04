@@ -8,7 +8,7 @@ import {
   assertHook,
   assertSchema,
   copyDependencies,
-  copyPublishes,
+  rejectPublishes,
   validateLimit,
 } from "./define-function-validation.js";
 import { isStreamOutputSchema } from "./stream.js";
@@ -44,7 +44,7 @@ export const createFunctionDescriptorEffect = Effect.fn("functions.function.crea
       }
       const base = createDescriptorBase("function", options.id, options);
       const dependencies = copyDependencies(options.dependencies);
-      const publishes = copyPublishes(options.publishes);
+      rejectPublishes((options as { readonly publishes?: unknown }).publishes);
       const errors = copyErrors(options.errors);
       const tool = options.tool === undefined ? undefined : copyFunctionToolMetadata(options.tool);
       const descriptor = {
@@ -56,7 +56,6 @@ export const createFunctionDescriptorEffect = Effect.fn("functions.function.crea
         ...(options.descriptorFields ?? {}),
         ...(errors === undefined ? {} : { errors }),
         ...(dependencies === undefined ? {} : { dependencies }),
-        ...(publishes === undefined ? {} : { publishes }),
         ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
         ...(options.concurrency === undefined ? {} : { concurrency: options.concurrency }),
         ...(tool === undefined ? {} : { tool }),

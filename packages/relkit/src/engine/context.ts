@@ -34,7 +34,6 @@ export const createContextEffect = Effect.fn("Engine.createContext")(
         const clients = yield* buildDependencyClientsEffect({
           ownerId: options.ownerId,
           ...(options.dependencies === undefined ? {} : { dependencies: options.dependencies }),
-          ...(options.publications === undefined ? {} : { publications: options.publications }),
           sources: { ...sourceMaps(base as unknown as InvocationContextBase), ...options.clients },
           ...(options.bridge === undefined ? {} : { bridge: options.bridge }),
           ...(options.signal === undefined ? {} : { signal: options.signal }),

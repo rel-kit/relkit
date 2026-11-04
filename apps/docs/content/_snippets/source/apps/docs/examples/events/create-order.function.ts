@@ -1,5 +1,6 @@
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "zod";
+import orderCreated from "../events/order-created.event.js";
 
 const createOrder = defineFunction({
   input: z.object({
@@ -12,10 +13,10 @@ const createOrder = defineFunction({
     sku: z.string(),
     totalCents: z.number().int().nonnegative(),
   }),
-  publishes: ["orders.created"],
+  dependencies: { events: { orderCreated } },
   handler: async (input, context) => {
     const order = { orderId: input.orderId, sku: input.sku, totalCents: input.quantity * 100 };
-    await context.events["orders.created"].publish(order);
+    await context.events.orderCreated.publish(order);
     return order;
   },
 });

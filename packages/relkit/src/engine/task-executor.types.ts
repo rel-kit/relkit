@@ -19,5 +19,4 @@ export interface TaskExecutorOptions {
   readonly idSource?: InvocationIdSource;
   readonly effectRunner?: InvocationRunner;
   readonly now?: () => number;
-  readonly publications?: Readonly<Record<string, import("./dependencies.js").DependencyRefLike>>;
 }

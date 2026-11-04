@@ -68,6 +68,7 @@ test("engine dispatch uses the verified generation registry in its shared scope"
       [parent.id]: runtimeHandler(parent.handler),
       [child.id]: runtimeHandler((value: number) => value + 1),
     },
+    targets: { [child.id]: generationChild(child.id, (value) => value + 1) },
   });
   const records: Array<{ id: string; functionId: string; parentId?: string; traceId: string }> = [];
   let sequence = 0;
@@ -101,7 +102,7 @@ test("engine dispatch uses the verified generation registry in its shared scope"
   expect(admissionCount).toBe(2);
 });
 
-test("function invoke uses standalone and active generation dispatch", async () => {
+test("function dependency calls use standalone and active generation dispatch", async () => {
   const child = defineFunction({
     id: "orders.descriptor-child",
     input,
@@ -112,17 +113,13 @@ test("function invoke uses standalone and active generation dispatch", async () 
     id: "orders.descriptor-parent",
     input,
     output,
-    handler: () => child.invoke(1),
+    dependencies: { functions: { child } },
+    handler: (value, context) => context.functions.child(value),
   });
 
   expect(Object.keys(child)).not.toContain("invoke");
-  expect(Object.getOwnPropertyDescriptor(child, "invoke")).toMatchObject({
-    enumerable: false,
-    writable: false,
-    configurable: false,
-  });
   expect(Object.isFrozen(child)).toBe(true);
-  await expect(child.invoke(1)).resolves.toBe(-1);
+  await expect(dispatchInvocation({ target: invocationTarget(child), input: 1 })).resolves.toBe(-1);
 
   const graph: ApplicationGraph = {
     contractVersion: GRAPH_VERSION,
@@ -156,6 +153,7 @@ test("function invoke uses standalone and active generation dispatch", async () 
       [parent.id]: runtimeHandler(parent.handler),
       [child.id]: runtimeHandler((value: number) => value + 1),
     },
+    targets: { [child.id]: generationChild(child.id, (value) => value + 1) },
   });
   const hooks = createInspectableObservabilityHooks();
 
@@ -196,11 +194,12 @@ test("keeps concurrent generation runtimes isolated", async () => {
     id: "orders.concurrent-parent",
     input,
     output,
-    handler: async () => {
+    dependencies: { functions: { child } },
+    handler: async (value, context) => {
       started += 1;
       if (started === 2) bothStarted();
       await gate;
-      return child.invoke(1);
+      return context.functions.child(value);
     },
   });
   const graph: ApplicationGraph = {
@@ -236,6 +235,7 @@ test("keeps concurrent generation runtimes isolated", async () => {
         [parent.id]: runtimeHandler(parent.handler),
         [child.id]: () => value,
       },
+      targets: { [child.id]: generationChild(child.id, () => value) },
     });
   const idSource = (prefix: string) => {
     let sequence = 0;
@@ -258,6 +258,11 @@ test("keeps concurrent generation runtimes isolated", async () => {
 
   expect(await Promise.all([first, second])).toEqual([11, 22]);
 });
+
+/** The child descriptor a generation registers, replacing the authored child inside that generation. */
+function generationChild(id: string, handler: (value: number) => number) {
+  return defineFunction({ id, input, output, handler });
+}
 
 function runtimeCohort(graphHash: string) {
   return {

@@ -35,17 +35,15 @@ export interface DefineFunction {
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-    const Publishes extends readonly Extract<keyof Relkit.EventRegistry, string>[] = readonly [],
     const Options extends FunctionCallOptions<
       Id,
       InputSchema,
       OutputSchema,
       {},
-      Publishes,
       ProgressSchema
-    > = FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes, ProgressSchema>,
+    > = FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema>,
   >(
-    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes, ProgressSchema> &
+    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> &
       Options &
       FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> & {
         readonly dependencies?: never;
@@ -59,7 +57,6 @@ export interface DefineFunction {
     InputSchema,
     OutputSchema,
     ToolMetadataOf<Options>,
-    Publishes,
     ProgressSchema
   >;
 
@@ -74,22 +71,19 @@ export interface DefineFunction {
     const OutputSchema extends StandardSchemaV1,
     const Dependencies extends FunctionDependencies,
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-    const Publishes extends readonly Extract<keyof Relkit.EventRegistry, string>[] = readonly [],
     const Options extends FunctionCallOptions<
       Id,
       InputSchema,
       OutputSchema,
       Dependencies,
-      Publishes,
       ProgressSchema
-    > = FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, Publishes, ProgressSchema>,
+    > = FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema>,
   >(
     options: FunctionCallOptions<
       Id,
       InputSchema,
       OutputSchema,
       Dependencies,
-      Publishes,
       ProgressSchema
     > &
       Options &
@@ -103,7 +97,6 @@ export interface DefineFunction {
     InputSchema,
     OutputSchema,
     ToolMetadataOf<Options>,
-    Publishes,
     ProgressSchema
   >;
 }
@@ -115,17 +108,15 @@ export interface DefineFunctionEffect {
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-    const Publishes extends readonly Extract<keyof Relkit.EventRegistry, string>[] = readonly [],
     const Options extends FunctionCallOptions<
       Id,
       InputSchema,
       OutputSchema,
       {},
-      Publishes,
       ProgressSchema
-    > = FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes, ProgressSchema>,
+    > = FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema>,
   >(
-    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes, ProgressSchema> &
+    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> &
       Options &
       FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> & {
         readonly dependencies?: never;
@@ -140,7 +131,6 @@ export interface DefineFunctionEffect {
       InputSchema,
       OutputSchema,
       ToolMetadataOf<Options>,
-      Publishes,
       ProgressSchema
     >,
     FunctionOperationError
@@ -152,22 +142,19 @@ export interface DefineFunctionEffect {
     const OutputSchema extends StandardSchemaV1,
     const Dependencies extends FunctionDependencies,
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-    const Publishes extends readonly Extract<keyof Relkit.EventRegistry, string>[] = readonly [],
     const Options extends FunctionCallOptions<
       Id,
       InputSchema,
       OutputSchema,
       Dependencies,
-      Publishes,
       ProgressSchema
-    > = FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, Publishes, ProgressSchema>,
+    > = FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema>,
   >(
     options: FunctionCallOptions<
       Id,
       InputSchema,
       OutputSchema,
       Dependencies,
-      Publishes,
       ProgressSchema
     > &
       Options &
@@ -182,7 +169,6 @@ export interface DefineFunctionEffect {
       InputSchema,
       OutputSchema,
       ToolMetadataOf<Options>,
-      Publishes,
       ProgressSchema
     >,
     FunctionOperationError

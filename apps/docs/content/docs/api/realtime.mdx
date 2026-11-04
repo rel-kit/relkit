@@ -587,7 +587,7 @@ declare const defineChannel: <
 ) => ChannelDescriptor<Id, ParamsSchema, Events, Client, Presence>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L135)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L115)
 
 Since v0.4.0
 
@@ -617,7 +617,7 @@ Re-exports all named exports from the "./channel-client.types.js" module.
 export * from "./channel-client.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L27)
 
 ### "./channel.types.js" (namespace export)
 
@@ -629,7 +629,7 @@ Re-exports all named exports from the "./channel.types.js" module.
 export * from "./channel.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L26)
 
 ### defineChannelEffect
 
@@ -659,7 +659,7 @@ declare const defineChannelEffect: <
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L35)
 
 ### getChannelPresenceEffect
 
@@ -676,7 +676,7 @@ declare const getChannelPresenceEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L28)
 
 ### isChannelDescriptor
 
@@ -694,7 +694,7 @@ isChannelDescriptor(channel);
 declare const isChannelDescriptor: (value: unknown) => value is ChannelDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L167)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L147)
 
 ### isChannelDescriptorEffect
 
@@ -712,7 +712,7 @@ Effect.runSync(isChannelDescriptorEffect(channel));
 declare const isChannelDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L154)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L134)
 
 ### triggerChannelEffect
 
@@ -732,7 +732,7 @@ declare const triggerChannelEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L28)
 
 ## `channel.types.ts`
 
@@ -758,7 +758,7 @@ type ChannelClientPolicy<Guard> =
 
 ### ChannelDescriptor (type alias)
 
-A typed channel descriptor with backend publication methods.
+A typed channel descriptor; functions reach it through `dependencies.channels`.
 
 **Example**
 
@@ -782,32 +782,7 @@ type ChannelDescriptor<
   readonly client?: Client;
   readonly replay?: ChannelReplay;
   readonly presence?: Presence;
-  /** Validates and publishes one event through the bound dispatcher.
-   * @param params - Schema input for channel parameters.
-   * @param event - One of the declared event names.
-   * @param payload - Input for the selected event schema.
-   * @param options - Optional idempotency key.
-   * @returns A trigger receipt or validation/provider rejection.
-   * @example await channel.trigger({ orderId: "o1" }, "changed", { status: "paid" });
-   */
-  readonly trigger: <Name extends Extract<keyof Events, string>>(
-    params: InferInput<ParamsSchema>,
-    event: Name,
-    payload: InferInput<Events[Name]>,
-    options?: { readonly idempotencyKey?: OperationId },
-  ) => Promise<TriggerReceipt>;
-} & ([Presence] extends [undefined]
-    ? {}
-    : {
-        /** Reads validated presence through the bound dispatcher.
-         * @param params - Schema input for channel parameters.
-         * @returns Count or member presence, or a validation/provider rejection.
-         * @example await channel.getPresence({ orderId: "o1" });
-         */
-        readonly getPresence: (
-          params: InferInput<ParamsSchema>,
-        ) => Promise<PresenceResult<Presence>>;
-      });
+};
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L55)
@@ -834,12 +809,11 @@ type ChannelDescriptorAny = ChannelDescriptor<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L104)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L73)
 
 ### ChannelDescriptorData (type alias)
 
 Descriptor data read by provider and transport boundaries.
-Typed trigger methods remain on ChannelDescriptor; providers read only this data.
 
 **Example**
 
@@ -860,7 +834,7 @@ type ChannelDescriptorData = DescriptorBase<"channel", string> & {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L84)
 
 ### ChannelGuard (type alias)
 
@@ -963,7 +937,7 @@ export interface DefineChannelOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L96)
 
 ### MemberPresenceDescriptor (interface)
 

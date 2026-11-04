@@ -7,6 +7,7 @@ import { defineApp, defineEnv, env } from "relkit/config";
 import { defineServiceRoutes } from "relkit/routes";
 import { z, type InferInput, type InferOutput } from "relkit/schema";
 import { redis } from "@relkit/redis";
+import type { FunctionContext } from "relkit";
 
 type IsAny<Value> = 0 extends 1 & Value ? true : false;
 type AssertFalse<Value extends false> = Value;
@@ -17,6 +18,9 @@ const example = defineFunction({
   handler: ({ id }) => ({ id }),
 });
 const service = defineService({ functions: { example } });
+type ExampleClient = FunctionContext<{
+  functions: { example: typeof example };
+}>["functions"]["example"];
 const routes = defineServiceRoutes(service, { GET: "example" });
 const created = defineEvent({ id: "types.audit-created", input: z.object({ id: z.string() }) });
 const task = defineTask({
@@ -35,8 +39,8 @@ const application = defineApp({
 });
 
 export type AuthoringTypeEvidence = [
-  AssertFalse<IsAny<Parameters<typeof example.invoke>[0]>>,
-  AssertFalse<IsAny<Awaited<ReturnType<typeof example.invoke>>>>,
+  AssertFalse<IsAny<Parameters<ExampleClient>[0]>>,
+  AssertFalse<IsAny<Awaited<ReturnType<ExampleClient>>>>,
   AssertFalse<IsAny<typeof service.example>>,
   AssertFalse<IsAny<typeof routes.GET>>,
   AssertFalse<IsAny<typeof routes.GET.target>>,
@@ -48,12 +52,20 @@ export type AuthoringTypeEvidence = [
   AssertFalse<IsAny<typeof application.defaults.cache>>,
 ];
 
-// @ts-expect-error service calls preserve the function input contract
-service.example.invoke({ id: 123 });
+defineFunction({
+  input: z.object({}),
+  output: z.string(),
+  dependencies: { functions: { example: service.example, routed: routes.GET.target } },
+  handler: async (_input, context) => {
+    // @ts-expect-error service calls preserve the function input contract
+    await context.functions.example({ id: 123 });
+    // @ts-expect-error route targets retain the same function input contract
+    await context.functions.routed({ id: 123 });
+    return "checked";
+  },
+});
 // @ts-expect-error service membership is closed
 service.missing;
-// @ts-expect-error route targets retain the same function input contract
-routes.GET.target.invoke({ id: 123 });
 defineTask({
   id: "types.audit-invalid-task",
   version: "1",

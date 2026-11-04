@@ -16,7 +16,6 @@ export interface FunctionDescriptorFactoryOptions extends DescriptorMetadata {
   readonly handler: (...args: any[]) => unknown;
   readonly errors?: readonly ErrorDescriptorAny[];
   readonly dependencies?: FunctionDependencies;
-  readonly publishes?: readonly string[];
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly tool?: FunctionToolMetadata;

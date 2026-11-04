@@ -6,7 +6,7 @@ sidebar:
 ---
 
 A function contains a piece of application behavior, such as calculating a price or creating an order. It declares runtime input and output schemas,
-expected errors, provider-backed dependencies, optional publication access, and one handler. Routes, jobs,
+expected errors, the dependencies its handler uses, and one handler. Routes, jobs,
 event consumers, tools, agents, and direct calls all enter the same invocation engine.
 
 Functions remain request- or event-scoped operations. When work must outlive the initiating request, define a
@@ -41,8 +41,10 @@ For every scaffolding flag, see the [function command reference](/docs/api/cli#r
 </include>
 
 The handler receives validated input. Its return value is validated before the invocation succeeds. The example
-calls `priceOrder.invoke(...)`, so the nested operation keeps validation, deadlines, cancellation, tracing, and
-causation. Calling another descriptor's handler directly bypasses that contract.
+declares `priceOrder` under `dependencies.functions` and calls it with `context.functions.priceOrder(...)`. A
+function can call another function only when it declares the call under `dependencies.functions`. The nested
+operation keeps validation, deadlines, cancellation, tracing, and causation. Calling another descriptor's handler
+directly bypasses that contract.
 
 ### Use this function from the frontend
 
@@ -68,8 +70,10 @@ transport fields such as cookies and raw headers in the route unless they are ge
 
 ### Declare failures and capabilities
 
-List only errors callers are expected to handle. Declare only the jobs, buckets, caches, and agents the
-handler uses. Event publication is separate: list exact event IDs in `publishes`.
+List only errors callers are expected to handle. Under `dependencies`, declare only the functions, events,
+channels, databases, tasks, jobs, buckets, caches, and agents the handler uses. The handler reaches each one
+through `context`, such as `context.events.orderCreated.publish(order)`. The default database stays available as
+`context.database` without a declaration.
 
 ### Implement transport-independent behavior
 

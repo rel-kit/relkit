@@ -2009,15 +2009,14 @@ const receipt = defineEventFunction({
 declare const defineEventFunction: <
   const Id extends string,
   const Event extends EventName,
-  const Publishes extends readonly EventName[] = readonly [],
   const Dependencies extends FunctionDependencies = {},
-  const Options extends EventFunctionCallOptions<Id, Event, Publishes, Dependencies> =
-    EventFunctionCallOptions<Id, Event, Publishes, Dependencies>,
+  const Options extends EventFunctionCallOptions<Id, Event, Dependencies> =
+    EventFunctionCallOptions<Id, Event, Dependencies>,
 >(
-  options: EventFunctionCallOptions<Id, Event, Publishes, Dependencies> &
+  options: EventFunctionCallOptions<Id, Event, Dependencies> &
     Options &
     EventFunctionValidation<NoInfer<Options>>,
-) => EventFunctionDescriptor<Id, Event, Publishes, Dependencies, ErrorListOf<Options>>;
+) => EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L59)
@@ -2042,21 +2041,20 @@ Effect.runSync(
 declare const defineEventFunctionEffect: <
   const Id extends string,
   const Event extends EventName,
-  const Publishes extends readonly EventName[] = readonly [],
   const Dependencies extends FunctionDependencies = {},
-  const Options extends EventFunctionCallOptions<Id, Event, Publishes, Dependencies> =
-    EventFunctionCallOptions<Id, Event, Publishes, Dependencies>,
+  const Options extends EventFunctionCallOptions<Id, Event, Dependencies> =
+    EventFunctionCallOptions<Id, Event, Dependencies>,
 >(
-  options: EventFunctionCallOptions<Id, Event, Publishes, Dependencies> &
+  options: EventFunctionCallOptions<Id, Event, Dependencies> &
     Options &
     EventFunctionValidation<NoInfer<Options>>,
 ) => Effect.Effect<
-  EventFunctionDescriptor<Id, Event, Publishes, Dependencies, ErrorListOf<Options>>,
+  EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>,
   EventDefinitionError
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L83)
 
 ### isEventFunctionDescriptor
 
@@ -2074,7 +2072,7 @@ isEventFunctionDescriptor(candidate);
 declare const isEventFunctionDescriptor: (value: unknown) => value is EventFunctionDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L145)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L143)
 
 ### isEventFunctionDescriptorEffect
 
@@ -2094,7 +2092,7 @@ declare const isEventFunctionDescriptorEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L154)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L152)
 
 ## `define-event-function.types.ts`
 
@@ -2146,15 +2144,14 @@ type Options = EventFunctionCallOptions<"receipt.send", "orders.created", [], {}
 type EventFunctionCallOptions<
   Id extends string,
   Event extends EventName,
-  Publishes extends readonly EventName[],
   Dependencies extends FunctionDependencies,
 > = Omit<
-  DefineEventFunctionOptions<Id, Event, Publishes, Dependencies, readonly ErrorDescriptorAny[]>,
+  DefineEventFunctionOptions<Id, Event, Dependencies, readonly ErrorDescriptorAny[]>,
   "handler"
 > & {
   readonly handler: (
     input: EventInputByName<Event>,
-    context: EventFunctionContext<Event, Publishes, Dependencies>,
+    context: EventFunctionContext<Event, Dependencies>,
   ) => unknown;
 };
 ```
@@ -2166,13 +2163,7 @@ type EventFunctionCallOptions<
 **Signature**
 
 ```ts
-declare const EventFunctionDescriptor: EventFunctionDescriptor<
-  Id,
-  Event,
-  Publishes,
-  Dependencies,
-  Errors
->;
+declare const EventFunctionDescriptor: EventFunctionDescriptor<Id, Event, Dependencies, Errors>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L11)
@@ -2204,7 +2195,7 @@ type EventFunctionValidation<Options extends { readonly handler: (...args: never
   FunctionHandlerValidation<Awaited<ReturnType<Options["handler"]>>, void, ErrorListOf<Options>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L44)
 
 ### EventName
 
@@ -2790,7 +2781,6 @@ declare const assertVersionEffect: (
 declare const bindFunctionEventsEffect: <T extends FunctionWithEvents>(
   descriptor: T,
   consumed: EventDescriptorAny | undefined,
-  published: readonly EventDescriptorAny[],
 ) => Effect<T, EventBindingError>;
 ```
 
@@ -2842,16 +2832,15 @@ declare const defineEventEffect: <
 declare const defineEventFunctionEffect: <
   const Id extends string,
   const Event extends EventName,
-  const Publishes extends readonly EventName[] = readonly [],
   const Dependencies extends FunctionDependencies = {},
-  const Options extends EventFunctionCallOptions<Id, Event, Publishes, Dependencies> =
-    EventFunctionCallOptions<Id, Event, Publishes, Dependencies>,
+  const Options extends EventFunctionCallOptions<Id, Event, Dependencies> =
+    EventFunctionCallOptions<Id, Event, Dependencies>,
 >(
-  options: EventFunctionCallOptions<Id, Event, Publishes, Dependencies> &
+  options: EventFunctionCallOptions<Id, Event, Dependencies> &
     Options &
     EventFunctionValidation<NoInfer<Options>>,
 ) => Effect<
-  EventFunctionDescriptor<Id, Event, Publishes, Dependencies, ErrorListOf<Options>>,
+  EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>,
   EventDefinitionError
 >;
 ```
@@ -3328,12 +3317,12 @@ Binds validated event contracts into a generated function target.
 
 **Throws**
 
-TypeError if any declared contract is missing or invalid.
+TypeError if the consumed contract is missing or invalid.
 
 **Example**
 
 ```ts
-bindFunctionEvents(publisher, undefined, [orderCreated]);
+bindFunctionEvents(onOrderCreated, orderCreated);
 ```
 
 **Signature**
@@ -3342,11 +3331,10 @@ bindFunctionEvents(publisher, undefined, [orderCreated]);
 declare const bindFunctionEvents: <T extends FunctionWithEvents>(
   descriptor: T,
   consumed: EventDescriptorAny | undefined,
-  published: readonly EventDescriptorAny[],
 ) => T;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-target.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-target.ts#L21)
 
 ### bindFunctionEventsEffect
 
@@ -3355,7 +3343,7 @@ Binds event contracts with typed failures in an Effect workflow.
 **Example**
 
 ```ts
-Effect.runSync(bindFunctionEventsEffect(publisher, undefined, [orderCreated]));
+Effect.runSync(bindFunctionEventsEffect(onOrderCreated, orderCreated));
 ```
 
 **Signature**
@@ -3364,11 +3352,10 @@ Effect.runSync(bindFunctionEventsEffect(publisher, undefined, [orderCreated]));
 declare const bindFunctionEventsEffect: <T extends FunctionWithEvents>(
   descriptor: T,
   consumed: EventDescriptorAny | undefined,
-  published: readonly EventDescriptorAny[],
 ) => Effect.Effect<T, EventBindingError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-target.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-target.ts#L39)
 
 ## `event-function-target.types.ts`
 
@@ -3377,7 +3364,7 @@ Minimal function descriptor accepted by event contract binding.
 **Example**
 
 ```ts
-const target: FunctionWithEvents = { id: "orders.create", publishes: ["orders.created"] };
+const target: FunctionWithEvents = { id: "orders.on-created", event: "orders.created" };
 ```
 
 ### EventDescriptorAny
@@ -3388,7 +3375,7 @@ const target: FunctionWithEvents = { id: "orders.create", publishes: ["orders.cr
 declare const EventDescriptorAny: EventDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-target.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-target.types.ts#L10)
 
 ### FunctionWithEvents (interface)
 
@@ -3397,7 +3384,7 @@ Minimal function descriptor accepted by event contract binding.
 **Example**
 
 ```ts
-const target: FunctionWithEvents = { id: "orders.create", publishes: ["orders.created"] };
+const target: FunctionWithEvents = { id: "orders.on-created", event: "orders.created" };
 ```
 
 **Signature**
@@ -3407,7 +3394,6 @@ export interface FunctionWithEvents {
   readonly id: string;
   readonly invocationMode?: "callable" | "event-only";
   readonly event?: string;
-  readonly publishes?: readonly string[];
   readonly input?: unknown;
 }
 ```
@@ -3602,7 +3588,6 @@ const options = { id: "receipt.send", event: "orders.created", handler: () => {}
 export interface DefineEventFunctionOptions<
   Id extends string,
   Event extends EventName,
-  Publishes extends readonly EventName[] = readonly [],
   Dependencies extends FunctionDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
 > extends DescriptorMetadata {
@@ -3613,18 +3598,17 @@ export interface DefineEventFunctionOptions<
   readonly retry?: Partial<EventRetryPolicy>;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
-  readonly publishes?: Publishes;
   readonly dependencies?: Dependencies;
   readonly errors?: Errors;
   readonly onBefore?: (
     input: EventInputByName<Event>,
-    context: EventFunctionContext<Event, Publishes, Dependencies>,
+    context: EventFunctionContext<Event, Dependencies>,
   ) => MaybePromise<EventInputByName<Event>>;
   readonly onAfter?: (
     output: void,
-    context: EventFunctionContext<Event, Publishes, Dependencies>,
+    context: EventFunctionContext<Event, Dependencies>,
   ) => MaybePromise<void>;
-  readonly handler: EventFunctionHandler<Event, Publishes, Dependencies, Errors>;
+  readonly handler: EventFunctionHandler<Event, Dependencies, Errors>;
   readonly input?: never;
   readonly output?: never;
   readonly tool?: never;
@@ -3632,7 +3616,7 @@ export interface DefineEventFunctionOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L74)
 
 ### EventDelivery (type alias)
 
@@ -3667,9 +3651,8 @@ const eventId = context.trigger.event.id;
 ```ts
 export interface EventFunctionContext<
   Event extends EventName,
-  Publishes extends readonly EventName[] = readonly [],
   Dependencies extends FunctionDependencies = {},
-> extends FunctionContext<Dependencies, Publishes> {
+> extends FunctionContext<Dependencies> {
   readonly trigger: EventFunctionTrigger<Event>;
 }
 ```
@@ -3692,7 +3675,6 @@ const descriptor = defineEventFunction(options);
 export interface EventFunctionDescriptor<
   Id extends string = string,
   Event extends EventName = EventName,
-  Publishes extends readonly EventName[] = readonly [],
   Dependencies extends FunctionDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly ErrorDescriptorAny[],
 > extends DescriptorBase<"function", Id> {
@@ -3703,17 +3685,16 @@ export interface EventFunctionDescriptor<
   readonly retry: EventRetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
-  readonly publishes?: Publishes;
   readonly dependencies?: Dependencies;
   readonly errors?: Errors;
-  readonly handler: EventFunctionHandler<Event, Publishes, Dependencies, Errors>;
+  readonly handler: EventFunctionHandler<Event, Dependencies, Errors>;
   readonly invoke?: never;
   readonly asTool?: never;
   readonly __input?: InferOutput<EventDescriptorByName<Event>["input"]>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L111)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L107)
 
 ### EventFunctionDescriptorAny (interface)
 
@@ -3736,12 +3717,11 @@ export interface EventFunctionDescriptorAny extends DescriptorBase<"function"> {
   readonly retry: EventRetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
-  readonly publishes?: readonly string[];
   readonly handler: (...args: never[]) => unknown;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L137)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L131)
 
 ### EventFunctionHandler (type alias)
 
@@ -3758,16 +3738,15 @@ const handler: EventFunctionHandler<"orders.created", [], {}, []> = () => {};
 ```ts
 type EventFunctionHandler<
   Event extends EventName,
-  Publishes extends readonly EventName[],
   Dependencies extends FunctionDependencies,
   Errors extends readonly ErrorDescriptorAny[],
 > = (
   input: EventInputByName<Event>,
-  context: EventFunctionContext<Event, Publishes, Dependencies>,
+  context: EventFunctionContext<Event, Dependencies>,
 ) => MaybePromise<FunctionHandlerResult<void, Errors>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L62)
 
 ### EventFunctionTrigger (interface)
 
@@ -4359,7 +4338,6 @@ declare const assertEventDescriptor: (value: unknown) => asserts value is EventD
 declare const bindFunctionEvents: <T extends FunctionWithEvents>(
   descriptor: T,
   consumed: EventDescriptorAny | undefined,
-  published: readonly EventDescriptorAny[],
 ) => T;
 ```
 
@@ -4405,15 +4383,14 @@ declare const defineEvent: <
 declare const defineEventFunction: <
   const Id extends string,
   const Event extends EventName,
-  const Publishes extends readonly EventName[] = readonly [],
   const Dependencies extends FunctionDependencies = {},
-  const Options extends EventFunctionCallOptions<Id, Event, Publishes, Dependencies> =
-    EventFunctionCallOptions<Id, Event, Publishes, Dependencies>,
+  const Options extends EventFunctionCallOptions<Id, Event, Dependencies> =
+    EventFunctionCallOptions<Id, Event, Dependencies>,
 >(
-  options: EventFunctionCallOptions<Id, Event, Publishes, Dependencies> &
+  options: EventFunctionCallOptions<Id, Event, Dependencies> &
     Options &
     EventFunctionValidation<NoInfer<Options>>,
-) => EventFunctionDescriptor<Id, Event, Publishes, Dependencies, ErrorListOf<Options>>;
+) => EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L34)

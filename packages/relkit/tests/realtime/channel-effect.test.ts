@@ -16,6 +16,11 @@ import {
   setActiveRealtimeDispatcher,
 } from "../../src/realtime/dispatch.js";
 import { fixturePresence, fixtureReceipt } from "./provider-fixture.js";
+/** Promise forms of the channel operations, as a handler's `ctx.channels` client runs them. */
+const triggerPromise = (...args: Parameters<typeof triggerChannelEffect>) =>
+  runChannelPromise(triggerChannelEffect(...args));
+const presencePromise = (...args: Parameters<typeof getChannelPresenceEffect>) =>
+  runChannelPromise(getChannelPresenceEffect(...args));
 const options = {
   id: "news",
   params: z.object({ id: z.string() }),
@@ -23,10 +28,11 @@ const options = {
   client: { public: true as const },
   presence: "count" as const,
 };
-test("Effect construction freezes descriptors and exposes compatibility methods", () => {
+test("Effect construction freezes descriptors without backend methods", () => {
   const channel = Effect.runSync(defineChannelEffect(options));
   expect(Object.isFrozen(channel)).toBe(true);
-  expect(Object.keys(channel)).not.toContain("trigger");
+  expect("trigger" in channel).toBe(false);
+  expect("getPresence" in channel).toBe(false);
   expect(isChannelDescriptor(channel)).toBe(true);
   expect(Effect.runSync(isChannelDescriptorEffect(channel))).toBe(true);
   expect(Effect.runSync(isChannelDescriptorEffect({}))).toBe(false);
@@ -70,18 +76,18 @@ test("trigger validates parameters and payload before dispatch", async () => {
   };
   expect(
     await runWithRealtimeDispatcher(dispatcher, () =>
-      channel.trigger({ id: "one" }, "posted", "hello"),
+      triggerPromise(channel, { id: "one" }, "posted", "hello"),
     ),
   ).toMatchObject({ accepted: true });
   expect(events).toEqual(["posted"]);
   await expect(
     runWithRealtimeDispatcher(dispatcher, () =>
-      channel.trigger({ id: 1 } as never, "posted", "hello"),
+      triggerPromise(channel, { id: 1 } as never, "posted", "hello"),
     ),
   ).rejects.toThrow("params validation failed");
   await expect(
     runWithRealtimeDispatcher(dispatcher, () =>
-      channel.trigger({ id: "one" }, "posted", 1 as never),
+      triggerPromise(channel, { id: "one" }, "posted", 1 as never),
     ),
   ).rejects.toThrow("payload validation failed");
   const unknown = await Effect.runPromise(
@@ -128,14 +134,16 @@ test("presence and provider failures retain typed Effect paths and Promise rejec
     getPresence: async () => fixturePresence(),
   };
   expect(
-    await runWithRealtimeDispatcher(dispatcher, () => channel.getPresence({ id: "one" })),
+    await runWithRealtimeDispatcher(dispatcher, () => presencePromise(channel, { id: "one" })),
   ).toMatchObject({ connections: 2 });
   const presence = await runWithRealtimeDispatcher(dispatcher, () =>
     Effect.runPromise(getChannelPresenceEffect(channel, { id: "one" })),
   );
   expect(presence).toMatchObject({ status: "fresh" });
   await expect(
-    runWithRealtimeDispatcher(dispatcher, () => channel.trigger({ id: "one" }, "posted", "hello")),
+    runWithRealtimeDispatcher(dispatcher, () =>
+      triggerPromise(channel, { id: "one" }, "posted", "hello"),
+    ),
   ).rejects.toThrow("append unavailable");
   const failure = await runWithRealtimeDispatcher(dispatcher, () =>
     Effect.runPromise(Effect.flip(triggerChannelEffect(channel, { id: "one" }, "posted", "hello"))),
@@ -147,7 +155,7 @@ test("presence and provider failures retain typed Effect paths and Promise rejec
   ).toMatchObject({
     _tag: "Realtime.DispatcherError",
   });
-  await expect(channel.getPresence({ id: "one" })).rejects.toThrow(
+  await expect(presencePromise(channel, { id: "one" })).rejects.toThrow(
     "No realtime dispatcher is active.",
   );
   const failedPresence = {
@@ -157,6 +165,6 @@ test("presence and provider failures retain typed Effect paths and Promise rejec
     },
   };
   await expect(
-    runWithRealtimeDispatcher(failedPresence, () => channel.getPresence({ id: "one" })),
+    runWithRealtimeDispatcher(failedPresence, () => presencePromise(channel, { id: "one" })),
   ).rejects.toThrow("presence unavailable");
 });

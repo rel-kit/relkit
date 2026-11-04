@@ -2,7 +2,6 @@ import type { MaybePromise } from "../contracts/index.js";
 import type { FunctionContext, FunctionDependencies } from "./function-context.types.js";
 import type { InferOutput, StandardSchemaV1 } from "../schema/index.js";
 
-type KnownEventName = Extract<keyof Relkit.EventRegistry, string>;
 
 /** Validated progress value inferred from an optional schema.
  * @example type Progress = ProgressValue<typeof progressSchema>;
@@ -19,9 +18,8 @@ export type ProgressValue<Schema extends StandardSchemaV1 | undefined> =
 export type FunctionLifecycleHook<
   Value,
   Dependencies extends FunctionDependencies = {},
-  Publishes extends readonly KnownEventName[] = readonly [],
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 > = (
   value: Value,
-  context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
+  context: FunctionContext<Dependencies, ProgressValue<ProgressSchema>>,
 ) => MaybePromise<Value>;

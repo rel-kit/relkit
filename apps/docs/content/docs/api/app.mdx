@@ -2083,7 +2083,6 @@ declare const defineTaskEffect: <
   const OutputSchema extends StandardSchemaV1,
   const Dependencies extends TaskDependencies = {},
   const Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  const Publishes extends readonly PublishedEventName[] = readonly [],
   const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   const Streams extends Readonly<Record<string, StandardSchemaV1<unknown, unknown>>> = {},
   const Execution extends TaskExecution = "durable",
@@ -2095,7 +2094,6 @@ declare const defineTaskEffect: <
     OutputSchema,
     Dependencies,
     Errors,
-    Publishes,
     ProgressSchema,
     Streams,
     Execution
@@ -2108,7 +2106,6 @@ declare const defineTaskEffect: <
     OutputSchema,
     Dependencies,
     Errors,
-    Publishes,
     ProgressSchema,
     Streams,
     Execution
@@ -2720,7 +2717,6 @@ declare const DefineTaskOptions: DefineTaskOptions<
   OutputSchema,
   Dependencies,
   Errors,
-  Publishes,
   ProgressSchema,
   Streams,
   Execution
@@ -2814,7 +2810,7 @@ declare const TaskConcurrency: TaskConcurrency<InputKey>;
 **Signature**
 
 ```ts
-declare const TaskContext: TaskContext<Execution, Dependencies, ProgressSchema, Streams, Publishes>;
+declare const TaskContext: TaskContext<Execution, Dependencies, ProgressSchema, Streams>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L12)
@@ -2824,7 +2820,7 @@ declare const TaskContext: TaskContext<Execution, Dependencies, ProgressSchema, 
 **Signature**
 
 ```ts
-declare const TaskContextBase: TaskContextBase<Dependencies, Publishes>;
+declare const TaskContextBase: TaskContextBase<Dependencies>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L13)
@@ -2851,7 +2847,6 @@ declare const TaskDescriptor: TaskDescriptor<
   OutputSchema,
   Dependencies,
   Errors,
-  Publishes,
   ProgressSchema,
   Streams,
   Execution
@@ -2885,7 +2880,7 @@ declare const TaskExecution: TaskExecution;
 **Signature**
 
 ```ts
-declare const TaskFailureHook: TaskFailureHook<Dependencies, Publishes>;
+declare const TaskFailureHook: TaskFailureHook<Dependencies>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L18)
@@ -2902,8 +2897,7 @@ declare const TaskHandler: TaskHandler<
   Dependencies,
   Errors,
   ProgressSchema,
-  Streams,
-  Publishes
+  Streams
 >;
 ```
 
@@ -2924,7 +2918,7 @@ declare const TaskHandlerResult: TaskHandlerResult<Output, Errors>;
 **Signature**
 
 ```ts
-declare const TaskHookContext: TaskHookContext<Dependencies, Publishes>;
+declare const TaskHookContext: TaskHookContext<Dependencies>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L21)
@@ -3044,7 +3038,7 @@ declare const TaskSleepOptions: TaskSleepOptions;
 **Signature**
 
 ```ts
-declare const TaskStartHook: TaskStartHook<InputSchema, Dependencies, Publishes>;
+declare const TaskStartHook: TaskStartHook<InputSchema, Dependencies>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L32)
@@ -3124,7 +3118,7 @@ declare const TaskStreamSchemas: Readonly<Record<string, StandardSchemaV1<unknow
 **Signature**
 
 ```ts
-declare const TaskSuccessHook: TaskSuccessHook<OutputSchema, Dependencies, Publishes>;
+declare const TaskSuccessHook: TaskSuccessHook<OutputSchema, Dependencies>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L40)
@@ -3181,7 +3175,6 @@ declare const defineTask: <
   const OutputSchema extends StandardSchemaV1,
   const Dependencies extends TaskDependencies = {},
   const Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  const Publishes extends readonly PublishedEventName[] = readonly [],
   const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   const Streams extends TaskStreamSchemas = {},
   const Execution extends TaskExecution = "durable",
@@ -3193,7 +3186,6 @@ declare const defineTask: <
     OutputSchema,
     Dependencies,
     Errors,
-    Publishes,
     ProgressSchema,
     Streams,
     Execution
@@ -3205,7 +3197,6 @@ declare const defineTask: <
   OutputSchema,
   Dependencies,
   Errors,
-  Publishes,
   ProgressSchema,
   Streams,
   Execution

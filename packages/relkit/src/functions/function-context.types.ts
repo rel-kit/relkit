@@ -109,20 +109,11 @@ export interface AuthContext<Session = unknown> {
  */
 export type FunctionDependencyOptions<D extends FunctionDependencies> = D;
 
-/** Registered event names accepted by publishes.
- * @example type EventName = KnownEventName;
- */
-export type KnownEventName = Extract<keyof Relkit.EventRegistry, string>;
-type PublishedEventMap<Names extends readonly KnownEventName[]> = {
-  readonly [Name in Names[number]]: Relkit.EventRegistry[Name];
-};
-
 /** Invocation context before optional progress is added.
  * @example const env = context.env;
  */
 export interface FunctionContextBase<
   D extends FunctionDependencies = {},
-  Publishes extends readonly KnownEventName[] = readonly [],
 > {
   readonly invocation: InvocationMetadata;
   readonly signal: AbortSignal;
@@ -133,7 +124,7 @@ export interface FunctionContextBase<
   readonly functions: FunctionClients<D["functions"]>;
   readonly tasks: TaskClients<D["tasks"]>;
   readonly jobs: JobClients<D["jobs"]>;
-  readonly events: EventClients<PublishedEventMap<Publishes>> & EventClients<D["events"]>;
+  readonly events: EventClients<D["events"]>;
   readonly channels: ChannelClients<D["channels"]>;
   readonly databases: DatabaseClients<D["databases"]>;
   readonly buckets: BucketClients<D["buckets"]>;
@@ -150,9 +141,8 @@ export interface FunctionContextBase<
  */
 export type FunctionContext<
   D extends FunctionDependencies = {},
-  Publishes extends readonly KnownEventName[] = readonly [],
   Progress = never,
-> = FunctionContextBase<D, Publishes> &
+> = FunctionContextBase<D> &
   ([Progress] extends [never]
     ? {}
     : { readonly progress: import("../invocation/index.js").ProgressEmitter<Progress> });

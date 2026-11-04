@@ -32,7 +32,6 @@ export const defineTaskEffect = Effect.fn("Jobs.defineTask")(
     const OutputSchema extends StandardSchemaV1,
     const Dependencies extends TaskDependencies = {},
     const Errors extends readonly ErrorDescriptorAny[] = readonly [],
-    const Publishes extends readonly PublishedEventName[] = readonly [],
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
     const Streams extends TaskStreamSchemas = {},
     const Execution extends TaskExecution = "durable",
@@ -44,7 +43,6 @@ export const defineTaskEffect = Effect.fn("Jobs.defineTask")(
       OutputSchema,
       Dependencies,
       Errors,
-      Publishes,
       ProgressSchema,
       Streams,
       Execution
@@ -81,7 +79,6 @@ export function defineTask<
   const OutputSchema extends StandardSchemaV1,
   const Dependencies extends TaskDependencies = {},
   const Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  const Publishes extends readonly PublishedEventName[] = readonly [],
   const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   const Streams extends TaskStreamSchemas = {},
   const Execution extends TaskExecution = "durable",
@@ -93,7 +90,6 @@ export function defineTask<
     OutputSchema,
     Dependencies,
     Errors,
-    Publishes,
     ProgressSchema,
     Streams,
     Execution
@@ -105,7 +101,6 @@ export function defineTask<
   OutputSchema,
   Dependencies,
   Errors,
-  Publishes,
   ProgressSchema,
   Streams,
   Execution

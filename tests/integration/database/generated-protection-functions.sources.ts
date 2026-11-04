@@ -19,9 +19,10 @@ import read from "../functions/read.function.js";
 export default read.asTool({ id: "ownership.read-tool", description: "Read an owned subject", sideEffect: "read", approval: "never" });
 `,
   "src/services/ownership/functions/direct-read.function.ts": guardedBridge(
-    "read.invoke",
+    "context.functions.read",
     'import read from "./read.function.js";',
     "ownership.direct-read",
+    "{ functions: { read } }",
   ),
   "src/services/ownership/functions/tool-read.function.ts": guardedBridge(
     "readTool.invoke",
@@ -35,9 +36,10 @@ import { owns } from "@app/platform/ownership.js";
 import feed from "../channels/feed.channel.js";
 import denied from "../errors/denied.error.js";
 export default defineFunction({ id: "ownership.publish", input: z.object({ ownerId: z.string(), tenant: z.string(), message: z.string() }), output: z.object({ accepted: z.boolean() }), errors: [denied],
+  dependencies: { channels: { feed } },
   handler: async (input, context) => {
     if (!await owns(input, context)) return new denied({ ownerId: input.ownerId });
-    await feed.trigger({ ownerId: input.ownerId, tenant: input.tenant }, "changed", { message: input.message });
+    await context.channels.feed.trigger({ ownerId: input.ownerId, tenant: input.tenant }, "changed", { message: input.message });
     return { accepted: true };
   },
 });
@@ -49,9 +51,10 @@ import { owns } from "@app/platform/ownership.js";
 import feed from "../channels/feed.channel.js";
 import denied from "../errors/denied.error.js";
 export default defineFunction({ id: "ownership.presence", input: z.object({ ownerId: z.string(), tenant: z.string() }), output: z.object({ connections: z.number() }), errors: [denied],
+  dependencies: { channels: { feed } },
   handler: async (input, context) => {
     if (!await owns(input, context)) return new denied({ ownerId: input.ownerId });
-    const presence = await feed.getPresence(input);
+    const presence = await context.channels.feed.getPresence(input);
     if (typeof presence.connections !== "number") throw new Error("Native presence count was unavailable");
     return { connections: presence.connections };
   },
@@ -95,17 +98,18 @@ export default defineMiddleware("/ownership/*", async (context, next, relkit) =>
 
 /**
  * Retains declared native failures through a real nested function or tool call while preserving all other rejection channels.
- * @param invoke - Native operation on the controlled original descriptor.
+ * @param invoke - Native call: a declared `context.functions` client or a tool's `invoke`.
  * @param imports - Exact native source imports for that edge.
  * @param id - Stable explicit compiler identity.
+ * @param dependencies - Declared dependencies backing a `context` call, if any.
  * @returns Native authoring source for one guarded invocation edge.
  */
-function guardedBridge(invoke: string, imports: string, id: string): string {
+function guardedBridge(invoke: string, imports: string, id: string, dependencies?: string): string {
   return `/** Native nested invocation preserves declared subject denial and original failures. */
 import { defineFunction } from "relkit/functions";
 ${imports}
 import denied from "../errors/denied.error.js";
-export default defineFunction({ id: ${JSON.stringify(id)}, input: read.input, output: read.output, errors: [denied], handler: async (input) => {
+export default defineFunction({ id: ${JSON.stringify(id)}, input: read.input, output: read.output, errors: [denied],${dependencies === undefined ? "" : ` dependencies: ${dependencies},`} handler: async (input${dependencies === undefined ? "" : ", context"}) => {
   try { return await ${invoke}(input); }
   catch (cause) {
     if (typeof cause === "object" && cause !== null && "kind" in cause && cause.kind === "application" && "id" in cause && cause.id === "ownership.denied") return new denied({ ownerId: input.ownerId });

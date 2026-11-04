@@ -89,23 +89,6 @@ export const eventSourceDiagnosticsEffect = Effect.fn("Compiler.eventSourceDiagn
                 );
               }
             }
-            if (name === "defineFunction" || name === "defineEventFunction") {
-              const publishes = field(options, "publishes");
-              if (publishes && ts.isArrayLiteralExpression(unwrap(publishes))) {
-                const seen = new Set<string>();
-                for (const entry of (unwrap(publishes) as ts.ArrayLiteralExpression).elements) {
-                  if (!ts.isStringLiteralLike(entry)) continue;
-                  if (seen.has(entry.text))
-                    report(
-                      entry,
-                      NORMALIZE_CODES.publishesDuplicate,
-                      `Function ${id} publishes event "${entry.text}" more than once.`,
-                      `Remove the duplicate "${entry.text}" entry.`,
-                    );
-                  seen.add(entry.text);
-                }
-              }
-            }
             if (
               ["defineRoute", "defineJob", "defineTool", "defineService", "defineAgent"].includes(
                 name,

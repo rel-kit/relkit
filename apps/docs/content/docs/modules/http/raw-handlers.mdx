@@ -29,9 +29,22 @@ native `Request` and returns a `Response`, synchronously or asynchronously:
   /_snippets/source/examples/commerce/src/routes/orders/export/route.ts
 </include>
 
-This route reads the native body itself and returns `202` with the started run. Do not combine `handler`
-and `target`, or pass a raw handler to `defineServiceRoutes`. `ALL` is reserved for mounting Better Auth
-yourself. Route file naming and collision checks still apply.
+This route reads the native body itself and returns `202` with the started run.
+
+A raw handler is not a function handler, so it has no `context.functions`. To call a function, use
+`getRelkit()` from `relkit`. It groups functions by service ID and member name:
+
+```ts
+import { getRelkit } from "relkit";
+
+const order = await getRelkit().functions.orders.getOrder({ orderId: "order-1" });
+```
+
+`getRelkit()` works only inside the running application. Elsewhere it throws
+[`RELKIT_APPLICATION_NOT_RUNNING`](/docs/errors/relkit-application-not-running).
+
+Do not combine `handler` and `target`, or pass a raw handler to `defineServiceRoutes`.
+`ALL` is reserved for mounting Better Auth yourself. Route file naming and collision checks still apply.
 
 ## Understand the boundary
 

@@ -1,6 +1,7 @@
 /** Places an order and publishes `orders.placed`; its input and output are Valibot schemas. */
 import { defineFunction } from "@relkit/app/functions";
 import * as v from "valibot";
+import orderPlaced from "../events/order-placed.event.js";
 
 export default defineFunction({
   id: "orders.place-order",
@@ -10,10 +11,10 @@ export default defineFunction({
     note: v.optional(v.string()),
   }),
   output: v.object({ orderId: v.string() }),
-  publishes: ["orders.placed"],
+  dependencies: { events: { orderPlaced } },
   handler: async ({ sku, quantity }, context) => {
     const orderId = `order-${sku}-${quantity}`;
-    await context.events["orders.placed"].publish({ orderId, sku, quantity });
+    await context.events.orderPlaced.publish({ orderId, sku, quantity });
     return { orderId };
   },
 });

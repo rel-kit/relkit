@@ -16,6 +16,7 @@ import { isRecord, refId } from "./normalize-utils.js";
 import { graphIdForDescriptor } from "./normalize-graph-id.js";
 import {
   dependencyMetadata,
+  publishedEvents,
   schema,
   schemaHashes,
   text,
@@ -82,7 +83,7 @@ export const graphNodeForEffect = Effect.fn("Compiler.graphNodeFor")(
             : { progress: schema(work, descriptor, "progress") }),
           errors: clean(value.errors),
           dependencies: dependencyMetadata(value.dependencies),
-          publishes: clean(value.publishes ?? []),
+          publishes: publishedEvents(value.dependencies),
           timeoutMs: clean(value.timeoutMs),
           concurrency: clean(value.concurrency),
           generated: clean(value.generated),
@@ -99,7 +100,7 @@ export const graphNodeForEffect = Effect.fn("Compiler.graphNodeFor")(
           schemaHashes: schemaHashes(work, descriptor.id, ["input", "output", "progress"]),
           errors: clean(value.errors),
           dependencies: dependencyMetadata(value.dependencies),
-          publishes: clean(value.publishes ?? []),
+          publishes: publishedEvents(value.dependencies),
           policy: clean({
             retry: value.retry,
             maxDuration: value.maxDuration,

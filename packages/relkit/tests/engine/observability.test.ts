@@ -173,7 +173,8 @@ describe("versioned invocation observability hooks", () => {
       id: "orders.get",
       input: z.object({}),
       output: z.object({ sku: z.string() }),
-      handler: (): Promise<{ sku: string }> => service.product.invoke({}),
+      dependencies: { functions: { product: child } },
+      handler: (_input, context) => context.functions.product({}),
     });
     const service = defineService({ id: "orders", functions: { get: parent, product: child } });
 

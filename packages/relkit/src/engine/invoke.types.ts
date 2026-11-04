@@ -60,7 +60,6 @@ export interface InvocationTarget<
   Context extends { readonly signal: AbortSignal } = InvocationContext,
 > extends SharedInvocationTarget<Input, Output, Context> {
   readonly dependencies?: DependencyDeclarations;
-  readonly publications?: Readonly<Record<string, import("./dependencies.js").DependencyRefLike>>;
 }
 
 /** Shared execution identity, ancestry, attempt and deadline metadata. */

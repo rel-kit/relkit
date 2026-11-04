@@ -8,7 +8,7 @@ test("reports source-located event function option, result, capability, and targ
   const file = resolve(import.meta.dir, "event-source-fixture.ts");
   const source = `
     import { defineEventFunction as reaction } from "relkit/events";
-    import { defineError, defineFunction } from "relkit/functions";
+    import { defineError } from "relkit/functions";
     import { Effect } from "../../packages/relkit/node_modules/effect/dist/index.js";
     import { defineJob } from "../../packages/relkit/src/jobs/legacy.js";
     import { z } from "relkit/schema";
@@ -17,7 +17,6 @@ test("reports source-located event function option, result, capability, and targ
     (consumer as any).asTool();
     reaction({ id: "bad_result", event: "created" as never, handler: async () => 123 });
     reaction({ id: "bad_options", event: "created", input: z.unknown(), output: z.void(), tool: {}, trigger: {}, handler: () => {} } as any);
-    defineFunction({ id: "publisher", input: z.unknown(), output: z.void(), publishes: ["created", "created"], handler: () => {} });
     const failed = defineError({ id: "failed", data: z.unknown(), message: "failed" });
     reaction({ id: "effect_void", event: "created" as never, handler: () => Effect.void });
     reaction({ id: "effect_error", event: "created" as never, errors: [failed], handler: () => Effect.fail(failed.create(null)) });
@@ -48,7 +47,6 @@ test("reports source-located event function option, result, capability, and targ
     "RELKIT_EVENT_FUNCTION_TARGET_INVALID",
     "RELKIT_EVENT_FUNCTION_RESULT_INVALID",
     ...Array(4).fill("RELKIT_EVENT_FUNCTION_OPTION_INVALID"),
-    "RELKIT_EVENT_PUBLICATION_DUPLICATE",
     "RELKIT_EVENT_FUNCTION_RESULT_INVALID",
     "RELKIT_EVENT_FUNCTION_TARGET_INVALID",
   ]);

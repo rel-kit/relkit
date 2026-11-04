@@ -31,6 +31,7 @@ import {
   defineProviderCapability,
 } from "relkit/provider";
 import { getJsonSchema, z } from "relkit/schema";
+import { dispatchInvocation } from "relkit/invocation";
 
 const input = z.object({ id: z.string() });
 const output = z.object({ ok: z.boolean() });
@@ -135,10 +136,10 @@ describe.serial("Phase 2 descriptor cohort", () => {
 
     const dependent = defineFunction({
       id: "orders.dependent",
-      publishes: ["orders.created" as never],
       input,
       output,
       dependencies: {
+        events: { created },
         jobs: { reconcile: job },
         buckets: { assets: bucket },
         cache: { prices: cache },
@@ -151,6 +152,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
       "agents",
       "buckets",
       "cache",
+      "events",
       "jobs",
     ]);
 
@@ -395,7 +397,12 @@ describe.serial("Phase 2 descriptor cohort", () => {
     expect(isServiceRef(service)).toBe(true);
     expect(service.get).toBe(member);
 
-    await expect(service.get.invoke({ id: "order-1" })).resolves.toEqual({ ok: true });
+    expect(service.get).not.toHaveProperty("invoke");
+    await expect(
+      dispatchInvocation({ target: service.get, input: { id: "order-1" } }),
+    ).resolves.toEqual({
+      ok: true,
+    });
     const derivedTool = service.get.asTool({
       id: "orders.service-tool",
       description: "Read an order",
@@ -456,11 +463,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
     expect(Object.isFrozen(service)).toBe(true);
     expect(Object.isFrozen(service.get)).toBe(true);
     expect(Object.isFrozen(tool)).toBe(true);
-    expect(Object.getOwnPropertyDescriptor(lookup, "invoke")).toMatchObject({
-      enumerable: false,
-      writable: false,
-      configurable: false,
-    });
+    expect(Object.getOwnPropertyDescriptor(lookup, "invoke")).toBeUndefined();
     expect(Object.getOwnPropertyDescriptor(lookup, "asTool")).toMatchObject({
       enumerable: false,
       writable: false,

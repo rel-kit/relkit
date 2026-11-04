@@ -78,7 +78,7 @@ Create the order and publish its details:
   /_snippets/source/apps/docs/examples/events/create-order.function.ts
 </include>
 
-`publishes` allows this function to send `orders.created`. The handler returns the order without waiting for the confirmation.
+`dependencies.events` declares `orderCreated`, so the handler can send `orders.created` through `context.events.orderCreated`. The handler returns the order without waiting for the confirmation.
 
 ### Consume the event
 

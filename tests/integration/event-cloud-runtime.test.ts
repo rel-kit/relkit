@@ -37,7 +37,7 @@ test("EventBridge keeps the published envelope and delivery/replay metadata", as
       seen.push(input, context.trigger);
     },
   });
-  const target = bindFunctionEvents(consumer, event, []) as unknown as InvocationTarget;
+  const target = bindFunctionEvents(consumer, event) as unknown as InvocationTarget;
   const graph = normalizeCompilation({ descriptors: [event, consumer] }).graph! as ApplicationGraph;
   await materializeEvents({
     plan: createRegistrationPlan(graph),

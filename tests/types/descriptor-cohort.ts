@@ -25,6 +25,7 @@ const child = defineFunction({
   output,
   handler: async () => ({ ok: true }),
 });
+import { eventCreated } from "./descriptor-events.fixture.js";
 export { eventCreated, eventChanged } from "./descriptor-events.fixture.js";
 const job = defineJob({
   id: "types.job",
@@ -64,17 +65,18 @@ const parent = defineFunction({
   id: "types.parent",
   input,
   output,
-  publishes: ["types.created"],
   dependencies: {
+    functions: { child },
+    events: { created: eventCreated },
     jobs: { job },
     buckets: { bucket },
     cache: { cache, numericCache },
     agents: { agent },
   },
   handler: async (value, context) => {
-    const childResult: InferOutput<typeof output> = await child.invoke({ id: value.id });
+    const childResult: InferOutput<typeof output> = await context.functions.child({ id: value.id });
     const queued = await context.jobs.job.enqueue({ id: value.id });
-    const published = await context.events["types.created"].publish({ orderId: value.id });
+    const published = await context.events.created.publish({ orderId: value.id });
     const object = await context.buckets.bucket.get("orders/1");
     const cached: { price: number } | undefined = await context.cache.cache.get({
       sku: value.id,
@@ -111,10 +113,11 @@ void mapped;
 const reaction = defineEventFunction({
   id: "types.reaction",
   event: "types.created",
+  dependencies: { functions: { child } },
   handler: async (input, context) => {
     const orderId: string = input.orderId;
     const eventId: "types.created" = context.trigger.event.id;
-    await child.invoke({ id: orderId });
+    await context.functions.child({ id: orderId });
     void eventId;
   },
 });
@@ -146,9 +149,20 @@ const service = defineService({
   id: "types.orders",
   functions: { lookup: child },
 });
-const serviceInput: Parameters<typeof service.lookup.invoke>[0] = { id: "order-1" };
-const serviceOutput: Promise<InferOutput<typeof child.output>> =
-  service.lookup.invoke(serviceInput);
+const serviceCaller = defineFunction({
+  id: "types.orders.caller",
+  input,
+  output,
+  dependencies: { functions: { lookup: service.lookup } },
+  handler: async (value, context) => {
+    const serviceInput: Parameters<typeof context.functions.lookup>[0] = { id: value.id };
+    const serviceOutput: Promise<InferOutput<typeof child.output>> =
+      context.functions.lookup(serviceInput);
+    // @ts-expect-error service member calls use the original function input
+    await context.functions.lookup({ orderId: "order-1" });
+    return serviceOutput;
+  },
+});
 const serviceTool = service.lookup.asTool({
   id: "types.orders.lookup-tool",
   description: "Look up an order",
@@ -162,7 +176,7 @@ const directToolOutput: Promise<InferOutput<typeof child.output>> = tool.invoke(
   id: "order-1",
 });
 const originalMember: typeof child = service.lookup;
-void serviceOutput;
+void serviceCaller;
 void serviceToolOutput;
 void directToolOutput;
 void originalMember;
@@ -171,7 +185,5 @@ void originalMember;
 defineService({ id: "types.invalid-service-member", functions: { broken: {} } });
 // @ts-expect-error zero-argument asTool requires complete function tool metadata
 child.asTool();
-// @ts-expect-error service member invoke uses the original function input
-service.lookup.invoke({ orderId: "order-1" });
 // @ts-expect-error direct service members are immutable
 service.lookup = child;
