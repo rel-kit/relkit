@@ -1,11 +1,11 @@
 /** Exercises native runtime tools effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/adapter.js";
 import { Effect } from "effect";
 import { expect, test } from "vitest";
 import { defineFunction } from "relkit/functions";
 import { z } from "relkit/schema";
 import { defineTool } from "relkit/tools";
-import { defineAgent } from "../src/define-agent.js";
 import {
   findModelToolEffect,
   findToolEffect,
@@ -109,6 +109,7 @@ function allowedToolRunFixture() {
   const options = {
     agent: defineAgent({
       id: "allowed.tool.fixture",
+      runtime: langchain(),
       input: z.object({ prompt: z.string() }),
       output: z.object({ answer: z.string() }),
       instructions: "Use the selected tool.",

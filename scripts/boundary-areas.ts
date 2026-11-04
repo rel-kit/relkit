@@ -2,6 +2,7 @@
 
 /** Areas that define the contracts integrations implement or call. */
 const protocolAreas: ReadonlySet<string> = new Set([
+  "agent-adapters",
   "agents",
   "buckets",
   "cache",

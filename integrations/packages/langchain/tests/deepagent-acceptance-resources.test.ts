@@ -1,5 +1,6 @@
 /** Exercises native deepagent acceptance resources behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/index.ts";
 import { afterEach, expect, test } from "vitest";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -8,7 +9,7 @@ import { FilesystemBackend } from "deepagents";
 import { createBucketClient, defineBucket, type BucketProvider } from "relkit/buckets";
 import { z } from "relkit/schema";
 import { createThreadBucketBackend } from "../src/deepagent-bucket-scope.ts";
-import { defineAgent, invokeAgent } from "../src/index.ts";
+import { invokeAgent } from "../src/index.ts";
 import { createTestModel } from "./test-model.ts";
 
 const limits = { maxSteps: 8, maxToolCalls: 8, timeoutMs: 2_000 };
@@ -62,14 +63,11 @@ async function runResourceAgent(
   return invokeAgent({
     agent: defineAgent({
       id,
+      runtime: langchain({ model, backend, memory: ["/AGENTS.md"], skills: ["/skills/"] }),
       input: z.object({ message: z.string() }),
       output: z.object({ answer: z.string() }),
-      model,
       instructions: "Use loaded resources.",
       tools: [],
-      backend,
-      memory: ["/AGENTS.md"],
-      skills: ["/skills/"],
       limits,
     }),
     input: { message: "go" },

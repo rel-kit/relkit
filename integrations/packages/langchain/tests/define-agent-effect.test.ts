@@ -1,12 +1,13 @@
 /** Exercises native define agent effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent, defineAgentEffect } from "relkit/agents";
 import { IdentityStore } from "relkit/invocation";
 import { z } from "relkit/schema";
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
-import { defineAgent, defineAgentEffect } from "../src/define-agent.js";
+import { langchain } from "../src/adapter.js";
 
 const options = {
+  runtime: langchain(),
   input: z.object({ question: z.string() }),
   output: z.object({ answer: z.string() }),
   instructions: "Answer.",

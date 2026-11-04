@@ -1,5 +1,6 @@
 /** Publishes the explicit LangChain integration authoring and execution surface; generic application imports remain owned by the SDK-free agents package. */
 
+export * from "./adapter.js";
 export * from "./define-agent.js";
 export * from "./define-graph-node.js";
 export * from "./define-graph.js";

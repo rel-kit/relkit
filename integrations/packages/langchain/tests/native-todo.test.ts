@@ -1,9 +1,10 @@
 /** Exercises native todo behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/index.ts";
 import { expect, test } from "vitest";
 import { z } from "relkit/schema";
 import { todoListMiddleware } from "langchain";
-import { defineAgent, invokeAgent, type AgentExecutionEvent } from "../src/index.ts";
+import { invokeAgent, type AgentExecutionEvent } from "../src/index.ts";
 import { createTestModel } from "./test-model.ts";
 
 const expectedToolStates = [
@@ -107,12 +108,11 @@ function todoAgentFixture() {
   ]);
   const agent = defineAgent({
     id: "support.todos",
+    runtime: langchain({ model: model.model, middleware: [todos] }),
     input: z.object({ message: z.string() }),
     output: z.object({ answer: z.string() }),
-    model: model.model,
     instructions: "Use the todo list for this request.",
     tools: [],
-    middleware: [todos],
     limits: { maxSteps: 5, maxToolCalls: 4, timeoutMs: 1_000 },
     stateProfile: "public",
     client: { public: true, state: ["todos"] },

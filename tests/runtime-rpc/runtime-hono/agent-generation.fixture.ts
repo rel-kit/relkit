@@ -1,5 +1,6 @@
 /** Constructs two native generations sharing one provider while holding control reads behind an explicit barrier. Exposes the original retirement and cleanup observations without replaying the agent. */
-import { defineAgent } from "@relkit/langchain";
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import { createLocalAgentStateProvider } from "relkit/providers-local";
 import { z } from "relkit/schema";
 import { createApp } from "relkit/runtime-hono";
@@ -52,6 +53,7 @@ function generationControls(root: string) {
 function generationAgent() {
   const agent = defineAgent({
     id: "support.echo",
+    runtime: langchain(),
     input: z.string(),
     output: z.string(),
     instructions: "Echo.",

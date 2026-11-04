@@ -52,7 +52,7 @@ const descriptorFactories = new Set([
   "defineServiceRoutes",
   "defineTask",
 ]);
-const providerFactories = new Set(["localAgentState", "localRealtime"]);
+const providerFactories = new Set(["localAgentState", "localRealtime", "langchain"]);
 const constructors = new Set(["FakeToolCallingModel", "MemorySaver", "StateSchema"]);
 const deferredProperties = new Set(["edges", "handler"]);
 

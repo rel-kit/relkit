@@ -1,5 +1,6 @@
 /** Constructs the echo agent, observable engine and two generation HTTP clients plus the native WebSocket server. The shared lifetime fixture owns provider/run/server cleanup. */
-import { defineAgent } from "@relkit/langchain";
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import { createLocalAgentStateProvider } from "relkit/providers-local";
 import { createOperationId } from "relkit/realtime";
 import { z } from "relkit/schema";
@@ -26,6 +27,7 @@ import {
 function echoAgent(authorizedOperations: string[]) {
   const agent = defineAgent({
     id: "support.echo",
+    runtime: langchain(),
     input: z.object({ message: z.string() }),
     output: z.object({ answer: z.string() }),
     instructions: "Echo the authorized user message.",

@@ -1,8 +1,9 @@
 /** Retains the original redaction flows helpers and exact synthetic credential assertions. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../../../integrations/packages/langchain/src/index.ts";
 import { Effect } from "../../../packages/relkit/node_modules/effect/dist/index.js";
 import { z } from "relkit/schema";
 import { defineEventFunction } from "relkit/events";
-import { defineAgent } from "../../../integrations/packages/langchain/src/index.ts";
 import {
   type InvocationContextOptions,
   type InvocationHooks,
@@ -48,6 +49,7 @@ export async function flushTelemetry(): Promise<void> {
 export async function runAgent(collector: ObservabilityCollector) {
   const agent = defineAgent({
     id: "security.agent",
+    runtime: langchain(),
     input: z.object({
       password: z.string(),
       authorization: z.string(),

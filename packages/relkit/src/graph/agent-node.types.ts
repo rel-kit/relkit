@@ -24,6 +24,8 @@ export interface AgentNode extends GraphNodeBase<"agent"> {
   readonly chat?: JsonValue;
   readonly controls?: JsonValue;
   readonly execution?: "graph";
+  /** Adapter that executes the agent; graph workflows have none and run on LangChain. */
+  readonly runtime?: AgentRuntimeNode;
   /** Native DeepAgents-only capabilities selected by the authored descriptor. */
   readonly requiresDeepAgents?: true;
   readonly workflow?: JsonValue;
@@ -32,6 +34,17 @@ export interface AgentNode extends GraphNodeBase<"agent"> {
   readonly resourceDependencies?: readonly AgentResourceDependency[];
   readonly backendBucketId?: string;
   readonly clientContract?: AgentClientContractMetadata;
+}
+
+/**
+ * Adapter identity recorded for an agent; it selects the adapter's `agent-execution` registration.
+ * @example const runtime: AgentRuntimeNode = { integrationId: "langchain", adapterId: "langchain", protocolVersion: 1, nativeOptions: [] };
+ */
+export interface AgentRuntimeNode {
+  readonly integrationId: string;
+  readonly adapterId: string;
+  readonly protocolVersion: 1;
+  readonly nativeOptions: readonly string[];
 }
 
 /**

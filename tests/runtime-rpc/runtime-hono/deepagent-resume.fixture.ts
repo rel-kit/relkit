@@ -1,4 +1,6 @@
 /** Owns native DeepAgents setup, temporary state cleanup, and public resume polling. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import {
   trackFixtureRun,
   trackFixtureProvider,
@@ -11,8 +13,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { MemorySaver } from "@langchain/langgraph";
-
-import { defineAgent, invokeAgent } from "@relkit/langchain";
+import { invokeAgent } from "@relkit/langchain";
 import type { RegistrationPlan } from "relkit/graph";
 import { createLocalAgentStateProvider } from "relkit/providers-local";
 import { createOperationId } from "relkit/realtime";
@@ -89,24 +90,27 @@ function deepReviewAgent() {
   });
   const agent = defineAgent({
     id: "deep.review",
-    input: z.object({ message: z.string() }),
-    output: z.object({ answer: z.string() }),
-    model,
-    instructions: "Call danger once, then finish.",
-    tools: [danger],
-    interruptOn: {
-      danger: {
-        allowedDecisions: ["approve", "edit", "reject"],
-        description: "Review write",
-        argsSchema: {
-          type: "object",
-          properties: { value: { type: "string" } },
-          required: ["value"],
-          additionalProperties: false,
+    runtime: langchain({
+      interruptOn: {
+        danger: {
+          allowedDecisions: ["approve", "edit", "reject"],
+          description: "Review write",
+          argsSchema: {
+            type: "object",
+            properties: { value: { type: "string" } },
+            required: ["value"],
+            additionalProperties: false,
+          },
         },
       },
-    },
-    checkpointer: new MemorySaver(),
+      checkpointer: new MemorySaver(),
+      model,
+      tools: [danger],
+    }),
+    input: z.object({ message: z.string() }),
+    output: z.object({ answer: z.string() }),
+    instructions: "Call danger once, then finish.",
+    tools: [],
     limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 2_000 },
     stateProfile: "default",
     client: { authorize: () => true },

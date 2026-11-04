@@ -1,4 +1,6 @@
 /** Retains original metadata assertions for langgraph-authoring, registered by the owning suite. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../../integrations/packages/langchain/src/index.ts";
 import { nativeAgentRuntimePackages } from "./native-agent-runtime.fixture.js";
 import { expect } from "bun:test";
 import {
@@ -6,7 +8,6 @@ import {
   todoListMiddleware,
   tool,
 } from "../../integrations/packages/langchain/node_modules/langchain/dist/index.js";
-import { defineAgent } from "../../integrations/packages/langchain/src/index.ts";
 import { defineFunction } from "relkit/functions";
 import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
 import { z } from "relkit/schema";
@@ -52,25 +53,27 @@ export function case4Metadata() {
 export function case5Metadata() {
   const child = defineAgent({
     id: "researcher",
+    runtime: langchain({ model: new FakeToolCallingModel() }),
     input: z.string(),
     output: z.string(),
-    model: new FakeToolCallingModel(),
     instructions: "Research.",
     tools: [],
     limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 1_000 },
   });
   const parent = defineAgent({
     id: "coordinator",
+    runtime: langchain({
+      model: new FakeToolCallingModel(),
+      subagents: [child],
+      skills: ["/private/skills/research"],
+      memory: ["/private/memory/notes.md"],
+      checkpointer: {} as never,
+      store: {} as never,
+    }),
     input: z.string(),
     output: z.string(),
-    model: new FakeToolCallingModel(),
     instructions: "Coordinate.",
     tools: [],
-    subagents: [child],
-    skills: ["/private/skills/research"],
-    memory: ["/private/memory/notes.md"],
-    checkpointer: {} as never,
-    store: {} as never,
     limits: { maxSteps: 2, maxToolCalls: 1, timeoutMs: 1_000 },
   });
 
@@ -95,9 +98,9 @@ export function case5Metadata() {
 export function case6Metadata() {
   const agent = defineAgent({
     id: "assistant",
+    runtime: langchain({ model: new FakeToolCallingModel() }),
     input: z.string(),
     output: z.string(),
-    model: new FakeToolCallingModel(),
     instructions: "Answer.",
     tools: [],
     limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 1_000 },
@@ -131,12 +134,11 @@ function nativeClientFixture() {
   });
   const agent = defineAgent({
     id: "native-client",
+    runtime: langchain({ model: new FakeToolCallingModel(), middleware: [todos], tools: [echo] }),
     input: z.object({ message: z.string() }),
     output: z.object({ answer: z.string() }),
-    model: new FakeToolCallingModel(),
     instructions: "Answer.",
-    tools: [echo],
-    middleware: [todos],
+    tools: [],
     limits: { maxSteps: 2, maxToolCalls: 2, timeoutMs: 1_000 },
     stateProfile: "default",
     client: {

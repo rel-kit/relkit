@@ -1,3 +1,4 @@
+import { langchain } from "@relkit/langchain";
 import { describe, expect, test } from "bun:test";
 import { defineEnv } from "relkit/config";
 import { defineApp } from "relkit";
@@ -39,6 +40,7 @@ describe("optional authoring IDs", () => {
       approval: "never",
     });
     const agent = defineAgent({
+      runtime: langchain(),
       input,
       output,
       model: "default",

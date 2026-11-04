@@ -18,6 +18,7 @@ import type { AgentInvocationOptions, AgentRuntime, AgentRuntimeOptions } from "
 
 export type * from "./runtime.types.js";
 export { runtimeIntegration } from "./runtime-integration.js";
+export { langchainAgentRuntime } from "./adapter-runtime.js";
 export { createGeneratedAgentFunction } from "relkit/agents/generated-function";
 export { releaseAgentPersistence } from "./graph-persistence-release.js";
 export { assertAgentRuntimeDependencies } from "./runtime-dependencies.js";

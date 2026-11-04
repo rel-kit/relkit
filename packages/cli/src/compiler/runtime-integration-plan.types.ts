@@ -4,6 +4,7 @@ export interface RuntimeIntegrationGraph {
     readonly kind: string;
     readonly id: string;
     readonly requiresDeepAgents?: true;
+    readonly runtime?: { readonly integrationId: string; readonly adapterId: string };
     readonly capability?: string;
     readonly adapter?: {
       readonly integrationId: string;

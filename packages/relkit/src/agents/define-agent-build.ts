@@ -1,9 +1,9 @@
 /**
- * Validates generic authoring inputs before binding a descriptor identity.
- * Native fields are rejected with their integration import so no capability is silently ignored.
+ * Validates portable authoring inputs before binding a descriptor identity, then lets the selected
+ * adapter add its own fields. Native fields outside the adapter's options are rejected.
  */
 import { createDescriptorBase, normalizeId } from "../contracts/index.js";
-import type { InferInput, InferOutput, StandardSchemaV1 } from "../schema/index.js";
+import type { StandardSchemaV1 } from "../schema/index.js";
 import { isToolRef, type ToolRefAny } from "../tools/index.js";
 import { copyAgentInstructions } from "./define-agent-support.js";
 import { agentClientContractMetadata } from "./client-contract-metadata.js";
@@ -11,8 +11,10 @@ import { assertAgentSchema } from "./agent-validation.js";
 import { copyAgentChat, copyAgentClientPolicy, copyAgentControls } from "./agent-client.js";
 import { normalizeModelSelector } from "./model-selection.js";
 import { copyAgentLimits } from "./define-agent-limits.js";
+import { agentRuntimeReference, isAgentRuntimeAdapter } from "../agent-adapters/index.js";
+import type { AgentRuntimeAdapterAny } from "../agent-adapters/index.js";
 import type {
-  AgentDescriptor,
+  AgentDefinition,
   AgentToolReferences,
   DefineAgentOptions,
 } from "./define-agent.types.js";
@@ -27,21 +29,21 @@ export function prepareAgentDescriptor<
   const InputSchema extends StandardSchemaV1,
   const OutputSchema extends StandardSchemaV1,
   const Tools extends readonly ToolRefAny[],
+  const Runtime extends AgentRuntimeAdapterAny,
 >(
-  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools>,
-): (
-  id: Id,
-) => AgentDescriptor<
-  Id,
-  InferInput<InputSchema>,
-  InferOutput<OutputSchema>,
-  InputSchema,
-  OutputSchema,
-  Tools
-> {
+  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools, Runtime>,
+): (id: Id) => AgentDefinition<Id, InputSchema, OutputSchema, Tools, Runtime> {
+  const runtime: AgentRuntimeAdapterAny = options.runtime;
+  if (!isAgentRuntimeAdapter(runtime)) {
+    throw new TypeError(
+      "Agents require a runtime adapter, such as runtime: langchain() from @relkit/langchain",
+    );
+  }
   assertGenericCapabilities(options);
   if (options.model !== undefined && typeof options.model !== "string") {
-    throw new TypeError("Native models require defineAgent from @relkit/langchain");
+    throw new TypeError(
+      "Agent model names a model profile; pass native models through the adapter's options",
+    );
   }
   assertAgentSchema(options.input, "input");
   assertAgentSchema(options.output, "output");
@@ -49,7 +51,7 @@ export function prepareAgentDescriptor<
   const instructions = copyAgentInstructions(options.instructions);
   const tools = copyTools(options.tools);
   const limits = copyAgentLimits(options.limits);
-  const client = copyAgentClientPolicy<never>(options.client);
+  const client = copyAgentClientPolicy(options.client, new Set(runtime.clientStateKeys));
   const controls = copyAgentControls(options.controls);
   const chat = copyAgentChat(options.chat);
   if (client !== undefined && options.stateProfile === undefined) {
@@ -57,8 +59,9 @@ export function prepareAgentDescriptor<
   }
   const stateProfile =
     options.stateProfile === undefined ? undefined : normalizeId(options.stateProfile);
-  return (id: Id) =>
-    Object.freeze({
+  const { runtime: _runtime, ...authored } = options;
+  return (id: Id) => {
+    const descriptor = {
       ...createDescriptorBase("agent", id, options),
       input: options.input,
       output: options.output,
@@ -76,15 +79,23 @@ export function prepareAgentDescriptor<
         tools,
         ...(client === undefined ? {} : { client }),
       }),
-    });
+    };
+    const native = runtime.extend?.({ id, options: authored, descriptor }) ?? {};
+    return Object.freeze({
+      ...descriptor,
+      ...native,
+      runtime: agentRuntimeReference(runtime),
+    }) as unknown as AgentDefinition<Id, InputSchema, OutputSchema, Tools, Runtime>;
+  };
 }
 
 /** Rejects native options at the generic facade instead of silently dropping them.
  * @param options - Generic options whose runtime input may contain additional keys.
  * @returns Nothing when native capabilities are absent.
  */
-function assertGenericCapabilities(options: { readonly middleware?: readonly [] }): void {
+function assertGenericCapabilities(options: object): void {
   for (const key of [
+    "middleware",
     "subagents",
     "skills",
     "memory",
@@ -94,10 +105,9 @@ function assertGenericCapabilities(options: { readonly middleware?: readonly [] 
     "interruptOn",
   ]) {
     if (Object.hasOwn(options, key))
-      throw new TypeError(`Agent ${key} requires defineAgent from @relkit/langchain`);
-  }
-  if (options.middleware !== undefined && options.middleware.length !== 0) {
-    throw new TypeError("Native middleware requires defineAgent from @relkit/langchain");
+      throw new TypeError(
+        `Agent ${key} is an adapter option; pass it through the runtime adapter, such as langchain({ ${key} })`,
+      );
   }
 }
 
@@ -110,7 +120,7 @@ function copyTools<const Tools extends readonly ToolRefAny[]>(
 ): AgentToolReferences<Tools> {
   if (!Array.isArray(tools) || tools.some((tool) => !isToolRef(tool))) {
     throw new TypeError(
-      "Generic agent tools must be RelKit references; native tools use @relkit/langchain",
+      "Agent tools must be RelKit tool references; pass native tools through the adapter's options",
     );
   }
   const ids = tools.map((tool) => tool.ref.id);

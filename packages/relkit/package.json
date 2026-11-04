@@ -30,6 +30,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./agent-adapters": {
+      "types": "./dist/agent-adapters/index.d.ts",
+      "import": "./dist/agent-adapters/index.js"
+    },
     "./agents": {
       "types": "./dist/app/agents.d.ts",
       "import": "./dist/app/agents.js"
@@ -368,6 +372,7 @@
   "relkit": {
     "maturity": "core",
     "labs": [
+      "agent-adapters",
       "realtime"
     ]
   },

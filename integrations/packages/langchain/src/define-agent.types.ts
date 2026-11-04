@@ -52,6 +52,8 @@ export interface AgentDescriptor<
     AgentRef<Id, InputSchema, OutputSchema>,
     DeepAgentCapabilities {
   readonly model?: AgentModel;
+  /** Adapter that executes the agent; set by `defineAgent` from `relkit`. */
+  readonly runtime?: import("relkit/agent-adapters").AgentRuntimeReference;
   readonly instructions: AgentInstructions;
   readonly tools: Tools;
   readonly middleware: Middleware;

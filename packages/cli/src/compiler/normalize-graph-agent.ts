@@ -55,6 +55,7 @@ export function agentNodeData(
     ...(value.chat === undefined ? {} : { chat: clean(value.chat) }),
     ...(value.controls === undefined ? {} : { controls: clean(value.controls) }),
     ...(value.execution === "graph" ? { execution: "graph" as const } : {}),
+    ...agentRuntime(value.runtime),
     ...(["subagents", "skills", "memory", "backend", "interruptOn"].some(
       (key) => value[key] !== undefined,
     )
@@ -90,4 +91,25 @@ function toolIds(value: unknown): readonly string[] {
  */
 function agentClient(value: unknown): "public" | "protected" {
   return isRecord(value) && value.public === true ? "public" : "protected";
+}
+
+/**
+ * Copies the adapter identity an agent's `runtime` field carries.
+ * @param value - Declared metadata inspected without coercion.
+ * @returns The serializable runtime node field, or nothing for graph workflows.
+ */
+function agentRuntime(value: unknown) {
+  if (!isRecord(value) || value.kind !== "agent-runtime") return {};
+  const { integrationId, adapterId, nativeOptions } = value;
+  if (typeof integrationId !== "string" || typeof adapterId !== "string") return {};
+  return {
+    runtime: {
+      integrationId,
+      adapterId,
+      protocolVersion: 1 as const,
+      nativeOptions: Array.isArray(nativeOptions)
+        ? nativeOptions.filter((key): key is string => typeof key === "string")
+        : [],
+    },
+  };
 }

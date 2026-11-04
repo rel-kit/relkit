@@ -28,7 +28,7 @@ function isProviderNode(
 }
 
 /**
- * Selects provider and native agent registrations without loading their modules.
+ * Selects provider registrations and each agent's adapter registration without loading modules.
  * @param graph - Canonical graph with deep capability markers preserved.
  * @returns Exact capability requirements; the plan owner deduplicates and sorts.
  */
@@ -48,13 +48,17 @@ export function graphIntegrationRequirements(
       adapterId: node.adapter.adapterId,
       protocolVersion: node.adapter.protocolVersion,
     }));
-  if (graph.nodes.some((node) => node.kind === "agent"))
+  for (const node of graph.nodes) {
+    if (node.kind !== "agent") continue;
+    // Graph workflows carry no runtime adapter and execute on LangChain.
+    const runtime = node.runtime ?? { integrationId: "langchain", adapterId: "langchain" };
     entries.push({
-      integrationId: "langchain",
+      integrationId: runtime.integrationId,
       capability: "agent-execution",
-      adapterId: "langchain",
+      adapterId: runtime.adapterId,
       protocolVersion: 1,
     });
+  }
   if (graph.nodes.some((node) => node.kind === "agent" && node.requiresDeepAgents === true))
     entries.push({
       integrationId: "langchain",

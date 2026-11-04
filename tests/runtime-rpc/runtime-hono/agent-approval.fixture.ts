@@ -1,6 +1,7 @@
 /** Acquires the native approval provider, agent, progress-emitting engine and HTTP client. Its shared lifetime fixture joins accepted runs before removing temporary state. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import type { PendingApproval } from "relkit/agents";
-import { defineAgent } from "@relkit/langchain";
 import { createLocalAgentStateProvider } from "relkit/providers-local";
 import { z } from "relkit/schema";
 import { createApp } from "relkit/runtime-hono";
@@ -21,6 +22,7 @@ import {
 function approvalAgent() {
   const agent = defineAgent({
     id: "support.approval",
+    runtime: langchain(),
     input: z.string(),
     output: z.string(),
     instructions: "Require approval.",
