@@ -71,7 +71,8 @@ if (import.meta.main) {
     `@relkit/client browser bundle: ${report.modules} modules, ${(report.bytes / 1024).toFixed(1)} KiB minified.`,
   );
   if (report.effectImports.length > 0) {
-    for (const entry of report.effectImports) console.error(`${entry.importer} -> ${entry.specifier}`);
+    for (const entry of report.effectImports)
+      console.error(`${entry.importer} -> ${entry.specifier}`);
     process.exitCode = 1;
   }
 }

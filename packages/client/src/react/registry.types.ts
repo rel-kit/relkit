@@ -96,4 +96,3 @@ export type ChannelSelector = Extract<keyof ChannelRegistry, string>;
  * String keys of the declared agent registry.
  */
 export type AgentSelector = Extract<keyof AgentRegistry, string>;
-

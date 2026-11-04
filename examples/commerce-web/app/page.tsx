@@ -6,7 +6,10 @@ import { AgentExamples } from "./agent-examples";
 
 export default function Page() {
   const orders = useRoute(api.orders.searchOrders, { input: {}, staleTime: 30_000 });
-  const announcements = useRoute(api.announcements.getAnnouncements, { input: {}, staleTime: 30_000 });
+  const announcements = useRoute(api.announcements.getAnnouncements, {
+    input: {},
+    staleTime: 30_000,
+  });
   const post = useRouteMutation(api.announcements.postAnnouncement, {
     onSuccess: async () => {
       await announcements.refetch();
