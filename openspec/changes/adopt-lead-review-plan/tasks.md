@@ -138,7 +138,7 @@ not tasks of this change.
 
 - [x] 13.1 Generate benchmark apps with 10, 100 and 500 functions and a script that measures save-to-serving p95 and `relkit check` peak memory against `tsc`, and verify the script reports both metrics
 - [ ] 13.2 Run the benchmarks in release readiness and build the benchmarks page with the measuring host from that CI output, and verify the pull request's run produces the numbers and the docs build shows them
-- [ ] 13.3 Keep one warm evaluator per dev session that re-evaluates only changed modules and their dependents through `invalidateWatchDependencies`, and verify tests that unchanged modules are not re-imported
+- [x] 13.3 Keep one warm evaluator per dev session that re-evaluates only changed modules and their dependents through `invalidateWatchDependencies`, and verify tests that unchanged modules are not re-imported
 - [ ] 13.4 Swap the handler table atomically when configuration, providers and route shape are unchanged and fall back to blue/green otherwise, and verify the process stays the same on a handler edit and restarts on a binding change
 - [ ] 13.5 Run type-checking as a parallel watch process that streams diagnostics to the CLI and Inspector without blocking reloads, and verify a type error does not block a reload
 - [ ] 13.6 Stop running the production bundler in dev, and verify no bundle is written on save

@@ -12,3 +12,6 @@ export {
   checkRuntimeIntegrations,
   loadRuntimeIntegration,
 } from "../provider/dependency-runtime.js";
+// Development reload: the warm evaluator and the dev server evict changed modules with this.
+export { createModuleReloader } from "./dev-module-reload.js";
+export type { ModuleReloader } from "./dev-module-reload.js";

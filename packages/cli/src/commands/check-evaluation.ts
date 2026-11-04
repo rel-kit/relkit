@@ -61,7 +61,8 @@ export const evaluateCheckSources = Effect.fn("Project.checkEvaluation")(functio
 ) {
   const compiler = yield* CliCompiler;
   const input = yield* readCheckSources(projectRoot, options, generationId);
-  const evaluator = yield* compiler.evaluate({
+  const evaluate = options.evaluate ?? compiler.evaluate;
+  const evaluator = yield* evaluate({
     projectRoot,
     candidates: input.prefiltered.candidates,
     generationId,

@@ -1,7 +1,7 @@
 /** Captures project capabilities for scoped checks, development snapshots, and builds. */
 import { Context, Effect, Layer } from "effect";
 import { buildProjectEffect } from "../commands/build.js";
-import { checkDevProjectEffect } from "../commands/dev-check.js";
+import { createDevChecker } from "../commands/dev-check.js";
 import { CliCompiler } from "./compiler.service.js";
 import { CliFileSystem } from "./filesystem.service.js";
 import { CliModules } from "./modules.service.js";
@@ -46,6 +46,10 @@ export const projectLayer = Layer.effect(
     const snapshotFiles = yield* SnapshotFiles;
     const dependencies = yield* SelectedDependencies;
     const dependencySource = yield* DependencySource;
+    // One warm checker per invocation: every development check of a session reuses it.
+    const devChecker = yield* Effect.acquireRelease(Effect.sync(createDevChecker), (checker) =>
+      checker.close,
+    );
     return CliProject.of({
       check: (options) =>
         checkProjectWithCurrentReceiptEffect(options).pipe(
@@ -55,8 +59,7 @@ export const projectLayer = Layer.effect(
           Effect.provideService(CliModules, modules),
           Effect.provideService(SnapshotFiles, snapshotFiles),
         ),
-      checkDevelopment: (request) =>
-        checkDevProjectEffect(request).pipe(Effect.provideService(CliCleanup, cleanup)),
+      checkDevelopment: (request) => devChecker.check(request),
       build: (options) =>
         buildProjectEffect(options).pipe(
           Effect.provideService(DependencySource, dependencySource),
