@@ -1,5 +1,5 @@
 /**
- * Coordinates materialization, bundling and atomic publication of one accepted
+ * Coordinates materialization, production bundling and atomic publication of one accepted
  * build cohort. The caller owns stage rollback; interruption wins before the
  * publication transaction, and no partial executable stage becomes current.
  */
@@ -7,6 +7,9 @@ import { Effect } from "effect";
 import { observeCli } from "../cli-runtime.js";
 import { activateBuildEffect } from "./build-activation.js";
 import { bundleServerEffect } from "./build-support.js";
+import { linkFrameworkModules } from "./build-module-links.js";
+import { CliFileSystem } from "../services/filesystem.service.js";
+import { join } from "node:path";
 import { buildArtifacts } from "./build-manifest.js";
 import { loadBuildStageCohort } from "./build-stage-cohort.js";
 import { writeBuildAssets, writeBuildMetadata, writeBuildServer } from "./build-stage-files.js";
@@ -23,13 +26,22 @@ export const stageBuildEffect = Effect.fn("Project.stageBuild")(
     const cohort = yield* loadBuildStageCohort(input);
     yield* writeBuildAssets(input, cohort);
     yield* writeBuildServer(input, cohort);
-    yield* bundleServerEffect(
-      cohort.serverDirectory,
-      input.projectRoot,
-      input.options.mode === "development",
-      input.options.bundleInputInventory,
-      Object.keys(cohort.productionDependencies),
-    );
+    // Development runs server/index.ts directly, so a save never runs the production bundler;
+    // the generation keeps the framework links the bundler would otherwise have resolved.
+    if (input.options.mode === "development")
+      yield* linkFrameworkModules(
+        yield* CliFileSystem,
+        join(cohort.serverDirectory, "node_modules"),
+        input.projectRoot,
+      );
+    else
+      yield* bundleServerEffect(
+        cohort.serverDirectory,
+        input.projectRoot,
+        false,
+        input.options.bundleInputInventory,
+        Object.keys(cohort.productionDependencies),
+      );
     yield* writeBuildMetadata(input, cohort);
     // Pending cancellation must win before the short publication transaction.
     yield* Effect.yieldNow;

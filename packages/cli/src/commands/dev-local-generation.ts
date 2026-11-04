@@ -108,7 +108,8 @@ function generationReceipt(
   inspection: Readonly<Record<string, string | undefined>> | undefined,
 ): Awaited<ReturnType<CandidateCompile>> {
   return {
-    entrypoint: "server/index.js",
+    // Bun runs the generated TypeScript entry directly; development writes no bundle.
+    entrypoint: "server/index.ts",
     ...(local === undefined && inspection === undefined
       ? {}
       : {
