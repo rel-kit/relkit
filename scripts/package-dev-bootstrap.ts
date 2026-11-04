@@ -4,7 +4,7 @@
  * dispatch and compiler modules remain external dynamic imports, so unchanged
  * startup neither parses nor evaluates their dependency graph.
  */
-import { resolve, relative } from "node:path";
+import { dirname, resolve, relative, sep } from "node:path";
 import { readdir, rm } from "node:fs/promises";
 import { Effect } from "effect";
 import { ownedNativePromise, narrowEffectImportPlugin } from "@relkit/cli/tooling";
@@ -108,6 +108,29 @@ const packagePreparedCohort = Effect.fn("Packaging.preparedCohort")(function* ()
   }
 });
 
+/**
+ * Keeps the compiler out of the prepared chunks, as it was while it was its own package. The
+ * compiler locates its evaluator child from its own module URL, so inlining it into
+ * `dist/dev-snapshot` would point that lookup at a file that does not exist.
+ * @param root - Repository root.
+ * @returns Bundler policy rewriting compiler imports to the tsc output beside the chunks.
+ */
+function externalCompiler(root: string): Bun.BunPlugin {
+  const compiler = resolve(root, "packages/cli/src/compiler");
+  return {
+    name: "relkit-external-compiler",
+    setup(builder) {
+      builder.onResolve({ filter: /(?:^|\/)compiler(?:\/|\.js$)/ }, (args) => {
+        if (!args.path.startsWith(".")) return undefined;
+        const target = resolve(dirname(args.importer), args.path);
+        if (target !== compiler && !target.startsWith(compiler + sep)) return undefined;
+        const inside = relative(compiler, target).split(sep).join("/");
+        return { path: `../compiler/${inside === "" ? "index.js" : inside}`, external: true };
+      });
+    },
+  };
+}
+
 /** Builds one dependency-isolated prepared graph so preparation-only TypeScript stays off hits. */
 const buildPreparedEntries = Effect.fn("Packaging.preparedEntries")(
   (root: string, destination: string, entries: readonly string[], chunk: string) =>
@@ -122,6 +145,7 @@ const buildPreparedEntries = Effect.fn("Packaging.preparedEntries")(
         minify: true,
         plugins: [
           lazyImports(["../services/local-capabilities.js", "../commands/dev-local-compiler.js"]),
+          externalCompiler(root),
           narrowEffectImportPlugin(),
         ],
       }),

@@ -56,7 +56,8 @@ test("the route sets 201, Location and a cookie from the function's output", asy
 test("the same function runs from a job and returns only its output", async () => {
   const job = await createTestJob({
     jobId: "orders.create-later",
-    target: createOrder,
+    // The job harness types plain targets; a function descriptor is one at run time.
+    target: createOrder as unknown as Parameters<typeof createTestJob>[0]["target"],
     retry: { maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
   });
   try {

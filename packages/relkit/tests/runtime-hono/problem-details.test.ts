@@ -110,8 +110,8 @@ const app = createApp({
 });
 
 /** Requests one path with a known trace ID. */
-function request(path: string, init: RequestInit = {}): Promise<Response> {
-  return app.request(`https://app.example${path}`, {
+async function request(path: string, init: RequestInit = {}): Promise<Response> {
+  return await app.request(`https://app.example${path}`, {
     ...init,
     headers: { traceparent: `00-${traceId}-00f067aa0ba902b7-01`, ...init.headers },
   });

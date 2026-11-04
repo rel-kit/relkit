@@ -25,7 +25,7 @@ test("local create shares matching native dependencies without changing differen
     join(root, "package.json"),
     JSON.stringify({
       dependencies: {
-        relkit: appManifest.version,
+        "@relkit/app": appManifest.version,
         "@relkit/langchain": langchainManifest.version,
         "@langchain/langgraph": "1.4.14",
         langchain: "1.5.10",
@@ -39,7 +39,7 @@ test("local create shares matching native dependencies without changing differen
   expect(names).toContain("langchain");
   const manifest = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
   expect(manifest.dependencies).toEqual({
-    relkit: "link:@relkit/app",
+    "@relkit/app": "link:@relkit/app",
     "@relkit/langchain": "link:@relkit/langchain",
     "@langchain/langgraph": "link:@langchain/langgraph",
     langchain: "link:langchain",
@@ -64,7 +64,7 @@ test("local links keep web dependencies local and repair previously linked inspe
       join(root, "package.json"),
       JSON.stringify({
         dependencies: {
-          relkit: appManifest.version,
+          "@relkit/app": appManifest.version,
           langchain: "link:langchain",
           next: linked ? "link:next" : "16.3.3",
           react: linked ? "link:react" : "19.2.8",

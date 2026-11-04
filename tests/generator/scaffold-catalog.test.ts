@@ -16,6 +16,7 @@ const OWNERS = {
   "@relkit/drizzle": "packages/drizzle/package.json",
   "@relkit/effect-mq": "integrations/packages/effect-mq/package.json",
   "@relkit/inngest": "integrations/packages/inngest/package.json",
+  "@relkit/inspector": "packages/inspector/package.json",
   "@relkit/local": "integrations/packages/local/package.json",
   "@relkit/langchain": "integrations/packages/langchain/package.json",
   "@relkit/pulumi": "integrations/packages/pulumi/package.json",
