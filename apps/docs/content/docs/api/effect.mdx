@@ -78,7 +78,7 @@ export interface AppCompatibilityConfig {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L44)
 
 ### InspectorConfig (interface)
 
@@ -96,7 +96,7 @@ const inspector: InspectorConfig = { enabled: true };
 export interface InspectorConfig extends InspectorConfigurationInput {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L39)
 
 ### ServerConfig (interface)
 
@@ -120,6 +120,11 @@ export interface ServerConfig {
   readonly mcp?: boolean | { readonly auth?: "required" };
   /** Explicitly selects the optional AG-UI HTTP protocol independently of agent RPC. */
   readonly agUi?: boolean;
+  /** Runs once after the application's providers are ready and before the server accepts
+   * requests; `getRelkit()` returns the application's handle inside it. A rejection stops startup.
+   * @example onStart: async () => { await getRelkit().functions.catalog.warmPrices({}); }
+   */
+  readonly onStart?: () => void | Promise<void>;
 }
 ```
 
@@ -494,7 +499,16 @@ declare const normalizeAppRuntimeMetadataEffect: (
   options: Pick<ApplicationDescriptor, "server" | "inspector" | "deployment" | "check">,
 ) => Effect.Effect<
   {
-    server: ServerConfig | undefined;
+    server:
+      | {
+          port?: number;
+          maxBodyBytes?: number;
+          apiDocs?: ApiDocsConfig;
+          clientContract?: boolean;
+          mcp?: boolean | { readonly auth?: "required" };
+          agUi?: boolean;
+        }
+      | undefined;
     inspector: InspectorConfiguration | undefined;
     deployment: Readonly<Record<string, JsonValue>> | undefined;
     check: AppCheckConfig | undefined;

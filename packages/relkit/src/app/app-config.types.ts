@@ -26,6 +26,11 @@ export interface ServerConfig {
   readonly mcp?: boolean | { readonly auth?: "required" };
   /** Explicitly selects the optional AG-UI HTTP protocol independently of agent RPC. */
   readonly agUi?: boolean;
+  /** Runs once after the application's providers are ready and before the server accepts
+   * requests; `getRelkit()` returns the application's handle inside it. A rejection stops startup.
+   * @example onStart: async () => { await getRelkit().functions.catalog.warmPrices({}); }
+   */
+  readonly onStart?: () => void | Promise<void>;
 }
 
 /** Development bridge selection; installing or running the UI is independent.

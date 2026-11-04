@@ -1,6 +1,6 @@
 /** Owns source, SQLite seed, real generated server, native requests and joined shutdown for flat/grouped specialized acceptance. */
 import { Database } from "bun:sqlite";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { Context, Effect, Layer, Scope } from "effect";
@@ -12,6 +12,7 @@ import { scaffoldPort } from "../../../scripts/scaffold-http.js";
 import { ScaffoldProcessFailure } from "../../../scripts/scaffold-process.errors.js";
 import type { ScaffoldChild } from "../../../scripts/scaffold-process.types.js";
 import { writeGeneratedHostFixture } from "./generated-host-fixture.js";
+import { withOnStartProbe } from "./generated-host-handle.sources.js";
 import { flattenGeneratedHost } from "./generated-host-layout.js";
 import { prepareGeneratedProtection } from "./generated-protection-project.js";
 import { generatedRequest, generatedRecords } from "./generated-host-http.js";
@@ -55,6 +56,10 @@ export const startGeneratedHost = Effect.fn("GeneratedHost.start")(
       writeGeneratedHostFixture(root, repository),
     );
     if (protection) yield* prepareGeneratedProtection(root, repository);
+    yield* scaffoldNative("generated.host.on-start", async () => {
+      const path = join(root, "relkit.config.ts");
+      await writeFile(path, withOnStartProbe(await readFile(path, "utf8")));
+    });
     yield* seedDatabase(root);
     if (!grouped) yield* flattenGeneratedHost(root);
     const built = yield* scaffoldNative("generated.host.build", () =>
@@ -77,6 +82,7 @@ export const startGeneratedHost = Effect.fn("GeneratedHost.start")(
         BETTER_AUTH_URL: baseURL,
         BETTER_AUTH_SECRET: "generated-host-test-secret-at-least-32-bytes",
         RELKIT_TEST_RELEASES: join(root, "releases.txt"),
+        RELKIT_TEST_ON_START: join(root, "on-start.json"),
         RELKIT_DRAIN_TIMEOUT_MS: "5000",
         RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS: "1000",
       },

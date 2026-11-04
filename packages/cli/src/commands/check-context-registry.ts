@@ -21,10 +21,15 @@ export const writeContextRegistryEffect = Effect.fn("Project.writeContextRegistr
     descriptors: readonly ExtractedDescriptor[],
     projectRoot: string,
     generatedDirectory: string,
+    identities?: ReadonlyMap<string, string>,
   ) {
     const compiler = yield* CliCompiler;
     const source = yield* cliTry("project.writeContextRegistry", () =>
-      generateContextRegistry(descriptors, { projectRoot, generatedDirectory }),
+      generateContextRegistry(descriptors, {
+        projectRoot,
+        generatedDirectory,
+        ...(identities === undefined ? {} : { identities }),
+      }),
     );
     yield* compiler.writeChanged(
       join(projectRoot, generatedDirectory, CONTEXT_REGISTRY_FILE),
@@ -36,6 +41,7 @@ export const writeContextRegistryEffect = Effect.fn("Project.writeContextRegistr
     _descriptors: readonly ExtractedDescriptor[],
     _projectRoot: string,
     _generatedDirectory: string,
+    _identities?: ReadonlyMap<string, string>,
   ) => observeCli("project.writeContextRegistry", effect),
 );
 

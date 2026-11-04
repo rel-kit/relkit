@@ -8,6 +8,7 @@ import {
   checkConventions,
   extractDescriptors,
   normalizeCompilation,
+  resolvedIdentities,
   type GeneratedOutputs,
 } from "../compiler/index.js";
 import { sortDiagnostics } from "relkit/diagnostics";
@@ -45,18 +46,6 @@ const normalizeCheckEvaluation = Effect.fn("Project.checkNormalization")(functio
   const extracted = yield* cliTry("project.extract", () =>
     extractDescriptors(evaluator, { projectRoot, sources: discoverySources }),
   );
-  yield* Effect.all(
-    [
-      writeEventRegistryEffect(extracted, projectRoot, config.generatedDirectory),
-      writeContextRegistryEffect(extracted, projectRoot, config.generatedDirectory),
-    ],
-    { concurrency: 2 },
-  );
-  const typeDiagnostics = yield* compiler.typecheck(
-    projectRoot,
-    config.generatedDirectory,
-    config.check,
-  );
   const hasAgents = extracted.some((entry) => entry.descriptor.kind === "agent");
   const runtimeIntegrationPackages =
     hasAgents && !declaredIntegrations.some((entry) => entry.integrationId === "langchain")
@@ -84,6 +73,20 @@ const normalizeCheckEvaluation = Effect.fn("Project.checkNormalization")(functio
       mode: options.mode ?? "development",
       runtimeIntegrationPackages,
     }),
+  );
+  // The registries name inferred IDs, so they are written after normalization resolves them.
+  const identities = resolvedIdentities(normalization.descriptors);
+  yield* Effect.all(
+    [
+      writeEventRegistryEffect(extracted, projectRoot, config.generatedDirectory),
+      writeContextRegistryEffect(extracted, projectRoot, config.generatedDirectory, identities),
+    ],
+    { concurrency: 2 },
+  );
+  const typeDiagnostics = yield* compiler.typecheck(
+    projectRoot,
+    config.generatedDirectory,
+    config.check,
   );
   return { normalization, extracted, typeDiagnostics };
 });

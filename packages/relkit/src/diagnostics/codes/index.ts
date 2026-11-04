@@ -3,6 +3,7 @@ import type { DiagnosticCodeEntry } from "./codes.types.js";
 import { authCodes } from "./auth.js";
 import { checkRuleCodes } from "./check-rules.js";
 import { cliCodes } from "./cli.js";
+import { handleCodes } from "./handle.js";
 import { compilerCodes } from "./compiler.js";
 import { inspectorCodes } from "./inspector.js";
 import { jobsCodes } from "./jobs.js";
@@ -23,6 +24,7 @@ export const DIAGNOSTIC_CODES: readonly DiagnosticCodeEntry[] = Object.freeze(
     ...checkRuleCodes,
     ...authCodes,
     ...runtimeCodes,
+    ...handleCodes,
     ...jobsCodes,
     ...inspectorCodes,
   ].sort((left, right) => left.code.localeCompare(right.code)),

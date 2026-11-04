@@ -93,6 +93,24 @@ async function invocationContext({ invocation, signal, env, time }, spanId) {
   return { invocation, signal, env, time, auth, log, trace: publicTrace, database, databases, ...resolved };
 }
 
+/** Builds the application's runtime handle once providers and the database are ready. */
+function relkitHandle() {
+  relkitHandle.promise ??= (async () => {
+    const providerRegistry = await providerStartup;
+    if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
+    const database = databaseStartup === undefined ? undefined : (await databaseStartup).context;
+    const refs = (kind, nodes) => Object.fromEntries((nodes ?? []).map((node) => [node.id, { ref: { kind, id: node.id } }]));
+    return createRuntimeHandle({
+      services: runtimeManifest.services ?? {},
+      invoke: (functionId, input) => invokeHttp({ functionId, input, source: "direct" }),
+      descriptors: { channels: runtimeManifest.channels ?? {}, agents: runtimeManifest.agents ?? {}, cache: refs("cache", plan.caches), buckets: refs("bucket", plan.buckets) },
+      sources: createDependencySources(providerRegistry),
+      ...(database === undefined ? {} : { database, databases: { [databaseNode.id]: database } }),
+    });
+  })();
+  return relkitHandle.promise;
+}
+
 function createDatabaseRegistration(node, services, env) {
   if (node === undefined) return undefined;
   const service = services?.[node.id];

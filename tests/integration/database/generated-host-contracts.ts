@@ -30,6 +30,7 @@ export const verifyGeneratedHost = Effect.fn("GeneratedHost.verify")(function* (
   expect(yield* host.records("descendants")).toMatchObject({ count: 1 });
   expect(yield* host.records("numeric")).toMatchObject({ count: 1, numeric: -1e100 });
   expect(yield* host.records("nested-auth")).toMatchObject({ count: 1, nested: true });
+  yield* verifyRuntimeHandle(host);
   yield* verifyNativeSession(host);
   expect((yield* host.read("releases.txt")).trim().split("\n")).toHaveLength(1);
   const stopped = yield* host.stop;
@@ -37,6 +38,22 @@ export const verifyGeneratedHost = Effect.fn("GeneratedHost.verify")(function* (
   expect((yield* host.read("releases.txt")).trim().split("\n")).toHaveLength(2);
   expect(stopped.output).not.toContain("host-password-123");
   expect(stopped.output).not.toContain("generated-host-test-secret-at-least-32-bytes");
+});
+
+/**
+ * Checks that onStart, middleware and a raw route reach the application through `getRelkit()`.
+ * @param host - Running generated host.
+ * @returns Completion after each probe answered from the running application.
+ */
+const verifyRuntimeHandle = Effect.fn("GeneratedHost.verifyHandle")(function* (
+  host: GeneratedHostSession,
+) {
+  expect(JSON.parse(yield* host.read("on-start.json"))).toEqual({ count: 0 });
+  const response = yield* host.request("/handle");
+  const body = yield* scaffoldNative("generated.host.handle.body", () => response.json());
+  expect(response.status).toBe(200);
+  expect(body).toEqual({ rows: 1, count: 1 });
+  expect(response.headers.get("x-handle")).toBe("1");
 });
 
 /**

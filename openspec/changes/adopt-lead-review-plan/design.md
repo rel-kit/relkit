@@ -274,6 +274,13 @@ Decisions taken during section 10 (maintainer, 2026-11-04):
   jobs by service and member name (`relkit.functions.orders.priceOrder`), keys buckets, caches,
   channels and agents by their explicit ID, and exposes the default database as `database` and every
   Drizzle service as `databases.<service>`.
+- **`server.onStart` is the startup hook.** RelKit had no application startup hook, so
+  `defineApp({ server: { onStart } })` runs once after providers are ready and before the server
+  accepts requests, inside the handle's context so `getRelkit()` works there.
+- **Task 10.3 lands before 10.2.** Commerce's order middleware calls a function outside any
+  handler, so it needs `getRelkit()` before descriptor `.invoke()` can go.
+- **Only function descriptors lose `.invoke()`.** Tool descriptors and function graph nodes keep
+  their `invoke` adapter, because agent adapters such as LangChain call it.
 
 ### D15. Typed client (#16)
 

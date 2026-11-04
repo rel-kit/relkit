@@ -24,6 +24,7 @@
     "defineTransform",
     "env",
     "fail",
+    "getRelkit",
     "http",
     "streamOf"
   ],
@@ -97,6 +98,7 @@
     "PublicLogger",
     "RawHttpHandler",
     "RawRouteOptions",
+    "RelkitHandle",
     "ResolvedEnv",
     "RouteCookie",
     "RouteDescriptor",

@@ -13,6 +13,7 @@ export * from "./provider-registry.js";
 export * from "./recursion.js";
 export * from "./registry.js";
 export * from "./registry.service.js";
+export * from "./runtime-handle.js";
 export * from "./runtime-integrations.js";
 export * from "./stream-runtime.js";
 export * from "./task-executor.js";

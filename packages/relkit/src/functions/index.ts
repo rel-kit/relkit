@@ -4,6 +4,8 @@ export * from "./handler-result.js";
 export * from "./function-graph-node.js";
 export { callGraphNodeEffect, callToolEffect } from "./descriptor-effects.js";
 export * from "./stream.js";
+export { ApplicationNotRunningError, getRelkit } from "./runtime-handle.js";
+export type * from "./runtime-handle.types.js";
 export * from "./function-observability.js";
 export type {
   FunctionToolApproval,

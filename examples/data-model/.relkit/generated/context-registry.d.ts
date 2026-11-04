@@ -10,6 +10,21 @@ declare global {
     }
     interface JobRegistry {
     }
+    interface HandleServices {
+    readonly "database": typeof import("../../src/services/database/service.js")["default"];
+    readonly "users": typeof import("../../src/services/users/service.js")["default"];
+    }
+    interface HandleDatabases {
+    readonly "database": typeof import("../../src/services/database/service.js")["default"];
+    }
+    interface HandleCaches {
+    }
+    interface HandleBuckets {
+    }
+    interface HandleChannels {
+    }
+    interface HandleAgents {
+    }
   }
 }
 

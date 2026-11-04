@@ -21,7 +21,8 @@ export function serverHttpSource(configuration: ServerSourceConfiguration): stri
 const app = preparedApplication.app;
 ${serverJobsAdministrationSource(configuration)}
 `;
-  const dispatchSource = "preparedApplication.fetch(request, bunServer)";
+  const dispatchSource =
+    "runWithRelkit(await relkitHandle(), () => preparedApplication.fetch(request, bunServer))";
   return `const internalEndpointsEnabled = environment !== "production";
 const httpMiddlewareOptions = {
   generationId, graphHash, observability: telemetry, spanRuntime, maxBodyBytes: ${configuration.maxBodyBytes},
@@ -35,6 +36,8 @@ const httpMiddlewareOptions = {
   } }),
 };
 ${serverHttpOptionsSource(configuration)}${applicationSource}
+const onStart = application.server?.onStart;
+if (typeof onStart === "function") await runWithRelkit(await relkitHandle(), () => onStart());
 const server = Bun.serve({
   hostname: "0.0.0.0",
   port: Number(process.env.PORT ?? 3000),

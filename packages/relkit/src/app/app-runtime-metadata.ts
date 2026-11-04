@@ -20,7 +20,7 @@ export const normalizeAppRuntimeMetadataEffect = Effect.fn("App.runtimeMetadata"
     observeApp(
       "runtimeMetadata.normalize",
       Effect.gen(function* () {
-        const server = options.server === undefined ? undefined : yield* copyEffect(options.server);
+        const server = options.server === undefined ? undefined : yield* copyServerEffect(options.server);
         const inspector =
           options.inspector === undefined
             ? undefined
@@ -36,3 +36,20 @@ export const normalizeAppRuntimeMetadataEffect = Effect.fn("App.runtimeMetadata"
       }),
     ),
 );
+
+/** Copies server settings as JSON data and keeps the `onStart` callback as written.
+ * @param server - Authored server settings.
+ * @returns The copied settings, or AppValidationFailure when `onStart` is not a function.
+ */
+function copyServerEffect(server: NonNullable<ApplicationDescriptor["server"]>) {
+  return Effect.gen(function* () {
+    const { onStart, ...data } = server;
+    if (onStart !== undefined && typeof onStart !== "function")
+      return yield* new AppValidationFailure({
+        message: "server.onStart must be a function",
+        cause: new TypeError("server.onStart must be a function"),
+      });
+    const copied = yield* copyEffect(data);
+    return onStart === undefined ? copied : { ...copied, onStart };
+  });
+}

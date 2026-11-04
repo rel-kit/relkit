@@ -22,11 +22,13 @@ export function serverEngineImports(graph: ApplicationGraph) {
     "assertRuntimeIntegrationModules",
     "createFunctionRegistry",
     "createProviderRegistry",
+    "createRuntimeHandle",
     ...(hasJobs ? ["createTaskExecutor"] : []),
     "invoke",
     ...(hasEvents ? ["materializeEvents"] : []),
     ...(hasJobs ? ["materializeJobs"] : []),
     "parseInfrastructureBindingValues",
+    "runWithRelkit",
   ].join(", ");
   const stubs = `${hasJobs ? "" : "const createTaskExecutor = () => undefined;\nconst materializeJobs = async () => undefined;"}
 ${hasEvents ? "" : "const materializeEvents = async () => undefined;"}`;

@@ -30,6 +30,7 @@ export const generateContextRegistryEffect = Effect.fn("Compiler.generateContext
     const prompts = descriptors.filter((entry) => entry.descriptor.kind === "prompt");
     const tasks = registryEntries(descriptors, "task", output, root);
     const jobs = registryEntries(descriptors, "job", output, root);
+    const handle = handleRegistries(descriptors, output, root, options.identities);
     const fields = [
       database === undefined
         ? undefined
@@ -65,6 +66,7 @@ export const generateContextRegistryEffect = Effect.fn("Compiler.generateContext
       "    interface JobRegistry {",
       ...jobs,
       "    }",
+      ...handle,
       "  }",
       "}",
       "",
@@ -101,27 +103,91 @@ export function generateContextRegistry(
  */
 function registryEntries(
   descriptors: readonly ExtractedDescriptor[],
-  kind: "task" | "job",
+  kind: string,
   output: string,
   root: string,
+  include: (entry: ExtractedDescriptor) => boolean = () => true,
+  identities?: ReadonlyMap<string, string>,
 ): readonly string[] {
   const seen = new Set<string>();
+  const idOf = (entry: ExtractedDescriptor) =>
+    identities?.get(identityKey(entry.reference.module, entry.exportName)) ?? entry.descriptor.id;
   return descriptors
-    .filter(({ descriptor }) => descriptor.kind === kind)
+    .filter((entry) => entry.descriptor.kind === kind && include(entry))
     .sort(
       (left, right) =>
-        left.descriptor.id.localeCompare(right.descriptor.id) ||
+        idOf(left).localeCompare(idOf(right)) ||
         left.reference.module.localeCompare(right.reference.module) ||
         left.exportName.localeCompare(right.exportName),
     )
     .flatMap((entry) => {
-      if (seen.has(entry.descriptor.id)) return [];
-      seen.add(entry.descriptor.id);
+      const id = idOf(entry);
+      if (seen.has(id)) return [];
+      seen.add(id);
       const module = importPath(output, root, entry.reference.module);
       return [
-        `    readonly ${JSON.stringify(entry.descriptor.id)}: typeof import(${JSON.stringify(module)})[${JSON.stringify(entry.exportName)}];`,
+        `    readonly ${JSON.stringify(id)}: typeof import(${JSON.stringify(module)})[${JSON.stringify(entry.exportName)}];`,
       ];
     });
+}
+
+/**
+ * Renders the registries that type the runtime handle returned by `getRelkit()`.
+ * @param descriptors - Ordered normalized descriptors.
+ * @param output - Generated output filename.
+ * @param root - Canonical root used for path resolution.
+ * @returns Interface declarations keyed by service or descriptor ID.
+ */
+function handleRegistries(
+  descriptors: readonly ExtractedDescriptor[],
+  output: string,
+  root: string,
+  identities: ReadonlyMap<string, string> | undefined,
+): readonly string[] {
+  const sections: readonly (readonly [string, string, (entry: ExtractedDescriptor) => boolean])[] = [
+    ["HandleServices", "service", () => true],
+    ["HandleDatabases", "service", (entry) => hasCapability(entry, "drizzle")],
+    ["HandleCaches", "cache", () => true],
+    ["HandleBuckets", "bucket", () => true],
+    ["HandleChannels", "channel", () => true],
+    ["HandleAgents", "agent", () => true],
+  ];
+  return sections.flatMap(([name, kind, include]) => [
+    `    interface ${name} {`,
+    ...registryEntries(descriptors, kind, output, root, include, identities),
+    "    }",
+  ]);
+}
+
+/**
+ * Keys a descriptor by its source module and export name.
+ * @param module - Authored source module.
+ * @param exportName - Export binding.
+ * @returns The lookup key used by `identities`.
+ */
+export function identityKey(module: string, exportName: string): string {
+  return `${module}\0${exportName}`;
+}
+
+/**
+ * Maps each normalized descriptor's source binding to its resolved ID, for `identities`.
+ * @param descriptors - Descriptors after normalization resolved their IDs.
+ * @returns Resolved IDs keyed by `<module>\0<export name>`.
+ */
+export function resolvedIdentities(
+  descriptors: readonly {
+    readonly id: string;
+    readonly exportName: string;
+    readonly reference?: { readonly module: string };
+  }[],
+): ReadonlyMap<string, string> {
+  return new Map(
+    descriptors.flatMap((descriptor) =>
+      descriptor.reference === undefined
+        ? []
+        : [[identityKey(descriptor.reference.module, descriptor.exportName), descriptor.id] as const],
+    ),
+  );
 }
 
 /**

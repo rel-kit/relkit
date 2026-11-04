@@ -48,9 +48,15 @@ export function readServer<Value>(value: Value, issues: ConfigIssue[]) {
   rejectUnknown(
     record,
     "server",
-    ["port", "maxBodyBytes", "apiDocs", "clientContract", "mcp", "agUi"],
+    ["port", "maxBodyBytes", "apiDocs", "clientContract", "mcp", "agUi", "onStart"],
     issues,
   );
+  if (record.onStart !== undefined && typeof record.onStart !== "function")
+    issues.push({
+      code: CONFIG_CODES.behavior,
+      path: "server.onStart",
+      message: "server.onStart must be a function.",
+    });
   const port = readPort(record.port, "server.port", DEFAULT_TOOLING_CONFIG.server.port, issues);
   const maxBodyBytes = readPositive(
     record.maxBodyBytes,

@@ -1,7 +1,10 @@
 /** Checks paired generated public contracts and native context imports while retaining real grouped source provenance. */
 import assert from "node:assert/strict";
 import * as ts from "typescript";
-import { generateContextRegistry } from "../../src/compiler/context-registry.js";
+import {
+  generateContextRegistry,
+  resolvedIdentities,
+} from "../../src/compiler/context-registry.js";
 import type { FixtureCompilation } from "../../../../tests/compiler/fixture-runner.js";
 
 /**
@@ -28,9 +31,11 @@ export function assertGroupedArtifacts(
   }
   const leftContext = generateContextRegistry(before.extracted, {
     projectRoot: before.temporaryRoot,
+    identities: resolvedIdentities(before.normalization.descriptors),
   });
   const rightContext = generateContextRegistry(after.extracted, {
     projectRoot: after.temporaryRoot,
+    identities: resolvedIdentities(after.normalization.descriptors),
   });
   assert.equal(portableContext(rightContext), leftContext, "context binding contracts changed");
   for (const descriptor of after.normalization.descriptors) {
