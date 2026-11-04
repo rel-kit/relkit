@@ -139,6 +139,7 @@ function createAuthRegistration(node, authStartup) {
   if (node === undefined || authStartup === undefined) return undefined;
   return createHttpAuthRuntime({
     getOpenApiDocument: async () => generateBetterAuthOpenApi(await authStartup, specializedInstrumentation),
+    resolveAccess: async (session) => resolveBetterAuthAccess(await authStartup, session),
     getSession: async (headers) => {
       const auth = await authStartup;
       return (await auth.api.getSession({ headers })) ?? null;

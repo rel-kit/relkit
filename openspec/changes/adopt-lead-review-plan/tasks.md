@@ -193,7 +193,7 @@ not tasks of this change.
 ## 18. Access rules, typed middleware and several databases (#13 d, e, f)
 
 - [x] 18.1 Implement function `access` rules (roles, permissions, predicate) enforced in the engine for every invocation source, and verify a test for each source: HTTP, job, task, event, tool, agent, MCP and runtime handle
-- [ ] 18.2 Read roles and permissions from the Better Auth organization plugin, and verify an integration test with organization roles
+- [x] 18.2 Read roles and permissions from the Better Auth organization plugin, and verify an integration test with organization roles
 - [x] 18.3 Run runtime-handle calls as `system` and add `relkit.as(session)`, and verify tests for both principals
 - [ ] 18.4 Show route authentication and access rules in the graph, OpenAPI security and the Inspector, and verify snapshot tests
 - [ ] 18.5 Add typed middleware `provides` schemas and an `http.from(middleware, field)` request mapping while keeping Hono middleware, and verify HTTP tests
