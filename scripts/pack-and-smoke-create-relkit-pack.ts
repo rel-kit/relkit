@@ -50,10 +50,8 @@ export async function packPackages(
   const names = packingWorkspaceClosure(
     [
       "relkit",
+      "@relkit/app",
       "@relkit/cli",
-      "relkit",
-      "relkit/config",
-      "relkit/schema",
       "@relkit/testing",
       "create-relkit",
       "@relkit/local",

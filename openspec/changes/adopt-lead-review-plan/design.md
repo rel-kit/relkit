@@ -193,6 +193,13 @@ Decided while applying section 14 (maintainer, 2026-11-05):
   not support, and a pinned `node:24.22.0-bookworm-slim` image runs `node server/index.js` as the
   `node` user. `manifest.json` gains `"runtime": "node"` only for Node builds, so Bun builds stay
   byte-identical. `relkit dev` and `relkit start` still run on Bun.
+- **The template's own HTTP tests check the production build.** `RELKIT_TEST_SERVER_URL` makes
+  `createTestApplication` send `testApp.http` requests to a running server, adding the server's
+  origin when a test sends none, because production servers reject unsafe requests without one.
+  `scripts/runtime-http-suite.ts` packs the checkout, creates `api` from a local registry, runs
+  `relkit build --runtime <bun|node>`, starts the server with the chosen executable and runs
+  `bun test tests/integration` against it. The test runner stays Bun; the server under test is
+  the one that changes runtime.
 
 ### D8. TypeScript 7 (#11)
 
