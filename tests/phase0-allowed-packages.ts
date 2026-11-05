@@ -6,24 +6,21 @@ export const allowedPackages: readonly [Files, Files] = [
   packageFiles([
     {
       path: "packages/app",
-      name: "relkit",
+      name: "@relkit/app",
       source: 'import "relkit/config";',
-      dependencies: { "relkit/config": "workspace:*" },
+      dependencies: { relkit: "workspace:*" },
     },
-    { path: "packages/relkit", name: "relkit/config", source: "" },
+    { path: "packages/relkit", name: "relkit", source: "" },
   ]),
   packageFiles([
-    { path: "packages/relkit", name: "relkit/provider", source: "" },
-    { path: "packages/relkit", name: "relkit/providers-local", source: "" },
+    { path: "packages/relkit", name: "relkit", source: "" },
     {
       path: "integrations/packages/redis",
       name: "@relkit/redis",
       source:
         'import "relkit/cache"; import "relkit/contracts"; import "relkit/provider"; import "ioredis";',
       dependencies: {
-        "relkit/cache": "workspace:*",
-        "relkit/contracts": "workspace:*",
-        "relkit/provider": "workspace:*",
+        relkit: "workspace:*",
         ioredis: "5.0.0",
       },
     },
@@ -32,8 +29,7 @@ export const allowedPackages: readonly [Files, Files] = [
       name: "@relkit/s3",
       source: 'import "relkit/buckets"; import "relkit/provider";',
       dependencies: {
-        "relkit/buckets": "workspace:*",
-        "relkit/provider": "workspace:*",
+        relkit: "workspace:*",
       },
     },
     {
@@ -41,8 +37,7 @@ export const allowedPackages: readonly [Files, Files] = [
       name: "@relkit/local",
       source: 'import "relkit/provider"; import "relkit/providers-local";',
       dependencies: {
-        "relkit/provider": "workspace:*",
-        "relkit/providers-local": "workspace:*",
+        relkit: "workspace:*",
       },
     },
     {
