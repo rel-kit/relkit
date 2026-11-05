@@ -23,6 +23,7 @@ export type RouteOperation =
   | "dsl.source"
   | "dsl.whole-body"
   | "dsl.constant"
+  | "dsl.from"
   | "dsl.optional"
   | "dsl.default"
   | "dsl.transform"

@@ -1,3 +1,4 @@
+import { providedValue } from "./middleware-data.js";
 import { Context, Effect, Layer } from "effect";
 import { httpBoundary, observeHttp, runHttp } from "./http-effect.js";
 import { MISSING } from "./request-mapping-body.js";
@@ -148,6 +149,10 @@ const visit: EffectVisit = Effect.fn("RequestMapping.visit")(function* (
       return yield* httpBoundary("request.mapping.form", () =>
         formField(name, state, path, node.kind === "multipart-all"),
       );
+    }
+    case "middleware": {
+      const value = providedValue(state.request.request, String(node.name));
+      return value.found ? value.value : MISSING;
     }
     case "whole-body":
       return yield* httpBoundary("request.mapping.json", () => jsonValue(state, path));

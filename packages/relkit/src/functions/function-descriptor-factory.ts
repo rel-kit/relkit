@@ -12,6 +12,7 @@ import {
   validateLimit,
 } from "./define-function-validation.js";
 import { isStreamOutputSchema } from "./stream.js";
+import { copyAccess } from "./function-access.js";
 import { copyFunctionToolMetadata } from "./function-tool.js";
 import type { FunctionDescriptorFactoryOptions } from "./function-descriptor-factory.types.js";
 
@@ -36,6 +37,7 @@ export const createFunctionDescriptorEffect = Effect.fn("functions.function.crea
       assertHook(options.onAfter, "onAfter");
       validateLimit(options.timeoutMs, "timeoutMs");
       validateLimit(options.concurrency, "concurrency");
+      const access = copyAccess(options.access);
       if (options.invocationMode === "event-only" && options.tool !== undefined) {
         throw new FunctionInputError("Event functions cannot declare tool metadata");
       }
@@ -56,6 +58,7 @@ export const createFunctionDescriptorEffect = Effect.fn("functions.function.crea
         ...(options.descriptorFields ?? {}),
         ...(errors === undefined ? {} : { errors }),
         ...(dependencies === undefined ? {} : { dependencies }),
+        ...(access === undefined ? {} : { access }),
         ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
         ...(options.concurrency === undefined ? {} : { concurrency: options.concurrency }),
         ...(tool === undefined ? {} : { tool }),

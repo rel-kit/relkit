@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { observeOpenApi } from "./generate-observability.js";
 import { buildRequestEffect } from "./generate-request.js";
 import { buildResponsesEffect } from "./generate-response.js";
+import { operationSecurity } from "./generate-security.js";
 import { operationTagsEffect } from "./generate-tags.js";
 import type {
   FunctionNode,
@@ -36,6 +37,7 @@ export const buildOperationEffect = Effect.fn("OpenApi.buildOperation")(
           routePath,
         );
         const tags = yield* operationTagsEffect(service, trigger.config.tags);
+        const protection = operationSecurity(trigger, target);
         return {
           operationId,
           ...(trigger.config.title === undefined ? {} : { summary: trigger.config.title }),
@@ -45,12 +47,16 @@ export const buildOperationEffect = Effect.fn("OpenApi.buildOperation")(
           ...(tags.length === 0 ? {} : { tags }),
           ...(request.parameters.length === 0 ? {} : { parameters: request.parameters }),
           ...(request.body === undefined ? {} : { requestBody: request.body }),
-          responses:
-            target === undefined
+          ...(protection.security === undefined ? {} : { security: protection.security }),
+          responses: {
+            ...protection.responses,
+            ...(target === undefined
               ? { default: { description: "Response returned by the route handler" } }
-              : yield* buildResponsesEffect(trigger.config.responses, target),
+              : yield* buildResponsesEffect(trigger.config.responses, target)),
+          },
           "x-relkit": {
             routeId: trigger.id,
+            ...protection.relkit,
             ...(target === undefined ? {} : { functionId: target.id }),
             ...(service === undefined ? {} : { serviceId: service.id }),
             middleware: trigger.config.middleware.map((entry) => ({ ...entry })),

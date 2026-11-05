@@ -20,6 +20,7 @@ import {
   defaultIdSource,
   resolveTarget,
 } from "./invoke-utils.js";
+import { invocationPrincipal, memoizePrincipal } from "./access.js";
 import {
   emitObservabilityEvent,
   OBSERVABILITY_HOOK_PROTOCOL,
@@ -32,13 +33,16 @@ export type { InvocationStart, MutableInvocationParent } from "./invoke-start.ty
  * @param record - Immutable invocation identity and start metadata.
  * @param signal - Caller cancellation signal.
  * @param deadlineMs - Optional absolute deadline in milliseconds.
+ * @param principal - Caller inherited by child access checks.
  */
 export function invocationScopeParent(
   record: InvocationRecord,
   signal: AbortSignal,
   deadlineMs: number | undefined,
+  principal?: InvokeOptions["principal"],
 ): MutableInvocationParent {
   return {
+    ...(principal === undefined ? {} : { principal }),
     id: record.id,
     traceId: record.traceId,
     ...(record.correlationId === undefined ? {} : { correlationId: record.correlationId }),
@@ -116,8 +120,10 @@ export const startInvocationEffect = Effect.fn("Engine.startInvocation")(
       ),
     );
     const taskAncestry = options.taskAncestry ?? activeScope?.taskAncestry;
+    const principal = invocationPrincipal(options.principal, options.parent?.principal, source);
     return {
-      options,
+      options:
+        principal === undefined ? options : { ...options, principal: memoizePrincipal(principal) },
       dispatcher,
       parentChain,
       target,

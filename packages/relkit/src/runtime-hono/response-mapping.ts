@@ -1,4 +1,4 @@
-import { isJsonValue } from "../contracts/index.js";
+import { isAccessFailureId, isJsonValue } from "../contracts/index.js";
 import { InvocationValidationError } from "../engine/index.js";
 import type { HttpTriggerRegistration } from "../graph/index.js";
 import {
@@ -72,6 +72,13 @@ const failure = Effect.fn("ResponseMapping.failure")(function* (
   const failure = normalized.success;
   if (failure.kind !== "application")
     return yield* genericFailureResponse(trigger, failure, options);
+  if (isAccessFailureId(failure.id))
+    return yield* encodeProblem({
+      ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
+      status: failure.status ?? 403,
+      code: failure.id,
+      detail: failure.message,
+    });
   const declaration = findError(trigger, failure.id);
   if (
     declaration === undefined ||

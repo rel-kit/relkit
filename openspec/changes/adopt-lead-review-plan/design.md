@@ -214,6 +214,51 @@ RelKit rebuilds the served instance from `auth.options`, adding the default Driz
 Without a database, Better Auth 1.7.1 falls back to an in-memory adapter, so importing the file during
 `check` stays offline; a test confirms that no timers or sockets open.
 
+Decided while applying section 18 (maintainer, 2026-11-05):
+
+- **One check in the engine.** `defineFunction({ access: { roles, permissions, allow } })` is checked
+  in the engine's `runHandler`, after input validation and context creation and before `onBefore`
+  and the handler, so every source that reaches a handler (HTTP, jobs, tasks, event deliveries,
+  tools, agent tool calls, MCP and the runtime handle) goes through the same check. Every part that
+  is set must pass: at least one of `roles`, every `resource:action` permission, and `allow`
+  returning true over `{ principal, session, input }`.
+- **The caller is a principal.** An invocation carries a lazy, memoized principal: `system`,
+  `anonymous`, or `user` with `session`, `roles` and `hasPermission`. A caller can pass one
+  explicitly; otherwise a call inherits its parent's (through `ctx.functions`, agent tool calls and
+  the dispatcher), runtime-handle calls are `system`, and anything else reads the handler context's
+  `auth.getSession()`. The generated server builds the principal from the request's memoized
+  session, so route auth, middleware, access rules and `ctx.auth` share one lookup.
+- **Two built-in failures.** A denial raises `access-denied` (403) for a signed-in caller and
+  `unauthenticated` (401) without a session. They are application failures with those codes that no
+  function declares; declared-error validation lets them through, HTTP answers them as Problem
+  Details, MCP returns the code as the tool error, and other callers receive the coded failure.
+- **Background work has no user.** Job runs, task runs and event deliveries carry no session, so a
+  function with an access rule that they call fails with `unauthenticated` unless its `allow`
+  accepts anonymous callers. Background code that should act as the application calls
+  `getRelkit()` (system); code that should act as a user calls `relkit.as(session)`. Carrying the
+  enqueuing user's session through durable queues is not part of section 18.
+- **Protection is projected, not re-derived.** The graph records a function's rule as
+  `access: { roles, permissions, predicate: true }`; predicates are not serialized. OpenAPI adds a
+  `session` apiKey cookie scheme (`better-auth.session_token`) and `security: [{ session: [] }]` to
+  operations whose route requires a session or whose function has an access rule, with 401 and 403
+  problem responses. The Inspector reads the same graph fields in its graph and route views.
+- **Typed middleware provides by field.** `defineMiddleware(path, { provides, handler })` gives the
+  handler `relkit.provide(data)`, which validates the data against `provides` (a failure is a 500,
+  because the server produced it) and stores it on the request. `http.from(middleware, field)` is a
+  serializable `{ kind: "middleware", name }` mapping typed from the middleware's schema; the
+  runtime reads the field from the request, the function's input schema validates it again, and
+  the client generator and OpenAPI leave it out. The mapping names the field, not the middleware's
+  source-derived ID, so a route reads whichever typed middleware on its path provided it.
+  `defineMiddleware(path, handler)` keeps the Hono signature.
+- **Several databases need one default.** `defineDrizzleService({ default: true })` marks the
+  service that `ctx.database`, the handle's `database` and Better Auth use. One service is the
+  default without the flag; with several, check requires exactly one flag. The generated server
+  activates every Drizzle service and fills `ctx.databases` and the handle's `databases` with all of
+  them. Migrations and `relkit db` commands still act on the default service; per-service migration
+  tooling is a follow-up.
+- **`relkit.as(session)`** returns a handle of the same shape whose function calls run as that
+  session's user. The trace source stays `system`; the principal is the user's.
+
 ### D13. Effect boundary (#14)
 
 The `relkit` root re-exports only Promise APIs; `relkit/effect` re-exports the Effect helpers (for

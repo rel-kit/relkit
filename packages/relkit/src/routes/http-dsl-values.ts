@@ -43,6 +43,7 @@ export const httpValue: HttpDsl = {
     source("multipart", name, options)) as HttpDsl["multipart"],
   multipartAll: ((name: string, options?: HttpSourceOptions) =>
     source("multipart-all", name, options)) as HttpDsl["multipartAll"],
+  from: ((_middleware: unknown, field: string) => source("middleware", field)) as HttpDsl["from"],
   constant: (value) => {
     assertJsonValue(value);
     return deepFreeze({ kind: "constant" as const, value });

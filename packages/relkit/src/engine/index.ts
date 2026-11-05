@@ -1,3 +1,4 @@
+export * from "./access.js";
 export * from "./concurrency.js";
 export * from "./context.js";
 export * from "./dependencies.js";

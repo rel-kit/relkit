@@ -6,6 +6,7 @@ import {
   type CapturedInvocationTrace,
 } from "../runtime-effect/index.js";
 import { Effect } from "effect";
+import { enforceAccess } from "./access.js";
 import { createContext } from "./context.js";
 import type { DirectFunctionInvoker, DirectTaskInvoker } from "./dependencies.js";
 import { createDependencyBridge } from "./dependency-bridge.js";
@@ -85,6 +86,7 @@ export async function runHandler<
               ...(deadlineMs === undefined ? {} : { deadlineMs }),
               signal: request.signal ?? signalRef.current,
               trace,
+              ...(options.principal === undefined ? {} : { principal: options.principal }),
             });
     const invokeTask: DirectTaskInvoker | undefined = taskInvoker;
     const context = yield* Effect.tryPromise({
@@ -146,6 +148,7 @@ export async function runHandler<
       },
       catch: (cause) => normalizeFailure(cause, { signal: controller.signal }),
     });
+    yield* enforceAccess(target.access, input, context, options.principal);
     const lifecycle = runConfiguredLifecycle({
       target: target as InvocationTarget<unknown, unknown, Context>,
       input,

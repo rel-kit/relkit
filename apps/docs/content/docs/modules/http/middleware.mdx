@@ -54,6 +54,43 @@ The handler receives the Hono `context`, `next`, and a RelKit context containing
 Call public service functions through `getRelkit()` for domain behavior rather than importing their private
 implementation.
 
+## Provide typed data to routes
+
+Middleware that works out a value for the request, such as the tenant, can hand it to routes as typed
+data. Declare a `provides` schema and call `relkit.provide(data)`:
+
+```ts title="src/routes/middleware/tenant.middleware.ts"
+import { defineMiddleware } from "@relkit/app/routes";
+import { z } from "@relkit/app/schema";
+
+export default defineMiddleware("/orders/*", {
+  provides: z.object({ tenantId: z.string().min(1) }),
+  handler: async (context, next, relkit) => {
+    const tenantId = context.req.header("x-tenant");
+    if (tenantId !== undefined) await relkit.provide({ tenantId });
+    await next();
+  },
+});
+```
+
+A route maps a provided field into its function's input with `http.from(middleware, field)`:
+
+```ts title="src/routes/orders/[orderId]/route.ts"
+import { defineRoute, http } from "@relkit/app/routes";
+import tenant from "@app/routes/middleware/tenant.middleware.js";
+import orders from "@app/services/orders/service.js";
+
+export default defineRoute(orders.getOrder, {
+  method: "GET",
+  request: http.input({ tenantId: http.from(tenant, "tenantId"), orderId: http.path("orderId") }),
+});
+```
+
+`provide` validates the data against `provides`; data that does not match fails the request with `500`,
+because the server produced it. The function's input schema validates the field again, and TypeScript only
+accepts fields the schema declares. Clients never send these fields: the generated client and OpenAPI
+leave them out. Middleware defined with a plain handler keeps the Hono signature and provides nothing.
+
 ## Choose the match scope
 
 | Pattern            | Intended scope         |

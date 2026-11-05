@@ -23,7 +23,7 @@ export function serverSourceOptions(
     .map((node) => node.capability?.kind);
   const specializedImports = [
     serviceCapabilities.includes("better-auth")
-      ? 'import { activateBetterAuthService, generateBetterAuthOpenApi } from "@relkit/better-auth/drizzle";'
+      ? 'import { activateBetterAuthService, generateBetterAuthOpenApi, resolveBetterAuthAccess } from "@relkit/better-auth/drizzle";'
       : undefined,
     serviceCapabilities.includes("drizzle")
       ? 'import { activateDrizzleService } from "@relkit/drizzle/server";'

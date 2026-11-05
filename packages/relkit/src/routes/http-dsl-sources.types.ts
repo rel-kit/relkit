@@ -1,4 +1,5 @@
 import type {
+  HttpMiddlewareMapping,
   HttpMappingNode,
   HttpPathMapping,
   HttpPathSegmentsMapping,
@@ -153,4 +154,25 @@ export interface HttpDslSources {
    * @example http.multipartAll("files", { optional: true });
    */
   multipartAll(name: string, options: HttpSourceOptions): HttpMappingNode;
+  /** One field a typed middleware provides, validated by the middleware's `provides` schema.
+   * @param middleware - Middleware defined with `provides`.
+   * @param field - Field of the provided data.
+   * @returns A middleware source mapping; clients and OpenAPI never see it.
+   * @throws TypeError when the field name is empty.
+   * @example http.from(tenant, "tenantId");
+   */
+  from<
+    const Middleware extends { readonly __provides?: object },
+    const Field extends keyof ProvidedBy<Middleware> & string,
+  >(
+    middleware: Middleware,
+    field: Field,
+  ): HttpMiddlewareMapping<ProvidedBy<Middleware>[Field]>;
 }
+
+/** Data a typed middleware provides; plain middleware provides nothing. */
+type ProvidedBy<Middleware extends { readonly __provides?: object }> = [
+  NonNullable<Middleware["__provides"]>,
+] extends [never]
+  ? {}
+  : NonNullable<Middleware["__provides"]>;

@@ -20,6 +20,13 @@ export type MappingShapeOutput<S extends HttpMappingShape> = {
  * @example type Output = HttpMappingOutput<HttpPathMapping>;
  */
 export type HttpMappingOutput<M> = M extends HttpMapping<infer Output> ? Output : never;
+/** One field a typed middleware provided for this request.
+ * @example const mapping: HttpMiddlewareMapping<string> = http.from(tenant, "tenantId");
+ */
+export interface HttpMiddlewareMapping<Output = unknown> extends HttpMapping<Output> {
+  readonly kind: "middleware";
+  readonly name: string;
+}
 /** One named route path parameter.
  * @example const mapping: HttpPathMapping = http.path("id");
  */
@@ -143,6 +150,7 @@ export interface HttpTransformMapping<Output = unknown> extends HttpMapping<Outp
  * @example const mapping: HttpMappingNode = http.path("id");
  */
 export type HttpMappingNode =
+  | HttpMiddlewareMapping
   | HttpPathMapping
   | HttpPathSegmentsMapping
   | HttpQueryMapping

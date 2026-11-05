@@ -152,6 +152,8 @@ function mapInput(
     return body instanceof FormData ? body.getAll(String(mapping.name)) : [];
   }
   if (mapping.kind === "transform") return mapInput(mapping.value, url, params, request, body);
+  // The test dispatcher runs no route middleware, so middleware-provided fields are absent.
+  if (mapping.kind === "middleware") return undefined;
   throw new TypeError(`Unsupported test HTTP mapping: ${String(mapping.kind)}`);
 }
 

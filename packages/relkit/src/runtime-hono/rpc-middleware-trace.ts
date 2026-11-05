@@ -1,10 +1,11 @@
 import { publicTrace } from "../invocation/index.js";
-import type { MiddlewareContext, MiddlewareDescriptor } from "../routes/index.js";
+import type { MiddlewareDescriptor, MiddlewareServices } from "../routes/index.js";
 import { createPublicClockEffect } from "../runtime-effect/index.js";
 import type { Context, Next } from "hono";
 import { runHttp } from "./http-effect.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import { getRequestState } from "./middleware.js";
+import { withProvide } from "./middleware-data.js";
 
 /** Runs declared middleware within an attributed public trace span.
  * @param descriptor - Resolved runtime declaration and its application callbacks.
@@ -19,10 +20,14 @@ export function runRpcMiddleware(
   middlewareId: string,
   context: Context,
   next: Next,
-  middlewareContext: MiddlewareContext | Promise<MiddlewareContext>,
+  middlewareContext: MiddlewareServices | Promise<MiddlewareServices>,
 ): Promise<unknown> {
   return publicTrace.span(`relkit.middleware.${middlewareId}`, async () =>
-    descriptor.handler(context, next, await middlewareContext),
+    descriptor.handler(
+      context,
+      next,
+      withProvide(await middlewareContext, descriptor, context.req.raw),
+    ),
   );
 }
 
@@ -36,7 +41,7 @@ export async function createRpcMiddlewareContext(
   middlewareId: string,
   context: Context,
   options: RouteMaterializationOptions,
-): Promise<MiddlewareContext> {
+): Promise<MiddlewareServices> {
   const state = getRequestState(context);
   if (options.middlewareContext !== undefined) {
     return options.middlewareContext({

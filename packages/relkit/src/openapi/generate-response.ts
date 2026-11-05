@@ -14,7 +14,7 @@ const PROBLEM = "application/problem+json";
  * @param fields - Property schemas that replace or add to the common ones.
  * @returns A JSON Schema for the problem body.
  */
-function problemSchema(
+export function problemSchema(
   required: readonly string[] = [],
   fields: Readonly<Record<string, OpenApiSchema>> = {},
 ): OpenApiSchema {

@@ -28,6 +28,7 @@ export function serverEngineImports(graph: ApplicationGraph) {
     ...(hasEvents ? ["materializeEvents"] : []),
     "parseInfrastructureBindingValues",
     "runWithRelkit",
+    "sessionPrincipalSource",
   ].join(", ");
   const stubs = `${hasJobs ? "" : "const createTaskExecutor = () => undefined;"}
 ${hasEvents ? "" : "const materializeEvents = async () => undefined;"}`;

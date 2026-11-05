@@ -44,7 +44,9 @@ const sourceToken = tokenFrom(process.env.RELKIT_SOURCE_TOKEN);
 const generationToken = tokenFrom(process.env.RELKIT_GENERATION_TOKEN);
 const sourceValues = Object.fromEntries(Object.entries(process.env).filter((entry) => entry[1] !== undefined));
 const infrastructureBindingValues = parseInfrastructureBindingValues(process.env.RELKIT_INFRASTRUCTURE_BINDINGS);
-const databaseNode = plan.services?.find((service) => service.capability?.kind === "drizzle");
+const databaseNodes = (plan.services ?? []).filter((service) => service.capability?.kind === "drizzle");
+// ctx.database and Better Auth use the service marked default, or the only one.
+const databaseNode = databaseNodes.find((service) => service.capability.default === true) ?? databaseNodes[0];
 const authNode = plan.services?.find((service) => service.capability?.kind === "better-auth");
 let runtimeReport = () => {};
 let runtimeWrite = () => {};

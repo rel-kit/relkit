@@ -1,6 +1,6 @@
 ---
 title: Protect routes
-description: Mount Better Auth's public API, require sessions on selected routes, and enforce resource permissions inside business operations.
+description: Mount Better Auth's public API, require sessions on selected routes, and decide who may call a function with access rules.
 pagination: false
 sidebar:
   icon: lock-keyhole
@@ -79,20 +79,70 @@ Expect `401` for the protected profile and `200` with `authenticated: false` for
 operation. Then follow [Your first auth flow](/guides/auth/email-password-sign-in) to repeat the protected request
 with a valid cookie.
 
-## Enforce permissions in the business operation
+## Add an access rule to a function
 
-Inside the function, read the verified identity with [session lookup](/docs/modules/auth/sessions), reject a
-missing session if the operation requires one, and check the resource's owner, organization membership,
-or applicable role before accessing it. Derive the caller's identity from the session, not from an
-input such as `userId`, `organizationId`, or `role`.
+Route protection applies to HTTP requests, not every direct invocation of its target. To decide who may
+call a function from anywhere, give the function an `access` rule:
 
-For example, a request for another user's order still needs an ownership or membership check even
-when both users are signed in. Use a constrained query or transaction appropriate to the operation,
-and return an intentional declared error for denied access. Keep privileged role assignment server-owned.
+```ts title="src/services/orders/functions/refund-order.function.ts"
+import { defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
 
-Route protection applies to HTTP requests, not every direct invocation of its target. Jobs, tools,
-agents, and other services can reach business operations through other entry points. A generated
-database client is not row-level authorization, and a service export is not an access-control rule.
-Do not publish an operation on another transport until its identity and permission boundary is defined.
+export const refundOrder = defineFunction({
+  id: "orders.refund-order",
+  input: z.object({ orderId: z.string() }),
+  output: z.object({ refunded: z.boolean() }),
+  access: {
+    roles: ["admin", "support"],
+    permissions: ["orders:refund"],
+    allow: ({ session, input }) => session !== null && input.orderId !== "locked",
+  },
+  handler: async () => ({ refunded: true }),
+});
+```
+
+Every part you set must pass: the caller needs at least one of `roles`, every `resource:action` entry in
+`permissions`, and `allow` must return `true`. `allow` receives the session (or `null`), the validated input
+and the caller. RelKit checks the rule before the function's handler for every caller: HTTP routes, jobs,
+tasks, event consumers, tools, agent tool calls, MCP and the runtime handle. A call from inside another
+function, such as `ctx.functions.refundOrder(...)`, is checked as the caller of the outer function.
+
+| Caller                            | Outcome when the rule fails                                    |
+| --------------------------------- | -------------------------------------------------------------- |
+| Signed-in user without the rule   | `access-denied`: HTTP `403`, the coded error for other callers |
+| No session                        | `unauthenticated`: HTTP `401`, the coded error otherwise       |
+| `getRelkit()` or `createRelkit()` | Runs as `system`, which passes every rule                      |
+| `relkit.as(session).functions...` | Decided by that session's roles and permissions                |
+
+Roles and permissions come from Better Auth. With the
+[organization plugin](https://www.better-auth.com/docs/plugins/organization), the roles are the user's member
+role in the session's active organization, and permissions are checked against the plugin's access control.
+Without it, roles come from the admin plugin's `user.role`, and no permission is granted.
+
+Jobs, tasks and event deliveries run without a session, so a function with an access rule fails with
+`unauthenticated` when they call it. Call it through `getRelkit()` to act as the application, or through
+`relkit.as(session)` to act as a user:
+
+```ts
+import { getRelkit } from "@relkit/app/functions";
+
+await getRelkit().as(session).functions.orders.refundOrder({ orderId });
+```
+
+## Check ownership in the function
+
+An access rule decides who may call the function. A request for another user's order still needs an
+ownership or membership check: read the verified identity with [session lookup](/docs/modules/auth/sessions),
+or use `allow`, and constrain the query to rows the caller owns. Derive the caller's identity from the
+session, not from an input such as `userId`, `organizationId`, or `role`. Keep privileged role assignment
+server-owned. A generated database client is not row-level authorization, and a service export is not an
+access-control rule.
+
+## See protection in OpenAPI and the Inspector
+
+A route with `auth: "required"`, or one whose function has an access rule, declares the `session` cookie
+security requirement and `401` and `403` problem responses in OpenAPI, with the rule under `x-relkit.access`.
+The graph records the rule on the function node, and the Inspector shows it next to the route's auth
+requirement in its graph and route views.
 
 <include>/_snippets/generated/related/docs-modules-auth-protect-routes.mdx</include>

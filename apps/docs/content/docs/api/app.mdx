@@ -1841,8 +1841,8 @@ declare const defineJobEffect: <
 ```ts
 declare const defineMiddlewareEffect: (
   path: string,
-  handler: MiddlewareHandler,
-) => Effect<MiddlewareDescriptor<string>, RouteOperationError, never>;
+  definition: MiddlewareHandler | TypedMiddlewareOptions<StandardSchemaV1<unknown, unknown>>,
+) => Effect<MiddlewareDescriptor<string, any>, RouteOperationError, never>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L20)

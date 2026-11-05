@@ -1,6 +1,7 @@
 "use client";
 
 /** Details for functions, services, tables, events and channels. */
+import { accessRule, describeAccessRule } from "../../lib/graph-hierarchy-access";
 import {
   capabilityDetail,
   channelClient,
@@ -26,6 +27,11 @@ export function FunctionDetails({ hierarchy, node, onSelect }: DetailProps) {
   const errors = functionErrors(node);
   return (
     <>
+      {accessRule(node) !== undefined && (
+        <Section title="Access" hint="protected">
+          <Facts items={[["Access rule", describeAccessRule(accessRule(node)!)]]} />
+        </Section>
+      )}
       <Section title="Contract">
         <SchemaDisclosure title="Input" schema={functionInput(node)} />
         <SchemaDisclosure title="Output" schema={functionOutput(node)} />

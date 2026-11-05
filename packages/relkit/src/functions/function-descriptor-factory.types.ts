@@ -1,4 +1,4 @@
-import type { DescriptorMetadata } from "../contracts/index.js";
+import type { AccessRule, DescriptorMetadata } from "../contracts/index.js";
 import type { StandardSchemaV1 } from "../schema/index.js";
 import type { ErrorDescriptorAny } from "./define-error.js";
 import type { FunctionDependencies } from "./types.js";
@@ -16,6 +16,7 @@ export interface FunctionDescriptorFactoryOptions extends DescriptorMetadata {
   readonly handler: (...args: any[]) => unknown;
   readonly errors?: readonly ErrorDescriptorAny[];
   readonly dependencies?: FunctionDependencies;
+  readonly access?: AccessRule<never, unknown>;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly tool?: FunctionToolMetadata;

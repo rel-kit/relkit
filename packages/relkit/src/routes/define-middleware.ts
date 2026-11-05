@@ -1,6 +1,13 @@
 import { createDescriptorBase, deepFreeze, isDescriptor } from "../contracts/index.js";
 import { Effect } from "effect";
-import type { MiddlewareDescriptor, MiddlewareHandler } from "./define-middleware.types.js";
+import type { StandardSchemaV1 } from "../schema/index.js";
+import type {
+  MiddlewareDescriptor,
+  MiddlewareHandler,
+  MiddlewareServices,
+  ProvidedData,
+  TypedMiddlewareOptions,
+} from "./define-middleware.types.js";
 import {
   RouteInputError,
   RouteOperationError,
@@ -15,6 +22,9 @@ export type {
   MiddlewareContext,
   MiddlewareDescriptor,
   MiddlewareHandler,
+  MiddlewareServices,
+  ProvidedData,
+  TypedMiddlewareOptions,
 } from "./define-middleware.types.js";
 
 /** Defines path-scoped middleware through a typed Effect.
@@ -26,14 +36,20 @@ export type {
 export const defineMiddlewareEffect = Effect.fn("routes.middleware.define")(
   (
     path: string,
-    handler: MiddlewareHandler,
-  ): Effect.Effect<MiddlewareDescriptor<string>, RouteOperationError> =>
+    definition: MiddlewareHandler | TypedMiddlewareOptions<StandardSchemaV1>,
+  ): Effect.Effect<MiddlewareDescriptor<string, any>, RouteOperationError> =>
     measureRoute(
       "middleware.define",
       Effect.gen(function* () {
+        const typed = typeof definition === "function" ? undefined : definition;
+        const handler = (
+          typed === undefined ? definition : typed.handler
+        ) as MiddlewareHandler<any>;
         const normalizedPath = yield* routeAttempt("middleware.define", () => {
           if (typeof handler !== "function")
             throw new RouteInputError("Middleware handler must be a function");
+          if (typed !== undefined && !isSchema(typed.provides))
+            throw new RouteInputError("Middleware provides must be a Standard Schema");
           return middlewarePath(path);
         });
         const id = yield* routeIdentity("middleware.define");
@@ -42,6 +58,7 @@ export const defineMiddlewareEffect = Effect.fn("routes.middleware.define")(
             ...createDescriptorBase("middleware", id),
             path: normalizedPath,
             handler,
+            ...(typed === undefined ? {} : { provides: typed.provides }),
           }),
         );
       }),
@@ -72,8 +89,31 @@ export const defineMiddlewareEffect = Effect.fn("routes.middleware.define")(
 export function defineMiddleware(
   path: string,
   handler: MiddlewareHandler,
-): MiddlewareDescriptor<string> {
-  return runRouteSync(defineMiddlewareEffect(path, handler));
+): MiddlewareDescriptor<string>;
+/** Defines typed middleware that provides validated data to routes through `http.from`.
+ * @param path - Absolute pattern or wildcard.
+ * @param options - `provides` schema and the handler that calls `relkit.provide(data)`.
+ * @returns Frozen descriptor carrying the provided data type.
+ * @throws TypeError for an invalid path, handler or schema.
+ * @example defineMiddleware("/orders/*", { provides: z.object({ tenantId: z.string() }), handler });
+ */
+export function defineMiddleware<const Schema extends StandardSchemaV1>(
+  path: string,
+  options: TypedMiddlewareOptions<Schema>,
+): MiddlewareDescriptor<string, ProvidedData<Schema>>;
+export function defineMiddleware(
+  path: string,
+  definition: MiddlewareHandler | TypedMiddlewareOptions<StandardSchemaV1>,
+): MiddlewareDescriptor<string, any> {
+  return runRouteSync(defineMiddlewareEffect(path, definition));
+}
+
+function isSchema(value: unknown): value is StandardSchemaV1 {
+  return (
+    value !== null &&
+    (typeof value === "object" || typeof value === "function") &&
+    "~standard" in value
+  );
 }
 
 /** Checks a middleware descriptor through Effect.

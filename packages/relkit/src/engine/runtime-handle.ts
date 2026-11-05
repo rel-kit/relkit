@@ -1,4 +1,5 @@
 /** Builds the runtime handle: an application's typed clients for code outside function handlers. */
+import { sessionPrincipalSource, type AccessPrincipalSource } from "../contracts/index.js";
 import { getDescriptorIdentity } from "../invocation/index.js";
 import { serviceMemberEntries, type ServiceDescriptorAny } from "../services/index.js";
 import { buildDependencyClients, type DependencyDeclarations } from "./dependencies.js";
@@ -19,6 +20,19 @@ export const RUNTIME_HANDLE_OWNER = "relkit.handle";
  * @example const handle = createRuntimeHandle({ services, invoke });
  */
 export function createRuntimeHandle(options: RuntimeHandleOptions): RelkitHandle {
+  return buildHandle(options, undefined);
+}
+
+/** Builds a handle whose calls run as `principal`, or as `system` when it is undefined. */
+function buildHandle(
+  base: RuntimeHandleOptions,
+  principal: AccessPrincipalSource | undefined,
+): RelkitHandle {
+  const call = principal === undefined ? undefined : { principal };
+  const options: RuntimeHandleOptions = {
+    ...base,
+    invoke: (functionId, input) => base.invoke(functionId, input, call),
+  };
   const functions: Record<string, unknown> = {};
   const events: Record<string, unknown> = {};
   const tasks: Record<string, unknown> = {};
@@ -59,6 +73,11 @@ export function createRuntimeHandle(options: RuntimeHandleOptions): RelkitHandle
     buckets: keyed.buckets,
     channels: keyed.channels,
     agents: keyed.agents,
+    as: (session: unknown) =>
+      buildHandle(
+        base,
+        sessionPrincipalSource(() => Promise.resolve(session), base.resolveAccess),
+      ),
   }) as unknown as RelkitHandle;
 }
 
@@ -89,7 +108,10 @@ function memberDeclarations(service: unknown) {
   for (const [name, member] of serviceMemberEntries(service as ServiceDescriptorAny)) {
     const kind = (member as { readonly ref?: { readonly kind?: string } } | undefined)?.ref?.kind;
     const target = kind === undefined ? undefined : kinds[kind];
-    if (target === "functions" && (member as { invocationMode?: string }).invocationMode === "event-only")
+    if (
+      target === "functions" &&
+      (member as { invocationMode?: string }).invocationMode === "event-only"
+    )
       continue;
     if (target !== undefined) byKind[target][name] = member;
   }

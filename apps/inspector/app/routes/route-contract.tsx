@@ -1,6 +1,7 @@
 import { ArrowUpRight, Network } from "lucide-react";
 import Link from "next/link";
 import { openApiOperation } from "../../lib/route-openapi";
+import { routeAuthSummary } from "../../lib/graph-hierarchy-access";
 import type { InspectorObject } from "../../lib/api-types";
 import { SCALAR_API_REFERENCE_URL } from "../../lib/api-reference";
 import { signalKey } from "../../lib/observability-model";
@@ -28,7 +29,6 @@ export function RouteFacts({
   const path = text(config?.path) || "/";
   const raw = config?.rawHandler === true;
   const targetId = text(route.targetFunctionId);
-  const auth = text(record(config?.auth)?.kind);
   const stream = text(record(config?.stream)?.format);
   const middleware = Array.isArray(config?.middleware) ? config.middleware.length : 0;
   return (
@@ -69,7 +69,7 @@ export function RouteFacts({
                   mono: true,
                 },
               ]),
-          { label: "Auth", value: auth || "none declared", mono: true },
+          { label: "Auth", value: routeAuthSummary(config?.auth, target?.access), mono: true },
           {
             label: "Response mode",
             value: stream ? `stream · ${stream}` : "single response",

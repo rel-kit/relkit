@@ -22,6 +22,8 @@ export interface FunctionNode extends GraphNodeBase<"function"> {
   readonly output: JsonValue;
   readonly progress?: JsonValue;
   readonly errors?: JsonValue;
+  /** Who may call the function: `roles`, `permissions` and `predicate: true` for an `allow` check. */
+  readonly access?: JsonValue;
   readonly dependencies?: JsonValue;
   readonly timeoutMs?: number;
   readonly concurrency?: number;

@@ -8,6 +8,7 @@ import type {
   JobClients,
   TaskClients,
 } from "./clients.types.js";
+import type { AccessPrincipalSource, AccessResolver, AccessSession } from "../contracts/index.js";
 import type { ChannelClients } from "../realtime/channel-client.types.js";
 import type {
   ServiceEvents,
@@ -65,10 +66,27 @@ export interface RelkitHandle {
   readonly buckets: BucketClients<Relkit.HandleBuckets>;
   readonly channels: ChannelClients<Relkit.HandleChannels>;
   readonly agents: AgentClients<Relkit.HandleAgents>;
+  /** Returns a handle whose function calls run as the session's user instead of `system`, so
+   * that user's roles and permissions decide every access rule.
+   * @param session - A session, such as one from `auth.api.getSession`.
+   * @returns A handle bound to that user.
+   * @example await relkit.as(session).functions.orders.refundOrder({ orderId });
+   */
+  readonly as: (session: AccessSession) => RelkitHandle;
+}
+
+/** Options for one call through the handle. */
+export interface RuntimeHandleCallOptions {
+  /** Caller access rules decide about; omitted for `system`. */
+  readonly principal?: AccessPrincipalSource;
 }
 
 /** Calls one function of the running application on behalf of the handle. */
-export type RuntimeHandleInvoke = (functionId: string, input: unknown) => Promise<unknown>;
+export type RuntimeHandleInvoke = (
+  functionId: string,
+  input: unknown,
+  options?: RuntimeHandleCallOptions,
+) => Promise<unknown>;
 
 /** What a host supplies to build an application's runtime handle. */
 export interface RuntimeHandleOptions {
@@ -84,4 +102,6 @@ export interface RuntimeHandleOptions {
   readonly sources?: Readonly<Record<string, Readonly<Record<string, unknown>>>>;
   readonly database?: unknown;
   readonly databases?: Readonly<Record<string, unknown>>;
+  /** Reads roles and permissions for `relkit.as(session)`, such as from Better Auth organizations. */
+  readonly resolveAccess?: AccessResolver;
 }

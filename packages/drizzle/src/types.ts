@@ -121,6 +121,8 @@ export type ApplicationEnv = keyof Relkit.ApplicationEnv extends never
 export interface DrizzleCapability {
   readonly kind: "drizzle";
   readonly dialect: "pg" | "mysql" | "sqlite";
+  /** Set when the service is marked as the application's default database. */
+  readonly default?: true;
   readonly tables: readonly {
     readonly name: string;
     readonly databaseName: string;

@@ -164,7 +164,7 @@ export const compilerCodes = [
     title: "Domain is set up incorrectly",
     happened:
       "A domain has more than one service, no definitions, members from another domain, or an unsupported database or Better Auth setup.",
-    fix: "Follow the message to fix the domain: one service per domain, members from that domain only, and exactly one Drizzle service when you use Better Auth.",
+    fix: "Follow the message to fix the domain: one service per domain, members from that domain only, a Drizzle service when you use Better Auth, and default: true on one Drizzle service when there are several.",
   },
   {
     code: "RELKIT_DUPLICATE_ID",

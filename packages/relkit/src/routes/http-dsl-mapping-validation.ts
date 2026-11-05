@@ -25,6 +25,7 @@ export function isHttpMapping(value: unknown): value is HttpMappingNode {
 function isHttpMappingValue(value: unknown): value is HttpMappingNode {
   if (!isRecordValue(value) || typeof value.kind !== "string") return false;
   switch (value.kind) {
+    case "middleware":
     case "path":
     case "path-segments":
     case "query":

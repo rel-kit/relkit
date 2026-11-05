@@ -56,6 +56,7 @@ export function httpSessionLayer(
 export function createHttpAuthRuntime(options: CreateHttpAuthRuntimeOptions): HttpAuthRuntime {
   const contexts = new WeakMap<Request, HttpAuthInvocation>();
   return Object.freeze({
+    ...(options.resolveAccess === undefined ? {} : { resolveAccess: options.resolveAccess }),
     ...(options.getOpenApiDocument === undefined
       ? {}
       : {

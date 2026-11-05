@@ -137,6 +137,8 @@ export interface InvocationParent {
   readonly deadlineMs?: number;
   readonly signal?: AbortSignal;
   readonly trace?: unknown;
+  /** Caller of the parent invocation, inherited by its children's access checks. */
+  readonly principal?: import("../contracts/index.js").AccessPrincipalSource;
 }
 
 /** Request to admit a function invocation under concurrency controls.

@@ -192,13 +192,13 @@ not tasks of this change.
 
 ## 18. Access rules, typed middleware and several databases (#13 d, e, f)
 
-- [ ] 18.1 Implement function `access` rules (roles, permissions, predicate) enforced in the engine for every invocation source, and verify a test for each source: HTTP, job, task, event, tool, agent, MCP and runtime handle
-- [ ] 18.2 Read roles and permissions from the Better Auth organization plugin, and verify an integration test with organization roles
-- [ ] 18.3 Run runtime-handle calls as `system` and add `relkit.as(session)`, and verify tests for both principals
-- [ ] 18.4 Show route authentication and access rules in the graph, OpenAPI security and the Inspector, and verify snapshot tests
-- [ ] 18.5 Add typed middleware `provides` schemas and an `http.from(middleware, field)` request mapping while keeping Hono middleware, and verify HTTP tests
-- [ ] 18.6 Add `ctx.databases.<service>` with `ctx.database` as the default, and verify type tests with two Drizzle services
-- [ ] 18.7 Document access rules, typed middleware and several databases and make the protect-orders tutorial protect a route with one line on the route, and verify the docs tests
+- [x] 18.1 Implement function `access` rules (roles, permissions, predicate) enforced in the engine for every invocation source, and verify a test for each source: HTTP, job, task, event, tool, agent, MCP and runtime handle
+- [x] 18.2 Read roles and permissions from the Better Auth organization plugin, and verify an integration test with organization roles
+- [x] 18.3 Run runtime-handle calls as `system` and add `relkit.as(session)`, and verify tests for both principals
+- [x] 18.4 Show route authentication and access rules in the graph, OpenAPI security and the Inspector, and verify snapshot tests
+- [x] 18.5 Add typed middleware `provides` schemas and an `http.from(middleware, field)` request mapping while keeping Hono middleware, and verify HTTP tests
+- [x] 18.6 Add `ctx.databases.<service>` with `ctx.database` as the default, and verify type tests with two Drizzle services
+- [x] 18.7 Document access rules, typed middleware and several databases and make the protect-orders tutorial protect a route with one line on the route, and verify the docs tests
 
 ## 19. relkit mcp and the Inspector (#18)
 

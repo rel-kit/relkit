@@ -83,6 +83,31 @@ Since v0.9.0
 
 <include>/_snippets/generated/exports/better-auth.mdx</include>
 
+## `access.ts`
+
+Reads function access roles and permissions from a Better Auth instance.
+With the organization plugin, roles are the user's member role in the session's active
+organization and permissions are checked against the plugin's access control. Without it,
+roles come from the admin plugin's `user.role` and no permission is granted.
+
+### resolveBetterAuthAccess
+
+Resolves the roles and permissions of a Better Auth session.
+
+**Example**
+
+```ts
+const { roles } = await resolveBetterAuthAccess(auth, session);
+```
+
+**Signature**
+
+```ts
+declare const resolveBetterAuthAccess: (auth: Auth<any>, session: unknown) => Promise<Resolved>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/access.ts#L27)
+
 ## `activation.ts`
 
 Binds lazy auth declarations to shared or isolated managed native owners.
@@ -910,6 +935,19 @@ declare const generateBetterAuthOpenApi: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L4)
+
+### resolveBetterAuthAccess
+
+**Signature**
+
+```ts
+declare const resolveBetterAuthAccess: (
+  auth: Auth<any>,
+  session: unknown,
+) => Promise<Pick<UserPrincipal<unknown>, "roles" | "hasPermission">>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L19)
 
 ## `index.ts`
 
