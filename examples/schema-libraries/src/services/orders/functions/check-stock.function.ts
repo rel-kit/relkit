@@ -1,5 +1,5 @@
 /** Checks stock for a SKU; its input and output are ArkType schemas, and it can fail with an ArkType error. */
-import { defineFunction, fail } from "@relkit/app/functions";
+import { defineFunction, fail } from "relkit/functions";
 import { type } from "arktype";
 import OutOfStock from "../errors/out-of-stock.error.js";
 

@@ -1,5 +1,5 @@
 /** Supplies the report route with ten validated stream items, stopping when its invocation signal aborts. */
-import { defineFunction, streamOf } from "@relkit/app/functions";
+import { defineFunction, streamOf } from "relkit/functions";
 import { z } from "zod";
 
 const streamOrderReport = defineFunction({

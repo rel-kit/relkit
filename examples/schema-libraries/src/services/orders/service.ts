@@ -1,5 +1,5 @@
 /** Exposes the orders functions, event and task, each built with a different schema library. */
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 import checkStock from "./functions/check-stock.function.js";
 import placeOrder from "./functions/place-order.function.js";
 import quoteOrder from "./functions/quote-order.function.js";

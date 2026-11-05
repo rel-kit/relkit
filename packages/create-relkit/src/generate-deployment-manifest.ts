@@ -36,13 +36,13 @@ export const customizeDeploymentManifestEffect = Effect.fn(
       dependencies: { ...decoded.dependencies },
       scripts: { ...decoded.scripts },
     };
-    const version = manifest.dependencies["@relkit/app"];
+    const version = manifest.dependencies.relkit;
     if (version === undefined)
       return yield* Effect.fail(
         domainError(
           new GenerateProjectError(
             "RELKIT_CREATE_TEMPLATE_INVALID",
-            "Template has no @relkit/app dependency.",
+            "Template has no relkit dependency.",
           ),
         ),
       );

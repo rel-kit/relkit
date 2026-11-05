@@ -13,7 +13,6 @@
     "db:migrate": "relkit db migrate"
   },
   "dependencies": {
-    "@relkit/app": "workspace:*",
     "@relkit/drizzle": "workspace:*",
     "drizzle-orm": "catalog:",
     "relkit": "workspace:*",

@@ -1,5 +1,5 @@
 /** Selects agent runtime bindings without enabling an inspector tool or bridge. */
-import { defineApp } from "@relkit/app/config";
+import { defineApp } from "relkit/config";
 import { localAgentState, localRealtime } from "@relkit/local";
 import env from "@app/platform/env.js";
 // relkit:create:deployment-imports

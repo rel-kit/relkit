@@ -1,5 +1,5 @@
 /** Reports a shipment's status; its input and output are Effect Schema schemas. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { Schema } from "effect";
 
 export default defineFunction({

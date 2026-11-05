@@ -1,5 +1,5 @@
 /** Places an order and publishes `orders.placed`; its input and output are Valibot schemas. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import * as v from "valibot";
 import orderPlaced from "../events/order-placed.event.js";
 

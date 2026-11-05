@@ -12,8 +12,8 @@ export function functionSource(
   relationships: { readonly error?: DomainArtifact; readonly event?: DomainArtifact } = {},
 ): string {
   const imports = [
-    `import { defineFunction } from "@relkit/app/functions";`,
-    `import { z } from "@relkit/app/schema";`,
+    `import { defineFunction } from "relkit/functions";`,
+    `import { s } from "relkit/schema";`,
     ...(relationships.error
       ? [
           sourceImport(
@@ -35,8 +35,8 @@ export function functionSource(
   ];
   return `${imports.join("\n")}\n\nconst ${artifact.binding} = defineFunction({
   id: "${artifact.id}",
-  input: z.object({ value: z.string().default("example") }),
-  output: z.object({ value: z.string() }),${relationships.error ? `\n  errors: [${relationships.error.binding}],` : ""}${relationships.event ? `\n  dependencies: { events: { ${relationships.event.binding} } },` : ""}
+  input: s.object({ value: s.string().default("example") }),
+  output: s.object({ value: s.string() }),${relationships.error ? `\n  errors: [${relationships.error.binding}],` : ""}${relationships.event ? `\n  dependencies: { events: { ${relationships.event.binding} } },` : ""}
   handler: async ({ value }, context) => {${relationships.error ? `\n    if (value === "error") return ${relationships.error.binding}.create({ message: "Example failure" });` : ""}${relationships.event ? `\n    await context.events.${relationships.event.binding}.publish({ value });` : ""}
     return { value };
   },
@@ -50,11 +50,11 @@ export default ${artifact.binding};
  * @returns Typed error descriptor source for the normalized artifact identity.
  */
 export function errorSource(artifact: DomainArtifact): string {
-  return `import { defineError } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+  return `import { defineError } from "relkit/functions";
+import { s } from "relkit/schema";
 const ${artifact.binding} = defineError({
   id: "${artifact.id}",
-  data: z.object({ message: z.string() }),
+  data: s.object({ message: s.string() }),
   message: ({ message }) => message,
   retry: "never",
 });
@@ -68,12 +68,12 @@ export default ${artifact.binding};
  * @returns Event descriptor source with its schema and optional provider profile.
  */
 export function eventSource(artifact: DomainArtifact, profile?: string): string {
-  return `import { defineEvent } from "@relkit/app/events";
-import { z } from "@relkit/app/schema";
+  return `import { defineEvent } from "relkit/events";
+import { s } from "relkit/schema";
 const ${artifact.binding} = defineEvent({
   id: "${artifact.id}",
   version: 1,
-  input: z.object({ value: z.string() }),${profile ? `\n  profile: "${profile}",` : ""}
+  input: s.object({ value: s.string() }),${profile ? `\n  profile: "${profile}",` : ""}
 });
 declare global {
   namespace Relkit {
@@ -99,7 +99,7 @@ export function eventFunctionSource(
   delivery: "transient" | "durable",
   profile?: string,
 ): string {
-  return `import { defineEventFunction } from "@relkit/app/events";
+  return `import { defineEventFunction } from "relkit/events";
 const ${artifact.binding} = defineEventFunction({
   id: "${artifact.id}",
   event: "${eventId}",
@@ -119,7 +119,7 @@ export { taskSource, taskJobSource } from "./render-job-sources.js";
  * @returns Prompt descriptor source preserving the declared text entries.
  */
 export function promptSource(artifact: DomainArtifact, text: readonly string[]): string {
-  return `import { definePrompt } from "@relkit/app";\n\nconst ${artifact.binding} = definePrompt(${JSON.stringify(text.length === 1 ? text[0] : text, null, 2)}, { id: "${artifact.id}" });\n\nexport default ${artifact.binding};\n`;
+  return `import { definePrompt } from "relkit";\n\nconst ${artifact.binding} = definePrompt(${JSON.stringify(text.length === 1 ? text[0] : text, null, 2)}, { id: "${artifact.id}" });\n\nexport default ${artifact.binding};\n`;
 }
 /**
  * Renders constants Source as source text without executing user modules.
@@ -127,5 +127,5 @@ export function promptSource(artifact: DomainArtifact, text: readonly string[]):
  * @returns Constants descriptor source with its stable ID and replaceable example value.
  */
 export function constantsSource(artifact: DomainArtifact): string {
-  return `import { defineConstants } from "@relkit/app";\n\nconst ${artifact.binding} = defineConstants({ "${artifact.id}": "replace-me" }, { id: "${artifact.id}" });\n\nexport default ${artifact.binding};\n`;
+  return `import { defineConstants } from "relkit";\n\nconst ${artifact.binding} = defineConstants({ "${artifact.id}": "replace-me" }, { id: "${artifact.id}" });\n\nexport default ${artifact.binding};\n`;
 }

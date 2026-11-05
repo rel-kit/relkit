@@ -1,5 +1,5 @@
 /** Returns a validated named greeting and logs each invocation through RelKit's request context. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 
 const hello = defineFunction({

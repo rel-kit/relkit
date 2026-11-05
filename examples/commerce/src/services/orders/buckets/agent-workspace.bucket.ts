@@ -1,5 +1,5 @@
 /** Declares private bounded text/Markdown objects for the native deep-agent workspace backend. */
-import { defineBucket } from "@relkit/app/buckets";
+import { defineBucket } from "relkit/buckets";
 
 const agentWorkspace = defineBucket({
   id: "orders.agent-workspace",

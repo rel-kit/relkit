@@ -12,7 +12,7 @@ import {
   normalizeCreateOptions,
   formatGenerateResult,
 } from "../../packages/cli/src/scaffolding/index.ts";
-import appManifest from "../../packages/app/package.json" with { type: "json" };
+import relkitManifest from "../../packages/relkit/package.json" with { type: "json" };
 import awsManifest from "../../integrations/packages/aws/package.json" with { type: "json" };
 import pulumiManifest from "../../integrations/packages/pulumi/package.json" with { type: "json" };
 import { makeRoot, contextFor, createOptions } from "./option-matrix-fixture.js";
@@ -96,7 +96,7 @@ test("adds AWS and Pulumi only when explicitly selected", async () => {
   );
   const config = await readFile(join(result.destination, "relkit.config.ts"), "utf8");
   expect(manifest.dependencies).toMatchObject({
-    "@relkit/app": appManifest.version,
+    relkit: relkitManifest.version,
     "@relkit/aws": awsManifest.version,
     "@relkit/pulumi": pulumiManifest.version,
   });

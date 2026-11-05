@@ -13,7 +13,6 @@
     "db:migrate": "relkit db migrate"
   },
   "dependencies": {
-    "@relkit/app": "workspace:*",
     "@relkit/better-auth": "workspace:*",
     "@relkit/client": "workspace:*",
     "@relkit/drizzle": "workspace:*",

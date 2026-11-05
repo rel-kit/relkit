@@ -129,7 +129,7 @@ not tasks of this change.
 
 - [x] 12.1 Build `relkit migrate` codemods for imports and package names, `.invoke()` and `.trigger()`, dependency declarations, explicit error IDs (writing the previously inferred ID), removed aliases and legacy jobs, `defineServiceRoutes`, Better Auth options to a Better Auth file, the `z` to `s` builder rename, client hook call sites and agent `runtime` fields, and verify each rule with fixture tests
 - [x] 12.2 Give `relkit migrate` preview, write and rollback receipts like `migrate layout`, listing code it cannot change with file and line, and verify with tests
-- [ ] 12.3 Migrate every repository example and template with `relkit migrate` only, and verify their check, typecheck, test and build commands pass
+- [x] 12.3 Migrate every repository example and template with `relkit migrate` only, and verify their check, typecheck, test and build commands pass
 - [ ] 12.4 Write the 0.9 migration guide and changelog in the new format, and verify the guide's snippets compile
 - [ ] 12.5 Rehearse `0.9.0-beta` on the release-branch pull request: version and pack the candidate, run the packed-consumer, creation and runtime suites against the packed packages from a local registry, and verify all pass
 - [ ] 12.6 Prepare the final `@relkit/app` that re-exports `relkit` and carries its deprecation message in the release configuration, and verify with the packed candidate that a project on the final `@relkit/app` builds and the release rehearsal includes the deprecation step

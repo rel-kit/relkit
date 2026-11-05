@@ -1,4 +1,4 @@
-import { defineEnv, env as envFactory } from "@relkit/app/config";
+import { defineEnv, env as envFactory } from "relkit/config";
 
 const env = defineEnv({
   APP_ENV: envFactory.literal("development", "test", "production").default("development"),

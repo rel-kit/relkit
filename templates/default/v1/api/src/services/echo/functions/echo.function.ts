@@ -1,5 +1,5 @@
 /** Echoes a nonempty message through the service's validated function and inferred HTTP contract. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 
 const echo = defineFunction({

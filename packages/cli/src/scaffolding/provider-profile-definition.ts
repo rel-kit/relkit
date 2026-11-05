@@ -55,7 +55,7 @@ export function postgresDefinition(capability: "event" | "job"): ProviderDefinit
     adapter,
     expression: `${adapter}({ url: binding.secret("DATABASE_URL") })`,
     imports: [
-      `import { env as binding } from "@relkit/app/config";`,
+      `import { env as binding } from "relkit/config";`,
       `import { ${adapter} } from "@relkit/postgres";`,
     ],
     dependencies: ["@relkit/postgres"],

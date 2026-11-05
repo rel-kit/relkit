@@ -132,7 +132,6 @@
     "examples/auth-drizzle": {
       "name": "@relkit/example-auth-drizzle",
       "dependencies": {
-        "@relkit/app": "workspace:*",
         "@relkit/better-auth": "workspace:*",
         "@relkit/client": "workspace:*",
         "@relkit/drizzle": "workspace:*",
@@ -155,7 +154,6 @@
       "dependencies": {
         "@langchain/core": "catalog:",
         "@langchain/langgraph": "catalog:",
-        "@relkit/app": "workspace:*",
         "@relkit/aws": "workspace:*",
         "@relkit/better-auth": "workspace:*",
         "@relkit/client": "workspace:*",
@@ -204,7 +202,6 @@
     "examples/data-model": {
       "name": "@relkit/example-data-model",
       "dependencies": {
-        "@relkit/app": "workspace:*",
         "@relkit/drizzle": "workspace:*",
         "drizzle-orm": "catalog:",
         "relkit": "workspace:*",
@@ -222,7 +219,6 @@
     "examples/schema-libraries": {
       "name": "@relkit/example-schema-libraries",
       "dependencies": {
-        "@relkit/app": "workspace:*",
         "@relkit/local": "workspace:*",
         "@valibot/to-json-schema": "1.8.0",
         "arktype": "2.2.9",

@@ -1,5 +1,5 @@
 /** Returns the validated demonstration deletion result consumed by the order DELETE route. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { orderDeleteInput, orderDeleteOutput } from "../../../platform/schemas.js";
 
 const deleteOrder = defineFunction({

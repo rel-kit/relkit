@@ -7,7 +7,7 @@ The database and auth integrations are specialized services, separate from `defi
 ## `defineEnv` and `defineDrizzleService`
 
 ```ts
-import { defineEnv, env as envFactory } from "@relkit/app/config";
+import { defineEnv, env as envFactory } from "relkit/config";
 
 export default defineEnv({
   DATABASE_PATH: envFactory.string().default(".relkit/app.sqlite"),
@@ -66,7 +66,7 @@ The selected auth scaffold keeps Better Auth 1.7.1 and the existing migration co
 ## `defineCache` and `defineBucket`
 
 ```ts
-import { defineCache } from "@relkit/app/cache";
+import { defineCache } from "relkit/cache";
 import { z } from "zod";
 
 export default defineCache({
@@ -80,7 +80,7 @@ export default defineCache({
 ```
 
 ```ts
-import { defineBucket } from "@relkit/app/buckets";
+import { defineBucket } from "relkit/buckets";
 
 export default defineBucket({
   id: "assets.objects",

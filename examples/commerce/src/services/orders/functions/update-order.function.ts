@@ -1,5 +1,5 @@
 /** Returns the requested demonstration order state after publishing its update to the order-specific channel. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { orderLookupOutput, orderMutationInput } from "../../../platform/schemas.js";
 import orderUpdates from "../channels/order-updates.channel.js";
 

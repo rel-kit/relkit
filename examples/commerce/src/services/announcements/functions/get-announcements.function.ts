@@ -1,5 +1,5 @@
 /** Reads the latest fifty database announcements and returns their messages in chronological display order. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 
 const getAnnouncements = defineFunction({

@@ -1,5 +1,5 @@
 /** Rejects an order line whose SKU has too little stock; its data is an ArkType schema. */
-import { defineError } from "@relkit/app/functions";
+import { defineError } from "relkit/functions";
 import { type } from "arktype";
 
 export default defineError({

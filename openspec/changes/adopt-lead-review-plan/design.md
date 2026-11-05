@@ -145,6 +145,19 @@ Decided while applying section 12 (maintainer, 2026-11-05):
   bundled skill references move with the code. Rules that derive identities from file paths do not
   run on fences. Files under `migrations/` folders are never read, so applied migration history is
   untouched.
+- **Samples were moved by `relkit migrate --write` alone.** On every template and example the rules
+  that section 10 had already applied by hand found nothing; `package-imports`, `schema-builder`
+  and `agent-runtime` (the bundled skill references' LangChain example) made every change, and a
+  second preview reports nothing to migrate and no findings. Prettier then reformatted the five
+  rewritten skill-reference fences, the only change not made by the codemod. This supersedes the
+  section 24 note that the skill references keep the old example: the minimal template's digest in
+  `create-capabilities.ts` is re-pinned as the test computes it. `relkit add` now writes `relkit`
+  specifiers and the `s` builder, and the creator reads provider versions from the template's
+  `relkit` dependency, because templates no longer depend on `@relkit/app`.
+- **Every breaking changeset maps to a rule.** Four breaking changes had no rewritable syntax yet,
+  so rules were added: `route-auth` moves the protected-path list onto matching route modules,
+  `problem-details` reports reads of the old `error` field, `package-imports` maps
+  `relkit/runtime-hono/bun`, and `removed-aliases` rewrites a tool's `invokeEffect`.
 
 ### D3. Creation gate becomes a CI concern (#1)
 

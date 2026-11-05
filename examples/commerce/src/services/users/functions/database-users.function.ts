@@ -1,5 +1,5 @@
 /** Lists users through the invocation's sole database context for the inferred database-users HTTP route. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 
 export default defineFunction({

@@ -1,3 +1,3 @@
-import { defineEnv } from "@relkit/app/config";
+import { defineEnv } from "relkit/config";
 
 export default defineEnv({});

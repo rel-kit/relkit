@@ -1,5 +1,5 @@
 /** Announces a placed order; its payload is a Valibot schema. */
-import { defineEvent } from "@relkit/app/events";
+import { defineEvent } from "relkit/events";
 import * as v from "valibot";
 
 const orderPlaced = defineEvent({

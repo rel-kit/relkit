@@ -13,7 +13,7 @@ export const privateLookup = hello.asTool({
 });
 // #endregion private-tool
 
-import { defineApp } from "@relkit/app/config";
+import { defineApp } from "relkit/config";
 import env from "@app/platform/env.js";
 
 export const mcpDisabled = defineApp({
