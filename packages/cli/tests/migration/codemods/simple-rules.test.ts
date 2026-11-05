@@ -102,6 +102,13 @@ describe("route-auth", () => {
     ]);
   });
 
+  test("requires a session on service route map entries", () => {
+    expect(
+      expectFixture(routeAuthRule, "service-routes", "src/routes/account/route.ts", context)
+        .findings,
+    ).toEqual([]);
+  });
+
   test("requires a session on routes the list protected", () => {
     expect(
       expectFixture(routeAuthRule, "profile", "src/routes/account/profile/route.ts", context)

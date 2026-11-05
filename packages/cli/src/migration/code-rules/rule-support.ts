@@ -47,19 +47,24 @@ export interface DefineCall {
  * Finds calls of the given local functions whose first argument is an object literal.
  * @param source - Parsed file.
  * @param callees - Local function names.
+ * @param argument - Which argument must be the options object literal (default the first).
  * @returns Calls in source order.
  */
-export function defineCalls(source: CodeSource, callees: ReadonlySet<string>): DefineCall[] {
+export function defineCalls(
+  source: CodeSource,
+  callees: ReadonlySet<string>,
+  argument = 0,
+): DefineCall[] {
   const found: DefineCall[] = [];
   walk(source, (node) => {
     if (
       ts.isCallExpression(node) &&
       ts.isIdentifier(node.expression) &&
       callees.has(node.expression.text) &&
-      node.arguments[0] !== undefined &&
-      ts.isObjectLiteralExpression(node.arguments[0])
+      node.arguments[argument] !== undefined &&
+      ts.isObjectLiteralExpression(node.arguments[argument])
     )
-      found.push({ call: node, options: node.arguments[0], callee: node.expression.text });
+      found.push({ call: node, options: node.arguments[argument], callee: node.expression.text });
   });
   return found;
 }

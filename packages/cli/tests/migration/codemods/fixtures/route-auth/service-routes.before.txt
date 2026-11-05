@@ -1,0 +1,7 @@
+import { defineServiceRoutes } from "relkit/routes";
+import account from "@app/services/account/service.js";
+
+export default defineServiceRoutes(account, {
+  GET: "getAccount",
+  PUT: { member: "updateAccount" },
+});

@@ -1,9 +1,9 @@
 /**
  * Rule `route-auth`: the Better Auth route's `auth: { protected: [...] }` list was replaced by
  * `auth: "required"` on each route. The rule reads every protected pattern in the project,
- * adds `auth: "required"` to the `defineRoute` calls of route modules whose path matches, and
- * removes the list. Patterns no route module matches (such as `/mcp`, now
- * `server.mcp: { auth: "required" }`) and service route maps are reported.
+ * adds `auth: "required"` to the `defineRoute` calls and `defineServiceRoutes` entries of route
+ * modules whose path matches, and removes the list. Patterns no route module matches (such as
+ * `/mcp`, now `server.mcp: { auth: "required" }`) are reported.
  */
 import { codeSyntax as ts, parseCodeSource } from "../code-parser.js";
 import {
@@ -63,15 +63,7 @@ export const routeAuthRule: CodeRule = {
         edits.push(appendProperty(source, options, 'auth: "required"'));
     }
     if (path !== undefined && patterns.some((pattern) => matches(pattern, path)))
-      for (const { call } of defineCalls(source, relkitLocals(source, "defineServiceRoutes")))
-        findings.push(
-          findingAt(
-            source,
-            call,
-            id,
-            `${path} was protected; require a session on these routes with auth: "required".`,
-          ),
-        );
+      edits.push(...serviceRouteAuth(source));
     return { text: applyTextEdits(file.text, edits), findings };
   },
 };
@@ -136,4 +128,27 @@ function matchedByRoute(context: CodeRuleContext, pattern: string): boolean {
     if (path !== undefined && matches(pattern, path)) return true;
   }
   return false;
+}
+
+/**
+ * Requires a session on every entry of the module's service route maps.
+ * @param source - Parsed route module.
+ * @returns Edits turning `"member"` into `{ member: "member", auth: "required" }`.
+ */
+function serviceRouteAuth(source: ts.SourceFile): TextEdit[] {
+  const edits: TextEdit[] = [];
+  for (const { call } of defineCalls(source, relkitLocals(source, "defineServiceRoutes"), 1))
+    for (const entry of (call.arguments[1] as ts.ObjectLiteralExpression).properties) {
+      if (!ts.isPropertyAssignment(entry)) continue;
+      const value = entry.initializer;
+      if (ts.isStringLiteralLike(value))
+        edits.push({
+          start: value.getStart(source),
+          end: value.getEnd(),
+          text: `{ member: ${value.getText(source)}, auth: "required" }`,
+        });
+      else if (ts.isObjectLiteralExpression(value) && objectProperty(value, "auth") === undefined)
+        edits.push(appendProperty(source, value, 'auth: "required"'));
+    }
+  return edits;
 }
