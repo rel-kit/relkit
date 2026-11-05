@@ -22,6 +22,116 @@ For a complete workflow, follow [from express or hono](/guides/migrate/from-expr
 
 [Call a public service operation](/docs/modules/service/routes#use-from-the-frontend) shows the client side of this capability.
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### defineFunction
+
+Defines the graph-visible executable unit shared by HTTP, background, tool, and agent calls.
+
+The `id` is optional for source-scoped functions; the compiler derives it from the
+source/export hierarchy. Durable resources keep explicit IDs. The handler receives
+validated reusable input and an invocation-scoped context. Declare every function it calls
+under `dependencies.functions` and call it through `context.functions`, so the common engine
+preserves validation, service policy, limits, and telemetry.
+
+**Throws**
+
+TypeError for invalid definition inputs.
+
+**Example**
+
+```ts
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
+
+const greet = defineFunction({
+  input: z.object({ name: z.string() }),
+  output: z.object({ message: z.string() }),
+  handler: async ({ name }, context) => {
+    context.log.info("greeting requested");
+    return { message: `Hello, ${name}!` };
+  },
+});
+const welcome = defineFunction({
+  input: z.object({ name: z.string() }),
+  output: z.object({ message: z.string() }),
+  dependencies: { functions: { greet } },
+  handler: ({ name }, context) => context.functions.greet({ name }),
+});
+void welcome;
+```
+
+**Signature**
+
+```ts
+declare const defineFunction: DefineFunction;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L132)
+
+Since v0.1.0
+
+#### Backend and frontend example
+
+**Backend** — these maintained files define the operation used by the frontend below.
+
+<include
+  source="templates/default/v1/api/src/services/orders/functions/create-order.function.ts"
+  lang="ts"
+  meta='title="templates/default/v1/api/src/services/orders/functions/create-order.function.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/services/orders/functions/create-order.function.ts
+</include>
+
+<include
+  source="templates/default/v1/api/src/routes/orders/route.ts"
+  lang="ts"
+  meta='title="templates/default/v1/api/src/routes/orders/route.ts"'
+>
+  /_snippets/source/templates/default/v1/api/src/routes/orders/route.ts
+</include>
+
+**Frontend**
+
+<include>/_frontend/create-order.mdx</include>
+
+### defineError
+
+Defines a typed application error.
+
+**Throws**
+
+TypeError for invalid schema, retry, HTTP status, or message.
+
+**Example**
+
+```ts
+import { defineError } from "relkit/functions";
+import { z } from "relkit/schema";
+const NotFound = defineError({
+  id: "orders.not-found",
+  data: z.object({ id: z.string() }),
+  message: "Missing",
+});
+const error = new NotFound({ id: "order-1" });
+```
+
+**Signature**
+
+```ts
+declare const defineError: <const Id extends string, const DataSchema extends StandardSchemaV1>(
+  options: DefineErrorOptions<Id, DataSchema>,
+) => ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L206)
+
+Since v0.1.0
+
+## Complete reference
+
 <include>/_snippets/generated/exports/functions.mdx</include>
 
 ## `client-maps.types.ts`
@@ -775,39 +885,6 @@ declare const validateErrorHttpEffect: (
 
 ## `define-error.ts`
 
-### defineError
-
-Defines a typed application error.
-
-**Throws**
-
-TypeError for invalid schema, retry, HTTP status, or message.
-
-**Example**
-
-```ts
-import { defineError } from "relkit/functions";
-import { z } from "relkit/schema";
-const NotFound = defineError({
-  id: "orders.not-found",
-  data: z.object({ id: z.string() }),
-  message: "Missing",
-});
-const error = new NotFound({ id: "order-1" });
-```
-
-**Signature**
-
-```ts
-declare const defineError: <const Id extends string, const DataSchema extends StandardSchemaV1>(
-  options: DefineErrorOptions<Id, DataSchema>,
-) => ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L206)
-
-Since v0.1.0
-
 ### defineErrorEffect
 
 Defines a typed application error with safe data, transport metadata, and an optional retry hint.
@@ -1151,8 +1228,6 @@ export interface ErrorRef<Id extends string = string> {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L16)
 
-## `define-function-inference.types.ts`
-
 ## `define-function-validation.ts`
 
 ### assertHook
@@ -1365,77 +1440,6 @@ declare const validateLimitEffect: (
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function-validation.ts#L20)
 
 ## `define-function.ts`
-
-### defineFunction
-
-Defines the graph-visible executable unit shared by HTTP, background, tool, and agent calls.
-
-The `id` is optional for source-scoped functions; the compiler derives it from the
-source/export hierarchy. Durable resources keep explicit IDs. The handler receives
-validated reusable input and an invocation-scoped context. Declare every function it calls
-under `dependencies.functions` and call it through `context.functions`, so the common engine
-preserves validation, service policy, limits, and telemetry.
-
-**Throws**
-
-TypeError for invalid definition inputs.
-
-**Example**
-
-```ts
-import { defineFunction } from "relkit/functions";
-import { z } from "relkit/schema";
-
-const greet = defineFunction({
-  input: z.object({ name: z.string() }),
-  output: z.object({ message: z.string() }),
-  handler: async ({ name }, context) => {
-    context.log.info("greeting requested");
-    return { message: `Hello, ${name}!` };
-  },
-});
-const welcome = defineFunction({
-  input: z.object({ name: z.string() }),
-  output: z.object({ message: z.string() }),
-  dependencies: { functions: { greet } },
-  handler: ({ name }, context) => context.functions.greet({ name }),
-});
-void welcome;
-```
-
-**Signature**
-
-```ts
-declare const defineFunction: DefineFunction;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L132)
-
-Since v0.1.0
-
-#### Backend and frontend example
-
-**Backend** — these maintained files define the operation used by the frontend below.
-
-<include
-  source="templates/default/v1/api/src/services/orders/functions/create-order.function.ts"
-  lang="ts"
-  meta='title="templates/default/v1/api/src/services/orders/functions/create-order.function.ts"'
->
-  /_snippets/source/templates/default/v1/api/src/services/orders/functions/create-order.function.ts
-</include>
-
-<include
-  source="templates/default/v1/api/src/routes/orders/route.ts"
-  lang="ts"
-  meta='title="templates/default/v1/api/src/routes/orders/route.ts"'
->
-  /_snippets/source/templates/default/v1/api/src/routes/orders/route.ts
-</include>
-
-**Frontend**
-
-<include>/_frontend/create-order.mdx</include>
 
 ### AgentClientFor
 

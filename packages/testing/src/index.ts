@@ -45,7 +45,10 @@ export type {
   TestHttpListener,
   TestHttpListenerOptions,
   TestHttpRequest,
+  TestHttpRequestInit,
+  TestHttpResponse,
   TestObservability,
+  TestProblemResponse,
 } from "./http.js";
 export { createDeterministicJobsAdapter, createTestJobsAdapter } from "./test-jobs-adapter.js";
 export type { TestJobsAdapter, TestJobsAdapterOptions } from "./test-jobs-adapter.js";

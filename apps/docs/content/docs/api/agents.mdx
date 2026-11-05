@@ -23,6 +23,147 @@ For a complete workflow, follow [build an offline agent](/guides/ai/build-an-off
 
 [Observe an agent and send controls](/docs/modules/ai/streaming#use-from-the-frontend) shows the client side of this capability.
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### approveApproval
+
+Moves a pending approval to the approved state.
+
+**Throws**
+
+ApprovalStateError for a malformed or final decision.
+
+**Example**
+
+```ts
+import { approveApproval, createApproval } from "relkit/agents";
+
+const pending = createApproval({
+  invocationId: "run",
+  toolCallId: "call",
+  toolId: "send",
+  sideEffect: "write",
+  policy: "always",
+});
+const approved = approveApproval(pending);
+void approved;
+```
+
+**Signature**
+
+```ts
+declare const approveApproval: (approval: ApprovalRecord) => ApprovedApproval;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L106)
+
+Since v0.4.0
+
+### denyApproval
+
+Moves a pending approval to the denied state.
+
+**Throws**
+
+ApprovalStateError for a malformed or final decision.
+
+**Example**
+
+```ts
+import { createApproval, denyApproval } from "relkit/agents";
+
+const pending = createApproval({
+  invocationId: "run",
+  toolCallId: "call",
+  toolId: "send",
+  sideEffect: "write",
+  policy: "always",
+});
+const denied = denyApproval(pending);
+void denied;
+```
+
+**Signature**
+
+```ts
+declare const denyApproval: (approval: ApprovalRecord) => DeniedApproval;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L139)
+
+Since v0.4.0
+
+### defineAgent
+
+Defines an SDK-independent agent using validated schemas and RelKit tool references.
+
+**Throws**
+
+The original authoring validation or identity error.
+
+**Example**
+
+```ts
+import { defineAgent } from "relkit/agents";
+import { z } from "relkit/schema";
+
+const support = defineAgent({
+  id: "support",
+  input: z.object({ message: z.string() }),
+  output: z.object({ answer: z.string() }),
+  instructions: "Reply briefly.",
+  tools: [],
+  limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 30_000 },
+});
+void support;
+```
+
+**Signature**
+
+```ts
+declare const defineAgent: <
+  const Id extends string,
+  const InputSchema extends StandardSchemaV1,
+  const OutputSchema extends StandardSchemaV1,
+  const Tools extends readonly ToolRefAny[],
+>(
+  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools>,
+) => AgentDescriptor<
+  Id,
+  InferInput<InputSchema>,
+  InferOutput<OutputSchema>,
+  InputSchema,
+  OutputSchema,
+  Tools
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L82)
+
+Since v0.4.0
+
+#### Backend and frontend example
+
+This SDK-independent factory describes the client contract. The runnable example below uses `defineAgent` from `@relkit/langchain` to supply native execution; see [agent setup](/docs/modules/ai/agents) for the required integration and runtime bindings.
+
+**Backend** — these maintained files define the operation used by the frontend below.
+
+<include
+  source="templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"
+  lang="ts"
+  meta='title="templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"'
+>
+  /_snippets/source/templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts
+</include>
+
+**Frontend**
+
+<include>/_frontend/assistant.mdx</include>
+
+## Complete reference
+
 <include>/_snippets/generated/exports/agents.mdx</include>
 
 ## `agent-client-chat.ts`
@@ -1251,74 +1392,6 @@ readonly code: "RELKIT_APPROVAL_STATE_INVALID"
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval-error.ts#L7)
 
 ## `approval.ts`
-
-### approveApproval
-
-Moves a pending approval to the approved state.
-
-**Throws**
-
-ApprovalStateError for a malformed or final decision.
-
-**Example**
-
-```ts
-import { approveApproval, createApproval } from "relkit/agents";
-
-const pending = createApproval({
-  invocationId: "run",
-  toolCallId: "call",
-  toolId: "send",
-  sideEffect: "write",
-  policy: "always",
-});
-const approved = approveApproval(pending);
-void approved;
-```
-
-**Signature**
-
-```ts
-declare const approveApproval: (approval: ApprovalRecord) => ApprovedApproval;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L106)
-
-Since v0.4.0
-
-### denyApproval
-
-Moves a pending approval to the denied state.
-
-**Throws**
-
-ApprovalStateError for a malformed or final decision.
-
-**Example**
-
-```ts
-import { createApproval, denyApproval } from "relkit/agents";
-
-const pending = createApproval({
-  invocationId: "run",
-  toolCallId: "call",
-  toolId: "send",
-  sideEffect: "write",
-  policy: "always",
-});
-const denied = denyApproval(pending);
-void denied;
-```
-
-**Signature**
-
-```ts
-declare const denyApproval: (approval: ApprovalRecord) => DeniedApproval;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L139)
-
-Since v0.4.0
 
 ### "./approval.types.js" (namespace export)
 
@@ -2772,73 +2845,6 @@ declare const normalizeAgentModelEffect: (
 
 Builds plain agent descriptors without loading an execution SDK.
 The compiler selects native execution when an application actually declares agents.
-
-### defineAgent
-
-Defines an SDK-independent agent using validated schemas and RelKit tool references.
-
-**Throws**
-
-The original authoring validation or identity error.
-
-**Example**
-
-```ts
-import { defineAgent } from "relkit/agents";
-import { z } from "relkit/schema";
-
-const support = defineAgent({
-  id: "support",
-  input: z.object({ message: z.string() }),
-  output: z.object({ answer: z.string() }),
-  instructions: "Reply briefly.",
-  tools: [],
-  limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 30_000 },
-});
-void support;
-```
-
-**Signature**
-
-```ts
-declare const defineAgent: <
-  const Id extends string,
-  const InputSchema extends StandardSchemaV1,
-  const OutputSchema extends StandardSchemaV1,
-  const Tools extends readonly ToolRefAny[],
->(
-  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools>,
-) => AgentDescriptor<
-  Id,
-  InferInput<InputSchema>,
-  InferOutput<OutputSchema>,
-  InputSchema,
-  OutputSchema,
-  Tools
->;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L82)
-
-Since v0.4.0
-
-#### Backend and frontend example
-
-This SDK-independent factory describes the client contract. The runnable example below uses `defineAgent` from `@relkit/langchain` to supply native execution; see [agent setup](/docs/modules/ai/agents) for the required integration and runtime bindings.
-
-**Backend** — these maintained files define the operation used by the frontend below.
-
-<include
-  source="templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"
-  lang="ts"
-  meta='title="templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"'
->
-  /_snippets/source/templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts
-</include>
-
-**Frontend**
-
-<include>/_frontend/assistant.mdx</include>
 
 ### "./define-agent.types.js" (namespace export)
 

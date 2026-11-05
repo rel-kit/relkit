@@ -20,6 +20,66 @@ For configuration and examples, read [realtime](/docs/modules/realtime), [access
 
 [Subscribe to a channel](/docs/modules/realtime/react) shows the client side of this capability.
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### defineChannel
+
+Defines a typed channel for validated backend publication and observation.
+
+**Throws**
+
+TypeError for invalid channel options.
+
+**Example**
+
+```ts
+import { defineChannel } from "relkit/realtime";
+import { z } from "relkit/schema";
+const alerts = defineChannel({
+  id: "alerts",
+  params: z.object({}),
+  events: { posted: z.string() },
+});
+```
+
+**Signature**
+
+```ts
+declare const defineChannel: <
+  const Id extends string,
+  const ParamsSchema extends StandardSchemaV1,
+  const Events extends Readonly<Record<string, StandardSchemaV1>>,
+  const Client extends ChannelClientPolicy<ChannelGuard<InferOutput<ParamsSchema>>> | undefined,
+  const Presence extends ChannelPresence<InferOutput<ParamsSchema>> | undefined = undefined,
+>(
+  options: DefineChannelOptions<Id, ParamsSchema, Events, Client, Presence>,
+) => ChannelDescriptor<Id, ParamsSchema, Events, Client, Presence>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L115)
+
+Since v0.4.0
+
+#### Backend and frontend example
+
+**Backend** — these maintained files define the operation used by the frontend below.
+
+<include
+  source="examples/commerce/src/services/announcements/channels/announcements.channel.ts"
+  lang="ts"
+  meta='title="examples/commerce/src/services/announcements/channels/announcements.channel.ts"'
+>
+  /_snippets/source/examples/commerce/src/services/announcements/channels/announcements.channel.ts
+</include>
+
+**Frontend**
+
+<include>/_frontend/channel.mdx</include>
+
+## Complete reference
+
 <include>/_snippets/generated/exports/realtime.mdx</include>
 
 ## `channel-client.types.ts`
@@ -552,60 +612,6 @@ declare const validateChannelValueEffect: (
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel-validation.ts#L98)
 
 ## `channel.ts`
-
-### defineChannel
-
-Defines a typed channel for validated backend publication and observation.
-
-**Throws**
-
-TypeError for invalid channel options.
-
-**Example**
-
-```ts
-import { defineChannel } from "relkit/realtime";
-import { z } from "relkit/schema";
-const alerts = defineChannel({
-  id: "alerts",
-  params: z.object({}),
-  events: { posted: z.string() },
-});
-```
-
-**Signature**
-
-```ts
-declare const defineChannel: <
-  const Id extends string,
-  const ParamsSchema extends StandardSchemaV1,
-  const Events extends Readonly<Record<string, StandardSchemaV1>>,
-  const Client extends ChannelClientPolicy<ChannelGuard<InferOutput<ParamsSchema>>> | undefined,
-  const Presence extends ChannelPresence<InferOutput<ParamsSchema>> | undefined = undefined,
->(
-  options: DefineChannelOptions<Id, ParamsSchema, Events, Client, Presence>,
-) => ChannelDescriptor<Id, ParamsSchema, Events, Client, Presence>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.ts#L115)
-
-Since v0.4.0
-
-#### Backend and frontend example
-
-**Backend** — these maintained files define the operation used by the frontend below.
-
-<include
-  source="examples/commerce/src/services/announcements/channels/announcements.channel.ts"
-  lang="ts"
-  meta='title="examples/commerce/src/services/announcements/channels/announcements.channel.ts"'
->
-  /_snippets/source/examples/commerce/src/services/announcements/channels/announcements.channel.ts
-</include>
-
-**Frontend**
-
-<include>/_frontend/channel.mdx</include>
 
 ### "./channel-client.types.js" (namespace export)
 

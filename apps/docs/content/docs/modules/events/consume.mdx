@@ -63,6 +63,40 @@ When the reaction must survive the consumer process or expose run progress, trig
 the event function. Event delivery and task acceptance remain separate operations; use an explicit stable
 idempotency key where repeated event delivery could duplicate business work.
 
+## Understand delivery guarantees
+
+An event function chooses its `delivery`. The scaffold command calls the second choice `transient`;
+the `defineEventFunction` option is `"ephemeral"`.
+
+| Delivery            | Stored            | Survives a restart | Retried on failure | Duplicates possible |
+| ------------------- | ----------------- | ------------------ | ------------------ | ------------------- |
+| `durable` (default) | Yes, in a journal | Yes                | Yes                | Yes                 |
+| `ephemeral`         | No                | No                 | No                 | No                  |
+
+**Durable delivery is at least once.** The local provider writes each delivery to a journal under
+`.relkit/state` before it runs the handler. A failed attempt is retried by the event function's
+`retry` policy, and a delivery that was running when the process stopped is made available again,
+so the same event can reach the handler more than once. There is no exactly-once guarantee and no
+ordering across events or by key. Make the handler idempotent. The event's `instanceId` and
+`delivery.attempt` are in `context.trigger`, and `instanceId` is the same on every redelivery:
+
+<include
+  source="apps/docs/examples/events/idempotent-confirmation.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/idempotent-confirmation.function.ts"'
+>
+  /_snippets/source/apps/docs/examples/events/idempotent-confirmation.function.ts
+</include>
+
+**Ephemeral delivery has no queue.** It runs the handler right away for each published event and
+keeps nothing. It admits at most 100 simultaneous handler runs per event function (the local
+provider's default capacity) and holds no backlog. When all 100 are busy, a newly published event is
+dropped, not queued. The newest event is the one lost; events already running finish. A dropped
+event is not retried, and that function's delivery result reports `status: "dropped"`
+with `dropReason: "capacity"` (the local provider also counts it in its `dropped` counter). A handler that throws is not retried either, and a restart loses any event
+that was running. Use `ephemeral` only for work you can afford to lose, such as cache invalidation
+or live notifications, and use `durable` for anything that must happen.
+
 ## Add another subscriber
 
 To run multiple reactions, add another event function with a different `id` and the same `event`.

@@ -16,35 +16,9 @@ sidebar:
 
 For configuration and examples, read [integrations](/docs/modules/integrations), [local providers](/docs/modules/integrations/local-providers).
 
-<include>/_snippets/generated/exports/integrations/local.mdx</include>
+## Most-used APIs
 
-## `index.ts`
-
-### "./providers.js" (namespace export)
-
-Re-exports all named exports from the "./providers.js" module.
-
-**Signature**
-
-```ts
-export * from "./providers.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L2)
-
-### "relkit/local-service" (namespace export)
-
-Re-exports all named exports from the "relkit/local-service" module.
-
-**Signature**
-
-```ts
-export * from "relkit/local-service";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L1)
-
-## `providers.ts`
+These entries carry each API's contract and example. The complete reference follows.
 
 ### localEvent
 
@@ -87,6 +61,38 @@ declare const localJob: (options?: LocalProviderOptions) => LocalJobAdapter;
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L57)
 
 Since v0.4.0
+
+## Complete reference
+
+<include>/_snippets/generated/exports/integrations/local.mdx</include>
+
+## `index.ts`
+
+### "./providers.js" (namespace export)
+
+Re-exports all named exports from the "./providers.js" module.
+
+**Signature**
+
+```ts
+export * from "./providers.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L2)
+
+### "relkit/local-service" (namespace export)
+
+Re-exports all named exports from the "relkit/local-service" module.
+
+**Signature**
+
+```ts
+export * from "relkit/local-service";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L1)
+
+## `providers.ts`
 
 ### LocalAgentStateAdapter (type alias)
 

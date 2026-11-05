@@ -1,0 +1,78 @@
+---
+title: How relkit check works
+description: relkit check imports your application modules and runs their top-level code; this page lists the side effects it blocks.
+pagination: false
+search:
+  keywords:
+    [check, top-level code, side effects, RELKIT_EVALUATOR_SIDE_EFFECT, evaluator, relkit.config.ts]
+sidebar:
+  icon: shield-check
+---
+
+`relkit check` reads your definitions by **importing your application modules and running their
+top-level code**. It does not only parse them. Top-level code such as constants, `defineService`
+calls, schema construction and module-level `new` expressions runs on every check and in the
+commands that prepare the project. Handlers and functions do not run.
+
+## What runs and where
+
+| Step                | Where it runs                                                  | Guard                                                                  |
+| ------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `relkit.config.ts`  | The CLI process itself, imported like any ES module.           | None. It is trusted configuration code.                                |
+| Application modules | A short-lived Bun child process started from the project root. | The side-effect detectors below, a deadline and a reduced environment. |
+
+Check first reads the files named by `source` in `relkit.config.ts` and skips any that cannot
+define a descriptor. It then imports the remaining modules in the child process, snapshots the
+descriptors they export, and compares the result with the project graph. The child is not a
+security sandbox: it is a guard against accidental work during import, such as a module that
+starts a server when loaded. Run only code you trust.
+
+## Which side effects are blocked
+
+While a module is imported, the child replaces these Node and Bun APIs. A blocked call throws, the
+module fails to load, and check reports `RELKIT_EVALUATOR_SIDE_EFFECT` with the operation and
+target for every effect it recorded.
+
+| Kind                              | Blocked                                                                                                                                                                                                          |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `listening-socket`                | `Bun.serve`, `Bun.listen`, `net.Server.listen` and UDP `bind`.                                                                                                                                                   |
+| `child-process`                   | `Bun.spawn`, `Bun.spawnSync`, `Bun.$` and `child_process` `spawn`, `spawnSync`, `exec`, `execFile` and `fork`.                                                                                                   |
+| `unapproved-network`              | `fetch`, `WebSocket`, `EventSource`, `XMLHttpRequest`, `http` and `https` `request` and `get`, `net` and `tls` connections, `Bun.connect` and DNS lookups, unless the host is allowlisted.                       |
+| `write-outside-generated-sandbox` | Filesystem writes (`writeFile`, `appendFile`, `mkdir`, `rm`, `rename`, `copyFile`, `symlink`, `createWriteStream`, `open` with a write flag, `Bun.write`) outside the generated directory (`.relkit/generated`). |
+| `live-timer`                      | A `setTimeout`, `setInterval` or `setImmediate` still pending when the import finishes. Check cancels it and reports it.                                                                                         |
+| `direct-output`                   | Writes to `stdout` or `stderr` during import. Check captures the output instead of printing it.                                                                                                                  |
+
+Everything else runs normally. Reading files, computing values, building schemas and keeping
+state in memory are allowed.
+
+## Environment, network and time limits
+
+- **Environment.** The child receives only the variables on the check's environment allowlist.
+  By default that is none, so `process.env.DATABASE_URL` is `undefined` at import time. Read
+  environment values inside handlers or through the `defineEnv` contract in `relkit.config.ts`,
+  not at module top level. Dotenv files are not loaded for the child.
+- **Network.** The network allowlist is empty by default, so every outbound connection is blocked.
+- **Time.** The evaluation has a 10 second default deadline. A module that does slow work at top level
+  fails the check with a timeout.
+
+The allowlists and the deadline are options of the programmatic check API (`environmentAllowlist`,
+`networkAllowlist` and `timeoutMs`), described in the [CLI reference](/docs/api/cli#relkit-check);
+the `relkit check` command itself uses the defaults.
+
+## Fix a blocked side effect
+
+Move the work into a function that runs on request or at startup:
+
+```ts title="src/services/orders/service.ts"
+// Fails check: starts work when the file is imported.
+// setInterval(syncInventory, 60_000);
+
+// Runs when a job or handler asks for it.
+export async function syncInventory() {
+  // ...
+}
+```
+
+Use a [job schedule](/docs/modules/jobs/schedules) for periodic work and a service resource for
+connections. See [`RELKIT_EVALUATOR_SIDE_EFFECT`](/docs/errors/relkit-evaluator-side-effect) for
+the diagnostic.

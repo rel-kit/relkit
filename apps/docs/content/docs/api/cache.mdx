@@ -17,6 +17,44 @@ For configuration and examples, read [define](/docs/modules/caching/define), [or
 
 For a complete workflow, follow [cache product prices](/guides/caching/cache-product-prices).
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### defineCache
+
+Defines a typed cache contract with existing synchronous behavior.
+
+**Throws**
+
+TypeError for invalid options and IDs.
+
+**Example**
+
+```ts
+import { defineCache } from "relkit/cache";
+import { z } from "relkit/schema";
+const prices = defineCache({ id: "prices", key: z.string(), value: z.number() });
+```
+
+**Signature**
+
+```ts
+declare const defineCache: <
+  const Id extends string,
+  const KeySchema extends StandardSchemaV1,
+  const ValueSchema extends StandardSchemaV1,
+>(
+  options: DefineCacheOptions<Id, KeySchema, ValueSchema>,
+) => CacheDescriptor<Id, InferInput<KeySchema>, InferOutput<ValueSchema>, KeySchema, ValueSchema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L100)
+
+Since v0.1.0
+
+## Complete reference
+
 <include>/_snippets/generated/exports/cache.mdx</include>
 
 ## `client-abort.ts`
@@ -1944,38 +1982,6 @@ declare class CacheDescriptorError
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache-error.ts#L6)
 
 ## `define-cache.ts`
-
-### defineCache
-
-Defines a typed cache contract with existing synchronous behavior.
-
-**Throws**
-
-TypeError for invalid options and IDs.
-
-**Example**
-
-```ts
-import { defineCache } from "relkit/cache";
-import { z } from "relkit/schema";
-const prices = defineCache({ id: "prices", key: z.string(), value: z.number() });
-```
-
-**Signature**
-
-```ts
-declare const defineCache: <
-  const Id extends string,
-  const KeySchema extends StandardSchemaV1,
-  const ValueSchema extends StandardSchemaV1,
->(
-  options: DefineCacheOptions<Id, KeySchema, ValueSchema>,
-) => CacheDescriptor<Id, InferInput<KeySchema>, InferOutput<ValueSchema>, KeySchema, ValueSchema>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L100)
-
-Since v0.1.0
 
 ### CacheDescriptor
 

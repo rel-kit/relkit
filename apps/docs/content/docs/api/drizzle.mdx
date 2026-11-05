@@ -19,31 +19,90 @@ For configuration and examples, read [Database](/docs/modules/database), [local 
 
 For a complete workflow, follow [register users in a transaction](/guides/database/register-users-in-a-transaction), [email password sign in](/guides/auth/email-password-sign-in).
 
-<include>/_snippets/generated/exports/drizzle.mdx</include>
+## Most-used APIs
 
-## `activate.ts`
+These entries carry each API's contract and example. The complete reference follows.
 
-Validates the selected ORM before loading runtime activation or calling the native factory.
+### defineDrizzleService
 
-### activateDrizzleService
+Defines the application's Drizzle service, table operations, and model customizations.
+The client factory runs at activation, not during descriptor discovery.
 
-Acquires a database using the existing owner after selected dependency validation.
+**Throws**
+
+TypeError for invalid declarations, dialects, models or overrides.
+
+**Example**
+
+```ts
+import { defineDrizzleService } from "@relkit/drizzle";
+import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+const users = sqliteTable("users", { id: integer().primaryKey() });
+const service = defineDrizzleService({
+  schema: { users },
+  client: () => {
+    throw new Error("Configure a Drizzle driver before activation");
+  },
+});
+console.assert(service.capability.dialect === "sqlite");
+```
 
 **Signature**
 
 ```ts
-declare const activateDrizzleService: <
-  Service extends DrizzleServiceDescriptor<any, any, any, any>,
+declare const defineDrizzleService: <
+  Client,
+  const Schema extends Readonly<Record<string, unknown>>,
+  const Models extends DrizzleModelMap<TablesOf<Schema>> = {},
 >(
-  service: Service,
-  env: Readonly<Record<string, unknown>>,
-  options?: DrizzleActivationOptions,
-) => Promise<DrizzleActivation<Service>>;
+  options: DefineDrizzleServiceOptions<Client, Schema, Models>,
+) => DrizzleServiceDescriptor<string, Client, Schema, Models>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activate.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/service.ts#L39)
 
-## `activation.ts`
+Since v0.1.0
+
+### defineModel
+
+Adds named table methods with an injected table and transaction-aware Drizzle client.
+Use service overrides, not extensions, to replace the six reserved CRUD operations.
+Select a dialect entrypoint when an extension uses the injected native database.
+
+**Throws**
+
+TypeError for missing, non-callable or reserved extensions.
+
+**Example**
+
+```ts
+import { defineModel } from "@relkit/drizzle/sqlite";
+import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+const users = sqliteTable("users", { id: integer().primaryKey() });
+const model = defineModel({
+  table: users,
+  extend: { firstTen: ({ table, database }) => database.select().from(table).limit(10) },
+});
+console.assert(model.extensionNames.includes("firstTen"));
+```
+
+**Signature**
+
+```ts
+declare const defineModel: <
+  const T extends Table,
+  const Extensions extends ModelExtensionMap<T>,
+>(options: {
+  readonly table: T;
+  readonly extend: NonEmptyExtensions<Extensions>;
+}) => ModelDescriptor<T, Extensions>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.ts#L54)
+
+Since v0.1.0
 
 ### activateDrizzleService
 
@@ -90,6 +149,34 @@ declare const activateDrizzleService: <
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activation.ts#L58)
 
 Since v0.1.0
+
+## Complete reference
+
+<include>/_snippets/generated/exports/drizzle.mdx</include>
+
+## `activate.ts`
+
+Validates the selected ORM before loading runtime activation or calling the native factory.
+
+### activateDrizzleService
+
+Acquires a database using the existing owner after selected dependency validation.
+
+**Signature**
+
+```ts
+declare const activateDrizzleService: <
+  Service extends DrizzleServiceDescriptor<any, any, any, any>,
+>(
+  service: Service,
+  env: Readonly<Record<string, unknown>>,
+  options?: DrizzleActivationOptions,
+) => Promise<DrizzleActivation<Service>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activate.ts#L9)
+
+## `activation.ts`
 
 ### DrizzleActivation
 
@@ -653,46 +740,6 @@ declare const inspectTables: (tables: TableMap) => {
 
 Declares frozen model extensions and binds their native calls to the owning database admission scope.
 Dialect leaves provide precise database methods while shared descriptors preserve authored operation inference.
-
-### defineModel
-
-Adds named table methods with an injected table and transaction-aware Drizzle client.
-Use service overrides, not extensions, to replace the six reserved CRUD operations.
-Select a dialect entrypoint when an extension uses the injected native database.
-
-**Throws**
-
-TypeError for missing, non-callable or reserved extensions.
-
-**Example**
-
-```ts
-import { defineModel } from "@relkit/drizzle/sqlite";
-import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
-
-const users = sqliteTable("users", { id: integer().primaryKey() });
-const model = defineModel({
-  table: users,
-  extend: { firstTen: ({ table, database }) => database.select().from(table).limit(10) },
-});
-console.assert(model.extensionNames.includes("firstTen"));
-```
-
-**Signature**
-
-```ts
-declare const defineModel: <
-  const T extends Table,
-  const Extensions extends ModelExtensionMap<T>,
->(options: {
-  readonly table: T;
-  readonly extend: NonEmptyExtensions<Extensions>;
-}) => ModelDescriptor<T, Extensions>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.ts#L54)
-
-Since v0.1.0
 
 ### RESERVED_OPERATIONS
 
@@ -2164,47 +2211,6 @@ declare const withDrizzleWork: <A, E, R>(
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L13)
 
 ## `service.ts`
-
-### defineDrizzleService
-
-Defines the application's Drizzle service, table operations, and model customizations.
-The client factory runs at activation, not during descriptor discovery.
-
-**Throws**
-
-TypeError for invalid declarations, dialects, models or overrides.
-
-**Example**
-
-```ts
-import { defineDrizzleService } from "@relkit/drizzle";
-import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
-
-const users = sqliteTable("users", { id: integer().primaryKey() });
-const service = defineDrizzleService({
-  schema: { users },
-  client: () => {
-    throw new Error("Configure a Drizzle driver before activation");
-  },
-});
-console.assert(service.capability.dialect === "sqlite");
-```
-
-**Signature**
-
-```ts
-declare const defineDrizzleService: <
-  Client,
-  const Schema extends Readonly<Record<string, unknown>>,
-  const Models extends DrizzleModelMap<TablesOf<Schema>> = {},
->(
-  options: DefineDrizzleServiceOptions<Client, Schema, Models>,
-) => DrizzleServiceDescriptor<string, Client, Schema, Models>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/service.ts#L39)
-
-Since v0.1.0
 
 ### DefineDrizzleServiceOptions
 

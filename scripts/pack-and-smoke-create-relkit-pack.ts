@@ -51,9 +51,7 @@ export async function packPackages(
     [
       "relkit",
       "@relkit/cli",
-      "relkit",
-      "relkit/config",
-      "relkit/schema",
+      "@relkit/app",
       "@relkit/testing",
       "create-relkit",
       "@relkit/local",

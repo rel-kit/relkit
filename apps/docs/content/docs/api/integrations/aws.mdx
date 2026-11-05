@@ -16,6 +16,37 @@ labs: true
 
 For configuration and examples, read [deployment](/docs/modules/deployment), [aws](/docs/modules/deployment/aws).
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### aws
+
+Provisions a supported S3 or Redis adapter on AWS and grants only its workload access.
+
+**Example**
+
+```ts
+import { aws } from "@relkit/aws";
+import { s3 } from "@relkit/s3";
+const receipts = aws(s3(), { versioning: true });
+```
+
+**Signature**
+
+```ts
+declare const aws: <const Adapter extends AwsAdapter>(
+  adapter: Adapter,
+  options?: AwsOptions<Adapter>,
+) => InfrastructureProviderSource<Adapter>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/aws/src/aws.ts#L48)
+
+Since v0.2.0
+
+## Complete reference
+
 <include>/_snippets/generated/exports/integrations/aws.mdx</include>
 
 ## `index.ts`
@@ -83,31 +114,6 @@ declare const materializeAwsAccess: (input: {
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/aws/src/access/materialize.ts#L8)
 
 ## `aws.ts`
-
-### aws
-
-Provisions a supported S3 or Redis adapter on AWS and grants only its workload access.
-
-**Example**
-
-```ts
-import { aws } from "@relkit/aws";
-import { s3 } from "@relkit/s3";
-const receipts = aws(s3(), { versioning: true });
-```
-
-**Signature**
-
-```ts
-declare const aws: <const Adapter extends AwsAdapter>(
-  adapter: Adapter,
-  options?: AwsOptions<Adapter>,
-) => InfrastructureProviderSource<Adapter>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/aws/src/aws.ts#L48)
-
-Since v0.2.0
 
 ### AwsAdapter (type alias)
 
