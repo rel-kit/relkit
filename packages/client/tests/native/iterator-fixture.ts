@@ -11,7 +11,8 @@ const schema = {
     validate: (value: unknown) => ({ value }),
   },
 };
-const contract = { watch: oc.input(schema).output(schema) };
+// Framework procedures (`jobs`, `relkit.*`) keep the RPC protocol; routes use REST.
+const contract = { jobs: { watch: oc.input(schema).output(schema) } };
 
 /**
  * Proves pending pulls release real Bun HTTP responses on each public cleanup edge.
@@ -68,7 +69,7 @@ async function verify(sse: boolean, mode: "return" | "throw" | "abort"): Promise
           { agentId: "agent", threadId: "thread", after: {} },
           { signal: caller.signal },
         )
-      : ((await (client as ReturnType<typeof createClient<typeof contract>>).watch(
+      : ((await (client as ReturnType<typeof createClient<typeof contract>>).jobs.watch(
           {},
           { signal: caller.signal },
         )) as AsyncIterable<unknown>);
@@ -135,7 +136,7 @@ async function verifyWatchFallback(): Promise<void> {
   });
   const caller = new AbortController();
   try {
-    const client = createClient<{ jobs: { fixture: { runs: typeof contract } } }>({
+    const client = createClient<{ jobs: { fixture: { runs: typeof contract.jobs } } }>({
       baseUrl: server.url.href,
     });
     let failure: unknown;

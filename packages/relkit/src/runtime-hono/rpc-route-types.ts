@@ -1,4 +1,4 @@
-import { asyncIteratorObject } from "@orpc/server";
+import { eventIterator } from "@orpc/server";
 import type { HttpTriggerRegistration } from "../graph/index.js";
 import type { MiddlewareDescriptor } from "../routes/index.js";
 import type { StandardSchemaV1 } from "../schema/index.js";
@@ -22,7 +22,7 @@ export function isSchema(value: unknown): value is StandardSchemaV1 {
  * @returns The stream item iterator schema or the original scalar schema.
  */
 export function rpcOutputSchema(schema: StandardSchemaV1): StandardSchemaV1 {
-  return isStreamSchema(schema) ? (asyncIteratorObject(schema.item) as StandardSchemaV1) : schema;
+  return isStreamSchema(schema) ? (eventIterator(schema.item) as StandardSchemaV1) : schema;
 }
 
 /** Adapt a stream result to the async iterator object required by oRPC.

@@ -1,11 +1,4 @@
-import {
-  COMMON_ERROR_STATUS_MAP,
-  ORPCError,
-  os,
-  type AnyProcedure,
-  type ErrorMap,
-  type Router,
-} from "@orpc/server";
+import { ORPCError, os, type AnyProcedure, type ErrorMap, type Router } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import type { HttpTriggerRegistration } from "../graph/index.js";
 import type { Context, Hono, Next } from "hono";
@@ -17,6 +10,7 @@ import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import { realtimeProcedures } from "./realtime-rpc.js";
 import { CLIENT_API_ROOT } from "../contracts/client-api.js";
 import { rpcApiTree } from "./rpc-api-tree.js";
+import { errorStatusInterceptor } from "./rpc-handler-options.js";
 import { assertExpectedIdentity, assertRpcSecurity } from "./rpc-identity.js";
 import {
   createRpcMiddlewareContext,
@@ -40,7 +34,9 @@ export type { RpcContext } from "./rpc.types.js";
  */
 export function installRpc(app: Hono, options: RouteMaterializationOptions): void {
   const { router, errorStatusMap } = createRpcRouter(options);
-  const handler = new RPCHandler<RpcContext>(router, { errorStatusMap });
+  const handler = new RPCHandler<RpcContext>(router, {
+    clientInterceptors: [errorStatusInterceptor(errorStatusMap)],
+  });
   /** Attach request authentication before dispatching through the installed oRPC router.
    * @param context - Incoming Hono context for the RPC endpoint.
    * @returns The matching RPC response, or the stable RPC not-found response.
@@ -62,14 +58,13 @@ export function installRpc(app: Hono, options: RouteMaterializationOptions): voi
  * @returns The combined procedure router and its public error-to-status mapping.
  */
 export function createRpcRouter(options: RouteMaterializationOptions): {
-  readonly router: Router<RpcContext>;
+  readonly router: Router<any, RpcContext>;
   readonly errorStatusMap: Readonly<Record<string, number>>;
 } {
   const triggers = options.plan.httpTriggers.filter(
     (trigger) => trigger.config.rawHandler !== true && trigger.config.client !== false,
   );
   const errorStatusMap = {
-    ...COMMON_ERROR_STATUS_MAP,
     ...Object.fromEntries(triggers.flatMap((trigger) => errorStatuses(trigger))),
     ...agentErrorStatuses,
     ...jobsErrorStatuses,
@@ -99,7 +94,7 @@ export function createRpcRouter(options: RouteMaterializationOptions): {
     ...realtimeProcedures(options),
     ...agentProcedures(options),
     ...jobsProcedures(options),
-  } as Router<RpcContext>;
+  } as Router<any, RpcContext>;
   return { router, errorStatusMap };
 }
 /** Adapts one registered route to its oRPC procedure contract.

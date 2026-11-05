@@ -91,7 +91,7 @@ test("serves the existing oRPC router through Bun WebSockets", async () => {
   const server = await startBunFixture("rpc-websocket");
   servers.push(server);
   const socket = new WebSocket(`ws://127.0.0.1:${server.port}/rpc`);
-  const client = createORPCClient(new RPCLink({ connect: () => socket })) as {
+  const client = createORPCClient(new RPCLink({ websocket: socket })) as {
     readonly "query.route": (input: unknown) => Promise<unknown>;
   };
   await expect(client["query.route"]({ value: 1 })).resolves.toEqual({ value: 1 });

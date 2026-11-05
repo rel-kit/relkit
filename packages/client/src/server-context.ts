@@ -1,6 +1,6 @@
 /**
  * Implements the opt-in Bun server query context and identity-bound hydration.
- * Install @orpc/tanstack-query@2.0.0-beta.31 and @tanstack/query-core@^5 alongside
+ * Install @orpc/tanstack-query@1.16.1 and @tanstack/query-core@^5 alongside
  * @relkit/client and import @relkit/client/server/tanstack-query to select it.
  */
 import type {

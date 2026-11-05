@@ -241,7 +241,7 @@ not tasks of this change.
 - [ ] 23.1 Evaluate oRPC's OpenAPI-based link for dates, large integers, files and streams, record the decision in design.md, and verify with a spike test suite
 - [ ] 23.2 Switch the client transport from `/rpc` to the REST routes without changing user code, and verify the client test suite and a browser network test
 - [ ] 23.3 Remove the `/rpc` endpoint once no generated client calls it, and verify the HTTP tests
-- [ ] 23.4 Move off the oRPC 2.0 beta and resolve the drizzle-orm release-candidate pin under the dependency policy, and verify the policy check shows no unlisted pre-release in user installs
+- [x] 23.4 Move off the oRPC 2.0 beta and resolve the drizzle-orm release-candidate pin under the dependency policy, and verify the policy check shows no unlisted pre-release in user installs
 
 ## 24. Agent adapters (#22)
 

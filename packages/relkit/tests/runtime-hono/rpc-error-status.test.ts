@@ -1,6 +1,7 @@
 import { expect, test } from "vitest";
 import { ORPCError, os } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
+import { errorStatusInterceptor } from "../../src/runtime-hono/rpc-handler-options.js";
 import { createRpcRouter } from "../../src/runtime-hono/rpc.js";
 import { channelPlan, manifest } from "./fixtures/channel-plan.ts";
 
@@ -24,7 +25,7 @@ test.each([
         throw new ORPCError(code);
       }),
     },
-    { errorStatusMap },
+    { clientInterceptors: [errorStatusInterceptor(errorStatusMap)] },
   );
   const result = await handler.handle(
     new Request("http://relkit.test/fail", {
@@ -35,4 +36,23 @@ test.each([
   );
   expect(result.matched).toBe(true);
   expect(result.response?.status).toBe(status);
+});
+
+test("RPC answers a declared code with its mapped status", async () => {
+  const handler = new RPCHandler(
+    {
+      fail: os.handler(() => {
+        throw new ORPCError("IDENTITY_PRECONDITION_FAILED");
+      }),
+    },
+    { clientInterceptors: [errorStatusInterceptor({ IDENTITY_PRECONDITION_FAILED: 409 })] },
+  );
+  const result = await handler.handle(
+    new Request("http://relkit.test/fail", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ json: {} }),
+    }),
+  );
+  expect(result.response?.status).toBe(409);
 });

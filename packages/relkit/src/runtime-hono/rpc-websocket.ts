@@ -1,9 +1,10 @@
-import { RPCHandler, type WebSocketLike } from "@orpc/server/websocket";
+import { RPCHandler, type MinimalWebsocket } from "@orpc/server/websocket";
 import { REALTIME_RUNTIME_LIMITS } from "../contracts/index.js";
 import type { Hono } from "hono";
 import type { UpgradeWebSocket } from "hono/ws";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import { createRpcRouter, type RpcContext } from "./rpc.js";
+import { errorStatusInterceptor, rpcHeadersInterceptor } from "./rpc-handler-options.js";
 import { assertWebSocketRequest } from "./transport-security.js";
 
 /** Installs the oRPC WebSocket adapter on the same router and policies as HTTP RPC.
@@ -17,7 +18,11 @@ export function installRpcWebSocket(
   options: RouteMaterializationOptions,
   upgradeWebSocket: UpgradeWebSocket,
 ): void {
-  const handler = new RPCHandler<RpcContext>(createRpcRouter(options).router);
+  const { router, errorStatusMap } = createRpcRouter(options);
+  const handler = new RPCHandler<RpcContext>(router, {
+    rootInterceptors: [rpcHeadersInterceptor()],
+    clientInterceptors: [errorStatusInterceptor(errorStatusMap)],
+  });
   app.get(
     "/rpc",
     upgradeWebSocket(async (hono) => {
@@ -39,14 +44,10 @@ export function installRpcWebSocket(
             socket.close(1009, "RelKit frame exceeds the transport limit.");
             return;
           }
-          const peer = (socket.raw ?? socket) as WebSocketLike;
-          void handler
-            .message(peer, event.data as string | ArrayBuffer, {
-              context: (request) => ({ ...context, rpcHeaders: request.headers }),
-            })
-            .catch(() => {
-              socket.close(1011, "RelKit RPC transport failed.");
-            });
+          const peer = (socket.raw ?? socket) as MinimalWebsocket;
+          void handler.message(peer, event.data as string | ArrayBuffer, { context }).catch(() => {
+            socket.close(1011, "RelKit RPC transport failed.");
+          });
         },
         /** Releases protocol state when the WebSocket closes.
          * @param _event - Unused native close event; cleanup is keyed by its socket.
@@ -54,7 +55,7 @@ export function installRpcWebSocket(
          * @returns Nothing; protocol cleanup is requested for the closed socket.
          */
         onClose(_event, socket) {
-          void handler.close((socket.raw ?? socket) as WebSocketLike);
+          void handler.close((socket.raw ?? socket) as MinimalWebsocket);
         },
       };
     }),

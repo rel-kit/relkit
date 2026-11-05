@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import { RPCHandler } from "@orpc/server/fetch";
+import { errorStatusInterceptor } from "../../src/runtime-hono/rpc-handler-options.js";
 import { createRpcRouter } from "../../src/runtime-hono/rpc.js";
 import type { HttpTriggerRegistration } from "../../src/graph/index.js";
 import { channelPlan, manifest } from "./fixtures/channel-plan.ts";
@@ -58,7 +59,9 @@ test("route procedures are mounted at their typed-client API paths", async () =>
       },
     } as never,
   });
-  const handler = new RPCHandler(router, { errorStatusMap });
+  const handler = new RPCHandler(router, {
+    clientInterceptors: [errorStatusInterceptor(errorStatusMap)],
+  });
   const call = async (path: string) => {
     const result = await handler.handle(
       new Request(`http://relkit.test/${path}`, {

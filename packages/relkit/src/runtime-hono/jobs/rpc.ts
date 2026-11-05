@@ -1,4 +1,4 @@
-import { asyncIteratorObject, ORPCError, os, type AnyProcedure, type ErrorMap } from "@orpc/server";
+import { eventIterator, ORPCError, os, type AnyProcedure, type ErrorMap } from "@orpc/server";
 import type { TaskJobNode } from "../../graph/index.js";
 import type { RouteMaterializationOptions } from "../materialize-routes.js";
 import type { RpcContext } from "../rpc.js";
@@ -110,7 +110,7 @@ function streamCall(
     .$context<RpcContext>()
     .errors(jobErrors)
     .input(jobEnvelopeSchema)
-    .output(asyncIteratorObject(jobItemSchema))
+    .output(eventIterator(jobItemSchema))
     .handler(({ input, context, signal }) =>
       invoke(options, job, operation, () => handler(options, context, job, input, signal)).then(
         (value) => asAsyncIterator(value as AsyncIterable<unknown>),

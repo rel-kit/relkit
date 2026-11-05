@@ -25,8 +25,8 @@ test("createApi calls a route at its API path and keeps declared error fields", 
           {
             json: {
               defined: true,
-              inferable: true,
               code: "orders.not-found",
+              status: 404,
               message: "Order not found",
               data: { orderId: "o2" },
             },

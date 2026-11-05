@@ -1,5 +1,5 @@
 import { createORPCClient } from "@orpc/client";
-import type { RouterContract, RouterContractClient } from "@orpc/contract";
+import type { AnyContractRouter, ContractRouterClient } from "@orpc/contract";
 import type { DefaultContract } from "./index.js";
 import type {
   CreateClientOptions,
@@ -23,9 +23,9 @@ import { httpLink, webSocketLink } from "./transport-native.js";
  * @category Client
  * @since 0.1.0
  */
-export function createClient<Contract extends RouterContract = DefaultContract>(
+export function createClient<Contract extends AnyContractRouter = DefaultContract>(
   options: CreateClientOptions,
-): RouterContractClient<Contract> {
+): ContractRouterClient<Contract> {
   const link = httpLink(options);
   return proxy<Contract>(async () => link);
 }
@@ -36,9 +36,9 @@ export function createClient<Contract extends RouterContract = DefaultContract>(
  * @param options - WebSocket constructor, headers and establishment configuration.
  * @returns The existing oRPC proxy; oRPC owns connected sockets.
  */
-export function createWebSocketClient<Contract extends RouterContract = DefaultContract>(
+export function createWebSocketClient<Contract extends AnyContractRouter = DefaultContract>(
   options: CreateWebSocketClientOptions,
-): RouterContractClient<Contract> {
+): ContractRouterClient<Contract> {
   const Socket = options.websocket ?? globalThis.WebSocket;
   if (Socket === undefined) throw new Error("WebSocket is unavailable in this runtime.");
   const link = webSocketLink(options, Socket);
@@ -51,9 +51,9 @@ export function createWebSocketClient<Contract extends RouterContract = DefaultC
  * @param options - Explicit HTTP/WebSocket configuration.
  * @returns The existing proxy with establishment-only HTTP fallback.
  */
-export function createAutoClient<Contract extends RouterContract = DefaultContract>(
+export function createAutoClient<Contract extends AnyContractRouter = DefaultContract>(
   options: CreateAutoClientOptions,
-): RouterContractClient<Contract> {
+): ContractRouterClient<Contract> {
   return proxy<Contract>(selectAutoTransport(options));
 }
 
@@ -63,11 +63,11 @@ export function createAutoClient<Contract extends RouterContract = DefaultContra
  * @param select - Lazy configured link decision.
  * @returns A synchronous proxy; each call is cancelled by its own signal.
  */
-function proxy<Contract extends RouterContract>(
+function proxy<Contract extends AnyContractRouter>(
   select: TransportSelection,
-): RouterContractClient<Contract> {
+): ContractRouterClient<Contract> {
   const transport = createClientTransport(select);
   return createORPCClient({
     call: (path, input, options) => transport.invoke(path, input, options),
-  }) as RouterContractClient<Contract>;
+  }) as ContractRouterClient<Contract>;
 }

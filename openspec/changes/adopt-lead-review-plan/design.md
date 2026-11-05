@@ -654,6 +654,24 @@ Decided while applying section 11 (maintainer, 2026-11-05):
   starters; that changes the minimal template's bytes, so the pinned `templateDigest` in
   `packages/create-relkit/src/create-capabilities.ts` is updated, as earlier template changes did.
 
+Decided while applying section 23 (maintainer, 2026-11-05):
+
+- **oRPC version.** npm has no stable oRPC 2.x: its `2.0.0` is a deprecated publish from 2024 and
+  the 2.0 line is still in beta (`2.0.0-beta.48`). Every `@orpc/*` package moves to the latest
+  stable 1.x, `1.16.1`, and leaves `docs/dependencies.md`. The 1.x port: `eventIterator` replaces
+  `asyncIteratorObject`; the handlers' `errorStatusMap` becomes a client interceptor
+  (`runtime-hono/rpc-handler-options.ts`) that gives a thrown error its declared status, since 1.x
+  reads the status from the error; WebSocket calls get `rpcHeaders` from a root interceptor; the
+  client's 1.x WebSocket link is bound to one socket, so `webSocketLink` opens a new socket for
+  the next call after one closes; and the HTTP link hands a caller's `fetch` the URL and an init
+  with headers, body and signal, as before, because 1.x passes a `Request`.
+- **Drizzle.** No stable Drizzle 1.0 exists (the stable line is 0.45, without the Effect
+  integration), so the `1.0.0-rc.5-169397b` pin and its patch stay, with the exit plan updated:
+  `drizzle-orm@1.0.0-rc.5` (2026-10-21) already imports `effect/sql`, so moving to it removes the
+  patch together with the patch-shipping steps in `create-relkit` and the CLI build catalog. That
+  removal touches the creation and packaging code other sections own, so it is left as the exit
+  plan's next step rather than done here.
+
 ### D16. Agent adapters (#22)
 
 The adapter interface covers run, stream, resume and stop; tool calls bridged to the common engine;

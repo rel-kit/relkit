@@ -8,7 +8,7 @@ it does not create a second normative specification.
 | -------------- | -------------: | --------------------------------------------------------------------------------------- |
 | Bun            |         1.3.10 | Hono-hosted oRPC iterator delivery, cancellation, and native stream bodies              |
 | Hono           |         4.13.5 | Native SSE terminal events and text/byte connection failure behavior                    |
-| oRPC           |  2.0.0-beta.31 | Finite procedures, HTTP iterators, route-ID aliases, and method/path aliases            |
+| oRPC           |  1.16.1 | Finite procedures, HTTP iterators, route-ID aliases, and method/path aliases            |
 | TanStack Query |        5.102.3 | Query, mutation, infinite, suspense, cache utilities, selection, and cancellation types |
 | React          |         19.2.8 | Provider, Strict Mode-safe observer mounting, and conditional hook surfaces             |
 | LangChain      |         1.5.10 | Native agent models, tools, middleware, and v3 event collection                         |

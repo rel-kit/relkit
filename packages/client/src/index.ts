@@ -3,7 +3,7 @@
  * Install @relkit/client for HTTP/WebSocket clients; React and TanStack peers
  * are needed only by their explicit integration entrypoints.
  */
-import type { RouterContract } from "@orpc/contract";
+import type { AnyContractRouter } from "@orpc/contract";
 export { ORPCError } from "@orpc/client";
 export { createClient, createAutoClient, createWebSocketClient } from "./transport.js";
 export { api, apiRoutePath, createApi } from "./api.js";
@@ -47,7 +47,7 @@ export interface DefaultContractRegistry {}
 
 /** Contract inferred from the preserved public registry augmentation. */
 export type DefaultContract = DefaultContractRegistry extends {
-  readonly contract: infer Contract extends RouterContract;
+  readonly contract: infer Contract extends AnyContractRouter;
 }
   ? Contract
-  : RouterContract;
+  : AnyContractRouter;

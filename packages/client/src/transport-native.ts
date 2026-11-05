@@ -7,6 +7,7 @@ import type {
   CreateWebSocketClientOptions,
 } from "./index.types.js";
 import { connectSocket } from "./transport-socket.js";
+import type { TransportContext, TransportLink } from "./transport.types.js";
 
 /**
  * Builds the native HTTP oRPC link with lazy headers and owned iterator cancellation.
@@ -17,8 +18,7 @@ export function httpLink(options: CreateClientOptions): RPCLink<Record<PropertyK
   const endpoint = endpointFor(options.baseUrl);
   const fetcher = options.fetch ?? globalThis.fetch;
   return new RPCLink({
-    origin: endpoint.origin,
-    url: endpoint.pathname as `/${string}`,
+    url: endpoint.href,
     headers: () => resolveHeaders(options.headers),
     interceptors: [
       async (call) => {
@@ -63,12 +63,20 @@ export function httpLink(options: CreateClientOptions): RPCLink<Record<PropertyK
         return wrapped;
       },
     ],
-    fetch: async (url, init) => {
-      const response = await fetcher(url, {
+    fetch: async (request, init, call) => {
+      // oRPC 1.x hands over a Request; pass its parts as init so a caller's fetch wrapper
+      // (tracing, tests) sees the headers, body and signal as it did before.
+      const body =
+        request.method === "GET" || request.method === "HEAD" ? undefined : await request.blob();
+      const response = await fetcher(request.url, {
         ...init,
+        method: request.method,
+        headers: request.headers,
+        signal: request.signal,
         credentials: options.credentials ?? "include",
+        ...(body === undefined ? {} : { body }),
       });
-      const record = init?.signal == null ? undefined : responseStatus.get(init.signal);
+      const record = call.signal == null ? undefined : responseStatus.get(call.signal);
       if (record !== undefined) record.status = response.status;
       return response;
     },
@@ -97,11 +105,12 @@ function withStatus(error: unknown, status: number | undefined): unknown {
 }
 
 /**
- * Builds the native oRPC WebSocket link while retaining SDK reconnect ownership.
+ * Builds the WebSocket link. oRPC 1.x binds a link to one socket, so this opens a socket
+ * on first use and opens a new one for the next call after the socket closes.
  * @param options - Existing public configuration and authority.
  * @param Socket - Native WebSocket constructor.
  * @param connect - Lazy native socket establishment adapter.
- * @returns The native WebSocket link that owns SDK connection and reconnect behavior.
+ * @returns A link that reconnects after the socket closes.
  */
 export function webSocketLink(
   options: CreateWebSocketClientOptions,
@@ -112,12 +121,27 @@ export function webSocketLink(
       webSocketEndpoint(options.baseUrl),
       options.establishmentTimeoutMs ?? 10_000,
     ),
-): WebSocketRPCLink<Record<PropertyKey, unknown>> {
-  return new WebSocketRPCLink({
-    connect,
-    headers: () => resolveHeaders(options.headers),
-    reconnect: { enabled: true, onClose: { enabled: true } },
-  });
+): TransportLink {
+  let current: Promise<TransportLink> | undefined;
+  const open = (): Promise<TransportLink> => {
+    const next = connect().then((socket) => {
+      socket.addEventListener("close", () => {
+        if (current === next) current = undefined;
+      });
+      return new WebSocketRPCLink<TransportContext>({
+        websocket: socket,
+        headers: () => resolveHeaders(options.headers),
+      });
+    });
+    current = next;
+    next.catch(() => {
+      if (current === next) current = undefined;
+    });
+    return next;
+  };
+  return {
+    call: async (path, input, call) => (await (current ?? open())).call(path, input, call),
+  };
 }
 
 /**
@@ -148,7 +172,7 @@ function endpointFor(baseUrl: string): URL {
  * @param value - Original input or payload; its identity is retained where required.
  * @returns A Promise for the existing result, preserving original rejected values.
  */
-async function resolveHeaders(value: ClientHeaders | undefined): Promise<Headers> {
+export async function resolveHeaders(value: ClientHeaders | undefined): Promise<Headers> {
   const resolved = typeof value === "function" ? await value() : value;
   const headers = resolved instanceof Headers ? new Headers(resolved) : new Headers();
   if (!(resolved instanceof Headers) && Array.isArray(resolved)) {
