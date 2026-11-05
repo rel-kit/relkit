@@ -3,7 +3,7 @@
  * TypeScript object declaration. This pure syntax adapter never evaluates member
  * expressions or creates a runtime service; ownership is resolved separately.
  */
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import { readFactoryObject, staticPropertyName } from "./source-edit.js";
 
 /**

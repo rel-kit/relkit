@@ -3,8 +3,9 @@
  * `relkit dev` session. Reloads never wait for it: the warm check skips type-checking, and
  * this process reports each finished pass through the session log, which the terminal
  * prints and the Inspector receives as a log record (`dev.typecheck.failed` with the
- * diagnostics and their source locations, or `dev.typecheck.passed`). It prefers `tsgo`
- * when the project installs it, falls back to `typescript/bin/tsc`, and reports
+ * diagnostics and their source locations, or `dev.typecheck.passed`). It runs the same
+ * project compiler as `relkit check` (`tsgo` when installed, else the `typescript` package's
+ * `tsc`, 5.9 or 7), and reports
  * `dev.typecheck.unavailable` when neither or no `tsconfig.json` is present. The Scope that
  * acquired it stops the process.
  */
@@ -17,6 +18,7 @@ import { parseTypecheckLine } from "./typecheck-output.js";
 import type { DevLog } from "../commands/dev.types.js";
 import type { TypecheckDiagnostic } from "./typecheck-output.types.js";
 import { runtime } from "../runtime/index.js";
+import { projectCompilerCommand } from "../compiler/typescript-compiler.js";
 
 /** Diagnostics included in one log record; the count is always complete. */
 const REPORTED_DIAGNOSTICS = 20;
@@ -56,14 +58,18 @@ export const acquireTypecheckWatch = Effect.fn("Dev.typecheckWatch")(function* (
 function typecheckCommand(projectRoot: string): readonly string[] | undefined {
   const config = join(projectRoot, "tsconfig.json");
   if (!existsSync(config)) return undefined;
-  const flags = ["--watch", "--noEmit", "--pretty", "false", "--preserveWatchOutput", "-p", config];
-  const tsgo = join(projectRoot, "node_modules/.bin/tsgo");
-  if (existsSync(tsgo)) return [tsgo, ...flags];
-  try {
-    return [process.execPath, runtime.modules.resolve("typescript/bin/tsc", projectRoot), ...flags];
-  } catch {
-    return undefined;
-  }
+  const compiler = projectCompilerCommand(projectRoot);
+  if (compiler === undefined) return undefined;
+  return [
+    ...compiler,
+    "--watch",
+    "--noEmit",
+    "--pretty",
+    "false",
+    "--preserveWatchOutput",
+    "-p",
+    config,
+  ];
 }
 
 /**

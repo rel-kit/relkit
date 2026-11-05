@@ -6,7 +6,7 @@
 import { applicationSourceLayer, type ApplicationLayout } from "relkit/contracts";
 import { createDiagnostic } from "relkit/diagnostics";
 import { Effect } from "effect";
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import { SourceResolution } from "./source-resolution.service.js";
 import { sourceModuleReferences } from "./source-module-references.js";
 import { allowedSourceDependency } from "./normalize-boundary-policy.js";

@@ -1,7 +1,7 @@
 /** Checks every workspace's package/import ownership and source scope; documentation build-only edges have a separate finite policy. */
 import { readFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import {
   dependencyName,
   descriptorPackages,

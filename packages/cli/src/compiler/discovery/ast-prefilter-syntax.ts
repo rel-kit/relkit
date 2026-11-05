@@ -1,4 +1,4 @@
-import * as ts from "typescript";
+import ts from "../../typescript-parser.js";
 
 /**
  * Checks whether an import retains runtime content.

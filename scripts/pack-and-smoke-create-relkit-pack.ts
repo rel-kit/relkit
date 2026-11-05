@@ -5,6 +5,7 @@ import { runCommand, type Manifest } from "./pack-and-smoke-create-relkit-suppor
 import { workspacePackageDirectories } from "./workspace-packages.js";
 import { registryPackages, registryResponse, registryUpstream } from "./packed-registry-runtime.js";
 import { packingWorkspaceClosure } from "./packing-workspace-closure.js";
+import { toolPackageVersions } from "./release-stage.js";
 
 /**
  * Reads package metadata from the artifact that consumers actually install.
@@ -64,6 +65,7 @@ export async function packPackages(
       "@relkit/postgres",
     ],
     manifests,
+    new Set(toolPackageVersions(resolve(import.meta.dir, "..")).keys()),
   );
   const result = new Map<string, string>();
   for (const name of names) {

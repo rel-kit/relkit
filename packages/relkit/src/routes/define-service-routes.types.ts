@@ -48,6 +48,15 @@ type EntryRequest<Entry> = Entry extends {
   ? Request
   : undefined;
 
+/** Type-only record of the method a service route table created a descriptor for. The
+ * generated route module checks compare it with the export name, so plain `tsc` rejects
+ * `export const { GET: POST } = defineServiceRoutes(...)` without the editor plugin.
+ * @example type Marker = ServiceRouteMethodMarker<"GET">;
+ */
+export interface ServiceRouteMethodMarker<Method> {
+  readonly __relkit_service_route_method?: Method;
+}
+
 /** Route descriptors inferred from a service route table.
  * @example type Routes = ServiceRoutesResult<typeof service, { GET: "list" }>;
  */
@@ -56,5 +65,6 @@ export type ServiceRoutesResult<Service, Options> = Readonly<{
     string,
     ServiceFunction<Service, Extract<EntryName<Options[Method]>, ServiceFunctionName<Service>>>,
     EntryRequest<Options[Method]>
-  >;
+  > &
+    ServiceRouteMethodMarker<Method>;
 }>;

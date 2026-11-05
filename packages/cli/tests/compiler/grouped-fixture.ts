@@ -7,7 +7,7 @@ import { Effect } from "effect";
 import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, relative, resolve } from "node:path";
-import * as ts from "typescript";
+import ts from "../../src/typescript-parser.js";
 import { discoverApplicationLayout } from "../../src/compiler/discovery/application-layout.js";
 import { compileProject } from "../../../../tests/compiler/fixture-runner.js";
 import type { AstSourceModule } from "../../src/compiler/discovery/ast-prefilter.types.js";

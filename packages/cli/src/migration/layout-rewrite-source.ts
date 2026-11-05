@@ -1,5 +1,5 @@
 /** Uses effective TypeScript resolution for import edits; computed references block publication. */
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import { SourceResolution } from "../compiler/index.js";
 import { Effect } from "effect";
 import { observeCli } from "../cli-runtime.js";

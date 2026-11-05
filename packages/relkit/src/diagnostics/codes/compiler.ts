@@ -785,4 +785,11 @@ export const compilerCodes = [
     happened: "A request transform has the same ID as another definition in your app.",
     fix: "Rename the transform, or give it an explicit `id` if the ID was taken from the file or export name.",
   },
+  {
+    code: "RELKIT_TYPESCRIPT_COMPILER_FAILED",
+    title: "TypeScript compiler could not run",
+    happened:
+      "`relkit check` type-checks by running your project's own TypeScript compiler (`tsc` from `typescript`, or `tsgo`), and it exited without reporting any errors, for example because its installation is broken.",
+    fix: "Run `tsc --noEmit` in the project to see why the compiler fails, reinstall `typescript` (5.9 or 7) if needed, then run `relkit check` again.",
+  },
 ] as const satisfies readonly DiagnosticCodeEntry[];

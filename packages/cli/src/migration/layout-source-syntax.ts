@@ -1,5 +1,5 @@
 /** Classifies module and tooling path syntax while preserving comments as untouched bytes. */
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import { mentionsMovedRoot } from "./layout-rewrite-paths.js";
 import type { MigrationFinding, MigrationMove } from "./layout.types.js";
 

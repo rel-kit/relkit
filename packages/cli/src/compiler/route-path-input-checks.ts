@@ -1,4 +1,4 @@
-import ts from "typescript";
+import ts from "../typescript-parser.js";
 import { routePathParameters } from "./route-path-parameters.js";
 
 /** Checks raw schema input keys; explicit mappings can rename path parameters. */

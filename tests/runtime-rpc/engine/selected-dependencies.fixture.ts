@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { generateRuntimeIntegrationImports } from "@relkit/cli/compiler";
-import ts from "typescript";
+import ts from "relkit-typescript";
 
 const repository = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 

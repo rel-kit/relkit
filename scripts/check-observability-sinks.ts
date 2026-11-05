@@ -1,7 +1,7 @@
 /** Audits authored observability sources for output and record serialization outside their owning adapters. */
 import { readFileSync, realpathSync } from "node:fs";
 import { relative, resolve } from "node:path";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import { resolveOwnedSourceFile, scanLoggerSinks } from "./check-logger-sinks.ts";
 
 export const OBSERVABILITY_SOURCE_ROOTS = Object.freeze([

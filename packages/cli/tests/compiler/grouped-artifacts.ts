@@ -1,6 +1,6 @@
 /** Checks paired generated public contracts and native context imports while retaining real grouped source provenance. */
 import assert from "node:assert/strict";
-import * as ts from "typescript";
+import ts from "../../src/typescript-parser.js";
 import {
   generateContextRegistry,
   resolvedIdentities,

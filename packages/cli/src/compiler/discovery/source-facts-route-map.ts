@@ -1,4 +1,4 @@
-import * as ts from "typescript";
+import ts from "../../typescript-parser.js";
 import type { ExportFact, FactoryBindingFact } from "./source-facts.types.js";
 
 const MAP_METHODS: ReadonlySet<string> = new Set([

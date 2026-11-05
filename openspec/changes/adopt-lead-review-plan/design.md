@@ -491,6 +491,78 @@ dependency is bundled into `@relkit/cli` so it never constrains the application.
 its own type-checking to TypeScript 7; tools that still need the 5.x API, such as the docs generator,
 are checked and kept on the private parser if needed.
 
+Decided while applying section 15 (maintainer, 2026-11-05):
+
+- **The private parser is `packages/cli/src/typescript-parser.ts`, bundled at build time.** Every
+  CLI module, including `relkit migrate`'s one parser module `src/migration/code-parser.ts`,
+  imports `ts` from it (`import ts from "./typescript-parser.js"`), never from `typescript`. It
+  re-exports TypeScript 5.9.3 from the private workspace package `relkit-typescript`
+  (`tools/typescript-api`, a devDependency), and `scripts/package-typescript-parser.ts` replaces
+  the emitted `dist/typescript-parser.js` with a Bun bundle that inlines it, so the published CLI
+  depends on no `typescript`. A plain `npm:typescript@5.9.3` alias was tried first and rejected:
+  an alias is a direct dependency whose `tsc` executable takes `node_modules/.bin/tsc` (in the
+  workspace it replaced TypeScript 7's; in an application installed with npm it could shadow the
+  application's own). The workspace package depends on `typescript` itself, and executables of
+  transitive dependencies are never linked. The editor plugin bundle maps the package back to the
+  editor's own `typescript`,
+  because the plugin always receives the editor's TypeScript instance.
+- **`route-module-checks.ts` is the one generated file a tsconfig must list.** It references
+  `context-registry.d.ts` and `event-registry.d.ts` with `/// <reference path>` directives, so
+  plain `tsc` sees every generated guarantee; until normalization writes the registries, `relkit
+check` writes an empty module in their place. Templates already listed it; the examples now do
+  too. The one plugin finding types could not express, a service route destructured under another
+  method's name (`export const { GET: POST } = defineServiceRoutes(...)`), is now a type error:
+  `defineServiceRoutes` results carry the type-only `ServiceRouteMethodMarker<Method>` and
+  `RouteModuleContract` rejects an export whose marker names another method. Verified with
+  TypeScript 7.0.2's `tsc` and no plugin on a template app.
+- **`relkit check` runs the project's compiler; RelKit's own analyses keep the private parser.**
+  `src/compiler/typescript-compiler.ts` finds the compiler (`node_modules/.bin/tsgo`, then the
+  `bin` of `@typescript/native-preview` or `typescript` read from their exported
+  `package.json`, because TypeScript 7's `exports` hide `typescript/bin/tsc`) and runs
+  `-p <config> --noEmit --pretty false` through the runtime adapter on Bun or Node; its output
+  is parsed into RelKit diagnostics, continuation lines included. The `relkit dev` watch uses the
+  same lookup, which also fixes it for TypeScript 7. When the project's `tsconfig.json` does not
+  list the route checks, or its `rootDir` excludes them, RelKit writes
+  `<generated>/tsconfig.check.json`, which extends it with the same files plus the route checks
+  and a widened validation root. Route module, event source and unused-error analyses still
+  read a program built with the private TypeScript 5.9 API, without its type diagnostics, since
+  TypeScript 7 has no stable JavaScript checker API yet. `typecheckProject` now returns a Promise. Prepared checks,
+  which pass a `TypecheckInputs` journal to certify reuse, keep their type diagnostics on the
+  journal-hosted private-parser program: a separate compiler process would read files the
+  journal never observes. A project that installs no compiler is checked by that program too,
+  so `RELKIT_TYPESCRIPT_COMPILER_FAILED` reports only a compiler that runs and fails.
+- **Templates keep the editor plugin entry, and TypeScript 5.9.3 stays their default.** The plugin
+  only adds while-you-type route errors in editors that load TypeScript 5.9 plugins; no check
+  depends on it, and the docs say so. Templates drop `baseUrl`, which TypeScript 7 removed, and
+  write `paths` relative to the configuration (`"@app/*": ["./src/*"]`). Their `.gitignore` now
+  also tracks `.relkit/generated/event-registry.d.ts`, which the route checks reference, so a
+  fresh clone type-checks. Moving the generated default to TypeScript 7 is left to a later
+  release decision.
+- **The TypeScript matrix is the fresh-clone job.** `fresh-clone-typecheck` in `checks.yml` runs
+  every template on `typescript: ["5.9", "7"]`; `scripts/fresh-clone-typecheck.ts --typescript`
+  pins 5.9.3 or 7.0.2, removes the editor plugin, then runs `typecheck`, `relkit check`,
+  `relkit add function` and `typecheck` again. It runs on pull requests that touch the CLI,
+  the creator, templates or the workflow.
+- **Supported versions are documented in Modules › CLI › TypeScript versions**, which `relkit
+check`'s page and Learn › Local development link to.
+- **The workspace builds and type-checks with TypeScript 7.0.2 from a named `workspace` catalog.**
+  The root, the published packages, the integrations and the Bun examples depend on
+  `"typescript": "catalog:workspace"`; the default catalog, which feeds generated applications'
+  dependencies, keeps 5.9.3. `apps/docs` (Effect docgen, Astro check and the docs scripts use the
+  5.x API), `apps/inspector` and `examples/commerce-web` (Next.js loads the `typescript` API
+  during builds) stay on the default catalog. Scripts and tests that read the compiler API import
+  `relkit-typescript`. TypeScript 7 removed `baseUrl`, so the examples, the Inspector, the type
+  fixtures and the docs tutorial write `paths` relative to their configuration. CI's new
+  `workspace-typecheck` job requires `tsc --version` to be 7, builds the packages and runs `bun
+run typecheck`. Bun 1.3.10 refreshes a workspace's lock entry only when its dependency names
+  change, so moving a workspace between catalogs needs a temporary dependency added and removed.
+- **Example tsconfigs no longer extend one another.** Without `baseUrl`, Bun 1.3.10 resolves
+  `paths` through `extends` inconsistently: a child's `@app/*` loaded the extended commerce
+  modules, and a shared base without `paths` still failed when `relkit check --project-root` ran
+  from the repository root. TypeScript resolves them correctly either way. Each example now
+  declares its full compiler options and its own `paths`. Generated projects do not extend a
+  configuration and are unaffected.
+
 ### D9. Deploy targets (#12)
 
 `relkit build` emits a container definition (non-root, health endpoints, no local durable state) for

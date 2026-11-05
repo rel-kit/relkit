@@ -1,4 +1,4 @@
-import ts from "typescript";
+import ts from "../typescript-parser.js";
 import { createDiagnostic, type Diagnostic } from "relkit/diagnostics";
 import { missingRoutePathInputs } from "./route-path-input-checks.js";
 import {

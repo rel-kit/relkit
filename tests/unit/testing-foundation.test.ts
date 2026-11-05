@@ -2,7 +2,7 @@
 import { expect, test } from "bun:test";
 import { dirname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import ts from "typescript";
+import ts from "relkit-typescript";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 

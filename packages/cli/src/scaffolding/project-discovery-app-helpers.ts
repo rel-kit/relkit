@@ -1,5 +1,5 @@
 /** Reads static app AST values without evaluating authored source. */
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import { staticPropertyName } from "./source-edit.js";
 /**
  * Finds a statically named app configuration property.

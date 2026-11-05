@@ -3,7 +3,7 @@ import { createRequire } from "node:module";
 import { mkdir, mkdtemp, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import ts from "typescript";
+import ts from "./src/typescript-parser.js";
 
 const require = createRequire(import.meta.url);
 
@@ -76,7 +76,7 @@ test("the editor entry point loads through Node and TypeScript's plugin resolver
       [
         node!,
         "-e",
-        `const ts = require(${JSON.stringify(require.resolve("typescript"))});
+        `const ts = require(${JSON.stringify(require.resolve("relkit-typescript"))});
 const result = ts.sys.require(process.cwd(), "@relkit/cli/editor");
 if (result.error) throw result.error;
 if (typeof require("@relkit/cli/editor") !== "function") throw new Error("Invalid CommonJS entry");

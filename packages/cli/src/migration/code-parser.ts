@@ -1,11 +1,12 @@
 /**
  * The one TypeScript parser that `relkit migrate` codemods use. Every rule imports the syntax
- * namespace and the parse function from here, never from `typescript` directly, so replacing
- * the parser (for example with the CLI's bundled private TypeScript) changes only this file.
+ * namespace and the parse function from here, never from `typescript` directly. The parser is
+ * the CLI's private TypeScript 5.9 (`../typescript-parser.ts`), so the application's own
+ * TypeScript version, 5.9 or 7, never constrains a codemod.
  * Parsing is syntax-only: no program, type checker or file system access, so a codemod never
  * runs or resolves application code.
  */
-import * as codeSyntax from "typescript";
+import codeSyntax from "../typescript-parser.js";
 
 export { codeSyntax };
 

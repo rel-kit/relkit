@@ -4,7 +4,7 @@
  * unsupported imports remain unchanged. The Bun build plugin lives in
  * `narrow-effect-imports.bun.ts`; nothing here edits installed or authored module files.
  */
-import ts from "typescript";
+import ts from "../typescript-parser.js";
 
 const namespaces = new Set([
   "Array",

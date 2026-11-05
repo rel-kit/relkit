@@ -412,7 +412,8 @@
     "@vitest/coverage-v8": "catalog:",
     "deepagents": "catalog:",
     "langchain": "catalog:",
-    "typescript": "catalog:",
+    "relkit-typescript": "workspace:*",
+    "typescript": "catalog:workspace",
     "vitest": "catalog:"
   },
   "peerDependenciesMeta": {

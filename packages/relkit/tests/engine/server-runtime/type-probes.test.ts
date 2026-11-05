@@ -2,7 +2,7 @@
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";
 import { fileURLToPath } from "node:url";
-import ts from "typescript";
+import ts from "relkit-typescript";
 
 const probe = `import { Context, Effect, Layer } from "effect";
 import { ServerRuntime, ServerRuntimeLive } from "../../../src/engine/server-runtime/server-runtime.service.js";

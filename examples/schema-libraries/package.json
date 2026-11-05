@@ -22,6 +22,6 @@
     "@relkit/cli": "workspace:*",
     "@relkit/testing": "workspace:*",
     "@types/bun": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:workspace"
   }
 }

@@ -4,7 +4,7 @@
  * boundary policy, while dependencies stay external and are never evaluated.
  */
 import { dirname, isAbsolute, relative, resolve } from "node:path";
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import type { SourceDependency, SourceResolutionInput } from "./source-resolution.types.js";
 
 /**

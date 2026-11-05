@@ -3,7 +3,7 @@
  * Witnesses contain relative paths and text identities, never source text or an
  * absolute project root. The journal is owned by one check, not shared by requests.
  */
-import type ts from "typescript";
+import type ts from "../typescript-parser.js";
 import type { Effect } from "effect";
 import type { TypecheckInputError } from "./typecheck-inputs-error.js";
 

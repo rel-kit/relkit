@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { createRequire } from "node:module";
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { resolve, join } from "node:path";
-import ts from "typescript";
+import ts from "./src/typescript-parser.js";
 
 const require = createRequire(import.meta.url);
 

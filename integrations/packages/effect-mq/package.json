@@ -155,7 +155,8 @@
     "@effect/vitest": "catalog:",
     "drizzle-orm": "catalog:",
     "effect-mq": "catalog:",
-    "typescript": "catalog:",
+    "relkit-typescript": "workspace:*",
+    "typescript": "catalog:workspace",
     "vitest": "catalog:"
   },
   "peerDependencies": {

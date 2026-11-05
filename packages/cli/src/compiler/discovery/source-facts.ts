@@ -1,5 +1,5 @@
 import { observeCompiler } from "../observability.js";
-import * as ts from "typescript";
+import ts from "../../typescript-parser.js";
 import { Effect } from "effect";
 import { runDiscoverySync } from "./discovery-sync.js";
 import { factoryForEffect, membersForEffect } from "./source-facts-factory.js";

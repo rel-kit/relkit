@@ -1,4 +1,4 @@
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 
 const declarations = new Set(["AgentDescriptor", "DefineAgentOptions"]);
 const providerProperties = new Set([

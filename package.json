@@ -99,8 +99,9 @@
     "konsistent": "1.0.0-beta.4",
     "prettier": "catalog:",
     "relkit": "workspace:*",
+    "relkit-typescript": "workspace:*",
     "turbo": "2.11.7",
-    "typescript": "catalog:",
+    "typescript": "catalog:workspace",
     "vitest": "catalog:"
   },
   "overrides": {
@@ -118,7 +119,8 @@
     "apps/*",
     "examples/*",
     "integrations/packages/*",
-    "packages/*"
+    "packages/*",
+    "tools/*"
   ],
   "catalog": {
     "@better-fetch/fetch": "1.3.2",
@@ -161,6 +163,9 @@
     "vitest": "5.0.1"
   },
   "catalogs": {
+    "workspace": {
+      "typescript": "7.0.2"
+    },
     "peer": {
       "@tanstack/query-core": ">=5.80.2",
       "@tanstack/react-query": ">=5.80.2",

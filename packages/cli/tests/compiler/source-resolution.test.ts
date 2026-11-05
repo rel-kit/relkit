@@ -13,7 +13,7 @@ import {
   sourceResolutionLayer,
 } from "../../src/compiler/source-resolution.service.js";
 import { sourceResolutionOptionsEffect } from "../../src/compiler/source-resolution-options.js";
-import * as ts from "typescript";
+import ts from "../../src/typescript-parser.js";
 
 /**
  * Owns one real configuration directory for a finite test workflow.

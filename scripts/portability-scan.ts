@@ -4,7 +4,7 @@
  * `node/` directory or named `*.bun.ts` or `*.node.ts`, may use them; everything else goes through
  * an adapter.
  */
-import ts from "typescript";
+import ts from "relkit-typescript";
 
 /** Kind of runtime-specific use. */
 export type PortabilityKind = "bun" | "node";

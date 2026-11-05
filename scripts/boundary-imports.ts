@@ -2,7 +2,7 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { builtinModules } from "node:module";
 import { isAbsolute, relative, resolve } from "node:path";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 
 import type {
   DependencyMap,

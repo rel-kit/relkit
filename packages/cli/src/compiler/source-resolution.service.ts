@@ -4,7 +4,7 @@
  * require no request Context. Tests can substitute this same contract with a Layer.
  */
 import { Context, Effect, Layer, Option } from "effect";
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import { TypecheckInputs } from "./typecheck-inputs.service.js";
 import { sourceResolutionHost, resolveSourceDependency } from "./source-resolution-native.js";
 import { sourceResolutionOptionsEffect } from "./source-resolution-options.js";

@@ -5,6 +5,7 @@ node_modules
 .relkit/generated/*
 !.relkit/generated/route-module-checks.ts
 !.relkit/generated/context-registry.d.ts
+!.relkit/generated/event-registry.d.ts
 !.relkit/generated/client-registry.d.ts
 .env
 .env.*

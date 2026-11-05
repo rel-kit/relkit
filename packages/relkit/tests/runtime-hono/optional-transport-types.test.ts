@@ -4,7 +4,7 @@
  * it does not substitute SDK modules or represent an external packed install.
  */
 import { expect, test } from "vitest";
-import ts from "typescript";
+import ts from "relkit-typescript";
 import { resolve } from "node:path";
 import { readFileSync } from "node:fs";
 import { Schema } from "effect";

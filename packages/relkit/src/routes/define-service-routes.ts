@@ -16,6 +16,7 @@ import type { FunctionRouteDescriptor } from "./route.types.js";
 
 export type {
   ServiceRouteMethod,
+  ServiceRouteMethodMarker,
   ServiceRouteOptions,
   ServiceRouteEntry,
   ServiceRoutesOptions,

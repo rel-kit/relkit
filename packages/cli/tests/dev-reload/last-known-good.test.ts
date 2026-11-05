@@ -17,6 +17,12 @@ test(
   "keeps serving the last good handlers after a syntax error",
   async () => {
     const before = await dev.waitFor("/b1", "b1 v0");
+    // The location comes from the type-check watch. Save only after its first pass: a fast
+    // compiler (TypeScript 7) can finish that pass on the old file and not report a save made
+    // while it ran.
+    const watched = Date.now() + 60_000;
+    while (!/ types +(No type errors|\d+ type errors?)/u.test(dev.output()) && Date.now() < watched)
+      await Bun.sleep(100);
     const file = "src/services/beta/functions/b1.function.ts";
     fixture.write(
       file,

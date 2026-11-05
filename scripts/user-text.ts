@@ -4,7 +4,7 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
-import ts from "typescript";
+import ts from "relkit-typescript";
 
 /** One rule violation with its location. */
 export interface UserTextFinding {

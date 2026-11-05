@@ -1,7 +1,7 @@
 /** Retains original workflow assertions for langgraph-authoring, registered by the owning suite. */
 import { nativeAgentRuntimePackages } from "./native-agent-runtime.fixture.js";
 import { expect } from "bun:test";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import {
   END,
   START,

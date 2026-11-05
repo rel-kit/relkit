@@ -2246,7 +2246,8 @@ declare const defineServiceRoutesEffect: <
         FunctionRefAny
       >,
       EntryRequest<Options[Method]>
-    >;
+    > &
+      ServiceRouteMethodMarker<Method>;
   }>,
   RouteOperationError,
   never

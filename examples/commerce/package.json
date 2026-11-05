@@ -41,7 +41,7 @@
     "@relkit/cli": "workspace:*",
     "@relkit/testing": "workspace:*",
     "@types/bun": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:workspace"
   },
   "overrides": {
     "@better-fetch/fetch": "1.3.2"

@@ -1,8 +1,11 @@
 import { afterEach, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import ts from "typescript";
-import { generateRouteModuleChecks } from "../../packages/cli/src/compiler/route-module-checks.js";
+import ts from "relkit-typescript";
+import {
+  generateRouteModuleChecks,
+  ROUTE_MODULE_CHECK_REFERENCES,
+} from "../../packages/cli/src/compiler/route-module-checks.js";
 import { routeModuleFindings } from "../../packages/cli/src/compiler/route-module-diagnostics.js";
 import { routeSourceFindings } from "../../packages/cli/src/compiler/route-source-checks.js";
 import { readFacts } from "../../packages/cli/src/compiler/discovery/source-facts.js";
@@ -42,6 +45,8 @@ export default defineService({ functions: { example } });
     join(root, ".relkit/generated/route-module-checks.ts"),
     generateRouteModuleChecks(["src/routes/users/route.ts"], root),
   );
+  for (const file of ROUTE_MODULE_CHECK_REFERENCES)
+    await writeFile(join(root, ".relkit/generated", file), "export {};\n");
   await writeFile(
     join(root, "tsconfig.json"),
     JSON.stringify({
@@ -236,4 +241,33 @@ export const { GET } = expose(service, { GET: "example" });`,
   expect(facts.routeOperations).toContainEqual(
     expect.objectContaining({ exportName: "GET", method: "GET" }),
   );
+});
+
+test("plain tsc without the editor plugin rejects every route module the plugin rejects", async () => {
+  const both = 'defineServiceRoutes(service, { GET: "example", POST: "example" })';
+  for (const route of [
+    `${prefix}export const { GET: POST } = defineServiceRoutes(service, { GET: "example" });`,
+    `${prefix}export const { GET: POST, POST: GET } = ${both};`,
+    `${prefix}export const { GET, ...rest } = ${both};`,
+    `${prefix}const { GET } = ${both};\nexport {};`,
+    `${prefix}export const routes = ${both};`,
+  ]) {
+    const root = await fixture(route);
+    const application = program(root);
+    const source = application.getSourceFile(join(root, "src/routes/users/route.ts"))!;
+    const plugin = [...routeSourceFindings(source), ...routeModuleFindings(application, source)];
+    expect(plugin.length).toBeGreaterThan(0);
+    // The fixture's tsconfig lists only route-module-checks.ts and has no plugin.
+    expect(ts.getPreEmitDiagnostics(application).length).toBeGreaterThan(0);
+  }
+}, 60_000);
+
+test("route checks bring the context and event registries into the program", async () => {
+  const root = await fixture(
+    `${prefix}export const GET = defineRoute({ target: service.example });`,
+  );
+  const application = program(root);
+  for (const file of ROUTE_MODULE_CHECK_REFERENCES)
+    expect(application.getSourceFile(join(root, ".relkit/generated", file))).toBeDefined();
+  expect(ts.getPreEmitDiagnostics(application)).toEqual([]);
 });

@@ -483,7 +483,7 @@ declare const SERVICE_ROUTE_METHODS: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L26)
 
 ### ServiceRouteEntry
 
@@ -493,7 +493,7 @@ declare const SERVICE_ROUTE_METHODS: readonly [
 declare const ServiceRouteEntry: ServiceRouteEntry<Service>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L21)
 
 ### ServiceRouteMethod
 
@@ -505,6 +505,16 @@ declare const ServiceRouteMethod: ServiceRouteMethod;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L18)
 
+### ServiceRouteMethodMarker
+
+**Signature**
+
+```ts
+declare const ServiceRouteMethodMarker: ServiceRouteMethodMarker<Method>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L19)
+
 ### ServiceRouteOptions
 
 **Signature**
@@ -513,7 +523,7 @@ declare const ServiceRouteMethod: ServiceRouteMethod;
 declare const ServiceRouteOptions: ServiceRouteOptions<Name, Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L20)
 
 ### ServiceRoutesOptions
 
@@ -525,7 +535,7 @@ declare const ServiceRoutesOptions: Partial<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L22)
 
 ### ServiceRoutesResult
 
@@ -543,11 +553,12 @@ declare const ServiceRoutesResult: Readonly<{
       FunctionRefAny
     >,
     EntryRequest<Options[Method]>
-  >;
+  > &
+    ServiceRouteMethodMarker<Method>;
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L23)
 
 ### defineServiceRoutes
 
@@ -575,7 +586,7 @@ declare const defineServiceRoutes: <
 ) => ServiceRoutesResult<Service, Options>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L83)
 
 #### Backend and frontend example
 
@@ -624,14 +635,15 @@ declare const defineServiceRoutesEffect: <
         FunctionRefAny
       >,
       EntryRequest<Options[Method]>
-    >;
+    > &
+      ServiceRouteMethodMarker<Method>;
   }>,
   RouteOperationError,
   never
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L42)
 
 ## `define-service-routes.types.ts`
 
@@ -673,6 +685,28 @@ type ServiceRouteMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" |
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L9)
+
+### ServiceRouteMethodMarker (interface)
+
+Type-only record of the method a service route table created a descriptor for. The
+generated route module checks compare it with the export name, so plain `tsc` rejects
+`export const { GET: POST } = defineServiceRoutes(...)` without the editor plugin.
+
+**Example**
+
+```ts
+type Marker = ServiceRouteMethodMarker<"GET">;
+```
+
+**Signature**
+
+```ts
+export interface ServiceRouteMethodMarker<Method> {
+  readonly __relkit_service_route_method?: Method;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L56)
 
 ### ServiceRouteOptions (type alias)
 
@@ -733,11 +767,12 @@ type ServiceRoutesResult<Service, Options> = Readonly<{
     string,
     ServiceFunction<Service, Extract<EntryName<Options[Method]>, ServiceFunctionName<Service>>>,
     EntryRequest<Options[Method]>
-  >;
+  > &
+    ServiceRouteMethodMarker<Method>;
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L63)
 
 ## `http-dsl-mapping-validation.ts`
 
@@ -3464,7 +3499,7 @@ type RouteModuleContract<Module, Parameters extends string = never> = keyof Modu
     };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-module.types.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-module.types.ts#L49)
 
 ### RouteModuleMethod (type alias)
 
@@ -3476,7 +3511,7 @@ Value exports accepted by a filesystem route module.
 type RouteModuleMethod = ServiceRouteMethod | "ALL";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-module.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-module.types.ts#L9)
 
 ## `route-observability.ts`
 

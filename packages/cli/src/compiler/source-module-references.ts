@@ -3,7 +3,7 @@
  * imports and dynamic import expressions. Computed dynamic targets remain explicit
  * analysis limits; nothing in this syntax walk evaluates application code.
  */
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import type { SourceModuleReference } from "./source-resolution.types.js";
 
 /**

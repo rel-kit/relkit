@@ -5,7 +5,7 @@
  */
 import { createDiagnostic, type Diagnostic } from "relkit/diagnostics";
 import { Effect } from "effect";
-import ts from "typescript";
+import ts from "../typescript-parser.js";
 import { factoryName, field, unwrap } from "./event-source-diagnostics-support.js";
 import { NORMALIZE_CODES } from "./normalize-types.js";
 

@@ -2,7 +2,7 @@
 import { strict as assert } from "node:assert";
 import { cp, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 
 /**
  * Keeps the original auth environment while selecting and copying the real local task.

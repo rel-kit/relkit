@@ -72,8 +72,7 @@
     "effect": "catalog:",
     "esbuild": "0.28.2",
     "hono": "catalog:",
-    "relkit": "workspace:*",
-    "typescript": "catalog:"
+    "relkit": "workspace:*"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
@@ -81,6 +80,7 @@
     "@modelcontextprotocol/server": "2.3.0",
     "@relkit/local": "workspace:*",
     "@relkit/pulumi": "workspace:*",
+    "relkit-typescript": "workspace:*",
     "vitest": "catalog:"
   },
   "peerDependencies": {
@@ -92,7 +92,7 @@
     }
   },
   "scripts": {
-    "build": "tsc -b && bun run ../../scripts/prune-cli-output.ts && bun run ../../scripts/package-editor.ts && bun run ../../scripts/package-dev-bootstrap.ts",
+    "build": "tsc -b && bun run ../../scripts/prune-cli-output.ts && bun run ../../scripts/package-editor.ts && bun run ../../scripts/package-typescript-parser.ts && bun run ../../scripts/package-dev-bootstrap.ts",
     "check": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false && tsc -p tsconfig.tests.json --pretty false && bun run ../../scripts/package-editor.ts"
   },

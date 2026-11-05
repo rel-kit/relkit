@@ -2,5 +2,5 @@
   "$schema": "apps/docs/node_modules/@effect/docgen/schema.json",
   "outDir": ".relkit/docgen",
   "runExamples": true,
-  "tscExecutable": "node_modules/.bin/tsc"
+  "tscExecutable": "apps/docs/node_modules/.bin/tsc"
 }

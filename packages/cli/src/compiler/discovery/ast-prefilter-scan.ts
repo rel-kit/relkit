@@ -1,6 +1,6 @@
 /** Collects one module's syntax evidence without importing application code. */
 import { Effect } from "effect";
-import * as ts from "typescript";
+import ts from "../../typescript-parser.js";
 import { readReExportEffect } from "./ast-prefilter-reexports.js";
 import {
   expressionName,

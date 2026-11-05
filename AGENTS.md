@@ -34,6 +34,7 @@ The main product topology is:
 | `integrations/packages` | Independently publishable Redis, S3, Docker, local, Cloudflare, telemetry, AWS, and Pulumi integrations.                        |
 | `packages/`             | Authoring APIs, compiler/graph, engine, runtimes, providers, CLI, generator, and Pulumi deployment.                             |
 | `templates/default/v1`  | Generated `minimal`, `api`, and `agent` projects.                                                                               |
+| `tools/typescript-api`  | Private `relkit-typescript` package: the TypeScript 5.9 API for tooling while the workspace compiles with TypeScript 7.         |
 | `tests/`                | Type, unit, compiler, contract, integration, restart, inspector, generator, deployment, container, security, and browser tests. |
 | `scripts/`              | Boundary, build, release, smoke, performance, and verification tooling.                                                         |
 | `docs/`                 | User documentation, technical specifications, decisions, and evidence.                                                          |
