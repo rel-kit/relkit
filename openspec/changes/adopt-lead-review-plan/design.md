@@ -801,14 +801,14 @@ Decided while applying section 22 (maintainer, 2026-11-06):
   `wrangler.jsonc`, `wrangler.json` or `wrangler.toml`, the files `deploy init cloudflare` writes
   and wrangler reads; no separate flag is needed. For every used provider profile (a cache, bucket,
   job, event, event or queue trigger, channel or agent state that names it), the provider must be
-  one that runs on Workers: Cloudflare Queues for jobs and events, Durable Objects for realtime,
-  Workers KV or Redis for caches, R2 or S3 for buckets, Redis for agent state. Anything else fails
+  one that runs on Workers: the Postgres durable backend for jobs and events (run from Cloudflare
+  Queues and Cron Triggers, see 22.4), a Durable Object for realtime, Workers KV or Redis for
+  caches, R2 or S3 for buckets. Anything else fails
   with `RELKIT_WORKERS_PROVIDER_UNSUPPORTED`, which names the provider, why it cannot run (local
-  files, a worker loop in a long-lived process, a listener the Worker does not run) and the
+  files, its own worker process, a listener the Worker does not run) and the
   alternative for that capability; a used profile without a provider fails too, because it would
-  fall back to local state. Inngest and Trigger.dev are refused for now because their RelKit
-  bindings serve or poll from a process; Postgres jobs and events because their worker loop and
-  drain are unverified on Workers. A Drizzle service with the SQLite dialect fails with
+  fall back to local state. Inngest, Trigger.dev and effect-mq are refused because their RelKit
+  bindings serve or poll from a process. A Drizzle service with the SQLite dialect fails with
   `RELKIT_WORKERS_SQLITE_UNSUPPORTED`, which suggests Postgres through Hyperdrive. Unused profiles
   are not reported. Redis is accepted for caches only, and must use an HTTP URL (task 22.3).
 
@@ -845,6 +845,42 @@ Decided while applying section 22 (maintainer, 2026-11-06):
   runs with `RELKIT_TEST_WORKERS=1` and `REDIS_URL` (or `RELKIT_TEST_DOCKER=1`); unit tests run the
   binding checks against in-memory bindings and the HTTP client against a stub endpoint in every
   run.
+
+- **Jobs, events and schedules keep their state in Postgres; Queues and Cron Triggers run them.**
+  Every job runtime in RelKit is about 1,500 lines of run state, leases, retries, controls and
+  schedules; the Postgres backend already has all of it, passes the jobs and events conformance
+  suites, and connects from workerd (`@effect/sql-pg` over `nodejs_compat` sockets). So the Workers
+  target uses `@relkit/postgres` for jobs and events, and Cloudflare's primitives do the waking:
+  after every request that is not `GET`, `HEAD` or `OPTIONS` the Worker sends one message to the
+  `RELKIT_WORK` queue (`ctx.waitUntil`), and its `queue` handler runs the server's function-host
+  `drain` (section 21: due job attempts and event deliveries until none is left or 25 s pass), then
+  acks the batch, or retries it when the drain fails, so a wake-up is delivered at least once and
+  every event consumer runs through a queue-triggered invocation; the `scheduled` handler of a
+  `* * * * *` Cron Trigger runs the same drain, which claims due schedule occurrences once
+  (Postgres's unique claim) and picks up retries whose backoff has passed. A Queues-native run
+  store in a Durable Object is the follow-up that would remove the database.
+- **The Postgres backend connects once per operation on Workers.** The first local run hung: a
+  Worker may not use a socket opened while handling another request, and the backend shared one
+  pool per process. On Workers (`detectRuntime() === "workers"`) `openPostgresDatabase` returns a
+  per-operation owner: each `run` opens one connection, applies the schema on the isolate's first
+  operation, runs the effect and closes; a `fork` (the lease heartbeat) holds its own connection
+  until it ends. Hyperdrive in front of the database keeps the connects cheap. Bun and Node keep
+  the pool.
+- **Realtime runs on a Durable Object.** `durableObjectRealtime({ binding })` reuses RelKit's
+  shared realtime logic (`createRealtimeProviderFromStore`, as Redis does) over a store whose JSON
+  document lives in one `RelkitRealtimeState` object per profile: `/read`, an atomic
+  `/compare-and-set` (an in-object lock on top of Durable Object input gates) and `/wait`, which
+  holds the request until the document changes or the deadline passes, so subscribers in any
+  isolate wait without polling. The class uses the classic `fetch` interface, needs nothing from
+  `cloudflare:*`, lives in `@relkit/cloudflare/workers`, and the Workers entry re-exports it when
+  the graph uses the adapter. `durability` gains `"durable-object"`, and `@relkit/cloudflare` may
+  import `relkit/providers-local` like `@relkit/redis`.
+- **Verified locally in workerd.** A probe app (the Railway probe service plus a public channel,
+  Postgres jobs and events, Durable Object realtime) built with `--runtime workers` and served by
+  `wrangler dev --test-scheduled` with a local queue and a local Postgres 16: the HTTP-submitted
+  job, the event consumer's task and the Cron-triggered occurrence all completed, two concurrent
+  Cron calls left exactly one run per occurrence, and the conformance Worker's Durable Object check
+  passed the shared realtime checks.
 
 ### D10. Postgres durable backend (#12)
 

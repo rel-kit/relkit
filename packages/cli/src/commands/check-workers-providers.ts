@@ -29,16 +29,16 @@ const WORKERS_PROVIDERS: Readonly<
   Record<WorkersProviderCapability, { readonly allowed: readonly string[]; readonly use: string }>
 > = {
   job: {
-    allowed: ["cloudflare"],
-    use: "Cloudflare Queues: `queueJobs()` from `@relkit/cloudflare`",
+    allowed: ["postgres"],
+    use: "the durable Postgres backend (`relkit add jobs --provider postgres`), which the Worker runs from Cloudflare Queues and Cron Triggers",
   },
   event: {
-    allowed: ["cloudflare"],
-    use: "Cloudflare Queues: `queueEvents()` from `@relkit/cloudflare`",
+    allowed: ["postgres"],
+    use: "the durable Postgres backend (`relkit add events --provider postgres`), which the Worker delivers from Cloudflare Queues",
   },
   realtime: {
     allowed: ["cloudflare"],
-    use: "Durable Objects: `durableObjectRealtime()` from `@relkit/cloudflare`",
+    use: "a Durable Object (`durableObjectRealtime()` from `@relkit/cloudflare`)",
   },
   cache: {
     allowed: ["cloudflare", "redis"],
@@ -59,7 +59,6 @@ const WORKERS_PROVIDERS: Readonly<
 const REASONS: Readonly<Record<string, string>> = {
   local: "keeps its state in local files, and a Worker has no filesystem",
   "effect-mq": "runs a worker that polls Postgres in a long-lived process",
-  postgres: "runs jobs and events from a worker loop in a long-lived process",
   inngest: "serves its function endpoint from a listener the Worker does not run",
   trigger: "runs tasks through a worker process the Worker does not run",
   docker: "starts containers from a local process",

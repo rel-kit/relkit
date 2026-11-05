@@ -112,11 +112,15 @@ function graph(kind: string, capability: string, integrationId: string | undefin
 
 test("each capability names the provider and a Workers alternative", () => {
   const message = (text: string) => workersProviderDiagnostics(text, "/project")[0];
-  expect(message(graph("job", "job", "local"))?.suggestion).toContain("queueJobs()");
+  expect(message(graph("job", "job", "local"))?.suggestion).toContain(
+    "relkit add jobs --provider postgres",
+  );
   expect(message(graph("job", "job", "effect-mq"))?.message).toContain(
     "uses the effect-mq provider, which runs a worker that polls Postgres",
   );
-  expect(message(graph("event", "event", "postgres"))?.suggestion).toContain("queueEvents()");
+  expect(message(graph("event", "event", "inngest"))?.suggestion).toContain(
+    "relkit add events --provider postgres",
+  );
   expect(message(graph("cache", "cache", undefined))?.message).toContain(
     "The cache profile default (1 cache) has no provider, so it would fall back to local state",
   );
@@ -142,7 +146,9 @@ test("Workers providers, unused profiles and other databases pass; SQLite does n
   expect(workersProviderDiagnostics(graph("cache", "cache", "cloudflare"), "/p")).toEqual([]);
   expect(workersProviderDiagnostics(graph("cache", "cache", "redis"), "/p")).toEqual([]);
   expect(workersProviderDiagnostics(graph("bucket", "bucket", "s3"), "/p")).toEqual([]);
-  expect(workersProviderDiagnostics(graph("job", "job", "cloudflare"), "/p")).toEqual([]);
+  expect(workersProviderDiagnostics(graph("job", "job", "postgres"), "/p")).toEqual([]);
+  expect(workersProviderDiagnostics(graph("event", "event", "postgres"), "/p")).toEqual([]);
+  expect(workersProviderDiagnostics(graph("channel", "realtime", "cloudflare"), "/p")).toEqual([]);
   const unused = JSON.stringify({
     nodes: [
       {

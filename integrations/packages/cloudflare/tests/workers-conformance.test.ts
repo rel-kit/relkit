@@ -45,6 +45,10 @@ beforeAll(async () => {
         alias: { "@relkit/redis/runtime": redisRuntime },
         kv_namespaces: [{ binding: "CACHE", id: "relkit-conformance-cache" }],
         r2_buckets: [{ binding: "UPLOADS", bucket_name: "relkit-conformance-uploads" }],
+        durable_objects: {
+          bindings: [{ name: "RELKIT_REALTIME", class_name: "RelkitRealtimeState" }],
+        },
+        migrations: [{ tag: "v1", new_sqlite_classes: ["RelkitRealtimeState"] }],
         vars: { REDIS_HTTP_URL: proxy.url },
       },
       null,
@@ -81,7 +85,7 @@ afterAll(async () => {
 });
 
 (enabled ? test : test.skip)(
-  "Redis over HTTP, KV and R2 bindings pass their checks in workerd",
+  "Redis over HTTP, KV, R2 and Durable Object realtime pass their checks in workerd",
   async () => {
     const response = await fetch(`http://127.0.0.1:${port}/run`);
     const body = (await response.json()) as {
@@ -97,6 +101,7 @@ afterAll(async () => {
       "redis socket URL is refused on Workers",
       "KV binding: cache",
       "R2 binding: bucket",
+      "Durable Object realtime: two providers share one channel",
       "missing binding names itself",
     ]);
   },

@@ -70,7 +70,7 @@ export const mergedAreas: Readonly<Record<string, readonly string[]>> = {
 /** Integration packages expose finite capability leaves beside their catalog root. */
 export const integrationSubpaths: Readonly<Record<string, readonly string[]>> = {
   "@relkit/aws": ["host", "infrastructure", "access"],
-  "@relkit/cloudflare": ["runtime"],
+  "@relkit/cloudflare": ["runtime", "workers"],
   "@relkit/docker": ["runtime"],
   "@relkit/local": ["runtime"],
   "@relkit/otlp": ["runtime"],

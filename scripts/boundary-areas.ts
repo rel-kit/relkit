@@ -22,6 +22,8 @@ const protocolAreas: ReadonlySet<string> = new Set([
 const integrationAreas: ReadonlyMap<string, ReadonlySet<string>> = new Map([
   ["@relkit/local", new Set(["providers-local"])],
   ["@relkit/redis", new Set(["providers-local"])],
+  // Durable Object realtime reuses the shared realtime logic over its own state store.
+  ["@relkit/cloudflare", new Set(["providers-local"])],
   // The Postgres backend implements the event provider and reuses the local retry classification.
   ["@relkit/postgres", new Set(["events", "providers-local"])],
   ["@relkit/langchain", new Set(["functions", "invocation", "schema", "tools"])],

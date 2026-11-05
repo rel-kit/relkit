@@ -20,7 +20,7 @@ import { dockerfile, dockerignore } from "./build-container.js";
 import { buildManifest, buildProductionManifest } from "./build-manifest.js";
 import type { BuildStageCohort, BuildStageInputs } from "./build.types.js";
 import { defaultBuildRuntime } from "../runtime/index.js";
-import { workersEntrySource } from "./build-workers-entry.js";
+import { workersEntryOptions, workersEntrySource } from "./build-workers-entry.js";
 
 /**
  * Writes graph, optional workers and public assets into one owned stage.
@@ -106,7 +106,9 @@ export const writeBuildServer = Effect.fn("Project.buildServer")(function* (
       : [[GENERATED_ARTIFACT_FILES.localServices, cohort.localServicesPlanSource] as const]),
     ["index.ts", entrypoint],
     // The Workers bundle's entry; it imports index.ts lazily from its handlers.
-    ...(runtime === "workers" ? [["worker.ts", workersEntrySource()] as const] : []),
+    ...(runtime === "workers"
+      ? [["worker.ts", workersEntrySource(workersEntryOptions(cohort.graph))] as const]
+      : []),
   ];
   yield* Effect.forEach(
     members,

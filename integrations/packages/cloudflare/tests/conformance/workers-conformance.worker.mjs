@@ -9,12 +9,17 @@ import { detectRuntime } from "relkit/runtime";
 import {
   createCloudflareKvBindingCacheProvider,
   createCloudflareR2BindingBucketProvider,
+  createDurableObjectRealtimeProvider,
 } from "../../dist/runtime/index.js";
+import { checkRealtime } from "../../../redis/tests/conformance/realtime-checks.mjs";
 import {
   checkRedisCache,
   checkRedisProtocol,
 } from "../../../redis/tests/conformance/redis-cache-checks.mjs";
 import { checkKvCache, checkR2Bucket } from "./binding-checks.mjs";
+
+// The Durable Object class the realtime provider's namespace binding names.
+export { RelkitRealtimeState } from "../../dist/workers/index.js";
 
 export default {
   async fetch(request, env) {
@@ -50,6 +55,16 @@ export default {
     await run("R2 binding: bucket", () =>
       checkR2Bucket(createCloudflareR2BindingBucketProvider({ binding: "UPLOADS" }), prefix),
     );
+    await run("Durable Object realtime: two providers share one channel", async () => {
+      const profile = `${prefix}-realtime`;
+      const [reader, writer] = [
+        createDurableObjectRealtimeProvider({ binding: "RELKIT_REALTIME", profile }),
+        createDurableObjectRealtimeProvider({ binding: "RELKIT_REALTIME", profile }),
+      ];
+      await Promise.all([reader.ready(), writer.ready()]);
+      await checkRealtime(reader, writer, profile, "workers-conformance");
+      assert.equal(reader.capabilities.durability, "durable-object");
+    });
     await run("missing binding names itself", () =>
       assert.rejects(
         createCloudflareKvBindingCacheProvider({ binding: "MISSING", cacheId: prefix }).get("k"),

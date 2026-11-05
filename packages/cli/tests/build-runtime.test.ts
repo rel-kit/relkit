@@ -6,7 +6,7 @@ import { expect, test } from "bun:test";
 import { dockerfile } from "../src/commands/build-container.ts";
 import { serverImportsSource } from "../src/commands/build-server-imports.ts";
 import { serverSource } from "../src/commands/build-server.ts";
-import { workersEntrySource } from "../src/commands/build-workers-entry.ts";
+import { workersEntryOptions, workersEntrySource } from "../src/commands/build-workers-entry.ts";
 import { parseProjectArgs } from "../src/commands/project-args.ts";
 import type { ServerSourceEmission } from "../src/commands/build-server.types.ts";
 
@@ -88,6 +88,20 @@ test("a Workers server has no top-level await or disk static files, and its entr
   expect(workers.trimEnd().endsWith("}")).toBe(true);
 
   const entry = workersEntrySource();
+  expect(entry).not.toContain("RelkitRealtimeState");
+  expect(entry).toContain("async queue(batch, env) {");
+  expect(entry).toContain("batch.retryAll();");
+  expect(entry).toContain("async scheduled(controller, env) {");
+  expect(entry).toContain("env?.RELKIT_WORK");
+  expect(workersEntrySource({ durableObjectRealtime: true })).toContain(
+    'export { RelkitRealtimeState } from "@relkit/cloudflare/workers";',
+  );
+  expect(
+    workersEntryOptions({
+      nodes: [{ kind: "provider", adapter: { adapterId: "cloudflare-durable-object-realtime" } }],
+    }),
+  ).toEqual({ durableObjectRealtime: true });
+  expect(workersEntryOptions({ nodes: [] })).toEqual({});
   expect(entry).toContain('import("./index.ts")');
   expect(entry).toContain("functionHost: true");
   expect(entry).toContain('process.env.RELKIT_WORKER_ROLE = "api";');

@@ -1,6 +1,6 @@
 /**
  * Providers that use a Cloudflare Worker's own bindings instead of Cloudflare's HTTP APIs: a Workers
- * KV namespace for caches and an R2 bucket for buckets. They run only in a Worker built with
+ * KV namespace for caches, an R2 bucket for buckets and a Durable Object for realtime. They run only in a Worker built with
  * `relkit build --runtime workers`; the binding name is recorded in the graph, so
  * `relkit deploy init cloudflare` writes the matching `kv_namespaces` and `r2_buckets` entries.
  */
@@ -16,6 +16,7 @@ import {
 
 const cache = defineProviderCapability("cache");
 const bucket = defineProviderCapability("bucket");
+const realtime = defineProviderCapability("realtime");
 const integration = defineIntegrationReference("cloudflare");
 const noConnection = defineConnectionContract({});
 
@@ -94,6 +95,43 @@ export function r2Binding<const Binding extends string>(
     connection: {},
     behavior: defineProviderBehavior({ binding }),
   }) as CloudflareR2BindingAdapter<Binding>;
+}
+
+/** @experimental */
+export type DurableObjectRealtimeAdapter<Binding extends string = string> = ProviderAdapter<
+  typeof realtime,
+  "cloudflare-durable-object-realtime",
+  Readonly<Record<never, never>>,
+  ProviderBehavior<Readonly<{ binding: Binding }>>
+>;
+
+/**
+ * Defines realtime on a Durable Object namespace whose class is `RelkitRealtimeState` from
+ * `@relkit/cloudflare/workers`; the Workers build exports the class from the Worker. Every isolate
+ * shares the profile's channels, retained events and presence through one object.
+ * @param options - The namespace binding name.
+ * @returns The realtime adapter.
+ * @example
+ * ```ts
+ * import { durableObjectRealtime } from "@relkit/cloudflare";
+ * const realtime = durableObjectRealtime({ binding: "RELKIT_REALTIME" });
+ * ```
+ * @category Integrations
+ * @since 0.8.0
+ * @experimental
+ */
+export function durableObjectRealtime<const Binding extends string>(
+  options: CloudflareBindingOptions<Binding>,
+): DurableObjectRealtimeAdapter<Binding> {
+  const binding = bindingName(options, "Durable Object realtime binding");
+  return defineProviderAdapter({
+    integration,
+    capability: realtime,
+    adapterId: "cloudflare-durable-object-realtime",
+    connectionContract: noConnection,
+    connection: {},
+    behavior: defineProviderBehavior({ binding }),
+  }) as DurableObjectRealtimeAdapter<Binding>;
 }
 
 /**
