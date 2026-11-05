@@ -1,9 +1,22 @@
 {
   "protocol": "relkit.walkthrough-result",
-  "createdAt": "2026-11-05T20:09:30.233Z",
+  "createdAt": "2026-11-05T21:03:10.115Z",
   "kind": "create-to-railway",
-  "outcome": "failed",
-  "seconds": null,
-  "steps": [],
-  "note": "The Railway newcomer test failed (exit 1): Deploy failed (annotated by hand) Reproduced locally in a Linux container: relkit build in the Railway image fails with RELKIT_ROUTE_MODULE_TYPE for every route; see design D19, 'Decided while applying section 20'."
+  "outcome": "passed",
+  "seconds": 121,
+  "steps": [
+    {
+      "name": "create",
+      "seconds": 38
+    },
+    {
+      "name": "deployed",
+      "seconds": 117
+    },
+    {
+      "name": "reachable",
+      "seconds": 121
+    }
+  ],
+  "note": "Railway newcomer test (bun image): creation and install 38 s, then deploy until the app answers over HTTPS; packing the candidate (13 s) is excluded."
 }
