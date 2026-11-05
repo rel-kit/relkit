@@ -42,15 +42,16 @@ const WORKERS_PROVIDERS: Readonly<
   },
   cache: {
     allowed: ["cloudflare", "redis"],
-    use: "Workers KV (`kv()` from `@relkit/cloudflare`) or Redis over HTTP (`redis()` from `@relkit/redis` with an HTTP URL)",
+    use: "a Workers KV binding (`kvBinding()` from `@relkit/cloudflare`), Workers KV over its API (`kv()`), or Redis over HTTP (`redis()` from `@relkit/redis` with an `https://` URL)",
   },
   bucket: {
     allowed: ["cloudflare", "s3"],
-    use: "R2 (`r2()` from `@relkit/cloudflare`) or an S3-compatible bucket (`s3()` from `@relkit/s3`)",
+    use: "an R2 binding (`r2Binding()` from `@relkit/cloudflare`), R2 over its S3 API (`r2()`), or an S3-compatible bucket (`s3()` from `@relkit/s3`)",
   },
   "agent-state": {
-    allowed: ["redis"],
-    use: "Redis over HTTP (`redisAgentState()` from `@relkit/redis` with an HTTP URL)",
+    // Waiting for agent state changes needs a blocking Redis read, which HTTP cannot do.
+    allowed: [],
+    use: "No agent state provider runs on Workers yet: agent state waits on a blocking Redis read, which HTTP cannot do. Deploy apps with agents to a container target such as Railway.",
   },
 };
 
@@ -111,7 +112,9 @@ export function workersProviderDiagnostics(graphText: string, projectRoot: strin
       diagnostic(
         WORKERS_PROVIDER_CODE,
         `The ${profile.capability} profile ${profile.profile} (${profile.usage}) ${described}; Cloudflare Workers has no local filesystem and no long-lived process.`,
-        `Select a provider that runs on Workers for the profile: ${rule.use}. Or deploy to a container target such as Railway.`,
+        rule.allowed.length === 0
+          ? rule.use
+          : `Select a provider that runs on Workers for the profile: ${rule.use}. Or deploy to a container target such as Railway.`,
         profile.provider?.source ?? profile.firstUse?.source,
         projectRoot,
       ),

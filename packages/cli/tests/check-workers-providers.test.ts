@@ -133,6 +133,9 @@ test("each capability names the provider and a Workers alternative", () => {
     ],
   });
   expect(message(agents)?.message).toContain("The agent-state profile state (1 agent)");
+  expect(message(agents)?.suggestion).toContain("No agent state provider runs on Workers yet");
+  const redisAgents = agents.replace('"integrationId":"local"', '"integrationId":"redis"');
+  expect(message(redisAgents)?.message).toContain("uses the redis provider");
 });
 
 test("Workers providers, unused profiles and other databases pass; SQLite does not", () => {

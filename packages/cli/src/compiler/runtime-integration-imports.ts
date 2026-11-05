@@ -8,7 +8,10 @@ import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
 import { RuntimeIntegrationImportFailure } from "./runtime-integration-errors.js";
 export { RuntimeIntegrationImportFailure } from "./runtime-integration-errors.js";
-import type { RuntimeModuleImport } from "./runtime-integration-imports.types.js";
+import type {
+  RuntimeIntegrationImportOptions,
+  RuntimeModuleImport,
+} from "./runtime-integration-imports.types.js";
 import type { RuntimeIntegrationPlan } from "relkit/contracts";
 
 /**
@@ -20,7 +23,7 @@ import type { RuntimeIntegrationPlan } from "relkit/contracts";
 export const generateRuntimeIntegrationImportsEffect = Effect.fn(
   "Compiler.generateRuntimeIntegrationImports",
 )(
-  function* (plan: RuntimeIntegrationPlan) {
+  function* (plan: RuntimeIntegrationPlan, options: RuntimeIntegrationImportOptions = {}) {
     const modules = [
       ...new Map(
         plan.integrations.map((entry) => {
@@ -33,6 +36,24 @@ export const generateRuntimeIntegrationImportsEffect = Effect.fn(
         }),
       ).values(),
     ].sort((left, right) => moduleKey(left).localeCompare(moduleKey(right)));
+    if (options.workers === true) {
+      // A Worker has no files to check and may not await at the top of a lazily evaluated module:
+      // the bundle holds the versions `relkit build` checked, imported statically.
+      const statics = yield* Effect.forEach(modules, (entry, index) =>
+        specifierEffect(entry).pipe(
+          Effect.map(
+            (value) =>
+              `import * as __relkit_runtime_${index} from ${sourceJson(JSON.stringify(value))};`,
+          ),
+        ),
+      );
+      const listed = modules.map(
+        (entry, index) =>
+          `  { packageName: ${sourceJson(JSON.stringify(entry.packageName))}, packageVersion: ${sourceJson(JSON.stringify(entry.packageVersion))}, exportName: ${sourceJson(JSON.stringify(entry.exportName))}, module: __relkit_runtime_${index} },`,
+      );
+      if (statics.length === 0) return "export const runtimeIntegrationModules = [] as const;\n";
+      return `${statics.join("\n")}\n\nexport const runtimeIntegrationModules = [\n${listed.join("\n")}\n] as const;\n`;
+    }
     const imports = yield* Effect.forEach(modules, (entry, index) =>
       specifierEffect(entry).pipe(
         Effect.map(
@@ -62,7 +83,7 @@ await checkRuntimeIntegrations(${sourceJson(JSON.stringify(selectedPlan))}, { pr
 `;
     return `${preflight}${imports.join("\n")}\n\nexport const runtimeIntegrationModules = [\n${entries.join("\n")}\n] as const;\n`;
   },
-  (effect, plan) =>
+  (effect, plan, _options?: RuntimeIntegrationImportOptions) =>
     observeCompiler("generation", "generateRuntimeIntegrationImports", effect, () => ({
       registrations: plan.integrations.length,
     })),
@@ -71,11 +92,17 @@ await checkRuntimeIntegrations(${sourceJson(JSON.stringify(selectedPlan))}, { pr
 /**
  * Renders static imports for the selected runtime integrations.
  * @param plan - Resolved runtime integration registrations to import.
+ * @param options - `workers` renders static imports without the startup dependency check.
  * @returns Static TypeScript imports for selected runtime integrations.
  */
-export function generateRuntimeIntegrationImports(plan: RuntimeIntegrationPlan): string {
+export function generateRuntimeIntegrationImports(
+  plan: RuntimeIntegrationPlan,
+  options: RuntimeIntegrationImportOptions = {},
+): string {
   return runCompilerSync(
-    generateRuntimeIntegrationImportsEffect(plan).pipe(Effect.mapError((error) => error.cause)),
+    generateRuntimeIntegrationImportsEffect(plan, options).pipe(
+      Effect.mapError((error) => error.cause),
+    ),
   );
 }
 

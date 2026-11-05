@@ -11,6 +11,7 @@ import {
   RUNTIME_INTEGRATION_PLAN_FILE,
 } from "relkit/contracts";
 import { GENERATED_ARTIFACT_FILES } from "../compiler/index.js";
+import { generateRuntimeIntegrationImports } from "../compiler/runtime-integration-imports.js";
 import { cliOriginalError, cliTry, type CliAdapterError } from "../cli-errors.js";
 import { CliFileSystem } from "../services/filesystem.service.js";
 import { stageJobsEffect } from "./build-jobs.js";
@@ -92,7 +93,14 @@ export const writeBuildServer = Effect.fn("Project.buildServer")(function* (
     ["runtime.manifest.ts", cohort.manifestSource],
     [RUNTIME_ACTIVATION_FILE, `${canonicalJson(cohort.activationFingerprint)}\n`],
     [RUNTIME_INTEGRATION_PLAN_FILE, outputs.runtimeIntegrations],
-    [GENERATED_ARTIFACT_FILES.runtimeIntegrationImports, outputs.runtimeIntegrationImports],
+    [
+      GENERATED_ARTIFACT_FILES.runtimeIntegrationImports,
+      runtime === "workers"
+        ? generateRuntimeIntegrationImports(JSON.parse(outputs.runtimeIntegrations), {
+            workers: true,
+          })
+        : outputs.runtimeIntegrationImports,
+    ],
     ...(cohort.localServicesPlanSource === undefined
       ? []
       : [[GENERATED_ARTIFACT_FILES.localServices, cohort.localServicesPlanSource] as const]),

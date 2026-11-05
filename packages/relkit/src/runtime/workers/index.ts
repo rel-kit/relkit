@@ -41,6 +41,33 @@ const modules: RuntimeModules = Object.freeze({
   registry: undefined,
 });
 
+/** Global key under which the Workers entry stores the Worker's `env` for providers to read. */
+export const WORKERS_BINDINGS_KEY: symbol = Symbol.for("relkit.workers.bindings");
+
+/**
+ * Reads one binding (a KV namespace, R2 bucket, queue or Durable Object namespace) from the `env`
+ * the Workers entry received.
+ * @param name - Binding name from the wrangler configuration.
+ * @returns The binding object.
+ * @throws Error naming the binding when the Worker has none by that name, or when this code does
+ *   not run inside a Worker built by `relkit build --runtime workers`.
+ */
+export function workersBinding<Binding>(name: string): Binding {
+  const env = (globalThis as Record<symbol, Readonly<Record<string, unknown>> | undefined>)[
+    WORKERS_BINDINGS_KEY
+  ];
+  if (env === undefined)
+    throw new Error(
+      `Binding ${name} is only available inside a Worker built with \`relkit build --runtime workers\`.`,
+    );
+  const binding = env[name];
+  if (binding === undefined || binding === null || typeof binding !== "object")
+    throw new Error(
+      `The Worker has no binding named ${name}; add it to wrangler.jsonc (relkit deploy init cloudflare writes the bindings the graph needs).`,
+    );
+  return binding as Binding;
+}
+
 /** Runtime adapter for Cloudflare Workers. */
 export const workersRuntime: RuntimeAdapter = Object.freeze({
   name: "workers",

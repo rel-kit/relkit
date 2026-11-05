@@ -51,6 +51,16 @@
               "capability": "cache",
               "adapterId": "cloudflare-kv",
               "protocolVersion": 1
+            },
+            {
+              "capability": "cache",
+              "adapterId": "cloudflare-kv-binding",
+              "protocolVersion": 1
+            },
+            {
+              "capability": "bucket",
+              "adapterId": "cloudflare-r2-binding",
+              "protocolVersion": 1
             }
           ]
         }

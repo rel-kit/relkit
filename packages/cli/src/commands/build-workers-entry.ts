@@ -22,6 +22,8 @@ let environmentLoaded = false;
 
 /** Copies string bindings into process.env once per isolate; the build is a production build. */
 function loadEnvironment(env) {
+  // Providers read bindings (KV, R2, queues, Durable Objects) through relkit/runtime/workers.
+  globalThis[Symbol.for("relkit.workers.bindings")] = env ?? {};
   if (environmentLoaded) return;
   environmentLoaded = true;
   for (const [name, value] of Object.entries(env ?? {}))

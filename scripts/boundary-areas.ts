@@ -14,6 +14,8 @@ const protocolAreas: ReadonlySet<string> = new Set([
   "observability",
   "provider",
   "realtime",
+  // The runtime adapter contract: integrations pick their per-runtime client and read Workers bindings.
+  "runtime",
 ]);
 
 /** Further areas a named integration may use because it implements them. */

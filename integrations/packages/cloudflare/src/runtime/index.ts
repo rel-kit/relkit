@@ -1,9 +1,14 @@
 import type { RuntimeProviderContext, RuntimeProviderIntegration } from "relkit/provider";
 import { createCloudflareKvCacheProvider } from "./kv.js";
 import { createCloudflareR2BucketProvider } from "./r2.js";
+import {
+  createCloudflareKvBindingCacheProvider,
+  createCloudflareR2BindingBucketProvider,
+} from "./binding-providers.js";
 
 export * from "./kv.js";
 export * from "./r2.js";
+export * from "./binding-providers.js";
 
 /** @experimental */
 export const runtimeIntegration = Object.freeze({
@@ -38,6 +43,28 @@ export const runtimeIntegration = Object.freeze({
         });
         return { value: provider, ready: provider.ready, release: provider.close };
       },
+    },
+    {
+      capability: "cache",
+      adapterId: "cloudflare-kv-binding",
+      protocolVersion: 1,
+      create: ({ profile, behavior }: RuntimeProviderContext) => {
+        const provider = createCloudflareKvBindingCacheProvider({
+          binding: text(record(behavior, "Cloudflare KV binding").binding, "Cloudflare KV binding"),
+          cacheId: profile,
+        });
+        return { value: provider, release: provider.close };
+      },
+    },
+    {
+      capability: "bucket",
+      adapterId: "cloudflare-r2-binding",
+      protocolVersion: 1,
+      create: ({ behavior }: RuntimeProviderContext) => ({
+        value: createCloudflareR2BindingBucketProvider({
+          binding: text(record(behavior, "Cloudflare R2 binding").binding, "Cloudflare R2 binding"),
+        }),
+      }),
     },
   ]),
 }) satisfies RuntimeProviderIntegration<"cloudflare">;

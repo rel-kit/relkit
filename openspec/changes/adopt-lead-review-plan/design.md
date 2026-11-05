@@ -810,7 +810,41 @@ Decided while applying section 22 (maintainer, 2026-11-06):
   bindings serve or poll from a process; Postgres jobs and events because their worker loop and
   drain are unverified on Workers. A Drizzle service with the SQLite dialect fails with
   `RELKIT_WORKERS_SQLITE_UNSUPPORTED`, which suggests Postgres through Hyperdrive. Unused profiles
-  are not reported. Redis is accepted here; section 22.3 adds the rule that it must use HTTP.
+  are not reported. Redis is accepted for caches only, and must use an HTTP URL (task 22.3).
+
+- **Redis on Workers speaks HTTP, chosen by the URL.** `@relkit/redis` keeps one `url` secret: a
+  `redis://` or `rediss://` URL opens a socket as before, and an `http://` or `https://` URL sends
+  each command as one `fetch` POST of `[command, ...args]`, answered with `{ result }` or
+  `{ error }`, the REST protocol Upstash Redis and compatible proxies serve. The access token rides
+  in the URL's password and is sent as a bearer token, never in the request URL. On Workers a
+  socket URL fails at once with a message that asks for an HTTP URL; the runtime is read through
+  `relkit/runtime`'s `detectRuntime`, which is why `runtime` joined the `relkit` areas integrations
+  may import. HTTP serves caches only: realtime and agent state wait for changes with a blocking
+  `XREAD`, which the protocol cannot do, so their providers refuse an HTTP URL, and the Workers
+  check now accepts no provider for agent state (realtime on Workers is Durable Objects, 22.4).
+  `ioredis` stays a static import: it bundles and loads in workerd under `nodejs_compat` and is
+  never called there.
+- **KV and R2 get binding providers; the HTTP and S3 ones stay.** `kv()` (Cloudflare's KV REST
+  API) and `r2()` (R2's S3 API with signed URLs) already run anywhere `fetch` does, Workers
+  included. `kvBinding({ binding })` and `r2Binding({ binding })` add caches and buckets on the
+  Worker's own bindings (`cloudflare-kv-binding`, `cloudflare-r2-binding`), which need no API
+  token and record the binding name in the graph so the generator can declare it. The R2 binding
+  cannot sign URLs, so that bucket declares no signed-URL features and `r2()` remains the choice
+  for them. Providers read bindings through `workersBinding(name)` from `relkit/runtime/workers`,
+  on first use, from the `env` the Workers entry stores under `Symbol.for("relkit.workers.bindings")`
+  on every event; a missing binding or a call outside a Worker names the binding.
+- **Integration modules load statically in a Workers bundle.** The generated
+  `runtime-integrations.ts` checks installed integration versions on disk and loads each module
+  with a top-level `await`; neither works in a Worker. A Workers build renders it with static
+  imports and no startup check: the bundle contains exactly the versions `relkit build` checked.
+- **Conformance runs inside workerd.** `@relkit/cloudflare`'s `workers-conformance.test.ts` serves a
+  conformance Worker with a pinned `wrangler dev`, with a local KV namespace, a local R2 bucket and
+  a Redis REST proxy in front of a real Redis, and asserts each check passes there: the Redis
+  protocol and cache checks over HTTP (the same module the Bun and Node socket conformance runs,
+  now shared), the socket refusal, the KV and R2 binding checks, and the missing-binding error. It
+  runs with `RELKIT_TEST_WORKERS=1` and `REDIS_URL` (or `RELKIT_TEST_DOCKER=1`); unit tests run the
+  binding checks against in-memory bindings and the HTTP client against a stub endpoint in every
+  run.
 
 ### D10. Postgres durable backend (#12)
 
