@@ -63,6 +63,7 @@ export async function packPackages(
       "@relkit/redis",
       "@relkit/s3",
       "@relkit/postgres",
+      "@relkit/cloudflare",
     ],
     manifests,
     new Set(toolPackageVersions(resolve(import.meta.dir, "..")).keys()),

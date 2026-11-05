@@ -882,6 +882,26 @@ Decided while applying section 22 (maintainer, 2026-11-06):
   Cron calls left exactly one run per occurrence, and the conformance Worker's Durable Object check
   passed the shared realtime checks.
 
+- **The live newcomer deploy test passed against Cloudflare (2026-11-06).**
+  `scripts/cloudflare-newcomer.ts` follows the Railway and Vercel tests: opt-in
+  (`RELKIT_TEST_CLOUDFLARE=1`, wrangler credentials, `RELKIT_TEST_CLOUDFLARE_DATABASE_URL` for a
+  Postgres the Worker can reach), it packs the checkout, creates the `api` template, adds Postgres
+  jobs and events, `@relkit/cloudflare` with Durable Object realtime and the probe service plus a
+  public channel, names the Worker `relkit-test-<run id>`, runs `relkit deploy init cloudflare`,
+  creates the queue, deploys with a pinned wrangler, sets `DATABASE_URL`, and reads the outcomes from
+  the backend's tables. `@relkit/cloudflare` joined the packed candidate closure for it. The run on
+  the packed candidate, with a throwaway Railway Postgres behind a TCP proxy, passed: deployed after
+  52 s, `/healthz` ready over HTTPS after 84 s (readiness includes the realtime provider's first
+  Durable Object round trip), the HTTP job and the event consumer completed through the queue after
+  107 s, and two Cron-claimed occurrences each had exactly one run after 705 s; the Worker, the queue
+  and the database were deleted, and the Railway project was scheduled for deletion. Two lessons went
+  into the flow: Cloudflare refuses to delete a Worker that consumes a queue, so cleanup detaches the
+  consumer first, and a new Cron Trigger took about ten minutes to start firing (Cloudflare documents
+  up to 15), so the flow waits up to 15 minutes for two occurrences. A first run against a linked
+  scratch project showed both. `.github/workflows/cloudflare-newcomer.yml` runs the test when the
+  `RELKIT_TEST_CLOUDFLARE` variable is `1`; `tests/deployment/cloudflare-newcomer.test.ts` runs the
+  flow against stubs in every test run.
+
 - **`relkit deploy init cloudflare` writes three files from the graph.** With the Railway and
   Vercel rules (identical files kept, `RELKIT_DEPLOY_INIT_CONFLICT` unless `--force`,
   `cloudResourcesChanged: false`, the compiled graph required), it writes `wrangler.jsonc`, the

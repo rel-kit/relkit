@@ -38,7 +38,7 @@ function option(name: string): string | undefined {
  * @param adminUrl - URL of a role that may create databases.
  * @returns The admin port.
  */
-function databaseAdmin(adminUrl: string): DatabaseAdmin {
+export function databaseAdmin(adminUrl: string): DatabaseAdmin {
   const withDatabase = (name: string) => {
     const url = new URL(adminUrl);
     url.pathname = `/${name}`;
@@ -65,7 +65,7 @@ function databaseAdmin(adminUrl: string): DatabaseAdmin {
  * @param url - Database URL of the run.
  * @returns Queries over the backend's own tables.
  */
-async function postgresBackend(url: string): Promise<BackendReader> {
+export async function postgresBackend(url: string): Promise<BackendReader> {
   const sql = new SQL(url, { max: 1 });
   return {
     runs: async () => {
