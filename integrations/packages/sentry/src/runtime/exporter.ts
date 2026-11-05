@@ -40,7 +40,7 @@ export async function createSentryExporter(
   options: SentryExporterOptions,
 ): Promise<SentryExporter> {
   const dsn = required(options.dsn, "dsn");
-  const sdk = options.sdk ?? ((await import("@sentry/bun")) as SentrySdk);
+  const sdk = options.sdk ?? (await runtimeSdk());
   sdk.init({
     dsn,
     sendDefaultPii: false,
@@ -97,6 +97,15 @@ export async function createTelemetryExporter(
     flush: async (timeoutMs?: number) => void (await exporter.flush(timeoutMs)),
     close: async (timeoutMs?: number) => void (await exporter.close(timeoutMs)),
   });
+}
+
+/**
+ * Loads the Sentry SDK for the runtime this process runs on.
+ * @returns `@sentry/bun` on Bun and `@sentry/node` on Node.
+ */
+async function runtimeSdk(): Promise<SentrySdk> {
+  if (typeof process.versions.bun === "string") return (await import("@sentry/bun")) as SentrySdk;
+  return (await import("@sentry/node")) as SentrySdk;
 }
 
 function recordTags(record: RedactedObservabilityRecord): Readonly<Record<string, string>> {

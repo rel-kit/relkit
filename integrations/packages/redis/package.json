@@ -19,7 +19,8 @@
     "access": "public"
   },
   "engines": {
-    "bun": ">=1.3.10"
+    "bun": ">=1.3.10",
+    "node": ">=22.13.0"
   },
   "type": "module",
   "exports": {
@@ -72,6 +73,7 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
+    "ioredis": "5.11.1",
     "relkit": "workspace:*"
   }
 }

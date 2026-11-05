@@ -2278,6 +2278,142 @@ export interface DefineDrizzleServiceOptions<
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/service.types.ts#L9)
 
+## `index.ts`
+
+SQLite on Bun: `bun:sqlite` through Drizzle's `bun-sqlite` driver.
+
+### openBunSqlite
+
+Opens a database file with `bun:sqlite`, creating its folder.
+
+**Signature**
+
+```ts
+declare const openBunSqlite: OpenSqlite;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/bun/index.ts#L9)
+
+## `index.ts`
+
+Opens a SQLite database with the driver of the runtime the application runs on.
+
+### openSqliteDatabase
+
+Opens a SQLite database file, creating its folder, with `bun:sqlite` on Bun and `node:sqlite`
+on Node, so one Drizzle service runs on both.
+
+**Example**
+
+```ts
+import { openSqliteDatabase } from "@relkit/drizzle/sqlite";
+import { sql } from "drizzle-orm";
+
+const database = await openSqliteDatabase(":memory:");
+try {
+  console.assert((await database.all(sql`select 1 as one`)).length === 1);
+} finally {
+  database.$client.close();
+}
+```
+
+**Signature**
+
+```ts
+declare const openSqliteDatabase: <Relations extends AnyRelations = EmptyRelations>(
+  path: string,
+  config?: SqliteDatabaseConfig<Relations>,
+) => Promise<SqliteDatabase<Relations>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/index.ts#L24)
+
+Since v0.9.0
+
+### SqliteDatabase
+
+**Signature**
+
+```ts
+declare const SqliteDatabase: SqliteDatabase<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/index.ts#L4)
+
+### SqliteDatabaseConfig
+
+**Signature**
+
+```ts
+declare const SqliteDatabaseConfig: SqliteDatabaseConfig<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/index.ts#L4)
+
+## `index.ts`
+
+SQLite on Node: the built-in `node:sqlite` through Drizzle's `node-sqlite` driver.
+
+### openNodeSqlite
+
+Opens a database file with `node:sqlite` (Node 22.13 or later), creating its folder.
+
+**Signature**
+
+```ts
+declare const openNodeSqlite: OpenSqlite;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/node/index.ts#L9)
+
+## `sqlite-client.types.ts`
+
+The Drizzle SQLite database `openSqliteDatabase` returns on either runtime.
+
+### OpenSqlite (type alias)
+
+Opens one database file with a runtime's driver.
+
+**Signature**
+
+```ts
+type OpenSqlite = <Relations extends AnyRelations = EmptyRelations>(
+  path: string,
+  config?: SqliteDatabaseConfig<Relations>,
+) => SqliteDatabase<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/sqlite-client.types.ts#L18)
+
+### SqliteDatabase (type alias)
+
+A synchronous-driver Drizzle database whose native client can be closed.
+
+**Signature**
+
+```ts
+type SqliteDatabase<Relations extends AnyRelations = EmptyRelations> = SQLiteAsyncDatabase<
+  "sync",
+  unknown,
+  Relations
+> & { readonly $client: { close(): void } };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/sqlite-client.types.ts#L7)
+
+### SqliteDatabaseConfig (type alias)
+
+Drizzle settings passed through to the runtime's driver.
+
+**Signature**
+
+```ts
+type SqliteDatabaseConfig<Relations extends AnyRelations = EmptyRelations> =
+  DrizzleSQLiteConfig<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/sqlite-client.types.ts#L14)
+
 ## `sqlite.ts`
 
 sqlite native model typing; imports only this selected dialect's upstream declarations.
@@ -2304,7 +2440,27 @@ Native database injected into model extensions for the selected dialect.
 type DialectDatabase = Omit<SQLiteAsyncDatabase<any, any, any>, "query">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L10)
+
+### SqliteDatabase
+
+**Signature**
+
+```ts
+declare const SqliteDatabase: SqliteDatabase<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L7)
+
+### SqliteDatabaseConfig
+
+**Signature**
+
+```ts
+declare const SqliteDatabaseConfig: SqliteDatabaseConfig<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L7)
 
 ### defineModel
 
@@ -2316,7 +2472,20 @@ Declares lazy native extensions with this dialect's real transaction client type
 declare const defineModel: DefineModel<DialectDatabase>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L13)
+
+### openSqliteDatabase
+
+**Signature**
+
+```ts
+declare const openSqliteDatabase: <Relations extends AnyRelations = EmptyRelations>(
+  path: string,
+  config?: SqliteDatabaseConfig<Relations>,
+) => Promise<SqliteDatabase<Relations>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L6)
 
 ## `table.schemas.ts`
 

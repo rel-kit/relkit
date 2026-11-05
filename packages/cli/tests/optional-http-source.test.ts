@@ -23,7 +23,9 @@ test("generated options retain independently selected transports", () => {
 test("full and prepared generations await startup before listener publication", () => {
   for (const configuration of [selected, { ...selected, httpApplication: "prepared" as const }]) {
     const source = serverHttpSource(configuration);
-    expect(source.indexOf("await runtimeOwner.resource")).toBeLessThan(source.indexOf("Bun.serve"));
+    expect(source.indexOf("await runtimeOwner.resource")).toBeLessThan(
+      source.indexOf("relkitRuntime.serve"),
+    );
     expect(source).toContain("createPreparedApp(httpApplicationOptions");
     expect(source).toContain('internalEndpointsEnabled = environment !== "production"');
     expect(source).not.toContain('RELKIT_INTERNAL_ENDPOINTS === "1"');

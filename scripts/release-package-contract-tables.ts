@@ -51,6 +51,7 @@ export const relkitAreas = [
   "providers-local",
   "realtime",
   "routes",
+  "runtime",
   "runtime-effect",
   "runtime-hono",
   "schema",

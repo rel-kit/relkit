@@ -74,3 +74,83 @@ jobs:
           else
             gh issue create --title "$title" --body "$body"
           fi
+
+  node-canary:
+    name: Run ${{ matrix.template }} on Node ${{ matrix.node }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: write
+    strategy:
+      fail-fast: false
+      matrix:
+        template: [minimal, api, agent, fullstack, tasks]
+        node: ["22", "24"]
+    env:
+      CI: "1"
+      TEMPLATE: ${{ matrix.template }}
+      NODE_MAJOR: ${{ matrix.node }}
+    steps:
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: latest
+      - id: node
+        name: Record the Node version
+        run: echo "version=$(node --version)" >> "$GITHUB_OUTPUT"
+      - name: Create the template with the published creator
+        working-directory: ${{ runner.temp }}
+        run: bunx create-relkit@latest canary-app --template "$TEMPLATE" --no-git
+      - id: support
+        name: Check that the published CLI builds for Node
+        working-directory: ${{ runner.temp }}/canary-app
+        run: |
+          if bunx --no-install relkit build --help | grep -q -- "--runtime"; then
+            echo "node=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::The published @relkit/cli has no relkit build --runtime yet; the Node canary starts with the first release that has it."
+            echo "node=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build the production server for Node
+        if: steps.support.outputs.node == 'true'
+        working-directory: ${{ runner.temp }}/canary-app
+        run: bunx --no-install relkit build --runtime node
+      - name: Serve the build on Node until it answers
+        if: steps.support.outputs.node == 'true'
+        working-directory: ${{ runner.temp }}/canary-app
+        run: |
+          # Node reads no env files; export the template's example values instead.
+          if test -f .env.example; then set -a; . ./.env.example; set +a; fi
+          NODE_ENV=production PORT=3000 node .relkit/build/server/index.js > "$RUNNER_TEMP/node.log" 2>&1 &
+          server=$!
+          for _ in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3000/_relkit/v1/health/live > /dev/null; then
+              kill "$server"
+              exit 0
+            fi
+            if ! kill -0 "$server" 2> /dev/null; then break; fi
+            sleep 1
+          done
+          kill "$server" 2> /dev/null || true
+          cat "$RUNNER_TEMP/node.log"
+          exit 1
+      - name: Open or update the canary issue
+        if: failure() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          NODE_VERSION: ${{ steps.node.outputs.version }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Creation canary fails: $TEMPLATE template on Node $NODE_MAJOR"
+          body="Building the \`$TEMPLATE\` template from \`create-relkit@latest\` for Node and serving it on Node $NODE_VERSION failed. Run: $RUN_URL"
+          number="$(gh issue list --state open --search "\"$title\" in:title" --json number,title \
+            --jq "map(select(.title == \"$title\")) | .[0].number // empty")"
+          if test -n "$number"; then
+            gh issue comment "$number" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi

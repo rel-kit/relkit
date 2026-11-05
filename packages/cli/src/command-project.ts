@@ -33,6 +33,7 @@ export const executeProjectEffect = Effect.fn("Cli.project-command")(function* (
   }
   const result = yield* project.build({
     ...optionalProjectRoot(options.projectRoot),
+    ...(options.runtime === undefined ? {} : { runtime: options.runtime }),
     signal: context.signal,
   });
   let human: string | undefined;

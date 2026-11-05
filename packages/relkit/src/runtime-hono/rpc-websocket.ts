@@ -9,7 +9,7 @@ import { assertWebSocketRequest } from "./transport-security.js";
 /** Installs the oRPC WebSocket adapter on the same router and policies as HTTP RPC.
  * @param app - Hono application receiving the configured endpoints or middleware.
  * @param options - Application dependencies and configuration for this domain.
- * @param upgradeWebSocket - Bun adapter callback that upgrades an admitted native request.
+ * @param upgradeWebSocket - Runtime adapter callback that upgrades an admitted native request.
  * @returns Nothing; the requested update is applied to the owned state.
  */
 export function installRpcWebSocket(

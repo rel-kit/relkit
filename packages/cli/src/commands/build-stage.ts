@@ -29,6 +29,7 @@ export const stageBuildEffect = Effect.fn("Project.stageBuild")(
       input.options.mode === "development",
       input.options.bundleInputInventory,
       Object.keys(cohort.productionDependencies),
+      input.options.runtime,
     );
     yield* writeBuildMetadata(input, cohort);
     // Pending cancellation must win before the short publication transaction.

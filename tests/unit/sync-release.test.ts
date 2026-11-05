@@ -22,6 +22,7 @@ async function prepareProducers(fixture: string) {
     "build-catalog.types.ts",
     "release-plan.ts",
     "integration-dependency-metadata.ts",
+    "package-engines.ts",
   ])
     await copyFile(join(root, "scripts", file), join(fixture, "scripts", file));
   await copyFile(join(root, "package.json"), join(fixture, "package.json"));

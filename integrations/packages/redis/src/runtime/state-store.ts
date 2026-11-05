@@ -90,7 +90,7 @@ function createCore<State>(options: RedisStateStoreOptions<State>) {
         JSON.stringify(next),
       ]);
       if (Number(committed) === 1) return value;
-      await Bun.sleep(10);
+      await sleep(10);
     }
     throw new Error("Redis RelKit state update timed out.");
   };
@@ -145,7 +145,7 @@ async function waitForChange<State>(
       if (await recheck()) return;
     } catch (error) {
       if (signal.aborted) throw signal.reason;
-      await Bun.sleep(Math.min(250, Math.max(0, deadlineMs - Date.now())));
+      await sleep(Math.min(250, Math.max(0, deadlineMs - Date.now())));
       void error;
     } finally {
       signal.removeEventListener("abort", abort);
@@ -153,4 +153,9 @@ async function waitForChange<State>(
     }
   }
   if (signal.aborted) throw signal.reason;
+}
+
+/** Waits without blocking the event loop. @param milliseconds - Delay. @returns After the delay. */
+function sleep(milliseconds: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }

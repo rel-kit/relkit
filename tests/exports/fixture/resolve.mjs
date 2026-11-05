@@ -11,7 +11,7 @@ for (const [packageName, exports] of Object.entries(expected)) {
     const nativeBunLeaf =
       packageName === "create-relkit" ||
       packageName === "@relkit/cli" ||
-      (packageName === "relkit" && subpath === "./runtime-hono/bun");
+      (packageName === "relkit" && subpath === "./runtime/bun");
     if (bunOnly && !nativeBunLeaf && (typeof target === "string" || target.bun === undefined))
       continue;
     // A require-only entry, such as the CLI's editor plugin, is not an ESM import target.

@@ -25,10 +25,10 @@ export async function activateRelkitApplication(relkitMode = { embedded: false }
 
 /** Closes the activation function and starts the server when this module is the entry point. */
 const EMBEDDED_ACTIVATION_END = `}
-if (import.meta.main) await activateRelkitApplication();
+if (relkitEntryPoint) await activateRelkitApplication();
 `;
 /**
- * Emits the Bun entrypoint shared by dev, start, and the production container.
+ * Emits the server entrypoint shared by dev, start, and the production container.
  * @param graph - Validated application graph.
  * @param graphHash - Graph identity verified by the generated host.
  * @param activation - Atomic artifact activation identity.

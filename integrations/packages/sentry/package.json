@@ -19,7 +19,8 @@
     "access": "public"
   },
   "engines": {
-    "bun": ">=1.3.10"
+    "bun": ">=1.3.10",
+    "node": ">=22.13.0"
   },
   "type": "module",
   "exports": {
@@ -62,6 +63,19 @@
             "build",
             "runtime"
           ]
+        },
+        {
+          "package": "@sentry/node",
+          "supportedRange": "10.71.0",
+          "installSection": "dependencies",
+          "capabilities": [
+            "telemetry"
+          ],
+          "phases": [
+            "check",
+            "build",
+            "runtime"
+          ]
         }
       ]
     }
@@ -75,14 +89,19 @@
     "relkit": "workspace:*"
   },
   "peerDependencies": {
-    "@sentry/bun": "10.71.0"
+    "@sentry/bun": "10.71.0",
+    "@sentry/node": "10.71.0"
   },
   "peerDependenciesMeta": {
     "@sentry/bun": {
       "optional": true
+    },
+    "@sentry/node": {
+      "optional": true
     }
   },
   "devDependencies": {
-    "@sentry/bun": "10.71.0"
+    "@sentry/bun": "10.71.0",
+    "@sentry/node": "10.71.0"
   }
 }

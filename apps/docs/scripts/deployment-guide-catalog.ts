@@ -4,6 +4,7 @@ import { group, relation } from "./guide-catalog-helpers.js";
 export const deploymentGuideGroup = group("docs/modules/deployment", "Deployment", "CloudUpload", [
   "index",
   "local-docker",
+  "runtimes",
   "aws",
   "providers",
 ]);
@@ -18,6 +19,11 @@ export const deploymentGuideRelations = [
     "docs/modules/deployment/local-docker",
     ["app", "integrations/docker"],
     ["templates/default/v1/minimal/relkit.config.ts"],
+  ),
+  relation(
+    "docs/modules/deployment/runtimes",
+    ["app", "testing", "drizzle", "integrations/redis", "integrations/sentry"],
+    ["templates/default/v1/api/relkit.config.ts"],
   ),
   relation(
     "docs/modules/deployment/aws",

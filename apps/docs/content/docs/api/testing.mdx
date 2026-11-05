@@ -18,279 +18,7 @@ For configuration and examples, read [testing](/docs/modules/operations/testing)
 
 For a complete workflow, follow [from express or hono](/guides/migrate/from-express-or-hono), [cache product prices](/guides/caching/cache-product-prices), [build an offline agent](/guides/ai/build-an-offline-agent).
 
-## Most-used APIs
-
-These entries carry each API's contract and example. The complete reference follows.
-
-### invokeFunction
-
-Invokes a function descriptor through the engine's direct, transport-free path.
-
-**Example**
-
-```ts
-import { defineFunction } from "relkit/functions";
-import { z } from "relkit/schema";
-import { invokeFunction } from "@relkit/testing";
-
-export async function greetingExample(): Promise<string> {
-  const greet = defineFunction({
-    id: "greet",
-    input: z.string(),
-    output: z.string(),
-    handler: async (name) => `Hello ${name}`,
-  });
-  return invokeFunction(greet, "Ada");
-}
-```
-
-**Signature**
-
-```ts
-declare const invokeFunction: <
-  const Target extends StandaloneFunctionTarget,
-  Context extends { readonly signal: AbortSignal } = FunctionContextOf<Target>,
->(
-  target: Target,
-  input: FunctionInput<Target>,
-  options?: InvokeFunctionOptions<Context>,
-) => Promise<FunctionOutput<Target>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L52)
-
-Since v0.1.0
-
-### createTestApplication
-
-Creates an application owner with HTTP, deterministic runtime and provider services.
-
-**Example**
-
-```ts
-import { defineEnv } from "relkit/config";
-import { createTestApplication } from "@relkit/testing";
-async function testApplication(projectRoot: string): Promise<void> {
-  const app = await createTestApplication({ env: defineEnv({}) }, { projectRoot });
-  try {
-    await app.http.get("/");
-  } finally {
-    await app.close();
-  }
-}
-```
-
-**Signature**
-
-```ts
-declare const createTestApplication: (
-  app: { readonly env: object },
-  options?: TestApplicationOptions,
-) => Promise<TestApplication>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L32)
-
-Since v0.1.0
-
-## Complete reference
-
 <include>/_snippets/generated/exports/testing.mdx</include>
-
-## `agents-conformance-fixture.ts`
-
-Builds the conformance agent, its tools, a recording engine, state, trace and access hooks.
-
-### ConformanceRun (interface)
-
-Everything one case observes.
-
-**Signature**
-
-```ts
-export interface ConformanceRun {
-  readonly execution: AgentAdapterExecution;
-  readonly engineCalls: { readonly functionId: string; readonly input: unknown }[];
-  readonly accessRequests: AgentAccessRequest[];
-  readonly spans: { readonly span: string; outcome?: "ok" | "error" }[];
-  readonly threads: Map<string, AgentThreadState>;
-  readonly resolvedProfiles: (string | undefined)[];
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance-fixture.ts#L45)
-
-### conformanceRun
-
-Creates one agent execution with recording hooks.
-
-**Signature**
-
-```ts
-declare const conformanceRun: (
-  options: AgentConformanceOptions,
-  turns: readonly AgentConformanceTurn[],
-  access?: AgentAccessCheck,
-) => ConformanceRun;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance-fixture.ts#L61)
-
-### lookupTool
-
-**Signature**
-
-```ts
-declare const lookupTool: ToolDescriptor<"conformance.lookup">;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance-fixture.ts#L29)
-
-### refundTool
-
-**Signature**
-
-```ts
-declare const refundTool: ToolDescriptor<"conformance.refund">;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance-fixture.ts#L36)
-
-## `agents-conformance.ts`
-
-Shared agent adapter conformance suite. Every first-party adapter runs the same cases: tools
-through the engine, approvals, durable threads, AG-UI streaming, access rules, traces and model
-profiles. A case rejects with a description of the first broken expectation.
-
-### "./agents-conformance.types.js" (namespace export)
-
-Re-exports all named exports from the "./agents-conformance.types.js" module.
-
-**Signature**
-
-```ts
-export * from "./agents-conformance.types.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.ts#L15)
-
-### AGENT_CONFORMANCE_CASES
-
-The cases every adapter passes.
-
-**Signature**
-
-```ts
-declare const AGENT_CONFORMANCE_CASES: ReadonlyArray<AgentConformanceCase>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.ts#L18)
-
-### createAgentConformanceHarness
-
-Creates the conformance harness for one adapter.
-
-**Example**
-
-```ts
-import { createAgentAdapterRuntime, defineAgentRuntime } from "relkit/agent-adapters";
-import { createAgentConformanceHarness } from "@relkit/testing/agents-conformance";
-
-const harness = createAgentConformanceHarness({
-  adapter: () => defineAgentRuntime({ adapterId: "echo", integrationId: "echo", options: {} }),
-  runtime: createAgentAdapterRuntime({
-    adapterId: "echo",
-    turn: async () => ({ text: "", toolCalls: [] }),
-  }),
-  scriptedModel: () => ({}),
-});
-// In a test file: for (const item of harness.cases) test(item.description, () => harness.run(item.id));
-console.log(harness.cases.map((item) => item.id));
-```
-
-**Signature**
-
-```ts
-declare const createAgentConformanceHarness: (
-  options: AgentConformanceOptions,
-) => AgentConformanceHarness;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.ts#L60)
-
-## `agents-conformance.types.ts`
-
-Inputs and results of the shared agent adapter conformance suite.
-
-### AgentConformanceCase (interface)
-
-One conformance case.
-
-**Signature**
-
-```ts
-export interface AgentConformanceCase {
-  readonly id:
-    "tools" | "approvals" | "threads" | "streaming" | "access-rules" | "traces" | "model-profiles";
-  readonly description: string;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L26)
-
-### AgentConformanceHarness (interface)
-
-Cases plus a runner that rejects when the adapter breaks a case.
-
-**Signature**
-
-```ts
-export interface AgentConformanceHarness {
-  readonly cases: readonly AgentConformanceCase[];
-  readonly run: (caseId: AgentConformanceCase["id"]) => Promise<void>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L33)
-
-### AgentConformanceOptions (interface)
-
-What an adapter supplies to run the suite.
-
-**Signature**
-
-```ts
-export interface AgentConformanceOptions {
-  /** Creates the agent's `runtime` value, such as `langchain()`. */
-  readonly adapter: () => AgentRuntimeAdapterAny;
-  /** The adapter's runtime half, exported from its runtime entry. */
-  readonly runtime: AgentAdapterRuntime;
-  /** Builds the adapter's native scripted model from neutral turns. */
-  readonly scriptedModel: (turns: readonly AgentConformanceTurn[]) => unknown;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L16)
-
-### AgentConformanceTurn (interface)
-
-One scripted model turn, written once for every adapter.
-
-**Signature**
-
-```ts
-export interface AgentConformanceTurn {
-  readonly text?: string;
-  readonly toolCalls?: readonly {
-    readonly id: string;
-    /** Model-facing tool name, such as `conformance_lookup` or `relkit_output`. */
-    readonly name: string;
-    readonly input: unknown;
-  }[];
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L5)
 
 ## `application-acquisition.ts`
 
@@ -716,6 +444,37 @@ type TestRoute = TestFunctionRoute | TestRawRoute;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L38)
 
+## `application-server.ts`
+
+Points a test application's HTTP client at an already running server, so an application's HTTP
+suite can run against its production build on any runtime. Requests without an `Origin` get the
+server's own, as a browser on the app would send. Only `http` and `close` are available; members
+that need the in-process application throw when read.
+
+### TEST_SERVER_URL_VARIABLE
+
+Environment variable that selects a running server for `createTestApplication`.
+
+**Signature**
+
+```ts
+declare const TEST_SERVER_URL_VARIABLE: "RELKIT_TEST_SERVER_URL";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-server.ts#L14)
+
+### serverTestApplication
+
+Creates a test application whose HTTP client sends requests to a running server.
+
+**Signature**
+
+```ts
+declare const serverTestApplication: (server: string | URL) => TestApplication;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-server.ts#L21)
+
 ## `application-service-auth.ts`
 
 Composes auth over a borrowed database without taking a second disposal authority.
@@ -960,6 +719,38 @@ type TestServiceActivator = (
 
 General test application ownership with explicitly selected capability helpers.
 
+### createTestApplication
+
+Creates an application owner with HTTP, deterministic runtime and provider services.
+
+**Example**
+
+```ts
+import { defineEnv } from "relkit/config";
+import { createTestApplication } from "@relkit/testing";
+async function testApplication(projectRoot: string): Promise<void> {
+  const app = await createTestApplication({ env: defineEnv({}) }, { projectRoot });
+  try {
+    await app.http.get("/");
+  } finally {
+    await app.close();
+  }
+}
+```
+
+**Signature**
+
+```ts
+declare const createTestApplication: (
+  app: { readonly env: object },
+  options?: TestApplicationOptions,
+) => Promise<TestApplication>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L35)
+
+Since v0.1.0
+
 ### TestApplication
 
 **Signature**
@@ -968,7 +759,7 @@ General test application ownership with explicitly selected capability helpers.
 declare const TestApplication: TestApplication;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L14)
 
 ### TestApplicationHarness
 
@@ -978,7 +769,7 @@ declare const TestApplication: TestApplication;
 declare const TestApplicationHarness: typeof TestApplicationHarness;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L10)
 
 ### TestApplicationOptions
 
@@ -988,7 +779,7 @@ declare const TestApplicationHarness: typeof TestApplicationHarness;
 declare const TestApplicationOptions: TestApplicationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L14)
 
 ### TestApplicationPlatform
 
@@ -998,7 +789,7 @@ declare const TestApplicationOptions: TestApplicationOptions;
 declare const TestApplicationPlatform: typeof TestApplicationPlatform;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L11)
 
 ### TestApplicationPlatformLive
 
@@ -1008,7 +799,7 @@ declare const TestApplicationPlatform: typeof TestApplicationPlatform;
 declare const TestApplicationPlatformLive: Layer.Layer<TestApplicationPlatform, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L12)
 
 ### testApplicationLayer
 
@@ -1023,7 +814,7 @@ declare const testApplicationLayer: (
 ) => Layer.Layer<TestApplicationHarness, unknown, TestApplicationPlatform>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L66)
 
 ## `application.types.ts`
 
@@ -2766,7 +2557,7 @@ declare const createBunHttpListener: (
 ) => Promise<TestHttpListener>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.ts#L44)
 
 ### createTestHttpListener
 
@@ -2781,7 +2572,7 @@ declare const createTestHttpListener: (
 ) => Promise<TestHttpListener>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.ts#L19)
 
 ## `http-listener.types.ts`
 
@@ -2933,24 +2724,6 @@ export interface HttpPlatformService {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-owner.types.ts#L9)
 
-## `http-request-init.ts`
-
-### toRequestInit
-
-Converts the test request options to a native `RequestInit`.
-
-**Throws**
-
-TypeError when `json` and `body` are both supplied.
-
-**Signature**
-
-```ts
-declare const toRequestInit: (init: TestHttpRequestInit | undefined) => RequestInit | undefined;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-request-init.ts#L9)
-
 ## `http.ts`
 
 ### RealListenerPurpose
@@ -2961,7 +2734,7 @@ declare const toRequestInit: (init: TestHttpRequestInit | undefined) => RequestI
 declare const RealListenerPurpose: RealListenerPurpose;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L106)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L94)
 
 ### TestHttpApplication
 
@@ -2971,7 +2744,7 @@ declare const RealListenerPurpose: RealListenerPurpose;
 declare const TestHttpApplication: TestHttpApplication;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L16)
 
 ### TestHttpClient
 
@@ -2981,7 +2754,7 @@ declare const TestHttpApplication: TestHttpApplication;
 declare const TestHttpClient: TestHttpClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L18)
 
 ### TestHttpClientOptions
 
@@ -2991,7 +2764,7 @@ declare const TestHttpClient: TestHttpClient;
 declare const TestHttpClientOptions: TestHttpClientOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L17)
 
 ### TestHttpInput
 
@@ -3001,7 +2774,7 @@ declare const TestHttpClientOptions: TestHttpClientOptions;
 declare const TestHttpInput: TestHttpInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L14)
 
 ### TestHttpListener
 
@@ -3011,7 +2784,7 @@ declare const TestHttpInput: TestHttpInput;
 declare const TestHttpListener: TestHttpListener;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L107)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L95)
 
 ### TestHttpListenerOptions
 
@@ -3021,7 +2794,7 @@ declare const TestHttpListener: TestHttpListener;
 declare const TestHttpListenerOptions: TestHttpListenerOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L96)
 
 ### TestHttpRequest
 
@@ -3031,27 +2804,7 @@ declare const TestHttpListenerOptions: TestHttpListenerOptions;
 declare const TestHttpRequest: TestHttpRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L18)
-
-### TestHttpRequestInit
-
-**Signature**
-
-```ts
-declare const TestHttpRequestInit: TestHttpRequestInit<Json>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L19)
-
-### TestHttpResponse
-
-**Signature**
-
-```ts
-declare const TestHttpResponse: TestHttpResponse<Body>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L15)
 
 ### TestObservability
 
@@ -3061,17 +2814,7 @@ declare const TestHttpResponse: TestHttpResponse<Body>;
 declare const TestObservability: TestObservability;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L25)
-
-### TestProblemResponse
-
-**Signature**
-
-```ts
-declare const TestProblemResponse: TestProblemResponse;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L19)
 
 ### assertObservabilityHookTypes
 
@@ -3086,7 +2829,7 @@ declare const assertObservabilityHookTypes: (
 ) => readonly ObservabilityHookEvent[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L174)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L162)
 
 ### assertResponseStatus
 
@@ -3098,7 +2841,7 @@ Asserts the existing native HTTP response status.
 declare const assertResponseStatus: (response: Response, expected: number) => Response;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L117)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L105)
 
 ### createBunHttpListener
 
@@ -3111,7 +2854,7 @@ declare const createBunHttpListener: (
 ) => Promise<TestHttpListener>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L104)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L92)
 
 ### createHttpTestClient
 
@@ -3124,7 +2867,7 @@ declare const createHttpTestClient: (
 ) => TestHttpClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L90)
 
 ### createObservabilityAssertions
 
@@ -3134,7 +2877,7 @@ declare const createHttpTestClient: (
 declare const createObservabilityAssertions: () => TestObservability;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L166)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L154)
 
 ### createTestHttpClient
 
@@ -3149,7 +2892,7 @@ declare const createTestHttpClient: (
 ) => TestHttpClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L41)
 
 ### createTestHttpListener
 
@@ -3162,7 +2905,7 @@ declare const createTestHttpListener: (
 ) => Promise<TestHttpListener>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L103)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L91)
 
 ### createTestObservability
 
@@ -3174,7 +2917,7 @@ Creates a protocol/version-checked capture for engine-backed HTTP tests.
 declare const createTestObservability: () => TestObservability;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L153)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L141)
 
 ### responseJson
 
@@ -3189,7 +2932,7 @@ declare const responseJson: <T = unknown>(
 ) => Promise<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L130)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L118)
 
 ### responseText
 
@@ -3201,7 +2944,7 @@ Reads text after the optional native status assertion.
 declare const responseText: (response: Response, expectedStatus?: number) => Promise<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L144)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L132)
 
 ## `http.types.ts`
 
@@ -3218,7 +2961,7 @@ export interface TestHttpApplication {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L12)
 
 ### TestHttpClient (interface)
 
@@ -3239,7 +2982,7 @@ export interface TestHttpClient {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L28)
 
 ### TestHttpClientOptions (interface)
 
@@ -3258,7 +3001,7 @@ export interface TestHttpClientOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L18)
 
 ### TestHttpInput (type alias)
 
@@ -3274,54 +3017,15 @@ type TestHttpInput = Request | string | URL;
 
 ### TestHttpRequest (type alias)
 
-Native in-memory request operation that types the request and response JSON.
+Native in-memory request operation preserving RequestInit and Response contracts.
 
 **Signature**
 
 ```ts
-type TestHttpRequest = <Body = unknown, Json = unknown>(
-  input: TestHttpInput,
-  init?: TestHttpRequestInit<Json>,
-) => Promise<TestHttpResponse<Body>>;
+type TestHttpRequest = (input: TestHttpInput, init?: RequestInit) => Promise<Response>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L36)
-
-### TestHttpRequestInit (interface)
-
-`RequestInit` with a `json` shorthand for the request body.
-
-**Signature**
-
-```ts
-export interface TestHttpRequestInit<Json = unknown> extends RequestInit {
-  /** Serialized as the body, with `content-type: application/json` unless a header already sets one. */
-  readonly json?: Json;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L26)
-
-### TestHttpResponse (interface)
-
-Native `Response` whose JSON body has the type the test declares.
-
-**Example**
-
-```ts
-const response = await app.http.get<{ message: string }>("/hello");
-const { message } = await response.json();
-```
-
-**Signature**
-
-```ts
-export interface TestHttpResponse<Body = unknown> extends Response {
-  readonly json: () => Promise<Body>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L9)
 
 ### TestObservability (interface)
 
@@ -3341,19 +3045,7 @@ export interface TestObservability {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L70)
-
-### TestProblemResponse (type alias)
-
-Problem Details response that RelKit routes return for validation and declared errors.
-
-**Signature**
-
-```ts
-type TestProblemResponse = TestHttpResponse<ProblemDetails>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L40)
 
 ## `identity.ts`
 
@@ -3461,7 +3153,7 @@ declare const InvokeFunctionOptions: InvokeFunctionOptions<Context>;
 declare const JOBS_CONFORMANCE_FIXTURES: ReadonlyArray<JobsConformanceFixture>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L55)
 
 ### JobsConformanceFixture
 
@@ -3471,7 +3163,7 @@ declare const JOBS_CONFORMANCE_FIXTURES: ReadonlyArray<JobsConformanceFixture>;
 declare const JobsConformanceFixture: JobsConformanceFixture;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L57)
 
 ### JobsConformanceHarness
 
@@ -3481,7 +3173,7 @@ declare const JobsConformanceFixture: JobsConformanceFixture;
 declare const JobsConformanceHarness: JobsConformanceHarness;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L57)
 
 ### RealListenerPurpose
 
@@ -3601,7 +3293,7 @@ declare const TestClock: TestClock;
 declare const TestEventCloseOptions: TestEventCloseOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L60)
 
 ### TestEventDeliveryAttempt
 
@@ -3611,7 +3303,7 @@ declare const TestEventCloseOptions: TestEventCloseOptions;
 declare const TestEventDeliveryAttempt: TestEventDeliveryAttempt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L61)
 
 ### TestEventFake
 
@@ -3621,7 +3313,7 @@ declare const TestEventDeliveryAttempt: TestEventDeliveryAttempt;
 declare const TestEventFake: TestEventFake<Payload, Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L62)
 
 ### TestEventOptions
 
@@ -3631,7 +3323,7 @@ declare const TestEventFake: TestEventFake<Payload, Output>;
 declare const TestEventOptions: TestEventOptions<Payload, Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L63)
 
 ### TestEventPublishResult
 
@@ -3641,7 +3333,7 @@ declare const TestEventOptions: TestEventOptions<Payload, Output>;
 declare const TestEventPublishResult: TestEventPublishResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L64)
 
 ### TestEventTriggerOptions
 
@@ -3651,7 +3343,7 @@ declare const TestEventPublishResult: TestEventPublishResult;
 declare const TestEventTriggerOptions: TestEventTriggerOptions<Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L65)
 
 ### TestFailureControls
 
@@ -3753,26 +3445,6 @@ declare const TestHttpRequest: TestHttpRequest;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L47)
 
-### TestHttpRequestInit
-
-**Signature**
-
-```ts
-declare const TestHttpRequestInit: TestHttpRequestInit<Json>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L48)
-
-### TestHttpResponse
-
-**Signature**
-
-```ts
-declare const TestHttpResponse: TestHttpResponse<Body>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L49)
-
 ### TestJobsAdapter
 
 **Signature**
@@ -3781,7 +3453,7 @@ declare const TestHttpResponse: TestHttpResponse<Body>;
 declare const TestJobsAdapter: TestJobsAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L51)
 
 ### TestJobsAdapterOptions
 
@@ -3791,7 +3463,7 @@ declare const TestJobsAdapter: TestJobsAdapter;
 declare const TestJobsAdapterOptions: TestJobsAdapterOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L51)
 
 ### TestObservability
 
@@ -3801,17 +3473,7 @@ declare const TestJobsAdapterOptions: TestJobsAdapterOptions;
 declare const TestObservability: TestObservability;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L50)
-
-### TestProblemResponse
-
-**Signature**
-
-```ts
-declare const TestProblemResponse: TestProblemResponse;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L48)
 
 ### TestProviderReplacements
 
@@ -3904,7 +3566,7 @@ declare const createBunHttpListener: (
 declare const createDeterministicJobsAdapter: (options?: TestJobsAdapterOptions) => TestJobsAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L50)
 
 ### createHttpTestClient
 
@@ -3929,7 +3591,7 @@ declare const createJobsConformanceHarness: (
 ) => JobsConformanceHarness;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L53)
 
 ### createObservabilityAssertions
 
@@ -4024,7 +3686,7 @@ declare const createTestEvent: <Payload = unknown, Output = unknown>(
 ) => Promise<TestEventFake<Payload, Output>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L58)
 
 ### createTestEventFake
 
@@ -4036,7 +3698,7 @@ declare const createTestEventFake: <Payload = unknown, Output = unknown>(
 ) => Promise<TestEventFake<Payload, Output>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L58)
 
 ### createTestFakes
 
@@ -4082,7 +3744,7 @@ declare const createTestHttpListener: (
 declare const createTestJobsAdapter: (options?: TestJobsAdapterOptions) => TestJobsAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L50)
 
 ### createTestObservability
 
@@ -4167,9 +3829,48 @@ declare const runJobsConformance: (
 ) => Promise<readonly string[]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L54)
 
 ## `invoke-function.ts`
+
+### invokeFunction
+
+Invokes a function descriptor through the engine's direct, transport-free path.
+
+**Example**
+
+```ts
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
+import { invokeFunction } from "@relkit/testing";
+
+export async function greetingExample(): Promise<string> {
+  const greet = defineFunction({
+    id: "greet",
+    input: z.string(),
+    output: z.string(),
+    handler: async (name) => `Hello ${name}`,
+  });
+  return invokeFunction(greet, "Ada");
+}
+```
+
+**Signature**
+
+```ts
+declare const invokeFunction: <
+  const Target extends StandaloneFunctionTarget,
+  Context extends { readonly signal: AbortSignal } = FunctionContextOf<Target>,
+>(
+  target: Target,
+  input: FunctionInput<Target>,
+  options?: InvokeFunctionOptions<Context>,
+) => Promise<FunctionOutput<Target>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L52)
+
+Since v0.1.0
 
 ### FunctionContextOf
 

@@ -1,5 +1,5 @@
 /**
- * Exposes the prepared-only Bun HTTP boundary. REST uses the canonical eager
+ * Exposes the prepared-only HTTP boundary that runtime adapters serve. REST uses the canonical eager
  * policy directly, with selected SDKs initialized before acquisition returns.
  * Only legacy inspection selects a separate generation-owned router before
  * middleware runs, avoiding duplicate auth and request logs.
@@ -41,7 +41,7 @@ export async function createPreparedApp(
     const service = await runtime.runPromise(PreparedTransports);
     return {
       app: service.app,
-      fetch: (request, server) => {
+      fetch: (request, bindings) => {
         const internal = options.internalEndpoints;
         const mode = internal?.environment ?? internal?.mode ?? "development";
         if (
@@ -50,13 +50,13 @@ export async function createPreparedApp(
           mode === "production" ||
           !requiresDeferredTransport(new URL(request.url).pathname)
         ) {
-          return service.app.fetch(request, server);
+          return service.app.fetch(request, bindings);
         }
         return runtime
           .runPromise(service.load().pipe(Effect.provide(currentHttpContext())), {
             signal: request.signal,
           })
-          .then((app) => app.fetch(request, server));
+          .then((app) => app.fetch(request, bindings));
       },
       close: () => runtime.dispose(),
     };

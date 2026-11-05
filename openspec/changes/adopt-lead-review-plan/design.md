@@ -164,6 +164,84 @@ Node server; the Workers adapter exports a fetch handler with no filesystem. `re
 standard Redis client on Node, an HTTP-based Redis client for Workers, and a per-runtime SQLite
 driver. A portability check bans `Bun.*` and `node:` imports outside adapters.
 
+Decided while applying section 14 (maintainer, 2026-11-05):
+
+- **Adapters live in `relkit/runtime`.** `relkit/runtime` holds the `RuntimeAdapter` contract
+  (`serve`, `upgradeWebSocket`, `files`, `crypto`, `environment`, with `files` undefined for a
+  runtime without a filesystem) and `currentRuntime()`, which picks the adapter from
+  `process.versions.bun`. `relkit/runtime/bun` wraps `Bun.serve`, Hono's Bun WebSocket handler,
+  `Bun.file` and `Bun.SHA256`; `relkit/runtime/node` uses `@hono/node-server` 2.x, whose built-in
+  WebSocket support runs on `ws`, plus `fs.openAsBlob` and `node:crypto`. `relkit/runtime-hono/bun`
+  goes away. The request path passes the adapter's per-request bindings through unchanged, static
+  files open their bodies through `files`, and the inspector bridge listens through `serve`. The
+  generated server imports the selected adapter as `relkitRuntime`. Node's listener has no body
+  limit of its own, so RelKit's `maxBodyBytes` middleware alone limits bodies there.
+- **The portability check is a shrink-only baseline.** `scripts/portability.ts`, wired into
+  `bun run check`, parses package sources and rejects `Bun.*` references, `bun`/`bun:*` imports and
+  `node:` imports outside adapters. Adapters are files under a `bun/` or `node/` directory or named
+  `*.bun.ts`/`*.node.ts`. `Bun.*` is checked in every package; `node:` is checked only in packages
+  that run inside applications, because the CLI, the creator, `@relkit/testing` and the inspector
+  tool only run on Tier 1 runtimes, where `node:` modules are portable. Call sites that existed when
+  the check landed (the dev supervisor and snapshot code that section 13 rewrites, the CLI's
+  subprocess and glob code, and the `node:` imports of `relkit` areas) are counted per file in
+  `scripts/portability-baseline.json`; a file's count may only shrink, and
+  `--update-baseline` only lowers counts.
+- **`relkit build --runtime node` keeps Bun for installs.** The bundle targets Node and the server
+  imports `relkit/runtime/node`; Node 22 has no `import.meta.main`, so the Node entry point compares
+  `import.meta.url` with `process.argv[1]`. The Node Dockerfile is two-stage: the pinned Bun image
+  runs `bun install --production`, which applies the selected `patchedDependencies` that npm does
+  not support, and a pinned `node:24.22.0-bookworm-slim` image runs `node server/index.js` as the
+  `node` user. `manifest.json` gains `"runtime": "node"` only for Node builds, so Bun builds stay
+  byte-identical. `relkit dev` and `relkit start` still run on Bun.
+- **The template's own HTTP tests check the production build.** `RELKIT_TEST_SERVER_URL` makes
+  `createTestApplication` send `testApp.http` requests to a running server, adding the server's
+  origin when a test sends none, because production servers reject unsafe requests without one.
+  `scripts/runtime-http-suite.ts` packs the checkout, creates `api` from a local registry, runs
+  `relkit build --runtime <bun|node>`, starts the server with the chosen executable and runs
+  `bun test tests/integration` against it. The test runner stays Bun; the server under test is
+  the one that changes runtime.
+- **Integrations pick their client per runtime, at load time.** `@relkit/redis` sends every
+  command through a small native-client interface: `Bun.RedisClient` on Bun (unchanged) and
+  `ioredis` 5 on Node, both without retries or an offline queue. `@relkit/sentry` imports
+  `@sentry/bun` or `@sentry/node`; the integration's dependency list names both (same version,
+  and `@sentry/bun` already depends on `@sentry/node`), because the requirement schema has no
+  runtime field yet. `@relkit/drizzle/sqlite` gains `openSqliteDatabase(path)`, which uses
+  `bun:sqlite` on Bun and `node:sqlite` on Node; `node:sqlite` is unflagged from Node 22.13 and
+  prints an experimental warning on Node 22 and 24. Conformance modules are plain JavaScript that
+  import the built packages, so the same file runs under `bun` and `node`; Redis runs against a
+  Docker Redis behind `RELKIT_TEST_DOCKER=1`.
+- **Not moved in section 14:** `relkit add database --dialect sqlite` still writes a `bun:sqlite`
+  service, because the dev snapshot import policy that section 13 removes allow-lists exactly
+  those imports; switching the scaffold to `openSqliteDatabase` is a follow-up once that lands.
+  The AWS Valkey client (`@relkit/aws`) still imports `RedisClient` from `bun` and stays Bun-only.
+- **`engines` comes from one table.** `scripts/package-engines.ts` gives every published package
+  `bun: ">=1.3.10"` and, unless it is listed as Bun-only, `node: ">=22.13.0"` (the first Node 22
+  with `node:sqlite` unflagged); release sync writes it and the release check compares it. The
+  Bun-only list names its reason: `@relkit/cli` and `create-relkit` until task 14.5's work lands
+  everywhere they spawn and serve, `@relkit/testing` for its in-process transpiler, and
+  `@relkit/aws` for its Valkey client. A unit test fails when a Bun-only package has no Bun call
+  site left in the portability baseline, so the list cannot outlive its reason. The inspector keeps
+  its Next.js range, `node: ">=20.9.0"`. `@relkit/docker` moved to `node:child_process` so it can
+  list Node.
+- **The runtime matrix gates merges through the CI Gate.** The `runtime-http` job runs the
+  adapter test and the `api` HTTP suite on Bun 1.3.10, Node 22 and Node 24, and the Node legs also
+  run the Redis, Sentry and SQLite conformance runners (each spawns both runtimes). The CI Gate
+  requires the job's result to be `success`, and a unit test runs the gate's shell step with that
+  result set to `failure`, `cancelled` or `skipped` to show each one blocks. The nightly creation
+  canary gains a `node-canary` job for every template on Node 22 and 24: it creates with the
+  published creator, builds with `--runtime node` and serves on Node until liveness answers. Until
+  a release ships `relkit build --runtime`, that job notes the missing option and passes.
+- **Task 14.5 stays open.** The creator and the CLI still need Bun: `create-relkit` installs with
+  `bun install` (its output schema names that command) and writes Bun scripts and
+  `packageManager: bun@1.3.10` into templates; the `relkit` launcher runs the CLI under Bun; the
+  compiler's evaluator and the dev supervisor spawn, serve and evaluate TypeScript through Bun; and
+  `relkit build` bundles with `bun build`. The evaluator and supervisor are being rewritten in
+  section 13, so moving them waits for that work. Running the CLI on Node also needs a TypeScript
+  loader for application sources and another bundler. The production server already runs on
+  Node through `relkit build --runtime node`.
+- **Docs:** `/docs/modules/deployment/runtimes` lists the tiers, the Bun-only packages, building,
+  running and testing on Node, the Node container image and the per-runtime integration clients.
+
 ### D8. TypeScript 7 (#11)
 
 Generated declaration files (`route-module-checks.ts`, context and event registries) carry every type

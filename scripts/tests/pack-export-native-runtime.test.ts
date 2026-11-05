@@ -42,15 +42,15 @@ async function packedHonoLeaf(root: string) {
     recursive: true,
   });
   const manifest = await Effect.runPromise(readExportManifest(packed));
-  const target = manifest.exports?.["./runtime-hono/bun"];
+  const target = manifest.exports?.["./runtime/bun"];
   expect(target).toEqual({
-    types: "./dist/runtime-hono/bun.d.ts",
-    import: "./dist/runtime-hono/bun.js",
+    types: "./dist/runtime/bun/index.d.ts",
+    import: "./dist/runtime/bun/index.js",
   });
   await mkdir(fixture, { recursive: true });
   await writeFile(
     join(fixture, "expected-exports.json"),
-    JSON.stringify({ relkit: { "./runtime-hono/bun": target } }),
+    JSON.stringify({ relkit: { "./runtime/bun": target } }),
   );
   await cp(
     resolve(import.meta.dirname, "../../tests/exports/fixture/resolve.mjs"),

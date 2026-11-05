@@ -1,4 +1,5 @@
 /** Synchronizes owning manifests, selected dependency metadata and starter catalogs through the release producers. */
+import { packageEngines } from "./package-engines.js";
 import { readFile, writeFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { workspacePackageDirectories } from "./workspace-packages.js";
@@ -87,7 +88,7 @@ for (const directory of workspacePackageDirectories(root)) {
           ? ["dist", "src/catalog-resolution.ts", "src/catalog-resolution.types.ts"]
           : ["dist"],
     publishConfig: { access: "public" },
-    engines: { bun: ">=1.3.10", ...(name === "@relkit/inspector" ? { node: ">=20.9.0" } : {}) },
+    engines: packageEngines(name),
     ...rest,
     ...(relkitMetadata === undefined ? {} : { relkit: relkitMetadata }),
     ...(metadataPackages.has(name)

@@ -1,3 +1,4 @@
+import { packageEngines } from "./package-engines.js";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { basename, join, relative, resolve } from "node:path";
@@ -190,8 +191,7 @@ export function checkManifests(
               : ["dist"],
         ) ||
       item.manifest.publishConfig?.access !== "public" ||
-      item.manifest.engines?.bun !== ">=1.3.10" ||
-      (directoryName === "inspector" && item.manifest.engines?.node !== ">=20.9.0") ||
+      JSON.stringify(item.manifest.engines) !== JSON.stringify(packageEngines(item.name)) ||
       item.manifest.private === true
     )
       throw new Error(`Release metadata mismatch: ${item.name}`);

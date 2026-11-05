@@ -1,9 +1,10 @@
 /**
- * Adapts Bun listeners and Fetch forwarding to the private bridge contract.
+ * Adapts runtime listeners and Fetch forwarding to the private bridge contract.
  * FiberSet joins request operations when the listener's Scope closes; native
  * forwarding keeps cancellation and never follows redirects with credentials.
  */
 import { Context, Effect, Exit, FiberSet, Layer, Scope } from "effect";
+import { currentRuntime } from "../../runtime/index.js";
 import { connectionAttempt, InspectionConnectionError } from "./connection-error.js";
 import type { InspectionNativeOperations } from "./bridge.types.js";
 import { ownInspectionResponse } from "./native-response.js";
@@ -22,7 +23,7 @@ export class InspectionNative extends Context.Service<
   ),
 }) {}
 
-/** How long listener retirement waits for Bun to confirm a forced stop. */
+/** How long listener retirement waits for the runtime to confirm a forced stop. */
 const LISTENER_CLOSE_CONFIRMATION = "2 seconds";
 
 /** Supplies native adapters without binding until the bridge is explicitly started. */
@@ -39,22 +40,20 @@ const listenInspection: InspectionNativeOperations["listen"] = (options, handler
     const run = yield* FiberSet.makeRuntimePromise<never, Response, never>();
     const responses = yield* Scope.make();
     const server = yield* Effect.acquireRelease(
-      connectionAttempt("listener.bind", () =>
-        Promise.resolve(
-          Bun.serve({
-            hostname: options.host,
-            port: options.port,
-            // Control readers bound their bytes; streamed app requests use the application's limits.
-            maxRequestBodySize: Infinity,
-            fetch: (request) =>
-              run(
-                handler(request).pipe(
-                  Effect.flatMap((response) => ownInspectionResponse(response, responses)),
-                ),
-                { signal: request.signal },
+      connectionAttempt("listener.bind", async () =>
+        (await currentRuntime()).serve({
+          hostname: options.host,
+          port: options.port,
+          // Control readers bound their bytes; streamed app requests use the application's limits.
+          maxRequestBodySize: Infinity,
+          fetch: (request) =>
+            run(
+              handler(request).pipe(
+                Effect.flatMap((response) => ownInspectionResponse(response, responses)),
               ),
-          }),
-        ),
+              { signal: request.signal },
+            ),
+        }),
       ).pipe(
         Effect.onExit((exit) =>
           Exit.isFailure(exit) ? Scope.close(responses, exit) : Effect.void,

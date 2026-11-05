@@ -101,6 +101,9 @@ marked **Advisory** have no check.
   configs.
 - **Enforced:** Keep implementation files at or below 250 lines; split by
   responsibility. Files already over the limit may only shrink.
+- **Enforced:** Keep `Bun.*` calls and `bun:` imports in runtime adapters
+  (`relkit/runtime/bun`, `relkit/runtime/node`), and `node:` imports too outside the
+  CLI, creator, testing and inspector tools; older call sites may only shrink.
 - **Enforced:** Do not commit bug-fix reports, raw evidence, or machine-specific
   paths. Link the GitHub issue, keep full reports in CI artifacts, and use
   repository-relative paths.
