@@ -4,4 +4,4 @@
 "@relkit/cli": patch
 ---
 
-Breaking: `@relkit/integrations` and `@relkit/providers-standard` are no longer published. `create-relkit` now carries the integration catalog, and `relkit add` refuses an integration package that is not part of the current release. The AWS deployment components from `@relkit/cloud-aws` now live inside `@relkit/aws`, and Pulumi is an optional peer dependency there. See the [0.9 migration guide](https://relkit.dev/guides/migrate/relkit-0-9).
+Breaking: `@relkit/integrations` and `@relkit/providers-standard` are no longer published. `create-relkit` now carries the integration catalog, and `relkit add` refuses an integration package that is not part of the current release. The AWS deployment components from `@relkit/cloud-aws` now live inside `@relkit/aws`, and Pulumi is an optional peer dependency there. See the [0.9 migration guide](https://relkit.dev/guides/migrate/relkit-0-9#packages-and-imports).

@@ -3,7 +3,7 @@
  * and rate-limit policies. The rate-limit reference addresses the declared cache
  * by its stable identity without importing a private service implementation.
  */
-import { defineServiceRoutes, http } from "@relkit/app/routes";
+import { defineServiceRoutes, http } from "relkit/routes";
 import { z } from "zod";
 import orders from "../../services/orders/service.js";
 

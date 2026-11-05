@@ -1,5 +1,5 @@
 /** Declares auth/database environment requirements without selecting inspection. */
-import { defineApp, defineEnv, env } from "@relkit/app/config";
+import { defineApp, defineEnv, env } from "relkit/config";
 
 export default defineApp({
   env: defineEnv({

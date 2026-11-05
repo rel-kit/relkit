@@ -473,13 +473,20 @@ Enable the inspector bridge and its local UI
 
 `relkit add inspector` — Enable the inspector bridge and its local UI
 
-### `relkit migrate <command>`
+### `relkit migrate [--write | --rollback <record>]`
 
-Preview and apply source layout migrations
+Preview and apply the 0.9 code migration, or layout migrations
+
+| Option         | Value   | Description                                                                      |
+| -------------- | ------- | -------------------------------------------------------------------------------- |
+| --project-root | string  | Application directory (defaults to cwd)                                          |
+| --write        | boolean | Apply the previewed changes and write a migration record                         |
+| --rollback     | string  | Restore files from a migration record; refuses to overwrite later edits          |
+| --contract     | string  | Client contract (client-contract.json) used to name api properties for hook keys |
 
 #### Examples
 
-`relkit migrate` — Preview and apply source layout migrations
+`relkit migrate` — Preview and apply the 0.9 code migration, or layout migrations
 
 #### `relkit migrate layout`
 

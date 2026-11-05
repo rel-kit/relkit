@@ -1,0 +1,331 @@
+---
+title: Migrate to RelKit 0.9
+description: Upgrade an application from RelKit 0.8 to 0.9 with relkit migrate, then change by hand the few places it lists.
+pagination: false
+search:
+  keywords: [upgrade, "0.9", relkit migrate, codemod, breaking changes, "@relkit/app"]
+sidebar:
+  icon: arrow-up-circle
+---
+
+RelKit 0.9 is one breaking release: the `relkit` package replaces `@relkit/app`, each concept keeps one spelling, handlers call what they declare through `ctx`, and error responses use Problem Details. `relkit migrate` rewrites almost all of it for you. This guide shows what it changes, section by section, and what you change by hand.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  Commit or stash your work first: `relkit migrate --write` refuses to change a file with
+  uncommitted changes. The example on this page lives in
+  [`apps/docs/examples/migrate-0-9`](https://github.com/rel-kit/relkit/tree/main/apps/docs/examples/migrate-0-9):
+  `before` holds the 0.8 files and `src` the files `relkit migrate` writes from them, and the
+  documentation tests check both.
+</Callout>
+
+## Run the migration [#run-relkit-migrate]
+
+<Steps>
+<Step icon="package">
+
+### Upgrade the packages
+
+In your project folder, install 0.9 of `relkit` and the CLI:
+
+```sh
+bun add relkit@0.9
+bun add -d @relkit/cli@0.9
+```
+
+Keep `@relkit/app` installed for now; `relkit migrate` removes it from `package.json`.
+
+</Step>
+<Step icon="eye">
+
+### Preview the changes
+
+```sh
+bunx relkit migrate
+```
+
+The preview lists every file it would change and the rules that change it, then every place it cannot change, as `file:line` with what to do. It writes nothing.
+
+</Step>
+<Step icon="pencil">
+
+### Apply them
+
+```sh
+bunx relkit migrate --write
+```
+
+It prints the path of a migration record under `.relkit/migrations`. Change the places listed under "Change these by hand", then run:
+
+```sh
+bun install
+bun run check
+bun run typecheck
+bun run test
+```
+
+</Step>
+<Step icon="undo-2">
+
+### Undo, if you need to
+
+```sh
+bunx relkit migrate --rollback .relkit/migrations/<id>/receipt.json
+```
+
+Rollback restores every file the migration changed and deletes the files it created. If you edited one of them afterwards, it changes nothing and names the file.
+
+</Step>
+</Steps>
+
+A frontend in its own folder, such as a Next.js app that uses `@relkit/client`, needs the backend's client contract to rename hook keys. Run `relkit check` in the backend, then pass the contract:
+
+```sh
+bunx relkit migrate --contract ../api/.relkit/generated/client-contract.json
+```
+
+## Packages and imports [#packages-and-imports]
+
+`relkit` is the core package, and `@relkit/app` only re-exports it. The 25 packages it replaced, such as `@relkit/functions`, and the tool packages merged into `@relkit/cli`, `@relkit/inspector` and `@relkit/pulumi` are no longer published. `relkit migrate` rewrites imports and `package.json`:
+
+```ts title="src/services/orders/functions/price-order.function.ts — 0.8"
+import { defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
+```
+
+<include
+  source="apps/docs/examples/migrate-0-9/src/services/orders/functions/price-order.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/price-order.function.ts — 0.9"'
+>
+  /_snippets/source/apps/docs/examples/migrate-0-9/src/services/orders/functions/price-order.function.ts
+</include>
+
+The `relkit` root exports only the Promise APIs an application writes against. An import from the `@relkit/app` root of any other name stays on `@relkit/app` and is listed: import it from its `relkit/<area>` subpath, or from `relkit/effect` for the Effect forms such as `failEffect` and `defineFunctionEffect`. Subpaths lose their `internal` segment, and `relkit/runtime-hono/bun` becomes `relkit/runtime/bun`. `@relkit/integrations`, `@relkit/providers-standard` and `@relkit/cloud-aws` have no replacement import and are listed.
+
+## The schema builder is `s` [#schema-builder]
+
+`relkit/schema` exports the built-in builder as `s`; `z` still works as a deprecated alias. `relkit migrate` renames the import and every use, and leaves `z` from `zod` alone. If your file already uses the name `s`, it imports `s as z` instead.
+
+## One spelling for each concept [#one-spelling]
+
+| 0.8                                   | 0.9                                |
+| ------------------------------------- | ---------------------------------- |
+| `toJsonSchema` from `relkit/schema`   | `getJsonSchema`                    |
+| `s.undefined()`                       | `s.void()`                         |
+| `defineRequestTransform`              | `defineTransform`                  |
+| `defineApp({ job: … })`               | `defineApp({ jobs: … })`           |
+| `defaults: { job: "…" }`              | `defaults: { jobs: "…" }`          |
+| `defineJob({ profile: "…" })`         | `defineJob({ service: "…" })`      |
+| `tool.invokeEffect(input)`            | `callToolEffect(tool, input)`      |
+| `node.invokeEffect(input)` on a graph | `callGraphNodeEffect(node, input)` |
+
+`relkit migrate` makes each change. When both spellings are already set, it lists the line instead of choosing one, and it lists `invokeEffect` calls on anything other than a tool imported from a `.tool` file.
+
+## Legacy jobs [#legacy-jobs]
+
+The function-target `defineJob` from `relkit/jobs/legacy` and its queue runtime were removed. `relkit migrate` lists each legacy job, because the task that replaces it needs an output and retry policy you choose. Define a task for the work and a task-backed job:
+
+```ts title="src/services/receipts/jobs/send-receipt.job.ts — 0.9"
+import { defineJob, defineTask } from "relkit/jobs";
+import { s } from "relkit/schema";
+
+export const sendReceiptTask = defineTask({
+  id: "receipts.send",
+  version: "1",
+  input: s.object({ orderId: s.string() }),
+  output: s.object({ receiptId: s.string() }),
+  handler: async ({ orderId }) => ({ receiptId: `receipt-${orderId}` }),
+});
+
+export default defineJob({ name: "sendReceipt", task: sendReceiptTask, service: "queue" });
+```
+
+`relkit migrate` rewrites `ctx.jobs.<name>.enqueue(input)` to `trigger(input)`. A run reports `runId` instead of `instanceId`, and the places that read `instanceId` are listed.
+
+## Explicit error IDs [#error-ids]
+
+An error's ID is its public `code`, so `defineError` needs an `id`. Earlier versions inferred it from the file path and the error's name; `relkit migrate` writes exactly that ID, so your API's error codes do not change:
+
+```ts title="src/services/orders/errors/order-not-found.error.ts — 0.8"
+const OrderNotFound = defineError({
+  data: z.object({ orderId: z.string() }),
+  message: ({ orderId }) => `Order ${orderId} was not found`,
+  http: { status: 404 },
+});
+```
+
+<include
+  source="apps/docs/examples/migrate-0-9/src/services/orders/errors/order-not-found.error.ts"
+  lang="ts"
+  meta='title="src/services/orders/errors/order-not-found.error.ts — 0.9"'
+>
+  /_snippets/source/apps/docs/examples/migrate-0-9/src/services/orders/errors/order-not-found.error.ts
+</include>
+
+An error created without a name, such as `defineError({ … })` inside an `errors` array, had no stable code and is listed.
+
+## Declare what a handler publishes [#dependency-declarations]
+
+`publishes: ["orders.placed"]` is gone. Declare the event under `dependencies.events` and publish through its name on `ctx`. `relkit migrate` finds each event's `defineEvent({ id })`, imports it, and rewrites `context.events["orders.placed"]` to `context.events.orderPlaced`. An event ID it cannot find is listed.
+
+## Call functions and channels through `ctx` [#context-calls]
+
+Function descriptors lost `invoke()` and channels lost `trigger()` and `getPresence()`. Inside a handler, `relkit migrate` declares the descriptor under `dependencies` and calls it through `ctx`:
+
+```ts title="src/services/orders/functions/place-order.function.ts — 0.8"
+const placeOrder = defineFunction({
+  input: z.object({ orderId: z.string(), quantity: z.number().int().positive() }),
+  output: z.object({ orderId: z.string(), totalCents: z.number() }),
+  publishes: ["orders.placed"],
+  handler: async ({ orderId, quantity }, context) => {
+    const { totalCents } = await priceOrder.invoke({ quantity });
+    await context.events["orders.placed"].publish({ orderId });
+    await orderUpdates.trigger({ orderId }, "placed", { totalCents });
+    return { orderId, totalCents };
+  },
+});
+```
+
+<include
+  source="apps/docs/examples/migrate-0-9/src/services/orders/functions/place-order.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/place-order.function.ts — 0.9"'
+>
+  /_snippets/source/apps/docs/examples/migrate-0-9/src/services/orders/functions/place-order.function.ts
+</include>
+
+Outside a handler, in raw routes, middleware and scripts, `orders.priceOrder.invoke(…)` becomes a call on the [runtime handle](/docs/learn/concepts/runtime-handle):
+
+<include
+  source="apps/docs/examples/migrate-0-9/src/routes/middleware/price-header.middleware.ts"
+  lang="ts"
+  meta='title="src/routes/middleware/price-header.middleware.ts — 0.9"'
+>
+  /_snippets/source/apps/docs/examples/migrate-0-9/src/routes/middleware/price-header.middleware.ts
+</include>
+
+Other calls outside a handler, such as a channel trigger, are listed. Tool descriptors and graph nodes keep `invoke()`, so `relkit migrate` only rewrites descriptors imported from `.function` and `.channel` files, created with `defineFunction` or `defineChannel`, or read from an imported service.
+
+## Export service route maps [#service-routes]
+
+A route module exports its `defineServiceRoutes` map as the default export instead of destructuring methods. `relkit migrate` rewrites `export const { POST } = defineServiceRoutes(…)` and lists a module that already has a default export or reads a destructured handler.
+
+## Require sessions per route [#route-auth]
+
+The Better Auth route's `auth: { protected: [...] }` list is gone; each route that needs a session sets `auth: "required"`. `relkit migrate` adds it to every route module the list covered and removes the list:
+
+```ts title="src/routes/api/auth/[[...auth]]/route.ts — 0.8"
+export const ALL = defineRoute({
+  handler: auth.handler,
+  auth: { protected: ["/orders/*"] },
+});
+```
+
+<include
+  source="apps/docs/examples/migrate-0-9/src/routes/orders/route.ts"
+  lang="ts"
+  meta='title="src/routes/orders/route.ts — 0.9"'
+>
+  /_snippets/source/apps/docs/examples/migrate-0-9/src/routes/orders/route.ts
+</include>
+
+<include
+  source="apps/docs/examples/migrate-0-9/src/routes/orders/[orderId]/route.ts"
+  lang="ts"
+  meta='title="src/routes/orders/[orderId]/route.ts — 0.9"'
+>
+  /_snippets/source/apps/docs/examples/migrate-0-9/src/routes/orders/[orderId]/route.ts
+</include>
+
+A protected path with no route module is listed. To keep requiring a session on the MCP endpoint, set `server.mcp: { auth: "required" }` in `defineApp`.
+
+## Move Better Auth options into a Better Auth file [#better-auth-file]
+
+`defineBetterAuthService` takes the instance from your own Better Auth file. `relkit migrate` writes `better-auth.ts` next to the service with your options and the imports they use:
+
+```ts title="src/services/auth/service.ts — 0.8"
+export default defineBetterAuthService({
+  baseURL: process.env.BETTER_AUTH_URL ?? "http://127.0.0.1:3000",
+  emailAndPassword: { enabled: true },
+});
+```
+
+<include
+  source="apps/docs/examples/migrate-0-9/src/services/auth/better-auth.ts"
+  lang="ts"
+  meta='title="src/services/auth/better-auth.ts — 0.9"'
+>
+  /_snippets/source/apps/docs/examples/migrate-0-9/src/services/auth/better-auth.ts
+</include>
+
+<include
+  source="apps/docs/examples/migrate-0-9/src/services/auth/service.ts"
+  lang="ts"
+  meta='title="src/services/auth/service.ts — 0.9"'
+>
+  /_snippets/source/apps/docs/examples/migrate-0-9/src/services/auth/service.ts
+</include>
+
+Options that read something declared in the service file are listed. New projects declare `BETTER_AUTH_URL` and `BETTER_AUTH_SECRET` with `defineEnv`; if your project never mentions `BETTER_AUTH_URL`, that is listed too.
+
+## Pass `api` properties to hooks [#client-hooks]
+
+Route hooks take a property of the generated `api` object instead of a string key:
+
+```tsx title="app/orders.tsx — 0.8"
+const orders = useRoute("GET /orders", { input: {} });
+```
+
+```tsx title="app/orders.tsx — 0.9"
+import { api } from "@relkit/client";
+
+const orders = useRoute(api.orders.searchOrders, { input: {} });
+```
+
+`relkit migrate` names each property with the same rule the client generator uses, from the client contract. A key that is not a route, such as a job ID passed to `useRouteMutation`, is listed: start jobs with `useJobTrigger`.
+
+## Choose an agent runtime [#agent-runtime]
+
+`defineAgent` from `@relkit/langchain` was removed. Agents use `defineAgent` from `relkit/agents` and select LangChain with `runtime: langchain({ … })`, which holds LangChain's own options:
+
+```ts title="src/services/hello/agents/assistant.agent.ts — 0.8"
+import { defineAgent } from "@relkit/langchain";
+
+export default defineAgent({
+  id: "hello.assistant",
+  model: new FakeToolCallingModel({ toolCalls: [] }),
+  tools: [lookup],
+  checkpointer: new MemorySaver(),
+  instructions: "Answer briefly.",
+});
+```
+
+```ts title="src/services/hello/agents/assistant.agent.ts — 0.9"
+import { langchain } from "@relkit/langchain";
+import { defineAgent } from "relkit/agents";
+
+export default defineAgent({
+  id: "hello.assistant",
+  runtime: langchain({
+    model: new FakeToolCallingModel({ toolCalls: [] }),
+    checkpointer: new MemorySaver(),
+  }),
+  tools: [lookup],
+  instructions: "Answer briefly.",
+});
+```
+
+A model given as a string stays a model profile name. RelKit tools stay in `tools` and LangChain tools move into `langchain({ tools })`; when an array mixes them in a way the imports do not show, it is listed.
+
+## Read Problem Details errors [#problem-details]
+
+Every HTTP error response is now [RFC 9457 Problem Details](/docs/modules/http/responses) with the error's ID in `code`. Code that reads the old `error` field cannot be told apart from other objects, so `relkit migrate` changes nothing here and lists the usual places: comparisons such as `body.error === "not-found"` and expectations such as `toEqual({ error: "not-found" })`. Read `body.code` instead, with `status`, `detail` and `data`.
+
+## Related tasks
+
+- [Runtime handle](/docs/learn/concepts/runtime-handle) for calls outside handlers.
+- [Better Auth](/docs/modules/auth/better-auth) for the Better Auth file and route sessions.
+- [HTTP responses](/docs/modules/http/responses) for the Problem Details format.
+- [Agent adapters](/docs/modules/ai/adapters) for `runtime: langchain()` and the AI SDK.
+
+<include>/_snippets/generated/related/guides-migrate-relkit-0-9.mdx</include>

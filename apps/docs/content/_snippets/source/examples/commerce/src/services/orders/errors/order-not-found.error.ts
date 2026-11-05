@@ -1,5 +1,5 @@
 /** Carries the missing order identity from lookup to an HTTP 404 with the established one-second retry hint. */
-import { defineError } from "@relkit/app/functions";
+import { defineError } from "relkit/functions";
 import { z } from "zod";
 
 const orderNotFound = defineError({

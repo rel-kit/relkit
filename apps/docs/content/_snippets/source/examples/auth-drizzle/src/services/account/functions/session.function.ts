@@ -1,5 +1,5 @@
 /** Reads the invocation's native session and returns validated authentication and user identity fields. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 
 export default defineFunction({

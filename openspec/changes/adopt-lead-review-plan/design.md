@@ -158,6 +158,19 @@ Decided while applying section 12 (maintainer, 2026-11-05):
   so rules were added: `route-auth` moves the protected-path list onto matching route modules,
   `problem-details` reports reads of the old `error` field, `package-imports` maps
   `relkit/runtime-hono/bun`, and `removed-aliases` rewrites a tool's `invokeEffect`.
+- **The guide's example is migrated by the CLI in the docs tests.** `/guides/migrate/relkit-0-9` has
+  one section per rule, headed by the rule's `guide` anchor. Its 0.8 files live as text in
+  `apps/docs/examples/migrate-0-9/before`; `apps/docs/tests/migrate-0-9.test.ts` runs the built
+  `relkit migrate --write` over them and requires the Prettier-formatted output to equal the
+  compiled 0.9 files in `examples/migrate-0-9/src` that the page includes, with no findings, then
+  rolls back to the 0.8 bytes. `handle-registry.d.ts` stands in for the registry `relkit check`
+  generates, so `getRelkit()` types there. Agent and client-hook snippets stay plain fences,
+  because the docs package installs neither LangChain nor a generated client; their rules have
+  fixture tests.
+- **Changelog entries are the changesets.** `CHANGELOG.md` is written by `version-packages.ts` at
+  versioning, so the 0.9 entries are the pending changesets: every breaking one now links its rule's
+  guide section, and new breaking changesets cover the client hooks (section 11) and
+  `defineAgent({ runtime })` (section 24), which had none, plus a New entry for `relkit migrate`.
 
 ### D3. Creation gate becomes a CI concern (#1)
 
