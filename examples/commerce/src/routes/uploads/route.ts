@@ -1,5 +1,5 @@
 /** Admits bounded multipart upload requests to the assets service's validated image handler. */
-import { defineRoute } from "@relkit/app/routes";
+import { defineRoute } from "relkit/routes";
 import assets from "../../services/assets/service.js";
 
 export const POST = defineRoute({

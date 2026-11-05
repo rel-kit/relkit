@@ -1,0 +1,8 @@
+import { expect, test } from "bun:test";
+
+test("missing orders are reported", async () => {
+  const body = await (await fetch("/orders/missing")).json();
+  if (body.error === "not-found") console.log("missing");
+  expect(body).toEqual({ error: "not-found" });
+  expect(body).toMatchObject({ code: "not-found" });
+});

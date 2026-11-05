@@ -43,7 +43,7 @@ export const planCreateEffect = Effect.fn("CreatePreview.plan")(
       Effect.mapError(domainError),
     );
     const dependencies = { ...manifest.dependencies, ...manifest.devDependencies };
-    const version = dependencies["@relkit/app"] ?? ownManifest.version;
+    const version = dependencies.relkit ?? ownManifest.version;
     if (options.cloud === "aws") dependencies["@relkit/aws"] = version;
     if (options.deploy === "pulumi") dependencies["@relkit/pulumi"] = version;
     if (options.jobs !== undefined) {

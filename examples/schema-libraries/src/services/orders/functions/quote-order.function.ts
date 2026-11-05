@@ -1,5 +1,5 @@
 /** Prices an order; its input and output are Zod 4 schemas. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 
 export default defineFunction({

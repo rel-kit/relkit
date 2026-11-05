@@ -7,7 +7,7 @@ A generated application has two authoring files at its root: `relkit.config.ts` 
 In `src/platform/env.ts`:
 
 ```ts
-import { defineEnv, env } from "@relkit/app/config";
+import { defineEnv, env } from "relkit/config";
 
 export default defineEnv({
   LOG_LEVEL: env.literal("debug", "info", "warn", "error").default("info"),
@@ -22,7 +22,7 @@ Builders include `string`, `secret`, `number`, `boolean`, `port`, `url`, `json`,
 Pass the definition into `defineApp({ env })`. Functions read the resolved, typed values through `context.env`:
 
 ```ts
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 
 export default defineFunction({
@@ -39,7 +39,7 @@ Mark credentials with `env.secret()`; keep actual values outside source control.
 In `relkit.config.ts`, the baseline application contains the environment contract, telemetry redaction and backend settings. Inspection is omitted and disabled:
 
 ```ts
-import { defineApp } from "@relkit/app/config";
+import { defineApp } from "relkit/config";
 import env from "@app/platform/env.js";
 
 export default defineApp({
@@ -54,7 +54,7 @@ export default defineApp({
 For a one-machine realtime provider and a named Docker-backed cache profile, the complete configuration shape is:
 
 ```ts
-import { defineApp, env as binding } from "@relkit/app/config";
+import { defineApp, env as binding } from "relkit/config";
 import { docker } from "@relkit/docker";
 import { localRealtime } from "@relkit/local";
 import { redis } from "@relkit/redis";

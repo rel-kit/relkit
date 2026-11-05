@@ -10,7 +10,6 @@
     "build": "bun ../../packages/cli/dist/bin.js build"
   },
   "dependencies": {
-    "@relkit/app": "workspace:*",
     "@relkit/local": "workspace:*",
     "@valibot/to-json-schema": "1.8.0",
     "arktype": "2.2.9",

@@ -108,6 +108,94 @@ breaking change without a migration link.
 
 - **Alternative:** several smaller breaking releases. Rejected by the maintainer in round 3.
 
+Decided while applying section 12 (maintainer, 2026-11-05):
+
+- **`relkit migrate` is the code migration; `layout` stays a subcommand.** `relkit migrate` previews,
+  `--write` applies and `--rollback <record>` undoes; `relkit migrate layout` is unchanged. A code
+  record is told apart from a layout record by `kind: "code"`, may list created files (no `before`),
+  and rollback deletes a created file only while it still holds the migrated bytes. Write refuses a
+  touched file with uncommitted Git changes and restores automatically when publication fails. The
+  codes are `RELKIT_MIGRATE_*` in their own registry file, because `cli.ts` may only shrink.
+- **One rule per breaking change, pure and fixture-tested.** Eleven rules in
+  `packages/cli/src/migration/code-rules/` run in a fixed order (`package-imports` first,
+  `schema-builder` last): `package-imports`, `legacy-jobs`, `removed-aliases`, `error-ids`,
+  `dependency-declarations`, `context-calls`, `service-routes`, `better-auth-file`, `client-hooks`,
+  `agent-runtime`, `schema-builder`. Each is a text transform over a syntax tree that keeps the
+  bytes it does not change; fixtures are `.txt` pairs so 0.8 code never reaches the type checker or
+  the formatter. Every TypeScript parse goes through `packages/cli/src/migration/code-parser.ts`, so
+  swapping in the CLI's bundled TypeScript is a one-file change.
+- **Rules rewrite only what syntax proves and report the rest with file and line.** `context-calls`
+  rewrites receivers imported from `*.function` / `*.channel` modules, created by `defineFunction` /
+  `defineChannel`, or members of an imported `service` module, because tools and graph nodes keep
+  `invoke`; outside a handler only `<service>.<member>.invoke()` has a known handle path
+  (`getRelkit().functions.<serviceId>.<member>`, the ID read from `defineService({ id })` or the
+  service folder). `legacy-jobs` reports every function-target job instead of inventing a task, and
+  rewrites only `ctx.jobs.<name>.enqueue` to `trigger`. `agent-runtime` splits `tools` only when
+  every entry's import tells RelKit tools (`*.tool` modules, `defineTool`) from LangChain tools
+  (`langchain`, `@langchain/*`, `deepagents`). `@relkit/app` root names outside the curated
+  `relkit` root stay on `@relkit/app` and are reported.
+- **Exact public codes for errors.** `error-ids` calls the compiler's own `encodeErrorId` with the
+  file path and binding name, so the written ID equals the code 0.8 inferred; an error without a
+  binding is reported.
+- **Client hooks need the backend's contract.** `client-hooks` names `api` properties with
+  `clientApiPaths` over the routes of `.relkit/generated/client-contract.json`, or the file passed
+  with `--contract` (a separate frontend such as `examples/commerce-web` passes its backend's).
+- **Guidance migrates too.** Rules marked `markdown` (imports, aliases, builder, service routes,
+  client hooks, agent runtime) also rewrite TypeScript code fences in `.md` and `.mdx` files, so the
+  bundled skill references move with the code. Rules that derive identities from file paths do not
+  run on fences. Files under `migrations/` folders are never read, so applied migration history is
+  untouched.
+- **Samples were moved by `relkit migrate --write` alone.** On every template and example the rules
+  that section 10 had already applied by hand found nothing; `package-imports`, `schema-builder`
+  and `agent-runtime` (the bundled skill references' LangChain example) made every change, and a
+  second preview reports nothing to migrate and no findings. Prettier then reformatted the five
+  rewritten skill-reference fences, the only change not made by the codemod. This supersedes the
+  section 24 note that the skill references keep the old example: the minimal template's digest in
+  `create-capabilities.ts` is re-pinned as the test computes it. `relkit add` now writes `relkit`
+  specifiers and the `s` builder, and the creator reads provider versions from the template's
+  `relkit` dependency, because templates no longer depend on `@relkit/app`.
+- **Every breaking changeset maps to a rule.** Four breaking changes had no rewritable syntax yet,
+  so rules were added: `route-auth` moves the protected-path list onto matching route modules,
+  `problem-details` reports reads of the old `error` field, `package-imports` maps
+  `relkit/runtime-hono/bun`, and `removed-aliases` rewrites a tool's `invokeEffect`.
+- **The guide's example is migrated by the CLI in the docs tests.** `/guides/migrate/relkit-0-9` has
+  one section per rule, headed by the rule's `guide` anchor. Its 0.8 files live as text in
+  `apps/docs/examples/migrate-0-9/before`; `apps/docs/tests/migrate-0-9.test.ts` runs the built
+  `relkit migrate --write` over them and requires the Prettier-formatted output to equal the
+  compiled 0.9 files in `examples/migrate-0-9/src` that the page includes, with no findings, then
+  rolls back to the 0.8 bytes. `handle-registry.d.ts` stands in for the registry `relkit check`
+  generates, so `getRelkit()` types there. Agent and client-hook snippets stay plain fences,
+  because the docs package installs neither LangChain nor a generated client; their rules have
+  fixture tests.
+- **Changelog entries are the changesets.** `CHANGELOG.md` is written by `version-packages.ts` at
+  versioning, so the 0.9 entries are the pending changesets: every breaking one now links its rule's
+  guide section, and new breaking changesets cover the client hooks (section 11) and
+  `defineAgent({ runtime })` (section 24), which had none, plus a New entry for `relkit migrate`.
+- **A breaking change names its rule through its guide link (task 26.3).** Changesets frontmatter
+  holds only package bumps, so `scripts/breaking-migrations.ts` reads the link instead: every
+  changeset versioning would group under Breaking must link `/guides/migrate/<page>#<section>`,
+  the section must exist in that guide page, and the anchor must be some rule's `guide` anchor.
+  It runs in `bun run check`, which every pull request (the release pull request included) runs,
+  next to the migration-link check `version-packages.ts` already applies, and
+  `tests/unit/breaking-migrations.test.ts` shows it failing on a fixture.
+- **The beta rehearsal publishes nothing and changes no repository file.** `scripts/rehearse-beta.ts`
+  reads the next shared version from the pending changesets (the plan `version-packages.ts
+--check` prints) and uses `<version>-beta.0`, builds and packs the release closure with the
+  packing helper the creation smoke test uses, then rewrites each archive's manifests (its own,
+  the creator's template manifests and provider catalog) to the beta version, as versioning and
+  packing would. The existing candidate registry serves the archives, so nothing falls back to
+  published first-party versions; a small front adds each deprecated package's message to its
+  version metadata, which is what `npm deprecate` changes. Against it, the rehearsal creates
+  projects with the packed `create-relkit` and runs their `check`, `typecheck`, `test` and
+  `build`, serves the built minimal project on Bun and on Node, and turns a copy into a 0.8-style
+  project on the final `@relkit/app` that must report the deprecation, build, migrate with the
+  packed `relkit migrate` and build again. The release-readiness workflow, which runs on pull
+  requests, runs it for the minimal, api and fullstack templates.
+- **The deprecation lives in release configuration.** `scripts/release-deprecations.ts` holds the
+  final `@relkit/app` message, which names `relkit` and the migration guide; after publishing and
+  verifying a batch, `publish-release.ts` runs `npm deprecate` for each deprecated package in it.
+  The package itself already re-exports `relkit` (section 7).
+
 ### D3. Creation gate becomes a CI concern (#1)
 
 The capability table stays as data that CI writes, but the creator compares only release and

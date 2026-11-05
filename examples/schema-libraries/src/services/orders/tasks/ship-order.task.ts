@@ -1,5 +1,5 @@
 /** Ships a placed order in the background; its input and output are Effect Schema schemas. */
-import { defineTask } from "@relkit/app/tasks";
+import { defineTask } from "relkit/tasks";
 import { Schema } from "effect";
 
 export const shipOrder = defineTask({

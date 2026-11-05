@@ -22,7 +22,7 @@ Each service selects its own operations; another service must not act as a barre
 
 ```ts
 // src/services/pricing/service.ts
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 import calculateQuote from "./functions/calculate-quote.function.js";
 
 export default defineService({ functions: { calculateQuote } });
@@ -68,7 +68,7 @@ Compare the actual service graph and routes with the ownership map. Check that e
 Put domain behavior in `src/services/<domain>/functions/*.function.ts`. A function validates input before its handler and validates the returned output:
 
 ```ts
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 
 const greet = defineFunction({
@@ -84,7 +84,7 @@ export default greet;
 Expose selected functions from `src/services/<domain>/service.ts`:
 
 ```ts
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 import greet from "@app/services/hello/functions/greet.function.js";
 
 export default defineService({ functions: { greet } });
@@ -101,7 +101,7 @@ Within a domain, import a sibling function directly. Across domains and from rou
 Declare an event payload in `src/services/<domain>/events/*.event.ts`:
 
 ```ts
-import { defineEvent } from "@relkit/app/events";
+import { defineEvent } from "relkit/events";
 import { z } from "zod";
 
 const orderCreated = defineEvent({
@@ -126,7 +126,7 @@ Expose it through `defineService({ events: { orderCreated } })` when other domai
 An event-only consumer in `src/services/notifications/functions/` reacts without returning a result to its publisher:
 
 ```ts
-import { defineEventFunction } from "@relkit/app/events";
+import { defineEventFunction } from "relkit/events";
 
 export default defineEventFunction({
   id: "notifications.order-created",
@@ -140,7 +140,7 @@ export default defineEventFunction({
 ## `defineError`
 
 ```ts
-import { defineError } from "@relkit/app/functions";
+import { defineError } from "relkit/functions";
 import { z } from "zod";
 
 export default defineError({
@@ -155,7 +155,7 @@ export default defineError({
 Declare only expected failures callers should handle on a function. Return each declared error through the public `fail` helper so it appears in the inferred handler result; throwing a declared error from an ordinary helper does not satisfy that contract. Use the route layer for HTTP-specific request mapping and middleware.
 
 ```ts
-import { defineFunction, fail } from "@relkit/app/functions";
+import { defineFunction, fail } from "relkit/functions";
 import { z } from "zod";
 import AuthenticationRequired from "../errors/authentication-required.error.js";
 

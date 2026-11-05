@@ -7,7 +7,7 @@ Use a channel to notify connected clients about a change. Keep the authoritative
 Create `src/services/announcements/channels/announcements.channel.ts`:
 
 ```ts
-import { defineChannel } from "@relkit/app/realtime";
+import { defineChannel } from "relkit/realtime";
 import { z } from "zod";
 
 const announcements = defineChannel({
@@ -28,7 +28,7 @@ export default announcements;
 After the application change succeeds, publish one validated event from a backend function:
 
 ```ts
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 import announcements from "@app/services/announcements/channels/announcements.channel.js";
 
@@ -81,7 +81,7 @@ Load authoritative state through a route before relying on updates. `onGap` must
 Configure a compatible `realtime` provider and `defaults.realtime` in `relkit.config.ts`. For a one-machine app with `@relkit/local` installed, the relevant configuration is:
 
 ```ts
-import { defineApp } from "@relkit/app/config";
+import { defineApp } from "relkit/config";
 import { localRealtime } from "@relkit/local";
 import env from "@app/platform/env.js";
 

@@ -1,5 +1,5 @@
 /** Inserts a validated announcement, removes older demo rows and publishes its posted event before acknowledgement. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 import announcements from "../channels/announcements.channel.js";
 

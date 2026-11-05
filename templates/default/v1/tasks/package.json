@@ -13,7 +13,6 @@
     "jobs:trigger": "relkit jobs trigger --job exportOrders --input-file examples/export-orders.json --operation-id example-trigger"
   },
   "dependencies": {
-    "@relkit/app": "0.8.4",
     "@scalar/hono-api-reference": "0.12.9",
     "relkit": "0.8.8",
     "zod": "4.6.7"

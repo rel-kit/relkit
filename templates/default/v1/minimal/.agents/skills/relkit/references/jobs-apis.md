@@ -5,7 +5,7 @@ Use a task for work that must outlive its initiating request; a function remains
 ## `defineTask`
 
 ```ts
-import { defineTask } from "@relkit/app/tasks";
+import { defineTask } from "relkit/tasks";
 import { z } from "zod";
 
 export default defineTask({
@@ -27,7 +27,7 @@ export default defineTask({
 Bind the task to a public job name and an explicit client policy in `src/services/orders/jobs/export-orders.job.ts`:
 
 ```ts
-import { defineJob } from "@relkit/app/jobs";
+import { defineJob } from "relkit/jobs";
 import exportOrders from "@app/services/orders/tasks/export-orders.task.js";
 
 export default defineJob({

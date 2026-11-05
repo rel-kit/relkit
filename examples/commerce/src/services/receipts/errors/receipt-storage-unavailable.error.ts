@@ -1,5 +1,5 @@
 /** Declares the receipt bucket failure exposed by sendReceipt, retaining its affected key and delayed-retry policy. */
-import { defineError } from "@relkit/app/functions";
+import { defineError } from "relkit/functions";
 import { z } from "zod";
 
 export default defineError({

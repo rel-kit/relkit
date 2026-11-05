@@ -1,5 +1,5 @@
 /** Lists validated user fields through the database model's email-domain extension. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 
 export default defineFunction({

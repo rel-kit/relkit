@@ -3,6 +3,6 @@ import { defineMeta } from "blume";
 export default defineMeta({
   title: "Migrate",
   icon: "arrow-right-left",
-  pages: ["from-express-or-hono"],
+  pages: ["from-express-or-hono", "relkit-0-9"],
   display: "flat",
 });

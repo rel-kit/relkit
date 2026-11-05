@@ -1,5 +1,5 @@
 /** Validates order input, calls the declared pricing function, and returns the calculated order. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 import priceOrder from "@app/services/orders/functions/price-order.function.js";
 

@@ -1,5 +1,5 @@
 /** Declares per-order status events with a native auth-context check, bounded replay and count presence. */
-import { defineChannel } from "@relkit/app/realtime";
+import { defineChannel } from "relkit/realtime";
 import { z } from "zod";
 
 const orderUpdates = defineChannel({

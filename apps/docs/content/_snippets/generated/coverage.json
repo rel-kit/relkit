@@ -282,6 +282,11 @@
         "apps/docs/examples/migrate/tests/orders.route.test.ts"
       ]
     },
+    {
+      "path": "guides/migrate/relkit-0-9",
+      "api": ["functions", "routes"],
+      "examples": ["apps/docs/tests/migrate-0-9.test.ts"]
+    },
     { "path": "guides/index", "api": ["app"], "examples": [] },
     {
       "path": "guides/storage/upload-product-images",

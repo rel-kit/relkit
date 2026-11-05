@@ -16,13 +16,13 @@ exports[`snapshots simple, custom, and full service plans 1`] = `
     {
       "action": "create",
       "content": [
-        "import { defineFunction } from "@relkit/app/functions";",
-        "import { z } from "@relkit/app/schema";",
+        "import { defineFunction } from "relkit/functions";",
+        "import { s } from "relkit/schema";",
         "",
         "const example = defineFunction({",
         "  id: "billing.example",",
-        "  input: z.object({ value: z.string().default("example") }),",
-        "  output: z.object({ value: z.string() }),",
+        "  input: s.object({ value: s.string().default("example") }),",
+        "  output: s.object({ value: s.string() }),",
         "  handler: async ({ value }, context) => {",
         "    return { value };",
         "  },",
@@ -35,7 +35,7 @@ exports[`snapshots simple, custom, and full service plans 1`] = `
     {
       "action": "create",
       "content": [
-        "import { defineService } from "@relkit/app/services";",
+        "import { defineService } from "relkit/services";",
         "import example from "@app/services/billing/functions/example.function.js";",
         "",
         "export default defineService({ id: "billing", functions: { example } });",
@@ -96,7 +96,6 @@ exports[`snapshots simple, custom, and full service plans 2`] = `
         "    "typecheck": "tsc --noEmit"",
         "  },",
         "  "dependencies": {",
-        "    "@relkit/app": "0.8.4",",
         "    "@relkit/local": "<release-version>",",
         "    "@scalar/hono-api-reference": "0.12.9",",
         "    "relkit": "0.8.8",",
@@ -117,7 +116,7 @@ exports[`snapshots simple, custom, and full service plans 2`] = `
       "action": "update",
       "content": [
         "/** Declares backend defaults; inspection remains disabled unless explicitly enabled. */",
-        "import { defineApp } from "@relkit/app/config";",
+        "import { defineApp } from "relkit/config";",
         "import env from "@app/platform/env.js";",
         "import { localEvent } from "@relkit/local";",
         "// relkit:create:deployment-imports",
@@ -137,12 +136,12 @@ exports[`snapshots simple, custom, and full service plans 2`] = `
     {
       "action": "create",
       "content": [
-        "import { defineEvent } from "@relkit/app/events";",
-        "import { z } from "@relkit/app/schema";",
+        "import { defineEvent } from "relkit/events";",
+        "import { s } from "relkit/schema";",
         "const exampleEvent = defineEvent({",
         "  id: "billing.example-event",",
         "  version: 1,",
-        "  input: z.object({ value: z.string() }),",
+        "  input: s.object({ value: s.string() }),",
         "  profile: "local",",
         "});",
         "declare global {",
@@ -160,14 +159,14 @@ exports[`snapshots simple, custom, and full service plans 2`] = `
     {
       "action": "create",
       "content": [
-        "import { defineFunction } from "@relkit/app/functions";",
-        "import { z } from "@relkit/app/schema";",
+        "import { defineFunction } from "relkit/functions";",
+        "import { s } from "relkit/schema";",
         "import exampleEvent from "@app/services/billing/events/example.event.js";",
         "",
         "const example = defineFunction({",
         "  id: "billing.example",",
-        "  input: z.object({ value: z.string().default("example") }),",
-        "  output: z.object({ value: z.string() }),",
+        "  input: s.object({ value: s.string().default("example") }),",
+        "  output: s.object({ value: s.string() }),",
         "  dependencies: { events: { exampleEvent } },",
         "  handler: async ({ value }, context) => {",
         "    await context.events.exampleEvent.publish({ value });",
@@ -182,7 +181,7 @@ exports[`snapshots simple, custom, and full service plans 2`] = `
     {
       "action": "create",
       "content": [
-        "import { defineService } from "@relkit/app/services";",
+        "import { defineService } from "relkit/services";",
         "import exampleEvent from "@app/services/billing/events/example.event.js";",
         "import example from "@app/services/billing/functions/example.function.js";",
         "",
@@ -333,7 +332,6 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
         "  "dependencies": {",
         "    "@langchain/core": "1.2.9",",
         "    "@langchain/langgraph": "1.4.14",",
-        "    "@relkit/app": "0.8.4",",
         "    "@relkit/docker": "0.7.13",",
         "    "@relkit/langchain": "0.7.15",",
         "    "@relkit/local": "<release-version>",",
@@ -360,7 +358,7 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
       "action": "update",
       "content": [
         "/** Declares backend defaults; inspection remains disabled unless explicitly enabled. */",
-        "import { defineApp } from "@relkit/app/config";",
+        "import { defineApp } from "relkit/config";",
         "import env from "@app/platform/env.js";",
         "import { localEvent, localJob } from "@relkit/local";",
         "import { docker } from "@relkit/docker";",
@@ -386,7 +384,7 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     {
       "action": "create",
       "content": [
-        "import { defineServiceRoutes } from "@relkit/app/routes";",
+        "import { defineServiceRoutes } from "relkit/routes";",
         "import billing from "@app/services/billing/service.js";",
         "",
         "export default defineServiceRoutes(billing, {",
@@ -399,9 +397,9 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     {
       "action": "create",
       "content": [
-        "import { defineAgent } from "@relkit/app/agents";",
+        "import { defineAgent } from "relkit/agents";",
         "import { langchain } from "@relkit/langchain";",
-        "import { z } from "@relkit/app/schema";",
+        "import { s } from "relkit/schema";",
         "import { FakeToolCallingModel } from "langchain";",
         "import exampleTool from "@app/services/billing/tools/example.tool.js";",
         "import examplePrompt from "@app/services/billing/prompts/example.prompt.js";",
@@ -415,8 +413,8 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
         "      id: "output-1",",
         "    }]],",
         "  }) }),",
-        "  input: z.object({ question: z.string().min(1) }),",
-        "  output: z.object({ answer: z.string() }),",
+        "  input: s.object({ question: s.string().min(1) }),",
+        "  output: s.object({ answer: s.string() }),",
         "  instructions: examplePrompt,",
         "  tools: [exampleTool],",
         "  limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 10_000 },",
@@ -430,7 +428,7 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     {
       "action": "create",
       "content": [
-        "import { defineBucket } from "@relkit/app/buckets";",
+        "import { defineBucket } from "relkit/buckets";",
         "",
         "const exampleBucket = defineBucket({",
         "  id: "billing.example-bucket",",
@@ -448,14 +446,14 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     {
       "action": "create",
       "content": [
-        "import { defineCache } from "@relkit/app/cache";",
-        "import { z } from "@relkit/app/schema";",
+        "import { defineCache } from "relkit/cache";",
+        "import { s } from "relkit/schema";",
         "",
         "const exampleCache = defineCache({",
         "  id: "billing.example-cache",",
         "  profile: "local",",
-        "  key: z.string().min(1),",
-        "  value: z.string(),",
+        "  key: s.string().min(1),",
+        "  value: s.string(),",
         "  defaultTtlMs: 60_000,",
         "  maxTtlMs: 300_000,",
         "});",
@@ -468,7 +466,7 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     {
       "action": "create",
       "content": [
-        "import { defineConstants } from "@relkit/app";",
+        "import { defineConstants } from "relkit";",
         "",
         "const exampleConstants = defineConstants({ "billing.example-constants": "replace-me" }, { id: "billing.example-constants" });",
         "",
@@ -480,11 +478,11 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     {
       "action": "create",
       "content": [
-        "import { defineError } from "@relkit/app/functions";",
-        "import { z } from "@relkit/app/schema";",
+        "import { defineError } from "relkit/functions";",
+        "import { s } from "relkit/schema";",
         "const exampleError = defineError({",
         "  id: "billing.example-error",",
-        "  data: z.object({ message: z.string() }),",
+        "  data: s.object({ message: s.string() }),",
         "  message: ({ message }) => message,",
         "  retry: "never",",
         "});",
@@ -496,12 +494,12 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     {
       "action": "create",
       "content": [
-        "import { defineEvent } from "@relkit/app/events";",
-        "import { z } from "@relkit/app/schema";",
+        "import { defineEvent } from "relkit/events";",
+        "import { s } from "relkit/schema";",
         "const exampleEvent = defineEvent({",
         "  id: "billing.example-event",",
         "  version: 1,",
-        "  input: z.object({ value: z.string() }),",
+        "  input: s.object({ value: s.string() }),",
         "  profile: "local",",
         "});",
         "declare global {",
@@ -519,15 +517,15 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     {
       "action": "create",
       "content": [
-        "import { defineFunction } from "@relkit/app/functions";",
-        "import { z } from "@relkit/app/schema";",
+        "import { defineFunction } from "relkit/functions";",
+        "import { s } from "relkit/schema";",
         "import exampleError from "@app/services/billing/errors/example.error.js";",
         "import exampleEvent from "@app/services/billing/events/example.event.js";",
         "",
         "const example = defineFunction({",
         "  id: "billing.example",",
-        "  input: z.object({ value: z.string().default("example") }),",
-        "  output: z.object({ value: z.string() }),",
+        "  input: s.object({ value: s.string().default("example") }),",
+        "  output: s.object({ value: s.string() }),",
         "  errors: [exampleError],",
         "  dependencies: { events: { exampleEvent } },",
         "  handler: async ({ value }, context) => {",
@@ -544,7 +542,7 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     {
       "action": "create",
       "content": [
-        "import { defineEventFunction } from "@relkit/app/events";",
+        "import { defineEventFunction } from "relkit/events";",
         "const onExample = defineEventFunction({",
         "  id: "billing.on-example",",
         "  event: "billing.example-event",",
@@ -562,7 +560,7 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     {
       "action": "create",
       "content": [
-        "import { defineJob } from "@relkit/app/jobs";",
+        "import { defineJob } from "relkit/jobs";",
         "import exampleTask from "@app/services/billing/tasks/example.task.js";",
         "const exampleJob = defineJob({",
         "  id: "billing.example-job",",
@@ -578,7 +576,7 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     {
       "action": "create",
       "content": [
-        "import { definePrompt } from "@relkit/app";",
+        "import { definePrompt } from "relkit";",
         "",
         "const examplePrompt = definePrompt("Use the available tool and answer concisely.", { id: "billing.example-prompt" });",
         "",
@@ -590,7 +588,7 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     {
       "action": "create",
       "content": [
-        "import { defineService } from "@relkit/app/services";",
+        "import { defineService } from "relkit/services";",
         "import exampleEvent from "@app/services/billing/events/example.event.js";",
         "import example from "@app/services/billing/functions/example.function.js";",
         "import exampleTask from "@app/services/billing/tasks/example.task.js";",
@@ -604,14 +602,14 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     {
       "action": "create",
       "content": [
-        "import { defineTask } from "@relkit/app/tasks";",
-        "import { z } from "@relkit/app/schema";",
+        "import { defineTask } from "relkit/tasks";",
+        "import { s } from "relkit/schema";",
         "const exampleTask = defineTask({",
         "  id: "billing.example-task",",
         "  version: "1",",
         "  execution: "durable",",
-        "  input: z.object({ value: z.string() }),",
-        "  output: z.object({ accepted: z.literal(true) }),",
+        "  input: s.object({ value: s.string() }),",
+        "  output: s.object({ accepted: s.literal(true) }),",
         "  handler: async ({ value }, context) => {",
         "    context.log.info("example task", { value });",
         "    return { accepted: true as const };",

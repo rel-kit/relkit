@@ -369,6 +369,13 @@ Every error and warning RelKit prints starts with a `RELKIT_*` code and ends wit
 | [`RELKIT_METHOD_INVALID`](/docs/errors/relkit-method-invalid)                                                                 | HTTP method is invalid                                             |
 | [`RELKIT_MIDDLEWARE_INPUT_INCOMPATIBLE`](/docs/errors/relkit-middleware-input-incompatible)                                   | Middleware input does not match the route                          |
 | [`RELKIT_MIDDLEWARE_OUTPUT_INCOMPATIBLE`](/docs/errors/relkit-middleware-output-incompatible)                                 | Middleware output does not match the route                         |
+| [`RELKIT_MIGRATE_CONCURRENT_EDIT`](/docs/errors/relkit-migrate-concurrent-edit)                                               | A file changed while relkit migrate was writing                    |
+| [`RELKIT_MIGRATE_CONTRACT_UNAVAILABLE`](/docs/errors/relkit-migrate-contract-unavailable)                                     | The client contract could not be read                              |
+| [`RELKIT_MIGRATE_DIRTY`](/docs/errors/relkit-migrate-dirty)                                                                   | Files to migrate have uncommitted changes                          |
+| [`RELKIT_MIGRATE_INVALID_PROJECT`](/docs/errors/relkit-migrate-invalid-project)                                               | relkit migrate needs a project folder                              |
+| [`RELKIT_MIGRATE_RECEIPT_INVALID`](/docs/errors/relkit-migrate-receipt-invalid)                                               | Migration record is invalid                                        |
+| [`RELKIT_MIGRATE_RECOVERY_CONFLICT`](/docs/errors/relkit-migrate-recovery-conflict)                                           | Rollback kept a later edit                                         |
+| [`RELKIT_MIGRATE_USAGE`](/docs/errors/relkit-migrate-usage)                                                                   | Invalid relkit migrate arguments                                   |
 | [`RELKIT_MISSING_MIDDLEWARE`](/docs/errors/relkit-missing-middleware)                                                         | Middleware is not defined                                          |
 | [`RELKIT_MISSING_TARGET`](/docs/errors/relkit-missing-target)                                                                 | Reference does not point at anything                               |
 | [`RELKIT_MISSING_TRANSFORM`](/docs/errors/relkit-missing-transform)                                                           | Request transform is not found                                     |

@@ -1,5 +1,5 @@
 /** Maps GET requests to `orders.trackShipment`. */
-import { defineRoute } from "@relkit/app/routes";
+import { defineRoute } from "relkit/routes";
 import orders from "@app/services/orders/service.js";
 
 export const GET = defineRoute({ target: orders.trackShipment });

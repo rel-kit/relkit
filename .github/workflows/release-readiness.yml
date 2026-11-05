@@ -115,6 +115,31 @@ jobs:
       - name: Verify generated source remained stable during packaging
         run: git diff --exit-code
 
+  beta-rehearsal:
+    name: Rehearse the beta from packed packages
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Build the packages the candidate packs
+        run: >-
+          bun x turbo run build --filter=./packages/* --filter=./integrations/packages/*
+          --output-logs=errors-only
+      - name: Version, pack, serve locally, create, run and migrate; publishes nothing
+        run: |
+          git show-ref --verify --quiet refs/heads/main || git branch main "$GITHUB_SHA"
+          bun scripts/rehearse-beta.ts --templates minimal,api,fullstack
+
   dev-loop-benchmark:
     name: Benchmark the development loop
     runs-on: ubuntu-24.04

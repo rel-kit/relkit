@@ -1,0 +1,14 @@
+import { defineError, defineFunction } from "relkit";
+import { s } from "relkit/schema";
+
+const NotFoundError = defineError({
+  data: s.object({ orderId: s.string() }),
+  http: { status: 404 },
+});
+const Explicit = defineError({ id: "orders.explicit", message: "kept" });
+const Inline = defineError({ message: "The order ID is invalid" });
+
+export default defineFunction({
+  errors: [NotFoundError, Explicit, Inline, defineError({ message: "anonymous" })],
+  handler: async () => ({}),
+});

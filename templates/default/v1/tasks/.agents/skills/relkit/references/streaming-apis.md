@@ -7,7 +7,7 @@ Use a typed stream when one request returns a sequence to its caller. It ends wi
 Create a function in `src/services/reports/functions/stream-report.function.ts`:
 
 ```ts
-import { defineFunction, streamOf } from "@relkit/app/functions";
+import { defineFunction, streamOf } from "relkit/functions";
 import { z } from "zod";
 
 export default defineFunction({
@@ -36,7 +36,7 @@ iterator pulls. Keep public descriptors as plain TypeScript.
 In `src/routes/reports/[reportId]/route.ts`, import the public service member:
 
 ```ts
-import { defineRoute, http } from "@relkit/app/routes";
+import { defineRoute, http } from "relkit/routes";
 import reports from "@app/services/reports/service.js";
 
 export const GET = defineRoute({

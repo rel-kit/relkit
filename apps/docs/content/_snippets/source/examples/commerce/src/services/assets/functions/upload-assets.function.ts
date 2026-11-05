@@ -1,23 +1,23 @@
 /** Validates multipart image files, writes them through the declared assets bucket and returns their uploaded names. */
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { s } from "relkit/schema";
 import assets from "../buckets/assets.bucket.js";
 
-const uploadedFile = z.file({
+const uploadedFile = s.file({
   maxBytes: 1024 * 1024 * 10,
   mediaTypes: ["image/jpeg", "image/png"],
 });
 
 const uploadAssets = defineFunction({
-  input: z.object({
-    label: z.string().min(1),
+  input: s.object({
+    label: s.string().min(1),
     primary: uploadedFile,
-    attachments: z.array(uploadedFile),
+    attachments: s.array(uploadedFile),
   }),
 
-  output: z.object({
-    label: z.string(),
-    files: z.array(z.string()),
+  output: s.object({
+    label: s.string(),
+    files: s.array(s.string()),
   }),
 
   dependencies: { buckets: { assets } },

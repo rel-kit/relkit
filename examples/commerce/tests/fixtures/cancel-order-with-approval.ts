@@ -1,6 +1,6 @@
 /** Connects an on-write order tool to a trusted asynchronous confirmation callback, preserving denied invocation failures. */
 // #region approval-tool
-import { defineTool } from "@relkit/app/tools";
+import { defineTool } from "relkit/tools";
 import deleteOrder from "../../src/services/orders/functions/delete-order.function.js";
 
 export const cancelOrder = defineTool({

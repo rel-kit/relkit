@@ -1,5 +1,5 @@
 /** Maps a report path identifier to the order stream and exposes its validated items as server-sent events. */
-import { defineRoute, http } from "@relkit/app/routes";
+import { defineRoute, http } from "relkit/routes";
 import orders from "../../../services/orders/service.js";
 
 export const GET = defineRoute({

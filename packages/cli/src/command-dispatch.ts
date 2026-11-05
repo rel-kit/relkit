@@ -5,6 +5,7 @@ import { runDbEffect } from "./commands/db.js";
 import { processLayer } from "./services/process.service.js";
 import { fileSystemLayer } from "./services/filesystem.service.js";
 import { layoutMigrationLayer } from "./migration/layout-migration.service.js";
+import { codeMigrationLayer } from "./migration/code-migration.service.js";
 import { executeProjectEffect } from "./command-project.js";
 import { executeStartEffect } from "./command-start.js";
 import { runDevCommandEffect } from "./commands/dev-command.js";
@@ -141,7 +142,9 @@ function selectCommandEffect(invocation: CliInvocation, context: CliCommandConte
         ),
       );
     case "migrate":
-      return runMigrateEffect(args, context).pipe(Effect.provide(layoutMigrationLayer));
+      return runMigrateEffect(args, context).pipe(
+        Effect.provide(Layer.merge(layoutMigrationLayer, codeMigrationLayer)),
+      );
     case "db":
       return runDbEffect(args, context).pipe(
         Effect.provide(Layer.merge(processLayer, fileSystemLayer)),

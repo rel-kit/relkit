@@ -1,0 +1,9 @@
+import { defineGraph, langchain } from "@relkit/langchain";
+import { tool } from "langchain";
+import lookup from "../tools/lookup.tool.js";
+import { defineAgent } from "relkit/agents";
+
+const search = tool(async () => "x", { name: "search" });
+
+export default defineAgent({ id: "a.b", runtime: langchain({ tools: [search] }), model: "default", tools: [lookup] });
+export const graph = defineGraph;

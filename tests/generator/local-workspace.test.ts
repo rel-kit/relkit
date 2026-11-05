@@ -48,7 +48,6 @@ test("local create installs workspace links after jobs and final confirmation", 
   expect(result.output).not.toContain("Planned project");
   expect(await Bun.file(join(parent, "app/package.json")).exists()).toBe(true);
   const manifest = await Bun.file(join(parent, "app/package.json")).json();
-  expect(manifest.dependencies["@relkit/app"]).toBe("link:@relkit/app");
   expect(manifest.dependencies["relkit"]).toBe("link:relkit");
   const graph = Bun.file(join(parent, "app/.relkit/generated/application.graph.json"));
   expect(await graph.exists()).toBe(true);

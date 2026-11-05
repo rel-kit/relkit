@@ -1,5 +1,5 @@
 /** Exercises the real prices dependency with a logged cache-miss producer and validated SKU/price results. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 import prices from "@app/services/orders/cache/prices.cache.js";
 

@@ -5,7 +5,7 @@ RelKit records HTTP requests and invocation spans automatically. Use `context.lo
 ## Log and trace inside a function
 
 ```ts
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 
 export default defineFunction({
@@ -33,7 +33,7 @@ export default defineFunction({
 Edit the existing `relkit.config.ts` and preserve its environment and provider settings:
 
 ```ts
-import { defineApp } from "@relkit/app/config";
+import { defineApp } from "relkit/config";
 import env from "@app/platform/env.js";
 
 export default defineApp({

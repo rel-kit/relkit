@@ -17,7 +17,6 @@
   "dependencies": {
     "@langchain/core": "1.2.9",
     "@langchain/langgraph": "1.4.14",
-    "@relkit/app": "0.8.4",
     "@relkit/langchain": "0.7.15",
     "@relkit/local": "0.7.14",
     "@scalar/hono-api-reference": "0.12.9",

@@ -1,5 +1,5 @@
 /** Registers the export task as a public job exposing trigger, get, list and watch with progress/output fields. */
-import { defineJob } from "@relkit/app/jobs";
+import { defineJob } from "relkit/jobs";
 import exportOrders from "../tasks/export-orders.task.js";
 
 const exportOrdersJob = defineJob({

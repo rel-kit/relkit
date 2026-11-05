@@ -64,9 +64,9 @@ export function agentSource(
   },
 ): string {
   const imports = [
-    `import { defineAgent } from "@relkit/app/agents";`,
+    `import { defineAgent } from "relkit/agents";`,
     `import { langchain } from "@relkit/langchain";`,
-    `import { z } from "@relkit/app/schema";`,
+    `import { s } from "relkit/schema";`,
     ...(model === undefined ? [`import { FakeToolCallingModel } from "langchain";`] : []),
     ...tools.map((tool) => sourceImport(tool.binding, tool.module, tool.exportKind)),
     ...(instructions.binding && instructions.module
@@ -77,8 +77,8 @@ export function agentSource(
   return `${imports.join("\n")}\n\nconst ${artifact.binding} = defineAgent({
   id: "${artifact.id}",
   runtime: langchain(${model === undefined ? `{ model: ${offlineModel()} }` : ""}),
-  input: z.object({ question: z.string().min(1) }),
-  output: z.object({ answer: z.string() }),${model === undefined ? "" : `\n  model: ${JSON.stringify(model)},`}
+  input: s.object({ question: s.string().min(1) }),
+  output: s.object({ answer: s.string() }),${model === undefined ? "" : `\n  model: ${JSON.stringify(model)},`}
   instructions: ${prompt},
   tools: [${tools.map((tool) => tool.binding).join(", ")}],
   limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 10_000 },

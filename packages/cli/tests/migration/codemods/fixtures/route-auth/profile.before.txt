@@ -1,0 +1,7 @@
+import { defineRoute } from "relkit/routes";
+import account from "@app/services/account/service.js";
+
+export const GET = defineRoute({ target: account.accountSession });
+export const PUT = defineRoute({
+  target: account.updateProfile,
+});

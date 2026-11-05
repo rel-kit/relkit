@@ -8,7 +8,6 @@ import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { Schema } from "effect";
 import { generateProject } from "../../packages/create-relkit/src/generate.js";
-import appManifest from "../../packages/app/package.json" with { type: "json" };
 import relkitManifest from "../../packages/relkit/package.json" with { type: "json" };
 import cliManifest from "../../packages/cli/package.json" with { type: "json" };
 import clientManifest from "../../packages/client/package.json" with { type: "json" };
@@ -104,7 +103,6 @@ function verifyGeneratedManifest(
           langsmith: workspaceManifest.catalog.langsmith,
         }
       : {}),
-    "@relkit/app": appManifest.version,
     relkit: relkitManifest.version,
     "@scalar/hono-api-reference": "0.12.9",
     zod: "4.6.7",

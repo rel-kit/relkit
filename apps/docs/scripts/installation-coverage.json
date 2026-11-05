@@ -10,6 +10,7 @@
   "docs/faq": ["update", "concept", ""],
   "docs/maturity": ["update", "concept", ""],
   "guides/migrate/from-express-or-hono": ["update", "continuation", "/docs/learn/create-an-app"],
+  "guides/migrate/relkit-0-9": ["update", "concept", ""],
   "docs/learn/build-and-run": ["retain", "concept", ""],
   "docs/learn/concepts/application": ["update", "concept", ""],
   "docs/learn/concepts/context": ["update", "continuation", "/guides/caching/cache-product-prices"],

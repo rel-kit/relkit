@@ -1,0 +1,15 @@
+import { defineFunction } from "relkit/functions";
+import priceOrder from "./price-order.function.js";
+import orders from "../service.js";
+import updates from "../channels/order-updates.channel.js";
+
+export default defineFunction({
+  id: "orders.place",
+  dependencies: { events: { placed } },
+  handler: async ({ orderId }) => {
+    const price = await priceOrder.invoke({ orderId });
+    const check = await orders.authorizeOrder.invoke({ orderId });
+    await updates.trigger({ orderId }, "changed", { price });
+    return { price, check };
+  },
+});

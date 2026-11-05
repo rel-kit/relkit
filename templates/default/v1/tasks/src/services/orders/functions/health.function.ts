@@ -1,5 +1,5 @@
 /** Supplies the orders service with a validated health result independent of job execution. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 
 export default defineFunction({
