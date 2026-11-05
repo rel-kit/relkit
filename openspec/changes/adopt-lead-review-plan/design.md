@@ -175,7 +175,8 @@ Decided while applying section 12 (maintainer, 2026-11-05):
   holds only package bumps, so `scripts/breaking-migrations.ts` reads the link instead: every
   changeset versioning would group under Breaking must link `/guides/migrate/<page>#<section>`,
   the section must exist in that guide page, and the anchor must be some rule's `guide` anchor.
-  It runs in `bun run check` and before `version-packages.ts` versions, and
+  It runs in `bun run check`, which every pull request (the release pull request included) runs,
+  next to the migration-link check `version-packages.ts` already applies, and
   `tests/unit/breaking-migrations.test.ts` shows it failing on a fixture.
 
 ### D3. Creation gate becomes a CI concern (#1)

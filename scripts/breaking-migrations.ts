@@ -4,7 +4,7 @@
  * (`classifyChange`). Its summary must link a section of a migration guide under
  * `/guides/migrate/`, that section must exist in the guide page, and its anchor must be the
  * `guide` anchor of a `relkit migrate` rule, which is how a breaking change names the rule that
- * migrates it. `bun run check` and `version-packages.ts` run it on `.changeset`.
+ * migrates it. `bun run check` runs it on `.changeset`.
  */
 import { readdir, readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
