@@ -1,15 +1,17 @@
 /**
  * Runs TypeScript and route/event validation after generated declarations exist.
- * Type errors come from the project's own compiler (`tsc` or `tsgo`, TypeScript 5.9 or 7) run as
- * a separate process. RelKit's own source analyses (route modules, event sources, unused errors)
- * read a program built with the CLI's private TypeScript 5.9 parser, never the project's.
- * Prepared checks can supply a scoped input journal that observes the declarations that
- * program consumes and its negative resolution probes.
+ * Ordinary checks take type errors from the project's own compiler (`tsc` or `tsgo`, TypeScript
+ * 5.9 or 7) run as a separate process. RelKit's own source analyses (route modules, event sources,
+ * unused errors) read a program built with the CLI's private TypeScript 5.9 parser, never the
+ * project's. Prepared checks supply a scoped input journal that observes the declarations that
+ * program consumes and its negative resolution probes; because a separate process escapes that
+ * journal, their type errors come from the journal-hosted program itself. A project that installs
+ * no TypeScript compiler is type-checked by that program too.
  */
-import { createDiagnostic, type Diagnostic } from "relkit/diagnostics";
+import type { Diagnostic } from "relkit/diagnostics";
 import { Effect, Option } from "effect";
 import { existsSync } from "node:fs";
-import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
+import { dirname, resolve } from "node:path";
 import ts from "../typescript-parser.js";
 import { runCompilerPromise } from "./compatibility.js";
 import { eventSourceDiagnosticsEffect } from "./event-source-diagnostics.js";
@@ -19,7 +21,8 @@ import { checkConfigPath, routeValidationRoot } from "./project-typecheck-config
 import { ROUTE_MODULE_CHECKS_FILE } from "./route-module-checks.js";
 import { routeModuleDiagnostics } from "./route-module-diagnostics.js";
 import { TypecheckInputs } from "./typecheck-inputs.service.js";
-import { runProjectCompilerEffect, type CompilerRun } from "./typescript-compiler.js";
+import { runProjectCompilerEffect } from "./typescript-compiler.js";
+import { compilerDiagnostics, programDiagnostic } from "./project-typecheck-diagnostics.js";
 
 /**
  * Checks an authored project after generated declarations are available.
@@ -40,6 +43,8 @@ export const typecheckProjectEffect = Effect.fn("Compiler.typecheckProject")(
     const system = Option.isSome(journal) ? journal.value.system : ts.sys;
     const physicalRoot = system.realpath?.(projectRoot) ?? projectRoot;
     const loaded = ts.readConfigFile(configPath, system.readFile);
+    if (Option.isSome(journal) && loaded.error)
+      return [programDiagnostic(loaded.error, projectRoot, physicalRoot)];
     // The project's compiler reports configuration errors itself, with its own option set.
     const parsed = ts.parseJsonConfigFileContent(
       loaded.config ?? {},
@@ -50,10 +55,12 @@ export const typecheckProjectEffect = Effect.fn("Compiler.typecheckProject")(
     );
     const routeChecks = resolve(projectRoot, generatedDirectory, ROUTE_MODULE_CHECKS_FILE);
     const hasRouteChecks = existsSync(routeChecks);
-    const compiler = yield* runProjectCompilerEffect(
-      projectRoot,
-      checkConfigPath(configPath, parsed, hasRouteChecks ? routeChecks : undefined),
-    );
+    const compiler = Option.isSome(journal)
+      ? undefined
+      : yield* runProjectCompilerEffect(
+          projectRoot,
+          checkConfigPath(configPath, parsed, hasRouteChecks ? routeChecks : undefined),
+        );
     const options = { ...parsed.options };
     if (hasRouteChecks && options.rootDir !== undefined)
       options.rootDir = routeValidationRoot(options.rootDir, routeChecks);
@@ -71,7 +78,11 @@ export const typecheckProjectEffect = Effect.fn("Compiler.typecheckProject")(
       ...(rules.unusedErrors === true
         ? yield* unusedErrorDiagnosticsEffect(program, projectRoot)
         : []),
-      ...compilerDiagnostics(compiler, projectRoot, physicalRoot),
+      ...(compiler === undefined || compiler.kind === "unavailable"
+        ? [...parsed.errors, ...ts.getPreEmitDiagnostics(program)].map((diagnostic) =>
+            programDiagnostic(diagnostic, projectRoot, physicalRoot),
+          )
+        : compilerDiagnostics(compiler, projectRoot, physicalRoot)),
     ];
   },
   (effect, projectRoot, _generatedDirectory = ".relkit/generated", _rules: CheckRules = {}) =>
@@ -96,52 +107,4 @@ export function typecheckProject(
 /** Opt-in check rules; every rule is off unless set. */
 export interface CheckRules {
   readonly unusedErrors?: boolean;
-}
-
-/**
- * Converts one compiler run to RelKit diagnostics.
- * @param run - Outcome of the project's compiler.
- * @param projectRoot - Absolute project root and compiler working directory.
- * @param physicalRoot - Same root after native symlink/canonical-path resolution.
- * @remarks Diagnostics in files outside the project keep their code and message without a location.
- * @returns Compiler diagnostics retaining TypeScript code, severity, message and position.
- */
-function compilerDiagnostics(
-  run: CompilerRun,
-  projectRoot: string,
-  physicalRoot: string,
-): readonly Diagnostic[] {
-  if (run.kind === "unavailable")
-    return [
-      createDiagnostic({
-        code: "RELKIT_TYPESCRIPT_COMPILER_FAILED",
-        severity: "error",
-        message:
-          "No TypeScript compiler is installed. Add `typescript` (5.9 or 7) to devDependencies.",
-      }),
-    ];
-  if (run.kind === "failed")
-    return [
-      createDiagnostic({
-        code: "RELKIT_TYPESCRIPT_COMPILER_FAILED",
-        severity: "error",
-        message: `The TypeScript compiler exited with code ${run.exitCode} without reporting diagnostics.${run.output === "" ? "" : `\n${run.output}`}`,
-      }),
-    ];
-  return run.diagnostics.map(({ code, severity, message, location }) => {
-    const file = location === undefined ? undefined : resolve(projectRoot, location.file);
-    const root =
-      file === undefined
-        ? undefined
-        : [projectRoot, physicalRoot].find((root) => {
-            const local = relative(root, file);
-            return local !== ".." && !local.startsWith(`..${sep}`) && !isAbsolute(local);
-          });
-    if (location === undefined || file === undefined || root === undefined)
-      return createDiagnostic({ code, severity, message });
-    return createDiagnostic(
-      { code, severity, message, file, line: location.line, column: location.column },
-      { projectRoot: root },
-    );
-  });
 }

@@ -1,7 +1,7 @@
 /** Reproduces whole-package native aliases through a transitive linked declaration re-export. */
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { expect, it } from "@effect/vitest";
 import { Cause, Effect, Exit } from "effect";
 import { TypecheckInputs } from "../../src/compiler/typecheck-inputs.service.js";
@@ -50,6 +50,19 @@ const fixture = Effect.fn("Typecheck.linkedFixture")((parent: string) =>
     await writeFile(join(leaf, "dist/value.d.ts"), "export declare const value: number;");
     await symlink(bridge, join(root, "node_modules/bridge"));
     await symlink(leaf, join(bridge, "node_modules/leaf"));
+    // Ordinary checks run the project's own compiler, which stops at missing global types under
+    // noLib, so the fixture declares them; the prepared check never reads the compiler.
+    await writeFile(
+      join(root, "src/globals.d.ts"),
+      ["Array<T>", "Boolean", "CallableFunction", "Function", "IArguments", "NewableFunction"]
+        .concat(["Number", "Object", "RegExp", "String"])
+        .map((name) => `interface ${name} {}`)
+        .join("\n"),
+    );
+    await symlink(
+      resolve(import.meta.dirname, "../../../../node_modules/typescript"),
+      join(root, "node_modules/typescript"),
+    );
     return root;
   }),
 );

@@ -789,7 +789,7 @@ export const compilerCodes = [
     code: "RELKIT_TYPESCRIPT_COMPILER_FAILED",
     title: "TypeScript compiler could not run",
     happened:
-      "`relkit check` type-checks by running your project's own TypeScript compiler (`tsc` from `typescript`, or `tsgo`), and it is not installed or exited without reporting any errors.",
-    fix: "Add `typescript` 5.9 or 7 to your devDependencies, install, then run `relkit check` again. If it is installed, run `tsc --noEmit` to see why it fails.",
+      "`relkit check` type-checks by running your project's own TypeScript compiler (`tsc` from `typescript`, or `tsgo`), and it exited without reporting any errors, for example because its installation is broken.",
+    fix: "Run `tsc --noEmit` in the project to see why the compiler fails, reinstall `typescript` (5.9 or 7) if needed, then run `relkit check` again.",
   },
 ] as const satisfies readonly DiagnosticCodeEntry[];

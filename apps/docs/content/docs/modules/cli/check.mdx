@@ -33,7 +33,8 @@ After the graph is known, check type-checks the project with the compiler instal
 `typescript` (5.9 or 7, see [TypeScript versions](/docs/modules/cli#typescript-versions)). It
 reports each compiler error with its file, line and message. If your `tsconfig.json` does not list
 `.relkit/generated/route-module-checks.ts`, check writes `.relkit/generated/tsconfig.check.json`,
-which extends yours and adds that file, and checks that configuration instead.
+which extends yours and adds that file, and checks that configuration instead. A project that
+installs no TypeScript is checked with the TypeScript 5.9 bundled in `@relkit/cli`.
 
 ## Which side effects are blocked
 
