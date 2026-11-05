@@ -12,6 +12,9 @@ it("exposes Promise helpers for selected integrations and the context resolver",
     "checkRuntimeIntegrations",
     "createApplicationContextResolver",
     "createApplicationContextResolverEffect",
+    "createHandlerTable",
+    "createModuleReloader",
+    "installDevelopmentReload",
     "loadRuntimeIntegration",
   ]);
 });

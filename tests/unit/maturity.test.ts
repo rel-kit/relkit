@@ -46,7 +46,8 @@ test("the initial assignment puts the plan's Labs features in Labs", () => {
     "Inngest job adapter",
     "Trigger.dev job adapter",
     "Effect MQ job adapter",
-    "Agent adapters (LangChain and DeepAgents)",
+    "Agent adapters (LangChain, DeepAgents and AI SDK)",
+    "Postgres durable backend",
     "Graph workflows",
   ])
     expect(tierOf.get(name)).toBe("labs");

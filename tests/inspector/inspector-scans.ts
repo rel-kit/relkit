@@ -35,6 +35,8 @@ const networkFiles = new Set([
   "apps/inspector/lib/api-transport.ts",
   "apps/inspector/app/application-runtime-client.ts",
   "apps/inspector/lib/stream.ts",
+  // The reference page's own browser script fetches the document through the loopback proxy.
+  "apps/inspector/app/scalar/route.ts",
 ]);
 
 export const FORBIDDEN_PAYLOAD_MARKERS = Object.freeze([

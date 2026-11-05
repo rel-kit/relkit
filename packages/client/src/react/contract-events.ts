@@ -1,6 +1,6 @@
 import { CLIENT_CONTRACT_EVENTS_PATH } from "../wire.js";
 
-/** Callbacks of one contract event subscription. */
+/** Callbacks of one contract event listener. */
 export interface ContractEventHandlers {
   /** The backend may have a new contract: re-read the identity document. */
   readonly changed: () => void;
@@ -12,14 +12,14 @@ export interface ContractEventHandlers {
  * Follows the backend's development contract stream until the signal aborts.
  *
  * `relkit dev` serves the stream on the backend's public port; elsewhere it answers 404 and
- * the subscription stops. The stream sends `ready` when it connects and `contract` after each
+ * the listener stops. The stream sends `ready` when it connects and `contract` after each
  * generation switch; both report {@link ContractEventHandlers.changed}, because the contract
  * may also have changed while the stream was disconnected. A dropped stream reconnects with
  * a growing delay, up to ten seconds.
  * @param baseUrl - Backend root URL.
  * @param handlers - Change and connection callbacks.
- * @param signal - Ends the subscription.
- * @returns A promise that settles when the subscription ends.
+ * @param signal - Ends the listener.
+ * @returns A promise that settles when the listener ends.
  * @example void followContractEvents(baseUrl, { changed: reload, live: setLive }, signal);
  */
 export async function followContractEvents(

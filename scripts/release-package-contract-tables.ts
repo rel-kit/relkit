@@ -30,6 +30,7 @@ export const relkitFacadeSubpaths = { app: "index", effect: "effect" } as const;
 
 /** Former packages merged into `relkit`; each keeps its exports under `relkit/<area>`. */
 export const relkitAreas = [
+  "agent-adapters",
   "agents",
   "buckets",
   "cache",

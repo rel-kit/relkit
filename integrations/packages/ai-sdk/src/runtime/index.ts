@@ -1,9 +1,9 @@
 /** Runtime entry of the AI SDK adapter: the generated server imports it only for agents that select `aiSdk()`. */
 import type { RuntimeIntegrationModuleMetadata } from "relkit/contracts";
 
-export { aiSdkAgentRuntime } from "./adapter-runtime.js";
-export { invokeAgentFunction } from "./runtime-invoke.js";
-export type { AiSdkInvocationOptions } from "./runtime-invoke.types.js";
+export { aiSdkAgentRuntime } from "../adapter-runtime.js";
+export { invokeAgentFunction } from "../runtime-invoke.js";
+export type { AiSdkInvocationOptions } from "../runtime-invoke.types.js";
 export { createGeneratedAgentFunction } from "relkit/agents/generated-function";
 
 /** @experimental */

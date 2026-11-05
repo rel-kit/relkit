@@ -44,6 +44,7 @@ export const SCAFFOLD_DEPENDENCIES = Object.freeze({
     version: buildCatalogProvider("@relkit/postgres"),
     section: "dependencies",
   },
+  "@relkit/ai-sdk": { version: buildCatalogProvider("@relkit/ai-sdk"), section: "dependencies" },
   "@relkit/pulumi": { version: buildCatalogProvider("@relkit/pulumi"), section: "dependencies" },
   "@relkit/redis": { version: buildCatalogProvider("@relkit/redis"), section: "dependencies" },
   "@relkit/s3": { version: buildCatalogProvider("@relkit/s3"), section: "dependencies" },
