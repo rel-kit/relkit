@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { Effect, Schema } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
 import { ReadinessBenchmarkError } from "./benchmark-error.js";
-import { snapshotDigest } from "@relkit/cli/tooling";
+import { contentDigest } from "@relkit/cli/tooling";
 
 /**
  * Resolves the literal Bun executable and installed CLI plus all package tarballs.
@@ -42,7 +42,7 @@ export const packedReadinessIdentity = Effect.fn("ReadinessBenchmark.identity")(
           artifacts,
           (artifact) =>
             native("identity.tarball", (signal) => readFile(artifact.path, { signal })).pipe(
-              Effect.map((bytes) => ({ name: artifact.name, hash: snapshotDigest(bytes) })),
+              Effect.map((bytes) => ({ name: artifact.name, hash: contentDigest(bytes) })),
             ),
           { concurrency: 4 },
         );
@@ -50,7 +50,7 @@ export const packedReadinessIdentity = Effect.fn("ReadinessBenchmark.identity")(
           bun: { path: bunPath, realpath: bunRealpath, version: Bun.version },
           cli: { ...cli, path: cliPath, realpath: cliRealpath },
           typescript,
-          lockHash: snapshotDigest(lock),
+          lockHash: contentDigest(lock),
           artifacts: hashes,
           inspectorOverride: process.env.RELKIT_INSPECTOR_ROOT === undefined ? "absent" : "present",
         };

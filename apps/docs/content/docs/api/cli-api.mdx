@@ -39,7 +39,7 @@ Resolves a command path in the static tree without executing the command.
 declare const findCliHelp: (path: readonly string[]) => CliHelpCommand | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L126)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L119)
 
 ### getCliHelpModel
 
@@ -51,7 +51,7 @@ Returns a frozen static help tree without acquiring command services.
 declare const getCliHelpModel: (version: string) => CliHelpModel;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L118)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L111)
 
 ## `cli-help-model.types.ts`
 
@@ -571,7 +571,7 @@ type DevActivationFingerprint =
     ) => RuntimeActivationFingerprint | PromiseLike<RuntimeActivationFingerprint>);
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L32)
 
 ### DevLocalServices (interface)
 
@@ -589,7 +589,7 @@ export interface DevLocalServices {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L38)
 
 ### DevLog (type alias)
 
@@ -601,7 +601,7 @@ Synchronous native logging callback; failures cannot change session lifecycle.
 type DevLog = (event: DevLogEvent) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L26)
 
 ### DevLogEvent (interface)
 
@@ -617,7 +617,7 @@ export interface DevLogEvent {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L16)
 
 ### DevOptions (interface)
 
@@ -629,6 +629,8 @@ Development host inputs; all process/session resources belong to one lifetime.
 export interface DevOptions {
   readonly projectRoot?: string;
   readonly compile: CandidateCompile;
+  /** Offers each save to the in-place handler swap before starting a new generation. */
+  readonly reload?: DevReload;
   readonly activationFingerprint?: DevActivationFingerprint;
   /**
    * Reuses the prepared identity only for a child installed from that validated receipt.
@@ -737,7 +739,7 @@ export interface DevOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L46)
 
 ## `editor.ts`
 
@@ -808,7 +810,7 @@ Re-exports all named exports from the "./context-registry.js" module.
 export * from "./context-registry.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L23)
 
 ### "./conventions.js" (namespace export)
 
@@ -846,6 +848,18 @@ export * from "./discovery/ast-prefilter.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L9)
 
+### "./discovery/evaluator-warm.js" (namespace export)
+
+Re-exports all named exports from the "./discovery/evaluator-warm.js" module.
+
+**Signature**
+
+```ts
+export * from "./discovery/evaluator-warm.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L17)
+
 ### "./discovery/evaluator.js" (namespace export)
 
 Re-exports all named exports from the "./discovery/evaluator.js" module.
@@ -868,7 +882,7 @@ Re-exports all named exports from the "./discovery/extract.js" module.
 export * from "./discovery/extract.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L18)
 
 ### "./discovery/source-id.js" (namespace export)
 
@@ -880,7 +894,7 @@ Re-exports all named exports from the "./discovery/source-id.js" module.
 export * from "./discovery/source-id.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L20)
 
 ### "./discovery/source-map.js" (namespace export)
 
@@ -892,7 +906,7 @@ Re-exports all named exports from the "./discovery/source-map.js" module.
 export * from "./discovery/source-map.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L19)
 
 ### "./event-registry.js" (namespace export)
 
@@ -904,7 +918,7 @@ Re-exports all named exports from the "./event-registry.js" module.
 export * from "./event-registry.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L22)
 
 ### "./generate-manifest.js" (namespace export)
 
@@ -916,7 +930,7 @@ Re-exports all named exports from the "./generate-manifest.js" module.
 export * from "./generate-manifest.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L21)
 
 ### "./generated-artifacts.js" (namespace export)
 
@@ -928,7 +942,7 @@ Re-exports all named exports from the "./generated-artifacts.js" module.
 export * from "./generated-artifacts.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L24)
 
 ### "./integration-package-resolution.js" (namespace export)
 
@@ -940,7 +954,7 @@ Re-exports all named exports from the "./integration-package-resolution.js" modu
 export * from "./integration-package-resolution.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L25)
 
 ### "./jobs/build-id.js" (namespace export)
 
@@ -952,7 +966,7 @@ Re-exports all named exports from the "./jobs/build-id.js" module.
 export * from "./jobs/build-id.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L42)
 
 ### "./jobs/diagnostics.js" (namespace export)
 
@@ -964,7 +978,7 @@ Re-exports all named exports from the "./jobs/diagnostics.js" module.
 export * from "./jobs/diagnostics.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L39)
 
 ### "./jobs/discover.js" (namespace export)
 
@@ -976,7 +990,7 @@ Re-exports all named exports from the "./jobs/discover.js" module.
 export * from "./jobs/discover.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L37)
 
 ### "./jobs/manifest.js" (namespace export)
 
@@ -988,7 +1002,7 @@ Re-exports all named exports from the "./jobs/manifest.js" module.
 export * from "./jobs/manifest.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L43)
 
 ### "./jobs/names.js" (namespace export)
 
@@ -1000,7 +1014,7 @@ Re-exports all named exports from the "./jobs/names.js" module.
 export * from "./jobs/names.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L38)
 
 ### "./jobs/provider-requirements.js" (namespace export)
 
@@ -1012,7 +1026,7 @@ Re-exports all named exports from the "./jobs/provider-requirements.js" module.
 export * from "./jobs/provider-requirements.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L40)
 
 ### "./jobs/replay-diagnostics.js" (namespace export)
 
@@ -1024,7 +1038,7 @@ Re-exports all named exports from the "./jobs/replay-diagnostics.js" module.
 export * from "./jobs/replay-diagnostics.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L41)
 
 ### "./jobs/worker-entries.js" (namespace export)
 
@@ -1036,7 +1050,7 @@ Re-exports all named exports from the "./jobs/worker-entries.js" module.
 export * from "./jobs/worker-entries.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L46)
 
 ### "./layout-contract.js" (namespace export)
 
@@ -1060,7 +1074,7 @@ Re-exports all named exports from the "./local-service-plan.js" module.
 export * from "./local-service-plan.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L26)
 
 ### "./normalize.js" (namespace export)
 
@@ -1072,7 +1086,7 @@ Re-exports all named exports from the "./normalize.js" module.
 export * from "./normalize.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L27)
 
 ### "./project-typecheck.js" (namespace export)
 
@@ -1084,7 +1098,7 @@ Re-exports all named exports from the "./project-typecheck.js" module.
 export * from "./project-typecheck.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L28)
 
 ### "./route-file.js" (namespace export)
 
@@ -1096,7 +1110,7 @@ Re-exports all named exports from the "./route-file.js" module.
 export * from "./route-file.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L33)
 
 ### "./route-module-checks.js" (namespace export)
 
@@ -1108,7 +1122,7 @@ Re-exports all named exports from the "./route-module-checks.js" module.
 export * from "./route-module-checks.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L32)
 
 ### "./runtime-integration-imports.js" (namespace export)
 
@@ -1120,7 +1134,7 @@ Re-exports all named exports from the "./runtime-integration-imports.js" module.
 export * from "./runtime-integration-imports.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L35)
 
 ### "./runtime-integration-plan.js" (namespace export)
 
@@ -1132,7 +1146,7 @@ Re-exports all named exports from the "./runtime-integration-plan.js" module.
 export * from "./runtime-integration-plan.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L34)
 
 ### "./source-resolution.service.js" (namespace export)
 
@@ -1168,7 +1182,7 @@ Re-exports all named exports from the "./watch.js" module.
 export * from "./watch.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L36)
 
 ### AuthoredSourceInspectionError
 
@@ -1246,7 +1260,7 @@ declare const JobsManifestSchema: Struct<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L44)
 
 ### LoadedToolingConfigSchema
 
@@ -1281,7 +1295,7 @@ declare const LoadedToolingConfigSchema: Struct<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L45)
 
 ### SourceResolutionError
 
@@ -1301,7 +1315,7 @@ declare const SourceResolutionError: typeof SourceResolutionError;
 declare const TypecheckInputError: typeof TypecheckInputError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L30)
 
 ### TypecheckInputOperations
 
@@ -1311,7 +1325,7 @@ declare const TypecheckInputError: typeof TypecheckInputError;
 declare const TypecheckInputOperations: TypecheckInputOperations;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L31)
 
 ### TypecheckInputWitness
 
@@ -1321,7 +1335,7 @@ declare const TypecheckInputOperations: TypecheckInputOperations;
 declare const TypecheckInputWitness: TypecheckInputWitness;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L31)
 
 ### TypecheckInputs
 
@@ -1331,7 +1345,7 @@ declare const TypecheckInputWitness: TypecheckInputWitness;
 declare const TypecheckInputs: typeof TypecheckInputs;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L29)
 
 ### typecheckInputsLayer
 
@@ -1343,7 +1357,7 @@ declare const typecheckInputsLayer: (
 ) => Layer<TypecheckInputs, TypecheckInputError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/compiler/index.ts#L29)
 
 ## `editor.ts`
 
@@ -3175,137 +3189,15 @@ Exposes finite native ownership, byte identities and import policy to
 repository tooling through a declared package boundary. These exports acquire
 no CLI session; callers own cancellation, compilation and publication scopes.
 
-### DevSnapshot
+### contentDigest
 
 **Signature**
 
 ```ts
-declare const DevSnapshot: Struct<{
-  readonly version: Literal<1>;
-  readonly fingerprint: String;
-  readonly graphHash: String;
-  readonly graphFile: String;
-  readonly activationFile: String;
-  readonly manifestFile: String;
-  readonly runtimeIntegrationsFile: String;
-  readonly jobsManifestFile: optionalKey<String>;
-  readonly localServicesFile: optionalKey<String>;
-  readonly entrypoint: String;
-  readonly importIndex: String;
-  readonly activation: Struct<{
-    readonly graphHash: String;
-    readonly manifestHash: String;
-    readonly jobsManifestHash: optionalKey<String>;
-    readonly runtimeIntegrationsPlanHash: String;
-    readonly localServicesPlanHash: optionalKey<String>;
-    readonly schemaLibrariesHash: optionalKey<String>;
-  }>;
-  readonly tools: Struct<{
-    readonly layout: Literal<1>;
-    readonly bun: String;
-    readonly effect: String;
-    readonly typescript: String;
-    readonly relkit: String;
-    readonly platform: Literals<
-      readonly ["darwin-arm64", "darwin-x64", "linux-arm64", "linux-x64"]
-    >;
-  }>;
-  readonly inspector: optionalKey<
-    Struct<{
-      readonly enabled: Boolean;
-      readonly connection: Struct<{ readonly host: String; readonly port: Number }>;
-      readonly maxPreviewBytes: Number;
-    }>
-  >;
-  readonly ports: optionalKey<Struct<{ readonly backend: Number }>>;
-  readonly readiness: Union<
-    readonly [
-      Struct<{
-        readonly kind: Literal<"route">;
-        readonly path: String;
-        readonly status: Literal<200>;
-        readonly body: String;
-      }>,
-      Struct<{ readonly kind: Literal<"graph">; readonly routeTableHash: String }>,
-    ]
-  >;
-  readonly inputs: $Array<
-    Struct<{ readonly path: String; readonly hash: String; readonly bytes: Number }>
-  >;
-  readonly typecheckInputs: Struct<{
-    readonly files: $Array<
-      Struct<{ readonly path: String; readonly hash: String; readonly bytes: Number }>
-    >;
-    readonly observations: $Array<
-      Union<
-        readonly [
-          Struct<{
-            readonly kind: Literals<readonly ["fileExists", "directoryExists"]>;
-            readonly path: Union<readonly [String, Literal<".">]>;
-            readonly exists: Boolean;
-          }>,
-          Struct<{
-            readonly kind: Literals<readonly ["directories", "entries"]>;
-            readonly path: Union<readonly [String, Literal<".">]>;
-            readonly entries: $Array<String>;
-          }>,
-        ]
-      >
-    >;
-  }>;
-  readonly dependencies: $Array<
-    Struct<{
-      readonly name: String;
-      readonly version: String;
-      readonly root: String;
-      readonly members: $Array<
-        Struct<{ readonly path: String; readonly hash: String; readonly bytes: Number }>
-      >;
-    }>
-  >;
-  readonly artifacts: $Array<
-    Struct<{ readonly path: String; readonly hash: String; readonly bytes: Number }>
-  >;
-  readonly routeImports: $Array<
-    Struct<{ readonly routeId: String; readonly members: $Array<String> }>
-  >;
-}>;
+declare const contentDigest: (bytes: Uint8Array | string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L11)
-
-### SnapshotFileOperations
-
-**Signature**
-
-```ts
-declare const SnapshotFileOperations: SnapshotFileOperations;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L10)
-
-### SnapshotFiles
-
-**Signature**
-
-```ts
-declare const SnapshotFiles: typeof SnapshotFiles;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L9)
-
-### SnapshotPointer
-
-**Signature**
-
-```ts
-declare const SnapshotPointer: Struct<{
-  readonly version: Literal<1>;
-  readonly generation: String;
-}>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L8)
 
 ### narrowEffectImportPlugin
 
@@ -3339,23 +3231,3 @@ declare const ownedNativePromise: <A>(
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L6)
-
-### snapshotDigest
-
-**Signature**
-
-```ts
-declare const snapshotDigest: (bytes: Uint8Array | string) => string;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L8)
-
-### snapshotFilesLive
-
-**Signature**
-
-```ts
-declare const snapshotFilesLive: Layer<SnapshotFiles, never, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L9)

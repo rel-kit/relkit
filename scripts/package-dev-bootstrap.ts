@@ -1,11 +1,10 @@
 /**
- * Builds small packaged executable/prepared-command closures with pinned Bun.
- * Compilation and native publication are finite owned adapter calls. Safe CLI
- * dispatch and compiler modules remain external dynamic imports, so unchanged
- * startup neither parses nor evaluates their dependency graph.
+ * Builds the small packaged CLI executable with pinned Bun. Compilation and native
+ * publication are finite owned adapter calls. CLI dispatch stays an external dynamic
+ * import, so the executable itself neither parses nor evaluates its dependency graph.
  */
-import { dirname, resolve, relative, sep } from "node:path";
-import { readdir, rm } from "node:fs/promises";
+import { resolve } from "node:path";
+import { rm } from "node:fs/promises";
 import { Effect } from "effect";
 import { ownedNativePromise, narrowEffectImportPlugin } from "@relkit/cli/tooling";
 
@@ -61,129 +60,11 @@ function lazyImports(external: readonly string[]): Bun.BunPlugin {
 }
 
 /**
- * Packages prepared policy and lightweight capture with a single shared Effect identity.
- * @returns Joined chunk publication without native storage or UI entries.
- */
-const packagePreparedCohort = Effect.fn("Packaging.preparedCohort")(function* () {
-  const root = resolve(import.meta.dir, "..");
-  const destination = resolve(root, "packages/cli/dist/dev-snapshot");
-  yield* removeStalePreparedChunks(destination);
-  const hit = yield* buildPreparedEntries(
-    root,
-    destination,
-    [
-      "packages/cli/src/dev-snapshot/snapshot-command-entry.ts",
-      "packages/cli/src/dev-snapshot/snapshot-hash-worker.ts",
-    ],
-    "prepared-hit-[hash].js",
-  );
-  const preparation = yield* buildPreparedEntries(
-    root,
-    destination,
-    ["packages/cli/src/dev-snapshot/snapshot-preparation-entry.ts"],
-    "prepared-prepare-[hash].js",
-  );
-  if (
-    !hit.success ||
-    !preparation.success ||
-    !["snapshot-command-entry.js", "snapshot-hash-worker.js"].every((name) =>
-      hit.outputs.some((output) => output.path.endsWith(`/${name}`)),
-    )
-  )
-    return yield* Effect.die(new Error("Prepared development cohort packaging failed."));
-  const outputs = new Map(
-    [...hit.outputs, ...preparation.outputs].map((output) => [output.path, output]),
-  );
-  for (const output of outputs.values()) {
-    const path = relative(destination, output.path);
-    if (path.startsWith("../") || path === ".." || path.startsWith("/"))
-      return yield* Effect.die(new Error("Prepared chunk escaped its packaging destination."));
-    yield* ownedNativePromise("package.dev.chunk", async () => {
-      const bytes = await output.arrayBuffer();
-      await Bun.write(output.path, bytes);
-    });
-    yield* ownedNativePromise("package.dev.remove-stale-map", () =>
-      rm(output.path + ".map", { force: true }),
-    );
-  }
-});
-
-/**
- * Keeps the compiler out of the prepared chunks, as it was while it was its own package. The
- * compiler locates its evaluator child from its own module URL, so inlining it into
- * `dist/dev-snapshot` would point that lookup at a file that does not exist.
- * @param root - Repository root.
- * @returns Bundler policy rewriting compiler imports to the tsc output beside the chunks.
- */
-function externalCompiler(root: string): Bun.BunPlugin {
-  const compiler = resolve(root, "packages/cli/src/compiler");
-  return {
-    name: "relkit-external-compiler",
-    setup(builder) {
-      builder.onResolve({ filter: /(?:^|\/)compiler(?:\/|\.js$)/ }, (args) => {
-        if (!args.path.startsWith(".")) return undefined;
-        const target = resolve(dirname(args.importer), args.path);
-        if (target !== compiler && !target.startsWith(compiler + sep)) return undefined;
-        const inside = relative(compiler, target).split(sep).join("/");
-        return { path: `../compiler/${inside === "" ? "index.js" : inside}`, external: true };
-      });
-    },
-  };
-}
-
-/** Builds one dependency-isolated prepared graph so preparation-only TypeScript stays off hits. */
-const buildPreparedEntries = Effect.fn("Packaging.preparedEntries")(
-  (root: string, destination: string, entries: readonly string[], chunk: string) =>
-    ownedNativePromise("package.dev.cohort", () =>
-      Bun.build({
-        entrypoints: entries.map((entry) => resolve(root, entry)),
-        outdir: destination,
-        target: "bun",
-        format: "esm",
-        splitting: true,
-        naming: { entry: "[name].js", chunk },
-        minify: true,
-        plugins: [
-          lazyImports(["../services/local-capabilities.js", "../commands/dev-local-compiler.js"]),
-          externalCompiler(root),
-          narrowEffectImportPlugin(),
-        ],
-      }),
-    ),
-);
-
-/** Removes only previous content-addressed cohort chunks before writing the next cohort. */
-const removeStalePreparedChunks = Effect.fn("Packaging.removeStalePreparedChunks")(function* (
-  destination: string,
-) {
-  const entries = yield* ownedNativePromise("package.dev.read-output-directory", () =>
-    readdir(destination, { withFileTypes: true }),
-  );
-  yield* Effect.forEach(
-    entries.filter(
-      (entry) =>
-        entry.isFile() &&
-        /^prepared(?:-(?:hit|prepare))?-[a-z0-9]+\.js(?:\.map)?$/i.test(entry.name),
-    ),
-    (entry) =>
-      ownedNativePromise("package.dev.remove-stale-chunk", () =>
-        rm(resolve(destination, entry.name), { force: true }),
-      ),
-    { concurrency: 8 },
-  );
-});
-
-/**
- * Packages both native boundaries after TypeScript has emitted their declarations.
+ * Packages the executable boundary after TypeScript has emitted its declarations.
  * @returns Joined finite build/publication; no server or support process is acquired.
  */
 const main = Effect.gen(function* () {
-  yield* packageDevBootstrap("packages/cli/src/bin.ts", "packages/cli/dist/bin.js", [
-    "./main.js",
-    "./dev-snapshot/snapshot-command-entry.js",
-    "./dev-snapshot/snapshot-preparation-entry.js",
-  ]);
-  yield* packagePreparedCohort();
+  yield* packageDevBootstrap("packages/cli/src/bin.ts", "packages/cli/dist/bin.js", ["./main.js"]);
 });
 
 if (import.meta.main) await Effect.runPromise(Effect.scoped(main));

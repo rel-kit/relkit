@@ -3,7 +3,7 @@
  * the real installed dependency graph. Physical project paths remain visible to
  * boundary policy, while dependencies stay external and are never evaluated.
  */
-import { isAbsolute, relative, resolve } from "node:path";
+import { dirname, isAbsolute, relative, resolve } from "node:path";
 import * as ts from "typescript";
 import type { SourceDependency, SourceResolutionInput } from "./source-resolution.types.js";
 
@@ -20,12 +20,22 @@ export function sourceResolutionHost(
   const textByPath = new Map(
     [...input.sources].map(([file, text]) => [resolve(input.root, file), text]),
   );
+  // Every ancestor directory of a virtual source, computed once: resolution asks for
+  // directories many times per import, and scanning every source per call was quadratic.
+  const directories = new Set<string>();
+  for (const file of textByPath.keys())
+    for (
+      let directory = dirname(file);
+      !directories.has(directory);
+      directory = dirname(directory)
+    ) {
+      directories.add(directory);
+      if (dirname(directory) === directory) break;
+    }
   return {
     fileExists: (path) => textByPath.has(resolve(path)) || system.fileExists(path),
     readFile: (path) => textByPath.get(resolve(path)) ?? system.readFile(path),
-    directoryExists: (path) =>
-      [...textByPath.keys()].some((file) => file.startsWith(`${resolve(path)}/`)) ||
-      system.directoryExists(path),
+    directoryExists: (path) => directories.has(resolve(path)) || system.directoryExists(path),
     getCurrentDirectory: () => input.root,
     realpath: (path) => {
       const absolute = resolve(path);

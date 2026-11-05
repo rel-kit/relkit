@@ -30,6 +30,7 @@ export const overviewPages = [
   "docs/why-relkit",
   "docs/faq",
   "docs/maturity",
+  "docs/benchmarks",
   "docs/modules/index",
   "guides/index",
 ] as const;
@@ -107,6 +108,7 @@ const relations = [
   relation("docs/modules/index", ["app"], []),
   relation("docs/why-relkit", ["app"], []),
   relation("docs/maturity", ["app"], []),
+  relation("docs/benchmarks", ["app"], ["scripts/benchmark-dev-loop.ts"]),
   relation(
     "docs/faq",
     ["app", "functions"],

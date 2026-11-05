@@ -27,7 +27,7 @@ export function devActivationWorker(owner: DevEngineState, session: DevSession) 
           ? Effect.succeed(false)
           : provideDevEngine(
               owner,
-              activateCandidateEffect(session, request.version, request.changedFiles),
+              reloadOrActivate(session, request.version, request.changedFiles),
             );
       yield* Deferred.complete(request.result, activation);
       yield* Ref.update(session.state, (state) => ({
@@ -43,6 +43,34 @@ export function devActivationWorker(owner: DevEngineState, session: DevSession) 
     ),
   );
 }
+
+/**
+ * Offers a save to the in-place swap and starts a new generation only when it needs one.
+ * @param session - Serving generation, options and log.
+ * @param version - Admitted source version.
+ * @param changedFiles - Changed paths from the watcher.
+ * @returns Acceptance: true after a swap or activation, false when the save failed.
+ */
+const reloadOrActivate = Effect.fn("Dev.reloadOrActivate")(function* (
+  session: DevSession,
+  version: number,
+  changedFiles: readonly string[],
+) {
+  const candidate = session.active;
+  const reload = session.options.reload;
+  if (candidate !== undefined && reload !== undefined) {
+    const outcome = yield* reload({
+      candidate,
+      version,
+      changedFiles,
+      signal: session.abortController.signal,
+      log: session.log,
+    });
+    if (outcome === "swapped") return true;
+    if (outcome === "failed") return false;
+  }
+  return yield* activateCandidateEffect(session, version, changedFiles);
+});
 
 /**
  * Admits a new source version atomically and joins its serialized result.

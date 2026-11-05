@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 /**
- * Native argv/signal edge selects the owning Effect command before importing it.
- * Prepared and safe commands each own their service graph and physical cleanup;
- * this edge awaits that lifetime and removes only its native signal listeners.
+ * Native argv/signal edge: loads the CLI, which selects the owning Effect command.
+ * Each command owns its service graph and physical cleanup; this edge awaits that
+ * lifetime and removes only its native signal listeners.
  */
 import { installInvocationSignals } from "./invocation-signals.js";
 
@@ -31,26 +31,12 @@ export async function run(args: readonly string[] = process.argv.slice(2)): Prom
 }
 
 /**
- * Loads only the selected startup graph; help/global syntax retains the full parser.
+ * Loads the CLI parser and runs the selected command.
  * @param args - Literal native invocation arguments.
  * @param signal - Existing invocation-owned cancellation.
  * @returns Established exit status after the selected command's lifetime joins.
  */
 async function selectedCommand(args: readonly string[], signal: AbortSignal): Promise<number> {
-  if (args[0] === "dev" && args.includes("--prepare") && !args.includes("--help")) {
-    const prepared = await import("./dev-snapshot/snapshot-preparation-entry.js");
-    return prepared.runSnapshotPreparation(args.slice(1), signal);
-  }
-  if (
-    args[0] === "dev" &&
-    !args.some(
-      (argument) =>
-        ["--help", "--version", "--prepare"].includes(argument) || argument.startsWith("--json"),
-    )
-  ) {
-    const prepared = await import("./dev-snapshot/snapshot-command-entry.js");
-    if (await prepared.runPreparedDev(args.slice(1), signal)) return 0;
-  }
   const { runCli } = await import("./main.js");
   return runCli(args, { signal, installSignalHandlers: false });
 }

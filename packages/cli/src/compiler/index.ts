@@ -14,6 +14,7 @@ export * from "./source-resolution.types.js";
 export { SourceResolutionError } from "./source-resolution-options.js";
 export * from "./layout-contract.js";
 export * from "./discovery/evaluator.js";
+export * from "./discovery/evaluator-warm.js";
 export * from "./discovery/extract.js";
 export * from "./discovery/source-map.js";
 export * from "./discovery/source-id.js";

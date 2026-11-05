@@ -22,10 +22,27 @@ export const linkBuildModules = Effect.fn("Project.buildModuleLinks")(function* 
   directory: string,
   projectRoot: string,
 ) {
-  const source = yield* DependencySource;
   yield* Effect.acquireRelease(files.mkdir(directory), () =>
     cleanupEffect("build.moduleLink.remove", files.remove(directory)),
   );
+  yield* linkFrameworkModules(files, directory, projectRoot);
+});
+
+/**
+ * Links the framework packages the generated server imports into a module directory that
+ * outlives the call; a development generation runs its TypeScript entry against it.
+ * @param files - Build-owned filesystem capabilities.
+ * @param directory - Module directory, created if missing.
+ * @param projectRoot - Actual consuming application root, preferred for resolution.
+ * @returns Completion after every link exists.
+ */
+export const linkFrameworkModules = Effect.fn("Project.frameworkModuleLinks")(function* (
+  files: FileSystemCapabilities,
+  directory: string,
+  projectRoot: string,
+) {
+  const source = yield* DependencySource;
+  yield* files.mkdir(directory);
   const producer = dirname(fileURLToPath(import.meta.url));
   for (const name of FRAMEWORK_PACKAGES) {
     const identity =

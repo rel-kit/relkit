@@ -1,8 +1,7 @@
 /**
- * Materializes, installs and validates a private creation stage. Finite dev
- * --prepare owns one full check and reuses it for bundling; creation publishes
- * only after its complete snapshot is durable. No development listener or
- * support process is started here.
+ * Materializes, installs and validates a private creation stage. The finite
+ * `relkit dev --prepare` checks the project; creation publishes only after it
+ * passes. No development listener or support process is started here.
  */
 
 import { join } from "node:path";
@@ -84,10 +83,7 @@ export const installGenerationStage = Effect.fn("ProjectGeneration.installStage"
   (effect) => observeExecution("generator", "generation.installStage", effect),
 );
 
-/** Preparation's message when the prepared snapshot cannot capture the project's source. */
-const SNAPSHOT_INELIGIBLE = "Development snapshot ineligible during";
-
-/** Checks prerequisites and prepares a snapshot from one source validation.
+/** Checks prerequisites and the project's source.
  * @param stage - Installed private project root.
  * @param options - Cloud/deployment options controlling existing doctor checks.
  * @param context - Native executable, progress and cancellation authority.
@@ -112,29 +108,14 @@ export const verifyGenerationStage = Effect.fn("ProjectGeneration.prepareStage")
       "doctor",
       "doctor",
     );
-    context.onProgress?.("Checking and preparing development snapshot...");
-    // Keep the existing check failure-injection contract. The finite command
-    // checks once and supplies its accepted result to snapshot preparation.
-    // A project the prepared snapshot cannot capture is checked instead; its
-    // first `relkit dev` then compiles normally.
+    context.onProgress?.("Checking the project...");
+    // Keeps the existing check failure-injection contract; `dev --prepare` is the check.
     yield* runProjectStepEffect(
       context,
       [relkit, "dev", "--prepare", "--project-root", stage],
       stage,
       "prepare",
       "check",
-    ).pipe(
-      Effect.catch((error) =>
-        error.message.includes(SNAPSHOT_INELIGIBLE)
-          ? runProjectStepEffect(
-              context,
-              [relkit, "check", "--project-root", stage],
-              stage,
-              "check",
-              "check",
-            )
-          : Effect.fail(error),
-      ),
     );
   },
   (effect) => observeExecution("generator", "generation.prepareStage", effect),

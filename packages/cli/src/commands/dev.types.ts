@@ -10,6 +10,7 @@ import type {
 import type { InspectionBridgeOptions } from "relkit/inspector-api/connection";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { DevInspectorPolicy } from "./dev-inspector-support.types.js";
+import type { DevReload } from "../dev-reload/reload.types.js";
 
 /** One admitted development log, rendered by the existing terminal policy. */
 export interface DevLogEvent {
@@ -45,6 +46,8 @@ export interface DevLocalServices {
 export interface DevOptions {
   readonly projectRoot?: string;
   readonly compile: CandidateCompile;
+  /** Offers each save to the in-place handler swap before starting a new generation. */
+  readonly reload?: DevReload;
   readonly activationFingerprint?: DevActivationFingerprint;
   /**
    * Reuses the prepared identity only for a child installed from that validated receipt.

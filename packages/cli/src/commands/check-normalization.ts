@@ -83,11 +83,11 @@ const normalizeCheckEvaluation = Effect.fn("Project.checkNormalization")(functio
     ],
     { concurrency: 2 },
   );
-  const typeDiagnostics = yield* compiler.typecheck(
-    projectRoot,
-    config.generatedDirectory,
-    config.check,
-  );
+  options.onWatchIndex?.(normalization.watch);
+  const typeDiagnostics =
+    options.typecheck === false
+      ? []
+      : yield* compiler.typecheck(projectRoot, config.generatedDirectory, config.check);
   return { normalization, extracted, typeDiagnostics };
 });
 

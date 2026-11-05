@@ -78,15 +78,36 @@ export function bindDescriptorServiceMembersEffect<T extends object>(
 ) {
   return identityOperation("identity.service-bind", (store) => {
     assertIdentityObject(service);
+    const epoch = currentEvaluationEpoch();
     for (const descriptor of descriptors) {
       assertIdentityObject(descriptor);
       const existing = store.services.get(descriptor);
-      if (existing !== undefined && existing !== service)
+      // A service from an earlier development evaluation pass was replaced by this one.
+      const superseded = existing !== undefined && (ownerEpochs.get(existing) ?? 0) < epoch;
+      if (existing !== undefined && existing !== service && !superseded)
         throw new DescriptorIdentityError("Descriptor already belongs to another service");
     }
+    ownerEpochs.set(service, epoch);
     for (const descriptor of descriptors) store.services.set(descriptor, service);
     return descriptors;
   });
+}
+
+/** Evaluation pass in which each service was defined; see {@link currentEvaluationEpoch}. */
+const ownerEpochs = new WeakMap<object, number>();
+
+/**
+ * Reads the development evaluation epoch. `relkit dev` advances it each time it evicts
+ * changed modules, so a service module evaluated again may claim the unchanged functions
+ * its previous instance owned. It is shared through `globalThis` because the evaluator and
+ * the application can load separate copies of `relkit`; it stays 0 outside development.
+ * @returns The current epoch.
+ */
+function currentEvaluationEpoch(): number {
+  const value = (globalThis as { readonly [key: symbol]: number | undefined })[
+    Symbol.for("relkit.dev.evaluationEpoch")
+  ];
+  return typeof value === "number" ? value : 0;
 }
 
 /** Synchronous service member binding adapter.

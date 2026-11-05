@@ -155,6 +155,72 @@ once the budgets hold.
 - **Alternative:** keep blue/green and optimize it. Rejected: a full process start cannot meet the
   budgets for large apps.
 
+Decided while applying section 13 (maintainer, 2026-11-05):
+
+- **Eviction, not query strings, gives a fresh module.** Bun keys ES modules by path, and importing
+  `file.ts?v=2` still binds that module's static imports to the old dependency instances. The
+  reloader (`relkit/host`, `createModuleReloader`) therefore tracks the application modules a
+  process has loaded, finds the changed ones by modification stamp, adds every loaded module that
+  imports them (from `Bun.Transpiler.scanImports`), and deletes all of them from Bun's module
+  registry; the next import evaluates each of them again, and every other module keeps its
+  instance. Descriptor dependents come from `invalidateWatchDependencies` over the previous
+  compilation's watch index. Both the warm evaluator and the dev server use the reloader.
+- **The warm evaluator is two warm processes.** The development checker (`dev-check-worker`) is
+  now one persistent process per session instead of one per check, and it evaluates through one
+  persistent evaluator child (`evaluator-warm-child`) that keeps the one-shot child's allowlisted
+  environment and side-effect detectors. Unchanged candidates reuse their snapshot, relabelled
+  with the current generation.
+- **Service ownership tolerates a re-evaluated service.** A re-evaluated `service.ts` claims the
+  unchanged function descriptors its previous instance owned. Each eviction advances a
+  development evaluation epoch (shared through `globalThis`, because the evaluator and the
+  application can load separate copies of `relkit`), and `bindDescriptorServiceMembers` lets a
+  service replace an owner defined in an earlier epoch. Outside development the epoch stays 0 and
+  the rule is unchanged.
+- **What may be swapped.** A save is swapped in place only when no changed path is
+  `relkit.config.ts`, under `src/platform`, `package.json`, a lockfile, `tsconfig.json`,
+  `bunfig.toml`, a `.env` file or `node_modules`; when the new check's configuration, provider and
+  local-service plans, jobs manifest, schema-library hash and graph shape (the graph with source
+  positions removed) equal the serving generation's; and when, in the server, no manifest entry
+  other than functions, targets, services and routes was re-evaluated (middleware, transforms,
+  hooks, agents, tools, channels, tasks, jobs and the application are captured by the HTTP
+  application and workers at startup). Anything else takes the blue/green path, reusing the
+  check already done. Provider bindings live in `relkit.config.ts` and `src/platform`, so the
+  restart test changes the configuration file.
+- **The swap travels over the candidate's IPC channel.** Candidates are spawned with a Bun IPC
+  channel; the CLI writes `runtime.manifest.v<N>.ts` and `application.graph.v<N>.json` next to
+  the serving `index.ts` and sends `relkit.dev.reload`. The generated server installs the hook
+  (`installDevelopmentReload`) only when `RELKIT_DEV_RELOAD=1` and not in production, and its
+  function registry is a stable `createHandlerTable` registry whose table and manifest maps are
+  replaced in one synchronous step. The change to the generated server is two lines in
+  `build-server-application.ts` and one import in `build-server-imports.ts`, outside the HTTP
+  serving files section 14 owns.
+- **Development runs the generated TypeScript.** A development build skips `bun build` and links
+  `effect` and `relkit` into the generation's `server/node_modules` (the links the bundler used
+  to create temporarily), and the dev entrypoint is `server/index.ts`. The one exception is a
+  generation with local Docker job workers (inngest, effect-mq, trigger): their containers run
+  the generation's `server/index.js` with only the generation and `node_modules` mounted, so that
+  generation is still bundled, and it is never swapped in place, because the workers would keep
+  the old handlers.
+- **Types report through the session log.** `tsc --watch` (or the project's `tsgo`) runs for the
+  session; each finished pass is logged as `dev.typecheck.failed` with up to 20 diagnostics, or
+  `dev.typecheck.passed`. The session log feeds both the terminal and the Inspector's log records,
+  so no new Inspector protocol was added. Development checks, including the initial one, no
+  longer type-check; `relkit check` and `relkit build` still do.
+- **`relkit dev --prepare` is `relkit check`.** The CLI dispatches it to the check command, so it
+  prints `Checked <root>` and exits non-zero with located diagnostics. create-relkit keeps
+  running it during installed creation and keeps the `--no-install` next step
+  `bunx --no-install relkit dev --prepare` between `bun install` and `bun run dev`; the
+  snapshot-ineligible fallback is gone. `@relkit/cli/tooling` exports `contentDigest` in place of
+  the snapshot exports, and the packed readiness probe always compares the served OpenAPI
+  document.
+- **Benchmarks measure process trees.** Peak memory is the largest summed resident set of the
+  command and every process it starts, sampled every 20 ms with `ps`, for `relkit check` and for
+  `tsc -p` over the same sources. The docs page renders the report named by
+  `RELKIT_DEV_LOOP_REPORT` (release readiness sets it to its own run's report) or the checked-in
+  `apps/docs/data/dev-loop-benchmarks.json` from a local run. The budget gate
+  (`scripts/check-dev-loop-budgets.ts`) re-judges a report against the current budgets, so a
+  fixture's stored verdict cannot pass it.
+
 ### D7. Runtime adapters (#10)
 
 A runtime adapter interface covers serving, static files, WebSocket upgrade, crypto, environment

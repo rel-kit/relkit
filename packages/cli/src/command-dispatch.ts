@@ -88,6 +88,12 @@ function selectCommandEffect(invocation: CliInvocation, context: CliCommandConte
     case "doctor":
       return runDoctorEffect(args, context).pipe(Effect.provide(doctorLiveLayer()));
     case "dev":
+      // `dev --prepare` is a finite check: no listener, no Inspector, nothing published.
+      if (args.includes("--prepare"))
+        return executeProjectEffect(
+          { ...invocation, command: "check", args: args.filter((arg) => arg !== "--prepare") },
+          context,
+        ).pipe(Effect.provide(projectLiveLayer));
       return runDevCommandEffect(args, context).pipe(
         Effect.provide(devLiveLayer()),
         Effect.as(CLI_EXIT_CODES.success),

@@ -1,7 +1,7 @@
 /**
  * Owns atomic creation from normalized options through installed preparation.
  * The creation Scope keeps its private sibling stage until a successful finite
- * check/snapshot operation; failure cleans that stage before the public adapter
+ * check operation; failure cleans that stage before the public adapter
  * returns. Published directories transfer to the user.
  */
 

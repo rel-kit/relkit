@@ -39,11 +39,14 @@ export const checkProjectEffect = Effect.fn("Project.check")(
       if (input.evaluator.status === "ok")
         return yield* finishCheckEvaluation(projectRoot, input, options);
       const compiler = yield* CliCompiler;
-      const typeDiagnostics = yield* compiler.typecheck(
-        projectRoot,
-        input.config.generatedDirectory,
-        input.config.check,
-      );
+      const typeDiagnostics =
+        options.typecheck === false
+          ? []
+          : yield* compiler.typecheck(
+              projectRoot,
+              input.config.generatedDirectory,
+              input.config.check,
+            );
       return yield* emitCheckResultEffect(projectRoot, input.outputDirectory, [
         ...typeDiagnostics,
         ...evaluatorDiagnostics(input.evaluator.failures),

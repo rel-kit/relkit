@@ -24,6 +24,11 @@ export interface BuildOptions extends CheckOptions {
   readonly providerOverridesGeneration?: string;
   /** Runtime the production server and container run on; defaults to Bun. */
   readonly runtime?: RuntimeName;
+  /**
+   * Bundles a development build too. Local Docker job workers run the generation's
+   * `server/index.js` in a container that mounts only the generation and `node_modules`.
+   */
+  readonly developmentBundle?: boolean;
   /** Internal preparation requests Bun's consumed-input inventory beside the entrypoint. */
   readonly bundleInputInventory?: "bun.inputs.json";
 }

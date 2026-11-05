@@ -1603,6 +1603,334 @@ declare const ServerConfig: ServerConfig;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L12)
 
+## `dev-handler-table.ts`
+
+Holds the function handler table of a generated server behind a stable registry object,
+so `relkit dev` can replace every handler at once without restarting the process. The
+generated server passes the stable registry to invocation and keeps its executable
+manifest object; `swap` replaces the registry and the manifest's `functions` and
+`targets` entries in one synchronous step, so a request sees either the old table or the
+new one, never a mix. Requests already running keep the handler they resolved.
+
+### HandlerTable
+
+**Signature**
+
+```ts
+declare const HandlerTable: HandlerTable;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.ts#L15)
+
+### SwappableManifest
+
+**Signature**
+
+```ts
+declare const SwappableManifest: SwappableManifest;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.ts#L15)
+
+### createHandlerTable
+
+Wraps a verified registry and the manifest whose entries routes resolve per request.
+
+**Signature**
+
+```ts
+declare const createHandlerTable: (
+  initial: SwappableRegistry,
+  manifest: SwappableManifest,
+) => HandlerTable;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.ts#L23)
+
+## `dev-handler-table.types.ts`
+
+Contracts of the development handler table and its reload hook.
+
+### DevelopmentReloadOptions (interface)
+
+Inputs the generated server supplies to the reload hook.
+
+**Signature**
+
+```ts
+export interface DevelopmentReloadOptions {
+  readonly projectRoot: string;
+  /** Directory of the running server's `index.ts`. */
+  readonly serverDirectory: string;
+  readonly table: HandlerTable;
+  /** Manifest the server started with; later reloads compare against the last one applied. */
+  readonly runtimeManifest: ReloadedManifest;
+  /**
+   * Verifies a graph and manifest pair the same way startup does.
+   * @param graph - Graph of the new generation.
+   * @param manifest - Manifest module's `runtimeManifest` export.
+   * @returns The verified registry.
+   */
+  readonly createRegistry: (
+    graph: ApplicationGraph,
+    manifest: SwappableManifest,
+  ) => SwappableRegistry;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L81)
+
+### DevelopmentReloadReply (type alias)
+
+The server's answer to a reload request.
+
+**Signature**
+
+```ts
+type DevelopmentReloadReply =
+  | {
+      readonly type: "relkit.dev.reloaded";
+      readonly id: number;
+      readonly ok: true;
+      /** Application modules evaluated again, project-relative. */
+      readonly reimported: readonly string[];
+      readonly pid: number;
+    }
+  | {
+      readonly type: "relkit.dev.reloaded";
+      readonly id: number;
+      readonly ok: false;
+      readonly error: string;
+      readonly pid: number;
+    };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L63)
+
+### DevelopmentReloadRequest (interface)
+
+A request from `relkit dev` to load a new handler table.
+
+**Signature**
+
+```ts
+export interface DevelopmentReloadRequest {
+  readonly type: "relkit.dev.reload";
+  /** Correlates the acknowledgement. */
+  readonly id: number;
+  /** Manifest module file name in the server directory. */
+  readonly manifest: string;
+  /** Graph JSON file name in the server directory. */
+  readonly graph: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L52)
+
+### HandlerTable (interface)
+
+A stable registry whose table can be replaced atomically.
+
+**Signature**
+
+```ts
+export interface HandlerTable {
+  /** Registry object handed to invocation; it always delegates to the current table. */
+  readonly registry: SwappableRegistry;
+  /** Number of swaps applied since startup. */
+  readonly generation: number;
+  /**
+   * Replaces the registry and the manifest's function and target entries in one step.
+   * @param next - Registry verified against the new graph and manifest.
+   * @param manifest - The new generation's manifest maps.
+   */
+  readonly swap: (next: SwappableRegistry, manifest: SwappableManifest) => void;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L38)
+
+### ReloadedManifest (interface)
+
+Manifest maps that a reload must leave untouched; a re-evaluated entry forces a restart.
+
+**Signature**
+
+```ts
+export interface ReloadedManifest extends SwappableManifest {
+  readonly middleware?: Readonly<Record<string, object>>;
+  readonly hooks?: Readonly<Record<string, object>>;
+  readonly requestTransforms?: Readonly<Record<string, object>>;
+  readonly agents?: Readonly<Record<string, object>>;
+  readonly tools?: Readonly<Record<string, object>>;
+  readonly channels?: Readonly<Record<string, object>>;
+  readonly tasks?: Readonly<Record<string, object>>;
+  readonly jobs?: Readonly<Record<string, object>>;
+  readonly application?: object;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L25)
+
+### SwappableHandler (type alias)
+
+A handler as the generated server stores it: a function or a handler-bearing descriptor.
+
+**Signature**
+
+```ts
+type SwappableHandler = object;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L5)
+
+### SwappableManifest (interface)
+
+The manifest maps the running server reads handlers and targets from.
+
+**Signature**
+
+```ts
+export interface SwappableManifest {
+  readonly functions?: Record<string, SwappableHandler>;
+  readonly targets?: Record<string, object>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L19)
+
+### SwappableRegistry (interface)
+
+The function registry shape the engine's verified registry has; declared structurally
+here because `relkit/host` may not depend on the engine.
+
+**Signature**
+
+```ts
+export interface SwappableRegistry extends ReadonlyMap<string, SwappableHandler> {
+  readonly graphHash: string;
+  readonly functionIds: readonly string[];
+  readonly handlers: Readonly<Record<string, SwappableHandler>>;
+  readonly targets: Readonly<Record<string, object>>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L11)
+
+## `dev-module-reload.ts`
+
+Tracks the application modules a development process has loaded and evicts the changed
+ones, together with every loaded module that imports them, from Bun's module registry.
+The warm evaluator and the development server both use it: after eviction the next
+import evaluates a fresh module record for each evicted file while every other module
+keeps its cached instance. Bun keys ES modules by path, and a fresh query string alone
+would still bind static imports to the old dependency, so eviction is what makes a
+re-import observe the edit. Only files below the project root and outside
+`node_modules` and `.relkit` are tracked. Development-only and Bun-specific.
+
+### ModuleReloader
+
+**Signature**
+
+```ts
+declare const ModuleReloader: ModuleReloader;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-module-reload.ts#L14)
+
+### createModuleReloader
+
+Creates a reloader for one project root.
+
+**Signature**
+
+```ts
+declare const createModuleReloader: (projectRoot: string) => ModuleReloader;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-module-reload.ts#L33)
+
+## `dev-module-reload.types.ts`
+
+Loaded-module tracking and eviction for one project root.
+
+### ModuleReloader (interface)
+
+Loaded-module tracking and eviction for one project root.
+
+**Signature**
+
+```ts
+export interface ModuleReloader {
+  /** Records the modification stamp of every loaded application module. */
+  readonly record: () => void;
+  /** @returns Every application module currently in the registry, sorted. */
+  readonly loaded: () => readonly string[];
+  /** @returns Loaded application modules whose file changed or disappeared since `record`. */
+  readonly changed: () => readonly string[];
+  /**
+   * Evicts files and every loaded module that transitively imports them.
+   * @param files - Absolute or project-relative changed files.
+   * @returns Every evicted absolute file, sorted.
+   */
+  readonly invalidate: (files: readonly string[]) => readonly string[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-module-reload.types.ts#L4)
+
+## `dev-reload.ts`
+
+The development reload hook a generated server installs when `relkit dev` starts it with
+an IPC channel. On a `relkit.dev.reload` message it evicts the application modules that
+changed since the last load, together with their importers, imports the new generation's
+manifest module from the server directory (which re-evaluates exactly those modules),
+verifies it against the new graph like startup does, and swaps the handler table. The
+reply says whether the swap happened; on failure the previous table keeps serving and
+`relkit dev` falls back to starting a new generation.
+
+### DevelopmentReloadOptions
+
+**Signature**
+
+```ts
+declare const DevelopmentReloadOptions: DevelopmentReloadOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L21)
+
+### DevelopmentReloadReply
+
+**Signature**
+
+```ts
+declare const DevelopmentReloadReply: DevelopmentReloadReply;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L22)
+
+### DevelopmentReloadRequest
+
+**Signature**
+
+```ts
+declare const DevelopmentReloadRequest: DevelopmentReloadRequest;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L23)
+
+### installDevelopmentReload
+
+Listens for reload requests on the process IPC channel.
+
+**Signature**
+
+```ts
+declare const installDevelopmentReload: (options: DevelopmentReloadOptions) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L43)
+
 ## `effect.ts`
 
 The Effect form of each root API, for applications written with Effect. Handlers may return an
@@ -2176,6 +2504,66 @@ declare const AppConstantRunnerLive: Layer<AppConstantRunner, never, never>;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L10)
 
+### DevelopmentReloadOptions
+
+**Signature**
+
+```ts
+declare const DevelopmentReloadOptions: DevelopmentReloadOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L20)
+
+### DevelopmentReloadReply
+
+**Signature**
+
+```ts
+declare const DevelopmentReloadReply: DevelopmentReloadReply;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L21)
+
+### DevelopmentReloadRequest
+
+**Signature**
+
+```ts
+declare const DevelopmentReloadRequest: DevelopmentReloadRequest;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L22)
+
+### HandlerTable
+
+**Signature**
+
+```ts
+declare const HandlerTable: HandlerTable;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L17)
+
+### ModuleReloader
+
+**Signature**
+
+```ts
+declare const ModuleReloader: ModuleReloader;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L25)
+
+### SwappableManifest
+
+**Signature**
+
+```ts
+declare const SwappableManifest: SwappableManifest;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L17)
+
 ### bindDescriptorIdentity
 
 **Signature**
@@ -2198,6 +2586,39 @@ declare const checkRuntimeIntegrations: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L12)
+
+### createHandlerTable
+
+**Signature**
+
+```ts
+declare const createHandlerTable: (
+  initial: SwappableRegistry,
+  manifest: SwappableManifest,
+) => HandlerTable;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L16)
+
+### createModuleReloader
+
+**Signature**
+
+```ts
+declare const createModuleReloader: (projectRoot: string) => ModuleReloader;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L24)
+
+### installDevelopmentReload
+
+**Signature**
+
+```ts
+declare const installDevelopmentReload: (options: DevelopmentReloadOptions) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L18)
 
 ### loadRuntimeIntegration
 

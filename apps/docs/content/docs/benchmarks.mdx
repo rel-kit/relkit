@@ -1,0 +1,30 @@
+---
+title: Benchmarks
+description: How fast relkit dev reloads and how much memory relkit check uses, measured for every release on generated apps with 10, 100 and 500 functions.
+sidebar:
+  icon: gauge
+---
+
+Release readiness measures the development loop on generated applications with 10, 100 and 500
+functions, one route each. For every size it records:
+
+- **Reload p95**: the 95th percentile, over 20 saves, of the time from writing a handler file to the
+  first response that serves the new code, under `relkit dev`.
+- **`relkit check` peak memory** against plain `tsc` on the same sources: the largest resident
+  memory of each command's whole process tree.
+
+The budgets come from the development loop's requirements: reload p95 under 300 ms, 1 s and 2 s,
+and `relkit check` memory at or below `tsc` for 10 and 100 functions and under 1.5 times `tsc` for 500. A run that misses a budget fails release readiness and reports the measured value and the
+host. [How the dev loop reloads](/docs/learn/local-development#how-reloads-work) explains what a
+reload does.
+
+<include>/_snippets/generated/dev-loop-benchmarks.mdx</include>
+
+Run the benchmark yourself from a checkout after `bun run build`:
+
+```sh
+bun scripts/benchmark-dev-loop.ts
+```
+
+It writes `test-results/dev-loop-benchmark/report.json`; `--sizes 10,100` limits the sizes and
+`--enforce` exits non-zero when a budget is missed.
