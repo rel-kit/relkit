@@ -50,8 +50,10 @@ server = await relkitRuntime.serve({
   fetch: (request, bindings) => instrumentHttpRequest(request, httpMiddlewareOptions, async (request) => {
     const path = new URL(request.url).pathname;
     if (path === "/_relkit/v1/health/live") return healthResponse("ok");
-    if (path === "/_relkit/v1/health/ready")
-      return healthResponse(runtimeState().ready.provider && runtimeState().ready.nativeWorker && runtimeState().ready.database && runtimeState().ready.auth && !runtimeState().stopping ? "ready" : "not-ready", runtimeState().ready.provider && runtimeState().ready.nativeWorker && runtimeState().ready.database && runtimeState().ready.auth && !runtimeState().stopping ? 200 : 503);
+    const ready = runtimeState().ready.provider && runtimeState().ready.nativeWorker && runtimeState().ready.database && runtimeState().ready.auth && !runtimeState().stopping;
+    if (path === "/_relkit/v1/health/ready") return healthResponse(ready ? "ready" : "not-ready", ready ? 200 : 503);
+    // Public platform probe: live while the process answers, 200 only once every provider is ready.
+    if (path === "/healthz") return Response.json({ status: ready ? "ready" : "not-ready", live: true, ready }, { status: ready ? 200 : 503, headers: { "cache-control": "no-store" } });
     if (runtimeState().stopping) return problemResponse(503, "Service Unavailable", "draining", "The server is shutting down.");
     const nativeWorker = nativeJobHandler(request);
     if (nativeWorker !== undefined) return await nativeWorker;

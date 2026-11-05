@@ -12,7 +12,8 @@ import { serverImportsSource } from "./build-server-imports.js";
 import { serverIdentitySource } from "./build-server-identity.js";
 import { SERVER_TELEMETRY_SOURCE } from "./build-server-telemetry.js";
 import { serverApplicationSource } from "./build-server-application.js";
-import { SERVER_PROVIDER_SOURCE } from "./build-server-provider.js";
+import { serverProviderSource } from "./build-server-provider.js";
+import { localDurableProfiles } from "./build-durable-warnings.js";
 import { serverTailSource } from "./build-server-tail.js";
 
 /** Opens the activation function; `createRelkit` calls it with `{ embedded: true }`. */
@@ -68,7 +69,7 @@ export function serverSource(
     serverIdentitySource(input),
     SERVER_TELEMETRY_SOURCE,
     serverApplicationSource(input),
-    SERVER_PROVIDER_SOURCE,
+    serverProviderSource(localDurableProfiles(JSON.stringify(graph))),
     serverTailSource(input),
     EMBEDDED_ACTIVATION_END,
   ].join("");

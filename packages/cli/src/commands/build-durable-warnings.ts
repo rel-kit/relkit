@@ -33,18 +33,14 @@ interface GraphNode {
 export function localDurableProviderWarnings(graphText: string): readonly Diagnostic[] {
   const nodes = parseGraphNodes(graphText);
   const warnings: Diagnostic[] = [];
-  for (const provider of nodes) {
-    if (provider.kind !== "provider" || provider.adapter?.integrationId !== "local") continue;
-    if (provider.capability !== "job" && provider.capability !== "event") continue;
-    const usage = describeUsage(nodes, provider.capability, provider.profile ?? "default");
-    if (usage === undefined) continue;
+  for (const { provider, usage } of usedLocalDurableProviders(nodes)) {
     warnings.push(
       createDiagnostic({
         code: LOCAL_DURABLE_PROVIDER_CODE,
         severity: "warning",
-        message: `${usage} use the local filesystem provider (profile ${provider.profile ?? "default"}); in production their state stays on one machine and is lost on redeploy.`,
+        message: `${usage} ${usage === "1 job" ? "uses" : "use"} the local filesystem provider (profile ${provider.profile ?? "default"}); in production their state stays on one machine and is lost on redeploy, and the container image refuses to start with it.`,
         suggestion:
-          "Select a durable provider such as `relkit add jobs --provider postgres` or `relkit add events --provider postgres`.",
+          "Use the durable Postgres backend from `@relkit/postgres`: run `relkit add jobs --provider postgres` and `relkit add events --provider postgres`.",
         ...(provider.source?.file === undefined ? {} : { file: provider.source.file }),
         ...(provider.source?.line === undefined ? {} : { line: provider.source.line }),
         ...(provider.source?.column === undefined ? {} : { column: provider.source.column }),
@@ -52,6 +48,34 @@ export function localDurableProviderWarnings(graphText: string): readonly Diagno
     );
   }
   return warnings;
+}
+
+/**
+ * Lists the local jobs and events profiles the application uses, for the production server's
+ * container guard.
+ * @param graphText - Compiled application graph JSON.
+ * @returns Entries such as `job:default`, sorted; empty when nothing durable is local.
+ */
+export function localDurableProfiles(graphText: string): readonly string[] {
+  return usedLocalDurableProviders(parseGraphNodes(graphText))
+    .map(({ provider }) => `${provider.capability}:${provider.profile ?? "default"}`)
+    .sort();
+}
+
+/**
+ * Finds local jobs and events providers that something in the graph uses.
+ * @param nodes - Graph nodes.
+ * @returns Each used local provider with a phrase naming its users.
+ */
+function usedLocalDurableProviders(
+  nodes: readonly GraphNode[],
+): readonly { readonly provider: GraphNode; readonly usage: string }[] {
+  return nodes.flatMap((provider) => {
+    if (provider.kind !== "provider" || provider.adapter?.integrationId !== "local") return [];
+    if (provider.capability !== "job" && provider.capability !== "event") return [];
+    const usage = describeUsage(nodes, provider.capability, provider.profile ?? "default");
+    return usage === undefined ? [] : [{ provider, usage }];
+  });
 }
 
 /**

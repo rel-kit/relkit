@@ -327,6 +327,28 @@ function entry; Cloudflare gets `wrangler.jsonc` and the Workers entry. A target
 a maintained provider exists. AWS keeps its Pulumi program and moves to Labs until it builds and
 pushes images, serves HTTPS, runs several tasks and passes a real deploy test.
 
+Decided while applying section 17 (maintainer, 2026-11-05):
+
+- **`/healthz` is the public platform probe.** The generated server answers `GET /healthz` with
+  `{ status, live: true, ready }`: 200 once provider, worker, database and auth readiness hold and
+  the server is not draining, 503 before. It carries none of the build identity that
+  `/_relkit/v1/health/*` reports, so it is safe on a public URL and needs no internal-endpoint
+  authorization. Liveness stays `/_relkit/v1/health/live`; a host that only takes one path (Railway's
+  `healthcheckPath`) gates a deploy on readiness, which is what `/healthz` reports. Both images add
+  a Docker `HEALTHCHECK` that fetches `/healthz` with the image's own runtime (`bun -e` or
+  `node -e`), since neither base image ships curl.
+- **The image keeps no durable state, enforced at startup.** Both Dockerfiles set
+  `RELKIT_DURABLE_STATE=external`. The build records the jobs and events profiles that use the local
+  filesystem provider (the same graph check as the `RELKIT_BUILD_LOCAL_DURABLE_PROVIDER` warning) in
+  the server; with that variable set, provider startup fails with
+  `RELKIT_LOCAL_DURABLE_STATE_IN_CONTAINER` and `/healthz` stays 503, so a host never routes traffic
+  to an instance that would lose jobs on the next redeploy. `RELKIT_ALLOW_LOCAL_DURABLE_STATE=1`
+  opts a single instance with a volume mounted at `/app/.relkit/state` back in; the image still
+  creates that directory owned by the runtime user so a named volume inherits the ownership. Outside
+  the image (`relkit start`, a bare `bun server/index.js`) nothing changes. The build warning now
+  names `@relkit/postgres` and says the image refuses the local provider. Both images run on a
+  read-only root filesystem (the container test runs them with `--read-only`).
+
 ### D10. Postgres durable backend (#12)
 
 Tables hold jobs (leased with `FOR UPDATE SKIP LOCKED`), an event outbox written in the caller's
