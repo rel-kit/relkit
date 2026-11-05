@@ -6,7 +6,6 @@
  * `worker` role and calls `registerWorker`, which starts the scheduler unless
  * the instance runs in the `api` role.
  */
-import { randomUUID } from "node:crypto";
 import type { JobsAdapterRuntime } from "relkit/jobs/adapter";
 import { Effect, Fiber } from "effect";
 import { openPostgresDatabase } from "./database.js";

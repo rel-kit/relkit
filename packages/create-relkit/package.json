@@ -210,6 +210,7 @@
       "@relkit/docker": "0.7.13",
       "@relkit/local": "0.7.14",
       "@relkit/langchain": "0.7.15",
+      "@relkit/ai-sdk": "0.8.4",
       "@relkit/inngest": "0.8.3",
       "@relkit/trigger": "0.8.3",
       "@relkit/effect-mq": "0.8.3",

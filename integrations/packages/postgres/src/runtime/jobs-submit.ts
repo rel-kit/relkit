@@ -6,7 +6,6 @@
  * identity is unique per original run, so repeating a retry returns the same
  * new run. Each function is a lazy Effect requiring the SQL client.
  */
-import { randomUUID } from "node:crypto";
 import { canonicalJson } from "relkit/contracts";
 import type { JobUnknownOutcome, RunRetryReceipt } from "relkit/contracts/jobs";
 import type {

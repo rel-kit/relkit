@@ -1,4 +1,3 @@
-import { randomBytes } from "node:crypto";
 import { Effect } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
 import { runInspectorPromise as runExecutionPromise } from "./native-edge.js";
@@ -47,7 +46,9 @@ export const dispatchInspectorActionEffect = Effect.fn("Inspector.dispatchInspec
         return yield* Effect.fail(
           new InspectorActionError("RELKIT_INSPECTOR_ACTION_NOT_FOUND", 404),
         );
-      const traceId = randomBytes(16).toString("hex");
+      const traceId = Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) =>
+        byte.toString(16).padStart(2, "0"),
+      ).join("");
       const value = yield* nativeAttempt(() =>
         invoke({
           generationId: generation.generationId,

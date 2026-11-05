@@ -5,7 +5,13 @@
  * that need the in-process application throw when read.
  */
 import type { TestApplication } from "./application.types.js";
-import type { TestHttpInput, TestHttpRequest } from "./http.types.js";
+import { toRequestInit } from "./http-request-init.js";
+import type {
+  TestHttpInput,
+  TestHttpRequest,
+  TestHttpRequestInit,
+  TestHttpResponse,
+} from "./http.types.js";
 
 /** Members that only exist for an application running in the test process. */
 const IN_PROCESS_MEMBERS = ["runtime", "clock", "fakes", "observability"] as const;
@@ -22,11 +28,14 @@ export function serverTestApplication(server: string | URL): TestApplication {
   const origin = new URL(server);
   if (origin.protocol !== "http:" && origin.protocol !== "https:")
     throw new TypeError(`${TEST_SERVER_URL_VARIABLE} must be an http or https URL.`);
-  const request: TestHttpRequest = (input, init) => {
-    const target = targetRequest(origin, input, init);
+  const request: TestHttpRequest = async <Body, Json>(
+    input: TestHttpInput,
+    init?: TestHttpRequestInit<Json>,
+  ) => {
+    const target = targetRequest(origin, input, toRequestInit(init));
     // Production servers reject unsafe requests without an Origin; a browser on the app sends one.
     if (!target.headers.has("origin")) target.headers.set("origin", origin.origin);
-    return fetch(target);
+    return (await fetch(target)) as TestHttpResponse<Body>;
   };
   const method =
     (verb: string): TestHttpRequest =>

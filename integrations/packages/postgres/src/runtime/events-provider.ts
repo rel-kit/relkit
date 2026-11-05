@@ -7,7 +7,6 @@
  * Delivery is at least once: a consumer that crashes after its handler
  * succeeded is invoked again when its lease expires.
  */
-import { randomUUID } from "node:crypto";
 import type { JsonValue } from "relkit/contracts";
 import { planRetry } from "relkit/providers-local";
 import type { RetryPolicy } from "relkit/jobs";

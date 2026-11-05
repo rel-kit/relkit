@@ -6,7 +6,6 @@
  * advances the pending occurrence. A contender that reads a stale pending
  * occurrence loses on the primary key, so it never enqueues a second run.
  */
-import { randomUUID } from "node:crypto";
 import { canonicalJson, type JsonValue } from "relkit/contracts";
 import { Effect } from "effect";
 import * as SqlClient from "effect/sql/SqlClient";

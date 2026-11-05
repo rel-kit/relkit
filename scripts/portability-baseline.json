@@ -71,6 +71,9 @@
   "packages/cli/src/commands/doctor-toolchain.service.ts": {
     "bun": 4
   },
+  "packages/cli/src/commands/mcp-project.ts": {
+    "bun": 1
+  },
   "packages/cli/src/commands/port-availability.service.ts": {
     "bun": 1
   },
@@ -104,23 +107,17 @@
   "packages/cli/src/compiler/discovery/evaluator-process.ts": {
     "bun": 1
   },
+  "packages/cli/src/compiler/discovery/evaluator-warm.ts": {
+    "bun": 2
+  },
   "packages/cli/src/compiler/integration-package-source.ts": {
     "bun": 1
   },
   "packages/cli/src/database/migration-execute.ts": {
     "bun": 2
   },
-  "packages/cli/src/dev-snapshot/snapshot-command-preflight.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/dev-snapshot/snapshot-hash-worker.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/dev-snapshot/snapshot-integrity-process.ts": {
+  "packages/cli/src/dev-reload/typecheck-watch.ts": {
     "bun": 2
-  },
-  "packages/cli/src/dev-snapshot/snapshot-tools.ts": {
-    "bun": 1
   },
   "packages/cli/src/services/filesystem.service.ts": {
     "bun": 1
@@ -184,6 +181,13 @@
   },
   "packages/inspector/src/ui-native.service.ts": {
     "bun": 3
+  },
+  "packages/relkit/src/app/dev-module-reload.ts": {
+    "bun": 2,
+    "node": 2
+  },
+  "packages/relkit/src/app/dev-reload.ts": {
+    "node": 3
   },
   "packages/relkit/src/functions/create-relkit.ts": {
     "node": 3

@@ -16,6 +16,7 @@ export const generatorProviders = [
   "@relkit/docker",
   "@relkit/local",
   "@relkit/langchain",
+  "@relkit/ai-sdk",
   "@relkit/inngest",
   "@relkit/trigger",
   "@relkit/effect-mq",

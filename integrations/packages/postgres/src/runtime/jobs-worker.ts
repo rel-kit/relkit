@@ -7,7 +7,6 @@
  * heartbeats without settling, which is exactly what a crash looks like to the
  * database: the lease expires and another worker retries the run.
  */
-import { randomUUID } from "node:crypto";
 import type { JsonValue } from "relkit/contracts";
 import type { NativeTaskWorker } from "relkit/jobs/adapter";
 import { Effect, Fiber } from "effect";

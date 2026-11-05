@@ -11,6 +11,7 @@ export const descriptions: Record<string, string> = {
   "@relkit/inspector":
     "Standalone RelKit development inspector, collector, and local diagnostic history.",
   "@relkit/langchain": "Explicit native LangChain agent execution for RelKit.",
+  "@relkit/ai-sdk": "Optional Vercel AI SDK agent adapter for RelKit.",
   "@relkit/testing": "Testing utilities and local providers for RelKit applications.",
   "@relkit/aws": "AWS host and infrastructure integration for RelKit.",
   "@relkit/cloudflare": "Cloudflare integration for RelKit.",

@@ -4,7 +4,6 @@
  * inside an application transaction is indistinguishable from one published
  * directly. Pure construction; no connection is opened.
  */
-import { randomUUID } from "node:crypto";
 import type { TracePropagation } from "relkit/contracts";
 import type { EventPublishOptions, UnknownEventEnvelope } from "relkit/events";
 
