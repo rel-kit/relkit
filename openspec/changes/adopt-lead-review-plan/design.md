@@ -512,6 +512,19 @@ check` writes an empty module in their place. Templates already listed it; the e
   `defineServiceRoutes` results carry the type-only `ServiceRouteMethodMarker<Method>` and
   `RouteModuleContract` rejects an export whose marker names another method. Verified with
   TypeScript 7.0.2's `tsc` and no plugin on a template app.
+- **`relkit check` runs the project's compiler; RelKit's own analyses keep the private parser.**
+  `src/compiler/typescript-compiler.ts` finds the compiler (`node_modules/.bin/tsgo`, then the
+  `bin` of `@typescript/native-preview` or `typescript` read from their exported
+  `package.json`, because TypeScript 7's `exports` hide `typescript/bin/tsc`) and runs
+  `-p <config> --noEmit --pretty false` through the runtime adapter on Bun or Node; its output
+  is parsed into RelKit diagnostics, continuation lines included. The `relkit dev` watch uses the
+  same lookup, which also fixes it for TypeScript 7. When the project's `tsconfig.json` does not
+  list the route checks, or its `rootDir` excludes them, RelKit writes
+  `<generated>/tsconfig.check.json`, which extends it with the same files plus the route checks
+  and a widened validation root. Route module, event source and unused-error analyses still
+  read a program built with the private TypeScript 5.9 API, without its type diagnostics, since
+  TypeScript 7 has no stable JavaScript checker API yet. A missing or crashing compiler is
+  `RELKIT_TYPESCRIPT_COMPILER_FAILED`. `typecheckProject` now returns a Promise.
 
 ### D9. Deploy targets (#12)
 

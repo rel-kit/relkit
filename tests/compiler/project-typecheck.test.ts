@@ -92,9 +92,9 @@ test("generated checks do not reject rootDir src projects without routes", () =>
   Effect.runPromise(
     withFixture(async (root) => {
       const config = await readFile(join(root, "tsconfig.json"), "utf8");
-      expect(typecheckProject(root)).toEqual([]);
+      expect(await typecheckProject(root)).toEqual([]);
       await writeChecks(root, ["src/example.ts"], ".relkit/generated");
-      expect(typecheckProject(root)).toEqual([]);
+      expect(await typecheckProject(root)).toEqual([]);
       expect(await readFile(join(root, "tsconfig.json"), "utf8")).toBe(config);
     }),
   ));
@@ -110,9 +110,9 @@ test("route assertions outside rootDir still reject invalid exports", async () =
             'import { defineRoute } from "relkit/routes";\nexport const GET = defineRoute({ handler: () => new Response("ok") });\n',
           );
           await writeChecks(root, ["src/routes/route.ts"], generatedDirectory);
-          expect(typecheckProject(root, generatedDirectory)).toEqual([]);
+          expect(await typecheckProject(root, generatedDirectory)).toEqual([]);
           await writeFile(route, 'export const GET = "not a route";\n');
-          const diagnostics = typecheckProject(root, generatedDirectory);
+          const diagnostics = await typecheckProject(root, generatedDirectory);
           expect(diagnostics).toContainEqual(expect.objectContaining({ code: "TS2344" }));
           expect(diagnostics.some(({ code }) => code === "TS6059")).toBe(false);
         },
@@ -132,7 +132,7 @@ test("validation retains a broader rootDir and ordinary source type errors", () 
         'import { shared } from "../../shared.js";\nexport const example: string = shared;\n',
       );
       await writeChecks(root, ["src/example.ts"], ".relkit/generated");
-      expect(typecheckProject(root).map(({ code }) => code)).toEqual(["TS2322"]);
+      expect((await typecheckProject(root)).map(({ code }) => code)).toEqual(["TS2322"]);
     }, ".."),
   ));
 
