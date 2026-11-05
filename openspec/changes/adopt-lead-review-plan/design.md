@@ -655,6 +655,36 @@ Decided while applying section 17 (maintainer, 2026-11-05):
   the Railway CLI; AWS: Pulumi; Vercel and Cloudflare: platform configuration, not available yet.
   The AWS page lists its four missing Labs criteria, checked against `@relkit/aws` (an ECR repository
   but no image build or push, an HTTP-only listener on port 80, `desiredCount: 1`, no CI deploy).
+- **Follow-up (2026-11-06): the Railway build failed because the bundled parser loaded no
+  TypeScript library off the build machine.** `relkit build --runtime bun` in the Dockerfile's build
+  stage reported `RELKIT_ROUTE_MODULE_TYPE` for every route on Railway and in `oven/bun:1.3.10`,
+  for any project directory, while it passed on macOS. Cause: `scripts/package-typescript-parser.ts`
+  bundles the CLI's private TypeScript 5.9 API with Bun, and Bun's bundler inlines CommonJS
+  `__filename`/`__dirname` as the building machine's absolute paths. TypeScript finds
+  `lib.*.d.ts` beside its own module file, so the bundled parser looked for its default library in
+  the checkout that built the CLI. Where that path exists (the maintainer's machine, a CI runner
+  that builds and tests in one job) everything passed; anywhere else (a Docker build stage, and so
+  any published install) the program had no global types, route descriptors degraded to
+  `FunctionRouteDescriptor<string, any, …>`, and the route check rejected them. `tsc --noEmit`
+  passed because it is the project's own compiler. The vendored tarballs, the probe and Linux path
+  handling were not involved.
+- **The CLI ships the parser's default library.** The packaging script now copies TypeScript's
+  `lib.*.d.ts` (about 3 MB, the same 5.9.3 the parser is) to `dist/typescript-lib/`, rewrites the
+  inlined paths to ones resolved from the bundle's `import.meta.url`, and fails the build if the
+  bundle still names a path of the building machine. Resolving the library from the project's own
+  `typescript` instead was rejected: the project may use TypeScript 7, whose library set need not
+  match the 5.9 parser, or install no compiler at all.
+- **The regression test runs the built parser somewhere it was not built.**
+  `tests/container/relocated-typescript-parser.test.ts` (part of `bun run test:container`, which
+  builds every package first) mounts `packages/cli/dist` into the pinned Bun image and requires the
+  default library to resolve inside the mounted bundle with no diagnostics for a source using
+  `Array` and `Promise`. It fails on the old bundle. It needs no packing or install, so it takes
+  seconds; the full newcomer build in Linux stays covered by the live walkthrough. The live run
+  after the fix (`bun scripts/walkthrough/create-to-railway.ts`, 2026-11-05 21:03 UTC) passed every
+  phase: the app answered over HTTPS 121 s after creation started (38 s create and install, deploy
+  79 s), then the restart and two-instance phases, and the `relkit-test-mw412td8` project was
+  deleted. The metrics row "Time from `create` to an app deployed on Railway" now reads met, 2 min
+  1 s.
 
 Decided while applying section 21 (maintainer, 2026-11-05):
 
@@ -1395,6 +1425,8 @@ walkthrough. The launch checklist reads the same page.
   because the live run happened. Two defects in the test itself were fixed on the way: the probe
   imported `@relkit/app/*`, which new projects no longer install, and `railway up` build output
   was dropped from the error. Hand-over detail: `g20-metrics-launch.md` in the shared notes.
+  Fixed afterwards: the bundled TypeScript parser loaded no default library off the build machine;
+  cause, fix and the passing live run are in D9's section 17 follow-ups.
 
 ### D20. Findings follow-ups (plan section 8.5)
 
