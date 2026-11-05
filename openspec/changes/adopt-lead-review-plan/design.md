@@ -723,6 +723,16 @@ $CRON_SECRET`; the entry compares it in constant time, refuses a missing or shor
   runs opt-in like Railway's (`RELKIT_TEST_VERCEL=1`, `VERCEL_TOKEN` or a `vercel login` session;
   `.github/workflows/vercel-newcomer.yml` gated on the `RELKIT_TEST_VERCEL` variable), and
   `tests/deployment/vercel-newcomer.test.ts` runs the flow against stubs in every test run.
+- **`relkit check` refuses per-instance realtime state on Vercel.** When the project root holds
+  `vercel.json`, every channel that clients subscribe to (`client` public or protected; internal
+  channels are server-side only) must use a realtime profile backed by an external provider, meaning
+  any realtime provider other than the local filesystem one (today `redisRealtime()`); otherwise the
+  check fails with `RELKIT_VERCEL_REALTIME_PROVIDER_REQUIRED` at the channel's source. The presence of
+  `vercel.json` is the target signal because it is what `deploy init vercel` writes and what Vercel
+  reads; no separate check flag is needed. The rule is about state, not transport: Vercel functions
+  also accept no WebSocket upgrades, which an external provider does not change, so the guide states
+  that WebSocket subscriptions need a host that keeps connections open and that realtime on Vercel is
+  unverified.
 - **Verified locally, live run pending.** The function entry was driven in Node 24 against the `api`
   template with the probe service, Postgres jobs and events on a local Postgres 17, simulating
   Vercel's request context: cold requests waited for readiness, an HTTP job and an event consumer

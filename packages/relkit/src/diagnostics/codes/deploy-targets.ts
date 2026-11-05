@@ -16,4 +16,11 @@ export const deployTargetCodes = [
       "`relkit build --target vercel` found jobs, schedules or events whose profile uses the local filesystem provider. A Vercel function keeps no files between invocations, so that work would be lost.",
     fix: "Use the durable Postgres backend from `@relkit/postgres` (`relkit add jobs --provider postgres`, `relkit add events --provider postgres`) with a database the deployment can reach, and set `DATABASE_URL` on the Vercel project.",
   },
+  {
+    code: "RELKIT_VERCEL_REALTIME_PROVIDER_REQUIRED",
+    title: "Realtime channel on Vercel needs an external provider",
+    happened:
+      "`relkit check` found `vercel.json` in the project and a channel that clients subscribe to whose realtime profile uses the local provider, or no provider. Vercel functions keep no state between invocations and run as many instances as traffic needs, so subscribers would miss events published from another instance.",
+    fix: "Select an external realtime provider for the channel's profile, such as `redisRealtime()` from `@relkit/redis` with a Redis the deployment can reach, or deploy the app to a container target such as Railway. Vercel functions also accept no WebSocket upgrades; the Vercel guide describes the realtime limits.",
+  },
 ] as const satisfies readonly DiagnosticCodeEntry[];
