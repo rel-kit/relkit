@@ -166,13 +166,15 @@ function caseRecognizesAndValidatesEveryDeepCapability() {
     { backend: {} },
   ]) {
     expect(
-      hasDeepAgentCapabilities(defineAgent({ ...base, runtime: langchain({ model, ...capability }) })),
+      hasDeepAgentCapabilities(
+        defineAgent({ ...base, runtime: langchain({ model, ...capability }) }),
+      ),
     ).toBe(true);
   }
   expect(() =>
     defineAgent({ ...base, runtime: langchain({ model, skills: ["/skills", "/skills"] }) }),
   ).toThrow("unique");
-  expect(() => defineAgent({ ...base, runtime: langchain({ model, subagents: [child, child] }) })).toThrow(
-    "Duplicate",
-  );
+  expect(() =>
+    defineAgent({ ...base, runtime: langchain({ model, subagents: [child, child] }) }),
+  ).toThrow("Duplicate");
 }

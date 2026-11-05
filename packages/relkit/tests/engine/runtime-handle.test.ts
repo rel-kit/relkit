@@ -107,9 +107,7 @@ try { getRelkit(); } catch (error) { console.log(error.code); }
   });
 
   test("createRelkit needs the application's configuration and a build", async () => {
-    await expect(createRelkit({ ref: { kind: "service" } } as never)).rejects.toThrow(
-      "defineApp",
-    );
+    await expect(createRelkit({ ref: { kind: "service" } } as never)).rejects.toThrow("defineApp");
     const directory = await mkdtemp(join(tmpdir(), "relkit-create-"));
     try {
       await expect(

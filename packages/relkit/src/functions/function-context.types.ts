@@ -112,9 +112,7 @@ export type FunctionDependencyOptions<D extends FunctionDependencies> = D;
 /** Invocation context before optional progress is added.
  * @example const env = context.env;
  */
-export interface FunctionContextBase<
-  D extends FunctionDependencies = {},
-> {
+export interface FunctionContextBase<D extends FunctionDependencies = {}> {
   readonly invocation: InvocationMetadata;
   readonly signal: AbortSignal;
   readonly env: ResolvedApplicationEnv;

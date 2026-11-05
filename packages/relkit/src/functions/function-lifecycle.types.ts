@@ -2,7 +2,6 @@ import type { MaybePromise } from "../contracts/index.js";
 import type { FunctionContext, FunctionDependencies } from "./function-context.types.js";
 import type { InferOutput, StandardSchemaV1 } from "../schema/index.js";
 
-
 /** Validated progress value inferred from an optional schema.
  * @example type Progress = ProgressValue<typeof progressSchema>;
  */

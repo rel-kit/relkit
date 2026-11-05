@@ -28,7 +28,9 @@ export class ApplicationBuildUnavailableError extends Error {
   readonly code = "RELKIT_APPLICATION_BUILD_UNAVAILABLE" as const;
 
   constructor(entry: string, reason: string) {
-    super(`createRelkit needs a current build at ${entry} (${reason}); run \`relkit build\` first.`);
+    super(
+      `createRelkit needs a current build at ${entry} (${reason}); run \`relkit build\` first.`,
+    );
     this.name = "ApplicationBuildUnavailableError";
   }
 }

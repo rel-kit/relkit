@@ -31,16 +31,8 @@ export type FunctionCallOptions<
 > & {
   /** Removed: declare each event under `dependencies.events` instead. */
   readonly publishes?: never;
-  readonly onBefore?: FunctionLifecycleHook<
-    InferOutput<InputSchema>,
-    Dependencies,
-    ProgressSchema
-  >;
-  readonly onAfter?: FunctionLifecycleHook<
-    InferOutput<OutputSchema>,
-    Dependencies,
-    ProgressSchema
-  >;
+  readonly onBefore?: FunctionLifecycleHook<InferOutput<InputSchema>, Dependencies, ProgressSchema>;
+  readonly onAfter?: FunctionLifecycleHook<InferOutput<OutputSchema>, Dependencies, ProgressSchema>;
   readonly handler: (
     input: InferOutput<InputSchema>,
     context: FunctionContext<Dependencies, ProgressValue<ProgressSchema>>,

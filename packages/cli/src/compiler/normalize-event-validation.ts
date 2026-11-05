@@ -118,4 +118,3 @@ function validateEventTrigger(work: NormalizationWork, descriptor: NormalizedDes
     );
   }
 }
-

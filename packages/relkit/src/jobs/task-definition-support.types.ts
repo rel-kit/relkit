@@ -31,24 +31,19 @@ export type TaskHandlerResult<Output, Errors extends readonly ErrorDescriptorAny
 export type TaskStartHook<
   InputSchema extends StandardSchemaV1,
   Dependencies extends TaskDependencies,
-> = (
-  input: InferOutput<InputSchema>,
-  context: TaskHookContext<Dependencies>,
-) => Promise<void>;
+> = (input: InferOutput<InputSchema>, context: TaskHookContext<Dependencies>) => Promise<void>;
 
 /** Hook invoked after a task completes successfully. */
 export type TaskSuccessHook<
   OutputSchema extends StandardSchemaV1,
   Dependencies extends TaskDependencies,
-> = (
-  output: InferOutput<OutputSchema>,
-  context: TaskHookContext<Dependencies>,
-) => Promise<void>;
+> = (output: InferOutput<OutputSchema>, context: TaskHookContext<Dependencies>) => Promise<void>;
 
 /** Hook invoked after task execution fails. */
-export type TaskFailureHook<
-  Dependencies extends TaskDependencies,
-> = (error: unknown, context: TaskHookContext<Dependencies>) => Promise<void>;
+export type TaskFailureHook<Dependencies extends TaskDependencies> = (
+  error: unknown,
+  context: TaskHookContext<Dependencies>,
+) => Promise<void>;
 
 /** Visibility settings for progress and named streams. */
 export interface TaskObservation<

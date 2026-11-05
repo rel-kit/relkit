@@ -20,7 +20,8 @@ export const normalizeAppRuntimeMetadataEffect = Effect.fn("App.runtimeMetadata"
     observeApp(
       "runtimeMetadata.normalize",
       Effect.gen(function* () {
-        const server = options.server === undefined ? undefined : yield* copyServerEffect(options.server);
+        const server =
+          options.server === undefined ? undefined : yield* copyServerEffect(options.server);
         const inspector =
           options.inspector === undefined
             ? undefined

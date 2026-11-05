@@ -35,13 +35,8 @@ export interface DefineFunction {
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-    const Options extends FunctionCallOptions<
-      Id,
-      InputSchema,
-      OutputSchema,
-      {},
-      ProgressSchema
-    > = FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema>,
+    const Options extends FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> =
+      FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema>,
   >(
     options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> &
       Options &
@@ -79,13 +74,7 @@ export interface DefineFunction {
       ProgressSchema
     > = FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema>,
   >(
-    options: FunctionCallOptions<
-      Id,
-      InputSchema,
-      OutputSchema,
-      Dependencies,
-      ProgressSchema
-    > &
+    options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema> &
       Options &
       FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>>,
   ): FunctionDescriptor<
@@ -108,13 +97,8 @@ export interface DefineFunctionEffect {
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-    const Options extends FunctionCallOptions<
-      Id,
-      InputSchema,
-      OutputSchema,
-      {},
-      ProgressSchema
-    > = FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema>,
+    const Options extends FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> =
+      FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema>,
   >(
     options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> &
       Options &
@@ -150,13 +134,7 @@ export interface DefineFunctionEffect {
       ProgressSchema
     > = FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema>,
   >(
-    options: FunctionCallOptions<
-      Id,
-      InputSchema,
-      OutputSchema,
-      Dependencies,
-      ProgressSchema
-    > &
+    options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema> &
       Options &
       FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>>,
   ): Effect.Effect<

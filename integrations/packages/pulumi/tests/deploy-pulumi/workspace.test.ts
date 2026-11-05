@@ -30,7 +30,12 @@ describe("Pulumi workspace setup", () => {
       }
     `,
       ],
-      { cwd: resolve(import.meta.dir, "../../../../.."), timeout: 3000, stdout: "pipe", stderr: "pipe" },
+      {
+        cwd: resolve(import.meta.dir, "../../../../.."),
+        timeout: 3000,
+        stdout: "pipe",
+        stderr: "pipe",
+      },
     );
     expect(result.exitCode).toBe(0);
     expect(result.stdout.toString()).toContain("stackName contains unsupported characters");

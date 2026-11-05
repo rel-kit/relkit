@@ -20,7 +20,11 @@ export function nativePublicTypes(engine: AgentRuntimeOptions["engine"]) {
   });
   const agent = defineAgent({
     id: "packed.public-types",
-    runtime: langchain({ model: nativeModel, checkpointer: new MemorySaver(), tools: [nativeTool] }),
+    runtime: langchain({
+      model: nativeModel,
+      checkpointer: new MemorySaver(),
+      tools: [nativeTool],
+    }),
     input: z.object({ message: z.string() }),
     output: z.object({ answer: z.string() }),
     instructions: "Use the selected native tool.",

@@ -119,7 +119,10 @@ export async function makeStandaloneContext<Context extends { readonly signal: A
  * @returns Client sources keyed by managed category.
  */
 function declaredSources(
-  options: Pick<StandaloneContextOptions<{ readonly signal: AbortSignal }>, "clients" | "dependencies">,
+  options: Pick<
+    StandaloneContextOptions<{ readonly signal: AbortSignal }>,
+    "clients" | "dependencies"
+  >,
 ): ManagedDependencySources {
   const declared = options.dependencies?.functions;
   if (declared === undefined) return options.clients ?? {};

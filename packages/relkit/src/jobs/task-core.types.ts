@@ -107,9 +107,7 @@ export interface TaskRunContext {
 }
 
 /** Common invocation context shared by task handlers and hooks. */
-export interface TaskContextBase<
-  Dependencies extends TaskDependencies = {},
-> {
+export interface TaskContextBase<Dependencies extends TaskDependencies = {}> {
   readonly run: TaskRunContext;
   readonly invocation: InvocationMetadata;
   readonly signal: AbortSignal;
@@ -155,6 +153,5 @@ export type TaskContext<
   ([keyof Streams] extends [never] ? {} : { readonly streams: TaskStreamEmitters<Streams> });
 
 /** Invocation context visible to task lifecycle hooks. */
-export type TaskHookContext<
-  Dependencies extends TaskDependencies = {},
-> = TaskContextBase<Dependencies>;
+export type TaskHookContext<Dependencies extends TaskDependencies = {}> =
+  TaskContextBase<Dependencies>;

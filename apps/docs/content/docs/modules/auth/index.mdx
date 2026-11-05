@@ -24,15 +24,15 @@ clients connect those responsibilities without becoming a second authentication 
 
 ## Organize authentication by responsibility
 
-| What you need to add                          | Where it belongs                                                      | Continue with                                                                                               |
-| --------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Sign-in methods, session policy, auth plugins | `src/services/auth/service.ts`, using the chosen integration          | [Better Auth service](/docs/modules/auth/better-auth)                                                       |
-| Auth tables, connection, schema changes       | The existing database domain and migration tooling                    | [Database integration](/docs/modules/database/better-auth)                                                  |
-| Public authentication endpoints               | A filesystem route under `src/routes/`                                | [Protect routes](/docs/modules/auth/protect-routes)                                                         |
-| The current caller in a business operation    | The owning domain's function                                          | [Read sessions](/docs/modules/auth/sessions)                                                                |
+| What you need to add                          | Where it belongs                                                      | Continue with                                                                                 |
+| --------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Sign-in methods, session policy, auth plugins | `src/services/auth/service.ts`, using the chosen integration          | [Better Auth service](/docs/modules/auth/better-auth)                                         |
+| Auth tables, connection, schema changes       | The existing database domain and migration tooling                    | [Database integration](/docs/modules/database/better-auth)                                    |
+| Public authentication endpoints               | A filesystem route under `src/routes/`                                | [Protect routes](/docs/modules/auth/protect-routes)                                           |
+| The current caller in a business operation    | The owning domain's function                                          | [Read sessions](/docs/modules/auth/sessions)                                                  |
 | Ownership, roles, organization access         | The business operation that reads or changes the resource             | [Authorization boundaries](/docs/modules/auth/protect-routes#check-ownership-in-the-function) |
-| Sign-up forms and sign-in state               | Your frontend and auth client's public configuration                  | [Clients](/docs/modules/auth/clients)                                                                       |
-| Background work on behalf of a user           | The owning job/function, with an explicit trusted identity and policy | [Sessions outside HTTP](/docs/modules/auth/sessions#work-without-an-http-request)                           |
+| Sign-up forms and sign-in state               | Your frontend and auth client's public configuration                  | [Clients](/docs/modules/auth/clients)                                                         |
+| Background work on behalf of a user           | The owning job/function, with an explicit trusted identity and policy | [Sessions outside HTTP](/docs/modules/auth/sessions#work-without-an-http-request)             |
 
 This separation keeps identity plumbing out of every domain. Changing an auth provider's settings does
 not require moving Orders functions; changing an Orders permission rule does not require rewriting the

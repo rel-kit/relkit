@@ -44,8 +44,7 @@ export interface HttpTriggerConfig {
   readonly stream?: { readonly format: "sse" | "text" | "bytes" };
   /** `required` for a route that needs a session; `better-auth` for the Better Auth mount. */
   readonly auth?:
-    | { readonly kind: "required" }
-    | { readonly kind: "better-auth"; readonly serviceId: string };
+    { readonly kind: "required" } | { readonly kind: "better-auth"; readonly serviceId: string };
 }
 /** Exact event trigger and delivery configuration.
  * @example function inspect(value: EventTriggerConfig): void { console.log(value); }

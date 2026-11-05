@@ -1,7 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import * as pulumi from "@pulumi/pulumi";
 import type { MockResourceArgs } from "@pulumi/pulumi/runtime/mocks";
-import { RelkitApplicationService, RelkitContainerRegistry, RelkitNetwork } from "../../src/cloud-aws/index.js";
+import {
+  RelkitApplicationService,
+  RelkitContainerRegistry,
+  RelkitNetwork,
+} from "../../src/cloud-aws/index.js";
 import { iamRoleName } from "../../src/cloud-aws/components/common.js";
 
 interface SeenResource {
