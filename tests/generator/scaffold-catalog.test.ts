@@ -19,6 +19,8 @@ const OWNERS = {
   "@relkit/inspector": "packages/inspector/package.json",
   "@relkit/local": "integrations/packages/local/package.json",
   "@relkit/langchain": "integrations/packages/langchain/package.json",
+  "@relkit/postgres": "integrations/packages/postgres/package.json",
+  "@relkit/ai-sdk": "integrations/packages/ai-sdk/package.json",
   "@relkit/pulumi": "integrations/packages/pulumi/package.json",
   "@relkit/redis": "integrations/packages/redis/package.json",
   "@relkit/s3": "integrations/packages/s3/package.json",
