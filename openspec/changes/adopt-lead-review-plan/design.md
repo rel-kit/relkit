@@ -178,6 +178,23 @@ Decided while applying section 12 (maintainer, 2026-11-05):
   It runs in `bun run check`, which every pull request (the release pull request included) runs,
   next to the migration-link check `version-packages.ts` already applies, and
   `tests/unit/breaking-migrations.test.ts` shows it failing on a fixture.
+- **The beta rehearsal publishes nothing and changes no repository file.** `scripts/rehearse-beta.ts`
+  reads the next shared version from the pending changesets (the plan `version-packages.ts
+--check` prints) and uses `<version>-beta.0`, builds and packs the release closure with the
+  packing helper the creation smoke test uses, then rewrites each archive's manifests (its own,
+  the creator's template manifests and provider catalog) to the beta version, as versioning and
+  packing would. The existing candidate registry serves the archives, so nothing falls back to
+  published first-party versions; a small front adds each deprecated package's message to its
+  version metadata, which is what `npm deprecate` changes. Against it, the rehearsal creates
+  projects with the packed `create-relkit` and runs their `check`, `typecheck`, `test` and
+  `build`, serves the built minimal project on Bun and on Node, and turns a copy into a 0.8-style
+  project on the final `@relkit/app` that must report the deprecation, build, migrate with the
+  packed `relkit migrate` and build again. The release-readiness workflow, which runs on pull
+  requests, runs it for the minimal, api and fullstack templates.
+- **The deprecation lives in release configuration.** `scripts/release-deprecations.ts` holds the
+  final `@relkit/app` message, which names `relkit` and the migration guide; after publishing and
+  verifying a batch, `publish-release.ts` runs `npm deprecate` for each deprecated package in it.
+  The package itself already re-exports `relkit` (section 7).
 
 ### D3. Creation gate becomes a CI concern (#1)
 
