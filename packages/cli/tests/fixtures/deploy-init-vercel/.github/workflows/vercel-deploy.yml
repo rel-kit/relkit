@@ -33,9 +33,5 @@ jobs:
       - run: bun run check
       - run: bun run typecheck
       - run: bun run test
-      - name: Pull the production settings
-        run: bunx vercel@65.11.0 pull --yes --environment=production --token "${{ secrets.VERCEL_TOKEN }}"
-      - name: Build
-        run: bunx vercel@65.11.0 build --prod --token "${{ secrets.VERCEL_TOKEN }}"
-      - name: Deploy the prebuilt output
-        run: bunx vercel@65.11.0 deploy --prebuilt --prod --token "${{ secrets.VERCEL_TOKEN }}"
+      - name: Build remotely and deploy to production
+        run: bunx vercel@65.11.0 deploy --prod --yes --token "${{ secrets.VERCEL_TOKEN }}"

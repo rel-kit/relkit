@@ -5,6 +5,7 @@ import { authCodes } from "./auth.js";
 import { checkRuleCodes } from "./check-rules.js";
 import { cliCodes } from "./cli.js";
 import { deprecatedCodes } from "./deprecated.js";
+import { deployTargetCodes } from "./deploy-targets.js";
 import { handleCodes } from "./handle.js";
 import { compilerCodes } from "./compiler.js";
 import { durableBackendCodes } from "./durable-backend.js";
@@ -33,6 +34,7 @@ export const DIAGNOSTIC_CODES: readonly DiagnosticCodeEntry[] = Object.freeze(
     ...handleCodes,
     ...jobsCodes,
     ...durableBackendCodes,
+    ...deployTargetCodes,
     ...inspectorCodes,
     ...mcpCodes,
     ...migrateCodes,

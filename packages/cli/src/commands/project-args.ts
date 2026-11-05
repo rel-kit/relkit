@@ -22,6 +22,7 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
   let noColor = false;
   let prepare = false;
   let runtime: "bun" | "node" | undefined;
+  let target: "vercel" | undefined;
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index]!;
     if (argument === "--project-root") projectRoot = value(args, ++index, argument, command);
@@ -42,6 +43,10 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
       if (selected !== "bun" && selected !== "node")
         throw fail("RELKIT_BUILD_USAGE", "--runtime must be bun or node.", 2);
       runtime = selected;
+    } else if (argument === "--target" && command === "build") {
+      if (value(args, ++index, argument, command) !== "vercel")
+        throw fail("RELKIT_BUILD_USAGE", "--target must be vercel.", 2);
+      target = "vercel";
     } else if (argument === "--log-level" && command === "dev") {
       const selected = value(args, ++index, argument, command);
       if (!Schema.is(minimumLogLevelSchema)(selected))
@@ -54,6 +59,13 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
         2,
       );
   }
+  if (target === "vercel" && runtime === "bun")
+    throw fail(
+      "RELKIT_BUILD_USAGE",
+      "--target vercel builds the Node server; use --runtime node.",
+      2,
+    );
+  if (target === "vercel") runtime = "node";
   return {
     ...(projectRoot === undefined ? {} : { projectRoot }),
     ...(port === undefined ? {} : { port }),
@@ -64,6 +76,7 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
     noColor,
     ...(prepare ? { prepare } : {}),
     ...(runtime === undefined ? {} : { runtime }),
+    ...(target === undefined ? {} : { target }),
   };
 }
 

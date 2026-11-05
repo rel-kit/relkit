@@ -206,6 +206,7 @@ const platformFiles = Effect.fn("Cli.deployInitFiles")(function* (
         (fallback) =>
           `Schedule ${fallback.job}/${fallback.schedule} (${fallback.reason}) wakes the deployment every minute, which needs a Vercel plan with per-minute cron jobs.`,
       ),
+      "Rerun relkit deploy init vercel after changing schedules; relkit build --target vercel fails while vercel.json's crons are out of date.",
     ],
   };
 });

@@ -79,6 +79,7 @@ const root = command(
         options: [
           projectRoot,
           option("runtime", "choice", "Runtime the production server runs on", [], ["bun", "node"]),
+          option("target", "choice", "Deploy target whose build rules apply", [], ["vercel"]),
         ],
       }),
       command("start", "Start a built application", "relkit start", {

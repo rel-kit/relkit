@@ -13,7 +13,7 @@ export const durableBackendCodes = [
     code: "RELKIT_LOCAL_DURABLE_STATE_IN_CONTAINER",
     title: "Production image refused the local provider for durable work",
     happened:
-      "The server started inside the image that `relkit build` emits, which sets `RELKIT_DURABLE_STATE=external`, and a jobs or events profile it uses selects the local filesystem provider. The image keeps no durable state on its own disk, so provider startup fails and `/healthz` stays unready.",
+      "The server started inside the image that `relkit build` emits or the Vercel function entry, which set `RELKIT_DURABLE_STATE=external`, and a jobs or events profile it uses selects the local filesystem provider. The image keeps no durable state on its own disk, so provider startup fails and `/healthz` stays unready.",
     fix: "Use the durable Postgres backend from `@relkit/postgres` (`relkit add jobs --provider postgres`, `relkit add events --provider postgres`). For a single instance with a persistent volume mounted at `/app/.relkit/state`, set `RELKIT_ALLOW_LOCAL_DURABLE_STATE=1` instead.",
   },
   {

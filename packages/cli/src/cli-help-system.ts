@@ -76,11 +76,17 @@ export const deploy = command("deploy", "Manage deployments", "relkit deploy <co
       {
         options: [
           ...deployOptions,
-          option("runtime", "choice", "Server runtime of the image (railway)", [], ["bun", "node"]),
-          option("force", "boolean", "Replace existing deploy files that differ (railway)"),
+          option(
+            "runtime",
+            "choice",
+            "Server runtime (railway: bun or node; vercel: node)",
+            [],
+            ["bun", "node"],
+          ),
+          option("force", "boolean", "Replace existing deploy files that differ (railway, vercel)"),
         ],
         arguments: [
-          argument("target", false, "railway, or aws for the Pulumi stack (default: aws)"),
+          argument("target", false, "railway, vercel, or aws for the Pulumi stack (default: aws)"),
         ],
       },
     ),

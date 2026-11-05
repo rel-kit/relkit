@@ -1,8 +1,8 @@
 /**
  * Renders the files `relkit deploy init vercel` writes: `vercel.json` (the build command, one Node
  * function that serves every path, cron entries derived from the project's schedules), the function
- * entry and a GitHub Actions workflow that deploys on push. Pure renderers; the command writes them
- * and never calls Vercel.
+ * entry, an upload ignore list and a GitHub Actions workflow that deploys on push. Pure renderers;
+ * the command writes them and never calls Vercel.
  */
 import type { DeployInitFile } from "./deploy-init-railway.js";
 import type { VercelCronPlan } from "./deploy-init-vercel-crons.js";
@@ -24,6 +24,7 @@ export function vercelFiles(cron: VercelCronPlan): readonly DeployInitFile[] {
   return [
     { path: "vercel.json", content: vercelConfig(cron) },
     { path: VERCEL_FUNCTION_ENTRY, content: vercelFunctionEntry() },
+    { path: ".vercelignore", content: vercelIgnore() },
     { path: ".github/workflows/vercel-deploy.yml", content: vercelWorkflow() },
   ];
 }
@@ -58,9 +59,26 @@ export function vercelConfig(cron: VercelCronPlan): string {
 }
 
 /**
- * Renders the workflow that checks the project, builds it with the Vercel CLI and deploys the
- * prebuilt output to production on push to `main`. It needs the `VERCEL_TOKEN` secret and the
- * `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` variables.
+ * Renders the upload ignore list: Vercel builds from source, so local installs, build output,
+ * state and secrets stay on the developer's machine.
+ * @returns `.vercelignore` source.
+ */
+export function vercelIgnore(): string {
+  return `node_modules
+.relkit
+.env
+.env.*
+!.env.example
+coverage
+*.log
+`;
+}
+
+/**
+ * Renders the workflow that checks the project and deploys it to production with the Vercel CLI on
+ * push to `main`; Vercel builds it remotely from the uploaded source, as `vercel deploy` does
+ * locally. It needs the `VERCEL_TOKEN` secret and the `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`
+ * variables.
  * @returns Workflow YAML.
  */
 export function vercelWorkflow(): string {
@@ -100,11 +118,7 @@ jobs:
       - run: bun run check
       - run: bun run typecheck
       - run: bun run test
-      - name: Pull the production settings
-        run: ${vercel} pull --yes --environment=production --token "\${{ secrets.VERCEL_TOKEN }}"
-      - name: Build
-        run: ${vercel} build --prod --token "\${{ secrets.VERCEL_TOKEN }}"
-      - name: Deploy the prebuilt output
-        run: ${vercel} deploy --prebuilt --prod --token "\${{ secrets.VERCEL_TOKEN }}"
+      - name: Build remotely and deploy to production
+        run: ${vercel} deploy --prod --yes --token "\${{ secrets.VERCEL_TOKEN }}"
 `;
 }
