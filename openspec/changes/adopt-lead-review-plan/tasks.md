@@ -188,7 +188,7 @@ not tasks of this change.
 - [x] 17.3 Write the Railway guide with Railway Postgres and add a newcomer deploy test against an authorized Railway test project, and verify HTTPS reachability and job, event and schedule behavior across a restart and with two instances
 - [x] 17.4 Document which engine each target uses, and verify the docs build
 - [x] 17.5 Mark AWS hosting Labs and list its missing criteria (image build and push, HTTPS, more than one task, real deploy test) on its docs page, and verify the maturity check
-- [ ] 17.6 Add Railway deployment steps to the template skill's references, and verify the skill content test
+- [x] 17.6 Add Railway deployment steps to the template skill's references, and verify the skill content test
 
 ## 18. Access rules, typed middleware and several databases (#13 d, e, f)
 

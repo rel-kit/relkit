@@ -70,6 +70,7 @@ export async function verifyCreationTuple(root: string, selection: CreationTuple
     ".agents/skills/relkit/references/realtime-apis.md",
     ".agents/skills/relkit/references/observability-apis.md",
     ".agents/skills/relkit/references/testing-apis.md",
+    ".agents/skills/relkit/references/deployment.md",
   ]) {
     expect(result.files).toContain(path);
     expect(await readFile(join(result.destination, path), "utf8")).toBe(

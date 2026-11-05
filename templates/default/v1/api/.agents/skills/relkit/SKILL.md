@@ -70,6 +70,7 @@ Read only the reference relevant to the requested change. These examples describ
 - [Realtime channels](references/realtime-apis.md)
 - [Observability and tracing](references/observability-apis.md)
 - [Testing functions, routes, and providers](references/testing-apis.md)
+- [Deploying to Railway and other targets](references/deployment.md)
 
 ## Working conventions
 

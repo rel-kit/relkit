@@ -11,6 +11,7 @@ const files = [
   "references/agent-apis.md",
   "references/data-apis.md",
   "references/testing-apis.md",
+  "references/deployment.md",
 ];
 
 test("all starters ship consistent domain guidance with usable local references", () => {
