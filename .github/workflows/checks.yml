@@ -501,7 +501,7 @@ jobs:
       contents: read
 
   fresh-clone-typecheck:
-    name: Fresh clone type-checks (${{ matrix.template }})
+    name: Fresh clone type-checks (${{ matrix.template }}, TypeScript ${{ matrix.typescript }})
     needs: creation-changes
     if: needs.creation-changes.outputs.changed == 'true'
     runs-on: ubuntu-24.04
@@ -512,6 +512,7 @@ jobs:
       fail-fast: false
       matrix:
         template: [minimal, api, agent, fullstack, tasks]
+        typescript: ["5.9", "7"]
     env:
       TURBO_CONCURRENCY: "1"
       VITEST_MAX_WORKERS: "1"
@@ -531,8 +532,10 @@ jobs:
         run: >-
           bun x turbo run build --filter=./packages/* --filter=./integrations/*
           --filter=./integrations/packages/*
-      - name: Create from the packed candidate, commit, clone fresh, install and run tsc --noEmit
-        run: bun scripts/fresh-clone-typecheck.ts --template "${{ matrix.template }}"
+      - name: Create from the packed candidate, clone fresh, pin TypeScript, type-check, check and add
+        run: >-
+          bun scripts/fresh-clone-typecheck.ts --template "${{ matrix.template }}"
+          --typescript "${{ matrix.typescript }}"
 
   ci-gate:
     name: CI Gate
