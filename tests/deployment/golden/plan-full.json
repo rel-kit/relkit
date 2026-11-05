@@ -1,6 +1,6 @@
 {
   "contractVersion": 3,
-  "graphHash": "sha256:751c3aa7ed91277c9e428db36453261e12d5bda1821a5b617293277f99e6b094",
+  "graphHash": "sha256:c11a89dfaac212a2968af87854dea40746de094515405b20509684c842ea58b3",
   "application": {
     "id": "full-app",
     "image": {
