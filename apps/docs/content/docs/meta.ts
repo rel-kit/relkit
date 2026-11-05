@@ -10,6 +10,8 @@ export default defineMeta({
     "maturity",
     "versioning",
     "benchmarks",
+    "metrics",
+    "roadmap",
     "learn",
     "modules",
     "api",

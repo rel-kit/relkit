@@ -51,7 +51,13 @@ async function railway(cwd: string, args: readonly string[]): Promise<string> {
     new Response(child.stdout).text(),
     new Response(child.stderr).text(),
   ]);
-  if (code !== 0) throw new Error(`railway ${args.join(" ")} failed (${code}): ${stderr.trim()}`);
+  if (code !== 0) {
+    // `railway up --ci` reports build failures on standard output, so keep the end of both.
+    const detail = [stderr.trim(), stdout.trim().split("\n").slice(-30).join("\n")]
+      .filter((part) => part !== "")
+      .join("\n");
+    throw new Error(`railway ${args.join(" ")} failed (${code}): ${detail}`);
+  }
   return stdout;
 }
 

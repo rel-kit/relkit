@@ -215,10 +215,24 @@ not tasks of this change.
 
 ## 20. Metrics and launch (#21)
 
-- [ ] 20.1 Build the metrics page from CI outputs (creation canary, runtime matrix, benchmarks, agent evaluations, Railway test, package count) and link it from release notes, and verify it renders from the pull request's CI outputs and the release-notes generator test includes the link
-- [ ] 20.2 Script the newcomer walkthrough (create to first route, create to Railway deploy) and record its timings, and verify the script runs end to end
+- [x] 20.1 Build the metrics page from CI outputs (creation canary, runtime matrix, benchmarks, agent evaluations, Railway test, package count) and link it from release notes, and verify it renders from the pull request's CI outputs and the release-notes generator test includes the link
+- [x] 20.2 Script the newcomer walkthrough (create to first route, create to Railway deploy) and record its timings, and verify the script runs end to end
+  - The first-route walkthrough ran end to end live (17 s, local, warm cache). The Railway walkthrough
+    ran live through preparation, `relkit check` and `railway up`, and ends in a failed deploy: `relkit
+build` fails inside the Linux image (see design D19, "Decided while applying section 20"), so its
+    metric reads "failed" until that defect is fixed.
 - [ ] 20.3 Enable GitHub Discussions or a Discord, publish the roadmap with Core and Labs status, label about ten good first issues and set the repository description, and verify each item on the launch checklist
-- [ ] 20.4 Write the launch checklist (P0 items, Railway newcomer test, community channels, roadmap) as a check, and verify it passes on the pull request
+  - Prepared and verified; the apply step awaits the maintainer. The roadmap page (`/docs/roadmap`),
+    `scripts/launch/good-first-issues.md` (ten drafts), `scripts/launch/repository-description.txt`
+    and `scripts/launch/apply-github.ts` are done and tested. Nothing was applied: Discussions is
+    still off, no issues or labels were created and the description is unchanged. When the launch
+    goes live, run `bun scripts/launch/apply-github.ts` (a dry run), review it, then run it with
+    `--apply`, and check this task off after `bun scripts/launch/checklist.ts --github --strict`.
+- [x] 20.4 Write the launch checklist (P0 items, Railway newcomer test, community channels, roadmap) as a check, and verify it passes on the pull request
+  - Report mode runs in the `metrics` job of every pull request and passes while listing open items;
+    `--strict` is the launch gate (`Plan metrics` workflow, `strict` input). On this branch's outputs
+    the report passes and lists four open items: the nightly canary has no data yet, the Railway
+    deploy fails (see 20.2), Discussions is off and no issue carries `good first issue` (20.3).
 
 ## 21. Vercel target (#12)
 

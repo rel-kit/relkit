@@ -18,6 +18,9 @@ import { packAll, templateInputs } from "./release-check-artifacts.js";
 import { readReleasePlan, selectReleasePackages } from "./release-plan.js";
 import { changelogSection } from "./version-packages.js";
 
+/** Docs page that shows the plan metrics; every release's notes link it. */
+export const METRICS_URL = "https://relkit.dev/docs/metrics";
+
 export function releaseNotes(data: RecordValue): string {
   const packageRows = (data.packages as RecordValue[])
     .map((item) => {
@@ -41,6 +44,11 @@ Deterministic release output generated from checked-in package and template meta
 ## Changes
 
 ${changes}
+
+## Metrics
+
+The plan's metrics for this release, each with its current value and target, are on the
+[metrics page](${METRICS_URL}).
 
 ## Review status
 

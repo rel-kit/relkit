@@ -7,7 +7,7 @@
 /** Project-relative path to file content. */
 export const PROBE_FILES: Readonly<Record<string, string>> = {
   "src/services/probe/tasks/record.task.ts": `/** Records one probe; its run row in Postgres is the evidence the deploy test reads. */
-import { defineTask } from "@relkit/app/tasks";
+import { defineTask } from "relkit/tasks";
 import { z } from "zod";
 
 export default defineTask({
@@ -23,7 +23,7 @@ export default defineTask({
 });
 `,
   "src/services/probe/jobs/record.job.ts": `/** Runs the probe task on demand and once a minute. */
-import { defineJob } from "@relkit/app/jobs";
+import { defineJob } from "relkit/jobs";
 import record from "@app/services/probe/tasks/record.task.js";
 
 export default defineJob({
@@ -41,7 +41,7 @@ export default defineJob({
 });
 `,
   "src/services/probe/events/pinged.event.ts": `/** The fact the probe publishes and consumes. */
-import { defineEvent } from "@relkit/app/events";
+import { defineEvent } from "relkit/events";
 import { z } from "zod";
 
 export default defineEvent({
@@ -51,7 +51,7 @@ export default defineEvent({
 });
 `,
   "src/services/probe/functions/submit.function.ts": `/** Triggers the probe task; the key is also the operation ID, so a retry never doubles it. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 import record from "@app/services/probe/tasks/record.task.js";
 
@@ -67,7 +67,7 @@ export default defineFunction({
 });
 `,
   "src/services/probe/functions/ping.function.ts": `/** Publishes the probe event. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 import pinged from "@app/services/probe/events/pinged.event.js";
 
@@ -83,7 +83,7 @@ export default defineFunction({
 });
 `,
   "src/services/probe/functions/on-pinged.function.ts": `/** Consumes the probe event and records it through the task. */
-import { defineEventFunction } from "@relkit/app/events";
+import { defineEventFunction } from "relkit/events";
 import record from "@app/services/probe/tasks/record.task.js";
 
 export default defineEventFunction({
@@ -97,7 +97,7 @@ export default defineEventFunction({
 });
 `,
   "src/services/probe/service.ts": `/** Declares the probe service the deploy test drives. */
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 import pinged from "@app/services/probe/events/pinged.event.js";
 import ping from "@app/services/probe/functions/ping.function.js";
 import submit from "@app/services/probe/functions/submit.function.js";
@@ -112,13 +112,13 @@ export default defineService({
 });
 `,
   "src/routes/probe/jobs/route.ts": `/** POST /probe/jobs triggers the probe task. */
-import { defineRoute } from "@relkit/app/routes";
+import { defineRoute } from "relkit/routes";
 import probe from "@app/services/probe/service.js";
 
 export const POST = defineRoute({ target: probe.submit });
 `,
   "src/routes/probe/events/route.ts": `/** POST /probe/events publishes the probe event. */
-import { defineRoute } from "@relkit/app/routes";
+import { defineRoute } from "relkit/routes";
 import probe from "@app/services/probe/service.js";
 
 export const POST = defineRoute({ target: probe.ping });

@@ -1,0 +1,60 @@
+---
+title: Roadmap
+description: What RelKit is working on next, which features are Core and which are Labs, and what the project will not do before 1.0.
+sidebar:
+  icon: map
+---
+
+RelKit reaches 1.0 when Core is complete on the runtimes it supports, a newcomer can create an app and
+deploy it to Railway in 15 minutes, and the creation canary stays green. This page says where the
+project is, what comes next, and what it will not do on the way. The
+[metrics page](/docs/metrics) shows how close each target is.
+
+## Where RelKit is today
+
+Every feature is either **Core** or **Labs**. Core features are tested on every supported runtime and
+follow semantic versioning from 1.0. Labs features can change in any release.
+[Core and Labs](/docs/maturity) explains the tiers and the packages behind each feature.
+
+<include>/_snippets/generated/roadmap-status.mdx</include>
+
+## Next: launch
+
+The launch happens when the first-impression work is done and a newcomer's path works end to end:
+
+- `create-relkit` works on the current Bun with every template, checked every night.
+- One plain-language description of RelKit, a [Why RelKit](/docs/why-relkit) page and an
+  [FAQ](/docs/faq).
+- Any [Standard Schema](https://standardschema.dev) validator works: Zod, ArkType, Effect Schema and
+  Valibot.
+- The Core and Labs tiers are published.
+- A newcomer deploys an app to Railway in 15 minutes.
+
+## Next quarter
+
+The quarter after `0.9.0` ships, in this order of intent. Dates are not promised; this page changes
+when the plan does.
+
+| Area              | What changes                                                                                            | Tier today |
+| ----------------- | ------------------------------------------------------------------------------------------------------- | ---------- |
+| Deploy targets    | Vercel, then Cloudflare, join Railway as targets for `relkit deploy init`.                              | Planned    |
+| Runtimes          | Cloudflare Workers runs the HTTP surface with external durable backends; other runtimes follow in Labs. | Planned    |
+| Typed client      | The client switches from RPC to REST under the hood; your call sites do not change.                     | Planned    |
+| Agents            | Agents run through adapters. LangChain is first and the Vercel AI SDK is second.                        | Labs       |
+| Provider kit      | A guide, a starter package and public conformance suites for people who write providers.                | Planned    |
+| Stability and 1.0 | A stability policy and the criteria for 1.0, published on the [versioning page](/docs/versioning).      | Planned    |
+
+AWS hosting stays in Labs until it meets the [criteria on its page](/docs/modules/deployment/aws).
+
+## What RelKit will not do before 1.0
+
+- Add feature areas outside the approved plan.
+- Refuse to create a project on a setup it has not tested; it warns instead.
+- Present AWS as the lead deploy target.
+- Add a fast path that helps only one example application.
+
+## Help with the roadmap
+
+Issues labeled `good first issue` are small and say what done looks like.
+[CONTRIBUTING](https://github.com/rel-kit/relkit/blob/main/CONTRIBUTING.md) explains how to set up
+the repository and run the checks.

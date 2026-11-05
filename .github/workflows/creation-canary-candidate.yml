@@ -41,6 +41,21 @@ jobs:
           bun-version: latest
       - name: Create, start and test the template with the packed creator
         run: bun scripts/creation-canary.ts --template "${{ matrix.template }}"
+      - name: Record the result for the metrics report
+        if: ${{ !cancelled() }}
+        env:
+          OUTCOME: ${{ job.status }}
+        run: >-
+          bun scripts/metrics/write-result.ts creation-canary --template "${{ matrix.template }}"
+          --outcome "$OUTCOME" --bun "$(bun --version)" --source candidate
+          --output "$RUNNER_TEMP/metrics/canary-${{ matrix.template }}.json"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: metrics-creation-canary-candidate-${{ matrix.template }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/metrics/canary-${{ matrix.template }}.json
+          if-no-files-found: warn
+          retention-days: 90
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: failure()
         with:

@@ -2,7 +2,7 @@
 import { expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { releaseNotes } from "../../scripts/release-check.ts";
+import { METRICS_URL, releaseNotes } from "../../scripts/release-check.ts";
 import { publicationOrder } from "../../scripts/release-check-artifacts.ts";
 import { checkManifests, packages, readJson, root } from "../../scripts/release-check-support.ts";
 import { validateCreationReport } from "../../scripts/release-create-evidence.ts";
@@ -91,6 +91,19 @@ test("tracked release notes exclude rebuild-dependent tarball hashes", () => {
   expect(notes).toContain("Archive checks run during publication");
   expect(notes).not.toContain("packed-artifact, template, declaration");
   expect(notes).toContain("## Changes\n\nNo changelog entry for this release.");
+});
+
+test("release notes link the metrics page", () => {
+  const notes = releaseNotes({
+    version: "0.0.3",
+    inputFingerprint: "input",
+    packageManager: "bun@1.3.10",
+    packages: [],
+    templates: [],
+  });
+  expect(METRICS_URL).toBe("https://relkit.dev/docs/metrics");
+  expect(notes).toContain("## Metrics");
+  expect(notes).toContain(`[metrics page](${METRICS_URL})`);
 });
 
 test("release notes list the release's changelog groups", () => {

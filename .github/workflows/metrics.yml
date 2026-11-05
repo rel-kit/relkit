@@ -1,0 +1,97 @@
+name: Plan metrics
+
+# Publishes the plan's metrics from the latest main CI run and the latest nightly creation canary.
+# Pull requests build the same report inside CI (the `metrics` job in checks.yml). A release
+# publication attaches metrics.json to the release; dispatch with `strict` to run the launch
+# checklist as the gate for announcing the launch.
+on:
+  release:
+    types: [published]
+  schedule:
+    - cron: "43 5 * * 1"
+  workflow_dispatch:
+    inputs:
+      strict:
+        description: Fail unless every launch checklist item is done (the launch gate)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plan-metrics
+  cancel-in-progress: false
+
+jobs:
+  metrics:
+    name: Build and publish the metrics report
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: write
+      issues: read
+      pull-requests: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Download the artifacts of the latest main CI run and the latest nightly canary
+        run: |
+          mkdir -p metrics-inputs
+          download() {
+            workflow="$1"; shift
+            run="$(gh run list --workflow "$workflow" --branch main --status completed --limit 1 \
+              --json databaseId --jq '.[0].databaseId // empty')"
+            if test -n "$run"; then
+              gh run download "$run" --dir metrics-inputs "$@" || echo "::notice::No artifacts to download from $workflow run $run."
+            else
+              echo "::notice::No completed run of $workflow on main."
+            fi
+          }
+          download checks.yml --pattern 'metrics-runtime-http-*' --pattern 'dev-loop-benchmark-*' \
+            --pattern 'agent-evals-*'
+          download creation-canary.yml --pattern 'metrics-creation-canary-*'
+      - name: Download the walkthrough timings
+        run: |
+          for workflow in walkthrough.yml railway-newcomer.yml; do
+            run="$(gh run list --workflow "$workflow" --status completed --limit 1 \
+              --json databaseId --jq '.[0].databaseId // empty')"
+            if test -n "$run"; then
+              gh run download "$run" --dir metrics-inputs --pattern 'metrics-walkthrough-*' \
+                || echo "::notice::No walkthrough artifacts in $workflow run $run."
+            fi
+          done
+      - name: Count outside contributions
+        continue-on-error: true
+        run: bun scripts/metrics/contributions.ts --repo "$GITHUB_REPOSITORY" --output metrics-inputs/contributions.json
+      - name: Build the metrics report
+        run: |
+          bun scripts/metrics.ts --inputs metrics-inputs --output test-results/metrics
+          bun scripts/metrics.ts --inputs metrics-inputs --output test-results/metrics --summary >> "$GITHUB_STEP_SUMMARY"
+      - name: Report the launch checklist
+        run: >-
+          bun scripts/launch/checklist.ts --metrics test-results/metrics/metrics.json --github
+          | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: metrics-report-${{ github.sha }}-${{ github.run_id }}
+          path: test-results/metrics/metrics.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Attach the report to the release
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG" test-results/metrics/metrics.json --clobber
+      - name: Enforce the launch checklist (strict mode, the launch gate)
+        if: github.event_name == 'workflow_dispatch' && inputs.strict
+        run: bun scripts/launch/checklist.ts --metrics test-results/metrics/metrics.json --github --strict

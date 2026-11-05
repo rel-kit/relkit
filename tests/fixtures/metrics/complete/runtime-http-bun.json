@@ -1,0 +1,7 @@
+{
+  "protocol": "relkit.runtime-http-result",
+  "runtime": "bun",
+  "version": "1.3.10",
+  "outcome": "success",
+  "createdAt": "2026-11-05T10:00:00.000Z"
+}

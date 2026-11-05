@@ -19,6 +19,7 @@ export function isDocumentationBuildImport(source: string, target: string): bool
       target === "scripts/workspace-packages.js" || target === "scripts/first-party-exports.js"
     );
   if (source === "apps/docs/scripts/maturity-table.ts") return target === "scripts/maturity.js";
+  if (source === "apps/docs/scripts/metrics-page.ts") return target === "scripts/metrics/render.js";
   if (source === "apps/docs/scripts/installation-catalog.ts")
     return target === "packages/relkit/src/runtime-hono/selected-transports.js";
   const consumer =
