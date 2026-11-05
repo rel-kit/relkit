@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 import { Command } from "effect/cli";
 import {
   booleanArgs,
@@ -6,8 +6,10 @@ import {
   document,
   keyValueArgs,
   optionArgs,
+  optionalChoice,
   optionalKeyValue,
   optionalString,
+  stringArgument,
   type SelectInvocation,
 } from "./cli-command-shared.js";
 
@@ -18,7 +20,40 @@ import {
  * @returns The pure deployment parser tree.
  */
 export function deployCommand(select: SelectInvocation) {
-  const operations = ["init", "preview", "up", "refresh", "outputs", "destroy"] as const;
+  const operations = ["preview", "up", "refresh", "outputs", "destroy"] as const;
+  const initPath = ["deploy", "init"] as const;
+  const init = document(
+    Command.make(
+      "init",
+      {
+        target: stringArgument(initPath, "target", false),
+        projectRoot: optionalString(initPath, "project-root"),
+        stack: optionalString(initPath, "stack"),
+        backend: optionalString(initPath, "backend"),
+        config: optionalKeyValue(initPath, "config"),
+        secrets: optionalKeyValue(initPath, "config-secret"),
+        nonInteractive: booleanFlag(initPath, "non-interactive"),
+        runtime: optionalChoice(initPath, "runtime"),
+        force: booleanFlag(initPath, "force"),
+      },
+      (value) =>
+        Effect.sync(() =>
+          select("deploy", [
+            "init",
+            ...(Option.isSome(value.target) ? [value.target.value] : []),
+            ...optionArgs("project-root", value.projectRoot),
+            ...optionArgs("stack", value.stack),
+            ...optionArgs("backend", value.backend),
+            ...keyValueArgs("config", value.config),
+            ...keyValueArgs("config-secret", value.secrets),
+            ...booleanArgs("non-interactive", value.nonInteractive),
+            ...optionArgs("runtime", value.runtime),
+            ...booleanArgs("force", value.force),
+          ]),
+        ),
+    ),
+    initPath,
+  );
   const commands = operations.map((operation) => {
     const path = ["deploy", operation] as const;
     return document(
@@ -48,5 +83,7 @@ export function deployCommand(select: SelectInvocation) {
       path,
     );
   });
-  return document(Command.make("deploy").pipe(Command.withSubcommands(commands)), ["deploy"]);
+  return document(Command.make("deploy").pipe(Command.withSubcommands([init, ...commands])), [
+    "deploy",
+  ]);
 }

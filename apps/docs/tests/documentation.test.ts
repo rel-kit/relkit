@@ -93,7 +93,7 @@ test("keeps Core concepts near Start and retires the duplicate Async section", a
     guideGroups.find(({ directory }) => directory === "docs/modules/deployment"),
   ).toMatchObject({
     title: "Deployment",
-    pages: ["index", "local-docker", "runtimes", "aws", "providers"],
+    pages: ["index", "local-docker", "runtimes", "railway", "aws", "providers"],
   });
   expect(guideGroups.some(({ directory }) => directory === "async")).toBe(false);
 

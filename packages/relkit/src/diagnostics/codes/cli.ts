@@ -414,6 +414,13 @@ export const cliCodes = [
     fix: "Put all `@relkit/*` packages on the same version, run `relkit check`, then deploy again.",
   },
   {
+    code: "RELKIT_DEPLOY_INIT_CONFLICT",
+    title: "relkit deploy init would overwrite a different file",
+    happened:
+      "`relkit deploy init <target>` found a file it writes, such as `railway.json` or `Dockerfile`, that already exists with different content, so it wrote nothing.",
+    fix: "Compare the existing file with what the target needs, keep any change you still want elsewhere, then run the command again with `--force` to replace it.",
+  },
+  {
     code: "RELKIT_DEPLOY_LIVE_OBJECT_UNSUPPORTED",
     title: "Graph contains a live object",
     happened:
@@ -458,7 +465,7 @@ export const cliCodes = [
     code: "RELKIT_DEPLOY_USAGE",
     title: "Invalid relkit deploy arguments",
     happened:
-      "`relkit deploy` received an unknown subcommand or option, an option without its value, or an invalid `--backend` or `--config` value.",
+      "`relkit deploy` received an unknown subcommand, target or option, an option without its value, an option the target does not take, or an invalid `--backend` or `--config` value.",
     fix: "Run `relkit deploy --help` to see the accepted subcommands and options, then run the command again.",
   },
   {

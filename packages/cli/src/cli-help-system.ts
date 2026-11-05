@@ -67,12 +67,29 @@ export const env = command(
 );
 
 /** Static deployment metadata; native workspaces are acquired only by deployment services. */
-export const deploy = command("deploy", "Manage Pulumi deployments", "relkit deploy <command>", {
-  commands: ["init", "preview", "up", "refresh", "outputs", "destroy"].map((name) =>
-    command(name, `${title(name)} the Pulumi stack`, `relkit deploy ${name}`, {
-      options: deployOptions,
-    }),
-  ),
+export const deploy = command("deploy", "Manage deployments", "relkit deploy <command>", {
+  commands: [
+    command(
+      "init",
+      "Write a deploy target's files, or initialize the Pulumi stack",
+      "relkit deploy init [target]",
+      {
+        options: [
+          ...deployOptions,
+          option("runtime", "choice", "Server runtime of the image (railway)", [], ["bun", "node"]),
+          option("force", "boolean", "Replace existing deploy files that differ (railway)"),
+        ],
+        arguments: [
+          argument("target", false, "railway, or aws for the Pulumi stack (default: aws)"),
+        ],
+      },
+    ),
+    ...["preview", "up", "refresh", "outputs", "destroy"].map((name) =>
+      command(name, `${title(name)} the Pulumi stack`, `relkit deploy ${name}`, {
+        options: deployOptions,
+      }),
+    ),
+  ],
 });
 
 /** Static local-service command tree; container and lease ownership remains in the service. */

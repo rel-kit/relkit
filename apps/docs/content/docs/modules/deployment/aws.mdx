@@ -7,6 +7,20 @@ sidebar:
 labs: true
 ---
 
+<Callout type="warning" title="Labs: what AWS hosting is missing" icon="flask-conical">
+  AWS hosting stays Labs until it meets these criteria, which it does not yet:
+
+- **Image build and push.** The stack creates an ECR repository but does not build the
+  application image or push it; the service runs an image you built and pushed yourself.
+- **HTTPS.** The load balancer listens on HTTP only; there is no certificate or HTTPS listener.
+- **More than one task.** The service runs a single Fargate task, with no scaling across tasks.
+- **A real deploy test.** CI never deploys a stack to a real AWS account; real AWS acceptance is
+  an opt-in local run.
+
+For a target that an end-to-end deploy test covers, see [Deploy to Railway](/docs/modules/deployment/railway).
+
+</Callout>
+
 Deploy an application after its local checks and production build pass. Pulumi is the
 deployment engine and AWS is the first host integration, but engine, host, application resources, access, and
 runtime wiring remain separate roles. See [supported providers](/docs/modules/deployment) for

@@ -11,6 +11,7 @@ import { join } from "node:path";
 import { buildProject } from "../src/commands/build.js";
 import {
   LOCAL_DURABLE_PROVIDER_CODE,
+  localDurableProfiles,
   localDurableProviderWarnings,
 } from "../src/commands/build-durable-warnings.js";
 import type { CheckResult } from "../src/commands/check-result.types.js";
@@ -51,6 +52,12 @@ test("warns once per used local jobs or events profile", () => {
   });
   expect(warnings[1]?.message).toContain("Events use the local filesystem provider");
   expect(JSON.stringify(warnings[0])).toContain("relkit.config.ts");
+  expect(warnings[0]?.suggestion).toContain("@relkit/postgres");
+});
+
+test("lists the used local profiles the container guard refuses", () => {
+  expect(localDurableProfiles(graph("local"))).toEqual(["event:default", "job:default"]);
+  expect(localDurableProfiles(graph("postgres"))).toEqual([]);
 });
 
 test("durable providers and unused local profiles do not warn", () => {

@@ -1071,28 +1071,34 @@ Check local prerequisites and ports
 
 ### `relkit deploy <command>`
 
-Manage Pulumi deployments
+Manage deployments
 
 #### Examples
 
-`relkit deploy` — Manage Pulumi deployments
+`relkit deploy` — Manage deployments
 
-#### `relkit deploy init`
+#### `relkit deploy init [target]`
 
-Init the Pulumi stack
+Write a deploy target's files, or initialize the Pulumi stack
 
-| Option                    | Value     | Description                               |
-| ------------------------- | --------- | ----------------------------------------- |
-| --project-root            | string    | Application directory (defaults to cwd)   |
-| --stack                   | string    | Pulumi stack name (default: development)  |
-| --backend                 | string    | cloud, local, or object-storage URL       |
-| --config                  | key=value | Set a non-secret Pulumi value; repeatable |
-| --config-secret           | key=value | Set a secret Pulumi value; repeatable     |
-| --non-interactive / --yes | boolean   | Approve protected operations              |
+| Argument | Value    | Description                                         |
+| -------- | -------- | --------------------------------------------------- |
+| target   | optional | railway, or aws for the Pulumi stack (default: aws) |
+
+| Option                    | Value     | Description                                         |
+| ------------------------- | --------- | --------------------------------------------------- |
+| --project-root            | string    | Application directory (defaults to cwd)             |
+| --stack                   | string    | Pulumi stack name (default: development)            |
+| --backend                 | string    | cloud, local, or object-storage URL                 |
+| --config                  | key=value | Set a non-secret Pulumi value; repeatable           |
+| --config-secret           | key=value | Set a secret Pulumi value; repeatable               |
+| --non-interactive / --yes | boolean   | Approve protected operations                        |
+| --runtime                 | bun, node | Server runtime of the image (railway)               |
+| --force                   | boolean   | Replace existing deploy files that differ (railway) |
 
 ##### Examples
 
-`relkit deploy init` — Init the Pulumi stack
+`relkit deploy init` — Write a deploy target's files, or initialize the Pulumi stack
 
 #### `relkit deploy preview`
 

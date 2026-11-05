@@ -415,6 +415,90 @@ function entry; Cloudflare gets `wrangler.jsonc` and the Workers entry. A target
 a maintained provider exists. AWS keeps its Pulumi program and moves to Labs until it builds and
 pushes images, serves HTTPS, runs several tasks and passes a real deploy test.
 
+Decided while applying section 17 (maintainer, 2026-11-05):
+
+- **`/healthz` is the public platform probe.** The generated server answers `GET /healthz` with
+  `{ status, live: true, ready }`: 200 once provider, worker, database and auth readiness hold and
+  the server is not draining, 503 before. It carries none of the build identity that
+  `/_relkit/v1/health/*` reports, so it is safe on a public URL and needs no internal-endpoint
+  authorization. Liveness stays `/_relkit/v1/health/live`; a host that only takes one path (Railway's
+  `healthcheckPath`) gates a deploy on readiness, which is what `/healthz` reports. Both images add
+  a Docker `HEALTHCHECK` that fetches `/healthz` with the image's own runtime (`bun -e` or
+  `node -e`), since neither base image ships curl.
+- **The image keeps no durable state, enforced at startup.** Both Dockerfiles set
+  `RELKIT_DURABLE_STATE=external`. The build records the jobs and events profiles that use the local
+  filesystem provider (the same graph check as the `RELKIT_BUILD_LOCAL_DURABLE_PROVIDER` warning) in
+  the server; with that variable set, provider startup fails with
+  `RELKIT_LOCAL_DURABLE_STATE_IN_CONTAINER` and `/healthz` stays 503, so a host never routes traffic
+  to an instance that would lose jobs on the next redeploy. `RELKIT_ALLOW_LOCAL_DURABLE_STATE=1`
+  opts a single instance with a volume mounted at `/app/.relkit/state` back in; the image still
+  creates that directory owned by the runtime user so a named volume inherits the ownership. Outside
+  the image (`relkit start`, a bare `bun server/index.js`) nothing changes. The build warning now
+  names `@relkit/postgres` and says the image refuses the local provider. Both images run on a
+  read-only root filesystem (the container test runs them with `--read-only`).
+- **`relkit deploy init <target>` routes before the Pulumi parser.** `railway` writes files only;
+  `aws`, or no target, keeps initializing the Pulumi stack with the existing options, so current
+  scripts keep working. `vercel` and `cloudflare` answer "not available yet" until sections 21 and
+  22; `--runtime` and `--force` are rejected on the Pulumi path. The Railway generator writes
+  `railway.json` (Dockerfile builder, `healthcheckPath: /healthz`, 120 s health timeout, 70 s
+  draining for the server's 60 s drain, restart on failure), a source `Dockerfile`, a
+  `.dockerignore` and `.github/workflows/railway-deploy.yml`. An identical existing file is left
+  alone, a differing one stops the command before anything is written
+  (`RELKIT_DEPLOY_INIT_CONFLICT`) unless `--force`, and the JSON result says
+  `cloudResourcesChanged: false`.
+- **The source Dockerfile installs from the application's lockfile.** Railway builds from the
+  repository, not from `.relkit/build`, so the Dockerfile runs `relkit build --runtime <bun|node>`
+  in a build stage, `bun install --frozen-lockfile --production` in a dependency stage, and copies
+  the build output and those `node_modules` into the same final stage as the build's own image
+  (`productionPolicy` is shared). Installing from the lockfile rather than re-resolving the build
+  manifest's exact versions keeps the deployed dependencies the ones the project tested, and also
+  lets dependencies that are not on the npm registry (vendored tarballs, as the newcomer test uses
+  for the packed candidate) install on Railway's builder.
+- **One `railway.json` serves the web and the worker service.** Railway reads environment
+  variables from the service, not from the config file, so a worker service uses the same file and
+  the same image; the guide sets `RELKIT_WORKER_ROLE=api` on the web service and `worker` on the
+  worker service. The workflow runs check, typecheck and tests, then `railway up --ci` with a
+  pinned `@railway/cli` for `vars.RAILWAY_SERVICE` and, when set, `vars.RAILWAY_WORKER_SERVICE`,
+  authenticated by the `RAILWAY_TOKEN` project-token secret.
+- **`RELKIT_TRUST_PROXY=1` takes the scheme from `X-Forwarded-Proto`.** The first live deploy
+  showed every browser `POST` denied with `origin-denied`: Railway terminates TLS, the server sees
+  `http://<domain>` and the same-origin check compares that with the `https://` `Origin`. With the
+  variable set, the generated server rebuilds the request URL with the forwarded scheme (`http` or
+  `https` only) before any middleware runs. It is opt-in because a server exposed without a proxy
+  must not trust a client-sent header; the Railway Dockerfile sets it, the build's own image does
+  not, and the local Docker page tells self-hosters behind a TLS proxy to set it.
+- **The newcomer test verifies outcomes in Postgres, not through the app.** It deploys the `api`
+  template with a `probe` service (an HTTP-triggered task, a schedule every minute, an event and a
+  consumer that triggers the task), opens a Railway TCP proxy to the database, and reads
+  `relkit_job_runs`, `relkit_event_deliveries` and `relkit_schedule_occurrences`: every submitted
+  job and consumer run `completed` once by operation ID, every delivery completed, a new occurrence
+  claimed in each phase and exactly one run per occurrence. The phases are one instance, after
+  `railway redeploy` (a job submitted just before it must complete after it), and two replicas
+  (`railway scale <region>=2`). Railway's `railway delete` schedules the project for deletion two
+  days later but removes every deployment at once, so nothing keeps running or billing.
+- **The candidate is vendored into the newcomer project.** The project is created from the local
+  registry, then every candidate tarball is copied to `vendor/` and referenced with `file:` both as a
+  dependency and in `overrides`, and `bun.lock` is regenerated against the public registry, because
+  Railway's builder cannot reach the local registry and its URLs would otherwise leak into the
+  lockfile. `@relkit/postgres` joined the packed candidate closure for this
+  (`scripts/pack-and-smoke-create-relkit-pack.ts`).
+- **The test runs opt-in.** `bun scripts/railway-newcomer.ts` prints a skip unless
+  `RELKIT_TEST_RAILWAY=1`; the `railway-newcomer` workflow runs it on pull requests from this
+  repository only when the `RELKIT_TEST_RAILWAY` variable is `1`, with `RAILWAY_API_TOKEN` and
+  `RAILWAY_WORKSPACE`. `tests/deployment/railway-newcomer.test.ts` runs the same flow against a
+  stubbed Railway, endpoint and database in every test run. The Railway target stays Labs (its
+  maturity row and docs page) until that workflow passes in CI, per the target-maturity requirement.
+- **Gaps found by the newcomer path, worked around in the probe and left for their owners:** the
+  templates' `tsconfig.json` lists the generated context registry but not
+  `.relkit/generated/event-registry.d.ts`, so any `defineEventFunction` fails to type-check in a new
+  project; and an event function without `profile` resolves to `default`, which does not exist
+  after `relkit add events --provider postgres` names the profile `postgres`, so `relkit check`
+  reports `RELKIT_PROVIDER_PROFILE_UNKNOWN` although `defaults.event` is set.
+- **Engines per target are documented on the deployment overview.** Railway: container image with
+  the Railway CLI; AWS: Pulumi; Vercel and Cloudflare: platform configuration, not available yet.
+  The AWS page lists its four missing Labs criteria, checked against `@relkit/aws` (an ECR repository
+  but no image build or push, an HTTP-only listener on port 80, `desiredCount: 1`, no CI deploy).
+
 ### D10. Postgres durable backend (#12)
 
 Tables hold jobs (leased with `FOR UPDATE SKIP LOCKED`), an event outbox written in the caller's

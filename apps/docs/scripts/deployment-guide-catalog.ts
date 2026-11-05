@@ -5,6 +5,7 @@ export const deploymentGuideGroup = group("docs/modules/deployment", "Deployment
   "index",
   "local-docker",
   "runtimes",
+  "railway",
   "aws",
   "providers",
 ]);
@@ -23,6 +24,11 @@ export const deploymentGuideRelations = [
   relation(
     "docs/modules/deployment/runtimes",
     ["app", "testing", "drizzle", "integrations/redis", "integrations/sentry"],
+    ["templates/default/v1/api/relkit.config.ts"],
+  ),
+  relation(
+    "docs/modules/deployment/railway",
+    ["app", "jobs", "events", "integrations/postgres"],
     ["templates/default/v1/api/relkit.config.ts"],
   ),
   relation(

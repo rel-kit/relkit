@@ -32,6 +32,9 @@ environment; the build does not embed `.env` values. Preserve application state,
 and immutable worker versions across releases.
 
 <CardGroup cols={2}>
+  <Card title="Deploy to Railway" href="/docs/modules/deployment/railway" icon="train-front" arrow>
+    Generate the container files and a deploy workflow, then run on Railway with Railway Postgres.
+  </Card>
   <Card
     title="Start with local Docker"
     href="/docs/modules/deployment/local-docker"
@@ -66,12 +69,29 @@ and immutable worker versions across releases.
   </Card>
 </CardGroup>
 
+## Deploy targets and engines
+
+`relkit deploy init <target>` writes a target's configuration. A target uses Pulumi only when a
+maintained Pulumi provider exists for it; otherwise RelKit generates the platform's own
+configuration and deploys with the platform's CLI, with no Pulumi program or state.
+
+| Target     | Engine                                                        | What `relkit deploy init` writes                                         | Status                                                |
+| ---------- | ------------------------------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------- |
+| Railway    | Container image, deployed with the Railway CLI                | `railway.json`, `Dockerfile`, `.dockerignore`, a GitHub Actions workflow | Labs; [guide](/docs/modules/deployment/railway)       |
+| AWS        | Pulumi, through `@relkit/pulumi` and `@relkit/aws`            | A Pulumi project and stack (`relkit deploy init aws`)                    | Labs; [guide](/docs/modules/deployment/aws)           |
+| Vercel     | Platform configuration (`vercel.json`), Node functions        | Not available yet                                                        | Coming next, after Node support                       |
+| Cloudflare | Platform configuration (`wrangler.jsonc`), the Workers bundle | Not available yet                                                        | Coming after the Workers adapter                      |
+| Any host   | The image `relkit build` emits                                | Nothing: build and run the image yourself                                | [Local Docker](/docs/modules/deployment/local-docker) |
+
+`relkit deploy init` without a target keeps initializing the AWS Pulumi stack.
+
 ## Supported providers
 
 | Role                                | Supported path                                                         | What RelKit manages                                                                                                                                           |
 | ----------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Local development services          | Docker recipes for Redis, MinIO, Inngest, Trigger.dev, and Effect MQ   | Graph-required containers, readiness, connection values, and persistent volumes; [coverage](/docs/modules/integrations/local-docker#supported-local-services) |
 | Self-hosted application             | Built Bun server or generated Docker image                             | Portable build output; you provide the host, process/container supervisor, TLS, and resource connections                                                      |
+| Container platform host             | **Railway**, through `relkit deploy init railway`                      | Generated `railway.json`, Dockerfile and deploy workflow; Railway Postgres as the durable backend; [Railway guide](/docs/modules/deployment/railway)          |
 | Cloud application host              | **AWS**, through `@relkit/aws`                                         | ECS/Fargate, networking, load balancer, workload access, and CloudWatch stdout; [AWS setup](/docs/modules/deployment/aws)                                     |
 | Infrastructure engine               | **Pulumi**, through `@relkit/pulumi`                                   | Stack configuration, preview, apply, outputs, refresh, and destroy                                                                                            |
 | Infrastructure-owned resources      | AWS wrappers for supported S3 and Redis/Valkey resources               | Resource lifecycle and access, separately from the application host                                                                                           |
@@ -80,10 +100,10 @@ and immutable worker versions across releases.
 | Application data and authentication | Drizzle with PostgreSQL, MySQL, or SQLite; Better Auth on that service | Application connection and auth activation; you own database hosting, migrations, and backups                                                                 |
 | Models and telemetry                | Selected LangChain model SDKs, Sentry, OTLP                            | Selected runtime integration; no implicit provisioning or model account                                                                                       |
 
-AWS is the current built-in cloud **host**. The Cloudflare package provides **R2/KV runtime
-adapters**, not Workers application deployment. There are no built-in Vercel, Railway, Azure,
-or Google Cloud host integrations. A platform that runs the built Bun server or image can be
-used through the self-hosted path; that is separate from `relkit deploy` support.
+Railway and AWS are the deploy targets today. The Cloudflare package provides **R2/KV runtime
+adapters**, not Workers application deployment. There are no built-in Vercel, Azure, or Google
+Cloud host integrations yet. A platform that runs the built server or image can be used through
+the self-hosted path; that is separate from `relkit deploy` support.
 
 Pulumi's cloud, local, and object-storage state backends store stack state; they do not add
 application hosts. The native job packages also publish deployment hooks for their workers,

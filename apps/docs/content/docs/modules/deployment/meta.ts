@@ -3,6 +3,6 @@ import { defineMeta } from "blume";
 export default defineMeta({
   title: "Deployment",
   icon: "cloud-upload",
-  pages: ["index", "local-docker", "runtimes", "aws", "providers"],
+  pages: ["index", "local-docker", "runtimes", "railway", "aws", "providers"],
   display: "page",
 });

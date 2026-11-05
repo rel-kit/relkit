@@ -5,10 +5,34 @@
  */
 import type { RuntimeName } from "relkit/runtime";
 
-const BUN_IMAGE =
+/** Pinned Bun base image of every generated Dockerfile. */
+export const BUN_IMAGE =
   "oven/bun:1.3.10@sha256:b86c67b531d87b4db11470d9b2bd0c519b1976eee6fcd71634e73abfa6230d2e";
-const NODE_IMAGE =
+/** Pinned Node base image of the Node server stage. */
+export const NODE_IMAGE =
   "node:24.22.0-bookworm-slim@sha256:91acba91b842bec0bf7ea6f5e09c644c7ccad72c4996ed9616d861d1c7cd60d4";
+
+/** Probes the public readiness endpoint with the image's own runtime; no curl in either base image. */
+const PROBE =
+  "fetch('http://127.0.0.1:'+(process.env.PORT??3000)+'/healthz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))";
+
+/**
+ * Renders the production policy shared by both runtimes: the non-root user, durable state kept
+ * outside the container, and a Docker health check on `/healthz`.
+ * @param user - Non-root user of the base image.
+ * @param executable - Runtime executable that runs the probe.
+ * @returns Dockerfile instructions that follow the copied artifacts.
+ */
+export function productionPolicy(user: "bun" | "node", executable: "bun" | "node"): string {
+  return `RUN mkdir -p .relkit/state .relkit/observability && chown -R ${user}:${user} .relkit
+USER ${user}
+ENV NODE_ENV=production
+ENV RELKIT_DURABLE_STATE=external
+EXPOSE 3000
+STOPSIGNAL SIGTERM
+HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=3 CMD ["${executable}", "-e", "${PROBE}"]
+`;
+}
 
 /** Renders the container build and startup source for the accepted artifact cohort.
  * @param includeJobs - Whether the accepted cohort includes immutable workers.
@@ -40,22 +64,12 @@ ARG SOURCE_DATE_EPOCH=0
 WORKDIR /app
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY package.json ./
-${artifacts}RUN mkdir -p .relkit/state .relkit/observability && chown -R node:node .relkit
-USER node
-ENV NODE_ENV=production
-EXPOSE 3000
-STOPSIGNAL SIGTERM
-CMD ["node", "server/index.js"]
+${artifacts}${productionPolicy("node", "node")}CMD ["node", "server/index.js"]
 `;
   return `FROM ${BUN_IMAGE}
 ARG SOURCE_DATE_EPOCH=0
 WORKDIR /app
-${install}${artifacts}RUN mkdir -p .relkit/state .relkit/observability && chown -R bun:bun .relkit
-USER bun
-ENV NODE_ENV=production
-EXPOSE 3000
-STOPSIGNAL SIGTERM
-CMD ["bun", "run", "--no-env-file", "server/index.js"]
+${install}${artifacts}${productionPolicy("bun", "bun")}CMD ["bun", "run", "--no-env-file", "server/index.js"]
 `;
 }
 

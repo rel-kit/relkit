@@ -1222,6 +1222,11 @@
       "examples": ["templates/default/v1/api/relkit.config.ts"]
     },
     {
+      "path": "docs/modules/deployment/railway",
+      "api": ["app", "jobs", "events", "integrations/postgres"],
+      "examples": ["templates/default/v1/api/relkit.config.ts"]
+    },
+    {
       "path": "docs/modules/deployment/aws",
       "api": [
         "app",

@@ -238,6 +238,7 @@
   "docs/modules/deployment/index": ["update", "continuation", "/docs/modules/database"],
   "docs/modules/deployment/local-docker": ["update", "continuation", "/docs/learn/create-an-app"],
   "docs/modules/deployment/runtimes": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/modules/deployment/railway": ["update", "continuation", "/docs/learn/create-an-app"],
   "docs/modules/deployment/providers": ["update", "continuation", "/docs/modules/integrations"],
   "docs/modules/deployment/aws": [
     "update",

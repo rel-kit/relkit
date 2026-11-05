@@ -183,12 +183,12 @@ not tasks of this change.
 
 ## 17. Production image and Railway (#12)
 
-- [ ] 17.1 Make the container image production-ready — non-root, health endpoints, no durable state on disk — for Bun and Node, and verify the container tests
-- [ ] 17.2 Add `relkit deploy init <target>` with a Railway generator (`railway.json`, container files, CI workflow) that changes no cloud resource, and verify a snapshot test of the generated files
-- [ ] 17.3 Write the Railway guide with Railway Postgres and add a newcomer deploy test against an authorized Railway test project, and verify HTTPS reachability and job, event and schedule behavior across a restart and with two instances
-- [ ] 17.4 Document which engine each target uses, and verify the docs build
-- [ ] 17.5 Mark AWS hosting Labs and list its missing criteria (image build and push, HTTPS, more than one task, real deploy test) on its docs page, and verify the maturity check
-- [ ] 17.6 Add Railway deployment steps to the template skill's references, and verify the skill content test
+- [x] 17.1 Make the container image production-ready — non-root, health endpoints, no durable state on disk — for Bun and Node, and verify the container tests
+- [x] 17.2 Add `relkit deploy init <target>` with a Railway generator (`railway.json`, container files, CI workflow) that changes no cloud resource, and verify a snapshot test of the generated files
+- [x] 17.3 Write the Railway guide with Railway Postgres and add a newcomer deploy test against an authorized Railway test project, and verify HTTPS reachability and job, event and schedule behavior across a restart and with two instances
+- [x] 17.4 Document which engine each target uses, and verify the docs build
+- [x] 17.5 Mark AWS hosting Labs and list its missing criteria (image build and push, HTTPS, more than one task, real deploy test) on its docs page, and verify the maturity check
+- [x] 17.6 Add Railway deployment steps to the template skill's references, and verify the skill content test
 
 ## 18. Access rules, typed middleware and several databases (#13 d, e, f)
 

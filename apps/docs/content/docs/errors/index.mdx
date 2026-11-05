@@ -141,6 +141,7 @@ Every error and warning RelKit prints starts with a `RELKIT_*` code and ends wit
 | [`RELKIT_DEPLOY_FAILED`](/docs/errors/relkit-deploy-failed)                                                                   | Deployment failed                                                  |
 | [`RELKIT_DEPLOY_GRAPH_INVALID`](/docs/errors/relkit-deploy-graph-invalid)                                                     | Application graph cannot be deployed                               |
 | [`RELKIT_DEPLOY_GRAPH_VERSION_UNSUPPORTED`](/docs/errors/relkit-deploy-graph-version-unsupported)                             | Application graph version is not supported                         |
+| [`RELKIT_DEPLOY_INIT_CONFLICT`](/docs/errors/relkit-deploy-init-conflict)                                                     | relkit deploy init would overwrite a different file                |
 | [`RELKIT_DEPLOY_LIVE_OBJECT_UNSUPPORTED`](/docs/errors/relkit-deploy-live-object-unsupported)                                 | Graph contains a live object                                       |
 | [`RELKIT_DEPLOY_PLAN_INVALID`](/docs/errors/relkit-deploy-plan-invalid)                                                       | Saved deployment plan is not valid JSON                            |
 | [`RELKIT_DEPLOY_PROFILE_UNSUPPORTED`](/docs/errors/relkit-deploy-profile-unsupported)                                         | Provider profile does not support a feature                        |
@@ -335,6 +336,7 @@ Every error and warning RelKit prints starts with a `RELKIT_*` code and ends wit
 | [`RELKIT_LAYOUT_TYPECHECK_FAILED`](/docs/errors/relkit-layout-typecheck-failed)                                               | Type check failed during layout migration                          |
 | [`RELKIT_LAYOUT_USAGE`](/docs/errors/relkit-layout-usage)                                                                     | Invalid relkit migrate arguments                                   |
 | [`RELKIT_LOCAL_CHECK_FAILED`](/docs/errors/relkit-local-check-failed)                                                         | Project check failed before starting local services                |
+| [`RELKIT_LOCAL_DURABLE_STATE_IN_CONTAINER`](/docs/errors/relkit-local-durable-state-in-container)                             | Production image refused the local provider for durable work       |
 | [`RELKIT_LOCAL_FAILED`](/docs/errors/relkit-local-failed)                                                                     | relkit local could not finish                                      |
 | [`RELKIT_LOCAL_INVALID`](/docs/errors/relkit-local-invalid)                                                                   | Local services setup is invalid                                    |
 | [`RELKIT_LOCAL_LEASE_BUSY`](/docs/errors/relkit-local-lease-busy)                                                             | Local project is busy                                              |
