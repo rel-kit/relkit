@@ -4,6 +4,7 @@ import { agentAdapterCodes } from "./agent-adapters.js";
 import { authCodes } from "./auth.js";
 import { checkRuleCodes } from "./check-rules.js";
 import { cliCodes } from "./cli.js";
+import { deprecatedCodes } from "./deprecated.js";
 import { handleCodes } from "./handle.js";
 import { compilerCodes } from "./compiler.js";
 import { durableBackendCodes } from "./durable-backend.js";
@@ -15,6 +16,7 @@ import { migrateCodes } from "./migrate.js";
 import { runtimeCodes } from "./runtime.js";
 
 export type { DiagnosticCodeEntry } from "./codes.types.js";
+export type { DeprecatedCode } from "./deprecated.js";
 
 /** Base URL of the public docs site. */
 export const DOCS_ORIGIN = "https://relkit.dev" as const;
@@ -35,6 +37,7 @@ export const DIAGNOSTIC_CODES: readonly DiagnosticCodeEntry[] = Object.freeze(
     ...mcpCodes,
     ...migrateCodes,
     ...agentAdapterCodes,
+    ...deprecatedCodes,
   ].sort((left, right) => left.code.localeCompare(right.code)),
 );
 
