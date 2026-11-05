@@ -1,4 +1,4 @@
-/** Codes reported for platform deploy targets: build and check rules of the Vercel target. */
+/** Codes reported for platform deploy targets: build and check rules of the Vercel and Cloudflare targets. */
 import type { DiagnosticCodeEntry } from "./codes.types.js";
 
 export const deployTargetCodes = [
@@ -22,5 +22,19 @@ export const deployTargetCodes = [
     happened:
       "`relkit check` found `vercel.json` in the project and a channel that clients subscribe to whose realtime profile uses the local provider, or no provider. Vercel functions keep no state between invocations and run as many instances as traffic needs, so subscribers would miss events published from another instance.",
     fix: "Select an external realtime provider for the channel's profile, such as `redisRealtime()` from `@relkit/redis` with a Redis the deployment can reach, or deploy the app to a container target such as Railway. Vercel functions also accept no WebSocket upgrades; the Vercel guide describes the realtime limits.",
+  },
+  {
+    code: "RELKIT_WORKERS_PROVIDER_UNSUPPORTED",
+    title: "Provider does not run on Cloudflare Workers",
+    happened:
+      "`relkit check` found a wrangler configuration (`wrangler.jsonc`, `wrangler.json` or `wrangler.toml`) in the project and a used provider profile whose provider needs a local filesystem or a long-lived process: the local provider, a job or event provider that runs a worker loop, or no provider at all, which falls back to local state. A Worker has no filesystem, runs only while a request or event is handled, and runs as many isolates as traffic needs.",
+    fix: "Select a provider that runs on Workers for the profile, as the message names: Cloudflare Queues (`queueJobs()`, `queueEvents()`) for jobs and events, Durable Objects (`durableObjectRealtime()`) for realtime, Workers KV (`kv()`) or Redis over HTTP for caches, R2 (`r2()`) or S3 for buckets, all from `@relkit/cloudflare` unless noted. Or deploy the app to a container target such as Railway and remove the wrangler configuration.",
+  },
+  {
+    code: "RELKIT_WORKERS_SQLITE_UNSUPPORTED",
+    title: "SQLite database on Cloudflare Workers",
+    happened:
+      "`relkit check` found a wrangler configuration in the project and a Drizzle service with the SQLite dialect. SQLite keeps the database in a local file, and a Worker has no filesystem.",
+    fix: "Use a Postgres database the Worker can reach with the `pg` Drizzle dialect, for example through Cloudflare Hyperdrive, or deploy the app to a container target such as Railway.",
   },
 ] as const satisfies readonly DiagnosticCodeEntry[];

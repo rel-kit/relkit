@@ -796,6 +796,22 @@ Decided while applying section 22 (maintainer, 2026-11-06):
   `@cloudflare/vitest-pool-workers` or a direct `miniflare` dependency, and serves the same bundle
   a deploy uploads.
 
+- **A wrangler configuration marks a Workers project for `relkit check`.** As with `vercel.json`
+  for Vercel, `relkit check` applies the Workers rules when the project root holds
+  `wrangler.jsonc`, `wrangler.json` or `wrangler.toml`, the files `deploy init cloudflare` writes
+  and wrangler reads; no separate flag is needed. For every used provider profile (a cache, bucket,
+  job, event, event or queue trigger, channel or agent state that names it), the provider must be
+  one that runs on Workers: Cloudflare Queues for jobs and events, Durable Objects for realtime,
+  Workers KV or Redis for caches, R2 or S3 for buckets, Redis for agent state. Anything else fails
+  with `RELKIT_WORKERS_PROVIDER_UNSUPPORTED`, which names the provider, why it cannot run (local
+  files, a worker loop in a long-lived process, a listener the Worker does not run) and the
+  alternative for that capability; a used profile without a provider fails too, because it would
+  fall back to local state. Inngest and Trigger.dev are refused for now because their RelKit
+  bindings serve or poll from a process; Postgres jobs and events because their worker loop and
+  drain are unverified on Workers. A Drizzle service with the SQLite dialect fails with
+  `RELKIT_WORKERS_SQLITE_UNSUPPORTED`, which suggests Postgres through Hyperdrive. Unused profiles
+  are not reported. Redis is accepted here; section 22.3 adds the rule that it must use HTTP.
+
 ### D10. Postgres durable backend (#12)
 
 Tables hold jobs (leased with `FOR UPDATE SKIP LOCKED`), an event outbox written in the caller's
