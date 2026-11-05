@@ -525,6 +525,20 @@ check` writes an empty module in their place. Templates already listed it; the e
   read a program built with the private TypeScript 5.9 API, without its type diagnostics, since
   TypeScript 7 has no stable JavaScript checker API yet. A missing or crashing compiler is
   `RELKIT_TYPESCRIPT_COMPILER_FAILED`. `typecheckProject` now returns a Promise.
+- **Templates keep the editor plugin entry, and TypeScript 5.9.3 stays their default.** The plugin
+  only adds while-you-type route errors in editors that load TypeScript 5.9 plugins; no check
+  depends on it, and the docs say so. Templates drop `baseUrl`, which TypeScript 7 removed, and
+  write `paths` relative to the configuration (`"@app/*": ["./src/*"]`). Their `.gitignore` now
+  also tracks `.relkit/generated/event-registry.d.ts`, which the route checks reference, so a
+  fresh clone type-checks. Moving the generated default to TypeScript 7 is left to a later
+  release decision.
+- **The TypeScript matrix is the fresh-clone job.** `fresh-clone-typecheck` in `checks.yml` runs
+  every template on `typescript: ["5.9", "7"]`; `scripts/fresh-clone-typecheck.ts --typescript`
+  pins 5.9.3 or 7.0.2, removes the editor plugin, then runs `typecheck`, `relkit check`,
+  `relkit add function` and `typecheck` again. It runs on pull requests that touch the CLI,
+  the creator, templates or the workflow.
+- **Supported versions are documented in Modules › CLI › TypeScript versions**, which `relkit
+check`'s page and Learn › Local development link to.
 
 ### D9. Deploy targets (#12)
 

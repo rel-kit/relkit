@@ -48,7 +48,8 @@ export async function verifyCreationTuple(root: string, selection: CreationTuple
   expect(result.installed).toBe(install);
   expect(result.gitInitialized).toBe(git);
   verifyGeneratedManifest(manifest, template);
-  expect(tsconfig.compilerOptions).toMatchObject({ baseUrl: ".", paths: { "@app/*": ["src/*"] } });
+  expect(tsconfig.compilerOptions).toMatchObject({ paths: { "@app/*": ["./src/*"] } });
+  expect(tsconfig.compilerOptions).not.toHaveProperty("baseUrl");
   if (template === "tasks")
     expect(result.files.some((path) => path.startsWith("src/services/orders/"))).toBe(examples);
   else
