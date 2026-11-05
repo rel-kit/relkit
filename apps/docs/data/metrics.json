@@ -1,7 +1,7 @@
 {
   "protocol": "relkit.metrics",
   "version": 1,
-  "createdAt": "2026-11-05T20:09:45.509Z",
+  "createdAt": "2026-11-05T21:03:41.110Z",
   "metrics": [
     {
       "id": "creation-success",
@@ -25,10 +25,10 @@
       "id": "time-to-railway",
       "name": "Time from `create` to an app deployed on Railway",
       "target": "Under 15 min",
-      "status": "not-met",
-      "value": "failed",
-      "numeric": null,
-      "detail": "The Railway newcomer test failed (exit 1): Deploy failed (annotated by hand) Reproduced locally in a Linux container: relkit build in the Railway image fails with RELKIT_ROUTE_MODULE_TYPE for every route; see design D19, 'Decided while applying section 20'."
+      "status": "met",
+      "value": "2 min 1 s",
+      "numeric": 121,
+      "detail": "Railway newcomer test (bun image): creation and install 38 s, then deploy until the app answers over HTTPS; packing the candidate (13 s) is excluded."
     },
     {
       "id": "runtimes-http",
