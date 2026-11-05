@@ -22,6 +22,7 @@ import {
 } from "./client-guide-catalog.js";
 import { realtimeGuideGroup, realtimeGuideRelations } from "./realtime-guide-catalog.js";
 import { operationsGuideRelations } from "./operations-guide-catalog.js";
+import { projectPageRelations, projectPages } from "./project-pages-catalog.js";
 import { cliGuideGroup, cliGuideRelations } from "./cli-guide-catalog.js";
 import { deploymentGuideGroup, deploymentGuideRelations } from "./deployment-guide-catalog.js";
 /** Authored pages outside every guide group: the section overviews and the root Docs pages. */
@@ -29,9 +30,7 @@ export const overviewPages = [
   "docs/index",
   "docs/why-relkit",
   "docs/faq",
-  "docs/maturity",
-  "docs/versioning",
-  "docs/benchmarks",
+  ...projectPages,
   "docs/modules/index",
   "guides/index",
 ] as const;
@@ -108,8 +107,7 @@ const relations = [
   relation("docs/learn/index", ["app"], ["templates/default/v1/minimal/README.md"]),
   relation("docs/modules/index", ["app"], []),
   relation("docs/why-relkit", ["app"], []),
-  ...["docs/maturity", "docs/versioning"].map((path) => relation(path, ["app"], [])),
-  relation("docs/benchmarks", ["app"], ["scripts/benchmark-dev-loop.ts"]),
+  ...projectPageRelations,
   relation(
     "docs/faq",
     ["app", "functions"],

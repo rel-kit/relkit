@@ -1,0 +1,88 @@
+{
+  "protocol": "relkit.metrics",
+  "version": 1,
+  "createdAt": "2026-11-05T15:24:41.178Z",
+  "metrics": [
+    {
+      "id": "creation-success",
+      "name": "Creation success on the latest Bun",
+      "target": "100% of templates, checked nightly",
+      "status": "no-data",
+      "value": "no data",
+      "numeric": null,
+      "detail": "No creation canary result was found."
+    },
+    {
+      "id": "time-to-first-route",
+      "name": "Time from `create` to a first route",
+      "target": "Under 5 min",
+      "status": "no-data",
+      "value": "no data",
+      "numeric": null,
+      "detail": "The walkthrough has not run."
+    },
+    {
+      "id": "time-to-railway",
+      "name": "Time from `create` to an app deployed on Railway",
+      "target": "Under 15 min",
+      "status": "no-data",
+      "value": "no data",
+      "numeric": null,
+      "detail": "The walkthrough has not run."
+    },
+    {
+      "id": "runtimes-http",
+      "name": "Runtimes passing the HTTP suite",
+      "target": "Bun and Node, then Workers",
+      "status": "no-data",
+      "value": "no data",
+      "numeric": null,
+      "detail": "No runtime matrix result was found."
+    },
+    {
+      "id": "reload-p95",
+      "name": "Save-to-serving p95 for a 100-function app",
+      "target": "Under 1000 ms",
+      "status": "no-data",
+      "value": "no data",
+      "numeric": null,
+      "detail": "No dev-loop benchmark report with a 100-function size was found."
+    },
+    {
+      "id": "check-memory",
+      "name": "`relkit check` peak memory compared with `tsc`",
+      "target": "At or below 1×",
+      "status": "no-data",
+      "value": "no data",
+      "numeric": null,
+      "detail": "No dev-loop benchmark report with a 100-function size was found."
+    },
+    {
+      "id": "agent-eval-pass-rate",
+      "name": "Agent eval pass rate (check and tests, first attempt)",
+      "target": "Published every release",
+      "status": "no-data",
+      "value": "no data",
+      "numeric": null,
+      "detail": "No agent evaluation summary was found."
+    },
+    {
+      "id": "outside-contributions",
+      "name": "Issues and PRs from outside contributors per month",
+      "target": "10 or more after launch",
+      "status": "no-data",
+      "value": "no data",
+      "numeric": null,
+      "detail": "The contributions count did not run."
+    },
+    {
+      "id": "published-packages",
+      "name": "Publishable packages",
+      "target": "6 first-party plus integrations",
+      "status": "met",
+      "value": "6 first-party plus 18 integrations and tools",
+      "numeric": 24,
+      "detail": "Non-private manifests under packages/ and integrations/packages/."
+    }
+  ]
+}

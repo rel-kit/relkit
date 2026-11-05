@@ -215,7 +215,7 @@ not tasks of this change.
 
 ## 20. Metrics and launch (#21)
 
-- [ ] 20.1 Build the metrics page from CI outputs (creation canary, runtime matrix, benchmarks, agent evaluations, Railway test, package count) and link it from release notes, and verify it renders from the pull request's CI outputs and the release-notes generator test includes the link
+- [x] 20.1 Build the metrics page from CI outputs (creation canary, runtime matrix, benchmarks, agent evaluations, Railway test, package count) and link it from release notes, and verify it renders from the pull request's CI outputs and the release-notes generator test includes the link
 - [ ] 20.2 Script the newcomer walkthrough (create to first route, create to Railway deploy) and record its timings, and verify the script runs end to end
 - [ ] 20.3 Enable GitHub Discussions or a Discord, publish the roadmap with Core and Labs status, label about ten good first issues and set the repository description, and verify each item on the launch checklist
 - [ ] 20.4 Write the launch checklist (P0 items, Railway newcomer test, community channels, roadmap) as a check, and verify it passes on the pull request

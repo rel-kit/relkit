@@ -17,6 +17,7 @@ import { generateInstallations } from "./generate-installations.js";
 import { contentFiles, pruneGenerated } from "./generation-files.js";
 import { labsRoutes, maturityTables } from "./maturity-table.js";
 import { devLoopBenchmarks } from "./dev-loop-benchmarks.js";
+import { metricsPage } from "./metrics-page.js";
 import { generateSourceSnippets } from "./source-snippets.js";
 import { referenceOverview } from "./api-related.js";
 import {
@@ -54,6 +55,7 @@ async function main(): Promise<void> {
     "_snippets/generated/dev-loop-benchmarks.mdx",
     devLoopBenchmarks(resolve(import.meta.dir, "..")),
   );
+  await emit("_snippets/generated/metrics.mdx", metricsPage(resolve(import.meta.dir, "..")));
   await emit("docs/api/cli.mdx", renderCliReference(cliModel));
   await emit("docs/api/inspector-protocol.mdx", await renderInspectorApiReference());
   await generateErrorPages(root, content, emit);
