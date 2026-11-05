@@ -21,6 +21,35 @@ For a complete workflow, follow [connect react](/guides/frontend/connect-react).
 
 [Connect a React frontend](/guides/frontend/connect-react) shows the client side of this capability.
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### createClient
+
+Creates the generated contract's synchronous HTTP proxy with a configured service owner.
+
+**Example**
+
+```ts
+import { createClient } from "@relkit/client";
+export const makeClient = () => createClient({ baseUrl: "http://127.0.0.1:3000" });
+```
+
+**Signature**
+
+```ts
+declare const createClient: <Contract extends RouterContract = RouterContract>(
+  options: CreateClientOptions,
+) => RouterContractClient<Contract>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.ts#L26)
+
+Since v0.1.0
+
+## Complete reference
+
 <include>/_snippets/generated/exports/client.mdx</include>
 
 ## `api.ts`
@@ -9005,29 +9034,6 @@ declare const selectAutoTransport: (options: CreateAutoClientOptions) => Transpo
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.service.ts#L50)
 
 ## `transport.ts`
-
-### createClient
-
-Creates the generated contract's synchronous HTTP proxy with a configured service owner.
-
-**Example**
-
-```ts
-import { createClient } from "@relkit/client";
-export const makeClient = () => createClient({ baseUrl: "http://127.0.0.1:3000" });
-```
-
-**Signature**
-
-```ts
-declare const createClient: <Contract extends RouterContract = RouterContract>(
-  options: CreateClientOptions,
-) => RouterContractClient<Contract>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.ts#L26)
-
-Since v0.1.0
 
 ### createAutoClient
 

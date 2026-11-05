@@ -156,7 +156,7 @@ declare const createEventEnvelope: (
 ) => UnknownEventEnvelope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/events-envelope.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/events-envelope.ts#L21)
 
 ## `index.ts`
 
@@ -518,7 +518,7 @@ Re-exports all named exports from the "./events-provider.types.js" module.
 export * from "./events-provider.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/events-provider.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/events-provider.ts#L24)
 
 ### createPostgresEventProvider
 
@@ -542,7 +542,7 @@ declare const createPostgresEventProvider: (
 ) => PostgresEventProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/events-provider.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/events-provider.ts#L42)
 
 ## `events-provider.types.ts`
 
@@ -1456,7 +1456,7 @@ Re-exports all named exports from the "./jobs-runtime.types.js" module.
 export * from "./jobs-runtime.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-runtime.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-runtime.ts#L25)
 
 ### createPostgresJobsRuntime
 
@@ -1480,7 +1480,7 @@ declare const createPostgresJobsRuntime: (
 ) => PostgresJobsRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-runtime.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-runtime.ts#L35)
 
 ## `jobs-runtime.types.ts`
 
@@ -1639,7 +1639,7 @@ Builds the submission dedupe key; runs without an idempotency key or occurrence 
 declare const dedupeKey: (request: NativeSubmission) => string | null;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-submit.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-submit.ts#L29)
 
 ### retryRun
 
@@ -1669,7 +1669,7 @@ declare const retryRun: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-submit.ts#L107)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-submit.ts#L106)
 
 ### storedRequest
 
@@ -1684,7 +1684,7 @@ declare const storedRequest: (
 ) => StoredRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-submit.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-submit.ts#L44)
 
 ### submitRun
 
@@ -1700,7 +1700,7 @@ declare const submitRun: (
 ) => Effect.Effect<RunHandle, PostgresBackendError, SqlClient.SqlClient>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-submit.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-submit.ts#L72)
 
 ### unknownSubmission
 
@@ -1712,7 +1712,7 @@ Describes a write whose commit may have happened but whose response was lost.
 declare const unknownSubmission: (request: NativeSubmission) => NativeReceipt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-submit.ts#L143)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-submit.ts#L142)
 
 ## `jobs-work.ts`
 
@@ -1774,7 +1774,7 @@ export interface PostgresJobWorker extends NativeTaskWorker {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-worker.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-worker.ts#L25)
 
 ### createPostgresJobWorker
 
@@ -1789,7 +1789,7 @@ declare const createPostgresJobWorker: (
 ) => PostgresJobWorker;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-worker.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-worker.ts#L39)
 
 ## `schedule-time.ts`
 
@@ -1920,7 +1920,7 @@ export interface ClaimedOccurrence {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/schedules-tick.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/schedules-tick.ts#L20)
 
 ### claimOccurrence
 
@@ -1941,7 +1941,7 @@ declare const claimOccurrence: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/schedules-tick.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/schedules-tick.ts#L99)
 
 ### occurrenceIdentity
 
@@ -1953,7 +1953,7 @@ Builds the identity that ties a run to its occurrence.
 declare const occurrenceIdentity: (scheduleId: string, occurrenceAt: string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/schedules-tick.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/schedules-tick.ts#L34)
 
 ### tickSchedules
 
@@ -1969,7 +1969,7 @@ declare const tickSchedules: (
 ) => Effect.Effect<Array<ClaimedOccurrence>, PostgresBackendError, SqlClient.SqlClient>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/schedules-tick.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/schedules-tick.ts#L46)
 
 ## `schedules.types.ts`
 
