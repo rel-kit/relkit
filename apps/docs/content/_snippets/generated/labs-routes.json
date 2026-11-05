@@ -16,6 +16,7 @@
   "/docs/modules/ai/graphs-persistence",
   "/docs/modules/ai/native-runtime",
   "/docs/modules/deployment/aws",
+  "/docs/modules/deployment/cloudflare",
   "/docs/modules/deployment/railway",
   "/docs/modules/deployment/vercel",
   "/docs/modules/jobs/providers/effect-mq",

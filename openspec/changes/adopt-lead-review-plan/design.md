@@ -777,6 +777,195 @@ $CRON_SECRET`; the entry compares it in constant time, refuses a missing or shor
   not happen while applying this section: the machine's Vercel CLI token was invalid (`vercel login`
   pending) and no `RELKIT_TEST_VERCEL_DATABASE_URL` server was set up, so the Vercel target stays Labs.
 
+Decided while applying section 22 (maintainer, 2026-11-06):
+
+- **Workers is an adapter name, not a Tier 1 runtime name.** `RuntimeName` stays `"bun" | "node"`
+  (the process runtimes the container image, Railway and Vercel use) and `RuntimeAdapterName` adds
+  `"workers"`; `RuntimeAdapter.name`, `detectRuntime`, `loadRuntimeAdapter` and the build's
+  `--runtime` take the wider type. `relkit/runtime/workers` exports `workersRuntime`: `serve`
+  rejects (a Worker has no listener), `files` is undefined, `processes.spawn` and
+  `modules.resolve` throw, `which` returns null and there is no module registry. Hashing uses
+  `node:crypto`'s synchronous `createHash`, because the adapter contract's `sha256Hex` is
+  synchronous and Web Crypto's digest is not; identifiers use Web Crypto's `randomUUID`.
+  `detectRuntime` recognizes Workers by `navigator.userAgent === "Cloudflare-Workers"`.
+- **Workers run with `nodejs_compat`.** The generated server and `relkit` itself use
+  `AsyncLocalStorage`, `node:crypto`, `node:path` and `process.env`; the flag provides them, and
+  `nodejs_compat` also fills `process.env` with the Worker's string bindings. The portability check
+  treats files under `workers/` or named `*.workers.ts` as Workers adapters, which may import
+  `node:*` modules but never Bun's.
+- **`relkit build --runtime workers` bundles everything into `server/index.js`.** The build writes
+  `server/worker.ts` beside the generated `index.ts` and bundles it with esbuild (on Bun too, since
+  `bun build` has no Workers target): neutral platform, `workerd`/`worker` export conditions, every
+  dependency included because a Worker cannot install packages beside its script, and only Node
+  built-ins and the optional transports the server imports by name left external. The bundle is
+  not minified, because minifying folds the server's non-literal imports of optional packages into
+  literals that wrangler then tries to resolve, and wrangler bundles the file again anyway (its
+  `nodejs_compat` polyfills cover the built-ins workerd lacks). `import.meta.url` is defined as
+  `file:///bundle/server/index.js` because a bundled Worker module has none, and an esbuild plugin
+  replaces `relkit/runtime`'s lazy imports of the Bun and Node adapters with a stub, which keeps
+  `ws` and `@hono/node-server` out of the bundle. The build writes no Dockerfile, `manifest.json`
+  records `"runtime": "workers"`, and `relkit start` refuses such a build and points at
+  `wrangler dev`.
+- **The Worker activates the server lazily, in function-host mode.** A Worker's global scope may not
+  generate random values or set timers, and RelKit's module scope does both (Effect fiber IDs at
+  `defineApp`), so `worker.ts` imports the server module from its first handler; esbuild then wraps
+  the module for lazy evaluation, which in turn forbids top-level await, so the Workers server omits
+  the `if (relkitEntryPoint) await activateRelkitApplication()` tail. The entry copies string
+  bindings into `process.env` once per isolate, defaults `RELKIT_ENV` to `production` (wrangler dev
+  defines `NODE_ENV` as `development`), forces `RELKIT_DURABLE_STATE=external` and
+  `RELKIT_WORKER_ROLE=api`, activates with `{ functionHost: true }` (section 21's mode: no listener,
+  no signal handlers, no background loop), waits up to 25 s for a cold isolate's providers and
+  passes the Worker's `env` as the request bindings. Static files are not read from disk: the
+  Workers server emits no `staticFiles` option, and `public/` is served by Workers static assets
+  before the Worker runs.
+- **The runtime HTTP suite runs on Workers through `wrangler dev`.** With `--runtime workers`,
+  `scripts/runtime-http-suite.ts` builds the `api` template for Workers, writes a minimal
+  `wrangler.jsonc` (the bundle, `nodejs_compat`, the `public/` assets) under `.relkit/` and serves
+  it locally in workerd with a pinned `bunx wrangler@4.151.3 dev`, then runs the template's HTTP
+  tests against it, as on Bun and Node. That needed no new dependency in the repository, unlike
+  `@cloudflare/vitest-pool-workers` or a direct `miniflare` dependency, and serves the same bundle
+  a deploy uploads.
+
+- **A wrangler configuration marks a Workers project for `relkit check`.** As with `vercel.json`
+  for Vercel, `relkit check` applies the Workers rules when the project root holds
+  `wrangler.jsonc`, `wrangler.json` or `wrangler.toml`, the files `deploy init cloudflare` writes
+  and wrangler reads; no separate flag is needed. For every used provider profile (a cache, bucket,
+  job, event, event or queue trigger, channel or agent state that names it), the provider must be
+  one that runs on Workers: the Postgres durable backend for jobs and events (run from Cloudflare
+  Queues and Cron Triggers, see 22.4), a Durable Object for realtime, Workers KV or Redis for
+  caches, R2 or S3 for buckets. Anything else fails
+  with `RELKIT_WORKERS_PROVIDER_UNSUPPORTED`, which names the provider, why it cannot run (local
+  files, its own worker process, a listener the Worker does not run) and the
+  alternative for that capability; a used profile without a provider fails too, because it would
+  fall back to local state. Inngest, Trigger.dev and effect-mq are refused because their RelKit
+  bindings serve or poll from a process. A Drizzle service with the SQLite dialect fails with
+  `RELKIT_WORKERS_SQLITE_UNSUPPORTED`, which suggests Postgres through Hyperdrive. Unused profiles
+  are not reported. Redis is accepted for caches only, and must use an HTTP URL (task 22.3).
+
+- **Redis on Workers speaks HTTP, chosen by the URL.** `@relkit/redis` keeps one `url` secret: a
+  `redis://` or `rediss://` URL opens a socket as before, and an `http://` or `https://` URL sends
+  each command as one `fetch` POST of `[command, ...args]`, answered with `{ result }` or
+  `{ error }`, the REST protocol Upstash Redis and compatible proxies serve. The access token rides
+  in the URL's password and is sent as a bearer token, never in the request URL. On Workers a
+  socket URL fails at once with a message that asks for an HTTP URL; the runtime is read through
+  `relkit/runtime`'s `detectRuntime`, which is why `runtime` joined the `relkit` areas integrations
+  may import. HTTP serves caches only: realtime and agent state wait for changes with a blocking
+  `XREAD`, which the protocol cannot do, so their providers refuse an HTTP URL, and the Workers
+  check now accepts no provider for agent state (realtime on Workers is Durable Objects, 22.4).
+  `ioredis` stays a static import: it bundles and loads in workerd under `nodejs_compat` and is
+  never called there.
+- **KV and R2 get binding providers; the HTTP and S3 ones stay.** `kv()` (Cloudflare's KV REST
+  API) and `r2()` (R2's S3 API with signed URLs) already run anywhere `fetch` does, Workers
+  included. `kvBinding({ binding })` and `r2Binding({ binding })` add caches and buckets on the
+  Worker's own bindings (`cloudflare-kv-binding`, `cloudflare-r2-binding`), which need no API
+  token and record the binding name in the graph so the generator can declare it. The R2 binding
+  cannot sign URLs, so that bucket declares no signed-URL features and `r2()` remains the choice
+  for them. Providers read bindings through `workersBinding(name)` from `relkit/runtime/workers`,
+  on first use, from the `env` the Workers entry stores under `Symbol.for("relkit.workers.bindings")`
+  on every event; a missing binding or a call outside a Worker names the binding.
+- **Integration modules load statically in a Workers bundle.** The generated
+  `runtime-integrations.ts` checks installed integration versions on disk and loads each module
+  with a top-level `await`; neither works in a Worker. A Workers build renders it with static
+  imports and no startup check: the bundle contains exactly the versions `relkit build` checked.
+- **Conformance runs inside workerd.** `@relkit/cloudflare`'s `workers-conformance.test.ts` serves a
+  conformance Worker with a pinned `wrangler dev`, with a local KV namespace, a local R2 bucket and
+  a Redis REST proxy in front of a real Redis, and asserts each check passes there: the Redis
+  protocol and cache checks over HTTP (the same module the Bun and Node socket conformance runs,
+  now shared), the socket refusal, the KV and R2 binding checks, and the missing-binding error. It
+  runs with `RELKIT_TEST_WORKERS=1` and `REDIS_URL` (or `RELKIT_TEST_DOCKER=1`); unit tests run the
+  binding checks against in-memory bindings and the HTTP client against a stub endpoint in every
+  run.
+
+- **Jobs, events and schedules keep their state in Postgres; Queues and Cron Triggers run them.**
+  Every job runtime in RelKit is about 1,500 lines of run state, leases, retries, controls and
+  schedules; the Postgres backend already has all of it, passes the jobs and events conformance
+  suites, and connects from workerd (`@effect/sql-pg` over `nodejs_compat` sockets). So the Workers
+  target uses `@relkit/postgres` for jobs and events, and Cloudflare's primitives do the waking:
+  after every request that is not `GET`, `HEAD` or `OPTIONS` the Worker sends one message to the
+  `RELKIT_WORK` queue (`ctx.waitUntil`), and its `queue` handler runs the server's function-host
+  `drain` (section 21: due job attempts and event deliveries until none is left or 25 s pass), then
+  acks the batch, or retries it when the drain fails, so a wake-up is delivered at least once and
+  every event consumer runs through a queue-triggered invocation; the `scheduled` handler of a
+  `* * * * *` Cron Trigger runs the same drain, which claims due schedule occurrences once
+  (Postgres's unique claim) and picks up retries whose backoff has passed. A Queues-native run
+  store in a Durable Object is the follow-up that would remove the database.
+- **The Postgres backend connects once per operation on Workers.** The first local run hung: a
+  Worker may not use a socket opened while handling another request, and the backend shared one
+  pool per process. On Workers (`detectRuntime() === "workers"`) `openPostgresDatabase` returns a
+  per-operation owner: each `run` opens one connection, applies the schema on the isolate's first
+  operation, runs the effect and closes; a `fork` (the lease heartbeat) holds its own connection
+  until it ends. Hyperdrive in front of the database keeps the connects cheap. Bun and Node keep
+  the pool.
+- **Realtime runs on a Durable Object.** `durableObjectRealtime({ binding })` reuses RelKit's
+  shared realtime logic (`createRealtimeProviderFromStore`, as Redis does) over a store whose JSON
+  document lives in one `RelkitRealtimeState` object per profile: `/read`, an atomic
+  `/compare-and-set` (an in-object lock on top of Durable Object input gates) and `/wait`, which
+  holds the request until the document changes or the deadline passes, so subscribers in any
+  isolate wait without polling. The class uses the classic `fetch` interface, needs nothing from
+  `cloudflare:*`, lives in `@relkit/cloudflare/workers`, and the Workers entry re-exports it when
+  the graph uses the adapter. `durability` gains `"durable-object"`, and `@relkit/cloudflare` may
+  import `relkit/providers-local` like `@relkit/redis`.
+- **Verified locally in workerd.** A probe app (the Railway probe service plus a public channel,
+  Postgres jobs and events, Durable Object realtime) built with `--runtime workers` and served by
+  `wrangler dev --test-scheduled` with a local queue and a local Postgres 16: the HTTP-submitted
+  job, the event consumer's task and the Cron-triggered occurrence all completed, two concurrent
+  Cron calls left exactly one run per occurrence, and the conformance Worker's Durable Object check
+  passed the shared realtime checks.
+
+- **The live newcomer deploy test passed against Cloudflare (2026-11-06).**
+  `scripts/cloudflare-newcomer.ts` follows the Railway and Vercel tests: opt-in
+  (`RELKIT_TEST_CLOUDFLARE=1`, wrangler credentials, `RELKIT_TEST_CLOUDFLARE_DATABASE_URL` for a
+  Postgres the Worker can reach), it packs the checkout, creates the `api` template, adds Postgres
+  jobs and events, `@relkit/cloudflare` with Durable Object realtime and the probe service plus a
+  public channel, names the Worker `relkit-test-<run id>`, runs `relkit deploy init cloudflare`,
+  creates the queue, deploys with a pinned wrangler, sets `DATABASE_URL`, and reads the outcomes from
+  the backend's tables. `@relkit/cloudflare` joined the packed candidate closure for it. The run on
+  the packed candidate, with a throwaway Railway Postgres behind a TCP proxy, passed: deployed after
+  52 s, `/healthz` ready over HTTPS after 84 s (readiness includes the realtime provider's first
+  Durable Object round trip), the HTTP job and the event consumer completed through the queue after
+  107 s, and two Cron-claimed occurrences each had exactly one run after 705 s; the Worker, the queue
+  and the database were deleted, and the Railway project was scheduled for deletion. Two lessons went
+  into the flow: Cloudflare refuses to delete a Worker that consumes a queue, so cleanup detaches the
+  consumer first, and a new Cron Trigger took about ten minutes to start firing (Cloudflare documents
+  up to 15), so the flow waits up to 15 minutes for two occurrences. A first run against a linked
+  scratch project showed both. `.github/workflows/cloudflare-newcomer.yml` runs the test when the
+  `RELKIT_TEST_CLOUDFLARE` variable is `1`; `tests/deployment/cloudflare-newcomer.test.ts` runs the
+  flow against stubs in every test run.
+
+- **`relkit deploy init cloudflare` writes three files from the graph.** With the Railway and
+  Vercel rules (identical files kept, `RELKIT_DEPLOY_INIT_CONFLICT` unless `--force`,
+  `cloudResourcesChanged: false`, the compiled graph required), it writes `wrangler.jsonc`, the
+  Worker entry `worker.mjs` and `.github/workflows/cloudflare-deploy.yml`. The configuration names
+  the Worker after the package, pins the compatibility date and `nodejs_compat`, runs
+  `relkit build --runtime workers` as wrangler's custom build, serves `.relkit/build/public` as
+  static assets, and declares what the graph uses: `kv_namespaces` and `r2_buckets` for the binding
+  providers (by binding name only, which wrangler provisions on the first deploy, so no IDs are
+  copied by hand), the `RelkitRealtimeState` Durable Object with a SQLite-backed migration, and,
+  when jobs or events use the Postgres backend, the `RELKIT_WORK` queue (producer and consumer) and
+  a `* * * * *` Cron Trigger. The entry is a two-line module that re-exports the built handlers and
+  Durable Objects, so the project has a stable, editable place for its own handlers while the
+  generated code stays in `.relkit/build`. The workflow checks, type-checks and tests, creates the
+  queue when it does not exist (queues are not provisioned automatically) and runs a pinned
+  `wrangler deploy` with `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. `--runtime` accepts
+  only `workers` here, and the JSON result reports it. A unit test keeps the generator's wrangler
+  pin, the runtime HTTP suite's and the conformance test's equal. Checked with
+  `wrangler deploy --dry-run` on the probe app: the custom build ran and the 5.2 MB bundle (927 KB
+  gzipped) uploaded with its Durable Object and queue bindings.
+
+- **Workers joins the runtime matrix nightly; the target and the runtime stay Labs.**
+  `.github/workflows/workers-runtime.yml` runs every night (and on demand): the `api` template's
+  HTTP suite against its Workers bundle in workerd and the clients' conformance in workerd, with
+  Redis from Docker. It is not a pull-request gate, per the runtime-matrix requirement for Tier 2.
+  `/docs/modules/deployment/cloudflare` is the guide; the deployment overview lists Cloudflare's
+  engine as platform configuration (`wrangler.jsonc`) with the Workers bundle deployed by wrangler,
+  and the runtimes page describes Tier 2 and `--runtime workers`. The maturity table gains
+  "Cloudflare deploy" and "Cloudflare Workers runtime", both Labs and both pointing at the guide:
+  the live newcomer test passed from this machine, but the target-maturity requirement asks for a
+  pass in CI, which needs the `RELKIT_TEST_CLOUDFLARE` variable, the Cloudflare secrets and a
+  database secret on the repository, as Railway and Vercel stayed Labs after their local runs.
+  `RELKIT_WORK` and `RELKIT_REALTIME` joined the names the error-page generator does not treat as
+  diagnostic codes, since they are binding names.
+
 ### D10. Postgres durable backend (#12)
 
 Tables hold jobs (leased with `FOR UPDATE SKIP LOCKED`), an event outbox written in the caller's

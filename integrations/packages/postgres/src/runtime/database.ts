@@ -6,6 +6,7 @@
  * the same runtime and interrupted before the pool closes.
  */
 import { PgClient } from "@effect/sql-pg";
+import { detectRuntime } from "relkit/runtime";
 import { Data, Effect, Fiber, Layer, ManagedRuntime, Redacted } from "effect";
 import * as SqlClient from "effect/sql/SqlClient";
 import { SqlError } from "effect/sql/SqlError";
@@ -79,6 +80,7 @@ const ensureSchema = Effect.fn("Postgres.ensureSchema")(function* (
  */
 export function openPostgresDatabase(options: PostgresDatabaseOptions): PostgresDatabase {
   const tables = postgresTables(options);
+  if (detectRuntime() === "workers") return openPerOperationDatabase(options, tables);
   const client = PgClient.layer({
     url: Redacted.make(options.url),
     maxConnections: options.maxConnections ?? 10,
@@ -109,4 +111,48 @@ export function openPostgresDatabase(options: PostgresDatabaseOptions): Postgres
     },
   };
   return Object.freeze(database);
+}
+
+/**
+ * Connects once per operation, for Cloudflare Workers: a Worker may not use a socket opened while
+ * handling another request, so no pool outlives the request, queue batch or Cron Trigger that
+ * opened it. Each `run` connects, applies the schema on the isolate's first operation, runs the
+ * effect in one connection (transactions included) and disconnects; a `fork` holds its own
+ * connection until it ends. Cloudflare Hyperdrive in front of the database keeps this cheap.
+ * @param options - Connection string and namespace.
+ * @param tables - Namespace tables.
+ * @returns The connection owner.
+ */
+function openPerOperationDatabase(
+  options: PostgresDatabaseOptions,
+  tables: PostgresTables,
+): PostgresDatabase {
+  const connection = () =>
+    PgClient.layer({
+      url: Redacted.make(options.url),
+      maxConnections: 1,
+      applicationName: "relkit-postgres",
+    });
+  let schemaReady = false;
+  const withSchema = <A, E>(effect: Effect.Effect<A, E, SqlClient.SqlClient>) =>
+    Effect.gen(function* () {
+      if (!schemaReady) {
+        yield* ensureSchema(tables, postgresBackendSql(options));
+        schemaReady = true;
+      }
+      return yield* effect;
+    }).pipe(Effect.provide(connection()));
+  const fibers = new Set<BackgroundFiber>();
+  return Object.freeze({
+    tables,
+    run: <A, E>(effect: Effect.Effect<A, E, SqlClient.SqlClient>, signal?: AbortSignal) =>
+      Effect.runPromise(withSchema(effect), signal === undefined ? undefined : { signal }),
+    fork: (effect: Effect.Effect<void, never, SqlClient.SqlClient>) => {
+      const fiber = Effect.runFork(withSchema(effect));
+      fibers.add(fiber);
+      fiber.addObserver(() => fibers.delete(fiber));
+      return fiber;
+    },
+    close: () => Effect.runPromise(Fiber.interruptAll([...fibers])).then(() => undefined),
+  });
 }

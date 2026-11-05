@@ -6,26 +6,29 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { Effect } from "effect";
-import type { RuntimeName } from "relkit/runtime";
+import type { RuntimeAdapterName } from "relkit/runtime";
 import { cliPromise } from "../cli-errors.js";
 import { DeployCommandError } from "./deploy-support.js";
 import type { DeployExecutionResult } from "./deploy-support.types.js";
 import { railwayFiles, type DeployInitFile } from "./deploy-init-railway.js";
 import { vercelFiles } from "./deploy-init-vercel.js";
 import { vercelCronPlan } from "./deploy-init-vercel-crons.js";
+import { cloudflareTarget } from "./deploy-init-cloudflare-target.js";
 
 /** Targets `deploy init` accepts, and the ones announced for later sections. */
 const PULUMI_TARGETS = new Set(["aws"]);
-const PLATFORM_TARGETS = new Set(["railway", "vercel"]);
-const COMING_TARGETS = new Set(["cloudflare"]);
+const PLATFORM_TARGETS = new Set(["railway", "vercel", "cloudflare"]);
 /** Compiled graph `relkit check` writes; the Vercel target reads its schedules. */
 const GRAPH_FILE = ".relkit/generated/application.graph.json";
 
+/** The `--runtime` values each platform target accepts. */
+const RUNTIMES = { railway: "bun|node", vercel: "node", cloudflare: "workers" } as const;
+
 /** A parsed platform-native initialization. */
 export interface PlatformInit {
-  readonly target: "railway" | "vercel";
+  readonly target: "railway" | "vercel" | "cloudflare";
   readonly projectRoot?: string;
-  readonly runtime: RuntimeName;
+  readonly runtime: RuntimeAdapterName;
   readonly force: boolean;
 }
 
@@ -41,20 +44,16 @@ export function selectDeployInit(
   const target = args[0] === "init" ? args[1] : undefined;
   if (target === undefined || target.startsWith("-")) return { pulumiArgs: rejectPlatform(args) };
   if (PULUMI_TARGETS.has(target)) return { pulumiArgs: rejectPlatform(["init", ...args.slice(2)]) };
-  if (COMING_TARGETS.has(target))
-    throw new DeployCommandError(
-      "RELKIT_DEPLOY_USAGE",
-      `The ${target} target is not available yet; use railway, vercel or aws.`,
-    );
   if (!PLATFORM_TARGETS.has(target))
     throw new DeployCommandError(
       "RELKIT_DEPLOY_USAGE",
-      `Unknown deploy target: ${target}. Use railway, vercel or aws.`,
+      `Unknown deploy target: ${target}. Use railway, vercel, cloudflare or aws.`,
     );
   const platform = target as PlatformInit["target"];
   let projectRoot: string | undefined;
   // Vercel functions run Node, so the Vercel target always builds the Node server.
-  let runtime: RuntimeName = platform === "vercel" ? "node" : "bun";
+  let runtime: RuntimeAdapterName =
+    platform === "vercel" ? "node" : platform === "cloudflare" ? "workers" : "bun";
   let force = false;
   for (let index = 2; index < args.length; index += 1) {
     const argument = args[index]!;
@@ -62,8 +61,12 @@ export function selectDeployInit(
     if (argument === "--project-root" && value !== undefined && !value.startsWith("-")) {
       projectRoot = value;
       index += 1;
+    } else if (argument === "--runtime" && value === "workers" && platform === "cloudflare") {
+      // A Worker always runs the Workers bundle; the option is accepted for symmetry.
+      index += 1;
     } else if (
       argument === "--runtime" &&
+      platform !== "cloudflare" &&
       (value === "node" || (value === "bun" && platform === "railway"))
     ) {
       runtime = value;
@@ -72,7 +75,7 @@ export function selectDeployInit(
     else
       throw new DeployCommandError(
         "RELKIT_DEPLOY_USAGE",
-        `relkit deploy init ${platform} does not take ${argument}${argument === "--runtime" ? ` ${value ?? ""}`.trimEnd() : ""}; it accepts --project-root, --runtime ${platform === "vercel" ? "node" : "bun|node"} and --force.`,
+        `relkit deploy init ${platform} does not take ${argument}${argument === "--runtime" ? ` ${value ?? ""}`.trimEnd() : ""}; it accepts --project-root, --runtime ${RUNTIMES[platform]} and --force.`,
       );
   }
   return {
@@ -172,7 +175,7 @@ const platformFiles = Effect.fn("Cli.deployInitFiles")(function* (
   if (init.target === "railway")
     return {
       label: "Railway",
-      files: railwayFiles(init.runtime),
+      files: railwayFiles(init.runtime === "node" ? "node" : "bun"),
       nextSteps: [
         "Create a Railway project with a Postgres database and an empty service (railway init, railway add --database postgres, railway add --service web).",
         "Set DATABASE_URL=${{Postgres.DATABASE_URL}} on the service, generate a domain, then run railway up --service web.",
@@ -185,8 +188,9 @@ const platformFiles = Effect.fn("Cli.deployInitFiles")(function* (
   if (graph === undefined)
     return yield* new DeployCommandError(
       "RELKIT_DEPLOY_USAGE",
-      `relkit deploy init vercel reads the schedules from ${GRAPH_FILE}; run relkit check first.`,
+      `relkit deploy init ${init.target} reads the application graph from ${GRAPH_FILE}; run relkit check first.`,
     );
+  if (init.target === "cloudflare") return yield* cloudflareTarget(root, graph);
   const cron = yield* Effect.try({
     try: () => vercelCronPlan(graph),
     catch: () =>

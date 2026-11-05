@@ -1235,6 +1235,20 @@
       "examples": ["templates/default/v1/api/relkit.config.ts"]
     },
     {
+      "path": "docs/modules/deployment/cloudflare",
+      "api": [
+        "app",
+        "jobs",
+        "events",
+        "realtime",
+        "cache",
+        "buckets",
+        "integrations/postgres",
+        "integrations/cloudflare"
+      ],
+      "examples": ["templates/default/v1/api/relkit.config.ts"]
+    },
+    {
       "path": "docs/modules/deployment/aws",
       "api": [
         "app",

@@ -116,6 +116,7 @@
       "relkit/runtime-hono/ag-ui": ["../../packages/relkit/src/runtime-hono/agent-protocol.ts"],
       "relkit/runtime/bun": ["../../packages/relkit/src/runtime/bun/index.ts"],
       "relkit/runtime/node": ["../../packages/relkit/src/runtime/node/index.ts"],
+      "relkit/runtime/workers": ["../../packages/relkit/src/runtime/workers/index.ts"],
       "relkit/runtime-hono/prepared": ["../../packages/relkit/src/runtime-hono/prepared-app.ts"],
       "relkit/runtime-hono/mcp": ["../../packages/relkit/src/runtime-hono/mcp.ts"],
       "relkit/runtime-hono/scalar": ["../../packages/relkit/src/runtime-hono/scalar.ts"],

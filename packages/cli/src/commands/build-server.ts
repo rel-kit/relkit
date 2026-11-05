@@ -28,6 +28,14 @@ export async function activateRelkitApplication(relkitMode = { embedded: false }
 const EMBEDDED_ACTIVATION_END = `}
 if (relkitEntryPoint) await activateRelkitApplication();
 `;
+
+/**
+ * Closes the activation function of a Workers server. The Workers entry imports the module lazily
+ * from its first handler, because a Worker's global scope may not generate random values or set
+ * timers, and a lazily evaluated bundle module may not use top-level await.
+ */
+const WORKERS_ACTIVATION_END = `}
+`;
 /**
  * Emits the server entrypoint shared by dev, start, and the production container.
  * @param graph - Validated application graph.
@@ -71,6 +79,6 @@ export function serverSource(
     serverApplicationSource(input),
     serverProviderSource(localDurableProfiles(JSON.stringify(graph))),
     serverTailSource(input),
-    EMBEDDED_ACTIVATION_END,
+    configuration.runtime === "workers" ? WORKERS_ACTIVATION_END : EMBEDDED_ACTIVATION_END,
   ].join("");
 }

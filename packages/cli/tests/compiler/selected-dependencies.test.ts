@@ -85,3 +85,19 @@ it("preflight is emitted before statically traceable executable imports", () => 
   );
   expect(source).not.toContain("import * as __relkit_runtime");
 });
+
+it("renders static imports without the disk check or top-level await for a Workers bundle", () => {
+  const plan = generateRuntimeIntegrationPlan(
+    { nodes: [{ id: "assistant", kind: "agent" }], edges: [] },
+    "hash",
+    [native],
+  );
+  const source = generateRuntimeIntegrationImports(plan, { workers: true });
+  expect(source).toContain('import * as __relkit_runtime_0 from "@relkit/langchain/runtime";');
+  expect(source).toContain("module: __relkit_runtime_0 }");
+  expect(source).not.toContain("checkRuntimeIntegrations");
+  expect(source).not.toContain("await ");
+  expect(generateRuntimeIntegrationImports({ ...plan, integrations: [] }, { workers: true })).toBe(
+    "export const runtimeIntegrationModules = [] as const;\n",
+  );
+});

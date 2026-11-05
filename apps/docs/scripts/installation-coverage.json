@@ -243,6 +243,7 @@
   "docs/modules/deployment/runtimes": ["update", "continuation", "/docs/learn/create-an-app"],
   "docs/modules/deployment/railway": ["update", "continuation", "/docs/learn/create-an-app"],
   "docs/modules/deployment/vercel": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/modules/deployment/cloudflare": ["update", "continuation", "/docs/learn/create-an-app"],
   "docs/modules/deployment/providers": ["update", "continuation", "/docs/modules/integrations"],
   "docs/modules/deployment/aws": [
     "update",

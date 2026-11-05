@@ -1,8 +1,9 @@
 /**
  * Finds runtime-specific code in TypeScript sources: `Bun.*` globals, imports of `bun` and
  * `bun:*` modules, and imports of `node:*` modules. Runtime adapters, the files under a `bun/` or
- * `node/` directory or named `*.bun.ts` or `*.node.ts`, may use them; everything else goes through
- * an adapter.
+ * `node/` directory or named `*.bun.ts` or `*.node.ts`, may use them; Workers adapters, the files
+ * under a `workers/` directory or named `*.workers.ts`, may import `node:*` modules (Workers run
+ * with `nodejs_compat`) but not Bun's; everything else goes through an adapter.
  */
 import ts from "relkit-typescript";
 
@@ -29,6 +30,17 @@ export function isRuntimeAdapter(file: string): boolean {
     segments.slice(0, -1).some((segment) => segment === "bun" || segment === "node") ||
     /\.(bun|node)\.ts$/u.test(name)
   );
+}
+
+/**
+ * Tells whether a repository-relative path is a Cloudflare Workers adapter, which may import
+ * `node:*` modules through Workers' `nodejs_compat` flag but never Bun's.
+ * @param file - Path with forward slashes.
+ * @returns Whether `node:*` imports are allowed in it.
+ */
+export function isWorkersAdapter(file: string): boolean {
+  const segments = file.split("/");
+  return segments.slice(0, -1).includes("workers") || /\.workers\.ts$/u.test(segments.at(-1) ?? "");
 }
 
 /**

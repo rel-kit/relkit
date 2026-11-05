@@ -7,8 +7,14 @@
 import type { UpgradeWebSocket } from "hono/ws";
 import type { RuntimeModules, RuntimeProcesses } from "./runtime-processes.types.js";
 
-/** Runtimes that have an adapter. Tier 1 runtimes run every Core feature. */
+/** Tier 1 runtimes: process runtimes that run every Core feature and the container image. */
 export type RuntimeName = "bun" | "node";
+
+/**
+ * Runtimes that have an adapter: the Tier 1 runtimes and Tier 2 Cloudflare Workers, which runs
+ * HTTP with external durable backends and has no process, listener or filesystem.
+ */
+export type RuntimeAdapterName = RuntimeName | "workers";
 
 /**
  * Opaque per-request bindings the adapter passes beside each request. Hono hands them to WebSocket
@@ -99,7 +105,7 @@ export interface RuntimeEnvironment {
 
 /** Everything RelKit needs from the runtime it runs on. */
 export interface RuntimeAdapter {
-  readonly name: RuntimeName;
+  readonly name: RuntimeAdapterName;
   /** Runtime version, for diagnostics. */
   readonly version: string;
   /**

@@ -8,7 +8,11 @@ import {
   shrinkBaseline,
   type PortabilityBaseline,
 } from "../../scripts/portability.ts";
-import { isRuntimeAdapter, portabilityUses } from "../../scripts/portability-scan.ts";
+import {
+  isRuntimeAdapter,
+  isWorkersAdapter,
+  portabilityUses,
+} from "../../scripts/portability-scan.ts";
 
 const root = resolve(import.meta.dir, "../..");
 const fixtureRoot = join(root, "tests/fixtures/portability");
@@ -36,6 +40,11 @@ test("adapters, comments and strings are not call sites", () => {
   expect(isRuntimeAdapter("packages/relkit/src/runtime/bun/index.ts")).toBe(true);
   expect(isRuntimeAdapter("integrations/packages/redis/src/runtime/client.node.ts")).toBe(true);
   expect(isRuntimeAdapter("packages/relkit/src/runtime/current-runtime.ts")).toBe(false);
+  // Workers adapters may import `node:*` through nodejs_compat, but they are not Bun or Node adapters.
+  expect(isRuntimeAdapter("packages/relkit/src/runtime/workers/index.ts")).toBe(false);
+  expect(isWorkersAdapter("packages/relkit/src/runtime/workers/index.ts")).toBe(true);
+  expect(isWorkersAdapter("integrations/packages/redis/src/runtime/client.workers.ts")).toBe(true);
+  expect(isWorkersAdapter("packages/relkit/src/runtime/current-runtime.ts")).toBe(false);
   expect(
     portabilityUses("a.ts", '// Bun.serve\nconst text = "Bun.file";\nconst s = `bun:sqlite`;\n'),
   ).toEqual([]);

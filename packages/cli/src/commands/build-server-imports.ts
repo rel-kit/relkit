@@ -7,7 +7,7 @@ import { RUNTIME_INTEGRATION_PLAN_FILE } from "relkit/contracts";
 import { SERVER_BOOTSTRAP_SOURCE } from "./build-server-bootstrap.js";
 import { serverEngineImports } from "./build-server-engine-imports.js";
 import type { ServerSourceEmission } from "./build-server.types.js";
-import type { RuntimeName } from "relkit/runtime";
+import type { RuntimeAdapterName } from "relkit/runtime";
 
 /**
  * Emits this stage from the same complete compilation result as every neighbor.
@@ -58,7 +58,12 @@ ${engine.stubs}
  * @param runtime - Runtime the server is emitted for.
  * @returns Import and binding source for `relkitRuntime` and `upgradeWebSocket`.
  */
-function runtimeImport(runtime: RuntimeName): string {
+function runtimeImport(runtime: RuntimeAdapterName): string {
+  if (runtime === "workers")
+    return `import { workersRuntime as relkitRuntime } from "relkit/runtime/workers";
+const { upgradeWebSocket } = relkitRuntime;
+// A Worker never runs this module as a process entry point; worker.ts activates it per isolate.
+const relkitEntryPoint = false;`;
   const entryPoint =
     runtime === "node"
       ? `

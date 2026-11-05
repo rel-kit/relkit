@@ -50,6 +50,11 @@ export function createRedisAgentStore(
 }
 
 function createCore<State>(options: RedisStateStoreOptions<State>) {
+  // Waiting for changes blocks on XREAD, which the HTTP protocol cannot do.
+  if (/^https?:\/\//iu.test(options.url))
+    throw new TypeError(
+      "Redis realtime and agent state need a socket URL (redis:// or rediss://); an HTTP Redis URL only serves caches.",
+    );
   const client = createRedisClient(options);
   const streamKey = `${options.key}:notifications`;
   let closed = false;

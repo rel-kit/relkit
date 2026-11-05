@@ -43,7 +43,10 @@ export const DIAGNOSTIC_CODES: readonly DiagnosticCodeEntry[] = Object.freeze(
   ].sort((left, right) => left.code.localeCompare(right.code)),
 );
 
-/** `RELKIT_*` names that are not diagnostic codes: environment variables and the definition marker. */
+/**
+ * `RELKIT_*` names that are not diagnostic codes: environment variables, the definition marker and
+ * the Cloudflare binding names the Workers target uses.
+ */
 export const RELKIT_NON_CODE_NAMES: ReadonlySet<string> = new Set([
   "RELKIT_ALLOWED_ORIGINS",
   "RELKIT_APPLICATION_ID",
@@ -71,11 +74,13 @@ export const RELKIT_NON_CODE_NAMES: ReadonlySet<string> = new Set([
   "RELKIT_PROVIDER_OVERRIDES_FILE",
   "RELKIT_PROVIDER_READY_DELAY_MS",
   "RELKIT_PUBLIC_ROOT",
+  "RELKIT_REALTIME",
   "RELKIT_SOURCE_TOKEN",
   "RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS",
   "RELKIT_TELEMETRY_TOKEN",
   "RELKIT_TELEMETRY_URL",
   "RELKIT_TEST_SERVER_URL",
+  "RELKIT_WORK",
   "RELKIT_WORKER_ROLE",
 ]);
 

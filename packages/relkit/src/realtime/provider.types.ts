@@ -130,7 +130,7 @@ export interface RealtimeProvider {
   readonly capabilities: {
     readonly replay: "memory" | "retained";
     readonly presenceScope: "process" | "shared";
-    readonly durability: "volatile" | "filesystem" | "redis-configured";
+    readonly durability: "volatile" | "filesystem" | "redis-configured" | "durable-object";
   };
   /** Reads the provider generation epoch.
    * @param signal - Optional cancellation signal for in-flight work.

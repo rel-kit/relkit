@@ -8,6 +8,8 @@ import {
   createRedisClient,
   createRedisRealtimeProvider,
 } from "@relkit/redis/runtime";
+import { checkRedisCache, checkRedisProtocol } from "./redis-cache-checks.mjs";
+import { checkRealtime } from "./realtime-checks.mjs";
 import { createOperationId } from "relkit/realtime";
 
 const url = process.env.REDIS_URL;
@@ -18,8 +20,9 @@ const runtime =
     : `node ${process.versions.node}`;
 const prefix = `conformance-${randomUUID()}`;
 
-await protocol();
-await cache();
+const runtimeApi = { createRedisClient, createRedisCacheProvider };
+await checkRedisProtocol(runtimeApi, { url, prefix, unreachable: "redis://127.0.0.1:1" });
+await checkRedisCache(runtimeApi, { url, prefix });
 const profile = `${prefix}-shared`;
 const [realtimeA, realtimeB] = [
   createRedisRealtimeProvider({ url, profile }),
@@ -31,132 +34,12 @@ const [agentA, agentB] = [
 ];
 await Promise.all([realtimeA.ready(), realtimeB.ready(), agentA.ready(), agentB.ready()]);
 try {
-  await realtime(realtimeA, realtimeB);
+  await checkRealtime(realtimeA, realtimeB, profile, "redis-conformance");
   await agentState(agentA, agentB);
 } finally {
   await Promise.all([realtimeA.close(), realtimeB.close(), agentA.close(), agentB.close()]);
 }
 console.log(`Redis conformance passed on ${runtime}`);
-
-async function protocol() {
-  const client = createRedisClient({ url, connectionTimeoutMs: 2_000 });
-  assert.equal(client.connected, false);
-  await client.connect();
-  assert.equal(client.connected, true);
-  try {
-    assert.equal(await client.ping(), true);
-    const key = `${prefix}:protocol`;
-    assert.equal(await client.get(key), null);
-    await client.set(key, "one");
-    assert.equal(await client.get(key), "one");
-    assert.equal(await client.has(key), true);
-    assert.equal(await client.type(key), "string");
-    assert.equal(await client.ttl(key), -1);
-    await client.set(key, "two", 60_000);
-    const ttl = await client.ttl(key);
-    assert.ok(ttl > 0 && ttl <= 60_000, `PTTL ${ttl}`);
-    assert.equal(await client.increment(`${prefix}:counter`, 5), 5);
-    assert.equal(await client.increment(`${prefix}:counter`), 6);
-    const [cursor, keys] = await client.scan("0", `${prefix}:*`, 100);
-    assert.equal(typeof cursor, "string");
-    assert.ok(keys.length > 0 && keys.every((name) => name.startsWith(prefix)));
-    assert.equal(await client.delete(key), 1);
-    assert.equal(await client.has(key), false);
-    assert.equal(await client.command("ECHO", ["raw"]), "raw");
-    await assert.rejects(client.command("NOT-A-COMMAND", []));
-    assert.equal(await client.ping(), true);
-  } finally {
-    client.close();
-  }
-  assert.equal(client.connected, false);
-  await assert.rejects(client.connect(), /closed/);
-  const unreachable = createRedisClient({ url: "redis://127.0.0.1:1", connectionTimeoutMs: 500 });
-  await assert.rejects(unreachable.connect());
-  unreachable.close();
-}
-
-async function cache() {
-  const provider = createRedisCacheProvider({ url, cacheId: `${prefix}-cache` });
-  await provider.ready();
-  try {
-    const key = { sku: "sku-1", region: "eu" };
-    await provider.set(key, 2);
-    assert.equal(await provider.get({ region: "eu", sku: "sku-1" }), 2);
-    assert.equal(await provider.has(key), true);
-    assert.equal(await provider.increment(key, 3), 5);
-    await provider.delete(key);
-    assert.equal(await provider.get(key), undefined);
-    await provider.set(key, { nested: [1, 2] }, { ttlMs: 50 });
-    assert.deepEqual(await provider.get(key), { nested: [1, 2] });
-    await new Promise((resolve) => setTimeout(resolve, 120));
-    assert.equal(await provider.get(key), undefined);
-  } finally {
-    await provider.close();
-  }
-}
-
-async function realtime(reader, writer) {
-  const scope = {
-    applicationId: "redis-conformance",
-    environment: "test",
-    profile,
-    providerEpoch: await reader.getEpoch(),
-    channelId: "orders",
-    partition: "one",
-    identityScope: "owner",
-    sessionEpoch: "session",
-    policyEpoch: "policy",
-  };
-  const limits = {
-    maxEventBytes: 65_536,
-    maxRetainedBytes: 1_048_576,
-    maxPartitions: 10,
-    maxConnections: 10,
-    maxPresenceMembers: 100,
-  };
-  const initial = await reader.readAfter({ ...scope, limit: 1, maxEncodedBytes: 65_536 });
-  const waiting = reader.waitAfter({
-    ...scope,
-    after: initial.checkpoint,
-    deadlineMs: Date.now() + 5_000,
-    signal: new AbortController().signal,
-  });
-  const event = (payload) => ({
-    ...scope,
-    event: "changed",
-    payload,
-    encodedBytes: 128,
-    occurredAt: new Date().toISOString(),
-    retentionMs: 300_000,
-    maxEvents: 100,
-    limits,
-  });
-  await writer.append({
-    ...event({ ok: true }),
-    operationId: createOperationId(),
-    semanticDigest: "shared-event",
-    receiptExpiresAt: new Date(Date.now() + 86_400_000).toISOString(),
-  });
-  await waiting;
-  const page = await reader.readAfter({
-    ...scope,
-    after: initial.checkpoint,
-    limit: 1,
-    maxEncodedBytes: 65_536,
-  });
-  assert.equal(page.events.length, 1);
-  const values = Array.from({ length: 20 }, (_, index) => `concurrent-${index}`);
-  await Promise.all(
-    values.map((value, index) => (index % 2 === 0 ? reader : writer).append(event({ value }))),
-  );
-  const next = await reader.readAfter({
-    ...scope,
-    after: page.checkpoint,
-    limit: values.length,
-    maxEncodedBytes: 65_536,
-  });
-  assert.deepEqual(next.events.map((item) => item.payload.value).sort(), [...values].sort());
-}
 
 async function agentState(reader, writer) {
   const scope = {

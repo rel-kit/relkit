@@ -77,8 +77,9 @@ function makeStartLive(defaults: StartOptions) {
             );
             const port = yield* native.allocate(requested, hostname);
             const owned = yield* processes.spawn({
+              // Workers builds are refused while the manifest is validated.
               command: builtServerCommand(
-                artifacts.manifest.runtime ?? "bun",
+                artifacts.manifest.runtime === "node" ? "node" : "bun",
                 join(buildDirectory, artifacts.manifest.containerEntrypoint),
               ),
               cwd: projectRoot,

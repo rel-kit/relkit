@@ -38,6 +38,9 @@ and immutable worker versions across releases.
   <Card title="Deploy to Vercel" href="/docs/modules/deployment/vercel" icon="triangle" arrow>
     Run the Node server as a Vercel function, with Vercel Cron and an external Postgres.
   </Card>
+  <Card title="Deploy to Cloudflare" href="/docs/modules/deployment/cloudflare" icon="cloud" arrow>
+    Run the server as a Worker, with Queues, a Cron Trigger and Durable Object realtime.
+  </Card>
   <Card
     title="Start with local Docker"
     href="/docs/modules/deployment/local-docker"
@@ -83,29 +86,30 @@ configuration and deploys with the platform's CLI, with no Pulumi program or sta
 | Railway    | Container image, deployed with the Railway CLI                                          | `railway.json`, `Dockerfile`, `.dockerignore`, a GitHub Actions workflow                       | Labs; [guide](/docs/modules/deployment/railway)       |
 | AWS        | Pulumi, through `@relkit/pulumi` and `@relkit/aws`                                      | A Pulumi project and stack (`relkit deploy init aws`)                                          | Labs; [guide](/docs/modules/deployment/aws)           |
 | Vercel     | Platform configuration (`vercel.json`), one Node function, deployed with the Vercel CLI | `vercel.json`, the function entry `api/relkit.mjs`, `.vercelignore`, a GitHub Actions workflow | Labs; [guide](/docs/modules/deployment/vercel)        |
-| Cloudflare | Platform configuration (`wrangler.jsonc`), the Workers bundle                           | Not available yet                                                                              | Coming after the Workers adapter                      |
+| Cloudflare | Platform configuration (`wrangler.jsonc`), the Workers bundle, deployed with wrangler   | `wrangler.jsonc`, the Worker entry `worker.mjs`, a GitHub Actions workflow                     | Labs; [guide](/docs/modules/deployment/cloudflare)    |
 | Any host   | The image `relkit build` emits                                                          | Nothing: build and run the image yourself                                                      | [Local Docker](/docs/modules/deployment/local-docker) |
 
 `relkit deploy init` without a target keeps initializing the AWS Pulumi stack.
 
 ## Supported providers
 
-| Role                                | Supported path                                                         | What RelKit manages                                                                                                                                                                  |
-| ----------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Local development services          | Docker recipes for Redis, MinIO, Inngest, Trigger.dev, and Effect MQ   | Graph-required containers, readiness, connection values, and persistent volumes; [coverage](/docs/modules/integrations/local-docker#supported-local-services)                        |
-| Self-hosted application             | Built Bun server or generated Docker image                             | Portable build output; you provide the host, process/container supervisor, TLS, and resource connections                                                                             |
-| Container platform host             | **Railway**, through `relkit deploy init railway`                      | Generated `railway.json`, Dockerfile and deploy workflow; Railway Postgres as the durable backend; [Railway guide](/docs/modules/deployment/railway)                                 |
-| Function platform host              | **Vercel**, through `relkit deploy init vercel`                        | Generated `vercel.json`, function entry and deploy workflow; Vercel Cron for schedules; an external Postgres as the durable backend; [Vercel guide](/docs/modules/deployment/vercel) |
-| Cloud application host              | **AWS**, through `@relkit/aws`                                         | ECS/Fargate, networking, load balancer, workload access, and CloudWatch stdout; [AWS setup](/docs/modules/deployment/aws)                                                            |
-| Infrastructure engine               | **Pulumi**, through `@relkit/pulumi`                                   | Stack configuration, preview, apply, outputs, refresh, and destroy                                                                                                                   |
-| Infrastructure-owned resources      | AWS wrappers for supported S3 and Redis/Valkey resources               | Resource lifecycle and access, separately from the application host                                                                                                                  |
-| Connected file/cache resources      | S3-compatible storage, Redis, Cloudflare R2 and KV                     | Runtime connections to existing resources; [provider configuration](/docs/modules/deployment/providers)                                                                              |
-| Native durable tasks                | Inngest, Trigger.dev, Effect MQ                                        | Provider-specific worker publication, schedules, and supported run semantics; [job deployment](/docs/modules/jobs/deployment)                                                        |
-| Application data and authentication | Drizzle with PostgreSQL, MySQL, or SQLite; Better Auth on that service | Application connection and auth activation; you own database hosting, migrations, and backups                                                                                        |
-| Models and telemetry                | Selected LangChain model SDKs, Sentry, OTLP                            | Selected runtime integration; no implicit provisioning or model account                                                                                                              |
+| Role                                | Supported path                                                         | What RelKit manages                                                                                                                                                                                                |
+| ----------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Local development services          | Docker recipes for Redis, MinIO, Inngest, Trigger.dev, and Effect MQ   | Graph-required containers, readiness, connection values, and persistent volumes; [coverage](/docs/modules/integrations/local-docker#supported-local-services)                                                      |
+| Self-hosted application             | Built Bun server or generated Docker image                             | Portable build output; you provide the host, process/container supervisor, TLS, and resource connections                                                                                                           |
+| Container platform host             | **Railway**, through `relkit deploy init railway`                      | Generated `railway.json`, Dockerfile and deploy workflow; Railway Postgres as the durable backend; [Railway guide](/docs/modules/deployment/railway)                                                               |
+| Function platform host              | **Vercel**, through `relkit deploy init vercel`                        | Generated `vercel.json`, function entry and deploy workflow; Vercel Cron for schedules; an external Postgres as the durable backend; [Vercel guide](/docs/modules/deployment/vercel)                               |
+| Edge platform host                  | **Cloudflare Workers**, through `relkit deploy init cloudflare`        | Generated `wrangler.jsonc`, Worker entry and deploy workflow; Queues and a Cron Trigger for durable work in an external Postgres; Durable Object realtime; [Cloudflare guide](/docs/modules/deployment/cloudflare) |
+| Cloud application host              | **AWS**, through `@relkit/aws`                                         | ECS/Fargate, networking, load balancer, workload access, and CloudWatch stdout; [AWS setup](/docs/modules/deployment/aws)                                                                                          |
+| Infrastructure engine               | **Pulumi**, through `@relkit/pulumi`                                   | Stack configuration, preview, apply, outputs, refresh, and destroy                                                                                                                                                 |
+| Infrastructure-owned resources      | AWS wrappers for supported S3 and Redis/Valkey resources               | Resource lifecycle and access, separately from the application host                                                                                                                                                |
+| Connected file/cache resources      | S3-compatible storage, Redis, Cloudflare R2 and KV                     | Runtime connections to existing resources; [provider configuration](/docs/modules/deployment/providers)                                                                                                            |
+| Native durable tasks                | Inngest, Trigger.dev, Effect MQ                                        | Provider-specific worker publication, schedules, and supported run semantics; [job deployment](/docs/modules/jobs/deployment)                                                                                      |
+| Application data and authentication | Drizzle with PostgreSQL, MySQL, or SQLite; Better Auth on that service | Application connection and auth activation; you own database hosting, migrations, and backups                                                                                                                      |
+| Models and telemetry                | Selected LangChain model SDKs, Sentry, OTLP                            | Selected runtime integration; no implicit provisioning or model account                                                                                                                                            |
 
-Railway, Vercel and AWS are the deploy targets today. The Cloudflare package provides **R2/KV runtime
-adapters**, not Workers application deployment. There are no built-in Azure or Google Cloud host
+Railway, Vercel, Cloudflare and AWS are the deploy targets today. The Cloudflare package also provides
+R2 and KV providers for apps hosted elsewhere. There are no built-in Azure or Google Cloud host
 integrations yet. A platform that runs the built server or image can be used through
 the self-hosted path; that is separate from `relkit deploy` support.
 

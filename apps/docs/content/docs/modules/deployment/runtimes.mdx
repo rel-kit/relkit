@@ -14,7 +14,7 @@ when you build, you choose the runtime the production server and its container i
 | Tier   | Runtimes                                     | What is supported                                                                                   |
 | ------ | -------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | Tier 1 | Bun `>=1.3.10`, Node 22 (`>=22.13.0`) and 24 | The production server: HTTP, WebSockets and static files, with the Redis, Sentry and SQLite clients |
-| Tier 2 | Cloudflare Workers                           | Planned: HTTP with external durable backends. Not available yet                                     |
+| Tier 2 | Cloudflare Workers (Labs)                    | HTTP, with jobs, events and schedules in an external Postgres and realtime on a Durable Object      |
 | Labs   | Anything else                                | Not tested. It may work, but no test covers it                                                      |
 
 Each package's `engines` field lists the runtimes it supports. These still need Bun on your
@@ -23,6 +23,16 @@ machine or in CI:
 - `@relkit/testing`'s in-process test application, which `bun test` runs, so the generated
   `test` script still runs `bun test`;
 - `@relkit/aws`, whose Valkey cache client uses Bun's Redis client.
+
+## Build for Cloudflare Workers
+
+`relkit build --runtime workers` writes a Workers bundle to `.relkit/build/server/index.js`. Its
+`fetch`, `queue` and `scheduled` handlers activate the server once per isolate, without a listener,
+a filesystem or a background loop; it needs the `nodejs_compat` compatibility flag, and `public/` is
+served by Workers static assets. `relkit start` refuses a Workers build: run it with `wrangler dev`,
+or deploy it with the [Cloudflare guide](/docs/modules/deployment/cloudflare), which also lists the
+providers that run on Workers. The nightly runtime matrix runs the `api` template's HTTP tests
+against the Workers bundle in workerd.
 
 ## Create and develop on Node
 

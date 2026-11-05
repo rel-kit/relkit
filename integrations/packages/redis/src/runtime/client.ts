@@ -1,7 +1,14 @@
-/** Owns the native Redis connection; a later operation can reconnect without replaying failed commands. */
+/**
+ * Owns the native Redis connection; a later operation can reconnect without replaying failed
+ * commands. A `redis://` or `rediss://` URL opens a socket (Bun's client or `ioredis` on Node); an
+ * `http://` or `https://` URL sends each command over HTTP, which is the only option on Cloudflare
+ * Workers.
+ */
+import { detectRuntime } from "relkit/runtime";
 import { openBunRedis } from "./redis-native.bun.js";
+import { openHttpRedis } from "./redis-native.http.js";
 import { openNodeRedis } from "./redis-native.node.js";
-import type { RedisNativeClient } from "./redis-native.types.js";
+import type { OpenRedisNative, RedisNativeClient } from "./redis-native.types.js";
 
 export interface RedisClientOptions {
   readonly url: string;
@@ -93,7 +100,7 @@ function redisConnection(url: string, timeout: number | undefined) {
   let closed = false;
   let disconnected = false;
   let pending: Promise<void> | undefined;
-  const openNative = typeof process.versions.bun === "string" ? openBunRedis : openNodeRedis;
+  const openNative = nativeOpener(url);
   const open = (): RedisNativeClient => {
     const next: RedisNativeClient = openNative({
       url,
@@ -144,8 +151,23 @@ function validateUrl(value: string): string {
     throw new TypeError("Redis URL must not be empty");
   }
   const url = new URL(value);
-  if (url.protocol !== "redis:" && url.protocol !== "rediss:") {
-    throw new TypeError("Redis URL must use redis:// or rediss://");
+  if (!["redis:", "rediss:", "http:", "https:"].includes(url.protocol)) {
+    throw new TypeError("Redis URL must use redis://, rediss://, http:// or https://");
   }
   return value;
+}
+
+/**
+ * Picks the client for a URL and the runtime this code runs on.
+ * @param url - Validated Redis URL.
+ * @returns The opener; throws on Workers for a socket URL, since Workers have no raw TCP client.
+ */
+function nativeOpener(url: string): OpenRedisNative {
+  if (url.startsWith("http://") || url.startsWith("https://")) return openHttpRedis;
+  const runtime = detectRuntime();
+  if (runtime === "workers")
+    throw new TypeError(
+      "Cloudflare Workers cannot open a Redis socket; set the Redis URL to an HTTP endpoint (https://:<token>@host) that speaks the Upstash REST protocol.",
+    );
+  return runtime === "bun" ? openBunRedis : openNodeRedis;
 }

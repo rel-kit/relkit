@@ -315,6 +315,10 @@
       "types": "./dist/runtime/node/index.d.ts",
       "import": "./dist/runtime/node/index.js"
     },
+    "./runtime/workers": {
+      "types": "./dist/runtime/workers/index.d.ts",
+      "import": "./dist/runtime/workers/index.js"
+    },
     "./runtime-effect": {
       "types": "./dist/runtime-effect/index.d.ts",
       "import": "./dist/runtime-effect/index.js"
