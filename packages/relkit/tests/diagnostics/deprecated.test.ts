@@ -42,6 +42,13 @@ describe("deprecated", () => {
     expect(output.lines.filter((line) => line.includes("RELKIT_DEPRECATED_"))).toHaveLength(2);
   });
 
+  it("falls back to the code when it has no catalog entry", () => {
+    deprecated("RELKIT_DEPRECATED_UNLISTED" as never, "something else");
+    expect(output.lines.join("\n")).toContain(
+      "RELKIT_DEPRECATED_UNLISTED: RELKIT_DEPRECATED_UNLISTED.",
+    );
+  });
+
   it("documents every deprecation code", () => {
     const codes = DIAGNOSTIC_CODES.filter(({ code }) => code.startsWith("RELKIT_DEPRECATED_"));
     expect(codes.map(({ code }) => code)).toEqual([

@@ -1123,6 +1123,29 @@ Decided while applying section 27 (maintainer, 2026-11-05):
     (`/v1/metrics`), the payload shape, the bucket counts, the attributes, and that unfinished
     requests are skipped. It does not change the exporter's public API.
 
+Decided while applying section 26 (maintainer, 2026-11-05):
+
+- **One helper, one code family.** `deprecated(code, replacement)` in `relkit/diagnostics` logs a
+  `RELKIT_DEPRECATED_*` warning through the Effect logger once per process for each code. The
+  message is the code, the catalog title, the replacement and the code's docs URL; `code` and
+  `replacement` are also log annotations. Its code argument is typed to the
+  `RELKIT_DEPRECATED_*` entries in `codes/deprecated.ts`, so a deprecation needs a catalog entry and
+  therefore a generated docs page. `resetDeprecationWarnings()` exists for tests.
+- **Two deprecations ship today.** `RELKIT_DEPRECATED_APP_PACKAGE` fires when any entry of the final
+  `@relkit/app` is imported (every entry imports `deprecated.js`, and the package's `sideEffects`
+  lists `./dist/deprecated.js` so a bundler keeps the call). `RELKIT_DEPRECATED_BETTER_AUTH_OPTIONS`
+  fires when `defineBetterAuthService` receives options instead of `{ auth }`, the one section 9
+  and 10 form kept as a transition; the `better-auth-file` rule migrates it.
+- **A runtime warning, not yet a check finding.** The warning appears when the deprecated API runs.
+  Reporting the same deprecations from `relkit check` with file and line is not part of this task.
+- **The 1.0 target date is relative.** The lead review gives no date, so the versioning page states
+  "the quarter after `0.9.0` ships" and says the page is updated if a criterion is missed. The
+  criteria are Core complete on Tier 1 runtimes (Bun, Node 22 and 24), a green creation canary, the
+  Railway newcomer test passing and the review's metrics targets.
+- **Semver covers documented Core APIs, the CLI's commands and flags, and `RELKIT_*` codes.** Labs and
+  undocumented behavior are outside it. Before 1.0, minor releases can break Core only through the
+  deprecation window after `0.9.0`.
+
 ## Risks / Trade-offs
 
 - [The breaking release is large and could stall other work] → Publish a beta first; keep additive
