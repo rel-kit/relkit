@@ -305,7 +305,10 @@ declare const createRedisAgentStateProvider: (
 
 ## `client.ts`
 
-Owns the native Redis connection; a later operation can reconnect without replaying failed commands.
+Owns the native Redis connection; a later operation can reconnect without replaying failed
+commands. A `redis://` or `rediss://` URL opens a socket (Bun's client or `ioredis` on Node); an
+`http://` or `https://` URL sends each command over HTTP, which is the only option on Cloudflare
+Workers.
 
 ### RedisClientOptions (interface)
 
@@ -318,7 +321,7 @@ export interface RedisClientOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/client.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/client.ts#L13)
 
 ### RedisProtocolClient (interface)
 
@@ -346,7 +349,7 @@ export interface RedisProtocolClient {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/client.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/client.ts#L18)
 
 ### createRedisClient
 
@@ -358,7 +361,7 @@ Creates a protocol client whose next connection attempt replaces a failed native
 declare const createRedisClient: (options: RedisClientOptions) => RedisProtocolClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/client.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/client.ts#L41)
 
 ## `index.ts`
 
@@ -551,6 +554,39 @@ declare const openBunRedis: OpenRedisNative;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/redis-native.bun.ts#L5)
+
+## `redis-native.http.ts`
+
+Redis over HTTP, for runtimes without raw TCP such as Cloudflare Workers. Each command is one
+`fetch` POST of the JSON array `[command, ...args]` to the endpoint, answered with `{ result }` or
+`{ error }`: the REST protocol Upstash Redis and compatible proxies serve. The URL carries the
+access token as its password (`https://:<token>@host`); the client sends it as a bearer token and
+never puts it in the request URL. There is no socket: `connect` sends one `PING`, and blocking or
+subscribing commands are not supported.
+
+### openHttpRedis
+
+Opens an HTTP Redis client; `connect` checks the endpoint with `PING`.
+
+**Signature**
+
+```ts
+declare const openHttpRedis: OpenRedisNative;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/redis-native.http.ts#L31)
+
+### redisHttpEndpoint
+
+Splits the token out of an HTTP Redis URL.
+
+**Signature**
+
+```ts
+declare const redisHttpEndpoint: (value: string) => RedisHttpEndpoint;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/runtime/redis-native.http.ts#L22)
 
 ## `redis-native.node.ts`
 

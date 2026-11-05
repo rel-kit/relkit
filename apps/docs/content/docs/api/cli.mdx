@@ -583,11 +583,11 @@ Compile descriptors, infer eligible IDs, and validate the application
 
 Build the checked graph, manifest, OpenAPI, and client
 
-| Option         | Value     | Description                             |
-| -------------- | --------- | --------------------------------------- |
-| --project-root | string    | Application directory (defaults to cwd) |
-| --runtime      | bun, node | Runtime the production server runs on   |
-| --target       | vercel    | Deploy target whose build rules apply   |
+| Option         | Value              | Description                             |
+| -------------- | ------------------ | --------------------------------------- |
+| --project-root | string             | Application directory (defaults to cwd) |
+| --runtime      | bun, node, workers | Runtime the production server runs on   |
+| --target       | vercel             | Deploy target whose build rules apply   |
 
 #### Examples
 
@@ -1082,20 +1082,20 @@ Manage deployments
 
 Write a deploy target's files, or initialize the Pulumi stack
 
-| Argument | Value    | Description                                                 |
-| -------- | -------- | ----------------------------------------------------------- |
-| target   | optional | railway, vercel, or aws for the Pulumi stack (default: aws) |
+| Argument | Value    | Description                                                             |
+| -------- | -------- | ----------------------------------------------------------------------- |
+| target   | optional | railway, vercel, cloudflare, or aws for the Pulumi stack (default: aws) |
 
-| Option                    | Value     | Description                                                 |
-| ------------------------- | --------- | ----------------------------------------------------------- |
-| --project-root            | string    | Application directory (defaults to cwd)                     |
-| --stack                   | string    | Pulumi stack name (default: development)                    |
-| --backend                 | string    | cloud, local, or object-storage URL                         |
-| --config                  | key=value | Set a non-secret Pulumi value; repeatable                   |
-| --config-secret           | key=value | Set a secret Pulumi value; repeatable                       |
-| --non-interactive / --yes | boolean   | Approve protected operations                                |
-| --runtime                 | bun, node | Server runtime (railway: bun or node; vercel: node)         |
-| --force                   | boolean   | Replace existing deploy files that differ (railway, vercel) |
+| Option                    | Value              | Description                                                              |
+| ------------------------- | ------------------ | ------------------------------------------------------------------------ |
+| --project-root            | string             | Application directory (defaults to cwd)                                  |
+| --stack                   | string             | Pulumi stack name (default: development)                                 |
+| --backend                 | string             | cloud, local, or object-storage URL                                      |
+| --config                  | key=value          | Set a non-secret Pulumi value; repeatable                                |
+| --config-secret           | key=value          | Set a secret Pulumi value; repeatable                                    |
+| --non-interactive / --yes | boolean            | Approve protected operations                                             |
+| --runtime                 | bun, node, workers | Server runtime (railway: bun or node; vercel: node; cloudflare: workers) |
+| --force                   | boolean            | Replace existing deploy files that differ (railway, vercel, cloudflare)  |
 
 ##### Examples
 

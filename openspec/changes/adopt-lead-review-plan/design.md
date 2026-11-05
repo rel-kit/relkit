@@ -922,6 +922,20 @@ Decided while applying section 22 (maintainer, 2026-11-06):
   `wrangler deploy --dry-run` on the probe app: the custom build ran and the 5.2 MB bundle (927 KB
   gzipped) uploaded with its Durable Object and queue bindings.
 
+- **Workers joins the runtime matrix nightly; the target and the runtime stay Labs.**
+  `.github/workflows/workers-runtime.yml` runs every night (and on demand): the `api` template's
+  HTTP suite against its Workers bundle in workerd and the clients' conformance in workerd, with
+  Redis from Docker. It is not a pull-request gate, per the runtime-matrix requirement for Tier 2.
+  `/docs/modules/deployment/cloudflare` is the guide; the deployment overview lists Cloudflare's
+  engine as platform configuration (`wrangler.jsonc`) with the Workers bundle deployed by wrangler,
+  and the runtimes page describes Tier 2 and `--runtime workers`. The maturity table gains
+  "Cloudflare deploy" and "Cloudflare Workers runtime", both Labs and both pointing at the guide:
+  the live newcomer test passed from this machine, but the target-maturity requirement asks for a
+  pass in CI, which needs the `RELKIT_TEST_CLOUDFLARE` variable, the Cloudflare secrets and a
+  database secret on the repository, as Railway and Vercel stayed Labs after their local runs.
+  `RELKIT_WORK` and `RELKIT_REALTIME` joined the names the error-page generator does not treat as
+  diagnostic codes, since they are binding names.
+
 ### D10. Postgres durable backend (#12)
 
 Tables hold jobs (leased with `FOR UPDATE SKIP LOCKED`), an event outbox written in the caller's

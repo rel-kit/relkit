@@ -248,7 +248,7 @@ build` fails inside the Linux image (see design D19, "Decided while applying sec
 - [x] 22.3 Provide Workers-compatible clients for Redis, R2 and KV, and verify their conformance in the Workers runtime
 - [x] 22.4 Run jobs and events through Cloudflare Queues, schedules through Cron Triggers and realtime through Durable Objects, and verify an authorized deploy test
 - [x] 22.5 Add a Cloudflare generator (`wrangler.jsonc`, Workers entry, CI workflow) to `relkit deploy init`, and verify snapshot tests
-- [ ] 22.6 Add Workers to the nightly matrix, write the Cloudflare guide, and move the target and the Workers runtime to Core when the newcomer test passes, and verify the maturity table update
+- [x] 22.6 Add Workers to the nightly matrix, write the Cloudflare guide, and move the target and the Workers runtime to Core when the newcomer test passes, and verify the maturity table update
 
 ## 23. One wire protocol (#16, second part; #8)
 

@@ -387,7 +387,7 @@ Re-exports all named exports from the "./database.types.js" module.
 export * from "./database.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/database.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/database.ts#L20)
 
 ### PostgresBackendError (class)
 
@@ -399,7 +399,7 @@ A SQL statement of the Postgres backend failed. @experimental
 declare class PostgresBackendError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/database.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/database.ts#L23)
 
 ### backendOperation
 
@@ -415,7 +415,7 @@ declare const backendOperation: (
 ) => Effect.Effect<A, Exclude<E, SqlError> | PostgresBackendError, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/database.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/database.ts#L38)
 
 ### openPostgresDatabase
 
@@ -433,7 +433,7 @@ const database = openPostgresDatabase({ url: process.env.DATABASE_URL! });
 declare const openPostgresDatabase: (options: PostgresDatabaseOptions) => PostgresDatabase;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/database.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/database.ts#L81)
 
 ## `database.types.ts`
 

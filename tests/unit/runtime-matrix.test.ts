@@ -104,3 +104,16 @@ test("pull requests create with npx and pnpm dlx and run dev on Node 22 and 24 w
   expect(run({ NODE_CREATION_RESULT: "failure" })).not.toBe(0);
   expect(run({ NODE_CREATION_RESULT: "skipped" })).not.toBe(0);
 });
+
+test("Workers runs nightly: the HTTP suite and the clients' conformance in workerd", async () => {
+  const text = await readFile(resolve(root, ".github/workflows/workers-runtime.yml"), "utf8");
+  const parsed = Bun.YAML.parse(text) as {
+    on: { schedule?: readonly { cron: string }[] };
+    jobs: Record<string, WorkflowJob>;
+  };
+  expect(parsed.on.schedule?.length).toBe(1);
+  const steps = parsed.jobs["workers-runtime"]?.steps ?? [];
+  const runs = steps.map((step) => step.run ?? "").join("\n");
+  expect(runs).toContain("bun scripts/runtime-http-suite.ts --runtime workers");
+  expect(runs).toContain("bun test integrations/packages/cloudflare/tests");
+});

@@ -7,6 +7,7 @@ export const deploymentGuideGroup = group("docs/modules/deployment", "Deployment
   "runtimes",
   "railway",
   "vercel",
+  "cloudflare",
   "aws",
   "providers",
 ]);
@@ -35,6 +36,20 @@ export const deploymentGuideRelations = [
   relation(
     "docs/modules/deployment/vercel",
     ["app", "jobs", "events", "realtime", "integrations/postgres"],
+    ["templates/default/v1/api/relkit.config.ts"],
+  ),
+  relation(
+    "docs/modules/deployment/cloudflare",
+    [
+      "app",
+      "jobs",
+      "events",
+      "realtime",
+      "cache",
+      "buckets",
+      "integrations/postgres",
+      "integrations/cloudflare",
+    ],
     ["templates/default/v1/api/relkit.config.ts"],
   ),
   relation(
