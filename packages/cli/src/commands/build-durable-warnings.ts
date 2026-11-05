@@ -27,10 +27,11 @@ interface GraphNode {
 /**
  * Finds jobs and events profiles that use the local provider in a production build.
  * @param graphText - Compiled application graph JSON.
- * @returns One warning per used local jobs or events profile.
+ * @returns One warning per used local jobs or events profile; none for a graph that did not
+ *   compile, whose own diagnostic the build reports.
  */
 export function localDurableProviderWarnings(graphText: string): readonly Diagnostic[] {
-  const nodes = (JSON.parse(graphText) as { readonly nodes?: readonly GraphNode[] }).nodes ?? [];
+  const nodes = parseGraphNodes(graphText);
   const warnings: Diagnostic[] = [];
   for (const provider of nodes) {
     if (provider.kind !== "provider" || provider.adapter?.integrationId !== "local") continue;
@@ -83,4 +84,17 @@ function describeUsage(
         (node.config?.profile ?? "default") === profile),
   );
   return events.length === 0 ? undefined : "Events";
+}
+
+/**
+ * Reads the graph's nodes, treating text that is not a graph document as an empty graph.
+ * @param graphText - Compiled application graph JSON.
+ * @returns The graph's nodes, or none.
+ */
+function parseGraphNodes(graphText: string): readonly GraphNode[] {
+  try {
+    return (JSON.parse(graphText) as { readonly nodes?: readonly GraphNode[] }).nodes ?? [];
+  } catch {
+    return [];
+  }
 }
