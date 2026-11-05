@@ -8,6 +8,7 @@ export default defineMeta({
     "why-relkit",
     "faq",
     "maturity",
+    "versioning",
     "benchmarks",
     "learn",
     "modules",
