@@ -318,6 +318,15 @@
       "examples": ["templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"]
     },
     {
+      "path": "docs/modules/jobs/providers/postgres",
+      "api": ["jobs", "integrations/postgres"],
+      "examples": [
+        "apps/docs/examples/postgres/config.ts",
+        "apps/docs/examples/postgres/place-order.ts",
+        "integrations/packages/postgres/tests/jobs-conformance.test.ts"
+      ]
+    },
+    {
       "path": "docs/modules/jobs/providers/comparison",
       "api": ["jobs"],
       "examples": ["tests/jobs/compatibility/evidence/capability-matrix.json"]
@@ -602,6 +611,7 @@
       "api": ["jobs", "testing"],
       "examples": [
         "examples/commerce/src/services/orders/tasks/export-orders.task.ts",
+        "apps/docs/examples/postgres/charge-order.job.ts",
         "packages/relkit/tests/jobs/task-policy.test.ts"
       ]
     },

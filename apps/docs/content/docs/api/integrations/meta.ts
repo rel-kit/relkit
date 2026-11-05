@@ -17,6 +17,7 @@ export default defineMeta({
     "inngest",
     "trigger",
     "effect-mq",
+    "postgres",
   ],
   display: "page",
 });

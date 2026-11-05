@@ -192,6 +192,86 @@ web process for single-instance apps or as a separate worker role. The first imp
 evaluates wrapping an existing Postgres queue library behind the provider interface; either way, the
 shared jobs and events conformance suites decide.
 
+Decided while applying section 16 (maintainer, 2026-11-05):
+
+- **The backend is RelKit's own SQL on `@effect/sql-pg`, not a wrapped queue library.** A spike
+  wrapped pg-boss 10.4 behind the jobs fixture steps against Postgres 16 (graphile-worker 0.16
+  was evaluated from its source). Measured: pg-boss `retry` re-queues the same job ID instead of
+  creating a linked run, a second `cancel` resolves silently instead of reporting
+  `already-terminal`, `singletonKey` on a standard queue does not deduplicate, and an expired
+  lease on an active job was still `active` 70 seconds later because recovery waits for its
+  maintenance interval. graphile-worker hard-codes a four-hour lock timeout. Neither has
+  per-consumer event delivery, and both own their schema migrations and add the `pg` driver,
+  while their transactional enqueue needs a `pg` client rather than the caller's Drizzle
+  transaction. Wrapping would keep only the `SKIP LOCKED` claim query. `@effect/sql-pg` is already
+  in the catalog. The in-repo spike is `integrations/packages/postgres/tests/jobs-conformance.test.ts`,
+  which runs every `runJobsConformance` fixture against the adapter.
+- **The runtime creates its tables.** On first use each namespace (`schema`, `tablePrefix`)
+  applies idempotent `create ... if not exists` DDL inside a transaction holding an advisory lock,
+  so instances starting together create it once. Applications that own migrations apply the same
+  statements from `postgresBackendSql()`.
+- **Five stored states, ten public ones.** Rows store `queued`, `running`, `completed`, `failed`
+  or `cancelled`; `delayed` and `retrying` are derived from the eligibility time and attempt
+  count when read. A run that fails on its last permitted attempt, or with `retry: "never"`, ends
+  `failed` and dead-lettered, reported as `nativeDiagnosticCode: RELKIT_JOB_DEAD_LETTERED`;
+  `retry` creates a new run that is unique per (original run, retry identity).
+- **An expired lease counts as an attempt.** Another worker re-claims the run while the task's
+  `retry.maxAttempts` allows; otherwise it ends failed with `RELKIT_JOB_LEASE_EXPIRED`. Every
+  settlement is fenced on the claim's owner token, so a worker that lost its lease cannot
+  overwrite the next attempt. Workers renew leases every third of `leaseMs` (default 30 s), and
+  the renewal reports cancellation requests, which abort the attempt's signal.
+- **Deduplication follows the deterministic adapter.** The dedupe key is (job, idempotency key,
+  occurrence identity), unique per service and scope. A submission whose commit outcome is unknown
+  returns `RELKIT_JOB_SUBMISSION_UNKNOWN` with `retry-with-same-key` recovery when it had an
+  idempotency key, else `inspect-native`. Durable sleep is reported unsupported.
+- **Events fan out when they are written.** Registering a durable trigger records a consumer row
+  (profile, trigger, event ID, version). Publishing is one statement that inserts the outbox row
+  and one delivery per registered consumer, so `@relkit/postgres/drizzle`'s
+  `outbox(tx).publish(event, payload)` commits or discards the event and every delivery with the
+  caller's transaction, and needs no relay process. A consumer registered later does not receive
+  events published before it. Each delivery is leased, retried under the trigger's retry policy
+  (`planRetry`, the local provider's classification) and dead-lettered on its own. Ephemeral
+  triggers run in-process after a provider `publish` and are not persisted; the outbox only
+  serves durable consumers.
+- **The outbox binds JSON as text.** It casts the envelope with `::text::jsonb`, because Bun's SQL
+  driver JSON-encodes a string bound directly to a `jsonb` parameter and would store a jsonb
+  string; the cast keeps every Drizzle Postgres driver writing the same object.
+- **One run per occurrence comes from the occurrence key, not from locking alone.** A scheduler
+  pass locks due schedule rows with `FOR UPDATE SKIP LOCKED`, inserts each occurrence into a table
+  keyed on (service, schedule ID, occurrence time), enqueues the run in the same transaction with
+  occurrence identity `<schedule>@<time>`, and advances the pending occurrence. A contender holding
+  a stale pending occurrence loses on the key. `misfire` defaults to `latest`; `skip` drops
+  occurrences more than a minute late; `all` catches up at most 100 per pass. `overlap: "skip"`
+  claims the occurrence without a run while an earlier run of the schedule is queued or running.
+  Re-upserting a schedule with unchanged timing keeps its pending occurrence, so a redeploy neither
+  skips nor repeats one.
+- **Worker modes reuse `RELKIT_WORKER_ROLE`.** The generated server already drives an adapter's
+  pull `worker` from its job loop and skips it in the `api` role, and passes `startWorker: false` to
+  `registerWorker` there. The Postgres runtime starts its scheduler from `registerWorker` and its
+  event consumers when the role is `worker` (the default), so a single instance runs everything in
+  the web process, and a deployment can run web instances with `RELKIT_WORKER_ROLE=api` beside
+  one or more `worker` instances of the same build. Jobs and events providers of one process that
+  name the same database and namespace share one pool. `RELKIT_POSTGRES_URL` overrides the
+  authored URL. Not verified here: a full `relkit build` and `relkit start` of an application on
+  this provider; the worker-mode tests build the providers through the same runtime integration
+  the server uses, with a child process as the worker instance.
+- **`relkit add jobs` and `relkit add events` add provider profiles.** They take
+  `--provider postgres|local` (default `local`) and `--profile` (default: the provider name), and
+  reuse the add transaction: the profile in `relkit.config.ts`, `@relkit/postgres` in
+  `package.json` and the `DATABASE_URL` secret in the env module are planned together, installed
+  and verified, and restored byte for byte when any step fails. The new profile becomes the
+  default only when the app has none; otherwise a warning names the existing default, so the
+  command never re-routes existing jobs or events silently.
+- **The local-provider warning comes from the compiled graph.** `relkit build` adds one
+  `RELKIT_BUILD_LOCAL_DURABLE_PROVIDER` warning per jobs or events profile whose adapter belongs
+  to `@relkit/local` and that a job, schedule, event or event trigger uses. The build still
+  succeeds; development (`relkit dev`) does not warn.
+- **Docs examples are compiled sources.** The provider page (`docs/modules/jobs/providers/postgres`)
+  and the at-least-once section of `docs/modules/jobs/retries-and-idempotency` include
+  `apps/docs/examples/postgres/*.ts`, which the docs `tsc` checks. Retry policies are read as the
+  task form (`initialDelay`, `maxDelay`, `factor`) or the millisecond form (`initialDelayMs`,
+  `maxDelayMs`, `multiplier`).
+
 ### D11. Problem Details errors (#13 a, b)
 
 Every error response becomes `application/problem+json` with `type` (`/errors/<code>`), `title`,

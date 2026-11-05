@@ -5,6 +5,7 @@ import { checkRuleCodes } from "./check-rules.js";
 import { cliCodes } from "./cli.js";
 import { handleCodes } from "./handle.js";
 import { compilerCodes } from "./compiler.js";
+import { durableBackendCodes } from "./durable-backend.js";
 import { inspectorCodes } from "./inspector.js";
 import { jobsCodes } from "./jobs.js";
 import { launcherCodes } from "./launcher.js";
@@ -26,6 +27,7 @@ export const DIAGNOSTIC_CODES: readonly DiagnosticCodeEntry[] = Object.freeze(
     ...runtimeCodes,
     ...handleCodes,
     ...jobsCodes,
+    ...durableBackendCodes,
     ...inspectorCodes,
   ].sort((left, right) => left.code.localeCompare(right.code)),
 );
@@ -53,6 +55,7 @@ export const RELKIT_NON_CODE_NAMES: ReadonlySet<string> = new Set([
   "RELKIT_KEEP_TEST_STATE",
   "RELKIT_LOCAL_SERVICE_INSPECTOR_STATE",
   "RELKIT_OBSERVABILITY_ROOT",
+  "RELKIT_POSTGRES_URL",
   "RELKIT_PROVIDER_OVERRIDES_FILE",
   "RELKIT_PROVIDER_READY_DELAY_MS",
   "RELKIT_PUBLIC_ROOT",

@@ -88,6 +88,7 @@ export const guideGroups = [
     "inngest",
     "trigger",
     "effect-mq",
+    "postgres",
   ]),
   group("guides/migrate", "Migrate", "ArrowRightLeft", ["from-express-or-hono"]),
   group("guides/cli", "CLI", "Terminal", ["create-and-build-an-api"]),
@@ -131,6 +132,15 @@ const relations = [
     "guides/ai/build-an-offline-agent",
     ["agents", "tools", "testing"],
     ["templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"],
+  ),
+  relation(
+    "docs/modules/jobs/providers/postgres",
+    ["jobs", "integrations/postgres"],
+    [
+      "apps/docs/examples/postgres/config.ts",
+      "apps/docs/examples/postgres/place-order.ts",
+      "integrations/packages/postgres/tests/jobs-conformance.test.ts",
+    ],
   ),
   ...["comparison", "inngest", "trigger", "effect-mq"].map((page) =>
     relation(

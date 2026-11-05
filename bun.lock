@@ -72,6 +72,7 @@
         "@relkit/inngest": "workspace:*",
         "@relkit/local": "workspace:*",
         "@relkit/otlp": "workspace:*",
+        "@relkit/postgres": "workspace:*",
         "@relkit/pulumi": "workspace:*",
         "@relkit/redis": "workspace:*",
         "@relkit/s3": "workspace:*",
@@ -365,6 +366,26 @@
       "dependencies": {
         "relkit": "workspace:*",
       },
+    },
+    "integrations/packages/postgres": {
+      "name": "@relkit/postgres",
+      "version": "0.1.0",
+      "dependencies": {
+        "@effect/sql-pg": "catalog:",
+        "effect": "catalog:",
+        "relkit": "workspace:*",
+      },
+      "devDependencies": {
+        "@relkit/testing": "workspace:*",
+        "drizzle-orm": "catalog:",
+        "typescript": "catalog:",
+      },
+      "peerDependencies": {
+        "drizzle-orm": "catalog:",
+      },
+      "optionalPeers": [
+        "drizzle-orm",
+      ],
     },
     "integrations/packages/pulumi": {
       "name": "@relkit/pulumi",
@@ -1851,6 +1872,8 @@
     "@relkit/local": ["@relkit/local@workspace:integrations/packages/local"],
 
     "@relkit/otlp": ["@relkit/otlp@workspace:integrations/packages/otlp"],
+
+    "@relkit/postgres": ["@relkit/postgres@workspace:integrations/packages/postgres"],
 
     "@relkit/pulumi": ["@relkit/pulumi@workspace:integrations/packages/pulumi"],
 

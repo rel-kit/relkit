@@ -133,6 +133,13 @@ export const apiPackageDefinitions = [
     "integrations/packages/effect-mq",
     "integrations",
   ),
+  apiPackage(
+    "integrations/postgres",
+    "Postgres",
+    "@relkit/postgres",
+    "integrations/packages/postgres",
+    "integrations",
+  ),
 ] as const;
 
 /** A source area merged into a package, such as `packages/relkit/src/functions`. */

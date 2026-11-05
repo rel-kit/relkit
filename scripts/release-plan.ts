@@ -19,6 +19,7 @@ export const generatorProviders = [
   "@relkit/inngest",
   "@relkit/trigger",
   "@relkit/effect-mq",
+  "@relkit/postgres",
   "@relkit/better-auth",
   "@relkit/cloudflare",
   "@relkit/drizzle",

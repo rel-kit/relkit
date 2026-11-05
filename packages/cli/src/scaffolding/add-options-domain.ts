@@ -92,7 +92,10 @@ export function executionRequest(
  * @returns The supported service include; excluded kinds raise a usage error.
  */
 function serviceInclude(value: string): ServiceInclude {
-  const excluded = new Set(["service", "database", "auth", "inspector", "middleware", "transform"]);
+  const excluded = new Set([
+    ...["service", "database", "auth", "inspector", "jobs", "events"],
+    ...["middleware", "transform"],
+  ]);
   if (excluded.has(value)) usage(`Unsupported service include: ${value}`);
   return value as ServiceInclude;
 }

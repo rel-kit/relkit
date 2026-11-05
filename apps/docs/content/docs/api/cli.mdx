@@ -430,6 +430,36 @@ Create Better Auth and its catch-all route
 
 `relkit add auth` — Create Better Auth and its catch-all route
 
+#### `relkit add jobs`
+
+Add a jobs provider profile
+
+| Option         | Value           | Description                               |
+| -------------- | --------------- | ----------------------------------------- |
+| --project-root | string          | Application directory (defaults to cwd)   |
+| --no-install   | boolean         | Do not install newly required packages    |
+| --provider     | postgres, local | Provider (default: local)                 |
+| --profile      | string          | Profile name (default: the provider name) |
+
+##### Examples
+
+`relkit add jobs` — Add a jobs provider profile
+
+#### `relkit add events`
+
+Add an events provider profile
+
+| Option         | Value           | Description                               |
+| -------------- | --------------- | ----------------------------------------- |
+| --project-root | string          | Application directory (defaults to cwd)   |
+| --no-install   | boolean         | Do not install newly required packages    |
+| --provider     | postgres, local | Provider (default: local)                 |
+| --profile      | string          | Profile name (default: the provider name) |
+
+##### Examples
+
+`relkit add events` — Add an events provider profile
+
 #### `relkit add inspector`
 
 Enable the inspector bridge and its local UI

@@ -8,6 +8,7 @@ import { cleanupEffect } from "../services/cleanup.service.js";
 import { buildCapabilitiesLayer } from "../services/project-capabilities.js";
 import { checkProjectEffect } from "./check.js";
 import { buildFailure } from "./build-result.js";
+import { localDurableProviderWarnings } from "./build-durable-warnings.js";
 import { stageBuildEffect } from "./build-stage.js";
 import { errorMessage } from "./build-support.js";
 import type { BuildOptions } from "./build.types.js";
@@ -31,6 +32,11 @@ export const buildProjectEffect = Effect.fn("Project.build")(
     const graphHash = checked.graphHash;
     if (!checked.ok || graphHash === undefined)
       return buildFailure(projectRoot, buildDirectory, checked.diagnostics);
+    // Production builds warn, without failing, when durable work would live on one machine.
+    const diagnostics = [
+      ...checked.diagnostics,
+      ...localDurableProviderWarnings(checked.outputs.graph),
+    ];
     const files = yield* CliFileSystem;
     const work = Effect.scoped(
       Effect.gen(function* () {
@@ -42,7 +48,7 @@ export const buildProjectEffect = Effect.fn("Project.build")(
           projectRoot,
           buildDirectory,
           stage,
-          checked: { ...checked, graphHash },
+          checked: { ...checked, graphHash, diagnostics },
           options,
         });
       }),
@@ -51,7 +57,7 @@ export const buildProjectEffect = Effect.fn("Project.build")(
       Effect.catchTag("CliAdapterError", (error) =>
         Effect.succeed(
           buildFailure(projectRoot, buildDirectory, [
-            ...checked.diagnostics,
+            ...diagnostics,
             createDiagnostic({
               code: "RELKIT_BUILD_FAILED",
               severity: "error",

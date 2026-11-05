@@ -25,7 +25,14 @@ import type { ProjectDiscovery } from "./project-discovery-types.js";
 import type { AddKind } from "create-relkit/add-types";
 
 /** Platform kinds identified by their project, path, or singleton role instead of a name. */
-const NAMELESS_KINDS: ReadonlySet<AddKind> = new Set(["database", "auth", "route", "inspector"]);
+const NAMELESS_KINDS: ReadonlySet<AddKind> = new Set([
+  "database",
+  "auth",
+  "route",
+  "inspector",
+  "jobs",
+  "events",
+]);
 
 /**
  * Resolves resolve domain options through explicit prompt and filesystem authority.

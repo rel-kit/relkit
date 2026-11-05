@@ -199,6 +199,39 @@ jobs:
           bun run test:contracts
           bun run test:security
 
+  postgres-backend:
+    name: Postgres durable backend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
+        env:
+          POSTGRES_PASSWORD: relkit
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 30
+    env:
+      RELKIT_TEST_POSTGRES_URL: postgres://postgres:relkit@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Build the backend and its test dependencies
+        run: bun x turbo run build --filter=@relkit/postgres... --output-logs=errors-only
+      - name: Run the Postgres jobs, events and schedule suites
+        run: bun run test:postgres
+
   inspector-container:
     name: Standalone inspector container
     runs-on: ubuntu-24.04
@@ -413,6 +446,7 @@ jobs:
         dependency-update,
         static,
         types-and-tests,
+        postgres-backend,
         inspector-container,
         docs-installations,
         dependency-review,
@@ -429,6 +463,7 @@ jobs:
     env:
       STATIC_RESULT: ${{ needs.static.result }}
       TYPES_RESULT: ${{ needs.types-and-tests.result }}
+      POSTGRES_RESULT: ${{ needs.postgres-backend.result }}
       INSPECTOR_CONTAINER_RESULT: ${{ needs.inspector-container.result }}
       DOCS_INSTALLATIONS_RESULT: ${{ needs.docs-installations.result }}
       DEPENDENCY_REVIEW_RESULT: ${{ needs.dependency-review.result }}
@@ -445,6 +480,7 @@ jobs:
         run: |
           test "$STATIC_RESULT" = success
           test "$TYPES_RESULT" = success
+          test "$POSTGRES_RESULT" = success
           test "$INSPECTOR_CONTAINER_RESULT" = success
           test "$DOCS_INSTALLATIONS_RESULT" = success
           test "$DEPENDENCY_REVIEW_RESULT" = success || test "$DEPENDENCY_REVIEW_RESULT" = skipped

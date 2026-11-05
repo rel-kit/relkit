@@ -172,14 +172,14 @@ not tasks of this change.
 
 ## 16. Durable Postgres backend (#12)
 
-- [ ] 16.1 Evaluate wrapping an existing Postgres queue library against the jobs conformance suite, record the decision in design.md, and verify the chosen approach with a spike test
-- [ ] 16.2 Implement durable jobs with leasing, retries and dead-letter, and verify the jobs conformance and crash tests
-- [ ] 16.3 Implement durable events with per-consumer delivery and the transactional outbox through Drizzle, and verify rollback and partial-failure tests
-- [ ] 16.4 Implement one run per schedule occurrence with a unique occurrence key, and verify a two-instance test
-- [ ] 16.5 Support workers in the web process and as a separate role, and verify both modes in tests
-- [ ] 16.6 Add `relkit add jobs --provider postgres` and the events equivalent as transactional edits, and verify the add tests including rollback
-- [ ] 16.7 Make production builds warn when jobs, events or schedules use the local filesystem provider, and verify the build warning test
-- [ ] 16.8 Document the Postgres backend, at-least-once delivery and idempotency keys, and verify the docs examples compile
+- [x] 16.1 Evaluate wrapping an existing Postgres queue library against the jobs conformance suite, record the decision in design.md, and verify the chosen approach with a spike test
+- [x] 16.2 Implement durable jobs with leasing, retries and dead-letter, and verify the jobs conformance and crash tests
+- [x] 16.3 Implement durable events with per-consumer delivery and the transactional outbox through Drizzle, and verify rollback and partial-failure tests
+- [x] 16.4 Implement one run per schedule occurrence with a unique occurrence key, and verify a two-instance test
+- [x] 16.5 Support workers in the web process and as a separate role, and verify both modes in tests
+- [x] 16.6 Add `relkit add jobs --provider postgres` and the events equivalent as transactional edits, and verify the add tests including rollback
+- [x] 16.7 Make production builds warn when jobs, events or schedules use the local filesystem provider, and verify the build warning test
+- [x] 16.8 Document the Postgres backend, at-least-once delivery and idempotency keys, and verify the docs examples compile
 
 ## 17. Production image and Railway (#12)
 

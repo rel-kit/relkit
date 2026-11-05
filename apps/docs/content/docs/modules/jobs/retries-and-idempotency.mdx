@@ -76,6 +76,25 @@ The two keys protect different steps. The trigger key stops duplicate runs from 
 key inside the handler stops a single run from repeating an external side effect when it is
 re-run.
 
+## Durable providers
+
+Durable providers such as `@relkit/postgres` follow the same rule with a lease instead of a journal.
+When a worker stops while it holds a run, its lease expires and another worker starts the attempt
+over; when it stops after the task succeeded but before the result was recorded, the task runs a
+second time. Set the job's `admission.idempotency.key` so a repeated submission for the same order
+reuses the first run instead of starting another.
+
+<include
+  source="apps/docs/examples/postgres/charge-order.job.ts"
+  lang="ts"
+  meta='title="src/services/orders/jobs/charge-order.job.ts"'
+>
+  /_snippets/source/apps/docs/examples/postgres/charge-order.job.ts
+</include>
+
+Event consumers follow the same rule: a consumer may receive the same event again after a crash,
+with the same `instanceId`, so use the instance ID or a business key to skip work already done.
+
 The dedupe scope is part of compatibility. Changing it can create duplicate work even when the task source is unchanged, so migration diagnostics treat it as a deliberate change.
 
 Classify permanent validation and authorization failures as terminal. Let transient network, rate-limit, and provider failures retry. Never log credentials or full untrusted input while diagnosing a retry loop.
