@@ -129,7 +129,9 @@ function rootOnly(
         source,
         node,
         id,
-        `${name} is not exported from the relkit root; import it from its relkit/<area> subpath.`,
+        /Effects?$/.test(name)
+          ? `${name} moved to relkit/effect; import it from there.`
+          : `${name} is not exported from the relkit root; import it from its relkit/<area> subpath.`,
       ),
     );
   return outside.length === 0;

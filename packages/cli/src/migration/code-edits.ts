@@ -176,3 +176,29 @@ export function insertFirst(
     text: multiline ? `${property},\n${indentOf(source, first)}` : `${property}, `,
   };
 }
+
+/**
+ * Appends a property after an object's last one, keeping a trailing comma and the layout.
+ * @param source - Parsed file.
+ * @param object - Object literal.
+ * @param property - Property text without commas.
+ * @returns The insertion edit.
+ */
+export function appendProperty(
+  source: CodeSource,
+  object: ts.ObjectLiteralExpression,
+  property: string,
+): TextEdit {
+  const last = object.properties[object.properties.length - 1];
+  if (last === undefined)
+    return { start: object.getStart(source), end: object.getEnd(), text: `{ ${property} }` };
+  const multiline =
+    source.getLineAndCharacterOfPosition(last.getStart(source)).line !==
+    source.getLineAndCharacterOfPosition(object.getStart(source)).line;
+  const comma = source.getFullText()[last.getEnd()] === ",";
+  const at = comma ? last.getEnd() + 1 : last.getEnd();
+  const text = multiline
+    ? `${comma ? "" : ","}\n${indentOf(source, last)}${property}${comma ? "," : ""}`
+    : `${comma ? "" : ","} ${property}`;
+  return { start: at, end: at, text };
+}

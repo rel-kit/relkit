@@ -60,6 +60,9 @@ const removed: Readonly<Record<string, string>> = {
  * @returns The new specifier and its package, a removal reason, or undefined when unchanged.
  */
 export function packageTarget(specifier: string): PackageTarget | undefined {
+  // The Bun WebSocket helper moved behind the runtime adapter in 0.9.
+  if (/^(?:@relkit|relkit)\/runtime-hono\/bun$/.test(specifier))
+    return moved("relkit/runtime/bun", "relkit");
   const match = /^@relkit\/([^/]+)(?:\/(.*))?$/.exec(specifier);
   if (match === null) return undefined;
   const [, name = "", rest] = match;

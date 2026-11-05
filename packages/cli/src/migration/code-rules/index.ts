@@ -16,6 +16,8 @@ import { betterAuthFileRule } from "./better-auth-file.js";
 import { clientHooksRule } from "./client-hooks.js";
 import { agentRuntimeRule } from "./agent-runtime.js";
 import { schemaBuilderRule } from "./schema-builder.js";
+import { routeAuthRule } from "./route-auth.js";
+import { problemDetailsRule } from "./problem-details.js";
 
 /** Every 0.9 codemod, in the order they run. */
 export const codeRules: readonly CodeRule[] = [
@@ -26,8 +28,10 @@ export const codeRules: readonly CodeRule[] = [
   dependencyDeclarationsRule,
   contextCallsRule,
   serviceRoutesRule,
+  routeAuthRule,
   betterAuthFileRule,
   clientHooksRule,
   agentRuntimeRule,
+  problemDetailsRule,
   schemaBuilderRule,
 ];

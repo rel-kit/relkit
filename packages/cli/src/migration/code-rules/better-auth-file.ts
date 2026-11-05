@@ -56,6 +56,15 @@ export const betterAuthFileRule: CodeRule = {
         { start: options.getStart(source), end: options.getEnd(), text: "{ auth }" },
         ...carried.removals,
       ];
+      if (![...context.sources.values()].some((text) => text.includes("BETTER_AUTH_URL")))
+        findings.push(
+          findingAt(
+            source,
+            call,
+            id,
+            "Declare BETTER_AUTH_URL and BETTER_AUTH_SECRET with defineEnv; new Better Auth projects require both.",
+          ),
+        );
       const add = addNamedImport(source, "./better-auth.js", "auth");
       if (add) edits.push(add);
       return {

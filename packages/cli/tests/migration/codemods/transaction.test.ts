@@ -69,6 +69,7 @@ describe("relkit migrate transaction", () => {
         finding.rule,
       ]),
     ).toEqual([
+      ["src/services/auth/service.ts", 3, "better-auth-file"],
       ["src/services/jobs/send.job.ts", 1, "package-imports"],
       ["src/services/jobs/send.job.ts", 3, "legacy-jobs"],
     ]);

@@ -43,6 +43,9 @@ describe("package-imports", () => {
   test("leaves non-RelKit and unchanged RelKit packages alone", () => {
     expect(packageTarget("zod")).toBeUndefined();
     expect(packageTarget("@relkit/client/react")).toBeUndefined();
+    expect(packageTarget("relkit/runtime-hono/bun")).toMatchObject({
+      specifier: "relkit/runtime/bun",
+    });
     expect(packageTarget("@relkit/deploy-pulumi")).toEqual({
       kind: "moved",
       specifier: "@relkit/pulumi/engine",

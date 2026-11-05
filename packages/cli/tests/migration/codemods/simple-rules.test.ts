@@ -9,7 +9,9 @@ import { removedAliasesRule } from "../../../src/migration/code-rules/removed-al
 import { legacyJobsRule } from "../../../src/migration/code-rules/legacy-jobs.js";
 import { errorIdsRule } from "../../../src/migration/code-rules/error-ids.js";
 import { serviceRoutesRule } from "../../../src/migration/code-rules/service-routes.js";
-import { expectFixture } from "./fixture.js";
+import { routeAuthRule } from "../../../src/migration/code-rules/route-auth.js";
+import { problemDetailsRule } from "../../../src/migration/code-rules/problem-details.js";
+import { expectFixture, testContext } from "./fixture.js";
 
 const lines = (result: { findings: readonly { line: number }[] }) =>
   result.findings.map((finding) => finding.line);
@@ -34,6 +36,12 @@ describe("removed-aliases", () => {
     expect(result.findings.map((finding) => [finding.line, finding.message])).toEqual([
       [6, "Both profile and service are set; keep only service."],
     ]);
+  });
+});
+
+describe("removed-aliases effects", () => {
+  test("moves tool invokeEffect to callToolEffect and reports other receivers", () => {
+    expect(lines(expectFixture(removedAliasesRule, "effects", "src/agents/run.ts"))).toEqual([5]);
   });
 });
 
@@ -68,6 +76,44 @@ describe("service-routes", () => {
   test("reports a module that reads a destructured handler", () => {
     expect(lines(expectFixture(serviceRoutesRule, "used", "src/routes/orders/route.ts"))).toEqual([
       4,
+    ]);
+  });
+});
+
+describe("route-auth", () => {
+  const sources = new Map([
+    [
+      "src/routes/api/auth/[[...auth]]/route.ts",
+      'export const ALL = defineRoute({\n  handler: auth.handler,\n  auth: { protected: ["/account/*", "/mcp"] },\n});\n',
+    ],
+    ["src/routes/account/profile/route.ts", ""],
+  ]);
+  const context = testContext({ sources });
+
+  test("removes the protected list and reports paths without a route module", () => {
+    const result = expectFixture(
+      routeAuthRule,
+      "auth-route",
+      "src/routes/api/auth/[[...auth]]/route.ts",
+      context,
+    );
+    expect(result.findings.map((finding) => [finding.line, finding.message.slice(0, 26)])).toEqual([
+      [7, "Protect the MCP endpoint w"],
+    ]);
+  });
+
+  test("requires a session on routes the list protected", () => {
+    expect(
+      expectFixture(routeAuthRule, "profile", "src/routes/account/profile/route.ts", context)
+        .findings,
+    ).toEqual([]);
+  });
+});
+
+describe("problem-details", () => {
+  test("reports reads of the old error field and changes nothing", () => {
+    expect(lines(expectFixture(problemDetailsRule, "client", "tests/orders.test.ts"))).toEqual([
+      5, 6,
     ]);
   });
 });

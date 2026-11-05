@@ -2,7 +2,8 @@
  * Rule `removed-aliases`: each concept keeps one spelling. `toJsonSchema` becomes
  * `getJsonSchema`, `defineRequestTransform` becomes `defineTransform`, the builder's
  * `undefined()` becomes `void()`, `defineApp`'s `job` provider key and `defaults.job` become
- * `jobs`, and a job's `profile` becomes `service`. When both spellings are already present the
+ * `jobs`, a job's `profile` becomes `service`, and a tool's `invokeEffect` becomes
+ * `callToolEffect` from `relkit/effect`. When both spellings are already present the
  * rule reports the line instead of guessing which value wins.
  */
 import { codeSyntax as ts, parseCodeSource, type CodeSource } from "../code-parser.js";
@@ -11,6 +12,7 @@ import { namedImports, removeNamedImport, renameReferences } from "../code-impor
 import type { CodeFinding, CodeRule } from "../code-migration.types.js";
 import { schemaModules } from "./schema-builder.js";
 import { defineCalls, isRelkitModule, relkitLocals } from "./rule-support.js";
+import { invokeEffectCalls } from "./effect-calls.js";
 
 const id = "removed-aliases";
 const renamedExports: readonly (readonly [string, string])[] = [
@@ -30,6 +32,7 @@ export const removedAliasesRule: CodeRule = {
     const findings: CodeFinding[] = [];
     for (const [from, to] of renamedExports) edits.push(...renameExport(source, from, to));
     edits.push(...builderUndefined(source));
+    edits.push(...invokeEffectCalls(source, id, findings));
     for (const { options } of defineCalls(source, relkitLocals(source, "defineApp"))) {
       renameKey(source, options, "job", "jobs", edits, findings);
       const defaults = objectProperty(options, "defaults");

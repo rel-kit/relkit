@@ -78,6 +78,9 @@ describe("context-calls", () => {
 describe("better-auth-file", () => {
   test("creates the Better Auth file and passes its instance", () => {
     const result = expectFixture(betterAuthFileRule, "service", "src/services/auth/service.ts");
+    expect(result.findings.map((finding) => finding.message)).toEqual([
+      expect.stringContaining("Declare BETTER_AUTH_URL and BETTER_AUTH_SECRET"),
+    ]);
     expect(result.created).toEqual([
       {
         path: "src/services/auth/better-auth.ts",
