@@ -265,6 +265,7 @@
     { "path": "docs/modules/index", "api": ["app"], "examples": [] },
     { "path": "docs/why-relkit", "api": ["app"], "examples": [] },
     { "path": "docs/maturity", "api": ["app"], "examples": [] },
+    { "path": "docs/versioning", "api": ["app"], "examples": [] },
     { "path": "docs/benchmarks", "api": ["app"], "examples": ["scripts/benchmark-dev-loop.ts"] },
     {
       "path": "docs/faq",

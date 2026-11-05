@@ -9,6 +9,7 @@
   "docs/benchmarks": ["update", "concept", ""],
   "docs/faq": ["update", "concept", ""],
   "docs/maturity": ["update", "concept", ""],
+  "docs/versioning": ["update", "concept", ""],
   "guides/migrate/from-express-or-hono": ["update", "continuation", "/docs/learn/create-an-app"],
   "guides/migrate/relkit-0-9": ["update", "concept", ""],
   "docs/learn/build-and-run": ["retain", "concept", ""],

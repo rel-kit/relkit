@@ -6,10 +6,22 @@ over this file. Read it before editing.
 
 ## Repository
 
-RelKit is experimental: interfaces may change, and current consumers are
-repository samples. Update affected samples directly within the task while
-preserving their data and applied migration history. This does not authorize
-data deletion or new legacy upgrade commands or compatibility layers.
+RelKit is experimental until Core reaches 1.0: interfaces may change, and
+current consumers are repository samples. Update affected samples directly
+within the task while preserving their data and applied migration history. This
+does not authorize data deletion or new legacy upgrade commands or
+compatibility layers.
+
+Every feature is Core or Labs. Core is covered by the stability policy; Labs can
+change in any release and carries the `@experimental` tag. The
+[maturity table](apps/docs/content/docs/maturity.mdx) lists which is which, and
+the [versioning and upgrades page](apps/docs/content/docs/versioning.mdx) holds
+the stability policy, the 1.0 criteria and the target date: semantic versioning
+for Core from 1.0, and a deprecated Core API keeps working with a coded
+`RELKIT_DEPRECATED_*` warning for one minor release. The one pre-1.0 breaking
+release ships with a `relkit migrate` migration and a
+[migration guide](apps/docs/content/guides/migrate/relkit-0-9.mdx); repository
+samples are migrated with that same command.
 
 RelKit is a strict TypeScript monorepo managed by Bun `1.3.10` and Turborepo.
 The main product topology is:

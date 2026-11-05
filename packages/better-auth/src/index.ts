@@ -1,5 +1,6 @@
 /** Lazy authentication authoring; select /drizzle for native database activation. @packageDocumentation */
 import { createDescriptorBase } from "relkit/contracts";
+import { deprecated } from "relkit/diagnostics";
 import { createUnboundIdentity } from "relkit/invocation";
 import type {
   BetterAuthHandler,
@@ -68,6 +69,10 @@ export function defineBetterAuthService(
     throw new TypeError("Better Auth service options must be an object");
   const instance = instanceOf(options);
   if (instance === undefined) {
+    deprecated(
+      "RELKIT_DEPRECATED_BETTER_AUTH_OPTIONS",
+      "a Better Auth file passed as `defineBetterAuthService({ auth })`",
+    );
     if (Object.hasOwn(options, "database"))
       throw new TypeError("Better Auth service database is provided by the Drizzle service");
     if (Object.hasOwn(options, "basePath"))

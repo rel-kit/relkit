@@ -73,6 +73,13 @@ verification. Both skills are also available directly in this repository under
 Coding agents can read the [documentation index](https://relkit.dev/llms.txt) or the
 [full documentation as one file](https://relkit.dev/llms-full.txt).
 
+## Stability and versions
+
+RelKit is pre-1.0. Every feature is Core or Labs: [Core and Labs](https://relkit.dev/docs/maturity)
+lists which, and Labs can change in any release. From 1.0, Core follows semantic versioning.
+[Versioning and upgrades](https://relkit.dev/docs/versioning) states the deprecation window, how
+`relkit migrate` carries you across breaking changes, the 1.0 criteria and the target date.
+
 ## Develop the repository
 
 The repository requires Bun `1.3.10`.
