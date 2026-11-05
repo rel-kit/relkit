@@ -41,7 +41,7 @@ export function resolveProjectCli(cwd: string): string {
   );
 }
 
-/** Launches one selected entry under Bun, preserving the child's terminal output.
+/** Launches one selected entry on Bun or Node (see `launch-bun.ts`), preserving the child's terminal output.
  * @param argv - Original launcher arguments.
  * @param cwd - Caller-owned working directory.
  * @returns The selected command's exit status.
@@ -64,7 +64,7 @@ export async function main(
     if (argv[0] === "create") {
       const creator = installedCreator();
       return creator === undefined
-        ? await launchBun("x", [`create-relkit@${manifest.version}`, ...argv.slice(1)], cwd)
+        ? await launchBun({ runPackage: `create-relkit@${manifest.version}` }, argv.slice(1), cwd)
         : await launchBun(creator, argv.slice(1), cwd);
     }
     return await launchBun(resolveProjectCli(selectedProjectRoot(argv, cwd)), argv, cwd);
@@ -75,7 +75,7 @@ export async function main(
 }
 
 /** Finds an installed creator without making it a dependency of production installs.
- * @returns The installed `create-relkit` executable, or undefined so `bun x` fetches the matching release.
+ * @returns The installed `create-relkit` executable, or undefined so the package runner fetches the matching release.
  */
 function installedCreator(): string | undefined {
   try {

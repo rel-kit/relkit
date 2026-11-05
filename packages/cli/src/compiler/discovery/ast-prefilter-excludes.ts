@@ -1,8 +1,8 @@
 /** Matches exclusion patterns without requiring native Bun in declaration-only test Layers. */
-import { posix } from "node:path";
 import { Effect } from "effect";
 import { observeCompiler } from "../observability.js";
 import { runDiscoverySync } from "./discovery-sync.js";
+import { globMatch } from "../../runtime/glob.js";
 
 /**
  * Matches portable filenames with the native Bun glob contract or Node's platform equivalent.
@@ -14,8 +14,7 @@ export const matchesExcludeEffect = Effect.fn("Discovery.matchesExclude")(
   function* (fileName: string, patterns: readonly string[]) {
     return patterns.some((pattern) => {
       const portable = pattern.replaceAll("\\", "/");
-      if (typeof Bun !== "undefined") return new Bun.Glob(portable).match(fileName);
-      return posix.matchesGlob(fileName, portable);
+      return globMatch(fileName, portable);
     });
   },
   (effect, _fileName, patterns) =>

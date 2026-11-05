@@ -63,7 +63,7 @@ const handlerTable = createHandlerTable(createFunctionRegistry(graph, executable
 const registry = handlerTable.registry;
 if (environment !== "production" && process.env.RELKIT_DEV_RELOAD === "1") installDevelopmentReload({
   projectRoot: process.cwd(),
-  serverDirectory: import.meta.dir,
+  serverDirectory: import.meta.dirname,
   table: handlerTable,
   runtimeManifest,
   createRegistry: (nextGraph, nextManifest) => createFunctionRegistry(nextGraph, nextManifest),

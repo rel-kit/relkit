@@ -62,98 +62,17 @@
   "packages/better-auth/src/dependencies.ts": {
     "node": 1
   },
-  "packages/cli/src/commands/dev.types.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/commands/doctor-native.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/commands/doctor-toolchain.service.ts": {
-    "bun": 4
-  },
-  "packages/cli/src/commands/mcp-project.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/commands/port-availability.service.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/commands/start-health.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/commands/start-native.service.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/commands/start-process.service.ts": {
-    "bun": 2
-  },
-  "packages/cli/src/commands/start-process.types.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/commands/start.types.ts": {
-    "bun": 3
-  },
-  "packages/cli/src/compiler/discovery/ast-prefilter-excludes.ts": {
-    "bun": 2
-  },
-  "packages/cli/src/compiler/discovery/evaluator-child.ts": {
-    "bun": 1
-  },
   "packages/cli/src/compiler/discovery/evaluator-detector-files.ts": {
     "bun": 1
   },
   "packages/cli/src/compiler/discovery/evaluator-detector-network.ts": {
     "bun": 1
   },
-  "packages/cli/src/compiler/discovery/evaluator-process.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/compiler/discovery/evaluator-warm.ts": {
-    "bun": 2
-  },
-  "packages/cli/src/compiler/integration-package-source.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/database/migration-execute.ts": {
-    "bun": 2
-  },
-  "packages/cli/src/dev-reload/typecheck-watch.ts": {
-    "bun": 2
-  },
-  "packages/cli/src/services/filesystem.service.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/services/narrow-effect-imports.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/supervisor/candidate-output.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/supervisor/candidate-platform.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/supervisor/candidate-process.ts": {
-    "bun": 3
-  },
-  "packages/cli/src/supervisor/candidate-service.types.ts": {
-    "bun": 3
-  },
-  "packages/cli/src/supervisor/candidate-start.ts": {
-    "bun": 1
-  },
-  "packages/cli/src/supervisor/candidate.types.ts": {
-    "bun": 1
-  },
   "packages/cli/src/supervisor/proxy-listener-native.ts": {
     "bun": 4
   },
-  "packages/cli/src/supervisor/proxy-websocket-native.ts": {
-    "bun": 1
-  },
   "packages/cli/src/supervisor/proxy-websocket.ts": {
-    "bun": 2
-  },
-  "packages/cli/src/supervisor/proxy-websocket.types.ts": {
-    "bun": 2
+    "bun": 1
   },
   "packages/cli/src/supervisor/proxy.ts": {
     "bun": 4
@@ -163,15 +82,6 @@
   },
   "packages/client/src/build/next.ts": {
     "node": 2
-  },
-  "packages/create-relkit/src/create-capabilities.ts": {
-    "bun": 1
-  },
-  "packages/create-relkit/src/generator-filesystem.ts": {
-    "bun": 1
-  },
-  "packages/create-relkit/src/generator-process.ts": {
-    "bun": 3
   },
   "packages/drizzle/src/activate.ts": {
     "node": 1
@@ -183,7 +93,6 @@
     "bun": 3
   },
   "packages/relkit/src/app/dev-module-reload.ts": {
-    "bun": 2,
     "node": 2
   },
   "packages/relkit/src/app/dev-reload.ts": {

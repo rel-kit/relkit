@@ -5,7 +5,7 @@
  */
 
 import { createHash } from "node:crypto";
-import manifest from "../package.json";
+import manifest from "../package.json" with { type: "json" };
 import { CREATE_OPTION_DEFAULTS, type CreateOptions, type CreateTemplate } from "./options.js";
 
 import type {
@@ -80,7 +80,8 @@ export function currentCreateCapabilityIdentity(
   const catalog = manifest.relkit.buildCatalog;
   return {
     release: manifest.version,
-    bun: Bun.version,
+    // Evidence is recorded per Bun line; on Node the line names Node and never matches it.
+    bun: process.versions.bun ?? `node-${process.versions.node}`,
     typescript: catalog.dependencies.typescript,
     packageCatalogDigest: createHash("sha256").update(JSON.stringify(catalog)).digest("hex"),
     template: templateIdentity(template),
@@ -101,7 +102,7 @@ export function checkCreateCapability(
 ): CreateCapabilityWarning | undefined {
   const identity = settings.identity ?? currentCreateCapabilityIdentity(options.template);
   if (supported(options, identity)) return undefined;
-  const subject = `${formatTuple(options)} has not been tested with RelKit ${identity.release} on Bun ${runtimeLine(identity.bun)}`;
+  const subject = `${formatTuple(options)} has not been tested with RelKit ${identity.release} on ${identity.bun.startsWith("node-") ? `Node ${runtimeLine(identity.bun.slice(5))}` : `Bun ${runtimeLine(identity.bun)}`}`;
   if (settings.strict === true) {
     const tested = testedTuples(identity).join(", ") || "none for this RelKit and Bun version";
     throw new CreateUntestedError(

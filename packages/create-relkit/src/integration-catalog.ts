@@ -1,5 +1,5 @@
 /** Reads the integration catalog that release synchronization bundles into this package's manifest. */
-import manifest from "../package.json";
+import manifest from "../package.json" with { type: "json" };
 import type { BundledIntegration } from "./integration-catalog.types.js";
 export type { BundledIntegration } from "./integration-catalog.types.js";
 

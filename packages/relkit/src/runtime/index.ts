@@ -2,3 +2,4 @@
 export * from "./current-runtime.js";
 export * from "./process-environment.js";
 export type * from "./runtime-adapter.types.js";
+export type * from "./runtime-processes.types.js";

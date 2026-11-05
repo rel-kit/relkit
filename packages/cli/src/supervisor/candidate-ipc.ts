@@ -1,7 +1,7 @@
 /**
  * Routes IPC messages from candidate servers to the callers waiting on them. Candidates are
- * spawned with a Bun IPC channel whose handler calls `dispatchCandidateMessage`; the dev
- * reload path sends a request with `requestCandidate` and waits for the matching reply.
+ * spawned with the runtime adapter's IPC channel, whose handler calls `dispatchCandidateMessage`;
+ * the dev reload path sends a request with `requestCandidate` and waits for the matching reply.
  * Waiters are keyed by the subprocess, so replies from a retired generation never reach a
  * request addressed to its successor, and a timed-out or cancelled wait removes itself.
  */

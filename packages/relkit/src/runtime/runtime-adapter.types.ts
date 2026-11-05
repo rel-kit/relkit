@@ -1,9 +1,11 @@
 /**
  * Declares the runtime adapter contract. Serving, static files, WebSocket upgrades, crypto,
- * environment access and filesystem availability go through one adapter per runtime, so the rest
- * of RelKit stays free of `Bun.*` and runtime-specific modules.
+ * environment access, filesystem availability, child processes and module resolution go through
+ * one adapter per runtime, so the rest of RelKit stays free of `Bun.*` and runtime-specific
+ * modules.
  */
 import type { UpgradeWebSocket } from "hono/ws";
+import type { RuntimeModules, RuntimeProcesses } from "./runtime-processes.types.js";
 
 /** Runtimes that have an adapter. Tier 1 runtimes run every Core feature. */
 export type RuntimeName = "bun" | "node";
@@ -112,4 +114,8 @@ export interface RuntimeAdapter {
   readonly files: RuntimeFiles | undefined;
   readonly crypto: RuntimeCrypto;
   readonly environment: RuntimeEnvironment;
+  /** Child processes and executables, for tooling and development servers. */
+  readonly processes: RuntimeProcesses;
+  /** Module resolution and the evictable registry, for tooling and development reloads. */
+  readonly modules: RuntimeModules;
 }

@@ -1,10 +1,12 @@
 /**
  * The Bun runtime adapter: `Bun.serve` with Hono's Bun WebSocket handler, `Bun.file` bodies and
- * Bun's native SHA-256. This is the only place in `relkit` that calls `Bun.*`.
+ * Bun's native SHA-256, plus `Bun.spawn`, `Bun.which` and Bun's module registry for tooling.
+ * This is the only place in `relkit` that calls `Bun.*`.
  */
 import { upgradeWebSocket, websocket } from "hono/bun";
 import type { BunWebSocketData } from "hono/bun";
 import { processEnvironment } from "../process-environment.js";
+import { bunModules, bunProcesses } from "./processes.js";
 import type {
   RuntimeAdapter,
   RuntimeServeOptions,
@@ -49,6 +51,8 @@ export const bunRuntime: RuntimeAdapter = Object.freeze({
     randomUUID: () => crypto.randomUUID(),
   }),
   environment: processEnvironment,
+  processes: bunProcesses,
+  modules: bunModules,
 });
 
 export { upgradeWebSocket };

@@ -1,6 +1,8 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 /** Builds the creator command presentation and signal scope around pure project creation, returning JSON or terminal results after owned work settles. */
 
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { spinner } from "@clack/prompts";
 import { Effect, Logger, References } from "effect";
 import { generateProjectEffect, projectGenerationLive } from "./generate.js";
@@ -17,7 +19,7 @@ import { formatCreateHelp, formatCreateWarning } from "./create-help.js";
 
 /**
  * Runs the executable presentation boundary with invocation-owned signal listeners.
- * @param args - Literal command arguments, excluding the Bun and script paths.
+ * @param args - Literal command arguments, excluding the runtime and script paths.
  * @returns Completion after generation scopes and presentation cleanup have settled.
  * @remarks The library barrel has no executable side effects. Generation owns final consent.
  */
@@ -63,7 +65,13 @@ export async function main(args: readonly string[]): Promise<void> {
   }
 }
 
-if (import.meta.main) await main(process.argv.slice(2));
+// Node before 22.18 has no `import.meta.main`; compare the entry script with this module instead.
+const entry = process.argv[1];
+if (
+  import.meta.main ??
+  (entry !== undefined && realpathSync(entry) === realpathSync(fileURLToPath(import.meta.url)))
+)
+  await main(process.argv.slice(2));
 
 function acquireCreationSignals(controller: AbortController) {
   return Effect.acquireRelease(

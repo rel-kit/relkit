@@ -13,7 +13,16 @@ it.effect("ordinary and prepared builds resolve modules from the consuming proje
   Effect.gen(function* () {
     for (const inventory of [undefined, "bun.inputs.json"] as const) {
       const links: string[][] = [];
-      yield* bundleServerEffect("/stage/server", "/consumer", false, inventory).pipe(
+      // The `bun build` subprocess path, whichever runtime runs the test.
+      yield* bundleServerEffect(
+        "/stage/server",
+        "/consumer",
+        false,
+        inventory,
+        [],
+        "bun",
+        "bun",
+      ).pipe(
         Effect.provide(
           Layer.mergeAll(
             cleanupLayer,

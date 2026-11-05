@@ -73,3 +73,34 @@ test("the nightly creation canary also serves every template on Node 22 and 24",
   expect(runs).toContain("gh issue create");
   expect(jobs.canary?.strategy?.matrix?.template).toEqual(node.strategy?.matrix?.template);
 });
+
+test("pull requests create with npx and pnpm dlx and run dev on Node 22 and 24 without Bun", async () => {
+  const jobs = await workflow("checks.yml");
+  const pack = jobs["node-creation-pack"]!;
+  expect((pack.steps ?? []).map((step) => step.run ?? "").join("\n")).toContain(
+    "bun scripts/node-creation-smoke.ts --out node-smoke",
+  );
+  const node = jobs["node-creation"]!;
+  expect(node.needs).toBe("node-creation-pack");
+  expect(node.strategy?.matrix).toEqual({ node: ["22", "24"], manager: ["npm", "pnpm"] });
+  const uses = (node.steps ?? []).map((step) => (step as { uses?: string }).uses ?? "").join("\n");
+  // The leg installs Node and pnpm only; setup-bun never runs there.
+  expect(uses).not.toContain("setup-bun");
+  const runs = (node.steps ?? []).map((step) => step.run ?? "").join("\n");
+  expect(runs).toContain(
+    'node node-smoke/smoke.mjs --package-manager "${{ matrix.manager }}" --require-no-bun',
+  );
+  const gate = jobs["ci-gate"]!;
+  expect(gate.needs).toContain("node-creation");
+  const script = gate.steps?.find((step) => step.name === "Require fast safety jobs")?.run;
+  expect(script).toContain('test "$NODE_CREATION_RESULT" = success');
+  const results = Object.fromEntries(
+    Object.keys(gate.env ?? {}).map((name) => [name, "success"] as const),
+  );
+  const run = (overrides: Record<string, string>) =>
+    Bun.spawnSync(["bash", "-e", "-c", script!], {
+      env: { PATH: process.env.PATH ?? "", ...results, ...overrides },
+    }).exitCode;
+  expect(run({ NODE_CREATION_RESULT: "failure" })).not.toBe(0);
+  expect(run({ NODE_CREATION_RESULT: "skipped" })).not.toBe(0);
+});

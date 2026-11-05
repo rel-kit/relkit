@@ -1,6 +1,7 @@
 /** Provides injectable filesystem operations used by creation and transaction workflows, preserving native I/O failures and atomic file ownership. */
 
 import * as fs from "node:fs/promises";
+import { join } from "node:path";
 import { Context, Effect, Layer } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorIoError, errorMessage, hasErrno } from "./generator-errors.js";
@@ -113,13 +114,27 @@ function readOperations(): Pick<
     ),
     glob: Effect.fn("GeneratorFileSystem.glob")(
       (root, pattern) =>
-        io("glob", () =>
-          Array.fromAsync(new Bun.Glob(pattern).scan({ cwd: root, onlyFiles: true })),
-        ).pipe(Effect.map((paths) => paths.sort())),
+        io("glob", () => globFiles(root, pattern)).pipe(Effect.map((paths) => paths.sort())),
       (effect) => observeExecution("generator", "filesystem.glob", effect),
     ),
   };
 }
+/**
+ * Lists the regular files under a root that match a pattern, with `node:fs`'s glob, which Bun and
+ * Node both implement; directories and other entries are dropped as Bun's `onlyFiles` would.
+ * @param root - Directory the pattern is relative to.
+ * @param pattern - Glob pattern with forward slashes.
+ * @returns Root-relative paths with forward slashes.
+ */
+async function globFiles(root: string, pattern: string): Promise<string[]> {
+  const files: string[] = [];
+  for await (const path of fs.glob(pattern, { cwd: root })) {
+    const metadata = await fs.stat(join(root, path)).catch(() => undefined);
+    if (metadata?.isFile() === true) files.push(path.replaceAll("\\", "/"));
+  }
+  return files;
+}
+
 function writeOperations(): Pick<
   GeneratorFileSystemService,
   "write" | "mkdir" | "temporaryDirectory" | "rename" | "remove" | "removeDirectory" | "chmod"

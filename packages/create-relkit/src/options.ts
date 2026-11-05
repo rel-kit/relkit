@@ -1,6 +1,7 @@
 /** Validates and normalizes pure creation options before selecting templates, destinations and optional installation or Git initialization. */
 
 import { createParsingState, applyCreateBoolean, readValue, choice } from "./options-parser.js";
+import { PACKAGE_MANAGERS, type PackageManagerName } from "./package-manager.js";
 /** Templates supported by explicit --template selection. */
 export const CREATE_TEMPLATES = ["minimal", "api", "agent", "fullstack", "tasks"] as const;
 /** Supported template selected by an explicit creation flag. */
@@ -44,6 +45,11 @@ export interface CreateOptions {
   readonly examples: boolean;
   readonly directory?: string;
   readonly forceEmptyDirectory: boolean;
+  /**
+   * `--package-manager`; when omitted, the manager that invoked the creator is used, else Bun
+   * under Bun and npm under Node.
+   */
+  readonly packageManager?: PackageManagerName;
   /** Refuses combinations without current CI evidence instead of warning. */
   readonly strict?: boolean;
   readonly json: boolean;
@@ -98,6 +104,10 @@ export function normalizeCreateOptions(
       const option = readValue(args, index, argument, "--jobs");
       index = option.index;
       state.jobs = choice(option.value, "--jobs", CREATE_JOBS);
+    } else if (argument === "--package-manager" || argument.startsWith("--package-manager=")) {
+      const option = readValue(args, index, argument, "--package-manager");
+      index = option.index;
+      state.packageManager = choice(option.value, "--package-manager", PACKAGE_MANAGERS);
     } else if (argument === "--directory" || argument.startsWith("--directory=")) {
       const option = readValue(args, index, argument, "--directory");
       index = option.index;
@@ -122,6 +132,7 @@ export function normalizeCreateOptions(
     examples: state.examples,
     ...(state.directory === undefined ? {} : { directory: state.directory }),
     forceEmptyDirectory: state.forceEmptyDirectory,
+    ...(state.packageManager === undefined ? {} : { packageManager: state.packageManager }),
     ...(state.strict ? { strict: true } : {}),
     json: state.json,
   });

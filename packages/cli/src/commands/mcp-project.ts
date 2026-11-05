@@ -6,6 +6,7 @@
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import type { McpCommandResult, McpProjectCommands } from "./mcp.types.js";
+import { nodeTypeScriptFlags, runtime } from "../runtime/index.js";
 
 const COMMAND_TIMEOUT_MS = 300_000;
 
@@ -25,16 +26,19 @@ function cliEntry(): string {
  * @returns The exit status, parsed JSON output and standard error.
  */
 async function runCli(root: string, args: readonly string[]): Promise<McpCommandResult> {
-  const child = Bun.spawn(
-    [process.execPath, cliEntry(), ...args, "--json", "--project-root", root],
-    {
-      cwd: root,
-      stdin: "ignore",
-      stdout: "pipe",
-      stderr: "pipe",
-      env: { ...process.env, CI: "1", NO_COLOR: "1" },
-    },
-  );
+  const entry = cliEntry();
+  // A built entry is JavaScript; the source entry needs the TypeScript hooks on Node.
+  const launch =
+    runtime.name === "bun" || entry.endsWith(".js")
+      ? [process.execPath, entry]
+      : [...nodeTypeScriptFlags(), entry];
+  const child = runtime.processes.spawn([...launch, ...args, "--json", "--project-root", root], {
+    cwd: root,
+    stdin: "ignore",
+    stdout: "pipe",
+    stderr: "pipe",
+    env: { ...process.env, CI: "1", NO_COLOR: "1" },
+  });
   const timer = setTimeout(() => child.kill(), COMMAND_TIMEOUT_MS);
   try {
     const [stdout, stderr, exitCode] = await Promise.all([

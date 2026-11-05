@@ -9,6 +9,7 @@ import { observeCli } from "../cli-runtime.js";
 import { CliProcess } from "../services/process.service.js";
 import { CliCleanup, cleanupEffect } from "../services/cleanup.service.js";
 import type { DoctorCommandRunner } from "./doctor.types.js";
+import { runtime } from "../runtime/index.js";
 
 /**
  * Executes a native check command or an injected runner under physical completion ownership.
@@ -83,8 +84,8 @@ export const availablePortEffect = Effect.fn("Doctor.port")(
     const cleanup = yield* CliCleanup;
     return yield* Effect.scoped(
       Effect.acquireRelease(
-        Effect.try({
-          try: () => Bun.serve({ hostname, port, fetch: () => new Response() }),
+        Effect.tryPromise({
+          try: () => runtime.serve({ hostname, port, fetch: () => new Response() }),
           catch: () => false,
         }),
         (server) =>

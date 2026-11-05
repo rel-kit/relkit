@@ -1,7 +1,7 @@
 /** Builds a no-install creation preview from maintained template bytes and metadata without importing or evaluating authored template configuration. */
 
 import { join } from "node:path";
-import ownManifest from "../package.json";
+import ownManifest from "../package.json" with { type: "json" };
 import { Effect, Schema } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
 import { EXAMPLE_PATH_PREFIXES, listProjectFilesEffect } from "./generate-files.js";

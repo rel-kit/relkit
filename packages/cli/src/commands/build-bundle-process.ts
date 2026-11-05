@@ -1,10 +1,23 @@
-/** Runs the consumer-resolved bundle subprocess through captured process authority. */
+/**
+ * Bundles the staged server: `bun build` as a subprocess on Bun, esbuild in process on Node
+ * (see `build-bundle-esbuild.ts`).
+ */
 import { join } from "node:path";
 import { Effect } from "effect";
-import { cliTry } from "../cli-errors.js";
+import { cliPromise, cliTry } from "../cli-errors.js";
+import { runtime as cliRuntime } from "../runtime/index.js";
+import { bundleWithEsbuild } from "./build-bundle-esbuild.js";
 import type { ProcessCapabilities } from "../services/process.types.js";
 import { HTTP_TRANSPORT_REQUIREMENTS } from "relkit/runtime-hono/prepared";
 import type { RuntimeName } from "relkit/runtime";
+
+/** Bundlers `relkit build` can run. */
+export type Bundler = "bun" | "esbuild";
+
+/** @returns `bun` on Bun, where `bun build` is available, and esbuild on Node. */
+export function defaultBundler(): Bundler {
+  return cliRuntime.name === "bun" ? "bun" : "esbuild";
+}
 
 /**
  * Bundles one emitted server and preserves the native diagnostic on failure.
@@ -15,6 +28,7 @@ import type { RuntimeName } from "relkit/runtime";
  * @param inventory - Prepared capsule inventory filename and chunk selection.
  * @param external - Selected packages left external by the bundler.
  * @param runtime - Bundle target; Node bundles resolve Node built-ins instead of Bun's.
+ * @param bundler - `bun build` (the default on Bun) or esbuild (the default on Node).
  * @returns Completion after the child and output readers have physically settled.
  */
 export const runBundleProcess = Effect.fn("Project.bundleProcess")(function* (
@@ -25,6 +39,7 @@ export const runBundleProcess = Effect.fn("Project.bundleProcess")(function* (
   inventory?: "bun.inputs.json",
   external: readonly string[] = [],
   runtime: RuntimeName = "bun",
+  bundler: Bundler = defaultBundler(),
 ) {
   const externalPackages = new Set([
     ...external,
@@ -38,14 +53,28 @@ export const runBundleProcess = Effect.fn("Project.bundleProcess")(function* (
     "relkit/runtime-hono/ag-ui",
     "relkit/runtime-hono/scalar",
   ];
+  const externals = [
+    ...[...externalPackages].flatMap((name) => [name, `${name}/*`]),
+    ...optionalLeaves,
+  ];
+  if (bundler === "esbuild")
+    return yield* cliPromise("build.bundle", () =>
+      bundleWithEsbuild({
+        directory,
+        root,
+        development,
+        external: externals,
+        runtime,
+        ...(inventory === undefined ? {} : { inventory }),
+      }),
+    );
   const child = yield* processes.run({
     command: process.execPath,
     args: [
       "build",
       `--target=${runtime}`,
       "--format=esm",
-      ...[...externalPackages].flatMap((name) => [`--external=${name}`, `--external=${name}/*`]),
-      ...optionalLeaves.map((name) => `--external=${name}`),
+      ...externals.map((name) => `--external=${name}`),
       ...(development ? ["--sourcemap=inline"] : ["--minify", "--sourcemap=none"]),
       "--env=disable",
       ...(inventory === undefined ? [] : [`--metafile=${join(directory, inventory)}`]),

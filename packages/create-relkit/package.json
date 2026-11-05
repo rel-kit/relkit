@@ -21,7 +21,8 @@
     "access": "public"
   },
   "engines": {
-    "bun": ">=1.3.10"
+    "bun": ">=1.3.10",
+    "node": ">=22.13.0"
   },
   "type": "module",
   "bin": {
@@ -108,6 +109,10 @@
       "types": "./dist/options.d.ts",
       "import": "./dist/options.js"
     },
+    "./package-manager": {
+      "types": "./dist/package-manager.d.ts",
+      "import": "./dist/package-manager.js"
+    },
     "./project-manifest.schemas": {
       "types": "./dist/project-manifest.schemas.d.ts",
       "import": "./dist/project-manifest.schemas.js"
@@ -134,7 +139,8 @@
     },
     "./catalog-resolution": {
       "types": "./src/catalog-resolution.ts",
-      "default": "./src/catalog-resolution.ts"
+      "bun": "./src/catalog-resolution.ts",
+      "default": "./dist/catalog-resolution.js"
     }
   },
   "scripts": {

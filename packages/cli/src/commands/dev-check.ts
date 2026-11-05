@@ -15,6 +15,7 @@ import { devCheckResponseSchema } from "./dev-check.schemas.js";
 import type { CheckResult } from "./check-result.js";
 import type { DevCheckRequest } from "./dev-check.types.js";
 import type { DevChecker, DevCheckerWorker } from "./dev-check-client.types.js";
+import { nodeTypeScriptFlags, runtime } from "../runtime/index.js";
 export type { DevChecker } from "./dev-check-client.types.js";
 
 /**
@@ -89,7 +90,7 @@ function startWorker(root: string): DevCheckerWorker {
   const grouped = process.platform !== "win32";
   const child = fork(entry, [], {
     execPath: process.execPath,
-    execArgv: ["--no-env-file", "--no-install"],
+    execArgv: workerFlags(),
     cwd: root,
     detached: grouped,
     stdio: ["ignore", "ignore", "pipe", "ipc"],
@@ -155,4 +156,13 @@ async function stopWorker(worker: DevCheckerWorker): Promise<void> {
   clearTimeout(timer);
   child.removeAllListeners();
   child.stderr?.removeAllListeners();
+}
+
+/**
+ * Runtime flags of the check worker, which imports `relkit.config.ts` itself.
+ * @returns Bun's flags, or the TypeScript hooks on Node.
+ */
+function workerFlags(): string[] {
+  if (runtime.name === "bun") return ["--no-env-file", "--no-install"];
+  return nodeTypeScriptFlags().slice(1);
 }

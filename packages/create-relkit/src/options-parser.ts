@@ -5,11 +5,13 @@ import {
   CreateOptionsError,
   type CreateOptionsContext,
 } from "./options.js";
+import type { PackageManagerName } from "./package-manager.js";
 export function createParsingState(context: CreateOptionsContext) {
   return {
     ...CREATE_OPTION_DEFAULTS,
     name: undefined as string | undefined,
     directory: undefined as string | undefined,
+    packageManager: undefined as PackageManagerName | undefined,
     json: CREATE_OPTION_DEFAULTS.json || context.json === true,
   };
 }

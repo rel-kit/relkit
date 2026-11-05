@@ -30,6 +30,7 @@ export const firstPartyExports: ReadonlySet<string> = new Set([
   "create-relkit/generator-prompt",
   "create-relkit/generator-runtime",
   "create-relkit/options",
+  "create-relkit/package-manager",
   "create-relkit/project-manifest.schemas",
   "create-relkit/prompt-driver",
   "create-relkit/prompt-driver.types",

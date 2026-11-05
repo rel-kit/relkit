@@ -14,6 +14,7 @@ import { buildArtifacts } from "./build-manifest.js";
 import { loadBuildStageCohort } from "./build-stage-cohort.js";
 import { writeBuildAssets, writeBuildMetadata, writeBuildServer } from "./build-stage-files.js";
 import type { BuildResult, BuildStageInputs } from "./build.types.js";
+import { defaultBuildRuntime } from "../runtime/index.js";
 
 /**
  * Publishes a complete stage after validation and native bundling succeed.
@@ -43,7 +44,7 @@ export const stageBuildEffect = Effect.fn("Project.stageBuild")(
         development,
         input.options.bundleInputInventory,
         Object.keys(cohort.productionDependencies),
-        input.options.runtime,
+        input.options.runtime ?? defaultBuildRuntime(),
       );
     yield* writeBuildMetadata(input, cohort);
     // Pending cancellation must win before the short publication transaction.

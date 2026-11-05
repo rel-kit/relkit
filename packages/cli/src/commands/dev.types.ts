@@ -1,4 +1,5 @@
 /** Explicit development policy keeps resourceful work in the session's Effect scope. */
+import type { RuntimeProcesses } from "relkit/runtime";
 import type { LoggerOptions, LogLevel, LogRecord } from "relkit/runtime-effect";
 import type { Effect } from "effect";
 import type { JsonValue, RuntimeActivationFingerprint } from "relkit/contracts";
@@ -115,7 +116,7 @@ export interface DevOptions {
   readonly inspectionRejected?: (generationToken: number) => Effect.Effect<void>;
   /** Grace period after backend activation before optional inspector acquisition. */
   readonly supportStartupDelayMs?: number;
-  readonly spawn?: typeof Bun.spawn;
+  readonly spawn?: RuntimeProcesses["spawn"];
   readonly signal?: AbortSignal;
   readonly installSignalHandlers?: boolean;
   readonly logger?: Omit<LoggerOptions, "component">;

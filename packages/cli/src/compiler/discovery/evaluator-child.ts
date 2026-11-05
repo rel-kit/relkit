@@ -2,13 +2,19 @@ import { observeCompiler } from "../observability.js";
 import { normalizeSourcePathEffect } from "relkit/contracts";
 import { realpathSync } from "node:fs";
 import { isAbsolute, relative, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
 import { Effect, Result } from "effect";
 import { acquireEvaluatorDetectors } from "./evaluator-detectors.js";
 import { sideEffectFailureEffect, snapshotModuleEffect } from "./evaluator-child-utils.js";
 import { EvaluatorChildBoundaryError } from "./evaluator-child-errors.js";
-import { evaluatorResponse, failureResponse, importFailure } from "./evaluator-child-framing.js";
-import { decodeEvaluatorRequest, encodeEvaluatorFrame } from "./evaluator-protocol.js";
+import {
+  candidateUrl,
+  evaluatorResponse,
+  failureResponse,
+  importFailure,
+  isMainModule,
+  readEvaluatorRequest,
+} from "./evaluator-child-framing.js";
+import { encodeEvaluatorFrame } from "./evaluator-protocol.js";
 import { CandidateResultSchema, EvaluatorFailure } from "./evaluator-protocol-schema.js";
 import type {
   EvaluatorCandidate,
@@ -16,7 +22,6 @@ import type {
   EvaluatorModuleResult as Module,
   EvaluatorRequest,
 } from "./evaluator-protocol.types.js";
-
 export { CandidateResultSchema } from "./evaluator-protocol-schema.js";
 export type { CandidateResult } from "./evaluator-child.types.js";
 
@@ -26,7 +31,7 @@ export type { CandidateResult } from "./evaluator-child.types.js";
  * @remarks Native adapters classify expected failures; defects and interruption remain visible.
  */
 const evaluateFromStdin = Effect.fn("Discovery.evaluateFromStdin")(function* () {
-  const decoded = yield* readRequest().pipe(Effect.result);
+  const decoded = yield* readEvaluatorRequest().pipe(Effect.result);
   if (Result.isFailure(decoded)) {
     return yield* failureResponse(
       "unknown",
@@ -52,30 +57,6 @@ const evaluateFromStdin = Effect.fn("Discovery.evaluateFromStdin")(function* () 
     );
   }
   return yield* evaluateCandidates(request);
-});
-
-/**
- * Decodes the untrusted stdin JSON request at the native transport boundary.
- * @returns A lazy effect yielding the accepted request or a typed boundary error.
- */
-const readRequest = Effect.fn("Discovery.readEvaluatorChildRequest")(function* () {
-  const text = yield* Effect.tryPromise({
-    try: () => new Response(Bun.stdin).text(),
-    catch: (cause) => new EvaluatorChildBoundaryError({ operation: "read-stdin", cause }),
-  });
-  const value: unknown = yield* Effect.try({
-    try: () => JSON.parse(text),
-    catch: (cause) => new EvaluatorChildBoundaryError({ operation: "parse-request", cause }),
-  });
-  return yield* decodeEvaluatorRequest(value).pipe(
-    Effect.mapError(
-      (cause) =>
-        new EvaluatorChildBoundaryError({
-          operation: "decode-request",
-          cause,
-        }),
-    ),
-  );
 });
 
 /**
@@ -235,14 +216,11 @@ const importCandidate = Effect.fn("Discovery.importEvaluatorCandidate")(function
   generationId: string,
 ) {
   return yield* Effect.tryPromise({
-    try: () =>
-      import(`${pathToFileURL(file).href}?relkit_generation=${generationId}`) as Promise<
-        Record<string, unknown>
-      >,
+    try: () => import(candidateUrl(file, generationId)) as Promise<Record<string, unknown>>,
     catch: (cause) => new EvaluatorChildBoundaryError({ operation: "import-candidate", cause }),
   });
 });
-if (import.meta.main) {
+if (import.meta.main ?? isMainModule(import.meta.url)) {
   // This process entrypoint is the sole asynchronous runtime/transport boundary.
   const response = await Effect.runPromise(evaluateFromStdin());
   process.stdout.write(encodeEvaluatorFrame(response));

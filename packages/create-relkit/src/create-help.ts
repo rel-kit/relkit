@@ -2,6 +2,7 @@
 
 import type { CreateCapabilityWarning } from "./create-capabilities.types.js";
 import { CREATE_CLOUDS, CREATE_DEPLOYMENTS, CREATE_JOBS, CREATE_TEMPLATES } from "./options.js";
+import { PACKAGE_MANAGERS } from "./package-manager.js";
 
 /**
  * Builds the creator's usage text.
@@ -17,6 +18,7 @@ export function formatCreateHelp(): string {
     `  --cloud <${CREATE_CLOUDS.join("|")}>  Cloud selection (default: none)`,
     `  --deploy <${CREATE_DEPLOYMENTS.join("|")}>  Deployment selection (default: none)`,
     "  --directory <path>  Destination directory (default: the project name)",
+    `  --package-manager <${PACKAGE_MANAGERS.join("|")}>  Installs and runs with it (default: the invoking one)`,
     "  --no-install  Skip dependency installation",
     "  --no-git  Skip Git initialization",
     "  --no-examples  Leave out example sources",
