@@ -571,7 +571,7 @@ type DevActivationFingerprint =
     ) => RuntimeActivationFingerprint | PromiseLike<RuntimeActivationFingerprint>);
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L33)
 
 ### DevLocalServices (interface)
 
@@ -589,7 +589,7 @@ export interface DevLocalServices {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L39)
 
 ### DevLog (type alias)
 
@@ -601,7 +601,7 @@ Synchronous native logging callback; failures cannot change session lifecycle.
 type DevLog = (event: DevLogEvent) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L27)
 
 ### DevLogEvent (interface)
 
@@ -617,7 +617,7 @@ export interface DevLogEvent {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L17)
 
 ### DevOptions (interface)
 
@@ -698,7 +698,7 @@ export interface DevOptions {
   readonly inspectionRejected?: (generationToken: number) => Effect.Effect<void>;
   /** Grace period after backend activation before optional inspector acquisition. */
   readonly supportStartupDelayMs?: number;
-  readonly spawn?: typeof Bun.spawn;
+  readonly spawn?: RuntimeProcesses["spawn"];
   readonly signal?: AbortSignal;
   readonly installSignalHandlers?: boolean;
   readonly logger?: Omit<LoggerOptions, "component">;
@@ -739,7 +739,7 @@ export interface DevOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L47)
 
 ## `editor.ts`
 
@@ -3197,7 +3197,7 @@ no CLI session; callers own cancellation, compilation and publication scopes.
 declare const contentDigest: (bytes: Uint8Array | string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L9)
 
 ### narrowEffectImportPlugin
 
@@ -3207,7 +3207,7 @@ declare const contentDigest: (bytes: Uint8Array | string) => string;
 declare const narrowEffectImportPlugin: () => Bun.BunPlugin;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/tooling.ts#L8)
 
 ### narrowEffectImports
 

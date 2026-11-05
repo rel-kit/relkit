@@ -1818,13 +1818,14 @@ export interface SwappableRegistry extends ReadonlyMap<string, SwappableHandler>
 ## `dev-module-reload.ts`
 
 Tracks the application modules a development process has loaded and evicts the changed
-ones, together with every loaded module that imports them, from Bun's module registry.
+ones, together with every loaded module that imports them, from the runtime's module registry.
 The warm evaluator and the development server both use it: after eviction the next
 import evaluates a fresh module record for each evicted file while every other module
 keeps its cached instance. Bun keys ES modules by path, and a fresh query string alone
 would still bind static imports to the old dependency, so eviction is what makes a
 re-import observe the edit. Only files below the project root and outside
-`node_modules` and `.relkit` are tracked. Development-only and Bun-specific.
+`node_modules` and `.relkit` are tracked. Development-only; the registry comes from the runtime
+adapter, and runtimes without one (Node) restart the process instead.
 
 ### ModuleReloader
 
@@ -1834,7 +1835,7 @@ re-import observe the edit. Only files below the project root and outside
 declare const ModuleReloader: ModuleReloader;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-module-reload.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-module-reload.ts#L20)
 
 ### createModuleReloader
 
@@ -1843,10 +1844,13 @@ Creates a reloader for one project root.
 **Signature**
 
 ```ts
-declare const createModuleReloader: (projectRoot: string) => ModuleReloader;
+declare const createModuleReloader: (
+  projectRoot: string,
+  modules: RuntimeModules,
+) => ModuleReloader;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-module-reload.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-module-reload.ts#L40)
 
 ## `dev-module-reload.types.ts`
 
@@ -1895,7 +1899,7 @@ reply says whether the swap happened; on failure the previous table keeps servin
 declare const DevelopmentReloadOptions: DevelopmentReloadOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L22)
 
 ### DevelopmentReloadReply
 
@@ -1905,7 +1909,7 @@ declare const DevelopmentReloadOptions: DevelopmentReloadOptions;
 declare const DevelopmentReloadReply: DevelopmentReloadReply;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L23)
 
 ### DevelopmentReloadRequest
 
@@ -1915,7 +1919,7 @@ declare const DevelopmentReloadReply: DevelopmentReloadReply;
 declare const DevelopmentReloadRequest: DevelopmentReloadRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L24)
 
 ### installDevelopmentReload
 
@@ -1927,7 +1931,7 @@ Listens for reload requests on the process IPC channel.
 declare const installDevelopmentReload: (options: DevelopmentReloadOptions) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L44)
 
 ## `effect.ts`
 
@@ -2242,7 +2246,8 @@ declare const defineServiceRoutesEffect: <
         FunctionRefAny
       >,
       EntryRequest<Options[Method]>
-    >;
+    > &
+      ServiceRouteMethodMarker<Method>;
   }>,
   RouteOperationError,
   never
@@ -2603,7 +2608,10 @@ declare const createHandlerTable: (
 **Signature**
 
 ```ts
-declare const createModuleReloader: (projectRoot: string) => ModuleReloader;
+declare const createModuleReloader: (
+  projectRoot: string,
+  modules: RuntimeModules,
+) => ModuleReloader;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L24)

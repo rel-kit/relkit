@@ -20,12 +20,20 @@ commands that prepare the project. Handlers and functions do not run.
 | ------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | `relkit.config.ts`  | The CLI process itself, imported like any ES module.           | None. It is trusted configuration code.                                |
 | Application modules | A short-lived Bun child process started from the project root. | The side-effect detectors below, a deadline and a reduced environment. |
+| Type checks         | Your project's own TypeScript compiler, as a separate process. | None. It reads your source but runs none of it.                        |
 
 Check first reads the files named by `source` in `relkit.config.ts` and skips any that cannot
 define a descriptor. It then imports the remaining modules in the child process, snapshots the
 descriptors they export, and compares the result with the project graph. The child is not a
 security sandbox: it is a guard against accidental work during import, such as a module that
 starts a server when loaded. Run only code you trust.
+
+After the graph is known, check type-checks the project with the compiler installed in
+`node_modules`: `tsgo` when you install `@typescript/native-preview`, otherwise `tsc` from
+`typescript` (5.9 or 7, see [TypeScript versions](/docs/modules/cli#typescript-versions)). It
+reports each compiler error with its file, line and message. If your `tsconfig.json` does not list
+`.relkit/generated/route-module-checks.ts`, check writes `.relkit/generated/tsconfig.check.json`,
+which extends yours and adds that file, and checks that configuration instead.
 
 ## Which side effects are blocked
 
