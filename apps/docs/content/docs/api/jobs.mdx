@@ -14528,7 +14528,7 @@ type TaskContext<
   ([keyof Streams] extends [never] ? {} : { readonly streams: TaskStreamEmitters<Streams> });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L140)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L138)
 
 ### TaskContextBase (interface)
 
@@ -14608,7 +14608,7 @@ Invocation context visible to task lifecycle hooks.
 type TaskHookContext<Dependencies extends TaskDependencies = {}> = TaskContextBase<Dependencies>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L158)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L156)
 
 ### TaskProgressEmitter
 
@@ -14764,7 +14764,7 @@ Named item schemas used to validate task stream emissions.
 type TaskStreamSchemas = Readonly<Record<string, StandardSchemaV1>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L137)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L135)
 
 ### TaskTriggerOptions
 
@@ -14891,7 +14891,7 @@ type TaskFailureHook<Dependencies extends TaskDependencies> = (
 ) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L43)
 
 ### TaskHandler (type alias)
 
@@ -14942,7 +14942,7 @@ export interface TaskLogging {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L58)
 
 ### TaskObservation (interface)
 
@@ -14960,7 +14960,7 @@ export interface TaskObservation<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L49)
 
 ### TaskStartHook (type alias)
 
@@ -14990,7 +14990,7 @@ type TaskSuccessHook<
 > = (output: InferOutput<OutputSchema>, context: TaskHookContext<Dependencies>) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L37)
 
 ## `task-definition.types.ts`
 

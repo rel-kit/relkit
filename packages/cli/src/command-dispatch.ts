@@ -127,8 +127,15 @@ function selectCommandEffect(invocation: CliInvocation, context: CliCommandConte
         Effect.provide(Layer.merge(contributorTerminalLayer, fileSystemLayer)),
       );
     case "mcp":
-      // Loaded on demand so other commands never load the MCP server SDK.
-      return Effect.promise(() => import("./commands/mcp.js")).pipe(
+      // Loaded on demand: the MCP server SDK is an optional peer that only `relkit mcp` needs.
+      return Effect.tryPromise({
+        try: () => import("./commands/mcp.js"),
+        catch: () =>
+          fail(
+            "RELKIT_MCP_SERVER_MISSING",
+            "relkit mcp needs the @modelcontextprotocol/server package, which is not installed.",
+          ),
+      }).pipe(
         Effect.flatMap(({ mcpLiveLayer, runMcpEffect }) =>
           runMcpEffect(args, context).pipe(Effect.provide(mcpLiveLayer)),
         ),

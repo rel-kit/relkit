@@ -17,6 +17,13 @@ export const mcpCodes = [
     fix: "Run `relkit add inspector` once if the project does not enable the Inspector, start `relkit dev` in the project, then start `relkit mcp` again.",
   },
   {
+    code: "RELKIT_MCP_SERVER_MISSING",
+    title: "MCP server package is not installed",
+    happened:
+      "`relkit mcp` needs the `@modelcontextprotocol/server` package to speak the Model Context Protocol, and the project does not have it installed. The package is optional so that projects that never run `relkit mcp` do not carry it.",
+    fix: "Add it to the project's development dependencies, for example `bun add -d @modelcontextprotocol/server`, then start `relkit mcp` again.",
+  },
+  {
     code: "RELKIT_MCP_SESSION_AMBIGUOUS",
     title: "More than one development session is running",
     happened:

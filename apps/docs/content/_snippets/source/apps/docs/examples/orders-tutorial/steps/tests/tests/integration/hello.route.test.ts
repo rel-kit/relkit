@@ -4,7 +4,10 @@ import { createTestApplication } from "@relkit/testing/better-auth";
 import config from "../../relkit.config.js";
 
 const testApp = await createTestApplication(config, {
-  env: { BETTER_AUTH_SECRET: "isolated-test-secret-never-use-in-production-12345" },
+  env: {
+    BETTER_AUTH_SECRET: "isolated-test-secret-never-use-in-production-12345",
+    BETTER_AUTH_URL: "http://127.0.0.1:3000",
+  },
 });
 
 test("GET /hello", async () => {
