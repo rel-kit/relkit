@@ -3264,6 +3264,7 @@ declare const SCAFFOLD_DEPENDENCIES: Readonly<{
   "@relkit/local": { version: string; section: "dependencies" };
   "@relkit/langchain": { version: string; section: "dependencies" };
   "@relkit/postgres": { version: string; section: "dependencies" };
+  "@relkit/ai-sdk": { version: string; section: "dependencies" };
   "@relkit/pulumi": { version: string; section: "dependencies" };
   "@relkit/redis": { version: string; section: "dependencies" };
   "@relkit/s3": { version: string; section: "dependencies" };
@@ -3296,6 +3297,7 @@ declare const ScaffoldDependency: ScaffoldDependency;
 
 ```ts
 declare const ScaffoldDependencyName:
+  | "@relkit/ai-sdk"
   | "@relkit/aws"
   | "better-auth"
   | "@relkit/better-auth"
@@ -3353,7 +3355,7 @@ Selects one supported dependency from the release's portable scaffold catalog.
 declare const scaffoldDependency: (name: ScaffoldDependencyName) => ScaffoldDependency;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L72)
 
 ## `scaffold-catalog.types.ts`
 

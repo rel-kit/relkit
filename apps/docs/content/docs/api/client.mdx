@@ -5778,7 +5778,7 @@ export interface RelkitHydrationState {
 
 ### ContractEventHandlers (interface)
 
-Callbacks of one contract event subscription.
+Callbacks of one contract event listener.
 
 **Signature**
 
@@ -5798,7 +5798,7 @@ export interface ContractEventHandlers {
 Follows the backend's development contract stream until the signal aborts.
 
 `relkit dev` serves the stream on the backend's public port; elsewhere it answers 404 and
-the subscription stops. The stream sends `ready` when it connects and `contract` after each
+the listener stops. The stream sends `ready` when it connects and `contract` after each
 generation switch; both report `ContractEventHandlers.changed`, because the contract
 may also have changed while the stream was disconnected. A dropped stream reconnects with
 a growing delay, up to ten seconds.

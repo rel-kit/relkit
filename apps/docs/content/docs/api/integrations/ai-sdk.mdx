@@ -207,7 +207,7 @@ export interface AiSdkInvocationOptions {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime-invoke.types.ts#L6)
 
-## `runtime.ts`
+## `index.ts`
 
 Runtime entry of the AI SDK adapter: the generated server imports it only for agents that select `aiSdk()`.
 
@@ -219,7 +219,7 @@ Runtime entry of the AI SDK adapter: the generated server imports it only for ag
 declare const AiSdkInvocationOptions: AiSdkInvocationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime/index.ts#L6)
 
 ### aiSdkAgentRuntime
 
@@ -229,7 +229,7 @@ declare const AiSdkInvocationOptions: AiSdkInvocationOptions;
 declare const aiSdkAgentRuntime: AgentAdapterRuntime<"ai-sdk">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime/index.ts#L4)
 
 ### assertAgentRuntimeDependencies
 
@@ -247,7 +247,7 @@ await assertAgentRuntimeDependencies([]);
 declare const assertAgentRuntimeDependencies: (agents: readonly unknown[]) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime/index.ts#L25)
 
 ### createGeneratedAgentFunction
 
@@ -260,7 +260,7 @@ declare const createGeneratedAgentFunction: (
 ) => GeneratedAgentFunction;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime/index.ts#L7)
 
 ### invokeAgentFunction
 
@@ -270,7 +270,7 @@ declare const createGeneratedAgentFunction: (
 declare const invokeAgentFunction: (options: AiSdkInvocationOptions) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime/index.ts#L5)
 
 ### releaseAgentPersistence
 
@@ -288,7 +288,7 @@ await releaseAgentPersistence([]);
 declare const releaseAgentPersistence: (agents: readonly unknown[]) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime/index.ts#L36)
 
 ### runtimeIntegration
 
@@ -302,4 +302,4 @@ declare const runtimeIntegration: Readonly<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/ai-sdk/src/runtime/index.ts#L10)
