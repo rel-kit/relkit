@@ -656,6 +656,49 @@ Decided while applying section 17 (maintainer, 2026-11-05):
   The AWS page lists its four missing Labs criteria, checked against `@relkit/aws` (an ECR repository
   but no image build or push, an HTTP-only listener on port 80, `desiredCount: 1`, no CI deploy).
 
+Decided while applying section 21 (maintainer, 2026-11-05):
+
+- **One Node function serves the whole app.** `relkit deploy init vercel` writes `vercel.json`, the
+  function entry `api/relkit.mjs` and `.github/workflows/vercel-deploy.yml`, with the Railway
+  generator's rules (identical files kept, `RELKIT_DEPLOY_INIT_CONFLICT` unless `--force`,
+  `cloudResourcesChanged: false`). `vercel.json` installs with `bun install --frozen-lockfile`, builds
+  with `relkit build --runtime node --target vercel`, serves `.relkit/build/public` from the CDN,
+  rewrites every other path to the one function and ships `.relkit/build/**` with it
+  (`includeFiles`, 60 s `maxDuration`). One function rather than one per route keeps a single cold
+  start and the server's own routing, middleware and health semantics; Vercel picks the Node runtime
+  for an `api/*.mjs` entry, so `--runtime bun` is refused for this target. The workflow runs check,
+  typecheck and tests, then `vercel pull`, `vercel build --prod` and `vercel deploy --prebuilt --prod`
+  with a pinned CLI, authenticated by the `VERCEL_TOKEN` secret and the `VERCEL_ORG_ID` and
+  `VERCEL_PROJECT_ID` variables.
+- **The generated server has a function-host mode.** `activateRelkitApplication({ functionHost: true })`
+  starts providers and the HTTP application but opens no listener and installs no signal handlers,
+  and returns `{ fetch, ready, drain, close }`. The entry forces `RELKIT_WORKER_ROLE=api` (no
+  background worker or scheduler loop in an instance Vercel freezes between invocations),
+  `RELKIT_DURABLE_STATE=external` and, unless set, `RELKIT_TRUST_PROXY=1`, changes into
+  `.relkit/build` so the server sees the same layout as in the image, activates once per instance and
+  waits up to 25 s for a cold instance's providers before answering. The word "serverless" is not
+  used in source because the repository's scope scan reserves it as an alternate infrastructure
+  engine name.
+- **Durable work runs in `drain`, woken by Vercel Cron and after requests.** `drain({ budgetMs })`
+  reconciles the persisted schedules once per instance, runs one scheduler pass (the Postgres
+  backend's unique `(service, schedule, occurrence)` claim makes concurrent passes enqueue each
+  occurrence once), then leases job attempts and delivers due events until none is left or the budget
+  is spent. Vercel Cron calls `/_relkit/v1/vercel/cron/...` with `Authorization: Bearer
+$CRON_SECRET`; the entry compares it in constant time, refuses a missing or shorter than
+  16-character secret with 401, and drains for up to 50 s. After every other request the entry
+  drains for up to 5 s through Vercel's request-context `waitUntil` (read from the same global
+  symbol `@vercel/functions` uses, so the app needs no extra dependency), so jobs and events
+  submitted over HTTP run without waiting for the next cron call;
+  `RELKIT_VERCEL_DRAIN_AFTER_REQUEST=0` turns that off. The job pass is the same code as the
+  container's worker loop (`processNativeJobPass`).
+- **Cron entries come from the compiled graph.** `deploy init vercel` reads the schedules from
+  `.relkit/generated/application.graph.json` (it asks for `relkit check` first when that file is
+  missing) and writes one `crons` entry per distinct expression, named after the first schedule
+  that uses it. A UTC numeric five-field cron is copied as is; a timezone, an interval or a
+  non-numeric expression falls back to every minute (named in the command's next steps, since only
+  paid Vercel plans run per-minute crons), because the cron call only wakes the deployment and the
+  backend decides which occurrences are due.
+
 ### D10. Postgres durable backend (#12)
 
 Tables hold jobs (leased with `FOR UPDATE SKIP LOCKED`), an event outbox written in the caller's

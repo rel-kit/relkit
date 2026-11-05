@@ -116,25 +116,33 @@ async function nativeJobControl(instanceId, action, reason) {
 async function startNativeJobWorker(runtimes) {
   if (runtimes.size === 0 || (process.env.RELKIT_WORKER_ROLE ?? "worker") === "api") return undefined;
   await runtimeOwner.worker("native-job-worker", async () => {
-        for (const runtime of runtimes.values()) {
-          const nativeWorker = runtime.adapter.worker;
-          if (nativeWorker === undefined || runtime.taskExecutor === undefined) continue;
-          const operation = runtime.operationContext({ signal: shutdownController.signal });
-          const work = await nativeWorker.next(operation);
-          if (work === undefined) continue;
-          try {
-            const output = await runInJobsRuntime(runtime, () => runtime.taskExecutor.execute(work.envelope, work.binding));
-            await nativeWorker.complete(work.envelope.runId, output, operation);
-          } catch (error) {
-            if (work.binding.isSuspension?.(error) === true) {
-              if (nativeWorker.suspend === undefined) throw new Error("Native worker cannot persist task continuation");
-              await nativeWorker.suspend(work.envelope.runId, error, operation);
-            } else {
-              await nativeWorker.fail(work.envelope.runId, error, operation);
-            }
-          }
-        }
+    await processNativeJobPass(runtimes);
   });
+}
+
+/** Leases and settles at most one attempt per jobs runtime; resolves the number that ran. */
+async function processNativeJobPass(runtimes) {
+  let ran = 0;
+  for (const runtime of runtimes.values()) {
+    const nativeWorker = runtime.adapter.worker;
+    if (nativeWorker === undefined || runtime.taskExecutor === undefined) continue;
+    const operation = runtime.operationContext({ signal: shutdownController.signal });
+    const work = await nativeWorker.next(operation);
+    if (work === undefined) continue;
+    ran += 1;
+    try {
+      const output = await runInJobsRuntime(runtime, () => runtime.taskExecutor.execute(work.envelope, work.binding));
+      await nativeWorker.complete(work.envelope.runId, output, operation);
+    } catch (error) {
+      if (work.binding.isSuspension?.(error) === true) {
+        if (nativeWorker.suspend === undefined) throw new Error("Native worker cannot persist task continuation");
+        await nativeWorker.suspend(work.envelope.runId, error, operation);
+      } else {
+        await nativeWorker.fail(work.envelope.runId, error, operation);
+      }
+    }
+  }
+  return ran;
 }
 ${SERVER_RUNTIME_SUPPORT_SOURCE}
 `;

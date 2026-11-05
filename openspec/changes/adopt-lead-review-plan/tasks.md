@@ -222,7 +222,7 @@ not tasks of this change.
 
 ## 21. Vercel target (#12)
 
-- [ ] 21.1 Add a Vercel generator (`vercel.json`, Node function entry, CI workflow) to `relkit deploy init`, and verify snapshot tests
+- [x] 21.1 Add a Vercel generator (`vercel.json`, Node function entry, CI workflow) to `relkit deploy init`, and verify snapshot tests
 - [ ] 21.2 Run schedules through Vercel Cron and jobs and events through the durable backend, and verify a scheduled run in an authorized preview deployment
 - [ ] 21.3 Make `relkit check` report a coded error for WebSocket realtime without an external provider on Vercel, and verify the check test
 - [ ] 21.4 Write the Vercel guide, run its newcomer deploy test, and move the target to Core when it passes, and verify the maturity table update

@@ -62,10 +62,8 @@ ${serverHttpOptionsSource(configuration)}${applicationSource}${FORWARDED_REQUEST
 if (relkitMode.embedded === true) return { handle: await relkitHandle(), close: closeEmbedded };
 const onStart = application.server?.onStart;
 if (typeof onStart === "function") await runWithRelkit(await relkitHandle(), () => onStart());
-server = await relkitRuntime.serve({
-  hostname: "0.0.0.0",
-  port: Number(process.env.PORT ?? 3000),
-  fetch: (request, bindings) => instrumentHttpRequest(forwardedRequest(request), httpMiddlewareOptions, async (request) => {
+// A function host (the Vercel function entry) takes this handler instead of a listener.
+const relkitFetch = (request, bindings) => instrumentHttpRequest(forwardedRequest(request), httpMiddlewareOptions, async (request) => {
     const path = new URL(request.url).pathname;
     if (path === "/_relkit/v1/health/live") return healthResponse("ok");
     const ready = runtimeState().ready.provider && runtimeState().ready.nativeWorker && runtimeState().ready.database && runtimeState().ready.auth && !runtimeState().stopping;
@@ -82,7 +80,8 @@ server = await relkitRuntime.serve({
     } catch {
       return problemResponse(500, "Internal Server Error", "internal-error", "The request failed unexpectedly.");
     }
-  }),
-});
+  });
+if (relkitMode.functionHost !== true)
+  server = await relkitRuntime.serve({ hostname: "0.0.0.0", port: Number(process.env.PORT ?? 3000), fetch: relkitFetch });
 runtimeOwner.setReady("server", true);`;
 }
