@@ -38,7 +38,7 @@ const entries: readonly CreateCapabilityEvidence[] = Object.freeze([
       release: "0.8.8",
       bun: "1.3.10",
       typescript: "5.9.3",
-      packageCatalogDigest: "65e80e9cc47098b66504ba3590269ca56b12c94d597305cc2f20d997aeae8755",
+      packageCatalogDigest: "8dd992730afac98eeba59d54eec7843e75d147ce0c767da110321e902521002f",
       template: "default/v1/minimal",
       snapshotProtocol: 1,
     }),
