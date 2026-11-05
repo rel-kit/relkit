@@ -11,7 +11,7 @@ import {
   optional,
 } from "./project-discovery-app-helpers.js";
 import { dirname, join, resolve } from "node:path";
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 import type { DiscoveredProfile } from "./project-discovery-types.js";
 import { readFactoryObject, staticPropertyName } from "./source-edit.js";

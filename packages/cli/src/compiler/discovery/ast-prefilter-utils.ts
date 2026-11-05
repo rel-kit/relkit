@@ -1,6 +1,6 @@
 /** Runs observable source syntax scanning while keeping native exclusion matching separate. */
 import { Effect } from "effect";
-import * as ts from "typescript";
+import ts from "../../typescript-parser.js";
 import { observeCompiler } from "../observability.js";
 import { scriptKind } from "./ast-prefilter-syntax.js";
 import type { AstPrefilterCandidate } from "./ast-prefilter.types.js";

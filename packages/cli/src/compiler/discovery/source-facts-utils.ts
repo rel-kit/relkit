@@ -1,4 +1,4 @@
-import * as ts from "typescript";
+import ts from "../../typescript-parser.js";
 import { Effect } from "effect";
 import type { ExportFact, LocalBinding } from "./source-facts.types.js";
 

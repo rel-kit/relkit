@@ -3,7 +3,7 @@ import { createRequire } from "node:module";
 import { mkdir, mkdtemp, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import ts from "typescript";
+import ts from "./src/typescript-parser.js";
 
 const require = createRequire(import.meta.url);
 

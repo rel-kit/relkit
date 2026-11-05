@@ -1,6 +1,6 @@
 /** Reads original compiler TSDoc consumers and checks them against the strict installed TypeScript/Effect API without emitting repository files. */
 import { readFileSync, readdirSync } from "node:fs";
-import ts from "typescript";
+import ts from "../../src/typescript-parser.js";
 
 /** Collects original executable TSDoc snippets with their documented caller-owned inputs.
  * @param root - Absolute original compiler source directory with a trailing separator.

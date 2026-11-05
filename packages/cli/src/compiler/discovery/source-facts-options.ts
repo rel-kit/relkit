@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import * as ts from "typescript";
+import ts from "../../typescript-parser.js";
 import { observeCompiler } from "../observability.js";
 import { propertyName, unwrap } from "./source-facts-syntax.js";
 import type { FactoryIdPresence } from "./source-facts.types.js";

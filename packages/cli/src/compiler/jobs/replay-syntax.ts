@@ -1,4 +1,4 @@
-import * as ts from "typescript";
+import ts from "../../typescript-parser.js";
 
 const EXTERNAL_METHODS = new Set([
   "charge",

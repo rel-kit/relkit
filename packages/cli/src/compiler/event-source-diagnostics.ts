@@ -9,7 +9,7 @@ import {
 import { Effect } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
-import ts from "typescript";
+import ts from "../typescript-parser.js";
 import { createDiagnostic, type Diagnostic } from "relkit/diagnostics";
 import { NORMALIZE_CODES } from "./normalize-types.js";
 

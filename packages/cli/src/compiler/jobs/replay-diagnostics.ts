@@ -4,7 +4,7 @@ import { runJobsSync } from "./compatibility.js";
 import type { ReplaySource } from "./replay-diagnostics.types.js";
 import { createSourceLocation } from "relkit/contracts";
 import { createDiagnostic } from "relkit/diagnostics";
-import * as ts from "typescript";
+import ts from "../../typescript-parser.js";
 import { NORMALIZE_CODES } from "../normalize-codes.js";
 import type { NormalizedDescriptor, NormalizationWork } from "../normalize-types.js";
 import { isRecord } from "../normalize-utils.js";

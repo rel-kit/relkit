@@ -11,7 +11,7 @@ import {
   type ApplicationLayout,
 } from "relkit/contracts";
 import { createDiagnostic } from "relkit/diagnostics";
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import { Effect } from "effect";
 import { readFactsEffect } from "./discovery/source-facts.js";
 import { runCompilerSync } from "./compatibility.js";

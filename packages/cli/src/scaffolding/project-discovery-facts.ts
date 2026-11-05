@@ -6,7 +6,7 @@
 
 import { join } from "node:path";
 import { discoverApplicationLayout, type AstSourceModule } from "../compiler/index.js";
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import type { ProjectDiscovery } from "./project-discovery-types.js";
 import { readAppDiscovery } from "./project-discovery-app.js";
 import { collectProjectArtifacts } from "./project-discovery-artifacts.js";

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
 import { createDiagnostic } from "relkit/diagnostics";
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import { routeSourceFindings } from "./route-source-checks.js";
 import { add } from "./normalize-pass-utils.js";
 import { NORMALIZE_CODES, type NormalizationWork } from "./normalize-types.js";

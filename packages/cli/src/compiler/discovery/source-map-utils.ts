@@ -1,7 +1,7 @@
 import { normalizeSourcePathEffect } from "relkit/contracts";
 import { Effect } from "effect";
 import { dirname, extname, join, resolve } from "node:path";
-import * as ts from "typescript";
+import ts from "../../typescript-parser.js";
 import { observeCompiler } from "../observability.js";
 import { runDiscoverySync } from "./discovery-sync.js";
 import { DiscoverySourceReader, nodeSourceReader } from "./source-map-source.js";

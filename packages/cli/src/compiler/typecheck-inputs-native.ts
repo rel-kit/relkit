@@ -7,7 +7,7 @@
 import { createHash } from "node:crypto";
 import { realpathSync } from "node:fs";
 import { join, resolve } from "node:path";
-import ts from "typescript";
+import ts from "../typescript-parser.js";
 import { registerDependencyAlias } from "./typecheck-inputs-aliases.js";
 import type { TypecheckInputState, TypecheckInputWitness } from "./typecheck-inputs.types.js";
 import {

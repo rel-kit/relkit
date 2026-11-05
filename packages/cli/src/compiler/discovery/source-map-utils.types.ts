@@ -1,4 +1,4 @@
-import type * as ts from "typescript";
+import type ts from "../../typescript-parser.js";
 import type { ExportFacts } from "./source-facts-types.js";
 
 /** Trusted TypeScript AST and its discovery facts, owned by one mapping invocation. */

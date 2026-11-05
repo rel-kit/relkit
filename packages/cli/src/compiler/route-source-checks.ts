@@ -1,4 +1,4 @@
-import ts from "typescript";
+import ts from "../typescript-parser.js";
 
 export const ROUTE_MODULE_METHODS = new Set([
   "GET",

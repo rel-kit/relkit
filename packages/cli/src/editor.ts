@@ -1,4 +1,4 @@
-import type ts from "typescript";
+import type ts from "./typescript-parser.js";
 import { routeSourceFindings, routeModuleFindings } from "./compiler/editor.js";
 import type { EditorModules } from "./editor.types.js";
 

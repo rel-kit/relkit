@@ -1,7 +1,7 @@
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";
 import { fileURLToPath } from "node:url";
-import ts from "typescript";
+import ts from "../../src/typescript-parser.js";
 
 const probe = `import { Effect, Layer } from "effect";
 import { CliFileSystem } from "../../dist/services/filesystem.service.js";

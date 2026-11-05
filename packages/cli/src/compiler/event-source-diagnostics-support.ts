@@ -1,4 +1,4 @@
-import ts from "typescript";
+import ts from "../typescript-parser.js";
 
 /**
  * Selects a named property from an object literal.

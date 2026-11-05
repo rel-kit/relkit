@@ -3,7 +3,7 @@ import { observeCompiler } from "../observability.js";
 import { createSourceLocationEffect, normalizeSourcePathEffect } from "relkit/contracts";
 import { Effect } from "effect";
 import { resolve } from "node:path";
-import * as ts from "typescript";
+import ts from "../../typescript-parser.js";
 import type { EvaluatorModuleResult } from "./evaluator-protocol.js";
 import { readFactsEffect, resolveImportEffect, sourceScriptKind } from "./source-map-utils.js";
 import { DiscoverySourceReader, nodeSourceReader } from "./source-map-source.js";

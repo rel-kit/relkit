@@ -491,6 +491,19 @@ dependency is bundled into `@relkit/cli` so it never constrains the application.
 its own type-checking to TypeScript 7; tools that still need the 5.x API, such as the docs generator,
 are checked and kept on the private parser if needed.
 
+Decided while applying section 15 (maintainer, 2026-11-05):
+
+- **The private parser is `packages/cli/src/typescript-parser.ts`, bundled at build time.** Every
+  CLI module, including `relkit migrate`'s one parser module `src/migration/code-parser.ts`,
+  imports `ts` from it (`import ts from "./typescript-parser.js"`), never from `typescript`. It
+  re-exports TypeScript 5.9.3 through the devDependency alias
+  `"relkit-typescript": "npm:typescript@5.9.3"`, and `scripts/package-typescript-parser.ts`
+  replaces the emitted `dist/typescript-parser.js` with a Bun bundle that inlines it. A plain
+  dependency alias was rejected: npm links a transitive dependency's `tsc` executable into the
+  application's `node_modules/.bin`, where TypeScript 5.9's `tsc` could shadow the application's
+  TypeScript 7. The editor plugin bundle maps the alias back to the editor's own `typescript`,
+  because the plugin always receives the editor's TypeScript instance.
+
 ### D9. Deploy targets (#12)
 
 `relkit build` emits a container definition (non-root, health endpoints, no local durable state) for

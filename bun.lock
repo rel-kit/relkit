@@ -515,7 +515,6 @@
         "esbuild": "0.28.2",
         "hono": "catalog:",
         "relkit": "workspace:*",
-        "typescript": "catalog:",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
@@ -523,6 +522,7 @@
         "@modelcontextprotocol/server": "2.3.0",
         "@relkit/local": "workspace:*",
         "@relkit/pulumi": "workspace:*",
+        "relkit-typescript": "npm:typescript@5.9.3",
         "vitest": "catalog:",
       },
       "peerDependencies": {
@@ -3788,6 +3788,8 @@
     "rehype-sanitize": ["rehype-sanitize@6.0.0", "", { "dependencies": { "@types/hast": "^3.0.0", "hast-util-sanitize": "^5.0.0" } }, "sha512-CsnhKNsyI8Tub6L4sm5ZFsme4puGfc6pYylvXo1AeqaGbjOYyzNv3qZPwvs0oMJ39eryyeOdmxwUIo94IpEhqg=="],
 
     "relkit": ["relkit@workspace:packages/relkit"],
+
+    "relkit-typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
     "remark": ["remark@15.0.1", "", { "dependencies": { "@types/mdast": "^4.0.0", "remark-parse": "^11.0.0", "remark-stringify": "^11.0.0", "unified": "^11.0.0" } }, "sha512-Eht5w30ruCXgFmxVUSlNWQ9iiimq07URKeFS3hNc8cUWy1llX4KDWfyEDZRycMc+znsN9Ux5/tJ/BFdgdOwA3A=="],
 

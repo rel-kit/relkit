@@ -5,7 +5,7 @@
  */
 import { Data, Effect } from "effect";
 import { resolve } from "node:path";
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import { observeCompiler } from "./observability.js";
 
 /** Module resolution cannot safely proceed with unreadable/invalid project options. */

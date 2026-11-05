@@ -1,6 +1,6 @@
 /** Watches effective TypeScript option inputs, including inherited/aliased configuration changes. */
 import { dirname, join, relative, resolve } from "node:path";
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import { Effect } from "effect";
 import { cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";

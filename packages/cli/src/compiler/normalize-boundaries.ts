@@ -6,7 +6,7 @@
 import { selectApplicationLayout, type ApplicationLayout } from "relkit/contracts";
 import { Effect } from "effect";
 import { createDiagnostic } from "relkit/diagnostics";
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
 import { sourceResolutionLayer } from "./source-resolution.service.js";

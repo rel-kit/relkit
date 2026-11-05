@@ -4,7 +4,7 @@ import { defineEnv } from "relkit/config";
 import { Deferred, Effect, Fiber, Layer, Logger, Ref } from "effect";
 import { TestClock } from "effect/testing";
 import { generatorFileSystemLive } from "create-relkit";
-import ts from "typescript";
+import ts from "../../src/typescript-parser.js";
 import { CliFileSystem } from "../../src/services/filesystem.service.js";
 import { CliModules } from "../../src/services/modules.service.js";
 import { CliProcess } from "../../src/services/process.service.js";

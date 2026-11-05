@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
 import { SourceLocationError } from "relkit/contracts";
 import { Effect, Exit, Schema } from "effect";
-import * as ts from "typescript";
+import ts from "../../../src/typescript-parser.js";
 import {
   prefilterSources,
   prefilterSourcesEffect,

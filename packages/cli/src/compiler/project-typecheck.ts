@@ -8,7 +8,7 @@ import { createDiagnostic, type Diagnostic, type DiagnosticSeverity } from "relk
 import { Effect, Option } from "effect";
 import { existsSync } from "node:fs";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
-import ts from "typescript";
+import ts from "../typescript-parser.js";
 import { runCompilerSync } from "./compatibility.js";
 import { eventSourceDiagnosticsEffect } from "./event-source-diagnostics.js";
 import { unusedErrorDiagnosticsEffect } from "./unused-error-diagnostics.js";
