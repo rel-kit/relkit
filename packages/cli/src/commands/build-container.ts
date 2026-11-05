@@ -5,9 +5,11 @@
  */
 import type { RuntimeName } from "relkit/runtime";
 
-const BUN_IMAGE =
+/** Pinned Bun base image of every generated Dockerfile. */
+export const BUN_IMAGE =
   "oven/bun:1.3.10@sha256:b86c67b531d87b4db11470d9b2bd0c519b1976eee6fcd71634e73abfa6230d2e";
-const NODE_IMAGE =
+/** Pinned Node base image of the Node server stage. */
+export const NODE_IMAGE =
   "node:24.22.0-bookworm-slim@sha256:91acba91b842bec0bf7ea6f5e09c644c7ccad72c4996ed9616d861d1c7cd60d4";
 
 /** Probes the public readiness endpoint with the image's own runtime; no curl in either base image. */
@@ -21,7 +23,7 @@ const PROBE =
  * @param executable - Runtime executable that runs the probe.
  * @returns Dockerfile instructions that follow the copied artifacts.
  */
-function productionPolicy(user: "bun" | "node", executable: "bun" | "node"): string {
+export function productionPolicy(user: "bun" | "node", executable: "bun" | "node"): string {
   return `RUN mkdir -p .relkit/state .relkit/observability && chown -R ${user}:${user} .relkit
 USER ${user}
 ENV NODE_ENV=production

@@ -348,6 +348,30 @@ Decided while applying section 17 (maintainer, 2026-11-05):
   the image (`relkit start`, a bare `bun server/index.js`) nothing changes. The build warning now
   names `@relkit/postgres` and says the image refuses the local provider. Both images run on a
   read-only root filesystem (the container test runs them with `--read-only`).
+- **`relkit deploy init <target>` routes before the Pulumi parser.** `railway` writes files only;
+  `aws`, or no target, keeps initializing the Pulumi stack with the existing options, so current
+  scripts keep working. `vercel` and `cloudflare` answer "not available yet" until sections 21 and
+  22; `--runtime` and `--force` are rejected on the Pulumi path. The Railway generator writes
+  `railway.json` (Dockerfile builder, `healthcheckPath: /healthz`, 120 s health timeout, 70 s
+  draining for the server's 60 s drain, restart on failure), a source `Dockerfile`, a
+  `.dockerignore` and `.github/workflows/railway-deploy.yml`. An identical existing file is left
+  alone, a differing one stops the command before anything is written
+  (`RELKIT_DEPLOY_INIT_CONFLICT`) unless `--force`, and the JSON result says
+  `cloudResourcesChanged: false`.
+- **The source Dockerfile installs from the application's lockfile.** Railway builds from the
+  repository, not from `.relkit/build`, so the Dockerfile runs `relkit build --runtime <bun|node>`
+  in a build stage, `bun install --frozen-lockfile --production` in a dependency stage, and copies
+  the build output and those `node_modules` into the same final stage as the build's own image
+  (`productionPolicy` is shared). Installing from the lockfile rather than re-resolving the build
+  manifest's exact versions keeps the deployed dependencies the ones the project tested, and also
+  lets dependencies that are not on the npm registry (vendored tarballs, as the newcomer test uses
+  for the packed candidate) install on Railway's builder.
+- **One `railway.json` serves the web and the worker service.** Railway reads environment
+  variables from the service, not from the config file, so a worker service uses the same file and
+  the same image; the guide sets `RELKIT_WORKER_ROLE=api` on the web service and `worker` on the
+  worker service. The workflow runs check, typecheck and tests, then `railway up --ci` with a
+  pinned `@railway/cli` for `vars.RAILWAY_SERVICE` and, when set, `vars.RAILWAY_WORKER_SERVICE`,
+  authenticated by the `RAILWAY_TOKEN` project-token secret.
 
 ### D10. Postgres durable backend (#12)
 
