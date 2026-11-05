@@ -1,5 +1,4 @@
 import type { JournalCheckpoint, ThreadSnapshot } from "relkit/contracts";
-import type { Effect } from "effect";
 import type { AgentBase } from "./agent-hook-types.types.js";
 
 /**
@@ -36,7 +35,7 @@ export interface AgentSubmission {
   readonly snapshot?: ThreadSnapshot;
   readonly activeRunId?: string;
 }
-/** Checkpoint state belongs to one observation fiber. */
+/** Checkpoint state belongs to one observation. */
 export interface AgentObservationCursor {
   checkpoint: JournalCheckpoint;
   runId: string | undefined;
@@ -52,7 +51,7 @@ export interface AgentOperationsService {
    * @param identity - Complete authorization and session boundary.
    * @param signal - View lifetime propagated to native observations.
    * @param update - Isolated external-store publication.
-   * @returns A lazy scoped recovery workflow preserving native errors. */
+   * @returns Completion once observation ends; failures are published as error state. */
   readonly observe: <Output>(
     client: unknown,
     streamClient: unknown,
@@ -61,35 +60,37 @@ export interface AgentOperationsService {
     identity: AgentIdentity | undefined,
     signal: AbortSignal,
     update: AgentUpdate<Output>,
-  ) => Effect.Effect<void, unknown>;
+  ) => Promise<void>;
   /** Binds continuation input to an authoritative waiting revision.
    * @param client - Borrowed finite procedure transport.
    * @param agentId - Declared agent key.
    * @param threadId - Caller-owned durable thread identity.
    * @param payload - Original transmitted continuation payload.
    * @param current - Matching authoritative snapshot when already available.
-   * @returns A lazy observed revision and digest input or original native failure. */
+   * @param signal - Optional cancellation that aborts the authoritative load.
+   * @returns The revision and digest input, or the original native failure. */
   readonly continuation: (
     client: unknown,
     agentId: string,
     threadId: string,
     payload: unknown,
     current?: ThreadSnapshot,
-  ) => Effect.Effect<PreparedContinuation, unknown>;
+    signal?: AbortSignal,
+  ) => Promise<PreparedContinuation>;
   /** Reconciles stored receipts with durable thread identity.
    * @param client - Borrowed receipt lookup transport.
    * @param scopeKey - Complete pending isolation scope.
    * @param agentId - Declared agent key.
    * @param signal - View lifetime for receipt observations.
-   * @returns A lazy observed restored thread identity or original native failure. */
+   * @returns The restored thread identity, or the original native failure or abort reason. */
   readonly reconcile: (
     client: unknown,
     scopeKey: string,
     agentId: string,
     signal: AbortSignal,
-  ) => Effect.Effect<string | undefined, unknown>;
+  ) => Promise<string | undefined>;
   /** Dispatches accepted agent work independently of observation cancellation.
    * @param request - Complete identity, input, continuation and pending authority.
-   * @returns A lazy observed original receipt or original native rejection. */
-  readonly submit: (request: AgentSubmission) => Effect.Effect<unknown, unknown>;
+   * @returns The original receipt or original native rejection. */
+  readonly submit: (request: AgentSubmission) => Promise<unknown>;
 }

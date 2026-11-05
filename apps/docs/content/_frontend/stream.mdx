@@ -1,5 +1,6 @@
 After [frontend setup and pulling the commerce contract](/guides/frontend/connect-react), render
-this component under the provider. The `GET /reports/:reportId` route exposes the streaming function:
+this component under the provider. The `GET /reports/:reportId` route exposes the streaming function `orders.stream-order-report`, so
+the hook takes `api.orders.streamOrderReport`:
 
 <include source="apps/docs/examples/frontend/report.tsx" lang="tsx" meta='title="src/Report.tsx"'>
   /_snippets/source/apps/docs/examples/frontend/report.tsx

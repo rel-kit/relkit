@@ -1,14 +1,15 @@
 "use client";
 
 /** Calls both commerce service-route methods using their generated domain inputs inside the frontend provider. */
+import { api } from "@relkit/client";
 import { useRelkitClient, useRoute, useRouteMutation } from "@relkit/client/react";
 
 /** Reads the Orders search count and submits one explicit creation without replaying a failed write.
  * @returns Typed query results, creation feedback, and an action available after identity is ready. */
 export function Orders() {
   const { status } = useRelkitClient();
-  const orders = useRoute("GET /orders", { input: { status: "pending" } });
-  const create = useRouteMutation("POST /orders");
+  const orders = useRoute(api.orders.searchOrders, { input: { status: "pending" } });
+  const create = useRouteMutation(api.orders.createOrder);
 
   return (
     <section>

@@ -54,14 +54,21 @@ export function wait(milliseconds: number, signal: AbortSignal): Promise<void> {
 }
 
 /**
+ * Reads the browser online hint synchronously, so an online attempt starts without a tick.
+ * @returns Whether the browser explicitly reports being offline.
+ */
+export function browserOffline(): boolean {
+  return (globalThis as { navigator?: { readonly onLine?: boolean } }).navigator?.onLine === false;
+}
+
+/**
  * Waits for browser online recovery while owning its listener and borrowed signal.
  * @param signal - Borrowed caller cancellation signal.
  * @returns A Promise for the existing result, preserving original rejected values.
  */
 export async function offline(signal: AbortSignal): Promise<boolean> {
   if (signal.aborted) throw signal.reason;
-  const navigatorValue = (globalThis as { navigator?: { readonly onLine?: boolean } }).navigator;
-  if (navigatorValue?.onLine !== false) return false;
+  if (!browserOffline()) return false;
   await new Promise<void>((resolve, reject) => {
     const online = (): void => {
       cleanup();

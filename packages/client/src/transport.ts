@@ -1,15 +1,13 @@
 import { createORPCClient } from "@orpc/client";
 import type { RouterContract, RouterContractClient } from "@orpc/contract";
-import { Effect, ManagedRuntime, type Scope } from "effect";
-import { runExecutionPromise, runExecutionSync } from "relkit/contracts/operation";
 import type { DefaultContract } from "./index.js";
 import type {
   CreateClientOptions,
   CreateWebSocketClientOptions,
   CreateAutoClientOptions,
 } from "./index.types.js";
-import type { TransportLink } from "./transport.types.js";
-import { ClientTransport, clientTransportLayer, selectAutoTransport } from "./transport.service.js";
+import type { TransportSelection } from "./transport.types.js";
+import { createClientTransport, selectAutoTransport } from "./transport.service.js";
 import { httpLink, webSocketLink } from "./transport-native.js";
 
 /**
@@ -28,7 +26,8 @@ import { httpLink, webSocketLink } from "./transport-native.js";
 export function createClient<Contract extends RouterContract = DefaultContract>(
   options: CreateClientOptions,
 ): RouterContractClient<Contract> {
-  return proxy<Contract>(Effect.succeed(httpLink(options)));
+  const link = httpLink(options);
+  return proxy<Contract>(async () => link);
 }
 
 /**
@@ -42,7 +41,8 @@ export function createWebSocketClient<Contract extends RouterContract = DefaultC
 ): RouterContractClient<Contract> {
   const Socket = options.websocket ?? globalThis.WebSocket;
   if (Socket === undefined) throw new Error("WebSocket is unavailable in this runtime.");
-  return proxy<Contract>(Effect.succeed(webSocketLink(options, Socket)));
+  const link = webSocketLink(options, Socket);
+  return proxy<Contract>(async () => link);
 }
 
 /**
@@ -58,22 +58,16 @@ export function createAutoClient<Contract extends RouterContract = DefaultContra
 }
 
 /**
- * Adapts one resource-free acquired service to oRPC's native link contract.
+ * Adapts one transport owner to oRPC's native link contract.
  * @typeParam Contract - Inferred public router shape.
  * @param select - Lazy configured link decision.
- * @returns A synchronous proxy; each call owns its own cancellable fiber.
+ * @returns A synchronous proxy; each call is cancelled by its own signal.
  */
 function proxy<Contract extends RouterContract>(
-  select: Effect.Effect<TransportLink, unknown, Scope.Scope>,
+  select: TransportSelection,
 ): RouterContractClient<Contract> {
-  const owner = ManagedRuntime.make(clientTransportLayer(select));
-  const service = runExecutionSync(owner, ClientTransport);
+  const transport = createClientTransport(select);
   return createORPCClient({
-    call: (path, input, options) =>
-      runExecutionPromise(
-        owner,
-        service.invoke(path, input, options),
-        options.signal === undefined ? undefined : { signal: options.signal },
-      ),
+    call: (path, input, options) => transport.invoke(path, input, options),
   }) as RouterContractClient<Contract>;
 }

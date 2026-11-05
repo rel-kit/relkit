@@ -16,7 +16,9 @@ test("generates a stable oRPC contract and shared client entry", () => {
   expect(first).toBe(second);
   expect(Effect.runSync(generateClientEffect(graph(false)))).toBe(first);
   expect(Effect.runSync(generateClientTypeScriptEffect(graph(false)))).toBe(first);
-  expect(first).toContain('export { createClient, ORPCError } from "@relkit/client";');
+  expect(first).toContain(
+    'export { api, createApi, createClient, ORPCError } from "@relkit/client";',
+  );
   const contract = generateContract(graph(false));
   expect(contract).toBe(generateContract(graph(true)));
   expect(contract).toContain('\"orders.get\": oc.errors({ \"orders.not-found\"');

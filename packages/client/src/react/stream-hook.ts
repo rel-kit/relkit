@@ -5,27 +5,29 @@ export type { StreamState, UseStreamResult } from "./stream-hook.types.js";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRelkitClient } from "./context.js";
-import { runExecutionPromise } from "relkit/contracts/operation";
-import { clientStreams, streamRuntime } from "./stream-runtime.js";
-import type { ErrorFor, InputFor, ItemFor, StreamSelector } from "./registry.types.js";
+import { apiRoutePath, API_ROOT } from "../api.js";
+import type { ApiStreamRoute, RouteError, RouteInput, RouteItem } from "../api.types.js";
+import { normalizeClientError } from "../client-errors.js";
+import { procedureCall } from "./procedure.js";
 
 /**
  * Adapts a declared scoped stream into React state and explicit cancellation controls.
- * @typeParam Name - Declared resource or procedure selector.
- * @param name - Declared resource or selector identity.
- * @param options - Existing public configuration and authority.
+ * @typeParam Route - A streamed route from the generated `api` object.
+ * @param route - The route, such as `api.reports.streamReport`.
+ * @param options - Optional input to start with on mount.
  * @returns Current stream state and stable start/abort controls.
  */
-export function useStream<Name extends StreamSelector>(
-  name: Name,
-  options: { readonly autoStart?: boolean; readonly input?: InputFor<Name> } = {},
-): UseStreamResult<InputFor<Name>, ItemFor<Name>, ErrorFor<Name>> {
+export function useStream<Route extends ApiStreamRoute>(
+  route: Route,
+  options: { readonly autoStart?: boolean; readonly input?: RouteInput<Route> } = {},
+): UseStreamResult<RouteInput<Route>, RouteItem<Route>, RouteError<Route>> {
   const runtime = useRelkitClient();
   const controller = useRef<AbortController | undefined>(undefined);
-  const [state, setState] = useState<StreamState<ItemFor<Name>, ErrorFor<Name>>>({
+  const [state, setState] = useState<StreamState<RouteItem<Route>, RouteError<Route>>>({
     status: "idle",
     items: [],
   });
+  const path = apiRoutePath(route);
   const cancel = useCallback(() => {
     controller.current?.abort();
     setState((current) => ({ ...current, status: "cancelled" }));
@@ -35,7 +37,7 @@ export function useStream<Name extends StreamSelector>(
     setState({ status: "idle", items: [] });
   }, []);
   const start = useCallback(
-    async (input: InputFor<Name>): Promise<void> => {
+    async (input: RouteInput<Route>): Promise<void> => {
       if (runtime.status !== "ready")
         throw new Error(`RelKit client is not ready (${runtime.status})`);
       controller.current?.abort();
@@ -43,31 +45,32 @@ export function useStream<Name extends StreamSelector>(
       controller.current = next;
       setState({ status: "starting", items: [] });
       try {
-        await runExecutionPromise(
-          streamRuntime,
-          clientStreams.consume(
-            runtime.streamClient,
-            name,
-            input,
-            next.signal,
-            () => setState({ status: "streaming", items: [] }),
-            (item) => {
-              setState((current) => ({
-                ...current,
-                status: "streaming",
-                items: [...current.items, item as ItemFor<Name>],
-              }));
-            },
-          ),
-          { signal: next.signal },
-        );
+        const iterable = (await procedureCall(runtime.streamClient, [API_ROOT, ...path])(input, {
+          signal: next.signal,
+        })) as AsyncIterable<RouteItem<Route>>;
+        if (next.signal.aborted) return;
+        setState({ status: "streaming", items: [] });
+        for await (const item of iterable) {
+          if (next.signal.aborted) break;
+          setState((current) => ({
+            ...current,
+            status: "streaming",
+            items: [...current.items, item],
+          }));
+        }
         if (!next.signal.aborted) setState((current) => ({ ...current, status: "completed" }));
       } catch (error) {
         if (!next.signal.aborted)
-          setState((current) => ({ ...current, status: "error", error: error as ErrorFor<Name> }));
+          setState((current) => ({
+            ...current,
+            status: "error",
+            error: normalizeClientError(error) as RouteError<Route>,
+          }));
       }
     },
-    [name, runtime],
+    // The path array is rebuilt each render; its joined form is the stable identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [path.join("."), runtime],
   );
   useEffect(() => {
     if (options.autoStart && options.input !== undefined) void start(options.input);

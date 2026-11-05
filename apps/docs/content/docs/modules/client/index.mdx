@@ -66,6 +66,11 @@ in the [Frontend guide](/guides/frontend/connect-react#2-pull-the-backend-contra
 changes. The backend must be reachable while you pull; do not import backend source into a
 browser bundle.
 
+The declarations type the `api` object that `@relkit/client` exports. It mirrors your services and
+routes: a route's property is its target function ID with each part in camelCase. The function
+`orders.search-orders` becomes `api.orders.searchOrders`. You pass these properties to the route
+hooks.
+
 The recipe explicitly declares `@opentelemetry/api`, the required oRPC peer, so setup does not depend
 on whether a package manager automatically installs required peers.
 
@@ -105,6 +110,11 @@ The compiled public-contract fingerprint must match the backend. A mismatch ente
 new typed work until frontend and backend are coordinated; unresolved mutation or control metadata is
 preserved rather than retried.
 
+Under `relkit dev`, the provider follows the backend's contract changes instead. When you change a
+route, it reads the new contract and keeps working, so you do not restart the frontend. Your editor
+picks up the new types from the regenerated `client-registry.d.ts`. Outside development, a changed
+backend contract still produces `application-updated`.
+
 Job hooks use the same provider and identity handshake. `useJobTrigger` retains the accepted `runId`, while
 `useJobRun` observes that run without starting a subscription during server rendering. Unknown submission
 outcomes remain visible for same-key recovery instead of becoming an automatic replay queue.
@@ -116,7 +126,7 @@ outcomes remain visible for same-key recovery instead of becoming an automatic r
 
 | Task                                          | API                                                         | Example                                                              |
 | --------------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------- |
-| Call without React                            | `createClient`, `createWebSocketClient`, `createAutoClient` | [Transports](/docs/modules/client/transports)                        |
+| Call without React                            | `createApi`, `createWebSocketClient`, `createAutoClient`    | [Transports](/docs/modules/client/transports)                        |
 | Provide clients and inspect connection status | `RelkitClientProvider`, `useRelkitClient`                   | Provider and `Greeting` above                                        |
 | Read a route                                  | `useRoute`, `useSuspenseRoute`, `useInfiniteRoute`          | [Route queries](/docs/modules/client/routes)                         |
 | Submit a change                               | `useRouteMutation`, `useRouteUtils`                         | [Mutations](/docs/modules/client/mutations)                          |

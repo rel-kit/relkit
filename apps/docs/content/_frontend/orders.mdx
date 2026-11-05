@@ -1,6 +1,8 @@
 After [frontend setup and pulling this backend's contract](/guides/frontend/connect-react),
 render this component under `RelkitClientProvider`. Each exported service-route method produces
-its own typed operation: `GET /orders` reads the search count, while `POST /orders` creates an order.
+its own `api` property, named after its target function: `GET /orders` targets
+`orders.search-orders` and becomes `api.orders.searchOrders`, while `POST /orders` targets
+`orders.create-order` and becomes `api.orders.createOrder`.
 
 <include source="apps/docs/examples/frontend/orders.tsx" lang="tsx" meta='title="src/Orders.tsx"'>
   /_snippets/source/apps/docs/examples/frontend/orders.tsx

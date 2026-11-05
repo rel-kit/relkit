@@ -59,7 +59,9 @@ test("documents raw and RPC boundaries without promising REST-only policies on R
   expect(read("raw-handlers")).toContain("`ALL` is reserved for mounting Better Auth");
   expect(read("raw-handlers")).toContain("OpenAPI and generated-client operation");
   expect(read("generated-clients")).toContain("RPC over `/rpc`");
-  expect(read("generated-clients")).toContain("Both execute the original route's authorization");
+  expect(read("generated-clients")).toContain(
+    "All three execute the original route's authorization",
+  );
   expect(read("rate-limits")).toContain("tests/compiler/rate-limit.test.ts#local-rate-limit");
   expect(read("rate-limits")).toContain("not hashed");
   expect(read("middleware")).toContain("not token verification");

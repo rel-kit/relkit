@@ -1,10 +1,6 @@
 import { RPCLink } from "@orpc/client/fetch";
 import { RPCLink as WebSocketRPCLink } from "@orpc/client/websocket";
-import {
-  AGENT_CAPABILITY_HEADER,
-  AGENT_CAPABILITY_QUERY,
-  AGENT_CAPABILITY_VALUE,
-} from "relkit/contracts";
+import { AGENT_CAPABILITY_HEADER, AGENT_CAPABILITY_QUERY, AGENT_CAPABILITY_VALUE } from "./wire.js";
 import type {
   ClientHeaders,
   CreateClientOptions,
@@ -31,7 +27,14 @@ export function httpLink(options: CreateClientOptions): RPCLink<Record<PropertyK
           call.signal === undefined
             ? controller.signal
             : AbortSignal.any([call.signal, controller.signal]);
-        const output = await call.next({ ...call, signal });
+        const response: { status?: number } = {};
+        responseStatus.set(signal, response);
+        let output: unknown;
+        try {
+          output = await call.next({ ...call, signal });
+        } catch (error) {
+          throw withStatus(error, response.status);
+        }
         if (
           output === null ||
           typeof output !== "object" ||
@@ -60,8 +63,37 @@ export function httpLink(options: CreateClientOptions): RPCLink<Record<PropertyK
         return wrapped;
       },
     ],
-    fetch: (url, init) => fetcher(url, { ...init, credentials: options.credentials ?? "include" }),
+    fetch: async (url, init) => {
+      const response = await fetcher(url, {
+        ...init,
+        credentials: options.credentials ?? "include",
+      });
+      const record = init?.signal == null ? undefined : responseStatus.get(init.signal);
+      if (record !== undefined) record.status = response.status;
+      return response;
+    },
   });
+}
+
+/** HTTP status of each call's response, keyed by the call's own signal. */
+const responseStatus = new WeakMap<AbortSignal, { status?: number }>();
+
+/**
+ * Gives an error from an HTTP response the response's status, which oRPC errors omit.
+ * @param error - The call's failure.
+ * @param status - The response status, when a response arrived.
+ * @returns The same error.
+ */
+function withStatus(error: unknown, status: number | undefined): unknown {
+  if (
+    status !== undefined &&
+    error !== null &&
+    typeof error === "object" &&
+    typeof (error as { readonly code?: unknown }).code === "string" &&
+    typeof (error as { readonly status?: unknown }).status !== "number"
+  )
+    Object.defineProperty(error, "status", { value: status, enumerable: true, configurable: true });
+  return error;
 }
 
 /**

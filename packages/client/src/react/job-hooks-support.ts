@@ -1,6 +1,6 @@
 import type { PreparedJobRequest } from "./job-hooks-support.types.js";
 import type { ExpectedClientIdentity } from "relkit/contracts";
-import { createOperationId } from "relkit/realtime/operation-id";
+import { createOperationId } from "../wire.js";
 export type { PreparedJobRequest } from "./job-hooks-support.types.js";
 
 const preparedByMutationContext = new WeakMap<object, PreparedJobRequest>();

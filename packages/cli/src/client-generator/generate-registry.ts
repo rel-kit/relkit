@@ -12,6 +12,8 @@ import { jobProcedureCalculations } from "./generate-job-procedures.js";
 import { jobRegistryCalculations } from "./generate-job-registry.js";
 import { registrySupportCalculations } from "./generate-registry-support.js";
 import { recordCalculation } from "./generate-schema-render.js";
+import { apiErrorUnion, apiTreeSource } from "./generate-api-tree.js";
+import type { ApiErrorType, ApiTreeEntry } from "./generate-api-tree.types.js";
 export { InvalidClientContract } from "./generate-agent-contract-validation.js";
 export { publicManifest, publicManifestEffect } from "./generate-public-manifest.js";
 export {
@@ -31,23 +33,42 @@ function generateClientRegistryFromDocumentCore(
 ): Effect.Effect<string, InvalidClientContract> {
   return Effect.gen(function* () {
     const procedures = Array.isArray(document.procedures) ? document.procedures : [];
-    const entries: string[] = [];
+    const entries: ApiTreeEntry[] = [];
     for (const value of procedures) {
       const procedure = yield* recordCalculation(value);
       if (procedure === undefined || typeof procedure.name !== "string") continue;
       const route = (yield* recordCalculation(procedure.route)) ?? {};
+      const selector =
+        typeof procedure.selector === "string"
+          ? /^([A-Z]+) (\/.*)$/.exec(procedure.selector)
+          : null;
+      const method = typeof route.method === "string" ? route.method : selector?.[1];
+      const path = typeof route.path === "string" ? route.path : selector?.[2];
+      if (method === undefined || path === undefined) continue;
       const output = (yield* recordCalculation(procedure.output)) ?? {};
       const stream = output.kind === "stream";
       const item = stream ? output.item : procedure.output;
       const operation = route.operation === "mutation" ? "mutation" : "query";
       const inputType = yield* schemaCalculations.typeEffect(procedure.input);
       const outputType = yield* schemaCalculations.typeEffect(item);
-      const type = stream
-        ? `import("@relkit/client/react").ClientStreamContract<${inputType}, ${outputType}, Error> & { readonly operation: ${JSON.stringify(operation)} }`
-        : `import("@relkit/client/react").ClientRouteContract<${inputType}, ${outputType}, Error> & { readonly operation: ${JSON.stringify(operation)} }`;
-      const selector = typeof procedure.selector === "string" ? [procedure.selector] : [];
-      for (const name of new Set([procedure.name, ...selector]))
-        entries.push(`    readonly ${JSON.stringify(name)}: ${type};`);
+      const errors: ApiErrorType[] = [];
+      for (const error of yield* registrySupportCalculations.recordsEffect(procedure.errors)) {
+        if (typeof error.id !== "string") continue;
+        errors.push({
+          code: error.id,
+          ...(typeof error.status === "number" ? { status: error.status } : {}),
+          data: yield* schemaCalculations.typeEffect(error.schema),
+        });
+      }
+      const contract = stream ? "ClientStreamContract" : "ClientRouteContract";
+      entries.push({
+        id: typeof procedure.routeId === "string" ? procedure.routeId : procedure.name,
+        method,
+        path,
+        targetFunctionId:
+          typeof procedure.functionId === "string" ? procedure.functionId : procedure.name,
+        type: `import("@relkit/client").${contract}<${inputType}, ${outputType}, ${apiErrorUnion(errors)}> & { readonly operation: ${JSON.stringify(operation)} }`,
+      });
     }
     const channels: string[] = [];
     for (const channel of yield* registrySupportCalculations.recordsEffect(document.channels)) {
@@ -79,13 +100,15 @@ function generateClientRegistryCore(
   routes: readonly ClientRoute[],
 ): Effect.Effect<string> {
   return Effect.gen(function* () {
-    const entries: string[] = [];
-    for (const route of routes) {
-      const type = yield* registryTypeCalculations.routeEffect(route);
-      const selector = yield* registrySupportCalculations.selectorEffect(route);
-      for (const name of [...new Set([route.trigger.id, selector])].sort())
-        entries.push(`    readonly ${JSON.stringify(name)}: ${type};`);
-    }
+    const entries: ApiTreeEntry[] = [];
+    for (const route of routes)
+      entries.push({
+        id: route.trigger.id,
+        method: route.trigger.config.method,
+        path: route.trigger.config.path,
+        targetFunctionId: route.target.id,
+        type: yield* registryTypeCalculations.routeEffect(route),
+      });
     const channels: string[] = [];
     for (const channel of yield* registrySupportCalculations.channelsEffect(graph)) {
       const type = yield* registryTypeCalculations.channelEffect(channel);
@@ -103,24 +126,22 @@ function generateClientRegistryCore(
     ].join("");
   });
 }
-/** Assembles route, channel, and agent declarations into a React module augmentation.
- * @param entries - HTTP route declarations.
+/** Assembles the `ClientApi` tree and channel and agent declarations into module augmentations.
+ * @param entries - Public routes with their contract types.
  * @param channels - Channel declarations.
  * @param agents - Agent declarations.
  * @returns An Effect yielding registry source; it has no expected failure.
  * @example Effect.runSync(registrySourceEffect([], [], []));
  */
 const registrySourceEffect = Effect.fnUntraced(function* (
-  entries: string[],
+  entries: readonly ApiTreeEntry[],
   channels: string[],
   agents: string[],
 ) {
   return [
     "/* generated by @relkit/client-generator; do not edit */",
+    apiTreeSource(entries),
     'declare module "@relkit/client/react" {',
-    "  interface ClientRegistry {",
-    ...entries,
-    "  }",
     "  interface ChannelRegistry {",
     ...channels,
     "  }",

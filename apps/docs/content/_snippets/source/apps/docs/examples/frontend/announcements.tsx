@@ -1,12 +1,13 @@
 "use client";
 
 /** Combines the commerce announcement query with channel invalidation and reconnect recovery. */
+import { api } from "@relkit/client";
 import { useChannel, useRoute } from "@relkit/client/react";
 
 /** Restores authoritative messages on publication, catch-up, and replay gaps.
  * @returns The current messages with query failure and channel status feedback. */
 export function Announcements() {
-  const messages = useRoute("GET /announcements", { input: {} });
+  const messages = useRoute(api.announcements.getAnnouncements, { input: {} });
   const channel = useChannel("announcements.feed", {
     params: {},
     on: {

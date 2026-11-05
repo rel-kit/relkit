@@ -42,8 +42,8 @@ test("OpenAPI describes every function's schemas, whichever library made them", 
   expect(body("/stock").properties.quantity).toEqual({ exclusiveMinimum: 0, type: "integer" });
   expect(success("/stock").required).toEqual(["available", "sku"]);
   expect(
-    openapi.paths["/stock"].post.responses["409"].content["application/json"].schema.properties.data
-      .required,
+    openapi.paths["/stock"].post.responses["409"].content["application/problem+json"].schema
+      .properties.data.required,
   ).toEqual(["available", "sku"]);
   // Valibot
   expect(body("/orders").required).toEqual(["quantity", "sku"]);

@@ -13,6 +13,7 @@ export * from "./runtime-integration.js";
 export * from "./integration-dependencies.js";
 export * from "./activation.js";
 export * from "./client.js";
+export * from "./client-api.js";
 export * from "./runtime-limits.js";
 export * from "./inspector-config.js";
 export * from "./trace-context.js";

@@ -435,6 +435,81 @@ client's transport: evaluate oRPC's OpenAPI-based link against the needs for dat
 files and streams before writing a custom fetch layer, and move off the oRPC 2.0 beta under the
 dependency policy.
 
+Decided while applying section 11 (maintainer, 2026-11-05):
+
+- **Names.** A route's `api` path is its target function ID with each segment in camelCase, so
+  the first segment is the service: `orders.price-order` is `api.orders.priceOrder`. When several
+  routes target one function, the first by method (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
+  and then path keeps the name; the others add their method (`getOrderHead`), or their static
+  path segments when the method repeats (`searchOrdersSearch` for `GET /orders/search`), and a
+  number as the last resort. `clientApiPaths` in `relkit/contracts` holds the rule, and both the
+  generator and the RPC transport call it, so they cannot disagree.
+- **What is generated.** `client-registry.d.ts` augments a `ClientApi` interface on
+  `@relkit/client` with the service and route tree; the runtime `api` value exported by
+  `@relkit/client` (and re-exported by the generated `client.ts`) is a lazy proxy whose
+  properties are route references. Frontends therefore keep including only the generated
+  declaration file, a route the backend adds is usable without a new runtime module, and a
+  pulled contract (`relkit client pull`) renders the same tree from the document.
+- **Transport until REST.** The RPC router mounts every route procedure a second time under
+  `api.<service>.<name>`, next to the trigger-ID and `METHOD /path` names, so the client reaches
+  a route by its API path with no lookup table. Section 23 replaces this transport; the `api`
+  object stays.
+- **Calls.** Hooks take `api` properties. `createApi(options)` returns the same tree with every
+  route callable (`await backend.orders.priceOrder(input)`); its routes can also be passed to the
+  hooks. `createClient` keeps returning the raw oRPC client for tests and tools.
+- **Errors.** A route's error type is one `RelkitDeclaredError<code, status, data>` per declared
+  error plus `RelkitUndeclaredError`, whose `code` is a closed list (the oRPC common codes, the
+  identity and idempotency codes, and `NETWORK_ERROR` for a request that got no response), so
+  checking `code` narrows `status` and `data`. Hooks and `createApi` wrap a failure without a
+  code in `RelkitNetworkError`; mutations add `RelkitWriteError`, which now carries
+  `WRITE_NOT_SENT` or `WRITE_OUTCOME_UNKNOWN`.
+- **Scope of the hook change.** The route hooks (`useRoute`, `useSuspenseRoute`,
+  `useRouteMutation`, `useInfiniteRoute`, `useRouteUtils`, `useStream`) take `api` properties
+  and no longer accept strings; the route string selectors and their helper types leave the
+  public API. Channel, agent and job hooks keep their declared IDs, because those are not routes
+  and the `api` object mirrors routes only; `useRouteMutation` no longer triggers jobs, which
+  `useJobTrigger` does.
+- **No Effect in the browser.** Every module the browser entries reach (`@relkit/client`,
+  `/react`, `/jobs`, `/tanstack-query`) is plain Promise and `AbortSignal` code: services became
+  objects, scopes became `createWorkOwner` (abort everything, then wait), streams became async
+  generators over `iterateNative`. `effect` and `@effect/vitest` leave the package's
+  dependencies. The Bun-only `/server` entries still reach Effect through `relkit`, which is
+  fine there. `packages/client/scripts/browser-bundle.ts` bundles the browser entries for a
+  browser target and lists every module that imports `effect`; `tests/browser-bundle.test.ts`
+  requires the list to be empty. The minified bundle went from 157.6 KiB to 114.5 KiB.
+- **What the browser client gave up.** It no longer emits Effect execution logs and metrics
+  (`rpc.invoke`, `pending.*`, `agent.observe`, `jobs.observe` and the rest); server-side tracing
+  is unchanged. The few runtime values it took from `relkit` (agent capability constants,
+  `canonicalJson`, `createOperationId`, the contract events path) are copied into
+  `packages/client/src/wire.ts`, and `tests/compatibility/wire.test.ts` checks each against
+  `relkit/contracts`.
+- **Development contract channel.** The channel is the backend's public development port, the
+  one the frontend already calls. The supervisor's stable proxy serves
+  `GET /_relkit/v1/client/contract-events` itself (through its existing `intercept` option), so
+  the stream outlives generation switches and never holds a retiring generation's drain open.
+  `packages/cli/src/supervisor/contract-publish.ts` holds the publisher; it listens to the
+  supervisor's `switch-succeeded` telemetry and sends a `contract` event, and
+  `commands/dev-session-native.ts` wires it in with three lines, leaving the supervisor
+  otherwise untouched for section 13. The event carries only the generation number;
+  `RelkitClientProvider` answers it, and the `ready` event on every reconnect, by re-reading the
+  identity document, so the new public fingerprint changes the query scope and queries refetch.
+  Once the stream has connected, the provider trusts the backend's fingerprint over the one
+  compiled into the frontend and no longer reports `application-updated`; outside `relkit dev`
+  the stream answers 404 and the old check stays. The runtime `api` proxy needs no reload, and
+  types follow because the frontend includes the regenerated `client-registry.d.ts`.
+- **Browser proof.** The commerce browser fixture mounts the same publisher plus a test-only
+  endpoint that switches the reported fingerprint; `tests/e2e-commerce/contract-reload.spec.ts`
+  checks that the page re-reads its identity, refetches under the new contract, shows no restart
+  alert and still posts. With the provider's subscription disabled the test fails.
+- **Consumers.** The repository's own frontends move by hand: `examples/commerce-web`
+  (`api.orders.searchOrders`, `api.announcements.getAnnouncements`, `postAnnouncement`,
+  `api.orders.streamOrderReport`), the fullstack template (`api.hello.hello`), and the docs
+  examples, which follow the backend each one targets (the minimal starter's `hello.greet`
+  gives `api.hello.greet`). The starter skill references change in the minimal template, which
+  `tests/generator/skill-consistency.test.ts` treats as the source, and are copied to the other
+  starters; that changes the minimal template's bytes, so the pinned `templateDigest` in
+  `packages/create-relkit/src/create-capabilities.ts` is updated, as earlier template changes did.
+
 ### D16. Agent adapters (#22)
 
 The adapter interface covers run, stream, resume and stop; tool calls bridged to the common engine;

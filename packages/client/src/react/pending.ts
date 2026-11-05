@@ -1,9 +1,7 @@
 import type { PendingOperationMetadata } from "relkit/contracts";
 import type { JobUnknownOutcome } from "relkit/contracts/jobs";
-import { ManagedRuntime } from "effect";
-import { runExecutionSync, runExecutionPromise } from "relkit/contracts/operation";
 import type { RelkitKeyScope } from "./keys.js";
-import { PendingOperations, pendingOperationsLayer } from "./pending.service.js";
+import { pendingOperations as service } from "./pending.service.js";
 import type { PendingRememberOptions, PendingReferences } from "./pending.types.js";
 import { jobUnknownOutcome } from "./pending-outcome.js";
 export { jobUnknownOutcome } from "./pending-outcome.js";
@@ -13,11 +11,6 @@ export {
   PendingRecoveryUnavailableError,
   PendingRequestMismatchError,
 } from "./pending-errors.js";
-
-// This browser-wide owner holds only plain metadata and borrowed storage. It never
-// acquires a socket, listener, timer or worker; each async call owns its own fiber.
-const owner = ManagedRuntime.make(pendingOperationsLayer());
-const service = runExecutionSync(owner, PendingOperations);
 
 /**
  * Preserves the complete existing scope serialization used by query and receipt keys.
@@ -46,10 +39,7 @@ export function rememberPending(
   references: PendingReferences = {},
   options: PendingRememberOptions = {},
 ): Promise<PendingOperationMetadata> {
-  return runExecutionPromise(
-    owner,
-    service.remember(scopeKey, kind, resourceId, value, references, options),
-  );
+  return service.remember(scopeKey, kind, resourceId, value, references, options);
 }
 
 /**
@@ -83,7 +73,7 @@ export function rememberJobPending(
  * @returns Nothing, synchronously.
  */
 export function updatePending(scopeKey: string, value: PendingOperationMetadata): void {
-  runExecutionSync(owner, service.update(scopeKey, value));
+  service.update(scopeKey, value);
 }
 
 /**
@@ -93,7 +83,7 @@ export function updatePending(scopeKey: string, value: PendingOperationMetadata)
  * @returns Nothing, synchronously.
  */
 export function forgetPending(scopeKey: string, operationId: string): void {
-  runExecutionSync(owner, service.forget(scopeKey, operationId));
+  service.forget(scopeKey, operationId);
 }
 
 /**
@@ -102,7 +92,7 @@ export function forgetPending(scopeKey: string, operationId: string): void {
  * @returns Pending metadata in existing insertion order.
  */
 export function pendingOperations(scopeKey: string): readonly PendingOperationMetadata[] {
-  return runExecutionSync(owner, service.list(scopeKey));
+  return service.list(scopeKey);
 }
 
 /**
@@ -112,7 +102,7 @@ export function pendingOperations(scopeKey: string): readonly PendingOperationMe
  * @returns The original in-memory request or undefined.
  */
 export function pendingRequest(scopeKey: string, operationId: string): unknown {
-  return runExecutionSync(owner, service.request(scopeKey, operationId));
+  return service.request(scopeKey, operationId);
 }
 
 /**
@@ -127,7 +117,7 @@ export function matchesPendingRequest(
   operationId: string,
   request: unknown,
 ): Promise<boolean> {
-  return runExecutionPromise(owner, service.matches(scopeKey, operationId, request));
+  return service.matches(scopeKey, operationId, request);
 }
 
 /**
@@ -136,7 +126,7 @@ export function matchesPendingRequest(
  * @returns Nothing, synchronously.
  */
 export function clearPendingOperations(scopeKey: string): void {
-  runExecutionSync(owner, service.clear(scopeKey));
+  service.clear(scopeKey);
 }
 
 /**
@@ -154,5 +144,5 @@ export function isJobUnknownOutcome(value: unknown): value is JobUnknownOutcome 
  * @returns Its SHA-256 digest with the existing prefix.
  */
 export function digestPendingRequest(value: unknown): Promise<string> {
-  return runExecutionPromise(owner, service.digest(value));
+  return service.digest(value);
 }

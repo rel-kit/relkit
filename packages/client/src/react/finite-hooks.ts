@@ -17,37 +17,38 @@ import {
   type UseSuspenseQueryOptions,
   type UseSuspenseQueryResult,
 } from "@tanstack/react-query";
-import { runExecutionPromise } from "relkit/contracts/operation";
-import { mutationOperations, mutationRuntime } from "./mutation-runtime.js";
+import { submitMutation } from "./mutation-runtime.js";
 import { useRelkitClient } from "./context.js";
-import { relkitJobKey, relkitKey } from "./keys.js";
-import { procedureUtils } from "./procedure.js";
+import { relkitKey } from "./keys.js";
+import { normalizedQuery, routeUtils } from "./finite-hooks-support.js";
 import type {
-  ErrorFor,
-  InputFor,
-  MutationSelector,
-  OutputFor,
-  QuerySelector,
-} from "./registry.types.js";
+  ApiMutationRoute,
+  ApiQueryRoute,
+  RouteError,
+  RouteInput,
+  RouteOutput,
+} from "../api.types.js";
+import { normalizeClientError } from "../client-errors.js";
 import { pendingScopeKey } from "./pending.js";
-import { generatedJobTriggerName, prepareJobRequest } from "./job-hooks-support.js";
 import { RelkitWriteError } from "./write-error.js";
 export { RelkitWriteError } from "./write-error.js";
 
 /**
- * Adapts a declared finite route into a scope-bound TanStack query.
- * @typeParam Name - Declared resource or procedure selector.
+ * Reads one `api` query route into a scope-bound TanStack query.
+ * @typeParam Route - A query route from the generated `api` object.
  * @typeParam Selected - Caller-selected query result.
- * @param name - Declared resource or selector identity.
- * @param options - Existing public configuration and authority.
- * @returns The typed finite query result.
+ * @param route - The route, such as `api.orders.getOrder`.
+ * @param options - TanStack options plus the route's typed `input`.
+ * @returns The typed query result; `error` narrows on `code`.
+ * @example const order = useRoute(api.orders.getOrder, { input: { orderId } });
  */
-export function useRoute<Name extends QuerySelector, Selected = OutputFor<Name>>(
-  name: Name,
-  options: QueryInput<Name, Selected>,
-): UseQueryResult<Selected, ErrorFor<Name>> {
+export function useRoute<Route extends ApiQueryRoute, Selected = RouteOutput<Route>>(
+  route: Route,
+  options: QueryInput<Route, Selected>,
+): UseQueryResult<Selected, RouteError<Route>> {
   const runtime = useRelkitClient();
-  const generated = procedureUtils(runtime.utils, name).queryOptions({ input: options.input });
+  const { utils, name } = routeUtils(runtime.utils, route);
+  const generated = normalizedQuery(utils.queryOptions({ input: options.input }));
   const enabled =
     runtime.status === "ready" && runtime.identityKey !== null && options.enabled !== false;
   return useQuery({
@@ -57,65 +58,73 @@ export function useRoute<Name extends QuerySelector, Selected = OutputFor<Name>>
     queryKey: runtime.scope
       ? relkitKey(runtime.scope, "query", name, options.input)
       : ["relkit", "blocked", name],
-  } as UseQueryOptions<OutputFor<Name>, ErrorFor<Name>, Selected>);
+  } as UseQueryOptions<RouteOutput<Route>, RouteError<Route>, Selected>);
 }
 
 /**
- * Adapts a ready declared route into a scope-bound suspense query.
- * @typeParam Name - Declared resource or procedure selector.
+ * Reads one ready `api` query route into a scope-bound suspense query.
+ * @typeParam Route - A query route from the generated `api` object.
  * @typeParam Selected - Caller-selected query result.
- * @param name - Declared resource or selector identity.
- * @param options - Existing public configuration and authority.
+ * @param route - The route, such as `api.orders.getOrder`.
+ * @param options - TanStack options plus the route's typed `input`.
  * @returns The typed ready suspense query result.
  */
-export function useSuspenseRoute<Name extends QuerySelector, Selected = OutputFor<Name>>(
-  name: Name,
+export function useSuspenseRoute<Route extends ApiQueryRoute, Selected = RouteOutput<Route>>(
+  route: Route,
   options: Omit<
-    UseSuspenseQueryOptions<OutputFor<Name>, ErrorFor<Name>, Selected>,
+    UseSuspenseQueryOptions<RouteOutput<Route>, RouteError<Route>, Selected>,
     "queryKey" | "queryFn"
-  > & { readonly input: InputFor<Name> },
-): UseSuspenseQueryResult<Selected, ErrorFor<Name>> {
+  > & { readonly input: RouteInput<Route> },
+): UseSuspenseQueryResult<Selected, RouteError<Route>> {
   const runtime = useRelkitClient();
   if (runtime.status !== "ready" || runtime.scope === undefined || runtime.identityKey === null) {
     throw new Error(`RelKit client is not ready (${runtime.status})`);
   }
-  const generated = procedureUtils(runtime.utils, name).queryOptions({ input: options.input });
+  const { utils, name } = routeUtils(runtime.utils, route);
+  const generated = normalizedQuery(utils.queryOptions({ input: options.input }));
   return useSuspenseQuery({
     ...generated,
     ...options,
     queryKey: relkitKey(runtime.scope, "query", name, options.input),
-  } as UseSuspenseQueryOptions<OutputFor<Name>, ErrorFor<Name>, Selected>);
+  } as UseSuspenseQueryOptions<RouteOutput<Route>, RouteError<Route>, Selected>);
 }
 
 /**
- * Adapts a declared accepted-work operation into TanStack mutation state.
- * @typeParam Name - Declared resource or procedure selector.
+ * Sends one `api` mutation route as TanStack mutation state.
+ * @typeParam Route - A mutation route from the generated `api` object.
  * @typeParam Context - TanStack mutation context.
- * @param name - Declared resource or selector identity.
- * @param options - Existing public configuration and authority.
- * @returns The typed accepted-work mutation result.
+ * @param route - The route, such as `api.orders.createOrder`.
+ * @param options - TanStack mutation options.
+ * @returns The typed mutation result; `error` narrows on `code`.
+ * @example const create = useRouteMutation(api.orders.createOrder);
  */
-export function useRouteMutation<Name extends MutationSelector, Context = unknown>(
-  name: Name,
+export function useRouteMutation<Route extends ApiMutationRoute, Context = unknown>(
+  route: Route,
   options: Omit<
-    UseMutationOptions<OutputFor<Name>, ErrorFor<Name>, InputFor<Name>, Context>,
+    UseMutationOptions<
+      RouteOutput<Route>,
+      RouteError<Route> | RelkitWriteError,
+      RouteInput<Route>,
+      Context
+    >,
     "mutationKey" | "mutationFn"
   > = {},
-): UseMutationResult<OutputFor<Name>, ErrorFor<Name>, InputFor<Name>, Context> {
+): UseMutationResult<
+  RouteOutput<Route>,
+  RouteError<Route> | RelkitWriteError,
+  RouteInput<Route>,
+  Context
+> {
   const runtime = useRelkitClient();
-  const generated = procedureUtils(runtime.utils, name).mutationOptions() as Record<
-    string,
-    unknown
-  >;
-  const original = generated.mutationFn as NonNullable<
-    UseMutationOptions<OutputFor<Name>, ErrorFor<Name>, InputFor<Name>, Context>["mutationFn"]
-  >;
+  const { utils, name } = routeUtils(runtime.utils, route);
+  const generated = utils.mutationOptions() as Record<string, unknown>;
+  const original = generated.mutationFn as (input: unknown, context: unknown) => Promise<unknown>;
   return useMutation({
     ...generated,
     ...options,
     retry: options.retry ?? false,
     networkMode: options.networkMode ?? "always",
-    mutationFn: async (input, mutationContext) => {
+    mutationFn: async (input: RouteInput<Route>, mutationContext: unknown) => {
       if (
         runtime.status !== "ready" ||
         runtime.scope === undefined ||
@@ -129,73 +138,62 @@ export function useRouteMutation<Name extends MutationSelector, Context = unknow
       ) {
         throw new RelkitWriteError("not-sent", "The browser is offline.");
       }
-      const scopeKey = pendingScopeKey(runtime.scope);
-      const jobName = generatedJobTriggerName(name);
-      const prepared =
-        jobName === undefined
-          ? undefined
-          : prepareJobRequest(input, runtime.identity, mutationContext);
-      const effectiveInput = (prepared?.value ?? input) as InputFor<Name>;
-      return (await runExecutionPromise(
-        mutationRuntime,
-        mutationOperations.submit(
-          scopeKey,
-          prepared === undefined ? "mutation" : "job-trigger",
+      try {
+        return (await submitMutation(
+          pendingScopeKey(runtime.scope),
+          "mutation",
           name,
-          effectiveInput,
+          input,
           {},
-          prepared === undefined
-            ? {}
-            : {
-                operationId: prepared.operationId,
-                retainRequest: true,
-                ...(prepared.idempotencyKey === undefined
-                  ? {}
-                  : { idempotencyKey: prepared.idempotencyKey }),
-              },
-          () => original(effectiveInput, mutationContext),
-        ),
-      )) as OutputFor<Name>;
+          {},
+          () => original(input, mutationContext),
+        )) as RouteOutput<Route>;
+      } catch (error) {
+        throw normalizeClientError(error);
+      }
     },
     mutationKey: runtime.scope
-      ? generatedJobTriggerName(name) === undefined
-        ? relkitKey(runtime.scope, "mutation", name)
-        : relkitJobKey(runtime.scope, "trigger", { jobId: generatedJobTriggerName(name)! })
+      ? relkitKey(runtime.scope, "mutation", name)
       : ["relkit", "blocked", name],
-  } as UseMutationOptions<OutputFor<Name>, ErrorFor<Name>, InputFor<Name>, Context>);
+  } as UseMutationOptions<
+    RouteOutput<Route>,
+    RouteError<Route> | RelkitWriteError,
+    RouteInput<Route>,
+    Context
+  >);
 }
 
 /**
- * Adapts a declared paginated route while retaining page and scope inference.
- * @typeParam Name - Declared resource or procedure selector.
+ * Reads one paginated `api` query route while retaining page and scope inference.
+ * @typeParam Route - A query route from the generated `api` object.
  * @typeParam PageParam - Declared pagination cursor.
  * @typeParam Selected - Caller-selected query result.
- * @param name - Declared resource or selector identity.
- * @param options - Existing public configuration and authority.
+ * @param route - The route, such as `api.orders.searchOrders`.
+ * @param options - TanStack options plus an `input` function of the page parameter.
  * @returns The typed paginated query result.
  */
 export function useInfiniteRoute<
-  Name extends QuerySelector,
+  Route extends ApiQueryRoute,
   PageParam,
-  Selected = InfiniteData<OutputFor<Name>, PageParam>,
+  Selected = InfiniteData<RouteOutput<Route>, PageParam>,
 >(
-  name: Name,
+  route: Route,
   options: Omit<
     UseInfiniteQueryOptions<
-      OutputFor<Name>,
-      ErrorFor<Name>,
+      RouteOutput<Route>,
+      RouteError<Route>,
       Selected,
       readonly unknown[],
       PageParam
     >,
     "queryKey" | "queryFn"
-  > & { readonly input: (page: PageParam) => InputFor<Name> },
-): UseInfiniteQueryResult<Selected, ErrorFor<Name>> {
+  > & { readonly input: (page: PageParam) => RouteInput<Route> },
+): UseInfiniteQueryResult<Selected, RouteError<Route>> {
   const runtime = useRelkitClient();
-  const generated = procedureUtils(runtime.utils, name).infiniteOptions({
-    input: options.input,
-    initialPageParam: options.initialPageParam,
-  });
+  const { utils, name } = routeUtils(runtime.utils, route);
+  const generated = normalizedQuery(
+    utils.infiniteOptions({ input: options.input, initialPageParam: options.initialPageParam }),
+  );
   return useInfiniteQuery({
     ...generated,
     ...options,
@@ -203,20 +201,21 @@ export function useInfiniteRoute<
       runtime.status === "ready" && runtime.identityKey !== null && options.enabled !== false,
     queryKey: runtime.scope ? relkitKey(runtime.scope, "query", name) : ["relkit", "blocked", name],
   } as UseInfiniteQueryOptions<
-    OutputFor<Name>,
-    ErrorFor<Name>,
+    RouteOutput<Route>,
+    RouteError<Route>,
     Selected,
     readonly unknown[],
     PageParam
   >);
 }
+
 /**
- * Returns the existing generated query/mutation utilities for a declared selector.
- * @typeParam Name - Declared resource or procedure selector.
- * @param name - Declared resource or selector identity.
- * @returns The declared generated query and mutation utilities.
+ * Returns the oRPC TanStack utilities of one `api` route, for prefetching and invalidation.
+ * @typeParam Route - A route from the generated `api` object.
+ * @param route - The route, such as `api.orders.getOrder`.
+ * @returns The route's query and mutation utilities.
  */
-export function useRouteUtils<Name extends QuerySelector | MutationSelector>(name: Name) {
+export function useRouteUtils<Route extends ApiQueryRoute | ApiMutationRoute>(route: Route) {
   const runtime = useRelkitClient();
-  return procedureUtils(runtime.utils, name);
+  return routeUtils(runtime.utils, route).utils;
 }

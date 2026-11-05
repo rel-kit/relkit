@@ -1,12 +1,12 @@
 import type { UseQueryOptions } from "@tanstack/react-query";
-import type { ErrorFor, InputFor, OutputFor, QuerySelector } from "./registry.types.js";
+import type { ApiQueryRoute, RouteError, RouteInput, RouteOutput } from "../api.types.js";
 
 /**
- * Declared route input or the existing skip-token readiness sentinel.
- * @typeParam Name - Declared registry key selecting the matching application contract.
+ * Query options for one `api` route, with its typed input.
+ * @typeParam Route - A query route from the generated `api` object.
  * @typeParam Selected - Selected query data exposed to subscribers.
  */
-export type QueryInput<Name extends QuerySelector, Selected> = Omit<
-  UseQueryOptions<OutputFor<Name>, ErrorFor<Name>, Selected>,
+export type QueryInput<Route extends ApiQueryRoute, Selected> = Omit<
+  UseQueryOptions<RouteOutput<Route>, RouteError<Route>, Selected>,
   "queryKey" | "queryFn"
-> & { readonly input: InputFor<Name> };
+> & { readonly input: RouteInput<Route> };

@@ -3,9 +3,7 @@
 import type { ObservationRequest, InvocationOptions } from "./agent-hook.types.js";
 
 import { useCallback, useEffect, useState } from "react";
-import { runExecutionPromise } from "relkit/contracts/operation";
-import { agentOperations, agentRuntime } from "./agent-runtime.js";
-import { isAcceptedAgentRun } from "./agent-operations.service.js";
+import { agentOperations, isAcceptedAgentRun } from "./agent-operations.service.js";
 import { emptyAgentContent } from "./agent-observation.js";
 import { requiredThreadId } from "./agent-continuation.js";
 import { agentMethods } from "./agent-methods.js";
@@ -84,21 +82,18 @@ export function useAgent<Name extends AgentSelector>(name: Name): UseAgentResult
         throw new Error(`RelKit client is not ready (${runtime.status})`);
       const threadId = requiredThreadId(options);
       const scope = pendingScopeKey(runtime.scope);
-      const receipt = await runExecutionPromise(
-        agentRuntime,
-        agentOperations.submit({
-          client: runtime.client,
-          scopeKey: scope,
-          agentId: name,
-          threadId,
-          identity: runtime.identity,
-          kind,
-          payload,
-          ...(options.resume === undefined ? {} : { resume: options.resume }),
-          ...(state.snapshot === undefined ? {} : { snapshot: state.snapshot }),
-          ...(state.threadId === threadId && activeRunId !== undefined ? { activeRunId } : {}),
-        }),
-      );
+      const receipt = await agentOperations.submit({
+        client: runtime.client,
+        scopeKey: scope,
+        agentId: name,
+        threadId,
+        identity: runtime.identity,
+        kind,
+        payload,
+        ...(options.resume === undefined ? {} : { resume: options.resume }),
+        ...(state.snapshot === undefined ? {} : { snapshot: state.snapshot }),
+        ...(state.threadId === threadId && activeRunId !== undefined ? { activeRunId } : {}),
+      });
       if (kind === "run" && isAcceptedAgentRun(receipt)) {
         setObservation((current) => ({ threadId, revision: (current?.revision ?? 0) + 1 }));
       }

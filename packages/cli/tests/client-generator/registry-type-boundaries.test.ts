@@ -38,5 +38,12 @@ test("renders channel presence variants and client-disabled route metadata", () 
     target: { ...route.target, output: { kind: "stream", item: { type: "string" } } },
   };
   expect(Effect.runSync(registryTypeEffect(streaming))).toContain("ClientStreamContract");
-  expect(Effect.runSync(registryTypeEffect({ ...route, responses: [] }))).toContain(", Error> &");
+  expect(
+    Effect.runSync(
+      registryTypeEffect({ ...route, responses: [], target: { ...route.target, errors: [] } }),
+    ),
+  ).toContain(', import("@relkit/client").RelkitUndeclaredError> &');
+  expect(Effect.runSync(registryTypeEffect({ ...route, responses: [] }))).toContain(
+    'RelkitDeclaredError<"orders.not-found", 404,',
+  );
 });

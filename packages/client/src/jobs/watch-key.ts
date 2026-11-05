@@ -1,17 +1,16 @@
-import { Equal, Hash } from "effect";
 import type { JobWatchOptions } from "./types.js";
 const feedIds = new WeakMap<object, number>();
 let nextFeedId = 1;
 
 /** Complete immutable sharing identity with borrowed transport/configuration. */
-export class WatchFeedKey implements Equal.Equal {
+export class WatchFeedKey {
   readonly value: string;
   /**
    * Serializes every existing authorization, protocol, cursor and retry boundary.
    * @param client - Transport object, compared by its existing WeakMap identity.
    * @param name - Declared job.
    * @param options - Complete observation authority.
-   * @returns The owner or public error instance.
+   * @returns A key compared by its serialized {@link WatchFeedKey.value}.
    */
   constructor(
     readonly client: unknown,
@@ -19,14 +18,6 @@ export class WatchFeedKey implements Equal.Equal {
     readonly options: JobWatchOptions,
   ) {
     this.value = feedKey(client, name, options);
-  }
-  /** @param that - Other key. @returns Equality by the complete existing key. */
-  [Equal.symbol](that: Equal.Equal): boolean {
-    return that instanceof WatchFeedKey && that.value === this.value;
-  }
-  /** @returns Stable hash of the complete existing serialized key. */
-  [Hash.symbol](): number {
-    return Hash.string(this.value);
   }
 }
 

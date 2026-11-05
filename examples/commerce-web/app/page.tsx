@@ -1,17 +1,21 @@
 "use client";
 
+import { api } from "@relkit/client";
 import { useChannel, useRoute, useRouteMutation, useStream } from "@relkit/client/react";
 import { AgentExamples } from "./agent-examples";
 
 export default function Page() {
-  const orders = useRoute("GET /orders", { input: {}, staleTime: 30_000 });
-  const announcements = useRoute("GET /announcements", { input: {}, staleTime: 30_000 });
-  const post = useRouteMutation("POST /announcements", {
+  const orders = useRoute(api.orders.searchOrders, { input: {}, staleTime: 30_000 });
+  const announcements = useRoute(api.announcements.getAnnouncements, {
+    input: {},
+    staleTime: 30_000,
+  });
+  const post = useRouteMutation(api.announcements.postAnnouncement, {
     onSuccess: async () => {
       await announcements.refetch();
     },
   });
-  const report = useStream("GET /reports/:reportId");
+  const report = useStream(api.orders.streamOrderReport);
   const channel = useChannel("announcements.feed", {
     params: {},
     on: {
@@ -41,7 +45,7 @@ export default function Page() {
         {post.isPending ? "Posting…" : "Post announcement"}
       </button>
       <span role="status">
-        {post.isError ? ` Post failed: ${String(post.error)}` : post.isSuccess ? " Posted" : ""}
+        {post.error ? ` Post failed: ${post.error.code}` : post.isSuccess ? " Posted" : ""}
       </span>
       <ul>
         {(announcements.data?.messages ?? []).map((message, index) => (

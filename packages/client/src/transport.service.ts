@@ -1,109 +1,81 @@
-import { Context, Effect, Fiber, Layer, type Scope } from "effect";
-import { observeExecution } from "relkit/contracts/operation";
-import { nativeCall } from "./native-stream.js";
-import type { ClientTransportService, TransportLink } from "./transport.types.js";
+import { abortable } from "./native/iterate.js";
+import { createWorkOwner } from "./native/owner.js";
+import type {
+  ClientTransportService,
+  TransportLink,
+  TransportSelection,
+} from "./transport.types.js";
 import type { CreateAutoClientOptions } from "./index.types.js";
 import { httpLink, webSocketEndpoint, webSocketLink } from "./transport-native.js";
-import { connectSocket, connectSocketEffect } from "./transport-socket.js";
-
-/** Configured transport selection and invocation authority, without server dependencies. */
-export class ClientTransport extends Context.Service<ClientTransport, ClientTransportService>()(
-  "relkit/client/ClientTransport",
-) {}
+import { connectSocket } from "./transport-socket.js";
 
 /**
- * Acquires one link owner with a lazy, shared transport-selection decision.
- * @param select - Native link or lazy auto-selection operation supplied by configuration.
- * @returns A synchronously acquirable Layer; lazy selection belongs to its owner Scope.
- * @remarks Each invocation can interrupt its own wait without cancelling or
- * poisoning the shared selection. Owner closure interrupts unfinished selection.
+ * Creates one link owner with a lazy transport-selection decision shared by every call.
+ * @param select - Native link or lazy auto-selection supplied by configuration.
+ * @returns A transport whose calls share one selection and whose close aborts all owned work.
+ * @remarks Each invocation can abort its own wait without cancelling or poisoning the
+ * shared selection. Closing the owner aborts an unfinished selection and in-flight calls.
  * @example
  * ```ts
- * import { Effect, ManagedRuntime } from "effect";
- * import { runExecutionSync } from "relkit/contracts/operation";
- * import { ClientTransport, clientTransportLayer } from "./transport.service.js";
+ * import { createClientTransport } from "./transport.service.js";
  * export async function transportOwner(): Promise<void> {
- *   const owner = ManagedRuntime.make(clientTransportLayer(Effect.succeed({ call: async () => 1 })));
- *   try { const transport = runExecutionSync(owner, ClientTransport); }
- *   finally { await owner.dispose(); }
+ *   const transport = createClientTransport(async () => ({ call: async () => 1 }));
+ *   try { await transport.invoke([], undefined, { context: {} }); }
+ *   finally { await transport.close(); }
  * }
  * ```
  * @see packages/client/tests/transport/examples.test.ts for executable ownership examples.
  */
-export function clientTransportLayer(
-  select: Effect.Effect<TransportLink, unknown, Scope.Scope>,
-): Layer.Layer<ClientTransport> {
-  return Layer.effect(
-    ClientTransport,
-    Effect.gen(function* () {
-      const scope = yield* Effect.scope;
-      const context = yield* Effect.context<Scope.Scope>();
-      let selection: Fiber.Fiber<TransportLink, unknown> | undefined;
-      const selected = Effect.uninterruptibleMask((restore) =>
-        Effect.gen(function* () {
-          // Forking and publishing the handle cannot suspend; concurrent callers
-          // share one owner-scoped selector before their interruptible joins.
-          selection ??= yield* Effect.forkIn(Effect.provideContext(select, context), scope);
-          return yield* restore(Fiber.join(selection));
-        }),
-      );
-      return ClientTransport.of({
-        invoke: Effect.fn("ClientTransport.invoke")((path, input, options) =>
-          observeExecution(
-            "client",
-            "rpc.invoke",
-            Effect.gen(function* () {
-              const link = yield* selected;
-              return yield* nativeCall((signal) =>
-                link.call(path, input, {
-                  ...options,
-                  signal:
-                    options.signal === undefined
-                      ? signal
-                      : AbortSignal.any([options.signal, signal]),
-                }),
-              );
-            }),
-          ),
-        ),
-      });
-    }),
-  );
+export function createClientTransport(select: TransportSelection): ClientTransportService {
+  const owner = createWorkOwner();
+  let selection: Promise<TransportLink> | undefined;
+  const selected = (): Promise<TransportLink> => (selection ??= owner.run(select));
+  return {
+    invoke: (path, input, options) =>
+      owner.run(async (signal) => {
+        const link = await abortable(selected(), signal);
+        signal.throwIfAborted();
+        return link.call(path, input, { ...options, signal });
+      }, options.signal),
+    close: () => owner.close(),
+  };
 }
 
 /**
- * Selects WebSocket once, falling back only when initial establishment fails.
+ * Selects WebSocket once, falling back to HTTP only when initial establishment fails.
  * @param options - Explicit transport configuration, retaining existing option precedence.
- * @returns A lazy decision shared by the owning transport Layer.
+ * @returns A lazy selection; the first connected socket stays owned by the selection's
+ * signal until the oRPC link takes it, so an unused socket closes with its owner.
  */
-export const selectAutoTransport = Effect.fn("ClientTransport.select")(
-  (options: CreateAutoClientOptions) =>
-    Effect.gen(function* () {
-      const fallback = httpLink(options);
-      const Socket = options.websocket ?? globalThis.WebSocket;
-      if (Socket === undefined) return fallback;
-      const endpoint = webSocketEndpoint(options.baseUrl);
-      let transferred = false;
-      return yield* Effect.acquireRelease(
-        connectSocketEffect(Socket, endpoint, options.establishmentTimeoutMs ?? 10_000),
-        (socket) =>
-          Effect.sync(() => {
-            if (!transferred) socket.close();
-          }),
-        { interruptible: true },
-      ).pipe(
-        Effect.map((socket) => {
-          let first: WebSocket | undefined = socket;
-          return webSocketLink(options, Socket, () => {
-            if (first === undefined)
-              return connectSocket(Socket, endpoint, options.establishmentTimeoutMs ?? 10_000);
-            const connected = first;
-            first = undefined;
-            transferred = true;
-            return Promise.resolve(connected);
-          });
-        }),
-        Effect.catch(() => Effect.succeed(fallback)),
-      );
-    }),
-);
+export function selectAutoTransport(options: CreateAutoClientOptions): TransportSelection {
+  return async (signal) => {
+    const fallback = httpLink(options);
+    const Socket = options.websocket ?? globalThis.WebSocket;
+    if (Socket === undefined) return fallback;
+    const endpoint = webSocketEndpoint(options.baseUrl);
+    const timeoutMs = options.establishmentTimeoutMs ?? 10_000;
+    let socket: WebSocket;
+    try {
+      socket = await connectSocket(Socket, endpoint, timeoutMs, signal);
+    } catch {
+      // Owner closure is cancellation, not an establishment failure.
+      if (signal.aborted) throw signal.reason;
+      return fallback;
+    }
+    let first: WebSocket | undefined = socket;
+    const release = (): void => {
+      if (first === undefined) return;
+      first = undefined;
+      socket.close();
+    };
+    if (signal.aborted) release();
+    else signal.addEventListener("abort", release, { once: true });
+    return webSocketLink(options, Socket, () => {
+      if (first === undefined) return connectSocket(Socket, endpoint, timeoutMs);
+      const connected = first;
+      first = undefined;
+      signal.removeEventListener("abort", release);
+      return Promise.resolve(connected);
+    });
+  };
+}

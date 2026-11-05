@@ -1,5 +1,6 @@
 After [frontend setup and pulling the commerce contract](/guides/frontend/connect-react), render
-this component under the provider. It subscribes to this declaration's `announcements.feed` channel:
+this component under the provider. It subscribes to this declaration's `announcements.feed` channel and reads messages through
+`api.announcements.getAnnouncements`, the `GET /announcements` route:
 
 <include
   source="apps/docs/examples/frontend/announcements.tsx"

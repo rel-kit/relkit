@@ -1,7 +1,7 @@
-/** Calls the Echo contract from a TypeScript browser frontend without React or backend source imports. */
-import { createClient } from "@relkit/client";
+/** Calls the Echo route from a TypeScript browser frontend without React or backend source imports. */
+import { createApi } from "@relkit/client";
 
-/** Sends one message over RPC using types from the caller's pulled contract.
+/** Sends one message using types from the caller's pulled contract.
  * @param baseUrl - Public backend origin, or the frontend origin when proxying RPC.
  * @param message - Nonempty message accepted by the Echo function.
  * @returns The validated message output; transport and application failures reject. */
@@ -19,12 +19,12 @@ export async function echoMessage(baseUrl: string, message: string) {
   ) {
     throw new Error("The backend returned an invalid client identity");
   }
-  const client = createClient({
+  const backend = createApi({
     baseUrl,
     headers: {
       "x-relkit-identity-scope": identity.identityScope,
       "x-relkit-session-epoch": identity.sessionEpoch,
     },
   });
-  return client["route.post.echo"]({ message });
+  return backend.echo.echo({ message });
 }
