@@ -4,7 +4,7 @@ import { posix } from "node:path";
 export const snapshotFactories = new Map([
   ["@langchain/langgraph", new Set(["END", "MemorySaver", "START", "StateSchema", "interrupt"])],
   ["relkit/agents", new Set(["defineAgent"])],
-  ["@relkit/langchain", new Set(["defineAgent", "defineGraph", "defineGraphNode"])],
+  ["@relkit/langchain", new Set(["defineGraph", "defineGraphNode", "langchain"])],
   ["relkit/config", new Set(["defineApp", "defineEnv", "env"])],
   ["relkit/functions", new Set(["defineFunction", "defineError"])],
   ["@relkit/better-auth", new Set(["defineBetterAuthService"])],

@@ -1,3 +1,4 @@
+import { langchain } from "@relkit/langchain";
 import { describe, expect, test } from "bun:test";
 import { defineApp } from "../../packages/relkit/src/app/define-app.ts";
 import { defineEnv, env } from "relkit/config";
@@ -55,6 +56,7 @@ describe("compiler semantic validation", () => {
     const agent = (model?: string) =>
       defineAgent({
         id: "support.agent",
+        runtime: langchain(),
         input: z.string(),
         output: z.string(),
         ...(model === undefined ? {} : { model }),

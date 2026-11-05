@@ -72,6 +72,15 @@ function routeMiddlewareContext({ middlewareId, signal, request, auth }) {
 
 /** Agent invocation/persistence wiring included only when the graph needs it. */
 export const SERVER_AGENT_REGISTRATION_SOURCE = `
+function agentIntegration(node) {
+  return node.runtime?.integrationId ?? "langchain";
+}
+function agentsOf(integrationId) {
+  return plan.agents
+    .filter((node) => agentIntegration(node) === integrationId)
+    .map((node) => runtimeManifest.agents?.[node.id])
+    .filter((agent) => agent !== undefined);
+}
 function bindAgents() {
   for (const node of plan.agents) {
     const agent = runtimeManifest.agents?.[node.id];
@@ -102,6 +111,7 @@ async function invokeBoundAgent(node, agent, input, context) {
     if (modelRegistry === undefined) throw new Error("Model provider registry unavailable.");
   }
   const trigger = context.trigger?.kind === "agent-run" ? context.trigger : undefined;
+  const invokeAgent = agentAdapters[agentIntegration(node)].invokeAgentFunction;
   return invokeAgent({
     agent, input, ...(modelRegistry === undefined ? {} : { modelRegistry }), tools: runtimeManifest.tools ?? {},
     environment: values,

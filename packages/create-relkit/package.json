@@ -223,6 +223,11 @@
     },
     "integrations": [
       {
+        "id": "ai-sdk",
+        "package": "@relkit/ai-sdk",
+        "maturity": "labs"
+      },
+      {
         "id": "aws",
         "package": "@relkit/aws",
         "maturity": "labs"

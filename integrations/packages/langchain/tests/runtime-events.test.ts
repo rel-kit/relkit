@@ -1,5 +1,5 @@
 /** Exercises native runtime events behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent } from "relkit/agents";
 import { describe, expect, test } from "vitest";
 import { defineFunction } from "relkit/functions";
 import {
@@ -11,12 +11,7 @@ import {
 } from "relkit/invocation";
 import { z } from "relkit/schema";
 import { defineTool } from "relkit/tools";
-import {
-  ApprovalRequiredError,
-  defineAgent,
-  invokeAgent,
-  type AgentRuntimeOptions,
-} from "../src/index.ts";
+import { ApprovalRequiredError, invokeAgent, type AgentRuntimeOptions } from "../src/index.ts";
 import { createHangingTestModel, createTestModel, type TestModelTurn } from "./test-model.ts";
 import { setup, expectedToolEvents } from "./runtime-events.fixture.js";
 

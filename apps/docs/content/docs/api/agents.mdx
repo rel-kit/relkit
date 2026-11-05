@@ -23,147 +23,6 @@ For a complete workflow, follow [build an offline agent](/guides/ai/build-an-off
 
 [Observe an agent and send controls](/docs/modules/ai/streaming#use-from-the-frontend) shows the client side of this capability.
 
-## Most-used APIs
-
-These entries carry each API's contract and example. The complete reference follows.
-
-### approveApproval
-
-Moves a pending approval to the approved state.
-
-**Throws**
-
-ApprovalStateError for a malformed or final decision.
-
-**Example**
-
-```ts
-import { approveApproval, createApproval } from "relkit/agents";
-
-const pending = createApproval({
-  invocationId: "run",
-  toolCallId: "call",
-  toolId: "send",
-  sideEffect: "write",
-  policy: "always",
-});
-const approved = approveApproval(pending);
-void approved;
-```
-
-**Signature**
-
-```ts
-declare const approveApproval: (approval: ApprovalRecord) => ApprovedApproval;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L106)
-
-Since v0.4.0
-
-### denyApproval
-
-Moves a pending approval to the denied state.
-
-**Throws**
-
-ApprovalStateError for a malformed or final decision.
-
-**Example**
-
-```ts
-import { createApproval, denyApproval } from "relkit/agents";
-
-const pending = createApproval({
-  invocationId: "run",
-  toolCallId: "call",
-  toolId: "send",
-  sideEffect: "write",
-  policy: "always",
-});
-const denied = denyApproval(pending);
-void denied;
-```
-
-**Signature**
-
-```ts
-declare const denyApproval: (approval: ApprovalRecord) => DeniedApproval;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L139)
-
-Since v0.4.0
-
-### defineAgent
-
-Defines an SDK-independent agent using validated schemas and RelKit tool references.
-
-**Throws**
-
-The original authoring validation or identity error.
-
-**Example**
-
-```ts
-import { defineAgent } from "relkit/agents";
-import { z } from "relkit/schema";
-
-const support = defineAgent({
-  id: "support",
-  input: z.object({ message: z.string() }),
-  output: z.object({ answer: z.string() }),
-  instructions: "Reply briefly.",
-  tools: [],
-  limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 30_000 },
-});
-void support;
-```
-
-**Signature**
-
-```ts
-declare const defineAgent: <
-  const Id extends string,
-  const InputSchema extends StandardSchemaV1,
-  const OutputSchema extends StandardSchemaV1,
-  const Tools extends readonly ToolRefAny[],
->(
-  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools>,
-) => AgentDescriptor<
-  Id,
-  InferInput<InputSchema>,
-  InferOutput<OutputSchema>,
-  InputSchema,
-  OutputSchema,
-  Tools
->;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L82)
-
-Since v0.4.0
-
-#### Backend and frontend example
-
-This SDK-independent factory describes the client contract. The runnable example below uses `defineAgent` from `@relkit/langchain` to supply native execution; see [agent setup](/docs/modules/ai/agents) for the required integration and runtime bindings.
-
-**Backend** — these maintained files define the operation used by the frontend below.
-
-<include
-  source="templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"
-  lang="ts"
-  meta='title="templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"'
->
-  /_snippets/source/templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts
-</include>
-
-**Frontend**
-
-<include>/_frontend/assistant.mdx</include>
-
-## Complete reference
-
 <include>/_snippets/generated/exports/agents.mdx</include>
 
 ## `agent-client-chat.ts`
@@ -1393,6 +1252,74 @@ readonly code: "RELKIT_APPROVAL_STATE_INVALID"
 
 ## `approval.ts`
 
+### approveApproval
+
+Moves a pending approval to the approved state.
+
+**Throws**
+
+ApprovalStateError for a malformed or final decision.
+
+**Example**
+
+```ts
+import { approveApproval, createApproval } from "relkit/agents";
+
+const pending = createApproval({
+  invocationId: "run",
+  toolCallId: "call",
+  toolId: "send",
+  sideEffect: "write",
+  policy: "always",
+});
+const approved = approveApproval(pending);
+void approved;
+```
+
+**Signature**
+
+```ts
+declare const approveApproval: (approval: ApprovalRecord) => ApprovedApproval;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L106)
+
+Since v0.4.0
+
+### denyApproval
+
+Moves a pending approval to the denied state.
+
+**Throws**
+
+ApprovalStateError for a malformed or final decision.
+
+**Example**
+
+```ts
+import { createApproval, denyApproval } from "relkit/agents";
+
+const pending = createApproval({
+  invocationId: "run",
+  toolCallId: "call",
+  toolId: "send",
+  sideEffect: "write",
+  policy: "always",
+});
+const denied = denyApproval(pending);
+void denied;
+```
+
+**Signature**
+
+```ts
+declare const denyApproval: (approval: ApprovalRecord) => DeniedApproval;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/approval.ts#L139)
+
+Since v0.4.0
+
 ### "./approval.types.js" (namespace export)
 
 Re-exports all named exports from the "./approval.types.js" module.
@@ -2522,8 +2449,8 @@ declare const toolClientEvents: (
 
 ## `define-agent-build.ts`
 
-Validates generic authoring inputs before binding a descriptor identity.
-Native fields are rejected with their integration import so no capability is silently ignored.
+Validates portable authoring inputs before binding a descriptor identity, then lets the selected
+adapter add its own fields. Native fields outside the adapter's options are rejected.
 
 ### prepareAgentDescriptor
 
@@ -2541,21 +2468,13 @@ declare const prepareAgentDescriptor: <
   const InputSchema extends StandardSchemaV1,
   const OutputSchema extends StandardSchemaV1,
   const Tools extends readonly ToolRefAny[],
+  const Runtime extends AgentRuntimeAdapterAny,
 >(
-  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools>,
-) => (
-  id: Id,
-) => AgentDescriptor<
-  Id,
-  InferInput<InputSchema>,
-  InferOutput<OutputSchema>,
-  InputSchema,
-  OutputSchema,
-  Tools
->;
+  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools, Runtime>,
+) => (id: Id) => AgentDefinition<Id, InputSchema, OutputSchema, Tools, Runtime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-build.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent-build.ts#L27)
 
 ## `define-agent-error.ts`
 
@@ -2843,8 +2762,75 @@ declare const normalizeAgentModelEffect: (
 
 ## `define-agent.ts`
 
-Builds plain agent descriptors without loading an execution SDK.
-The compiler selects native execution when an application actually declares agents.
+Builds agent descriptors without loading an execution SDK. The agent's `runtime` adapter names
+the integration the compiler selects to execute it.
+
+### defineAgent
+
+Defines an agent from validated schemas, RelKit tool references, a model profile and the
+`runtime` adapter that executes it.
+
+**Throws**
+
+The original authoring validation or identity error.
+
+**Example**
+
+```ts
+import { defineAgentRuntime } from "relkit/agent-adapters";
+import { defineAgent } from "relkit/agents";
+import { z } from "relkit/schema";
+
+// Applications use an adapter package, such as `langchain()` from `@relkit/langchain`.
+const runtime = defineAgentRuntime({ adapterId: "echo", integrationId: "echo", options: {} });
+const support = defineAgent({
+  id: "support",
+  runtime,
+  model: "default",
+  input: z.object({ message: z.string() }),
+  output: z.object({ answer: z.string() }),
+  instructions: "Reply briefly.",
+  tools: [],
+  limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 30_000 },
+});
+void support;
+```
+
+**Signature**
+
+```ts
+declare const defineAgent: <
+  const Id extends string,
+  const InputSchema extends StandardSchemaV1,
+  const OutputSchema extends StandardSchemaV1,
+  const Tools extends readonly ToolRefAny[],
+  const Runtime extends AgentRuntimeAdapterAny,
+>(
+  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools, Runtime>,
+) => AgentDefinition<Id, InputSchema, OutputSchema, Tools, Runtime>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L91)
+
+Since v0.4.0
+
+#### Backend and frontend example
+
+The runnable example below selects the LangChain adapter with `runtime: langchain({ ... })` from `@relkit/langchain`; see [agent setup](/docs/modules/ai/agents) for the required integration and runtime bindings.
+
+**Backend** — these maintained files define the operation used by the frontend below.
+
+<include
+  source="templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"
+  lang="ts"
+  meta='title="templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"'
+>
+  /_snippets/source/templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts
+</include>
+
+**Frontend**
+
+<include>/_frontend/assistant.mdx</include>
 
 ### "./define-agent.types.js" (namespace export)
 
@@ -2856,7 +2842,7 @@ Re-exports all named exports from the "./define-agent.types.js" module.
 export * from "./define-agent.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L18)
 
 ### AgentChatMapping
 
@@ -2866,7 +2852,7 @@ export * from "./define-agent.types.js";
 declare const AgentChatMapping: AgentChatMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L19)
 
 ### AgentClientPolicy
 
@@ -2876,7 +2862,7 @@ declare const AgentChatMapping: AgentChatMapping;
 declare const AgentClientPolicy: AgentClientPolicy<Guard, StateKey, Events>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L19)
 
 ### AgentControl
 
@@ -2886,7 +2872,7 @@ declare const AgentClientPolicy: AgentClientPolicy<Guard, StateKey, Events>;
 declare const AgentControl: AgentControl;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L19)
 
 ### assertAgentDescriptor
 
@@ -2896,7 +2882,7 @@ declare const AgentControl: AgentControl;
 declare const assertAgentDescriptor: (value: unknown) => asserts value is AgentAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L16)
 
 ### copyAgentLimits
 
@@ -2906,7 +2892,7 @@ declare const assertAgentDescriptor: (value: unknown) => asserts value is AgentA
 declare const copyAgentLimits: (value: unknown) => AgentLimits;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L17)
 
 ### copyAgentLimitsEffect
 
@@ -2922,7 +2908,7 @@ declare const copyAgentLimitsEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L17)
 
 ### defineAgentEffect
 
@@ -2936,23 +2922,17 @@ declare const defineAgentEffect: <
   const InputSchema extends StandardSchemaV1,
   const OutputSchema extends StandardSchemaV1,
   const Tools extends readonly ToolRefAny[],
+  const Runtime extends AgentRuntimeAdapterAny,
 >(
-  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools>,
+  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools, Runtime>,
 ) => Effect.Effect<
-  AgentDescriptor<
-    Id,
-    InferInput<InputSchema>,
-    InferOutput<OutputSchema>,
-    InputSchema,
-    OutputSchema,
-    Tools
-  >,
+  AgentDefinition<Id, InputSchema, OutputSchema, Tools, Runtime>,
   AgentDefinitionFailure,
   never
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L25)
 
 ### isAgentDescriptor
 
@@ -2962,12 +2942,42 @@ declare const defineAgentEffect: <
 declare const isAgentDescriptor: (value: unknown) => value is AgentAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.ts#L16)
 
 ## `define-agent.types.ts`
 
-Defines the SDK-independent agent contract used by generic application authoring.
-Native model, middleware, graph and persistence APIs are owned by @relkit/langchain.
+Defines the portable agent contract. The `runtime` adapter executes the agent; adapter-specific
+options such as LangChain middleware live in that adapter's options.
+
+### AgentDefinition (type alias)
+
+Descriptor `defineAgent` returns: the portable descriptor with the adapter's native fields.
+
+**Signature**
+
+```ts
+type AgentDefinition<
+  Id extends string,
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+  Tools extends readonly ToolRefAny[],
+  Runtime extends AgentRuntimeAdapterAny,
+> = Omit<
+  AgentDescriptor<
+    Id,
+    import("../schema/index.js").InferInput<InputSchema>,
+    import("../schema/index.js").InferOutput<OutputSchema>,
+    InputSchema,
+    OutputSchema,
+    Tools,
+    Runtime["adapterId"]
+  >,
+  keyof AgentRuntimeNativeFields<Runtime>
+> &
+  AgentRuntimeNativeFields<Runtime>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L100)
 
 ### AgentDescriptor (interface)
 
@@ -2983,9 +2993,13 @@ export interface AgentDescriptor<
   InputSchema extends StandardSchemaV1 = StandardSchemaV1,
   OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
   Tools extends readonly ToolRefAny[] = readonly ToolRefAny[],
+  AdapterId extends string = string,
 >
   extends DescriptorBase<"agent", Id>, AgentRef<Id, InputSchema, OutputSchema> {
+  /** Model profile bound in `relkit.config.ts`, optionally with a model override (`default:gpt-5`). */
   readonly model?: string;
+  /** The adapter that executes the agent. */
+  readonly runtime: AgentRuntimeReference<AdapterId>;
   readonly instructions: AgentInstructions;
   readonly tools: AgentToolReferences<Tools>;
   readonly middleware: readonly [];
@@ -2998,7 +3012,7 @@ export interface AgentDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L45)
 
 ### AgentInstructions (type alias)
 
@@ -3008,7 +3022,7 @@ export interface AgentDescriptor<
 type AgentInstructions = string | PromptTemplate | PromptInstructions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L30)
 
 ### AgentLimits (interface)
 
@@ -3024,7 +3038,7 @@ export interface AgentLimits {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L33)
 
 ### AgentToolReferences (type alias)
 
@@ -3038,11 +3052,11 @@ type AgentToolReferences<Tools extends readonly ToolRefAny[]> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L40)
 
 ### DefineAgentOptions (interface)
 
-Generic agent inputs; native capabilities use the explicit integration facade.
+Portable agent inputs plus the `runtime` adapter that executes the agent.
 
 **Signature**
 
@@ -3052,23 +3066,29 @@ export interface DefineAgentOptions<
   InputSchema extends StandardSchemaV1,
   OutputSchema extends StandardSchemaV1,
   Tools extends readonly ToolRefAny[],
+  Runtime extends AgentRuntimeAdapterAny = AgentRuntimeAdapterAny,
 > extends DescriptorMetadata {
   readonly id?: Id;
   readonly input: InputSchema;
   readonly output: OutputSchema;
+  /** Adapter that executes the agent, such as `langchain()` from `@relkit/langchain`. */
+  readonly runtime: Runtime;
+  /** Model profile bound in `relkit.config.ts`; omitted uses the `default` profile. */
   readonly model?: string;
   readonly instructions: AgentInstructions;
   readonly tools: Tools;
-  readonly middleware?: readonly [];
   readonly limits: AgentLimits;
   readonly stateProfile?: string;
-  readonly client?: AgentClientPolicy<NonNullable<AgentClientPolicy["authorize"]>, never>;
+  readonly client?: AgentClientPolicy<
+    NonNullable<AgentClientPolicy["authorize"]>,
+    AgentRuntimeStateKey<Runtime>
+  >;
   readonly chat?: AgentChatMapping;
   readonly controls?: readonly AgentControl[];
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L71)
 
 ### PromptInstructions (interface)
 
@@ -3083,7 +3103,7 @@ export interface PromptInstructions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L23)
 
 ### PromptTemplate (interface)
 
@@ -3096,7 +3116,7 @@ export interface PromptTemplate {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/define-agent.types.ts#L18)
 
 ## `generated-function-error.ts`
 

@@ -1,13 +1,15 @@
 ---
-title: Native runtime and DeepAgents
-description: Choose supported LangChain packages, expose middleware state safely, and add DeepAgents capabilities without adapters.
+title: LangChain adapter and DeepAgents
+description: Choose supported LangChain packages, pass native options through langchain(), expose middleware state safely, and add DeepAgents capabilities.
 pagination: false
 sidebar:
   icon: cpu
 labs: true
 ---
 
-RelKit runs ordinary agents through LangChain and uses DeepAgents when you select capabilities such as subagents, skills, or memory files. There is no public conversion wrapper or application-level runtime adapter.
+The LangChain adapter runs agents that declare `runtime: langchain({ ... })` and uses DeepAgents when
+the options select capabilities such as subagents, skills, or memory files. Native LangChain values go
+in the adapter's options; see [Agent adapters](/docs/modules/ai/adapters) for what RelKit owns under every adapter.
 
 ## Use the tested package versions
 
@@ -17,8 +19,8 @@ profiles used by the [first-agent tutorial](/guides/ai/build-an-offline-agent#co
 
 <include>/_snippets/generated/installations/agent.mdx</include>
 
-Import native `defineAgent`, `defineGraph`, and persistence resources from `@relkit/langchain`.
-Generic descriptors and public event/state contracts remain available from `@relkit/app/agents`.
+Import `langchain`, `langchainModel`, `defineGraph`, and persistence resources from `@relkit/langchain`, and
+`defineAgent` with the public event/state contracts from `@relkit/app/agents`.
 Install the model-provider package used by the application separately. DeepAgents is required only
 when a declaration selects a deep capability; AG-UI has its own independent
 [transport installation](/docs/modules/ai#observe-durable-execution). Neither belongs in a tool-only MCP app.
@@ -30,8 +32,8 @@ checkpointer or store fails protocol validation instead of being cast to a suppo
 
 ## Combine native and RelKit behavior
 
-This agent passes a native model, native tool, real `todoListMiddleware()`, and RelKit function-backed
-tools through one declaration:
+This agent passes a native model, native tool, real `todoListMiddleware()`, and persistence through
+`langchain({ ... })`, and RelKit function-backed tools through `tools`:
 
 <include
   source="examples/commerce/src/services/orders/agents/order-support.agent.ts"

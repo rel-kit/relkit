@@ -1,6 +1,8 @@
 /** Hosts the native todo protocol fixture with AG-UI explicitly selected; the test parent owns termination and releases blocked execution on shutdown. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import { type AgentExecutionEvent } from "../../../src/agents/index.js";
-import { defineAgent, invokeAgent, type AgentContentSink } from "@relkit/langchain";
+import { invokeAgent, type AgentContentSink } from "@relkit/langchain";
 import { createLocalAgentStateProvider } from "../../../src/providers-local/index.js";
 import { z } from "../../../src/schema/index.js";
 import { todoListMiddleware } from "langchain";
@@ -13,12 +15,11 @@ const provider = createLocalAgentStateProvider(root, { pollingMs: 50 });
 const scripted = createTodoTestModel(expectedStates);
 const agent = defineAgent({
   id: "support.echo",
+  runtime: langchain({ model: scripted.model, middleware: [todoListMiddleware()] }),
   input: z.object({ message: z.string() }),
   output: z.object({ answer: z.string() }),
-  model: scripted.model,
   instructions: "Track the order with the todo list, then answer.",
   tools: [],
-  middleware: [todoListMiddleware()],
   limits: { maxSteps: 5, maxToolCalls: 4, timeoutMs: 10_000 },
   stateProfile: "default",
   client: { authorize: () => true, state: ["todos"] },

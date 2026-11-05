@@ -2,6 +2,7 @@
 
 /** Areas that define the contracts integrations implement or call. */
 const protocolAreas: ReadonlySet<string> = new Set([
+  "agent-adapters",
   "agents",
   "buckets",
   "cache",
@@ -22,6 +23,7 @@ const integrationAreas: ReadonlyMap<string, ReadonlySet<string>> = new Map([
   // The Postgres backend implements the event provider and reuses the local retry classification.
   ["@relkit/postgres", new Set(["events", "providers-local"])],
   ["@relkit/langchain", new Set(["functions", "invocation", "schema", "tools"])],
+  ["@relkit/ai-sdk", new Set(["schema", "tools"])],
   // The AWS deployment components run the engine against the application graph.
   ["@relkit/aws", new Set(["engine", "events", "graph"])],
 ]);

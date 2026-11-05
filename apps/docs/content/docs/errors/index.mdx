@@ -19,6 +19,7 @@ Every error and warning RelKit prints starts with a `RELKIT_*` code and ends wit
 | [`RELKIT_ADD_UNSUPPORTED_SOURCE_SHAPE`](/docs/errors/relkit-add-unsupported-source-shape)                                     | Source file is too customized to edit                              |
 | [`RELKIT_ADD_USAGE`](/docs/errors/relkit-add-usage)                                                                           | Invalid relkit add arguments                                       |
 | [`RELKIT_ADD_VALIDATION_FAILED`](/docs/errors/relkit-add-validation-failed)                                                   | Project check failed after relkit add                              |
+| [`RELKIT_AGENT_ACCESS_DENIED`](/docs/errors/relkit-agent-access-denied)                                                       | Agent tool call was refused                                        |
 | [`RELKIT_AGENT_CANCELLED`](/docs/errors/relkit-agent-cancelled)                                                               | Agent run was cancelled                                            |
 | [`RELKIT_AGENT_CONTROL_INVALID`](/docs/errors/relkit-agent-control-invalid)                                                   | Agent is missing the approve control                               |
 | [`RELKIT_AGENT_DEADLINE_INVALID`](/docs/errors/relkit-agent-deadline-invalid)                                                 | Agent timeout or deadline is invalid                               |
@@ -30,10 +31,16 @@ Every error and warning RelKit prints starts with a `RELKIT_*` code and ends wit
 | [`RELKIT_AGENT_MODEL_UNAVAILABLE`](/docs/errors/relkit-agent-model-unavailable)                                               | Agent model is not available                                       |
 | [`RELKIT_AGENT_OUTPUT_VALIDATION`](/docs/errors/relkit-agent-output-validation)                                               | Agent output is invalid                                            |
 | [`RELKIT_AGENT_RESPONSE_LIMIT`](/docs/errors/relkit-agent-response-limit)                                                     | Agent value is too large                                           |
+| [`RELKIT_AGENT_RESUME_UNAVAILABLE`](/docs/errors/relkit-agent-resume-unavailable)                                             | No agent run is waiting                                            |
+| [`RELKIT_AGENT_RUN_FAILED`](/docs/errors/relkit-agent-run-failed)                                                             | Agent run failed                                                   |
+| [`RELKIT_AGENT_RUN_PENDING`](/docs/errors/relkit-agent-run-pending)                                                           | Agent thread is waiting for approval                               |
 | [`RELKIT_AGENT_STEP_LIMIT`](/docs/errors/relkit-agent-step-limit)                                                             | Agent hit its step limit                                           |
 | [`RELKIT_AGENT_TIMEOUT`](/docs/errors/relkit-agent-timeout)                                                                   | Agent run timed out                                                |
+| [`RELKIT_AGENT_TOOL_DENIED`](/docs/errors/relkit-agent-tool-denied)                                                           | Agent tool call was denied                                         |
+| [`RELKIT_AGENT_TOOL_FAILED`](/docs/errors/relkit-agent-tool-failed)                                                           | Agent tool call failed                                             |
 | [`RELKIT_AGENT_TOOL_INVALID`](/docs/errors/relkit-agent-tool-invalid)                                                         | Agent tool is invalid                                              |
 | [`RELKIT_AGENT_TOOL_LIMIT`](/docs/errors/relkit-agent-tool-limit)                                                             | Agent hit its tool-call limit                                      |
+| [`RELKIT_AGENT_TOOL_UNKNOWN`](/docs/errors/relkit-agent-tool-unknown)                                                         | Agent called an unknown tool                                       |
 | [`RELKIT_APP_DUPLICATE`](/docs/errors/relkit-app-duplicate)                                                                   | More than one app config is exported                               |
 | [`RELKIT_APPLICATION_BUILD_UNAVAILABLE`](/docs/errors/relkit-application-build-unavailable)                                   | No build for createRelkit                                          |
 | [`RELKIT_APPLICATION_NOT_RUNNING`](/docs/errors/relkit-application-not-running)                                               | No application is running                                          |

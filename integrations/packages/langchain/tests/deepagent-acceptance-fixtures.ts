@@ -1,7 +1,7 @@
 /** Exercises native deepagent acceptance fixtures behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/index.ts";
 import { z } from "relkit/schema";
-import { defineAgent } from "../src/index.ts";
 import { createTestModel } from "./test-model.ts";
 import { createNativeStringTool } from "./test-native-tool.ts";
 
@@ -63,13 +63,12 @@ function agent(
 ) {
   return defineAgent({
     id,
+    runtime: langchain({ model, tools, ...(subagents === undefined ? {} : { subagents }) }),
     description: id,
     input: z.object({ message: z.string() }),
     output: z.object({ answer: z.string() }),
-    model,
     instructions: `You are ${id}.`,
-    tools,
-    ...(subagents === undefined ? {} : { subagents }),
+    tools: [],
     limits,
   });
 }

@@ -1,5 +1,6 @@
 /** Lists every `RELKIT_*` code with its title, cause, next step and docs page. */
 import type { DiagnosticCodeEntry } from "./codes.types.js";
+import { agentAdapterCodes } from "./agent-adapters.js";
 import { authCodes } from "./auth.js";
 import { checkRuleCodes } from "./check-rules.js";
 import { cliCodes } from "./cli.js";
@@ -31,6 +32,7 @@ export const DIAGNOSTIC_CODES: readonly DiagnosticCodeEntry[] = Object.freeze(
     ...durableBackendCodes,
     ...inspectorCodes,
     ...mcpCodes,
+    ...agentAdapterCodes,
   ].sort((left, right) => left.code.localeCompare(right.code)),
 );
 

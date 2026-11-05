@@ -1,9 +1,10 @@
 /** Owns the checked AG-UI protocol fixture and joins all accepted runs before deleting its temporary provider state. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import { trackFixtureRun, trackFixtureProvider, joinFixtureRuns } from "./fixture-lifetime.js";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { defineAgent } from "@relkit/langchain";
 import type { RegistrationPlan } from "../../src/graph/index.js";
 import { z } from "../../src/schema/index.js";
 import { createLocalAgentStateProvider } from "../../src/providers-local/index.js";
@@ -27,6 +28,7 @@ export async function basicProtocolFixture() {
   const provider = trackFixtureProvider(createLocalAgentStateProvider(root, { pollingMs: 50 }));
   const agent = defineAgent({
     id: "support.echo",
+    runtime: langchain(),
     input: z.string(),
     output: z.string(),
     instructions: "Echo.",

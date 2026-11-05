@@ -1,6 +1,7 @@
 /** Checks the retained cross-domain descriptor inference and negative authoring contracts against public package APIs. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import { defineApp, defineService } from "relkit";
-import { defineAgent } from "@relkit/langchain";
 import { defineBucket } from "relkit/buckets";
 import { defineCache } from "relkit/cache";
 import { defineEnv, env, type EnvRef } from "relkit/config";
@@ -55,6 +56,7 @@ const tool = defineTool({
 });
 const agent = defineAgent({
   id: "types.agent",
+  runtime: langchain(),
   input: z.object({ prompt: z.string() }),
   output: z.object({ answer: z.string() }),
   model: "default",

@@ -9,6 +9,7 @@
     "jsx": "react-jsx",
     "paths": {
       "relkit": ["packages/relkit/src/index.ts"],
+      "relkit/agent-adapters": ["packages/relkit/src/agent-adapters/index.ts"],
       "relkit/agents": ["packages/relkit/src/app/agents.ts"],
       "relkit/agents/client-events": ["packages/relkit/src/agents/client-events.ts"],
       "relkit/agents/agent-client": ["packages/relkit/src/agents/agent-client.ts"],
@@ -117,6 +118,8 @@
       "@relkit/drizzle/mysql": ["packages/drizzle/src/mysql.ts"],
       "@relkit/drizzle/server": ["packages/drizzle/src/server.ts"],
       "@relkit/docker": ["integrations/packages/docker/src/index.ts"],
+      "langchain": ["integrations/packages/langchain/node_modules/langchain/dist/index.d.ts"],
+      "@relkit/ai-sdk": ["integrations/packages/ai-sdk/src/index.ts"],
       "@relkit/langchain": ["integrations/packages/langchain/src/index.ts"],
       "@relkit/langchain/testing": ["integrations/packages/langchain/src/testing/agents.ts"],
       "@relkit/testing": ["packages/testing/src/index.ts"],

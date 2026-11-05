@@ -1,10 +1,11 @@
 /** Exercises native deepagent runtime behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/index.ts";
 import { describe, expect, test } from "vitest";
 import { InMemoryStore, MemorySaver } from "@langchain/langgraph";
 import { createBucketClient, defineBucket, type BucketProvider } from "relkit/buckets";
 import { z } from "relkit/schema";
-import { defineAgent, defineCheckpointerDb, defineMemoryDb, invokeAgent } from "../src/index.ts";
+import { defineCheckpointerDb, defineMemoryDb, invokeAgent } from "../src/index.ts";
 import { hasDeepAgentCapabilities } from "../src/define-agent-deep.ts";
 import { createTestModel } from "./test-model.ts";
 import {
@@ -119,12 +120,14 @@ async function caseBindsARELKITBucketAsAThread() {
   ]);
   const agent = defineAgent({
     id: "bucket.agent",
+    runtime: langchain({
+      model: model.model,
+      backend: defineBucket({ id: "workspace", visibility: "private" }),
+    }),
     input: z.object({ message: z.string() }),
     output: z.object({ answer: z.string() }),
-    model: model.model,
     instructions: "Save the note.",
     tools: [],
-    backend: defineBucket({ id: "workspace", visibility: "private" }),
     limits,
   });
   await expect(
@@ -152,7 +155,6 @@ function caseRecognizesAndValidatesEveryDeepCapability() {
     id: "deep.capability",
     input: z.string(),
     output: z.string(),
-    model,
     instructions: "Use native DeepAgents.",
     tools: [],
     limits,
@@ -163,8 +165,14 @@ function caseRecognizesAndValidatesEveryDeepCapability() {
     { memory: [] },
     { backend: {} },
   ]) {
-    expect(hasDeepAgentCapabilities(defineAgent({ ...base, ...capability }))).toBe(true);
+    expect(
+      hasDeepAgentCapabilities(defineAgent({ ...base, runtime: langchain({ model, ...capability }) })),
+    ).toBe(true);
   }
-  expect(() => defineAgent({ ...base, skills: ["/skills", "/skills"] })).toThrow("unique");
-  expect(() => defineAgent({ ...base, subagents: [child, child] })).toThrow("Duplicate");
+  expect(() =>
+    defineAgent({ ...base, runtime: langchain({ model, skills: ["/skills", "/skills"] }) }),
+  ).toThrow("unique");
+  expect(() => defineAgent({ ...base, runtime: langchain({ model, subagents: [child, child] }) })).toThrow(
+    "Duplicate",
+  );
 }

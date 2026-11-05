@@ -1,5 +1,6 @@
 /** Hosts the native Bun HTTP/WebSocket echo agent against the parent-owned state directory. Reports its port over IPC and stops its server when the parent sends SIGTERM. */
-import { defineAgent } from "@relkit/langchain";
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import { createLocalAgentStateProvider } from "../../../src/providers-local/index.js";
 import { z } from "../../../src/schema/index.js";
 import { upgradeWebSocket, websocket } from "hono/bun";
@@ -12,6 +13,7 @@ const provider = createLocalAgentStateProvider(root, { pollingMs: 50 });
 const authorizedOperations: string[] = [];
 const agent = defineAgent({
   id: "support.echo",
+  runtime: langchain(),
   input: z.object({ message: z.string() }),
   output: z.object({ answer: z.string() }),
   instructions: "Echo the authorized user message.",

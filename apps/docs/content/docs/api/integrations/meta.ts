@@ -5,6 +5,7 @@ export default defineMeta({
   icon: "plug",
   pages: [
     "langchain",
+    "ai-sdk",
     "aws",
     "cloudflare",
     "docker",

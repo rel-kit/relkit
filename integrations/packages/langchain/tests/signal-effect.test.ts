@@ -1,5 +1,6 @@
 /** Exercises native signal effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/adapter.js";
 import { Effect, Layer, Result } from "effect";
 import { expect, test } from "vitest";
 import {
@@ -8,12 +9,12 @@ import {
   ExecutionSignalClock,
   withSignalEffect,
 } from "../src/signal.js";
-import { defineAgent } from "../src/define-agent.js";
 import { z } from "relkit/schema";
 
 const options = {
   agent: defineAgent({
     id: "signal.fixture",
+    runtime: langchain(),
     input: z.string(),
     output: z.string(),
     instructions: "Exercise cancellation.",

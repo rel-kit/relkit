@@ -1,5 +1,6 @@
 /** Builds the reusable-thread follow-up fixture with one explicit first-segment completion barrier. Native state, engine input capture and tracked lifetime remain owned by the RPC test fixture. */
-import { defineAgent } from "@relkit/langchain";
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import { createLocalAgentStateProvider } from "relkit/providers-local";
 import { z } from "relkit/schema";
 import { createApp } from "relkit/runtime-hono";
@@ -20,6 +21,7 @@ import {
 function followUpAgent() {
   const agent = defineAgent({
     id: "support.echo",
+    runtime: langchain(),
     input: z.string(),
     output: z.string(),
     instructions: "Echo.",

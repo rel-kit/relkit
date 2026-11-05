@@ -20,11 +20,6 @@
     "status": 301
   },
   {
-    "from": "/docs/api/integrations/ai-sdk",
-    "to": "/docs/modules/ai/native-runtime",
-    "status": 301
-  },
-  {
     "from": "/docs/ai",
     "to": "/docs/modules/ai",
     "status": 301

@@ -1,0 +1,103 @@
+---
+title: Agent adapters
+description: Choose the SDK that runs an agent with its runtime field, keep SDK-specific options in the adapter, and bind models through profiles.
+pagination: false
+sidebar:
+  icon: plug
+labs: true
+---
+
+This page continues [Define an agent](/docs/modules/ai/agents), which installs the LangChain adapter. An agent's `runtime` field names the adapter that executes it. RelKit owns everything around the
+model call: tools run through the common function engine, the engine's access rules apply, threads
+are durable, approvals pause and resume the run, events stream as AG-UI, and traces record each run.
+The adapter supplies the model turn.
+
+Two adapters ship with RelKit. Both are Labs until the adapter interface is declared stable.
+
+| Adapter       | Package             | Value         |
+| ------------- | ------------------- | ------------- |
+| LangChain     | `@relkit/langchain` | `langchain()` |
+| Vercel AI SDK | `@relkit/ai-sdk`    | `aiSdk()`     |
+
+## Select an adapter
+
+```ts title="src/services/hello/agents/support.agent.ts"
+import { defineAgent } from "@relkit/app/agents";
+import { langchain } from "@relkit/langchain";
+import { z } from "@relkit/app/schema";
+
+export default defineAgent({
+  id: "hello.support",
+  runtime: langchain(),
+  model: "default",
+  input: z.object({ message: z.string() }),
+  output: z.object({ answer: z.string() }),
+  instructions: "Answer briefly.",
+  tools: [],
+  limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 30_000 },
+});
+```
+
+An agent that uses no adapter-specific options switches adapters by changing `runtime` alone, for
+example to `aiSdk()` from `@relkit/ai-sdk`. Applications that never select the AI SDK adapter
+install no AI SDK package.
+
+## Keep SDK options in the adapter
+
+Native models, middleware, tools, persistence and DeepAgents capabilities go in the adapter's own
+options, such as `langchain({ middleware: [todoListMiddleware()] })`. Those options tie the agent to
+that adapter: `client.state` keys contributed by LangChain middleware type-check only under
+`langchain()`, and `defineAgent` rejects native fields placed beside the portable ones. See
+[LangChain adapter and DeepAgents](/docs/modules/ai/native-runtime) for every LangChain option.
+
+## Bind models through profiles
+
+`model` names a model profile bound in `relkit.config.ts`; omitted, the agent uses the `default`
+profile. Rebinding the profile moves every agent that uses it to the new model without code changes.
+
+```ts title="relkit.config.ts"
+import { defineApp } from "@relkit/app/config";
+import { langchainModel } from "@relkit/langchain";
+import env from "@app/platform/env.js";
+
+export default defineApp({
+  env,
+  model: { default: langchainModel({ model: "openai:gpt-5" }) },
+  defaults: { model: "default" },
+});
+```
+
+`model: "default:gpt-5-mini"` keeps the profile's provider and overrides the model name for one agent.
+
+## Write an adapter
+
+`relkit/agent-adapters` holds the interface. An adapter package exports two halves:
+
+- its authoring value, built with `defineAgentRuntime`, which loads no SDK;
+- its runtime half, built with `createAgentAdapterRuntime({ adapterId, turn })`, where `turn` runs one
+  model call with the bridged tool definitions and returns text and tool calls.
+
+RelKit's shared loop calls `turn` and implements run, stream, resume and stop. Its tool bridge
+(`createAgentToolBridge`) runs approvals and the engine's access check before each tool reaches the
+engine, and `agUiEvents` maps every stream frame to AG-UI events.
+
+## Run the conformance suite
+
+`@relkit/testing/agents-conformance` runs the same cases against any adapter: tools, approvals, threads,
+streaming, access rules, traces and model profiles. Both first-party adapters pass it.
+
+```ts title="tests/agent-conformance.test.ts"
+import { createAgentConformanceHarness } from "@relkit/testing/agents-conformance";
+import { test } from "vitest";
+import { myAdapter, myAdapterRuntime, scriptedModel } from "../src/index.js";
+
+const harness = createAgentConformanceHarness({
+  adapter: () => myAdapter(),
+  runtime: myAdapterRuntime,
+  scriptedModel,
+});
+for (const item of harness.cases) test(item.description, () => harness.run(item.id));
+```
+
+Reference: [Agent adapters API](/docs/api/agent-adapters), [LangChain API](/docs/api/integrations/langchain),
+[AI SDK API](/docs/api/integrations/ai-sdk).

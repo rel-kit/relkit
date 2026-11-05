@@ -442,6 +442,80 @@ model resolution from profiles; state persistence hooks; and AG-UI event mapping
 integration becomes the first adapter, keeping its native options under `langchain({ ... })`. The AI
 SDK adapter follows. One conformance suite runs against both.
 
+Decided while applying section 24 (maintainer, 2026-11-05):
+
+- **The interface is its own Labs area, `relkit/agent-adapters`.** Core areas may not carry
+  `@experimental`, so the adapter types, `defineAgentRuntime`, the tool bridge
+  (`createAgentToolBridge`), the shared loop (`createAgentAdapterRuntime`) and the AG-UI mapping
+  (`agUiEvents`) live there and `relkit.labs` lists the area. `relkit/agents` stays Core;
+  `defineAgent` only references the area's types. The conformance suite is
+  `@relkit/testing/agents-conformance` (Core package, no `@experimental` tags).
+- **An adapter has two halves.** The authoring value (`langchain()`, `aiSdk()`) is data plus an
+  optional `extend` hook that adds the adapter's descriptor fields; it loads no SDK. The runtime half
+  (`langchainAgentRuntime`, `aiSdkAgentRuntime`) is exported from the adapter's `./runtime` entry and
+  supplies one model turn; RelKit's shared loop owns run, stream, resume, stop, threads, approvals,
+  limits, traces and stream frames, so both adapters behave the same by construction.
+- **Native options live only inside the adapter value**, which is how they tie an agent to the
+  adapter: `defineAgent` rejects `middleware`, `checkpointer`, `store`, `subagents`, `skills`,
+  `memory`, `backend` and `interruptOn` beside the portable fields, rejects non-string `model`, and
+  accepts only RelKit tool references in `tools`. Client state keys contributed by middleware type-
+  and value-check only under `langchain()`. Switching `runtime` drops the native options, and whatever
+  depended on them (client state keys, native tools) then fails at definition or check time.
+  `nativeOptions` on the descriptor and graph node records which ones an agent used.
+- **`model` names a model profile.** The `model` capability profiles in `defineApp({ model })`
+  already existed; `@relkit/langchain` adds the first-party `langchainModel({ model: "openai:gpt-5" })`
+  provider (registration `model`/`langchain-model`). A selector `default:gpt-5-mini` keeps the
+  profile's provider and overrides the model name. Native model instances, such as the offline
+  `FakeToolCallingModel` in the agent template, move into `langchain({ model })`.
+- **The compiler selects each agent's adapter integration.** The agent graph node gains
+  `runtime: { integrationId, adapterId, protocolVersion, nativeOptions }`; runtime requirements add
+  `agent-execution` for that integration (graph workflows, which have no `runtime`, stay on
+  LangChain), and the generated server imports `@relkit/<integrationId>/runtime` only for
+  integrations some agent selects. An adapter runtime entry exports `invokeAgentFunction`,
+  `assertAgentRuntimeDependencies`, `releaseAgentPersistence` and `createGeneratedAgentFunction`.
+- **Access rules plug in at the bridge.** `createAgentToolBridge({ access })` calls the engine's
+  `AgentAccessCheck` with `{ source: "agent", agentId, toolId, functionId, input, principal }` before
+  every tool call and reports a denial to the model; section 18 supplies the check.
+- **Exact `defineAgent` shapes for the section 12 codemod.** Before:
+
+  ```ts
+  import { defineAgent } from "@relkit/langchain";
+  export default defineAgent({
+    id, input, output, instructions, limits, stateProfile, client, chat, controls,
+    model: <native model, factory or "profile">,
+    tools: [<RelKit tools and LangChain tools>],
+    middleware, checkpointer, store, subagents, skills, memory, backend, interruptOn,
+  });
+  ```
+
+  After:
+
+  ```ts
+  import { defineAgent } from "@relkit/app/agents"; // or "relkit/agents"
+  import { langchain } from "@relkit/langchain";
+  export default defineAgent({
+    id,
+    runtime: langchain({
+      model: <native model or factory>, // only when it is not a string
+      tools: [<LangChain tools>],
+      middleware, checkpointer, store, subagents, skills, memory, backend, interruptOn,
+    }),
+    input, output, instructions, limits, stateProfile, client, chat, controls,
+    model: "<profile>", // only when it was a string
+    tools: [<RelKit tools>],
+  });
+  ```
+
+  Every option keeps its value; `runtime: langchain()` is added when no native option is present,
+  and `defineAgentEffect` moves to `relkit/agents` the same way. Repository call sites were moved by
+  hand for this section; RelKit and LangChain tools in one `tools` array can only be told apart by
+  their type, so the codemod should report mixed arrays it cannot split.
+
+- **Bundled skill references keep the old example for now.** Every template's
+  `.agents/skills/relkit/references/agent-apis.md` must equal the minimal template's copy, whose bytes
+  are pinned to the measured creation evidence for 0.8.8; the update waits for the next measured
+  creation run.
+
 ### D17. relkit mcp (#18)
 
 `relkit mcp` is a stdio MCP server that discovers the running session through the existing private

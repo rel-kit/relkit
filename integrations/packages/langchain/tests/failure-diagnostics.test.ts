@@ -1,8 +1,9 @@
 /** Verifies private native provenance survives sanitization while logs and public fields exclude provider payloads. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/adapter.js";
 import { Effect, Logger } from "effect";
 import { expect, test } from "vitest";
 import { z } from "relkit/schema";
-import { defineAgent } from "../src/define-agent.js";
 import { agentInvocationFailure } from "../src/runtime-effect-error.js";
 import { logAgentFailure } from "../src/runtime-failure-diagnostics.js";
 import { modelFailure } from "../src/runtime-utils.js";
@@ -12,6 +13,7 @@ import { GraphInterruptedError } from "../src/graph-interruption.js";
 const options = {
   agent: defineAgent({
     id: "diagnostics.test",
+    runtime: langchain(),
     input: z.string(),
     output: z.string(),
     instructions: "test",

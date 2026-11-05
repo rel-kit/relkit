@@ -28,6 +28,7 @@ export default defineMeta({
     "cache",
     "tools",
     "agents",
+    "agent-adapters",
     "client",
     "realtime",
     "testing",

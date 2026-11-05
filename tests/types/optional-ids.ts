@@ -1,4 +1,6 @@
 /** Checks inferred descriptor identities while retaining explicit native graph authoring types. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import {
   defineApp,
   defineBucket,
@@ -16,7 +18,6 @@ import {
   defineTransform,
   http,
 } from "relkit";
-import { defineAgent } from "@relkit/langchain";
 import { z } from "relkit/schema";
 
 const input = z.object({ id: z.string() });
@@ -53,6 +54,7 @@ const optionalTool = defineTool({
   approval: "never",
 });
 const optionalAgent = defineAgent({
+  runtime: langchain(),
   input,
   output,
   model: "default",

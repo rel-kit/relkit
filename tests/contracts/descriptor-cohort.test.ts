@@ -1,3 +1,4 @@
+import { langchain } from "@relkit/langchain";
 import { describe, expect, test } from "bun:test";
 import {
   RELKIT_DESCRIPTOR,
@@ -128,6 +129,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
     });
     const agent = defineAgent({
       id: "orders.support",
+      runtime: langchain(),
       input: z.object({ prompt: z.string() }),
       output: z.object({ answer: z.string() }),
       model: "default",
@@ -291,6 +293,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
     });
     const agent = defineAgent({
       id: "orders.support-agent",
+      runtime: langchain(),
       input: z.object({ prompt: z.string() }),
       output: z.object({ answer: z.string() }),
       model: "openai.default",
@@ -319,6 +322,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
     expect(() =>
       defineAgent({
         id: "bad.agent",
+        runtime: langchain(),
         input: z.unknown(),
         output: z.unknown(),
         model: "default",

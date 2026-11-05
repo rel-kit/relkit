@@ -1,9 +1,10 @@
 /** Owns native AG-UI replay fixtures and joins accepted execution before removing temporary provider state. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type AgentExecutionEvent, type AgentStateProvider } from "../../src/agents/index.js";
-import { defineAgent } from "@relkit/langchain";
 import type { RegistrationPlan } from "../../src/graph/index.js";
 import { createLocalAgentStateProvider } from "../../src/providers-local/index.js";
 import {
@@ -70,6 +71,7 @@ export async function protocolFixture(
   roots.push(root);
   const agent = defineAgent({
     id: "support.echo",
+    runtime: langchain(),
     input: z.string(),
     output: z.string(),
     instructions: "Echo.",

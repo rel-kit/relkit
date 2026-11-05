@@ -27,11 +27,11 @@ test("native support agent executes mixed tools and publishes todo state", async
       },
     }),
   ).resolves.toEqual({ answer: "Order demo-1 is ready." });
-  expect(supportAgent.tools.map((entry) => ("ref" in entry ? entry.ref.id : entry.name))).toEqual([
-    "orders.lookup-order",
-    "orders.cancel-order",
-    "order_status",
-  ]);
+  expect(
+    supportAgent.tools.map((entry) =>
+      "ref" in entry ? (entry.ref as { readonly id: string }).id : entry.name,
+    ),
+  ).toEqual(["orders.lookup-order", "orders.cancel-order", "order_status"]);
   expect(values).toContain(
     JSON.stringify({
       todos: [

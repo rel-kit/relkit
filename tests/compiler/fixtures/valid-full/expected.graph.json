@@ -166,10 +166,18 @@
           "kind": "model"
         }
       ],
+      "runtime": {
+        "adapterId": "langchain",
+        "integrationId": "langchain",
+        "nativeOptions": [
+          "model"
+        ],
+        "protocolVersion": 1
+      },
       "source": {
         "column": 22,
         "file": "src/orders/agents/order-support.agent.ts",
-        "line": 12
+        "line": 13
       },
       "toolIds": [
         "orders.lookup-tool"
@@ -533,7 +541,7 @@
       "source": {
         "column": 22,
         "file": "src/orders/agents/order-support.agent.ts",
-        "line": 12
+        "line": 13
       }
     },
     {
