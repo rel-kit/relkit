@@ -41,7 +41,7 @@ const input = { orderId: "o-1", ownerId: "u-1" };
 
 const refundOnEvent = defineEventFunction({
   id: "orders.refund-on-request",
-  event: "orders.refund-requested",
+  event: "orders.refund-requested" as never,
   dependencies: { functions: { refundOrder } },
   handler: async (_event, context) => {
     await context.functions.refundOrder(input);
