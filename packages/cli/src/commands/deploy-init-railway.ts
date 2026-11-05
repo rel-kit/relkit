@@ -83,7 +83,9 @@ ARG SOURCE_DATE_EPOCH=0
 WORKDIR /app
 COPY --from=build /src/.relkit/build/ ./
 COPY --from=dependencies /src/node_modules ./node_modules
-${productionPolicy(user, runtime)}CMD ${command}
+${productionPolicy(user, runtime)}# Railway terminates TLS in front of the service; take the scheme from X-Forwarded-Proto.
+ENV RELKIT_TRUST_PROXY=1
+CMD ${command}
 `;
 }
 

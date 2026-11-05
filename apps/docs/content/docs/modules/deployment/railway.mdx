@@ -1,0 +1,149 @@
+---
+title: Deploy to Railway
+description: Deploy the production container to Railway with Railway Postgres as the durable backend for jobs, schedules and events.
+pagination: false
+sidebar:
+  icon: train-front
+labs: true
+---
+
+Railway builds your app from its repository with the container files RelKit generates, runs it
+behind HTTPS, and provides Postgres. Jobs, schedules and events live in that Postgres database
+through `@relkit/postgres`, so a redeploy or a second instance loses nothing.
+
+<Callout type="note" title="Labs" icon="flask-conical">
+  The Railway target stays Labs until its newcomer deploy test passes in CI. That test follows this
+  guide: it creates the `api` template, deploys it to a throwaway Railway project, and checks HTTPS,
+  jobs, events and schedules across a restart and with two instances.
+</Callout>
+
+## Pre-setup
+
+Start from an app that builds, such as the [`api` template](/docs/learn/create-an-app). Install the
+[Railway CLI](https://docs.railway.com/guides/cli) and sign in:
+
+```sh title="Terminal"
+railway login
+```
+
+Railway bills by usage. The steps below create one project with one database and one service.
+
+## Deploy
+
+<Steps>
+<Step title="Store jobs and events in Postgres" icon="database">
+
+The production image keeps no durable state on its own disk: with the local filesystem provider
+selected, the server refuses to start in the image (`RELKIT_LOCAL_DURABLE_STATE_IN_CONTAINER`).
+Select the [Postgres backend](/docs/modules/jobs/providers/postgres) for jobs and events, whether or
+not the app has any yet:
+
+```sh title="Terminal — application root"
+bun run relkit add jobs --provider postgres
+bun run relkit add events --provider postgres
+```
+
+Both commands read the connection string from the `DATABASE_URL` secret. The runtime creates its
+tables on first start.
+
+</Step>
+<Step title="Generate the Railway files" icon="file-plus">
+
+```sh title="Terminal — application root"
+bun run relkit deploy init railway
+```
+
+This writes four files and changes no cloud resource:
+
+| File                                   | Purpose                                                                            |
+| -------------------------------------- | ---------------------------------------------------------------------------------- |
+| `railway.json`                         | Build with the Dockerfile, gate each deploy on `/healthz`, allow a 70-second drain |
+| `Dockerfile`                           | Install from `bun.lock`, run `relkit build`, run the server as a non-root user     |
+| `.dockerignore`                        | Keep `node_modules`, `.relkit`, `.env` files and Git data out of the build         |
+| `.github/workflows/railway-deploy.yml` | Check, type-check and test, then deploy every push to `main` with the Railway CLI  |
+
+The Dockerfile sets `RELKIT_TRUST_PROXY=1`: Railway terminates HTTPS in front of the service, so
+the server takes the request scheme from `X-Forwarded-Proto` and browser requests from your
+`https://` domain pass its same-origin check. Add `--runtime node` to run the server on Node 24
+instead of Bun. A file that already exists with
+different content stops the command; review it, then rerun with `--force` to replace it. Commit the
+files with `bun.lock`.
+
+</Step>
+<Step title="Create the project, database and service" icon="cloud">
+
+```sh title="Terminal — application root"
+railway init --name my-app
+railway add --database postgres
+railway add --service web --variables 'DATABASE_URL=${{Postgres.DATABASE_URL}}'
+```
+
+`${{Postgres.DATABASE_URL}}` is a Railway reference: the service reads the database's private URL,
+which never leaves Railway's network. Add every other required value from your `defineEnv`
+descriptor the same way, with `railway variables --service web --set NAME=value`.
+
+</Step>
+<Step title="Deploy and open the app" icon="rocket">
+
+```sh title="Terminal — application root"
+railway up --service web
+railway domain --service web
+```
+
+`railway up` uploads the directory, builds the Dockerfile and waits until `/healthz` answers `200`,
+which it does once every provider is ready. `railway domain` prints the HTTPS address:
+
+```sh title="Terminal"
+curl https://<your-domain>/healthz
+```
+
+Expect `{"status":"ready","live":true,"ready":true}`.
+
+</Step>
+</Steps>
+
+## Deploy from GitHub
+
+The generated workflow deploys every push to `main`. In the Railway project, create a project token
+for the environment (Project Settings → Tokens). In the GitHub repository, add it as the
+`RAILWAY_TOKEN` secret and add a `RAILWAY_SERVICE` variable with the value `web`. Do not also
+connect the repository in Railway's service settings, or each push deploys twice.
+
+## Health checks and shutdown
+
+| Path                      | Answers                                                                                     |
+| ------------------------- | ------------------------------------------------------------------------------------------- |
+| `/healthz`                | `200` once providers, workers, database and auth are ready; `503` before and while draining |
+| `/_relkit/v1/health/live` | `200` while the process answers                                                             |
+
+On redeploy Railway sends `SIGTERM`; the server stops admitting requests, finishes or cancels work in
+flight and exits within its drain timeout (`RELKIT_DRAIN_TIMEOUT_MS`, 60 seconds by default). Leased
+jobs and event deliveries that do not finish are picked up again by the next instance.
+
+## Scale out and add a worker service
+
+Several instances of `web` share the database safely: each schedule occurrence runs once, and a job
+or a delivery runs on one instance at a time. Raise the replica count in the service settings or with
+`railway scale`.
+
+To run jobs, schedules and event consumers apart from request handling, add a second service from
+the same source and split the roles with `RELKIT_WORKER_ROLE`:
+
+```sh title="Terminal — application root"
+railway add --service worker --variables 'DATABASE_URL=${{Postgres.DATABASE_URL}}' --variables RELKIT_WORKER_ROLE=worker
+railway variables --service web --set RELKIT_WORKER_ROLE=api
+railway up --service worker
+```
+
+The worker uses the same `railway.json` and image. In GitHub, set the `RAILWAY_WORKER_SERVICE`
+variable to `worker` so the workflow deploys both services.
+
+## Troubleshooting
+
+- **The deploy never turns healthy.** Read the deploy logs with `railway logs --service web`. A
+  `Provider startup failed` record names the cause, such as a missing `DATABASE_URL` or
+  `RELKIT_LOCAL_DURABLE_STATE_IN_CONTAINER`.
+- **`bun install --frozen-lockfile` fails in the build.** Run `bun install` locally and commit the
+  updated `bun.lock`.
+- **POST requests are rejected.** Production servers reject unsafe requests without an `Origin` header
+  that matches the app; browsers send it, and scripts must set it.

@@ -90,7 +90,7 @@ export const MATURITY_FEATURES: readonly MaturityFeature[] = [
     ["@relkit/docker", "relkit/deploy"],
     ["/docs/modules/deployment/local-docker"],
   ),
-  core("Railway deploy", [], [], "Arrives with the production image."),
+
   labs(
     "Realtime",
     ["relkit/realtime"],
@@ -104,6 +104,7 @@ export const MATURITY_FEATURES: readonly MaturityFeature[] = [
       "/docs/api/realtime",
     ],
   ),
+  labs("Railway deploy", [], ["/docs/modules/deployment/railway"]),
   labs(
     "AWS hosting",
     ["@relkit/aws", "@relkit/pulumi"],

@@ -372,6 +372,44 @@ Decided while applying section 17 (maintainer, 2026-11-05):
   worker service. The workflow runs check, typecheck and tests, then `railway up --ci` with a
   pinned `@railway/cli` for `vars.RAILWAY_SERVICE` and, when set, `vars.RAILWAY_WORKER_SERVICE`,
   authenticated by the `RAILWAY_TOKEN` project-token secret.
+- **`RELKIT_TRUST_PROXY=1` takes the scheme from `X-Forwarded-Proto`.** The first live deploy
+  showed every browser `POST` denied with `origin-denied`: Railway terminates TLS, the server sees
+  `http://<domain>` and the same-origin check compares that with the `https://` `Origin`. With the
+  variable set, the generated server rebuilds the request URL with the forwarded scheme (`http` or
+  `https` only) before any middleware runs. It is opt-in because a server exposed without a proxy
+  must not trust a client-sent header; the Railway Dockerfile sets it, the build's own image does
+  not, and the local Docker page tells self-hosters behind a TLS proxy to set it.
+- **The newcomer test verifies outcomes in Postgres, not through the app.** It deploys the `api`
+  template with a `probe` service (an HTTP-triggered task, a schedule every minute, an event and a
+  consumer that triggers the task), opens a Railway TCP proxy to the database, and reads
+  `relkit_job_runs`, `relkit_event_deliveries` and `relkit_schedule_occurrences`: every submitted
+  job and consumer run `completed` once by operation ID, every delivery completed, a new occurrence
+  claimed in each phase and exactly one run per occurrence. The phases are one instance, after
+  `railway redeploy` (a job submitted just before it must complete after it), and two replicas
+  (`railway scale <region>=2`). Railway's `railway delete` schedules the project for deletion two
+  days later but removes every deployment at once, so nothing keeps running or billing.
+- **The candidate is vendored into the newcomer project.** The project is created from the local
+  registry, then every candidate tarball is copied to `vendor/` and referenced with `file:` both as a
+  dependency and in `overrides`, and `bun.lock` is regenerated against the public registry, because
+  Railway's builder cannot reach the local registry and its URLs would otherwise leak into the
+  lockfile. `@relkit/postgres` joined the packed candidate closure for this
+  (`scripts/pack-and-smoke-create-relkit-pack.ts`).
+- **The test runs opt-in.** `bun scripts/railway-newcomer.ts` prints a skip unless
+  `RELKIT_TEST_RAILWAY=1`; the `railway-newcomer` workflow runs it on pull requests from this
+  repository only when the `RELKIT_TEST_RAILWAY` variable is `1`, with `RAILWAY_API_TOKEN` and
+  `RAILWAY_WORKSPACE`. `tests/deployment/railway-newcomer.test.ts` runs the same flow against a
+  stubbed Railway, endpoint and database in every test run. The Railway target stays Labs (its
+  maturity row and docs page) until that workflow passes in CI, per the target-maturity requirement.
+- **Gaps found by the newcomer path, worked around in the probe and left for their owners:** the
+  templates' `tsconfig.json` lists the generated context registry but not
+  `.relkit/generated/event-registry.d.ts`, so any `defineEventFunction` fails to type-check in a new
+  project; and an event function without `profile` resolves to `default`, which does not exist
+  after `relkit add events --provider postgres` names the profile `postgres`, so `relkit check`
+  reports `RELKIT_PROVIDER_PROFILE_UNKNOWN` although `defaults.event` is set.
+- **Engines per target are documented on the deployment overview.** Railway: container image with
+  the Railway CLI; AWS: Pulumi; Vercel and Cloudflare: platform configuration, not available yet.
+  The AWS page lists its four missing Labs criteria, checked against `@relkit/aws` (an ECR repository
+  but no image build or push, an HTTP-only listener on port 80, `desiredCount: 1`, no CI deploy).
 
 ### D10. Postgres durable backend (#12)
 

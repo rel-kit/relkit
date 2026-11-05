@@ -23,4 +23,6 @@ ENV RELKIT_DURABLE_STATE=external
 EXPOSE 3000
 STOPSIGNAL SIGTERM
 HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=3 CMD ["node", "-e", "fetch('http://127.0.0.1:'+(process.env.PORT??3000)+'/healthz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+# Railway terminates TLS in front of the service; take the scheme from X-Forwarded-Proto.
+ENV RELKIT_TRUST_PROXY=1
 CMD ["node", "server/index.js"]

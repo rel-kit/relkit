@@ -61,6 +61,7 @@ export async function packPackages(
       "@relkit/trigger",
       "@relkit/redis",
       "@relkit/s3",
+      "@relkit/postgres",
     ],
     manifests,
   );

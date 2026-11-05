@@ -79,6 +79,13 @@ non-committed test values; the image itself does not load your project's dotenv 
 Do not reuse a host-loopback URL inside a container: it addresses the container itself.
 Configure reachable connected resources using [production provider setup](/docs/modules/deployment/providers).
 
+The image runs as a non-root user, answers `/healthz` (`200` once every provider is ready, `503`
+before and while draining) and reports it through a Docker `HEALTHCHECK`. It keeps no durable state
+on its disk: jobs and events on the local filesystem provider stop it from becoming ready
+(`RELKIT_LOCAL_DURABLE_STATE_IN_CONTAINER`) unless a volume is mounted at `/app/.relkit/state` and
+`RELKIT_ALLOW_LOCAL_DURABLE_STATE=1` is set. Behind a proxy that terminates HTTPS, set
+`RELKIT_TRUST_PROXY=1` so the server takes the request scheme from `X-Forwarded-Proto`.
+
 `relkit local` recipes serve development and publish loopback endpoints. The production image
 does not start Docker recipes. Its external services need their own lifecycle, network, credentials,
 and persistent volumes. Keep database migration tooling outside normal application startup.
