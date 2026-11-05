@@ -265,7 +265,7 @@ not tasks of this change.
 - [x] 26.1 Add coded deprecation warnings that name the replacement, and verify a deprecated-API test
 - [x] 26.2 Write the versioning and upgrades page with the stability policy, the 1.0 criteria and a target date, link it from the README, and verify it renders
 - [x] 26.3 Add a release check that every breaking change has a `relkit migrate` rule and a changelog migration link, and verify it fails on a fixture
-- [ ] 26.4 Update the root contributor guidance to link the maturity table and the stability policy, and verify the docs link check
+- [x] 26.4 Update the root contributor guidance to link the maturity table and the stability policy, and verify the docs link check
 
 ## 27. Findings follow-ups (plan section 8.5)
 

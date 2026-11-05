@@ -45,6 +45,12 @@ are covered by the stability promise; Labs features can change in any release, c
 `scripts/maturity.ts`. Run `bun scripts/maturity.ts` after changing a tier, an export of a Labs
 package or a Labs docs page.
 
+The [versioning and upgrades page](https://relkit.dev/docs/versioning) holds the stability policy,
+the 1.0 criteria and the target date. From 1.0, Core follows semantic versioning, and a deprecated
+Core API keeps working for one minor release with a `RELKIT_DEPRECATED_*` warning that names its
+replacement (use `deprecated()` from `relkit/diagnostics`). Every breaking change ships with a
+`relkit migrate` rule and a changelog link to its section of a migration guide.
+
 ## Stop-doing rules until 1.0
 
 Until Core reaches 1.0, review rejects a change that:
@@ -65,8 +71,10 @@ rules as the review checklist.
 
 RelKit is experimental, interfaces may change, and current consumers are the repository samples.
 Update affected samples directly within a scoped change; preserve data and applied migration
-history. Do not add legacy upgrade commands or compatibility layers merely to retain an experimental
-sample's old layout. Do not run the AWS acceptance suite unless a maintainer explicitly authorizes the
+history. The one pre-1.0 breaking release ships with a `relkit migrate` migration and a
+[migration guide](https://relkit.dev/guides/migrate/relkit-0-9), and repository samples are migrated
+with that same command. Do not add legacy upgrade commands or compatibility layers merely to retain an
+experimental sample's old layout. Do not run the AWS acceptance suite unless a maintainer explicitly authorizes the
 cost and provides an isolated environment.
 
 Pre-release and patched dependencies are listed with an owner and an exit plan in the

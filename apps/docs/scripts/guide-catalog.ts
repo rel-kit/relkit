@@ -108,8 +108,7 @@ const relations = [
   relation("docs/learn/index", ["app"], ["templates/default/v1/minimal/README.md"]),
   relation("docs/modules/index", ["app"], []),
   relation("docs/why-relkit", ["app"], []),
-  relation("docs/maturity", ["app"], []),
-  relation("docs/versioning", ["app"], []),
+  ...["docs/maturity", "docs/versioning"].map((path) => relation(path, ["app"], [])),
   relation("docs/benchmarks", ["app"], ["scripts/benchmark-dev-loop.ts"]),
   relation(
     "docs/faq",
