@@ -160,6 +160,8 @@ async function main(): Promise<void> {
       if (!item.newVersion) throw new Error(`Missing next version: ${item.name}`);
       return { name: item.name, version: item.newVersion };
     });
+  // Every breaking change must ship with a relkit migrate rule and a migration guide section.
+  await run("bun", ["run", "scripts/breaking-migrations.ts"]);
   const version = sharedReleaseVersion(packages);
   const plan: ReleasePlan = { protocol: "relkit.release-plan.v1", version, packages };
   const changelog = renderChangelog(source, version, status.changesets.map(classifyChange));

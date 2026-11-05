@@ -171,6 +171,12 @@ Decided while applying section 12 (maintainer, 2026-11-05):
   versioning, so the 0.9 entries are the pending changesets: every breaking one now links its rule's
   guide section, and new breaking changesets cover the client hooks (section 11) and
   `defineAgent({ runtime })` (section 24), which had none, plus a New entry for `relkit migrate`.
+- **A breaking change names its rule through its guide link (task 26.3).** Changesets frontmatter
+  holds only package bumps, so `scripts/breaking-migrations.ts` reads the link instead: every
+  changeset versioning would group under Breaking must link `/guides/migrate/<page>#<section>`,
+  the section must exist in that guide page, and the anchor must be some rule's `guide` anchor.
+  It runs in `bun run check` and before `version-packages.ts` versions, and
+  `tests/unit/breaking-migrations.test.ts` shows it failing on a fixture.
 
 ### D3. Creation gate becomes a CI concern (#1)
 
