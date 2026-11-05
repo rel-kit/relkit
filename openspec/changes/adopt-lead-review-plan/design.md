@@ -733,6 +733,12 @@ $CRON_SECRET`; the entry compares it in constant time, refuses a missing or shor
   also accept no WebSocket upgrades, which an external provider does not change, so the guide states
   that WebSocket subscriptions need a host that keeps connections open and that realtime on Vercel is
   unverified.
+- **The guide and the maturity row stay Labs.** `/docs/modules/deployment/vercel` documents what
+  runs as the function, Vercel Cron and the cron secret, the external Postgres requirement, the
+  after-request drain, the realtime limits and the newcomer path; the deployment overview lists
+  Vercel's engine as platform configuration with one Node function deployed by the Vercel CLI, and
+  the maturity table gains "Vercel deploy" as Labs. It moves to Core only once
+  `.github/workflows/vercel-newcomer.yml` passes in CI, per the target-maturity requirement.
 - **Verified locally, live run pending.** The function entry was driven in Node 24 against the `api`
   template with the probe service, Postgres jobs and events on a local Postgres 17, simulating
   Vercel's request context: cold requests waited for readiness, an HTTP job and an event consumer

@@ -1228,6 +1228,11 @@
       "examples": ["templates/default/v1/api/relkit.config.ts"]
     },
     {
+      "path": "docs/modules/deployment/vercel",
+      "api": ["app", "jobs", "events", "realtime", "integrations/postgres"],
+      "examples": ["templates/default/v1/api/relkit.config.ts"]
+    },
+    {
       "path": "docs/modules/deployment/aws",
       "api": [
         "app",

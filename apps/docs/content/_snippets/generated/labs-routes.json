@@ -17,6 +17,7 @@
   "/docs/modules/ai/native-runtime",
   "/docs/modules/deployment/aws",
   "/docs/modules/deployment/railway",
+  "/docs/modules/deployment/vercel",
   "/docs/modules/jobs/providers/effect-mq",
   "/docs/modules/jobs/providers/inngest",
   "/docs/modules/jobs/providers/postgres",
