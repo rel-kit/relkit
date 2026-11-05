@@ -1,0 +1,4 @@
+import { defineBetterAuthService } from "@relkit/better-auth";
+
+const trusted = ["http://localhost:3000"];
+export default defineBetterAuthService({ trustedOrigins: trusted });

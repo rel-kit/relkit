@@ -1,0 +1,7 @@
+import { defineTask } from "relkit/jobs";
+
+export default defineTask({
+  publishes: ["billing.charged"],
+  dependencies: { functions: {} },
+  handler: async () => ({}),
+});

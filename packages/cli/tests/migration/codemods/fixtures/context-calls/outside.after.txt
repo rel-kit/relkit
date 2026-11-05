@@ -1,0 +1,12 @@
+import { defineMiddleware } from "relkit/routes";
+import orders from "../../services/orders/service.js";
+import updates from "../../services/orders/channels/order-updates.channel.js";
+import lookup from "../../services/orders/tools/lookup.tool.js";
+import { getRelkit } from "relkit";
+
+export default defineMiddleware("/orders/*", async (c, next) => {
+  const result = await getRelkit().functions.orders.authorizeOrder({ token: c.req.header("x-token") });
+  await updates.trigger({ orderId: "1" }, "changed", {});
+  await lookup.invoke({ q: "kept: tools keep invoke" });
+  return result.ok ? next() : c.text("no", 403);
+});

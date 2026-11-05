@@ -1,0 +1,16 @@
+import { defineAgent } from "@relkit/langchain";
+import { FakeToolCallingModel } from "langchain";
+import { MemorySaver } from "@langchain/langgraph";
+import lookup from "../tools/lookup.tool.js";
+import { z } from "zod";
+
+export default defineAgent({
+  id: "hello.assistant",
+  input: z.object({ question: z.string() }),
+  model: new FakeToolCallingModel({
+    toolCalls: [],
+  }),
+  tools: [lookup],
+  checkpointer: new MemorySaver(),
+  instructions: "Answer briefly.",
+});

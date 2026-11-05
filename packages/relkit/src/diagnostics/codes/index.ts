@@ -11,6 +11,7 @@ import { inspectorCodes } from "./inspector.js";
 import { jobsCodes } from "./jobs.js";
 import { launcherCodes } from "./launcher.js";
 import { mcpCodes } from "./mcp.js";
+import { migrateCodes } from "./migrate.js";
 import { runtimeCodes } from "./runtime.js";
 
 export type { DiagnosticCodeEntry } from "./codes.types.js";
@@ -32,6 +33,7 @@ export const DIAGNOSTIC_CODES: readonly DiagnosticCodeEntry[] = Object.freeze(
     ...durableBackendCodes,
     ...inspectorCodes,
     ...mcpCodes,
+    ...migrateCodes,
     ...agentAdapterCodes,
   ].sort((left, right) => left.code.localeCompare(right.code)),
 );

@@ -1,0 +1,9 @@
+import { defineJob } from "relkit/jobs/legacy";
+import sendReceipt from "./send-receipt.function.js";
+
+export default defineJob({ id: "receipts.send", target: sendReceipt, profile: "queue" });
+
+export async function queue(context) {
+  const result = await context.jobs.sendReceipt.enqueue({ orderId: "1" });
+  return result.instanceId;
+}

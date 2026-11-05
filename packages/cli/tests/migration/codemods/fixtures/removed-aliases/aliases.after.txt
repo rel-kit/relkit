@@ -1,0 +1,14 @@
+import { defineApp } from "relkit/config";
+import { defineJob } from "relkit/jobs";
+import { defineTransform } from "relkit/routes";
+import { s, getJsonSchema } from "relkit/schema";
+import task from "./task.js";
+
+export const schema = getJsonSchema(s.object({ done: s.void() }));
+export const transform = defineTransform({ request: (request) => request });
+export const job = defineJob({ name: "nightly", task, service: "queue" });
+
+export default defineApp({
+  jobs: { default: { kind: "local" } },
+  defaults: { jobs: "default" },
+});

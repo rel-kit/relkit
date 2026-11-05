@@ -108,6 +108,44 @@ breaking change without a migration link.
 
 - **Alternative:** several smaller breaking releases. Rejected by the maintainer in round 3.
 
+Decided while applying section 12 (maintainer, 2026-11-05):
+
+- **`relkit migrate` is the code migration; `layout` stays a subcommand.** `relkit migrate` previews,
+  `--write` applies and `--rollback <record>` undoes; `relkit migrate layout` is unchanged. A code
+  record is told apart from a layout record by `kind: "code"`, may list created files (no `before`),
+  and rollback deletes a created file only while it still holds the migrated bytes. Write refuses a
+  touched file with uncommitted Git changes and restores automatically when publication fails. The
+  codes are `RELKIT_MIGRATE_*` in their own registry file, because `cli.ts` may only shrink.
+- **One rule per breaking change, pure and fixture-tested.** Eleven rules in
+  `packages/cli/src/migration/code-rules/` run in a fixed order (`package-imports` first,
+  `schema-builder` last): `package-imports`, `legacy-jobs`, `removed-aliases`, `error-ids`,
+  `dependency-declarations`, `context-calls`, `service-routes`, `better-auth-file`, `client-hooks`,
+  `agent-runtime`, `schema-builder`. Each is a text transform over a syntax tree that keeps the
+  bytes it does not change; fixtures are `.txt` pairs so 0.8 code never reaches the type checker or
+  the formatter. Every TypeScript parse goes through `packages/cli/src/migration/code-parser.ts`, so
+  swapping in the CLI's bundled TypeScript is a one-file change.
+- **Rules rewrite only what syntax proves and report the rest with file and line.** `context-calls`
+  rewrites receivers imported from `*.function` / `*.channel` modules, created by `defineFunction` /
+  `defineChannel`, or members of an imported `service` module, because tools and graph nodes keep
+  `invoke`; outside a handler only `<service>.<member>.invoke()` has a known handle path
+  (`getRelkit().functions.<serviceId>.<member>`, the ID read from `defineService({ id })` or the
+  service folder). `legacy-jobs` reports every function-target job instead of inventing a task, and
+  rewrites only `ctx.jobs.<name>.enqueue` to `trigger`. `agent-runtime` splits `tools` only when
+  every entry's import tells RelKit tools (`*.tool` modules, `defineTool`) from LangChain tools
+  (`langchain`, `@langchain/*`, `deepagents`). `@relkit/app` root names outside the curated
+  `relkit` root stay on `@relkit/app` and are reported.
+- **Exact public codes for errors.** `error-ids` calls the compiler's own `encodeErrorId` with the
+  file path and binding name, so the written ID equals the code 0.8 inferred; an error without a
+  binding is reported.
+- **Client hooks need the backend's contract.** `client-hooks` names `api` properties with
+  `clientApiPaths` over the routes of `.relkit/generated/client-contract.json`, or the file passed
+  with `--contract` (a separate frontend such as `examples/commerce-web` passes its backend's).
+- **Guidance migrates too.** Rules marked `markdown` (imports, aliases, builder, service routes,
+  client hooks, agent runtime) also rewrite TypeScript code fences in `.md` and `.mdx` files, so the
+  bundled skill references move with the code. Rules that derive identities from file paths do not
+  run on fences. Files under `migrations/` folders are never read, so applied migration history is
+  untouched.
+
 ### D3. Creation gate becomes a CI concern (#1)
 
 The capability table stays as data that CI writes, but the creator compares only release and

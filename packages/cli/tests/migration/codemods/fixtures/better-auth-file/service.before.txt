@@ -1,0 +1,9 @@
+/** Configures email and password sign-in. */
+import { defineBetterAuthService } from "@relkit/better-auth";
+import { organization } from "better-auth/plugins";
+
+export default defineBetterAuthService({
+  baseURL: process.env.BETTER_AUTH_URL ?? "http://127.0.0.1:3000",
+  emailAndPassword: { enabled: true },
+  plugins: [organization()],
+});
