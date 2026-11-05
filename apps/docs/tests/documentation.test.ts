@@ -83,6 +83,7 @@ test("keeps Core concepts near Start and retires the duplicate Async section", a
       "index",
       "observability",
       "inspector",
+      "mcp",
       "realtime-agents-streaming",
       "testing",
       "troubleshooting",

@@ -13,7 +13,9 @@ import {
   toolPlan,
 } from "../../../packages/relkit/tests/runtime-hono/fixtures/mcp-setup.ts";
 import { startBunFixture } from "../../../packages/relkit/tests/runtime-hono/bun-fixture.ts";
-import { execFile } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
+import { mkdir, mkdtemp, readdir, rm } from "node:fs/promises";
+import { join, resolve } from "node:path";
 import { promisify } from "node:util";
 test("lists and invokes visible tools through the official client", async () => {
   const calls: HttpInvocationOptions[] = [];
@@ -56,6 +58,43 @@ test("lists and invokes visible tools through the official client", async () => 
   await client.close();
 });
 
+test("an approval-required tool returns an actionable coded error and does not run", async () => {
+  const calls: HttpInvocationOptions[] = [];
+  const plan = toolPlan([tool("approved", true, "always")]);
+  const app = createApp({
+    plan,
+    manifest: {
+      ...runtimeCohort(plan.graphHash),
+      functions: {},
+      middleware: {},
+      requestTransforms: {},
+      tools: { approved: { target: { input, output } } },
+    },
+    engine: {
+      invoke: async (options) => {
+        calls.push(options);
+        return { echoed: "ran" };
+      },
+    },
+  });
+  const client = new Client({ name: "no-approval-ui", version: "1" });
+  await client.connect(
+    new StreamableHTTPClientTransport(new URL("http://localhost/mcp"), { fetch: appFetch(app) }),
+  );
+  const result = await client.callTool({ name: "approved", arguments: { value: "no" } });
+  expect(result.isError).toBe(true);
+  expect(result.structuredContent).toMatchObject({
+    code: "RELKIT_MCP_APPROVAL_REQUIRED",
+    tool: "approved",
+    docs: "https://relkit.dev/docs/errors/relkit-mcp-approval-required",
+  });
+  const [content] = result.content as { type: string; text: string }[];
+  expect(content?.text).toMatch(/^RELKIT_MCP_APPROVAL_REQUIRED: /u);
+  expect(content?.text).toContain('approval to "never"');
+  expect(calls).toHaveLength(0);
+  await client.close();
+});
+
 const inspectorTest = process.env.RELKIT_MCP_INSPECTOR_CLI === "1" ? test : test.skip;
 inspectorTest(
   "lists tools through the MCP Inspector CLI",
@@ -82,6 +121,73 @@ inspectorTest(
     }
   },
   30_000,
+);
+
+inspectorTest(
+  "lists and calls relkit mcp tools through the MCP Inspector CLI",
+  async () => {
+    const root = resolve(import.meta.dirname, "../../..");
+    await mkdir(join(root, ".relkit"), { recursive: true });
+    const runs = await mkdtemp(join(root, ".relkit/inspector-browser-mcp-cli-"));
+    const project = join(runs, "project");
+    const fixture = spawn("bun", ["tests/inspector/fixture-server.ts"], {
+      cwd: root,
+      env: {
+        ...process.env,
+        RELKIT_FIXTURE_PORT: String(20_000 + Math.floor(Math.random() * 20_000)),
+        RELKIT_FIXTURE_PROJECT: project,
+      },
+      stdio: "ignore",
+    });
+    try {
+      for (let attempt = 0; attempt < 300; attempt++) {
+        const files = await readdir(join(project, ".relkit/connections")).catch(() => []);
+        if (files.some((name) => name.endsWith(".json"))) break;
+        await new Promise((done) => setTimeout(done, 100));
+      }
+      const inspector = (...args: string[]) =>
+        promisify(execFile)(
+          "bun",
+          [
+            "x",
+            "@modelcontextprotocol/inspector@2.3.0",
+            "--cli",
+            "bun",
+            join(root, "packages/cli/src/bin.ts"),
+            "mcp",
+            // The Inspector CLI keeps server flags it does not know for itself, so the project
+            // is selected by working directory, as a coding agent starts relkit mcp.
+            "--cwd",
+            project,
+            ...args,
+          ],
+          { cwd: root, timeout: 40_000 },
+        );
+      const listed = await inspector("--method", "tools/list");
+      for (const name of [
+        "graph",
+        "diagnostics",
+        "request_trace",
+        "invoke_function",
+        "check",
+        "add",
+      ])
+        expect(listed.stdout).toContain(`"name": "${name}"`);
+      const called = await inspector(
+        "--method",
+        "tools/call",
+        "--tool-name",
+        "graph",
+        "--tool-arg",
+        "collection=functions",
+      );
+      expect(called.stdout).toContain("orders.create");
+    } finally {
+      fixture.kill();
+      await rm(runs, { recursive: true, force: true });
+    }
+  },
+  120_000,
 );
 
 test("MCP with auth required rejects callers without a session before any tool runs", async () => {

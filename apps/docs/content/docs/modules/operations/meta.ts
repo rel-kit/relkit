@@ -7,6 +7,7 @@ export default defineMeta({
     "index",
     "observability",
     "inspector",
+    "mcp",
     "realtime-agents-streaming",
     "testing",
     "troubleshooting",

@@ -31,8 +31,7 @@ async function historyViews(driver: BrowserAcceptanceDriver): Promise<void> {
 async function jobControl(driver: BrowserAcceptanceDriver): Promise<void> {
   const { baseUrl, run, snapshot, reference } = driver;
   await run("open", `${baseUrl}/jobs/receipts.send-job`);
-  await run("wait", "--text", "dead-lettered");
-  await run("click", reference(await snapshot(), 'button "Retry dead letter"'));
-  await run("click", reference(await snapshot(), 'button "Retry job"'));
-  await run("wait", "--text", "available");
+  await run("wait", "--text", "receipts-job-dead-letter-1");
+  await run("click", reference(await snapshot(), 'button "Retry"'));
+  await run("wait", "--text", "receipts-job-dead-letter-1-retry");
 }

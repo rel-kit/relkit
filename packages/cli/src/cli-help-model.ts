@@ -10,6 +10,7 @@ import { projectRoot } from "./cli-help-options.js";
 import { migrateHelp } from "./cli-help-migrate.js";
 import { dbHelp } from "./cli-help-db.js";
 import { inspectorHelp } from "./cli-help-inspector.js";
+import { mcpHelp } from "./cli-help-mcp.js";
 
 export type * from "./cli-help-model.types.js";
 
@@ -69,6 +70,7 @@ const root = command(
         ],
       }),
       inspectorHelp,
+      mcpHelp,
       command(
         "check",
         "Compile descriptors, infer eligible IDs, and validate the application",

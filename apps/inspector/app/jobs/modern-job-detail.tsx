@@ -2,6 +2,7 @@
 
 import { Briefcase, History, RotateCcw, X } from "lucide-react";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { CodeBlock } from "../../components/blocks/code-block";
 import { DetailList } from "../../components/blocks/details";
 import { FailedState } from "../../components/blocks/block-state";
@@ -21,7 +22,9 @@ export function ModernJobDetail({
   runs,
   onAction,
   pending,
+  trigger,
 }: {
+  readonly trigger?: ReactNode;
   readonly actionError: string;
   readonly definition: InspectorObject;
   readonly runs: readonly InspectorObject[];
@@ -186,6 +189,7 @@ export function ModernJobDetail({
           />
         </Section>
       </div>
+      {trigger}
     </DetailLayout>
   );
 }

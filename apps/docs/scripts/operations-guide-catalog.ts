@@ -37,6 +37,11 @@ export const operationsGuideRelations = [
     ["tests/e2e/inspector-redesign.spec.ts"],
   ),
   relation(
+    "docs/modules/operations/mcp",
+    ["cli-api", "inspector"],
+    ["packages/cli/tests/commands/mcp.test.ts"],
+  ),
+  relation(
     "docs/modules/operations/realtime-agents-streaming",
     ["realtime", "agents", "client"],
     ["tests/runtime-rpc/runtime-hono/realtime-rpc.test.ts"],

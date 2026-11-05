@@ -7,6 +7,11 @@ import { timingSafeEqual } from "node:crypto";
 import { Effect, Schema } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
 import { readInspectionBody } from "./bridge-body.js";
+import {
+  INSPECTION_ACK_PATH,
+  INSPECTION_HANDSHAKE_PATH,
+  INSPECTION_RECORDS_PATH,
+} from "./bridge-paths.js";
 import { InspectionConnectionError } from "./connection-error.js";
 import type { InspectionDescriptor } from "./protocol.types.js";
 import type { InspectionBridgeAuthority, InspectionTarget } from "./bridge.types.js";
@@ -60,7 +65,7 @@ const serveInspection = Effect.fn("Inspection.serve")(function* (
   if (denied !== undefined) return denied;
   const url = new URL(request.url);
   const target = authority.active();
-  if (url.pathname === "/_relkit/bridge/v1/handshake" && request.method === "GET")
+  if (url.pathname === INSPECTION_HANDSHAKE_PATH && request.method === "GET")
     return Response.json(
       {
         protocol: 1,
@@ -71,7 +76,7 @@ const serveInspection = Effect.fn("Inspection.serve")(function* (
       },
       { headers: { "cache-control": "no-store" } },
     );
-  if (/^\/_relkit\/bridge\/v1\/(records|ack)$/.test(url.pathname)) {
+  if (url.pathname === INSPECTION_RECORDS_PATH || url.pathname === INSPECTION_ACK_PATH) {
     if (authority.records === undefined) return failure(503, "collection.unavailable");
     return yield* authority.records(request);
   }

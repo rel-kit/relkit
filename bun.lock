@@ -493,6 +493,7 @@
       },
       "dependencies": {
         "@clack/prompts": "catalog:",
+        "@modelcontextprotocol/server": "2.3.0",
         "@relkit/client": "workspace:*",
         "create-relkit": "workspace:*",
         "effect": "catalog:",
@@ -502,6 +503,7 @@
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
+        "@modelcontextprotocol/client": "2.3.0",
         "@relkit/local": "workspace:*",
         "@relkit/pulumi": "workspace:*",
         "vitest": "catalog:",

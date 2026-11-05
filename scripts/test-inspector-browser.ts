@@ -4,6 +4,7 @@
 import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { runAgentGraphAcceptance } from "./test-inspector-agent-browser.js";
+import { runActionsBrowserAcceptance } from "./test-inspector-actions-browser.js";
 import { runResourceBrowserAcceptance } from "./test-inspector-resource-browser.js";
 import { withInspectorBrowser } from "./inspector-browser-runtime.js";
 import { runHistoryBrowserAcceptance } from "./test-inspector-history-browser.js";
@@ -12,6 +13,7 @@ await withInspectorBrowser(async (driver, artifacts) => {
   try {
     await runHistoryBrowserAcceptance(driver);
     await runResourceBrowserAcceptance(driver);
+    await runActionsBrowserAcceptance(driver);
     await runAgentGraphAcceptance(driver);
     console.log("Inspector browser acceptance passed.");
   } catch (error) {

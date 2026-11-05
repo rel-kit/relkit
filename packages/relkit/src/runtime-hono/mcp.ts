@@ -101,9 +101,7 @@ const invoke = Effect.fn("McpTools.invoke")(function* (
   context: Context,
   options: RouteMaterializationOptions,
 ) {
-  if (requiresApproval(tool)) {
-    return failure(`Approval required for tool "${tool.id}"`);
-  }
+  if (requiresApproval(tool)) return approvalRequired(tool);
   const state = getRequestState(context);
   const result = yield* Effect.result(
     Effect.gen(function* () {
@@ -154,6 +152,26 @@ function requiresApproval(tool: ToolRegistration): boolean {
     tool.approval === "always" ||
     (tool.approval === "on-write" && tool.sideEffect !== "none" && tool.sideEffect !== "read")
   );
+}
+
+/** Explains why an approval-required tool did not run and how to approve it.
+ * @param tool - Declared tool whose policy requires approval.
+ * @returns An MCP error result carrying `RELKIT_MCP_APPROVAL_REQUIRED` as text and structured content.
+ * @remarks The per-request MCP handler keeps no session, so it cannot hold a call open while an
+ * elicitation reply arrives on a later request; see design decision D17.
+ */
+function approvalRequired(tool: ToolRegistration) {
+  const message = `Tool "${tool.id}" needs approval before each call, and this MCP endpoint cannot ask for it. Run the tool from an agent, which pauses for approval and lets you approve the call in the Inspector's tool page, or set the tool's approval to "never" if it is safe to run without review.`;
+  return {
+    isError: true,
+    content: [{ type: "text" as const, text: `RELKIT_MCP_APPROVAL_REQUIRED: ${message}` }],
+    structuredContent: {
+      code: "RELKIT_MCP_APPROVAL_REQUIRED",
+      message,
+      tool: tool.id,
+      docs: "https://relkit.dev/docs/errors/relkit-mcp-approval-required",
+    },
+  };
 }
 
 /** Creates a sanitized MCP tool failure response.

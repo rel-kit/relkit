@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { Effect } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
 import { runInspectorPromise as runExecutionPromise } from "./native-edge.js";
@@ -8,6 +9,7 @@ import { safeJson, type ResolvedActiveGeneration } from "./shared.js";
 import { InspectorActionError } from "./actions-errors.js";
 import { ACTION_REDACTION, projectAdmin, projectApproval } from "./actions-projection.js";
 import { assertActionState, assertProtocol, bounded, reason } from "./actions-utils.js";
+import { START_ACTIONS, dispatchStartActionEffect } from "./actions-dispatch-start.js";
 import type {
   InspectorActionRequest,
   InspectorActionServices,
@@ -45,6 +47,7 @@ export const dispatchInspectorActionEffect = Effect.fn("Inspector.dispatchInspec
         return yield* Effect.fail(
           new InspectorActionError("RELKIT_INSPECTOR_ACTION_NOT_FOUND", 404),
         );
+      const traceId = randomBytes(16).toString("hex");
       const value = yield* nativeAttempt(() =>
         invoke({
           generationId: generation.generationId,
@@ -52,11 +55,14 @@ export const dispatchInspectorActionEffect = Effect.fn("Inspector.dispatchInspec
           functionId: request.targetId,
           input: request.body.input,
           idempotencyKey: request.idempotencyKey,
+          traceId,
           ...(request.signal === undefined ? {} : { signal: request.signal }),
         } satisfies InspectorFunctionActionRequest),
       );
-      return { output: safeJson(value, ACTION_REDACTION) };
+      return { output: safeJson(value, ACTION_REDACTION), traceId };
     }
+    if (START_ACTIONS.has(request.action))
+      return yield* dispatchStartActionEffect(request, actions);
     if (request.action.startsWith("job.")) {
       const service = actions.jobs;
       yield* projectionAttempt(() => assertProtocol(service, "relkit.jobs.admin"));

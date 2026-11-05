@@ -7,8 +7,11 @@ import type { InspectorBoundaryError } from "./native-edge.js";
 /** Declared Inspector action vocabulary; input data never becomes an operation label. */
 export type InspectorActionName =
   | "function.invoke"
+  | "job.trigger"
   | "job.retry"
   | "job.cancel"
+  | "event.publish"
+  | "event.replay"
   | "event.retry"
   | "event.cancel"
   | "tool.approve"
@@ -18,6 +21,8 @@ export type InspectorActionName =
 export interface InspectorFunctionActionRequest extends InspectorActionIdentity {
   readonly functionId: string;
   readonly input: unknown;
+  /** W3C trace ID the invocation should record, so the Inspector can open its trace. */
+  readonly traceId?: string;
   readonly signal?: AbortSignal;
 }
 
@@ -35,8 +40,19 @@ export interface InspectorJobActionRequest {
   readonly reason?: string;
 }
 
+/** Versioned request to start a new run of a declared job with the given input. */
+export interface InspectorJobTriggerRequest {
+  readonly protocol: "relkit.jobs.admin";
+  readonly version: typeof PROTOCOL_VERSION;
+  readonly jobId: string;
+  readonly input: unknown;
+  readonly idempotencyKey: string;
+}
+
 /** Native job status and administration capabilities; absent methods remain unsupported. */
 export interface InspectorJobActionService {
+  /** Starts a run; the result names the run's `instanceId` so the Inspector can open it. */
+  readonly trigger?: (request: InspectorJobTriggerRequest) => MaybePromise<unknown>;
   readonly protocol?: string;
   readonly version?: number;
   readonly status?: (instanceId: string) => MaybePromise<unknown>;
@@ -52,8 +68,29 @@ export interface InspectorEventActionRequest {
   readonly reason?: string;
 }
 
+/** Versioned request to publish one event with a payload, as a publisher function would. */
+export interface InspectorEventPublishRequest {
+  readonly protocol: "relkit.events.admin";
+  readonly version: typeof PROTOCOL_VERSION;
+  readonly eventId: string;
+  readonly eventVersion?: number;
+  readonly payload: unknown;
+  readonly idempotencyKey: string;
+}
+
+/** Versioned request to deliver a recorded publication to its consumers again. */
+export interface InspectorEventReplayRequest {
+  readonly protocol: "relkit.events.admin";
+  readonly version: typeof PROTOCOL_VERSION;
+  readonly publicationId: string;
+  readonly idempotencyKey: string;
+  readonly reason?: string;
+}
+
 /** Native event status and administration capabilities without synthetic fallback operations. */
 export interface InspectorEventActionService {
+  readonly publish?: (request: InspectorEventPublishRequest) => MaybePromise<unknown>;
+  readonly replay?: (request: InspectorEventReplayRequest) => MaybePromise<unknown>;
   readonly protocol?: string;
   readonly version?: number;
   readonly status?: (deliveryId: string) => MaybePromise<unknown>;

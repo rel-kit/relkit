@@ -5,6 +5,10 @@
   "skill": "generated relkit",
   "agent": "/root/evaluate_generated_fleet",
   "model": "inherited host model; identifier not exposed",
+  "verdict": {
+    "semantic": "pass",
+    "technical": "pass"
+  },
   "baseRevision": "71f352608a32b4fb639ca5591fffd570c94c178a",
   "inputFiles": {
     "SKILL.md": {

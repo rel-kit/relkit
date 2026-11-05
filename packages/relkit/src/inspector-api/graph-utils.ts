@@ -12,7 +12,7 @@ allowedContentTypes key value defaultTtlMs maxTtlMs sideEffect approval model to
 generatedFunction capabilities capability adapter ownership configuration
 title tags members functions events order ownerId ownerKind phase domainId exposure data http retry
 execution workflow workflowTopology subagents resourceDependencies backendBucketId
-client chat controls stateProfile clientContract
+client chat controls stateProfile clientContract mcp
 `
   .trim()
   .split(/\s+/);

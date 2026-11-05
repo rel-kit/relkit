@@ -5,7 +5,10 @@ export type {
   InspectorFunctionActionService,
   InspectorJobActionRequest,
   InspectorJobActionService,
+  InspectorJobTriggerRequest,
   InspectorEventActionRequest,
+  InspectorEventPublishRequest,
+  InspectorEventReplayRequest,
   InspectorEventActionService,
   InspectorToolApprovalState,
   InspectorToolApprovalRecord,
@@ -37,6 +40,9 @@ export const INSPECTOR_ACTION_PATHS = Object.freeze([
   `${API_BASE_PATH}/actions/tools/:id/approval`,
   `${API_BASE_PATH}/actions/tools/:id/approve`,
   `${API_BASE_PATH}/actions/tools/:id/deny`,
+  `${API_BASE_PATH}/actions/jobs/:id/trigger`,
+  `${API_BASE_PATH}/actions/events/:id/publish`,
+  `${API_BASE_PATH}/actions/events/:id/replay`,
 ] as const);
 
 /**
@@ -69,6 +75,9 @@ export function installInspectorActionEndpoints(
   bind(INSPECTOR_ACTION_PATHS[5], "tool.approve");
   bind(INSPECTOR_ACTION_PATHS[6], "tool.approve", "approve");
   bind(INSPECTOR_ACTION_PATHS[7], "tool.deny", "deny");
+  bind(INSPECTOR_ACTION_PATHS[8], "job.trigger");
+  bind(INSPECTOR_ACTION_PATHS[9], "event.publish");
+  bind(INSPECTOR_ACTION_PATHS[10], "event.replay");
 }
 
 /**

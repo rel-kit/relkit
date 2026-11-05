@@ -7,10 +7,13 @@ import { createInspectorClient } from "../../lib/client";
 import type { JobAction } from "../../lib/job-actions";
 import { FailedState, LoadingRows } from "../../components/blocks/block-state";
 import { ModernJobDetail } from "./modern-job-detail";
+import { JobTrigger } from "./job-trigger";
+import type { ActionIdentity } from "../../lib/inspector-actions";
 
 interface JobSnapshot {
   readonly definition: InspectorObject;
   readonly runs: readonly InspectorObject[];
+  readonly identity?: ActionIdentity;
 }
 
 export function JobDetailClient() {
@@ -31,7 +34,12 @@ export function JobDetailClient() {
       jobId: text(definition.jobId) || id,
       limit: 25,
     });
-    setSnapshot({ definition, runs: runs.items });
+    const graph = await api.graph().catch(() => undefined);
+    const identity =
+      graph?.generationId !== undefined && graph.graphHash !== undefined
+        ? { generationId: graph.generationId, graphHash: graph.graphHash }
+        : undefined;
+    setSnapshot({ definition, runs: runs.items, ...(identity === undefined ? {} : { identity }) });
     setError(false);
   }, [api, id]);
 
@@ -61,6 +69,14 @@ export function JobDetailClient() {
         runs={snapshot.runs}
         onAction={action}
         pending={pending}
+        trigger={
+          snapshot.identity === undefined ? undefined : (
+            <JobTrigger
+              jobId={text(snapshot.definition.jobId) || id}
+              identity={snapshot.identity}
+            />
+          )
+        }
       />
     );
   if (error)

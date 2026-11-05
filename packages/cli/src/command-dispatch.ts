@@ -120,6 +120,13 @@ function selectCommandEffect(invocation: CliInvocation, context: CliCommandConte
       return runInspectorEffect(args, context).pipe(
         Effect.provide(Layer.merge(contributorTerminalLayer, fileSystemLayer)),
       );
+    case "mcp":
+      // Loaded on demand so other commands never load the MCP server SDK.
+      return Effect.promise(() => import("./commands/mcp.js")).pipe(
+        Effect.flatMap(({ mcpLiveLayer, runMcpEffect }) =>
+          runMcpEffect(args, context).pipe(Effect.provide(mcpLiveLayer)),
+        ),
+      );
     case "migrate":
       return runMigrateEffect(args, context).pipe(Effect.provide(layoutMigrationLayer));
     case "db":

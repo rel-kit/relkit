@@ -12,7 +12,7 @@ import type { CliStatus, ScaffoldStatus } from "./cli-interaction.types.js";
  * process.exit(0), skipping scoped cleanup of child processes and streams.
  */
 function ownsTerminal(command: string, args: readonly string[]): boolean {
-  if (["create", "add", "dev", "start", "inspector"].includes(command)) return true;
+  if (["create", "add", "dev", "start", "inspector", "mcp"].includes(command)) return true;
   return command === "jobs" && args[0] === "runs" && args[1] === "watch";
 }
 
