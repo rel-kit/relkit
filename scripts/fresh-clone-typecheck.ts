@@ -36,9 +36,9 @@ async function selectTypeScript(clone: string, version: string): Promise<void> {
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
   const configPath = join(clone, "tsconfig.json");
   const config = JSON.parse(await readFile(configPath, "utf8")) as {
-    compilerOptions?: Record<string, unknown>;
+    compilerOptions?: { plugins?: unknown };
   };
-  if (config.compilerOptions !== undefined) delete config.compilerOptions["plugins"];
+  if (config.compilerOptions !== undefined) delete config.compilerOptions.plugins;
   await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
 }
 
