@@ -6,6 +6,7 @@
   "docs/modules/service/context-values": ["update", "continuation", "/docs/learn/create-an-app"],
   "docs/index": ["update", "concept", ""],
   "docs/why-relkit": ["update", "concept", ""],
+  "docs/benchmarks": ["update", "concept", ""],
   "docs/faq": ["update", "concept", ""],
   "docs/maturity": ["update", "concept", ""],
   "guides/migrate/from-express-or-hono": ["update", "continuation", "/docs/learn/create-an-app"],
