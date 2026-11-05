@@ -101,10 +101,18 @@ export function responseStatus(
  */
 export function jsonResponse(value: unknown, status: number): Response {
   if (status === 204 || status === 304) return new Response(null, { status });
-  return new Response(JSON.stringify(value), {
+  return new Response(JSON.stringify(value, jsonWireValue), {
     status,
     headers: { "content-type": "application/json" },
   });
+}
+/** JSON replacer for REST bodies: a bigint becomes its exact decimal string.
+ * @param _key - Property name.
+ * @param value - Property value.
+ * @returns The value JSON can carry.
+ */
+export function jsonWireValue(_key: string, value: unknown): unknown {
+  return typeof value === "bigint" ? value.toString() : value;
 }
 /** The 500 problem returned when a response cannot be produced safely.
  * @param traceId - The request's trace ID, when known.

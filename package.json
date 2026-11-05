@@ -76,6 +76,7 @@
     "@modelcontextprotocol/server": "2.3.0",
     "@orpc/client": "catalog:",
     "@orpc/contract": "catalog:",
+    "@orpc/openapi-client": "1.16.1",
     "@playwright/test": "1.63.0",
     "@relkit/cli": "workspace:*",
     "@relkit/client": "workspace:*",

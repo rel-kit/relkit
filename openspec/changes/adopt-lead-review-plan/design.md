@@ -656,6 +656,21 @@ Decided while applying section 11 (maintainer, 2026-11-05):
 
 Decided while applying section 23 (maintainer, 2026-11-05):
 
+- **OpenAPILink evaluated; RelKit keeps its own small REST link.** The spike
+  (`tests/runtime-rpc/runtime-hono/openapi-link-evaluation.test.ts`, oRPC 1.16.1, one test per
+  data kind over a real RelKit REST application) found: dates travel as ISO strings both ways,
+  which is all JSON can do and matches the client's JSON Schema types; large integers go out as
+  decimal strings, but the route answered 500 because REST's JSON encoder could not write a
+  bigint, so REST bodies and SSE items now write a bigint as its exact decimal string; files go
+  as multipart form data that a route's `multipart` mapping reads; streams fail silently,
+  because OpenAPILink reads only oRPC's own SSE events (`message`, `error`, `done`) and yields
+  none of RelKit's `relkit-item` events. Beyond the data kinds, OpenAPILink needs an oRPC
+  contract with `route()` metadata on the client, can express only oRPC's input structures
+  (not RelKit mappings that rename fields or read headers or path segments), and reads oRPC's
+  error body rather than Problem Details. RelKit therefore calls routes with a small link of
+  its own (`packages/client/src/rest-*.ts`): it reads each route's compiled request mapping from
+  the backend and writes every input field where the server reads it, reads Problem Details and
+  RelKit's stream formats, and needs no oRPC on that path.
 - **oRPC version.** npm has no stable oRPC 2.x: its `2.0.0` is a deprecated publish from 2024 and
   the 2.0 line is still in beta (`2.0.0-beta.48`). Every `@orpc/*` package moves to the latest
   stable 1.x, `1.16.1`, and leaves `docs/dependencies.md`. The 1.x port: `eventIterator` replaces

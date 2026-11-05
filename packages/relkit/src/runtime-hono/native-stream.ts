@@ -2,6 +2,7 @@ import { Context, Effect, Layer, Schema, Stream } from "effect";
 import { httpIterable, observeHttp } from "./http-effect.js";
 import { TextStreamItem } from "./native-stream.schemas.js";
 import type { NativeStreamFormat } from "./native-stream.types.js";
+import { jsonWireValue } from "./response-mapping-utils.js";
 export type { NativeStreamFormat } from "./native-stream.types.js";
 
 /** Converts native application output into a scoped, backpressured byte stream.
@@ -133,7 +134,9 @@ function encodeItem(value: unknown, format: NativeStreamFormat): Uint8Array {
  * @returns UTF-8 bytes for one named SSE event and its JSON data.
  */
 function encodeSse(event: string, data: unknown): Uint8Array {
-  return new TextEncoder().encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+  return new TextEncoder().encode(
+    `event: ${event}\ndata: ${JSON.stringify(data, jsonWireValue)}\n\n`,
+  );
 }
 
 /** Builds the native stream content-type and cache-control headers.
