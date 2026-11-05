@@ -27,7 +27,7 @@ export function createEventEnvelope(
 ): UnknownEventEnvelope {
   const timestamp = new Date().toISOString();
   return Object.freeze({
-    instanceId: `event-${randomUUID()}`,
+    instanceId: `event-${crypto.randomUUID()}`,
     eventId,
     version,
     payload,

@@ -108,7 +108,7 @@ export const claimOccurrence = Effect.fn("Postgres.schedules.claim")(function* (
   const active = yield* sql`select 1 from ${runs} where service = ${row.service}
     and status in ('queued', 'running') and request->>'scheduleId' = ${row.schedule_id} limit 1`;
   const runId =
-    definition.overlap === "skip" && active.length > 0 ? "skipped" : `run_${randomUUID()}`;
+    definition.overlap === "skip" && active.length > 0 ? "skipped" : `run_${crypto.randomUUID()}`;
   const inserted = yield* sql`insert into ${sql.literal(tables.scheduleOccurrences)}
       (service, schedule_id, occurrence_at, run_id, claimed_by)
     values (${row.service}, ${row.schedule_id}, ${occurrenceAt}::timestamptz, ${runId}, ${claimant})

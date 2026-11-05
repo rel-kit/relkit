@@ -82,7 +82,7 @@ export const submitRun = Effect.fn("Postgres.jobs.submit")(function* (
   const inserted = yield* sql<JobRunRow>`insert into ${table} (run_id, service, scope, job_id,
       task_id, task_version, build_id, status, input, request, dedupe_key, operation_id, run_at,
       accepted_at)
-    values (${`run_${randomUUID()}`}, ${context.service}, ${scope}, ${request.jobId},
+    values (${`run_${crypto.randomUUID()}`}, ${context.service}, ${scope}, ${request.jobId},
       ${request.taskId}, ${request.taskVersion}, ${request.buildId}, 'queued',
       ${JSON.stringify(input)}::jsonb, ${JSON.stringify(storedRequest(request, context))}::jsonb,
       ${key}, ${request.operationId}, coalesce(${request.scheduledFor ?? null}::timestamptz, now()),
@@ -116,7 +116,7 @@ export const retryRun = Effect.fn("Postgres.jobs.retry")(function* (
   const inserted = yield* sql<JobRunRow>`insert into ${table} (run_id, service, scope, job_id,
       task_id, task_version, build_id, status, input, request, operation_id, retry_of_run_id,
       retry_identity, run_at, accepted_at)
-    select ${`run_${randomUUID()}`}, service, scope, job_id, task_id, task_version, build_id,
+    select ${`run_${crypto.randomUUID()}`}, service, scope, job_id, task_id, task_version, build_id,
       'queued', coalesce(${input}::jsonb, input), request - 'scheduledFor' - 'idempotencyKey',
       ${request.operationId}, run_id, ${identity}, now(), now()
     from ${table} where run_id = ${request.runId} and service = ${context.service}

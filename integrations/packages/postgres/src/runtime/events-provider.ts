@@ -47,11 +47,11 @@ export function createPostgresEventProvider(
   const database = options.database ?? openPostgresDatabase({ ...options, url: options.url! });
   const profile = options.profile ?? "default";
   const leaseMs = options.leaseMs ?? 30_000;
-  const workerId = options.workerId ?? `postgres-events-${randomUUID().slice(0, 8)}`;
+  const workerId = options.workerId ?? `postgres-events-${crypto.randomUUID().slice(0, 8)}`;
   const triggers = new Map<string, PostgresEventTrigger>();
   let loop: BackgroundFiber | undefined;
   const deliverOne = (trigger: PostgresEventTrigger) =>
-    deliver(database, profile, trigger, `${workerId}:${randomUUID()}`, leaseMs);
+    deliver(database, profile, trigger, `${workerId}:${crypto.randomUUID()}`, leaseMs);
   const deliverDue = async () => {
     const durable = [...triggers.values()].filter((trigger) => trigger.delivery === "durable");
     const results = await Promise.all(durable.map(deliverOne));

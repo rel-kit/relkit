@@ -51,7 +51,7 @@ export function createPostgresJobWorker(
   const worker: PostgresJobWorker = {
     next: async (context) => {
       if (context.signal.aborted) return undefined;
-      const owner = `${options.workerId}:${randomUUID()}`;
+      const owner = `${options.workerId}:${crypto.randomUUID()}`;
       const row = await database.run(
         leaseRun(tables, options.service, owner, options.leaseMs),
         context.signal,

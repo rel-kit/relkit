@@ -39,7 +39,7 @@ export function createPostgresJobsRuntime(
   const service = options.service ?? "postgres";
   const leaseMs = options.leaseMs ?? 30_000;
   const pollIntervalMs = options.pollIntervalMs ?? 1_000;
-  const workerId = options.workerId ?? `postgres-${randomUUID().slice(0, 8)}`;
+  const workerId = options.workerId ?? `postgres-${crypto.randomUUID().slice(0, 8)}`;
   const tables = database.tables;
   const definitions = new Map<string, PostgresTaskDefinition>();
   const worker = createPostgresJobWorker(database, { service, leaseMs, workerId });
