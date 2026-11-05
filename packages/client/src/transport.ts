@@ -9,6 +9,7 @@ import type {
 import type { TransportSelection } from "./transport.types.js";
 import { createClientTransport, selectAutoTransport } from "./transport.service.js";
 import { httpLink, webSocketLink } from "./transport-native.js";
+import { createRestLink, type RestLink } from "./rest-link.js";
 
 /**
  * Creates the generated contract's synchronous HTTP proxy with a configured service owner.
@@ -27,7 +28,7 @@ export function createClient<Contract extends AnyContractRouter = DefaultContrac
   options: CreateClientOptions,
 ): ContractRouterClient<Contract> {
   const link = httpLink(options);
-  return proxy<Contract>(async () => link);
+  return proxy<Contract>(async () => link, createRestLink(options));
 }
 
 /**
@@ -42,7 +43,7 @@ export function createWebSocketClient<Contract extends AnyContractRouter = Defau
   const Socket = options.websocket ?? globalThis.WebSocket;
   if (Socket === undefined) throw new Error("WebSocket is unavailable in this runtime.");
   const link = webSocketLink(options, Socket);
-  return proxy<Contract>(async () => link);
+  return proxy<Contract>(async () => link, createRestLink(options));
 }
 
 /**
@@ -54,20 +55,26 @@ export function createWebSocketClient<Contract extends AnyContractRouter = Defau
 export function createAutoClient<Contract extends AnyContractRouter = DefaultContract>(
   options: CreateAutoClientOptions,
 ): ContractRouterClient<Contract> {
-  return proxy<Contract>(selectAutoTransport(options));
+  return proxy<Contract>(selectAutoTransport(options), createRestLink(options));
 }
 
 /**
- * Adapts one transport owner to oRPC's native link contract.
+ * Adapts one transport owner to oRPC's native link contract. Route calls go to their REST
+ * endpoints; channel, agent and job procedures use the selected RPC link.
  * @typeParam Contract - Inferred public router shape.
  * @param select - Lazy configured link decision.
+ * @param rest - The REST link for route calls.
  * @returns A synchronous proxy; each call is cancelled by its own signal.
  */
 function proxy<Contract extends AnyContractRouter>(
   select: TransportSelection,
+  rest: RestLink,
 ): ContractRouterClient<Contract> {
   const transport = createClientTransport(select);
   return createORPCClient({
-    call: (path, input, options) => transport.invoke(path, input, options),
+    call: (path, input, options) =>
+      rest.handles(path)
+        ? rest.call(path, input, { signal: options.signal })
+        : transport.invoke(path, input, options),
   }) as ContractRouterClient<Contract>;
 }

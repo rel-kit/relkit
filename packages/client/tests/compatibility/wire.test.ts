@@ -8,6 +8,8 @@ test("the browser wire constants match relkit/contracts", () => {
   expect(wire.AGENT_CAPABILITY_QUERY).toBe(contracts.AGENT_CAPABILITY_QUERY);
   expect(wire.AGENT_CAPABILITY_VALUE).toBe(contracts.AGENT_CAPABILITY_VALUE);
   expect(wire.CLIENT_CONTRACT_EVENTS_PATH).toBe(contracts.CLIENT_CONTRACT_EVENTS_PATH);
+  expect(wire.CLIENT_ROUTES_PATH).toBe(contracts.CLIENT_ROUTES_PATH);
+  expect(wire.API_ROOT_KEY).toBe(contracts.CLIENT_API_ROOT);
 });
 
 test("canonicalJson matches relkit/contracts, including its rejections", () => {

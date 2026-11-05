@@ -26,8 +26,8 @@ test("the client adopts a published backend contract without a frontend restart"
   await expect.poll(() => fingerprints.length).toBeGreaterThan(0);
 
   const next = `sha256:${"e".repeat(64)}`;
-  const announcements = page.waitForRequest((sent) =>
-    sent.url().startsWith(`${selected.backend}/rpc/api/announcements/`),
+  const announcements = page.waitForRequest(
+    (sent) => sent.method() === "GET" && sent.url() === `${selected.backend}/announcements`,
   );
   const published = await request.post(`${selected.backend}${CONTRACT_CONTROL_PATH}`, {
     data: { publicFingerprint: next },

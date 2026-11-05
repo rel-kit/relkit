@@ -91,7 +91,10 @@ function mutationPlan(): RegistrationPlan {
         config: {
           method: "POST",
           path: "/mutate",
-          request: { kind: "input" },
+          request: {
+            kind: "input",
+            fields: { value: { kind: "optional", value: { kind: "body", name: "value" } } },
+          },
           responses: [],
           middleware: [],
           transforms: [],

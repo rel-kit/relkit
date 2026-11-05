@@ -1,5 +1,9 @@
 import type { ClientApiRouteSource } from "./client-api.types.js";
-export type { ClientApiRouteSource } from "./client-api.types.js";
+export type {
+  ClientApiRouteSource,
+  ClientRouteEntry,
+  ClientRoutesDocument,
+} from "./client-api.types.js";
 
 /** Router key under which the RPC transport mounts the typed client's API tree. */
 export const CLIENT_API_ROOT = "api";
@@ -116,3 +120,9 @@ function pascalCase(value: string): string {
  * backend's client contract may have changed, so they reload it without a restart.
  */
 export const CLIENT_CONTRACT_EVENTS_PATH = "/_relkit/v1/client/contract-events";
+
+/**
+ * Framework endpoint that lists the routes the typed client calls: each route's `api`
+ * path, method, path pattern, request mapping, stream format and declared error codes.
+ */
+export const CLIENT_ROUTES_PATH = "/_relkit/v1/client/routes";

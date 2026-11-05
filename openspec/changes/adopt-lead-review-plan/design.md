@@ -671,6 +671,39 @@ Decided while applying section 23 (maintainer, 2026-11-05):
   its own (`packages/client/src/rest-*.ts`): it reads each route's compiled request mapping from
   the backend and writes every input field where the server reads it, reads Problem Details and
   RelKit's stream formats, and needs no oRPC on that path.
+- **REST transport.** Routes reach the client through a new framework document,
+  `GET /_relkit/v1/client/routes` (no-store, installed with the REST routes, so every runtime
+  serves it): for each client route its `api` path, method, path pattern, compiled request
+  mapping, stream format, operation and declared error codes, which the OpenAPI document
+  already publishes. The client loads it on its first route call and loads it again, at most
+  once a second, when a call names a route it lacks, so a route added during development works
+  without a restart. Calls whose first segment is `jobs` or starts with `relkit.` (jobs,
+  agents, channels) keep the RPC protocol; every other name, whether an `api` path, a
+  `METHOD /path` selector or a route ID passed to the raw `createClient`, is a route and goes
+  to REST, so `createClient`, `createApi`, the hooks, streaming and job watch keep their
+  signatures.
+- **Encoding.** The link walks the mapping backwards: path and catch-all segments are
+  URI-encoded, query and header values are text (dates in ISO 8601, objects as JSON), `body`
+  fields form one JSON object (a bigint becomes its decimal string), `multipart` fields form
+  `FormData` with files kept as files, and cookies, middleware values and constants are not
+  sent. A route that maps a custom header needs that header in `transportSecurity.allowedHeaders`
+  for cross-origin browsers, as any REST caller would.
+- **Responses and errors.** JSON, text and other bodies (as a `Blob`) decode by content type;
+  stream routes yield SSE `relkit-item` payloads, text chunks or byte chunks, and `return()`
+  aborts the request. A Problem Details failure becomes an `ORPCError` with the response status
+  and `detail` as message: a declared code or an upper-case framework code
+  (`IDENTITY_PRECONDITION_FAILED`) is kept, any other code becomes the common code for the
+  status (`validation-failed` 400 is `BAD_REQUEST` with the issues in `data.issues`), so the
+  client's error union does not change.
+- **Identity on REST mutations.** A mutation route that receives the typed client's
+  `x-relkit-identity-scope` and `x-relkit-session-epoch` headers answers 409
+  `IDENTITY_PRECONDITION_FAILED` when the session changed, as the RPC endpoint did; requests
+  without those headers, such as curl, are not affected (`runtime-hono/route-identity.ts`).
+- **Browser proof.** `tests/e2e-commerce/rest-wire.spec.ts` checks that the commerce page sends
+  `GET /orders`, `GET /announcements`, `POST /announcements` and `GET /reports/daily` and no
+  request under `/rpc`. It needs `next dev`, which the shared machine's resource budget did not
+  allow while other sessions ran, and no pull-request workflow runs the commerce browser suite,
+  so it was written but not run here.
 - **oRPC version.** npm has no stable oRPC 2.x: its `2.0.0` is a deprecated publish from 2024 and
   the 2.0 line is still in beta (`2.0.0-beta.48`). Every `@orpc/*` package moves to the latest
   stable 1.x, `1.16.1`, and leaves `docs/dependencies.md`. The 1.x port: `eventIterator` replaces

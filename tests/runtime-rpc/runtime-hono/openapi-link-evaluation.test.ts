@@ -7,6 +7,7 @@
 import { createORPCClient } from "@orpc/client";
 import { oc } from "@orpc/contract";
 import { OpenAPILink } from "@orpc/openapi-client/fetch";
+import { createClient } from "@relkit/client";
 import { expect, test } from "vitest";
 import { wireKindsApp } from "./wire-kinds.fixture.ts";
 
@@ -83,4 +84,44 @@ test("streams: OpenAPILink does not read RelKit's SSE events as stream items", a
   // the stream silently without any of the route's two items.
   expect(items).toEqual([]);
   expect(failure).toBeUndefined();
+});
+
+test("the typed client carries every data kind over the same REST routes", async () => {
+  const app = wireKindsApp();
+  const paths: string[] = [];
+  const client = createClient({
+    baseUrl: "http://relkit.test",
+    fetch: Object.assign(
+      async (input: string | URL | Request, init?: RequestInit) => {
+        const request = input instanceof Request ? input : new Request(String(input), init);
+        paths.push(`${request.method} ${new URL(request.url).pathname}`);
+        return app.fetch(request);
+      },
+      { preconnect: () => undefined },
+    ),
+  }) as unknown as Record<string, (input: unknown) => Promise<unknown>>;
+  await expect(
+    client["POST /kinds/date"]!({ at: new Date("2026-11-05T00:00:00.000Z") }),
+  ).resolves.toEqual({
+    received: "string",
+    next: "2026-11-06T00:00:00.000Z",
+  });
+  await expect(client["POST /kinds/integer"]!({ count: 9007199254740993n })).resolves.toEqual({
+    received: "string",
+    next: "9007199254740994",
+  });
+  await expect(
+    client["POST /kinds/file"]!({ file: new File(["hello"], "hello.txt"), label: "greeting" }),
+  ).resolves.toEqual({ name: "hello.txt", text: "hello", label: "greeting" });
+  const items: unknown[] = [];
+  for await (const item of (await client["GET /kinds/stream"]!({})) as AsyncIterable<unknown>)
+    items.push(item);
+  expect(items).toEqual([{ tick: 1 }, { tick: 2 }]);
+  expect(paths).toEqual([
+    "GET /_relkit/v1/client/routes",
+    "POST /kinds/date",
+    "POST /kinds/integer",
+    "POST /kinds/file",
+    "GET /kinds/stream",
+  ]);
 });

@@ -37,7 +37,8 @@ test("serves generated route descriptors through HTTP", async () => {
     baseUrl: "http://relkit.test",
     fetch: appFetch(app),
   });
-  await expect(client["GET /query"]({ value: 1 })).resolves.toEqual({ value: 1 });
+  // The typed client calls GET /query?value=1; a query value without a schema stays text.
+  await expect(client["GET /query"]({ value: 1 })).resolves.toEqual({ value: "1" });
   expect(invocation).not.toHaveProperty("timeoutMs");
 });
 
@@ -53,7 +54,14 @@ test("maps agent state conflicts without reporting server failure", () => {
 });
 
 test("streams generated route output through HTTP", async () => {
-  const plan = queryPlan();
+  const base = queryPlan();
+  const plan = {
+    ...base,
+    httpTriggers: base.httpTriggers.map((trigger) => ({
+      ...trigger,
+      config: { ...trigger.config, stream: { format: "sse" as const } },
+    })),
+  };
   const stream = {
     kind: "stream",
     item: schema,
