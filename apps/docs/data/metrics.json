@@ -1,7 +1,7 @@
 {
   "protocol": "relkit.metrics",
   "version": 1,
-  "createdAt": "2026-11-05T15:24:41.178Z",
+  "createdAt": "2026-11-05T20:09:45.509Z",
   "metrics": [
     {
       "id": "creation-success",
@@ -16,19 +16,19 @@
       "id": "time-to-first-route",
       "name": "Time from `create` to a first route",
       "target": "Under 5 min",
-      "status": "no-data",
-      "value": "no data",
-      "numeric": null,
-      "detail": "The walkthrough has not run."
+      "status": "met",
+      "value": "17 s",
+      "numeric": 17,
+      "detail": "create-relkit --template minimal --install from the packed candidate, one route added, relkit dev answering it; packing the candidate (14 s) is excluded. Measured locally on a Mac with a warm package cache (annotated by hand); a clean CI runner is the figure to publish."
     },
     {
       "id": "time-to-railway",
       "name": "Time from `create` to an app deployed on Railway",
       "target": "Under 15 min",
-      "status": "no-data",
-      "value": "no data",
+      "status": "not-met",
+      "value": "failed",
       "numeric": null,
-      "detail": "The walkthrough has not run."
+      "detail": "The Railway newcomer test failed (exit 1): Deploy failed (annotated by hand) Reproduced locally in a Linux container: relkit build in the Railway image fails with RELKIT_ROUTE_MODULE_TYPE for every route; see design D19, 'Decided while applying section 20'."
     },
     {
       "id": "runtimes-http",

@@ -1257,6 +1257,33 @@ walkthrough. The launch checklist reads the same page.
   `@relkit/app`, `@relkit/better-auth` and `@relkit/drizzle` stay under `packages/` as optional
   tools and count with the integrations. The metric is met when the six exist and nothing else
   sits under `packages/`.
+- **Two walkthroughs, one result shape.** `scripts/walkthrough/create-to-first-route.ts` packs the
+  candidate once, creates the `minimal` template from a local registry with `create-relkit --install`,
+  adds a function and a route, starts `relkit dev` and times the first correct answer from the new
+  route. `scripts/walkthrough/create-to-railway.ts` wraps `scripts/railway-newcomer.ts` (unchanged
+  apart from error detail) and reports creation plus install plus deploy until the app answers over
+  HTTPS. Both write `relkit.walkthrough-result`. Packing the candidate is excluded from both times,
+  because a newcomer downloads packages instead of building them; the result's `note` says so and
+  gives the pack time. A run without Railway credentials (no `RAILWAY_API_TOKEN`, `railway whoami`
+  failing) or with `--stub` runs the stubbed flow and records `stubbed` with no seconds, which the
+  report shows as "no data". CI runs the first-route walkthrough weekly (`walkthrough.yml`) and the
+  Railway one inside `railway-newcomer.yml`; both upload `metrics-walkthrough-*` artifacts.
+- **The local first-route timing is a warm-cache number.** The local run reuses Bun's package cache
+  and a loopback registry, so it measures RelKit's own creation and reload work, not the network.
+  A CI run on a clean runner is the figure to publish; the checked-in inputs under
+  `apps/docs/data/metric-inputs` say "measured locally" in their notes.
+- **The Railway walkthrough found a defect that blocks the deploy path.** Run live on 2026-11-05
+  with the signed-in CLI, the newcomer project (api template, Postgres jobs and events, the probe,
+  `relkit deploy init railway`) prepared and passed `relkit check`, but `railway up` failed. The same
+  failure reproduces without Railway: `relkit build --runtime bun` inside `oven/bun:1.3.10` on
+  Linux reports `RELKIT_ROUTE_MODULE_TYPE` ("must be a typed route descriptor") for every route
+  while `tsc --noEmit` in that container passes and the build passes on macOS. It is not the
+  generated `.dockerignore` (builds pass on macOS with and without `.relkit/generated`, and
+  loosening the ignore file did not change the Railway result), not a missing TypeScript, and not
+  a duplicate `relkit` copy. Until an owner fixes it the metric reads "failed", not "no data",
+  because the live run happened. Two defects in the test itself were fixed on the way: the probe
+  imported `@relkit/app/*`, which new projects no longer install, and `railway up` build output
+  was dropped from the error. Hand-over detail: `g20-metrics-launch.md` in the shared notes.
 
 ### D20. Findings follow-ups (plan section 8.5)
 

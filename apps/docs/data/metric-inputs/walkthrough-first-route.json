@@ -1,0 +1,22 @@
+{
+  "protocol": "relkit.walkthrough-result",
+  "createdAt": "2026-11-05T15:37:39.392Z",
+  "kind": "create-to-first-route",
+  "outcome": "passed",
+  "seconds": 17,
+  "steps": [
+    {
+      "name": "create",
+      "seconds": 13
+    },
+    {
+      "name": "route-added",
+      "seconds": 13
+    },
+    {
+      "name": "route-answers",
+      "seconds": 17
+    }
+  ],
+  "note": "create-relkit --template minimal --install from the packed candidate, one route added, relkit dev answering it; packing the candidate (14 s) is excluded. Measured locally on a Mac with a warm package cache (annotated by hand); a clean CI runner is the figure to publish."
+}
