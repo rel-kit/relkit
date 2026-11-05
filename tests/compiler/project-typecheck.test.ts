@@ -3,7 +3,10 @@ import { Effect, Exit, Fiber } from "effect";
 import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { typecheckProject } from "../../packages/cli/src/compiler/project-typecheck.js";
-import { generateRouteModuleChecks } from "../../packages/cli/src/compiler/route-module-checks.js";
+import {
+  generateRouteModuleChecks,
+  ROUTE_MODULE_CHECK_REFERENCES,
+} from "../../packages/cli/src/compiler/route-module-checks.js";
 
 const repository = resolve(import.meta.dir, "../..");
 
@@ -81,6 +84,8 @@ async function writeChecks(root: string, files: readonly string[], generatedDire
     join(root, generatedDirectory, "route-module-checks.ts"),
     generateRouteModuleChecks(files, root, generatedDirectory),
   );
+  for (const file of ROUTE_MODULE_CHECK_REFERENCES)
+    await writeFile(join(root, generatedDirectory, file), "export {};\n");
 }
 
 test("generated checks do not reject rootDir src projects without routes", () =>

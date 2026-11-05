@@ -162,7 +162,7 @@ not tasks of this change.
 
 ## 15. TypeScript 7 (#11)
 
-- [ ] 15.1 Make generated declarations carry every type guarantee so plain `tsc` reports route and context errors without the editor plugin, and verify the type tests with the plugin removed
+- [x] 15.1 Make generated declarations carry every type guarantee so plain `tsc` reports route and context errors without the editor plugin, and verify the type tests with the plugin removed
 - [ ] 15.2 Make `relkit check` run the project's TypeScript compiler as a separate process and map its errors to diagnostics, and verify with TypeScript 5.9 and 7 projects
 - [x] 15.3 Bundle a private `typescript@5.9` parser in `@relkit/cli` for codemods and source scanning, and verify `relkit add` and `relkit migrate` work in a TypeScript 7 project
 - [ ] 15.4 Make the editor plugin optional in templates and docs, and verify a template without it type-checks

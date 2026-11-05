@@ -2,7 +2,10 @@ import { afterEach, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import ts from "typescript";
-import { generateRouteModuleChecks } from "../../packages/cli/src/compiler/route-module-checks.js";
+import {
+  generateRouteModuleChecks,
+  ROUTE_MODULE_CHECK_REFERENCES,
+} from "../../packages/cli/src/compiler/route-module-checks.js";
 import { routeModuleFindings } from "../../packages/cli/src/compiler/route-module-diagnostics.js";
 
 const repository = resolve(import.meta.dir, "../..");
@@ -37,6 +40,8 @@ import { defineServiceRoutes, http, type ServiceRouteOptions } from "relkit/rout
     join(root, ".relkit/generated/route-module-checks.ts"),
     generateRouteModuleChecks(["src/routes/users/[id]/route.ts"], root),
   );
+  for (const file of ROUTE_MODULE_CHECK_REFERENCES)
+    await writeFile(join(root, ".relkit/generated", file), "export {};\n");
   const options: ts.CompilerOptions = {
     target: ts.ScriptTarget.ES2022,
     module: ts.ModuleKind.ESNext,

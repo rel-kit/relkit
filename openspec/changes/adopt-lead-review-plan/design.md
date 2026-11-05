@@ -503,6 +503,15 @@ Decided while applying section 15 (maintainer, 2026-11-05):
   application's `node_modules/.bin`, where TypeScript 5.9's `tsc` could shadow the application's
   TypeScript 7. The editor plugin bundle maps the alias back to the editor's own `typescript`,
   because the plugin always receives the editor's TypeScript instance.
+- **`route-module-checks.ts` is the one generated file a tsconfig must list.** It references
+  `context-registry.d.ts` and `event-registry.d.ts` with `/// <reference path>` directives, so
+  plain `tsc` sees every generated guarantee; until normalization writes the registries, `relkit
+check` writes an empty module in their place. Templates already listed it; the examples now do
+  too. The one plugin finding types could not express, a service route destructured under another
+  method's name (`export const { GET: POST } = defineServiceRoutes(...)`), is now a type error:
+  `defineServiceRoutes` results carry the type-only `ServiceRouteMethodMarker<Method>` and
+  `RouteModuleContract` rejects an export whose marker names another method. Verified with
+  TypeScript 7.0.2's `tsc` and no plugin on a template app.
 
 ### D9. Deploy targets (#12)
 

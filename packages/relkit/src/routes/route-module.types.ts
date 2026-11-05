@@ -1,5 +1,8 @@
 import type { RawRouteDescriptor, RouteDescriptor } from "./route.types.js";
-import type { ServiceRouteMethod } from "./define-service-routes.types.js";
+import type {
+  ServiceRouteMethod,
+  ServiceRouteMethodMarker,
+} from "./define-service-routes.types.js";
 import type { InferInput, StandardSchemaV1 } from "../schema/index.js";
 
 /** Value exports accepted by a filesystem route module. */
@@ -14,12 +17,22 @@ type MissingPathInput<Value, Parameters extends string> = Value extends {
     : never
   : never;
 
+/** The method a service route table bound the value to, when it differs from its export name. */
+type RenamedServiceRoute<Value, Method> =
+  Value extends ServiceRouteMethodMarker<infer Bound extends ServiceRouteMethod>
+    ? [Bound] extends [Method]
+      ? never
+      : Bound
+    : never;
+
 type CheckedRoute<Value, Method, Parameters extends string> = 0 extends 1 & Value
   ? never
   : [MissingPathInput<Value, Parameters>] extends [never]
-    ? Method extends "ALL"
-      ? RawRouteDescriptor<string>
-      : RouteDescriptor<string>
+    ? [RenamedServiceRoute<Value, Method>] extends [never]
+      ? Method extends "ALL"
+        ? RawRouteDescriptor<string>
+        : RouteDescriptor<string>
+      : { readonly __relkit_service_route_method: RenamedServiceRoute<Value, Method> }
     : { readonly __relkit_missing_path_input: MissingPathInput<Value, Parameters> };
 
 type CheckedMethods<Methods, Parameters extends string> = {
