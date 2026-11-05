@@ -1,3 +1,4 @@
+import type { RuntimeSubprocess } from "relkit/runtime";
 import type { SupervisorCandidateToken } from "./state-machine.types.js";
 import type { LoggerOptions } from "relkit/runtime-effect/logger";
 
@@ -82,7 +83,7 @@ export interface CandidateOutput {
 export interface StartedCandidate extends CompiledCandidate {
   readonly port: number;
   readonly pid: number;
-  readonly process: Bun.ReadableSubprocess;
+  readonly process: RuntimeSubprocess;
   readonly exited: Promise<number>;
   readonly output: Promise<CandidateOutput>;
   /** Stops the child and joins physical exit. @returns Shared native process termination. */

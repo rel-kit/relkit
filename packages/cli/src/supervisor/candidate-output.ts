@@ -1,3 +1,4 @@
+import type { RuntimeSubprocess } from "relkit/runtime";
 import type { CandidateLogEvent, CandidateLogger, CandidateOutput } from "./candidate.types.js";
 import type { SupervisorCandidateToken } from "./state-machine.types.js";
 import { captureOutputLines } from "./output-lines.js";
@@ -8,7 +9,7 @@ import type { CandidateOutputBudget, RetainedCandidateOutput } from "./candidate
  * @param limit - Shared retained-byte budget. @param signal - Owned reader cancellation.
  * @returns Diagnostics after both readers and framing timers release. */
 export function captureOutput(
-  child: Bun.ReadableSubprocess,
+  child: RuntimeSubprocess,
   logger: CandidateLogger | undefined,
   token: SupervisorCandidateToken,
   directory: string,

@@ -1,6 +1,6 @@
 /**
  * The Node runtime adapter: Hono's Node server with its `ws` WebSocket upgrades, `fs.openAsBlob`
- * file bodies and `node:crypto` hashing.
+ * file bodies, `node:crypto` hashing, `node:child_process` and `require.resolve` for tooling.
  */
 import { createHash } from "node:crypto";
 import { openAsBlob } from "node:fs";
@@ -10,6 +10,8 @@ import type { UpgradeWebSocket } from "hono/ws";
 import { getMimeType } from "hono/utils/mime";
 import { processEnvironment } from "../process-environment.js";
 import type { RuntimeAdapter, RuntimeFileBody } from "../runtime-adapter.types.js";
+import { nodeModules } from "./modules.js";
+import { nodeProcesses } from "./processes.js";
 import { serve } from "./serve.js";
 
 /** Hono WebSocket upgrade helper for the Node listener; the socket is `ws`'s WebSocket. */
@@ -34,4 +36,6 @@ export const nodeRuntime: RuntimeAdapter = Object.freeze({
     randomUUID: () => crypto.randomUUID(),
   }),
   environment: processEnvironment,
+  processes: nodeProcesses,
+  modules: nodeModules,
 });

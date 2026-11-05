@@ -396,6 +396,91 @@ Decided while applying section 14 (maintainer, 2026-11-05):
 - **Docs:** `/docs/modules/deployment/runtimes` lists the tiers, the Bun-only packages, building,
   running and testing on Node, the Node container image and the per-runtime integration clients.
 
+Decided while applying section 14 (task 14.5, maintainer, 2026-11-05):
+
+- **The adapter grows `processes` and `modules`.** `RuntimeAdapter` gains `processes` (`spawn`
+  with pipes, an optional IPC channel and an abort signal; `which`) and `modules` (`resolve`, and
+  `registry`, the evictable module registry). Bun wraps `Bun.spawn`, `Bun.which`,
+  `Bun.resolveSync` and `require.cache` with `Bun.Transpiler.scanImports`; Node uses
+  `node:child_process` with the structured-clone IPC serialization Bun's channel uses,
+  `Readable.toWeb` streams, a `PATH` search, and `require.resolve` with a fallback that reads a
+  package's `exports` map for import-only packages, including a package importing its own
+  subpaths. Node has no `registry`: its ES module cache
+  cannot drop an evaluated module. `createModuleReloader(projectRoot, modules)` takes the
+  adapter's modules, and the dev reload hook loads the adapter itself.
+- **Node runs application TypeScript through the CLI's module hooks.** `@relkit/cli` depends on
+  esbuild 0.28 (a dependency of the CLI only, which applications list as a dev dependency).
+  `src/runtime/node/typescript-hooks.ts` transpiles `.ts`/`.tsx`/`.mts` with esbuild's
+  `transform` (types removed, nothing checked), resolves a `.js` specifier that names a
+  TypeScript file, extensionless relative imports and the nearest `tsconfig.json` `paths`
+  (following a relative `extends`), and passes the JSX and decorator options through. Every Node
+  child that evaluates sources (the one-shot evaluator, the dev check worker, candidate servers,
+  the migration worker) starts with `--import` of the register module, and the CLI's own Node
+  process registers it before loading `relkit.config.ts`. Node 22.13 has neither unflagged type
+  stripping nor `paths`, so Node's own type stripping is not used.
+- **Without a registry, development restarts instead of reloading in process.** On Node the warm
+  evaluator evaluates each check in a fresh one-shot child, and `relkit dev` leaves out the
+  in-process handler-table reload, so every change starts a new candidate generation (about one
+  second for the `minimal` template). On Bun nothing changes. A one-shot Node evaluator imports
+  candidates without the `?relkit_generation` query, because Node keys modules by URL and the
+  query would load a second instance beside the one other candidates import.
+- **The supervisor keeps its Bun listener and gains a Node one.** The WebSocket tunnel takes an
+  `accept` callback instead of a Bun server, the downstream socket is a small
+  `ProxyDownstream` interface (`readyState`, `send`, `close`) both Bun's `ServerWebSocket` and
+  Hono's `WSContext` satisfy, and upstream clients close portably (Node's `WebSocket` has no
+  `terminate`, rejects close codes a client may not send, and delivers binary frames as
+  `ArrayBuffer`). `supervisor/proxy-listener.node.ts` serves through the adapter's `serve` and
+  Hono's Node WebSocket upgrade, pinning admission and connecting upstream before it accepts.
+  The Bun listener, with its Bun 1.3.10 stop workaround, is unchanged.
+- **`relkit build` bundles with esbuild on Node.** One bundler cannot serve both: `bun build`
+  is not available on Node, and replacing it on Bun would change Bun builds. On Node,
+  `build-bundle-esbuild.ts` runs esbuild with the `bun build` options (externals, splitting with
+  a metafile inventory, inline maps in development, minified otherwise) plus a `createRequire`
+  banner; `bundleServerEffect` takes the bundler as a parameter so tests pin `bun build`
+  whichever runtime runs them. Without `--runtime`, `relkit build` and the development server build for the runtime
+  the CLI runs on, so Bun output is unchanged and `relkit dev` on Node serves through
+  `relkit/runtime/node`. `relkit start` runs a build with the runtime its manifest records.
+- **Package managers.** `create-relkit/package-manager` selects the manager: the creator takes
+  `--package-manager bun|npm|pnpm`, then the invoking manager from `npm_config_user_agent`, then
+  Bun under Bun and npm under Node; the CLI reads a project's `packageManager` field, then its
+  lockfile, then the same fallback. The creator installs with that manager, records
+  `packageManager` with the invoking manager's version (or removes Bun's pin when the version is
+  unknown) and prints its commands; `relkit doctor` checks the lockfile with that manager's
+  frozen install (`npm ci --dry-run`, `pnpm install --frozen-lockfile --lockfile-only`) and
+  compares Node with the CLI's `engines.node` on Node; `relkit add` installs with it. pnpm
+  projects get a `pnpm-workspace.yaml` that approves esbuild's install script (`allowBuilds` for
+  pnpm 11, `onlyBuiltDependencies` for pnpm 10), because pnpm 11 fails an install whose
+  dependency scripts were not approved. Template
+  scripts already run `relkit`; `test` stays `bun test` because `@relkit/testing` still needs
+  Bun, and npm ignores `patchedDependencies`, so npm projects lack the Drizzle declaration repair.
+- **Executables start on Node.** The `relkit` launcher, the CLI and the creator use
+  `#!/usr/bin/env node`. The launcher runs the project CLI on Bun when it runs on Bun or a Bun
+  command invoked it, and on the running Node otherwise; `relkit create` without an installed
+  creator fetches it with `bun x`, `pnpm dlx` or `npx --yes`. Bun honours the shebang, so
+  `bun run dev` would start the CLI on Node wherever Node is installed; the CLI therefore hands
+  itself to Bun when it runs on Node but a Bun command invoked it (`npm_config_user_agent`
+  `bun/…`), so Bun projects keep running on Bun (`RELKIT_BUN_HANDOFF=0` keeps Node). The
+  creator runs in process on either runtime. The packaged CLI executable is bundled for Node (it runs on both) and keeps the
+  TypeScript hook registration as an external file. `import.meta.main` is absent before Node
+  22.18, so the CLI's entry points also compare `process.argv[1]`. Node needs import attributes
+  on JSON imports, so the creator's `package.json` imports gained `with { type: "json" }`, and
+  `create-relkit/catalog-resolution` keeps its source export under a `bun` condition for the cold
+  bootstrap while Node resolves the built file.
+- **Engines and evidence.** `@relkit/cli` and `create-relkit` left the Bun-only list and list
+  Node `>=22.13.0`; `@relkit/testing` (transpiler) and `@relkit/aws` (Valkey client) stay
+  Bun-only. The CLI's remaining Bun call sites are the Bun proxy listener and the evaluator's
+  guarded `Bun.write` detector. The creation capability identity names `node-<version>` on
+  Node, so creation on Node warns that the combination is untested until Node evidence exists.
+- **Verification without Bun.** `scripts/node-creation-smoke.ts` (Bun) packs the candidate,
+  verifies each archive and writes `index.json`, `tarballs/` and `smoke.mjs`, a Node bundle of
+  `node-creation-smoke-run.ts` that serves them as a registry with `node:http` (the Bun fixture
+  registry's request handling) and runs `npx create-relkit` or `pnpm dlx create-relkit`, checks
+  the manager's lockfile, starts `<manager> run dev` and waits for `GET /hello`. It gives npm
+  and pnpm fresh caches (as `npm_config_*` and pnpm 11's `pnpm_config_*`), because the candidate
+  shares its version with the published release. Checks run it
+  in `node-creation-pack` (Bun) and `node-creation` (Node 22 and 24 × npm and pnpm, no Bun
+  installed, `--require-no-bun`), which the CI Gate requires.
+
 ### D8. TypeScript 7 (#11)
 
 Generated declaration files (`route-module-checks.ts`, context and event registries) carry every type

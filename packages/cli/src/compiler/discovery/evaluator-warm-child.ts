@@ -3,7 +3,7 @@
  * modules it evaluated. Each IPC request carries an ordinary evaluator request and the
  * files the caller knows changed (the changed sources and their descriptor dependents from
  * the compiler's watch dependency index). The child adds every loaded module whose file
- * changed on disk, evicts those modules and their importers from Bun's registry, imports
+ * changed on disk, evicts those modules and their importers from the runtime's module registry, imports
  * only the evicted candidates again under the request's generation URL, and reuses the
  * snapshot of every other candidate. Detectors wrap each import exactly as in the one-shot
  * child, and the child runs with the same allowlisted environment.
@@ -11,6 +11,7 @@
 import { relative, resolve } from "node:path";
 import { Effect } from "effect";
 import { createModuleReloader } from "relkit/host";
+import { currentRuntime } from "relkit/runtime";
 import { evaluatorResponse } from "./evaluator-child-framing.js";
 import { evaluateCandidate } from "./evaluator-child.js";
 import { decodeEvaluatorRequest } from "./evaluator-protocol.js";
@@ -18,7 +19,7 @@ import type { CandidateResult } from "./evaluator-child.types.js";
 import type { EvaluatorFailure, EvaluatorModuleResult } from "./evaluator-protocol.types.js";
 import type { WarmEvaluatorReply, WarmEvaluatorRequest } from "./evaluator-warm.types.js";
 
-const reloader = createModuleReloader(process.cwd());
+const reloader = createModuleReloader(process.cwd(), (await currentRuntime()).modules);
 const results = new Map<string, CandidateResult>();
 
 /**

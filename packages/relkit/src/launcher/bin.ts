@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 /** Dispatches the lightweight public wrapper to pure creation or a compatible project-owned CLI. */
 import { main } from "./index.js";
 process.exitCode = await main();

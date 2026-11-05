@@ -10,6 +10,7 @@
 import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
+import { currentRuntime } from "../runtime/current-runtime.js";
 import { createModuleReloader } from "./dev-module-reload.js";
 import type {
   DevelopmentReloadOptions,
@@ -42,15 +43,21 @@ const FIXED_MAPS = [
  */
 export function installDevelopmentReload(options: DevelopmentReloadOptions): boolean {
   if (typeof process.send !== "function") return false;
-  const reloader = createModuleReloader(options.projectRoot);
-  reloader.record();
+  // On a runtime without an evictable registry every request is answered as not applied, and
+  // `relkit dev` starts a new generation instead.
+  const loading = currentRuntime().then((runtime) => {
+    const reloader = createModuleReloader(options.projectRoot, runtime.modules);
+    reloader.record();
+    return reloader;
+  });
+  void loading.catch(() => undefined);
   let queue = Promise.resolve();
   let applied = options.runtimeManifest;
   process.on("message", (message) => {
     if (!isReloadRequest(message)) return;
     // Requests are applied one at a time, in the order `relkit dev` sent them.
     queue = queue.then(async () => {
-      const { reply, manifest } = await reload(options, reloader, applied, message);
+      const { reply, manifest } = await reload(options, loading, applied, message);
       if (manifest !== undefined) applied = manifest;
       process.send?.(reply);
     });
@@ -63,18 +70,19 @@ export function installDevelopmentReload(options: DevelopmentReloadOptions): boo
 /**
  * Applies one reload request.
  * @param options - Hook inputs.
- * @param reloader - Module tracking for this process.
+ * @param loading - Module tracking for this process, once the runtime adapter loaded.
  * @param applied - Manifest of the table currently serving.
  * @param request - Accepted request.
  * @returns The acknowledgement and, after a swap, the manifest now serving.
  */
 async function reload(
   options: DevelopmentReloadOptions,
-  reloader: ReturnType<typeof createModuleReloader>,
+  loading: Promise<ReturnType<typeof createModuleReloader>>,
   applied: ReloadedManifest,
   request: DevelopmentReloadRequest,
 ): Promise<{ readonly reply: DevelopmentReloadReply; readonly manifest?: ReloadedManifest }> {
   try {
+    const reloader = await loading;
     const evicted = reloader.invalidate(reloader.changed());
     const module = (await import(
       pathToFileURL(join(options.serverDirectory, request.manifest)).href

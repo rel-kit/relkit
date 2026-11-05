@@ -18,6 +18,7 @@ import { serverSource } from "./build-server.js";
 import { dockerfile, dockerignore } from "./build-container.js";
 import { buildManifest, buildProductionManifest } from "./build-manifest.js";
 import type { BuildStageCohort, BuildStageInputs } from "./build.types.js";
+import { defaultBuildRuntime } from "../runtime/index.js";
 
 /**
  * Writes graph, optional workers and public assets into one owned stage.
@@ -74,7 +75,10 @@ export const writeBuildServer = Effect.fn("Project.buildServer")(function* (
       Schema.decodeUnknownSync(Schema.Json)(JSON.parse(outputs.clientContract || "{}")),
       {
         ...cohort.tooling.server,
-        ...(input.options.runtime === undefined ? {} : { runtime: input.options.runtime }),
+        // Recorded only for Node, so Bun output stays byte-identical.
+        ...((input.options.runtime ?? defaultBuildRuntime()) === "node"
+          ? { runtime: "node" as const }
+          : {}),
         maxPreviewBytes: cohort.tooling.inspector.maxPreviewBytes,
         inspectorEnabled: development && cohort.tooling.inspector.enabled,
         jobsAdministration: development && cohort.jobsManifest !== undefined,
@@ -130,7 +134,9 @@ export const writeBuildMetadata = Effect.fn("Project.buildMetadata")(function* (
       activationFingerprint: cohort.activationFingerprint,
       hasJobs: cohort.jobsManifest !== undefined,
       hasLocalServices: cohort.localServicesPlanSource !== undefined,
-      ...(input.options.runtime === "node" ? { runtime: "node" as const } : {}),
+      ...((input.options.runtime ?? defaultBuildRuntime()) === "node"
+        ? { runtime: "node" as const }
+        : {}),
       tooling: cohort.tooling,
     }),
   );
@@ -139,7 +145,7 @@ export const writeBuildMetadata = Effect.fn("Project.buildMetadata")(function* (
     dockerfile(
       cohort.jobsManifest !== undefined,
       cohort.productionRepairs.assets.length > 0,
-      input.options.runtime,
+      input.options.runtime ?? defaultBuildRuntime(),
     ),
   );
   yield* files.writeText(

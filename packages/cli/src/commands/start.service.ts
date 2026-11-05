@@ -10,6 +10,7 @@ import { CliBuiltProject, builtProjectLive } from "./start-built.js";
 import { CliStartNative, startNativeLive } from "./start-native.service.js";
 import { CliStartProcess, startProcessLive } from "./start-process.service.js";
 import { waitForStartHealthEffect } from "./start-health.js";
+import { builtServerCommand } from "../runtime/index.js";
 import type { StartOperations, StartOptions } from "./start.types.js";
 
 /** Production process domain whose returned resources belong to the caller's Scope. */
@@ -76,14 +77,10 @@ function makeStartLive(defaults: StartOptions) {
             );
             const port = yield* native.allocate(requested, hostname);
             const owned = yield* processes.spawn({
-              command: [
-                process.execPath,
-                "run",
-                "--no-env-file",
-                "--no-install",
-                "--silent",
+              command: builtServerCommand(
+                artifacts.manifest.runtime ?? "bun",
                 join(buildDirectory, artifacts.manifest.containerEntrypoint),
-              ],
+              ),
               cwd: projectRoot,
               environment: {
                 ...source,

@@ -27,7 +27,7 @@ test("native WebSocket construction failure releases its admitted generation pre
         new Request("http://public.test/rpc", {
           headers: { "sec-websocket-protocol": "same,same" },
         }),
-        server,
+        (data) => server.upgrade(new Request("http://public.test/rpc"), { data }),
         {
           target: {
             token: { sourceToken: 1, generationToken: 1 },

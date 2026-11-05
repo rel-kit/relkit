@@ -16,6 +16,7 @@ import { cliTry } from "../cli-errors.js";
 import { parseTypecheckLine } from "./typecheck-output.js";
 import type { DevLog } from "../commands/dev.types.js";
 import type { TypecheckDiagnostic } from "./typecheck-output.types.js";
+import { runtime } from "../runtime/index.js";
 
 /** Diagnostics included in one log record; the count is always complete. */
 const REPORTED_DIAGNOSTICS = 20;
@@ -59,7 +60,7 @@ function typecheckCommand(projectRoot: string): readonly string[] | undefined {
   const tsgo = join(projectRoot, "node_modules/.bin/tsgo");
   if (existsSync(tsgo)) return [tsgo, ...flags];
   try {
-    return [process.execPath, Bun.resolveSync("typescript/bin/tsc", projectRoot), ...flags];
+    return [process.execPath, runtime.modules.resolve("typescript/bin/tsc", projectRoot), ...flags];
   } catch {
     return undefined;
   }
@@ -73,7 +74,7 @@ function typecheckCommand(projectRoot: string): readonly string[] | undefined {
  * @returns The running process.
  */
 function startWatch(projectRoot: string, command: readonly string[], log: DevLog) {
-  const child = Bun.spawn([...command], {
+  const child = runtime.processes.spawn(command, {
     cwd: projectRoot,
     stdin: "ignore",
     stdout: "pipe",

@@ -3,6 +3,7 @@ import { existsSync, readFileSync, realpathSync } from "node:fs";
 import type { CompilerPackageSourceService } from "./integration-package-source.types.js";
 import { IntegrationPackageValidationError } from "./integration-package-errors.js";
 import { observeCompiler } from "./observability.js";
+import { runtime } from "../runtime/index.js";
 
 /** Filesystem, module resolution, or JSON syntax failure at the native metadata boundary. */
 export class IntegrationPackageIoError extends Schema.TaggedError<IntegrationPackageIoError>()(
@@ -24,7 +25,7 @@ export class CompilerPackageSource extends Context.Service<
   CompilerPackageSourceService
 >()("relkit/compiler/CompilerPackageSource") {}
 
-/** Bun module resolution and synchronous read-only metadata access at the native edge. */
+/** Runtime module resolution and synchronous read-only metadata access at the native edge. */
 export const CompilerPackageSourceLive = Layer.effect(
   CompilerPackageSource,
   Effect.sync(() =>
@@ -32,7 +33,7 @@ export const CompilerPackageSourceLive = Layer.effect(
       resolve: Effect.fn("CompilerPackageSource.resolve")(
         (specifier: string, base: string) =>
           Effect.try({
-            try: () => realpathSync(Bun.resolveSync(specifier, base)),
+            try: () => realpathSync(runtime.modules.resolve(specifier, base)),
             catch: (cause) =>
               new IntegrationPackageIoError({ operation: "resolve", path: specifier, cause }),
           }),

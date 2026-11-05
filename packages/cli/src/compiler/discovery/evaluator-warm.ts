@@ -4,14 +4,19 @@
  * one request at a time over IPC and keeps the child for the next save. A child that
  * exceeds the evaluator deadline, exits, or is asked for a different root or environment
  * is stopped and replaced; the timed-out request answers with the one-shot evaluator's
- * timeout failure, so check diagnostics stay the same.
+ * timeout failure, so check diagnostics stay the same. A runtime without an evictable module
+ * registry (Node) cannot keep modules between saves, so there every evaluation is one-shot.
  */
 import { existsSync } from "node:fs";
+import { relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Effect } from "effect";
 import { observeCompiler } from "../observability.js";
 import { failedResponseEffect } from "./evaluator-response.js";
 import { allowlistedEnvironment, createEvaluatorRequestEffect } from "./evaluator-request.js";
+import { evaluateCandidatesEffect } from "./evaluator.js";
+import { runtime, scriptCommand } from "../../runtime/index.js";
+import type { RuntimeSubprocess } from "relkit/runtime";
 import type { EvaluatorOptions } from "./evaluator-request.types.js";
 import type {
   WarmEvaluation,
@@ -23,7 +28,7 @@ export type { WarmEvaluation, WarmEvaluator } from "./evaluator-warm.types.js";
 
 /** A running warm child and what it was started for. */
 interface WarmChild {
-  readonly process: Bun.Subprocess;
+  readonly process: RuntimeSubprocess;
   readonly key: string;
   readonly pending: Map<number, (reply: WarmEvaluatorReply) => void>;
 }
@@ -33,6 +38,7 @@ interface WarmChild {
  * @returns Evaluation and close operations.
  */
 export function createWarmEvaluator(): WarmEvaluator {
+  if (runtime.modules.registry === undefined) return oneShotEvaluator();
   let child: WarmChild | undefined;
   let nextId = 0;
   const close = () => {
@@ -78,6 +84,31 @@ export function createWarmEvaluator(): WarmEvaluator {
 }
 
 /**
+ * Evaluates every request in a fresh one-shot child, reporting every candidate as re-imported.
+ * @returns An evaluator with nothing to close.
+ */
+function oneShotEvaluator(): WarmEvaluator {
+  return {
+    evaluate: (options) =>
+      evaluateCandidatesEffect(options).pipe(
+        Effect.map((response) => ({
+          response,
+          reimported: options.candidates.map((candidate) =>
+            relative(
+              options.projectRoot,
+              resolve(
+                options.projectRoot,
+                typeof candidate === "string" ? candidate : candidate.fileName,
+              ),
+            ).replaceAll("\\", "/"),
+          ),
+        })),
+      ),
+    close: () => undefined,
+  };
+}
+
+/**
  * Describes why a warm evaluation produced no response.
  * @param timedOut - Whether the deadline elapsed.
  * @param reply - Error reply, if the child answered or exited.
@@ -102,15 +133,16 @@ function failureMessage(
  */
 function spawnWarmChild(projectRoot: string, allowlist: readonly string[], key: string): WarmChild {
   const pending = new Map<number, (reply: WarmEvaluatorReply) => void>();
-  const process = Bun.spawn(
-    [globalThis.process.execPath, "--no-env-file", "--no-install", childPath()],
+  const process = runtime.processes.spawn(
+    scriptCommand(childPath(), { bunFlags: ["--no-install"] }),
     {
       cwd: projectRoot,
       env: allowlistedEnvironment(allowlist),
       stdin: "ignore",
       stdout: "ignore",
       stderr: "ignore",
-      ipc: (reply: WarmEvaluatorReply) => {
+      ipc: (message) => {
+        const reply = message as WarmEvaluatorReply;
         pending.get(reply.id)?.(reply);
         pending.delete(reply.id);
       },

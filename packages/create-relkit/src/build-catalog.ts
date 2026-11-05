@@ -1,4 +1,4 @@
-import manifest from "../package.json";
+import manifest from "../package.json" with { type: "json" };
 import { ADD_FAILURE_CODES, AddScaffoldError } from "./add-types.js";
 import type { DependencyPatchDescriptor } from "./dependency-patches.types.js";
 

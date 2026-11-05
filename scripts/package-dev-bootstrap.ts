@@ -1,7 +1,8 @@
 /**
- * Builds the small packaged CLI executable with pinned Bun. Compilation and native
- * publication are finite owned adapter calls. CLI dispatch stays an external dynamic
- * import, so the executable itself neither parses nor evaluates its dependency graph.
+ * Builds the small packaged CLI executable with pinned Bun, targeting Node so it starts on Bun
+ * and Node. Compilation and native publication are finite owned adapter calls. CLI dispatch
+ * and the Node TypeScript hooks stay external dynamic imports, so the executable itself
+ * neither parses nor evaluates its dependency graph.
  */
 import { resolve } from "node:path";
 import { rm } from "node:fs/promises";
@@ -24,7 +25,8 @@ export const packageDevBootstrap = Effect.fn("Packaging.devBootstrap")(function*
   const result = yield* ownedNativePromise("package.dev.build", () =>
     Bun.build({
       entrypoints: [resolve(root, entry)],
-      target: "bun",
+      // The executable runs on Bun and Node; a Node-target bundle runs on both.
+      target: "node",
       format: "esm",
       minify: true,
       plugins: [lazyImports(external), narrowEffectImportPlugin()],
@@ -64,7 +66,11 @@ function lazyImports(external: readonly string[]): Bun.BunPlugin {
  * @returns Joined finite build/publication; no server or support process is acquired.
  */
 const main = Effect.gen(function* () {
-  yield* packageDevBootstrap("packages/cli/src/bin.ts", "packages/cli/dist/bin.js", ["./main.js"]);
+  yield* packageDevBootstrap("packages/cli/src/bin.ts", "packages/cli/dist/bin.js", [
+    "./main.js",
+    // Registers the Node TypeScript hooks relative to its own module, so it stays a file.
+    "./runtime/node/typescript-register.js",
+  ]);
 });
 
 if (import.meta.main) await Effect.runPromise(Effect.scoped(main));

@@ -6,6 +6,9 @@ import { createProxyLayer, SupervisorProxyOwner } from "./proxy-service.js";
 import { validateHostname, validatePort } from "./proxy-validation.js";
 import { proxyWebSocketHandler, upgradeProxyWebSocket } from "./proxy-websocket.js";
 import { joinStoppedProxyListener } from "./proxy-listener-native.js";
+import { listenNodeProxy } from "./proxy-listener.node.js";
+import { runtime } from "../runtime/index.js";
+import type { RuntimeServer } from "relkit/runtime";
 import type { ProxySocketData } from "./proxy-websocket.js";
 import type { SupervisorCandidateToken } from "./state-machine.types.js";
 import type {
@@ -30,6 +33,8 @@ export class SupervisorProxy {
   private readonly owner;
   private readonly service: SupervisorProxyService;
   private server: Bun.Server<ProxySocketData> | undefined;
+  /** The listener on Node, where `server` stays undefined. */
+  private nodeServer: RuntimeServer | undefined;
   private stopping: Promise<void> | undefined;
   private readonly nativeSockets = new Set<Bun.ServerWebSocket<ProxySocketData>>();
 
@@ -52,10 +57,12 @@ export class SupervisorProxy {
 
   /** Bound port, or the requested port before listening. */
   get port(): number {
-    return this.server?.port ?? this.configuredPort;
+    return this.server?.port ?? this.nodeServer?.port ?? this.configuredPort;
   }
   /** Native listener authority when listening. */
   get url(): URL | undefined {
+    if (this.nodeServer !== undefined)
+      return new URL(`http://${this.hostname}:${this.nodeServer.port}/`);
     return this.server?.url;
   }
   /** Immutable generation selected for new admission. */
@@ -65,8 +72,15 @@ export class SupervisorProxy {
 
   /** Opens or reopens the stable listener. @returns This proxy once listening. */
   async listen(): Promise<this> {
-    if (this.server !== undefined) return this;
+    if (this.server !== undefined || this.nodeServer !== undefined) return this;
     if (this.stopping !== undefined) await this.stopping;
+    if (runtime.name === "node") {
+      this.nodeServer = await listenNodeProxy(runtime, this.hostname, this.configuredPort, {
+        handle: (request) => this.handle(request),
+        upgrade: (request, accept) => this.upgradeWith(request, accept),
+      });
+      return this;
+    }
     this.server = Bun.serve({
       hostname: this.hostname,
       port: this.configuredPort,
@@ -92,9 +106,18 @@ export class SupervisorProxy {
   /** Pins admission before native handshake. @param request - Upgrade request. @param server - Owned listener.
    * @returns Upstream acceptance or drain rejection. */
   private upgrade(request: Request, server: Bun.Server<ProxySocketData>): Promise<Response> {
+    return this.upgradeWith(request, (data) => server.upgrade(request, { data }));
+  }
+
+  /** Pins admission, then connects upstream before accepting downstream. @param request - Upgrade request.
+   * @param accept - Accepts the downstream socket. @returns Upstream acceptance or drain rejection. */
+  private upgradeWith(
+    request: Request,
+    accept: (data: ProxySocketData) => boolean,
+  ): Promise<Response> {
     const admitted = runExecutionSync(this.owner, this.service.admit);
     if (admitted === undefined) return Promise.resolve(drainResponse());
-    return this.unwrap(upgradeProxyWebSocket(request, server, admitted));
+    return this.unwrap(upgradeProxyWebSocket(request, accept, admitted));
   }
 
   /** Atomically selects a newer generation. @param expected - CAS witness. @param next - Next target.
@@ -126,25 +149,28 @@ export class SupervisorProxy {
     if (this.stopping !== undefined) return this.stopping;
     const scope = runExecutionSync(this.owner, this.service.stopAdmission);
     const server = this.server;
+    const nodeServer = this.nodeServer;
     const service = this.service;
     const sockets = this.nativeSockets;
     this.server = undefined;
+    this.nodeServer = undefined;
     this.stopping = this.unwrap(
       observeExecution(
         "supervisor",
         "proxy.stop",
         Effect.gen(function* () {
           // Force native listener shutdown before tunnel finalizers attempt close handshakes.
-          const stopped = server?.stop(true);
+          const stopped = server?.stop(true) ?? nodeServer?.stop(true);
           yield* Scope.close(scope, Exit.interrupt());
           if (stopped !== undefined)
             yield* Effect.tryPromise({
-              try: () => joinStoppedProxyListener(server!, stopped, sockets),
+              try: () =>
+                server === undefined ? stopped : joinStoppedProxyListener(server, stopped, sockets),
               catch: (error) => error,
             });
           yield* service.finishStop;
         }),
-        () => ({ listeners: server === undefined ? 0 : 1 }),
+        () => ({ listeners: server === undefined && nodeServer === undefined ? 0 : 1 }),
       ),
     ).finally(() => {
       this.stopping = undefined;

@@ -13,9 +13,7 @@ export const NODE_ENGINE = ">=22.13.0";
 /** Packages that still need Bun, with the reason. */
 export const BUN_ONLY_PACKAGES: Readonly<Record<string, string>> = {
   "@relkit/aws": "the Valkey cache client uses Bun's RedisClient",
-  "@relkit/cli": "the compiler and dev supervisor spawn and serve through Bun",
   "@relkit/testing": "the in-process test application loads sources with Bun's transpiler",
-  "create-relkit": "the creator lists, spawns and installs through Bun",
 };
 
 /** Node range of the standalone inspector, whose UI is a Next.js server. */

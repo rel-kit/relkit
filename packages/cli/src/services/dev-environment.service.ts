@@ -19,6 +19,7 @@ import type {
   DevelopmentEnvironmentState,
 } from "./dev-environment.types.js";
 import type { FileSystemCapabilities } from "./filesystem.types.js";
+import { runtime } from "../runtime/index.js";
 
 /** Per-invocation environment authority shared by ordinary and prepared candidate starts. */
 export class CliDevEnvironment extends Context.Service<
@@ -92,9 +93,11 @@ const resolveDevelopmentEnvironment = Effect.fn("DevEnvironment.load")(function*
   const output = yield* processes
     .run({
       command: process.execPath,
+      // Node has neither a config file nor default env files, so only Bun needs them disabled.
       args: [
-        `--config=${process.platform === "win32" ? "NUL" : "/dev/null"}`,
-        "--no-env-file",
+        ...(runtime.name === "bun"
+          ? [`--config=${process.platform === "win32" ? "NUL" : "/dev/null"}`, "--no-env-file"]
+          : []),
         ...paths.map((path) => `--env-file=${path}`),
         "--print",
         "JSON.stringify(process.env)",
@@ -119,7 +122,9 @@ const resolveDevelopmentEnvironment = Effect.fn("DevEnvironment.load")(function*
     return yield* Effect.fail(
       cliAdapterError(
         "dev.environment.load",
-        new Error("Bun could not load the development environment."),
+        new Error(
+          `${runtime.name === "bun" ? "Bun" : "Node"} could not load the development environment.`,
+        ),
       ),
     );
   const current = yield* decodeEnvironment(output.stdout);

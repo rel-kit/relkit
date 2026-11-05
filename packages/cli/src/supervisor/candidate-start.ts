@@ -1,3 +1,4 @@
+import type { RuntimeSubprocess } from "relkit/runtime";
 import { Cause, Effect, Exit, Fiber, Scope } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
 import { childEnvironment, emit, emitFailure } from "./candidate-process.js";
@@ -53,7 +54,7 @@ export function startCompiledCandidate(
     });
     let stopping: Promise<void> | undefined;
     const context = yield* Effect.context<never>();
-    let child: Bun.ReadableSubprocess;
+    let child: RuntimeSubprocess;
     const stopEffect = yield* Effect.cached(
       observeExecution(
         "supervisor",

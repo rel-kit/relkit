@@ -1,6 +1,7 @@
 /** Publishes pure project creation, normalized options and portable template metadata; existing-project AST discovery and add execution belong to the CLI. */
 
 export * from "./options.js";
+export * from "./package-manager.js";
 export * from "./create-capabilities.js";
 export * from "./create-help.js";
 export * from "./add-types.js";

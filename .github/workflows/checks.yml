@@ -275,6 +275,60 @@ jobs:
           bun test integrations/packages/redis/tests/runtime-conformance.test.ts integrations/packages/sentry/tests/runtime-conformance.test.ts
           node node_modules/vitest/vitest.mjs run packages/drizzle/tests/runtime-conformance.test.ts
 
+  node-creation-pack:
+    name: Node creation candidate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      TURBO_CONCURRENCY: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Build the packages the packed candidate needs
+        run: >-
+          bun x turbo run build --filter=./packages/* --filter=./integrations/*
+          --filter=./integrations/packages/* --output-logs=errors-only
+      - name: Pack the candidate and bundle the Node registry and smoke
+        run: bun scripts/node-creation-smoke.ts --out node-smoke
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: node-creation-candidate
+          path: node-smoke
+          retention-days: 1
+
+  node-creation:
+    name: Node creation (${{ matrix.manager }}, Node ${{ matrix.node }}, no Bun)
+    needs: node-creation-pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["22", "24"]
+        manager: [npm, pnpm]
+    steps:
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install pnpm
+        if: matrix.manager == 'pnpm'
+        run: npm install --global pnpm@11
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: node-creation-candidate
+          path: node-smoke
+      - name: Create with npx or pnpm dlx and run dev on Node, with no Bun installed
+        run: node node-smoke/smoke.mjs --package-manager "${{ matrix.manager }}" --require-no-bun
+
   inspector-container:
     name: Standalone inspector container
     runs-on: ubuntu-24.04
@@ -491,6 +545,7 @@ jobs:
         types-and-tests,
         postgres-backend,
         runtime-http,
+        node-creation,
         inspector-container,
         docs-installations,
         dependency-review,
@@ -509,6 +564,7 @@ jobs:
       TYPES_RESULT: ${{ needs.types-and-tests.result }}
       POSTGRES_RESULT: ${{ needs.postgres-backend.result }}
       RUNTIME_HTTP_RESULT: ${{ needs.runtime-http.result }}
+      NODE_CREATION_RESULT: ${{ needs.node-creation.result }}
       INSPECTOR_CONTAINER_RESULT: ${{ needs.inspector-container.result }}
       DOCS_INSTALLATIONS_RESULT: ${{ needs.docs-installations.result }}
       DEPENDENCY_REVIEW_RESULT: ${{ needs.dependency-review.result }}
@@ -527,6 +583,7 @@ jobs:
           test "$TYPES_RESULT" = success
           test "$POSTGRES_RESULT" = success
           test "$RUNTIME_HTTP_RESULT" = success
+          test "$NODE_CREATION_RESULT" = success
           test "$INSPECTOR_CONTAINER_RESULT" = success
           test "$DOCS_INSTALLATIONS_RESULT" = success
           test "$DEPENDENCY_REVIEW_RESULT" = success || test "$DEPENDENCY_REVIEW_RESULT" = skipped

@@ -1,16 +1,25 @@
+import type { PackageManagerName } from "./package-manager.js";
+
+/** Runs a project script with the selected package manager. */
+type RunScript<Script extends string> = `${PackageManagerName} run ${Script}`;
+
 /**
- * Local commands and endpoints displayed after successful project creation.
+ * Local commands and endpoints displayed after successful project creation, spelled for the
+ * package manager the project was created with.
  */
 export interface GenerateNextSteps {
   readonly commands: Readonly<{
     readonly cd: string;
-    readonly install?: "bun install";
+    readonly install?: `${PackageManagerName} install`;
     /** Finite validation/preparation required after a skipped dependency installation. */
-    readonly prepare?: "bunx --no-install relkit dev --prepare";
-    readonly dev: "bun run dev";
-    readonly test: "bun run test";
-    readonly check: "bun run check";
-    readonly build: "bun run build";
+    readonly prepare?:
+      | "bunx --no-install relkit dev --prepare"
+      | "npx --no-install relkit dev --prepare"
+      | "pnpm exec relkit dev --prepare";
+    readonly dev: RunScript<"dev">;
+    readonly test: RunScript<"test">;
+    readonly check: RunScript<"check">;
+    readonly build: RunScript<"build">;
   }>;
   readonly endpoints: Readonly<{
     /** A served backend URL: the example route, or the API reference without examples. */

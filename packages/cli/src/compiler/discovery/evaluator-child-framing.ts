@@ -14,6 +14,10 @@ import type {
   EvaluatorModuleResult,
   EvaluatorRequest,
 } from "./evaluator-protocol.types.js";
+import { realpathSync } from "node:fs";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { EvaluatorChildBoundaryError } from "./evaluator-child-errors.js";
+import { decodeEvaluatorRequest } from "./evaluator-protocol.js";
 
 /**
  * Builds one complete response preserving candidate and diagnostic order.
@@ -102,3 +106,63 @@ export const failureResponse = Effect.fn("Discovery.frameEvaluatorFailure")(
 function normalizeStack(stack: string, projectRoot: string): string {
   return stack.replaceAll(projectRoot.replaceAll("\\", "/"), "").replaceAll("\\", "/");
 }
+
+/**
+ * Reads the evaluator request from standard input on Bun or Node.
+ * @returns The complete UTF-8 input once the parent closes the pipe.
+ */
+export async function readStdin(): Promise<string> {
+  const chunks: Uint8Array[] = [];
+  for await (const chunk of process.stdin) chunks.push(chunk as Uint8Array);
+  return Buffer.concat(chunks).toString("utf8");
+}
+
+/**
+ * Tells whether a module is the process entry point, on Node 22 releases without
+ * `import.meta.main` as well.
+ * @param url - The module's `import.meta.url`.
+ * @returns Whether the process was started with this module.
+ */
+export function isMainModule(url: string): boolean {
+  const entry = process.argv[1];
+  return entry !== undefined && realpathSync(entry) === realpathSync(fileURLToPath(url));
+}
+
+/**
+ * Builds the import URL of one candidate. Bun keys modules by path, so the generation query keeps
+ * a re-import distinct; Node keys them by URL, where the query would load a second instance next
+ * to the one other candidates import, so a one-shot Node child imports the plain path.
+ * @param file - Absolute candidate path.
+ * @param generationId - Generation identity.
+ * @returns The URL to import.
+ */
+export function candidateUrl(file: string, generationId: string): string {
+  const url = pathToFileURL(file).href;
+  return typeof process.versions.bun === "string"
+    ? `${url}?relkit_generation=${generationId}`
+    : url;
+}
+
+/**
+ * Decodes the untrusted stdin JSON request at the native transport boundary.
+ * @returns A lazy effect yielding the accepted request or a typed boundary error.
+ */
+export const readEvaluatorRequest = Effect.fn("Discovery.readEvaluatorChildRequest")(function* () {
+  const text = yield* Effect.tryPromise({
+    try: readStdin,
+    catch: (cause) => new EvaluatorChildBoundaryError({ operation: "read-stdin", cause }),
+  });
+  const value: unknown = yield* Effect.try({
+    try: () => JSON.parse(text),
+    catch: (cause) => new EvaluatorChildBoundaryError({ operation: "parse-request", cause }),
+  });
+  return yield* decodeEvaluatorRequest(value).pipe(
+    Effect.mapError(
+      (cause) =>
+        new EvaluatorChildBoundaryError({
+          operation: "decode-request",
+          cause,
+        }),
+    ),
+  );
+});

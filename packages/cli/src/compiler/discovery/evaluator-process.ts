@@ -8,6 +8,7 @@ import type {
   EvaluatorProcessResult as ProcessResult,
 } from "./evaluator-process.types.js";
 import { allowlistedEnvironmentEffect } from "./evaluator-request.js";
+import { runtime, scriptCommand } from "../../runtime/index.js";
 
 export type { EvaluatorProcess, SpawnEvaluator } from "./evaluator-process.types.js";
 
@@ -44,17 +45,7 @@ export const runEvaluatorProcess = Effect.fn("Discovery.runEvaluatorProcess")(
         const child = yield* Effect.acquireRelease(
           Effect.try({
             try: () =>
-              spawn?.() ??
-              Bun.spawn(
-                [process.execPath, "run", "--no-env-file", "--no-install", "--silent", childPath],
-                {
-                  cwd: request.projectRoot,
-                  env: environment,
-                  stdin: "pipe",
-                  stdout: "pipe",
-                  stderr: "pipe",
-                },
-              ),
+              spawn?.() ?? spawnEvaluatorChild(childPath, request.projectRoot, environment),
             catch: (cause) => new EvaluatorProcessError({ operation: "spawn", cause }),
           }),
           (process) => terminateAndReap(process),
@@ -160,3 +151,45 @@ const readOutput = Effect.fn("Discovery.readOutput")(function* (
     onError: (cause) => new EvaluatorProcessError({ operation, cause }),
   }).pipe(Stream.decodeText(), Stream.mkString);
 });
+
+/**
+ * Starts the one-shot evaluator child on the CLI's runtime with the request on its stdin.
+ * @param childPath - Absolute evaluator entrypoint.
+ * @param cwd - Project root.
+ * @param env - Allowlisted environment.
+ * @returns The child behind the evaluator's process contract.
+ */
+function spawnEvaluatorChild(
+  childPath: string,
+  cwd: string,
+  env: Readonly<Record<string, string>>,
+): EvaluatorProcess {
+  const command =
+    runtime.name === "bun"
+      ? [process.execPath, "run", "--no-env-file", "--no-install", "--silent", childPath]
+      : scriptCommand(childPath);
+  const child = runtime.processes.spawn(command, {
+    cwd,
+    env,
+    stdin: "pipe",
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const stdin = child.stdin!;
+  return {
+    stdin: {
+      write: (value) => {
+        stdin.write(value);
+        return value.length;
+      },
+      end: () => stdin.end(),
+    },
+    stdout: child.stdout,
+    stderr: child.stderr,
+    exited: child.exited,
+    get exitCode() {
+      return child.exitCode;
+    },
+    kill: (signal) => child.kill(signal),
+  };
+}

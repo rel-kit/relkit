@@ -10,6 +10,7 @@ import { doctorDependencies } from "./doctor.schemas.js";
 import { CliDoctorToolchain, doctorToolchainLayer } from "./doctor-toolchain.service.js";
 export type { PackageJson } from "./doctor.types.js";
 import { readJsonEffect, packageManagerVersion, record } from "./doctor-compat-metadata.js";
+import { runtime } from "../runtime/index.js";
 export {
   readJsonEffect,
   readJson,
@@ -27,7 +28,10 @@ export const versionChecksEffect = Effect.fn("Doctor.versions")(
   function* (manifest: PackageJson | undefined, root: string) {
     if (manifest === undefined)
       return [{ name: "packages", ok: false, message: "package.json was not found." }];
-    const expectedBun = packageManagerVersion(manifest);
+    // On Node the runtime check compares Node with the CLI's own `engines.node` range.
+    const runtimeName = runtime.name === "bun" ? "Bun" : "Node";
+    const expectedBun =
+      runtime.name === "bun" ? packageManagerVersion(manifest) : cliEngines().node;
     const toolchain = yield* CliDoctorToolchain;
     const bunVersion = yield* toolchain.bunVersion();
     const bunOk =
@@ -55,11 +59,11 @@ export const versionChecksEffect = Effect.fn("Doctor.versions")(
     const relkit = yield* relkitVersions(dependencies, root);
     return [
       {
-        name: "bun",
+        name: runtime.name,
         ok: bunOk,
         message: bunOk
-          ? `Bun ${bunVersion} is compatible.`
-          : `Bun ${bunVersion} does not satisfy ${expectedBun}.`,
+          ? `${runtimeName} ${bunVersion} is compatible.`
+          : `${runtimeName} ${bunVersion} does not satisfy ${expectedBun}.`,
       },
       {
         name: "typescript",
@@ -159,3 +163,11 @@ const resolveDeclaredDependencies = Effect.fn("Doctor.declarations")(function* (
   });
   return yield* resolveProjectDependenciesEffect(root, specifications);
 });
+
+/**
+ * Reads the CLI's own runtime ranges.
+ * @returns The `engines` field of the installed CLI.
+ */
+function cliEngines(): Readonly<Record<string, string | undefined>> {
+  return "engines" in cliManifest ? (cliManifest.engines as Record<string, string>) : {};
+}

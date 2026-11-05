@@ -10,6 +10,11 @@ import { observeExecution } from "relkit/contracts/operation";
 import type { CreateOptions } from "./options.js";
 import type { GenerateProjectContext } from "./generate-types.js";
 import { GeneratorProcess } from "./generator-process.js";
+import {
+  creationPackageManager,
+  packageManagerCommands,
+  type PackageManagerName,
+} from "./package-manager.js";
 import { resolveTemplateRootEffect } from "./template-root.js";
 import { prepareProjectDependencyPatchEffect } from "./dependency-patches.js";
 import { domainTry } from "./generator-errors.js";
@@ -62,9 +67,10 @@ export const installGenerationStage = Effect.fn("ProjectGeneration.installStage"
   function* (stage: string, options: CreateOptions, context: GenerateProjectContext) {
     if (options.install) {
       context.onProgress?.("Installing dependencies...");
+      const manager = packageManagerCommands(creationPackageManager(options.packageManager));
       yield* runProjectStepEffect(
         context,
-        [context.bunExecutable ?? globalThis.process.execPath, "install"],
+        [yield* packageManagerExecutable(manager.name, context), ...manager.install],
         stage,
         "install",
         "install",
@@ -120,3 +126,20 @@ export const verifyGenerationStage = Effect.fn("ProjectGeneration.prepareStage")
   },
   (effect) => observeExecution("generator", "generation.prepareStage", effect),
 );
+
+/**
+ * Locates the selected package manager.
+ * @param manager - Selected package manager.
+ * @param context - Explicit Bun executable and injected command runner.
+ * @returns The running Bun for Bun under Bun, else the executable on `PATH`, else its name.
+ */
+const packageManagerExecutable = Effect.fn("ProjectGeneration.packageManager")(function* (
+  manager: PackageManagerName,
+  context: GenerateProjectContext,
+) {
+  if (manager === "bun" && context.bunExecutable !== undefined) return context.bunExecutable;
+  if (manager === "bun" && typeof globalThis.process.versions.bun === "string")
+    return globalThis.process.execPath;
+  if (context.commandRunner !== undefined) return manager;
+  return (yield* (yield* GeneratorProcess).which(manager)) ?? manager;
+});

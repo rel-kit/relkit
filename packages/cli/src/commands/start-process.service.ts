@@ -1,3 +1,5 @@
+import type { RuntimeProcesses } from "relkit/runtime";
+import { runtime } from "../runtime/index.js";
 import { Context, Deferred, Effect, Exit, Layer, Option, Ref } from "effect";
 import { cliAdapterError, cliPromise, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
@@ -12,10 +14,10 @@ export class CliStartProcess extends Context.Service<CliStartProcess, StartProce
 
 /**
  * Captures the selected native spawn boundary without starting a child.
- * @param spawn - Native Bun spawn or a contract-compatible test adapter.
+ * @param spawn - The runtime adapter's spawn or a contract-compatible test adapter.
  * @returns A Layer requiring cleanup authority; individual children require caller Scope.
  */
-export function startProcessLive(spawn: typeof Bun.spawn = Bun.spawn) {
+export function startProcessLive(spawn: RuntimeProcesses["spawn"] = runtime.processes.spawn) {
   return Layer.effect(
     CliStartProcess,
     Effect.gen(function* () {
@@ -31,7 +33,7 @@ export function startProcessLive(spawn: typeof Bun.spawn = Bun.spawn) {
             const drains = yield* Ref.make<readonly Promise<void>[]>([]);
             const owned = yield* Effect.acquireRelease(
               cliTry("start.spawn", () => ({
-                child: spawn([...request.command], {
+                child: spawn(request.command, {
                   cwd: request.cwd,
                   env: { ...request.environment },
                   stdin: "ignore",

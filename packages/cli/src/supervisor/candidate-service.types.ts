@@ -1,3 +1,4 @@
+import type { RuntimeSubprocess } from "relkit/runtime";
 import type { Effect } from "effect";
 import type {
   CandidateOptions,
@@ -31,15 +32,15 @@ export interface CandidatePlatformService {
     entrypoint: string,
     options: CandidateOptions,
     environment: Record<string, string>,
-  ) => Bun.ReadableSubprocess;
+  ) => RuntimeSubprocess;
   /** Stops and joins physical exit. @param child - Owned process. @param timeout - Graceful stop milliseconds.
    * @returns Only after native exit, distinct from fiber interruption. */
-  readonly stop: (child: Bun.ReadableSubprocess, timeout: number) => Promise<void>;
+  readonly stop: (child: RuntimeSubprocess, timeout: number) => Promise<void>;
   /** Consumes both native output pipes. @param child - Owned process. @param options - Output logger.
    * @param directory - Generation context. @param limit - Combined retained-byte budget. @param signal - Owned reader cancellation.
    * @returns Retained output after both readers release their locks. */
   readonly output: (
-    child: Bun.ReadableSubprocess,
+    child: RuntimeSubprocess,
     options: CandidateOptions,
     directory: string,
     limit: number,

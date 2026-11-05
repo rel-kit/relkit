@@ -8,6 +8,10 @@ import {
   websocketHeaders,
   protocols,
   closeDownstream,
+  closeUpstream,
+  frameBytes,
+  openUpstream,
+  terminateUpstream,
 } from "./proxy-websocket-native.js";
 
 export type { ProxySocketData } from "./proxy-websocket.types.js";
@@ -20,25 +24,38 @@ export const proxyWebSocketHandler: Bun.WebSocketHandler<ProxySocketData> = {
   },
   /** Forwards one frame while upstream remains open. @param socket - Native downstream. @param message - Frame. @returns After forwarding. */
   message(socket, message) {
-    if (socket.data.upstream.readyState === WebSocket.OPEN) socket.data.upstream.send(message);
+    forwardDownstream(socket.data, message);
   },
   /** Propagates downstream closure. @param socket - Native downstream. @param code - Close code. @param reason - Close reason. @returns After release. */
   close(socket, code, reason) {
-    socket.data.upstream.close(code, reason);
-    socket.data.release();
+    closeTunnel(socket.data, code, reason);
   },
 };
+
+/** Forwards one downstream frame while upstream remains open. @param data - Tunnel bindings.
+ * @param message - Downstream frame. @returns After forwarding. */
+export function forwardDownstream(data: ProxySocketData, message: string | Uint8Array): void {
+  if (data.upstream.readyState === WebSocket.OPEN) data.upstream.send(message);
+}
+
+/** Propagates downstream closure and releases the tunnel. @param data - Tunnel bindings.
+ * @param code - Close code. @param reason - Close reason. @returns After release. */
+export function closeTunnel(data: ProxySocketData, code?: number, reason?: string): void {
+  closeUpstream(data.upstream, code, reason);
+  data.release();
+}
 
 /**
  * Keeps one generation lease until its native socket closes.
  * @param request - Upgrade request, including forwarded browser origin.
- * @param server - Stable native listener.
+ * @param upgrade - Accepts the downstream socket with the tunnel's bindings: Bun's
+ * `server.upgrade`, or on Node a hand-off to Hono's upgrade helper.
  * @param admission - Generation chosen before awaiting the handshake.
  * @returns Upgrade response only after the upstream accepts the connection.
  */
 export const upgradeProxyWebSocket = Effect.fn("SupervisorProxy.websocket")(function* (
   request: Request,
-  server: Bun.Server<ProxySocketData>,
+  upgrade: (data: ProxySocketData) => boolean,
   admission: ProxyAdmission,
 ) {
   const scope = yield* Scope.fork(admission.scope);
@@ -61,13 +78,13 @@ export const upgradeProxyWebSocket = Effect.fn("SupervisorProxy.websocket")(func
     const upstream = yield* Effect.acquireRelease(
       Effect.try({
         try: () =>
-          new WebSocket(targetUrl, {
+          openUpstream(targetUrl, {
             headers: { ...websocketHeaders(request.headers), host: new URL(request.url).host },
             protocols: protocols(request.headers.get("sec-websocket-protocol")),
           }),
         catch: (error) => error,
       }),
-      (socket) => Effect.sync(() => socket.terminate()),
+      (socket) => Effect.sync(() => terminateUpstream(socket)),
     ).pipe(Effect.provideService(Scope.Scope, scope));
     /** Completes this tunnel's close latch idempotently. @returns After native close publication. */
     const release = (): void => {
@@ -75,7 +92,7 @@ export const upgradeProxyWebSocket = Effect.fn("SupervisorProxy.websocket")(func
     };
     /** Retires both native socket directions. @returns After requesting close and completing the latch. */
     const abort = (): void => {
-      upstream.terminate();
+      terminateUpstream(upstream);
       closeDownstream(Ref.getUnsafe(state).downstream);
       release();
     };
@@ -85,14 +102,14 @@ export const upgradeProxyWebSocket = Effect.fn("SupervisorProxy.websocket")(func
     ]);
     signal.addEventListener("abort", abort, { once: true });
     /** Forwards or bounds a pre-handoff frame. @param event - Upstream frame. @returns After forwarding, buffering or retirement. */
-    const onMessage = (event: MessageEvent<string | Uint8Array>): void => {
+    const onMessage = (event: MessageEvent<string | ArrayBuffer | Uint8Array>): void => {
       const current = Ref.getUnsafe(state);
+      const frame = frameBytes(event.data);
       if (current.downstream !== undefined) {
-        current.downstream.send(event.data);
+        current.downstream.send(frame);
         return;
       }
-      const bytes =
-        typeof event.data === "string" ? Buffer.byteLength(event.data) : event.data.byteLength;
+      const bytes = typeof frame === "string" ? Buffer.byteLength(frame) : frame.byteLength;
       if (current.bytes + bytes > 4 * 1024 * 1024) {
         abort();
         return;
@@ -100,7 +117,7 @@ export const upgradeProxyWebSocket = Effect.fn("SupervisorProxy.websocket")(func
       Effect.runSync(
         Ref.set(state, {
           ...current,
-          pending: [...current.pending, event.data],
+          pending: [...current.pending, frame],
           bytes: current.bytes + bytes,
         }),
       );
@@ -144,8 +161,7 @@ export const upgradeProxyWebSocket = Effect.fn("SupervisorProxy.websocket")(func
       Effect.gen(function* () {
         yield* awaitUpstream(upstream);
         if (signal.aborted) return yield* Effect.interrupt;
-        if (!server.upgrade(request, { data }))
-          return yield* Effect.fail(new Error("Proxy upgrade failed."));
+        if (!upgrade(data)) return yield* Effect.fail(new Error("Proxy upgrade failed."));
         yield* Deferred.succeed(headers, new Response(null));
         yield* Deferred.await(closed);
       }),

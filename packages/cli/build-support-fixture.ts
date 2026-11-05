@@ -84,6 +84,7 @@ function copyHelperFiles(root: string) {
     for (const relative of [
       "commands/build-support.ts",
       "commands/build-bundle-process.ts",
+      "commands/build-bundle-esbuild.ts",
       "commands/build-container.ts",
       "commands/build-module-links.ts",
       "cli-errors.ts",
@@ -101,6 +102,10 @@ function copyHelperFiles(root: string) {
       "services/process.types.ts",
       "services/cleanup.service.ts",
       "services/cleanup.types.ts",
+      "runtime/index.ts",
+      "runtime/glob.ts",
+      "runtime/bun/glob.ts",
+      "runtime/node/glob.ts",
     ]) {
       signal.throwIfAborted();
       const target = join(root, "cli/src", relative);

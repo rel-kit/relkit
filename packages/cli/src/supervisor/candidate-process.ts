@@ -1,3 +1,5 @@
+import type { RuntimeSubprocess } from "relkit/runtime";
+import { runtime } from "../runtime/index.js";
 import { rm } from "node:fs/promises";
 import { isAbsolute, join, relative, resolve } from "node:path";
 import type { CandidateLogEvent, CandidateLogger, CandidateOptions } from "./candidate.types.js";
@@ -64,12 +66,9 @@ export function childEnvironment(
   };
 }
 
-/** Shares actual native process termination. @param child - Owned Bun process.
+/** Shares actual native process termination. @param child - Owned process.
  * @param timeoutMs - Graceful termination bound. @returns Idempotent native stop callback. */
-export function createStopper(
-  child: Bun.ReadableSubprocess,
-  timeoutMs: number,
-): () => Promise<void> {
+export function createStopper(child: RuntimeSubprocess, timeoutMs: number): () => Promise<void> {
   let stopping: Promise<void> | undefined;
   return () => {
     stopping ??= terminate(child, timeoutMs);
@@ -79,7 +78,7 @@ export function createStopper(
 
 /** Stops the actual child, using SIGKILL after its native grace period. @param child - Owned process.
  * @param timeoutMs - SIGTERM deadline. @returns Completion only after actual native exit; clears its native timer. */
-export async function terminate(child: Bun.ReadableSubprocess, timeoutMs: number): Promise<void> {
+export async function terminate(child: RuntimeSubprocess, timeoutMs: number): Promise<void> {
   if (child.exitCode === null) child.kill("SIGTERM");
   let timer: ReturnType<typeof setTimeout> | undefined;
   const exited = await Promise.race([
@@ -151,13 +150,13 @@ function isWithin(root: string, candidate: string): boolean {
   return path === "" || (!path.startsWith("..") && !isAbsolute(path));
 }
 
-/** Acquires and stops a temporary Bun listener. @param hostname - Listener host.
+/** Acquires and stops a temporary listener. @param hostname - Listener host.
  * @returns Native ephemeral port after listener shutdown. */
 async function allocatePort(hostname: string): Promise<number> {
-  const server = Bun.serve({ hostname, port: 0, fetch: () => new Response() });
+  const server = await runtime.serve({ hostname, port: 0, fetch: () => new Response() });
   const port = server.port;
   await server.stop(true);
-  if (port === undefined) throw new Error("Bun did not allocate a candidate backend port.");
+  if (port === 0) throw new Error("The runtime did not allocate a candidate backend port.");
   return port;
 }
 

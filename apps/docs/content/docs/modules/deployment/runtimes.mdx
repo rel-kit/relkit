@@ -6,8 +6,8 @@ sidebar:
   icon: server
 ---
 
-RelKit runs your production server on Bun or on Node LTS. You keep developing with Bun; when you
-build, you choose the runtime the server and its container image run on.
+RelKit runs on Bun or on Node LTS: you can create, develop and build an app with either, and
+when you build, you choose the runtime the production server and its container image run on.
 
 ## Runtime tiers
 
@@ -20,9 +20,27 @@ build, you choose the runtime the server and its container image run on.
 Each package's `engines` field lists the runtimes it supports. These still need Bun on your
 machine or in CI:
 
-- the `relkit` CLI (`relkit dev`, `relkit check`, `relkit build`) and `create-relkit`;
-- `@relkit/testing`'s in-process test application, which `bun test` runs;
+- `@relkit/testing`'s in-process test application, which `bun test` runs, so the generated
+  `test` script still runs `bun test`;
 - `@relkit/aws`, whose Valkey cache client uses Bun's Redis client.
+
+## Create and develop on Node
+
+`create-relkit` installs with the package manager that started it, and the generated scripts call
+`relkit`, which runs on the same runtime:
+
+```sh title="Terminal"
+npx create-relkit my-app
+cd my-app
+npm run dev
+```
+
+With pnpm, run `pnpm dlx create-relkit my-app`, then `pnpm run dev`; the project's
+`pnpm-workspace.yaml` lets esbuild run its install script. A project you run with `bun run`
+stays on Bun even when Node is installed. Pass `--package-manager
+bun|npm|pnpm` to choose one yourself. On Node, `relkit` runs your TypeScript sources through
+esbuild (types are removed, not checked; the parallel type-check still reports type errors), and
+`relkit build` bundles with esbuild and builds for Node unless you pass `--runtime bun`.
 
 ## Pre-setup
 
@@ -45,7 +63,7 @@ bun run relkit build --runtime node
 
 The server in `.relkit/build/server/index.js` now listens through Node's HTTP server, and
 `.relkit/build/manifest.json` records `"runtime": "node"`. Without `--runtime`, `relkit build`
-builds for Bun.
+builds for the runtime `relkit` runs on: Bun under Bun, Node under Node.
 
 </Step>
 <Step title="Start it with Node" icon="play">
@@ -115,4 +133,8 @@ before you build for Node.
 
 - Node's HTTP server sets no request body limit of its own. RelKit's `server.maxBodyBytes` setting
   still rejects larger bodies with `413`.
-- `relkit dev` and `relkit start` run your app on Bun.
+- `relkit dev` on Node starts a new server generation for every change, because Node cannot drop
+  an evaluated module the way Bun's in-process reload does. A reload takes about a second.
+- `relkit start` runs the server on the runtime its build records, Bun unless the build says Node.
+- npm ignores `patchedDependencies`, so with npm the Drizzle declaration repair that Bun applies
+  is not installed; it changes type declarations only.

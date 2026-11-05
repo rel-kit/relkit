@@ -16,7 +16,10 @@ const failure = (operation: string) =>
 
 it.effect("failed bundling retains its primary failure and separate unlink evidence", () =>
   Effect.gen(function* () {
-    const exit = yield* Effect.exit(bundleServerEffect("/stage/server", "/project"));
+    // The `bun build` subprocess path, whichever runtime runs the test.
+    const exit = yield* Effect.exit(
+      bundleServerEffect("/stage/server", "/project", false, undefined, [], "bun", "bun"),
+    );
     expect(Exit.isFailure(exit)).toBe(true);
     if (Exit.isFailure(exit))
       expect(

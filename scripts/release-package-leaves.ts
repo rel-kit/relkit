@@ -27,6 +27,7 @@ export const packageLeafExports: Readonly<Record<string, ReleaseExports>> = {
     "./generator-prompt": esm("generator-prompt"),
     "./generator-runtime": esm("generator-runtime"),
     "./options": esm("options"),
+    "./package-manager": esm("package-manager"),
     "./project-manifest.schemas": esm("project-manifest.schemas"),
     "./prompt-driver": esm("prompt-driver"),
     "./prompt-driver.types": esm("prompt-driver.types"),
@@ -35,7 +36,8 @@ export const packageLeafExports: Readonly<Record<string, ReleaseExports>> = {
     "./validate-paths": esm("validate-paths"),
     "./catalog-resolution": {
       types: "./src/catalog-resolution.ts",
-      default: "./src/catalog-resolution.ts",
+      bun: "./src/catalog-resolution.ts",
+      default: "./dist/catalog-resolution.js",
     },
   },
   "cloud-aws": { "./runtime": esm("runtime/index") },
