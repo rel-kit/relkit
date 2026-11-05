@@ -14,4 +14,6 @@ export interface ProjectArgs {
   readonly prepare?: boolean;
   /** Runtime `relkit build` emits the production server for. */
   readonly runtime?: RuntimeName;
+  /** Deploy target `relkit build` checks the build against; only `vercel` changes the build. */
+  readonly target?: "vercel";
 }

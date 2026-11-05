@@ -9,6 +9,7 @@ import { buildCapabilitiesLayer } from "../services/project-capabilities.js";
 import { checkProjectEffect } from "./check.js";
 import { buildFailure } from "./build-result.js";
 import { localDurableProviderWarnings } from "./build-durable-warnings.js";
+import { vercelBuildErrors } from "./build-vercel-guard.js";
 import { stageBuildEffect } from "./build-stage.js";
 import { errorMessage } from "./build-support.js";
 import type { BuildOptions } from "./build.types.js";
@@ -37,6 +38,11 @@ export const buildProjectEffect = Effect.fn("Project.build")(
       ...checked.diagnostics,
       ...localDurableProviderWarnings(checked.outputs.graph),
     ];
+    if (options.target === "vercel") {
+      const errors = yield* vercelBuildErrors(projectRoot, checked.outputs.graph);
+      if (errors.length > 0)
+        return buildFailure(projectRoot, buildDirectory, [...diagnostics, ...errors]);
+    }
     const files = yield* CliFileSystem;
     const work = Effect.scoped(
       Effect.gen(function* () {

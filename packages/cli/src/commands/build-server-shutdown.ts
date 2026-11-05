@@ -36,6 +36,8 @@ async function shutdown() {
   process.exit(0);
 }
 
+// The function host owns the instance lifecycle: no signal handlers, and the handle is returned.
+if (relkitMode.functionHost === true) return { fetch: relkitFetch, ready: (budgetMs = 25_000) => awaitFunctionHostReady(Date.now() + budgetMs), drain: drainFunctionHost, close: closeEmbedded };
 process.once("SIGINT", () => void shutdown());
 process.once("SIGTERM", () => void shutdown());
 `;

@@ -6,6 +6,7 @@ export const deploymentGuideGroup = group("docs/modules/deployment", "Deployment
   "local-docker",
   "runtimes",
   "railway",
+  "vercel",
   "aws",
   "providers",
 ]);
@@ -29,6 +30,11 @@ export const deploymentGuideRelations = [
   relation(
     "docs/modules/deployment/railway",
     ["app", "jobs", "events", "integrations/postgres"],
+    ["templates/default/v1/api/relkit.config.ts"],
+  ),
+  relation(
+    "docs/modules/deployment/vercel",
+    ["app", "jobs", "events", "realtime", "integrations/postgres"],
     ["templates/default/v1/api/relkit.config.ts"],
   ),
   relation(

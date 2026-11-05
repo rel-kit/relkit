@@ -90,7 +90,7 @@ test("keeps identical files, refuses differing ones and replaces them with --for
 test("rejects targets that are not available and platform options on the Pulumi path", async () => {
   const root = await project();
   for (const [args, message] of [
-    [["deploy", "init", "vercel"], "not available yet"],
+    [["deploy", "init", "cloudflare"], "not available yet"],
     [["deploy", "init", "heroku"], "Unknown deploy target"],
     [["deploy", "init", "aws", "--runtime", "node"], "--runtime applies to platform targets"],
   ] as const) {

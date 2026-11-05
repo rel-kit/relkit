@@ -105,6 +105,7 @@ export const MATURITY_FEATURES: readonly MaturityFeature[] = [
     ],
   ),
   labs("Railway deploy", [], ["/docs/modules/deployment/railway"]),
+  labs("Vercel deploy", [], ["/docs/modules/deployment/vercel"]),
   labs(
     "AWS hosting",
     ["@relkit/aws", "@relkit/pulumi"],

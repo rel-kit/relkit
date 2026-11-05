@@ -656,6 +656,97 @@ Decided while applying section 17 (maintainer, 2026-11-05):
   The AWS page lists its four missing Labs criteria, checked against `@relkit/aws` (an ECR repository
   but no image build or push, an HTTP-only listener on port 80, `desiredCount: 1`, no CI deploy).
 
+Decided while applying section 21 (maintainer, 2026-11-05):
+
+- **One Node function serves the whole app.** `relkit deploy init vercel` writes `vercel.json`, the
+  function entry `api/relkit.mjs`, `.vercelignore` and `.github/workflows/vercel-deploy.yml`, with the Railway
+  generator's rules (identical files kept, `RELKIT_DEPLOY_INIT_CONFLICT` unless `--force`,
+  `cloudResourcesChanged: false`). `vercel.json` installs with `bun install --frozen-lockfile`, builds
+  with `relkit build --runtime node --target vercel`, serves `.relkit/build/public` from the CDN,
+  rewrites every other path to the one function and ships `.relkit/build/**` with it
+  (`includeFiles`, 60 s `maxDuration`). One function rather than one per route keeps a single cold
+  start and the server's own routing, middleware and health semantics; Vercel picks the Node runtime
+  for an `api/*.mjs` entry, so `--runtime bun` is refused for this target. The workflow runs check,
+  typecheck and tests, then `vercel deploy --prod` with a pinned CLI, authenticated by the
+  `VERCEL_TOKEN` secret and the `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` variables. Vercel builds
+  remotely from the uploaded source, as a local `vercel deploy` does, rather than from a prebuilt
+  output: `.vercelignore` keeps `node_modules`, `.relkit` and `.env*` out of the upload, and a local
+  `vercel build` would have to see `.relkit/build` to package it.
+- **The generated server has a function-host mode.** `activateRelkitApplication({ functionHost: true })`
+  starts providers and the HTTP application but opens no listener and installs no signal handlers,
+  and returns `{ fetch, ready, drain, close }`. The entry forces `RELKIT_WORKER_ROLE=api` (no
+  background worker or scheduler loop in an instance Vercel freezes between invocations),
+  `RELKIT_DURABLE_STATE=external` and, unless set, `RELKIT_TRUST_PROXY=1`, changes into
+  `.relkit/build` so the server sees the same layout as in the image, activates once per instance and
+  waits up to 25 s for a cold instance's providers before answering. The word "serverless" is not
+  used in source because the repository's scope scan reserves it as an alternate infrastructure
+  engine name.
+- **Durable work runs in `drain`, woken by Vercel Cron and after requests.** `drain({ budgetMs })`
+  reconciles the persisted schedules once per instance, runs one scheduler pass (the Postgres
+  backend's unique `(service, schedule, occurrence)` claim makes concurrent passes enqueue each
+  occurrence once), then leases job attempts and delivers due events until none is left or the budget
+  is spent. Vercel Cron calls `/_relkit/v1/vercel/cron/...` with `Authorization: Bearer
+$CRON_SECRET`; the entry compares it in constant time, refuses a missing or shorter than
+  16-character secret with 401, and drains for up to 50 s. After every other request the entry
+  drains for up to 5 s through Vercel's request-context `waitUntil` (read from the same global
+  symbol `@vercel/functions` uses, so the app needs no extra dependency), so jobs and events
+  submitted over HTTP run without waiting for the next cron call;
+  `RELKIT_VERCEL_DRAIN_AFTER_REQUEST=0` turns that off. The job pass is the same code as the
+  container's worker loop (`processNativeJobPass`).
+- **Cron entries come from the compiled graph.** `deploy init vercel` reads the schedules from
+  `.relkit/generated/application.graph.json` (it asks for `relkit check` first when that file is
+  missing) and writes one `crons` entry per distinct expression, named after the first schedule
+  that uses it. A UTC numeric five-field cron is copied as is; a timezone, an interval or a
+  non-numeric expression falls back to every minute (named in the command's next steps, since only
+  paid Vercel plans run per-minute crons), because the cron call only wakes the deployment and the
+  backend decides which occurrences are due.
+- **`relkit build --target vercel` enforces the target's rules before staging.** The flag implies
+  `--runtime node` (and refuses `--runtime bun`). The build fails with
+  `RELKIT_VERCEL_LOCAL_DURABLE_STATE` when a used jobs or events profile selects the local provider
+  (the same graph check as the image's startup guard, which the function entry also arms with
+  `RELKIT_DURABLE_STATE=external`), and with `RELKIT_VERCEL_CRONS_OUT_OF_DATE` when `vercel.json` is
+  missing or its `crons` differ from the ones the current schedules need, so a schedule added after
+  `deploy init` cannot silently never run. Both are errors, not warnings: unlike a container with a
+  volume, a function has no opt-in for local state. The local-state check runs in the CLI before
+  bundling rather than only at startup, so the remote build fails instead of a deployment that
+  answers 503.
+- **The newcomer test deploys to production of a throwaway project and brings its own database.**
+  Vercel Cron runs only on production deployments, so the authorized preview is the production
+  target of a throwaway `relkit-test-<run id>` project (created through the REST API with deployment
+  protection off, deleted in a `finally`). Vercel has no database of its own to provision from a
+  script, so the test creates and drops one database per run on a Postgres server named by
+  `RELKIT_TEST_VERCEL_DATABASE_URL` (a Neon or other reachable server). It proves HTTPS `/healthz`, an
+  HTTP-submitted job and an event consumer completing through the after-request drain, a new schedule
+  occurrence claimed while the test sends no request (so Vercel Cron claimed it), exactly one run per
+  occurrence after two concurrent authorized cron calls, and a 401 for a wrong secret. The probe's
+  every-minute schedule needs a plan with per-minute crons (`VERCEL_TEAM_ID` selects that team). It
+  runs opt-in like Railway's (`RELKIT_TEST_VERCEL=1`, `VERCEL_TOKEN` or a `vercel login` session;
+  `.github/workflows/vercel-newcomer.yml` gated on the `RELKIT_TEST_VERCEL` variable), and
+  `tests/deployment/vercel-newcomer.test.ts` runs the flow against stubs in every test run.
+- **`relkit check` refuses per-instance realtime state on Vercel.** When the project root holds
+  `vercel.json`, every channel that clients subscribe to (`client` public or protected; internal
+  channels are server-side only) must use a realtime profile backed by an external provider, meaning
+  any realtime provider other than the local filesystem one (today `redisRealtime()`); otherwise the
+  check fails with `RELKIT_VERCEL_REALTIME_PROVIDER_REQUIRED` at the channel's source. The presence of
+  `vercel.json` is the target signal because it is what `deploy init vercel` writes and what Vercel
+  reads; no separate check flag is needed. The rule is about state, not transport: Vercel functions
+  also accept no WebSocket upgrades, which an external provider does not change, so the guide states
+  that WebSocket subscriptions need a host that keeps connections open and that realtime on Vercel is
+  unverified.
+- **The guide and the maturity row stay Labs.** `/docs/modules/deployment/vercel` documents what
+  runs as the function, Vercel Cron and the cron secret, the external Postgres requirement, the
+  after-request drain, the realtime limits and the newcomer path; the deployment overview lists
+  Vercel's engine as platform configuration with one Node function deployed by the Vercel CLI, and
+  the maturity table gains "Vercel deploy" as Labs. It moves to Core only once
+  `.github/workflows/vercel-newcomer.yml` passes in CI, per the target-maturity requirement.
+- **Verified locally, live run pending.** The function entry was driven in Node 24 against the `api`
+  template with the probe service, Postgres jobs and events on a local Postgres 17, simulating
+  Vercel's request context: cold requests waited for readiness, an HTTP job and an event consumer
+  completed through the after-request drain, the cron endpoint refused a missing secret with 401 and
+  drained with it, and the claimed occurrence had exactly one run. The live run against Vercel did
+  not happen while applying this section: the machine's Vercel CLI token was invalid (`vercel login`
+  pending) and no `RELKIT_TEST_VERCEL_DATABASE_URL` server was set up, so the Vercel target stays Labs.
+
 ### D10. Postgres durable backend (#12)
 
 Tables hold jobs (leased with `FOR UPDATE SKIP LOCKED`), an event outbox written in the caller's

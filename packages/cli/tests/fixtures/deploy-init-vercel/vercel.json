@@ -1,0 +1,29 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "bun install --frozen-lockfile",
+  "buildCommand": "./node_modules/.bin/relkit build --runtime node --target vercel",
+  "outputDirectory": ".relkit/build/public",
+  "functions": {
+    "api/relkit.mjs": {
+      "maxDuration": 60,
+      "includeFiles": ".relkit/build/**"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/relkit"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/_relkit/v1/vercel/cron/billing.sweep/local",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/_relkit/v1/vercel/cron/mail.digest/nightly",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}

@@ -24,6 +24,8 @@ export interface BuildOptions extends CheckOptions {
   readonly providerOverridesGeneration?: string;
   /** Runtime the production server and container run on; defaults to Bun. */
   readonly runtime?: RuntimeName;
+  /** Deploy target whose rules the build enforces; `vercel` refuses local durable state and stale crons. */
+  readonly target?: "vercel";
   /**
    * Bundles a development build too. Local Docker job workers run the generation's
    * `server/index.js` in a container that mounts only the generation and `node_modules`.
