@@ -87,10 +87,10 @@ test("keeps identical files, refuses differing ones and replaces them with --for
   expect(await readFile(join(root, "Dockerfile"), "utf8")).toContain("relkit build --runtime bun");
 });
 
-test("rejects targets that are not available and platform options on the Pulumi path", async () => {
+test("rejects unknown targets, wrong runtimes and platform options on the Pulumi path", async () => {
   const root = await project();
   for (const [args, message] of [
-    [["deploy", "init", "cloudflare"], "not available yet"],
+    [["deploy", "init", "cloudflare", "--runtime", "node"], "--runtime workers"],
     [["deploy", "init", "heroku"], "Unknown deploy target"],
     [["deploy", "init", "aws", "--runtime", "node"], "--runtime applies to platform targets"],
   ] as const) {

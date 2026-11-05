@@ -16,7 +16,11 @@ export interface WorkersGraphNode {
   readonly stateProfile?: string;
   readonly triggerType?: string;
   readonly config?: { readonly profile?: string; readonly kind?: string };
-  readonly adapter?: { readonly integrationId?: string };
+  readonly adapter?: {
+    readonly integrationId?: string;
+    readonly adapterId?: string;
+    readonly behavior?: { readonly binding?: unknown };
+  };
   readonly source?: { readonly file?: string; readonly line?: number; readonly column?: number };
 }
 

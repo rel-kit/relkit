@@ -882,6 +882,26 @@ Decided while applying section 22 (maintainer, 2026-11-06):
   Cron calls left exactly one run per occurrence, and the conformance Worker's Durable Object check
   passed the shared realtime checks.
 
+- **`relkit deploy init cloudflare` writes three files from the graph.** With the Railway and
+  Vercel rules (identical files kept, `RELKIT_DEPLOY_INIT_CONFLICT` unless `--force`,
+  `cloudResourcesChanged: false`, the compiled graph required), it writes `wrangler.jsonc`, the
+  Worker entry `worker.mjs` and `.github/workflows/cloudflare-deploy.yml`. The configuration names
+  the Worker after the package, pins the compatibility date and `nodejs_compat`, runs
+  `relkit build --runtime workers` as wrangler's custom build, serves `.relkit/build/public` as
+  static assets, and declares what the graph uses: `kv_namespaces` and `r2_buckets` for the binding
+  providers (by binding name only, which wrangler provisions on the first deploy, so no IDs are
+  copied by hand), the `RelkitRealtimeState` Durable Object with a SQLite-backed migration, and,
+  when jobs or events use the Postgres backend, the `RELKIT_WORK` queue (producer and consumer) and
+  a `* * * * *` Cron Trigger. The entry is a two-line module that re-exports the built handlers and
+  Durable Objects, so the project has a stable, editable place for its own handlers while the
+  generated code stays in `.relkit/build`. The workflow checks, type-checks and tests, creates the
+  queue when it does not exist (queues are not provisioned automatically) and runs a pinned
+  `wrangler deploy` with `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. `--runtime` accepts
+  only `workers` here, and the JSON result reports it. A unit test keeps the generator's wrangler
+  pin, the runtime HTTP suite's and the conformance test's equal. Checked with
+  `wrangler deploy --dry-run` on the probe app: the custom build ran and the 5.2 MB bundle (927 KB
+  gzipped) uploaded with its Durable Object and queue bindings.
+
 ### D10. Postgres durable backend (#12)
 
 Tables hold jobs (leased with `FOR UPDATE SKIP LOCKED`), an event outbox written in the caller's
