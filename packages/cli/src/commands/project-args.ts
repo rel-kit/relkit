@@ -21,7 +21,7 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
   let verbose = false;
   let noColor = false;
   let prepare = false;
-  let runtime: "bun" | "node" | undefined;
+  let runtime: "bun" | "node" | "workers" | undefined;
   let target: "vercel" | undefined;
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index]!;
@@ -40,8 +40,8 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
     else if (argument === "--prepare" && command === "dev") prepare = true;
     else if (argument === "--runtime" && command === "build") {
       const selected = value(args, ++index, argument, command);
-      if (selected !== "bun" && selected !== "node")
-        throw fail("RELKIT_BUILD_USAGE", "--runtime must be bun or node.", 2);
+      if (selected !== "bun" && selected !== "node" && selected !== "workers")
+        throw fail("RELKIT_BUILD_USAGE", "--runtime must be bun, node or workers.", 2);
       runtime = selected;
     } else if (argument === "--target" && command === "build") {
       if (value(args, ++index, argument, command) !== "vercel")
@@ -59,7 +59,7 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
         2,
       );
   }
-  if (target === "vercel" && runtime === "bun")
+  if (target === "vercel" && (runtime === "bun" || runtime === "workers"))
     throw fail(
       "RELKIT_BUILD_USAGE",
       "--target vercel builds the Node server; use --runtime node.",

@@ -21,7 +21,7 @@ export const builtManifestSchema = Schema.Struct({
   localServicesPlanFile: Schema.optionalKey(Schema.String),
   server: Schema.optionalKey(Schema.Struct({ port: Schema.optionalKey(Schema.Number) })),
   /** Runtime the server was built for; absent for Bun builds. */
-  runtime: Schema.optionalKey(Schema.Literals(["bun", "node"])),
+  runtime: Schema.optionalKey(Schema.Literals(["bun", "node", "workers"])),
 });
 
 /** Untrusted artifact object; domain owners validate semantic and version contracts. */

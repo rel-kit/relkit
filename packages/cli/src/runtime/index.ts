@@ -65,5 +65,5 @@ export function builtServerCommand(target: "bun" | "node", entry: string): strin
  * @returns `bun` or `node`.
  */
 export function defaultBuildRuntime(): "bun" | "node" {
-  return runtime.name;
+  return runtime.name === "node" ? "node" : "bun";
 }

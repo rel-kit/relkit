@@ -125,6 +125,15 @@ const validateBuiltPathsEffect = Effect.fn("BuiltProject.paths")(function* (
       cliAdapterError("start.built", new Error("Built manifest paths are invalid.")),
     );
   }
+  if (manifest.runtime === "workers")
+    return yield* Effect.fail(
+      cliAdapterError(
+        "start.built",
+        new Error(
+          "This build is a Cloudflare Workers bundle; run it with `wrangler dev` (see relkit deploy init cloudflare) or rebuild with --runtime bun or node.",
+        ),
+      ),
+    );
   const files = yield* CliFileSystem;
   yield* files.stat(join(buildDirectory, manifest.entrypoint));
   yield* files.stat(join(buildDirectory, manifest.containerEntrypoint));

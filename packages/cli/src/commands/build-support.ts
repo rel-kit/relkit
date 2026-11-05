@@ -14,7 +14,7 @@ import { defaultBundler, runBundleProcess, type Bundler } from "./build-bundle-p
 import { linkBuildModules } from "./build-module-links.js";
 import { DependencySource, DependencySourceLive } from "relkit/provider/dependencies";
 import { linkRuntimeModules } from "../services/runtime-module-links.js";
-import type { RuntimeName } from "relkit/runtime";
+import type { RuntimeAdapterName } from "relkit/runtime";
 
 export { dockerfile, dockerignore } from "./build-container.js";
 
@@ -36,7 +36,7 @@ export const bundleServerEffect = Effect.fn("Project.bundleServer")(
     development = false,
     inventoryFile?: "bun.inputs.json",
     external: readonly string[] = [],
-    runtime: RuntimeName = "bun",
+    runtime: RuntimeAdapterName = "bun",
     bundler: Bundler = defaultBundler(),
   ) {
     const files = yield* CliFileSystem;
@@ -58,7 +58,9 @@ export const bundleServerEffect = Effect.fn("Project.bundleServer")(
         );
       }),
     );
-    yield* linkRuntimeModules(files, source, serverDirectory, projectRoot, external);
+    // A Workers bundle includes its dependencies; nothing is linked beside it.
+    if (runtime !== "workers")
+      yield* linkRuntimeModules(files, source, serverDirectory, projectRoot, external);
   },
   (
     effect,
@@ -67,7 +69,7 @@ export const bundleServerEffect = Effect.fn("Project.bundleServer")(
     _development = false,
     _inventoryFile?: "bun.inputs.json",
     _external: readonly string[] = [],
-    _runtime: RuntimeName = "bun",
+    _runtime: RuntimeAdapterName = "bun",
     _bundler: Bundler = defaultBundler(),
   ) => observeCli("build.bundleServer", effect),
 );

@@ -747,6 +747,55 @@ $CRON_SECRET`; the entry compares it in constant time, refuses a missing or shor
   not happen while applying this section: the machine's Vercel CLI token was invalid (`vercel login`
   pending) and no `RELKIT_TEST_VERCEL_DATABASE_URL` server was set up, so the Vercel target stays Labs.
 
+Decided while applying section 22 (maintainer, 2026-11-06):
+
+- **Workers is an adapter name, not a Tier 1 runtime name.** `RuntimeName` stays `"bun" | "node"`
+  (the process runtimes the container image, Railway and Vercel use) and `RuntimeAdapterName` adds
+  `"workers"`; `RuntimeAdapter.name`, `detectRuntime`, `loadRuntimeAdapter` and the build's
+  `--runtime` take the wider type. `relkit/runtime/workers` exports `workersRuntime`: `serve`
+  rejects (a Worker has no listener), `files` is undefined, `processes.spawn` and
+  `modules.resolve` throw, `which` returns null and there is no module registry. Hashing uses
+  `node:crypto`'s synchronous `createHash`, because the adapter contract's `sha256Hex` is
+  synchronous and Web Crypto's digest is not; identifiers use Web Crypto's `randomUUID`.
+  `detectRuntime` recognizes Workers by `navigator.userAgent === "Cloudflare-Workers"`.
+- **Workers run with `nodejs_compat`.** The generated server and `relkit` itself use
+  `AsyncLocalStorage`, `node:crypto`, `node:path` and `process.env`; the flag provides them, and
+  `nodejs_compat` also fills `process.env` with the Worker's string bindings. The portability check
+  treats files under `workers/` or named `*.workers.ts` as Workers adapters, which may import
+  `node:*` modules but never Bun's.
+- **`relkit build --runtime workers` bundles everything into `server/index.js`.** The build writes
+  `server/worker.ts` beside the generated `index.ts` and bundles it with esbuild (on Bun too, since
+  `bun build` has no Workers target): neutral platform, `workerd`/`worker` export conditions, every
+  dependency included because a Worker cannot install packages beside its script, and only Node
+  built-ins and the optional transports the server imports by name left external. The bundle is
+  not minified, because minifying folds the server's non-literal imports of optional packages into
+  literals that wrangler then tries to resolve, and wrangler bundles the file again anyway (its
+  `nodejs_compat` polyfills cover the built-ins workerd lacks). `import.meta.url` is defined as
+  `file:///bundle/server/index.js` because a bundled Worker module has none, and an esbuild plugin
+  replaces `relkit/runtime`'s lazy imports of the Bun and Node adapters with a stub, which keeps
+  `ws` and `@hono/node-server` out of the bundle. The build writes no Dockerfile, `manifest.json`
+  records `"runtime": "workers"`, and `relkit start` refuses such a build and points at
+  `wrangler dev`.
+- **The Worker activates the server lazily, in function-host mode.** A Worker's global scope may not
+  generate random values or set timers, and RelKit's module scope does both (Effect fiber IDs at
+  `defineApp`), so `worker.ts` imports the server module from its first handler; esbuild then wraps
+  the module for lazy evaluation, which in turn forbids top-level await, so the Workers server omits
+  the `if (relkitEntryPoint) await activateRelkitApplication()` tail. The entry copies string
+  bindings into `process.env` once per isolate, defaults `RELKIT_ENV` to `production` (wrangler dev
+  defines `NODE_ENV` as `development`), forces `RELKIT_DURABLE_STATE=external` and
+  `RELKIT_WORKER_ROLE=api`, activates with `{ functionHost: true }` (section 21's mode: no listener,
+  no signal handlers, no background loop), waits up to 25 s for a cold isolate's providers and
+  passes the Worker's `env` as the request bindings. Static files are not read from disk: the
+  Workers server emits no `staticFiles` option, and `public/` is served by Workers static assets
+  before the Worker runs.
+- **The runtime HTTP suite runs on Workers through `wrangler dev`.** With `--runtime workers`,
+  `scripts/runtime-http-suite.ts` builds the `api` template for Workers, writes a minimal
+  `wrangler.jsonc` (the bundle, `nodejs_compat`, the `public/` assets) under `.relkit/` and serves
+  it locally in workerd with a pinned `bunx wrangler@4.151.3 dev`, then runs the template's HTTP
+  tests against it, as on Bun and Node. That needed no new dependency in the repository, unlike
+  `@cloudflare/vitest-pool-workers` or a direct `miniflare` dependency, and serves the same bundle
+  a deploy uploads.
+
 ### D10. Postgres durable backend (#12)
 
 Tables hold jobs (leased with `FOR UPDATE SKIP LOCKED`), an event outbox written in the caller's

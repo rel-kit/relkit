@@ -10,6 +10,7 @@ import { join, relative, resolve } from "node:path";
 import { workspacePackageDirectories } from "./workspace-packages.js";
 import {
   isRuntimeAdapter,
+  isWorkersAdapter,
   portabilityUses,
   type PortabilityKind,
   type PortabilityUse,
@@ -47,8 +48,9 @@ export function scanPortability(root: string, packages?: readonly string[]): Por
     for (const file of sourceFiles(join(root, directory, "src"))) {
       const path = relative(root, file).replaceAll("\\", "/");
       if (isRuntimeAdapter(path)) continue;
+      const nodeAllowed = tooling || isWorkersAdapter(path);
       for (const use of portabilityUses(path, readFileSync(file, "utf8")))
-        if (use.kind === "bun" || !tooling) uses.push(use);
+        if (use.kind === "bun" || !nodeAllowed) uses.push(use);
     }
   }
   return uses;
@@ -156,7 +158,7 @@ if (import.meta.main) {
     for (const problem of problems) console.error(problem);
     if (problems.length > 0) {
       console.error(
-        `Portability check failed with ${problems.length} problem(s). Move runtime-specific code into a runtime adapter (relkit/runtime/bun or relkit/runtime/node).`,
+        `Portability check failed with ${problems.length} problem(s). Move runtime-specific code into a runtime adapter (relkit/runtime/bun, relkit/runtime/node or relkit/runtime/workers).`,
       );
       process.exitCode = 1;
     } else console.log(`Portability check passed (${uses.length} baselined call sites).`);

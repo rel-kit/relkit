@@ -19,6 +19,7 @@ import { dockerfile, dockerignore } from "./build-container.js";
 import { buildManifest, buildProductionManifest } from "./build-manifest.js";
 import type { BuildStageCohort, BuildStageInputs } from "./build.types.js";
 import { defaultBuildRuntime } from "../runtime/index.js";
+import { workersEntrySource } from "./build-workers-entry.js";
 
 /**
  * Writes graph, optional workers and public assets into one owned stage.
@@ -66,6 +67,7 @@ export const writeBuildServer = Effect.fn("Project.buildServer")(function* (
   const outputs = input.checked.outputs;
   const development =
     input.options.mode === "development" || input.options.bundleInputInventory !== undefined;
+  const runtime = input.options.runtime ?? defaultBuildRuntime();
   const entrypoint = yield* cliTry("build.serverSource", () =>
     serverSource(
       cohort.graph,
@@ -75,10 +77,8 @@ export const writeBuildServer = Effect.fn("Project.buildServer")(function* (
       Schema.decodeUnknownSync(Schema.Json)(JSON.parse(outputs.clientContract || "{}")),
       {
         ...cohort.tooling.server,
-        // Recorded only for Node, so Bun output stays byte-identical.
-        ...((input.options.runtime ?? defaultBuildRuntime()) === "node"
-          ? { runtime: "node" as const }
-          : {}),
+        // Recorded only for Node and Workers, so Bun output stays byte-identical.
+        ...(runtime === "bun" ? {} : { runtime }),
         maxPreviewBytes: cohort.tooling.inspector.maxPreviewBytes,
         inspectorEnabled: development && cohort.tooling.inspector.enabled,
         jobsAdministration: development && cohort.jobsManifest !== undefined,
@@ -97,6 +97,8 @@ export const writeBuildServer = Effect.fn("Project.buildServer")(function* (
       ? []
       : [[GENERATED_ARTIFACT_FILES.localServices, cohort.localServicesPlanSource] as const]),
     ["index.ts", entrypoint],
+    // The Workers bundle's entry; it imports index.ts lazily from its handlers.
+    ...(runtime === "workers" ? [["worker.ts", workersEntrySource()] as const] : []),
   ];
   yield* Effect.forEach(
     members,
@@ -134,12 +136,14 @@ export const writeBuildMetadata = Effect.fn("Project.buildMetadata")(function* (
       activationFingerprint: cohort.activationFingerprint,
       hasJobs: cohort.jobsManifest !== undefined,
       hasLocalServices: cohort.localServicesPlanSource !== undefined,
-      ...((input.options.runtime ?? defaultBuildRuntime()) === "node"
-        ? { runtime: "node" as const }
-        : {}),
+      ...((input.options.runtime ?? defaultBuildRuntime()) === "bun"
+        ? {}
+        : { runtime: input.options.runtime ?? defaultBuildRuntime() }),
       tooling: cohort.tooling,
     }),
   );
+  // A Workers bundle deploys with wrangler, not as a container image.
+  if (input.options.runtime === "workers") return;
   yield* files.writeText(
     join(input.stage, "Dockerfile"),
     dockerfile(

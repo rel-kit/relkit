@@ -2,21 +2,29 @@
  * Runtime HTTP suite: packs this checkout, creates the `api` template from a local registry,
  * builds it with `relkit build --runtime <runtime>`, starts the production server on the given
  * executable and runs the template's own HTTP tests against it through `RELKIT_TEST_SERVER_URL`.
- * The pull-request runtime matrix runs it once per Tier 1 runtime.
+ * The pull-request runtime matrix runs it once per Tier 1 runtime; the nightly matrix also runs
+ * it on Workers, where the bundle is served by workerd through a pinned `wrangler dev`.
  *
  *   bun scripts/runtime-http-suite.ts --runtime node [--executable /path/to/node]
  *     [--artifacts <packed release directory>] [--project <installed api project>]
+ *   bun scripts/runtime-http-suite.ts --runtime workers
  */
-import { rm } from "node:fs/promises";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { Effect } from "effect";
 import { preparePackedFixture } from "./dev-readiness/packed-fixture.js";
 
 const root = resolve(import.meta.dir, "..");
 
+/** Wrangler release that serves the Workers bundle locally (workerd); the generator pins the same. */
+export const RUNTIME_SUITE_WRANGLER = "wrangler@4.151.3";
+
+/** Runtimes the suite runs on. */
+type SuiteRuntime = "bun" | "node" | "workers";
+
 /** Parsed command line. */
 interface SuiteOptions {
-  readonly runtime: "bun" | "node";
+  readonly runtime: SuiteRuntime;
   readonly executable: string;
   readonly artifacts: string | undefined;
   readonly project: string | undefined;
@@ -38,7 +46,8 @@ function option(name: string): string | undefined {
 /** @returns Validated options. */
 function options(): SuiteOptions {
   const runtime = option("runtime");
-  if (runtime !== "bun" && runtime !== "node") throw new Error("--runtime must be bun or node");
+  if (runtime !== "bun" && runtime !== "node" && runtime !== "workers")
+    throw new Error("--runtime must be bun, node or workers");
   const artifacts = option("artifacts");
   const project = option("project");
   return {
@@ -84,16 +93,25 @@ function freePort(): number {
 async function startServer(suite: SuiteOptions, project: string, port: number) {
   const entry = join(project, ".relkit/build/server/index.js");
   const command =
-    suite.runtime === "node"
-      ? [suite.executable, entry]
-      : [suite.executable, "run", "--no-env-file", entry];
+    suite.runtime === "workers"
+      ? await workersCommand(project, port)
+      : suite.runtime === "node"
+        ? [suite.executable, entry]
+        : [suite.executable, "run", "--no-env-file", entry];
   const child = Bun.spawn(command, {
     cwd: project,
-    env: { ...process.env, NODE_ENV: "production", PORT: String(port) },
+    env: {
+      ...process.env,
+      NODE_ENV: "production",
+      PORT: String(port),
+      WRANGLER_SEND_METRICS: "false",
+    },
     stdout: "inherit",
     stderr: "inherit",
   });
-  const deadline = Date.now() + 60_000;
+  // The first Workers run may download wrangler and workerd before serving.
+  const budgetSeconds = suite.runtime === "workers" ? 180 : 60;
+  const deadline = Date.now() + budgetSeconds * 1000;
   while (Date.now() < deadline) {
     if (child.exitCode !== null)
       throw new Error(
@@ -107,7 +125,46 @@ async function startServer(suite: SuiteOptions, project: string, port: number) {
     await Bun.sleep(250);
   }
   child.kill();
-  throw new Error(`The ${suite.runtime} server was not ready within 60 seconds.`);
+  throw new Error(`The ${suite.runtime} server was not ready within ${budgetSeconds} seconds.`);
+}
+
+/**
+ * Writes the minimal wrangler configuration for the built Workers bundle and returns the command
+ * that serves it locally in workerd.
+ * @param project - Built project root.
+ * @param port - Listener port.
+ * @returns `bunx wrangler dev` with the configuration and address.
+ */
+async function workersCommand(project: string, port: number): Promise<string[]> {
+  const directory = join(project, ".relkit/runtime-http-suite");
+  await mkdir(directory, { recursive: true });
+  const config = join(directory, "wrangler.jsonc");
+  await writeFile(
+    config,
+    `${JSON.stringify(
+      {
+        name: "relkit-runtime-http-suite",
+        main: "../build/server/index.js",
+        compatibility_date: "2026-10-01",
+        compatibility_flags: ["nodejs_compat"],
+        assets: { directory: "../build/public" },
+      },
+      null,
+      2,
+    )}\n`,
+  );
+  return [
+    process.execPath,
+    "x",
+    RUNTIME_SUITE_WRANGLER,
+    "dev",
+    "--config",
+    config,
+    "--ip",
+    "127.0.0.1",
+    "--port",
+    String(port),
+  ];
 }
 
 /**
@@ -145,7 +202,10 @@ async function main(): Promise<void> {
     server.kill("SIGTERM");
     await server.exited;
   }
-  const version = await runtimeVersion(suite.executable);
+  const version =
+    suite.runtime === "workers"
+      ? `workerd (${RUNTIME_SUITE_WRANGLER})`
+      : await runtimeVersion(suite.executable);
   console.log(
     `api template HTTP suite passed against the production server on ${suite.runtime} ${version}`,
   );

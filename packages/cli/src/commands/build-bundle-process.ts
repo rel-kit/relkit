@@ -9,7 +9,7 @@ import { runtime as cliRuntime } from "../runtime/index.js";
 import { bundleWithEsbuild } from "./build-bundle-esbuild.js";
 import type { ProcessCapabilities } from "../services/process.types.js";
 import { HTTP_TRANSPORT_REQUIREMENTS } from "relkit/runtime-hono/prepared";
-import type { RuntimeName } from "relkit/runtime";
+import type { RuntimeAdapterName } from "relkit/runtime";
 
 /** Bundlers `relkit build` can run. */
 export type Bundler = "bun" | "esbuild";
@@ -38,7 +38,7 @@ export const runBundleProcess = Effect.fn("Project.bundleProcess")(function* (
   development: boolean,
   inventory?: "bun.inputs.json",
   external: readonly string[] = [],
-  runtime: RuntimeName = "bun",
+  runtime: RuntimeAdapterName = "bun",
   bundler: Bundler = defaultBundler(),
 ) {
   const externalPackages = new Set([
@@ -57,6 +57,12 @@ export const runBundleProcess = Effect.fn("Project.bundleProcess")(function* (
     ...[...externalPackages].flatMap((name) => [name, `${name}/*`]),
     ...optionalLeaves,
   ];
+  // A Worker cannot install packages beside its script, so its bundle includes them all; only the
+  // optional transports the server imports by name stay external (and are unavailable there).
+  if (runtime === "workers")
+    return yield* cliPromise("build.bundle", () =>
+      bundleWithEsbuild({ directory, root, development, external: optionalLeaves, runtime }),
+    );
   if (bundler === "esbuild")
     return yield* cliPromise("build.bundle", () =>
       bundleWithEsbuild({
