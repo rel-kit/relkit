@@ -4,7 +4,7 @@ import type { HttpTriggerRegistration } from "../graph/index.js";
 import { expectedClientIdentity, resolveClientIdentity } from "./client-identity.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.types.js";
 import { contextProblem } from "./problem-details.js";
-import { routeOperation } from "./rpc-route-types.js";
+import { routeOperation } from "./route-operation.js";
 
 /**
  * Wraps a mutation route so a request that names the identity it expects

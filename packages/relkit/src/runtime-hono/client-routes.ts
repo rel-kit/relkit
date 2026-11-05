@@ -8,7 +8,7 @@ import {
   type ClientRoutesDocument,
 } from "../contracts/client-api.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.types.js";
-import { errorStatuses, routeOperation } from "./rpc-route-types.js";
+import { errorStatuses, routeOperation } from "./route-operation.js";
 
 /**
  * Lists the routes a typed client may call: every route that is not raw and not hidden

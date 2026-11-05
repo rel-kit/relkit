@@ -83,3 +83,11 @@ test("keeps the RelKit control plane out of application telemetry", async () => 
   ).toHaveLength(1);
   expect(lifecycle).toEqual(["request.started", "request.completed"]);
 });
+
+test("the framework RPC endpoint stays application traffic under the reserved prefix", async () => {
+  const { isRelkitControlPlanePath } = await import("../../src/runtime-hono/control-plane.js");
+  expect(isRelkitControlPlanePath("/_relkit/v1/rpc")).toBe(false);
+  expect(isRelkitControlPlanePath("/_relkit/v1/rpc/relkit.agent.run")).toBe(false);
+  expect(isRelkitControlPlanePath("/_relkit/v1/rpcx")).toBe(true);
+  expect(isRelkitControlPlanePath("/_relkit/v1/graph")).toBe(true);
+});

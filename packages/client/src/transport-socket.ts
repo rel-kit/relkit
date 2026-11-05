@@ -6,7 +6,7 @@
  * @param signal - Optional cancellation; aborting closes the unopened socket.
  * @returns The connected socket. Failed, timed-out or cancelled sockets are closed; a
  * synchronous constructor exception rejects with its original identity.
- * @example const socket = await connectSocket(WebSocket, new URL("wss://example.test/rpc"), 10_000);
+ * @example const socket = await connectSocket(WebSocket, new URL("wss://example.test/_relkit/v1/rpc"), 10_000);
  */
 export function connectSocket(
   Socket: typeof WebSocket,

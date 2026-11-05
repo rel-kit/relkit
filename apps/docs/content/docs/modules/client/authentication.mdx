@@ -46,7 +46,7 @@ allowed Origin.
 </include>
 
 Wrap the part of your app that calls RelKit hooks in `AuthProvider`. For a same-origin proxy,
-forward the backend's `/api/auth` mount as well as `/rpc` and `/_relkit`, and configure Better Auth's
+forward the backend's `/api/auth` mount as well as the route paths it calls and `/_relkit`, and configure Better Auth's
 trusted origins for the frontend. Do not nest a second generic provider around private queries.
 The wrapper responds to native session changes; it does not replace the server's authorization.
 

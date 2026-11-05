@@ -41,10 +41,7 @@ export function encodeRestRequest(
   visit(route.request, input, parts);
   const url = new URL(`${rootPath(baseUrl)}${expandPath(route.path, parts.params)}`, baseUrl);
   for (const [name, value] of parts.query) url.searchParams.append(name, value);
-  const init: { method: string; headers: Headers; body?: RequestInit["body"] } = {
-    method: route.method,
-    headers,
-  };
+  const init: RequestInit = { method: route.method, headers };
   if (parts.form.length > 0) {
     const form = new FormData();
     for (const [name, value] of parts.form)

@@ -33,7 +33,7 @@ const server = Bun.serve({
   hostname: "127.0.0.1",
   port: 0,
   fetch: async (request) => {
-    assert.equal(new URL(request.url).pathname, "/rpc/jobs/ping");
+    assert.equal(new URL(request.url).pathname, "/_relkit/v1/rpc/jobs/ping");
     assert.equal(request.method, "POST");
     const body = await request.json();
     assert.deepEqual(body, { json: { message: "fallback" } });

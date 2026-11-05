@@ -19,7 +19,7 @@ it.live("real prepared dispatch preserves REST, RPC, MCP and absent agent respon
     const eager = createApp(options);
     const prepared = yield* acquirePreparedApp(options);
     yield* Effect.forEach(
-      ["/hello", "/rpc/missing", "/mcp", "/_relkit/v1/agents/missing/workflow"],
+      ["/hello", "/_relkit/v1/rpc/missing", "/mcp", "/_relkit/v1/agents/missing/workflow"],
       (path) =>
         Effect.gen(function* () {
           const request = new Request(`http://localhost${path}`, {
@@ -59,7 +59,7 @@ test("optional path selection matches transport boundaries without claiming sibl
   expect(
     [
       "/hello",
-      "/rpc",
+      "/_relkit/v1/rpc",
       "/mcp",
       "/_relkit/v1/graph",
       "/_relkit/v1/client/identity",

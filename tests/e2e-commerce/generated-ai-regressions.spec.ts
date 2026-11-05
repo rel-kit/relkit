@@ -24,7 +24,7 @@ test("generated dev host admits its browser origin and classifies malformed AI i
       }),
     });
     const identity = await (await fetch("/_relkit/v1/client/identity")).json();
-    const invalid = await fetch("/rpc/relkit.agent.run", {
+    const invalid = await fetch("/_relkit/v1/rpc/relkit.agent.run", {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -42,7 +42,7 @@ test("generated dev host admits its browser origin and classifies malformed AI i
         },
       }),
     });
-    const channel = await fetch("/rpc/relkit.realtime.subscribe", {
+    const channel = await fetch("/_relkit/v1/rpc/relkit.realtime.subscribe", {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -52,7 +52,7 @@ test("generated dev host admits its browser origin and classifies malformed AI i
       body: JSON.stringify({ json: { channel: "validation.feed", params: { topic: 42 } } }),
     });
     const websocket = await new Promise<boolean>((resolve) => {
-      const socket = new WebSocket(`${location.origin.replace("http", "ws")}/rpc`);
+      const socket = new WebSocket(`${location.origin.replace("http", "ws")}/_relkit/v1/rpc`);
       const timer = setTimeout(() => {
         socket.close();
         resolve(false);

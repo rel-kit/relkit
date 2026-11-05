@@ -1,5 +1,5 @@
 import { RPCHandler, type MinimalWebsocket } from "@orpc/server/websocket";
-import { REALTIME_RUNTIME_LIMITS } from "../contracts/index.js";
+import { FRAMEWORK_RPC_PATH, REALTIME_RUNTIME_LIMITS } from "../contracts/index.js";
 import type { Hono } from "hono";
 import type { UpgradeWebSocket } from "hono/ws";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
@@ -24,7 +24,7 @@ export function installRpcWebSocket(
     clientInterceptors: [errorStatusInterceptor(errorStatusMap)],
   });
   app.get(
-    "/rpc",
+    FRAMEWORK_RPC_PATH,
     upgradeWebSocket(async (hono) => {
       if (options.transportSecurity !== undefined) {
         await assertWebSocketRequest(hono.req.raw, options.transportSecurity);

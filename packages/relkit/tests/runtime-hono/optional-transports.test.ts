@@ -38,16 +38,20 @@ test("rpc_without_optional_sdks", async () => {
   try {
     const rest = await application.fetch(new Request("http://localhost/hello"));
     expect(await rest.json()).toEqual({ ok: true });
-    const rpc = await application.fetch(
-      new Request("http://localhost/rpc/hello.route", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ json: {} }),
-      }),
-    );
-    expect(rpc.status).toBe(200);
-    expect(await rpc.json()).toEqual({ json: { ok: true } });
-    expect((await application.fetch(new Request("http://localhost/rpc/missing"))).status).toBe(404);
+    // Routes are REST only: neither the old `/rpc` endpoint nor the framework RPC serves them.
+    for (const path of ["/rpc/hello.route", "/_relkit/v1/rpc/hello.route"]) {
+      const rpc = await application.fetch(
+        new Request(`http://localhost${path}`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ json: {} }),
+        }),
+      );
+      expect(rpc.status).toBe(404);
+    }
+    expect(
+      (await application.fetch(new Request("http://localhost/_relkit/v1/rpc/missing"))).status,
+    ).toBe(404);
     expect((await application.fetch(new Request("http://localhost/mcp"))).status).toBe(404);
     expect(
       (await application.fetch(new Request("http://localhost/_relkit/v1/api-reference"))).status,
@@ -135,14 +139,14 @@ test("request_logged_once_and_inspection_remains_unrecorded", async () => {
     },
   );
   try {
-    for (const path of ["/hello", "/rpc/missing"]) {
+    for (const path of ["/hello", "/_relkit/v1/rpc/missing"]) {
       const response = await application.fetch(new Request(`http://localhost${path}`));
       await response.text();
       expect(events.filter((event) => event === `${path}:request.started`)).toHaveLength(1);
       expect(events.filter((event) => event === `${path}:request.completed`)).toHaveLength(1);
     }
     await application.fetch(new Request("http://localhost/_relkit/v1/runtime/test"));
-    expect(events.some((event) => event.startsWith("/_relkit/"))).toBe(false);
+    expect(events.some((event) => event.startsWith("/_relkit/v1/runtime"))).toBe(false);
   } finally {
     await application.close();
   }

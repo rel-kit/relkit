@@ -143,7 +143,7 @@ HTTP helper does not execute declared HTTP middleware, so its success alone cann
 
 ## Include alternate entry points in policy tests
 
-Generated clients call `/rpc`, not the original REST URL. The RPC runtime replays associated
+Generated clients call the original REST URL, so route middleware runs as for any request. The RPC runtime replays associated
 path-scoped middleware, but it sees the native RPC request, not reconstructed REST path or body values.
 Read [Generated clients](/docs/modules/http/generated-clients) before relying on path/body-dependent policy.
 Test both transports if both are reachable.

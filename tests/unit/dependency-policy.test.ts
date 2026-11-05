@@ -17,10 +17,7 @@ test("the repository passes, lists the Drizzle candidate and patches, and has no
   const subjects = policySubjects(parseLockfile(lockText));
   expect(policyProblems(subjects, policyRows(policy))).toEqual([]);
   expect(subjects.map(({ id }) => id)).toEqual(
-    expect.arrayContaining([
-      "drizzle-orm@1.0.0-rc.5-169397b",
-      "blume@2.2.5",
-    ]),
+    expect.arrayContaining(["drizzle-orm@1.0.0-rc.5-169397b", "blume@2.2.5"]),
   );
   expect(subjects.filter(({ id }) => id.startsWith("@orpc/"))).toEqual([]);
 });

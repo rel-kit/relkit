@@ -92,7 +92,7 @@ function createApplicationClient(
   identity: ClientIdentityDocument | undefined,
   generation: string | undefined,
 ): ApplicationClient {
-  const endpoint = new URL("rpc", baseUrl);
+  const endpoint = new URL("_relkit/v1/rpc", baseUrl);
   return createORPCClient(
     new RPCLink({
       url: endpoint.href,

@@ -704,6 +704,16 @@ Decided while applying section 23 (maintainer, 2026-11-05):
   request under `/rpc`. It needs `next dev`, which the shared machine's resource budget did not
   allow while other sessions ran, and no pull-request workflow runs the commerce browser suite,
   so it was written but not run here.
+- **`/rpc` removed; what stays on RPC.** Channels, agents and jobs have no REST routes, and
+  building REST and WebSocket protocols for them was outside this section, so they keep the oRPC
+  protocol at a framework path, `/_relkit/v1/rpc` (HTTP and WebSocket), next to RelKit's other
+  framework endpoints and outside the OpenAPI document. The RPC router no longer contains route
+  procedures, route-ID or `METHOD /path` names, or the `api` tree (`rpc-api-tree.ts` and
+  `rpc-middleware-trace.ts` are gone), and nothing answers at `/rpc`. Requests under `/_relkit/`
+  skip application middleware, server spans and request records as control-plane traffic; the
+  RPC endpoint carries application calls, so `isRelkitControlPlanePath` excludes it and those
+  calls are observed exactly as they were at `/rpc`. Frontend proxies forward the route paths
+  they call plus `/_relkit` (with WebSockets) instead of `/rpc`.
 - **oRPC version.** npm has no stable oRPC 2.x: its `2.0.0` is a deprecated publish from 2024 and
   the 2.0 line is still in beta (`2.0.0-beta.48`). Every `@orpc/*` package moves to the latest
   stable 1.x, `1.16.1`, and leaves `docs/dependencies.md`. The 1.x port: `eventIterator` replaces

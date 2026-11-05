@@ -1,6 +1,11 @@
 import { RPCLink } from "@orpc/client/fetch";
 import { RPCLink as WebSocketRPCLink } from "@orpc/client/websocket";
-import { AGENT_CAPABILITY_HEADER, AGENT_CAPABILITY_QUERY, AGENT_CAPABILITY_VALUE } from "./wire.js";
+import {
+  AGENT_CAPABILITY_HEADER,
+  AGENT_CAPABILITY_QUERY,
+  AGENT_CAPABILITY_VALUE,
+  FRAMEWORK_RPC_PATH,
+} from "./wire.js";
 import type {
   ClientHeaders,
   CreateClientOptions,
@@ -157,14 +162,14 @@ export function webSocketEndpoint(baseUrl: string): URL {
 }
 
 /**
- * Resolves the RPC path relative to the caller's existing backend root.
+ * Resolves the framework RPC endpoint (channels, agents, jobs) relative to the backend root.
  * @param baseUrl - Configured backend root URL.
  * @returns The RPC endpoint resolved against the backend root.
  */
 function endpointFor(baseUrl: string): URL {
   const base = new URL(baseUrl);
   const root = base.pathname.endsWith("/") ? base : new URL(`${base.pathname}/`, base);
-  return new URL("rpc", root);
+  return new URL(FRAMEWORK_RPC_PATH.slice(1), root);
 }
 
 /**

@@ -618,8 +618,8 @@ export function createInspectorFixture(): InspectorFixture {
     }),
   );
   for (const path of [
-    "/rpc",
-    "/rpc/*",
+    "/_relkit/v1/rpc",
+    "/_relkit/v1/rpc/*",
     "/_relkit/v1/client/identity",
     "/_relkit/v1/agents/:agentId/workflow",
     "/_relkit/v1/runtime/agents/:agentId/executions",

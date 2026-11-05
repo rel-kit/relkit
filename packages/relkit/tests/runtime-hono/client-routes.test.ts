@@ -35,3 +35,13 @@ test("the client routes document lists each client route with its API path and m
     ],
   });
 });
+
+test("the OpenAPI document mentions no RPC endpoint", async () => {
+  const plan = queryPlan();
+  const app = createApp({ plan, manifest: manifest(plan), engine: { invoke: async () => ({}) } });
+  const response = await app.request("/_relkit/v1/openapi.json");
+  expect(response.status).toBe(200);
+  const text = await response.text();
+  expect(JSON.parse(text)).toHaveProperty("openapi");
+  expect(text.toLowerCase()).not.toContain("rpc");
+});

@@ -26,7 +26,7 @@ The React provider performs this identity step for hooks.
 </Tab>
 </Tabs>
 
-These calls use RPC over `/rpc`, with the same authorization and policy. Pass domain input rather
+These calls send the route's own REST request, the one the OpenAPI document describes, with the same authorization and policy. Pass domain input rather
 than assembling the route's REST mapping. Raw handlers and routes with `client: false` do not
 generate these operations. Never import the backend descriptor into the browser.
 
