@@ -1,5 +1,5 @@
 /** Prices validated order input and persists it with the authenticated session user's ownership. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 import priceOrder from "@app/services/orders/functions/price-order.function.js";
 const order = z.object({

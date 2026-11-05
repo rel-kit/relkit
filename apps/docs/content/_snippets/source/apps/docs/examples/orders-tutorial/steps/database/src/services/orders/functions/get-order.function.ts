@@ -1,5 +1,5 @@
 /** Reads the requested database order and returns validated selected fields or an explicit missing result. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 export default defineFunction({
   input: z.object({ orderId: z.string().min(1) }),

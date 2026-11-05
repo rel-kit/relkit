@@ -1,5 +1,5 @@
 /** Local Docker recipes pair with explicit connected resource values for release builds. */
-import { defineApp, defineEnv, env as binding } from "@relkit/app/config";
+import { defineApp, defineEnv, env as binding } from "relkit/config";
 import { docker } from "@relkit/docker";
 import { redis } from "@relkit/redis";
 import { s3 } from "@relkit/s3";

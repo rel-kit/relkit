@@ -1,3 +1,3 @@
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 
 export default defineService({});

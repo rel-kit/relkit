@@ -5,7 +5,7 @@
  * twice. The job's idempotency key also stops a second submission for the
  * same order from creating a second run.
  */
-import { defineJob, defineTask } from "@relkit/app/jobs";
+import { defineJob, defineTask } from "relkit/jobs";
 import { z } from "zod";
 
 /** Stand-in for a payment SDK that deduplicates by idempotency key. */

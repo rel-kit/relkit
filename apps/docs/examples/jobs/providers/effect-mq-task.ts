@@ -1,4 +1,4 @@
-import { defineTask } from "@relkit/app/tasks";
+import { defineTask } from "relkit/tasks";
 import { z } from "zod";
 
 const order = z.object({

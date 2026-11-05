@@ -1,5 +1,5 @@
 /** Application events use the supported filesystem provider, which has no Docker recipe. */
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 import { localEvent } from "@relkit/local";
 
 export default defineApp({

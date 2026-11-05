@@ -1,4 +1,4 @@
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 import orderCreated from "../events/order-created.event.js";
 

@@ -618,7 +618,7 @@ Runs the executable presentation boundary with invocation-owned signal listeners
 declare const main: (args: readonly string[]) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/cli.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/cli.ts#L26)
 
 ## `create-capabilities.ts`
 
@@ -754,7 +754,7 @@ declare const assertCreateCapability: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.ts#L124)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.ts#L125)
 
 ### checkCreateCapability
 
@@ -773,7 +773,7 @@ declare const checkCreateCapability: (
 ) => CreateCapabilityWarning | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.ts#L98)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.ts#L99)
 
 ### currentCreateCapabilityIdentity
 
@@ -802,7 +802,7 @@ declare const supported: (
 ) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.ts#L156)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.ts#L157)
 
 ### supportedCreateTemplates
 
@@ -817,7 +817,7 @@ declare const supportedCreateTemplates: (
 ) => readonly CreateTemplate[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.ts#L137)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.ts#L138)
 
 ## `create-capabilities.types.ts`
 
@@ -948,7 +948,7 @@ Builds the creator's usage text.
 declare const formatCreateHelp: () => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-help.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-help.ts#L11)
 
 ### formatCreateWarning
 
@@ -960,7 +960,7 @@ Formats one coded creation warning for standard error.
 declare const formatCreateWarning: (warning: CreateCapabilityWarning) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-help.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-help.ts#L38)
 
 ## `create-preview.ts`
 
@@ -1303,7 +1303,7 @@ into the generated-result contract. Formatting performs no runtime acquisition.
 declare const GenerateNextSteps: GenerateNextSteps;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generate-output.ts#L107)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generate-output.ts#L120)
 
 ### createGenerateNextSteps
 
@@ -1313,13 +1313,13 @@ Builds local commands and endpoints for a generated project.
 
 ```ts
 declare const createGenerateNextSteps: (
-  options: Pick<CreateOptions, "examples" | "install">,
+  options: Pick<CreateOptions, "examples" | "install" | "packageManager">,
   destination: string,
   cwd?: string,
 ) => GenerateNextSteps;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generate-output.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generate-output.ts#L43)
 
 ### formatGenerateResult
 
@@ -1331,15 +1331,14 @@ Formats a recognizable generation result for terminal display.
 declare const formatGenerateResult: <T>(value: T) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generate-output.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generate-output.ts#L78)
 
 ## `generate-output.types.ts`
 
-Local commands and endpoints displayed after successful project creation.
-
 ### GenerateNextSteps (interface)
 
-Local commands and endpoints displayed after successful project creation.
+Local commands and endpoints displayed after successful project creation, spelled for the
+package manager the project was created with.
 
 **Signature**
 
@@ -1347,13 +1346,16 @@ Local commands and endpoints displayed after successful project creation.
 export interface GenerateNextSteps {
   readonly commands: Readonly<{
     readonly cd: string;
-    readonly install?: "bun install";
+    readonly install?: `${PackageManagerName} install`;
     /** Finite validation/preparation required after a skipped dependency installation. */
-    readonly prepare?: "bunx --no-install relkit dev --prepare";
-    readonly dev: "bun run dev";
-    readonly test: "bun run test";
-    readonly check: "bun run check";
-    readonly build: "bun run build";
+    readonly prepare?:
+      | "bunx --no-install relkit dev --prepare"
+      | "npx --no-install relkit dev --prepare"
+      | "pnpm exec relkit dev --prepare";
+    readonly dev: RunScript<"dev">;
+    readonly test: RunScript<"test">;
+    readonly check: RunScript<"check">;
+    readonly build: RunScript<"build">;
   }>;
   readonly endpoints: Readonly<{
     /** A served backend URL: the example route, or the API reference without examples. */
@@ -1368,7 +1370,7 @@ export interface GenerateNextSteps {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generate-output.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generate-output.types.ts#L10)
 
 ## `generate-process.ts`
 
@@ -1920,7 +1922,7 @@ const supplied = inspect.pipe(Effect.provide(generatorFileSystemLive));
 declare class GeneratorFileSystem
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generator-filesystem.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generator-filesystem.ts#L26)
 
 ### generatorFileSystemLive
 
@@ -1932,7 +1934,7 @@ Live Node/Bun adapter. Mutating calls settle before scoped transaction cleanup c
 declare const generatorFileSystemLive: Layer.Layer<GeneratorFileSystem, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generator-filesystem.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generator-filesystem.ts#L35)
 
 ## `generator-filesystem.types.ts`
 
@@ -2192,7 +2194,7 @@ const supplied = locate.pipe(Effect.provide(generatorProcessLive));
 declare class GeneratorProcess
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generator-process.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generator-process.ts#L20)
 
 ### generatorProcessLayer
 
@@ -2206,11 +2208,11 @@ declare const generatorProcessLayer: (
 ) => Layer.Layer<GeneratorProcess>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generator-process.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generator-process.ts#L32)
 
 ### generatorProcessLive
 
-Live scoped Bun child-process implementation.
+Live scoped child-process implementation over the runtime adapter.
 
 **Signature**
 
@@ -2218,7 +2220,7 @@ Live scoped Bun child-process implementation.
 declare const generatorProcessLive: Layer.Layer<GeneratorProcess, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generator-process.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generator-process.ts#L25)
 
 ## `generator-process.types.ts`
 
@@ -2411,7 +2413,7 @@ Re-exports all named exports from the "./add-types.js" module.
 export * from "./add-types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L7)
 
 ### "./create-capabilities.js" (namespace export)
 
@@ -2423,7 +2425,7 @@ Re-exports all named exports from the "./create-capabilities.js" module.
 export * from "./create-capabilities.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L5)
 
 ### "./create-help.js" (namespace export)
 
@@ -2435,7 +2437,7 @@ Re-exports all named exports from the "./create-help.js" module.
 export * from "./create-help.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L6)
 
 ### "./create-preview.js" (namespace export)
 
@@ -2447,7 +2449,7 @@ Re-exports all named exports from the "./create-preview.js" module.
 export * from "./create-preview.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L13)
 
 ### "./create-resolver.js" (namespace export)
 
@@ -2459,7 +2461,7 @@ Re-exports all named exports from the "./create-resolver.js" module.
 export * from "./create-resolver.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L12)
 
 ### "./generate-output.js" (namespace export)
 
@@ -2471,7 +2473,7 @@ Re-exports all named exports from the "./generate-output.js" module.
 export * from "./generate-output.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L18)
 
 ### "./generate-types.js" (namespace export)
 
@@ -2483,7 +2485,7 @@ Re-exports all named exports from the "./generate-types.js" module.
 export * from "./generate-types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L17)
 
 ### "./generate.js" (namespace export)
 
@@ -2495,7 +2497,7 @@ Re-exports all named exports from the "./generate.js" module.
 export * from "./generate.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L16)
 
 ### "./generator-cleanup.js" (namespace export)
 
@@ -2507,7 +2509,7 @@ Re-exports all named exports from the "./generator-cleanup.js" module.
 export * from "./generator-cleanup.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L28)
 
 ### "./generator-errors.js" (namespace export)
 
@@ -2519,7 +2521,7 @@ Re-exports all named exports from the "./generator-errors.js" module.
 export * from "./generator-errors.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L29)
 
 ### "./generator-filesystem.js" (namespace export)
 
@@ -2531,7 +2533,7 @@ Re-exports all named exports from the "./generator-filesystem.js" module.
 export * from "./generator-filesystem.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L20)
 
 ### "./generator-filesystem.types.js" (namespace export)
 
@@ -2543,7 +2545,7 @@ Re-exports all named exports from the "./generator-filesystem.types.js" module.
 export * from "./generator-filesystem.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L21)
 
 ### "./generator-paths.js" (namespace export)
 
@@ -2555,7 +2557,7 @@ Re-exports all named exports from the "./generator-paths.js" module.
 export * from "./generator-paths.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L24)
 
 ### "./generator-paths.types.js" (namespace export)
 
@@ -2567,7 +2569,7 @@ Re-exports all named exports from the "./generator-paths.types.js" module.
 export * from "./generator-paths.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L25)
 
 ### "./generator-process.js" (namespace export)
 
@@ -2579,7 +2581,7 @@ Re-exports all named exports from the "./generator-process.js" module.
 export * from "./generator-process.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L22)
 
 ### "./generator-process.types.js" (namespace export)
 
@@ -2591,7 +2593,7 @@ Re-exports all named exports from the "./generator-process.types.js" module.
 export * from "./generator-process.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L23)
 
 ### "./generator-prompt.js" (namespace export)
 
@@ -2603,7 +2605,7 @@ Re-exports all named exports from the "./generator-prompt.js" module.
 export * from "./generator-prompt.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L26)
 
 ### "./generator-prompt.types.js" (namespace export)
 
@@ -2615,7 +2617,7 @@ Re-exports all named exports from the "./generator-prompt.types.js" module.
 export * from "./generator-prompt.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L27)
 
 ### "./options.js" (namespace export)
 
@@ -2629,6 +2631,18 @@ export * from "./options.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L3)
 
+### "./package-manager.js" (namespace export)
+
+Re-exports all named exports from the "./package-manager.js" module.
+
+**Signature**
+
+```ts
+export * from "./package-manager.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L4)
+
 ### "./prompt-driver.js" (namespace export)
 
 Re-exports all named exports from the "./prompt-driver.js" module.
@@ -2639,7 +2653,7 @@ Re-exports all named exports from the "./prompt-driver.js" module.
 export * from "./prompt-driver.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L11)
 
 ### "./scaffold-catalog.js" (namespace export)
 
@@ -2651,7 +2665,7 @@ Re-exports all named exports from the "./scaffold-catalog.js" module.
 export * from "./scaffold-catalog.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L8)
 
 ### "./template-root.js" (namespace export)
 
@@ -2663,7 +2677,7 @@ Re-exports all named exports from the "./template-root.js" module.
 export * from "./template-root.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L14)
 
 ### "./validate.js" (namespace export)
 
@@ -2675,7 +2689,7 @@ Re-exports all named exports from the "./validate.js" module.
 export * from "./validate.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L15)
 
 ### CatalogManifest
 
@@ -2685,7 +2699,7 @@ export * from "./validate.js";
 declare const CatalogManifest: CatalogManifest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L10)
 
 ### resolveCatalogVersion
 
@@ -2699,7 +2713,7 @@ declare const resolveCatalogVersion: (
 ) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L9)
 
 ## `integration-catalog.ts`
 
@@ -2769,7 +2783,7 @@ Supported cloud selections; none is the default.
 declare const CREATE_CLOUDS: readonly ["aws", "none"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L10)
 
 ### CREATE_DEPLOYMENTS
 
@@ -2781,7 +2795,7 @@ Supported deployment selections; none is the default.
 declare const CREATE_DEPLOYMENTS: readonly ["pulumi", "none"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L14)
 
 ### CREATE_JOBS
 
@@ -2793,7 +2807,7 @@ Supported explicit local job-provider selections.
 declare const CREATE_JOBS: readonly ["inngest-docker", "effect-mq-docker", "trigger-docker"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L18)
 
 ### CREATE_OPTION_DEFAULTS
 
@@ -2816,7 +2830,7 @@ declare const CREATE_OPTION_DEFAULTS: Readonly<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L24)
 
 ### CREATE_TASKS_DEFAULT_JOBS
 
@@ -2828,7 +2842,7 @@ Job provider used by the tasks template when --jobs is omitted.
 declare const CREATE_TASKS_DEFAULT_JOBS: "inngest-docker" | "effect-mq-docker" | "trigger-docker";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L22)
 
 ### CREATE_TEMPLATES
 
@@ -2840,7 +2854,7 @@ Templates supported by explicit --template selection.
 declare const CREATE_TEMPLATES: readonly ["minimal", "api", "agent", "fullstack", "tasks"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L6)
 
 ### CreateCloud (type alias)
 
@@ -2852,7 +2866,7 @@ Supported cloud choice for project generation.
 type CreateCloud = (typeof CREATE_CLOUDS)[number];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L12)
 
 ### CreateDeployment (type alias)
 
@@ -2864,7 +2878,7 @@ Supported deployment choice for project generation.
 type CreateDeployment = (typeof CREATE_DEPLOYMENTS)[number];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L16)
 
 ### CreateJobs (type alias)
 
@@ -2876,7 +2890,7 @@ Supported local job provider selected by an explicit creation flag.
 type CreateJobs = (typeof CREATE_JOBS)[number];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L20)
 
 ### CreateOptions (interface)
 
@@ -2896,13 +2910,18 @@ export interface CreateOptions {
   readonly examples: boolean;
   readonly directory?: string;
   readonly forceEmptyDirectory: boolean;
+  /**
+   * `--package-manager`; when omitted, the manager that invoked the creator is used, else Bun
+   * under Bun and npm under Node.
+   */
+  readonly packageManager?: PackageManagerName;
   /** Refuses combinations without current CI evidence instead of warning. */
   readonly strict?: boolean;
   readonly json: boolean;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L37)
 
 ### CreateOptionsContext (interface)
 
@@ -2916,7 +2935,7 @@ export interface CreateOptionsContext {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L58)
 
 ### CreateOptionsError (class)
 
@@ -2930,7 +2949,7 @@ declare class CreateOptionsError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L62)
 
 ### code (property)
 
@@ -2942,7 +2961,7 @@ Stable usage code reported by CreateOptionsError.
 readonly code: "RELKIT_CREATE_USAGE"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L66)
 
 ### CreateTemplate (type alias)
 
@@ -2954,7 +2973,7 @@ Supported template selected by an explicit creation flag.
 type CreateTemplate = (typeof CREATE_TEMPLATES)[number];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L8)
 
 ### normalizeCreateOptions
 
@@ -2969,7 +2988,151 @@ declare const normalizeCreateOptions: (
 ) => CreateOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/options.ts#L83)
+
+## `package-manager.ts`
+
+Selects the package manager a project is created and run with, and spells its commands.
+The creator takes `--package-manager`, then the manager that invoked it (the
+`npm_config_user_agent` every manager sets for `npx`/`pnpm dlx`/`bunx` and `run` scripts),
+then the runtime it runs on. The CLI reads an existing project's choice from its
+`packageManager` field and lockfile before falling back the same way.
+
+### PACKAGE_MANAGERS
+
+Supported package managers, in documentation order.
+
+**Signature**
+
+```ts
+declare const PACKAGE_MANAGERS: ReadonlyArray<PackageManagerName>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L15)
+
+### PackageManagerCommands (interface)
+
+Command spellings of one package manager.
+
+**Signature**
+
+```ts
+export interface PackageManagerCommands {
+  readonly name: PackageManagerName;
+  /** Installs a project's dependencies. */
+  readonly install: readonly string[];
+  /** Checks that the lockfile matches the manifest without changing `node_modules`. */
+  readonly frozenCheck: readonly string[];
+  /**
+   * Runs a package script, for display.
+   * @param script - Script name.
+   * @returns Shell text such as `npm run dev`.
+   */
+  readonly run: (script: string) => string;
+  /**
+   * Runs an installed binary without downloading one, for display.
+   * @param command - Binary and its arguments.
+   * @returns Shell text such as `npx --no-install relkit dev --prepare`.
+   */
+  readonly exec: (command: string) => string;
+  /** Adds development dependencies, for display (`bun add -d`). */
+  readonly addDev: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L18)
+
+### PackageManagerName (type alias)
+
+Package managers RelKit creates and runs projects with.
+
+**Signature**
+
+```ts
+type PackageManagerName = "bun" | "npm" | "pnpm";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L12)
+
+### creationPackageManager
+
+Selects the manager for a new project.
+
+**Signature**
+
+```ts
+declare const creationPackageManager: (
+  explicit?: PackageManagerName,
+  agent?: string | undefined,
+) => PackageManagerName;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L112)
+
+### isPackageManagerName
+
+Checks a candidate name.
+
+**Signature**
+
+```ts
+declare const isPackageManagerName: (value: string) => value is PackageManagerName;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L81)
+
+### packageManagerCommands
+
+Looks up one manager's commands.
+
+**Signature**
+
+```ts
+declare const packageManagerCommands: (name: PackageManagerName) => PackageManagerCommands;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L72)
+
+### packageManagerFromUserAgent
+
+Reads the manager from a user agent such as `npm/10.9.0 node/v22.13.0 darwin arm64`.
+
+**Signature**
+
+```ts
+declare const packageManagerFromUserAgent: (
+  agent?: string | undefined,
+) => { readonly name: PackageManagerName; readonly version: string | undefined } | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L90)
+
+### projectPackageManager
+
+Detects the manager an existing project uses.
+
+**Signature**
+
+```ts
+declare const projectPackageManager: (
+  root: string,
+  agent?: string | undefined,
+) => PackageManagerName;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L125)
+
+### runtimePackageManager
+
+The manager to fall back to when nothing names one.
+
+**Signature**
+
+```ts
+declare const runtimePackageManager: () => PackageManagerName;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L102)
 
 ## `project-manifest.schemas.ts`
 
@@ -3645,6 +3808,7 @@ declare const validateCreateOptionsEffect: (
     examples: boolean;
     directory?: string;
     forceEmptyDirectory: boolean;
+    packageManager?: PackageManagerName;
     strict?: boolean;
     json: boolean;
   }>,

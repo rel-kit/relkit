@@ -1,4 +1,4 @@
-import { defineChannel } from "@relkit/app/realtime";
+import { defineChannel } from "relkit/realtime";
 import { z } from "zod";
 
 const orderUpdates = defineChannel({

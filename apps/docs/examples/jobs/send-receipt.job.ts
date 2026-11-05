@@ -1,4 +1,4 @@
-import { defineJob, defineTask } from "@relkit/app/jobs";
+import { defineJob, defineTask } from "relkit/jobs";
 import { z } from "zod";
 import { receiptInput } from "./send-receipt.function.js";
 

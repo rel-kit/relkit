@@ -1,5 +1,5 @@
 /** Validates a new order and returns its calculated total. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 
 const createOrder = defineFunction({

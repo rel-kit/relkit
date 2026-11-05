@@ -79,7 +79,7 @@ The CLI is interactive, so it simply asks you for anything it needs (like which 
 This generates a file you then fill in, something like this:
 
 ```ts
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 import orderCreated from "../events/order-created.event.js";
 const createOrder = defineFunction({
@@ -126,7 +126,7 @@ bun run relkit add route /orders/:orderId
 This generates:
 
 ```ts
-import { defineServiceRoutes } from "@relkit/app/routes";
+import { defineServiceRoutes } from "relkit/routes";
 import orders from "@app/services/orders/service.js";
 export default defineServiceRoutes(orders, {
   GET: "getOrder",
@@ -183,7 +183,7 @@ src/services/orders/
 The `service.ts` file picks which functions the rest of the app is allowed to use:
 
 ```ts
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 import createOrder from "./functions/create-order.function.js";
 import getOrder from "./functions/get-order.function.js";
 import orderCreated from "./events/order-created.event.js";
@@ -222,7 +222,7 @@ defaults: { bucket: "assets" },
 Then you define the bucket with its rules:
 
 ```ts
-import { defineBucket } from "@relkit/app/buckets";
+import { defineBucket } from "relkit/buckets";
 export default defineBucket({
   id: "orders.invoices",
   profile: "assets",
@@ -260,7 +260,7 @@ An event says “something happened”, and other functions can react to it with
 First, define the event and what it carries:
 
 ```ts
-import { defineEvent } from "@relkit/app/events";
+import { defineEvent } from "relkit/events";
 import { z } from "zod";
 export default defineEvent({
   id: "orders.created",
@@ -271,7 +271,7 @@ export default defineEvent({
 Then subscribe to it from anywhere:
 
 ```ts
-import { defineEventFunction } from "@relkit/app/events";
+import { defineEventFunction } from "relkit/events";
 export default defineEventFunction({
   id: "orders.confirmation",
   event: "orders.created",
@@ -296,7 +296,7 @@ bun run relkit add cache prices
 Define what the key and value look like, and how long values live:
 
 ```ts
-import { defineCache } from "@relkit/app/cache";
+import { defineCache } from "relkit/cache";
 import { z } from "zod";
 export default defineCache({
   id: "orders.prices",
@@ -457,7 +457,7 @@ Not using React? The same typed client works without it: `createApi` from `@relk
 Want the order page to update the moment the order ships? That’s a **realtime channel**.
 
 ```ts
-import { defineChannel } from "@relkit/app/realtime";
+import { defineChannel } from "relkit/realtime";
 import { z } from "zod";
 
 export default defineChannel({
@@ -491,7 +491,7 @@ One little piece of wisdom from the docs that I love: the channel is **not** you
 Sometimes a response should arrive bit by bit instead of all at once: progress bars, long reports, AI output. Declare the output with `streamOf` and return an async generator:
 
 ```ts
-import { defineFunction, streamOf } from "@relkit/app/functions";
+import { defineFunction, streamOf } from "relkit/functions";
 
 const streamOrderReport = defineFunction({
   input: z.object({ reportId: z.string().min(1) }),
@@ -532,7 +532,7 @@ bun run relkit add job export-orders
 The task, with typed progress:
 
 ```ts
-import { defineTask } from "@relkit/app/tasks";
+import { defineTask } from "relkit/tasks";
 
 export default defineTask({
   id: "orders.export-orders",
@@ -553,7 +553,7 @@ export default defineTask({
 The job:
 
 ```ts
-import { defineJob } from "@relkit/app/jobs";
+import { defineJob } from "relkit/jobs";
 export default defineJob({
   name: "exportOrders",
   id: "orders.export-orders",
@@ -577,16 +577,19 @@ bun run relkit add agent support
 ```
 
 ```ts
-import { defineAgent } from "@relkit/langchain";
+import { langchain } from "@relkit/langchain";
 import { z } from "zod";
 import { supportModel } from "@app/platform/model.js"; // any LangChain chat model
 import lookupOrder from "@app/services/orders/tools/lookup-order.tool.js";
+import { defineAgent } from "relkit/agents";
 
 export default defineAgent({
   id: "orders.support",
+  runtime: langchain({
+    model: supportModel,
+  }),
   input: z.object({ message: z.string().min(1) }),
   output: z.object({ answer: z.string() }),
-  model: supportModel,
   instructions: "Help customers with their orders. Look the order up before answering.",
   tools: [lookupOrder],
   client: { public: true },

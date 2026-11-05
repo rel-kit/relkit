@@ -1,5 +1,5 @@
 /** Agent checkpoints and live updates use separate Docker Redis capabilities. */
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 import { docker } from "@relkit/docker";
 import { redisAgentState, redisRealtime } from "@relkit/redis";
 

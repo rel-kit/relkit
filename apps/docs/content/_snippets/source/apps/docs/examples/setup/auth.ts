@@ -1,5 +1,5 @@
 /** Auth and Drizzle share one database; credentials remain in the backend environment. */
-import { defineApp, defineEnv, env } from "@relkit/app/config";
+import { defineApp, defineEnv, env } from "relkit/config";
 
 export default defineApp({
   env: defineEnv({

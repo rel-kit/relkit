@@ -44,7 +44,7 @@ The [MCP endpoint](/docs/modules/ai/mcp) is not a route. To limit it to signed-i
 `server.mcp` in `relkit.config.ts`:
 
 ```ts title="relkit.config.ts"
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 
 export default defineApp({ env: defineEnv({}), server: { mcp: { auth: "required" } } });
 ```
@@ -85,13 +85,13 @@ Route protection applies to HTTP requests, not every direct invocation of its ta
 call a function from anywhere, give the function an `access` rule:
 
 ```ts title="src/services/orders/functions/refund-order.function.ts"
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { s } from "relkit/schema";
 
 export const refundOrder = defineFunction({
   id: "orders.refund-order",
-  input: z.object({ orderId: z.string() }),
-  output: z.object({ refunded: z.boolean() }),
+  input: s.object({ orderId: s.string() }),
+  output: s.object({ refunded: s.boolean() }),
   access: {
     roles: ["admin", "support"],
     permissions: ["orders:refund"],
@@ -124,7 +124,7 @@ Jobs, tasks and event deliveries run without a session, so a function with an ac
 `relkit.as(session)` to act as a user:
 
 ```ts
-import { getRelkit } from "@relkit/app/functions";
+import { getRelkit } from "relkit/functions";
 
 await getRelkit().as(session).functions.orders.refundOrder({ orderId });
 ```

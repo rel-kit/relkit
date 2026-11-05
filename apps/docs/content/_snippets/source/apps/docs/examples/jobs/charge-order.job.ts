@@ -1,4 +1,4 @@
-import { defineJob, defineTask } from "@relkit/app/jobs";
+import { defineJob, defineTask } from "relkit/jobs";
 import { z } from "zod";
 
 export const chargeOrderTask = defineTask({

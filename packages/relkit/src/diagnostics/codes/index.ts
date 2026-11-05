@@ -45,6 +45,7 @@ export const DIAGNOSTIC_CODES: readonly DiagnosticCodeEntry[] = Object.freeze(
 export const RELKIT_NON_CODE_NAMES: ReadonlySet<string> = new Set([
   "RELKIT_ALLOWED_ORIGINS",
   "RELKIT_APPLICATION_ID",
+  "RELKIT_BUN_HANDOFF",
   "RELKIT_CLIENT_PULL_TOKEN",
   "RELKIT_DEFERRED_INTEGRITY_HASH",
   "RELKIT_DESCRIPTOR",

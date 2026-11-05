@@ -1,4 +1,4 @@
-import { defineEvent } from "@relkit/app/events";
+import { defineEvent } from "relkit/events";
 import { z } from "zod";
 
 const orderCreated = defineEvent({

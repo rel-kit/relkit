@@ -45,7 +45,7 @@ A function may declare an error its handler never raises. To catch stale declara
 `unusedErrors` check in `relkit.config.ts`, and `relkit check` warns about each one:
 
 ```ts title="relkit.config.ts"
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 
 export default defineApp({ env: defineEnv({}), check: { unusedErrors: true } });
 ```

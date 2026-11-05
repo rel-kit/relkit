@@ -2,11 +2,11 @@
 import { Effect } from "effect";
 import { defineError, defineFunction } from "relkit";
 import { failEffect } from "relkit/effect";
-import { z } from "relkit/schema";
+import { s } from "relkit/schema";
 
 export const orderNotFound = defineError({
   id: "orders.order-not-found",
-  data: z.object({ orderId: z.string() }),
+  data: s.object({ orderId: s.string() }),
   message: ({ orderId }) => `Order ${orderId} was not found`,
   http: { status: 404 },
 });
@@ -15,8 +15,8 @@ const orders = new Map([["order-1", { id: "order-1", total: 42 }]]);
 
 export default defineFunction({
   id: "orders.get-order",
-  input: z.object({ orderId: z.string() }),
-  output: z.object({ id: z.string(), total: z.number() }),
+  input: s.object({ orderId: s.string() }),
+  output: s.object({ id: s.string(), total: s.number() }),
   errors: [orderNotFound],
   handler: ({ orderId }) =>
     Effect.gen(function* () {

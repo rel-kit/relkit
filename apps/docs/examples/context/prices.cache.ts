@@ -1,4 +1,4 @@
-import { defineCache } from "@relkit/app/cache";
+import { defineCache } from "relkit/cache";
 import { z } from "zod";
 
 const prices = defineCache({

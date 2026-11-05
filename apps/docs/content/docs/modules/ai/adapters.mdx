@@ -22,16 +22,16 @@ Two adapters ship with RelKit. Both are Labs until the adapter interface is decl
 ## Select an adapter
 
 ```ts title="src/services/hello/agents/support.agent.ts"
-import { defineAgent } from "@relkit/app/agents";
+import { defineAgent } from "relkit/agents";
 import { langchain } from "@relkit/langchain";
-import { z } from "@relkit/app/schema";
+import { s } from "relkit/schema";
 
 export default defineAgent({
   id: "hello.support",
   runtime: langchain(),
   model: "default",
-  input: z.object({ message: z.string() }),
-  output: z.object({ answer: z.string() }),
+  input: s.object({ message: s.string() }),
+  output: s.object({ answer: s.string() }),
   instructions: "Answer briefly.",
   tools: [],
   limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 30_000 },
@@ -56,7 +56,7 @@ that adapter: `client.state` keys contributed by LangChain middleware type-check
 profile. Rebinding the profile moves every agent that uses it to the new model without code changes.
 
 ```ts title="relkit.config.ts"
-import { defineApp } from "@relkit/app/config";
+import { defineApp } from "relkit/config";
 import { langchainModel } from "@relkit/langchain";
 import env from "@app/platform/env.js";
 

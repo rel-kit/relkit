@@ -57,7 +57,7 @@ Put startup work in `server.onStart` in `relkit.config.ts`. It runs once, after 
 are ready and before the server accepts requests:
 
 ```ts title="relkit.config.ts"
-import { defineApp } from "@relkit/app/config";
+import { defineApp } from "relkit/config";
 import { getRelkit } from "relkit";
 import env from "@app/platform/env.js";
 

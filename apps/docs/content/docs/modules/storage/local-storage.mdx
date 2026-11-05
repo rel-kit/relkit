@@ -22,7 +22,7 @@ Run the installation commands from your application directory:
 
 ## Add the provider profile
 
-In `relkit.config.ts`, import `s3` from `@relkit/s3`, `docker` from `@relkit/docker`, and `env as binding` from `@relkit/app/config`. Add this `assets` entry to the `bucket` configuration inside `defineApp()`:
+In `relkit.config.ts`, import `s3` from `@relkit/s3`, `docker` from `@relkit/docker`, and `env as binding` from `relkit/config`. Add this `assets` entry to the `bucket` configuration inside `defineApp()`:
 
 <include
   source="examples/commerce/relkit.config.ts#storage-local-profile"

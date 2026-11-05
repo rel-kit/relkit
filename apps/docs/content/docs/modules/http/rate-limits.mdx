@@ -23,7 +23,7 @@ This source-backed compiler test demonstrates a process-local policy:
 
 In your route file, add that `rateLimit` object to the existing `defineRoute` options, keeping your
 public service target and named method export. With `defineServiceRoutes`, add it to the object
-containing `member`. Import `http` from `@relkit/app/routes` for the key mapping.
+containing `member`. Import `http` from `relkit/routes` for the key mapping.
 
 Here, `limit: 2` permits two requests per `windowMs: 1_000` for the constant key. It is a shared bucket
 for callers of that route within one process, not a separate bucket per user. Both values must be

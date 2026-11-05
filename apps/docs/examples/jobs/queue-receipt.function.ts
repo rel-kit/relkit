@@ -1,4 +1,4 @@
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 import sendReceiptJob from "./send-receipt.job.js";
 

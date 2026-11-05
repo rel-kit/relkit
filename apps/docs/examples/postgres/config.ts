@@ -3,7 +3,7 @@
  * read the connection string from the DATABASE_URL secret and become the
  * defaults, so every job and event without an explicit profile uses them.
  */
-import { defineApp, defineEnv, env } from "@relkit/app/config";
+import { defineApp, defineEnv, env } from "relkit/config";
 import { postgresEvent, postgresJob } from "@relkit/postgres";
 
 const appEnv = defineEnv({ DATABASE_URL: env.secret() });

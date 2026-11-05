@@ -1,5 +1,5 @@
 /** Local Redis supplies the connection for the requests cache profile. */
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 import { docker } from "@relkit/docker";
 import { redis } from "@relkit/redis";
 

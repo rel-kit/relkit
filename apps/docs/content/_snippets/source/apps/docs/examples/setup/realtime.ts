@@ -1,5 +1,5 @@
 /** Channels use Docker Redis by default during local development. */
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 import { docker } from "@relkit/docker";
 import { redisRealtime } from "@relkit/redis";
 

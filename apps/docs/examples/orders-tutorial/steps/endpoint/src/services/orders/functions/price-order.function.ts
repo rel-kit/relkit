@@ -1,5 +1,5 @@
 /** Calculates tutorial totals at 100 cents per item, applying the 90-cent bulk price from ten items onward. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 
 const priceOrder = defineFunction({

@@ -1,4 +1,4 @@
-import { defineEventFunction } from "@relkit/app/events";
+import { defineEventFunction } from "relkit/events";
 
 const idempotentConfirmation = defineEventFunction({
   id: "orders.idempotent-confirmation",

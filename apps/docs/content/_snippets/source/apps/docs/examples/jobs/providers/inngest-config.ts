@@ -1,5 +1,5 @@
 /** Declares task application defaults with inspection disabled until selected. */
-import { defineApp } from "@relkit/app/config";
+import { defineApp } from "relkit/config";
 import env from "@app/platform/env.js";
 import { docker } from "@relkit/docker";
 import { inngest } from "@relkit/inngest";

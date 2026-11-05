@@ -34,7 +34,6 @@
   "devDependencies": {
     "@effect/docgen": "catalog:",
     "@playwright/test": "1.63.0",
-    "@relkit/app": "workspace:*",
     "@relkit/aws": "workspace:*",
     "@relkit/better-auth": "workspace:*",
     "@relkit/client": "workspace:*",

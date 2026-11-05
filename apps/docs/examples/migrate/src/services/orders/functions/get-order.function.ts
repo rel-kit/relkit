@@ -1,5 +1,5 @@
 /** Looks up one order, returning the declared not-found error for unknown identifiers. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { z } from "zod";
 import orderNotFound from "../errors/order-not-found.error.js";
 
