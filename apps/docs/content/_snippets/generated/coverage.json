@@ -268,6 +268,7 @@
     { "path": "docs/versioning", "api": ["app"], "examples": [] },
     { "path": "docs/benchmarks", "api": ["app"], "examples": ["scripts/benchmark-dev-loop.ts"] },
     { "path": "docs/metrics", "api": ["app"], "examples": ["scripts/metrics.ts"] },
+    { "path": "docs/roadmap", "api": ["app"], "examples": ["scripts/maturity.ts"] },
     {
       "path": "docs/faq",
       "api": ["app", "functions"],

@@ -1272,6 +1272,26 @@ walkthrough. The launch checklist reads the same page.
   and a loopback registry, so it measures RelKit's own creation and reload work, not the network.
   A CI run on a clean runner is the figure to publish; the checked-in inputs under
   `apps/docs/data/metric-inputs` say "measured locally" in their notes.
+- **The checklist has two modes.** `scripts/launch/checklist.ts` reads `metrics.json`, the checkout
+  and (with `--github`) the repository state through read-only `gh` calls. Report mode, the default,
+  lists every item, marks open ones and exits 0; it runs in the `metrics` job of every pull request
+  because before launch the community items are open by design and a failing check would block all
+  work. `--strict` exits 1 while any item is open; it is the launch gate, run by the maintainer through
+  the `Plan metrics` workflow's `strict` input before announcing, and it is not part of ordinary
+  releases (`0.9.0-beta` and `0.9.0` publish before launch). Items: the five P0 decisions (#1 canary
+  metric met, #2 Why RelKit and FAQ pages exist, #3 WRITING.md and the positioning sentence on every
+  surface, #4 the third-party schema suite and docs, #5 the maturity table consistent), the Railway
+  time under 15 minutes, Discussions on, the description equal to the positioning sentence, at
+  least 8 open `good first issue` issues ("about ten"), and the roadmap page. An unreadable GitHub or
+  missing metrics leaves the dependent items open with the reason.
+- **The community launch is prepared, not applied.** `scripts/launch/apply-github.ts` enables
+  Discussions, sets the description, creates any missing label and the ten issues in
+  `scripts/launch/good-first-issues.md`, and labels existing issue #174. It defaults to a dry run
+  (it reads the repository, prints each write as `[dry run] would run: gh ...`, and writes nothing);
+  `--apply` makes the changes. Labels and issues that exist are skipped. The repository already has
+  the positioning sentence as its description, and the labels `good first issue`, `help wanted`,
+  `documentation` and `bug`; Discussions is off. The maintainer runs the apply step when the launch
+  goes live; task 20.3 stays unchecked until then.
 - **The Railway walkthrough found a defect that blocks the deploy path.** Run live on 2026-11-05
   with the signed-in CLI, the newcomer project (api template, Postgres jobs and events, the probe,
   `relkit deploy init railway`) prepared and passed `relkit check`, but `railway up` failed. The same

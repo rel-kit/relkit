@@ -11,6 +11,7 @@ export default defineMeta({
     "versioning",
     "benchmarks",
     "metrics",
+    "roadmap",
     "learn",
     "modules",
     "api",

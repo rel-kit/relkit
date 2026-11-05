@@ -7,6 +7,7 @@ export const projectPages = [
   "docs/versioning",
   "docs/benchmarks",
   "docs/metrics",
+  "docs/roadmap",
 ] as const;
 
 /** Reference and source relations of those pages. */
@@ -15,4 +16,5 @@ export const projectPageRelations = [
   relation("docs/versioning", ["app"], []),
   relation("docs/benchmarks", ["app"], ["scripts/benchmark-dev-loop.ts"]),
   relation("docs/metrics", ["app"], ["scripts/metrics.ts"]),
+  relation("docs/roadmap", ["app"], ["scripts/maturity.ts"]),
 ];

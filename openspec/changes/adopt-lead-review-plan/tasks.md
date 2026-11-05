@@ -222,6 +222,12 @@ not tasks of this change.
     build` fails inside the Linux image (see design D19, "Decided while applying section 20"), so its
     metric reads "failed" until that defect is fixed.
 - [ ] 20.3 Enable GitHub Discussions or a Discord, publish the roadmap with Core and Labs status, label about ten good first issues and set the repository description, and verify each item on the launch checklist
+  - Prepared and verified; the apply step awaits the maintainer. The roadmap page (`/docs/roadmap`),
+    `scripts/launch/good-first-issues.md` (ten drafts), `scripts/launch/repository-description.txt`
+    and `scripts/launch/apply-github.ts` are done and tested. Nothing was applied: Discussions is
+    still off, no issues or labels were created and the description is unchanged. When the launch
+    goes live, run `bun scripts/launch/apply-github.ts` (a dry run), review it, then run it with
+    `--apply`, and check this task off after `bun scripts/launch/checklist.ts --github --strict`.
 - [ ] 20.4 Write the launch checklist (P0 items, Railway newcomer test, community channels, roadmap) as a check, and verify it passes on the pull request
 
 ## 21. Vercel target (#12)
