@@ -1,6 +1,6 @@
 import { readFileSync, realpathSync } from "node:fs";
 import { relative, resolve, sep } from "node:path";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 
 export interface LoggerSinkViolation {
   readonly file: string;

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import ts from "typescript";
+import ts from "relkit-typescript";
 import { generateRouteModuleChecks } from "../../packages/cli/src/compiler/route-module-checks.js";
 import { routeModuleFindings } from "../../packages/cli/src/compiler/route-module-diagnostics.js";
 import {

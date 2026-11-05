@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import { basename, join, relative, resolve } from "node:path";
 import { expectedExports } from "./release-package-contract.js";
 import { workspacePackageDirectories } from "./workspace-packages.js";
+import { toolPackageVersions } from "./release-stage.js";
 import {
   dependencyFields,
   exactVersion,
@@ -142,6 +143,8 @@ export function checkManifests(
   summary: RecordValue[];
 } {
   const workspaceNames = new Set(items.map((item) => item.name));
+  // Private tool packages are development-only workspace dependencies and are never published.
+  const toolNames = new Set(toolPackageVersions(root).keys());
   if (items.length === 0 || items.some((item) => !exactVersion(item.manifest.version)))
     throw new Error("Every package must have an exact release version.");
   const version = String(
@@ -198,9 +201,11 @@ export function checkManifests(
     const dependencies = resolveDependencyFields(item.manifest, rootManifest);
     for (const field of packageFields)
       for (const [name, spec] of Object.entries(dependencies[field])) {
-        const valid = workspaceNames.has(name)
-          ? spec === "workspace:*"
-          : field === "peerDependencies" || exactVersion(spec);
+        const valid = toolNames.has(name)
+          ? field === "devDependencies" && spec === "workspace:*"
+          : workspaceNames.has(name)
+            ? spec === "workspace:*"
+            : field === "peerDependencies" || exactVersion(spec);
         if (!valid)
           throw new Error(`Dependency is not pinned correctly: ${item.name} -> ${name}@${spec}`);
       }

@@ -1,7 +1,7 @@
 /** Owns an isolated account-free PostgreSQL container and volume for native schedule recovery after service source movement. */
 import { resolve, join } from "node:path";
 import { Context, Effect, Layer } from "effect";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import { CliProcess, processLayer } from "../../packages/cli/src/services/process.service.js";
 import { ScaffoldProcessFailure } from "../../scripts/scaffold-process.errors.js";
 import { scaffoldNative } from "../../scripts/scaffold-native.js";

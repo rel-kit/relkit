@@ -5,7 +5,7 @@
  */
 import { readFile, readdir } from "node:fs/promises";
 import { join, relative } from "node:path";
-import ts from "typescript";
+import ts from "relkit-typescript";
 import { Effect } from "effect";
 import { inspectionNative } from "./consumer-installation-native.js";
 

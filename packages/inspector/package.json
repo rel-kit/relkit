@@ -53,7 +53,8 @@
   "devDependencies": {
     "@effect/vitest": "catalog:",
     "@vitest/coverage-v8": "catalog:",
-    "typescript": "catalog:",
+    "relkit-typescript": "workspace:*",
+    "typescript": "catalog:workspace",
     "vitest": "catalog:"
   },
   "scripts": {

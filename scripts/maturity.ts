@@ -4,7 +4,7 @@
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative, resolve, sep } from "node:path";
-import ts from "typescript";
+import ts from "relkit-typescript";
 import { firstPartyExports } from "./first-party-exports.js";
 import { readPackageTiers, type PackageTier } from "./maturity-packages.js";
 export { readPackageTiers, type PackageTier } from "./maturity-packages.js";

@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import ts from "typescript";
+import ts from "relkit-typescript";
 import {
   generateRouteModuleChecks,
   ROUTE_MODULE_CHECK_REFERENCES,

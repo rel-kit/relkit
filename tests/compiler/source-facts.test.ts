@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import { readFacts } from "../../packages/cli/src/compiler/discovery/source-facts.ts";
 import { mapSourceLocations } from "../../packages/cli/src/compiler/discovery/source-map.ts";
 

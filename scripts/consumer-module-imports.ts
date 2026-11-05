@@ -1,5 +1,5 @@
 /** Retains preprocessor imports and namespace reexports that TypeScript's preprocessor omits. */
-import ts from "typescript";
+import ts from "relkit-typescript";
 
 /**
  * Collects exact source module literals without inferring computed import targets.

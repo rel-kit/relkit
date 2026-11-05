@@ -109,7 +109,8 @@ async function execute(cwd: string, directory: string, examples: string): Promis
       env: {
         ...process.env,
         RELKIT_DOCGEN_SOURCE_ROOT: resolve(root, sourceDirectory(directory)),
-        RELKIT_DOCGEN_TSC: resolve(root, "node_modules/.bin/tsc"),
+        // Docgen examples use `baseUrl` and the 5.x API; the workspace compiler is TypeScript 7.
+        RELKIT_DOCGEN_TSC: resolve(root, "apps/docs/node_modules/.bin/tsc"),
         PATH: `${resolve(root, "apps/docs/node_modules/.bin")}${delimiter}${process.env.PATH ?? ""}`,
       },
       stdout: "pipe",

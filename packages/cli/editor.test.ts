@@ -76,7 +76,7 @@ test("the editor entry point loads through Node and TypeScript's plugin resolver
       [
         node!,
         "-e",
-        `const ts = require(${JSON.stringify(require.resolve("typescript"))});
+        `const ts = require(${JSON.stringify(require.resolve("relkit-typescript"))});
 const result = ts.sys.require(process.cwd(), "@relkit/cli/editor");
 if (result.error) throw result.error;
 if (typeof require("@relkit/cli/editor") !== "function") throw new Error("Invalid CommonJS entry");

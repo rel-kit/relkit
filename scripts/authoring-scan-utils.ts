@@ -1,6 +1,6 @@
 import { readFileSync, realpathSync } from "node:fs";
 import { relative, resolve } from "node:path";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import { resolveOwnedSourceFile } from "./check-logger-sinks.ts";
 
 export type AuthoringViolation = {

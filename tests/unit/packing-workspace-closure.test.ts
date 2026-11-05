@@ -4,10 +4,13 @@ import { resolve } from "node:path";
 import { dependencyFields } from "../../scripts/catalog-manifest.ts";
 import { packingWorkspaceClosure } from "../../scripts/packing-workspace-closure.ts";
 import { readManifests } from "../../scripts/pack-and-smoke-create-relkit-pack.ts";
+import { toolPackageVersions } from "../../scripts/release-stage.ts";
 
 test("readiness packing retains isolated optional and development workspace owners", async () => {
-  const manifests = await readManifests(resolve(import.meta.dir, "../.."));
-  const names = packingWorkspaceClosure(["@relkit/cli", "@relkit/testing"], manifests);
+  const root = resolve(import.meta.dir, "../..");
+  const manifests = await readManifests(root);
+  const tools = new Set(toolPackageVersions(root).keys());
+  const names = packingWorkspaceClosure(["@relkit/cli", "@relkit/testing"], manifests, tools);
   for (const name of [
     "@relkit/langchain",
     "@relkit/better-auth",
@@ -18,7 +21,8 @@ test("readiness packing retains isolated optional and development workspace owne
   for (const name of names)
     for (const field of dependencyFields)
       for (const [dependency, spec] of Object.entries(manifests.get(name)!.manifest[field] ?? {}))
-        if (String(spec).startsWith("workspace:")) expect(names).toContain(dependency);
+        if (String(spec).startsWith("workspace:") && !tools.has(dependency))
+          expect(names).toContain(dependency);
   expect(new Set(names).size).toBe(names.length);
 });
 

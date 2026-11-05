@@ -5,7 +5,7 @@
  */
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import ts from "typescript";
+import ts from "relkit-typescript";
 import { expect, it } from "vitest";
 import * as root from "../../src/index.js";
 import * as effect from "../../src/app/effect.js";

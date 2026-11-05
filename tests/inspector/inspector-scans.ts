@@ -3,7 +3,7 @@
  */
 import { readdir, readFile, realpath } from "node:fs/promises";
 import { extname, isAbsolute, relative, resolve, sep } from "node:path";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import { dependencyName, importReferences } from "../../scripts/boundary-imports.ts";
 
 const allowedPackages = new Set([

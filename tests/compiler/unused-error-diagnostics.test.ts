@@ -2,7 +2,7 @@
 import { expect, test } from "bun:test";
 import { resolve } from "node:path";
 import { Effect } from "effect";
-import ts from "typescript";
+import ts from "relkit-typescript";
 import { unusedErrorDiagnosticsEffect } from "../../packages/cli/src/compiler/unused-error-diagnostics.ts";
 
 test("reports declared errors the handler neither throws nor returns", () => {

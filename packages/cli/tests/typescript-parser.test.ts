@@ -52,6 +52,6 @@ test("the published CLI bundles the parser instead of depending on typescript", 
   };
   expect(Object.keys(manifest.dependencies)).not.toContain("typescript");
   expect(Object.keys(manifest.dependencies)).not.toContain("relkit-typescript");
-  expect(manifest.devDependencies["relkit-typescript"]).toBe("npm:typescript@5.9.3");
+  expect(manifest.devDependencies["relkit-typescript"]).toBe("workspace:*");
   expect(manifest.scripts.build).toContain("package-typescript-parser.ts");
 });

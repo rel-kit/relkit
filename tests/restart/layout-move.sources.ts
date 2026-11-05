@@ -2,7 +2,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import { Effect } from "effect";
 import { scaffoldNative } from "../../scripts/scaffold-native.js";
 

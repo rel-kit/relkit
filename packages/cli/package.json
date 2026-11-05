@@ -80,7 +80,7 @@
     "@modelcontextprotocol/server": "2.3.0",
     "@relkit/local": "workspace:*",
     "@relkit/pulumi": "workspace:*",
-    "relkit-typescript": "npm:typescript@5.9.3",
+    "relkit-typescript": "workspace:*",
     "vitest": "catalog:"
   },
   "peerDependencies": {

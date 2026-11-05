@@ -166,7 +166,7 @@ not tasks of this change.
 - [x] 15.2 Make `relkit check` run the project's TypeScript compiler as a separate process and map its errors to diagnostics, and verify with TypeScript 5.9 and 7 projects
 - [x] 15.3 Bundle a private `typescript@5.9` parser in `@relkit/cli` for codemods and source scanning, and verify `relkit add` and `relkit migrate` work in a TypeScript 7 project
 - [x] 15.4 Make the editor plugin optional in templates and docs, and verify a template without it type-checks
-- [ ] 15.5 Move the workspace's own type-checking and builds to TypeScript 7, keeping the private parser where tools such as the docs generator still need the 5.x API, and verify `bun run typecheck` on TypeScript 7 in CI
+- [x] 15.5 Move the workspace's own type-checking and builds to TypeScript 7, keeping the private parser where tools such as the docs generator still need the 5.x API, and verify `bun run typecheck` on TypeScript 7 in CI
 - [x] 15.6 Add TypeScript 5.9 and 7 to the generated-application CI matrix, and verify both jobs run
 - [x] 15.7 Document supported TypeScript versions, and verify the docs build
 

@@ -5,7 +5,7 @@
  */
 import { existsSync } from "node:fs";
 import { relative, resolve } from "node:path";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import type { DeclarationLeak } from "./check-public-declarations";
 
 const effectModule = /^(?:effect|@effect\/[^/]+)(?:\/.*)?$/;
