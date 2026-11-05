@@ -11,7 +11,7 @@ export interface ClientTransportService {
    * @param options - Existing oRPC context, cancellation and request options.
    * @returns The native result, or the native rejection with its identity preserved. */
   readonly invoke: (
-    path: string[],
+    path: readonly string[],
     input: unknown,
     options: ClientOptions<TransportContext>,
   ) => Promise<unknown>;

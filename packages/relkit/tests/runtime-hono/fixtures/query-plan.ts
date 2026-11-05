@@ -24,7 +24,10 @@ export function queryPlan(): RegistrationPlan {
         config: {
           method: "GET",
           path: "/query",
-          request: { kind: "input" },
+          request: {
+            kind: "input",
+            fields: { value: { kind: "optional", value: { kind: "query", name: "value" } } },
+          },
           responses: [],
           middleware: [],
           transforms: [],

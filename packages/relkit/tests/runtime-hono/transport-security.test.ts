@@ -98,7 +98,7 @@ test("preflight rejects undeclared methods and headers", async () => {
   });
   expect(rejected.status).toBe(403);
 
-  const negotiated = await app.request("https://api.example/rpc", {
+  const negotiated = await app.request("https://api.example/_relkit/v1/rpc", {
     method: "OPTIONS",
     headers: {
       origin: "https://app.example",

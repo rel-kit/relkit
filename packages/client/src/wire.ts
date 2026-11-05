@@ -102,3 +102,12 @@ export function createOperationId(now = Date.now()): string {
 
 /** Development stream that announces backend contract changes; see `relkit/contracts`. */
 export const CLIENT_CONTRACT_EVENTS_PATH = "/_relkit/v1/client/contract-events";
+
+/** Router key under which the API tree lives; matches `CLIENT_API_ROOT` in `relkit/contracts`. */
+export const API_ROOT_KEY = "api";
+
+/** Backend path of the client routes document; matches `relkit/contracts`. */
+export const CLIENT_ROUTES_PATH = "/_relkit/v1/client/routes";
+
+/** Backend path of the framework RPC endpoint for channels, agents and jobs; matches `relkit/contracts`. */
+export const FRAMEWORK_RPC_PATH = "/_relkit/v1/rpc";

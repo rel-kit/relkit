@@ -7,6 +7,7 @@
 import type { HttpTriggerRegistration } from "../graph/index.js";
 import type { Context, Hono } from "hono";
 import { registerRouteAuth } from "./auth.js";
+import { installClientRoutesEndpoint } from "./client-routes.js";
 import { mountBetterAuth } from "./better-auth-mount.js";
 import { installHttpLogging } from "./http-logging.js";
 import {
@@ -18,6 +19,7 @@ import {
 import { assertHttpManifest } from "./materialize-routes-validation.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.types.js";
 import { withRateLimit } from "./rate-limit.js";
+import { withClientIdentity } from "./route-identity.js";
 import { registerRouteMiddleware } from "./route-middleware.js";
 
 /** Registers declared routes after validating the entire manifest.
@@ -28,6 +30,7 @@ import { registerRouteMiddleware } from "./route-middleware.js";
 export function materializeRestRoutes(app: Hono, options: RouteMaterializationOptions): void {
   assertHttpManifest(options);
   installHttpLogging(app, options);
+  installClientRoutesEndpoint(app, options);
   registerRouteAuth(app, options.plan.httpTriggers, options.auth);
   registerRouteMiddleware(app, options);
   const triggers = [...options.plan.httpTriggers].sort(
@@ -38,7 +41,11 @@ export function materializeRestRoutes(app: Hono, options: RouteMaterializationOp
       registerRawRoute(app, trigger, options);
       continue;
     }
-    const handler = withRateLimit(trigger, options, createRouteHandler(trigger, options));
+    const handler = withRateLimit(
+      trigger,
+      options,
+      withClientIdentity(trigger, options, createRouteHandler(trigger, options)),
+    );
     for (const path of trigger.config.runtimePaths ?? [trigger.config.path]) {
       if (trigger.config.method === "HEAD") {
         app.on("GET", path, (context, next) =>

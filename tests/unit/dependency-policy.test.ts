@@ -13,16 +13,13 @@ const root = resolve(import.meta.dir, "../..");
 const lockText = readFileSync(join(root, "bun.lock"), "utf8");
 const policy = readFileSync(join(root, "docs/dependencies.md"), "utf8");
 
-test("the repository passes and lists the oRPC beta, Drizzle candidate and patches", () => {
+test("the repository passes, lists the Drizzle candidate and patches, and has no oRPC pre-release", () => {
   const subjects = policySubjects(parseLockfile(lockText));
   expect(policyProblems(subjects, policyRows(policy))).toEqual([]);
   expect(subjects.map(({ id }) => id)).toEqual(
-    expect.arrayContaining([
-      "@orpc/server@2.0.0-beta.31",
-      "drizzle-orm@1.0.0-rc.5-169397b",
-      "blume@2.2.5",
-    ]),
+    expect.arrayContaining(["drizzle-orm@1.0.0-rc.5-169397b", "blume@2.2.5"]),
   );
+  expect(subjects.filter(({ id }) => id.startsWith("@orpc/"))).toEqual([]);
 });
 
 test("an unlisted pre-release fails until the policy lists it with an owner and exit plan", () => {

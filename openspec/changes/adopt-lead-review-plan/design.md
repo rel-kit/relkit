@@ -654,6 +654,82 @@ Decided while applying section 11 (maintainer, 2026-11-05):
   starters; that changes the minimal template's bytes, so the pinned `templateDigest` in
   `packages/create-relkit/src/create-capabilities.ts` is updated, as earlier template changes did.
 
+Decided while applying section 23 (maintainer, 2026-11-05):
+
+- **OpenAPILink evaluated; RelKit keeps its own small REST link.** The spike
+  (`tests/runtime-rpc/runtime-hono/openapi-link-evaluation.test.ts`, oRPC 1.16.1, one test per
+  data kind over a real RelKit REST application) found: dates travel as ISO strings both ways,
+  which is all JSON can do and matches the client's JSON Schema types; large integers go out as
+  decimal strings, but the route answered 500 because REST's JSON encoder could not write a
+  bigint, so REST bodies and SSE items now write a bigint as its exact decimal string; files go
+  as multipart form data that a route's `multipart` mapping reads; streams fail silently,
+  because OpenAPILink reads only oRPC's own SSE events (`message`, `error`, `done`) and yields
+  none of RelKit's `relkit-item` events. Beyond the data kinds, OpenAPILink needs an oRPC
+  contract with `route()` metadata on the client, can express only oRPC's input structures
+  (not RelKit mappings that rename fields or read headers or path segments), and reads oRPC's
+  error body rather than Problem Details. RelKit therefore calls routes with a small link of
+  its own (`packages/client/src/rest-*.ts`): it reads each route's compiled request mapping from
+  the backend and writes every input field where the server reads it, reads Problem Details and
+  RelKit's stream formats, and needs no oRPC on that path.
+- **REST transport.** Routes reach the client through a new framework document,
+  `GET /_relkit/v1/client/routes` (no-store, installed with the REST routes, so every runtime
+  serves it): for each client route its `api` path, method, path pattern, compiled request
+  mapping, stream format, operation and declared error codes, which the OpenAPI document
+  already publishes. The client loads it on its first route call and loads it again, at most
+  once a second, when a call names a route it lacks, so a route added during development works
+  without a restart. Calls whose first segment is `jobs` or starts with `relkit.` (jobs,
+  agents, channels) keep the RPC protocol; every other name, whether an `api` path, a
+  `METHOD /path` selector or a route ID passed to the raw `createClient`, is a route and goes
+  to REST, so `createClient`, `createApi`, the hooks, streaming and job watch keep their
+  signatures.
+- **Encoding.** The link walks the mapping backwards: path and catch-all segments are
+  URI-encoded, query and header values are text (dates in ISO 8601, objects as JSON), `body`
+  fields form one JSON object (a bigint becomes its decimal string), `multipart` fields form
+  `FormData` with files kept as files, and cookies, middleware values and constants are not
+  sent. A route that maps a custom header needs that header in `transportSecurity.allowedHeaders`
+  for cross-origin browsers, as any REST caller would.
+- **Responses and errors.** JSON, text and other bodies (as a `Blob`) decode by content type;
+  stream routes yield SSE `relkit-item` payloads, text chunks or byte chunks, and `return()`
+  aborts the request. A Problem Details failure becomes an `ORPCError` with the response status
+  and `detail` as message: a declared code or an upper-case framework code
+  (`IDENTITY_PRECONDITION_FAILED`) is kept, any other code becomes the common code for the
+  status (`validation-failed` 400 is `BAD_REQUEST` with the issues in `data.issues`), so the
+  client's error union does not change.
+- **Identity on REST mutations.** A mutation route that receives the typed client's
+  `x-relkit-identity-scope` and `x-relkit-session-epoch` headers answers 409
+  `IDENTITY_PRECONDITION_FAILED` when the session changed, as the RPC endpoint did; requests
+  without those headers, such as curl, are not affected (`runtime-hono/route-identity.ts`).
+- **Browser proof.** `tests/e2e-commerce/rest-wire.spec.ts` checks that the commerce page sends
+  `GET /orders`, `GET /announcements`, `POST /announcements` and `GET /reports/daily` and no
+  request under `/rpc`. It needs `next dev`, which the shared machine's resource budget did not
+  allow while other sessions ran, and no pull-request workflow runs the commerce browser suite,
+  so it was written but not run here.
+- **`/rpc` removed; what stays on RPC.** Channels, agents and jobs have no REST routes, and
+  building REST and WebSocket protocols for them was outside this section, so they keep the oRPC
+  protocol at a framework path, `/_relkit/v1/rpc` (HTTP and WebSocket), next to RelKit's other
+  framework endpoints and outside the OpenAPI document. The RPC router no longer contains route
+  procedures, route-ID or `METHOD /path` names, or the `api` tree (`rpc-api-tree.ts` and
+  `rpc-middleware-trace.ts` are gone), and nothing answers at `/rpc`. Requests under `/_relkit/`
+  skip application middleware, server spans and request records as control-plane traffic; the
+  RPC endpoint carries application calls, so `isRelkitControlPlanePath` excludes it and those
+  calls are observed exactly as they were at `/rpc`. Frontend proxies forward the route paths
+  they call plus `/_relkit` (with WebSockets) instead of `/rpc`.
+- **oRPC version.** npm has no stable oRPC 2.x: its `2.0.0` is a deprecated publish from 2024 and
+  the 2.0 line is still in beta (`2.0.0-beta.48`). Every `@orpc/*` package moves to the latest
+  stable 1.x, `1.16.1`, and leaves `docs/dependencies.md`. The 1.x port: `eventIterator` replaces
+  `asyncIteratorObject`; the handlers' `errorStatusMap` becomes a client interceptor
+  (`runtime-hono/rpc-handler-options.ts`) that gives a thrown error its declared status, since 1.x
+  reads the status from the error; WebSocket calls get `rpcHeaders` from a root interceptor; the
+  client's 1.x WebSocket link is bound to one socket, so `webSocketLink` opens a new socket for
+  the next call after one closes; and the HTTP link hands a caller's `fetch` the URL and an init
+  with headers, body and signal, as before, because 1.x passes a `Request`.
+- **Drizzle.** No stable Drizzle 1.0 exists (the stable line is 0.45, without the Effect
+  integration), so the `1.0.0-rc.5-169397b` pin and its patch stay, with the exit plan updated:
+  `drizzle-orm@1.0.0-rc.5` (2026-10-21) already imports `effect/sql`, so moving to it removes the
+  patch together with the patch-shipping steps in `create-relkit` and the CLI build catalog. That
+  removal touches the creation and packaging code other sections own, so it is left as the exit
+  plan's next step rather than done here.
+
 ### D16. Agent adapters (#22)
 
 The adapter interface covers run, stream, resume and stop; tool calls bridged to the common engine;

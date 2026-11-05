@@ -115,8 +115,8 @@ Keep your framework's existing plugins:
   /_snippets/source/apps/docs/examples/frontend/vite.config.ts
 </include>
 
-The browser sends `/rpc` calls and the `/_relkit/v1/client/identity` handshake to the frontend
-origin; Vite forwards them to the backend. This lets the provider use the current page's origin.
+The browser sends route calls such as `GET /hello` and RelKit's `/_relkit` requests to the frontend
+origin; Vite forwards them to the backend. Add a proxy entry for each route path your frontend calls. This lets the provider use the current page's origin.
 Keep `127.0.0.1` consistent in these local URLs.
 
 The development proxy is not part of the production build. Before publishing, configure equivalent
@@ -139,7 +139,8 @@ its `rewrites`. Keep the other options and any existing rules:
 
 [`withRelkit`](/docs/api/client#withrelkit) embeds the pulled contract fingerprint.
 The [Next.js rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites)
-forward `/rpc` calls and the `/_relkit/v1/client/identity` handshake to RelKit. The browser stays
+forward route calls such as `GET /hello` and RelKit's `/_relkit` requests to the backend; add a rule
+for each route path your frontend calls. The browser stays
 on the frontend origin, so the provider needs no separate `baseUrl`.
 
 Keep RelKit running as a separate backend on port `3000`; run Next.js on port `3002` in step 5.
@@ -195,8 +196,8 @@ request identity. The `/server` and `/server/react` helpers require Bun; see
 </Tabs>
 
 `greeting.data.message` is inferred from the backend function's output schema. No shared handwritten
-response interface is needed. `api.hello.greet` identifies that route, but the client sends
-RPC over `/rpc`; it does not construct a REST query string. Raw handlers are not generated operations.
+response interface is needed. `api.hello.greet` identifies that route, and the client sends
+its REST request, `GET /hello?name=…`, as curl would. Raw handlers are not generated operations.
 
 </Step>
 <Step icon="circle-check">

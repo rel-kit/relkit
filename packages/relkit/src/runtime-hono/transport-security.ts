@@ -1,4 +1,4 @@
-import { AGENT_CAPABILITY_HEADER } from "../contracts/index.js";
+import { AGENT_CAPABILITY_HEADER, FRAMEWORK_RPC_PATH } from "../contracts/index.js";
 import { Context, Effect, Layer } from "effect";
 import type { Context as HonoContext, Hono } from "hono";
 import { httpBoundary, HttpBoundaryError, observeHttp, runHttp } from "./http-effect.js";
@@ -38,7 +38,7 @@ export function installTransportSecurity(
       cors(context, origin, methods, requestedHeaders);
       return context.body(null, 204);
     }
-    if (isStateChanging(request.method) && !context.req.path.startsWith("/rpc")) {
+    if (isStateChanging(request.method) && !context.req.path.startsWith(FRAMEWORK_RPC_PATH)) {
       try {
         await assertStateChangingRequest(request, options);
       } catch (error) {

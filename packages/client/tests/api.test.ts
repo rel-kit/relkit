@@ -13,39 +13,68 @@ test("api properties are stable references to their route paths", () => {
   expect(() => apiRoutePath({} as never)).toThrow("generated `api` object");
 });
 
-test("createApi calls a route at its API path and keeps declared error fields", async () => {
+test("createApi calls a route at its REST endpoint and keeps declared error fields", async () => {
   const requests: string[] = [];
   const backend = createApi({
     baseUrl: "http://relkit.test",
-    fetch: mockFetch(async (input) => {
-      const url = String(input instanceof Request ? input.url : input);
-      requests.push(new URL(url).pathname);
-      if (url.endsWith("/missing"))
+    fetch: mockFetch(async (input, init) => {
+      const url = new URL(String(input instanceof Request ? input.url : input));
+      requests.push(`${init?.method ?? "GET"} ${url.pathname}${url.search}`);
+      if (url.pathname === "/_relkit/v1/client/routes")
+        return Response.json({ protocol: "relkit.client-routes", version: 1, routes });
+      if (url.pathname === "/orders/o2")
         return Response.json(
           {
-            json: {
-              defined: true,
-              inferable: true,
-              code: "orders.not-found",
-              message: "Order not found",
-              data: { orderId: "o2" },
-            },
+            type: "/errors/orders.not-found",
+            title: "Not Found",
+            status: 404,
+            code: "orders.not-found",
+            detail: "Order not found",
+            data: { orderId: "o2" },
           },
-          { status: 404 },
+          { status: 404, headers: { "content-type": "application/problem+json" } },
         );
-      return Response.json({ json: { totalCents: 1200 } });
+      return Response.json({ totalCents: 1200 });
     }),
   }) as unknown as Record<string, Record<string, (input: unknown) => Promise<unknown>>>;
-  expect(await backend.orders!.priceOrder!({ orderId: "o1" })).toEqual({ totalCents: 1200 });
+  expect(await backend.orders!.priceOrder!({ orderId: "o1", currency: "EUR" })).toEqual({
+    totalCents: 1200,
+  });
   expect(apiRoutePath(backend.orders!.priceOrder as never)).toEqual(["orders", "priceOrder"]);
-  const error = await backend.orders!.missing!({}).catch((cause: unknown) => cause);
+  const error = await backend.orders!.priceOrder!({ orderId: "o2" }).catch(
+    (cause: unknown) => cause,
+  );
   expect(error).toMatchObject({
     code: "orders.not-found",
     status: 404,
+    message: "Order not found",
     data: { orderId: "o2" },
   });
-  expect(requests).toEqual(["/rpc/api/orders/priceOrder", "/rpc/api/orders/missing"]);
+  expect(requests).toEqual([
+    "GET /_relkit/v1/client/routes",
+    "GET /orders/o1?currency=EUR",
+    "GET /orders/o2",
+  ]);
 });
+
+const routes = [
+  {
+    id: "route.get.orders.by-order-id",
+    api: ["orders", "priceOrder"],
+    method: "GET",
+    path: "/orders/:orderId",
+    request: {
+      kind: "input",
+      fields: {
+        orderId: { kind: "path", name: "orderId" },
+        currency: { kind: "optional", value: { kind: "query", name: "currency" } },
+      },
+    },
+    stream: null,
+    operation: "query",
+    errors: ["orders.not-found"],
+  },
+];
 
 test("a request without a response becomes a NETWORK_ERROR", async () => {
   const backend = createApi({

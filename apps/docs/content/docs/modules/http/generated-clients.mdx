@@ -12,10 +12,12 @@ becomes `api.orders.createOrder`. Input, output, and declared application errors
 target functions.
 Raw handlers do not become generated-client operations.
 
-The client uses **RPC over `/rpc`**. Every exposed route is reachable by its `api` path, its stable route ID, and a
-deterministic method/path alias. All three execute the original route's authorization, middleware, rate
-limit, timeout, error mapping, and telemetry against its canonical method and path. Use the
-[OpenAPI document](/docs/modules/http/openapi) when you need the native REST request and response shape.
+The client calls **the REST routes themselves**: `api.orders.createOrder(input)` sends the same
+request the [OpenAPI document](/docs/modules/http/openapi) describes, so curl can reproduce any call.
+It reads each route's request mapping from the backend (`/_relkit/v1/client/routes`) and places every
+input field in the path, query, headers or body the route reads it from. A route is also reachable by
+its stable route ID and its `METHOD /path` name on the raw client. Channels, agents and jobs, which
+have no REST route, use RelKit's own endpoint at `/_relkit/v1/rpc`.
 
 <Steps>
 <Step>
@@ -73,7 +75,7 @@ This repository example configures a client instance:
   /_snippets/source/examples/commerce/src/platform/generated-client.ts
 </include>
 
-Set `baseUrl` to the backend origin, without appending `/rpc`; the client adds that transport path.
+Set `baseUrl` to the backend origin, without a path suffix; the client adds each route path.
 The snippet uses port `3000`, the generated-app default. Change it to `4000` when calling the commerce
 app with its default configuration.
 
@@ -137,13 +139,13 @@ returned responses to `INTERNAL_SERVER_ERROR`. Test these cases if middleware pr
 ## Test security at both entry points
 
 Registered Better Auth protection and route policy run with the operation's canonical method/path.
-If a policy cannot be reproduced safely over RPC, compilation fails until the route is marked
-`client: false`; that opt-out registers neither RPC identity, and direct calls return `NOT_FOUND`.
+A route marked `client: false` stays out of the generated client and its routes document.
 
 Point the client at a running local test server. The current `createTestApplication` HTTP helper does
-not serve `/rpc`, so connecting it through a custom `fetch` is not an RPC integration test.
+not serve the client routes document, so connecting it through a custom `fetch` is not a client
+integration test.
 Cover success, invalid input, a declared error, missing credentials, and any quota policy.
-Keep REST tests too; RPC tests do not exercise request mapping. See [Testing](/docs/modules/operations/testing)
+Client tests exercise the same request mapping as REST tests. See [Testing](/docs/modules/operations/testing)
 for the other available test layers.
 
 ## Review compatibility changes

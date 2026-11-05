@@ -4,7 +4,7 @@ import type { CreateClientOptions } from "./index.types.js";
 import { createClient } from "./transport.js";
 import { normalizeClientError } from "./client-errors.js";
 
-/** Router key under which the RPC transport mounts the API tree; matches `relkit/contracts`. */
+/** Root segment of `api` call paths; matches `CLIENT_API_ROOT` in `relkit/contracts`. */
 export const API_ROOT = "api";
 
 const pathKey = "~route";

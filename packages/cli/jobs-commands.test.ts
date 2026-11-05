@@ -59,7 +59,9 @@ describe("jobs CLI", () => {
       ),
     ).toBe(0);
 
-    const request = requests.find((value) => value.url.includes("/rpc/jobs/exportOrders/trigger"));
+    const request = requests.find((value) =>
+      value.url.includes("/_relkit/v1/rpc/jobs/exportOrders/trigger"),
+    );
     expect(request).toBeDefined();
     expect(await request!.json()).toEqual({
       json: {
@@ -81,8 +83,8 @@ describe("jobs CLI", () => {
         JSON.stringify({
           json: {
             defined: true,
-            inferable: true,
             code: "RELKIT_JOB_SUBMISSION_UNKNOWN",
+            status: 503,
             message: "The provider did not confirm acceptance.",
             data: {
               outcome: "unknown",
@@ -191,7 +193,7 @@ describe("jobs CLI", () => {
     expect(code).toBe(0);
 
     const watchRequest = requests.find((value) =>
-      value.url.includes("/rpc/jobs/exportOrders/runs/watch"),
+      value.url.includes("/_relkit/v1/rpc/jobs/exportOrders/runs/watch"),
     );
     expect(watchRequest).toBeDefined();
     expect(await watchRequest!.json()).toEqual({ json: { runId: "run-1", after: "cursor-1" } });

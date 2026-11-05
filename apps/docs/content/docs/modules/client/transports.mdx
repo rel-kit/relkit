@@ -34,7 +34,7 @@ Call `echoMessage(window.location.origin, "Hello from the frontend")` behind a s
 or pass your configured backend origin. Handle the returned Promise's rejection in your UI.
 `createApi` returns the same tree as the `api` object, with every route callable. The Echo route
 targets the function `echo.echo`, so you call `backend.echo.echo(input)`. React hooks take the same
-`api.echo.echo` property. The call uses `/rpc` and returns the function output; it does not return an
+`api.echo.echo` property. The call sends the route's REST request and returns the function output; it does not return an
 HTTP `Response`.
 
 `createApi` configures transport; it does not perform the identity handshake. This example first
@@ -55,7 +55,7 @@ These factories are exported from `@relkit/client` and use the same generated co
 | [`createWebSocketClient`](/docs/api/client#createwebsocketclient) | A backend with WebSocket RPC enabled         | `baseUrl`, an optional WebSocket constructor, and `establishmentTimeoutMs`. Connection establishment is lazy.      |
 | [`createAutoClient`](/docs/api/client#createautoclient)           | WebSocket preference with HTTP fallback      | Combines the transport options. Fallback applies to connection establishment, not replay of an accepted operation. |
 
-Pass the backend origin without appending `/rpc`. A custom transport still needs the backend's
+Pass the backend origin, without a path suffix. A custom transport still needs the backend's
 matching configuration and authentication. Use [HTTP streaming](/docs/modules/http/streaming) for
 stream contracts, and [client stream hooks](/docs/modules/client/streams) when React owns them.
 

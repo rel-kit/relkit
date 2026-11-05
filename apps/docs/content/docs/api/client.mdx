@@ -39,12 +39,12 @@ export const makeClient = () => createClient({ baseUrl: "http://127.0.0.1:3000" 
 **Signature**
 
 ```ts
-declare const createClient: <Contract extends RouterContract = RouterContract>(
+declare const createClient: <Contract extends AnyContractRouter = AnyContractRouter>(
   options: CreateClientOptions,
-) => RouterContractClient<Contract>;
+) => ContractRouterClient<Contract>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.ts#L27)
 
 Since v0.1.0
 
@@ -100,7 +100,7 @@ declare const createApi: (options: CreateClientOptions) => ApiClient<ClientApi>;
 
 ### API_ROOT
 
-Router key under which the RPC transport mounts the API tree; matches `relkit/contracts`.
+Root segment of `api` call paths; matches `CLIENT_API_ROOT` in `relkit/contracts`.
 
 **Signature**
 
@@ -647,10 +647,10 @@ Contract inferred from the preserved public registry augmentation.
 
 ```ts
 type DefaultContract = DefaultContractRegistry extends {
-  readonly contract: infer Contract extends RouterContract;
+  readonly contract: infer Contract extends AnyContractRouter;
 }
   ? Contract
-  : RouterContract;
+  : AnyContractRouter;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L49)
@@ -812,9 +812,9 @@ declare const createApi: (options: CreateClientOptions) => ApiClient<ClientApi>;
 **Signature**
 
 ```ts
-declare const createAutoClient: <Contract extends RouterContract = RouterContract>(
+declare const createAutoClient: <Contract extends AnyContractRouter = AnyContractRouter>(
   options: CreateAutoClientOptions,
-) => RouterContractClient<Contract>;
+) => ContractRouterClient<Contract>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L8)
@@ -824,9 +824,9 @@ declare const createAutoClient: <Contract extends RouterContract = RouterContrac
 **Signature**
 
 ```ts
-declare const createClient: <Contract extends RouterContract = RouterContract>(
+declare const createClient: <Contract extends AnyContractRouter = AnyContractRouter>(
   options: CreateClientOptions,
-) => RouterContractClient<Contract>;
+) => ContractRouterClient<Contract>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L8)
@@ -836,9 +836,9 @@ declare const createClient: <Contract extends RouterContract = RouterContract>(
 **Signature**
 
 ```ts
-declare const createWebSocketClient: <Contract extends RouterContract = RouterContract>(
+declare const createWebSocketClient: <Contract extends AnyContractRouter = AnyContractRouter>(
   options: CreateWebSocketClientOptions,
-) => RouterContractClient<Contract>;
+) => ContractRouterClient<Contract>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L8)
@@ -8759,10 +8759,261 @@ readonly defined: false
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/write-error.ts#L6)
 
+## `rest-link.ts`
+
+Calls routes over their REST endpoints, the same requests the OpenAPI document describes,
+so a typed client call is reproducible with curl.
+
+### RestLink (interface)
+
+Route calls over REST.
+
+**Signature**
+
+```ts
+export interface RestLink {
+  /**
+   * Tells route calls from the framework procedures (channels, agents, jobs) that keep
+   * the RPC protocol.
+   * @param path - Call path.
+   * @returns Whether the call names a route.
+   */
+  readonly handles: (path: readonly string[]) => boolean;
+  /**
+   * Calls one route.
+   * @param path - `api` path, `METHOD /path` selector or route ID.
+   * @param input - Call input.
+   * @param options - Call cancellation.
+   * @returns The route output, or an async iterator for a stream route.
+   */
+  readonly call: (
+    path: readonly string[],
+    input: unknown,
+    options: { readonly signal?: AbortSignal | undefined },
+  ) => Promise<unknown>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-link.ts#L13)
+
+### createRestLink
+
+Creates the REST link for one client.
+
+**Example**
+
+```ts
+const link = createRestLink({ baseUrl: "http://127.0.0.1:3000" });
+```
+
+**Signature**
+
+```ts
+declare const createRestLink: (options: CreateClientOptions) => RestLink;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-link.ts#L41)
+
+## `rest-request.ts`
+
+Builds the REST request for one route call by reading the route's compiled request
+mapping backwards: each mapped input field goes to the path, query, header or body
+position the server reads it from.
+
+### encodeRestRequest
+
+Encodes one call's input as the route's REST request.
+
+**Example**
+
+```ts
+encodeRestRequest("http://127.0.0.1:3000", route, { orderId: "o1" }, new Headers());
+```
+
+**Signature**
+
+```ts
+declare const encodeRestRequest: (
+  baseUrl: string,
+  route: ClientRouteEntry,
+  input: unknown,
+  headers: Headers,
+) => { readonly url: URL; readonly init: RequestInit };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-request.ts#L27)
+
+## `rest-response.ts`
+
+Reads a REST route response as the call's output, stream or typed error.
+
+### decodeRestResponse
+
+Decodes one route response.
+
+**Throws**
+
+ORPCError with the declared code, or the common code for the status.
+
+**Example**
+
+```ts
+await decodeRestResponse(route, await fetch(url), () => controller.abort());
+```
+
+**Signature**
+
+```ts
+declare const decodeRestResponse: (
+  route: ClientRouteEntry,
+  response: Response,
+  abort: () => void,
+) => Promise<unknown>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-response.ts#L42)
+
+## `rest-routes.ts`
+
+Loads and caches the backend's client routes document.
+
+### ClientRouteEntry
+
+**Signature**
+
+```ts
+declare const ClientRouteEntry: ClientRouteEntry;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-routes.ts#L4)
+
+### RouteTable
+
+**Signature**
+
+```ts
+declare const RouteTable: RouteTable;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-routes.ts#L4)
+
+### createRouteTable
+
+Creates a lazily loaded route table. It loads on the first call, and reloads when a call
+names a route it lacks, so a route the backend adds during development works at once.
+
+**Example**
+
+```ts
+const table = createRouteTable("http://127.0.0.1:3000", (url, signal) => fetch(url, { signal }));
+```
+
+**Signature**
+
+```ts
+declare const createRouteTable: (
+  baseUrl: string,
+  load: (url: URL, signal?: AbortSignal) => Promise<Response>,
+) => RouteTable;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-routes.ts#L17)
+
+## `rest-routes.types.ts`
+
+One route in the backend's client routes document (`/_relkit/v1/client/routes`), a copy
+of `ClientRouteEntry` in `relkit/contracts` so the browser bundle needs no runtime import.
+
+### ClientRouteEntry (interface)
+
+One route in the backend's client routes document (`/_relkit/v1/client/routes`), a copy
+of `ClientRouteEntry` in `relkit/contracts` so the browser bundle needs no runtime import.
+
+**Signature**
+
+```ts
+export interface ClientRouteEntry {
+  readonly id: string;
+  /** Path below the `api` root, such as `["orders", "searchOrders"]`. */
+  readonly api: readonly string[];
+  readonly method: string;
+  readonly path: string;
+  /** The compiled request mapping the server reads the input with. */
+  readonly request: unknown;
+  readonly stream: "sse" | "text" | "bytes" | null;
+  readonly operation: "query" | "mutation";
+  /** Declared error codes. */
+  readonly errors: readonly string[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-routes.types.ts#L5)
+
+### RouteTable (interface)
+
+Looks routes up by the name a call uses.
+
+**Signature**
+
+```ts
+export interface RouteTable {
+  /**
+   * Finds the route a call path names: an `api` path (`["api", "orders", "getOrder"]`),
+   * a `METHOD /path` selector or a route ID.
+   * @param path - Call path.
+   * @param signal - Cancels the table request.
+   * @returns The route, or undefined when the backend has none by that name.
+   */
+  readonly find: (
+    path: readonly string[],
+    signal?: AbortSignal,
+  ) => Promise<ClientRouteEntry | undefined>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-routes.types.ts#L20)
+
+## `rest-sse.ts`
+
+Parses a RelKit SSE stream route: `relkit-item`, `relkit-complete` and `relkit-error` events.
+
+### ChunkReader (interface)
+
+The part of a body reader the parser uses.
+
+**Signature**
+
+```ts
+export interface ChunkReader {
+  readonly read: () => Promise<{ readonly done: boolean; readonly value?: Uint8Array | undefined }>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-sse.ts#L5)
+
+### readSse
+
+Reads SSE events from a body reader as stream items.
+
+**Example**
+
+```ts
+for await (const item of { [Symbol.asyncIterator]: () => readSse(reader) }) {
+}
+```
+
+**Signature**
+
+```ts
+declare const readSse: (reader: ChunkReader) => AsyncIterator<unknown>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-sse.ts#L16)
+
 ## `server-context.ts`
 
 Implements the opt-in Bun server query context and identity-bound hydration.
-Install @orpc/tanstack-query@2.0.0-beta.31 and @tanstack/query-core@^5 alongside
+Install @orpc/tanstack-query@1.16.1 and @tanstack/query-core@^5 alongside
 
 ### CreateRelkitServerContextOptions
 
@@ -8878,9 +9129,9 @@ Bun server client with operation-time W3C propagation. Response bodies remain un
 **Signature**
 
 ```ts
-declare const createServerClient: <Contract extends RouterContract = RouterContract>(
+declare const createServerClient: <Contract extends AnyContractRouter = AnyContractRouter>(
   options: CreateClientOptions,
-) => RouterContractClient<Contract>;
+) => ContractRouterClient<Contract>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/server.ts#L18)
@@ -8888,7 +9139,7 @@ declare const createServerClient: <Contract extends RouterContract = RouterContr
 ## `tanstack-query.ts`
 
 Reexports oRPC's query adapter without adding it to the transport dependency
-graph. Install @orpc/tanstack-query@2.0.0-beta.31 and @tanstack/query-core@^5
+graph. Install @orpc/tanstack-query@1.16.1 and @tanstack/query-core@^5
 alongside @relkit/client when selecting this entrypoint.
 
 ### TanstackQueryOperationContext
@@ -8906,9 +9157,9 @@ declare const TanstackQueryOperationContext: OperationContext;
 **Signature**
 
 ```ts
-declare const createTanstackQueryUtils: <T extends AnyNestedClient>(
+declare const createTanstackQueryUtils: <T extends NestedClient<any>>(
   client: T,
-  options?: NoInfer<RouterUtilsOptions<T>>,
+  options?: CreateRouterUtilsOptions<T>,
 ) => RouterUtils<T>;
 ```
 
@@ -8926,7 +9177,19 @@ Builds the native HTTP oRPC link with lazy headers and owned iterator cancellati
 declare const httpLink: (options: CreateClientOptions) => RPCLink<Record<PropertyKey, unknown>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-native.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-native.ts#L22)
+
+### resolveHeaders
+
+Resolves current header values without mutating caller-owned headers.
+
+**Signature**
+
+```ts
+declare const resolveHeaders: (value: ClientHeaders | undefined) => Promise<Headers>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-native.ts#L180)
 
 ### webSocketEndpoint
 
@@ -8938,11 +9201,12 @@ Resolves the RPC WebSocket endpoint and canonical agent capability query.
 declare const webSocketEndpoint: (baseUrl: string) => URL;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-native.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-native.ts#L157)
 
 ### webSocketLink
 
-Builds the native oRPC WebSocket link while retaining SDK reconnect ownership.
+Builds the WebSocket link. oRPC 1.x binds a link to one socket, so this opens a socket
+on first use and opens a new one for the next call after the socket closes.
 
 **Signature**
 
@@ -8951,10 +9215,10 @@ declare const webSocketLink: (
   options: CreateWebSocketClientOptions,
   Socket: typeof WebSocket,
   connect?: () => Promise<WebSocket>,
-) => WebSocketRPCLink<Record<PropertyKey, unknown>>;
+) => TransportLink;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-native.ts#L106)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-native.ts#L120)
 
 ## `transport-socket.ts`
 
@@ -8963,7 +9227,7 @@ Establishes a socket within a deadline and hands the connected socket to the cal
 **Example**
 
 ```ts
-const socket = await connectSocket(WebSocket, new URL("wss://example.test/rpc"), 10_000);
+const socket = await connectSocket(WebSocket, new URL("wss://example.test/_relkit/v1/rpc"), 10_000);
 ```
 
 ### connectSocket
@@ -8973,7 +9237,7 @@ Establishes a socket within a deadline and hands the connected socket to the cal
 **Example**
 
 ```ts
-const socket = await connectSocket(WebSocket, new URL("wss://example.test/rpc"), 10_000);
+const socket = await connectSocket(WebSocket, new URL("wss://example.test/_relkit/v1/rpc"), 10_000);
 ```
 
 **Signature**
@@ -9042,12 +9306,12 @@ Creates a lazy proxy whose first transport choice is shared by concurrent calls.
 **Signature**
 
 ```ts
-declare const createAutoClient: <Contract extends RouterContract = RouterContract>(
+declare const createAutoClient: <Contract extends AnyContractRouter = AnyContractRouter>(
   options: CreateAutoClientOptions,
-) => RouterContractClient<Contract>;
+) => ContractRouterClient<Contract>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.ts#L55)
 
 ### createWebSocketClient
 
@@ -9056,12 +9320,12 @@ Creates a synchronous lazy WebSocket proxy, retaining constructor availability e
 **Signature**
 
 ```ts
-declare const createWebSocketClient: <Contract extends RouterContract = RouterContract>(
+declare const createWebSocketClient: <Contract extends AnyContractRouter = AnyContractRouter>(
   options: CreateWebSocketClientOptions,
-) => RouterContractClient<Contract>;
+) => ContractRouterClient<Contract>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.ts#L40)
 
 ## `transport.types.ts`
 
@@ -9079,7 +9343,7 @@ export interface ClientTransportService {
    * @param options - Existing oRPC context, cancellation and request options.
    * @returns The native result, or the native rejection with its identity preserved. */
   readonly invoke: (
-    path: string[],
+    path: readonly string[],
     input: unknown,
     options: ClientOptions<TransportContext>,
   ) => Promise<unknown>;
@@ -9167,6 +9431,18 @@ declare const AGENT_CAPABILITY_VALUE: string;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/wire.ts#L14)
 
+### API_ROOT_KEY
+
+Router key under which the API tree lives; matches `CLIENT_API_ROOT` in `relkit/contracts`.
+
+**Signature**
+
+```ts
+declare const API_ROOT_KEY: "api";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/wire.ts#L107)
+
 ### CLIENT_CONTRACT_EVENTS_PATH
 
 Development stream that announces backend contract changes; see `relkit/contracts`.
@@ -9178,6 +9454,30 @@ declare const CLIENT_CONTRACT_EVENTS_PATH: "/_relkit/v1/client/contract-events";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/wire.ts#L104)
+
+### CLIENT_ROUTES_PATH
+
+Backend path of the client routes document; matches `relkit/contracts`.
+
+**Signature**
+
+```ts
+declare const CLIENT_ROUTES_PATH: "/_relkit/v1/client/routes";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/wire.ts#L110)
+
+### FRAMEWORK_RPC_PATH
+
+Backend path of the framework RPC endpoint for channels, agents and jobs; matches `relkit/contracts`.
+
+**Signature**
+
+```ts
+declare const FRAMEWORK_RPC_PATH: "/_relkit/v1/rpc";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/wire.ts#L113)
 
 ### canonicalJson
 

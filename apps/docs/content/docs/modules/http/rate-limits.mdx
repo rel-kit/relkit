@@ -93,7 +93,7 @@ keys and confirm rejected requests do not invoke the target. See [Testing](/docs
 ## Check which entry points are actually limited
 
 The route limiter wraps the original HTTP method/path. It does not wrap a [raw handler](/docs/modules/http/raw-handlers)
-or the generated client's `/rpc` invocation of the target. If RPC is reachable, enforce equivalent
+or another route that targets the same function. If such a path is reachable, enforce equivalent
 policy at that entry point or in shared business authorization; do not assume the REST limit protects it.
 See [Generated clients](/docs/modules/http/generated-clients#test-security-at-both-entry-points).
 

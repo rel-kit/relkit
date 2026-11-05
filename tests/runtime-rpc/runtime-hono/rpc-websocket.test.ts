@@ -37,7 +37,8 @@ test("serves generated route descriptors through HTTP", async () => {
     baseUrl: "http://relkit.test",
     fetch: appFetch(app),
   });
-  await expect(client["GET /query"]({ value: 1 })).resolves.toEqual({ value: 1 });
+  // The typed client calls GET /query?value=1; a query value without a schema stays text.
+  await expect(client["GET /query"]({ value: 1 })).resolves.toEqual({ value: "1" });
   expect(invocation).not.toHaveProperty("timeoutMs");
 });
 
@@ -53,7 +54,14 @@ test("maps agent state conflicts without reporting server failure", () => {
 });
 
 test("streams generated route output through HTTP", async () => {
-  const plan = queryPlan();
+  const base = queryPlan();
+  const plan = {
+    ...base,
+    httpTriggers: base.httpTriggers.map((trigger) => ({
+      ...trigger,
+      config: { ...trigger.config, stream: { format: "sse" as const } },
+    })),
+  };
   const stream = {
     kind: "stream",
     item: schema,
@@ -87,13 +95,19 @@ test("streams generated route output through HTTP", async () => {
   expect(values).toEqual([1, 2]);
 });
 
-test("serves the existing oRPC router through Bun WebSockets", async () => {
+test("the framework RPC endpoint answers over Bun WebSockets and serves no routes", async () => {
   const server = await startBunFixture("rpc-websocket");
   servers.push(server);
-  const socket = new WebSocket(`ws://127.0.0.1:${server.port}/rpc`);
-  const client = createORPCClient(new RPCLink({ connect: () => socket })) as {
+  const socket = new WebSocket(`ws://127.0.0.1:${server.port}/_relkit/v1/rpc`);
+  await new Promise((resolve, reject) => {
+    socket.addEventListener("open", resolve, { once: true });
+    socket.addEventListener("error", reject, { once: true });
+  });
+  const client = createORPCClient(new RPCLink({ websocket: socket })) as {
     readonly "query.route": (input: unknown) => Promise<unknown>;
   };
-  await expect(client["query.route"]({ value: 1 })).resolves.toEqual({ value: 1 });
+  // Routes are called at their REST paths; the RPC endpoint only has channels, agents and jobs.
+  await expect(client["query.route"]({ value: 1 })).rejects.toMatchObject({ code: "NOT_FOUND" });
   socket.close();
+  expect((await fetch(`http://127.0.0.1:${server.port}/rpc`)).status).toBe(404);
 });

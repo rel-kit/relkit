@@ -8,8 +8,8 @@ export default {
     port: 5173,
     strictPort: true,
     proxy: {
-      "/rpc": { target: "http://127.0.0.1:3000", ws: true },
-      "/_relkit": { target: "http://127.0.0.1:3000" },
+      "/hello": { target: "http://127.0.0.1:3000" },
+      "/_relkit": { target: "http://127.0.0.1:3000", ws: true },
     },
   },
 };
