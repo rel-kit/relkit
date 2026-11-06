@@ -221,7 +221,7 @@ not tasks of this change.
     ran live through preparation, `relkit check` and `railway up`, and ends in a failed deploy: `relkit
 build` fails inside the Linux image (see design D19, "Decided while applying section 20"), so its
     metric reads "failed" until that defect is fixed.
-- [ ] 20.3 Enable GitHub Discussions or a Discord, publish the roadmap with Core and Labs status, label about ten good first issues and set the repository description, and verify each item on the launch checklist
+- [x] 20.3 Enable GitHub Discussions or a Discord, publish the roadmap with Core and Labs status, label about ten good first issues and set the repository description, and verify each item on the launch checklist
   - Prepared and verified; the apply step awaits the maintainer. The roadmap page (`/docs/roadmap`),
     `scripts/launch/good-first-issues.md` (ten drafts), `scripts/launch/repository-description.txt`
     and `scripts/launch/apply-github.ts` are done and tested. Nothing was applied: Discussions is
