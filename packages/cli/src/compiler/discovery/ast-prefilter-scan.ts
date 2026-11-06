@@ -121,8 +121,12 @@ export const scanSourceNode = Effect.fn("Discovery.scanSourceNode")(function* (
   }
 });
 
+/** Community integration packages: `relkit-<name>` or `@<scope>/relkit-<name>`, with subpaths. */
+const COMMUNITY_INTEGRATION = /^(?:@[a-z0-9._-]+\/)?relkit-[a-z0-9._-]+(?:\/|$)/;
+
 /**
- * Registers an authored RelKit dependency in this module's syntax evidence.
+ * Registers an authored RelKit dependency in this module's syntax evidence: `relkit`, `@relkit/*`
+ * and community integration packages, whose metadata is then read like a first-party one's.
  * @param state - Current invocation-local scan state.
  * @param specifier - Literal dependency name.
  * @returns No value.
@@ -131,7 +135,8 @@ function addImport(state: SourceScanState, specifier: string): void {
   if (
     specifier !== "relkit" &&
     !specifier.startsWith("relkit/") &&
-    !specifier.startsWith("@relkit/")
+    !specifier.startsWith("@relkit/") &&
+    !COMMUNITY_INTEGRATION.test(specifier)
   )
     return;
   state.imports.add(specifier);

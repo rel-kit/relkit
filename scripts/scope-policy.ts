@@ -6,7 +6,7 @@ export const approvedApps = new Set(["docs", "inspector"]);
 export const approvedExamples = new Set(
   "README.md auth-drizzle commerce commerce-web data-model schema-libraries".split(" "),
 );
-export const approvedTemplates = new Set(["default"]);
+export const approvedTemplates = new Set(["default", "provider-starter"]);
 export const integrationPath = /^integrations\/(?:catalog(?:\/|$)|packages\/[^/]+(?:\/|$))/;
 export const forbiddenNames =
   "persistence|identity|workflow|knowledge(?:-store)?|plugin|marketplace|subscription|entity|relation";

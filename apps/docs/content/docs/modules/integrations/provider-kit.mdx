@@ -1,0 +1,125 @@
+---
+title: Build and test a provider
+description: Start a provider from the starter package, run the shared conformance suites, and pack it into a RelKit app. Runtime, deploy-target and agent adapters follow the same steps.
+pagination: false
+sidebar:
+  icon: package-check
+---
+
+This guide is for people writing a provider or adapter outside the RelKit repository. A provider
+built this way is checked by the same tests as the first-party ones: the conformance suites in
+`@relkit/testing` run the cases that Redis, Postgres, Cloudflare and the local providers pass.
+[Author a provider](/docs/modules/integrations/provider-authoring) covers the descriptor APIs this
+guide uses.
+
+## Start from the starter
+
+Copy [`templates/provider-starter`](https://github.com/rel-kit/relkit/tree/main/templates/provider-starter)
+from the RelKit repository and rename the package. It is a working cache provider with an in-memory
+store; replace the store with a client of your backend. It contains:
+
+| File                        | Role                                                                                   |
+| --------------------------- | -------------------------------------------------------------------------------------- |
+| `src/index.ts`              | Authoring entry: `starterCache()` returns the descriptor an app puts in its config.    |
+| `src/runtime.ts`            | Runtime entry: the provider and the `runtimeIntegration` registration that creates it. |
+| `package.json`              | Both entries under `relkit.integration`, so RelKit finds them without running them.    |
+| `tests/conformance.test.ts` | The shared cache suite, one test per case.                                             |
+
+The authoring entry is data only and loads no client library. The runtime entry is loaded by the
+server for each profile that selects your adapter id, and its `create` function returns the
+provider with `ready` and `release` hooks.
+
+Name the package `relkit-<name>` or `@<scope>/relkit-<name>`. `relkit check` reads integration
+metadata only from imports of `relkit`, `@relkit/*` and packages named this way, so a provider with
+another name is not found and the check fails with `RELKIT_RUNTIME_INTEGRATION_PACKAGE_MISSING`.
+Keep `relkit.integration.id` equal to the id you pass to `defineIntegrationReference` and to
+`runtimeIntegration.integrationId`.
+
+<include source="templates/provider-starter/src/index.ts" lang="ts" meta='title="src/index.ts"'>
+  /_snippets/source/templates/provider-starter/src/index.ts
+</include>
+
+## Run the conformance suites
+
+Each provider kind has a suite. A suite exports its cases and a harness; run each case as a test,
+or call `runConformance` from `@relkit/testing/conformance` for a report with pass, fail or skip per
+case.
+
+| Provider kind | Suite                                  | Interface                                       | First-party providers that run it    |
+| ------------- | -------------------------------------- | ----------------------------------------------- | ------------------------------------ |
+| Cache         | `@relkit/testing/cache-conformance`    | `CacheProvider` from `relkit/cache`             | local, Redis, Redis over HTTP, KV    |
+| Buckets       | `@relkit/testing/buckets-conformance`  | `BucketProvider` from `relkit/buckets`          | local, R2                            |
+| Realtime      | `@relkit/testing/realtime-conformance` | `RealtimeProvider` from `relkit/realtime`       | local, Redis, Durable Objects        |
+| Events        | `@relkit/testing/events-conformance`   | `EventProvider` from `relkit/events`            | local, Postgres                      |
+| Jobs          | `@relkit/testing/jobs-conformance`     | `JobsAdapterRuntime` from `relkit/jobs/adapter` | deterministic test adapter, Postgres |
+
+<include
+  source="templates/provider-starter/tests/conformance.test.ts"
+  lang="ts"
+  meta='title="tests/conformance.test.ts"'
+>
+  /_snippets/source/templates/provider-starter/tests/conformance.test.ts
+</include>
+
+A case is skipped only when the provider declares it lacks the feature: no `increment` capability,
+no signed URLs, no `close` method, or no failing provider given. A failed case names the first
+expectation that broke.
+
+### Inject failures
+
+The suites cannot break your backend for you, so each one takes a `failing` factory: a provider
+pointed at a backend that does not answer, such as an unreachable URL, a missing binding or, in the
+starter, a store whose methods reject. The `backend-failure` case checks that operations reject
+instead of reporting a miss. The jobs suite takes `faulty` instead: an adapter that commits a
+submission and loses the response, so the `unknown-acknowledgement` case can check recovery.
+
+## Pack it and install it into an app
+
+Build and pack the provider, then add the packed file to an app:
+
+```sh
+bun run build
+bun pm pack
+```
+
+```sh
+bun add ../relkit-provider-starter/relkit-provider-starter-0.1.0.tgz
+```
+
+Select it in the app's config and run `relkit check`, which reads the integration metadata from the
+installed package:
+
+```ts title="relkit.config.ts"
+import { defineApp } from "relkit/config";
+import { starterCache } from "relkit-provider-starter";
+
+export default defineApp({
+  cache: { memory: starterCache({ maxEntries: 100 }) },
+  defaults: { cache: "memory" },
+});
+```
+
+## Write an adapter
+
+Runtime, deploy-target and agent adapters work the same way: a public interface and a suite.
+
+| Adapter       | Interface                                                                   | Suite                                       | First-party adapters          |
+| ------------- | --------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------- |
+| Runtime       | `RuntimeAdapter` from `relkit/runtime`                                      | `@relkit/testing/runtime-conformance`       | Bun, Node, Cloudflare Workers |
+| Deploy target | `DeployTarget` from `@relkit/cli/deploy-targets`                            | `@relkit/testing/deploy-target-conformance` | Railway, Vercel, Cloudflare   |
+| Agent         | `AgentAdapterRuntime` and `defineAgentRuntime` from `relkit/agent-adapters` | `@relkit/testing/agents-conformance`        | LangChain, AI SDK             |
+
+- **Runtime adapters** run the suite inside the runtime they adapt. Pass `kind: "process"` for a
+  runtime with a listener, files and child processes, and `kind: "isolate"` for one without, whose
+  adapter must refuse those operations.
+- **Deploy targets** render native configuration and a CI workflow and change no cloud resource.
+  The suite checks every declared runtime, deterministic output, paths inside the project, a GitHub
+  Actions workflow and, for targets that read the compiled graph, a clear error without it.
+  `relkit deploy init` accepts the first-party targets only; a new target is written and tested
+  against the interface.
+- **Agent adapters** are described in [Agent adapters](/docs/modules/ai/adapters#write-an-adapter).
+
+Reference: [Testing API](/docs/api/testing), [Provider API](/docs/api/provider),
+[CLI automation API](/docs/api/cli-api) for `DeployTarget`.
+
+<include>/_snippets/generated/related/docs-modules-integrations-provider-kit.mdx</include>

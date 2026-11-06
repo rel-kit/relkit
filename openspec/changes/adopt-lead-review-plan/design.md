@@ -1781,6 +1781,36 @@ Decided while applying section 25 (maintainer, 2026-11-06):
   `packages/testing/tests/conformance/deploy-targets.test.ts` (Railway skips `graph-required`).
   AI SDK and LangChain: their `agent-conformance.test.ts` (7 of 7 each).
 
+- **The guide is a new page beside the descriptor page (25.2).**
+  `docs/modules/integrations/provider-kit` ("Build and test a provider") covers the starter, the
+  suites with failure injection, packing into an app, and the runtime, deploy-target and agent
+  adapters. `provider-authoring` keeps the descriptor APIs and links to it. It is listed in the
+  Integrations group, `installation-coverage.json` (concept) and the operations relations; it is not
+  a deployment guide, so `deployment-guide-catalog.ts` is unchanged.
+- **The starter is `templates/provider-starter`, not a `create-relkit` template.** The creator's
+  templates are apps; a provider is a package, so the starter is a directory to copy that the guide
+  points to, outside the workspaces and the creator catalog. `scripts/scope-policy.ts` now approves
+  it as a second template root. It is an in-memory cache provider (`relkit-provider-starter`, id
+  `starter`, adapter `starter-memory-cache`) with an authoring entry, a runtime entry with
+  `runtimeIntegration`, a pluggable store and `tests/conformance.test.ts` running the cache suite
+  (failure injection through a failing store). Its RelKit versions are pinned to the current
+  release (`relkit` 0.8.8, `@relkit/testing` 0.8.4); nothing syncs them on a version bump yet.
+- **Third-party packages were invisible to `relkit check`; fixed with a naming convention.** The
+  syntax-only import scan (`ast-prefilter-scan.ts`) kept only `relkit`, `relkit/*` and `@relkit/*`
+  imports, so an installed provider under any other name failed with
+  `RELKIT_RUNTIME_INTEGRATION_PACKAGE_MISSING`. It now also keeps `relkit-<name>` and
+  `@<scope>/relkit-<name>` (with subpaths), whose `relkit.integration` metadata is then read like a
+  first-party package's. Reading every imported package's manifest would accept any name but needs
+  file reads in a scan that is syntax-only; the convention keeps the scan pure. The guide and the
+  starter's README state the rule.
+- **Starter verification.** `scripts/pack-and-smoke-provider-starter.ts` packs the checkout,
+  creates an `api` app from the packed generator, copies the starter with the packed versions,
+  installs it from the local registry, runs its tests and typecheck, packs it with `bun pm pack`,
+  adds the tarball to the app, selects it as the app's default cache with a cache definition, and
+  runs `relkit check`, the app typecheck, the app tests and `relkit build`, then starts the built
+  server until `/_relkit/v1/health/ready` answers 200 (the server bundle imports
+  `relkit-provider-starter/runtime`). Passed on 2026-11-06 with Bun 1.3.10.
+
 ## Risks / Trade-offs
 
 - [The breaking release is large and could stall other work] → Publish a beta first; keep additive

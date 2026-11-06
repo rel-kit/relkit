@@ -1200,6 +1200,15 @@
       "examples": ["apps/docs/examples/public-api/provider.ts"]
     },
     {
+      "path": "docs/modules/integrations/provider-kit",
+      "api": ["testing", "provider", "cli-api"],
+      "examples": [
+        "templates/provider-starter/tests/conformance.test.ts",
+        "packages/testing/tests/conformance/local-storage.test.ts",
+        "packages/testing/tests/conformance/deploy-targets.test.ts"
+      ]
+    },
+    {
       "path": "docs/modules/integrations/local-providers",
       "api": ["providers-local", "integrations/local"],
       "examples": ["apps/docs/examples/public-api/local.ts"]

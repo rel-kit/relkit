@@ -71,6 +71,7 @@ export const guideGroups = [
     "index",
     "local-docker",
     "provider-authoring",
+    "provider-kit",
     "local-providers",
   ]),
   deploymentGuideGroup,

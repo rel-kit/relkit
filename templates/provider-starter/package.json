@@ -1,0 +1,57 @@
+{
+  "name": "relkit-provider-starter",
+  "version": "0.1.0",
+  "description": "A RelKit cache provider to copy and rename: an in-memory cache with its authoring and runtime entries and the shared conformance suite.",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime.d.ts",
+      "import": "./dist/runtime.js"
+    }
+  },
+  "engines": {
+    "bun": ">=1.3.10",
+    "node": ">=22.13.0"
+  },
+  "relkit": {
+    "integration": {
+      "id": "starter",
+      "exports": {
+        "authoring": ".",
+        "runtime": {
+          "export": "./runtime",
+          "registrations": [
+            {
+              "capability": "cache",
+              "adapterId": "starter-memory-cache",
+              "protocolVersion": 1
+            }
+          ]
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "bun test",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepack": "bun run build"
+  },
+  "peerDependencies": {
+    "relkit": "0.8.8"
+  },
+  "devDependencies": {
+    "@relkit/testing": "0.8.4",
+    "@types/bun": "1.3.10",
+    "relkit": "0.8.8",
+    "typescript": "5.9.3"
+  }
+}
