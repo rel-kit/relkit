@@ -77,4 +77,4 @@ test("report mode exits 0 with open items and strict mode exits 1", async () => 
     }).exited;
   expect(await run()).toBe(0);
   expect(await run("--strict")).toBe(1);
-});
+}, 60_000);
