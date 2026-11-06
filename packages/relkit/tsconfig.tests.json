@@ -8,7 +8,11 @@
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
-    "rootDir": "../.."
+    "rootDir": "../..",
+    "paths": {
+      "@relkit/langchain": ["../../integrations/packages/langchain/src/index.ts"],
+      "@relkit/langchain/*": ["../../integrations/packages/langchain/src/*"]
+    }
   },
   "include": [
     "src/**/*.ts",
