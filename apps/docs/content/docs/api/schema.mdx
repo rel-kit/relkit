@@ -3599,7 +3599,7 @@ type SchemaProjectionDirection = "input" | "output";
 declare const SchemaOperation: SchemaOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.ts#L5)
 
 ### SchemaTelemetry (class)
 
@@ -3617,7 +3617,7 @@ Effect.provide(validateEffect(z.string(), "ok"), SchemaTelemetryLive);
 declare class SchemaTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.ts#L11)
 
 ### SchemaTelemetryLive
 
@@ -3635,7 +3635,7 @@ Effect.runSync(Effect.provide(validateSyncEffect(z.string(), "ok"), SchemaTeleme
 declare const SchemaTelemetryLive: Layer.Layer<SchemaTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.ts#L19)
 
 ### SchemaTelemetryService
 
@@ -3645,7 +3645,7 @@ declare const SchemaTelemetryLive: Layer.Layer<SchemaTelemetry, never, never>;
 declare const SchemaTelemetryService: SchemaTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.ts#L5)
 
 ### observeSchema
 
@@ -3666,7 +3666,7 @@ declare const observeSchema: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.ts#L34)
 
 ### runSchemaSync
 

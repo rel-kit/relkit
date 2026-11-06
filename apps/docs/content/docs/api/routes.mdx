@@ -3531,7 +3531,7 @@ throw new RouteInputError("Route target is invalid");
 declare class RouteInputError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L12)
 
 ### RouteOperation
 
@@ -3541,7 +3541,7 @@ declare class RouteInputError
 declare const RouteOperation: RouteOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L7)
 
 ### RouteOperationError (class)
 
@@ -3563,7 +3563,7 @@ const error = new RouteOperationError({
 declare class RouteOperationError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L17)
 
 ### RouteTelemetry (class)
 
@@ -3581,7 +3581,7 @@ Effect.provide(defineRouteEffect(options), RouteTelemetryLive);
 declare class RouteTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L25)
 
 ### RouteTelemetryLive
 
@@ -3599,7 +3599,7 @@ Effect.runSync(Effect.provide(Effect.void, RouteTelemetryLive));
 declare const RouteTelemetryLive: Layer.Layer<RouteTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L38)
 
 ### RouteTelemetryService
 
@@ -3609,7 +3609,7 @@ declare const RouteTelemetryLive: Layer.Layer<RouteTelemetry, never, never>;
 declare const RouteTelemetryService: RouteTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L7)
 
 ### measureRoute
 
@@ -3630,7 +3630,7 @@ declare const measureRoute: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L59)
 
 ### observeRoute
 
@@ -3651,7 +3651,7 @@ declare const observeRoute: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L46)
 
 ### routeAttempt
 
