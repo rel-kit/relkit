@@ -293,7 +293,7 @@ build` fails inside the Linux image (see design D19, "Decided while applying sec
 
 ## 28. Integration checks
 
-- [ ] 28.1 Run full release readiness on the 0.9.0 candidate pull request — creation matrix on Tier 1 runtimes, TypeScript 5.9 and 7 matrix, benchmarks and agent evaluations — and verify every job passes
+- [x] 28.1 Run full release readiness on the 0.9.0 candidate pull request — creation matrix on Tier 1 runtimes, TypeScript 5.9 and 7 matrix, benchmarks and agent evaluations — and verify every job passes
 - [x] 28.2 Run the newcomer walkthrough with `bunx create-relkit` and `npx create-relkit` resolving the packed candidate from a local registry, through to a Railway deploy, and verify the timings meet the metric targets
 - [x] 28.3 Run `openspec validate adopt-lead-review-plan --strict`, confirm each requirement has a passing test or recorded evidence, and verify the plan coverage table in design.md is current
 
