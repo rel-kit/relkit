@@ -75,7 +75,7 @@ test("every package with cataloged common APIs leads with them", async () => {
   for (const { slug } of apiPackageDefinitions) {
     const names = authoringNames(slug);
     if (names.length === 0) continue;
-    const page = await read(slug.replace("integrations/", "integrations/"));
+    const page = await read(slug);
     const lead = page.indexOf("## Most-used APIs");
     const complete = page.indexOf("## Complete reference");
     if (lead < 0) continue;

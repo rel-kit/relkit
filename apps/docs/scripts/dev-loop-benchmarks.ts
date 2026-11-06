@@ -6,7 +6,7 @@
  * from reading that one file.
  */
 import { existsSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { resolve, sep } from "node:path";
 
 /** Fields of the report (`scripts/dev-loop-benchmark/benchmark.types.ts`) the page shows. */
 interface Report {
@@ -42,7 +42,9 @@ interface Report {
 }
 
 /**
- * Selects the report the docs build renders.
+ * Selects the report the docs build renders. The CI report is read only from inside the
+ * repository (release readiness writes it under the workspace), so the variable cannot name
+ * a file elsewhere.
  * @param docsRoot - `apps/docs`.
  * @param environment - Process environment.
  * @returns Report path and whether it is the CI report.
@@ -51,9 +53,22 @@ export function benchmarkReportPath(
   docsRoot: string,
   environment: Readonly<Record<string, string | undefined>> = process.env,
 ): { readonly path: string; readonly source: "ci" | "fallback" } {
-  const ci = environment.RELKIT_DEV_LOOP_REPORT;
-  if (ci !== undefined && ci !== "" && existsSync(ci)) return { path: ci, source: "ci" };
+  const ci = ciReportPath(resolve(docsRoot, "..", ".."), environment.RELKIT_DEV_LOOP_REPORT);
+  if (ci !== undefined) return { path: ci, source: "ci" };
   return { path: resolve(docsRoot, "data/dev-loop-benchmarks.json"), source: "fallback" };
+}
+
+/**
+ * Resolves the CI report path when it names an existing file inside the repository.
+ * @param repositoryRoot - Absolute repository root.
+ * @param value - `RELKIT_DEV_LOOP_REPORT`.
+ * @returns The absolute path, or undefined when unset, outside the repository or missing.
+ */
+function ciReportPath(repositoryRoot: string, value: string | undefined): string | undefined {
+  if (value === undefined || value === "") return undefined;
+  const candidate = resolve(repositoryRoot, value);
+  if (!candidate.startsWith(repositoryRoot + sep)) return undefined;
+  return existsSync(candidate) ? candidate : undefined;
 }
 
 /**
