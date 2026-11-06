@@ -5,7 +5,8 @@ import { Effect } from "effect";
 import { resolve } from "node:path";
 import ts from "../../typescript-parser.js";
 import type { EvaluatorModuleResult } from "./evaluator-protocol.js";
-import { readFactsEffect, resolveImportEffect, sourceScriptKind } from "./source-map-utils.js";
+import { resolveImportEffect, sourceScriptKind } from "./source-map-utils.js";
+import { parseSourceText, sourceFactsEffect } from "./parsed-sources.js";
 import { DiscoverySourceReader, nodeSourceReader } from "./source-map-source.js";
 import * as Models from "./source-map-schema.js";
 import type * as Mapping from "./source-map.types.js";
@@ -187,14 +188,8 @@ const parseSourceEffect = Effect.fn("discovery.source.parse")(function* (
     context.parsed.set(file, undefined);
     return undefined;
   }
-  const sourceFile = ts.createSourceFile(
-    file,
-    text,
-    ts.ScriptTarget.Latest,
-    true,
-    sourceScriptKind(file),
-  );
-  const parsed = { sourceFile, facts: yield* readFactsEffect(sourceFile) } satisfies ParsedSource;
+  const sourceFile = parseSourceText(file, text, sourceScriptKind(file));
+  const parsed = { sourceFile, facts: yield* sourceFactsEffect(sourceFile) } satisfies ParsedSource;
   context.parsed.set(file, parsed);
   return parsed;
 });

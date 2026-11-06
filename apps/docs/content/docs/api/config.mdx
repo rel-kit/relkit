@@ -62,7 +62,7 @@ Since v0.1.0
 declare const ConfigOperation: ConfigOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L5)
 
 ### ConfigTelemetry (class)
 
@@ -80,7 +80,7 @@ Effect.provide(resolveEnvEffect(definition, options), ConfigTelemetryLive);
 declare class ConfigTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L10)
 
 ### ConfigTelemetryLive
 
@@ -98,7 +98,7 @@ Effect.runSync(Effect.provide(projectEnvEffect(definition), ConfigTelemetryLive)
 declare const ConfigTelemetryLive: Layer.Layer<ConfigTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L17)
 
 ### ConfigTelemetryService
 
@@ -108,7 +108,7 @@ declare const ConfigTelemetryLive: Layer.Layer<ConfigTelemetry, never, never>;
 declare const ConfigTelemetryService: ConfigTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L5)
 
 ### observeConfig
 
@@ -129,7 +129,7 @@ declare const observeConfig: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L31)
 
 ### runConfigSync
 

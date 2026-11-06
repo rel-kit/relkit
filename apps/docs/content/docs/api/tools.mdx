@@ -1846,7 +1846,7 @@ type ToolSource =
 declare const ToolOperation: ToolOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L12)
 
 ### ToolOperationFailure (class)
 
@@ -1864,7 +1864,7 @@ Effect.catchTag(defineToolEffect(options), "ToolOperationFailure", () => Effect.
 declare class ToolOperationFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L17)
 
 ### ToolTelemetry (class)
 
@@ -1882,7 +1882,7 @@ Effect.provide(defineToolEffect(options), ToolTelemetryLive);
 declare class ToolTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L25)
 
 ### ToolTelemetryLive
 
@@ -1900,7 +1900,7 @@ Effect.runSync(Effect.provide(Effect.void, ToolTelemetryLive));
 declare const ToolTelemetryLive: Layer.Layer<ToolTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L38)
 
 ### ToolTelemetryService
 
@@ -1910,7 +1910,7 @@ declare const ToolTelemetryLive: Layer.Layer<ToolTelemetry, never, never>;
 declare const ToolTelemetryService: ToolTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L12)
 
 ### observeTool
 
@@ -1931,7 +1931,7 @@ declare const observeTool: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L46)
 
 ### runToolPromise
 

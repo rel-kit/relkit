@@ -6,10 +6,11 @@
  * diagnostics and their source locations, or `dev.typecheck.passed`). It runs the same
  * project compiler as `relkit check` (`tsgo` when installed, else the `typescript` package's
  * `tsc`, 5.9 or 7), and reports
- * `dev.typecheck.unavailable` when neither or no `tsconfig.json` is present. The Scope that
- * acquired it stops the process.
+ * `dev.typecheck.unavailable` when neither or no `tsconfig.json` is present. It runs at a
+ * lower scheduling priority than the reload path. The Scope that acquired it stops the process.
  */
 import { existsSync } from "node:fs";
+import { setPriority } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { cleanupEffect } from "../services/cleanup.service.js";
@@ -87,6 +88,7 @@ function startWatch(projectRoot: string, command: readonly string[], log: DevLog
     stderr: "ignore",
     env: { ...process.env, NO_COLOR: "1" },
   });
+  yieldToReloads(child.pid);
   let pass: TypecheckDiagnostic[] = [];
   let buffer = "";
   const decoder = new TextDecoder();
@@ -107,6 +109,21 @@ function startWatch(projectRoot: string, command: readonly string[], log: DevLog
     }
   })().catch(() => undefined);
   return child;
+}
+
+/**
+ * Lowers the checker's scheduling priority. A save starts a type-check pass and a reload at
+ * the same time; the checker re-checks the whole project on every core it can get, and the
+ * reload, which never waits for types, would otherwise compete with it for the CPU.
+ * @param pid - Checker process ID.
+ */
+function yieldToReloads(pid: number | undefined): void {
+  if (pid === undefined) return;
+  try {
+    setPriority(pid, 10);
+  } catch {
+    // A platform that refuses keeps the default priority.
+  }
 }
 
 /**

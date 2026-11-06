@@ -565,7 +565,7 @@ type AgentControl = "steer" | "follow-up" | "stop" | "approve";
 declare const AgentOperation: AgentOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L5)
 
 ### AgentTelemetry (class)
 
@@ -583,7 +583,7 @@ Effect.provide(observeAgent("capture.policy", Effect.void), AgentTelemetryLive);
 declare class AgentTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L10)
 
 ### AgentTelemetryLive
 
@@ -601,7 +601,7 @@ Effect.runSync(Effect.provide(observeAgent("capture.policy", Effect.void), Agent
 declare const AgentTelemetryLive: Layer.Layer<AgentTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L17)
 
 ### AgentTelemetryService
 
@@ -611,7 +611,7 @@ declare const AgentTelemetryLive: Layer.Layer<AgentTelemetry, never, never>;
 declare const AgentTelemetryService: AgentTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L5)
 
 ### observeAgent
 
@@ -632,7 +632,7 @@ declare const observeAgent: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agents/agent-telemetry.ts#L31)
 
 ## `agent-telemetry.types.ts`
 

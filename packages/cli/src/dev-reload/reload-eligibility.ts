@@ -25,7 +25,9 @@ export function swapBlocker(previous: CheckResult, next: CheckResult): string | 
   if ((before.jobsManifest ?? "") !== (after.jobsManifest ?? "")) return "jobs changed";
   if (schemaLibraries(before.runtimeActivation) !== schemaLibraries(after.runtimeActivation))
     return "schema library versions changed";
-  if (graphShape(before.graph) !== graphShape(after.graph)) return "graph shape changed";
+  // Equal graph text has an equal shape; only a changed graph is parsed and canonicalized.
+  if (before.graph !== after.graph && graphShape(before.graph) !== graphShape(after.graph))
+    return "graph shape changed";
   return undefined;
 }
 

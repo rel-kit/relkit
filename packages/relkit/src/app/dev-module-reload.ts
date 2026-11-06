@@ -47,10 +47,11 @@ export function createModuleReloader(projectRoot: string, modules: RuntimeModule
   const loaded = () => loadedProjectModules(root, registry);
   const lookup: ImportLookup = { registry, resolve: modules.resolve, scans };
   return {
-    record: () => {
+    record: (before) => {
       recorded.clear();
-      for (const file of loaded()) recorded.set(file, stampOf(file));
+      for (const file of loaded()) recorded.set(file, before?.get(file) ?? stampOf(file));
     },
+    stamps: () => new Map(loaded().map((file) => [file, stampOf(file)])),
     changed: () =>
       loaded().filter((file) => (recorded.get(file) ?? stampOf(file)) !== stampOf(file)),
     loaded,

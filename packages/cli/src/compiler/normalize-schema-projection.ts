@@ -125,20 +125,31 @@ function snapshotResult(value: SchemaSnapshot, direction: SchemaDirection): Sche
   const output = value.outputJsonSchema ?? legacy;
   const selected =
     direction === "input" ? input : direction === "output" ? output : (legacy ?? output ?? input);
-  if (!json(selected)) {
+  // The directions usually share one schema object; each distinct value is serialized once.
+  const checked = new Map<unknown, boolean>();
+  const isJson = (candidate: unknown): candidate is JsonValue => {
+    const known = checked.get(candidate);
+    if (known !== undefined) return known;
+    const result = json(candidate);
+    checked.set(candidate, result);
+    return result;
+  };
+  if (!isJson(selected)) {
     return { ok: false, reason: "schema snapshot has no JSON Schema projection" };
   }
+  const inputSchema = isJson(input) ? input : undefined;
+  const outputSchema = isJson(output) ? output : undefined;
   return {
     ok: true,
     schema: selected,
-    ...(json(input) ? { inputSchema: input } : {}),
-    ...(json(output) ? { outputSchema: output } : {}),
+    ...(inputSchema === undefined ? {} : { inputSchema }),
+    ...(outputSchema === undefined ? {} : { outputSchema }),
     contractHash:
       typeof value.contractHash === "string"
         ? value.contractHash
         : hashContract({
-            input: json(input) ? input : null,
-            output: json(output) ? output : null,
+            input: inputSchema ?? null,
+            output: outputSchema ?? null,
             direction,
           }),
     ...(value.transformed === true ? { transformed: true } : {}),

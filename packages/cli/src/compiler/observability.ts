@@ -1,4 +1,5 @@
 import { Cause, Clock, Effect, Exit, Metric } from "effect";
+import { attributedMetric } from "./metric-attributes.js";
 import type {
   CompilerStage,
   CompilerWorkload,
@@ -43,7 +44,7 @@ export function observeCompiler<A, E, R>(
   const attributes = { stage, operation };
   return Effect.gen(function* () {
     const started = yield* Clock.monotonicTimeNanos;
-    yield* Metric.update(Metric.withAttributes(calls, attributes), 1);
+    yield* Metric.update(attributedMetric(calls, attributes), 1);
     yield* Effect.annotateCurrentSpan("compiler.stage", stage);
     yield* Effect.annotateCurrentSpan("compiler.operation", operation);
     const body = Effect.gen(function* () {
@@ -68,8 +69,8 @@ export function observeCompiler<A, E, R>(
           0,
           Number((yield* Clock.monotonicTimeNanos) - started) / 1_000_000,
         );
-        yield* Metric.update(Metric.withAttributes(duration, attributes), elapsed);
-        yield* Metric.update(Metric.withAttributes(outcomes, { ...attributes, outcome }), 1);
+        yield* Metric.update(attributedMetric(duration, attributes), elapsed);
+        yield* Metric.update(attributedMetric(outcomes, { ...attributes, outcome }), 1);
         yield* Effect.annotateCurrentSpan("compiler.outcome", outcome);
         yield* Effect.annotateCurrentSpan("compiler.duration_ms", elapsed);
         if (emitLogs)
@@ -104,7 +105,7 @@ function recordWorkload(
       ([kind, count]) =>
         Effect.gen(function* () {
           yield* Effect.annotateCurrentSpan(`compiler.${kind}`, count);
-          yield* Metric.update(Metric.withAttributes(workload, { stage, operation, kind }), count);
+          yield* Metric.update(attributedMetric(workload, { stage, operation, kind }), count);
         }),
       { discard: true },
     );

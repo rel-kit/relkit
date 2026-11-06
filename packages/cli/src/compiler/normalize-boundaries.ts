@@ -6,11 +6,11 @@
 import { selectApplicationLayout, type ApplicationLayout } from "relkit/contracts";
 import { Effect } from "effect";
 import { createDiagnostic } from "relkit/diagnostics";
-import ts from "../typescript-parser.js";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
 import { sourceResolutionLayer } from "./source-resolution.service.js";
 import { validateBoundarySourceEffect } from "./normalize-boundary-source.js";
+import { parseSourceText } from "./discovery/parsed-sources.js";
 import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 
 /**
@@ -41,12 +41,7 @@ export const validateBoundariesEffect = Effect.fn("Compiler.validateBoundaries")
     const validation = Effect.forEach(
       [...sources],
       ([file, text]) =>
-        validateBoundarySourceEffect(
-          work,
-          layout,
-          ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true),
-          services,
-        ),
+        validateBoundarySourceEffect(work, layout, parseSourceText(file, text), services),
       { discard: true },
     );
     yield* validation.pipe(

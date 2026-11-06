@@ -1,6 +1,7 @@
 import { JsonValueError, StableIdError } from "../contracts/index.js";
 import { createUnboundIdentityEffect, DescriptorIdentityError } from "../invocation/index.js";
 import { Cause, Clock, Context, Effect, Exit, Layer, Metric, Option, Schema } from "effect";
+import { attributedMetric } from "../contracts/metric-attributes.js";
 import type { RouteOperation, RouteTelemetryService } from "./route-observability.types.js";
 
 export type { RouteOperation, RouteTelemetryService } from "./route-observability.types.js";
@@ -73,13 +74,12 @@ function observeLive<A, E, R>(
   const attributes = { operation };
   return Effect.gen(function* () {
     const started = yield* Clock.monotonicTimeNanos;
-    yield* Metric.update(Metric.withAttributes(calls, attributes), 1);
+    yield* Metric.update(attributedMetric(calls, attributes), 1);
     return yield* Effect.onExit(effect, (exit) =>
       Effect.gen(function* () {
         const elapsed = Number((yield* Clock.monotonicTimeNanos) - started) / 1_000_000;
-        yield* Metric.update(Metric.withAttributes(duration, attributes), Math.max(0, elapsed));
-        if (Exit.isFailure(exit))
-          yield* Metric.update(Metric.withAttributes(failures, attributes), 1);
+        yield* Metric.update(attributedMetric(duration, attributes), Math.max(0, elapsed));
+        if (Exit.isFailure(exit)) yield* Metric.update(attributedMetric(failures, attributes), 1);
       }),
     );
   });

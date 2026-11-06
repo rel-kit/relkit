@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { contractMemo } from "./contract-memo.js";
 import { observeContract, runContract } from "./contract-observability.js";
 import type { ProtocolId, StableId } from "./id.types.js";
 
@@ -74,8 +75,12 @@ export function normalizeIdEffect(value: unknown): Effect.Effect<StableId, Stabl
  * const id = normalizeId(" orders.list ");
  */
 export function normalizeId(value: unknown): StableId {
-  return runContract(normalizeIdEffect(value));
+  if (typeof value !== "string") return runContract(normalizeIdEffect(value));
+  return normalizedIds.get(value, () => runContract(normalizeIdEffect(value))) as StableId;
 }
+
+/** Successful ID normalizations; the result depends only on the text. */
+const normalizedIds = contractMemo();
 
 /**
  * Checks a value without normalizing it.

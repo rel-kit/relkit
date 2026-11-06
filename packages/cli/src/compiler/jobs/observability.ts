@@ -1,4 +1,5 @@
 import { Cause, Clock, Effect, Exit, Metric } from "effect";
+import { attributedMetric } from "../metric-attributes.js";
 import type { JobsOperation, JobsWorkload } from "./observability.types.js";
 
 /** Each execution is counted once per fixed operation label, including standalone calls. */
@@ -35,7 +36,7 @@ export function observeJobs<A, E, R>(
   return Effect.gen(function* () {
     yield* Effect.annotateCurrentSpan("compiler.jobs.operation", operation);
     const started = yield* Clock.monotonicTimeNanos;
-    yield* Metric.update(Metric.withAttributes(calls, attributes), 1);
+    yield* Metric.update(attributedMetric(calls, attributes), 1);
     const body = Effect.gen(function* () {
       if (inputWorkload !== undefined) yield* recordJobsWorkload(operation, inputWorkload());
       const result = yield* effect;
@@ -53,8 +54,8 @@ export function observeJobs<A, E, R>(
               ? "defect"
               : "failure";
         const elapsed = Number((yield* Clock.monotonicTimeNanos) - started) / 1_000_000;
-        yield* Metric.update(Metric.withAttributes(duration, attributes), Math.max(0, elapsed));
-        yield* Metric.update(Metric.withAttributes(outcomes, { operation, outcome }), 1);
+        yield* Metric.update(attributedMetric(duration, attributes), Math.max(0, elapsed));
+        yield* Metric.update(attributedMetric(outcomes, { operation, outcome }), 1);
         yield* Effect.annotateCurrentSpan("compiler.jobs.outcome", outcome);
         yield* Effect.annotateCurrentSpan("compiler.jobs.duration_ms", Math.max(0, elapsed));
         yield* Effect.annotateLogs(
@@ -88,7 +89,7 @@ export function recordJobsWorkload(
       ([kind, count]) =>
         Effect.gen(function* () {
           yield* Effect.annotateCurrentSpan(`compiler.jobs.${kind}`, count);
-          yield* Metric.update(Metric.withAttributes(workload, { operation, kind }), count);
+          yield* Metric.update(attributedMetric(workload, { operation, kind }), count);
         }),
       { discard: true },
     );

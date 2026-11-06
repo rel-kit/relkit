@@ -3422,7 +3422,7 @@ type ProgressValue<Schema extends StandardSchemaV1 | undefined> = Schema extends
 declare const FunctionOperation: FunctionOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L18)
 
 ### FunctionOperationError (class)
 
@@ -3443,7 +3443,7 @@ const error = new FunctionOperationError({
 declare class FunctionOperationError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L25)
 
 ### FunctionTelemetry (class)
 
@@ -3461,7 +3461,7 @@ Effect.provide(streamOfEffect(schema), FunctionTelemetryLive);
 declare class FunctionTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L33)
 
 ### FunctionTelemetryLive
 
@@ -3479,7 +3479,7 @@ Effect.runSync(Effect.provide(Effect.void, FunctionTelemetryLive));
 declare const FunctionTelemetryLive: Layer.Layer<FunctionTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L47)
 
 ### FunctionTelemetryService
 
@@ -3489,7 +3489,7 @@ declare const FunctionTelemetryLive: Layer.Layer<FunctionTelemetry, never, never
 declare const FunctionTelemetryService: FunctionTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L19)
 
 ### functionAttempt
 
@@ -3552,7 +3552,7 @@ declare const observeFunction: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L55)
 
 ### runFunctionPromise
 

@@ -1,11 +1,15 @@
 /** Runs observable source syntax scanning while keeping native exclusion matching separate. */
 import { Effect } from "effect";
-import ts from "../../typescript-parser.js";
 import { observeCompiler } from "../observability.js";
 import { scriptKind } from "./ast-prefilter-syntax.js";
 import type { AstPrefilterCandidate } from "./ast-prefilter.types.js";
 import { runDiscoverySync } from "./discovery-sync.js";
-import { readFactsEffect } from "./source-facts.js";
+import {
+  derivedValue,
+  parseSourceText,
+  rememberDerived,
+  sourceFactsEffect,
+} from "./parsed-sources.js";
 import {
   INDICATOR_ORDER,
   scanSourceNode,
@@ -32,33 +36,33 @@ export function scanSource(fileName: string, text: string): AstPrefilterCandidat
  */
 export const scanSourceEffect = Effect.fn("Discovery.scanSource")(
   function* (fileName: string, text: string) {
-    const source = ts.createSourceFile(
-      fileName,
-      text,
-      ts.ScriptTarget.Latest,
-      true,
-      scriptKind(fileName),
-    );
+    const source = parseSourceText(fileName, text, scriptKind(fileName));
+    const known = derivedValue<AstPrefilterCandidate>(source, "scan");
+    if (known !== undefined) return known;
     const state = sourceScanState();
     yield* Effect.forEach(sourceScanNodes(source), (node) => scanSourceNode(state, node), {
       discard: true,
     });
-    return Object.freeze({
-      fileName,
-      imports: Object.freeze([...state.imports].sort()),
-      factories: Object.freeze([...state.factories].sort()),
-      defaultExports: Object.freeze([...state.defaultExports].sort()),
-      brandAccess: state.brandAccess,
-      reExports: Object.freeze(
-        state.reExports.sort((left, right) =>
-          left.moduleSpecifier.localeCompare(right.moduleSpecifier),
+    return rememberDerived(
+      source,
+      "scan",
+      Object.freeze({
+        fileName,
+        imports: Object.freeze([...state.imports].sort()),
+        factories: Object.freeze([...state.factories].sort()),
+        defaultExports: Object.freeze([...state.defaultExports].sort()),
+        brandAccess: state.brandAccess,
+        reExports: Object.freeze(
+          state.reExports.sort((left, right) =>
+            left.moduleSpecifier.localeCompare(right.moduleSpecifier),
+          ),
         ),
-      ),
-      facts: yield* readFactsEffect(source),
-      indicators: Object.freeze(
-        INDICATOR_ORDER.filter((indicator) => state.indicators.has(indicator)),
-      ),
-    }) satisfies AstPrefilterCandidate;
+        facts: yield* sourceFactsEffect(source),
+        indicators: Object.freeze(
+          INDICATOR_ORDER.filter((indicator) => state.indicators.has(indicator)),
+        ),
+      }) satisfies AstPrefilterCandidate,
+    );
   },
   (effect, _fileName, text) =>
     observeCompiler(

@@ -69,6 +69,8 @@ const normalizeCheckEvaluation = Effect.fn("Project.checkNormalization")(functio
   const normalization = yield* cliTry("project.normalize", () =>
     normalizeCompilation({
       evaluator,
+      // The descriptors were just extracted from this evaluation; normalization reuses them.
+      extracted,
       projectRoot,
       sources: discoverySources,
       appId,
