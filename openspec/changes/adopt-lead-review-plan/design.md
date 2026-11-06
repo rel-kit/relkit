@@ -837,7 +837,17 @@ $CRON_SECRET`; the entry compares it in constant time, refuses a missing or shor
   completed through the after-request drain, the cron endpoint refused a missing secret with 401 and
   drained with it, and the claimed occurrence had exactly one run. The live run against Vercel did
   not happen while applying this section: the machine's Vercel CLI token was invalid (`vercel login`
-  pending) and no `RELKIT_TEST_VERCEL_DATABASE_URL` server was set up, so the Vercel target stays Labs.
+  pending) and no `RELKIT_TEST_VERCEL_DATABASE_URL` server was set up.
+- **Live run passed while applying section 28 (2026-11-07).** `scripts/vercel-newcomer.ts` against
+  the Cipay team (Pro, per-minute cron) with a throwaway Railway Postgres behind a TCP proxy:
+  deployed after 44 s, HTTPS `/healthz` ready after 54 s, the HTTP job and the event consumer
+  completed after 62 s, Vercel Cron claimed a new occurrence after 103 s with exactly one run, and
+  the project and database were deleted after 105 s. Two defects only the live run could show were
+  fixed first: the Vercel-target build left the output directory empty, which Vercel refuses
+  (`public/_relkit/vercel-output.txt` is written now), and the test driver read the deployment URL
+  with a trailing `",` from the CLI's JSON output, so every probe went to a host that does not
+  exist. The Vercel target stays Labs until the opt-in workflow passes in CI with the repository
+  secrets.
 
 Decided while applying section 22 (maintainer, 2026-11-06):
 
@@ -2090,13 +2100,14 @@ it, or the recorded evidence when the requirement is a process, CI or documentat
 2026-11-06, `openspec validate adopt-lead-review-plan --strict` reported "Change
 'adopt-lead-review-plan' is valid" and needed no fix.
 
-Status: 147 met, 11 not met, 1 held for the maintainer (after the release-debt fixes; 28.3 counted
+Status: 148 met, 10 not met, 1 held for the maintainer (after the release-debt fixes; 28.3 counted
 141 and 17). "Not met" rows carry their recorded
 reason. Most are the open debts listed in D22, D17 (section 19 Inspector actions), D15 (the unrun commerce browser suite), D20 (no
 file-and-line deprecations from `relkit check`) and D9 (the Vercel live run). Four rows only lack
 the GitHub run. Two gaps were not recorded before:
 
-- Task 21.2 is checked, but D9 section 21 says the live Vercel deploy never ran.
+- Task 21.2 was checked while D9 section 21 said the live Vercel deploy never ran; the lead
+  unchecked it, ran the deploy on 2026-11-07 (D9, section 21) and checked it again.
 - The landing page has no local-to-cloud path, `relkit mcp` mention or Why RelKit link.
 
 Group 13's budget misses were recorded only as numbers in `apps/docs/data/dev-loop-benchmarks.json`
@@ -2139,7 +2150,7 @@ until D22.
 | Production container image                                        | deployment-targets       | 17                 | `tests/container/production-image.test.ts`                                                                                                                                    | met                                                                                                                                                                                                                                                                                                                                 |
 | Deploy target initialization                                      | deployment-targets       | 17, 21, 22         | `packages/cli/tests/deploy-init-railway.test.ts`                                                                                                                              | met                                                                                                                                                                                                                                                                                                                                 |
 | Railway target                                                    | deployment-targets       | 17, 20             | `tests/deployment/railway-newcomer.test.ts`; live run passed in 2 min 1 s (design.md D9, section 17 follow-up)                                                                | met                                                                                                                                                                                                                                                                                                                                 |
-| Vercel target                                                     | deployment-targets       | 21                 | `tests/deployment/vercel-newcomer.test.ts` (stubbed)                                                                                                                          | not met: live Vercel deploy run pending, local simulation only (design.md D9, section 21)                                                                                                                                                                                                                                           |
+| Vercel target                                                     | deployment-targets       | 21                 | `tests/deployment/vercel-newcomer.test.ts` (stubbed)                                                                                                                          | met: live run on 2026-11-07 deployed in 44 s, reachable at 54 s, jobs and events at 62 s, a Vercel Cron occurrence with exactly one run at 103 s, resources deleted (design.md D9, section 21); the opt-in CI workflow needs the repository secrets                                                                                 |
 | Cloudflare target                                                 | deployment-targets       | 22                 | `tests/deployment/cloudflare-newcomer.test.ts`; live run passed (design.md D9, section 22)                                                                                    | met                                                                                                                                                                                                                                                                                                                                 |
 | Engine selection per target                                       | deployment-targets       | 17                 | `apps/docs/content/docs/modules/deployment/index.mdx` (design.md D9, section 17)                                                                                              | met                                                                                                                                                                                                                                                                                                                                 |
 | Target order and maturity                                         | deployment-targets       | 17, 21, 22         | `tests/unit/maturity.test.ts`                                                                                                                                                 | met                                                                                                                                                                                                                                                                                                                                 |

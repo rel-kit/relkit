@@ -237,7 +237,7 @@ build` fails inside the Linux image (see design D19, "Decided while applying sec
 ## 21. Vercel target (#12)
 
 - [x] 21.1 Add a Vercel generator (`vercel.json`, Node function entry, CI workflow) to `relkit deploy init`, and verify snapshot tests
-- [ ] 21.2 Run schedules through Vercel Cron and jobs and events through the durable backend, and verify a scheduled run in an authorized preview deployment
+- [x] 21.2 Run schedules through Vercel Cron and jobs and events through the durable backend, and verify a scheduled run in an authorized preview deployment
 - [x] 21.3 Make `relkit check` report a coded error for WebSocket realtime without an external provider on Vercel, and verify the check test
 - [x] 21.4 Write the Vercel guide, run its newcomer deploy test, and move the target to Core when it passes, and verify the maturity table update
 
