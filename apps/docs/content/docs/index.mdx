@@ -28,7 +28,16 @@ The TypeScript backend framework where you write the business logic. RelKit wire
 
 </DocsHero>
 
-Create an application and send your first request. Continue with the same Orders application through persistence, authentication, testing, and production builds.
+Create an application and send your first request. Continue with the same Orders application through persistence, authentication, testing, and production builds. New to RelKit? Read [Why RelKit](/docs/why-relkit) first.
+
+## From a new app to the cloud
+
+1. Create an app with `bunx create-relkit` (or `npx create-relkit`).
+2. Run it locally with `relkit dev`. The [Inspector](/docs/modules/operations/inspector) shows the live app.
+3. Write the deploy files with `relkit deploy init railway`. Use `vercel` or `cloudflare` instead to deploy to those platforms.
+4. Deploy with the generated workflow. The [deployment overview](/docs/modules/deployment) compares the targets, and the [metrics page](/docs/metrics) shows how each release measures up.
+
+Coding agents can work on the running app through [`relkit mcp`](/docs/modules/operations/mcp), an MCP server that gives them the live graph, diagnostics and traces.
 
 ## Find what you need
 
