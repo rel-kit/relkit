@@ -1908,6 +1908,24 @@ Decided while applying section 28 (2026-11-06):
   - the dev-loop budgets (group 13);
   - the fullstack fresh-start readiness on this host.
 
+- **Newcomer walkthrough on the packed candidate (28.2).** `scripts/node-creation-smoke.ts --out
+  <dir>` packs the candidate and prepares the local registry (`scripts/node-creation-registry.ts`,
+  candidate packages from tarballs, everything else from npmjs).
+  `scripts/walkthrough/create-with-runner.ts --prepared <dir>` then runs the commands a newcomer
+  types, `bunx create-relkit@<candidate>` and `npx --yes create-relkit@<candidate>`, each with a
+  fresh `TMPDIR` and package cache. For npx, Bun is also removed from `PATH`. Each run adds the
+  farewell route and waits for `bun run dev` or `npm run dev` to answer it. bunx reached the first
+  route in 10 s (create 8 s) and npx in 90 s (create 87 s), against a target of 5 minutes. A probe
+  with a dead registry confirmed that bunx resolves through the configured registry only with a
+  fresh `TMPDIR`. `scripts/walkthrough/create-to-railway.ts` deployed the api project to a
+  throwaway `relkit-test-mw539qgj` project: 100 s from the first command until the app answered
+  over HTTPS (create 33 s, deployed 97 s), against a target of 15 minutes. The flow restarted the
+  app, ran two instances and deleted the project, which Railway now lists as scheduled for purge
+  on 2026-11-08. Older `relkit-test-*` projects from groups 17 and 20 were left alone.
+  `apps/docs/data/metric-inputs` holds both results. `apps/docs/data/metrics.json` and the
+  generated metrics snippet were rebuilt with `scripts/metrics.ts`, and the built
+  `/docs/metrics` page shows "1 min 30 s, Met" and "1 min 40 s, Met".
+
 ## Risks / Trade-offs
 
 - [The breaking release is large and could stall other work] → Publish a beta first; keep additive
