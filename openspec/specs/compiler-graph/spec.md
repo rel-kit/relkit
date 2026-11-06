@@ -320,6 +320,10 @@ The compiler SHALL derive selected integration IDs and package exports from bran
 - **WHEN** an authored descriptor attempts to select an implementation by arbitrary module path
 - **THEN** compilation fails before generating executable output
 
+#### Scenario: One package offers several capabilities
+- **WHEN** compilation selects only one advertised capability
+- **THEN** the deterministic plan contains that capability's phase requirements and runtime references, not unrelated registrations or SDK imports
+
 ### Requirement: Task discovery and binding are deterministic
 
 Compilation SHALL discover task source/export identity and nested service members without executing handlers, deduplicate descriptor re-exports, validate task/job/name/reference/schema ownership, and resolve exactly one implicit or designated direct binding. New tasks SHALL not become generated function targets. Public/private name collisions, wrong-task selectors, missing versions, missing services and unsupported policies SHALL fail before activation.
@@ -487,6 +491,14 @@ Snapshot reuse SHALL require equality of the relevant source and imported helper
 - **WHEN** only symbolic runtime environment values differ while validated compilation inputs are unchanged
 - **THEN** runtime environment validation still precedes readiness and no resolved value or secret digest is persisted in the snapshot
 
+#### Scenario: Selected SDK disappears without a lockfile edit
+- **WHEN** an installed selected dependency is removed or its actual supported version changes after preparation
+- **THEN** startup revalidates selected requirements, rejects reuse before readiness and preserves the prior valid development generation
+
+#### Scenario: Selection changes
+- **WHEN** capability selection, requirement metadata or integration version changes
+- **THEN** the preparation fingerprint changes and a deployment-only requirement does not become a runtime dependency
+
 ### Requirement: Snapshot integrity before execution
 
 Persisted snapshots SHALL be decoded with bounded schema validation, path containment, version/cohort checks, and content integrity verification of all inventoried inputs and artifacts before accepting reuse or importing their executable startup closure. Deferred executable members SHALL be reverified before their first import against later mutation. Missing, corrupt, incompatible, mixed-generation, or path-escaping artifacts SHALL be rejected with safe diagnostics and use full validation. A declared hash SHALL not replace checking member content and cohort consistency.
@@ -592,3 +604,14 @@ Loading configuration and discovering descriptors SHALL NOT acquire database cli
 
 - **WHEN** an unimported Platform fragment or `.env.staging.example` is present and a CLI environment is selected
 - **THEN** its presence alone neither registers configuration nor loads that example file as runtime environment
+
+### Requirement: Requirement discovery precedes avoidable configuration evaluation
+The compiler SHALL reuse declaration/import analysis to discover selected dependency requirements from explicit configuration, descriptors and integration declarations. It SHALL diagnose statically identifiable missing integration imports before eager evaluation where possible, without executing arbitrary configuration to enumerate hypothetical packages or introducing another full source parser.
+
+#### Scenario: Configuration imports a missing integration
+- **WHEN** an explicit configuration import can be resolved statically to an absent selected integration
+- **THEN** the diagnostic identifies the source and required installation before avoidable configuration evaluation
+
+#### Scenario: Dynamic configuration cannot be fully analyzed
+- **WHEN** selection cannot be safely determined statically
+- **THEN** normal controlled evaluation and its original failures remain visible without falsely certifying hypothetical requirements or silently installing packages

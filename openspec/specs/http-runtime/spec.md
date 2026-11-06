@@ -1,6 +1,7 @@
 ## Purpose
 
 Defines observable HTTP routing, request/response conversion, internal endpoints, OpenAPI generation, and typed client behavior derived from the application graph.
+
 ## Requirements
 
 ### Requirement: Graph-driven HTTP materialization
@@ -134,7 +135,7 @@ Every inbound application request SHALL receive a fresh local request ID and ori
 
 ### Requirement: Versioned internal endpoints
 
-The backend SHALL expose versioned liveness, readiness, graph, request, log, trace, stream, and diagnostics endpoints under `/_relkit/v1`, and SHALL disable or protect them in production according to deployment configuration.
+Core liveness/readiness and activation probes SHALL remain independently owned under their established versioned application transport. Client identity, public jobs, streaming, realtime and typed RPC SHALL remain available without inspection. Rich graph/resource/diagnostic inspection and administrative APIs SHALL require the optional development bridge; historical queries SHALL belong to the tool. Production SHALL exclude rich inspection regardless of legacy environment overrides.
 
 #### Scenario: Readiness is queried during startup
 
@@ -143,8 +144,12 @@ The backend SHALL expose versioned liveness, readiness, graph, request, log, tra
 
 #### Scenario: Production protection is absent
 
-- **WHEN** a production configuration would expose unprotected internal endpoints
+- **WHEN** a production configuration would expose unprotected core internal endpoints
 - **THEN** startup or deployment validation rejects the configuration
+
+#### Scenario: No-example application disables inspection
+- **WHEN** development verifies a generation without a sample route or inspector bridge
+- **THEN** core serving proof still verifies live graph, generation, route-table and activation identity, and client identity/jobs/RPC remain functional
 
 ### Requirement: OpenAPI 3.1 from contracts
 
@@ -208,11 +213,11 @@ The HTTP runtime SHALL enforce route rate limits after framework request setup a
 
 ### Requirement: Runtime OpenAPI and API reference
 
-The backend SHALL serve its active deterministic OpenAPI document and an interactive API reference under versioned internal endpoints in development, and SHALL require explicit protected production opt-in.
+OpenAPI generation SHALL remain independent of an interactive documentation UI. The backend SHALL serve its active deterministic document under the existing protected documentation contract; interactive Scalar reference SHALL be explicitly selected with validated dependencies before readiness. Production documentation SHALL require explicit protected opt-in independently of inspection.
 
 #### Scenario: Developer opens the API reference
 
-- **WHEN** a valid development generation is active
+- **WHEN** a valid development generation with explicitly selected API reference is active
 - **THEN** the reference renders the same OpenAPI contract enforced by that generation
 
 #### Scenario: Production opt-in lacks protection
@@ -265,7 +270,8 @@ The HTTP runtime SHALL register declarative Better Auth session protection befor
 - **THEN** the standard unauthorized response is returned and authored route middleware and the target function do not run
 
 ### Requirement: Application traffic follows complete readiness
-Liveness SHALL remain available during startup, while readiness and non-internal application traffic SHALL remain unavailable until environment, providers, Drizzle, and Better Auth have completed activation.
+
+Liveness SHALL remain available during startup. Readiness and non-internal application traffic SHALL remain unavailable until environment, selected dependency requirements, required providers and registrations, and selected Drizzle/Better Auth capabilities complete activation. Optional inspection and history failures SHALL NOT block an otherwise healthy application.
 
 #### Scenario: Request arrives during auth startup
 - **WHEN** an application request arrives before Better Auth activation completes
@@ -407,6 +413,10 @@ Concurrent first requests for a deferred implementation SHALL share one per-gene
 - **WHEN** a generation is replaced or shut down while an implementation load is pending
 - **THEN** the load remains owned by that generation, pending work is finalized within the drain bound, and its result cannot enter the replacement generation
 
+#### Scenario: Typed RPC is the only optional transport selected
+- **WHEN** concurrent requests initialize typed RPC without MCP, AG-UI, Scalar or agents installed
+- **THEN** only selected implementation loading occurs, initialization is single-flight per generation, request contexts stay isolated and retired generations join disposal
+
 ### Requirement: Development serving proof identifies the active graph
 
 Backend readiness SHALL establish that current environment, required providers, registrations, graph/cohort, and HTTP dispatch are active. Generated example projects SHALL prove readiness through a safe real generated application route and its expected status/body. Fullstack SHALL use API `/hello`. Without examples, a protected development endpoint SHALL return live generation, graph, activation, and route-table identity only after the active engine and HTTP registrations are ready. Liveness, static artifact responses, or a readiness banner SHALL not constitute serving proof.
@@ -425,3 +435,17 @@ Backend readiness SHALL establish that current environment, required providers, 
 
 - **WHEN** a response identifies a previous generation or an unexpected graph/cohort
 - **THEN** that response cannot qualify as readiness of the launched command
+
+### Requirement: Optional HTTP features are validated independently
+MCP, AG-UI and interactive documentation SHALL be isolated optional entrypoints with selected dependency requirements. Ordinary REST/RPC SHALL retain Hono and essential oRPC behavior without those SDKs. Selected feature failures SHALL be diagnosed before readiness rather than first business use.
+
+#### Scenario: Each optional feature is selected separately
+- **WHEN** MCP, AG-UI or Scalar is selected with its peer absent, incompatible or failing initialization
+- **THEN** startup reports the correct selected requirement or original failure without requiring unrelated optional transports
+
+### Requirement: Transport isolation preserves request protections
+Moving inspection and selecting transports SHALL preserve authentication, origin/body limits, rate limits, middleware order, cancellation and exactly-once request logging. Existing jobs identity, authorization and operation-ID semantics SHALL remain on their application/provider boundary.
+
+#### Scenario: Inspection is absent during jobs and RPC requests
+- **WHEN** allowed and denied real HTTP requests reach jobs, client identity, realtime and RPC
+- **THEN** the same authorization and request policies apply, successful operations retain their IDs, and no duplicate log or initialization side effect occurs
