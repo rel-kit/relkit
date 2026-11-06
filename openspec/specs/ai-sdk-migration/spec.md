@@ -6,15 +6,6 @@ Defines the compatibility and migration boundary for replacing RELKIT’s AI SDK
 
 ## Requirements
 
-### Requirement: New builds contain no AI SDK runtime path
-
-RELKIT packages, integrations, generated applications, examples, and templates SHALL use the native runtime and SHALL NOT ship AI SDK model adapters, tool-loop execution, UI framing, or AI SDK frontend dependencies.
-
-#### Scenario: Published artifacts are scanned
-
-- **WHEN** release packages and generated applications are inspected
-- **THEN** no active AI SDK runtime, adapter, protocol endpoint, or dependency remains
-
 ### Requirement: Native AG-UI framing replaces the legacy UI endpoint
 
 RELKIT SHALL emit valid AG-UI objects through its agent endpoint and SHALL remove the legacy AI SDK UI stream endpoint and terminal framing rather than redirecting incompatible protocols.
@@ -50,3 +41,13 @@ Commerce, generated agent/fullstack templates, and documentation examples SHALL 
 
 - **WHEN** each supported template is generated and tested locally
 - **THEN** it installs, type-checks, builds, starts, streams its examples, and exposes the expected Inspector contracts without paid services
+
+### Requirement: AI SDK support is adapter-only
+
+The Vercel AI SDK SHALL be used only inside its agent adapter package, and applications that do not
+select that adapter SHALL NOT install or load it.
+
+#### Scenario: Application without the AI SDK adapter
+
+- **WHEN** an application's agents all use the LangChain adapter
+- **THEN** no AI SDK package is installed or loaded

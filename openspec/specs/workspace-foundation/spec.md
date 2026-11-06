@@ -6,11 +6,14 @@ Defines the reproducible workspace, dependency boundaries, and scope guardrails 
 
 ### Requirement: Reproducible Bun workspace
 
-The repository SHALL provide a private Bun/TypeScript workspace whose committed lockfile, strict shared TypeScript configuration, project references, and root scripts produce the same install and verification behavior from a clean checkout.
+The repository SHALL provide a private Bun workspace on TypeScript 7 whose committed lockfile, strict
+shared TypeScript configuration, project references and root scripts produce the same install and
+verification behavior from a clean checkout.
 
 #### Scenario: Clean checkout succeeds
 
-- **WHEN** a contributor runs `bun install --frozen-lockfile`, `bun run typecheck`, and `bun run verify` from a clean checkout with supported tool versions
+- **WHEN** a contributor runs `bun install --frozen-lockfile`, `bun run typecheck`, and
+  `bun run verify` from a clean checkout with supported tool versions
 - **THEN** all commands complete without hidden local setup or uncommitted generated changes
 
 #### Scenario: Lockfile drift is rejected
@@ -103,17 +106,23 @@ The documentation application and canonical examples SHALL be workspace packages
 
 ### Requirement: Integrations are independently installable workspace packages
 
-The workspace SHALL register a top-level integrations catalog and independently publishable packages for Redis, S3, Docker, local services, Cloudflare, selected agent execution, Sentry, OTLP, AWS, and Pulumi. Each package SHALL own its exports, project reference, build/check/test participation, public documentation, packed-package verification, and release classification.
+The workspace SHALL publish each integration — Redis, S3, Docker, local services, Cloudflare,
+Postgres, agent adapters, Sentry, OTLP, AWS, Pulumi and deploy targets — as its own `@relkit/*`
+package on the shared release version. Each SHALL own its exports, project reference, build, check and
+test participation, public documentation, packed verification and maturity label. Integration
+metadata SHALL live in `create-relkit`, not in a separate catalog package.
 
 #### Scenario: Application installs only Redis
 
 - **WHEN** it depends on `@relkit/redis`
-- **THEN** package resolution and generated runtime output do not require S3, AWS, Pulumi, Sentry, OTLP, or their SDKs
+- **THEN** package resolution and generated runtime output do not require S3, AWS, Pulumi, Sentry,
+  OTLP, or their SDKs
 
 #### Scenario: Application installs the catalog
 
-- **WHEN** it installs or reads `@relkit/integrations`
-- **THEN** only capability/package metadata is available, executable integration re-exports are absent, and selecting Redis uses `@relkit/redis` directly without installing every catalog entry
+- **WHEN** an application or tool needs the list of available integrations
+- **THEN** it reads the metadata bundled with `create-relkit`, no `@relkit/integrations` package is
+  installed, and selecting Redis uses `@relkit/redis` directly
 
 ### Requirement: Integration dependency direction is enforced
 

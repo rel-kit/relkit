@@ -4,19 +4,6 @@ Defines provider-neutral deployment planning and Pulumi Automation API delivery 
 
 ## Requirements
 
-### Requirement: Pulumi is the only POC deployment engine
-
-Explicitly selected deployment init, preview, up, refresh, outputs, and destroy SHALL be driven through Pulumi Automation API and the Pulumi CLI/backend; RelKit SHALL NOT introduce another infrastructure engine or state system.
-
-#### Scenario: Deployment stack is initialized
-
-- **WHEN** `relkit deploy init --stack development` succeeds
-- **THEN** it creates/selects a Pulumi project and explicit stack using the configured Pulumi backend without creating RelKit-owned infrastructure state
-
-#### Scenario: Ordinary CLI help or backend starts
-- **WHEN** deployment is not selected
-- **THEN** help/configuration metadata and backend startup require no Pulumi implementation or deployment-only AWS SDK
-
 ### Requirement: Stable resource identity
 
 Pulumi project, stack, logical resource names, parent relationships, and tags SHALL derive from normalized application/stable descriptor IDs and explicit stack, not source paths, with tags including app, stack, graph hash, and `managed-by=relkit`.
@@ -181,3 +168,31 @@ CLI parsing/help and authoring metadata SHALL remain independent of deployment e
 #### Scenario: Packed consumer prepares deployment offline
 - **WHEN** an external packed consumer selects AWS/Pulumi and executes supported plan/mock verification
 - **THEN** selected implementation resolution succeeds without workspace hoisting or cloud mutation, while an unselected backend does not install those SDKs
+
+### Requirement: Pulumi drives targets with maintained providers
+
+For targets that use Pulumi, deploy init, preview, up, refresh, outputs and destroy SHALL run through
+the Pulumi Automation API and the configured Pulumi backend without RelKit-owned infrastructure state,
+and applications that select no Pulumi target SHALL NOT load Pulumi.
+
+#### Scenario: Deployment stack is initialized
+
+- **WHEN** `relkit deploy init aws --stack development` succeeds
+- **THEN** it creates or selects a Pulumi project and an explicit stack using the configured Pulumi
+  backend, without creating RelKit-owned infrastructure state
+
+#### Scenario: Ordinary CLI help or backend starts
+
+- **WHEN** no Pulumi target is selected
+- **THEN** help, configuration metadata and backend startup require no Pulumi implementation or
+  deployment-only AWS SDK
+
+### Requirement: AWS hosting is Labs until proven
+
+AWS hosting SHALL be labelled Labs until it builds and pushes its own image, serves HTTPS, runs more
+than one task and passes a real deploy test in CI.
+
+#### Scenario: Docs before the criteria pass
+
+- **WHEN** the AWS deployment docs are viewed before those criteria pass
+- **THEN** the page carries the Labs badge and lists the missing criteria

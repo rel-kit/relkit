@@ -190,45 +190,6 @@ Compilation SHALL generate a deterministic TypeScript declaration mapping discov
 - **WHEN** a publisher or event function still names a removed event
 - **THEN** stale generated declarations cannot make compilation succeed and an unknown-event diagnostic is emitted
 
-### Requirement: Source-scoped IDs are derived deterministically
-
-When an eligible source-scoped descriptor omits `id`, the compiler SHALL derive one filesystem-safe stable ID from its descriptor kind, logical service-relative convention hierarchy, export or local binding, service membership, and route method/path as applicable; an explicit ID SHALL always override inference. Moving a complete service from `src/<service>/` to `src/services/<service>/` without changing its declarations SHALL preserve public and private identities, category stripping, selectors, references, and member names. Physical source locations SHALL remain accurate and SHALL NOT be rewritten to fictional flat locations.
-
-#### Scenario: Route ID is inferred
-
-- **WHEN** `src/routes/orders/[orderId]/route.ts` exports `GET` without an ID
-- **THEN** the resolved route ID is the safe canonical equivalent of `route.get.orders.by-order-id` while its displayed operation remains `GET /orders/{orderId}`
-
-#### Scenario: Function ID is inferred
-
-- **WHEN** a named `getOrder` function descriptor under the `orders` source hierarchy omits its ID
-- **THEN** the compiler resolves a stable ID equivalent to `orders.get-order`, using the default-export file stem when no named binding exists
-
-#### Scenario: Service member ID is inferred
-
-- **WHEN** service `orders` contains member `getOrder` whose function has no explicit ID
-- **THEN** the compiler resolves the member function ID as `orders.get-order`
-
-#### Scenario: Error ID is inferred
-
-- **WHEN** `const InvalidError = defineError(...)` is statically identifiable under the `orders` hierarchy
-- **THEN** its resolved ID is equivalent to `orders.InvalidError`
-
-#### Scenario: Inference is ambiguous
-
-- **WHEN** an eligible descriptor has neither an explicit ID nor one statically identifiable binding, export, service member, or route operation
-- **THEN** compilation fails with a source-located diagnostic requiring an explicit ID
-
-#### Scenario: Two IDs collide
-
-- **WHEN** explicit and inferred identities normalize to the same global ID
-- **THEN** `RELKIT_DUPLICATE_ID` identifies every origin and no activatable output is emitted
-
-#### Scenario: Complete service moves beneath grouping directory
-
-- **WHEN** equivalent flat and grouped fixtures contain explicit IDs, named/default exports, private functions, local errors, tasks/jobs, tools, agents, and public service members
-- **THEN** their logical IDs and references agree without a `services.` prefix, executable lookup uses those IDs, and diagnostics/source maps report each fixture's actual paths
-
 ### Requirement: Inferred identities are bound into executable output
 
 The generated manifest SHALL bind every inferred identity to its original executable descriptor so registry lookup, nested `invoke`, schemas, errors, middleware, logging, and traces use the resolved ID rather than an authoring placeholder.
@@ -453,90 +414,6 @@ Compiler operations SHALL own acquired evaluator children, output readers, detec
 - **WHEN** another writer owns the proposed temporary path
 - **THEN** the failed operation reports the acquisition failure and leaves that writer's file intact
 
-### Requirement: Portable validated development snapshot
-
-Successful preparation SHALL produce a versioned development snapshot containing the complete checked graph and activation cohort, runnable entrypoint, route execution references, readiness contract, artifact digests, and validation-input fingerprint. Paths SHALL be project-relative and relocation-safe. Snapshot content SHALL contain no staging root, resolved secret, secret-derived fingerprint, live client, or closure serialized as data. Preparation SHALL preserve deterministic graph truth and explicit check/build/start contracts.
-
-#### Scenario: Project root moves
-
-- **WHEN** the project is renamed atomically after creation or moved to another absolute root with equivalent installed dependencies
-- **THEN** validation accepts the snapshot and its runnable references resolve in the final project without old-root paths or another full check
-
-#### Scenario: Preparation output is scanned
-
-- **WHEN** preparation runs with synthetic secrets and a unique staging path
-- **THEN** recursive artifact scans find neither resolved secret values nor the staging path
-
-### Requirement: Complete snapshot invalidation
-
-Snapshot reuse SHALL require equality of the relevant source and imported helper/asset inventory, configuration and inherited configuration, package/lockfile/patch identity, applicable dependency executable identity, compiler/runtime/protocol/tool versions, and supported platform. Additions, deletions, and content edits SHALL invalidate reuse even when timestamps are preserved. Inputs whose effects cannot be safely represented SHALL make the snapshot ineligible, causing full validation. Symbolic environment contracts SHALL be resolved and validated with current runtime values without persisting secrets.
-
-#### Scenario: Helper changes or file is added or deleted
-
-- **WHEN** a relevant file changes, appears, or disappears after preparation while other metadata remains unchanged
-- **THEN** the next development attempt rejects snapshot reuse and validates the current complete source state before activation
-
-#### Scenario: Dependency or configuration changes
-
-- **WHEN** a lockfile, package, patch, dependency executable, config, inherited tsconfig, integration version, or supported tool/protocol identity differs
-- **THEN** stale executable artifacts cannot be imported as a validated candidate and safe validation is required
-
-#### Scenario: Configuration depends on uncaptured dynamic input
-
-- **WHEN** compilation depends on undeclared environment, external filesystem, network, time, or randomness
-- **THEN** preparation does not certify reuse of that result and development uses full validation
-
-#### Scenario: Current runtime environment differs
-
-- **WHEN** only symbolic runtime environment values differ while validated compilation inputs are unchanged
-- **THEN** runtime environment validation still precedes readiness and no resolved value or secret digest is persisted in the snapshot
-
-#### Scenario: Selected SDK disappears without a lockfile edit
-- **WHEN** an installed selected dependency is removed or its actual supported version changes after preparation
-- **THEN** startup revalidates selected requirements, rejects reuse before readiness and preserves the prior valid development generation
-
-#### Scenario: Selection changes
-- **WHEN** capability selection, requirement metadata or integration version changes
-- **THEN** the preparation fingerprint changes and a deployment-only requirement does not become a runtime dependency
-
-### Requirement: Snapshot integrity before execution
-
-Persisted snapshots SHALL be decoded with bounded schema validation, path containment, version/cohort checks, and content integrity verification of all inventoried inputs and artifacts before accepting reuse or importing their executable startup closure. Deferred executable members SHALL be reverified before their first import against later mutation. Missing, corrupt, incompatible, mixed-generation, or path-escaping artifacts SHALL be rejected with safe diagnostics and use full validation. A declared hash SHALL not replace checking member content and cohort consistency.
-
-#### Scenario: Cache is damaged or tampered with
-
-- **WHEN** a graph, entrypoint, executable member, receipt, or plan is changed, truncated, omitted, or taken from another cohort
-- **THEN** integrity or cohort verification rejects the snapshot before affected code executes or activates
-
-#### Scenario: Receipt member hashes are changed inconsistently
-
-- **WHEN** a modified receipt names different member hashes without matching input and cohort identity
-- **THEN** the snapshot is rejected rather than treating supplied hashes as proof of validation
-
-#### Scenario: Snapshot reference escapes the project
-
-- **WHEN** persisted paths or symbolic links resolve outside allowed snapshot/dependency roots
-- **THEN** validation refuses the reference before reading it as trusted executable content
-
-### Requirement: Atomic snapshot publication and immutable execution
-
-Preparation SHALL publish one complete validated snapshot atomically, retain the prior valid snapshot on failure, and bind execution to immutable generation-specific inputs. A changed input epoch SHALL prevent publication or activation of obsolete work. Concurrent publication and cancellation SHALL preserve exclusive temporary-file ownership and finalize acquired resources without deleting another writer's files or user-owned runtime state.
-
-#### Scenario: Rapid edits overlap preparation
-
-- **WHEN** a new source epoch arrives while an older candidate is being prepared
-- **THEN** the older result cannot replace a newer accepted result and the latest source state is eventually validated
-
-#### Scenario: Preparation is interrupted or a writer collides
-
-- **WHEN** interruption or exclusive publication failure occurs
-- **THEN** owned temporary output is finalized, the prior complete snapshot remains valid, and another writer's output is untouched
-
-#### Scenario: Working tree changes after startup
-
-- **WHEN** a delayed route implementation is loaded by an already active generation after source edits
-- **THEN** it loads verified immutable content from that generation rather than unvalidated working-tree source
-
 ### Requirement: Layout interpretation is consistent and path safe
 
 Compiler outputs and downstream tooling SHALL agree on the application root, selected layout, service owner, public boundary, layer, and service-relative source path. All remaining normative obligations below SHALL also hold.
@@ -615,3 +492,68 @@ The compiler SHALL reuse declaration/import analysis to discover selected depend
 #### Scenario: Dynamic configuration cannot be fully analyzed
 - **WHEN** selection cannot be safely determined statically
 - **THEN** normal controlled evaluation and its original failures remain visible without falsely certifying hypothetical requirements or silently installing packages
+
+### Requirement: Source-scoped IDs are inferred except for public contracts
+
+When an eligible source-scoped descriptor omits `id`, the compiler SHALL derive one filesystem-safe
+stable ID from its descriptor kind, service-relative hierarchy, export or local binding, service
+membership and route method and path as applicable; an explicit ID SHALL always override inference.
+Errors, events, buckets, caches, channels and tasks SHALL require explicit IDs. Moving a service
+between layouts SHALL preserve identities, and source locations SHALL stay accurate.
+
+#### Scenario: Route ID is inferred
+
+- **WHEN** `src/routes/orders/[orderId]/route.ts` exports `GET` without an ID
+- **THEN** the resolved route ID is the safe canonical equivalent of `route.get.orders.by-order-id`
+  while its displayed operation remains `GET /orders/{orderId}`
+
+#### Scenario: Function ID is inferred
+
+- **WHEN** a named `getOrder` function descriptor under the `orders` source hierarchy omits its ID
+- **THEN** the compiler resolves a stable ID equivalent to `orders.get-order`, using the
+  default-export file stem when no named binding exists
+
+#### Scenario: Service member ID is inferred
+
+- **WHEN** service `orders` contains member `getOrder` whose function has no explicit ID
+- **THEN** the compiler resolves the member function ID as `orders.get-order`
+
+#### Scenario: Error ID is omitted
+
+- **WHEN** `const InvalidError = defineError(...)` omits `id`
+- **THEN** compilation fails with a source-located diagnostic that requires an explicit ID, because
+  an error's ID is its public code
+
+#### Scenario: Inference is ambiguous
+
+- **WHEN** an eligible descriptor has neither an explicit ID nor one statically identifiable binding,
+  export, service member, or route operation
+- **THEN** compilation fails with a source-located diagnostic requiring an explicit ID
+
+#### Scenario: Two IDs collide
+
+- **WHEN** explicit and inferred identities normalize to the same global ID
+- **THEN** `RELKIT_DUPLICATE_ID` identifies every origin and no activatable output is emitted
+
+#### Scenario: Complete service moves beneath grouping directory
+
+- **WHEN** equivalent flat and grouped fixtures contain explicit IDs, named/default exports, private
+  functions, local errors, tasks/jobs, tools, agents, and public service members
+- **THEN** their logical IDs and references agree without a `services.` prefix, executable lookup
+  uses those IDs, and diagnostics/source maps report each fixture's actual paths
+
+### Requirement: Third-party schema projection
+
+The compiler SHALL project third-party Standard Schema contracts in the input and output directions
+the graph needs, canonicalize the projected JSON, and include each schema library's version in the
+build fingerprint.
+
+#### Scenario: Validator upgrade
+
+- **WHEN** the installed Zod version changes
+- **THEN** the build fingerprint changes and the next check projects the affected schemas again
+
+#### Scenario: Stable projection
+
+- **WHEN** the same schemas are compiled twice with the same library versions
+- **THEN** the projected JSON and the graph hash are identical

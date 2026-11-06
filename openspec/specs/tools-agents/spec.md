@@ -156,24 +156,6 @@ Agents, model turns, tool callbacks, parallel tool calls and approvals SHALL use
 - **WHEN** two model-selected tools execute concurrently and one fails
 - **THEN** each tool's logs and operations have its own active span, the failure is identifiable, and the parallel relationship is preserved
 
-### Requirement: Native LangChain execution is the default agent runtime
-
-Selected ordinary agents SHALL execute through the explicitly installed @relkit/langchain integration and supported native APIs, preserving RELKIT validation, authorization, limits, cancellation, redaction, tracing and common-engine tool invocation. Generic authoring and non-agent applications SHALL NOT install or evaluate that execution stack.
-
-#### Scenario: Native agent invokes a RELKIT tool
-
-- **WHEN** a declared native model requests a valid function-backed tool
-- **THEN** the target executes once through the common engine and the native agent receives the validated result
-
-### Requirement: Native models tools and middleware require no adapter wrapper
-
-The explicit agent integration SHALL accept compatible native model instances or lazy factories, native tools and middleware alongside RELKIT tools without redundant runtime registration or an application-level adapter. Intrinsically SDK-native helpers and types SHALL belong to that integration; generic declarations SHALL remain SDK-independent.
-
-#### Scenario: Todo middleware is declared
-
-- **WHEN** an agent includes the supported native todo middleware
-- **THEN** its contributed tool and state participate in the same native execution without duplicate declarations
-
 ### Requirement: Middleware state is explicitly exposed
 
 Agent declarations SHALL allow selected native state fields to be exposed through a typed allowlist, and SHALL keep unselected native state private by default.
