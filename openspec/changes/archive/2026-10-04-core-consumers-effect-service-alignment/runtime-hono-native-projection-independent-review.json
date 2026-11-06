@@ -4,13 +4,13 @@
   "status": "accepted final2-file correction; no outstanding findings",
   "files": [
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono/src/jobs/projection-validation.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono/src/jobs/projection-validation.ts",
       "sha256": "09d3ad93908e461f721e6df351c291358001eedcf785294a1fe545dfd0dfbf6e",
       "lines": 210,
       "readEOF": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono/tests/jobs-native-projection.test.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono/tests/jobs-native-projection.test.ts",
       "sha256": "c5b65889f2515fd3beaed1bd3bfc843b8940e83cbb9374c50cacfadd1782bae2",
       "lines": 116,
       "readEOF": true
@@ -18,67 +18,67 @@
   ],
   "eofAuthorities": [
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/submission-admission.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/submission-admission.ts",
       "sha256": "ce3b25bd94ec4a1cd450d654a287477f6aa826d1766d2a44fe6ebcbd4fb4e5e9",
       "lines": 161,
       "readEOF": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/identity.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/identity.ts",
       "sha256": "bad982327f24f765d2bddf2b19764321f88f68d2381781ba71f96b72dc3c8777",
       "lines": 140,
       "readEOF": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/controls-write-operations.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/controls-write-operations.ts",
       "sha256": "904387447476ce667d9b43b33249bf59f6ea60a68c559870e850f3b809b09c26",
       "lines": 185,
       "readEOF": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/task-policy-basic.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/task-policy-basic.ts",
       "sha256": "690e64d22d4e8506909c2efd8e1bb801f9557fdfe89a7f070bbd1c7b81b1059e",
       "lines": 120,
       "readEOF": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/task-policy-value.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/task-policy-value.ts",
       "sha256": "10ab2940b8b7a4bc6f54706d287937a3afa45902c0c053ef313fe07f1bb04bad",
       "lines": 129,
       "readEOF": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/trigger-validation.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/trigger-validation.ts",
       "sha256": "de01b4b60eef6b77f3e81eee39b8308948945903957e06182081fd05552cdf01",
       "lines": 158,
       "readEOF": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/runtime.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/runtime.ts",
       "sha256": "f1515762339a8fc7a4f65ad7d1d1ba5d68376a8a4e830f295a61578c4c2e9309",
       "lines": 145,
       "readEOF": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/runtime-selection.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/packages/jobs/src/runtime-selection.ts",
       "sha256": "9011047402282e85690fc4ce2875675aeebf8bfd5265e62b4411ddab844e47a4",
       "lines": 50,
       "readEOF": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono/src/jobs/handlers-validation.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono/src/jobs/handlers-validation.ts",
       "sha256": "c33ed4d58086478566562f6375b09fe6b0eb2c04b1a3a7f98a6f7fcbadc2313d",
       "lines": 166,
       "readEOF": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono/src/jobs/projection.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/packages/runtime-hono/src/jobs/projection.ts",
       "sha256": "6333bfe176de08aa8a1722ef8ad1801ef191902e17f236cf530305c7d20dbac5",
       "lines": 164,
       "readEOF": true
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/packages/providers-local/src/jobs/native-adapter-support.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/packages/providers-local/src/jobs/native-adapter-support.ts",
       "sha256": "09115f0c1d515e0291c0410148ecf20c11a54eaedad6f32d3a472863a8dd1d9b",
       "lines": 199,
       "readEOF": true

@@ -1,7 +1,7 @@
 /** Snapshots, writes and restores transaction-owned files and lock artifacts using the creator filesystem service; rollback preserves original bytes and modes. */
 
 import { atomicWriteEffect, ensureParentEffect, collision } from "./generator-file-writes.js";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 import { dirname, relative, resolve, sep } from "node:path";
 import { Cause, Effect, Exit } from "effect";

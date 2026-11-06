@@ -1,5 +1,8 @@
 import { expect, test } from "bun:test";
-import { generateManifest, type NormalizedDescriptor } from "../../packages/compiler/src/index.ts";
+import {
+  generateManifest,
+  type NormalizedDescriptor,
+} from "../../packages/cli/src/compiler/index.ts";
 
 const schema = { $relkit: "schema", jsonSchema: { type: "object" } };
 

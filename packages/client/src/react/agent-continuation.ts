@@ -1,7 +1,6 @@
-import type { ThreadSnapshot } from "@relkit/contracts";
+import type { ThreadSnapshot } from "relkit/contracts";
 import type { AgentThreadOptions } from "./agent-hook-types.types.js";
-import { runExecutionPromise } from "@relkit/contracts/operation";
-import { agentOperations, agentRuntime } from "./agent-runtime.js";
+import { agentOperations } from "./agent-operations.service.js";
 import type { PreparedContinuation } from "./agent-operations.types.js";
 
 /**
@@ -11,6 +10,7 @@ import type { PreparedContinuation } from "./agent-operations.types.js";
  * @param threadId - Caller-owned thread.
  * @param payload - Transmitted continuation input.
  * @param current - Borrowed snapshot, reused only for the same waiting thread.
+ * @param signal - Optional cancellation that aborts the authoritative load.
  * @returns Revision and digest input, retaining original Promise failures.
  */
 export function prepareAgentContinuation(
@@ -19,11 +19,9 @@ export function prepareAgentContinuation(
   threadId: string,
   payload: unknown,
   current?: ThreadSnapshot,
+  signal?: AbortSignal,
 ): Promise<PreparedContinuation> {
-  return runExecutionPromise(
-    agentRuntime,
-    agentOperations.continuation(client, agentId, threadId, payload, current),
-  );
+  return agentOperations.continuation(client, agentId, threadId, payload, current, signal);
 }
 
 /**

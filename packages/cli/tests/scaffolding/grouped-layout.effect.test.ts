@@ -10,12 +10,12 @@ import { memoryFileSystem } from "./generator-services.fixture.js";
 
 const root = "/memory/grouped-layout";
 const base = {
-  [root + "/package.json"]: '{"dependencies":{"@relkit/app":"0.7.5"}}',
+  [root + "/package.json"]: '{"dependencies":{"relkit":"0.7.5"}}',
   [root + "/relkit.config.ts"]:
-    'import { defineApp } from "@relkit/app/config"; export default defineApp({});',
+    'import { defineApp } from "relkit/config"; export default defineApp({});',
 };
 const service =
-  'import { defineService } from "@relkit/app/services"; export default defineService({});';
+  'import { defineService } from "relkit/services"; export default defineService({});';
 
 it.effect("selects empty grouped scaffolding without treating helpers as services", () =>
   Effect.gen(function* () {
@@ -63,7 +63,7 @@ it.effect("rejects mixed, nested and missing boundaries without mutating the fil
       { [root + "/src/services/orders/nested/service.ts"]: service },
       {
         [root + "/src/services/orders/get.function.ts"]:
-          'import { defineFunction } from "@relkit/app/functions"; export default defineFunction({});',
+          'import { defineFunction } from "relkit/functions"; export default defineFunction({});',
       },
     ]) {
       const fixture = yield* memoryFileSystem({ ...base, ...sources });

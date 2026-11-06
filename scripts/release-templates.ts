@@ -7,9 +7,9 @@ import type { ReleaseTemplate } from "./release-templates.types.js";
 
 export type { ReleaseTemplate } from "./release-templates.types.js";
 
-/** Public templates published with the current CLI release. */
+/** Templates whose generated scripts share the backend command contract. */
 export const releaseTemplates = ["minimal", "api", "agent", "fullstack"] as const;
-/** Release fixtures also include the documented legacy task starter. */
+/** Every public template, including the tasks starter with its jobs script. */
 export const packedTemplates = [...releaseTemplates, "tasks"] as const;
 
 const backendScripts = {
@@ -20,7 +20,7 @@ const backendScripts = {
   "test:unit": "bun test tests/unit",
   "test:integration": "bun test tests/integration",
   build: "relkit build",
-  start: "NODE_ENV=production bun run --no-env-file .relkit/build/server/index.js",
+  start: "relkit start",
   graph: "relkit graph print",
 };
 
@@ -32,7 +32,7 @@ const fullstackScripts = {
   typecheck: "tsc --noEmit && tsc --noEmit -p web/tsconfig.json",
   test: "bun test",
   build: "relkit build && next build web",
-  start: "NODE_ENV=production bun run --no-env-file .relkit/build/server/index.js",
+  start: "relkit start",
 };
 
 const taskScripts = {
@@ -41,7 +41,7 @@ const taskScripts = {
   typecheck: "tsc --noEmit",
   test: "bun test",
   build: "relkit build",
-  start: "NODE_ENV=production bun run --no-env-file .relkit/build/server/index.js",
+  start: "relkit start",
   "jobs:trigger":
     "relkit jobs trigger --job exportOrders --input-file examples/export-orders.json --operation-id example-trigger",
 };

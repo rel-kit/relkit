@@ -1,6 +1,6 @@
 /** Settles each atomic write and owned-directory mutation before rollback can run. */
 
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { randomUUID } from "node:crypto";
 import { dirname, isAbsolute, relative, sep } from "node:path";
 import { Cause, Effect } from "effect";

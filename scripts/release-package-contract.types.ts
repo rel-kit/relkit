@@ -1,7 +1,7 @@
 /**
  * Models exact release export conditions consumed by manifest comparisons.
  * Each target names package-contained bytes; these types confer no execution
- * authority and permit only conditions already used by RELKIT packages.
+ * authority and permit only conditions already used by RelKit packages.
  */
 
 /** Declaration plus the supported native/ESM compatibility conditions. */

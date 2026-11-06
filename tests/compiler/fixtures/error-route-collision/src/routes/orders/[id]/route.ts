@@ -1,4 +1,4 @@
-import { defineRoute, http } from "@relkit/app";
+import { defineRoute, http } from "relkit";
 import collision from "../../../collision/service.js";
 
 export const GET = defineRoute({

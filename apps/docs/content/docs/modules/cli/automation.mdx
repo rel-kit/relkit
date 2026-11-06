@@ -35,7 +35,6 @@ validates the same explicit template/cloud/deployment choices as the command lin
 | `create-relkit`    | Normalize creation options, preview a project, or explicitly generate it            | [Generator APIs](/docs/api/create-relkit#all-exported-apis) |
 | `@relkit/cli`      | Invoke commands with controlled I/O/cancellation, run development, or add artifacts | [CLI automation APIs](/docs/api/cli-api#all-exported-apis)  |
 | `@relkit/cli/help` | Read command descriptions, arguments, flags, and examples                           | [Help model](/docs/api/cli-api#public-imports)              |
-| `relkit`           | Resolve and launch the CLI installed in the target project                          | [Launcher APIs](/docs/api/relkit#all-exported-apis)         |
 
 Creation and scaffold execution write files; preview operations return plans. Keep the
 preview and execution boundaries explicit in your own tool. A development handle owns

@@ -3,7 +3,7 @@ import { Database } from "bun:sqlite";
 import { defineDrizzleService } from "@relkit/drizzle";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
-import { defineRoute } from "@relkit/routes";
+import { defineRoute } from "relkit/routes";
 
 export const clients: Database[] = [];
 export const released: Database[] = [];

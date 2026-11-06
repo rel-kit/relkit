@@ -1,4 +1,4 @@
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { buildCatalogPatch } from "./build-catalog.js";

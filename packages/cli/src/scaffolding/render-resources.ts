@@ -1,19 +1,15 @@
 /** Plans resource descriptors and their selected provider configuration, retaining service-local paths and explicit backend dependencies. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { observeExecution } from "relkit/contracts/operation";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
-} from "create-relkit/internal/generator-errors";
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
-import {
-  ADD_FAILURE_CODES,
-  AddScaffoldError,
-  type AddRequest,
-} from "create-relkit/internal/add-types";
+} from "create-relkit/generator-errors";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
+import { ADD_FAILURE_CODES, AddScaffoldError, type AddRequest } from "create-relkit/add-types";
 import { bucketProfileOwnersEffect } from "./bucket-profiles.js";
 import { assertAvailableId, domainArtifact, type DomainTarget } from "./domain-planning.js";
 import { PlanBuilder } from "./plan-builder.js";

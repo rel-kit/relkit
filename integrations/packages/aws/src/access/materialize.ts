@@ -3,7 +3,7 @@ import {
   type DeploymentAccessIntegration,
   type DeploymentInput,
   type DeploymentResourceOperation,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 
 export const materializeAwsAccess: DeploymentAccessIntegration["materialize"] = (input) => {
   const infrastructure = input.plan.infrastructureOperations.find(

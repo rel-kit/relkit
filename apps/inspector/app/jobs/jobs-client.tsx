@@ -10,15 +10,7 @@ import {
 } from "../../lib/api-types";
 import { jobsNotMounted, NO_JOBS_MESSAGE } from "../../lib/api-request-utils";
 import { createInspectorClient } from "../../lib/client";
-import {
-  itemsForJob,
-  JOB_STATES,
-  queueCounts,
-  RUN_STATES,
-  runCounts,
-  type JobQueueCounts,
-  type JobRunCounts,
-} from "../../lib/jobs-model";
+import { itemsForJob, RUN_STATES, runCounts, type JobRunCounts } from "../../lib/jobs-model";
 import { Briefcase, RefreshCw } from "lucide-react";
 import { DetailList } from "../../components/blocks/details";
 import { PageHeader } from "../../components/blocks/page-header";
@@ -29,11 +21,10 @@ import { StateCounts } from "./job-format";
 
 interface JobItem extends ResourceTableItem {
   readonly target: string;
-  readonly counts: JobQueueCounts | JobRunCounts;
-  readonly legacy: boolean;
+  readonly counts: JobRunCounts;
 }
 
-const statusOptions = [...new Set([...RUN_STATES, ...JOB_STATES])].map((id) => ({
+const statusOptions = RUN_STATES.map((id) => ({
   id,
   label: id,
 }));
@@ -50,35 +41,11 @@ export function JobsClient() {
         api.jobRuns<InspectorObject>({ ...runQuery, limit: Math.min(query.limit ?? 25, 100) }),
       ]);
       setAbsent(false);
-      return rows(jobs, runs.items, status, false);
+      return rows(jobs, runs.items, status);
     } catch (error) {
-      // An unmounted task-first API can still mean an older runtime that serves legacy jobs,
-      // so "no jobs" is only concluded once the legacy collection is empty or unavailable too.
-      const notMounted = jobsNotMounted(error);
-      const none = (): InspectorPage<JobItem> => {
-        setAbsent(true);
-        return { protocol: INSPECTOR_API_PROTOCOL, version: INSPECTOR_API_VERSION, items: [] };
-      };
-      try {
-        const [jobs, runtime] = await Promise.all([
-          api.list<InspectorObject>("jobs", definitionQuery),
-          api.runtimeList<InspectorObject>("jobs", {
-            ...runQuery,
-            limit: Math.min(query.limit ?? 25, 100),
-          }),
-        ]);
-        if (
-          notMounted &&
-          jobs.items.length === 0 &&
-          (await api.list<InspectorObject>("jobs", { limit: 1 })).items.length === 0
-        )
-          return none();
-        setAbsent(false);
-        return rows(jobs, runtime.items, status, true);
-      } catch (legacyError) {
-        if (notMounted) return none();
-        throw legacyError;
-      }
+      if (!jobsNotMounted(error)) throw error;
+      setAbsent(true);
+      return { protocol: INSPECTOR_API_PROTOCOL, version: INSPECTOR_API_VERSION, items: [] };
     }
   }, []);
 
@@ -118,7 +85,7 @@ export function JobsClient() {
       columns={[
         {
           key: "target",
-          label: "Task / target",
+          label: "Task",
           render: (item) => (
             <code className="font-mono text-xs text-foreground/90">{item.target}</code>
           ),
@@ -126,31 +93,22 @@ export function JobsClient() {
         {
           key: "runs",
           label: "Active",
-          render: (item) =>
-            item.legacy ? (
-              <StateCounts
-                counts={pick(item.counts, ["accepted", "available", "leased", "delayed"])}
-                empty="Idle"
-              />
-            ) : (
-              <StateCounts
-                counts={pick(item.counts, ["queued", "delayed", "running", "sleeping", "retrying"])}
-                empty="Idle"
-              />
-            ),
+          render: (item) => (
+            <StateCounts
+              counts={pick(item.counts, ["queued", "delayed", "running", "sleeping", "retrying"])}
+              empty="Idle"
+            />
+          ),
         },
         {
           key: "terminal",
           label: "Terminal",
-          render: (item) =>
-            item.legacy ? (
-              <StateCounts counts={pick(item.counts, ["completed", "dead-lettered"])} empty="—" />
-            ) : (
-              <StateCounts
-                counts={pick(item.counts, ["completed", "failed", "cancelled", "timed-out"])}
-                empty="—"
-              />
-            ),
+          render: (item) => (
+            <StateCounts
+              counts={pick(item.counts, ["completed", "failed", "cancelled", "timed-out"])}
+              empty="—"
+            />
+          ),
         },
       ]}
       href={(item) => `/jobs/${encodeURIComponent(item.id)}`}
@@ -159,7 +117,7 @@ export function JobsClient() {
         <DetailList
           columns={2}
           items={[
-            { label: "Task / target", value: item.target, mono: true },
+            { label: "Task", value: item.target, mono: true },
             ...Object.entries(item.counts).map(([state, count]) => ({
               label: state,
               value: <span className="tabular-nums">{count}</span>,
@@ -175,7 +133,6 @@ function rows(
   jobs: InspectorPage<InspectorObject>,
   items: readonly InspectorObject[],
   status: string | undefined,
-  legacy: boolean,
 ): InspectorPage<JobItem> {
   const ids = jobs.items.flatMap((job) => {
     const id = text(job.jobId) || text(job.id);
@@ -191,21 +148,15 @@ function rows(
       return [
         {
           id,
-          target: legacy
-            ? text(job.targetFunctionId) || "function unavailable"
-            : text(job.taskId) || "task unavailable",
-          counts: legacy ? queueCounts(matching) : runCounts(matching),
-          legacy,
+          target: text(job.taskId) || "task unavailable",
+          counts: runCounts(matching),
         },
       ];
     }),
   };
 }
 
-function pick(
-  counts: JobQueueCounts | JobRunCounts,
-  keys: readonly string[],
-): Record<string, number> {
+function pick(counts: JobRunCounts, keys: readonly string[]): Record<string, number> {
   const source = counts as Readonly<Record<string, number>>;
   return Object.fromEntries(keys.map((key) => [key, source[key] ?? 0]));
 }

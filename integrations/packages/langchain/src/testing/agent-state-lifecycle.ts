@@ -1,6 +1,6 @@
 /** Stops admission before aborting and joining every native invocation and model owner. */
 import { Context, Deferred, Effect, Ref } from "effect";
-import { joinOwnedWork, runOwnedContext } from "@relkit/testing/internal/work-ownership";
+import { joinOwnedWork, runOwnedContext } from "@relkit/testing/work-ownership";
 import type { AgentHarnessDependencies } from "./agent-harness.types.js";
 
 export function agentHarnessClose(

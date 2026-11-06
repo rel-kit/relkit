@@ -1,4 +1,4 @@
-import type { ChannelCheckpoint } from "@relkit/realtime";
+import type { ChannelCheckpoint } from "relkit/realtime";
 
 /**
  * Supplies a native replay cursor with complete deterministic scope authority.

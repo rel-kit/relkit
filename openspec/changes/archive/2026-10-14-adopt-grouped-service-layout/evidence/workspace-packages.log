@@ -1,7 +1,7 @@
 $ bun run scripts/test-packages.ts
 Running 738 Vitest (10 native Bun) and 133 Bun package test files.
 
- RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+ RUN  v5.0.1 <repo>
 
 
  Test Files  9 passed (9)
@@ -13,7 +13,7 @@ Running 738 Vitest (10 native Bun) and 133 Bun package test files.
              at least ~449ms faster with isolate: false — reuses workers across files instead of one per file
 
 
- RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+ RUN  v5.0.1 <repo>
 
 [17:42:56.617] INFO (#2): Execution operation completed {
   domain: 'cli',
@@ -3699,13 +3699,13 @@ A request failed when using a custom fetch implementation; this may be a misconf
 328 |       throw new Error("network disconnected");
                       ^
 error: network disconnected
-      at fetch (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
-      at _send (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+      at fetch (<repo>/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
+      at _send (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (<repo>/integrations/packages/inngest/inngest.test.ts:351:14)
 
 A request failed when using a custom fetch implementation; this may be a misconfiguration. Make sure that your fetch client is correctly bound to the global scope.
 323 |   const runtime = createInngestRuntime({
@@ -3716,13 +3716,13 @@ A request failed when using a custom fetch implementation; this may be a misconf
 328 |       throw new Error("network disconnected");
                       ^
 error: network disconnected
-      at fetch (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
-      at async <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
-      at async _send (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+      at fetch (<repo>/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
+      at async <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
+      at async _send (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (<repo>/integrations/packages/inngest/inngest.test.ts:351:14)
 
 A request failed when using a custom fetch implementation; this may be a misconfiguration. Make sure that your fetch client is correctly bound to the global scope.
 323 |   const runtime = createInngestRuntime({
@@ -3733,13 +3733,13 @@ A request failed when using a custom fetch implementation; this may be a misconf
 328 |       throw new Error("network disconnected");
                       ^
 error: network disconnected
-      at fetch (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
-      at async <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
-      at async _send (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+      at fetch (<repo>/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
+      at async <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
+      at async _send (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (<repo>/integrations/packages/inngest/inngest.test.ts:351:14)
 
 A request failed when using a custom fetch implementation; this may be a misconfiguration. Make sure that your fetch client is correctly bound to the global scope.
 323 |   const runtime = createInngestRuntime({
@@ -3750,13 +3750,13 @@ A request failed when using a custom fetch implementation; this may be a misconf
 328 |       throw new Error("network disconnected");
                       ^
 error: network disconnected
-      at fetch (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
-      at async <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
-      at async _send (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+      at fetch (<repo>/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
+      at async <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
+      at async _send (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (<repo>/integrations/packages/inngest/inngest.test.ts:351:14)
 
 A request failed when using a custom fetch implementation; this may be a misconfiguration. Make sure that your fetch client is correctly bound to the global scope.
 323 |   const runtime = createInngestRuntime({
@@ -3767,13 +3767,13 @@ A request failed when using a custom fetch implementation; this may be a misconf
 328 |       throw new Error("network disconnected");
                       ^
 error: network disconnected
-      at fetch (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
-      at async <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
-      at async _send (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+      at fetch (<repo>/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/helpers/promises.js:161:16)
+      at async <anonymous> (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:608:25)
+      at async _send (<repo>/node_modules/.bun/inngest@4.20.0+0877da07cdcad042/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (<repo>/integrations/packages/inngest/inngest.test.ts:351:14)
 
 ..................................
 
@@ -4046,7 +4046,7 @@ packages/inspector-api/tests/compatibility/jobs.test.ts:
 ...............................................
 
 packages/testing/tests/compatibility/runtime.test.ts:
-RELKIT_KEEP_TEST_STATE=1 retained test state at /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-test-5hLoJF/.relkit/state
+RELKIT_KEEP_TEST_STATE=1 retained test state at <tmp>/relkit-test-5hLoJF/.relkit/state
 ....
 
 packages/client/tests/compatibility/agent-thread-identity.test.ts:

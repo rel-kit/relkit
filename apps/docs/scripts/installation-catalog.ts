@@ -6,12 +6,12 @@
  */
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { selectedIntegrationRequirements } from "@relkit/contracts";
+import { selectedIntegrationRequirements } from "relkit/contracts";
 import { resolveCatalogVersion } from "create-relkit/catalog-resolution";
-import { scaffoldDependency } from "create-relkit/internal/scaffold-catalog";
+import { scaffoldDependency } from "create-relkit/scaffold-catalog";
 import { Effect, Schema } from "effect";
-import { HTTP_TRANSPORT_REQUIREMENTS } from "../../../packages/runtime-hono/src/selected-transports.js";
-import { apiPackageDefinitions } from "./documentation-catalog.js";
+import { HTTP_TRANSPORT_REQUIREMENTS } from "../../../packages/relkit/src/runtime-hono/selected-transports.js";
+import { apiPackageDefinitions, packageDirectory } from "./documentation-catalog.js";
 import * as Schemas from "./installation-catalog.schemas.js";
 import type {
   InstallationCatalog,
@@ -34,10 +34,12 @@ export function loadInstallationCatalog(root: string): Promise<InstallationCatal
         ),
       );
       const paths = [
-        ...apiPackageDefinitions.map(({ directory }) => directory),
-        "packages/cli",
-        "packages/runtime-hono",
-        "packages/create-relkit",
+        ...new Set([
+          ...apiPackageDefinitions.map(({ directory }) => packageDirectory(directory)),
+          "packages/cli",
+          "packages/relkit",
+          "packages/create-relkit",
+        ]),
       ];
       const manifests = yield* Effect.forEach(
         paths,
@@ -102,7 +104,7 @@ function selectDeclarations(
   if (selection.includeOwner !== false)
     addDeclaration(declarations, section, manifest.name, manifest.version);
   const requirements =
-    selection.name === "@relkit/runtime-hono"
+    selection.name === "relkit"
       ? HTTP_TRANSPORT_REQUIREMENTS
       : (manifest.relkit?.integration?.dependencies ?? []);
   for (const capability of selection.capabilities ?? [])
@@ -130,7 +132,7 @@ function selectDeclarations(
       resolveCatalogVersion({ ...catalog.workspace }, name, spec),
     );
   }
-  if (selection.name === "@relkit/runtime-hono")
+  if (selection.name === "relkit")
     for (const requirement of requirements)
       if (manifest.peerDependencies?.[requirement.package] !== requirement.supportedRange)
         throw new Error(`HTTP SDK metadata disagrees with optional peer ${requirement.package}.`);

@@ -1,5 +1,4 @@
-import { runExecutionPromise } from "@relkit/contracts/operation";
-import { agentOperations, agentRuntime } from "./agent-runtime.js";
+import { agentOperations } from "./agent-operations.service.js";
 
 /**
  * Reconciles recorded submissions using authoritative receipt lookup.
@@ -15,9 +14,5 @@ export function reconcileAgentRun(
   agentId: string,
   signal: AbortSignal,
 ): Promise<string | undefined> {
-  return runExecutionPromise(
-    agentRuntime,
-    agentOperations.reconcile(client, scopeKey, agentId, signal),
-    { signal },
-  );
+  return agentOperations.reconcile(client, scopeKey, agentId, signal);
 }

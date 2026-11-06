@@ -1,7 +1,5 @@
-/** Declares the auth service boundary without acquiring native clients. */
+/** Serves the commerce Better Auth instance at /api/auth without acquiring native clients at import. */
 import { defineBetterAuthService } from "@relkit/better-auth";
+import { auth } from "./better-auth.js";
 
-export default defineBetterAuthService({
-  baseURL: "http://127.0.0.1:3000",
-  secret: "development-only-auth-secret-32-characters",
-});
+export default defineBetterAuthService({ auth });

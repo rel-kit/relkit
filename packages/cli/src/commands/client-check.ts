@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import { CLI_EXIT_CODES, fail, type CliCommandContext } from "../main-support.js";
 import { cliTry, cliValidation } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";

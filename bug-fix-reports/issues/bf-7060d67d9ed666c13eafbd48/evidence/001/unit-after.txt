@@ -1,3 +1,0 @@
-Command: rtk proxy bun x tsc -p tests/types/tsconfig.json --noEmit --pretty false
-Exit code: 0
-Completed successfully; command emitted no output.

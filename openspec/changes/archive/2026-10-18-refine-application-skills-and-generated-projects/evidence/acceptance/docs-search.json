@@ -4,7 +4,7 @@
     "--smol",
     "scripts/check-search.ts"
   ],
-  "cwd": "/Users/mustafaelsayed/Workspace/relkit/apps/docs",
+  "cwd": "<repo>/apps/docs",
   "before": {
     "at": "2026-10-18T14:58:10.953492+00:00",
     "cpu": 10,

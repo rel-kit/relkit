@@ -7978,7 +7978,7 @@ No files were staged or committed. The normative v3 documents and `repos/effect`
 
 ### Next fresh-task handoff: checkbox 2.14
 
-- `codex_app__list_projects` selected saved local project `03a21aee-82e5-434f-9f9f-83fb95086727` at `/Users/mustafaelsayed/Workspace/relkit`.
+- `codex_app__list_projects` selected saved local project `03a21aee-82e5-434f-9f9f-83fb95086727` at `<repo>`.
 - Fresh same-directory task `019ffb2c-1c5e-7262-81f5-b52e9cfef3c4` was dispatched on host `local` with `target: { type: "project", projectId: "03a21aee-82e5-434f-9f9f-83fb95086727", environment: { type: "local" } }`.
 - The task owns only checkbox `2.14`; no files were staged or committed by the dispatcher.
 
@@ -8004,7 +8004,7 @@ No files were staged or committed. The normative v3 documents and `repos/effect`
 
 ### Next fresh-task handoff: checkbox 2.13
 
-- `codex_app__list_projects` selected saved local project `03a21aee-82e5-434f-9f9f-83fb95086727` at `/Users/mustafaelsayed/Workspace/relkit`.
+- `codex_app__list_projects` selected saved local project `03a21aee-82e5-434f-9f9f-83fb95086727` at `<repo>`.
 - Fresh same-directory task `019ffb23-f7a3-7413-b12c-0e1a5cd30f32` was dispatched on host `local` with `target: { type: "project", projectId: "03a21aee-82e5-434f-9f9f-83fb95086727", environment: { type: "local" } }`.
 - The task owns only checkbox `2.13`; no files were staged or committed by the dispatcher.
 
@@ -8032,7 +8032,7 @@ No files were staged or committed. The normative v3 documents and `repos/effect`
 
 ### Next fresh-task handoff: checkbox 2.12
 
-- `codex_app__list_projects` selected saved local project `03a21aee-82e5-434f-9f9f-83fb95086727` at `/Users/mustafaelsayed/Workspace/relkit`.
+- `codex_app__list_projects` selected saved local project `03a21aee-82e5-434f-9f9f-83fb95086727` at `<repo>`.
 - Fresh same-directory task `019ffb1b-edaa-7823-b381-e5696fce9c27` was dispatched on host `local` with `target: { type: "project", projectId: "03a21aee-82e5-434f-9f9f-83fb95086727", environment: { type: "local" } }`.
 - One bounded `codex_app__wait_threads(timeoutMs: 10000)` snapshot timed out while the task remained active/in progress; its latest commentary confirmed it is reading the apply workflow and implementing only 2.12. No blocker or user-input request was reported.
 
@@ -8092,7 +8092,7 @@ No files were staged or committed. Task `2.10` is the next pending unit.
 ## Coordinator dispatch: checkbox 2.11
 
 - Selected the only active change, `implement-relkit-typescript-poc-v3`, already on `fix/implement-relkit-typescript-poc-v3`; no branch switch was needed. Existing dirty files remain the change's visible uncommitted work, planning artifacts, supplied iterator skill, and completed phase work.
-- `codex_app__list_projects` selected the saved local project `03a21aee-82e5-434f-9f9f-83fb95086727` at `/Users/mustafaelsayed/Workspace/relkit`.
+- `codex_app__list_projects` selected the saved local project `03a21aee-82e5-434f-9f9f-83fb95086727` at `<repo>`.
 - Fresh same-directory task dispatched for checkbox `2.11`: `019ffb0e-372b-7d70-b0ab-321217c0e325` on host `local`, using `target: { type: "project", projectId: "03a21aee-82e5-434f-9f9f-83fb95086727", environment: { type: "local" } }`.
 - One bounded `codex_app__wait_threads(timeoutMs: 10000)` snapshot timed out while the task remained active and in progress. Its latest commentary confirmed it was reading the apply workflow and repository/change instructions; no blocker or user-input request was reported. The timeout is a successful handoff, not a reason to poll again.
 - Linear lifecycle hooks remain skipped because `openspec/linear.yaml` and a configured binding are absent. The coordinator changed no implementation files and did not stage or commit.
@@ -8123,7 +8123,7 @@ Normative documents remain unchanged. No files were staged or committed.
 
 ## Coordinator dispatch: checkbox 2.2 (historical handoff)
 
-- Fresh Codex-task dispatch: `codex_app__create_thread` was attempted twice for the saved local project `/Users/mustafaelsayed/Workspace/relkit` and returned `invalid arguments` before creating a task ID.
+- Fresh Codex-task dispatch: `codex_app__create_thread` was attempted twice for the saved local project `<repo>` and returned `invalid arguments` before creating a task ID.
 - Fallback dispatch: project-local worker `019ff783-7acd-7453-84be-f41e75a970dd` owns only checkbox `2.2`; no implementation files were edited by this coordinator.
 - Bounded snapshot: one `multi_agent_v1__wait_agent` call with `timeout_ms: 10000` timed out and returned an empty status map before the fallback worker completed the scoped implementation recorded above.
 
@@ -8145,7 +8145,7 @@ The required Phase 0 prerequisite checks passed. The next fresh same-directory t
 
 ### Next handoff attempt
 
-- Attempted after validation: `codex_app__create_thread` for fresh same-directory checkbox `2.2`, targeting local `/Users/mustafaelsayed/Workspace/relkit`.
+- Attempted after validation: `codex_app__create_thread` for fresh same-directory checkbox `2.2`, targeting local `<repo>`.
 - Dispatch result: failed before creation because `codex_app__create_thread` is not callable in the current tool context; no task ID was returned.
 - Bounded snapshot: unavailable because dispatch returned no task ID; the callable-tool inventory also exposed no `create_thread` or `wait_threads` tool for a task snapshot. This concrete lifecycle blocker is retained in `BLOCKERS.md`.
 
@@ -8469,7 +8469,7 @@ d69f37f1ff0d157876d624e73bcf163162a73f531b3144e03ef566c672cbb183  docs/relkit-ty
 
 ## Coordinator fallback dispatch: checkbox 2.3 (current retry)
 
-- The refreshed `codex_app__list_projects` result no longer contains the saved `/Users/mustafaelsayed/Workspace/relkit` project. The cached project ID therefore cannot produce the required local Codex task; corrected `codex_app__create_thread` payloads returned argument-validation/internal connector errors before task creation.
+- The refreshed `codex_app__list_projects` result no longer contains the saved `<repo>` project. The cached project ID therefore cannot produce the required local Codex task; corrected `codex_app__create_thread` payloads returned argument-validation/internal connector errors before task creation.
 - Fallback shared-checkout worker `019ff7af-6c94-7082-bd2e-649b78e99c97` (`Sagan`) was dispatched for checkbox `2.3` with no worktree and no Git publication actions.
 - Its single bounded `multi_agent_v1__wait_agent(timeout_ms: 10000)` call returned `timed_out: true` with an empty status map. No completion or blocker event was reported; the fallback worker remains the active owner of `2.3`.
 

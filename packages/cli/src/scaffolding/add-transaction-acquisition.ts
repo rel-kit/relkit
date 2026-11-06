@@ -4,15 +4,12 @@ import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { Cause, Effect, Exit } from "effect";
 
-import { type ScaffoldPlan } from "create-relkit/internal/add-types";
-import {
-  restoreFilesEffect,
-  snapshotFilesEffect,
-} from "create-relkit/internal/add-transaction-files";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { type ScaffoldPlan } from "create-relkit/add-types";
+import { restoreFilesEffect, snapshotFilesEffect } from "create-relkit/add-transaction-files";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
 
 import type { ApplyScaffoldContext } from "./add-transaction.types.js";
-import { recordCleanupFailure } from "create-relkit/internal/generator-cleanup";
+import { recordCleanupFailure } from "create-relkit/generator-cleanup";
 
 export const acquireScaffoldTransaction = Effect.fn("ScaffoldTransaction.acquire")(function* (
   plan: ScaffoldPlan,

@@ -6,8 +6,8 @@
     "packageManager": "bun@1.3.10",
     "lockfile": "bun.lock",
     "packages": {
-      "@relkit/jobs": "0.4.1",
-      "@relkit/runtime-effect": "0.4.1",
+      "relkit/jobs": "0.4.1",
+      "relkit/runtime-effect": "0.4.1",
       "effect": "4.0.0-rc.115",
       "@effect/sql-pg": "4.0.0-rc.115",
       "drizzle-orm": "1.0.0-rc.5-169397b",
@@ -35,7 +35,7 @@
     "installed": {
       "package": "effect",
       "version": "4.0.0-rc.115",
-      "packagePath": "packages/runtime-effect/node_modules/effect/package.json",
+      "packagePath": "packages/relkit/node_modules/effect/package.json",
       "durationExports": ["fromInput", "fromInputUnsafe", "toMillis"]
     },
     "publishedEffectMq": [

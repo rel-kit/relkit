@@ -4,7 +4,7 @@
  * the result retains source provenance for normalization and diagnostics.
  */
 import { join } from "node:path";
-import { prefilterSources } from "@relkit/compiler";
+import { prefilterSources } from "../compiler/index.js";
 import { Effect } from "effect";
 import { cliTry } from "../cli-errors.js";
 import { CliCompiler } from "../services/compiler.service.js";
@@ -61,7 +61,8 @@ export const evaluateCheckSources = Effect.fn("Project.checkEvaluation")(functio
 ) {
   const compiler = yield* CliCompiler;
   const input = yield* readCheckSources(projectRoot, options, generationId);
-  const evaluator = yield* compiler.evaluate({
+  const evaluate = options.evaluate ?? compiler.evaluate;
+  const evaluator = yield* evaluate({
     projectRoot,
     candidates: input.prefiltered.candidates,
     generationId,

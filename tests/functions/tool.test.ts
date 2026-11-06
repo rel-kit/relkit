@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { z } from "../../packages/schema/src/index.ts";
+import { z } from "relkit/schema";
 import {
   isToolDescriptor,
   ToolApprovalDeniedError,
   ToolApprovalRequiredError,
   ToolArgumentValidationError,
   defineTool,
-} from "../../packages/tools/src/index.ts";
-import { defineError, defineFunction } from "../../packages/functions/src/index.ts";
+} from "relkit/tools";
+import { defineError, defineFunction } from "relkit/functions";
 
 const input = z.object({ id: z.string() });
 const output = z.object({ ok: z.boolean() });

@@ -1,7 +1,7 @@
 /** Exercises native deepagent bucket scope behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
 import { describe, expect, test } from "vitest";
-import { createBucketClient, type BucketProvider } from "@relkit/buckets";
+import { createBucketClient, type BucketProvider } from "relkit/buckets";
 import { createThreadBucketBackend } from "../src/deepagent-bucket-scope.ts";
 
 describe("DeepAgents thread bucket scope", () => {

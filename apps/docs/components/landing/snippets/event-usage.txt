@@ -9,7 +9,7 @@ export default defineFunction({
     totalCents: z.number(),
   }),
 
-  publishes: ["orders.created"],
+  dependencies: { events: { orderCreated } },
 
   handler: async ({ orderId, quantity }, context) => {
     const order = {
@@ -18,8 +18,7 @@ export default defineFunction({
     };
 
     // Notify the order-confirmation subscriber.
-    const created = context.events["orders.created"];
-    await created.publish(order);
+    await context.events.orderCreated.publish(order);
 
     return order;
   },

@@ -1,4 +1,4 @@
-/** Checks assistant.agent through the supported public RELKIT APIs. */
+/** Checks assistant.agent through the supported public RelKit APIs. */
 import { expect, test } from "bun:test";
 import { invokeAgent } from "@relkit/langchain";
 import assistant, { uppercase } from "@app/services/hello/agents/assistant.agent.js";

@@ -1,10 +1,10 @@
-import { deepFreeze, isStableId, serializeJson } from "@relkit/contracts";
+import { deepFreeze, isStableId, serializeJson } from "relkit/contracts";
 import {
   LOCAL_SERVICE_STATE_FILE,
   LOCAL_SERVICE_STATE_VERSION,
   type LocalServiceBindingState,
   type LocalServiceState,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import type { LocalProjectIdentity } from "./identity.js";
 import { readLocalStateText, removeLocalStateFile, writeLocalStateText } from "./state-paths.js";
 

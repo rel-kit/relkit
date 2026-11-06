@@ -1,0 +1,39 @@
+---
+title: Metrics
+description: The numbers RelKit tracks for each release, with their current values and targets, built from CI outputs.
+sidebar:
+  icon: chart-no-axes-combined
+---
+
+Each RelKit release publishes the same nine metrics. A job in CI builds this page from the outputs
+of the jobs that measure them, so a number here comes from a run, not from an estimate. A metric
+whose CI output is not available to the run shows "no data" instead of a value.
+
+<include>/_snippets/generated/metrics.mdx</include>
+
+## Where each number comes from
+
+| Metric                               | Measured by                                                                                                                                                                                                                                                                               |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Creation success on the latest Bun   | The nightly [creation canary](https://github.com/rel-kit/relkit/blob/main/.github/workflows/creation-canary.yml) creates all five templates with `create-relkit@latest`, runs their tests and starts their dev servers.                                                                   |
+| Time to a first route                | The [first-route walkthrough](https://github.com/rel-kit/relkit/blob/main/scripts/walkthrough/create-to-first-route.ts): create a project, add a route, and time how long until the dev server answers it.                                                                                |
+| Time to a Railway deploy             | The [Railway walkthrough](https://github.com/rel-kit/relkit/blob/main/scripts/walkthrough/create-to-railway.ts) runs the [Railway newcomer test](https://github.com/rel-kit/relkit/blob/main/scripts/railway-newcomer.ts) and reports the time until the deployed app answers over HTTPS. |
+| Runtimes passing the HTTP suite      | The runtime matrix in CI runs the `api` template's HTTP tests against its production build on Bun and Node.                                                                                                                                                                               |
+| Reload p95 and `relkit check` memory | The [development-loop benchmark](/docs/benchmarks), for an app with 100 functions.                                                                                                                                                                                                        |
+| Agent eval pass rate                 | The graded agent evaluation runs. A run passes only when both its semantic review and its technical checks pass.                                                                                                                                                                          |
+| Outside contributions                | Issues and pull requests opened in the last 30 days by people outside the organization. The target applies after launch.                                                                                                                                                                  |
+| Publishable packages                 | The non-private packages in the repository. See [Core and Labs](/docs/maturity).                                                                                                                                                                                                          |
+
+The same data is published as `metrics.json`, a workflow artifact of every CI run and an asset of
+every release. The [release notes](https://github.com/rel-kit/relkit/blob/main/RELEASE_NOTES.md)
+link to this page.
+
+## Produce the report yourself
+
+Download the artifacts of a run into a folder and build the report from them:
+
+```sh
+bun scripts/metrics.ts --inputs path/to/artifacts --summary
+```
+
+The report is written to `test-results/metrics/metrics.json`.

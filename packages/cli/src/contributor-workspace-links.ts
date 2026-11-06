@@ -24,7 +24,7 @@ export function makeContributorLinks(
           const workspaces = yield* roots(root);
           const catalog = yield* read(join(root, "package.json"));
           const state = yield* Ref.make<ContributorTraversal>({
-            pending: Object.keys(direct).filter((name) => name.startsWith("@relkit/")),
+            pending: Object.keys(direct).filter(isWorkspacePackage),
             links: new Map(),
           });
           for (;;) {
@@ -42,10 +42,10 @@ export function makeContributorLinks(
             for (const dependency of new Set([
               ...Object.keys(manifest.dependencies ?? {}),
               ...Object.keys(manifest.peerDependencies ?? {}).filter(
-                (peer) => !peer.startsWith("@relkit/"),
+                (peer) => !isWorkspacePackage(peer),
               ),
             ])) {
-              if (dependency.startsWith("@relkit/")) {
+              if (isWorkspacePackage(dependency)) {
                 yield* enqueueContributorDependency(state, dependency);
               } else if (
                 name !== "@relkit/cli" &&
@@ -100,3 +100,8 @@ const linkSharedRuntime = Effect.fn("Contributor.sharedRuntime")(function* (
       links: new Map([...value.links, [dependency, shared]]),
     }));
 });
+
+/** Matches the workspace-owned `relkit` package and every `@relkit/*` package. */
+function isWorkspacePackage(name: string): boolean {
+  return name === "relkit" || name.startsWith("@relkit/");
+}

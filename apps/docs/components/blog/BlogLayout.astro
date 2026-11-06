@@ -38,9 +38,9 @@ const hasFeed = data.feeds.some((feed) => feed.href === blogFeed);
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {hasFeed && <link rel="alternate" type="application/rss+xml" title="RELKIT Blog" href={blogFeed} />}
+    {hasFeed && <link rel="alternate" type="application/rss+xml" title="RelKit Blog" href={blogFeed} />}
     <meta property="og:type" content={ogType} />
-    <meta property="og:site_name" content="RELKIT" />
+    <meta property="og:site_name" content="RelKit" />
     <meta property="og:url" content={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />

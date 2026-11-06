@@ -1,13 +1,13 @@
 
- RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+ RUN  v5.0.1 <repo>
 
  ❯ packages/better-auth/tests/service.test.ts (0 test)
 stdout | packages/better-auth/tests/auth/tracer.test.ts > configured tracers redact named Auth spans without changing native values or causes
 [14:38:22.837] ERROR (#1): Error [TypeError]: (0 , __vite_ssr_import_0__.withDrizzleSqliteWork) is not a function
-    at withAuthWork (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:159:36)
-    at authServiceLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:46:7)
-    at authTestLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/auth-test-layer.ts:17:10)
-    at /Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/tracer.test.ts:54:11 {
+    at withAuthWork (<repo>/packages/better-auth/src/auth.service.ts:159:36)
+    at authServiceLayer (<repo>/packages/better-auth/src/auth.service.ts:46:7)
+    at authTestLayer (<repo>/packages/better-auth/tests/auth/auth-test-layer.ts:17:10)
+    at <repo>/packages/better-auth/tests/auth/tracer.test.ts:54:11 {
   [cause]: undefined
 }
 
@@ -15,17 +15,17 @@ stdout | packages/better-auth/tests/auth/tracer.test.ts > configured tracers red
    × configured tracers redact named Auth spans without changing native values or causes 186ms
 stdout | packages/better-auth/tests/auth/coordination.test.ts > raw native handler and API queries wait for an unrelated portable SQLite transaction
 [14:38:23.751] ERROR (#1): Error [TypeError]: (0 , __vite_ssr_import_0__.withDrizzleSqliteWork) is not a function
-    at withAuthWork (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:159:36)
-    at authServiceLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:46:7)
-    at authTestLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
+    at withAuthWork (<repo>/packages/better-auth/src/auth.service.ts:159:36)
+    at authServiceLayer (<repo>/packages/better-auth/src/auth.service.ts:46:7)
+    at authTestLayer (<repo>/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
   [cause]: undefined
 }
 
 stdout | packages/better-auth/tests/auth/coordination.test.ts > native query failure releases the SQLite permit for subsequent portable work
 [14:38:23.762] ERROR (#9): Error [TypeError]: (0 , __vite_ssr_import_0__.withDrizzleSqliteWork) is not a function
-    at withAuthWork (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:159:36)
-    at authServiceLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:46:7)
-    at authTestLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
+    at withAuthWork (<repo>/packages/better-auth/src/auth.service.ts:159:36)
+    at authServiceLayer (<repo>/packages/better-auth/src/auth.service.ts:46:7)
+    at authTestLayer (<repo>/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
   [cause]: undefined
 }
 
@@ -34,31 +34,31 @@ stdout | packages/better-auth/tests/auth/coordination.test.ts > native query fai
    × native query failure releases the SQLite permit for subsequent portable work 3ms
 stdout | packages/better-auth/tests/auth/failure.test.ts > keeps lone native auth, database and defect rejection identities
 [14:38:23.933] ERROR (#1): Error [TypeError]: (0 , __vite_ssr_import_0__.inheritNativeLeases) is not a function
-    at runAuthPromise (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/activation.ts:97:26)
-    at /Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/failure.test.ts:16:9
-    at file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
-    at ~effect/Utils/internal (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
-    at MixedScheduler.<anonymous> (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3) {
+    at runAuthPromise (<repo>/packages/better-auth/src/activation.ts:97:26)
+    at <repo>/packages/better-auth/tests/auth/failure.test.ts:16:9
+    at file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
+    at ~effect/Utils/internal (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
+    at MixedScheduler.<anonymous> (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3) {
   [cause]: undefined
 }
 
 stdout | packages/better-auth/tests/auth/failure.test.ts > retains both primary auth rejection and finalizer defect at the Promise edge
 [14:38:23.937] ERROR (#8): Error [TypeError]: (0 , __vite_ssr_import_0__.inheritNativeLeases) is not a function
-    at runAuthPromise (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/activation.ts:97:26)
-    at /Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/failure.test.ts:44:7
-    at file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
-    at ~effect/Utils/internal (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
-    at MixedScheduler.<anonymous> (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3) {
+    at runAuthPromise (<repo>/packages/better-auth/src/activation.ts:97:26)
+    at <repo>/packages/better-auth/tests/auth/failure.test.ts:44:7
+    at file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
+    at ~effect/Utils/internal (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
+    at MixedScheduler.<anonymous> (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3) {
   [cause]: undefined
 }
 
 stdout | packages/better-auth/tests/auth/failure.test.ts > preserves interruption together with primary failure and cleanup defect
 [14:38:23.939] ERROR (#15): Error [TypeError]: (0 , __vite_ssr_import_0__.inheritNativeLeases) is not a function
-    at runAuthPromise (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/activation.ts:97:26)
-    at /Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/failure.test.ts:73:7
-    at file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
-    at ~effect/Utils/internal (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
-    at MixedScheduler.<anonymous> (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3) {
+    at runAuthPromise (<repo>/packages/better-auth/src/activation.ts:97:26)
+    at <repo>/packages/better-auth/tests/auth/failure.test.ts:73:7
+    at file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
+    at ~effect/Utils/internal (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
+    at MixedScheduler.<anonymous> (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3) {
   [cause]: undefined
 }
 
@@ -68,10 +68,10 @@ stdout | packages/better-auth/tests/auth/failure.test.ts > preserves interruptio
    × preserves interruption together with primary failure and cleanup defect 1ms
 stdout | packages/better-auth/tests/auth/instrumentation.test.ts > records standalone success/failure at configured levels with bounded redacted diagnostics
 [14:38:24.003] ERROR (#1): Error [TypeError]: (0 , __vite_ssr_import_0__.withDrizzleSqliteWork) is not a function
-    at withAuthWork (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:159:36)
-    at authServiceLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:46:7)
-    at authTestLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/auth-test-layer.ts:17:10)
-    at /Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/instrumentation.test.ts:38:11 {
+    at withAuthWork (<repo>/packages/better-auth/src/auth.service.ts:159:36)
+    at authServiceLayer (<repo>/packages/better-auth/src/auth.service.ts:46:7)
+    at authTestLayer (<repo>/packages/better-auth/tests/auth/auth-test-layer.ts:17:10)
+    at <repo>/packages/better-auth/tests/auth/instrumentation.test.ts:38:11 {
   [cause]: undefined
 }
 
@@ -79,19 +79,19 @@ stdout | packages/better-auth/tests/auth/instrumentation.test.ts > records stand
    × records standalone success/failure at configured levels with bounded redacted diagnostics 13ms
 stdout | packages/better-auth/tests/auth/compatibility.test.ts > Request abort reaches the SDK but Promise completion and DB close wait for native settlement
 [14:38:24.002] ERROR (#1): Error [TypeError]: (0 , __vite_ssr_import_0__.withDrizzleSqliteWork) is not a function
-    at withAuthWork (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:159:36)
-    at authServiceLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:46:7)
-    at authTestLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
+    at withAuthWork (<repo>/packages/better-auth/src/auth.service.ts:159:36)
+    at authServiceLayer (<repo>/packages/better-auth/src/auth.service.ts:46:7)
+    at authTestLayer (<repo>/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
   [cause]: undefined
 }
 
 stdout | packages/better-auth/tests/auth/compatibility.test.ts > native compatibility entrypoints inherit configured DB sinks during acquisition and calls
 [14:38:24.008] ERROR (#9): Error [TypeError]: (0 , __vite_ssr_import_0__.drizzleInstrumentationOf) is not a function
-    at activateBetterAuthService (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/activation.ts:52:29)
-    at /Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/compatibility.test.ts:117:9
-    at file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
-    at ~effect/Utils/internal (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
-    at MixedScheduler.<anonymous> (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3) {
+    at activateBetterAuthService (<repo>/packages/better-auth/src/activation.ts:52:29)
+    at <repo>/packages/better-auth/tests/auth/compatibility.test.ts:117:9
+    at file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
+    at ~effect/Utils/internal (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
+    at MixedScheduler.<anonymous> (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3) {
   [cause]: undefined
 }
 
@@ -100,35 +100,35 @@ stdout | packages/better-auth/tests/auth/compatibility.test.ts > native compatib
    × native compatibility entrypoints inherit configured DB sinks during acquisition and calls 3ms
 stdout | packages/better-auth/tests/auth/runtime.test.ts > substitutes the factory and preserves native method properties and API admission
 [14:38:24.004] ERROR (#1): Error [TypeError]: (0 , __vite_ssr_import_0__.withDrizzleSqliteWork) is not a function
-    at withAuthWork (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:159:36)
-    at authServiceLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:46:7)
-    at authTestLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
+    at withAuthWork (<repo>/packages/better-auth/src/auth.service.ts:159:36)
+    at authServiceLayer (<repo>/packages/better-auth/src/auth.service.ts:46:7)
+    at authTestLayer (<repo>/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
   [cause]: undefined
 }
 
 stdout | packages/better-auth/tests/auth/runtime.test.ts > keeps eager SDK context initialization admitted until native completion
 [14:38:24.008] ERROR (#9): Error [TypeError]: (0 , __vite_ssr_import_0__.withDrizzleSqliteWork) is not a function
-    at withAuthWork (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:159:36)
-    at authServiceLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:46:7)
-    at authTestLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
+    at withAuthWork (<repo>/packages/better-auth/src/auth.service.ts:159:36)
+    at authServiceLayer (<repo>/packages/better-auth/src/auth.service.ts:46:7)
+    at authTestLayer (<repo>/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
   [cause]: undefined
 }
 
 stdout | packages/better-auth/tests/auth/runtime.test.ts > interruption waits for uncancellable native handler before DB release
 [14:38:24.010] ERROR (#18): Error [TypeError]: (0 , __vite_ssr_import_0__.withDrizzleSqliteWork) is not a function
-    at withAuthWork (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:159:36)
-    at authServiceLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:46:7)
-    at authTestLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
+    at withAuthWork (<repo>/packages/better-auth/src/auth.service.ts:159:36)
+    at authServiceLayer (<repo>/packages/better-auth/src/auth.service.ts:46:7)
+    at authTestLayer (<repo>/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
   [cause]: undefined
 }
 
 stdout | packages/better-auth/tests/auth/runtime.test.ts > preserves SDK failures, acquisition failures, defects and interruption at Promise edges
 [14:38:24.012] ERROR (#26): Error [TypeError]: (0 , __vite_ssr_import_0__.inheritNativeLeases) is not a function
-    at runAuthPromise (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/activation.ts:97:26)
-    at /Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/runtime.test.ts:151:11
-    at file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
-    at ~effect/Utils/internal (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
-    at MixedScheduler.<anonymous> (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3) {
+    at runAuthPromise (<repo>/packages/better-auth/src/activation.ts:97:26)
+    at <repo>/packages/better-auth/tests/auth/runtime.test.ts:151:11
+    at file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
+    at ~effect/Utils/internal (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
+    at MixedScheduler.<anonymous> (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3) {
   [cause]: undefined
 }
 
@@ -141,52 +141,52 @@ stdout | packages/better-auth/tests/auth/runtime.test.ts > preserves SDK failure
 (Use `node --trace-warnings ...` to show where the warning was created)
 stdout | packages/better-auth/tests/auth/hooks.test.ts > native eager initializer can await public portable models under its existing SQLite lease
 [14:38:24.008] ERROR (#1): Error [TypeError]: (0 , __vite_ssr_import_0__.drizzleInstrumentationOf) is not a function
-    at activateBetterAuthService (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/activation.ts:52:29)
-    at /Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/hooks.test.ts:30:9
-    at file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
-    at ~effect/Utils/internal (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
-    at MixedScheduler.<anonymous> (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3) {
+    at activateBetterAuthService (<repo>/packages/better-auth/src/activation.ts:52:29)
+    at <repo>/packages/better-auth/tests/auth/hooks.test.ts:30:9
+    at file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
+    at ~effect/Utils/internal (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
+    at MixedScheduler.<anonymous> (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3) {
   [cause]: undefined
 }
 
 stdout | packages/better-auth/tests/auth/hooks.test.ts > a delayed SDK descendant reacquires its expired permit before using a public model
 [14:38:24.014] ERROR (#11): Error [TypeError]: (0 , __vite_ssr_import_0__.withDrizzleSqliteWork) is not a function
-    at withAuthWork (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:159:36)
-    at authServiceLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:46:7)
-    at authTestLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
+    at withAuthWork (<repo>/packages/better-auth/src/auth.service.ts:159:36)
+    at authServiceLayer (<repo>/packages/better-auth/src/auth.service.ts:46:7)
+    at authTestLayer (<repo>/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
   [cause]: undefined
 }
 
 stdout | packages/better-auth/tests/auth/hooks.test.ts > native eager initialization waits for another SQLite transaction before issuing queries
 [14:38:24.020] ERROR (#19): Error [TypeError]: (0 , __vite_ssr_import_0__.drizzleInstrumentationOf) is not a function
-    at activateBetterAuthService (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/activation.ts:52:29)
-    at /Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/hooks.test.ts:115:27 {
+    at activateBetterAuthService (<repo>/packages/better-auth/src/activation.ts:52:29)
+    at <repo>/packages/better-auth/tests/auth/hooks.test.ts:115:27 {
   [cause]: undefined
 }
 
 stdout | packages/better-auth/tests/auth/hooks.test.ts > failed eager initialization releases the native lease and leaves borrowed portable work usable
 [14:38:24.025] ERROR (#32): Error [AssertionError]: expected TypeError: (0 , __vite_ssr_import_0__.dri… to be Error: eager initialization failed // Object.is equality
-    at /Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/hooks.test.ts:156:22 {
+    at <repo>/packages/better-auth/tests/auth/hooks.test.ts:156:22 {
   actual: TypeError: (0 , __vite_ssr_import_0__.drizzleInstrumentationOf) is not a function
-      at activateBetterAuthService (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/activation.ts:52:29)
-      at /Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/hooks.test.ts:149:9
-      at file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
-      at ~effect/Utils/internal (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
-      at MixedScheduler.<anonymous> (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3)
-      at AsyncImpl.~effect/Effect/evaluate (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:817:24)
-      at FiberImpl.runLoop (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:487:95)
-      at FiberImpl.evaluate (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:438:23)
-      at file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:821:17
-      at file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:50,
+      at activateBetterAuthService (<repo>/packages/better-auth/src/activation.ts:52:29)
+      at <repo>/packages/better-auth/tests/auth/hooks.test.ts:149:9
+      at file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
+      at ~effect/Utils/internal (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
+      at MixedScheduler.<anonymous> (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3)
+      at AsyncImpl.~effect/Effect/evaluate (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:817:24)
+      at FiberImpl.runLoop (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:487:95)
+      at FiberImpl.evaluate (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:438:23)
+      at file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:821:17
+      at file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:50,
   expected: Error: eager initialization failed
-      at /Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/hooks.test.ts:135:23
+      at <repo>/packages/better-auth/tests/auth/hooks.test.ts:135:23
       at Generator.next (<anonymous>)
-      at IteratorImpl.~effect/Effect/successCont (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:990:28)
-      at ExitPrimitive.~effect/Effect/evaluate (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/core.js:297:30)
-      at FiberImpl.runLoop (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:487:95)
-      at FiberImpl.evaluate (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:438:23)
-      at file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:821:17
-      at file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:50,
+      at IteratorImpl.~effect/Effect/successCont (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:990:28)
+      at ExitPrimitive.~effect/Effect/evaluate (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/core.js:297:30)
+      at FiberImpl.runLoop (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:487:95)
+      at FiberImpl.evaluate (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:438:23)
+      at file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:821:17
+      at file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:50,
   showDiff: true,
   operator: 'strictEqual',
   [cause]: undefined
@@ -194,9 +194,9 @@ stdout | packages/better-auth/tests/auth/hooks.test.ts > failed eager initializa
 
 stdout | packages/better-auth/tests/auth/hooks.test.ts > an admitted native hook can recursively await the public Auth API after DB close begins
 [14:38:24.029] ERROR (#42): Error [TypeError]: (0 , __vite_ssr_import_0__.withDrizzleSqliteWork) is not a function
-    at withAuthWork (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:159:36)
-    at authServiceLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:46:7)
-    at authTestLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
+    at withAuthWork (<repo>/packages/better-auth/src/auth.service.ts:159:36)
+    at authServiceLayer (<repo>/packages/better-auth/src/auth.service.ts:46:7)
+    at authTestLayer (<repo>/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
   [cause]: undefined
 }
 
@@ -208,22 +208,22 @@ stdout | packages/better-auth/tests/auth/hooks.test.ts > an admitted native hook
    × an admitted native hook can recursively await the public Auth API after DB close begins 2ms
 stdout | packages/better-auth/tests/auth/acquisition.test.ts > cancelling one acquisition waiter does not cancel the managed Layer for another
 [14:38:28.935] ERROR (#11): Error [TypeError]: (0 , __vite_ssr_import_0__.withDrizzleSqliteWork) is not a function
-    at withAuthWork (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:159:36)
-    at authServiceLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/src/auth.service.ts:46:7)
-    at authTestLayer (/Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
+    at withAuthWork (<repo>/packages/better-auth/src/auth.service.ts:159:36)
+    at authServiceLayer (<repo>/packages/better-auth/src/auth.service.ts:46:7)
+    at authTestLayer (<repo>/packages/better-auth/tests/auth/auth-test-layer.ts:17:10) {
   [cause]: undefined
 }
 
 stdout | packages/better-auth/tests/auth/acquisition.test.ts > rejects invalid route prefixes before SDK construction and permits later valid activation
 [14:38:28.951] ERROR (#19): Error [AssertionError]: expected [Function] to throw error including 'Invalid Better Auth base path ""' but got '(0 , __vite_ssr_import_0__.drizzleIns…'
-    at _Assertion.__VITEST_REJECTS__ (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/vitest@5.0.1+632d306ebd1e5cd5/node_modules/vitest/dist/chunks/index.m3L2HgmY.js:2453:33)
-    at _Assertion.propertyGetter (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/chai@6.2.2/node_modules/chai/index.js:1570:27)
+    at _Assertion.__VITEST_REJECTS__ (file://<repo>/node_modules/.bun/vitest@5.0.1+632d306ebd1e5cd5/node_modules/vitest/dist/chunks/index.m3L2HgmY.js:2453:33)
+    at _Assertion.propertyGetter (file://<repo>/node_modules/.bun/chai@6.2.2/node_modules/chai/index.js:1570:27)
     at Reflect.get (<anonymous>)
-    at Object.proxyGetter [as get] (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/chai@6.2.2/node_modules/chai/index.js:1659:22)
-    at /Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/auth/acquisition.test.ts:140:80
-    at file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
-    at ~effect/Utils/internal (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
-    at MixedScheduler.<anonymous> (file:///Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3) {
+    at Object.proxyGetter [as get] (file://<repo>/node_modules/.bun/chai@6.2.2/node_modules/chai/index.js:1659:22)
+    at <repo>/packages/better-auth/tests/auth/acquisition.test.ts:140:80
+    at file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:22
+    at ~effect/Utils/internal (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/Utils.js:80:14)
+    at MixedScheduler.<anonymous> (file://<repo>/node_modules/.bun/effect@4.0.0-rc.115/node_modules/effect/dist/internal/effect.js:782:3) {
   actual: '(0 , __vite_ssr_import_0__.drizzleInstrumentationOf) is not a function',
   expected: 'Invalid Better Auth base path ""',
   showDiff: true,
@@ -239,7 +239,7 @@ stdout | packages/better-auth/tests/auth/acquisition.test.ts > rejects invalid r
 ⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
 
  FAIL  packages/better-auth/tests/service.test.ts [ packages/better-auth/tests/service.test.ts ]
-Error: Cannot find package 'bun:test' imported from /Users/mustafaelsayed/Workspace/relkit/packages/better-auth/tests/service.test.ts
+Error: Cannot find package 'bun:test' imported from <repo>/packages/better-auth/tests/service.test.ts
  ❯ packages/better-auth/tests/service.test.ts:1:1
       1| import { expect, test } from "bun:test";
        | ^

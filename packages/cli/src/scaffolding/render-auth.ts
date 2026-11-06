@@ -1,23 +1,18 @@
 /**
- * Plans the sole native Better Auth service and route at the compiler-selected
- * layout. Existing databases retain their owner/schema/dialect; the transaction
+ * Plans the application's Better Auth file and its service at the compiler-selected
+ * layout; RelKit mounts the handler, so no route is planned. Existing databases retain their owner/schema/dialect; the transaction
  * owns source publication and no live client, migration or secret is created here.
  */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
-import { scaffoldErrors, domainError, domainTry } from "create-relkit/internal/generator-errors";
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
-import { routePathToFilePath } from "@relkit/compiler";
-import {
-  ADD_FAILURE_CODES,
-  AddScaffoldError,
-  type AddRequest,
-} from "create-relkit/internal/add-types";
+import { observeExecution } from "relkit/contracts/operation";
+import { scaffoldErrors, domainError, domainTry } from "create-relkit/generator-errors";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
+import { ADD_FAILURE_CODES, AddScaffoldError, type AddRequest } from "create-relkit/add-types";
 import type { PlanBuilder } from "./plan-builder.js";
 import { scaffoldServiceBoundary } from "./scaffold-layout.js";
 import { ensureEnvironmentEffect } from "./provider-planning.js";
-import { authRouteSource, authServiceSource } from "./render-auth-sources.js";
+import { authServiceSource, betterAuthFileSource } from "./render-auth-sources.js";
 import { renderDatabaseEffect } from "./render-database.js";
 import type { RenderedDatabase } from "./render-database.types.js";
 import {
@@ -27,7 +22,7 @@ import {
 } from "./render-auth-database.js";
 
 /**
- * Plans native auth/database composition and one raw catch-all mount.
+ * Plans native auth/database composition: the Better Auth file and its service.
  * @param builder - Per-request planning owner with declaration-only discovery.
  * @param request - Native dialect and static auth mount configuration.
  * @returns Lazy completion with typed scaffold/filesystem failures; no resource activation.
@@ -61,11 +56,11 @@ export const renderAuthEffect = Effect.fn("Scaffold.renderAuth")(
       });
     if (found) yield* addAuthSchemaEffect(builder, database);
     const servicePath = yield* domainTry(() => scaffoldServiceBoundary(builder.discovery, "auth"));
-    yield* builder.createEffect(servicePath, authServiceSource());
     yield* builder.createEffect(
-      routePathToFilePath(`${request.basePath}/*auth?`),
-      authRouteSource(servicePath),
+      servicePath.replace(/[^/]+$/, "better-auth.ts"),
+      betterAuthFileSource(request.basePath),
     );
+    yield* builder.createEffect(servicePath, authServiceSource());
     yield* authEnvironmentEffect(builder);
     yield* builder.registerArtifactEffect("service", {
       domain: "auth",
@@ -89,17 +84,13 @@ const authEnvironmentEffect = Effect.fn("Scaffold.authEnvironment")(function* (
   yield* builder.dependencyEffect("better-auth");
   yield* builder.dependencyEffect("@cloudflare/workers-types");
   yield* ensureEnvironmentEffect(builder, "BETTER_AUTH_SECRET", "env.secret()");
-  yield* ensureEnvironmentEffect(
-    builder,
-    "BETTER_AUTH_URL",
-    `env.url().default(new URL("http://127.0.0.1:3000"))`,
-    "http://127.0.0.1:3000",
-  );
+  // Both are required: the server refuses to start without them, with RELKIT_ENVIRONMENT_INVALID.
+  yield* ensureEnvironmentEffect(builder, "BETTER_AUTH_URL", "env.url()", "http://127.0.0.1:3000");
   yield* builder.warningEffect(
     "auth-secret-required",
-    "Populate BETTER_AUTH_SECRET with a strong secret before starting auth.",
+    "Populate BETTER_AUTH_SECRET with a strong secret and BETTER_AUTH_URL with the server's URL before starting auth.",
   );
-  yield* builder.nextStepEffect("Set BETTER_AUTH_SECRET in your environment.");
+  yield* builder.nextStepEffect("Set BETTER_AUTH_SECRET and BETTER_AUTH_URL in your environment.");
 });
 
 /**

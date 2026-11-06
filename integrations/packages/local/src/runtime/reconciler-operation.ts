@@ -1,4 +1,4 @@
-import type { LocalServiceInstance } from "@relkit/local-service";
+import type { LocalServiceInstance } from "relkit/local-service";
 import type {
   LocalServiceReconcileRequest,
   LocalServiceReconcilerOptions,

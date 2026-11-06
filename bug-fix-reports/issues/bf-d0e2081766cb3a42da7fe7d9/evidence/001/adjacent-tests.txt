@@ -1,4 +1,0 @@
-SUMMARY:
-   50 pass
-   0 fail
-  Ran 50 tests across 17 files. [2.99s]

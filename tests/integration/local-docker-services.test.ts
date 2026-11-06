@@ -24,7 +24,7 @@ import {
   type LocalServiceMaterializerRuntime,
   type LocalServicePlan,
   type ProviderOverrideState,
-} from "../../packages/local-service/src/index.ts";
+} from "relkit/local-service";
 import { exerciseSharedRedisProviders } from "./redis-state-acceptance.ts";
 
 const dockerTest = process.env.RELKIT_TEST_DOCKER === "1" ? test : test.skip;

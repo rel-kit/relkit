@@ -57,10 +57,11 @@ jobs:
           name: create-certification-${{ github.sha }}
           path: |
             packages/create-relkit/src/create-capabilities.ts
-            docs/evidence/create-capabilities/${{ steps.identity.outputs.version }}/fresh.json
-            docs/evidence/create-capabilities/${{ steps.identity.outputs.version }}/restart.json
+            docs/evidence/create-capabilities/${{ steps.identity.outputs.version }}.md
+            test-results/evidence/create-capabilities/${{ steps.identity.outputs.version }}/fresh.json
+            test-results/evidence/create-capabilities/${{ steps.identity.outputs.version }}/restart.json
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 90
       - name: Preserve failed certification reports
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -157,8 +158,9 @@ jobs:
         run: |
           bun x prettier --check AGENTS.md README.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md RELEASE_NOTES.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .changeset .github apps examples integrations packages scripts templates tests docs/testing.md
           bun run lint
+          # `check` loads CLI source (the migrate rules) that imports relkit's built entry points.
+          bun x turbo run build --filter=relkit --output-logs=errors-only
           bun run check
-          bun x turbo run build --filter=@relkit/contracts --output-logs=errors-only
           bun test ./tests/phase0-docs-imports.ts
           bun run konsistent -- validate
           bun run scripts/check-observability-sinks.ts
@@ -187,6 +189,15 @@ jobs:
             --filter='!@relkit/inngest' \
             --filter='!@relkit/effect-mq' \
             --output-logs=errors-only
+      - name: Build the providers the type-check skips
+        # tests/unit/release-first-party-exports.test.ts packs every published package and expects
+        # its declared exports in the archive, so their dist must exist.
+        run: |
+          bun x turbo run build \
+            --filter=@relkit/trigger \
+            --filter=@relkit/inngest \
+            --filter=@relkit/effect-mq \
+            --output-logs=errors-only
       - name: Run focused tests
         run: |
           bun run test:types
@@ -197,6 +208,175 @@ jobs:
           bun run test:graph
           bun run test:contracts
           bun run test:security
+
+  workspace-typecheck:
+    name: Workspace type-checks on TypeScript 7
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Require TypeScript 7 as the workspace compiler
+        run: node_modules/.bin/tsc --version | grep -E '^Version 7\.'
+      - name: Build the packages with TypeScript 7
+        run: >-
+          bun x turbo run build --filter=./packages/* --filter=./integrations/packages/*
+          --output-logs=errors-only
+      - name: Type-check the workspace and the commerce example
+        run: bun run typecheck
+
+  postgres-backend:
+    name: Postgres durable backend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
+        env:
+          POSTGRES_PASSWORD: relkit
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 30
+    env:
+      RELKIT_TEST_POSTGRES_URL: postgres://postgres:relkit@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Build the backend and its test dependencies
+        run: bun x turbo run build --filter=@relkit/postgres... --output-logs=errors-only
+      - name: Run the Postgres jobs, events and schedule suites
+        run: bun run test:postgres
+
+  runtime-http:
+    name: Runtime HTTP suite (${{ matrix.runtime.name }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime:
+          - { name: Bun 1.3.10, kind: bun, node: "24" }
+          - { name: Node 22, kind: node, node: "22" }
+          - { name: Node 24, kind: node, node: "24" }
+    env:
+      TURBO_CONCURRENCY: "1"
+      VITEST_MAX_WORKERS: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.runtime.node }}
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Build the packages the packed candidate needs
+        run: >-
+          bun x turbo run build --filter=./packages/* --filter=./integrations/*
+          --filter=./integrations/packages/* --output-logs=errors-only
+      - name: Serve one app through both runtime adapters
+        run: node node_modules/vitest/vitest.mjs run --config packages/relkit/tests/runtime/vitest.config.ts
+      - name: Run the api template's HTTP suite against its production build
+        run: bun scripts/runtime-http-suite.ts --runtime "${{ matrix.runtime.kind }}"
+      - name: Record the result for the metrics report
+        if: ${{ !cancelled() }}
+        env:
+          OUTCOME: ${{ job.status }}
+          RUNTIME: ${{ matrix.runtime.kind }}
+        run: |
+          if test "$RUNTIME" = node; then version="$(node --version)"; else version="$(bun --version)"; fi
+          bun scripts/metrics/write-result.ts runtime-http --runtime "$RUNTIME" --version "$version" \
+            --outcome "$OUTCOME" --output "$RUNNER_TEMP/metrics/runtime-http-$RUNTIME-${{ matrix.runtime.node }}.json"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: metrics-runtime-http-${{ matrix.runtime.kind }}-${{ matrix.runtime.node }}
+          path: ${{ runner.temp }}/metrics/runtime-http-${{ matrix.runtime.kind }}-${{ matrix.runtime.node }}.json
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Run Redis, Sentry and SQLite conformance on Bun and this Node
+        if: matrix.runtime.kind == 'node'
+        env:
+          RELKIT_TEST_DOCKER: "1"
+        run: |
+          bun test integrations/packages/redis/tests/runtime-conformance.test.ts integrations/packages/sentry/tests/runtime-conformance.test.ts
+          node node_modules/vitest/vitest.mjs run packages/drizzle/tests/runtime-conformance.test.ts
+
+  node-creation-pack:
+    name: Node creation candidate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      TURBO_CONCURRENCY: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Build the packages the packed candidate needs
+        run: >-
+          bun x turbo run build --filter=./packages/* --filter=./integrations/*
+          --filter=./integrations/packages/* --output-logs=errors-only
+      - name: Pack the candidate and bundle the Node registry and smoke
+        run: bun scripts/node-creation-smoke.ts --out node-smoke
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: node-creation-candidate
+          path: node-smoke
+          retention-days: 1
+
+  node-creation:
+    name: Node creation (${{ matrix.manager }}, Node ${{ matrix.node }}, no Bun)
+    needs: node-creation-pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["22", "24"]
+        manager: [npm, pnpm]
+    steps:
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install pnpm
+        if: matrix.manager == 'pnpm'
+        run: npm install --global pnpm@11
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: node-creation-candidate
+          path: node-smoke
+      - name: Create with npx or pnpm dlx and run dev on Node, with no Bun installed
+        run: node node-smoke/smoke.mjs --package-manager "${{ matrix.manager }}" --require-no-bun
 
   inspector-container:
     name: Standalone inspector container
@@ -254,6 +434,61 @@ jobs:
           bun run test:docs
           bun --cwd=apps/docs run build
 
+  quickstart-changes:
+    name: Detect quickstart changes
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: diff
+        name: Check whether the quickstart or what it runs changed
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          pattern='^(CONTRIBUTING\.md|package\.json|bun\.lock|turbo\.json|scripts/(build|contributor-quickstart)\.ts|\.github/workflows/checks\.yml)$'
+          if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -qE "$pattern"; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  contributor-quickstart:
+    name: Contributor quickstart
+    needs: quickstart-changes
+    if: >-
+      !cancelled() &&
+      (github.event_name != 'pull_request' || needs.quickstart-changes.outputs.changed == 'true')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    env:
+      TURBO_CONCURRENCY: "1"
+      VITEST_MAX_WORKERS: "1"
+      NODE_OPTIONS: --max-old-space-size=2048
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - name: Run the CONTRIBUTING quickstart in this clean checkout
+        run: bun scripts/contributor-quickstart.ts
+
   dependency-review:
     name: Dependency review
     if: github.event_name == 'pull_request' && github.event.repository.visibility == 'public'
@@ -279,6 +514,136 @@ jobs:
     permissions:
       contents: read
 
+  creation-changes:
+    name: Detect creation changes
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: diff
+        name: Check whether creation, templates or the canary changed
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          pattern='^(packages/create-relkit/|packages/cli/|templates/|scripts/creation-canary\.ts$|scripts/fresh-clone-typecheck\.ts$|\.github/workflows/(creation-canary|checks))'
+          if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -qE "$pattern"; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  creation-canary:
+    name: Creation canary
+    needs: creation-changes
+    if: needs.creation-changes.outputs.changed == 'true'
+    uses: ./.github/workflows/creation-canary-candidate.yml
+    permissions:
+      contents: read
+
+  fresh-clone-typecheck:
+    name: Fresh clone type-checks (${{ matrix.template }}, TypeScript ${{ matrix.typescript }})
+    needs: creation-changes
+    if: needs.creation-changes.outputs.changed == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        template: [minimal, api, agent, fullstack, tasks]
+        typescript: ["5.9", "7"]
+    env:
+      TURBO_CONCURRENCY: "1"
+      VITEST_MAX_WORKERS: "1"
+      NODE_OPTIONS: --max-old-space-size=2048
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Build the packages the packed candidate needs
+        run: >-
+          bun x turbo run build --filter=./packages/* --filter=./integrations/*
+          --filter=./integrations/packages/*
+      - name: Create from the packed candidate, clone fresh, pin TypeScript, type-check, check and add
+        run: >-
+          bun scripts/fresh-clone-typecheck.ts --template "${{ matrix.template }}"
+          --typescript "${{ matrix.typescript }}"
+
+  metrics:
+    name: Plan metrics
+    needs: [runtime-http, release-readiness, creation-canary]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      # Each pattern matches nothing when its job was skipped, which leaves that metric at "no data".
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        continue-on-error: true
+        with:
+          pattern: metrics-*
+          path: metrics-inputs
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        continue-on-error: true
+        with:
+          pattern: dev-loop-benchmark-${{ github.run_id }}-*
+          path: metrics-inputs
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        continue-on-error: true
+        with:
+          pattern: agent-evals-${{ github.run_id }}-*
+          path: metrics-inputs
+      - name: Count outside contributions
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          bun scripts/metrics/contributions.ts --repo "$GITHUB_REPOSITORY"
+          --output metrics-inputs/contributions.json
+      - name: Build the metrics report; a metric without CI output shows "no data"
+        run: |
+          bun scripts/metrics.ts --inputs metrics-inputs --output test-results/metrics
+          bun scripts/metrics.ts --inputs metrics-inputs --output test-results/metrics --summary >> "$GITHUB_STEP_SUMMARY"
+      - name: Report the launch checklist; open items are listed and do not fail the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          bun scripts/launch/checklist.ts --metrics test-results/metrics/metrics.json --github
+          | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: metrics-report-${{ github.sha }}-${{ github.run_attempt }}
+          path: test-results/metrics/metrics.json
+          if-no-files-found: error
+          retention-days: 90
+
   ci-gate:
     name: CI Gate
     if: always()
@@ -288,10 +653,20 @@ jobs:
         dependency-update,
         static,
         types-and-tests,
+        workspace-typecheck,
+        postgres-backend,
+        runtime-http,
+        node-creation,
         inspector-container,
         docs-installations,
         dependency-review,
         release-readiness,
+        creation-changes,
+        creation-canary,
+        metrics,
+        fresh-clone-typecheck,
+        quickstart-changes,
+        contributor-quickstart,
       ]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -299,23 +674,43 @@ jobs:
     env:
       STATIC_RESULT: ${{ needs.static.result }}
       TYPES_RESULT: ${{ needs.types-and-tests.result }}
+      WORKSPACE_TYPECHECK_RESULT: ${{ needs.workspace-typecheck.result }}
+      POSTGRES_RESULT: ${{ needs.postgres-backend.result }}
+      RUNTIME_HTTP_RESULT: ${{ needs.runtime-http.result }}
+      NODE_CREATION_RESULT: ${{ needs.node-creation.result }}
       INSPECTOR_CONTAINER_RESULT: ${{ needs.inspector-container.result }}
       DOCS_INSTALLATIONS_RESULT: ${{ needs.docs-installations.result }}
       DEPENDENCY_REVIEW_RESULT: ${{ needs.dependency-review.result }}
       AUTO_CHANGESET_RESULT: ${{ needs.auto-changeset.result }}
       RELEASE_READINESS_RESULT: ${{ needs.release-readiness.result }}
       DEPENDENCY_UPDATE_RESULT: ${{ needs.dependency-update.result }}
+      CREATION_CHANGES_RESULT: ${{ needs.creation-changes.result }}
+      CREATION_CANARY_RESULT: ${{ needs.creation-canary.result }}
+      METRICS_RESULT: ${{ needs.metrics.result }}
+      FRESH_CLONE_RESULT: ${{ needs.fresh-clone-typecheck.result }}
+      QUICKSTART_CHANGES_RESULT: ${{ needs.quickstart-changes.result }}
+      CONTRIBUTOR_QUICKSTART_RESULT: ${{ needs.contributor-quickstart.result }}
     steps:
       - name: Require fast safety jobs
         run: |
           test "$STATIC_RESULT" = success
           test "$TYPES_RESULT" = success
+          test "$WORKSPACE_TYPECHECK_RESULT" = success
+          test "$POSTGRES_RESULT" = success
+          test "$RUNTIME_HTTP_RESULT" = success
+          test "$NODE_CREATION_RESULT" = success
           test "$INSPECTOR_CONTAINER_RESULT" = success
           test "$DOCS_INSTALLATIONS_RESULT" = success
           test "$DEPENDENCY_REVIEW_RESULT" = success || test "$DEPENDENCY_REVIEW_RESULT" = skipped
           test "$AUTO_CHANGESET_RESULT" = success || test "$AUTO_CHANGESET_RESULT" = skipped
           test "$RELEASE_READINESS_RESULT" = success
           test "$DEPENDENCY_UPDATE_RESULT" = success -o "$DEPENDENCY_UPDATE_RESULT" = skipped
+          test "$CREATION_CHANGES_RESULT" = success || test "$CREATION_CHANGES_RESULT" = skipped
+          test "$CREATION_CANARY_RESULT" = success || test "$CREATION_CANARY_RESULT" = skipped
+          test "$METRICS_RESULT" = success
+          test "$FRESH_CLONE_RESULT" = success || test "$FRESH_CLONE_RESULT" = skipped
+          test "$QUICKSTART_CHANGES_RESULT" = success || test "$QUICKSTART_CHANGES_RESULT" = skipped
+          test "$CONTRIBUTOR_QUICKSTART_RESULT" = success || test "$CONTRIBUTOR_QUICKSTART_RESULT" = skipped
 
   dispatch-release:
     name: Dispatch release after manual main CI

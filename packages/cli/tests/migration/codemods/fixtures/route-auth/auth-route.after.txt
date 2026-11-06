@@ -1,0 +1,7 @@
+/** Mounts Better Auth and protects application paths. */
+import { defineRoute } from "relkit/routes";
+import auth from "@app/services/auth/service.js";
+
+export const ALL = defineRoute({
+  handler: auth.handler,
+});

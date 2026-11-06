@@ -1,5 +1,6 @@
 import { effectVersion, effectMqSdk } from "../build-catalog.js";
 
+/** @experimental */
 export interface EffectMqDeploymentProfile {
   readonly provider: "effect-mq";
   readonly compatibility: "native";
@@ -17,6 +18,7 @@ export interface EffectMqDeploymentProfile {
   readonly policyIdentity: readonly string[];
 }
 
+/** @experimental */
 export interface EffectMqWorkerPublication {
   readonly provider: "effect-mq";
   readonly mechanism: "effect-mq-sdk";
@@ -27,6 +29,7 @@ export interface EffectMqWorkerPublication {
   readonly entrypoint: string;
 }
 
+/** @experimental */
 export const deploymentProfile: EffectMqDeploymentProfile = Object.freeze({
   provider: "effect-mq",
   compatibility: "native",
@@ -47,6 +50,7 @@ export const deploymentProfile: EffectMqDeploymentProfile = Object.freeze({
   ],
 });
 
+/** @experimental */
 export function nativeWorkerPublication(
   value: Omit<EffectMqWorkerPublication, "provider" | "mechanism">,
 ): EffectMqWorkerPublication {

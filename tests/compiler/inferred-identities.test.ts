@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import * as ts from "typescript";
-import { diffGraph } from "../../packages/graph/src/index.ts";
-import { readFacts } from "../../packages/compiler/src/discovery/source-facts.ts";
+import * as ts from "relkit-typescript";
+import { diffGraph } from "relkit/graph";
+import { readFacts } from "../../packages/cli/src/compiler/discovery/source-facts.ts";
 import {
   NORMALIZE_CODES,
   normalizeCompilation,
   type NormalizedDescriptor,
-} from "../../packages/compiler/src/index.ts";
-import type { ExtractedDescriptor } from "../../packages/compiler/src/discovery/extract.ts";
+} from "../../packages/cli/src/compiler/index.ts";
+import type { ExtractedDescriptor } from "../../packages/cli/src/compiler/discovery/extract.ts";
 
 const objectSchema = (properties: Record<string, unknown> = {}) => ({
   $relkit: "schema",

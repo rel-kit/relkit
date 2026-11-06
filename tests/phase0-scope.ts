@@ -12,7 +12,7 @@ describe.serial("Phase 0 guardrails", () => {
   test("scans content only when the final file extension is text", async () => {
     const name = ["terra", "form"].join("");
     const image = "tests/example.spec.ts-snapshots/image.png";
-    const source = "packages/app/src/value.ts";
+    const source = "packages/relkit/src/app/value.ts";
     return withFixture(
       { [image]: name, [source]: `export const value = "${name}";` },
       async (fixture) => {
@@ -34,17 +34,17 @@ describe.serial("Phase 0 guardrails", () => {
         expect(findings).toContainEqual(expect.objectContaining({ file, rule }));
       }
       expect(findings).not.toContainEqual(
-        expect.objectContaining({ file: "packages/app/src/error-code.ts" }),
+        expect.objectContaining({ file: "packages/relkit/src/app/error-code.ts" }),
       );
     });
   });
   test("ignores workspace coverage reports but still checks authored coverage files", async () => {
     const report = JSON.stringify({ name: ["pers", "istence"].join("") });
-    const generated = "packages/compiler/coverage/coverage-final.json";
-    const authored = "packages/compiler/src/coverage/coverage-final.json";
+    const generated = "packages/cli/coverage/compiler/coverage-final.json";
+    const authored = "packages/cli/src/compiler/coverage/coverage-final.json";
     return withFixture(
       {
-        "packages/compiler/package.json": manifest("@relkit/compiler"),
+        "packages/cli/package.json": manifest("@relkit/cli/compiler"),
         [generated]: report,
       },
       async (fixture) => {

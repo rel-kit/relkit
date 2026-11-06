@@ -60,27 +60,11 @@ export async function measureWorkloads(modules: PerformanceRecord): Promise<Perf
       throw new Error("Stream fixture failed");
   });
 
-  const jobSchema = schema.z.object({ value: schema.z.number() });
-  const job = await testing.createTestJob({
-    jobId: "bench.job",
-    target: {
-      id: "bench.job",
-      input: jobSchema,
-      output: jobSchema,
-      handler: (value: PerformanceRecord) => value,
-    },
-  });
-  const jobStarted = performance.now();
-  await repeat(100, (index) => job.enqueue({ value: index }));
-  const jobResults = await job.drain();
-  const jobMs = performance.now() - jobStarted;
-  if (jobResults.length !== 100) throw new Error("Job fixture did not drain");
-  await job.close();
-
+  const eventSchema = schema.z.object({ value: schema.z.number() });
   const event = await testing.createTestEvent({
     eventId: "bench.event",
     version: 1,
-    payloadSchema: jobSchema,
+    payloadSchema: eventSchema,
     triggers: Array.from({ length: 8 }, (_, index) => ({
       id: `bench.event.trigger.${index}`,
       delivery: "durable",
@@ -133,12 +117,6 @@ export async function measureWorkloads(modules: PerformanceRecord): Promise<Perf
     warmDirectInvocation,
     warmRoute,
     requestStream,
-    localJob: {
-      iterations: 100,
-      completed: jobResults.length,
-      totalMs: round(jobMs),
-      opsPerSecond: round(100_000 / jobMs),
-    },
     eventFanOut: {
       iterations: 100,
       fanOut: 8,

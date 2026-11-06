@@ -1,33 +1,33 @@
 
-▶ frozen install: /Users/mustafaelsayed/.bun/bin/bun install --frozen-lockfile
+▶ frozen install: <home>/.bun/bin/bun install --frozen-lockfile
 bun install v1.3.10 (30e609e0)
 
 Checked 423 installs across 440 packages (no changes) [8.00ms]
 ✓ frozen install
 ✓ frozen install no-diff
 
-▶ format check: /Users/mustafaelsayed/.bun/bin/bun x prettier --check AGENTS.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .github/workflows/ci.yml apps packages scripts templates tests
+▶ format check: <home>/.bun/bin/bun x prettier --check AGENTS.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .github/workflows/ci.yml apps packages scripts templates tests
 Checking formatting...
 All matched files use Prettier code style!
 ✓ format check
 
-▶ lint: /Users/mustafaelsayed/.bun/bin/bun run lint
+▶ lint: <home>/.bun/bin/bun run lint
 Public authoring scan passed (44 source/example fragments).
 ✓ lint
 
-▶ ESLint configuration check: /Users/mustafaelsayed/.bun/bin/bun x eslint eslint.config.mjs
+▶ ESLint configuration check: <home>/.bun/bin/bun x eslint eslint.config.mjs
 ✓ ESLint configuration check
 
-▶ boundaries and scope: /Users/mustafaelsayed/.bun/bin/bun run check
+▶ boundaries and scope: <home>/.bun/bin/bun run check
 Boundary check passed (34 roots, 766 TypeScript files).
 ✓ boundaries and scope
 
-▶ observability sink source scan: /Users/mustafaelsayed/.bun/bin/bun run scripts/check-observability-sinks.ts
+▶ observability sink source scan: <home>/.bun/bin/bun run scripts/check-observability-sinks.ts
 Observability sink source scan passed.
 ✓ observability sink source scan
 ✓ implementation-file limit (maximum 200 lines)
 
-▶ Konsistent configuration validation: /Users/mustafaelsayed/.bun/bin/bun run konsistent -- validate
+▶ Konsistent configuration validation: <home>/.bun/bin/bun run konsistent -- validate
 Configuration is valid.
 ✓ Konsistent configuration validation
 
@@ -44,46 +44,46 @@ Configuration is valid.
 ]
 ⚠ structural findings are advisory; configuration validation remains blocking
 
-▶ typecheck: /Users/mustafaelsayed/.bun/bin/bun run typecheck
+▶ typecheck: <home>/.bun/bin/bun run typecheck
 ✓ typecheck
 
-▶ type fixtures: /Users/mustafaelsayed/.bun/bin/bun run test:types
+▶ type fixtures: <home>/.bun/bin/bun run test:types
 Type fixtures passed (public descriptor inference and boundary rejection).
 ✓ type fixtures
 
-▶ unit and schema tests: /Users/mustafaelsayed/.bun/bin/bun run test:unit
+▶ unit and schema tests: <home>/.bun/bin/bun run test:unit
 bun test v1.3.10 (30e609e0)
 ✓ unit and schema tests
 
-▶ compiler and graph tests: /Users/mustafaelsayed/.bun/bin/bun run test:compiler
+▶ compiler and graph tests: <home>/.bun/bin/bun run test:compiler
 bun test v1.3.10 (30e609e0)
 ✓ compiler and graph tests
 
-▶ provider contracts: /Users/mustafaelsayed/.bun/bin/bun run test:contracts
+▶ provider contracts: <home>/.bun/bin/bun run test:contracts
 bun test v1.3.10 (30e609e0)
 ✓ provider contracts
 
-▶ integration tests: /Users/mustafaelsayed/.bun/bin/bun run test:integration
+▶ integration tests: <home>/.bun/bin/bun run test:integration
 bun test v1.3.10 (30e609e0)
 ✓ integration tests
 
-▶ restart tests: /Users/mustafaelsayed/.bun/bin/bun run test:restart
+▶ restart tests: <home>/.bun/bin/bun run test:restart
 bun test v1.3.10 (30e609e0)
 ✓ restart tests
 
-▶ inspector API tests: /Users/mustafaelsayed/.bun/bin/bun run test:inspector
+▶ inspector API tests: <home>/.bun/bin/bun run test:inspector
 bun test v1.3.10 (30e609e0)
 ✓ inspector API tests
 
-▶ generator tests: /Users/mustafaelsayed/.bun/bin/bun run test:generator
+▶ generator tests: <home>/.bun/bin/bun run test:generator
 bun test v1.3.10 (30e609e0)
 ✓ generator tests
 
-▶ packed generator smoke: /Users/mustafaelsayed/.bun/bin/bun run scripts/pack-and-smoke-create-relkit.ts
+▶ packed generator smoke: <home>/.bun/bin/bun run scripts/pack-and-smoke-create-relkit.ts
 packed create smoke passed (27 packages)
 ✓ packed generator smoke
 
-▶ build: /Users/mustafaelsayed/.bun/bin/bun run build
+▶ build: <home>/.bun/bin/bun run build
 
    • Packages in scope: @relkit/agents, @relkit/app, @relkit/buckets, @relkit/cache, @relkit/cli, @relkit/client-generator, @relkit/cloud-aws, @relkit/compiler, @relkit/config, @relkit/contracts, @relkit/deploy, @relkit/deploy-pulumi, @relkit/diagnostics, @relkit/engine, @relkit/events, @relkit/fixture-commerce, @relkit/functions, @relkit/graph, @relkit/inspector, @relkit/inspector-api, @relkit/jobs, @relkit/observability, @relkit/openapi, @relkit/providers-local, @relkit/routes, @relkit/runtime-effect, @relkit/runtime-hono, @relkit/schema, @relkit/supervisor, @relkit/testing, @relkit/tools, create-relkit
    • Running build in 32 packages
@@ -161,15 +161,15 @@ Workspace build passed.
 ▶ whitespace check: git diff --check
 ✓ whitespace check
 
-▶ security and redaction tests: /Users/mustafaelsayed/.bun/bin/bun run test:security
+▶ security and redaction tests: <home>/.bun/bin/bun run test:security
 bun test v1.3.10 (30e609e0)
 ✓ security and redaction tests
 
-▶ public declaration leak scan: /Users/mustafaelsayed/.bun/bin/bun run scripts/check-public-declarations.ts
+▶ public declaration leak scan: <home>/.bun/bin/bun run scripts/check-public-declarations.ts
 Public declaration scan passed (14 packages).
 ✓ public declaration leak scan
 
-▶ agent declaration/source/graph scans: /Users/mustafaelsayed/.bun/bin/bun test tests/agents/source-boundaries.test.ts tests/compiler/fixture-commerce.test.ts
+▶ agent declaration/source/graph scans: <home>/.bun/bin/bun test tests/agents/source-boundaries.test.ts tests/compiler/fixture-commerce.test.ts
 bun test v1.3.10 (30e609e0)
 ✓ agent declaration/source/graph scans
 

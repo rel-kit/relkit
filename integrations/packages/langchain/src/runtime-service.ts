@@ -10,6 +10,7 @@ export type { AgentExecutionService } from "./runtime-service.types.js";
 
 /** Injectable model, graph, loop, and identity boundary.
  * @example Effect.provide(invokeAgentEffect(options), AgentExecutionLive);
+ * @experimental
  */
 export class AgentExecution extends Context.Service<AgentExecution, AgentExecutionService>()(
   "relkit/agents/AgentExecution",
@@ -17,6 +18,7 @@ export class AgentExecution extends Context.Service<AgentExecution, AgentExecuti
 
 /** Live agent integrations used by the Promise compatibility API.
  * @example Effect.runPromise(Effect.provide(invokeAgentEffect(options), AgentExecutionLive));
+ * @experimental
  */
 export const AgentExecutionLive = Layer.effect(
   AgentExecution,

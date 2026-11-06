@@ -4,7 +4,7 @@
  * supplies t0 before spawning. Every child is scoped and reaped before returning.
  */
 import { Cause, Clock, Context, Effect, Exit, Layer, Ref, Schedule } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { BenchmarkNative } from "./benchmark-native.service.js";
 import type {
   BenchmarkChild,

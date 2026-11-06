@@ -1,7 +1,7 @@
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import type { CleanupIssue } from "./services/cleanup.types.js";
 import type { CliCleanupPresentation } from "./cli-runtime.types.js";
-import type { LogRecord } from "@relkit/runtime-effect";
+import type { LogRecord } from "relkit/runtime-effect";
 
 /**
  * Reports bounded cleanup evidence at an explicitly selected terminal boundary.

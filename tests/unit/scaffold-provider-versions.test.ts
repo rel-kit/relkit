@@ -9,7 +9,7 @@ test("scaffold catalog uses each provider's metadata instead of the generator re
   const source = join(import.meta.dir, "../../packages/create-relkit/src");
   try {
     await mkdir(join(root, "src"));
-    for (const file of ["scaffold-catalog.ts", "build-catalog.ts"])
+    for (const file of ["scaffold-catalog.ts", "build-catalog.ts", "integration-catalog.ts"])
       await copyFile(join(source, file), join(root, "src", file));
     await symlink(join(source, "add-types.ts"), join(root, "src/add-types.js"));
     const providerVersions = Object.fromEntries(

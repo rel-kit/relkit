@@ -52,7 +52,7 @@ After the engine lane passed its final acceptance and froze implementation, its 
 
 ## Vendor evidence and gaps
 
-Mandatory read-only reference: /Users/mustafaelsayed/Workspace/relkit/repos/effect, including ignored files via rg --no-ignore. Do not create/update/install in the reference. Core Effect/Context/Layer/ManagedRuntime/Clock/Schema/Ref/Config modules/tests and package manifest are absent; .agents/AGENTS.md and LLMS.md are absent. Retained modules sometimes use older effect/process, effect/sql and effect/observability paths, while rc.115 uses unstable subpaths.
+Mandatory read-only reference: <repo>/repos/effect, including ignored files via rg --no-ignore. Do not create/update/install in the reference. Core Effect/Context/Layer/ManagedRuntime/Clock/Schema/Ref/Config modules/tests and package manifest are absent; .agents/AGENTS.md and LLMS.md are absent. Retained modules sometimes use older effect/process, effect/sql and effect/observability paths, while rc.115 uses unstable subpaths.
 
 Retained evidence includes ai-docs/src/40_sql/10_basics.ts for Context.Service/Layer.effect/Effect.fn; packages/effect/src/persistence/PersistedCache.ts and corresponding tests; PersistedQueue implementation/tests for scoped fibers and schedules; process/ChildProcessSpawner.ts and process tests for acquisition and stream ownership; test/StackCapture.test.ts for named function behavior; test/observability/OtlpMetrics.test.ts for isolated registries and controlled clocks.
 

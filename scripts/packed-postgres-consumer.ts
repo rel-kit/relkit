@@ -9,7 +9,7 @@ import { runCommand, type Manifest } from "./pack-and-smoke-create-relkit-suppor
 
 /**
  * Verifies a standalone PostgreSQL consumer using only actual registry tarballs.
- * @param tarballs - Packed RELKIT artifacts, including the generator and native integration.
+ * @param tarballs - Packed RelKit artifacts, including the generator and native integration.
  * @param manifests - Source identities used to validate registry artifact metadata.
  * @returns When installation and strict dependency declaration compilation pass.
  * @remarks Uses an isolated install cache and a patch extracted from the generator

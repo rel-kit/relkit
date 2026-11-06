@@ -1,0 +1,5 @@
+import { s } from "relkit/schema";
+import { z as zod } from "zod";
+
+export const order = s.object({ id: s.string(), shape: { z: s } });
+export const other = zod.string();

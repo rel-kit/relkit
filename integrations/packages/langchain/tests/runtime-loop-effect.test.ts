@@ -1,16 +1,17 @@
 /** Exercises native runtime loop effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
-import { z } from "@relkit/schema";
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/adapter.js";
+import { z } from "relkit/schema";
 import { MemorySaver } from "@langchain/langgraph";
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
-import { defineAgent } from "../src/define-agent.js";
 import { defineCheckpointerDb } from "../src/define-persistence.js";
 import { runAgentLoopEffect } from "../src/runtime-loop.js";
 import { createTestModel } from "./test-model.js";
 
 const agent = defineAgent({
   id: "loop",
+  runtime: langchain(),
   input: z.object({ prompt: z.string() }),
   output: z.object({ answer: z.string() }),
   model: "default",

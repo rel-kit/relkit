@@ -1,0 +1,8 @@
+import { defineMiddleware } from "@relkit/app/routes";
+import orders from "../../services/orders/service.js";
+
+export default defineMiddleware("/orders/*", async (c, next) => {
+  const { totalCents } = await orders.priceOrder.invoke({ quantity: 1 });
+  await next();
+  c.header("x-unit-price-cents", String(totalCents));
+});

@@ -2,9 +2,9 @@
 
 import { dirname, relative } from "node:path";
 import { Effect, Layer, Ref } from "effect";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import { GeneratorIoError } from "create-relkit/internal/generator-errors";
-import type { GeneratorFileSystemService } from "create-relkit/internal/generator-filesystem.types";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { GeneratorIoError } from "create-relkit/generator-errors";
+import type { GeneratorFileSystemService } from "create-relkit/generator-filesystem.types";
 import { readOperations } from "./generator-services-read.fixture.js";
 import { mutationOperations } from "./generator-services-mutate.fixture.js";
 import { directoryOperations } from "./generator-services-directories.fixture.js";

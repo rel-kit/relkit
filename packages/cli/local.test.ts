@@ -87,7 +87,7 @@ async function localProject(): Promise<string> {
   await cp(join(process.cwd(), "examples/commerce/package.json"), join(root, "package.json"));
   await writeFile(
     join(root, "relkit.config.ts"),
-    `import { defineApp, defineEnv } from "@relkit/app";
+    `import { defineApp, defineEnv } from "relkit";
 import { docker } from "@relkit/docker";
 import { redis } from "@relkit/redis";
 export default defineApp({ id: "local-cli", env: defineEnv({}), cache: docker(redis()) });

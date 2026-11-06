@@ -8,6 +8,7 @@ import { SERVER_INVOCATION_SOURCE } from "./build-server-invocation.js";
 import { SERVER_REGISTRATION_SOURCE } from "./build-server-registration.js";
 import { SERVER_NATIVE_WORKER_SOURCE } from "./build-server-native-worker.js";
 import { SERVER_RUNTIME_SOURCE } from "./build-server-runtime.js";
+import { SERVER_FUNCTION_HOST_SOURCE } from "./build-server-function-host.js";
 import { serverShutdownSource } from "./build-server-shutdown.js";
 import type { ServerSourceEmission } from "./build-server.types.js";
 
@@ -24,6 +25,7 @@ ${SERVER_REGISTRATION_SOURCE}
 ${agentSource.registration}
 ${SERVER_NATIVE_WORKER_SOURCE}
 ${SERVER_RUNTIME_SOURCE}
+${SERVER_FUNCTION_HOST_SOURCE}
 ${serverShutdownSource(agentSource.release)}
 } catch (error) {
   await runtimeOwner.shutdown(async () => {});

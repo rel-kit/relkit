@@ -1,4 +1,4 @@
-import type { StandardSchemaV1 } from "@relkit/schema";
+import type { StandardSchemaV1 } from "relkit/schema";
 import type { TestRuntime } from "./runtime.js";
 
 /** Native function-backed HTTP route and its declared exposure/validation contract. */
@@ -21,6 +21,9 @@ export type TestFunctionRoute = {
     readonly status?: number;
     readonly errorId?: string;
   }[];
+  /** The route's `response` option, applied to successful responses. */
+  readonly response?: (output: never) => unknown;
+  readonly auth?: "required";
 };
 
 /** Raw native HTTP route preserving its original handler and method contract. */
@@ -28,7 +31,7 @@ export type TestRawRoute = {
   readonly method: "ALL";
   readonly path: string;
   readonly handler: (request: Request) => Response | Promise<Response>;
-  readonly auth?: { readonly protected: readonly string[] };
+  readonly auth?: { readonly kind: "better-auth" };
 };
 
 /** Supported native function or raw HTTP route declaration. */
@@ -40,4 +43,6 @@ export type AuthoredRoute = Omit<TestFunctionRoute, "method" | "path" | "request
   readonly request?: unknown;
   readonly responses?: TestFunctionRoute["responses"];
   readonly successStatus?: number;
+  readonly response?: (output: never) => unknown;
+  readonly auth?: "required";
 };

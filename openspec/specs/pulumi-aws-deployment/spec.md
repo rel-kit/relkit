@@ -4,15 +4,6 @@ Defines provider-neutral deployment planning and Pulumi Automation API delivery 
 
 ## Requirements
 
-### Requirement: Pulumi is the only POC deployment engine
-
-Deployment init, preview, up, refresh, outputs, and destroy SHALL be driven through Pulumi Automation API and the Pulumi CLI/backend; RelKit SHALL NOT introduce another infrastructure engine or state system.
-
-#### Scenario: Deployment stack is initialized
-
-- **WHEN** `relkit deploy init --stack development` succeeds
-- **THEN** it creates/selects a Pulumi project and explicit stack using the configured Pulumi backend without creating RelKit-owned infrastructure state
-
 ### Requirement: Stable resource identity
 
 Pulumi project, stack, logical resource names, parent relationships, and tags SHALL derive from normalized application/stable descriptor IDs and explicit stack, not source paths, with tags including app, stack, graph hash, and `managed-by=relkit`.
@@ -35,6 +26,14 @@ Pulumi project, stack, logical resource names, parent relationships, and tags SH
 
 - **WHEN** the production process is ready and receives SIGTERM during an in-flight request
 - **THEN** it stops accepting new traffic, drains or cancels by deadline, flushes bounded telemetry, and exits within the configured limit
+
+#### Scenario: Selected runtime has external native requirements
+- **WHEN** a supported runtime driver or worker is external to the JavaScript bundle
+- **THEN** generated production dependency metadata and container copy allowlists include every required external module, native binary, worker and asset without development-tooling fallback
+
+#### Scenario: Artifact is moved and installed production-only
+- **WHEN** emitted JavaScript and its complete runtime closure are relocated outside the checkout with development dependencies omitted
+- **THEN** documented startup, readiness, native functionality and shutdown pass without CLI/compiler/inspector/Pulumi and no rich inspection endpoint is registered
 
 ### Requirement: Preview makes no cloud changes
 
@@ -162,3 +161,38 @@ Accepted runs SHALL pin stable task/job/version/build/service-generation and sch
 
 - **WHEN** a prior build is reactivated for new submissions
 - **THEN** each accepted run continues on its original build and new runs use the selected rollback build
+
+### Requirement: Deployment implementation resolves from its selected integration
+CLI parsing/help and authoring metadata SHALL remain independent of deployment execution SDKs. A selected integration SHALL own and resolve its implementation from the consumer's installation, with deployment-only requirements excluded from runtime startup and production output.
+
+#### Scenario: Packed consumer prepares deployment offline
+- **WHEN** an external packed consumer selects AWS/Pulumi and executes supported plan/mock verification
+- **THEN** selected implementation resolution succeeds without workspace hoisting or cloud mutation, while an unselected backend does not install those SDKs
+
+### Requirement: Pulumi drives targets with maintained providers
+
+For targets that use Pulumi, deploy init, preview, up, refresh, outputs and destroy SHALL run through
+the Pulumi Automation API and the configured Pulumi backend without RelKit-owned infrastructure state,
+and applications that select no Pulumi target SHALL NOT load Pulumi.
+
+#### Scenario: Deployment stack is initialized
+
+- **WHEN** `relkit deploy init aws --stack development` succeeds
+- **THEN** it creates or selects a Pulumi project and an explicit stack using the configured Pulumi
+  backend, without creating RelKit-owned infrastructure state
+
+#### Scenario: Ordinary CLI help or backend starts
+
+- **WHEN** no Pulumi target is selected
+- **THEN** help, configuration metadata and backend startup require no Pulumi implementation or
+  deployment-only AWS SDK
+
+### Requirement: AWS hosting is Labs until proven
+
+AWS hosting SHALL be labelled Labs until it builds and pushes its own image, serves HTTPS, runs more
+than one task and passes a real deploy test in CI.
+
+#### Scenario: Docs before the criteria pass
+
+- **WHEN** the AWS deployment docs are viewed before those criteria pass
+- **THEN** the page carries the Labs badge and lists the missing criteria

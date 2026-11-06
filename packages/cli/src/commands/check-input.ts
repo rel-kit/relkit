@@ -1,7 +1,7 @@
 /** Reads contained project configuration and source snapshots before compiler discovery. */
 import { join, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { normalizeId } from "@relkit/contracts";
+import { normalizeId } from "relkit/contracts";
 import { Effect, Schema } from "effect";
 import { observeCli } from "../cli-runtime.js";
 import { cliTry } from "../cli-errors.js";

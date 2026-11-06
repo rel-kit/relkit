@@ -1,0 +1,6 @@
+import lookup from "./lookup.tool.js";
+import { graph } from "./graph.js";
+import { callToolEffect } from "relkit/effect";
+
+export const a = callToolEffect(lookup, { q: "x" });
+export const b = graph.invokeEffect({ q: "x" });

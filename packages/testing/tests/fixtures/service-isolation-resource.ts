@@ -6,7 +6,7 @@ import { drizzle } from "drizzle-orm/bun-sqlite";
 import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
 import { defineDrizzleService } from "@relkit/drizzle";
 import { defineBetterAuthService } from "@relkit/better-auth";
-import { defineRoute } from "@relkit/routes";
+import { defineRoute } from "relkit/routes";
 
 const records = sqliteTable("records", { id: integer().primaryKey() });
 export const clients: Database[] = [];
@@ -29,4 +29,4 @@ export const auth = defineBetterAuthService({
   secret: "testing-isolated-auth-owner-secret-at-least-32-bytes",
   emailAndPassword: { enabled: true },
 });
-export const authRoute = defineRoute({ handler: auth.handler, auth: { protected: [] } });
+export const authRoute = defineRoute({ handler: auth.handler });

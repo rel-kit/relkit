@@ -1,6 +1,3 @@
-import type { PendingOperationMetadata } from "@relkit/contracts";
-import { runExecutionSync } from "@relkit/contracts/operation";
-import { mutationOperations, mutationRuntime } from "./mutation-runtime.js";
 import { readRunId } from "./job-hooks-support.js";
 import type { RelkitClientRuntime } from "./context.js";
 import { RelkitWriteError } from "./write-error.js";
@@ -14,24 +11,9 @@ export function writableScope(
   runtime: RelkitClientRuntime,
 ): NonNullable<RelkitClientRuntime["scope"]> {
   if (runtime.status !== "ready" || runtime.scope === undefined || runtime.identity === undefined) {
-    throw new RelkitWriteError("not-sent", `Relkit client is not ready (${runtime.status})`);
+    throw new RelkitWriteError("not-sent", `RelKit client is not ready (${runtime.status})`);
   }
   return runtime.scope;
-}
-
-/**
- * Applies the existing authoritative or unknown receipt settlement policy.
- * @param scopeKey - Complete serialized identity scope.
- * @param pending - Original pending receipt metadata.
- * @param error - Original public failure object.
- * @returns Nothing; the existing owned state or publication is updated.
- */
-export function settlePending(
-  scopeKey: string,
-  pending: PendingOperationMetadata,
-  error: unknown,
-): void {
-  runExecutionSync(mutationRuntime, mutationOperations.settle(scopeKey, pending, error));
 }
 
 /**

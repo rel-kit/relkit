@@ -111,5 +111,5 @@ to the output schema updated the live response without restarting the server.
 - Formatting, lint, configuration validation and `git diff --check` passed.
 
 Repository-wide guardrails still encounter two pre-existing failures: the scope scan
-includes `packages/compiler/coverage/coverage-final.json`, and package export smoke
-rejects the current `@relkit/events` export map. These checks are not reported as passing.
+includes `packages/cli/coverage/compiler/coverage-final.json`, and package export smoke
+rejects the current `relkit/events` export map. These checks are not reported as passing.

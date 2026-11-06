@@ -21,23 +21,23 @@ bun run relkit --json check
 
 `--json` is a global option and appears before the command. `check` also writes
 `.relkit/generated/diagnostics.json` with stable codes, severity, source locations, descriptor IDs, and suggested
-repairs. Review output before sharing it; external tools can still print values RELKIT did not create.
+repairs. Review output before sharing it; external tools can still print values RelKit did not create.
 
 ## Diagnose the owning layer
 
-| Symptom                            | Inspect                                                 | Repair                                                                                                                      |
-| ---------------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| CLI rejects a flag                 | `relkit <command> --help`                               | Use the contextual option and place global flags first.                                                                     |
-| Graph will not compile             | `relkit --json check`                                   | Fix the first source-located configuration, identity, target, route, or schema diagnostic.                                  |
-| Environment is incomplete          | `relkit env check` and `relkit env explain NAME`        | Supply the declared value; do not add a hidden runtime branch.                                                              |
-| Local integration will not start   | `relkit local status` and Docker health                 | Repair the recipe or use `dev --local=off` with connected values.                                                           |
-| A new generation will not activate | Candidate diagnostic and readiness                      | Fix graph, manifest, integration, or readiness state; the last valid generation remains active.                             |
-| A prepared start falls back        | `relkit --json check` and `relkit dev --prepare`        | Repair stale inputs or an ineligible dynamic configuration; fallback keeps the full safe check.                             |
-| Route is unavailable               | `/_relkit/v1/health/live` and the route URL             | Confirm the active project, port, method, and route-to-function edge.                                                       |
-| Inspector is stale or absent       | Standalone tool status and private connection selection | Complete [tool install, bridge enablement and launch](/docs/modules/operations/inspector); distinguish UI and bridge ports. |
-| Build will not start               | `bun run build` and manifest/hash diagnostic            | Start only the current unedited build output.                                                                               |
-| Deployment preview fails           | `relkit --json doctor --pulumi` and preview             | Fix the first Pulumi, backend, role, integration, or environment diagnostic.                                                |
-| Test is flaky                      | The smallest test file                                  | Use deterministic fakes and explicit completion; remove arbitrary sleeps.                                                   |
+| Symptom                              | Inspect                                                 | Repair                                                                                                                      |
+| ------------------------------------ | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| CLI rejects a flag                   | `relkit <command> --help`                               | Use the contextual option and place global flags first.                                                                     |
+| Graph will not compile               | `relkit --json check`                                   | Fix the first source-located configuration, identity, target, route, or schema diagnostic.                                  |
+| Environment is incomplete            | `relkit env check` and `relkit env explain NAME`        | Supply the declared value; do not add a hidden runtime branch.                                                              |
+| Local integration will not start     | `relkit local status` and Docker health                 | Repair the recipe or use `dev --local=off` with connected values.                                                           |
+| A new generation will not activate   | Candidate diagnostic and readiness                      | Fix graph, manifest, integration, or readiness state; the last valid generation remains active.                             |
+| A save restarts instead of reloading | `relkit dev --verbose` (`dev.reload.restart` reason)    | Expected for configuration, binding, route-shape and dependency changes; handler edits reload in place.                     |
+| Route is unavailable                 | `/_relkit/v1/health/live` and the route URL             | Confirm the active project, port, method, and route-to-function edge.                                                       |
+| Inspector is stale or absent         | Standalone tool status and private connection selection | Complete [tool install, bridge enablement and launch](/docs/modules/operations/inspector); distinguish UI and bridge ports. |
+| Build will not start                 | `bun run build` and manifest/hash diagnostic            | Start only the current unedited build output.                                                                               |
+| Deployment preview fails             | `relkit --json doctor --pulumi` and preview             | Fix the first Pulumi, backend, role, integration, or environment diagnostic.                                                |
+| Test is flaky                        | The smallest test file                                  | Use deterministic fakes and explicit completion; remove arbitrary sleeps.                                                   |
 
 ## Verify from narrow to broad
 

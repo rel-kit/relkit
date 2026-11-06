@@ -1,5 +1,5 @@
 /** Declares private JSON/image assets with a five-million-byte limit for validated upload handlers. */
-import { defineBucket } from "@relkit/app/buckets";
+import { defineBucket } from "relkit/buckets";
 
 const assets = defineBucket({
   id: "assets.objects",

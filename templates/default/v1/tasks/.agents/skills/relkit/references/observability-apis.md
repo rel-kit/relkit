@@ -1,12 +1,12 @@
 # Observability and tracing
 
-RELKIT records HTTP requests and invocation spans automatically. Use `context.log` for structured application records and `context.trace` for application work inside an existing function that needs more detail.
+RelKit records HTTP requests and invocation spans automatically. Use `context.log` for structured application records and `context.trace` for application work inside an existing function that needs more detail.
 
 ## Log and trace inside a function
 
 ```ts
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "zod";
 
 export default defineFunction({
   id: "orders.total",
@@ -26,14 +26,14 @@ export default defineFunction({
 });
 ```
 
-`span(name, callback)` creates an internal child span; `span(name, { attributes, kind }, callback)` adds attributes and an `internal` or `client` kind. `event(name, attributes?)` adds an event to the active span, and `setAttributes` annotates it. RELKIT ends child spans on success or failure. Attribute values must be strings, finite numbers, or booleans. Do not log secrets or put payloads or random IDs in span attributes.
+`span(name, callback)` creates an internal child span; `span(name, { attributes, kind }, callback)` adds attributes and an `internal` or `client` kind. `event(name, attributes?)` adds an event to the active span, and `setAttributes` annotates it. RelKit ends child spans on success or failure. Attribute values must be strings, finite numbers, or booleans. Do not log secrets or put payloads or random IDs in span attributes.
 
 ## Configure capture and export
 
 Edit the existing `relkit.config.ts` and preserve its environment and provider settings:
 
 ```ts
-import { defineApp } from "@relkit/app/config";
+import { defineApp } from "relkit/config";
 import env from "@app/platform/env.js";
 
 export default defineApp({

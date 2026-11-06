@@ -1,10 +1,7 @@
 /** Checks selected deployment metadata before its SDK namespace is evaluated. */
 import { Effect } from "effect";
-import type { ResolvedIntegrationPackageRole } from "@relkit/compiler";
-import {
-  SelectedDependencies,
-  SelectedDependenciesLive,
-} from "@relkit/provider/internal/dependencies";
+import type { ResolvedIntegrationPackageRole } from "../compiler/index.js";
+import { SelectedDependencies, SelectedDependenciesLive } from "relkit/provider/dependencies";
 import { cliAdapterError } from "../cli-errors.js";
 
 /** Retains the original resolution failure while presenting deployment diagnostics. */

@@ -5,23 +5,27 @@ import {
   type InfrastructureProviderSource,
   type ProviderAdapter,
   type ProviderCapability,
-} from "@relkit/provider";
+} from "relkit/provider";
 
 type S3Adapter = ProviderAdapter<ProviderCapability<"bucket">, "s3">;
 type RedisAdapter = ProviderAdapter<ProviderCapability<"cache">, "redis">;
+/** @experimental */
 export type AwsAdapter = S3Adapter | RedisAdapter;
 
+/** @experimental */
 export interface AwsS3Options {
   readonly versioning?: boolean;
   readonly forceDestroy?: boolean;
 }
 
+/** @experimental */
 export interface AwsRedisOptions {
   readonly engine?: "valkey" | "redis";
   readonly nodeType?: string;
   readonly replicas?: number;
 }
 
+/** @experimental */
 export type AwsOptions<Adapter extends AwsAdapter> = Adapter extends S3Adapter
   ? AwsS3Options
   : AwsRedisOptions;
@@ -39,6 +43,7 @@ const integration = defineIntegrationReference("aws");
  * ```
  * @category Integrations
  * @since 0.2.0
+ * @experimental
  */
 export function aws<const Adapter extends AwsAdapter>(
   adapter: Adapter,

@@ -3,12 +3,9 @@ import { expect } from "bun:test";
 
 import { chmod, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { ADD_FAILURE_CODES } from "create-relkit/internal/add-types";
+import { ADD_FAILURE_CODES } from "create-relkit/add-types";
 import { applyScaffoldPlan } from "../../src/scaffolding/add-transaction.js";
-import {
-  prepareProjectDependencyPatch,
-  readDrizzlePatch,
-} from "create-relkit/internal/dependency-patches";
+import { prepareProjectDependencyPatch, readDrizzlePatch } from "create-relkit/dependency-patches";
 import { patchBuilder, withProject } from "./dependency-patches.fixture.js";
 
 /** Verifies that asset-only repair snapshots a lock created during the failed installation.

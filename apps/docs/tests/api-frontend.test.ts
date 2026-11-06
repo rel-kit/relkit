@@ -27,7 +27,7 @@ test("places the frontend beside the exact API without consuming the following e
     "",
     "Another contract.",
   ].join("\n");
-  const result = withFrontendExample(source, "packages/routes/src/define-route.ts");
+  const result = withFrontendExample(source, "packages/relkit/src/routes/define-route.ts");
   expect(result).toContain("#### Backend and frontend example");
   expect(result.indexOf("/_frontend/echo.mdx")).toBeLessThan(
     result.indexOf("### defineRouteEffect"),
@@ -36,22 +36,22 @@ test("places the frontend beside the exact API without consuming the following e
   expect(result.match(/#### Backend and frontend example/g)).toHaveLength(1);
 });
 
-test("does not attach task-first clients to a same-named legacy job factory", () => {
-  const source = "## `legacy-define-job.ts`\n\n### defineJob\n\nLegacy contract.";
-  expect(withFrontendExample(source, "packages/jobs/src/legacy-define-job.ts")).toBe(source);
-  expect(withFrontendExample(source, "packages/jobs/src/define-job.ts")).toContain(
+test("attaches the job client example only to the defineJob source file", () => {
+  const source = "## `define-job-value.ts`\n\n### defineJob\n\nInternal contract.";
+  expect(withFrontendExample(source, "packages/relkit/src/jobs/define-job-value.ts")).toBe(source);
+  expect(withFrontendExample(source, "packages/relkit/src/jobs/define-job.ts")).toContain(
     "/_frontend/job.mdx",
   );
 });
 
 test("fails when a configured symbol disappears or becomes ambiguous", () => {
-  expect(() => withFrontendExample("### renamed", "packages/routes/src/define-route.ts")).toThrow(
-    "Expected one",
-  );
+  expect(() =>
+    withFrontendExample("### renamed", "packages/relkit/src/routes/define-route.ts"),
+  ).toThrow("Expected one");
   expect(() =>
     withFrontendExample(
       "### defineRoute\n\n### defineRoute",
-      "packages/routes/src/define-route.ts",
+      "packages/relkit/src/routes/define-route.ts",
     ),
   ).toThrow("Expected one");
 });

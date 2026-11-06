@@ -1,17 +1,29 @@
 # AGENTS.md
 
-This is the working guide for agents in the RELKIT repository. User instructions
+This is the working guide for agents in the RelKit repository. User instructions
 take precedence; a more-specific `AGENTS.md` in a subtree takes precedence
 over this file. Read it before editing.
 
 ## Repository
 
-RELKIT is experimental: interfaces may change, and current consumers are
-repository samples. Update affected samples directly within the task while
-preserving their data and applied migration history. This does not authorize
-data deletion or new legacy upgrade commands or compatibility layers.
+RelKit is experimental until Core reaches 1.0: interfaces may change, and
+current consumers are repository samples. Update affected samples directly
+within the task while preserving their data and applied migration history. This
+does not authorize data deletion or new legacy upgrade commands or
+compatibility layers.
 
-RELKIT is a strict TypeScript monorepo managed by Bun `1.3.10` and Turborepo.
+Every feature is Core or Labs. Core is covered by the stability policy; Labs can
+change in any release and carries the `@experimental` tag. The
+[maturity table](apps/docs/content/docs/maturity.mdx) lists which is which, and
+the [versioning and upgrades page](apps/docs/content/docs/versioning.mdx) holds
+the stability policy, the 1.0 criteria and the target date: semantic versioning
+for Core from 1.0, and a deprecated Core API keeps working with a coded
+`RELKIT_DEPRECATED_*` warning for one minor release. The one pre-1.0 breaking
+release ships with a `relkit migrate` migration and a
+[migration guide](apps/docs/content/guides/migrate/relkit-0-9.mdx); repository
+samples are migrated with that same command.
+
+RelKit is a strict TypeScript monorepo managed by Bun `1.3.10` and Turborepo.
 The main product topology is:
 
 | Path                    | Role                                                                                                                            |
@@ -19,10 +31,10 @@ The main product topology is:
 | `apps/docs`             | Searchable Blume/Astro Learn, Modules, Guides, and generated API/CLI reference, normally served on port `3001`.                 |
 | `apps/inspector`        | Next.js inspector app, normally served on port `3210`.                                                                          |
 | `examples/commerce`     | Canonical executable example and cross-feature acceptance application.                                                          |
-| `integrations/catalog`  | Optional side-effect-free `@relkit/integrations` catalog.                                                                       |
 | `integrations/packages` | Independently publishable Redis, S3, Docker, local, Cloudflare, telemetry, AWS, and Pulumi integrations.                        |
 | `packages/`             | Authoring APIs, compiler/graph, engine, runtimes, providers, CLI, generator, and Pulumi deployment.                             |
 | `templates/default/v1`  | Generated `minimal`, `api`, and `agent` projects.                                                                               |
+| `tools/typescript-api`  | Private `relkit-typescript` package: the TypeScript 5.9 API for tooling while the workspace compiles with TypeScript 7.         |
 | `tests/`                | Type, unit, compiler, contract, integration, restart, inspector, generator, deployment, container, security, and browser tests. |
 | `scripts/`              | Boundary, build, release, smoke, performance, and verification tooling.                                                         |
 | `docs/`                 | User documentation, technical specifications, decisions, and evidence.                                                          |
@@ -41,7 +53,7 @@ New applications group generic, database, and auth boundaries at
 `src/services/<name>/service.ts`, with their descriptors, schemas, helpers, and
 assets colocated beneath that service. Routes remain in `src/routes`; environment
 contracts and explicitly imported configuration/provider fragments live in
-`src/platform`. Application descriptors use plain TypeScript and public RELKIT
+`src/platform`. Application descriptors use plain TypeScript and public RelKit
 APIs, without requiring Effect imports.
 
 Existing flat `src/<name>/service.ts` applications remain supported; add preserves
@@ -52,7 +64,7 @@ Platform cannot import services or Routes. Helpers do not independently create
 domains. Preserve logical IDs, exposure, policies, and durable versions during
 source-only moves. Optional `relkit migrate layout` previews before `--write`;
 `--rollback <receipt>` restores only matching owned bytes. Check, typecheck, and
-fresh `relkit dev --prepare` are required after either operation.
+fresh `relkit dev --prepare` are required after either operation (advisory).
 
 ## Commands
 
@@ -77,7 +89,7 @@ the opt-in Redis/MinIO Docker lifecycle.
 The repository guardrail suite is `bun test tests/phase0.test.ts`.
 `test:all` is fail-fast and local by default. Cloud acceptance requires
 explicit `RELKIT_TEST_ALL_CLOUD=1`, `RELKIT_AWS_INTEGRATION_REGION`, and
-`RELKIT_AWS_INTEGRATION_IMAGE`; do not incur cloud cost without authorization.
+`RELKIT_AWS_INTEGRATION_IMAGE`; do not incur cloud cost without authorization (advisory).
 Before any authorized push, run `bun run prepush`, which mirrors the focused
 merge-blocking CI checks and needs no Docker daemon. Run `bun run prepush:full`
 with Docker available for full local acceptance. Dependency review is CI-only;
@@ -94,44 +106,57 @@ tool nor legacy environment flags enables rich inspection in production.
 
 ## Editing rules
 
-- Use strict TypeScript, double quotes, semicolons, and the shared configs.
-- Keep implementation files at or below 250 lines; split by responsibility.
-- Prefer existing utilities and standard-library APIs over new abstractions or
-  dependencies. Add focused regression coverage for non-trivial behavior.
-- Use `apply_patch` for source and documentation edits; do not hand-edit
-  generated files.
-- Do not stage, commit, push, reset, check out, or delete user-owned work unless
-  explicitly requested. Do not modify protected normative documents or
-  `repos/effect` during unrelated work.
-- For scoped OpenSpec/provider compatibility work, the user grants standing
-  authority to resolve local blockers autonomously, including changing local
-  dependency pins or revising capability evidence when a native guarantee is
-  unavailable; ask before cloud spend, destructive actions, or Git operations.
-- Inspect overlapping dirty changes before editing and report unavailable or
-  intentionally skipped checks honestly.
+Rules marked **Enforced** have a check in `bun run prepush` and CI; the
+[rules table](CONTRIBUTING.md#rules-and-their-checks) names each check. Rules
+marked **Advisory** have no check.
 
-Before changing exports, imports, directories, or naming conventions, read
-`.agents/skills/konsistent-config/SKILL.md`.
+- **Enforced:** Use strict TypeScript, double quotes, semicolons, and the shared
+  configs.
+- **Enforced:** Keep implementation files at or below 250 lines; split by
+  responsibility. Files already over the limit may only shrink.
+- **Enforced:** Keep `Bun.*` calls and `bun:` imports in runtime adapters
+  (`relkit/runtime/bun`, `relkit/runtime/node`), and `node:` imports too outside the
+  CLI, creator, testing and inspector tools; older call sites may only shrink.
+- **Enforced:** Do not commit bug-fix reports, raw evidence, or machine-specific
+  paths. Link the GitHub issue, keep full reports in CI artifacts, and use
+  repository-relative paths.
+- **Enforced:** Follow the naming, export, and directory conventions checked by
+  `bun run konsistent -- validate`. Before changing them, read
+  `.agents/skills/konsistent-config/SKILL.md` (advisory).
+- **Advisory:** Prefer existing utilities and standard-library APIs over new
+  abstractions or dependencies. Add focused regression coverage for non-trivial
+  behavior.
+- **Advisory:** Use `apply_patch` for source and documentation edits; do not
+  hand-edit generated files.
+- **Advisory:** Do not stage, commit, push, reset, check out, or delete
+  user-owned work unless explicitly requested. Do not modify protected normative
+  documents or `repos/effect` during unrelated work.
+- **Advisory:** For scoped OpenSpec/provider compatibility work, the user grants
+  standing authority to resolve local blockers autonomously, including changing
+  local dependency pins or revising capability evidence when a native guarantee
+  is unavailable; ask before cloud spend, destructive actions, or Git operations.
+- **Advisory:** Inspect overlapping dirty changes before editing and report
+  unavailable or intentionally skipped checks honestly.
 
 ## Effect work
 
-- For all code changes, always use the
-  [use-effect skill](/Users/mustafaelsayed/.codex/skills/use-effect/SKILL.md).
+- **Advisory:** For all code changes, use the
+  [use-effect skill](.agents/skills/use-effect/SKILL.md).
   Read it before discovery or editing, and read and apply its required
   references before each relevant phase.
-- For Effect implementation or review, read `.agents/skills/effect/SKILL.md`
-  and the references matching the task before editing. Apply it alongside the
-  nearest `AGENTS.md` and established RELKIT conventions. Use the skill to
-  identify relevant Effect APIs and patterns.
-- For each relevant API or pattern, always inspect its implementation, tests,
-  and examples in the read-only `repos/effect` checkout, even when the skill
-  describes it. Check the pinned Effect version and installed
-  `node_modules/effect` source to verify compatibility. If the checkout lacks
-  a relevant file, note the gap and use the installed package source.
-- Read
-  `repos/effect/.agents/AGENTS.md` and `repos/effect/LLMS.md` if those files
-  exist. Git ignores `repos/*`, so use `rg --no-ignore` when searching there;
-  direct file reads continue to work. Do not edit or install in `repos/effect`.
+- **Advisory:** For Effect implementation or review, read
+  `.agents/skills/effect/SKILL.md` and the references matching the task before
+  editing. Apply it alongside the nearest `AGENTS.md` and established RelKit
+  conventions. Use the skill to identify relevant Effect APIs and patterns.
+- **Advisory:** For each relevant API or pattern, inspect its implementation,
+  tests, and examples in the read-only `repos/effect` checkout, even when the
+  skill describes it. Check the pinned Effect version and installed
+  `node_modules/effect` source to verify compatibility. If the checkout lacks a
+  relevant file, note the gap and use the installed package source.
+- **Advisory:** Read `repos/effect/.agents/AGENTS.md` and `repos/effect/LLMS.md`
+  if those files exist. Git ignores `repos/*`, so use `rg --no-ignore` when
+  searching there; direct file reads continue to work. Do not edit or install in
+  `repos/effect`.
 
 <!-- CODEGRAPH_START -->
 

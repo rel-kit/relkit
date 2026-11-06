@@ -1,12 +1,12 @@
 /** Resolves packed selected role exports and executes actual AWS materializers through the native Pulumi mock monitor. */
 import assert from "node:assert/strict";
 import { isAbsolute, relative } from "node:path";
-import { resolveIntegrationPackageRole } from "@relkit/compiler";
-import { assertDeploymentPlanVersion } from "@relkit/deploy";
+import { resolveIntegrationPackageRole } from "@relkit/cli/compiler";
+import { assertDeploymentPlanVersion } from "relkit/deploy";
 import {
   materializeDeploymentOperations,
   materializePulumiDeployment,
-} from "@relkit/deploy-pulumi";
+} from "@relkit/pulumi/deploy-pulumi";
 import { awsHost } from "@relkit/aws/host";
 import { awsInfrastructure } from "@relkit/aws/infrastructure";
 import { awsAccess } from "@relkit/aws/access";

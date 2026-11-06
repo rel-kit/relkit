@@ -1,12 +1,12 @@
 /** Adapts interactive add questions to the shared prompt service and returns selected values or the original cancellation failure. */
 
 import { Effect, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { normalizeArtifactName } from "./add-name.js";
 
-import { GeneratorPrompt } from "create-relkit/internal/generator-prompt";
+import { GeneratorPrompt } from "create-relkit/generator-prompt";
 
-import type { PromptOption } from "create-relkit/internal/prompt-driver.types";
+import type { PromptOption } from "create-relkit/prompt-driver.types";
 import type { AddResolutionSnapshot } from "./add-resolution-state.types.js";
 
 /**

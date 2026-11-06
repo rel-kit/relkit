@@ -28,14 +28,14 @@ export function migrationFixtureFiles(repository: string) {
       include: ["src", "relkit.config.ts", ".relkit/generated/*.d.ts"],
     }),
     "relkit.config.ts":
-      'import { defineApp, defineEnv } from "@relkit/app";\nexport default defineApp({ id: "layout-migration-test", env: defineEnv({}) });\n',
+      'import { defineApp, defineEnv } from "relkit";\nexport default defineApp({ id: "layout-migration-test", env: defineEnv({}) });\n',
     "src/hello/service.ts":
-      'import { defineService } from "@relkit/app";\nimport hello from "./functions/hello.function.js";\nexport default defineService({ functions: { hello } });\n',
+      'import { defineService } from "relkit";\nimport hello from "./functions/hello.function.js";\nexport default defineService({ functions: { hello } });\n',
     "src/hello/functions/hello.function.ts":
-      'import { defineFunction } from "@relkit/app";\nimport { z } from "@relkit/schema";\nexport default defineFunction({ input: z.object({}), output: z.string(), handler: async () => "hello" });\n',
+      'import { defineFunction } from "relkit";\nimport { z } from "relkit/schema";\nexport default defineFunction({ input: z.object({}), output: z.string(), handler: async () => "hello" });\n',
     "src/hello/assets/message.bin": "asset-byte-sentinel",
     "src/routes/route.ts":
-      'import { defineRoute } from "@relkit/app";\nimport hello from "../hello/service.js";\nexport const GET = defineRoute({ target: hello.hello });\n',
+      'import { defineRoute } from "relkit";\nimport hello from "../hello/service.js";\nexport const GET = defineRoute({ target: hello.hello });\n',
     ".relkit/state/sentinel": "state-byte-sentinel",
     ".relkit/observability/sentinel": "observability-byte-sentinel",
     "migrations/sentinel.sql": "migration-byte-sentinel",

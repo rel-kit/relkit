@@ -1,5 +1,5 @@
 /** Pure migration destination findings and warning policy for the selected layout. */
-import type { ApplicationLayout } from "@relkit/contracts";
+import type { ApplicationLayout } from "relkit/contracts";
 import type {
   MigrationFile,
   MigrationFinding,

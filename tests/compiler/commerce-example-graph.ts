@@ -4,7 +4,7 @@
  * or evaluating executable runtime modules.
  */
 import { expect } from "bun:test";
-import type { ApplicationGraph } from "../../packages/graph/src/index.ts";
+import type { ApplicationGraph } from "relkit/graph";
 
 /**
  * Verifies application deployment and telemetry metadata.

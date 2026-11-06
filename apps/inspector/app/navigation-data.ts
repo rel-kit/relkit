@@ -9,6 +9,7 @@ import {
   Layers3,
   LayoutDashboard,
   Network,
+  Plug,
   Radio,
   Route,
   ShieldCheck,
@@ -57,6 +58,7 @@ export const navigationGroups = [
       { href: "/agents", label: "Agents", icon: Bot },
       { href: "/graphs", label: "Agent graphs", icon: Workflow },
       { href: "/tools", label: "Tools", icon: Wrench },
+      { href: "/mcp", label: "MCP tools", icon: Plug },
     ],
   },
   {

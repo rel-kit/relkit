@@ -1,27 +1,16 @@
 import { expect, test } from "bun:test";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
-import {
-  createFunctionRegistry,
-  invoke,
-  type InvocationTarget,
-} from "../../packages/engine/src/index.ts";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
+import { createFunctionRegistry, invoke, type InvocationTarget } from "relkit/engine";
 import {
   bindFunctionEvents,
   defineEvent,
   defineEventFunction,
   isEventFunctionDescriptor,
-} from "../../packages/events/src/index.ts";
-import { defineFunction } from "../../packages/functions/src/index.ts";
-import {
-  createRegistrationPlan,
-  hashGraph,
-  type ApplicationGraph,
-} from "../../packages/graph/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
-import {
-  bindDescriptorIdentity,
-  getDescriptorIdentity,
-} from "../../packages/invocation/dist/index.js";
+} from "relkit/events";
+import { defineFunction } from "relkit/functions";
+import { createRegistrationPlan, hashGraph, type ApplicationGraph } from "relkit/graph";
+import { z } from "relkit/schema";
+import { bindDescriptorIdentity, getDescriptorIdentity } from "relkit/invocation";
 import {
   createTestRuntime,
   invokeFunction as invokeTestFunction,
@@ -34,7 +23,7 @@ const consumer = defineEventFunction({
   event: "created" as never,
   handler: () => {},
 });
-const target = bindFunctionEvents(consumer, event, []) as unknown as InvocationTarget;
+const target = bindFunctionEvents(consumer, event) as unknown as InvocationTarget;
 const graph = normalizeCompilation({ descriptors: [event, consumer] }).graph! as ApplicationGraph;
 const manifest = {
   ...runtimeCohort(hashGraph(graph)),
@@ -46,11 +35,11 @@ test("event binding and registration preserve inferred function identities", () 
   const inferred = defineFunction({
     input: z.unknown(),
     output: z.void(),
-    publishes: ["created" as never],
+    dependencies: { events: { created: event } },
     handler: () => {},
   });
   bindDescriptorIdentity(inferred, "inferred");
-  const bound = bindFunctionEvents(inferred, undefined, [event]);
+  const bound = bindFunctionEvents(inferred, undefined);
   expect(getDescriptorIdentity(bound)).toBe("inferred");
   const graph = normalizeCompilation({
     descriptors: [
@@ -66,32 +55,29 @@ test("event binding and registration preserve inferred function identities", () 
   expect(getDescriptorIdentity(registry.targets.inferred!)).toBe("inferred");
 });
 
-test("the test runtime resolves publication contracts for direct and nested calls", async () => {
+test("the test runtime resolves declared event dependencies for direct and nested calls", async () => {
   const publisher = defineFunction({
     id: "publisher",
     input: z.object({ id: z.string() }),
     output: z.void(),
-    publishes: ["created" as never],
+    dependencies: { events: { created: event } },
     handler: async (input, context) => {
-      const events = context.events as Record<
-        string,
-        { publish: (input: unknown) => Promise<unknown> }
-      >;
-      await events.created!.publish(input);
+      await context.events.created.publish(input);
     },
   });
   const caller = defineFunction({
     id: "caller",
     input: publisher.input,
     output: z.void(),
-    handler: (input) => publisher.invoke(input),
+    dependencies: { functions: { publisher } },
+    handler: (input, context) => context.functions.publisher(input),
   });
   const publicationGraph = normalizeCompilation({ descriptors: [event, publisher, caller] })
     .graph! as ApplicationGraph;
   const registry = createFunctionRegistry(publicationGraph, {
     ...runtimeCohort(hashGraph(publicationGraph)),
     functions: { publisher: publisher.handler as never, caller: caller.handler as never },
-    targets: { publisher: bindFunctionEvents(publisher, undefined, [event]), caller },
+    targets: { publisher: bindFunctionEvents(publisher, undefined), caller },
   });
   const runtime = createTestRuntime({ registry });
   const published: unknown[] = [];
@@ -140,14 +126,14 @@ test("the registry is authoritative even when a callable target is forged", asyn
   expect(isEventFunctionDescriptor({ ...consumer, invoke: () => {} })).toBe(false);
 });
 
-test("borrowed invocation and tool methods cannot turn an event function into a callable", async () => {
+test("borrowed tool methods cannot turn an event function into a callable", () => {
   const callable = defineFunction({
     id: "caller",
     input: z.unknown(),
     output: z.void(),
     handler: () => {},
   });
-  expect(() => callable.invoke.call(consumer as never, {})).toThrow("Event-only");
+  expect(callable).not.toHaveProperty("invoke");
   expect(() =>
     callable.asTool.call(consumer as never, {
       id: "forged_tool",
@@ -156,13 +142,6 @@ test("borrowed invocation and tool methods cannot turn an event function into a 
       approval: "never",
     }),
   ).toThrow("Event-only");
-  const nested = defineFunction({
-    id: "nested",
-    input: z.unknown(),
-    output: z.void(),
-    handler: () => callable.invoke.call(consumer as never, {}),
-  });
-  await expect(invoke({ target: nested, input: {} })).rejects.toBeDefined();
 });
 
 test("registration rejects event-only routes, services, jobs, schedules, tools, and agents", () => {
@@ -210,12 +189,12 @@ test("successful non-void values fail even when the output schema is forged", as
   ).rejects.toBeDefined();
 });
 
-test("forged publication bindings cannot bypass the authored capability", async () => {
-  await expect(
-    invoke({
-      target: { ...target, publications: { created: event } },
-      source: "event-delivery",
-      input: { id: "1" },
-    }),
-  ).rejects.toThrow('undeclared publication "created"');
+test("forged event publications cannot pass registry admission", () => {
+  expect(() =>
+    createFunctionRegistry(graph, { ...manifest, targets: { reaction: { ...target } } }),
+  ).not.toThrow();
+  const forged = { ...target, dependencies: { events: { created: event } } };
+  expect(() =>
+    createFunctionRegistry(graph, { ...manifest, targets: { reaction: forged } }),
+  ).toThrow("event-only executable target");
 });

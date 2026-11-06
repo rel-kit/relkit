@@ -16,9 +16,283 @@ sidebar:
 
 For configuration and examples, read [testing](/docs/modules/operations/testing), [first service](/docs/modules/service/first-service), [first route](/docs/modules/http/first-route).
 
-For a complete workflow, follow [cache product prices](/guides/caching/cache-product-prices), [build an offline agent](/guides/ai/build-an-offline-agent).
+For a complete workflow, follow [from express or hono](/guides/migrate/from-express-or-hono), [cache product prices](/guides/caching/cache-product-prices), [build an offline agent](/guides/ai/build-an-offline-agent).
+
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### invokeFunction
+
+Invokes a function descriptor through the engine's direct, transport-free path.
+
+**Example**
+
+```ts
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
+import { invokeFunction } from "@relkit/testing";
+
+export async function greetingExample(): Promise<string> {
+  const greet = defineFunction({
+    id: "greet",
+    input: z.string(),
+    output: z.string(),
+    handler: async (name) => `Hello ${name}`,
+  });
+  return invokeFunction(greet, "Ada");
+}
+```
+
+**Signature**
+
+```ts
+declare const invokeFunction: <
+  const Target extends StandaloneFunctionTarget,
+  Context extends { readonly signal: AbortSignal } = FunctionContextOf<Target>,
+>(
+  target: Target,
+  input: FunctionInput<Target>,
+  options?: InvokeFunctionOptions<Context>,
+) => Promise<FunctionOutput<Target>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L52)
+
+Since v0.1.0
+
+### createTestApplication
+
+Creates an application owner with HTTP, deterministic runtime and provider services.
+
+**Example**
+
+```ts
+import { defineEnv } from "relkit/config";
+import { createTestApplication } from "@relkit/testing";
+async function testApplication(projectRoot: string): Promise<void> {
+  const app = await createTestApplication({ env: defineEnv({}) }, { projectRoot });
+  try {
+    await app.http.get("/");
+  } finally {
+    await app.close();
+  }
+}
+```
+
+**Signature**
+
+```ts
+declare const createTestApplication: (
+  app: { readonly env: object },
+  options?: TestApplicationOptions,
+) => Promise<TestApplication>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L35)
+
+Since v0.1.0
+
+## Complete reference
 
 <include>/_snippets/generated/exports/testing.mdx</include>
+
+## `agents-conformance-fixture.ts`
+
+Builds the conformance agent, its tools, a recording engine, state, trace and access hooks.
+
+### ConformanceRun (interface)
+
+Everything one case observes.
+
+**Signature**
+
+```ts
+export interface ConformanceRun {
+  readonly execution: AgentAdapterExecution;
+  readonly engineCalls: { readonly functionId: string; readonly input: unknown }[];
+  readonly accessRequests: AgentAccessRequest[];
+  readonly spans: { readonly span: string; outcome?: "ok" | "error" }[];
+  readonly threads: Map<string, AgentThreadState>;
+  readonly resolvedProfiles: (string | undefined)[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance-fixture.ts#L45)
+
+### conformanceRun
+
+Creates one agent execution with recording hooks.
+
+**Signature**
+
+```ts
+declare const conformanceRun: (
+  options: AgentConformanceOptions,
+  turns: readonly AgentConformanceTurn[],
+  access?: AgentAccessCheck,
+) => ConformanceRun;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance-fixture.ts#L61)
+
+### lookupTool
+
+**Signature**
+
+```ts
+declare const lookupTool: ToolDescriptor<"conformance.lookup">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance-fixture.ts#L29)
+
+### refundTool
+
+**Signature**
+
+```ts
+declare const refundTool: ToolDescriptor<"conformance.refund">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance-fixture.ts#L36)
+
+## `agents-conformance.ts`
+
+Shared agent adapter conformance suite. Every first-party adapter runs the same cases: tools
+through the engine, approvals, durable threads, AG-UI streaming, access rules, traces and model
+profiles. A case rejects with a description of the first broken expectation.
+
+### "./agents-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./agents-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./agents-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.ts#L15)
+
+### AGENT_CONFORMANCE_CASES
+
+The cases every adapter passes.
+
+**Signature**
+
+```ts
+declare const AGENT_CONFORMANCE_CASES: ReadonlyArray<AgentConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.ts#L18)
+
+### createAgentConformanceHarness
+
+Creates the conformance harness for one adapter.
+
+**Example**
+
+```ts
+import { createAgentAdapterRuntime, defineAgentRuntime } from "relkit/agent-adapters";
+import { createAgentConformanceHarness } from "@relkit/testing/agents-conformance";
+
+const harness = createAgentConformanceHarness({
+  adapter: () => defineAgentRuntime({ adapterId: "echo", integrationId: "echo", options: {} }),
+  runtime: createAgentAdapterRuntime({
+    adapterId: "echo",
+    turn: async () => ({ text: "", toolCalls: [] }),
+  }),
+  scriptedModel: () => ({}),
+});
+// In a test file: for (const item of harness.cases) test(item.description, () => harness.run(item.id));
+console.log(harness.cases.map((item) => item.id));
+```
+
+**Signature**
+
+```ts
+declare const createAgentConformanceHarness: (
+  options: AgentConformanceOptions,
+) => AgentConformanceHarness;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.ts#L60)
+
+## `agents-conformance.types.ts`
+
+Inputs and results of the shared agent adapter conformance suite.
+
+### AgentConformanceCase (interface)
+
+One conformance case.
+
+**Signature**
+
+```ts
+export interface AgentConformanceCase {
+  readonly id:
+    "tools" | "approvals" | "threads" | "streaming" | "access-rules" | "traces" | "model-profiles";
+  readonly description: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L26)
+
+### AgentConformanceHarness (interface)
+
+Cases plus a runner that rejects when the adapter breaks a case. It is a `ConformanceHarness`,
+so `runConformance` from `@relkit/testing/conformance` reports it per case.
+
+**Signature**
+
+```ts
+export interface AgentConformanceHarness {
+  readonly suite: "agents";
+  readonly cases: readonly AgentConformanceCase[];
+  readonly run: (caseId: AgentConformanceCase["id"]) => Promise<void>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L36)
+
+### AgentConformanceOptions (interface)
+
+What an adapter supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface AgentConformanceOptions {
+  /** Creates the agent's `runtime` value, such as `langchain()`. */
+  readonly adapter: () => AgentRuntimeAdapterAny;
+  /** The adapter's runtime half, exported from its runtime entry. */
+  readonly runtime: AgentAdapterRuntime;
+  /** Builds the adapter's native scripted model from neutral turns. */
+  readonly scriptedModel: (turns: readonly AgentConformanceTurn[]) => unknown;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L16)
+
+### AgentConformanceTurn (interface)
+
+One scripted model turn, written once for every adapter.
+
+**Signature**
+
+```ts
+export interface AgentConformanceTurn {
+  readonly text?: string;
+  readonly toolCalls?: readonly {
+    readonly id: string;
+    /** Model-facing tool name, such as `conformance_lookup` or `relkit_output`. */
+    readonly name: string;
+    readonly input: unknown;
+  }[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L5)
 
 ## `application-acquisition.ts`
 
@@ -73,7 +347,7 @@ Acquires the sole database and releases it exactly once with the returned owner.
 declare const activateDrizzleTestServices: TestServiceActivator;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-drizzle-services.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-drizzle-services.ts#L22)
 
 ## `application-errors.ts`
 
@@ -120,10 +394,11 @@ declare const handleTestRequest: (
   routes: readonly TestRoute[],
   runtime: TestRuntime,
   request: Request,
+  getSession?: () => Promise<unknown>,
 ) => Promise<Response>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-http.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-http.ts#L15)
 
 ## `application-native-services.types.ts`
 
@@ -357,7 +632,7 @@ Loads filesystem routes and derives native request/response contracts.
 declare const loadTestRoutes: (root: string) => Promise<readonly TestRoute[]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.ts#L27)
 
 ## `application-routes.types.ts`
 
@@ -373,10 +648,12 @@ type AuthoredRoute = Omit<TestFunctionRoute, "method" | "path" | "request" | "re
   readonly request?: unknown;
   readonly responses?: TestFunctionRoute["responses"];
   readonly successStatus?: number;
+  readonly response?: (output: never) => unknown;
+  readonly auth?: "required";
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L41)
 
 ### TestFunctionRoute (type alias)
 
@@ -404,6 +681,9 @@ type TestFunctionRoute = {
     readonly status?: number;
     readonly errorId?: string;
   }[];
+  /** The route's `response` option, applied to successful responses. */
+  readonly response?: (output: never) => unknown;
+  readonly auth?: "required";
 };
 ```
 
@@ -420,11 +700,11 @@ type TestRawRoute = {
   readonly method: "ALL";
   readonly path: string;
   readonly handler: (request: Request) => Response | Promise<Response>;
-  readonly auth?: { readonly protected: readonly string[] };
+  readonly auth?: { readonly kind: "better-auth" };
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L30)
 
 ### TestRoute (type alias)
 
@@ -436,7 +716,38 @@ Supported native function or raw HTTP route declaration.
 type TestRoute = TestFunctionRoute | TestRawRoute;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L38)
+
+## `application-server.ts`
+
+Points a test application's HTTP client at an already running server, so an application's HTTP
+suite can run against its production build on any runtime. Requests without an `Origin` get the
+server's own, as a browser on the app would send. Only `http` and `close` are available; members
+that need the in-process application throw when read.
+
+### TEST_SERVER_URL_VARIABLE
+
+Environment variable that selects a running server for `createTestApplication`.
+
+**Signature**
+
+```ts
+declare const TEST_SERVER_URL_VARIABLE: "RELKIT_TEST_SERVER_URL";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-server.ts#L20)
+
+### serverTestApplication
+
+Creates a test application whose HTTP client sends requests to a running server.
+
+**Signature**
+
+```ts
+declare const serverTestApplication: (server: string | URL) => TestApplication;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-server.ts#L27)
 
 ## `application-service-auth.ts`
 
@@ -451,10 +762,39 @@ Acquires the optional native auth handler and its protection runtime.
 ```ts
 declare const acquireApplicationAuth: (
   platform: ApplicationServicesPlatform,
-  declaration: BetterAuthServiceDescriptor<BetterAuthServiceOptions> | undefined,
+  declaration:
+    | BetterAuthServiceDescriptor<
+        BetterAuthServiceOptions,
+        {
+          session: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            userId: string;
+            expiresAt: Date;
+            token: string;
+            ipAddress?: string | null | undefined;
+            userAgent?: string | null | undefined;
+          };
+          user: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            email: string;
+            emailVerified: boolean;
+            name: string;
+            image?: string | null | undefined;
+          };
+        }
+      >
+    | undefined,
   database: DrizzleActivation<DrizzleServiceDescriptor<any, any, any, any>> | undefined,
   routes: ReadonlyArray<TestRoute>,
-) => Effect.Effect<Pick<TestApplicationServices, "auth" | "authHandler">, Error, never>;
+) => Effect.Effect<
+  Pick<TestApplicationServices, "auth" | "authHandler" | "authBasePath">,
+  Error,
+  never
+>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-service-auth.ts#L22)
@@ -467,7 +807,7 @@ declare const acquireApplicationAuth: (
 declare const nativeServiceError: <Failure>(cause: Failure) => Error;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-service-auth.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-service-auth.ts#L67)
 
 ## `application-service-discovery.ts`
 
@@ -518,7 +858,7 @@ Owns scoped database/auth activation for a test application in either service la
 declare const ApplicationServicesPlatform: ApplicationServicesPlatform;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L18)
 
 ### TestApplicationServices
 
@@ -528,7 +868,7 @@ declare const ApplicationServicesPlatform: ApplicationServicesPlatform;
 declare const TestApplicationServices: TestApplicationServices;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L19)
 
 ### TestServices (class)
 
@@ -540,7 +880,7 @@ Database and authentication authorities whose lifetime follows their Layer.
 declare class TestServices
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L40)
 
 ### TestServicesPlatform (class)
 
@@ -552,7 +892,7 @@ Native activation dependencies acquired once per application owner.
 declare class TestServicesPlatform
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L22)
 
 ### TestServicesPlatformLive
 
@@ -564,7 +904,7 @@ Live native adapters; no database or auth client is acquired by this Layer.
 declare const TestServicesPlatformLive: Layer.Layer<TestServicesPlatform, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L91)
 
 ### activateTestServices
 
@@ -580,7 +920,7 @@ declare const activateTestServices: (
 ) => Promise<TestApplicationServices>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L118)
 
 ### testServicesLayer
 
@@ -596,7 +936,7 @@ declare const testServicesLayer: (
 ) => Layer.Layer<TestServices, Error, TestServicesPlatform>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L103)
 
 ## `application-services.types.ts`
 
@@ -625,6 +965,8 @@ export interface TestApplicationServices {
   readonly context: NonNullable<TestRuntimeOptions["context"]>;
   readonly auth?: HttpAuthRuntime;
   readonly authHandler?: (request: Request) => Promise<Response>;
+  /** Where the auth handler is mounted: its route's base path, or the service's own. */
+  readonly authBasePath?: string;
   readonly close: () => Promise<void>;
 }
 ```
@@ -645,43 +987,11 @@ type TestServiceActivator = (
 ) => Promise<TestApplicationServices>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.types.ts#L20)
 
 ## `application.ts`
 
 General test application ownership with explicitly selected capability helpers.
-
-### createTestApplication
-
-Creates an application owner with HTTP, deterministic runtime and provider services.
-
-**Example**
-
-```ts
-import { defineEnv } from "@relkit/app/config";
-import { createTestApplication } from "@relkit/testing";
-async function testApplication(projectRoot: string): Promise<void> {
-  const app = await createTestApplication({ env: defineEnv({}) }, { projectRoot });
-  try {
-    await app.http.get("/");
-  } finally {
-    await app.close();
-  }
-}
-```
-
-**Signature**
-
-```ts
-declare const createTestApplication: (
-  app: { readonly env: object },
-  options?: TestApplicationOptions,
-) => Promise<TestApplication>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L32)
-
-Since v0.1.0
 
 ### TestApplication
 
@@ -691,7 +1001,7 @@ Since v0.1.0
 declare const TestApplication: TestApplication;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L14)
 
 ### TestApplicationHarness
 
@@ -701,7 +1011,7 @@ declare const TestApplication: TestApplication;
 declare const TestApplicationHarness: typeof TestApplicationHarness;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L10)
 
 ### TestApplicationOptions
 
@@ -711,7 +1021,7 @@ declare const TestApplicationHarness: typeof TestApplicationHarness;
 declare const TestApplicationOptions: TestApplicationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L14)
 
 ### TestApplicationPlatform
 
@@ -721,7 +1031,7 @@ declare const TestApplicationOptions: TestApplicationOptions;
 declare const TestApplicationPlatform: typeof TestApplicationPlatform;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L11)
 
 ### TestApplicationPlatformLive
 
@@ -731,7 +1041,7 @@ declare const TestApplicationPlatform: typeof TestApplicationPlatform;
 declare const TestApplicationPlatformLive: Layer.Layer<TestApplicationPlatform, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L12)
 
 ### testApplicationLayer
 
@@ -746,7 +1056,7 @@ declare const testApplicationLayer: (
 ) => Layer.Layer<TestApplicationHarness, unknown, TestApplicationPlatform>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L66)
 
 ## `application.types.ts`
 
@@ -1020,6 +1330,138 @@ declare const copyBucketObject: (value: TestBucketObject) => TestBucketObject;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/bucket-validation.ts#L57)
 
+## `buckets-conformance.ts`
+
+Shared bucket provider conformance suite. Every first-party bucket provider (local, S3,
+Cloudflare R2) runs these cases, and provider authors run the same ones.
+
+### "./buckets-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./buckets-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./buckets-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.ts#L15)
+
+### BUCKETS_CONFORMANCE_CASES
+
+The cases every bucket provider passes.
+
+**Signature**
+
+```ts
+declare const BUCKETS_CONFORMANCE_CASES: ReadonlyArray<BucketsConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.ts#L18)
+
+### createBucketsConformanceHarness
+
+Creates the bucket conformance harness for one provider.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import { createBucketsConformanceHarness } from "@relkit/testing/buckets-conformance";
+import { createLocalBucketProvider } from "relkit/providers-local";
+
+const harness = createBucketsConformanceHarness({
+  create: () => createLocalBucketProvider({ root: "/tmp/relkit-bucket-conformance" }),
+});
+console.log((await runConformance(harness)).passed);
+```
+
+**Signature**
+
+```ts
+declare const createBucketsConformanceHarness: (
+  options: BucketsConformanceOptions,
+) => ConformanceHarness<BucketsConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.ts#L48)
+
+## `buckets-conformance.types.ts`
+
+Inputs of the shared bucket provider conformance suite.
+
+### BucketsConformanceCase (type alias)
+
+One bucket conformance case.
+
+**Signature**
+
+```ts
+type BucketsConformanceCase = ConformanceCase<BucketsConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.types.ts#L39)
+
+### BucketsConformanceCaseId (type alias)
+
+Case ids of the bucket suite.
+
+**Signature**
+
+```ts
+type BucketsConformanceCaseId =
+  | "round-trip"
+  | "metadata"
+  | "overwrite"
+  | "list-prefix"
+  | "delete"
+  | "signed-urls"
+  | "cancellation"
+  | "closed"
+  | "backend-failure";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.types.ts#L27)
+
+### BucketsConformanceOptions (interface)
+
+What a bucket provider supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface BucketsConformanceOptions {
+  /**
+   * Creates a provider for one case. Cases write only under the key prefix they pass, so one
+   * bucket can serve every case.
+   * @param prefix - Unique key prefix for the case, without a trailing slash.
+   */
+  readonly create: (prefix: string) => BucketsConformanceProvider;
+  /**
+   * Failure injection: creates a provider whose backend cannot answer (an unreachable endpoint, a
+   * missing binding, a failing `fetch`). The `backend-failure` case is skipped without it.
+   */
+  readonly failing?: () => BucketsConformanceProvider;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.types.ts#L12)
+
+### BucketsConformanceProvider (type alias)
+
+A bucket provider under test, with the optional lifecycle methods first-party providers have.
+
+**Signature**
+
+```ts
+type BucketsConformanceProvider = BucketProvider & {
+  readonly ready?: () => Promise<unknown>;
+  readonly close?: () => Promise<unknown>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.types.ts#L6)
+
 ## `buckets-types.ts`
 
 Preserved compatibility entrypoint for the canonical domain type companion.
@@ -1133,7 +1575,7 @@ export interface TestBucketFakeOptions {
   readonly stateRoot?: string;
   readonly clock?: () => number;
   readonly failures?: TestFailureControls;
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly maxObjectBytes?: number;
   readonly allowedContentTypes?: readonly string[];
 }
@@ -1156,6 +1598,139 @@ export interface TestBucketObject {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets.types.ts#L22)
+
+## `cache-conformance.ts`
+
+Shared cache provider conformance suite. Every first-party cache provider (local, Redis, Redis
+over HTTP, Cloudflare KV) runs these cases, and provider authors run the same ones.
+
+### "./cache-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./cache-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./cache-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache-conformance.ts#L23)
+
+### CACHE_CONFORMANCE_CASES
+
+The cases every cache provider passes.
+
+**Signature**
+
+```ts
+declare const CACHE_CONFORMANCE_CASES: ReadonlyArray<CacheConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache-conformance.ts#L26)
+
+### createCacheConformanceHarness
+
+Creates the cache conformance harness for one provider.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import { createCacheConformanceHarness } from "@relkit/testing/cache-conformance";
+import { createLocalCacheProvider } from "relkit/providers-local";
+
+const harness = createCacheConformanceHarness({
+  create: (cacheId) => createLocalCacheProvider({ cacheId }),
+});
+const report = await runConformance(harness);
+console.log(report.passed);
+```
+
+**Signature**
+
+```ts
+declare const createCacheConformanceHarness: (
+  options: CacheConformanceOptions,
+) => ConformanceHarness<CacheConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache-conformance.ts#L54)
+
+## `cache-conformance.types.ts`
+
+Inputs of the shared cache provider conformance suite.
+
+### CacheConformanceCase (type alias)
+
+One cache conformance case.
+
+**Signature**
+
+```ts
+type CacheConformanceCase = ConformanceCase<CacheConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache-conformance.types.ts#L39)
+
+### CacheConformanceCaseId (type alias)
+
+Case ids of the cache suite.
+
+**Signature**
+
+```ts
+type CacheConformanceCaseId =
+  | "round-trip"
+  | "has-delete"
+  | "get-or-set"
+  | "increment"
+  | "ttl"
+  | "cancellation"
+  | "closed"
+  | "backend-failure";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache-conformance.types.ts#L28)
+
+### CacheConformanceOptions (interface)
+
+What a cache provider supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface CacheConformanceOptions {
+  /**
+   * Creates a provider for one case. Each case passes a fresh cache id, so cases never share keys.
+   * @param cacheId - Unique cache id for the case.
+   */
+  readonly create: (cacheId: string) => CacheConformanceProvider;
+  /**
+   * Failure injection: creates a provider whose backend cannot answer (an unreachable server, a
+   * missing binding, a fault switch). The `backend-failure` case is skipped without it.
+   */
+  readonly failing?: () => CacheConformanceProvider;
+  /** Smallest TTL the backend accepts, such as 60 000 ms on Cloudflare KV; 0 by default. */
+  readonly minTtlMs?: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache-conformance.types.ts#L12)
+
+### CacheConformanceProvider (type alias)
+
+A cache provider under test, with the optional lifecycle methods first-party providers have.
+
+**Signature**
+
+```ts
+type CacheConformanceProvider = CacheProvider & {
+  readonly ready?: () => Promise<unknown>;
+  readonly close?: () => Promise<unknown>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache-conformance.types.ts#L6)
 
 ## `cache-storage-state.ts`
 
@@ -1485,7 +2060,7 @@ export interface TestCacheFakeOptions<
   readonly stateRoot?: string;
   readonly clock?: () => number;
   readonly failures?: TestFailureControls;
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly keySchema?: KeySchema;
   readonly valueSchema?: ValueSchema;
   readonly defaultTtlMs?: number;
@@ -1512,6 +2087,361 @@ export interface TestCacheSnapshot {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache.types.ts#L28)
+
+## `conformance.ts`
+
+Shared runner and assertions of the RelKit conformance suites. The suites use no Node or Bun
+built-ins, so the same cases run on Bun, Node and inside workerd.
+
+### "./conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L11)
+
+### SKIPPED
+
+Returned by a case that the provider does not support.
+
+**Signature**
+
+```ts
+declare const SKIPPED: "skipped";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L14)
+
+### abortedSignal
+
+**Signature**
+
+```ts
+declare const abortedSignal: () => AbortSignal;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L155)
+
+### assertConformance
+
+Throws when a report has a failed case, naming every failure.
+
+**Example**
+
+```ts
+import { assertConformance } from "@relkit/testing/conformance";
+
+assertConformance({ suite: "cache", results: [], passed: true });
+```
+
+**Signature**
+
+```ts
+declare const assertConformance: (report: ConformanceReport) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L65)
+
+### check
+
+Fails the current case when a condition does not hold.
+
+**Signature**
+
+```ts
+declare const check: (condition: boolean, label: string, actual?: unknown) => asserts condition;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L101)
+
+### conformanceHarness
+
+Builds a harness from a table of checks, one per case.
+
+**Signature**
+
+```ts
+declare const conformanceHarness: <Id extends string>(
+  suite: string,
+  cases: readonly { readonly id: Id; readonly description: string }[],
+  checks: Readonly<Record<Id, () => Promise<void | "skipped">>>,
+) => ConformanceHarness<Id>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L79)
+
+### delay
+
+**Signature**
+
+```ts
+declare const delay: (ms: number) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L150)
+
+### eventually
+
+Polls until a condition holds or the timeout passes.
+
+**Signature**
+
+```ts
+declare const eventually: (
+  condition: () => boolean,
+  step: () => Promise<unknown>,
+  timeoutMs: number,
+  label: string,
+) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L135)
+
+### rejects
+
+Expects an operation to reject.
+
+**Signature**
+
+```ts
+declare const rejects: (operation: () => unknown, label: string) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L120)
+
+### runConformance
+
+Runs every case of a harness, one after another, and reports pass, fail or skip per case.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import { createCacheConformanceHarness } from "@relkit/testing/cache-conformance";
+import { createLocalCacheProvider } from "relkit/providers-local";
+
+const report = await runConformance(
+  createCacheConformanceHarness({ create: (cacheId) => createLocalCacheProvider({ cacheId }) }),
+);
+console.log(
+  report.passed,
+  report.results.map((result) => `${result.id}: ${result.outcome}`),
+);
+```
+
+**Signature**
+
+```ts
+declare const runConformance: <Id extends string>(
+  harness: ConformanceHarness<Id>,
+  only?: readonly Id[],
+) => Promise<ConformanceReport>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L33)
+
+### same
+
+Compares two JSON-compatible values structurally, ignoring object key order.
+
+**Signature**
+
+```ts
+declare const same: (left: unknown, right: unknown) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L110)
+
+## `conformance.types.ts`
+
+One case of a conformance suite. Every provider of a kind runs the same cases.
+
+### ConformanceCase (interface)
+
+One case of a conformance suite. Every provider of a kind runs the same cases.
+
+**Signature**
+
+```ts
+export interface ConformanceCase<Id extends string = string> {
+  readonly id: Id;
+  readonly description: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.types.ts#L4)
+
+### ConformanceCaseResult (interface)
+
+The outcome of one case.
+
+**Signature**
+
+```ts
+export interface ConformanceCaseResult {
+  readonly id: string;
+  readonly description: string;
+  readonly outcome: "pass" | "fail" | "skip";
+  /** The failure message when `outcome` is `"fail"`. */
+  readonly error?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.types.ts#L21)
+
+### ConformanceHarness (interface)
+
+Cases plus a runner. `run` resolves when the provider passes the case, resolves `"skipped"` when
+the provider declares it does not support what the case checks, and rejects with a description
+of the first broken expectation otherwise.
+
+**Signature**
+
+```ts
+export interface ConformanceHarness<Id extends string = string> {
+  readonly suite: string;
+  readonly cases: readonly ConformanceCase<Id>[];
+  readonly run: (caseId: Id) => Promise<void | "skipped">;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.types.ts#L14)
+
+### ConformanceReport (interface)
+
+Results of every case of one suite run against one provider.
+
+**Signature**
+
+```ts
+export interface ConformanceReport {
+  readonly suite: string;
+  readonly results: readonly ConformanceCaseResult[];
+  /** True when no case failed. */
+  readonly passed: boolean;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.types.ts#L30)
+
+## `deploy-target-conformance.ts`
+
+Shared deploy-target conformance suite. The Railway, Vercel and Cloudflare targets of
+`relkit deploy init` run these cases, and a new target runs the same ones.
+
+### "./deploy-target-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./deploy-target-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./deploy-target-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.ts#L14)
+
+### DEPLOY_TARGET_CONFORMANCE_CASES
+
+The cases every deploy target passes.
+
+**Signature**
+
+```ts
+declare const DEPLOY_TARGET_CONFORMANCE_CASES: ReadonlyArray<DeployTargetConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.ts#L17)
+
+### createDeployTargetConformanceHarness
+
+Creates the deploy-target conformance harness for one target.
+
+**Example**
+
+```ts
+import { railwayDeployTarget } from "@relkit/cli/deploy-targets";
+import { runConformance } from "@relkit/testing/conformance";
+import { createDeployTargetConformanceHarness } from "@relkit/testing/deploy-target-conformance";
+
+const harness = createDeployTargetConformanceHarness({
+  target: railwayDeployTarget,
+  root: process.cwd(),
+});
+console.log((await runConformance(harness)).passed);
+```
+
+**Signature**
+
+```ts
+declare const createDeployTargetConformanceHarness: (
+  options: DeployTargetConformanceOptions,
+) => ConformanceHarness<DeployTargetConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.ts#L45)
+
+## `deploy-target-conformance.types.ts`
+
+Inputs of the shared deploy-target conformance suite.
+
+### DeployTargetConformanceCase (type alias)
+
+One deploy-target conformance case.
+
+**Signature**
+
+```ts
+type DeployTargetConformanceCase = ConformanceCase<DeployTargetConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.types.ts#L29)
+
+### DeployTargetConformanceCaseId (type alias)
+
+Case ids of the deploy-target suite.
+
+**Signature**
+
+```ts
+type DeployTargetConformanceCaseId =
+  | "naming"
+  | "every-runtime"
+  | "deterministic"
+  | "relative-paths"
+  | "ci-workflow"
+  | "next-steps"
+  | "graph-required";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.types.ts#L19)
+
+### DeployTargetConformanceOptions (interface)
+
+What a deploy target supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface DeployTargetConformanceOptions {
+  /** The target under test, such as `railwayDeployTarget` from `@relkit/cli/deploy-targets`. */
+  readonly target: DeployTarget;
+  /** Project root passed to `plan`; it holds whatever project files the target reads. */
+  readonly root: string;
+  /**
+   * A compiled application graph for targets that set `needsGraph`. The suite passes it as text
+   * and also checks that a missing or broken graph is refused.
+   */
+  readonly graph?: unknown;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.types.ts#L6)
 
 ## `drizzle.ts`
 
@@ -1575,6 +2505,193 @@ export interface EventControlsService {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/event-controls.types.ts#L7)
+
+## `events-conformance.ts`
+
+Shared event provider conformance suite. Every first-party event provider (local, Postgres)
+runs these cases, and provider authors run the same ones.
+
+### "./events-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./events-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./events-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.ts#L17)
+
+### EVENTS_CONFORMANCE_CASES
+
+The cases every event provider passes.
+
+**Signature**
+
+```ts
+declare const EVENTS_CONFORMANCE_CASES: ReadonlyArray<EventsConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.ts#L20)
+
+### createEventsConformanceHarness
+
+Creates the events conformance harness for one provider.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import { createEventsConformanceHarness } from "@relkit/testing/events-conformance";
+
+const published: unknown[] = [];
+const harness = createEventsConformanceHarness({
+  create: () => ({
+    publish: async (payload) => {
+      published.push(payload);
+      return { accepted: true, instanceId: `event-${published.length}` };
+    },
+  }),
+});
+console.log((await runConformance(harness, ["publish-accepted"])).passed);
+```
+
+**Signature**
+
+```ts
+declare const createEventsConformanceHarness: (
+  options: EventsConformanceOptions,
+) => ConformanceHarness<EventsConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.ts#L52)
+
+## `events-conformance.types.ts`
+
+Inputs of the shared events provider conformance suite.
+
+### EventsConformanceCase (type alias)
+
+One events conformance case.
+
+**Signature**
+
+```ts
+type EventsConformanceCase = ConformanceCase<EventsConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.types.ts#L73)
+
+### EventsConformanceCaseId (type alias)
+
+Case ids of the events suite.
+
+**Signature**
+
+```ts
+type EventsConformanceCaseId =
+  | "publish-accepted"
+  | "distinct-instances"
+  | "delivery"
+  | "retry-after-failure"
+  | "backend-failure";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.types.ts#L65)
+
+### EventsConformanceEnvelope (interface)
+
+The envelope a consumer receives; every provider's trigger envelope has at least these.
+
+**Signature**
+
+```ts
+export interface EventsConformanceEnvelope {
+  readonly instanceId: string;
+  readonly payload: unknown;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.types.ts#L6)
+
+### EventsConformanceOptions (interface)
+
+What an event provider supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface EventsConformanceOptions {
+  /**
+   * Creates a provider for one case, already set up for `event`: a provider that validates
+   * against registered contracts registers it here.
+   * @param namespace - Unique profile or namespace for the case.
+   * @param event - The event the cases publish.
+   */
+  readonly create: (
+    namespace: string,
+    event: { readonly id: string; readonly version: number },
+  ) => EventsConformanceProvider | Promise<EventsConformanceProvider>;
+  /**
+   * Moves due deliveries forward, for providers that deliver on a poll the test drives (such as
+   * Postgres with `consumers: false`). Background delivery needs nothing here.
+   */
+  readonly deliver?: (provider: EventsConformanceProvider) => Promise<unknown>;
+  /**
+   * The failure a consumer throws to ask for a retry. By default an `applicationFailure` with
+   * `retry: "later"`; a plain `Error` is a permanent failure that is dead-lettered.
+   */
+  readonly retryableFailure?: () => unknown;
+  /** Time limit for a delivery, 10 000 ms by default. */
+  readonly deliveryTimeoutMs?: number;
+  /** Failure injection: a provider whose backend cannot answer. */
+  readonly failing?: () => EventsConformanceProvider | Promise<EventsConformanceProvider>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.types.ts#L37)
+
+### EventsConformanceProvider (type alias)
+
+An event provider under test. Delivery cases need `registerTrigger`.
+
+**Signature**
+
+```ts
+type EventsConformanceProvider = EventProvider & {
+  readonly registerTrigger?: (trigger: EventsConformanceTrigger) => Promise<unknown>;
+  readonly close?: () => Promise<unknown>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.types.ts#L31)
+
+### EventsConformanceTrigger (interface)
+
+A durable consumer, in the shape the local and Postgres event providers register through
+`registerTrigger`.
+
+**Signature**
+
+```ts
+export interface EventsConformanceTrigger {
+  readonly id: string;
+  readonly eventId: string;
+  readonly eventVersion: number;
+  readonly delivery: "durable";
+  readonly retry: {
+    readonly maxAttempts: number;
+    readonly initialDelayMs: number;
+    readonly maxDelayMs: number;
+    readonly multiplier: number;
+    readonly jitter: "none";
+  };
+  readonly invoke: (envelope: EventsConformanceEnvelope) => Promise<unknown>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.types.ts#L15)
 
 ## `events-inspection.ts`
 
@@ -1696,7 +2813,7 @@ Native authorities and Effect workflows owned by one event service Layer.
 
 ```ts
 export interface TestEventControlState {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly router: () => EventRouter;
   readonly log: () => { readonly close: () => Promise<void> };
   readonly open: Effect.Effect<void, unknown>;
@@ -2031,7 +3148,7 @@ type NormalizedTrigger<Output> = TestEventTriggerOptions<Output> & {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L119)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L118)
 
 ### TestEventCloseOptions (interface)
 
@@ -2045,7 +3162,7 @@ export interface TestEventCloseOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L69)
 
 ### TestEventDeliveryAttempt (interface)
 
@@ -2059,7 +3176,7 @@ export interface TestEventDeliveryAttempt extends EventDeliveryResult {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L74)
 
 ### TestEventFake (interface)
 
@@ -2094,7 +3211,7 @@ export interface TestEventFake<Payload = unknown, Output = unknown> extends Even
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L83)
 
 ### TestEventInvocation (type alias)
 
@@ -2106,7 +3223,7 @@ Native invocation request consumed by an event target fixture.
 type TestEventInvocation = EventInvocationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L113)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L112)
 
 ### TestEventOptions (interface)
 
@@ -2116,9 +3233,8 @@ Event publication contract, native consumers and deterministic fixture dependenc
 
 ```ts
 export interface TestEventOptions<Payload = unknown, Output = unknown> {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly event?: EventDescriptorAny;
-  readonly events?: readonly EventDescriptorAny[];
   readonly eventId?: string;
   readonly version?: number;
   readonly payloadSchema?: StandardSchemaV1;
@@ -2157,7 +3273,7 @@ Native accepted publication receipt retained by the public event fixture.
 type TestEventPublishResult = EventPublishResult<string, number, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L110)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L109)
 
 ### TestEventTriggerOptions (interface)
 
@@ -2439,7 +3555,7 @@ Explicit clock, logger and provider replacement policy for one fake owner.
 
 ```ts
 export interface TestFakesOptions {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly clock?: () => number;
   readonly providers?: TestProviderReplacements;
 }
@@ -2490,7 +3606,7 @@ declare const createBunHttpListener: (
 ) => Promise<TestHttpListener>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.ts#L56)
 
 ### createTestHttpListener
 
@@ -2505,7 +3621,7 @@ declare const createTestHttpListener: (
 ) => Promise<TestHttpListener>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.ts#L26)
 
 ## `http-listener.types.ts`
 
@@ -2657,6 +3773,24 @@ export interface HttpPlatformService {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-owner.types.ts#L9)
 
+## `http-request-init.ts`
+
+### toRequestInit
+
+Converts the test request options to a native `RequestInit`.
+
+**Throws**
+
+TypeError when `json` and `body` are both supplied.
+
+**Signature**
+
+```ts
+declare const toRequestInit: (init: TestHttpRequestInit | undefined) => RequestInit | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-request-init.ts#L9)
+
 ## `http.ts`
 
 ### RealListenerPurpose
@@ -2667,7 +3801,7 @@ export interface HttpPlatformService {
 declare const RealListenerPurpose: RealListenerPurpose;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L106)
 
 ### TestHttpApplication
 
@@ -2677,7 +3811,7 @@ declare const RealListenerPurpose: RealListenerPurpose;
 declare const TestHttpApplication: TestHttpApplication;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L22)
 
 ### TestHttpClient
 
@@ -2687,7 +3821,7 @@ declare const TestHttpApplication: TestHttpApplication;
 declare const TestHttpClient: TestHttpClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L24)
 
 ### TestHttpClientOptions
 
@@ -2697,7 +3831,7 @@ declare const TestHttpClient: TestHttpClient;
 declare const TestHttpClientOptions: TestHttpClientOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L23)
 
 ### TestHttpInput
 
@@ -2707,7 +3841,7 @@ declare const TestHttpClientOptions: TestHttpClientOptions;
 declare const TestHttpInput: TestHttpInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L17)
 
 ### TestHttpListener
 
@@ -2717,7 +3851,7 @@ declare const TestHttpInput: TestHttpInput;
 declare const TestHttpListener: TestHttpListener;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L95)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L107)
 
 ### TestHttpListenerOptions
 
@@ -2727,7 +3861,7 @@ declare const TestHttpListener: TestHttpListener;
 declare const TestHttpListenerOptions: TestHttpListenerOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L96)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L108)
 
 ### TestHttpRequest
 
@@ -2737,7 +3871,27 @@ declare const TestHttpListenerOptions: TestHttpListenerOptions;
 declare const TestHttpRequest: TestHttpRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L18)
+
+### TestHttpRequestInit
+
+**Signature**
+
+```ts
+declare const TestHttpRequestInit: TestHttpRequestInit<Json>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L19)
+
+### TestHttpResponse
+
+**Signature**
+
+```ts
+declare const TestHttpResponse: TestHttpResponse<Body>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L20)
 
 ### TestObservability
 
@@ -2747,7 +3901,17 @@ declare const TestHttpRequest: TestHttpRequest;
 declare const TestObservability: TestObservability;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L25)
+
+### TestProblemResponse
+
+**Signature**
+
+```ts
+declare const TestProblemResponse: TestProblemResponse;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L21)
 
 ### assertObservabilityHookTypes
 
@@ -2762,7 +3926,7 @@ declare const assertObservabilityHookTypes: (
 ) => readonly ObservabilityHookEvent[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L162)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L174)
 
 ### assertResponseStatus
 
@@ -2774,7 +3938,7 @@ Asserts the existing native HTTP response status.
 declare const assertResponseStatus: (response: Response, expected: number) => Response;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L105)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L117)
 
 ### createBunHttpListener
 
@@ -2787,7 +3951,7 @@ declare const createBunHttpListener: (
 ) => Promise<TestHttpListener>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L92)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L104)
 
 ### createHttpTestClient
 
@@ -2800,7 +3964,7 @@ declare const createHttpTestClient: (
 ) => TestHttpClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L102)
 
 ### createObservabilityAssertions
 
@@ -2810,7 +3974,7 @@ declare const createHttpTestClient: (
 declare const createObservabilityAssertions: () => TestObservability;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L154)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L166)
 
 ### createTestHttpClient
 
@@ -2825,7 +3989,7 @@ declare const createTestHttpClient: (
 ) => TestHttpClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L47)
 
 ### createTestHttpListener
 
@@ -2838,7 +4002,7 @@ declare const createTestHttpListener: (
 ) => Promise<TestHttpListener>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L103)
 
 ### createTestObservability
 
@@ -2850,7 +4014,7 @@ Creates a protocol/version-checked capture for engine-backed HTTP tests.
 declare const createTestObservability: () => TestObservability;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L141)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L153)
 
 ### responseJson
 
@@ -2865,7 +4029,7 @@ declare const responseJson: <T = unknown>(
 ) => Promise<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L118)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L130)
 
 ### responseText
 
@@ -2877,7 +4041,7 @@ Reads text after the optional native status assertion.
 declare const responseText: (response: Response, expectedStatus?: number) => Promise<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L132)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L144)
 
 ## `http.types.ts`
 
@@ -2894,7 +4058,7 @@ export interface TestHttpApplication {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L42)
 
 ### TestHttpClient (interface)
 
@@ -2915,7 +4079,7 @@ export interface TestHttpClient {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L58)
 
 ### TestHttpClientOptions (interface)
 
@@ -2925,7 +4089,7 @@ Explicit test origin, listener close policy and ownership callbacks.
 
 ```ts
 export interface TestHttpClientOptions {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly baseUrl?: string | URL;
   /** Registers client shutdown with the owning test runtime/application. */
   readonly registerClose?: (close: () => Promise<void>) => void;
@@ -2934,7 +4098,7 @@ export interface TestHttpClientOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L48)
 
 ### TestHttpInput (type alias)
 
@@ -2950,15 +4114,54 @@ type TestHttpInput = Request | string | URL;
 
 ### TestHttpRequest (type alias)
 
-Native in-memory request operation preserving RequestInit and Response contracts.
+Native in-memory request operation that types the request and response JSON.
 
 **Signature**
 
 ```ts
-type TestHttpRequest = (input: TestHttpInput, init?: RequestInit) => Promise<Response>;
+type TestHttpRequest = <Body = unknown, Json = unknown>(
+  input: TestHttpInput,
+  init?: TestHttpRequestInit<Json>,
+) => Promise<TestHttpResponse<Body>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L36)
+
+### TestHttpRequestInit (interface)
+
+`RequestInit` with a `json` shorthand for the request body.
+
+**Signature**
+
+```ts
+export interface TestHttpRequestInit<Json = unknown> extends RequestInit {
+  /** Serialized as the body, with `content-type: application/json` unless a header already sets one. */
+  readonly json?: Json;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L26)
+
+### TestHttpResponse (interface)
+
+Native `Response` whose JSON body has the type the test declares.
+
+**Example**
+
+```ts
+const response = await app.http.get<{ message: string }>("/hello");
+const { message } = await response.json();
+```
+
+**Signature**
+
+```ts
+export interface TestHttpResponse<Body = unknown> extends Response {
+  readonly json: () => Promise<Body>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L15)
 
 ### TestObservability (interface)
 
@@ -2978,7 +4181,19 @@ export interface TestObservability {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L70)
+
+### TestProblemResponse (type alias)
+
+Problem Details response that RelKit routes return for validation and declared errors.
+
+**Signature**
+
+```ts
+type TestProblemResponse = TestHttpResponse<ProblemDetails>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L20)
 
 ## `identity.ts`
 
@@ -3086,7 +4301,7 @@ declare const InvokeFunctionOptions: InvokeFunctionOptions<Context>;
 declare const JOBS_CONFORMANCE_FIXTURES: ReadonlyArray<JobsConformanceFixture>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L58)
 
 ### JobsConformanceFixture
 
@@ -3096,7 +4311,7 @@ declare const JOBS_CONFORMANCE_FIXTURES: ReadonlyArray<JobsConformanceFixture>;
 declare const JobsConformanceFixture: JobsConformanceFixture;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L60)
 
 ### JobsConformanceHarness
 
@@ -3106,7 +4321,7 @@ declare const JobsConformanceFixture: JobsConformanceFixture;
 declare const JobsConformanceHarness: JobsConformanceHarness;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L60)
 
 ### RealListenerPurpose
 
@@ -3226,7 +4441,7 @@ declare const TestClock: TestClock;
 declare const TestEventCloseOptions: TestEventCloseOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L63)
 
 ### TestEventDeliveryAttempt
 
@@ -3236,7 +4451,7 @@ declare const TestEventCloseOptions: TestEventCloseOptions;
 declare const TestEventDeliveryAttempt: TestEventDeliveryAttempt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L64)
 
 ### TestEventFake
 
@@ -3246,7 +4461,7 @@ declare const TestEventDeliveryAttempt: TestEventDeliveryAttempt;
 declare const TestEventFake: TestEventFake<Payload, Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L65)
 
 ### TestEventOptions
 
@@ -3256,7 +4471,7 @@ declare const TestEventFake: TestEventFake<Payload, Output>;
 declare const TestEventOptions: TestEventOptions<Payload, Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L66)
 
 ### TestEventPublishResult
 
@@ -3266,7 +4481,7 @@ declare const TestEventOptions: TestEventOptions<Payload, Output>;
 declare const TestEventPublishResult: TestEventPublishResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L67)
 
 ### TestEventTriggerOptions
 
@@ -3276,7 +4491,7 @@ declare const TestEventPublishResult: TestEventPublishResult;
 declare const TestEventTriggerOptions: TestEventTriggerOptions<Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L68)
 
 ### TestFailureControls
 
@@ -3378,35 +4593,25 @@ declare const TestHttpRequest: TestHttpRequest;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L47)
 
-### TestJobCloseOptions
+### TestHttpRequestInit
 
 **Signature**
 
 ```ts
-declare const TestJobCloseOptions: TestJobCloseOptions;
+declare const TestHttpRequestInit: TestHttpRequestInit<Json>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L48)
 
-### TestJobFake
+### TestHttpResponse
 
 **Signature**
 
 ```ts
-declare const TestJobFake: TestJobFake<Input, Output>;
+declare const TestHttpResponse: TestHttpResponse<Body>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L51)
-
-### TestJobOptions
-
-**Signature**
-
-```ts
-declare const TestJobOptions: TestJobOptions<Input, Output>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L49)
 
 ### TestJobsAdapter
 
@@ -3416,7 +4621,7 @@ declare const TestJobOptions: TestJobOptions<Input, Output>;
 declare const TestJobsAdapter: TestJobsAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L54)
 
 ### TestJobsAdapterOptions
 
@@ -3426,7 +4631,7 @@ declare const TestJobsAdapter: TestJobsAdapter;
 declare const TestJobsAdapterOptions: TestJobsAdapterOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L54)
 
 ### TestObservability
 
@@ -3436,7 +4641,17 @@ declare const TestJobsAdapterOptions: TestJobsAdapterOptions;
 declare const TestObservability: TestObservability;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L50)
+
+### TestProblemResponse
+
+**Signature**
+
+```ts
+declare const TestProblemResponse: TestProblemResponse;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L51)
 
 ### TestProviderReplacements
 
@@ -3529,7 +4744,7 @@ declare const createBunHttpListener: (
 declare const createDeterministicJobsAdapter: (options?: TestJobsAdapterOptions) => TestJobsAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L53)
 
 ### createHttpTestClient
 
@@ -3554,7 +4769,7 @@ declare const createJobsConformanceHarness: (
 ) => JobsConformanceHarness;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L56)
 
 ### createObservabilityAssertions
 
@@ -3649,7 +4864,7 @@ declare const createTestEvent: <Payload = unknown, Output = unknown>(
 ) => Promise<TestEventFake<Payload, Output>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L61)
 
 ### createTestEventFake
 
@@ -3661,7 +4876,7 @@ declare const createTestEventFake: <Payload = unknown, Output = unknown>(
 ) => Promise<TestEventFake<Payload, Output>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L61)
 
 ### createTestFakes
 
@@ -3699,30 +4914,6 @@ declare const createTestHttpListener: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L34)
 
-### createTestJob
-
-**Signature**
-
-```ts
-declare const createTestJob: <Input = JsonValue, Output = unknown>(
-  options: TestJobOptions<Input, Output>,
-) => Promise<TestJobFake<Input, Output>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L50)
-
-### createTestJobFake
-
-**Signature**
-
-```ts
-declare const createTestJobFake: <Input = JsonValue, Output = unknown>(
-  options: TestJobOptions<Input, Output>,
-) => Promise<TestJobFake<Input, Output>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L50)
-
 ### createTestJobsAdapter
 
 **Signature**
@@ -3731,7 +4922,7 @@ declare const createTestJobFake: <Input = JsonValue, Output = unknown>(
 declare const createTestJobsAdapter: (options?: TestJobsAdapterOptions) => TestJobsAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L53)
 
 ### createTestObservability
 
@@ -3816,48 +5007,9 @@ declare const runJobsConformance: (
 ) => Promise<readonly string[]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L57)
 
 ## `invoke-function.ts`
-
-### invokeFunction
-
-Invokes a function descriptor through the engine's direct, transport-free path.
-
-**Example**
-
-```ts
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
-import { invokeFunction } from "@relkit/testing";
-
-export async function greetingExample(): Promise<string> {
-  const greet = defineFunction({
-    id: "greet",
-    input: z.string(),
-    output: z.string(),
-    handler: async (name) => `Hello ${name}`,
-  });
-  return invokeFunction(greet, "Ada");
-}
-```
-
-**Signature**
-
-```ts
-declare const invokeFunction: <
-  const Target extends StandaloneFunctionTarget,
-  Context extends { readonly signal: AbortSignal } = FunctionContextOf<Target>,
->(
-  target: Target,
-  input: FunctionInput<Target>,
-  options?: InvokeFunctionOptions<Context>,
-) => Promise<FunctionOutput<Target>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L52)
-
-Since v0.1.0
 
 ### FunctionContextOf
 
@@ -3946,7 +5098,7 @@ type FunctionContextOf<Target> =
     : InvocationContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L44)
 
 ### FunctionInput (type alias)
 
@@ -3960,7 +5112,7 @@ type FunctionInput<Target extends { readonly input: StandardSchemaV1 }> = InferI
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L28)
 
 ### FunctionOutput (type alias)
 
@@ -3974,7 +5126,7 @@ type FunctionOutput<Target extends { readonly output: StandardSchemaV1 }> = Infe
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L36)
 
 ### InvokeFunctionOptions (interface)
 
@@ -3995,7 +5147,7 @@ export interface InvokeFunctionOptions<Context extends { readonly signal: AbortS
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L55)
 
 ### StandaloneFunctionTarget (interface)
 
@@ -4009,9 +5161,8 @@ export interface StandaloneFunctionTarget {
   readonly input: StandardSchemaV1;
   readonly output: StandardSchemaV1;
   readonly errors?: readonly { readonly id: string; readonly data: StandardSchemaV1 }[];
-  readonly dependencies?: import("@relkit/engine").DependencyDeclarations;
-  readonly publishes?: readonly string[];
-  readonly publications?: Readonly<Record<string, import("@relkit/engine").DependencyRefLike>>;
+  readonly dependencies?: import("relkit/engine").DependencyDeclarations;
+  readonly publications?: Readonly<Record<string, import("relkit/engine").DependencyRefLike>>;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly handler: (...arguments_: readonly never[]) => MaybePromise<unknown>;
@@ -4019,136 +5170,6 @@ export interface StandaloneFunctionTarget {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L12)
-
-## `job-harness.types.ts`
-
-### JobHarnessService (interface)
-
-Native inspection and Effect workflows over one durable job generation.
-
-**Signature**
-
-```ts
-export interface JobHarnessService {
-  readonly value: TestJobFake<never, unknown>;
-  readonly runNext: (
-    id?: string,
-  ) => Effect.Effect<Awaited<ReturnType<TestJobFake["runNext"]>>, unknown>;
-  readonly drain: Effect.Effect<Awaited<ReturnType<TestJobFake["drain"]>>, unknown>;
-  readonly restart: Effect.Effect<void, unknown>;
-  readonly close: (options?: TestJobCloseOptions) => Effect.Effect<void, unknown>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/job-harness.types.ts#L5)
-
-## `job-runtime-controls.ts`
-
-### enqueueJob
-
-Persists one submission before making a new durable instance available.
-
-**Signature**
-
-```ts
-declare const enqueueJob: (
-  queue: JobQueue,
-  input: JobQueueEnqueue,
-  signal: AbortSignal,
-) => Effect.Effect<JobQueueAcceptance, unknown, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/job-runtime-controls.ts#L13)
-
-### jobWorkerControls
-
-Composes native worker selection and retry promotion against the current generation.
-
-**Signature**
-
-```ts
-declare const jobWorkerControls: (state: JobWorkerState) => {
-  runNext: (
-    instanceId?: string | undefined,
-  ) => Effect.Effect<JobRunResult | undefined, unknown, never>;
-  drain: Effect.Effect<ReadonlyArray<JobRunResult>, unknown, never>;
-};
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/job-runtime-controls.ts#L67)
-
-### promoteDueJobs
-
-Promotes due entries in native snapshot order before worker admission.
-
-**Signature**
-
-```ts
-declare const promoteDueJobs: (
-  queue: JobQueue,
-  currentTimeMs: () => number,
-) => Effect.Effect<void, unknown, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/job-runtime-controls.ts#L37)
-
-## `job-runtime.ts`
-
-### createTestJobRuntime
-
-Acquires and composes the durable job owner's actual workflows.
-
-**Signature**
-
-```ts
-declare const createTestJobRuntime: <Input = JsonValue, Output = unknown>(
-  options: TestJobOptions<Input, Output>,
-) => Effect.Effect<
-  {
-    value: JobHarnessService["value"];
-    runNext: (instanceId?: string) => Effect.Effect<JobRunResult | undefined, unknown, never>;
-    drain: Effect.Effect<ReadonlyArray<JobRunResult>, unknown, never>;
-    restart: Effect.Effect<void, unknown, never>;
-    close: (closeOptions: TestJobCloseOptions | undefined) => Effect.Effect<void, unknown, never>;
-  },
-  unknown,
-  Scope.Scope
->;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/job-runtime.ts#L38)
-
-## `job-runtime.types.ts`
-
-### JobRuntimeState (interface)
-
-Admission, native cancellation and actual completion receipts for one durable job owner.
-
-**Signature**
-
-```ts
-export interface JobRuntimeState extends WorkOwnershipState {}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/job-runtime.types.ts#L6)
-
-### JobWorkerState (interface)
-
-Current-generation native authorities read lazily by ordered worker workflows.
-
-**Signature**
-
-```ts
-export interface JobWorkerState {
-  readonly queue: () => JobQueue;
-  readonly worker: () => Awaited<ReturnType<typeof materializeJobs>>;
-  readonly jobId: string;
-  readonly now: () => number;
-  readonly isClosed: () => boolean;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/job-runtime.types.ts#L9)
 
 ## `jobs-conformance.ts`
 
@@ -4160,7 +5181,7 @@ export interface JobWorkerState {
 declare const JOBS_CONFORMANCE_FIXTURES: ReadonlyArray<JobsConformanceFixture>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L22)
 
 ### JobsConformanceFixture
 
@@ -4170,7 +5191,7 @@ declare const JOBS_CONFORMANCE_FIXTURES: ReadonlyArray<JobsConformanceFixture>;
 declare const JobsConformanceFixture: JobsConformanceFixture;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L9)
 
 ### JobsConformanceHarness
 
@@ -4180,7 +5201,37 @@ declare const JobsConformanceFixture: JobsConformanceFixture;
 declare const JobsConformanceHarness: JobsConformanceHarness;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L10)
+
+### JobsConformanceProvider
+
+**Signature**
+
+```ts
+declare const JobsConformanceProvider: JobsConformanceProvider;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L11)
+
+### JobsProviderConformanceOptions
+
+**Signature**
+
+```ts
+declare const JobsProviderConformanceOptions: JobsProviderConformanceOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L12)
+
+### createDeterministicJobsAdapter
+
+**Signature**
+
+```ts
+declare const createDeterministicJobsAdapter: (options?: TestJobsAdapterOptions) => TestJobsAdapter;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L20)
 
 ### createJobsConformanceHarness
 
@@ -4194,7 +5245,39 @@ declare const createJobsConformanceHarness: (
 ) => JobsConformanceHarness;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L45)
+
+### createJobsProviderConformanceHarness
+
+Creates the jobs conformance harness for a jobs provider, with the same cases as every
+first-party provider. The ambiguous-write case (`unknown-acknowledgement`) runs against the
+`faulty` adapter, the provider's own failure injection, and is skipped without one.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import {
+  createDeterministicJobsAdapter,
+  createJobsProviderConformanceHarness,
+} from "@relkit/testing/jobs-conformance";
+
+const harness = createJobsProviderConformanceHarness({
+  create: () => createDeterministicJobsAdapter(),
+  faulty: () => createDeterministicJobsAdapter({ unknown: { submit: true } }),
+});
+console.log((await runConformance(harness)).passed);
+```
+
+**Signature**
+
+```ts
+declare const createJobsProviderConformanceHarness: (
+  options: JobsProviderConformanceOptions,
+) => ConformanceHarness;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L112)
 
 ### runJobsConformance
 
@@ -4209,7 +5292,7 @@ declare const runJobsConformance: (
 ) => Promise<readonly string[]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L71)
 
 ## `jobs-conformance.types.ts`
 
@@ -4245,21 +5328,39 @@ export interface JobsConformanceHarness {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.types.ts#L13)
 
-## `jobs-types.ts`
+### JobsConformanceProvider (type alias)
 
-Preserved compatibility entrypoint for the canonical domain type companion.
-
-### "./jobs.types.js" (namespace export)
-
-Re-exports all named exports from the "./jobs.types.js" module.
+A jobs adapter under test; `close` runs after each case when present.
 
 **Signature**
 
 ```ts
-export * from "./jobs.types.js";
+type JobsConformanceProvider = JobsAdapterRuntime & {
+  readonly close?: () => Promise<unknown>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-types.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.types.ts#L21)
+
+### JobsProviderConformanceOptions (interface)
+
+What a jobs provider supplies to run the shared suite.
+
+**Signature**
+
+```ts
+export interface JobsProviderConformanceOptions {
+  /** Creates an adapter for one case. */
+  readonly create: () => JobsConformanceProvider;
+  /**
+   * Failure injection: an adapter that commits a submission but loses the response, so the
+   * submission's outcome is unknown. The `unknown-acknowledgement` case is skipped without it.
+   */
+  readonly faulty?: () => JobsConformanceProvider;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.types.ts#L26)
 
 ## `jobs-utils.ts`
 
@@ -4273,7 +5374,7 @@ Creates isolated named failure injection controls.
 declare const createFailures: () => TestFailureControls;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L170)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L37)
 
 ### createIdSource
 
@@ -4285,47 +5386,7 @@ Creates an isolated monotonically sequenced invocation identity source.
 declare const createIdSource: () => InvocationIdSource;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L142)
-
-### createJobInvoker
-
-Binds job invocation to deterministic IDs, time and owner cancellation.
-
-**Signature**
-
-```ts
-declare const createJobInvoker: <Input, Output>(
-  target: InvocationTarget<Input, Output>,
-  failures: TestFailureControls,
-  runner: InvocationRunner,
-  idSource: InvocationIdSource,
-  now: () => number,
-  env: Readonly<Record<string, unknown>> | undefined,
-  clients: DependencyClientSources | undefined,
-  hooks: InvocationHooks | undefined,
-  ownerSignal?: () => AbortSignal,
-) => (request: JobInvocationOptions) => Promise<unknown>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L86)
-
-### createPlan
-
-Builds the minimal registration plan consumed by native materialization.
-
-**Signature**
-
-```ts
-declare const createPlan: <Input, Output>(
-  jobId: string,
-  target: InvocationTarget<Input, Output>,
-  retry: RetryPolicy,
-  profile: string,
-  options: TestJobOptions<Input, Output>,
-) => Parameters<typeof materializeJobs>[0]["plan"];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L9)
 
 ### createRandom
 
@@ -4340,146 +5401,7 @@ declare const createRandom: (
 ) => () => number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L152)
-
-### defaultRetry
-
-**Signature**
-
-```ts
-declare const defaultRetry: RetryPolicy;
-```
-
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L19)
-
-## `jobs.ts`
-
-### TestJobHarness (class)
-
-Durable native job generation owned by one test scope.
-
-**Signature**
-
-```ts
-declare class TestJobHarness
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs.ts#L10)
-
-### createTestJob
-
-**Signature**
-
-```ts
-declare const createTestJob: <Input = JsonValue, Output = unknown>(
-  options: TestJobOptions<Input, Output>,
-) => Promise<TestJobFake<Input, Output>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs.ts#L92)
-
-### createTestJobFake
-
-Creates a durable one-job harness with an owned Effect runtime.
-
-**Signature**
-
-```ts
-declare const createTestJobFake: <Input = JsonValue, Output = unknown>(
-  options: TestJobOptions<Input, Output>,
-) => Promise<TestJobFake<Input, Output>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs.ts#L52)
-
-### testJobLayer
-
-Acquires native store/queue/worker resources with deterministic retry inputs.
-
-**Signature**
-
-```ts
-declare const testJobLayer: <Input, Output>(
-  options: TestJobOptions<Input, Output>,
-) => Layer.Layer<TestJobHarness, unknown, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs.ts#L21)
-
-## `jobs.types.ts`
-
-### TestJobCloseOptions (interface)
-
-Explicit failed-test state retention policy for durable job shutdown.
-
-**Signature**
-
-```ts
-export interface TestJobCloseOptions {
-  readonly failed?: boolean;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs.types.ts#L46)
-
-### TestJobFake (interface)
-
-Owned durable native job facade with deterministic admission and lifecycle controls.
-
-**Signature**
-
-```ts
-export interface TestJobFake<Input = JsonValue, Output = unknown> extends JobClient<Input> {
-  readonly id: string;
-  readonly client: JobClient<Input>;
-  readonly provider: JobProvider;
-  readonly stateRoot: string;
-  readonly clock: TestClock;
-  readonly random: () => number;
-  readonly failures: TestFailureControls;
-  readonly admin: JobAdmin;
-  readonly status: () => JobQueueCounts;
-  readonly get: (instanceId: string) => JobQueueEntry | undefined;
-  readonly runNext: (instanceId?: string) => Promise<JobRunResult | undefined>;
-  readonly drain: () => Promise<readonly JobRunResult[]>;
-  readonly restart: () => Promise<void>;
-  readonly close: (options?: TestJobCloseOptions) => Promise<void>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs.types.ts#L55)
-
-### TestJobOptions (interface)
-
-Durable native target, retry bounds and deterministic persistence dependencies.
-
-**Signature**
-
-```ts
-export interface TestJobOptions<Input = JsonValue, Output = unknown> {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
-  readonly jobId?: string;
-  readonly target: InvocationTarget<Input, Output>;
-  readonly retry?: RetryPolicy;
-  readonly profile?: string;
-  readonly timeoutMs?: number;
-  readonly concurrency?: number;
-  readonly consumerConcurrency?: number;
-  readonly idempotency?: JobIdempotencyDefinition;
-  readonly leaseDurationMs?: number;
-  readonly ownerId?: string;
-  readonly stateRoot?: string;
-  readonly startTimeMs?: number;
-  readonly random?: () => number;
-  readonly randomValues?: readonly number[];
-  readonly failures?: TestFailureControls;
-  readonly env?: Readonly<Record<string, unknown>>;
-  readonly clients?: DependencyClientSources;
-  readonly hooks?: InvocationHooks;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs.types.ts#L23)
 
 ## `native-jobs-observe.ts`
 
@@ -4704,6 +5626,137 @@ type TestProviderReplacements = Readonly<
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/provider-replacements.types.ts#L4)
 
+## `realtime-conformance.ts`
+
+Shared realtime provider conformance suite. Every first-party realtime provider (local, Redis,
+Cloudflare Durable Objects) runs these cases with two instances on one backend, and provider
+authors run the same ones.
+
+### "./realtime-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./realtime-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./realtime-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/realtime-conformance.ts#L17)
+
+### REALTIME_CONFORMANCE_CASES
+
+The cases every realtime provider passes.
+
+**Signature**
+
+```ts
+declare const REALTIME_CONFORMANCE_CASES: ReadonlyArray<RealtimeConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/realtime-conformance.ts#L20)
+
+### createRealtimeConformanceHarness
+
+Creates the realtime conformance harness for one provider.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import { createRealtimeConformanceHarness } from "@relkit/testing/realtime-conformance";
+import { createLocalRealtimeProvider } from "relkit/providers-local";
+
+const harness = createRealtimeConformanceHarness({
+  create: () => createLocalRealtimeProvider("/tmp/relkit-realtime-conformance", { pollingMs: 50 }),
+});
+console.log((await runConformance(harness)).passed);
+```
+
+**Signature**
+
+```ts
+declare const createRealtimeConformanceHarness: (
+  options: RealtimeConformanceOptions,
+) => ConformanceHarness<RealtimeConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/realtime-conformance.ts#L55)
+
+## `realtime-conformance.types.ts`
+
+Inputs of the shared realtime provider conformance suite.
+
+### RealtimeConformanceCase (type alias)
+
+One realtime conformance case.
+
+**Signature**
+
+```ts
+type RealtimeConformanceCase = ConformanceCase<RealtimeConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/realtime-conformance.types.ts#L37)
+
+### RealtimeConformanceCaseId (type alias)
+
+Case ids of the realtime suite.
+
+**Signature**
+
+```ts
+type RealtimeConformanceCaseId =
+  | "wake-on-append"
+  | "read-after-checkpoint"
+  | "concurrent-appends"
+  | "idempotent-append"
+  | "wait-deadline"
+  | "presence"
+  | "backend-failure";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/realtime-conformance.types.ts#L27)
+
+### RealtimeConformanceOptions (interface)
+
+What a realtime provider supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface RealtimeConformanceOptions {
+  /**
+   * Creates a provider on the shared backend. Each case calls it twice with the same profile and
+   * expects both instances to see each other's events, as two server processes would.
+   * @param profile - Unique profile for the case.
+   */
+  readonly create: (profile: string) => RealtimeConformanceProvider;
+  /**
+   * Failure injection: creates a provider whose backend cannot answer. The `backend-failure` case
+   * is skipped without it.
+   */
+  readonly failing?: () => RealtimeConformanceProvider;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/realtime-conformance.types.ts#L12)
+
+### RealtimeConformanceProvider (type alias)
+
+A realtime provider under test, with the optional lifecycle methods first-party ones have.
+
+**Signature**
+
+```ts
+type RealtimeConformanceProvider = RealtimeProvider & {
+  readonly ready?: () => Promise<unknown>;
+  readonly close?: () => Promise<unknown>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/realtime-conformance.types.ts#L6)
+
 ## `runtime-clock.ts`
 
 ### TestDeterministicClock (class)
@@ -4823,6 +5876,131 @@ declare const closeRuntime: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-close.ts#L11)
+
+## `runtime-conformance.ts`
+
+Shared runtime adapter conformance suite. The Bun, Node and Workers adapters run these cases
+inside the runtime they adapt, and a new adapter runs the same ones. The full HTTP behavior of a
+built application (static files, WebSocket echo, streaming) stays in the runtime HTTP suite.
+
+### "./runtime-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./runtime-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./runtime-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.ts#L14)
+
+### RUNTIME_CONFORMANCE_CASES
+
+The cases every runtime adapter passes.
+
+**Signature**
+
+```ts
+declare const RUNTIME_CONFORMANCE_CASES: ReadonlyArray<RuntimeConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.ts#L17)
+
+### createRuntimeConformanceHarness
+
+Creates the runtime conformance harness for one adapter. Run it inside the runtime the adapter
+adapts.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import { createRuntimeConformanceHarness } from "@relkit/testing/runtime-conformance";
+import { nodeRuntime } from "relkit/runtime/node";
+
+const harness = createRuntimeConformanceHarness({
+  adapter: nodeRuntime,
+  kind: "process",
+  executable: process.execPath,
+});
+console.log((await runConformance(harness)).results);
+```
+
+**Signature**
+
+```ts
+declare const createRuntimeConformanceHarness: (
+  options: RuntimeConformanceOptions,
+) => ConformanceHarness<RuntimeConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.ts#L50)
+
+## `runtime-conformance.types.ts`
+
+Inputs of the shared runtime adapter conformance suite.
+
+### RuntimeConformanceCase (type alias)
+
+One runtime conformance case.
+
+**Signature**
+
+```ts
+type RuntimeConformanceCase = ConformanceCase<RuntimeConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.types.ts#L37)
+
+### RuntimeConformanceCaseId (type alias)
+
+Case ids of the runtime suite.
+
+**Signature**
+
+```ts
+type RuntimeConformanceCaseId =
+  | "naming"
+  | "crypto"
+  | "environment"
+  | "serve"
+  | "websocket-helper"
+  | "files"
+  | "processes"
+  | "modules";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.types.ts#L26)
+
+### RuntimeConformanceOptions (interface)
+
+What a runtime adapter supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface RuntimeConformanceOptions {
+  /** The adapter under test, such as `nodeRuntime` from `relkit/runtime/node`. */
+  readonly adapter: RuntimeAdapter;
+  /**
+   * `process` for runtimes with a listener, a filesystem and child processes (Bun, Node);
+   * `isolate` for runtimes without them (Cloudflare Workers), whose adapter must refuse those
+   * operations instead.
+   */
+  readonly kind: "process" | "isolate";
+  /** A variable set in the environment of the run, read back through the adapter. */
+  readonly environment?: { readonly name: string; readonly value: string };
+  /** An existing file the `files` case opens (process runtimes). */
+  readonly file?: { readonly path: string; readonly contents: string };
+  /** Executable of the runtime under test, such as `process.execPath` (process runtimes). */
+  readonly executable?: string;
+  /** Directory from which the `modules` case resolves `relkit` (process runtimes). */
+  readonly resolveFrom?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.types.ts#L6)
 
 ## `runtime-context.ts`
 
@@ -4991,7 +6169,7 @@ Creates a small deterministic runtime for direct function tests.
 **Example**
 
 ```ts
-import { defineEnv } from "@relkit/app/config";
+import { defineEnv } from "relkit/config";
 import { createTestRuntime } from "@relkit/testing";
 
 export async function runtimeExample(): Promise<void> {
@@ -5113,7 +6291,7 @@ Constructs the native local agent state provider at an explicit test root.
 declare const createTestAgentStateProvider: (root: string) => AgentStateProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/state-providers.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/state-providers.ts#L20)
 
 ### createTestRealtimeProvider
 
@@ -5125,7 +6303,7 @@ Constructs the native local realtime provider at an explicit test root.
 declare const createTestRealtimeProvider: (root: string) => RealtimeProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/state-providers.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/state-providers.ts#L11)
 
 ## `state-root.ts`
 
@@ -5497,7 +6675,7 @@ Owned native jobs adapter with deterministic worker and snapshot test controls.
 ```ts
 export interface TestJobsAdapter extends JobsAdapterRuntime {
   readonly clock: TestClock;
-  readonly runNext: () => Promise<import("@relkit/jobs/adapter").NativeTaskWork | undefined>;
+  readonly runNext: () => Promise<import("relkit/jobs/adapter").NativeTaskWork | undefined>;
   readonly snapshot: (runId: string) => RunSnapshot;
 }
 ```
@@ -5512,7 +6690,7 @@ Deterministic native adapter time, failure injection and unknown-outcome policy.
 
 ```ts
 export interface TestJobsAdapterOptions {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly clock?: TestClock;
   readonly startTimeMs?: number;
   readonly service?: string;

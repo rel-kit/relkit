@@ -1,4 +1,15 @@
-/** Owns the native Redis connection; a later operation can reconnect without replaying failed commands. */
+/**
+ * Owns the native Redis connection; a later operation can reconnect without replaying failed
+ * commands. A `redis://` or `rediss://` URL opens a socket (Bun's client or `ioredis` on Node); an
+ * `http://` or `https://` URL sends each command over HTTP, which is the only option on Cloudflare
+ * Workers.
+ */
+import { detectRuntime } from "relkit/runtime";
+import { openBunRedis } from "./redis-native.bun.js";
+import { openHttpRedis } from "./redis-native.http.js";
+import { openNodeRedis } from "./redis-native.node.js";
+import type { OpenRedisNative, RedisNativeClient } from "./redis-native.types.js";
+
 export interface RedisClientOptions {
   readonly url: string;
   readonly connectionTimeoutMs?: number;
@@ -38,68 +49,67 @@ export function createRedisClient(options: RedisClientOptions): RedisProtocolCli
   return protocolClient(redisConnection(url, options.connectionTimeoutMs));
 }
 
-/** Maps the existing protocol to the currently owned socket without retrying commands.
+/** Maps the protocol to raw commands on the currently owned socket without retrying them.
  * @param connection - Native socket lifecycle. @returns The Redis protocol adapter. */
 function protocolClient(connection: ReturnType<typeof redisConnection>): RedisProtocolClient {
+  const send = (command: string, args: readonly string[]) => connection.client.send(command, args);
   return {
     get connected() {
       return connection.connected;
     },
     connect: connection.connect,
     close: connection.close,
-    ping: async () => String(await connection.client.send("PING", [])) === "PONG",
-    get: (key) => connection.client.get(key),
+    ping: async () => String(await send("PING", [])) === "PONG",
+    get: async (key) => {
+      const value = await send("GET", [key]);
+      return value === null || value === undefined ? null : String(value);
+    },
     set: async (key, value, ttlMs) => {
-      if (ttlMs === undefined) await connection.client.set(key, value);
+      if (ttlMs === undefined) await send("SET", [key, value]);
       else {
         if (!Number.isSafeInteger(ttlMs) || ttlMs < 1) {
           throw new RangeError("Redis ttlMs must be a positive integer");
         }
-        await connection.client.set(key, value, "PX", ttlMs);
+        await send("SET", [key, value, "PX", String(ttlMs)]);
       }
     },
-    delete: (key) => connection.client.del(key),
-    has: (key) => connection.client.exists(key),
-    increment: (key, amount = 1) => {
+    delete: async (key) => Number(await send("DEL", [key])),
+    has: async (key) => Number(await send("EXISTS", [key])) > 0,
+    increment: async (key, amount = 1) => {
       if (!Number.isSafeInteger(amount)) throw new RangeError("Redis increment must be an integer");
-      return connection.client.incrby(key, amount);
+      return Number(await send("INCRBY", [key, String(amount)]));
     },
     scan: async (cursor, pattern, count) => {
-      const result = await connection.client.send("SCAN", [
-        cursor,
-        "MATCH",
-        pattern,
-        "COUNT",
-        String(count),
-      ]);
+      const result = await send("SCAN", [cursor, "MATCH", pattern, "COUNT", String(count)]);
       if (!Array.isArray(result) || result.length !== 2 || !Array.isArray(result[1])) {
         throw new Error("Redis SCAN returned an invalid response");
       }
       return [String(result[0]), result[1].map(String)];
     },
-    type: async (key) => String(await connection.client.send("TYPE", [key])),
-    ttl: async (key) => Number(await connection.client.send("PTTL", [key])),
-    command: (command, args) => connection.client.send(command, [...args]),
+    type: async (key) => String(await send("TYPE", [key])),
+    ttl: async (key) => Number(await send("PTTL", [key])),
+    command: (command, args) => send(command, args),
   };
 }
 
-/** Replaces closed native clients because Bun 1.3.10 can reconnect a socket while commands stay closed.
+/** Replaces closed native clients because Bun 1.3.10 can reconnect a socket while commands stay closed;
+ * Node uses `ioredis` with the same no-retry policy.
  * @param url - Validated Redis URL. @param timeout - Optional connection timeout in milliseconds.
  * @returns One shared connection attempt and terminal explicit shutdown. */
 function redisConnection(url: string, timeout: number | undefined) {
   let closed = false;
   let disconnected = false;
   let pending: Promise<void> | undefined;
-  const open = () => {
-    const next = new Bun.RedisClient(url, {
+  const openNative = nativeOpener(url);
+  const open = (): RedisNativeClient => {
+    const next: RedisNativeClient = openNative({
+      url,
       tls: url.startsWith("rediss://"),
-      autoReconnect: false,
-      enableOfflineQueue: false,
-      ...(timeout === undefined ? {} : { connectionTimeout: timeout }),
+      connectionTimeoutMs: timeout,
+      onClose: () => {
+        if (client === next) disconnected = true;
+      },
     });
-    next.onclose = () => {
-      if (client === next) disconnected = true;
-    };
     return next;
   };
   let client = open();
@@ -141,8 +151,23 @@ function validateUrl(value: string): string {
     throw new TypeError("Redis URL must not be empty");
   }
   const url = new URL(value);
-  if (url.protocol !== "redis:" && url.protocol !== "rediss:") {
-    throw new TypeError("Redis URL must use redis:// or rediss://");
+  if (!["redis:", "rediss:", "http:", "https:"].includes(url.protocol)) {
+    throw new TypeError("Redis URL must use redis://, rediss://, http:// or https://");
   }
   return value;
+}
+
+/**
+ * Picks the client for a URL and the runtime this code runs on.
+ * @param url - Validated Redis URL.
+ * @returns The opener; throws on Workers for a socket URL, since Workers have no raw TCP client.
+ */
+function nativeOpener(url: string): OpenRedisNative {
+  if (url.startsWith("http://") || url.startsWith("https://")) return openHttpRedis;
+  const runtime = detectRuntime();
+  if (runtime === "workers")
+    throw new TypeError(
+      "Cloudflare Workers cannot open a Redis socket; set the Redis URL to an HTTP endpoint (https://:<token>@host) that speaks the Upstash REST protocol.",
+    );
+  return runtime === "bun" ? openBunRedis : openNodeRedis;
 }

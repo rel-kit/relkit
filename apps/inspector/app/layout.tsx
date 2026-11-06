@@ -6,8 +6,8 @@ import { InspectorShell } from "./inspector-shell";
 import { INSPECTOR_THEME_KEY } from "./theme-storage";
 
 export const metadata = {
-  title: "RELKIT Inspector",
-  description: "A read-only view of the active RELKIT development generation.",
+  title: "RelKit Inspector",
+  description: "A read-only view of the active RelKit development generation.",
   icons: { icon: "/logo.svg" },
 };
 

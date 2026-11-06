@@ -1,7 +1,8 @@
 /** Selected database-only test acquisition; authentication SDKs are never imported. */
+import { getDescriptorIdentity } from "relkit/invocation";
 import { activateDrizzleService } from "@relkit/drizzle";
 import { Context, Effect, Layer, ManagedRuntime } from "effect";
-import { runExecutionPromise } from "@relkit/contracts/operation";
+import { runExecutionPromise } from "relkit/contracts/operation";
 import { nativeServiceError } from "./application-errors.js";
 import { loadApplicationServices, soleNativeService } from "./application-service-discovery.js";
 import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
@@ -56,6 +57,11 @@ function acquire(root: string, env: ServiceEnvironment) {
       }),
       (active) => Effect.promise(() => active.close()),
     );
-    return { context: { database: database.context } };
+    return {
+      context: {
+        database: database.context,
+        databases: { [getDescriptorIdentity(declaration as object)]: database.context },
+      },
+    };
   });
 }

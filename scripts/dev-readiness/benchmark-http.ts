@@ -5,7 +5,7 @@
  */
 import { Cause, Effect } from "effect";
 import { createServer } from "node:net";
-import { ownedNativePromise } from "@relkit/cli/internal/tooling";
+import { ownedNativePromise } from "@relkit/cli/tooling";
 import { ReadinessBenchmarkError } from "./benchmark-error.js";
 import type { StartRequest } from "./benchmark.types.js";
 

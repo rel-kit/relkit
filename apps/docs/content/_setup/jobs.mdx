@@ -24,8 +24,7 @@ Merge `jobs` and `defaults.jobs` into your root configuration. Keep your existin
 </include>
 
 Docker supplies the local provider's connection values; there are no new `defineEnv` secrets
-for this recipe. Jobs with `profile: "default"` use this binding. `localJob()` is the older
-function-target provider and is not a substitute for the native task provider used here.
+for this recipe. Jobs with `service: "default"`, or no `service`, use this binding.
 
 </Step>
 <Step title="Check and start after registering the task and job" icon="terminal">

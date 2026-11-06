@@ -2,7 +2,7 @@
 
 import { describe, expect, expectTypeOf, test } from "vitest";
 import { Command, END, Send, interrupt } from "@langchain/langgraph";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import {
   assertGraphNodeDestinations,
   defineGraphNode,

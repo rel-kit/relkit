@@ -2,7 +2,7 @@ import { afterEach, expect, test } from "bun:test";
 import { mkdtemp, readFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { CONTRACT_VERSION } from "@relkit/contracts";
+import { CONTRACT_VERSION } from "relkit/contracts";
 import { runClient } from "./src/commands/client.js";
 import type { CliCommandContext } from "./src/main-support.js";
 const originalFetch = globalThis.fetch;

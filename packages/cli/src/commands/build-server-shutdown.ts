@@ -15,17 +15,29 @@ function flushTelemetry() {
   return typeof flush === "function" ? Promise.resolve(flush()) : Promise.resolve();
 }
 
-async function shutdown() {
+async function releaseRuntime() {
   await runtimeOwner.shutdown(async () => {
     spanRuntime.close();
     ${agentRelease}
   }, async () => {
     await runtimeOwner.cleanup("telemetry.flush", flushTelemetry);
   });
+}
+
+/** Releases an embedded handle's providers without stopping the process. */
+async function closeEmbedded() {
+  closeEmbedded.done ??= releaseRuntime();
+  await closeEmbedded.done;
+}
+
+async function shutdown() {
+  await releaseRuntime();
   await server.stop(true);
   process.exit(0);
 }
 
+// The function host owns the instance lifecycle: no signal handlers, and the handle is returned.
+if (relkitMode.functionHost === true) return { fetch: relkitFetch, ready: (budgetMs = 25_000) => awaitFunctionHostReady(Date.now() + budgetMs), drain: drainFunctionHost, close: closeEmbedded };
 process.once("SIGINT", () => void shutdown());
 process.once("SIGTERM", () => void shutdown());
 `;

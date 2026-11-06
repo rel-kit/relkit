@@ -1,6 +1,6 @@
 /** Emits lookup progress and returns the demonstration order or its declared order-not-found error. */
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "zod";
 import orderNotFound from "../errors/order-not-found.error.js";
 import { orderLookupInput, orderLookupOutput } from "../../../platform/schemas.js";
 

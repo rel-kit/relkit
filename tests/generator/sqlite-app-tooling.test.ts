@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 import { join, resolve } from "node:path";
 import { mkdir, symlink } from "node:fs/promises";
 import { Database } from "bun:sqlite";
-import ts from "typescript";
+import ts from "relkit-typescript";
 import { buildCatalogDependency } from "../../packages/create-relkit/src/build-catalog.js";
 import { project, add, linkDependencies, registerAddCleanup } from "./add-acceptance-fixture.js";
 

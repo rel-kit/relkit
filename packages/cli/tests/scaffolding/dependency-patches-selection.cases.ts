@@ -5,9 +5,9 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { applyScaffoldPlan } from "../../src/scaffolding/add-transaction.js";
-import { readDrizzlePatch } from "create-relkit/internal/dependency-patches";
+import { readDrizzlePatch } from "create-relkit/dependency-patches";
 import { patchBuilder, withProject } from "./dependency-patches.fixture.js";
-import { SCAFFOLD_DEPENDENCIES } from "create-relkit/internal/scaffold-catalog";
+import { SCAFFOLD_DEPENDENCIES } from "create-relkit/scaffold-catalog";
 
 /** Verifies that patch-only plans install, retain public package results, and can be finished twice.
  * @returns Completion after fixture assertions and owned cleanup settle.

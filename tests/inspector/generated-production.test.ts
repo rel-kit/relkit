@@ -19,7 +19,7 @@ const buildProduction = Effect.fn("InspectorProduction.build")(function* (projec
   expect(status, errors.join("\n")).toBe(0);
   const entry = join(project, ".relkit/build/server/index.js");
   const source = yield* Effect.promise(() => readFile(entry, "utf8"));
-  expect(source).not.toContain("@relkit/inspector-api");
+  expect(source).not.toContain("relkit/inspector-api");
   expect(source).not.toContain("installInspectorEndpoints");
   return entry;
 });

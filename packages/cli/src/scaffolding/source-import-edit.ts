@@ -1,7 +1,7 @@
 /** Adds and merges TypeScript import bindings required by planned source changes while preserving existing imports and module specifiers. */
 
-import * as ts from "typescript";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import ts from "../typescript-parser.js";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 
 /**
  * Adds or merges one import declaration without reprinting the source file.

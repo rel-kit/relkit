@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GenerateProjectError } from "./generate-types.js";
 import { GeneratorFileSystem } from "./generator-filesystem.js";
 import { domainError } from "./generator-errors.js";
@@ -8,6 +8,7 @@ import type { GeneratorDomainError, GeneratorIoError } from "./generator-errors.
 import { runGeneratorPromise } from "./generator-runtime.js";
 import type { CreateOptions } from "./options.js";
 import { customizeDeploymentEffect } from "./generate-deployment.js";
+import { creationPackageManager, packageManagerFromUserAgent } from "./package-manager.js";
 import {
   compareNames,
   projectId,
@@ -86,11 +87,47 @@ export const customizeProjectEffect = Effect.fn("ProjectFiles.customize")(
       "export default defineApp({",
       `export default defineApp({\n  id: ${JSON.stringify(projectId(options.name))},`,
     );
+    yield* customizePackageManagerEffect(root, options);
     yield* customizeDeploymentEffect(root, options);
     if (!options.examples) yield* removeExamplesEffect(root);
   },
   (effect) => observeExecution("generator", "generation.customize", effect),
 );
+
+/**
+ * Lets pnpm run esbuild's install script, which pnpm 10 skips with a warning and pnpm 11 refuses
+ * without approval; `@relkit/cli` uses esbuild to run TypeScript on Node. `allowBuilds` is pnpm
+ * 11's setting and `onlyBuiltDependencies` pnpm 10's.
+ */
+const PNPM_WORKSPACE = `allowBuilds:
+  esbuild: true
+onlyBuiltDependencies:
+  - esbuild
+`;
+
+/**
+ * Records the selected package manager in `packageManager`. Templates pin Bun; for npm and pnpm
+ * the field names the invoking manager's version, or is removed when that version is unknown.
+ * pnpm projects also get the `pnpm-workspace.yaml` above.
+ * @param root - Staged project root.
+ * @param options - Creation options carrying `--package-manager`.
+ * @returns Completion after `package.json` is rewritten.
+ */
+const customizePackageManagerEffect = Effect.fn("ProjectFiles.packageManager")(function* (
+  root: string,
+  options: CreateOptions,
+) {
+  const manager = creationPackageManager(options.packageManager);
+  if (manager === "bun") return;
+  const fs = yield* GeneratorFileSystem;
+  if (manager === "pnpm") yield* fs.write(join(root, "pnpm-workspace.yaml"), PNPM_WORKSPACE);
+  const path = join(root, "package.json");
+  const content = yield* fs.readText(path);
+  const agent = packageManagerFromUserAgent();
+  const version = agent?.name === manager ? agent.version : undefined;
+  const field = version === undefined ? "" : `$1"packageManager": "${manager}@${version}",\n`;
+  yield* fs.write(path, content.replace(/^(\s*)"packageManager": "bun@[^"]*",\n/m, field));
+});
 
 /**
  * Preserves ordered template copy's Promise API.

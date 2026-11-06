@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" id="relkit-mark" viewBox="0 0 18 18" role="img" aria-label="RELKIT">
+<svg xmlns="http://www.w3.org/2000/svg" id="relkit-mark" viewBox="0 0 18 18" role="img" aria-label="RelKit">
   <!-- The landing page's four-square mark inherits the surrounding light or dark foreground. -->
   <path fill="currentColor" d="M0 0h8v8H0zM10 0h8v8h-8zM0 10h8v8H0zM10 10h8v8h-8z" />
 </svg>

@@ -1,13 +1,13 @@
 /** Serializes bounded discovery, recovery and collection independently from application requests. */
 import { Cause, Clock, Effect, Ref } from "effect";
-import { InspectionConnectionError } from "@relkit/inspector-api/connection";
-import type { InspectionFilesOperations } from "@relkit/inspector-api/connection";
+import { InspectionConnectionError } from "relkit/inspector-api/connection";
+import type { InspectionFilesOperations } from "relkit/inspector-api/connection";
 import type { InspectorDiscoveryOperations } from "./discovery.types.js";
 import type { InspectorRemoteOperations } from "./remote.types.js";
 import type { InspectorOptions } from "./options.types.js";
 import type { InspectorToolStateRef } from "./tool-state.types.js";
 import { collectInspectionBatch } from "./collector.js";
-import type { ObservabilityStream } from "@relkit/observability";
+import type { ObservabilityStream } from "relkit/observability";
 import { publishSelection, publishCollection } from "./live-events.js";
 import { acquireHistory, historyFailureHint, recoverInspection } from "./tool-history.js";
 

@@ -11,3 +11,7 @@ tests/deployment/golden/**
 docs/*technical-spec*.md
 # Mirrors the author-formatted Medium article; keep its code snippets byte-for-byte.
 apps/docs/content/blog/introducing-relkit.mdx
+# Deliberately malformed: the metrics reader must skip a file that is not JSON.
+tests/fixtures/metrics/partial/broken.json
+# Byte-for-byte snapshots of `relkit deploy init` output.
+packages/cli/tests/fixtures/deploy-init-*/**

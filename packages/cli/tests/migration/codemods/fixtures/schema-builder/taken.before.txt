@@ -1,0 +1,4 @@
+import { z, getJsonSchema } from "relkit/schema";
+
+const s = "already used";
+export const order = z.object({ name: z.string().describe(s) });

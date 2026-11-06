@@ -14,7 +14,7 @@ import { ScaffoldProcess, scaffoldProcessLayer } from "./scaffold-process.js";
 
 const repository = resolve(import.meta.dir, "..");
 const nativePackages = ["@langchain/core", "@langchain/langgraph", "langchain", "langsmith"];
-const firstParty = ["@relkit/langchain", "@relkit/schema", "@relkit/testing"];
+const firstParty = ["@relkit/langchain", "relkit/schema", "@relkit/testing"];
 
 /** Installs one isolated external cohort and retains its sources, lockfile and observed closure. */
 export const smokePackedNativeAgents = Effect.fn("PackedNativeAgents.smoke")(function* (

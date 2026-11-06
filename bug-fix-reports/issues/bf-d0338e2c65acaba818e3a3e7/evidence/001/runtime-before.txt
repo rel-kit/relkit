@@ -1,3 +1,0 @@
-{"probes":[],"success":true,"diagnostics":[]}
-
-Exit code: 1

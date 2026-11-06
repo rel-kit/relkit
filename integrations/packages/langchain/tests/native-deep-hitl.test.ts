@@ -1,11 +1,12 @@
 /** Exercises native deep hitl behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/index.ts";
 import { expect, test } from "vitest";
 import { MemorySaver } from "@langchain/langgraph";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { createNativeStringTool } from "./test-native-tool.ts";
 import { createTestModel } from "./test-model.ts";
-import { defineAgent, GraphInterruptedError, invokeAgent } from "../src/index.ts";
+import { GraphInterruptedError, invokeAgent } from "../src/index.ts";
 
 test("resumes a native DeepAgents human-input checkpoint", async () => {
   const model = approvalModel();
@@ -16,13 +17,16 @@ test("resumes a native DeepAgents human-input checkpoint", async () => {
   });
   const agent = defineAgent({
     id: "deep.hitl",
+    runtime: langchain({
+      model: model.model,
+      interruptOn: { danger: { allowedDecisions: ["approve"], description: "Review" } },
+      checkpointer: new MemorySaver(),
+      tools: [danger],
+    }),
     input: z.object({ message: z.string() }),
     output: z.object({ answer: z.string() }),
-    model: model.model,
     instructions: "Call danger once, then finish.",
-    tools: [danger],
-    interruptOn: { danger: { allowedDecisions: ["approve"], description: "Review" } },
-    checkpointer: new MemorySaver(),
+    tools: [],
     limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 2_000 },
   });
   const waiting: unknown[] = [];

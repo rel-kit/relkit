@@ -1,4 +1,4 @@
-import { defineTool } from "@relkit/app/tools";
+import { defineTool } from "relkit/tools";
 import deleteOrder from "../../src/services/orders/functions/delete-order.function.js";
 
 export const cancelOrder = defineTool({

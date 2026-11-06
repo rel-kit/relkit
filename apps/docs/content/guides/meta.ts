@@ -3,6 +3,17 @@ import { defineMeta } from "blume";
 export default defineMeta({
   title: "Guides",
   icon: "book-open",
-  pages: ["index", "cli", "frontend", "storage", "caching", "events", "database", "auth", "ai"],
+  pages: [
+    "index",
+    "migrate",
+    "cli",
+    "frontend",
+    "storage",
+    "caching",
+    "events",
+    "database",
+    "auth",
+    "ai",
+  ],
   display: "flat",
 });

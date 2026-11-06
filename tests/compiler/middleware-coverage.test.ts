@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { pathRelation } from "../../packages/compiler/src/middleware-coverage";
+import { pathRelation } from "../../packages/cli/src/compiler/middleware-coverage";
 
 describe("middleware route coverage", () => {
   test("classifies exact, parameter, wildcard, global, unmatched, and partial catch-all paths", () => {

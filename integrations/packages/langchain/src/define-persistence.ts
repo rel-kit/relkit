@@ -1,9 +1,9 @@
 /** Creates native persistence descriptors around authored checkpointers and stores; runtime acquisition and release remain owned by the invocation scope. */
 
 import type { BaseCheckpointSaver, BaseStore } from "@langchain/langgraph";
-import { normalizeId, type MaybePromise } from "@relkit/contracts";
+import { normalizeId, type MaybePromise } from "relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { RELKIT_PERSISTENCE } from "./persistence-symbol.js";
 import { agentPersistenceFailure } from "./persistence-error.js";
 import type {
@@ -26,6 +26,7 @@ export {
  * @param options - Identity, client factory, ownership, and disposal policy.
  * @returns An Effect with a resource descriptor or AgentPersistenceFailure.
  * @example Effect.runSync(defineCheckpointerDbEffect({ id: "db", client: saver }));
+ * @experimental
  */
 export const defineCheckpointerDbEffect = Effect.fn("Agents.persistence.defineCheckpointer")(
   <Value extends BaseCheckpointSaver>(options: PersistenceOptions<Value>) =>
@@ -41,6 +42,7 @@ export const defineCheckpointerDbEffect = Effect.fn("Agents.persistence.defineCh
  * @returns A lazily acquired resource descriptor.
  * @throws The original invalid options error.
  * @example const resource = defineCheckpointerDb({ id: "db", client: saver });
+ * @experimental
  */
 export function defineCheckpointerDb<Value extends BaseCheckpointSaver>(
   options: PersistenceOptions<Value>,
@@ -56,6 +58,7 @@ export function defineCheckpointerDb<Value extends BaseCheckpointSaver>(
  * @param options - Identity, client factory, ownership, and disposal policy.
  * @returns An Effect with a resource descriptor or AgentPersistenceFailure.
  * @example Effect.runSync(defineMemoryDbEffect({ id: "memory", client: store }));
+ * @experimental
  */
 export const defineMemoryDbEffect = Effect.fn("Agents.persistence.defineMemory")(
   <Value extends BaseStore>(options: PersistenceOptions<Value>) =>
@@ -71,6 +74,7 @@ export const defineMemoryDbEffect = Effect.fn("Agents.persistence.defineMemory")
  * @returns A lazily acquired resource descriptor.
  * @throws The original invalid options error.
  * @example const resource = defineMemoryDb({ id: "memory", client: store });
+ * @experimental
  */
 export function defineMemoryDb<Value extends BaseStore>(
   options: PersistenceOptions<Value>,

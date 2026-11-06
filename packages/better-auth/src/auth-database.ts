@@ -1,11 +1,17 @@
 /** Borrows database admission and resolves its existing native declaration brand. */
-import { drizzleRuntimeOf, withDrizzleSqliteWork, withDrizzleWork } from "@relkit/drizzle/internal";
+import { drizzleRuntimeOf, withDrizzleSqliteWork, withDrizzleWork } from "@relkit/drizzle/server";
 import type { Effect } from "effect";
 import type { AuthDatabase } from "./auth.types.js";
 
 /** Keeps SQLite serialization and owner drain admission around the complete SDK call. */
-export function withAuthWork<A, E, R>(database: AuthDatabase, effect: Effect.Effect<A, E, R>) {
-  return withDrizzleWork(database, withDrizzleSqliteWork(database, effect));
+export function withAuthWork<A, E, R>(
+  database: AuthDatabase | undefined,
+  effect: Effect.Effect<A, E, R>,
+) {
+  // A custom database adapter is the application's; RelKit has no admission to hold for it.
+  return database === undefined
+    ? effect
+    : withDrizzleWork(database, withDrizzleSqliteWork(database, effect));
 }
 
 /** Reads the established native brand; auth never acquires another database owner. */

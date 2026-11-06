@@ -4,6 +4,7 @@ import { observeCli } from "./cli-runtime.js";
 import {
   createClackPromptDriver,
   formatAddResult,
+  formatCreateWarning,
   formatGenerateResult,
   formatScaffoldPlan,
 } from "./scaffolding/index.js";
@@ -46,7 +47,7 @@ export const executeCreateEffect = Effect.fn("Scaffold.create")(
         Effect.mapError((wrapped) => {
           const error = cliOriginalError(wrapped);
           if (error instanceof Error && "code" in error) {
-            return error.code === "RELKIT_CREATE_USAGE"
+            return error.code === "RELKIT_CREATE_USAGE" || error.code === "RELKIT_CREATE_UNTESTED"
               ? cliAdapterError(
                   "create.resolve",
                   fail(error.code, error.message, CLI_EXIT_CODES.usage),
@@ -59,6 +60,8 @@ export const executeCreateEffect = Effect.fn("Scaffold.create")(
           );
         }),
       );
+    for (const warning of resolved.warnings ?? [])
+      context.io?.stderr(formatCreateWarning(warning).trimEnd());
     const status = yield* createScaffoldStatusEffect(
       runtime,
       context.json,

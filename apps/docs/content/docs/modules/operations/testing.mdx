@@ -57,6 +57,20 @@ two users' ownership boundary. The starter's smallest HTTP test is:
   /_snippets/source/templates/default/v1/api/tests/integration/orders.route.test.ts
 </include>
 
+Responses are native `Response` objects whose JSON body you can type. Give each verb the body shape
+you expect, and send a request body with `json`, which serializes it and sets the content type:
+
+```ts title="tests/integration/orders.route.test.ts"
+const response = await testApp.http.post<{ id: string }, { sku: string }>("/orders", {
+  json: { sku: "sku-1" },
+});
+const { id } = await response.json();
+```
+
+The body type is a declaration, not a check: assert the shape with `expect`. Without a type argument,
+`json()` resolves to `unknown`. `TestProblemResponse` types the Problem Details body that failed
+requests return.
+
 The harness runs in process and exposes `application.http`. It maps invalid function input to a
 validation `422`, but it does not implement the entire production HTTP pipeline. It does not prove
 all middleware, rate limits, OpenAPI behavior, or RPC transport. Close it in `afterAll` so runtime
@@ -83,7 +97,7 @@ bun run typecheck
 bun run build
 ```
 
-Keep live integration and cloud tests separate and opt-in. In the RELKIT repository, `bun run prepush`
+Keep live integration and cloud tests separate and opt-in. In the RelKit repository, `bun run prepush`
 runs the focused merge-blocking checks without Docker; `bun run prepush:full` includes Docker acceptance.
 
 Task-first jobs add focused unit, type, contract, restart, client, Inspector, Docker, and provider suites.

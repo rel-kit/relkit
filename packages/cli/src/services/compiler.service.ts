@@ -1,5 +1,5 @@
 import { Context, Effect, Layer } from "effect";
-import * as Compiler from "@relkit/compiler";
+import * as Compiler from "../compiler/index.js";
 import { cliAdapterError } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import type { CompilerCapabilities } from "./compiler.types.js";

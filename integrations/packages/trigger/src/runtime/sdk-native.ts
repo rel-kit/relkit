@@ -4,8 +4,8 @@ import type {
   NativeRunQuery,
   NativeSubmission,
   OperationContext,
-} from "@relkit/jobs/adapter";
-import type { RunHandle } from "@relkit/contracts/jobs";
+} from "relkit/jobs/adapter";
+import type { RunHandle } from "relkit/contracts/jobs";
 import {
   type TriggerHttpClientOptions,
   type TriggerNativeClient,

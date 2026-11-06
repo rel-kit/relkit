@@ -1,5 +1,5 @@
 import { Cache, Duration, Effect, Exit, Ref } from "effect";
-import type { RuntimeIntegrationPlan } from "@relkit/contracts";
+import type { RuntimeIntegrationPlan } from "relkit/contracts";
 import { cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { CliCompiler } from "../services/compiler.service.js";

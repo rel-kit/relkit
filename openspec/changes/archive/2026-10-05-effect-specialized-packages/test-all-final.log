@@ -253,16 +253,16 @@ create-relkit:build: $ tsc -b && bun ../../scripts/package-create-relkit-templat
 @relkit/example-data-model:build: cache hit, replaying logs 98e7c363df77f247
 @relkit/example-auth-drizzle:build: cache hit, replaying logs 9fff26c4f5a667f4
 @relkit/example-data-model:build: $ bun ../../packages/cli/dist/index.js build
-@relkit/example-data-model:build: Built /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/data-model/.relkit/build
+@relkit/example-data-model:build: Built <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/data-model/.relkit/build
 @relkit/example-auth-drizzle:build: $ bun ../../packages/cli/dist/index.js build
-@relkit/example-auth-drizzle:build: Built /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/auth-drizzle/.relkit/build
+@relkit/example-auth-drizzle:build: Built <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/auth-drizzle/.relkit/build
 @relkit/example-commerce:build: cache hit, replaying logs b2b84ae0eb2995b7
 @relkit/example-commerce:build: $ bun ../../packages/cli/dist/index.js build
-@relkit/example-commerce:build: Built /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce/.relkit/build
+@relkit/example-commerce:build: Built <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce/.relkit/build
 @relkit/example-commerce-web:build: cache hit, replaying logs cd01cbc12e54a9e7
 @relkit/example-commerce-web:build: $ bun --cwd ../commerce check && bun run scripts/build.ts
 @relkit/example-commerce-web:build: $ bun ../../packages/cli/dist/index.js check
-@relkit/example-commerce-web:build: Checked /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
+@relkit/example-commerce-web:build: Checked <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
 @relkit/example-commerce-web:build: ▲ Next.js 16.3.3 (Turbopack)
 @relkit/example-commerce-web:build: ✓ Running next.config.ts took 75ms
 @relkit/example-commerce-web:build:
@@ -924,7 +924,7 @@ $ vitest run --config scripts/jobs-coverage/vitest.config.ts --coverage
 ▶ test:types
 $ bun run scripts/test-types.ts
 
- RUN  v5.0.1 /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit
+ RUN  v5.0.1 <home>/.codex/worktrees/effect-specialized-recovery/relkit
       Coverage enabled with v8
 
 [20:45:11.102] INFO (#29): Execution operation completed {
@@ -3512,7 +3512,7 @@ tests/compiler/route-path-input.test.ts:
 Ran 145 tests across 38 files. [35.26s]
 $ vitest run --config packages/graph/vitest.config.ts
 
- RUN  v5.0.1 /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit
+ RUN  v5.0.1 <home>/.codex/worktrees/effect-specialized-recovery/relkit
 
   ✓  11 tests/e2e/inspector.spec.ts:216:1 › pinpoints failed, timed out, cancelled, and incomplete requests (2.9s)
 
@@ -3543,7 +3543,7 @@ tests/contracts/descriptor-cohort.test.ts:
 (pass) Phase 2 descriptor cohort > emits every convention warning without excluding a descriptor [5.93ms]
 
 tests/contracts/events.test.ts:
-[32m20:45:57 (8786) INFO Sandbox[39m Running build command "bun scripts/jobs-coverage/link-sandbox-dependencies.ts" in "/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/.stryker-tmp/sandbox-V4HcEZ".
+[32m20:45:57 (8786) INFO Sandbox[39m Running build command "bun scripts/jobs-coverage/link-sandbox-dependencies.ts" in "<home>/.codex/worktrees/effect-specialized-recovery/relkit/.stryker-tmp/sandbox-V4HcEZ".
 (pass) event contract: deterministic testing event harness > publishes a validated payload as one correlated envelope [96.69ms]
 (pass) event contract: deterministic testing event harness > rejects invalid payload before acceptance or delivery [14.46ms]
 (pass) event contract: deterministic testing event harness > exposes honest ephemeral and durable delivery capabilities
@@ -4307,7 +4307,7 @@ create-relkit:build: $ tsc -b && bun ../../scripts/package-create-relkit-templat
 @relkit/routes:build: $ tsc -b
 @relkit/example-data-model:check: cache hit, replaying logs 3c4cec95986bcf05
 @relkit/example-data-model:check: $ bun ../../packages/cli/dist/index.js check
-@relkit/example-data-model:check: Checked /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/data-model
+@relkit/example-data-model:check: Checked <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/data-model
 @relkit/example-auth-drizzle:check: cache hit, replaying logs 93aff20a4e85661e
 @relkit/providers-local:build: cache hit, replaying logs 3d2c82319bb18bee
 @relkit/providers-local:build: $ tsc -b
@@ -4315,10 +4315,10 @@ create-relkit:build: $ tsc -b && bun ../../scripts/package-create-relkit-templat
 @relkit/example-commerce:check: cache hit, replaying logs c47ed8e1d3088730
 @relkit/app:build: cache hit, replaying logs 030480fef3f9279b
 @relkit/example-commerce:check: $ bun ../../packages/cli/dist/index.js check
-@relkit/example-commerce:check: Checked /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
+@relkit/example-commerce:check: Checked <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
 @relkit/app:build: $ tsc -b
 @relkit/example-auth-drizzle:check: $ bun ../../packages/cli/dist/index.js check
-@relkit/example-auth-drizzle:check: Checked /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/auth-drizzle
+@relkit/example-auth-drizzle:check: Checked <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/auth-drizzle
 @relkit/better-auth:build: $ tsc -b
 @relkit/redis:build: cache hit, replaying logs a26ee84ca3720d57
 @relkit/redis:build: $ tsc -b
@@ -4633,7 +4633,7 @@ create-relkit:build: $ tsc -b && bun ../../scripts/package-create-relkit-templat
 @relkit/example-data-model:test:  42 expect() calls
 @relkit/example-data-model:test: Ran 4 tests across 2 files. [3.62s]
 @relkit/example-data-model:build: $ bun ../../packages/cli/dist/index.js build
-@relkit/example-data-model:build: Built /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/data-model/.relkit/build
+@relkit/example-data-model:build: Built <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/data-model/.relkit/build
 @relkit/example-commerce:test: cache hit, replaying logs d20b9e76ee9c5608
 @relkit/diagnostics:typecheck: cache hit, replaying logs 00c4efdddbd2bf3c
 @relkit/diagnostics:typecheck: $ tsc -b --pretty false
@@ -4669,7 +4669,7 @@ create-relkit:build: $ tsc -b && bun ../../scripts/package-create-relkit-templat
 @relkit/example-commerce:test: Ran 11 tests across 6 files. [5.25s]
 @relkit/example-commerce:build: cache hit, replaying logs b2b84ae0eb2995b7
 @relkit/example-commerce:build: $ bun ../../packages/cli/dist/index.js build
-@relkit/example-commerce:build: Built /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce/.relkit/build
+@relkit/example-commerce:build: Built <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce/.relkit/build
 @relkit/cache:typecheck: cache hit, replaying logs f6128f1be1924e9f
 @relkit/cache:typecheck: $ tsc -b --pretty false
 @relkit/buckets:typecheck: cache hit, replaying logs 60ec2ab60818ed4b
@@ -4689,10 +4689,10 @@ create-relkit:build: $ tsc -b && bun ../../scripts/package-create-relkit-templat
 @relkit/example-auth-drizzle:build: cache hit, replaying logs 9fff26c4f5a667f4
 @relkit/example-commerce-web:check: cache hit, replaying logs e0c421ed8a171b76
 @relkit/example-auth-drizzle:build: $ bun ../../packages/cli/dist/index.js build
-@relkit/example-auth-drizzle:build: Built /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/auth-drizzle/.relkit/build
+@relkit/example-auth-drizzle:build: Built <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/auth-drizzle/.relkit/build
 @relkit/example-commerce-web:check: $ bun --cwd ../commerce check && tsc --noEmit
 @relkit/example-commerce-web:check: $ bun ../../packages/cli/dist/index.js check
-@relkit/example-commerce-web:check: Checked /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
+@relkit/example-commerce-web:check: Checked <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
 @relkit/realtime:typecheck: cache hit, replaying logs c82e8ff5a3f4a667
 @relkit/realtime:typecheck: $ tsc -b --pretty false
 @relkit/provider:typecheck: cache hit, replaying logs a881ade1d8554182
@@ -4700,7 +4700,7 @@ create-relkit:build: $ tsc -b && bun ../../scripts/package-create-relkit-templat
 @relkit/example-commerce-web:build: cache hit, replaying logs cd01cbc12e54a9e7
 @relkit/example-commerce-web:build: $ bun --cwd ../commerce check && bun run scripts/build.ts
 @relkit/example-commerce-web:build: $ bun ../../packages/cli/dist/index.js check
-@relkit/example-commerce-web:build: Checked /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
+@relkit/example-commerce-web:build: Checked <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
 @relkit/example-commerce-web:build: ▲ Next.js 16.3.3 (Turbopack)
 @relkit/example-commerce-web:build: ✓ Running next.config.ts took 75ms
 @relkit/example-commerce-web:build:
@@ -4765,7 +4765,7 @@ create-relkit:build: $ tsc -b && bun ../../scripts/package-create-relkit-templat
 @relkit/example-commerce-web:typecheck: $ bun run check
 @relkit/example-commerce-web:typecheck: $ bun --cwd ../commerce check && tsc --noEmit
 @relkit/example-commerce-web:typecheck: $ bun ../../packages/cli/dist/index.js check
-@relkit/example-commerce-web:typecheck: Checked /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
+@relkit/example-commerce-web:typecheck: Checked <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
 @relkit/supervisor:typecheck: cache hit, replaying logs c82e75af81fc42b9
 @relkit/supervisor:typecheck: $ tsc -b --pretty false && tsc -p tsconfig.tests.json --pretty false
 @relkit/inspector-api:typecheck: cache hit, replaying logs 9bafadd8c00440c1
@@ -4807,12 +4807,12 @@ create-relkit:typecheck: $ tsc -b --pretty false && bun ../../scripts/package-cr
 @relkit/example-auth-drizzle:typecheck: cache hit, replaying logs d0856d98cfc88c50
 @relkit/example-data-model:typecheck: cache hit, replaying logs d6488c0278c84582
 @relkit/example-auth-drizzle:typecheck: $ bun ../../packages/cli/dist/index.js check && tsc --noEmit
-@relkit/example-auth-drizzle:typecheck: Checked /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/auth-drizzle
+@relkit/example-auth-drizzle:typecheck: Checked <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/auth-drizzle
 @relkit/example-commerce:typecheck: cache hit, replaying logs cad2407405cc74f4
 @relkit/example-commerce:typecheck: $ bun ../../packages/cli/dist/index.js check && tsc --noEmit
-@relkit/example-commerce:typecheck: Checked /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
+@relkit/example-commerce:typecheck: Checked <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
 @relkit/example-data-model:typecheck: $ bun ../../packages/cli/dist/index.js check && tsc --noEmit
-@relkit/example-data-model:typecheck: Checked /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/data-model
+@relkit/example-data-model:typecheck: Checked <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/data-model
 
  Tasks:    154 successful, 154 total
 Cached:    154 cached, 154 total
@@ -7950,7 +7950,7 @@ All files                    |  64.06 |   65.46 |      501 |         7 |        
    task-policy-value-copy.ts |  72.00 |   72.83 |      126 |         0 |         47 |        2 |        0 |
    task-policy-value.ts      |  82.24 |   83.02 |       88 |         0 |         18 |        1 |        0 |
 -----------------------------|--------|---------|----------|-----------|------------|----------|----------|
-[32m20:48:47 (8786) INFO JsonReporter[39m Your report can be found at: file:///Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/reports/mutation/mutation.json
+[32m20:48:47 (8786) INFO JsonReporter[39m Your report can be found at: file://<home>/.codex/worktrees/effect-specialized-recovery/relkit/reports/mutation/mutation.json
 [32m20:48:47 (8786) INFO MutationTestExecutor[39m Done in 3 minutes and 4 seconds.
 tenant checks: 18 killed / 21 targeted mutants
 abort cleanup: 18 killed / 30 targeted mutants
@@ -7965,7 +7965,7 @@ mutation semantic gate passed: 501 killed, 268 survived, 17 no-coverage
 $ bun run scripts/test-packages.ts
 Running 607 Vitest and 118 Bun package test files.
 
- RUN  v5.0.1 /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit
+ RUN  v5.0.1 <home>/.codex/worktrees/effect-specialized-recovery/relkit
 
 [20:49:07.368] INFO (#8): Execution operation completed {
   domain: 'client',
@@ -11959,13 +11959,13 @@ A request failed when using a custom fetch implementation; this may be a misconf
 328 |       throw new Error("network disconnected");
                       ^
 error: network disconnected
-      at fetch (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/env.js:156:18)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:612:33)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/promises.js:161:16)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:608:25)
-      at _send (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:633:79)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+      at fetch (<home>/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/promises.js:161:16)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:608:25)
+      at _send (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
 
 A request failed when using a custom fetch implementation; this may be a misconfiguration. Make sure that your fetch client is correctly bound to the global scope.
 323 |   const runtime = createInngestRuntime({
@@ -11976,13 +11976,13 @@ A request failed when using a custom fetch implementation; this may be a misconf
 328 |       throw new Error("network disconnected");
                       ^
 error: network disconnected
-      at fetch (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/env.js:156:18)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:612:33)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/promises.js:161:16)
-      at async <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:608:25)
-      at async _send (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:633:79)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+      at fetch (<home>/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/promises.js:161:16)
+      at async <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:608:25)
+      at async _send (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
 
 A request failed when using a custom fetch implementation; this may be a misconfiguration. Make sure that your fetch client is correctly bound to the global scope.
 323 |   const runtime = createInngestRuntime({
@@ -11993,13 +11993,13 @@ A request failed when using a custom fetch implementation; this may be a misconf
 328 |       throw new Error("network disconnected");
                       ^
 error: network disconnected
-      at fetch (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/env.js:156:18)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:612:33)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/promises.js:161:16)
-      at async <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:608:25)
-      at async _send (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:633:79)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+      at fetch (<home>/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/promises.js:161:16)
+      at async <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:608:25)
+      at async _send (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
 
 A request failed when using a custom fetch implementation; this may be a misconfiguration. Make sure that your fetch client is correctly bound to the global scope.
 323 |   const runtime = createInngestRuntime({
@@ -12010,13 +12010,13 @@ A request failed when using a custom fetch implementation; this may be a misconf
 328 |       throw new Error("network disconnected");
                       ^
 error: network disconnected
-      at fetch (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/env.js:156:18)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:612:33)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/promises.js:161:16)
-      at async <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:608:25)
-      at async _send (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:633:79)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+      at fetch (<home>/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/promises.js:161:16)
+      at async <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:608:25)
+      at async _send (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
 
 A request failed when using a custom fetch implementation; this may be a misconfiguration. Make sure that your fetch client is correctly bound to the global scope.
 323 |   const runtime = createInngestRuntime({
@@ -12027,13 +12027,13 @@ A request failed when using a custom fetch implementation; this may be a misconf
 328 |       throw new Error("network disconnected");
                       ^
 error: network disconnected
-      at fetch (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/env.js:156:18)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:612:33)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/promises.js:161:16)
-      at async <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:608:25)
-      at async _send (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:633:79)
-      at <anonymous> (/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
+      at fetch (<home>/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:328:17)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/env.js:156:18)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:612:33)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/helpers/promises.js:161:16)
+      at async <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:608:25)
+      at async _send (<home>/.codex/worktrees/effect-specialized-recovery/relkit/node_modules/.bun/inngest@4.20.0+41dc8fb602b0b488/node_modules/inngest/components/Inngest.js:633:79)
+      at <anonymous> (<home>/.codex/worktrees/effect-specialized-recovery/relkit/integrations/packages/inngest/inngest.test.ts:351:14)
 
 ..................................
 
@@ -13979,7 +13979,7 @@ packages/inspector-api/tests/compatibility/stream-heartbeat.test.ts:
 ...............................
 
 packages/testing/tests/compatibility/runtime.test.ts:
-RELKIT_KEEP_TEST_STATE=1 retained test state at /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-test-nFMFRa/.relkit/state
+RELKIT_KEEP_TEST_STATE=1 retained test state at <tmp>/relkit-test-nFMFRa/.relkit/state
 ....
 
 packages/client/tests/compatibility/agent-thread-identity.test.ts:

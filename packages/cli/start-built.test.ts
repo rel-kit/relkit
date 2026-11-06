@@ -11,9 +11,9 @@ import {
   RUNTIME_INTEGRATION_PLAN_FILE,
   RUNTIME_INTEGRATION_PLAN_VERSION,
   canonicalJson,
-} from "@relkit/contracts";
-import { createRuntimeActivationFingerprint } from "@relkit/compiler";
-import { hashGraph, type ApplicationGraph } from "@relkit/graph";
+} from "relkit/contracts";
+import { createRuntimeActivationFingerprint } from "./src/compiler/index.js";
+import { hashGraph, type ApplicationGraph } from "relkit/graph";
 import { readBuilt } from "./src/commands/start-built.js";
 
 const roots: string[] = [];

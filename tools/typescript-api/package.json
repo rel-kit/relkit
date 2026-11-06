@@ -1,0 +1,22 @@
+{
+  "name": "relkit-typescript",
+  "version": "5.9.3",
+  "private": true,
+  "description": "The TypeScript 5.9 compiler API for RelKit tooling, without a tsc executable beside the workspace's TypeScript 7.",
+  "license": "MIT",
+  "main": "./index.cjs",
+  "types": "./index.d.cts",
+  "exports": {
+    ".": {
+      "types": "./index.d.cts",
+      "default": "./index.cjs"
+    }
+  },
+  "files": [
+    "index.cjs",
+    "index.d.cts"
+  ],
+  "dependencies": {
+    "typescript": "catalog:"
+  }
+}

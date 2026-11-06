@@ -1,15 +1,15 @@
 /** Creates native persistence descriptors around authored checkpointers and stores; runtime acquisition and release remain owned by the invocation scope. This companion preserves the native input and output types without starting runtime work. */
 
 import type { BaseCheckpointSaver, BaseStore } from "@langchain/langgraph";
-import type { MaybePromise } from "@relkit/contracts";
+import type { MaybePromise } from "relkit/contracts";
 import type { RELKIT_PERSISTENCE } from "./persistence-symbol.js";
 
-/** Environment made available while acquiring persistence. */
+/** Environment made available while acquiring persistence. @experimental */
 export interface PersistenceContext {
   readonly env: Readonly<Record<string, unknown>>;
 }
 
-/** Lazily acquired, explicitly released persistence descriptor. */
+/** Lazily acquired, explicitly released persistence descriptor. @experimental */
 export interface PersistenceResource<Kind extends "checkpointer" | "memory", Value> {
   readonly [RELKIT_PERSISTENCE]: true;
   readonly kind: "agent-persistence";
@@ -20,16 +20,16 @@ export interface PersistenceResource<Kind extends "checkpointer" | "memory", Val
   readonly release: () => Promise<void>;
 }
 
-/** Checkpointer resource passed to a LangGraph runtime. */
+/** Checkpointer resource passed to a LangGraph runtime. @experimental */
 export type CheckpointerResource<Value extends BaseCheckpointSaver = BaseCheckpointSaver> =
   PersistenceResource<"checkpointer", Value>;
-/** Memory store resource passed to a LangGraph runtime. */
+/** Memory store resource passed to a LangGraph runtime. @experimental */
 export type MemoryResource<Value extends BaseStore = BaseStore> = PersistenceResource<
   "memory",
   Value
 >;
 
-/** Acquisition and disposal configuration for an agent persistence resource. */
+/** Acquisition and disposal configuration for an agent persistence resource. @experimental */
 export interface PersistenceOptions<Value> {
   readonly id: string;
   readonly client: Value | ((context: PersistenceContext) => MaybePromise<Value>);

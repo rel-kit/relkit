@@ -1,0 +1,74 @@
+import type { EnvDefinition, EnvShape } from "../config/index.js";
+import type { DescriptorBase, DescriptorMetadata, JsonValue } from "../contracts/index.js";
+import type { TelemetryConfiguration, TelemetryExporterMap } from "../observability/telemetry.js";
+import type { InspectorConfig, ServerConfig } from "./app-config.types.js";
+import type {
+  AppProviderDefaults,
+  AppProviderInputs,
+  NormalizedAppProviderDefaults,
+  NormalizedProviders,
+} from "./app-provider.types.js";
+
+export type { ApiDocsConfig, ServerConfig, InspectorConfig } from "./app-config.types.js";
+export type {
+  AppProviderCapability,
+  AppProviderInputs,
+  AppProviderDefaults,
+  NormalizedAppProviderDefaults,
+} from "./app-provider.types.js";
+
+/** Application telemetry settings parameterized by exporters.
+ * @example const telemetry: AppTelemetryConfig = { redaction: { mode: "off" } };
+ */
+export type AppTelemetryConfig<Exporters extends TelemetryExporterMap = TelemetryExporterMap> =
+  TelemetryConfiguration<Exporters>;
+
+/** JSON deployment metadata attached to the application descriptor.
+ * @example const deployment: AppDeploymentConfig = { engine: "pulumi" };
+ */
+export type AppDeploymentConfig = Readonly<Record<string, JsonValue>>;
+
+/** Opt-in `relkit check` rules.
+ * @example const check: AppCheckConfig = { unusedErrors: true };
+ */
+export interface AppCheckConfig {
+  /** Warn when a function declares an error that its handler never raises. Defaults to `false`. */
+  readonly unusedErrors?: boolean;
+}
+
+/** Authored application topology and runtime settings.
+ * @example const options: DefineAppOptions<{}, {}> = { env: defineEnv({}) };
+ */
+export type DefineAppOptions<
+  Shape extends EnvShape,
+  Providers extends AppProviderInputs,
+  Exporters extends TelemetryExporterMap = TelemetryExporterMap,
+> = DescriptorMetadata &
+  Providers & {
+    readonly id?: string;
+    readonly env: EnvDefinition<Shape>;
+    readonly defaults?: AppProviderDefaults<Providers>;
+    readonly telemetry?: AppTelemetryConfig<Exporters>;
+    readonly server?: ServerConfig;
+    readonly inspector?: InspectorConfig;
+    readonly deployment?: AppDeploymentConfig;
+    readonly check?: AppCheckConfig;
+  };
+
+/** Immutable normalized application descriptor returned by `defineApp`.
+ * @example const descriptor: ApplicationDescriptor = defineApp({ env: defineEnv({}) });
+ */
+export type ApplicationDescriptor<
+  Shape extends EnvShape = EnvShape,
+  Providers extends AppProviderInputs = AppProviderInputs,
+  Exporters extends TelemetryExporterMap = TelemetryExporterMap,
+> = DescriptorBase<"app", string> &
+  NormalizedProviders<Providers> & {
+    readonly env: EnvDefinition<Shape>;
+    readonly defaults: NormalizedAppProviderDefaults<Providers>;
+    readonly telemetry?: AppTelemetryConfig<Exporters>;
+    readonly server?: ServerConfig;
+    readonly inspector?: InspectorConfig;
+    readonly deployment?: AppDeploymentConfig;
+    readonly check?: AppCheckConfig;
+  };

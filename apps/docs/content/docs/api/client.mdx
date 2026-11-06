@@ -21,7 +21,290 @@ For a complete workflow, follow [connect react](/guides/frontend/connect-react).
 
 [Connect a React frontend](/guides/frontend/connect-react) shows the client side of this capability.
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### createClient
+
+Creates the generated contract's synchronous HTTP proxy with a configured service owner.
+
+**Example**
+
+```ts
+import { createClient } from "@relkit/client";
+export const makeClient = () => createClient({ baseUrl: "http://127.0.0.1:3000" });
+```
+
+**Signature**
+
+```ts
+declare const createClient: <Contract extends AnyContractRouter = AnyContractRouter>(
+  options: CreateClientOptions,
+) => ContractRouterClient<Contract>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.ts#L27)
+
+Since v0.1.0
+
+## Complete reference
+
 <include>/_snippets/generated/exports/client.mdx</include>
+
+## `api.ts`
+
+### api
+
+The generated application's routes, grouped by service: `api.orders.getOrder`.
+
+Each property is a reference that the React hooks take, such as
+`useRoute(api.orders.getOrder, { input })`. Its type comes from the generated
+`client-registry.d.ts`; at runtime it is a lazy proxy, so a route the backend adds
+during development is usable without restarting the frontend.
+
+**Example**
+
+```ts
+useRoute(api.orders.getOrder, { input: { orderId: "o1" } });
+```
+
+**Signature**
+
+```ts
+declare const api: ClientApi;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.ts#L22)
+
+### createApi
+
+Creates a callable copy of `api` bound to one backend.
+
+**Example**
+
+```ts
+import { createApi } from "@relkit/client";
+export const backend = createApi({ baseUrl: "http://127.0.0.1:3000" });
+// With the generated client-registry.d.ts included:
+// const order = await backend.orders.getOrder({ orderId: "o1" });
+```
+
+**Signature**
+
+```ts
+declare const createApi: (options: CreateClientOptions) => ApiClient<ClientApi>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.ts#L38)
+
+### API_ROOT
+
+Root segment of `api` call paths; matches `CLIENT_API_ROOT` in `relkit/contracts`.
+
+**Signature**
+
+```ts
+declare const API_ROOT: "api";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.ts#L8)
+
+### apiRoutePath
+
+Reads the route path an `api` property refers to.
+
+**Throws**
+
+TypeError when the value is not an API route reference.
+
+**Example**
+
+```ts
+apiRoutePath(api.orders.getOrder); // ["orders", "getOrder"]
+```
+
+**Signature**
+
+```ts
+declare const apiRoutePath: (route: ApiRoute<AnyRouteContract>) => readonly string[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.ts#L59)
+
+## `api.types.ts`
+
+### AnyRouteContract (type alias)
+
+Any finite or streamed route contract.
+
+**Signature**
+
+```ts
+type AnyRouteContract =
+  | (ClientRouteContract<unknown, unknown, unknown> & { readonly operation: "query" | "mutation" })
+  | (ClientStreamContract<unknown, unknown, unknown> & {
+      readonly operation: "query" | "mutation";
+    });
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L4)
+
+### ApiCallOptions (interface)
+
+Per-call options for a bound API route.
+
+**Signature**
+
+```ts
+export interface ApiCallOptions {
+  readonly signal?: AbortSignal;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L54)
+
+### ApiClient (type alias)
+
+The `api` tree with every route callable against one backend.
+
+**Signature**
+
+```ts
+type ApiClient<Tree> = {
+  readonly [Key in keyof Tree]: Tree[Key] extends ApiRoute<infer Contract>
+    ? Tree[Key] &
+        ((input: Contract["input"], options?: ApiCallOptions) => Promise<Contract["output"]>)
+    : ApiClient<Tree[Key]>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L62)
+
+### ApiMutationRoute (type alias)
+
+A finite mutation route.
+
+**Signature**
+
+```ts
+type ApiMutationRoute = ApiRoute<
+  ClientRouteContract<unknown, unknown, unknown> & { readonly operation: "mutation" }
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L44)
+
+### ApiQueryRoute (type alias)
+
+A finite query route.
+
+**Signature**
+
+```ts
+type ApiQueryRoute = ApiRoute<
+  ClientRouteContract<unknown, unknown, unknown> & { readonly operation: "query" }
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L39)
+
+### ApiRoute (interface)
+
+One route in the generated `api` object.
+
+**Example**
+
+```ts
+type GetOrder = typeof api.orders.getOrder;
+```
+
+**Signature**
+
+```ts
+export interface ApiRoute<Contract extends AnyRouteContract = AnyRouteContract> {
+  /** Path below the API root; read it with `apiRoutePath`. */
+  readonly "~route": readonly string[];
+  /** Type-only carrier of the route contract; always undefined at runtime. */
+  readonly "~contract"?: Contract;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L15)
+
+### ApiStreamRoute (type alias)
+
+A streamed route.
+
+**Signature**
+
+```ts
+type ApiStreamRoute = ApiRoute<
+  ClientStreamContract<unknown, unknown, unknown> & { readonly operation: "query" | "mutation" }
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L49)
+
+### RouteContractOf (type alias)
+
+The contract an API route carries.
+
+**Signature**
+
+```ts
+type RouteContractOf<Route> = Route extends ApiRoute<infer Contract> ? Contract : never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L23)
+
+### RouteError (type alias)
+
+The error union an API route rejects with, keyed by `code`.
+
+**Signature**
+
+```ts
+type RouteError<Route> = RouteContractOf<Route>["error"];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L36)
+
+### RouteInput (type alias)
+
+The input an API route takes.
+
+**Signature**
+
+```ts
+type RouteInput<Route> = RouteContractOf<Route>["input"];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L26)
+
+### RouteItem (type alias)
+
+The item type a streamed API route yields.
+
+**Signature**
+
+```ts
+type RouteItem<Route> = RouteContractOf<Route> extends { readonly item: infer Item } ? Item : never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L32)
+
+### RouteOutput (type alias)
+
+The finite output an API route returns.
+
+**Signature**
+
+```ts
+type RouteOutput<Route> = RouteContractOf<Route>["output"];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L29)
 
 ## `manifest.ts`
 
@@ -115,80 +398,176 @@ export interface RelkitVitePlugin {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/build/vite.types.ts#L2)
 
-## `client-owner.ts`
+## `client-errors.ts`
 
-### acquireClientOwner
+### RelkitNetworkError (class)
 
-Acquires one synchronous Layer context and an independently closable fiber scope.
+A request that ended without a response, such as a refused connection.
 
-**Signature**
+**Example**
 
 ```ts
-declare const acquireClientOwner: <Service, Shape>(
-  layer: Layer.Layer<Service>,
-  key: Context.Key<Service, Shape>,
-) => ClientOwner<Shape>;
+throw new RelkitNetworkError(new TypeError("fetch failed"));
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/client-owner.ts#L17)
-
-## `client-owner.types.ts`
-
-### ClientOwner (interface)
-
-Once-acquired domain context with independent asynchronous lifetime ownership.
-
 **Signature**
 
 ```ts
-export interface ClientOwner<Shape> {
-  /** Stable service identity; invoking it does not acquire another Layer. */
-  readonly service: Shape;
-  /** Runs one child owned by this context and joins its scoped finalizers.
-   * @typeParam A - Successful operation result.
-   * @typeParam E - Original typed failure, preserved at the Promise boundary.
-   * @param effect - Lazy resource-owning service workflow.
-   * @returns The original result or rejection after child cleanup. */
-  readonly run: <A, E>(effect: Effect.Effect<A, E>) => Promise<A>;
-  /** Interrupts active children and joins acquired-resource finalizers once.
-   * @returns The same settlement Promise on concurrent or repeated closure. */
-  readonly close: () => Promise<void>;
+declare class RelkitNetworkError {
+  constructor(cause: unknown);
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/client-owner.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/client-errors.ts#L7)
 
-## `client-runtime.ts`
-
-### runClient
-
-Runs fully provided client work at a Promise adapter, retaining original failures.
+### code (property)
 
 **Signature**
 
 ```ts
-declare const runClient: <A, E>(effect: Effect.Effect<A, E>, signal?: AbortSignal) => Promise<A>;
+readonly code: RelkitUndeclaredErrorCode
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/client-runtime.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/client-errors.ts#L8)
 
-### runClientSync
-
-Runs a fully provided synchronous state decision at its compatibility edge.
+### status (property)
 
 **Signature**
 
 ```ts
-declare const runClientSync: <A, E>(effect: Effect.Effect<A, E>) => A;
+readonly status: 0
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/client-runtime.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/client-errors.ts#L9)
+
+### data (property)
+
+**Signature**
+
+```ts
+readonly data: undefined
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/client-errors.ts#L10)
+
+### defined (property)
+
+**Signature**
+
+```ts
+readonly defined: false
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/client-errors.ts#L11)
+
+### normalizeClientError
+
+Gives every client failure a `code`, `status` and `data`, so callers can narrow on `code`.
+Errors with a string code pass through, gaining the code's status when the transport
+gave none; aborts pass through too, because the caller started them.
+
+**Example**
+
+```ts
+throw normalizeClientError(error);
+```
+
+**Signature**
+
+```ts
+declare const normalizeClientError: (error: unknown) => unknown;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/client-errors.ts#L62)
 
 ## `index.ts`
 
 Exposes transport clients and the generated contract augmentation authority.
 Install @relkit/client for HTTP/WebSocket clients; React and TanStack peers
 are needed only by their explicit integration entrypoints.
+
+### AnyRouteContract
+
+**Signature**
+
+```ts
+declare const AnyRouteContract: AnyRouteContract;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L12)
+
+### ApiCallOptions
+
+**Signature**
+
+```ts
+declare const ApiCallOptions: ApiCallOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L13)
+
+### ApiClient
+
+**Signature**
+
+```ts
+declare const ApiClient: ApiClient<Tree>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L14)
+
+### ApiMutationRoute
+
+**Signature**
+
+```ts
+declare const ApiMutationRoute: ApiMutationRoute;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L15)
+
+### ApiQueryRoute
+
+**Signature**
+
+```ts
+declare const ApiQueryRoute: ApiQueryRoute;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L16)
+
+### ApiRoute
+
+**Signature**
+
+```ts
+declare const ApiRoute: ApiRoute<Contract>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L17)
+
+### ApiStreamRoute
+
+**Signature**
+
+```ts
+declare const ApiStreamRoute: ApiStreamRoute;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L18)
+
+### ClientApi (interface)
+
+Shape of the generated `api` object: services, then their routes. The generated
+`client-registry.d.ts` augments this interface.
+
+**Signature**
+
+```ts
+export interface ClientApi {}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L43)
 
 ### ClientHeaders
 
@@ -198,7 +577,7 @@ are needed only by their explicit integration entrypoints.
 declare const ClientHeaders: ClientHeaders;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L33)
 
 ### ClientHeadersInit
 
@@ -208,7 +587,27 @@ declare const ClientHeaders: ClientHeaders;
 declare const ClientHeadersInit: ClientHeadersInit;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L32)
+
+### ClientRouteContract
+
+**Signature**
+
+```ts
+declare const ClientRouteContract: ClientRouteContract<Input, Output, Failure>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L26)
+
+### ClientStreamContract
+
+**Signature**
+
+```ts
+declare const ClientStreamContract: ClientStreamContract<Input, Item, Failure>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L27)
 
 ### CreateAutoClientOptions
 
@@ -218,7 +617,7 @@ declare const ClientHeadersInit: ClientHeadersInit;
 declare const CreateAutoClientOptions: CreateAutoClientOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L36)
 
 ### CreateClientOptions
 
@@ -228,7 +627,7 @@ declare const CreateAutoClientOptions: CreateAutoClientOptions;
 declare const CreateClientOptions: CreateClientOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L34)
 
 ### CreateWebSocketClientOptions
 
@@ -238,7 +637,7 @@ declare const CreateClientOptions: CreateClientOptions;
 declare const CreateWebSocketClientOptions: CreateWebSocketClientOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L35)
 
 ### DefaultContract (type alias)
 
@@ -248,13 +647,13 @@ Contract inferred from the preserved public registry augmentation.
 
 ```ts
 type DefaultContract = DefaultContractRegistry extends {
-  readonly contract: infer Contract extends RouterContract;
+  readonly contract: infer Contract extends AnyContractRouter;
 }
   ? Contract
-  : RouterContract;
+  : AnyContractRouter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L49)
 
 ### DefaultContractRegistry (interface)
 
@@ -266,7 +665,7 @@ Original augmentation authority; generated applications extend this exact module
 export interface DefaultContractRegistry {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L46)
 
 ### ORPCError
 
@@ -278,14 +677,144 @@ declare const ORPCError: typeof ORPCError;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L7)
 
+### RelkitClientError
+
+**Signature**
+
+```ts
+declare const RelkitClientError: RelkitClientError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L28)
+
+### RelkitDeclaredError
+
+**Signature**
+
+```ts
+declare const RelkitDeclaredError: RelkitDeclaredError<Code, Status, Data>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L29)
+
+### RelkitNetworkError
+
+**Signature**
+
+```ts
+declare const RelkitNetworkError: typeof RelkitNetworkError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L10)
+
+### RelkitUndeclaredError
+
+**Signature**
+
+```ts
+declare const RelkitUndeclaredError: RelkitUndeclaredError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L30)
+
+### RelkitUndeclaredErrorCode
+
+**Signature**
+
+```ts
+declare const RelkitUndeclaredErrorCode: RelkitUndeclaredErrorCode;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L31)
+
+### RouteContractOf
+
+**Signature**
+
+```ts
+declare const RouteContractOf: RouteContractOf<Route>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L19)
+
+### RouteError
+
+**Signature**
+
+```ts
+declare const RouteError: RouteError<Route>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L20)
+
+### RouteInput
+
+**Signature**
+
+```ts
+declare const RouteInput: RouteInput<Route>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L21)
+
+### RouteItem
+
+**Signature**
+
+```ts
+declare const RouteItem: RouteItem<Route>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L22)
+
+### RouteOutput
+
+**Signature**
+
+```ts
+declare const RouteOutput: RouteOutput<Route>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L23)
+
+### api
+
+**Signature**
+
+```ts
+declare const api: ClientApi;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L9)
+
+### apiRoutePath
+
+**Signature**
+
+```ts
+declare const apiRoutePath: (route: ApiRoute<AnyRouteContract>) => readonly string[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L9)
+
+### createApi
+
+**Signature**
+
+```ts
+declare const createApi: (options: CreateClientOptions) => ApiClient<ClientApi>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L9)
+
 ### createAutoClient
 
 **Signature**
 
 ```ts
-declare const createAutoClient: <Contract extends RouterContract = RouterContract>(
+declare const createAutoClient: <Contract extends AnyContractRouter = AnyContractRouter>(
   options: CreateAutoClientOptions,
-) => RouterContractClient<Contract>;
+) => ContractRouterClient<Contract>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L8)
@@ -295,9 +824,9 @@ declare const createAutoClient: <Contract extends RouterContract = RouterContrac
 **Signature**
 
 ```ts
-declare const createClient: <Contract extends RouterContract = RouterContract>(
+declare const createClient: <Contract extends AnyContractRouter = AnyContractRouter>(
   options: CreateClientOptions,
-) => RouterContractClient<Contract>;
+) => ContractRouterClient<Contract>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L8)
@@ -307,9 +836,9 @@ declare const createClient: <Contract extends RouterContract = RouterContract>(
 **Signature**
 
 ```ts
-declare const createWebSocketClient: <Contract extends RouterContract = RouterContract>(
+declare const createWebSocketClient: <Contract extends AnyContractRouter = AnyContractRouter>(
   options: CreateWebSocketClientOptions,
-) => RouterContractClient<Contract>;
+) => ContractRouterClient<Contract>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L8)
@@ -342,6 +871,51 @@ type ClientHeadersInit =
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L2)
+
+### ClientRouteContract (interface)
+
+Generated finite route declaration preserving payload and failure inference.
+
+**Signature**
+
+```ts
+export interface ClientRouteContract<
+  Input = unknown,
+  Output = unknown,
+  Failure = RelkitClientError,
+> {
+  readonly input: Input;
+  readonly output: Output;
+  readonly error: Failure;
+  readonly operation: "query" | "mutation";
+  readonly stream: false;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L43)
+
+### ClientStreamContract (interface)
+
+Generated route stream declaration preserving item and failure inference.
+
+**Signature**
+
+```ts
+export interface ClientStreamContract<
+  Input = unknown,
+  Item = unknown,
+  Failure = RelkitClientError,
+> {
+  readonly input: Input;
+  readonly output: AsyncIterable<Item>;
+  readonly item: Item;
+  readonly error: Failure;
+  readonly operation: "query" | "mutation";
+  readonly stream: true;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L61)
 
 ### CreateAutoClientOptions (interface)
 
@@ -398,23 +972,116 @@ export interface CreateWebSocketClientOptions {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L22)
 
-## `content.service.ts`
+### RelkitClientError (type alias)
 
-### JobContent (class)
-
-Named job content lifetime and bounded continuity contract.
+Any client error: declared by a route or not.
 
 **Signature**
 
 ```ts
-declare class JobContent
+type RelkitClientError = RelkitDeclaredError<string, number, unknown> | RelkitUndeclaredError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/content.service.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L131)
 
-### JobContentLive
+### RelkitDeclaredError (interface)
 
-Provides named-content acquisition with scoped native pulls and bounded continuity.
+An error a route declares, as the client receives it.
+
+**Example**
+
+```ts
+if (error.code === "orders.not-found") console.log(error.data.orderId);
+```
+
+**Signature**
+
+```ts
+export interface RelkitDeclaredError<
+  Code extends string,
+  Status extends number,
+  Data,
+> extends Error {
+  readonly code: Code;
+  readonly status: Status;
+  readonly data: Data;
+  readonly defined: true;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L81)
+
+### RelkitUndeclaredError (interface)
+
+An error that no route declares. `NETWORK_ERROR` means no response arrived.
+
+**Signature**
+
+```ts
+export interface RelkitUndeclaredError extends Error {
+  readonly code: RelkitUndeclaredErrorCode;
+  readonly status: number;
+  readonly data: unknown;
+  readonly defined: false;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L123)
+
+### RelkitUndeclaredErrorCode (type alias)
+
+Codes of errors that no route declares: transport, framework and network failures.
+
+**Signature**
+
+```ts
+type RelkitUndeclaredErrorCode =
+  | "BAD_REQUEST"
+  | "UNAUTHORIZED"
+  | "PAYMENT_REQUIRED"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "METHOD_NOT_SUPPORTED"
+  | "NOT_ACCEPTABLE"
+  | "TIMEOUT"
+  | "CONFLICT"
+  | "GONE"
+  | "PRECONDITION_FAILED"
+  | "PAYLOAD_TOO_LARGE"
+  | "UNSUPPORTED_MEDIA_TYPE"
+  | "UNPROCESSABLE_CONTENT"
+  | "PRECONDITION_REQUIRED"
+  | "TOO_MANY_REQUESTS"
+  | "CLIENT_CLOSED_REQUEST"
+  | "INTERNAL_SERVER_ERROR"
+  | "NOT_IMPLEMENTED"
+  | "BAD_GATEWAY"
+  | "SERVICE_UNAVAILABLE"
+  | "GATEWAY_TIMEOUT"
+  | "IDENTITY_PRECONDITION_FAILED"
+  | "IDEMPOTENCY_CONFLICT"
+  | "IDEMPOTENCY_WINDOW_EXPIRED"
+  | "PROVIDER_STATE_LOST"
+  | "NETWORK_ERROR";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L93)
+
+## `content.service.ts`
+
+### jobContent
+
+Named-content acquisition with an owned native request and bounded continuity.
+
+**Example**
+
+```ts
+import { jobContent } from "./content.service.js";
+export async function printFrames(client: Parameters<typeof jobContent.open>[0]) {
+  const frames = await jobContent.open(client, "exports", { runId: "run", name: "text" });
+  for await (const frame of frames) console.log(frame.kind);
+}
+```
 
 **See**
 
@@ -423,7 +1090,7 @@ Provides named-content acquisition with scoped native pulls and bounded continui
 **Signature**
 
 ```ts
-declare const JobContentLive: Layer.Layer<JobContent, never, never>;
+declare const jobContent: JobContentService;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/content.service.ts#L25)
@@ -439,19 +1106,20 @@ Named stream acquisition, continuity and memory-bound ownership.
 ```ts
 export interface JobContentService {
   /** Acquires named content and transfers native cleanup to the returned iterator.
+   * @typeParam Item - Declared JSON content payload.
    * @param client - Borrowed generated job transport.
    * @param job - Declared job key.
    * @param options - Existing stream identity, cursor, cancellation and bounds.
-   * @returns Lazy acquisition of bounded frames or the original native failure. */
-  readonly open: (
+   * @returns Bounded frames once the native response is acquired, or the original native failure. */
+  readonly open: <Item extends JsonValue = JsonValue>(
     client: unknown,
     job: string,
     options: JobStreamOptions,
-  ) => Effect.Effect<AsyncIterable<NamedStreamFrame<JsonValue>>, unknown>;
+  ) => Promise<AsyncIterable<NamedStreamFrame<Item>>>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/content.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/content.types.ts#L5)
 
 ## `contracts.types.ts`
 
@@ -724,41 +1392,24 @@ declare const resumedOptions: <Run>(
 
 ## `controller.service.ts`
 
-### JobControllers (class)
+### createJobControllers
 
-Creates passive external-store views over scoped physical observation services.
-
-**Signature**
-
-```ts
-declare class JobControllers
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.service.ts#L15)
-
-### JobControllersLive
-
-Acquires the controller factory once without opening native requests.
+Creates the controller factory without opening native requests.
 
 **Example**
 
 ```ts
-import { Layer, ManagedRuntime } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
-import { JobControllers, JobControllersLive } from "./controller.service.js";
-import { JobFeedRegistryLive } from "./feed-registry.service.js";
-export async function observeJob(client: unknown): Promise<void> {
-  const owner = ManagedRuntime.make(JobControllersLive.pipe(Layer.provide(JobFeedRegistryLive)));
+import { createJobControllers } from "./controller.service.js";
+import { createJobFeedRegistry } from "./feed-registry.service.js";
+export async function connectOnce(
+  client: Parameters<ReturnType<typeof createJobControllers>["view"]>[0],
+) {
+  const factory = createJobControllers(createJobFeedRegistry());
+  const view = factory.view(client, "job", { runId: "run" });
   try {
-    const factory = runExecutionSync(owner, JobControllers);
-    const view = factory.view(client, "job", { runId: "run" });
-    try {
-      await view.connect();
-    } finally {
-      await view.dispose();
-    }
+    await view.connect();
   } finally {
-    await owner.dispose();
+    await view.dispose();
   }
 }
 ```
@@ -766,10 +1417,10 @@ export async function observeJob(client: unknown): Promise<void> {
 **Signature**
 
 ```ts
-declare const JobControllersLive: Layer.Layer<JobControllers, never, JobFeedRegistry>;
+declare const createJobControllers: (registry: JobFeedRegistryService) => JobControllerFactory;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.service.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.service.ts#L26)
 
 ## `controller.service.types.ts`
 
@@ -812,7 +1463,7 @@ export interface JobControllerView {
 
 ### JobRunWatchController (class)
 
-Passive synchronous external-store facade over scoped physical feed services.
+Passive synchronous external-store facade over shared physical feeds.
 
 **Signature**
 
@@ -822,7 +1473,7 @@ declare class JobRunWatchController<Run> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L19)
 
 ### getSnapshot (method)
 
@@ -832,7 +1483,7 @@ declare class JobRunWatchController<Run> {
 declare const getSnapshot: () => JobWatchState<Run>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L37)
 
 ### subscribe (method)
 
@@ -844,7 +1495,7 @@ Borrows controller state publication without acquiring native work.
 declare const subscribe: (listener: JobWatchListener<Run>) => () => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L46)
 
 ### connect (method)
 
@@ -854,7 +1505,7 @@ declare const subscribe: (listener: JobWatchListener<Run>) => () => void;
 declare const connect: () => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L51)
 
 ### disconnect (method)
 
@@ -864,7 +1515,7 @@ declare const connect: () => Promise<void>;
 declare const disconnect: () => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L65)
 
 ### dispose (method)
 
@@ -874,7 +1525,7 @@ declare const disconnect: () => Promise<void>;
 declare const dispose: () => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L77)
 
 ### refetch (method)
 
@@ -884,7 +1535,7 @@ declare const dispose: () => Promise<void>;
 declare const refetch: () => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L88)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L83)
 
 ### watchJobRun
 
@@ -900,59 +1551,43 @@ declare const watchJobRun: <Name extends string>(
 ) => JobWatchController<JobRunFor<Name>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/controller.ts#L97)
 
 ## `feed-registry.service.ts`
 
-### JobFeedRegistry (class)
+### createJobFeedRegistry
 
-Reference-counted native observation ownership, independent of controller state.
-
-**Signature**
-
-```ts
-declare class JobFeedRegistry
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/feed-registry.service.ts#L14)
-
-### JobFeedRegistryLive
-
-Provides reference-counted feed sharing within complete security/protocol keys.
+Creates a reference-counted feed registry that shares within complete security/protocol keys.
 
 **Example**
 
 ```ts
-import { Effect, ManagedRuntime } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
-import { JobFeedRegistry, JobFeedRegistryLive } from "./feed-registry.service.js";
-export async function borrowJobFeed(client: unknown): Promise<void> {
-  const owner = ManagedRuntime.make(JobFeedRegistryLive);
+import { createJobFeedRegistry } from "./feed-registry.service.js";
+export async function watchOnce(
+  client: Parameters<ReturnType<typeof createJobFeedRegistry>["borrowView"]>[0],
+) {
+  const registry = createJobFeedRegistry();
+  const borrow = registry.borrowView(client, "job", { runId: "run" });
   try {
-    const registry = runExecutionSync(owner, JobFeedRegistry);
-    const borrow = await owner.runPromise(registry.borrow(client, "job", { runId: "run" }));
-    try {
-      await borrow.feed.addLease("view", () => undefined);
-    } finally {
-      await Effect.runPromise(borrow.release);
-    }
+    await borrow.feed.addLease("view", () => undefined);
   } finally {
-    await owner.dispose();
+    await borrow.releaseView();
+    await registry.close();
   }
 }
 ```
 
 **See**
 
-- tests/jobs/registry.test.ts for checked scoped native cleanup.
+- tests/jobs/registry.test.ts for checked native cleanup.
 
 **Signature**
 
 ```ts
-declare const JobFeedRegistryLive: Layer.Layer<JobFeedRegistry, never, never>;
+declare const createJobFeedRegistry: () => JobFeedRegistryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/feed-registry.service.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/feed-registry.service.ts#L27)
 
 ## `feed-registry.types.ts`
 
@@ -964,17 +1599,14 @@ Reference-counted observation registry, with complete request authority.
 
 ```ts
 export interface JobFeedRegistryService {
-  /** Registers a passive external-store view without another Layer acquisition. */
+  /** Registers a passive external-store view, sharing a feed within its complete key. */
   readonly borrowView: (client: unknown, name: string, options: JobWatchOptions) => WatchFeedBorrow;
-  readonly borrow: (
-    client: unknown,
-    name: string,
-    options: JobWatchOptions,
-  ) => Effect.Effect<WatchFeedBorrow>;
+  /** Closes every retained feed and refuses later borrows; repeat calls share it. */
+  readonly close: () => Promise<void>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/feed-registry.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/feed-registry.types.ts#L19)
 
 ### WatchFeedBorrow (interface)
 
@@ -985,33 +1617,30 @@ One independently closable reference to a shared feed.
 ```ts
 export interface WatchFeedBorrow {
   readonly feed: SharedWatchFeed<unknown>;
-  /** Excludes a final retiring group before native callbacks can reconnect. */
-  readonly retire: Effect.Effect<void>;
-  readonly release: Effect.Effect<void>;
-  /** Passive view retirement; this boundary never awaits native work. */
+  /** Passive view retirement; excludes a final retiring group before native callbacks can reconnect. */
   readonly retireView: () => void;
-  /** Joins the shared native borrow after passive view retirement. */
+  /** Retires the view, then joins the shared feed's cleanup when it was the final reference. */
   readonly releaseView: () => Promise<void>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/feed-registry.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/feed-registry.types.ts#L11)
 
 ### WatchFeedGroup (interface)
 
-One native RcMap borrow shared by independently retired passive view leases.
+One physical feed shared by independently retired passive view leases.
 
 **Signature**
 
 ```ts
 export interface WatchFeedGroup {
   readonly feed: SharedWatchFeed<unknown>;
-  readonly scope: Scope.Closeable;
-  readonly references: Ref.Ref<number>;
+  references: number;
+  closing?: Promise<void>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/feed-registry.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/feed-registry.types.ts#L5)
 
 ## `index.ts`
 
@@ -1950,39 +2579,33 @@ type SelectedJobField<
 
 ## `observation.service.ts`
 
-### JobObservation (class)
+### jobObservation
 
-Cohesive native/polling observation workflow, replaceable at the feed owner.
+Live native/polling observation workflow; native dependencies are supplied by each feed.
 
-**Signature**
+**Example**
 
 ```ts
-declare class JobObservation
+await jobObservation.consume(feed, generation, signal);
 ```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/observation.service.ts#L7)
-
-### JobObservationLive
-
-Acquires the live observation workflow; native dependencies are supplied by each feed.
 
 **See**
 
-- tests/jobs/quality.test.ts for checked observation, recovery and interruption cases.
+- tests/jobs/quality.test.ts for checked observation, recovery and abort cases.
 
 **Signature**
 
 ```ts
-declare const JobObservationLive: Layer.Layer<JobObservation, never, never>;
+declare const jobObservation: JobObservationService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/observation.service.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/observation.service.ts#L10)
 
 ## `observation.types.ts`
 
 ### JobObservationService (interface)
 
-Live/test contract for one independently cancellable shared observation lifetime.
+Contract for one independently cancellable shared observation lifetime.
 
 **Signature**
 
@@ -1992,15 +2615,17 @@ export interface JobObservationService {
    * @typeParam Run - Application-declared run payload.
    * @param feed - Native dependency and authoritative observation state.
    * @param generation - Active worker generation rejecting stale callbacks.
-   * @returns A lazy observed and interruptible workflow preserving native failures. */
+   * @param signal - Abort that stops the observation and its native requests.
+   * @returns Settles when observation ends; rejects with the original failure or on abort. */
   readonly consume: <Run>(
     feed: WatchFeedLoop<Run>,
     generation: number,
-  ) => Effect.Effect<void, unknown>;
+    signal?: AbortSignal,
+  ) => Promise<void>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/observation.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/observation.types.ts#L4)
 
 ## `read-timeout.ts`
 
@@ -2436,7 +3061,7 @@ declare const validateFrame: (value: unknown) => NamedStreamFrame;
 declare const JobStreamGapError: typeof JobStreamGapError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/stream.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/stream.ts#L6)
 
 ### JobStreamOptions
 
@@ -2446,7 +3071,7 @@ declare const JobStreamGapError: typeof JobStreamGapError;
 declare const JobStreamOptions: JobStreamOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/stream.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/stream.ts#L5)
 
 ### JobStreamOverflowError
 
@@ -2456,7 +3081,7 @@ declare const JobStreamOptions: JobStreamOptions;
 declare const JobStreamOverflowError: typeof JobStreamOverflowError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/stream.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/stream.ts#L6)
 
 ### watchJobStream
 
@@ -2472,7 +3097,7 @@ declare const watchJobStream: <Item extends JsonValue = JsonValue>(
 ) => Promise<AsyncIterable<NamedStreamFrame<Item>>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/stream.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/stream.ts#L16)
 
 ## `stream.types.ts`
 
@@ -2660,11 +3285,11 @@ declare const isTerminalRun: (run: unknown) => boolean;
 declare const WatchFeedLoop: WatchFeedLoop<Run>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-loop.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-loop.ts#L9)
 
 ### runWatchFeed
 
-Runs the native observation/reconciliation/retry state machine in its owner fiber.
+Runs the native observation/reconciliation/retry state machine.
 
 **Signature**
 
@@ -2672,7 +3297,8 @@ Runs the native observation/reconciliation/retry state machine in its owner fibe
 declare const runWatchFeed: <Run>(
   feed: WatchFeedLoop<Run>,
   generation: number,
-) => Effect.Effect<void, unknown, never>;
+  signal?: AbortSignal,
+) => Promise<void>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-loop.ts#L19)
@@ -2801,7 +3427,7 @@ type WatchFeedObservers<Run> = ReadonlyMap<
 
 ### runPollingFeed
 
-Observes authoritative snapshots with the injected Clock and unchanged retry policy.
+Observes authoritative snapshots on the existing poll interval and retry policy.
 
 **Signature**
 
@@ -2809,7 +3435,8 @@ Observes authoritative snapshots with the injected Clock and unchanged retry pol
 declare const runPollingFeed: <Run>(
   feed: WatchFeedLoop<Run>,
   generation: number,
-) => Effect.Effect<void, unknown, never>;
+  signal?: AbortSignal,
+) => Promise<void>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-polling.ts#L16)
@@ -2828,10 +3455,28 @@ declare const recoverWatchFeed: <Run>(
   generation: number,
   error: unknown,
   controller: AbortController,
-) => Effect.Effect<void, unknown>;
+) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-recovery.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-recovery.ts#L52)
+
+### runFeedAttempts
+
+Runs observation attempts while the feed generation is active, each with its own request owner.
+
+**Signature**
+
+```ts
+declare const runFeedAttempts: <Run>(
+  feed: WatchFeedLoop<Run>,
+  generation: number,
+  signal: AbortSignal | undefined,
+  attempt: (controller: AbortController) => Promise<void>,
+  failed?: () => void,
+) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-recovery.ts#L16)
 
 ## `watch-feed-refetch.ts`
 
@@ -2935,6 +3580,18 @@ declare const backoff: (attempt: number, options: JobWatchOptions) => number;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L26)
 
+### browserOffline
+
+Reads the browser online hint synchronously, so an online attempt starts without a tick.
+
+**Signature**
+
+```ts
+declare const browserOffline: () => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L60)
+
 ### closeEmptyIterator
 
 Provides the existing already-completed native iterator.
@@ -2945,7 +3602,7 @@ Provides the existing already-completed native iterator.
 declare const closeEmptyIterator: () => AsyncIterator<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L98)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L105)
 
 ### deferred
 
@@ -2969,7 +3626,7 @@ Checks the existing selective observation-frame shape.
 declare const isFrame: (value: unknown) => value is RunWatchFrame;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L107)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L114)
 
 ### isUnauthorized
 
@@ -2981,7 +3638,7 @@ Recognizes existing nested authorization denial envelopes.
 declare const isUnauthorized: (value: unknown) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L134)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L141)
 
 ### offline
 
@@ -2993,7 +3650,7 @@ Waits for browser online recovery while owning its listener and borrowed signal.
 declare const offline: (signal: AbortSignal) => Promise<boolean>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L69)
 
 ### resetFrame
 
@@ -3005,7 +3662,7 @@ Marks reconnect continuity without fabricating cursor or terminal evidence.
 declare const resetFrame: (value: unknown) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L123)
 
 ### wait
 
@@ -3029,7 +3686,7 @@ Adds a retained cursor only when one exists.
 declare const withAfter: (options: JobWatchOptions, after: string | undefined) => JobWatchOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L97)
 
 ## `watch-feed-support.types.ts`
 
@@ -3062,13 +3719,10 @@ Joins native feed completion within the public teardown deadline.
 **Signature**
 
 ```ts
-declare const joinFeedTeardown: (
-  interrupted: Promise<void>,
-  running: Promise<void>,
-) => Promise<void>;
+declare const joinFeedTeardown: (running: Promise<void>) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-teardown.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-teardown.ts#L8)
 
 ## `watch-feed-terminal.ts`
 
@@ -3116,7 +3770,7 @@ export * from "./watch-feed.types.js";
 declare const FeedEvent: FeedEvent<Run>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L16)
 
 ### FeedStatus
 
@@ -3126,11 +3780,11 @@ declare const FeedEvent: FeedEvent<Run>;
 declare const FeedStatus: FeedStatus;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L16)
 
 ### SharedWatchFeed (class)
 
-Scoped physical native observation shared by independently retired view leases.
+Physical native observation shared by independently retired view leases.
 
 **Signature**
 
@@ -3143,7 +3797,7 @@ declare class SharedWatchFeed<Run> { constructor(
   ) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L22)
 
 ### addLease (method)
 
@@ -3155,7 +3809,7 @@ Registers one observer and its first-snapshot Promise without duplicating shared
 declare const addLease: (id: string, observer: FeedObserver<Run>) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L58)
 
 ### removeLease (method)
 
@@ -3167,7 +3821,7 @@ Releases one observer and joins bounded native teardown only for the final obser
 declare const removeLease: (id: string, error?: unknown) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L77)
 
 ### refetch (method)
 
@@ -3183,7 +3837,7 @@ declare const refetch: (signal?: AbortSignal) => Promise<RunWatchFrame<Run> | un
 
 ### close (method)
 
-Closes the service owner after the sharing registry removes its final entry.
+Permanently stops observation after the sharing registry removes its final entry.
 
 **Signature**
 
@@ -3203,7 +3857,7 @@ Starts one supervised observation worker only when live observers require it.
 declare const ensureRunning: () => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L150)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L148)
 
 ### loop (method)
 
@@ -3231,7 +3885,7 @@ declare const loop: (generation: number) => {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L176)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L183)
 
 ### releaseTerminal (method)
 
@@ -3243,7 +3897,7 @@ Retires terminal observer authority and invalidates the shared registry entry.
 declare const releaseTerminal: () => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L217)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L224)
 
 ### acceptFrame (method)
 
@@ -3255,7 +3909,7 @@ Applies epoch, sequence and cursor duplicate rules to the cached observer snapsh
 declare const acceptFrame: (value: unknown) => RunWatchFrame<Run> | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L229)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L236)
 
 ### emit (method)
 
@@ -3267,7 +3921,7 @@ Publishes an observation without allowing one callback to fail another observer.
 declare const emit: (event: FeedEvent<Run>) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L240)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L247)
 
 ## `watch-feed.types.ts`
 
@@ -3326,27 +3980,7 @@ declare class WatchFeedKey { constructor(
   ) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-key.ts#L7)
-
-### [Equal.symbol] (method)
-
-**Signature**
-
-```ts
-declare const [Equal.symbol]: (that: Equal.Equal) => boolean
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-key.ts#L24)
-
-### [Hash.symbol] (method)
-
-**Signature**
-
-```ts
-declare const [Hash.symbol]: () => number
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-key.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-key.ts#L6)
 
 ### value (property)
 
@@ -3356,7 +3990,7 @@ declare const [Hash.symbol]: () => number
 readonly value: string
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-key.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-key.ts#L7)
 
 ## `watch.ts`
 
@@ -3368,7 +4002,7 @@ readonly value: string
 declare const FeedEvent: FeedEvent<Run>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.ts#L3)
 
 ### FeedStatus
 
@@ -3378,19 +4012,7 @@ declare const FeedEvent: FeedEvent<Run>;
 declare const FeedStatus: FeedStatus;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.ts#L5)
-
-### JobFeedRegistryDefault
-
-Borrowed browser registry; each controller closes its explicit RcMap borrow.
-
-**Signature**
-
-```ts
-declare const JobFeedRegistryDefault: Layer.Layer<JobFeedRegistry, never, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.ts#L3)
 
 ### SharedWatchFeed
 
@@ -3400,11 +4022,11 @@ declare const JobFeedRegistryDefault: Layer.Layer<JobFeedRegistry, never, never>
 declare const SharedWatchFeed: typeof SharedWatchFeed;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.ts#L2)
 
 ### jobFeedRegistry
 
-Once-acquired reference-counted registry used by controller operations.
+Process-wide reference-counted registry used by controller operations.
 
 **Signature**
 
@@ -3412,7 +4034,7 @@ Once-acquired reference-counted registry used by controller operations.
 declare const jobFeedRegistry: JobFeedRegistryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.ts#L8)
 
 ## `watch.types.ts`
 
@@ -3513,39 +4135,149 @@ export interface JobWatchState<Run = RunSnapshot> {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.types.ts#L29)
 
-## `native-stream.ts`
+## `iterate.ts`
 
-### nativeCall
+Pulls a native async iterator that one request owns, and releases the request on every exit.
 
-Suspends native work and passes the owning fiber's cancellation signal.
+**Example**
+
+```ts
+for await (const item of iterateNative((signal) => client.stream(input, { signal }))) use(item);
+```
+
+### abortable
+
+Settles with the first of a promise or an abort.
+
+**Example**
+
+```ts
+await abortable(fetchSomething(), signal);
+```
 
 **Signature**
 
 ```ts
-declare const nativeCall: <A>(
-  execute: (signal: AbortSignal) => PromiseLike<A>,
-) => Effect.Effect<A, unknown>;
+declare const abortable: <A>(
+  promise: PromiseLike<A>,
+  signal: AbortSignal | undefined,
+) => Promise<A>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/native-stream.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/native/iterate.ts#L57)
 
-### nativeStream
+### delay
 
-Owns an iterator and its request through all pulls, EOF and early return.
+Waits for a delay unless aborted.
+
+**Example**
+
+```ts
+await delay(250, signal);
+```
 
 **Signature**
 
 ```ts
-declare const nativeStream: <A>(
-  operation: string,
-  open: (signal: AbortSignal) => PromiseLike<AsyncIterator<A>>,
-  caller?: AbortSignal,
-  opened?: Effect.Effect<void>,
-  read?: (iterator: AsyncIterator<A>, signal: AbortSignal) => PromiseLike<IteratorResult<A>>,
-) => Stream.Stream<A, unknown>;
+declare const delay: (ms: number, signal?: AbortSignal) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/native-stream.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/native/iterate.ts#L83)
+
+### iterateNative
+
+Pulls a native async iterator that one request owns, and releases the request on every exit.
+
+**Example**
+
+```ts
+for await (const item of iterateNative((signal) => client.stream(input, { signal }))) use(item);
+```
+
+**Signature**
+
+```ts
+declare const iterateNative: <A>(
+  open: (signal: AbortSignal) => PromiseLike<AsyncIterator<A> | AsyncIterable<A>>,
+  options?: {
+    readonly signal?: AbortSignal;
+    readonly opened?: () => void;
+    readonly read?: (
+      iterator: AsyncIterator<A>,
+      signal: AbortSignal,
+    ) => PromiseLike<IteratorResult<A>>;
+  },
+) => AsyncGenerator<A, void, undefined>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/native/iterate.ts#L10)
+
+## `owner.ts`
+
+Owns a set of running operations so that closing the owner aborts them and waits for them.
+
+**Example**
+
+```ts
+import { createWorkOwner } from "./owner.js";
+export async function fetchUntilClosed(url: string) {
+  const owner = createWorkOwner();
+  const result = owner.run((signal: AbortSignal) => fetch(url, { signal }));
+  await owner.close(); // aborts the fetch and waits for it to settle
+  return result;
+}
+```
+
+### WorkOwner (interface)
+
+Owns a set of running operations so that closing the owner aborts them and waits for them.
+
+**Example**
+
+```ts
+import { createWorkOwner } from "./owner.js";
+export async function fetchUntilClosed(url: string) {
+  const owner = createWorkOwner();
+  const result = owner.run((signal: AbortSignal) => fetch(url, { signal }));
+  await owner.close(); // aborts the fetch and waits for it to settle
+  return result;
+}
+```
+
+**Signature**
+
+```ts
+export interface WorkOwner {
+  /** Whether {@link WorkOwner.close} has been called. */
+  readonly closed: boolean;
+  /**
+   * Runs one operation with a signal the owner aborts on close.
+   * @param work - The operation; it must stop when its signal aborts.
+   * @param signal - Optional caller abort, combined with the owner's.
+   * @returns The operation's result; rejects with an AbortError when the owner is closed.
+   */
+  run<A>(work: (signal: AbortSignal) => PromiseLike<A>, signal?: AbortSignal): Promise<A>;
+  /**
+   * Aborts every running operation and waits for all of them to settle; repeat calls share it.
+   * @returns A promise that settles once everything the owner ran has finished.
+   */
+  close(): Promise<void>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/native/owner.ts#L14)
+
+### createWorkOwner
+
+Creates a `WorkOwner`.
+
+**Signature**
+
+```ts
+declare const createWorkOwner: () => WorkOwner;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/native/owner.ts#L35)
 
 ## `agent-continuation.ts`
 
@@ -3562,6 +4294,7 @@ declare const prepareAgentContinuation: (
   threadId: string,
   payload: unknown,
   current?: ThreadSnapshot,
+  signal?: AbortSignal,
 ) => Promise<PreparedContinuation>;
 ```
 
@@ -3581,7 +4314,7 @@ Error when the existing thread validation fails.
 declare const requiredThreadId: (options: AgentThreadOptions | undefined) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-continuation.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-continuation.ts#L33)
 
 ## `agent-contract-selection.ts`
 
@@ -4079,7 +4812,7 @@ Browser progress projection with its canonical run or tool scope.
 **Signature**
 
 ```ts
-type AgentProgress = AgentProgressBase & import("@relkit/contracts").AgentProgressScope;
+type AgentProgress = AgentProgressBase & import("relkit/contracts").AgentProgressScope;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-hook-types.types.ts#L81)
@@ -4198,7 +4931,7 @@ Re-exports all named exports from the "./agent-hook-types.js" module.
 export * from "./agent-hook-types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-hook.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-hook.ts#L17)
 
 ### useAgent
 
@@ -4210,7 +4943,7 @@ Adapts the agent service into React state while keeping accepted work independen
 declare const useAgent: <Name extends AgentSelector>(name: Name) => UseAgentResult<Name>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-hook.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-hook.ts#L25)
 
 ## `agent-hook.types.ts`
 
@@ -4311,28 +5044,6 @@ type Invoke = (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-methods.types.ts#L4)
 
-## `agent-observation-effect.ts`
-
-### observeAgent
-
-Restores the authoritative snapshot and owns every subsequent observation attempt.
-
-**Signature**
-
-```ts
-declare const observeAgent: <Output>(
-  client: unknown,
-  streamClient: unknown,
-  agentId: string,
-  threadId: string,
-  identity: AgentIdentity | undefined,
-  signal: AbortSignal,
-  update: AgentUpdate<Output>,
-) => Effect.Effect<void, unknown, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-observation-effect.ts#L27)
-
 ## `agent-observation-index.ts`
 
 ### upsertMessage
@@ -4412,6 +5123,30 @@ declare const emptyAgentContent: () => AgentContent;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-observation.ts#L27)
 
+## `agent-observe.ts`
+
+### observeAgent
+
+Restores the authoritative snapshot and owns every subsequent observation attempt.
+Transport failures reconnect from the last cursor with backoff (50 ms doubling to 1 s);
+an RPC error or a failed restore is published as error state.
+
+**Signature**
+
+```ts
+declare const observeAgent: <Output>(
+  client: unknown,
+  streamClient: unknown,
+  agentId: string,
+  threadId: string,
+  identity: AgentIdentity | undefined,
+  signal: AbortSignal,
+  update: AgentUpdate<Output>,
+) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-observe.ts#L27)
+
 ## `agent-observer.ts`
 
 ### restoreAndObserve
@@ -4432,42 +5167,45 @@ declare const restoreAndObserve: <Output>(
 ) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-observer.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-observer.ts#L16)
 
 ## `agent-operations.service.ts`
 
-### AgentOperations (class)
+### agentOperations
 
-Agent observation, continuation and accepted-work ownership contract.
+The browser's agent operations, backed by the shared pending receipt authority.
 
 **Signature**
 
 ```ts
-declare class AgentOperations
+declare const agentOperations: AgentOperationsService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.service.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.service.ts#L160)
 
-### AgentOperationsLive
+### createAgentOperations
 
-Provides agent operations using the existing pending receipt authority.
+Creates agent operations over a pending receipt authority.
 
 **Example**
 
 ```ts
-import { Layer } from "effect";
-import { AgentOperationsLive } from "./agent-operations.service.js";
-import { pendingOperationsLayer } from "./pending.service.js";
-export const live = AgentOperationsLive.pipe(Layer.provide(pendingOperationsLayer()));
+import { createAgentOperations } from "./agent-operations.service.js";
+import { pendingOperations } from "./pending.service.js";
+type Client = Parameters<ReturnType<typeof createAgentOperations>["reconcile"]>[0];
+export async function reconcile(client: Client, scopeKey: string, signal: AbortSignal) {
+  const operations = createAgentOperations(pendingOperations);
+  await operations.reconcile(client, scopeKey, "support.echo", signal);
+}
 ```
 
 **Signature**
 
 ```ts
-declare const AgentOperationsLive: Layer.Layer<AgentOperations, never, PendingOperations>;
+declare const createAgentOperations: (pending: PendingOperationService) => AgentOperationsService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.service.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.service.ts#L30)
 
 ### isAcceptedAgentRun
 
@@ -4479,7 +5217,7 @@ Retains the existing weak receipt predicate used by agent dispatch.
 declare const isAcceptedAgentRun: (value: unknown) => value is { readonly threadId: string };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.service.ts#L203)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.service.ts#L167)
 
 ## `agent-operations.types.ts`
 
@@ -4496,11 +5234,11 @@ export interface AgentIdentity {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.types.ts#L12)
 
 ### AgentObservationCursor (interface)
 
-Checkpoint state belongs to one observation fiber.
+Checkpoint state belongs to one observation.
 
 **Signature**
 
@@ -4511,7 +5249,7 @@ export interface AgentObservationCursor {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.types.ts#L39)
 
 ### AgentOperationsService (interface)
 
@@ -4530,7 +5268,7 @@ export interface AgentOperationsService {
    * @param identity - Complete authorization and session boundary.
    * @param signal - View lifetime propagated to native observations.
    * @param update - Isolated external-store publication.
-   * @returns A lazy scoped recovery workflow preserving native errors. */
+   * @returns Completion once observation ends; failures are published as error state. */
   readonly observe: <Output>(
     client: unknown,
     streamClient: unknown,
@@ -4539,41 +5277,43 @@ export interface AgentOperationsService {
     identity: AgentIdentity | undefined,
     signal: AbortSignal,
     update: AgentUpdate<Output>,
-  ) => Effect.Effect<void, unknown>;
+  ) => Promise<void>;
   /** Binds continuation input to an authoritative waiting revision.
    * @param client - Borrowed finite procedure transport.
    * @param agentId - Declared agent key.
    * @param threadId - Caller-owned durable thread identity.
    * @param payload - Original transmitted continuation payload.
    * @param current - Matching authoritative snapshot when already available.
-   * @returns A lazy observed revision and digest input or original native failure. */
+   * @param signal - Optional cancellation that aborts the authoritative load.
+   * @returns The revision and digest input, or the original native failure. */
   readonly continuation: (
     client: unknown,
     agentId: string,
     threadId: string,
     payload: unknown,
     current?: ThreadSnapshot,
-  ) => Effect.Effect<PreparedContinuation, unknown>;
+    signal?: AbortSignal,
+  ) => Promise<PreparedContinuation>;
   /** Reconciles stored receipts with durable thread identity.
    * @param client - Borrowed receipt lookup transport.
    * @param scopeKey - Complete pending isolation scope.
    * @param agentId - Declared agent key.
    * @param signal - View lifetime for receipt observations.
-   * @returns A lazy observed restored thread identity or original native failure. */
+   * @returns The restored thread identity, or the original native failure or abort reason. */
   readonly reconcile: (
     client: unknown,
     scopeKey: string,
     agentId: string,
     signal: AbortSignal,
-  ) => Effect.Effect<string | undefined, unknown>;
+  ) => Promise<string | undefined>;
   /** Dispatches accepted agent work independently of observation cancellation.
    * @param request - Complete identity, input, continuation and pending authority.
-   * @returns A lazy observed original receipt or original native rejection. */
-  readonly submit: (request: AgentSubmission) => Effect.Effect<unknown, unknown>;
+   * @returns The original receipt or original native rejection. */
+  readonly submit: (request: AgentSubmission) => Promise<unknown>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.types.ts#L44)
 
 ### AgentReceiptLookup (type alias)
 
@@ -4587,7 +5327,7 @@ type AgentReceiptLookup =
   | { readonly status: "not-found" | "expired" | "state-lost" };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.types.ts#L22)
 
 ### AgentSubmission (interface)
 
@@ -4610,7 +5350,7 @@ export interface AgentSubmission {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.types.ts#L26)
 
 ### AgentUpdate (type alias)
 
@@ -4624,7 +5364,7 @@ type AgentUpdate<Output> = (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.types.ts#L8)
 
 ### PreparedContinuation (interface)
 
@@ -4639,7 +5379,7 @@ export interface PreparedContinuation {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-operations.types.ts#L17)
 
 ## `agent-reconcile.ts`
 
@@ -4658,31 +5398,7 @@ declare const reconcileAgentRun: (
 ) => Promise<string | undefined>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-reconcile.ts#L12)
-
-## `agent-runtime.ts`
-
-### agentOperations
-
-Once-acquired service used by synchronous constructors and Promise adapters.
-
-**Signature**
-
-```ts
-declare const agentOperations: AgentOperationsService;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-runtime.ts#L11)
-
-### agentRuntime
-
-**Signature**
-
-```ts
-declare const agentRuntime: ManagedRuntime.ManagedRuntime<AgentOperations, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-runtime.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-reconcile.ts#L11)
 
 ## `agent-snapshot-observation.ts`
 
@@ -4719,7 +5435,7 @@ declare const createAgentSseClient: (options: AgentSseClientOptions, fallback?: 
 
 ### agentSseObservations
 
-Transfers a native response reader into a scoped Effect parser and iterator edge.
+Parses a native SSE response body into canonical agent observations.
 
 **Signature**
 
@@ -4731,7 +5447,7 @@ declare const agentSseObservations: (
 ) => AsyncIterable<AgentObservation>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-sse-stream.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-sse-stream.ts#L11)
 
 ## `agent-sse.types.ts`
 
@@ -4824,7 +5540,7 @@ declare const identityHeaders: (
 
 ### isRelkitQuery
 
-Selects query entries owned by RELKIT's existing key prefix.
+Selects query entries owned by RelKit's existing key prefix.
 
 **Signature**
 
@@ -4940,7 +5656,7 @@ Provides configured clients, query hydration, identity isolation and realtime ow
 declare const RelkitClientProvider: (props: RelkitClientProviderProps) => ReactNode;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.tsx#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.tsx#L52)
 
 ### RelkitClientProviderProps
 
@@ -4950,7 +5666,7 @@ declare const RelkitClientProvider: (props: RelkitClientProviderProps) => ReactN
 declare const RelkitClientProviderProps: RelkitClientProviderProps;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.tsx#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.tsx#L40)
 
 ### RelkitClientRuntime
 
@@ -4960,7 +5676,7 @@ declare const RelkitClientProviderProps: RelkitClientProviderProps;
 declare const RelkitClientRuntime: RelkitClientRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.tsx#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.tsx#L41)
 
 ### RelkitHydrationState
 
@@ -4970,7 +5686,7 @@ declare const RelkitClientRuntime: RelkitClientRuntime;
 declare const RelkitHydrationState: RelkitHydrationState;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.tsx#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.tsx#L42)
 
 ### useRelkitClient
 
@@ -4990,7 +5706,7 @@ Error when called outside RelkitClientProvider.
 declare const useRelkitClient: () => RelkitClientRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.tsx#L195)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.tsx#L216)
 
 ## `context.types.ts`
 
@@ -5058,6 +5774,94 @@ export interface RelkitHydrationState {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.types.ts#L12)
 
+## `contract-events.ts`
+
+### ContractEventHandlers (interface)
+
+Callbacks of one contract event listener.
+
+**Signature**
+
+```ts
+export interface ContractEventHandlers {
+  /** The backend may have a new contract: re-read the identity document. */
+  readonly changed: () => void;
+  /** Whether the development stream is connected. */
+  readonly live: (connected: boolean) => void;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/contract-events.ts#L4)
+
+### followContractEvents
+
+Follows the backend's development contract stream until the signal aborts.
+
+`relkit dev` serves the stream on the backend's public port; elsewhere it answers 404 and
+the listener stops. The stream sends `ready` when it connects and `contract` after each
+generation switch; both report `ContractEventHandlers.changed`, because the contract
+may also have changed while the stream was disconnected. A dropped stream reconnects with
+a growing delay, up to ten seconds.
+
+**Example**
+
+```ts
+void followContractEvents(baseUrl, { changed: reload, live: setLive }, signal);
+```
+
+**Signature**
+
+```ts
+declare const followContractEvents: (
+  baseUrl: string,
+  handlers: ContractEventHandlers,
+  signal: AbortSignal,
+) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/contract-events.ts#L25)
+
+### followsContractEvents
+
+Whether the client runs in a development build, where contract events are followed.
+
+**Signature**
+
+```ts
+declare const followsContractEvents: () => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/contract-events.ts#L106)
+
+## `finite-hooks-support.ts`
+
+### normalizedQuery
+
+Wraps a generated query function so every failure carries `code`, `status` and `data`.
+
+**Signature**
+
+```ts
+declare const normalizedQuery: <Options extends object>(generated: Options) => Options;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/finite-hooks-support.ts#L25)
+
+### routeUtils
+
+Resolves the TanStack utilities and cache identity of one `api` route.
+
+**Signature**
+
+```ts
+declare const routeUtils: (
+  root: unknown,
+  route: ApiQueryRoute | ApiMutationRoute,
+) => { readonly utils: ProcedureUtilsLike; readonly name: string };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/finite-hooks-support.ts#L12)
+
 ## `finite-hooks.ts`
 
 ### RelkitWriteError
@@ -5068,116 +5872,138 @@ export interface RelkitHydrationState {
 declare const RelkitWriteError: typeof RelkitWriteError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/finite-hooks.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/finite-hooks.ts#L34)
 
 ### useInfiniteRoute
 
-Adapts a declared paginated route while retaining page and scope inference.
+Reads one paginated `api` query route while retaining page and scope inference.
 
 **Signature**
 
 ```ts
 declare const useInfiniteRoute: <
-  Name extends QuerySelector,
+  Route extends ApiQueryRoute,
   PageParam,
-  Selected = InfiniteData<OutputFor<Name>, PageParam>,
+  Selected = InfiniteData<RouteOutput<Route>, PageParam>,
 >(
-  name: Name,
+  route: Route,
   options: Omit<
     UseInfiniteQueryOptions<
-      OutputFor<Name>,
-      ErrorFor<Name>,
+      RouteOutput<Route>,
+      RouteError<Route>,
       Selected,
       readonly unknown[],
       PageParam
     >,
     "queryKey" | "queryFn"
-  > & { readonly input: (page: PageParam) => InputFor<Name> },
-) => UseInfiniteQueryResult<Selected, ErrorFor<Name>>;
+  > & { readonly input: (page: PageParam) => RouteInput<Route> },
+) => UseInfiniteQueryResult<Selected, RouteError<Route>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/finite-hooks.ts#L177)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/finite-hooks.ts#L175)
 
 ### useRoute
 
-Adapts a declared finite route into a scope-bound TanStack query.
+Reads one `api` query route into a scope-bound TanStack query.
+
+**Example**
+
+```ts
+const order = useRoute(api.orders.getOrder, { input: { orderId } });
+```
 
 **Signature**
 
 ```ts
-declare const useRoute: <Name extends QuerySelector, Selected = OutputFor<Name>>(
-  name: Name,
-  options: QueryInput<Name, Selected>,
-) => UseQueryResult<Selected, ErrorFor<Name>>;
+declare const useRoute: <Route extends ApiQueryRoute, Selected = RouteOutput<Route>>(
+  route: Route,
+  options: QueryInput<Route, Selected>,
+) => UseQueryResult<Selected, RouteError<Route>>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/finite-hooks.ts#L45)
 
 ### useRouteMutation
 
-Adapts a declared accepted-work operation into TanStack mutation state.
+Sends one `api` mutation route as TanStack mutation state.
+
+**Example**
+
+```ts
+const create = useRouteMutation(api.orders.createOrder);
+```
 
 **Signature**
 
 ```ts
-declare const useRouteMutation: <Name extends MutationSelector, Context = unknown>(
-  name: Name,
+declare const useRouteMutation: <Route extends ApiMutationRoute, Context = unknown>(
+  route: Route,
   options?: Omit<
-    UseMutationOptions<OutputFor<Name>, ErrorFor<Name>, InputFor<Name>, Context>,
+    UseMutationOptions<
+      RouteOutput<Route>,
+      RouteError<Route> | RelkitWriteError,
+      RouteInput<Route>,
+      Context
+    >,
     "mutationKey" | "mutationFn"
   >,
-) => UseMutationResult<OutputFor<Name>, ErrorFor<Name>, InputFor<Name>, Context>;
+) => UseMutationResult<
+  RouteOutput<Route>,
+  RouteError<Route> | RelkitWriteError,
+  RouteInput<Route>,
+  Context
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/finite-hooks.ts#L98)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/finite-hooks.ts#L101)
 
 ### useRouteUtils
 
-Returns the existing generated query/mutation utilities for a declared selector.
+Returns the oRPC TanStack utilities of one `api` route, for prefetching and invalidation.
 
 **Signature**
 
 ```ts
-declare const useRouteUtils: <Name extends QuerySelector | MutationSelector>(
-  name: Name,
+declare const useRouteUtils: <Route extends ApiQueryRoute | ApiMutationRoute>(
+  route: Route,
 ) => ProcedureUtilsLike;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/finite-hooks.ts#L219)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/finite-hooks.ts#L218)
 
 ### useSuspenseRoute
 
-Adapts a ready declared route into a scope-bound suspense query.
+Reads one ready `api` query route into a scope-bound suspense query.
 
 **Signature**
 
 ```ts
-declare const useSuspenseRoute: <Name extends QuerySelector, Selected = OutputFor<Name>>(
-  name: Name,
+declare const useSuspenseRoute: <Route extends ApiQueryRoute, Selected = RouteOutput<Route>>(
+  route: Route,
   options: Omit<
-    UseSuspenseQueryOptions<OutputFor<Name>, ErrorFor<Name>, Selected>,
+    UseSuspenseQueryOptions<RouteOutput<Route>, RouteError<Route>, Selected>,
     "queryKey" | "queryFn"
   > & {
-    readonly input: InputFor<Name>;
+    readonly input: RouteInput<Route>;
   },
-) => UseSuspenseQueryResult<Selected, ErrorFor<Name>>;
+) => UseSuspenseQueryResult<Selected, RouteError<Route>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/finite-hooks.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/finite-hooks.ts#L72)
 
 ## `finite-hooks.types.ts`
 
 ### QueryInput (type alias)
 
-Declared route input or the existing skip-token readiness sentinel.
+Query options for one `api` route, with its typed input.
 
 **Signature**
 
 ```ts
-type QueryInput<Name extends QuerySelector, Selected> = Omit<
-  UseQueryOptions<OutputFor<Name>, ErrorFor<Name>, Selected>,
+type QueryInput<Route extends ApiQueryRoute, Selected> = Omit<
+  UseQueryOptions<RouteOutput<Route>, RouteError<Route>, Selected>,
   "queryKey" | "queryFn"
-> & { readonly input: InputFor<Name> };
+> & { readonly input: RouteInput<Route> };
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/finite-hooks.types.ts#L9)
@@ -5952,7 +6778,7 @@ declare const useJobCancel: <Name extends JobCancelName, Context = unknown>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-hooks.ts#L114)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-hooks.ts#L110)
 
 ### useJobRetry
 
@@ -5977,7 +6803,7 @@ declare const useJobRetry: <Name extends JobRetryName, Context = unknown>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-hooks.ts#L139)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-hooks.ts#L135)
 
 ### useJobTrigger
 
@@ -6002,7 +6828,7 @@ declare const useJobTrigger: <Name extends JobTriggerName, Context = unknown>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-hooks.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-hooks.ts#L40)
 
 ## `job-mutation-hooks.types.ts`
 
@@ -6033,7 +6859,7 @@ Retains the existing run reference in a job control receipt.
 declare const controlReferences: (input: unknown) => { readonly runId?: string };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-support.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-support.ts#L24)
 
 ### offline
 
@@ -6045,23 +6871,7 @@ Reads the browser online hint synchronously without acquiring resources.
 declare const offline: () => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-support.ts#L51)
-
-### settlePending
-
-Applies the existing authoritative or unknown receipt settlement policy.
-
-**Signature**
-
-```ts
-declare const settlePending: (
-  scopeKey: string,
-  pending: PendingOperationMetadata,
-  error: unknown,
-) => void;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-support.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-support.ts#L33)
 
 ### writableScope
 
@@ -6075,7 +6885,7 @@ declare const writableScope: (
 ) => NonNullable<RelkitClientRuntime["scope"]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-support.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-support.ts#L10)
 
 ## `keys.ts`
 
@@ -6181,7 +6991,7 @@ export interface RelkitKeyScope {
 
 ### mutationOperations
 
-Once-acquired submission service at the Promise/React compatibility boundary.
+Browser-wide submission service over the browser-wide pending-operation state.
 
 **Signature**
 
@@ -6189,35 +6999,33 @@ Once-acquired submission service at the Promise/React compatibility boundary.
 declare const mutationOperations: MutationOperationsService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/mutation-runtime.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/mutation-runtime.ts#L5)
 
-### mutationRuntime
+### submitMutation
+
+Submits accepted work with pending-receipt tracking.
 
 **Signature**
 
 ```ts
-declare const mutationRuntime: ManagedRuntime.ManagedRuntime<MutationOperations, never>;
+declare const submitMutation: (
+  scope: string,
+  kind: PendingOperationKind,
+  resource: string,
+  input: unknown,
+  references: PendingReferences,
+  options: PendingRememberOptions,
+  execute: () => PromiseLike<unknown>,
+) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/mutation-runtime.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/mutation-runtime.ts#L12)
 
 ## `mutation.service.ts`
 
-### MutationOperations (class)
+### createMutationOperations
 
-Accepted-work dispatch and authoritative pending settlement contract.
-
-**Signature**
-
-```ts
-declare class MutationOperations
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/mutation.service.ts#L11)
-
-### MutationOperationsLive
-
-Acquires accepted-work submission and pending-outcome settlement.
+Creates accepted-work submission and pending-outcome settlement over one pending service.
 
 **See**
 
@@ -6226,10 +7034,12 @@ Acquires accepted-work submission and pending-outcome settlement.
 **Signature**
 
 ```ts
-declare const MutationOperationsLive: Layer.Layer<MutationOperations, never, PendingOperations>;
+declare const createMutationOperations: (
+  pending: PendingOperationService,
+) => MutationOperationsService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/mutation.service.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/mutation.service.ts#L13)
 
 ## `mutation.service.types.ts`
 
@@ -6249,7 +7059,7 @@ export interface MutationOperationsService {
    * @param references - Existing receipt references.
    * @param options - Existing idempotency, reuse and retention policy.
    * @param execute - Native server submission boundary.
-   * @returns A lazy observed original result or rejection after metadata settlement. */
+   * @returns The original result, or the original rejection after metadata settlement. */
   readonly submit: (
     scope: string,
     kind: PendingOperationMetadata["kind"],
@@ -6258,21 +7068,17 @@ export interface MutationOperationsService {
     references: PendingReferences,
     options: PendingRememberOptions,
     execute: () => PromiseLike<unknown>,
-  ) => Effect.Effect<unknown, unknown>;
+  ) => Promise<unknown>;
   /** Applies the existing unknown-outcome policy to receipt metadata.
    * @param scope - Complete pending receipt isolation scope.
    * @param pending - Previously stored metadata.
    * @param error - Original native rejection.
-   * @returns A lazy observed metadata update; submission preserves the original rejection. */
-  readonly settle: (
-    scope: string,
-    pending: PendingOperationMetadata,
-    error: unknown,
-  ) => Effect.Effect<void>;
+   * @returns Nothing, after a synchronous metadata update. */
+  readonly settle: (scope: string, pending: PendingOperationMetadata, error: unknown) => void;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/mutation.service.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/mutation.service.types.ts#L4)
 
 ## `pending-errors.ts`
 
@@ -6378,6 +7184,18 @@ declare const PENDING_PREFIX: "relkit.pending.";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending-store.ts#L4)
 
+### PendingStorage (type alias)
+
+Reads the storage that persists pending metadata, or undefined when unavailable.
+
+**Signature**
+
+```ts
+type PendingStorage = () => Storage | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending-store.ts#L117)
+
 ### clearPendingStorage
 
 Retires all persisted receipt metadata in one complete identity scope.
@@ -6385,10 +7203,10 @@ Retires all persisted receipt metadata in one complete identity scope.
 **Signature**
 
 ```ts
-declare const clearPendingStorage: (scopeKey: string) => void;
+declare const clearPendingStorage: (scopeKey: string, storage?: PendingStorage) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending-store.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending-store.ts#L85)
 
 ### pendingEntryKey
 
@@ -6422,10 +7240,13 @@ Recovers selectively validated metadata while isolating malformed entries.
 **Signature**
 
 ```ts
-declare const readPendingStorage: (scopeKey: string) => Map<string, PendingOperationMetadata>;
+declare const readPendingStorage: (
+  scopeKey: string,
+  storage?: PendingStorage,
+) => Map<string, PendingOperationMetadata>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending-store.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending-store.ts#L58)
 
 ### removePendingStorage
 
@@ -6434,10 +7255,22 @@ Removes persisted receipt metadata without surfacing unavailable browser storage
 **Signature**
 
 ```ts
-declare const removePendingStorage: (key: string) => void;
+declare const removePendingStorage: (key: string, storage?: PendingStorage) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending-store.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending-store.ts#L43)
+
+### sessionStorageValue
+
+Reads browser session storage without throwing when access is unavailable.
+
+**Signature**
+
+```ts
+declare const sessionStorageValue: () => Storage | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending-store.ts#L123)
 
 ### writePendingStorage
 
@@ -6446,10 +7279,14 @@ Persists metadata best-effort without persisting transmitted requests.
 **Signature**
 
 ```ts
-declare const writePendingStorage: (key: string, value: PendingOperationMetadata) => void;
+declare const writePendingStorage: (
+  key: string,
+  value: PendingOperationMetadata,
+  storage?: PendingStorage,
+) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending-store.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending-store.ts#L27)
 
 ## `pending-support.ts`
 
@@ -6481,17 +7318,21 @@ declare const isRecord: (value: unknown) => value is Record<string, unknown>;
 
 ## `pending.schemas.ts`
 
-### PersistedPendingMetadata
+Legacy persisted metadata authority: only operationId was required on recovery.
+
+### PersistedPendingMetadata (interface)
 
 Legacy persisted metadata authority: only operationId was required on recovery.
 
 **Signature**
 
 ```ts
-declare const PersistedPendingMetadata: Schema.Struct<{ readonly operationId: Schema.String }>;
+export interface PersistedPendingMetadata {
+  readonly operationId: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.schemas.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.schemas.ts#L2)
 
 ### isPersistedPendingMetadata
 
@@ -6500,61 +7341,67 @@ Validates the recovery discriminator without stripping other legacy fields.
 **Signature**
 
 ```ts
-declare const isPersistedPendingMetadata: <I>(
-  input: I,
-) => input is I & { readonly operationId: string };
+declare const isPersistedPendingMetadata: (value: unknown) => value is PersistedPendingMetadata;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.schemas.ts#L11)
 
 ## `pending.service.ts`
 
-### PendingOperations (class)
+### PendingOperationsOptions (interface)
 
-Submission receipts, recovery authority and memory-only transmitted requests.
+Memory and persistence an isolated pending-operation service uses.
 
 **Signature**
 
 ```ts
-declare class PendingOperations
+export interface PendingOperationsOptions {
+  /** Memory-only receipts and retained requests; defaults to the browser-wide map. */
+  readonly memory?: typeof pendingMemory;
+  /** Persistence for receipt metadata; defaults to browser session storage. */
+  readonly storage?: PendingStorage;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.service.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.service.ts#L23)
 
-### pendingOperationsLayer
+### createPendingOperations
 
-Acquires pending state once; storage remains a best-effort native persistence edge.
+Creates pending-operation state; storage remains a best-effort native persistence edge.
 
 **Example**
 
 ```ts
-import { Effect, ManagedRuntime } from "effect";
-import { PendingOperations, pendingOperationsLayer } from "./pending.service.js";
-export async function pendingOwner(): Promise<void> {
-  const owner = ManagedRuntime.make(pendingOperationsLayer(new Map()));
-  try {
-    await owner.runPromise(
-      Effect.flatMap(PendingOperations, (service) => service.digest({ input: 1 })),
-    );
-  } finally {
-    await owner.dispose();
-  }
-}
+import { createPendingOperations } from "./pending.service.js";
+const pending = createPendingOperations({ memory: new Map(), storage: () => undefined });
+export const digest = pending.digest({ input: 1 });
 ```
 
 **See**
 
-- packages/client/tests/transport/examples.test.ts for the checked live Layer example.
+- packages/client/tests/transport/examples.test.ts for the checked example.
 
 **Signature**
 
 ```ts
-declare const pendingOperationsLayer: (
-  memory?: Map<string, { readonly metadata: PendingOperationMetadata; readonly request?: unknown }>,
-) => Layer.Layer<PendingOperations>;
+declare const createPendingOperations: (
+  options?: PendingOperationsOptions,
+) => PendingOperationService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.service.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.service.ts#L42)
+
+### pendingOperations
+
+The browser-wide pending-operation service over session storage and shared memory.
+
+**Signature**
+
+```ts
+declare const pendingOperations: PendingOperationService;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.service.ts#L141)
 
 ## `pending.ts`
 
@@ -6566,7 +7413,7 @@ declare const pendingOperationsLayer: (
 declare const PendingCapacityError: typeof PendingCapacityError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L10)
 
 ### PendingRecoveryUnavailableError
 
@@ -6576,7 +7423,7 @@ declare const PendingCapacityError: typeof PendingCapacityError;
 declare const PendingRecoveryUnavailableError: typeof PendingRecoveryUnavailableError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L11)
 
 ### PendingRememberOptions
 
@@ -6586,7 +7433,7 @@ declare const PendingRecoveryUnavailableError: typeof PendingRecoveryUnavailable
 declare const PendingRememberOptions: PendingRememberOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L8)
 
 ### PendingRequestMismatchError
 
@@ -6596,7 +7443,7 @@ declare const PendingRememberOptions: PendingRememberOptions;
 declare const PendingRequestMismatchError: typeof PendingRequestMismatchError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L12)
 
 ### clearPendingOperations
 
@@ -6608,7 +7455,7 @@ Clears every receipt in an explicitly retired identity scope.
 declare const clearPendingOperations: (scopeKey: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L138)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L128)
 
 ### digestPendingRequest
 
@@ -6620,7 +7467,7 @@ Hashes the existing canonical transmitted request representation.
 declare const digestPendingRequest: (value: unknown) => Promise<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L156)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L146)
 
 ### forgetPending
 
@@ -6632,7 +7479,7 @@ Removes memory and best-effort persisted metadata after a known outcome.
 declare const forgetPending: (scopeKey: string, operationId: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L95)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L85)
 
 ### isJobUnknownOutcome
 
@@ -6644,7 +7491,7 @@ Checks nested public error envelopes for an unknown job outcome.
 declare const isJobUnknownOutcome: (value: unknown) => value is JobUnknownOutcome;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L147)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L137)
 
 ### jobUnknownOutcome
 
@@ -6654,7 +7501,7 @@ declare const isJobUnknownOutcome: (value: unknown) => value is JobUnknownOutcom
 declare const jobUnknownOutcome: (value: unknown) => JobUnknownOutcome | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L7)
 
 ### matchesPendingRequest
 
@@ -6670,7 +7517,7 @@ declare const matchesPendingRequest: (
 ) => Promise<boolean>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L125)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L115)
 
 ### pendingOperations
 
@@ -6682,7 +7529,7 @@ Merges recovered metadata with newer in-memory values without discarding authori
 declare const pendingOperations: (scopeKey: string) => readonly PendingOperationMetadata[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L104)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L94)
 
 ### pendingRequest
 
@@ -6694,7 +7541,7 @@ Reads a transmitted request; restored session metadata never recreates input.
 declare const pendingRequest: (scopeKey: string, operationId: string) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L114)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L104)
 
 ### pendingScopeKey
 
@@ -6706,7 +7553,7 @@ Preserves the complete existing scope serialization used by query and receipt ke
 declare const pendingScopeKey: (scope: RelkitKeyScope) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L20)
 
 ### rememberJobPending
 
@@ -6723,7 +7570,7 @@ declare const rememberJobPending: (
 ) => Promise<PendingOperationMetadata>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L53)
 
 ### rememberPending
 
@@ -6742,7 +7589,7 @@ declare const rememberPending: (
 ) => Promise<PendingOperationMetadata>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L34)
 
 ### updatePending
 
@@ -6754,13 +7601,13 @@ Updates metadata while preserving a previously retained in-memory request.
 declare const updatePending: (scopeKey: string, value: PendingOperationMetadata) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L75)
 
 ## `pending.types.ts`
 
 ### PendingOperationService (interface)
 
-One browser's pending-operation state with isolated live/test implementations.
+One browser's pending-operation state; tests create isolated instances.
 
 **Signature**
 
@@ -6773,7 +7620,7 @@ export interface PendingOperationService {
    * @param value - Original transmitted request payload.
    * @param references - Existing durable receipt references.
    * @param options - Existing operation identity, reuse and retention policy.
-   * @returns Lazy observed metadata creation or the original hashing/capacity failure. */
+   * @returns The recorded metadata, or a rejection with the original hashing/capacity failure. */
   readonly remember: (
     scope: string,
     kind: PendingOperationMetadata["kind"],
@@ -6781,44 +7628,44 @@ export interface PendingOperationService {
     value: unknown,
     references: PendingReferences,
     options: PendingRememberOptions,
-  ) => Effect.Effect<PendingOperationMetadata, unknown>;
+  ) => Promise<PendingOperationMetadata>;
   /** Replaces persisted metadata without persisting request inputs.
    * @param scope - Complete pending isolation scope.
    * @param value - Existing receipt metadata with its updated outcome.
-   * @returns A synchronous observed best-effort metadata update. */
-  readonly update: (scope: string, value: PendingOperationMetadata) => Effect.Effect<void>;
+   * @returns Nothing, after a synchronous best-effort metadata update. */
+  readonly update: (scope: string, value: PendingOperationMetadata) => void;
   /** Removes one settled receipt and its memory-only request.
    * @param scope - Complete pending isolation scope.
    * @param id - Existing operation identity.
-   * @returns A synchronous observed state update. */
-  readonly forget: (scope: string, id: string) => Effect.Effect<void>;
+   * @returns Nothing, after a synchronous state update. */
+  readonly forget: (scope: string, id: string) => void;
   /** Lists metadata using the existing selective persistence validation.
    * @param scope - Complete pending isolation scope.
-   * @returns A synchronous observed metadata snapshot. */
-  readonly list: (scope: string) => Effect.Effect<readonly PendingOperationMetadata[]>;
+   * @returns A synchronous metadata snapshot. */
+  readonly list: (scope: string) => readonly PendingOperationMetadata[];
   /** Reads opted-in memory input without recovering payloads from persisted metadata.
    * @param scope - Complete pending isolation scope.
    * @param id - Existing operation identity.
-   * @returns A synchronous observed original input when retained. */
-  readonly request: (scope: string, id: string) => Effect.Effect<unknown>;
+   * @returns The original input when retained, synchronously. */
+  readonly request: (scope: string, id: string) => unknown;
   /** Clears receipt metadata and retained memory input for one isolation scope.
    * @param scope - Complete pending isolation scope.
-   * @returns A synchronous observed state update. */
-  readonly clear: (scope: string) => Effect.Effect<void>;
+   * @returns Nothing, after a synchronous state update. */
+  readonly clear: (scope: string) => void;
   /** Checks a request digest against stored receipt metadata.
    * @param scope - Complete pending isolation scope.
    * @param id - Existing operation identity.
    * @param value - Original request payload whose digest is compared.
-   * @returns A lazy observed match decision or the original hashing failure. */
-  readonly matches: (scope: string, id: string, value: unknown) => Effect.Effect<boolean, unknown>;
+   * @returns The match decision, or a rejection with the original hashing failure. */
+  readonly matches: (scope: string, id: string, value: unknown) => Promise<boolean>;
   /** Hashes canonical JSON through the existing WebCrypto boundary.
    * @param value - Original payload whose canonical representation is hashed.
-   * @returns A lazy observed SHA-256 digest or the original serialization/crypto failure. */
-  readonly digest: (value: unknown) => Effect.Effect<string, unknown>;
+   * @returns The SHA-256 digest, or a rejection with the original serialization/crypto failure. */
+  readonly digest: (value: unknown) => Promise<string>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.types.ts#L16)
 
 ### PendingReferences (type alias)
 
@@ -6830,7 +7677,7 @@ References persisted with metadata; transmitted inputs remain memory-only.
 type PendingReferences = Pick<PendingOperationMetadata, "threadId" | "runId">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.types.ts#L13)
 
 ### PendingRememberOptions (interface)
 
@@ -6847,7 +7694,7 @@ export interface PendingRememberOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.types.ts#L5)
 
 ## `procedure.ts`
 
@@ -7142,11 +7989,11 @@ export interface UseRealtimeResult {
 declare const RealtimeFrame: RealtimeFrame;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L8)
 
 ### RealtimeManager (class)
 
-Synchronous external-store adapter over one scoped realtime session owner.
+Synchronous external-store adapter over one realtime session owner.
 
 **Signature**
 
@@ -7159,7 +8006,7 @@ declare class RealtimeManager {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L12)
 
 ### subscribe (method)
 
@@ -7176,7 +8023,7 @@ declare const subscribe: (
 ) => () => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L52)
 
 ### listenStatus (method)
 
@@ -7188,7 +8035,7 @@ Subscribes to manager status changes for React's synchronous external store.
 declare const listenStatus: (listener: () => void) => () => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L69)
 
 ### dispose (method)
 
@@ -7200,7 +8047,7 @@ Initiates disposal synchronously; close joins native iterator cleanup.
 declare const dispose: () => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L77)
 
 ### close (method)
 
@@ -7212,7 +8059,7 @@ Joins the manager's finalization, including pending native pulls and retries.
 declare const close: () => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L86)
 
 ### RealtimeStatus
 
@@ -7222,7 +8069,7 @@ declare const close: () => Promise<void>;
 declare const RealtimeStatus: RealtimeStatus;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L8)
 
 ### realtimeSubscriptionKey
 
@@ -7232,7 +8079,7 @@ declare const RealtimeStatus: RealtimeStatus;
 declare const realtimeSubscriptionKey: (channel: string, params: unknown) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L9)
 
 ## `realtime-manager.types.ts`
 
@@ -7255,11 +8102,11 @@ type RealtimeFrame =
   | { readonly kind: "presence"; readonly presence: PresenceSnapshot };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.types.ts#L7)
 
 ### RealtimeSessionService (interface)
 
-Realtime state and scoped workflows supplied by live and test Layers.
+Realtime state and owned connection workers of one manager.
 
 **Signature**
 
@@ -7267,28 +8114,32 @@ Realtime state and scoped workflows supplied by live and test Layers.
 export interface RealtimeSessionService {
   readonly feeds: Map<string, SharedSubscription>;
   readonly statusListeners: Set<() => void>;
-  /** Reads the current pure external-store status.
-   * @returns A synchronous state read without native acquisition. */
-  readonly snapshot: () => Effect.Effect<RealtimeStatus>;
-  /** Registers a manager-local view over a complete-key scoped native connection.
+  /** Reads the current external-store status.
+   * @returns The status, synchronously and without native acquisition. */
+  readonly snapshot: () => RealtimeStatus;
+  /** Registers a manager-local view over a complete-key shared native connection.
    * @param channel - Declared channel key.
    * @param params - Complete native channel parameters.
    * @param listener - Isolated synchronous frame publication.
    * @param statusListener - Optional isolated lifecycle publication.
-   * @returns A synchronous registration Effect yielding independently releasable view ownership. */
+   * @returns An idempotent synchronous release of this view.
+   * @throws Error when the sessions are stopped. */
   readonly subscribe: (
     channel: string,
     params: unknown,
     listener: (frame: RealtimeFrame) => void,
     statusListener?: (status: RealtimeStatus) => void,
-  ) => Effect.Effect<Effect.Effect<void>>;
-  /** Initiates cancellation of all scoped native connections and resets idle state.
-   * @returns A synchronous cancellation request; owner closure joins native workers. */
-  readonly stop: () => Effect.Effect<void>;
+  ) => () => void;
+  /** Aborts every shared connection and resets idle state, synchronously.
+   * @returns Nothing; {@link RealtimeSessionService.close} waits for the workers. */
+  readonly stop: () => void;
+  /** Stops the sessions and waits for every connection worker, pull and retry to settle.
+   * @returns The same settlement Promise on repeated calls. */
+  readonly close: () => Promise<void>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.types.ts#L28)
 
 ### RealtimeStatus (type alias)
 
@@ -7300,7 +8151,7 @@ Existing realtime external-store states.
 type RealtimeStatus = "idle" | "connecting" | "connected" | "stale" | "error";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.types.ts#L4)
 
 ### SharedSubscription (interface)
 
@@ -7315,11 +8166,10 @@ export interface SharedSubscription {
   readonly statusListeners: Set<(status: RealtimeStatus) => void>;
   status: RealtimeStatus;
   checkpoint?: ChannelCheckpoint;
-  fiber?: Fiber.Fiber<void, unknown>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.types.ts#L19)
 
 ## `realtime-session-key.ts`
 
@@ -7339,52 +8189,38 @@ declare const realtimeSubscriptionKey: (channel: string, params: unknown) => str
 
 ## `realtime-session.service.ts`
 
-### RealtimeSessions (class)
+### createRealtimeSessions
 
-One manager's sharing registry, checkpoints and reconnect workers.
-
-**Signature**
-
-```ts
-declare class RealtimeSessions
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-session.service.ts#L15)
-
-### realtimeSessionsLayer
-
-Acquires one synchronous registry with scoped, lazy native workers.
+Creates one manager's sharing registry, checkpoints and owned reconnect workers.
 
 **Example**
 
 ```ts
-import { ManagedRuntime } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
-import { RealtimeSessions, realtimeSessionsLayer } from "./realtime-session.service.js";
+import { createRealtimeSessions } from "./realtime-session.service.js";
 export async function realtimeOwner(): Promise<void> {
-  const owner = ManagedRuntime.make(realtimeSessionsLayer({}));
+  const sessions = createRealtimeSessions({});
   try {
-    const sessions = runExecutionSync(owner, RealtimeSessions);
+    sessions.snapshot();
   } finally {
-    await owner.dispose();
+    await sessions.close();
   }
 }
 ```
 
 **See**
 
-- packages/client/tests/transport/examples.test.ts for the checked live Layer example.
+- packages/client/tests/transport/examples.test.ts for the checked example.
 
 **Signature**
 
 ```ts
-declare const realtimeSessionsLayer: (
+declare const createRealtimeSessions: (
   client: unknown,
   identity?: Pick<ClientIdentityDocument, "identityScope" | "sessionEpoch">,
-) => Layer.Layer<RealtimeSessions>;
+) => RealtimeSessionService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-session.service.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-session.service.ts#L29)
 
 ## `registry.ts`
 
@@ -7450,7 +8286,7 @@ String keys of the declared agent registry.
 type AgentSelector = Extract<keyof AgentRegistry, string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L129)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L98)
 
 ### ChannelSelector (type alias)
 
@@ -7462,7 +8298,7 @@ String keys of the declared channel registry.
 type ChannelSelector = Extract<keyof ChannelRegistry, string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L124)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L93)
 
 ### ClientAgentContract (interface)
 
@@ -7496,7 +8332,7 @@ export interface ClientAgentContract<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L89)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L58)
 
 ### ClientAgentDynamic (interface)
 
@@ -7511,7 +8347,7 @@ export interface ClientAgentDynamic {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L85)
 
 ### ClientChannelContract (interface)
 
@@ -7531,137 +8367,27 @@ export interface ClientChannelContract<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L35)
 
-### ClientRouteContract (interface)
-
-Generated finite route declaration preserving payload and failure inference.
+### ClientRouteContract
 
 **Signature**
 
 ```ts
-export interface ClientRouteContract<
-  Input = unknown,
-  Output = unknown,
-  Failure = globalThis.Error,
-> {
-  readonly input: Input;
-  readonly output: Output;
-  readonly error: Failure;
-  readonly operation: "query" | "mutation";
-  readonly stream: false;
-}
+declare const ClientRouteContract: ClientRouteContract<Input, Output, Failure>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L3)
 
-### ClientSelector (type alias)
-
-String keys of the declared procedure registry.
+### ClientStreamContract
 
 **Signature**
 
 ```ts
-type ClientSelector = Extract<keyof ClientRegistry, string>;
+declare const ClientStreamContract: ClientStreamContract<Input, Item, Failure>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L134)
-
-### ClientStreamContract (interface)
-
-Generated route stream declaration preserving item and failure inference.
-
-**Signature**
-
-```ts
-export interface ClientStreamContract<Input = unknown, Item = unknown, Failure = globalThis.Error> {
-  readonly input: Input;
-  readonly output: AsyncIterable<Item>;
-  readonly item: Item;
-  readonly error: Failure;
-  readonly operation: "query" | "mutation";
-  readonly stream: true;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L27)
-
-### ContractFor (type alias)
-
-Looks up one exact application procedure contract.
-
-**Signature**
-
-```ts
-type ContractFor<Name extends ClientSelector> = ClientRegistry[Name];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L172)
-
-### ErrorFor (type alias)
-
-Infers the declared failure of one exact application procedure.
-
-**Signature**
-
-```ts
-type ErrorFor<Name extends ClientSelector> =
-  ContractFor<Name> extends {
-    readonly error: infer Error;
-  }
-    ? Error
-    : never;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L200)
-
-### FiniteSelector (type alias)
-
-Declared procedure keys whose result is finite.
-
-**Signature**
-
-```ts
-type FiniteSelector = {
-  [Name in ClientSelector]: ClientRegistry[Name] extends { readonly stream: false } ? Name : never;
-}[ClientSelector];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L139)
-
-### InputFor (type alias)
-
-Infers the input of one exact application procedure.
-
-**Signature**
-
-```ts
-type InputFor<Name extends ClientSelector> =
-  ContractFor<Name> extends {
-    readonly input: infer Input;
-  }
-    ? Input
-    : never;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L178)
-
-### ItemFor (type alias)
-
-Infers the item payload of one exact application stream.
-
-**Signature**
-
-```ts
-type ItemFor<Name extends StreamSelector> =
-  ContractFor<Name> extends {
-    readonly item: infer Item;
-  }
-    ? Item
-    : never;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L211)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L3)
 
 ### JobCancelInput
 
@@ -7671,7 +8397,7 @@ type ItemFor<Name extends StreamSelector> =
 declare const JobCancelInput: JobCancelInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L8)
 
 ### JobClientField
 
@@ -7681,7 +8407,7 @@ declare const JobCancelInput: JobCancelInput;
 declare const JobClientField: JobClientField;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L7)
 
 ### JobContract
 
@@ -7701,7 +8427,7 @@ declare const JobContract: JobContract<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L6)
 
 ### JobFor
 
@@ -7711,7 +8437,7 @@ declare const JobContract: JobContract<
 declare const JobFor: JobFor<Name>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L9)
 
 ### JobGetInput
 
@@ -7721,7 +8447,7 @@ declare const JobFor: JobFor<Name>;
 declare const JobGetInput: JobGetInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L10)
 
 ### JobListInput
 
@@ -7731,7 +8457,7 @@ declare const JobGetInput: JobGetInput;
 declare const JobListInput: JobListInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L12)
 
 ### JobListQuery
 
@@ -7741,7 +8467,7 @@ declare const JobListInput: JobListInput;
 declare const JobListQuery: JobListQuery;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L11)
 
 ### JobProcedureContract
 
@@ -7751,7 +8477,7 @@ declare const JobListQuery: JobListQuery;
 declare const JobProcedureContract: JobProcedureContract<Input, Output, Failure>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L14)
 
 ### JobProcedureSelector
 
@@ -7761,7 +8487,7 @@ declare const JobProcedureContract: JobProcedureContract<Input, Output, Failure>
 declare const JobProcedureSelector: JobProcedureSelector<Name>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L13)
 
 ### JobRegistry
 
@@ -7771,7 +8497,7 @@ declare const JobProcedureSelector: JobProcedureSelector<Name>;
 declare const JobRegistry: JobRegistry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L15)
 
 ### JobRetryInput
 
@@ -7781,7 +8507,7 @@ declare const JobRegistry: JobRegistry;
 declare const JobRetryInput: JobRetryInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L16)
 
 ### JobRunSelector
 
@@ -7791,7 +8517,7 @@ declare const JobRetryInput: JobRetryInput;
 declare const JobRunSelector: JobRunSelector<Name>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L17)
 
 ### JobSelector
 
@@ -7801,7 +8527,7 @@ declare const JobRunSelector: JobRunSelector<Name>;
 declare const JobSelector: never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L18)
 
 ### JobSnapshotFor
 
@@ -7811,7 +8537,7 @@ declare const JobSelector: never;
 declare const JobSnapshotFor: JobSnapshotFor<Input, Output, Progress, Failure, Fields>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L19)
 
 ### JobStreamInput
 
@@ -7821,7 +8547,7 @@ declare const JobSnapshotFor: JobSnapshotFor<Input, Output, Progress, Failure, F
 declare const JobStreamInput: JobStreamInput<StreamName>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L20)
 
 ### JobStreamProcedureContract
 
@@ -7831,7 +8557,7 @@ declare const JobStreamInput: JobStreamInput<StreamName>;
 declare const JobStreamProcedureContract: JobStreamProcedureContract<Input, Item, Failure>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L21)
 
 ### JobTriggerInput
 
@@ -7841,7 +8567,7 @@ declare const JobStreamProcedureContract: JobStreamProcedureContract<Input, Item
 declare const JobTriggerInput: JobTriggerInput<Input>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L22)
 
 ### JobTriggerOptions
 
@@ -7851,7 +8577,7 @@ declare const JobTriggerInput: JobTriggerInput<Input>;
 declare const JobTriggerOptions: JobTriggerOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L23)
 
 ### JobTriggerSelector
 
@@ -7861,7 +8587,7 @@ declare const JobTriggerOptions: JobTriggerOptions;
 declare const JobTriggerSelector: JobTriggerSelector<Name>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L24)
 
 ### JobWatchInput
 
@@ -7871,56 +8597,7 @@ declare const JobTriggerSelector: JobTriggerSelector<Name>;
 declare const JobWatchInput: JobWatchInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L56)
-
-### MutationSelector (type alias)
-
-Declared finite mutation procedure keys.
-
-**Signature**
-
-```ts
-type MutationSelector = {
-  [Name in FiniteSelector]: ClientRegistry[Name] extends { readonly operation: "mutation" }
-    ? Name
-    : never;
-}[FiniteSelector];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L155)
-
-### OutputFor (type alias)
-
-Infers the successful output of one exact application procedure.
-
-**Signature**
-
-```ts
-type OutputFor<Name extends ClientSelector> =
-  ContractFor<Name> extends {
-    readonly output: infer Output;
-  }
-    ? Output
-    : never;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L189)
-
-### QuerySelector (type alias)
-
-Declared finite query procedure keys.
-
-**Signature**
-
-```ts
-type QuerySelector = {
-  [Name in FiniteSelector]: ClientRegistry[Name] extends { readonly operation: "query" }
-    ? Name
-    : never;
-}[FiniteSelector];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L146)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L25)
 
 ### SelectedJobField
 
@@ -7930,21 +8607,7 @@ type QuerySelector = {
 declare const SelectedJobField: SelectedJobField<Fields, Field>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L57)
-
-### StreamSelector (type alias)
-
-Declared procedure keys whose result is streamed.
-
-**Signature**
-
-```ts
-type StreamSelector = {
-  [Name in ClientSelector]: ClientRegistry[Name] extends { readonly stream: true } ? Name : never;
-}[ClientSelector];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L164)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L26)
 
 ## `stream-hook.ts`
 
@@ -7975,13 +8638,13 @@ Adapts a declared scoped stream into React state and explicit cancellation contr
 **Signature**
 
 ```ts
-declare const useStream: <Name extends StreamSelector>(
-  name: Name,
-  options?: { readonly autoStart?: boolean; readonly input?: InputFor<Name> },
-) => UseStreamResult<InputFor<Name>, ItemFor<Name>, ErrorFor<Name>>;
+declare const useStream: <Route extends ApiStreamRoute>(
+  route: Route,
+  options?: { readonly autoStart?: boolean; readonly input?: RouteInput<Route> },
+) => UseStreamResult<RouteInput<Route>, RouteItem<Route>, RouteError<Route>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/stream-hook.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/stream-hook.ts#L20)
 
 ## `stream-hook.types.ts`
 
@@ -8019,91 +8682,6 @@ export interface UseStreamResult<Input, Item, Error> extends StreamState<Item, E
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/stream-hook.types.ts#L18)
 
-## `stream-runtime.ts`
-
-### clientStreams
-
-Once-acquired stream service whose call fibers own all native requests.
-
-**Signature**
-
-```ts
-declare const clientStreams: ClientStreamService;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/stream-runtime.ts#L8)
-
-### streamRuntime
-
-**Signature**
-
-```ts
-declare const streamRuntime: ManagedRuntime.ManagedRuntime<ClientStreams, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/stream-runtime.ts#L6)
-
-## `stream.service.ts`
-
-### ClientStreams (class)
-
-Arbitrary declared procedure observation lifetime, independent of React.
-
-**Signature**
-
-```ts
-declare class ClientStreams
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/stream.service.ts#L8)
-
-### ClientStreamsLive
-
-Supplies declared procedure streams with scoped native pulls.
-
-**See**
-
-- tests/transport/native.test.ts for checked pending-pull cancellation at the Bun boundary.
-
-**Signature**
-
-```ts
-declare const ClientStreamsLive: Layer.Layer<ClientStreams, never, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/stream.service.ts#L17)
-
-## `stream.service.types.ts`
-
-### ClientStreamService (interface)
-
-Declared procedure observation with borrowed external-store callbacks.
-
-**Signature**
-
-```ts
-export interface ClientStreamService {
-  /** Owns declared native pulls and external-store publication until cancellation.
-   * @param client - Borrowed generated transport.
-   * @param name - Exact declared procedure key.
-   * @param input - Original request payload.
-   * @param signal - View lifetime propagated to the native transport.
-   * @param opened - Synchronous establishment publication.
-   * @param publish - Isolated synchronous item publication.
-   * @returns A lazy scoped observation preserving native errors and joining cleanup. */
-  readonly consume: (
-    client: unknown,
-    name: string,
-    input: unknown,
-    signal: AbortSignal,
-    opened: () => void,
-    publish: (item: unknown) => void,
-  ) => Effect.Effect<void, unknown>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/stream.service.types.ts#L3)
-
 ## `view-owner.ts`
 
 Retains an owner across React's synchronous development cleanup/setup replay.
@@ -8139,10 +8717,303 @@ declare class RelkitWriteError { constructor(
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/write-error.ts#L1)
 
+### code (property)
+
+`WRITE_NOT_SENT` when the request never left, `WRITE_OUTCOME_UNKNOWN` otherwise.
+
+**Signature**
+
+```ts
+readonly code: "WRITE_NOT_SENT" | "WRITE_OUTCOME_UNKNOWN"
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/write-error.ts#L3)
+
+### status (property)
+
+**Signature**
+
+```ts
+readonly status: 0
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/write-error.ts#L4)
+
+### data (property)
+
+**Signature**
+
+```ts
+readonly data: undefined
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/write-error.ts#L5)
+
+### defined (property)
+
+**Signature**
+
+```ts
+readonly defined: false
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/write-error.ts#L6)
+
+## `rest-link.ts`
+
+Calls routes over their REST endpoints, the same requests the OpenAPI document describes,
+so a typed client call is reproducible with curl.
+
+### RestLink (interface)
+
+Route calls over REST.
+
+**Signature**
+
+```ts
+export interface RestLink {
+  /**
+   * Tells route calls from the framework procedures (channels, agents, jobs) that keep
+   * the RPC protocol.
+   * @param path - Call path.
+   * @returns Whether the call names a route.
+   */
+  readonly handles: (path: readonly string[]) => boolean;
+  /**
+   * Calls one route.
+   * @param path - `api` path, `METHOD /path` selector or route ID.
+   * @param input - Call input.
+   * @param options - Call cancellation.
+   * @returns The route output, or an async iterator for a stream route.
+   */
+  readonly call: (
+    path: readonly string[],
+    input: unknown,
+    options: { readonly signal?: AbortSignal | undefined },
+  ) => Promise<unknown>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-link.ts#L13)
+
+### createRestLink
+
+Creates the REST link for one client.
+
+**Example**
+
+```ts
+const link = createRestLink({ baseUrl: "http://127.0.0.1:3000" });
+```
+
+**Signature**
+
+```ts
+declare const createRestLink: (options: CreateClientOptions) => RestLink;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-link.ts#L41)
+
+## `rest-request.ts`
+
+Builds the REST request for one route call by reading the route's compiled request
+mapping backwards: each mapped input field goes to the path, query, header or body
+position the server reads it from.
+
+### encodeRestRequest
+
+Encodes one call's input as the route's REST request.
+
+**Example**
+
+```ts
+encodeRestRequest("http://127.0.0.1:3000", route, { orderId: "o1" }, new Headers());
+```
+
+**Signature**
+
+```ts
+declare const encodeRestRequest: (
+  baseUrl: string,
+  route: ClientRouteEntry,
+  input: unknown,
+  headers: Headers,
+) => { readonly url: URL; readonly init: RequestInit };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-request.ts#L27)
+
+## `rest-response.ts`
+
+Reads a REST route response as the call's output, stream or typed error.
+
+### decodeRestResponse
+
+Decodes one route response.
+
+**Throws**
+
+ORPCError with the declared code, or the common code for the status.
+
+**Example**
+
+```ts
+await decodeRestResponse(route, await fetch(url), () => controller.abort());
+```
+
+**Signature**
+
+```ts
+declare const decodeRestResponse: (
+  route: ClientRouteEntry,
+  response: Response,
+  abort: () => void,
+) => Promise<unknown>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-response.ts#L42)
+
+## `rest-routes.ts`
+
+Loads and caches the backend's client routes document.
+
+### ClientRouteEntry
+
+**Signature**
+
+```ts
+declare const ClientRouteEntry: ClientRouteEntry;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-routes.ts#L4)
+
+### RouteTable
+
+**Signature**
+
+```ts
+declare const RouteTable: RouteTable;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-routes.ts#L4)
+
+### createRouteTable
+
+Creates a lazily loaded route table. It loads on the first call, and reloads when a call
+names a route it lacks, so a route the backend adds during development works at once.
+
+**Example**
+
+```ts
+const table = createRouteTable("http://127.0.0.1:3000", (url, signal) => fetch(url, { signal }));
+```
+
+**Signature**
+
+```ts
+declare const createRouteTable: (
+  baseUrl: string,
+  load: (url: URL, signal?: AbortSignal) => Promise<Response>,
+) => RouteTable;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-routes.ts#L17)
+
+## `rest-routes.types.ts`
+
+One route in the backend's client routes document (`/_relkit/v1/client/routes`), a copy
+of `ClientRouteEntry` in `relkit/contracts` so the browser bundle needs no runtime import.
+
+### ClientRouteEntry (interface)
+
+One route in the backend's client routes document (`/_relkit/v1/client/routes`), a copy
+of `ClientRouteEntry` in `relkit/contracts` so the browser bundle needs no runtime import.
+
+**Signature**
+
+```ts
+export interface ClientRouteEntry {
+  readonly id: string;
+  /** Path below the `api` root, such as `["orders", "searchOrders"]`. */
+  readonly api: readonly string[];
+  readonly method: string;
+  readonly path: string;
+  /** The compiled request mapping the server reads the input with. */
+  readonly request: unknown;
+  readonly stream: "sse" | "text" | "bytes" | null;
+  readonly operation: "query" | "mutation";
+  /** Declared error codes. */
+  readonly errors: readonly string[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-routes.types.ts#L5)
+
+### RouteTable (interface)
+
+Looks routes up by the name a call uses.
+
+**Signature**
+
+```ts
+export interface RouteTable {
+  /**
+   * Finds the route a call path names: an `api` path (`["api", "orders", "getOrder"]`),
+   * a `METHOD /path` selector or a route ID.
+   * @param path - Call path.
+   * @param signal - Cancels the table request.
+   * @returns The route, or undefined when the backend has none by that name.
+   */
+  readonly find: (
+    path: readonly string[],
+    signal?: AbortSignal,
+  ) => Promise<ClientRouteEntry | undefined>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-routes.types.ts#L20)
+
+## `rest-sse.ts`
+
+Parses a RelKit SSE stream route: `relkit-item`, `relkit-complete` and `relkit-error` events.
+
+### ChunkReader (interface)
+
+The part of a body reader the parser uses.
+
+**Signature**
+
+```ts
+export interface ChunkReader {
+  readonly read: () => Promise<{ readonly done: boolean; readonly value?: Uint8Array | undefined }>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-sse.ts#L5)
+
+### readSse
+
+Reads SSE events from a body reader as stream items.
+
+**Example**
+
+```ts
+for await (const item of { [Symbol.asyncIterator]: () => readSse(reader) }) {
+}
+```
+
+**Signature**
+
+```ts
+declare const readSse: (reader: ChunkReader) => AsyncIterator<unknown>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-sse.ts#L16)
+
 ## `server-context.ts`
 
 Implements the opt-in Bun server query context and identity-bound hydration.
-Install @orpc/tanstack-query@2.0.0-beta.31 and @tanstack/query-core@^5 alongside
+Install @orpc/tanstack-query@1.16.1 and @tanstack/query-core@^5 alongside
 
 ### CreateRelkitServerContextOptions
 
@@ -8258,9 +9129,9 @@ Bun server client with operation-time W3C propagation. Response bodies remain un
 **Signature**
 
 ```ts
-declare const createServerClient: <Contract extends RouterContract = RouterContract>(
+declare const createServerClient: <Contract extends AnyContractRouter = AnyContractRouter>(
   options: CreateClientOptions,
-) => RouterContractClient<Contract>;
+) => ContractRouterClient<Contract>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/server.ts#L18)
@@ -8268,7 +9139,7 @@ declare const createServerClient: <Contract extends RouterContract = RouterContr
 ## `tanstack-query.ts`
 
 Reexports oRPC's query adapter without adding it to the transport dependency
-graph. Install @orpc/tanstack-query@2.0.0-beta.31 and @tanstack/query-core@^5
+graph. Install @orpc/tanstack-query@1.16.1 and @tanstack/query-core@^5
 alongside @relkit/client when selecting this entrypoint.
 
 ### TanstackQueryOperationContext
@@ -8286,9 +9157,9 @@ declare const TanstackQueryOperationContext: OperationContext;
 **Signature**
 
 ```ts
-declare const createTanstackQueryUtils: <T extends AnyNestedClient>(
+declare const createTanstackQueryUtils: <T extends NestedClient<any>>(
   client: T,
-  options?: NoInfer<RouterUtilsOptions<T>>,
+  options?: CreateRouterUtilsOptions<T>,
 ) => RouterUtils<T>;
 ```
 
@@ -8306,7 +9177,19 @@ Builds the native HTTP oRPC link with lazy headers and owned iterator cancellati
 declare const httpLink: (options: CreateClientOptions) => RPCLink<Record<PropertyKey, unknown>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-native.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-native.ts#L22)
+
+### resolveHeaders
+
+Resolves current header values without mutating caller-owned headers.
+
+**Signature**
+
+```ts
+declare const resolveHeaders: (value: ClientHeaders | undefined) => Promise<Headers>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-native.ts#L180)
 
 ### webSocketEndpoint
 
@@ -8318,11 +9201,12 @@ Resolves the RPC WebSocket endpoint and canonical agent capability query.
 declare const webSocketEndpoint: (baseUrl: string) => URL;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-native.ts#L96)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-native.ts#L157)
 
 ### webSocketLink
 
-Builds the native oRPC WebSocket link while retaining SDK reconnect ownership.
+Builds the WebSocket link. oRPC 1.x binds a link to one socket, so this opens a socket
+on first use and opens a new one for the next call after the socket closes.
 
 **Signature**
 
@@ -8331,16 +9215,30 @@ declare const webSocketLink: (
   options: CreateWebSocketClientOptions,
   Socket: typeof WebSocket,
   connect?: () => Promise<WebSocket>,
-) => WebSocketRPCLink<Record<PropertyKey, unknown>>;
+) => TransportLink;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-native.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-native.ts#L120)
 
 ## `transport-socket.ts`
 
+Establishes a socket within a deadline and hands the connected socket to the caller.
+
+**Example**
+
+```ts
+const socket = await connectSocket(WebSocket, new URL("wss://example.test/_relkit/v1/rpc"), 10_000);
+```
+
 ### connectSocket
 
-Establishes a socket through an interruptible Clock deadline and native callback.
+Establishes a socket within a deadline and hands the connected socket to the caller.
+
+**Example**
+
+```ts
+const socket = await connectSocket(WebSocket, new URL("wss://example.test/_relkit/v1/rpc"), 10_000);
+```
 
 **Signature**
 
@@ -8349,65 +9247,28 @@ declare const connectSocket: (
   Socket: typeof WebSocket,
   endpoint: URL,
   timeoutMs: number,
+  signal?: AbortSignal,
 ) => Promise<WebSocket>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-socket.ts#L12)
-
-### connectSocketEffect
-
-Owns establishment callbacks until socket ownership transfers to oRPC.
-
-**Signature**
-
-```ts
-declare const connectSocketEffect: (
-  Socket: {
-    new (url: string | URL, options?: Bun.WebSocketOptions): WebSocket;
-    new (url: string | URL, protocols?: string | string[]): WebSocket;
-    prototype: WebSocket;
-    readonly CONNECTING: 0;
-    readonly OPEN: 1;
-    readonly CLOSING: 2;
-    readonly CLOSED: 3;
-  },
-  endpoint: URL,
-  timeoutMs: number,
-) => Effect.Effect<WebSocket, unknown, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-socket.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport-socket.ts#L11)
 
 ## `transport.service.ts`
 
-### ClientTransport (class)
+### createClientTransport
 
-Configured transport selection and invocation authority, without server dependencies.
-
-**Signature**
-
-```ts
-declare class ClientTransport
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.service.ts#L10)
-
-### clientTransportLayer
-
-Acquires one link owner with a lazy, shared transport-selection decision.
+Creates one link owner with a lazy transport-selection decision shared by every call.
 
 **Example**
 
 ```ts
-import { Effect, ManagedRuntime } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
-import { ClientTransport, clientTransportLayer } from "./transport.service.js";
+import { createClientTransport } from "./transport.service.js";
 export async function transportOwner(): Promise<void> {
-  const owner = ManagedRuntime.make(clientTransportLayer(Effect.succeed({ call: async () => 1 })));
+  const transport = createClientTransport(async () => ({ call: async () => 1 }));
   try {
-    const transport = runExecutionSync(owner, ClientTransport);
+    await transport.invoke([], undefined, { context: {} });
   } finally {
-    await owner.dispose();
+    await transport.close();
   }
 }
 ```
@@ -8419,55 +9280,24 @@ export async function transportOwner(): Promise<void> {
 **Signature**
 
 ```ts
-declare const clientTransportLayer: (
-  select: Effect.Effect<TransportLink, unknown, Scope.Scope>,
-) => Layer.Layer<ClientTransport>;
+declare const createClientTransport: (select: TransportSelection) => ClientTransportService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.service.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.service.ts#L29)
 
 ### selectAutoTransport
 
-Selects WebSocket once, falling back only when initial establishment fails.
+Selects WebSocket once, falling back to HTTP only when initial establishment fails.
 
 **Signature**
 
 ```ts
-declare const selectAutoTransport: (
-  options: CreateAutoClientOptions,
-) => Effect.Effect<
-  RPCLink<Record<PropertyKey, unknown>> | RPCLink<Record<PropertyKey, unknown>>,
-  never,
-  Scope.Scope
->;
+declare const selectAutoTransport: (options: CreateAutoClientOptions) => TransportSelection;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.service.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.service.ts#L50)
 
 ## `transport.ts`
-
-### createClient
-
-Creates the generated contract's synchronous HTTP proxy with a configured service owner.
-
-**Example**
-
-```ts
-import { createClient } from "@relkit/client";
-export const makeClient = () => createClient({ baseUrl: "http://127.0.0.1:3000" });
-```
-
-**Signature**
-
-```ts
-declare const createClient: <Contract extends RouterContract = RouterContract>(
-  options: CreateClientOptions,
-) => RouterContractClient<Contract>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.ts#L28)
-
-Since v0.1.0
 
 ### createAutoClient
 
@@ -8476,12 +9306,12 @@ Creates a lazy proxy whose first transport choice is shared by concurrent calls.
 **Signature**
 
 ```ts
-declare const createAutoClient: <Contract extends RouterContract = RouterContract>(
+declare const createAutoClient: <Contract extends AnyContractRouter = AnyContractRouter>(
   options: CreateAutoClientOptions,
-) => RouterContractClient<Contract>;
+) => ContractRouterClient<Contract>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.ts#L55)
 
 ### createWebSocketClient
 
@@ -8490,9 +9320,9 @@ Creates a synchronous lazy WebSocket proxy, retaining constructor availability e
 **Signature**
 
 ```ts
-declare const createWebSocketClient: <Contract extends RouterContract = RouterContract>(
+declare const createWebSocketClient: <Contract extends AnyContractRouter = AnyContractRouter>(
   options: CreateWebSocketClientOptions,
-) => RouterContractClient<Contract>;
+) => ContractRouterClient<Contract>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.ts#L40)
@@ -8511,16 +9341,19 @@ export interface ClientTransportService {
    * @param path - Exact generated procedure path segments.
    * @param input - Original request payload passed to the native link.
    * @param options - Existing oRPC context, cancellation and request options.
-   * @returns A lazy observed invocation preserving the native result and error identity. */
+   * @returns The native result, or the native rejection with its identity preserved. */
   readonly invoke: (
-    path: string[],
+    path: readonly string[],
     input: unknown,
     options: ClientOptions<TransportContext>,
-  ) => Effect.Effect<unknown, unknown>;
+  ) => Promise<unknown>;
+  /** Aborts the selection and every in-flight invocation, then waits for them to settle.
+   * @returns The same settlement Promise on repeated calls. */
+  readonly close: () => Promise<void>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.types.ts#L7)
 
 ### TransportContext (type alias)
 
@@ -8532,7 +9365,7 @@ Existing oRPC context retained without translating native error objects.
 type TransportContext = Record<PropertyKey, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.types.ts#L4)
 
 ### TransportLink (type alias)
 
@@ -8544,4 +9377,146 @@ Native link dependency supplied at transport acquisition.
 type TransportLink = ClientLink<TransportContext>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.types.ts#L24)
+
+### TransportSelection (type alias)
+
+Lazily chooses the native link once for a transport owner.
+
+**Signature**
+
+```ts
+type TransportSelection = (signal: AbortSignal) => Promise<TransportLink>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.types.ts#L31)
+
+## `wire.ts`
+
+Header that negotiates agent stream capabilities.
+
+### AGENT_CAPABILITY_HEADER
+
+Header that negotiates agent stream capabilities.
+
+**Signature**
+
+```ts
+declare const AGENT_CAPABILITY_HEADER: "x-relkit-agent-capabilities";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/wire.ts#L8)
+
+### AGENT_CAPABILITY_QUERY
+
+Query parameter that carries agent stream capabilities where headers cannot.
+
+**Signature**
+
+```ts
+declare const AGENT_CAPABILITY_QUERY: "relkitCapabilities";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/wire.ts#L11)
+
+### AGENT_CAPABILITY_VALUE
+
+The agent stream capabilities this client supports, comma separated.
+
+**Signature**
+
+```ts
+declare const AGENT_CAPABILITY_VALUE: string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/wire.ts#L14)
+
+### API_ROOT_KEY
+
+Router key under which the API tree lives; matches `CLIENT_API_ROOT` in `relkit/contracts`.
+
+**Signature**
+
+```ts
+declare const API_ROOT_KEY: "api";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/wire.ts#L107)
+
+### CLIENT_CONTRACT_EVENTS_PATH
+
+Development stream that announces backend contract changes; see `relkit/contracts`.
+
+**Signature**
+
+```ts
+declare const CLIENT_CONTRACT_EVENTS_PATH: "/_relkit/v1/client/contract-events";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/wire.ts#L104)
+
+### CLIENT_ROUTES_PATH
+
+Backend path of the client routes document; matches `relkit/contracts`.
+
+**Signature**
+
+```ts
+declare const CLIENT_ROUTES_PATH: "/_relkit/v1/client/routes";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/wire.ts#L110)
+
+### FRAMEWORK_RPC_PATH
+
+Backend path of the framework RPC endpoint for channels, agents and jobs; matches `relkit/contracts`.
+
+**Signature**
+
+```ts
+declare const FRAMEWORK_RPC_PATH: "/_relkit/v1/rpc";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/wire.ts#L113)
+
+### canonicalJson
+
+Serializes JSON data with object keys sorted, so equal values produce equal text. Like
+`canonicalJson` in `relkit/contracts`, it accepts only JSON data: finite numbers, strings,
+booleans, null, ordinary arrays and plain objects.
+
+**Throws**
+
+TypeError naming the path of the first value that is not JSON data.
+
+**Example**
+
+```ts
+canonicalJson({ b: 1, a: 2 }); // '{"a":2,"b":1}'
+```
+
+**Signature**
+
+```ts
+declare const canonicalJson: (value: unknown) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/wire.ts#L31)
+
+### createOperationId
+
+Creates a UUIDv7 operation ID from the current time and cryptographic randomness.
+
+**Example**
+
+```ts
+createOperationId();
+```
+
+**Signature**
+
+```ts
+declare const createOperationId: (now?: number) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/wire.ts#L90)

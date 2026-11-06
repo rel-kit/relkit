@@ -1,0 +1,130 @@
+---
+title: Why RelKit
+description: What RelKit gives you, how it compares with Encore.ts, Motia, NestJS and Hono with tRPC or oRPC, and when another tool is the better choice.
+pagination: false
+sidebar:
+  icon: scale
+---
+
+The TypeScript backend framework where you write the business logic. RelKit wires the APIs, jobs, events, agents and typed client, and gives you, and your coding agent, a live map of the app.
+
+## What you get
+
+You write functions. Each function declares its input and output schemas and the errors it can return. Routes, jobs, event listeners, tools and agents all call functions, so validation, retries, cancellation and logging work the same way everywhere.
+
+RelKit reads your source and builds one **application graph**: every service, function, route, job, event and agent, with a stable ID and the links between them. From that graph it gives you:
+
+- **Checks before you run.** `bun run check` validates the whole graph, such as duplicate or ambiguous routes and invalid declarations, and reports each problem with a `RELKIT_*` code.
+- **An HTTP server and its contract.** The same schemas validate requests, produce the OpenAPI document and type the generated client.
+- **Background work without glue code.** Jobs, schedules and events use local providers in development and Inngest, Trigger.dev or Effect MQ when you need them.
+- **A live map of the app.** The optional [Inspector](/docs/modules/operations/inspector) shows the graph, traces and logs, and lets you call a function by hand.
+- **Help for coding agents.** New projects include an agent skill in `.agents/skills/relkit`, and the docs publish [`llms.txt`](https://relkit.dev/llms.txt), so an agent can find the right file and API without guessing.
+
+Handlers are plain `async` functions. RelKit uses [Effect](https://effect.website) internally, but you don't need to know it.
+
+## Where RelKit stands today
+
+<Callout type="warning" title="RelKit is young" icon="triangle-alert">
+  RelKit is pre-1.0 and has few outside users so far. Applications run on **Bun 1.3.10 or later**;
+  Node.js support is planned. One release with breaking changes is planned before 1.0, and it will
+  ship with a migration command and a migration guide. Production deployment is documented for [a
+  built Bun server, local Docker and AWS with Pulumi](/docs/modules/deployment).
+</Callout>
+
+If you need a framework with years of production use, a large community or Node.js today, one of the alternatives below is a safer choice for now.
+
+## How RelKit compares
+
+These are honest positioning notes, not benchmarks. Each alternative is a good tool; the question is which trade-offs fit your project.
+
+|                            | RelKit                             | Encore.ts                                         | Motia    | NestJS                                    | Hono with tRPC or oRPC          |
+| -------------------------- | ---------------------------------- | ------------------------------------------------- | -------- | ----------------------------------------- | ------------------------------- |
+| Main building block        | Typed functions with schemas       | API endpoints and infrastructure declared in code | Steps    | Controllers and providers with decorators | Route handlers and procedures   |
+| Background jobs and events | Built in, with swappable providers | Built in                                          | Built in | Add-on packages                           | Bring your own                  |
+| OpenAPI and typed client   | Generated from the same schemas    | Generated                                         | Varies   | OpenAPI with decorators                   | Typed client; OpenAPI with oRPC |
+| Maturity                   | Pre-1.0                            | Established                                       | Young    | Very established                          | Established                     |
+
+### Encore.ts
+
+Encore.ts is the closest alternative: it also reads your code to understand the whole application, and it has a local development dashboard with tracing.
+
+**Where Encore.ts is stronger**
+
+- It is more mature, with more production users and a larger community.
+- It runs on Node.js, with a Rust-based runtime that handles HTTP for speed.
+- It declares infrastructure such as databases, Pub/Sub and cron jobs in code and can provision it in your cloud account through Encore Cloud.
+
+**Where RelKit is stronger**
+
+- Every entry point, including jobs, event listeners, tools and agents, calls the same kind of typed function with declared errors, so one check covers all of them.
+- Schemas are runtime validators that you write once; they drive validation, OpenAPI and the client.
+- Agents and tools are part of the application model, not a separate system.
+- There is no hosted platform: you pick the providers, and everything runs from packages in your repository.
+
+### Motia
+
+Motia organizes a backend around steps that handle API calls, events and scheduled work.
+
+**Where Motia is stronger**
+
+- One step concept covers APIs, events and scheduled work, and steps can be written in more than one language, including Python.
+- Its Workbench shows flows visually while you build them.
+
+**Where RelKit is stronger**
+
+- Functions declare input, output and errors, which become OpenAPI, a typed client and checked failures.
+- Services give the application boundaries that the graph checks and the Inspector shows.
+- The test harness runs the real application in memory with fake providers.
+
+### NestJS
+
+NestJS is the most established structured framework for Node.js backends.
+
+**Where NestJS is stronger**
+
+- It has years of production use, a very large ecosystem and many developers who already know it.
+- Modules, dependency injection and decorators suit large teams that like that architecture.
+- It runs on Node.js with Express or Fastify, and has mature packages for GraphQL, microservices and queues.
+
+**Where RelKit is stronger**
+
+- There is less ceremony: plain functions and files instead of classes, decorators and modules.
+- OpenAPI and the typed client come from the schemas you already wrote, without extra decorators.
+- Jobs, events, agents, tests and the Inspector come from one model instead of separate libraries.
+
+### Hono with tRPC or oRPC
+
+Hono is a small web framework built on Web Standards. tRPC and oRPC add typed procedures and clients. RelKit itself uses Hono for HTTP and oRPC for its client.
+
+**Where Hono with tRPC or oRPC is stronger**
+
+- They are small, fast and run on many runtimes, including Cloudflare Workers, Deno, Bun and Node.js.
+- You choose every piece, so nothing is included that you don't use.
+- tRPC gives end-to-end types with almost no setup, and oRPC adds OpenAPI.
+
+**Where RelKit is stronger**
+
+- You don't assemble jobs, schedules, events, retries, agents, testing and inspection yourself.
+- One checked graph keeps routes, functions and their consumers in step as the app grows.
+- Errors use one declared format across every entry point.
+
+## Next steps
+
+<CardGroup cols={3}>
+  <Card title="Create and run an API" href="/docs/learn/create-an-app" icon="rocket" arrow>
+    Create a project and send your first request.
+  </Card>
+  <Card title="FAQ" href="/docs/faq" icon="circle-help" arrow>
+    Runtimes, Effect, schemas, databases and support.
+  </Card>
+  <Card
+    title="Migrate from Express or Hono"
+    href="/guides/migrate/from-express-or-hono"
+    icon="arrow-right-left"
+    arrow
+  >
+    Move an existing API one endpoint at a time.
+  </Card>
+</CardGroup>
+
+<include>/_snippets/generated/related/docs-why-relkit.mdx</include>

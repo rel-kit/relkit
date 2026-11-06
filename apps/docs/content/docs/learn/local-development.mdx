@@ -29,11 +29,9 @@ With both processes running, open the tool's UI. Choose **Routes**, then `POST /
 public function it targets. Open **Functions** and find the Orders pricing and creation
 operations. The inspector shows the checked application, not a second configuration to edit.
 
-On an unchanged installed project, development reuses a prepared snapshot only after checking its
-complete source, generated graph, dependency, and tool identities. A missing, stale, corrupt, or
-ineligible snapshot returns to the normal full validation path; it never weakens candidate health or
-last-known-good switching. Run `bunx --no-install relkit dev --prepare` when you want to perform that
-finite validation ahead of the interactive session.
+`bunx --no-install relkit dev --prepare` checks the project the way `bun run dev` would and exits
+without starting a server. You never need it before `bun run dev`; it is useful in CI or after
+installing dependencies separately.
 
 Backend readiness is independent of the Inspector. Explicit `inspector.enabled` starts only the private
 authenticated bridge on `127.0.0.1:0`; it installs or launches no UI or history store. The standalone
@@ -66,6 +64,32 @@ reactivate, run `bun run check` and fix its first diagnostic. The last valid gen
 serve requests while a changed candidate is invalid, but an initial startup failure has no
 previous generation to keep serving.
 
+### How reloads work [#how-reloads-work]
+
+`bun run dev` keeps one warm evaluator for the whole session. When you save, it evaluates again
+only the files you changed and the files that import them, rebuilds the graph, and compares it with
+the graph that is serving:
+
+- **Only handler code changed.** If configuration, provider bindings, environment contracts and the
+  shape of your routes are the same, the running server swaps its handler table in place. The next
+  request uses the new code in the same process: open connections, in-memory state and the
+  server's port survive. The terminal prints `Reloaded in …ms (same process)`.
+- **Something the server was started with changed.** Editing `relkit.config.ts`, anything under
+  `src/platform`, `package.json`, a lockfile, `tsconfig.json` or a `.env` file, adding or removing
+  a route, or changing a middleware, transform, agent, tool, job, task or channel restarts the
+  server: a new generation starts beside the old one, passes the same readiness checks, and only
+  then takes over the port. The terminal prints `Reloaded in …ms`.
+- **The save does not evaluate or the graph is invalid.** The previous handlers keep serving, and
+  the terminal prints `Reload failed; previous version is still serving` with the file and line.
+
+Type-checking runs beside the dev server in a `tsc --watch` process (`tsgo` when your project
+installs it). A type error never blocks a reload: the reload completes, and the error appears in the
+terminal and in the Inspector's logs as `dev.typecheck.failed` with its location. Set
+`RELKIT_DEV_TYPECHECK=0` to turn the watcher off. Development runs the generated server's
+TypeScript directly; it never runs the production bundler, so a save writes no bundle.
+
+[Benchmarks](/docs/benchmarks) lists the measured reload times for 10, 100 and 500 functions.
+
 </Step>
 <Step icon="file-code">
 
@@ -80,6 +104,8 @@ under `.relkit/generated` are useful for diagnosis; repair source, then rerun `c
 
 `bun run check`, `bun run typecheck`, and `bun run test` cover different concerns: graph
 relationships, TypeScript types, and behavior.
+`typecheck` runs your project's TypeScript compiler, 5.9 or 7; [TypeScript versions](/docs/modules/cli#typescript-versions)
+explains how to choose one.
 
 </Step>
 </Steps>

@@ -95,7 +95,7 @@ Compare client browser bundle size, shared-watch resource counts/cleanup, Inspec
 
 ### 8. Regression-demo replay against candidate builds
 
-The source is `/Users/mustafaelsayed/Workspace/relkit-regression-demo`; context is chat `01a0fee1-8e3b-7761-acfb-393c901f5648`. `AI_REPAIR_VALIDATION.md` and `AI_INDEPENDENT_VALIDATION.md` supersede historical AI-01–AI-04 failures in `AI_VALIDATION.md`. Existing evidence records 9/9 generated-host checks and all three commerce Playwright cases passing. `VALIDATION.md` has additional inspector/telemetry findings that must be compared separately.
+The source is `<home>/Workspace/relkit-regression-demo`; context is chat `01a0fee1-8e3b-7761-acfb-393c901f5648`. `AI_REPAIR_VALIDATION.md` and `AI_INDEPENDENT_VALIDATION.md` supersede historical AI-01–AI-04 failures in `AI_VALIDATION.md`. Existing evidence records 9/9 generated-host checks and all three commerce Playwright cases passing. `VALIDATION.md` has additional inspector/telemetry findings that must be compared separately.
 
 Use disposable copies of the demo and its retained `evidence/ai-validation-2026-10-03/agent-starter` fixture. Preserve authored declarations, manifests, tests and scripts; omit dependencies, Git metadata, historical result files and generated/runtime state. Record original status/revision and source hashes. Run the same assertions; this isolation preserves the user's demo and its historical evidence.
 

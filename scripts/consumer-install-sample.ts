@@ -4,7 +4,7 @@
  * their original command diagnostics and never become empty passing samples.
  */
 import { Clock, Effect, Exit, Cause } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { consumerInstallCommand } from "./consumer-install-command.js";
 import { inspectInstallation } from "./consumer-installation.js";
 import { accountDependencies } from "./consumer-dependency-policy.js";

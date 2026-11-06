@@ -4,8 +4,8 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect, Exit } from "effect";
-import { startLocalWorkerEffect } from "@relkit/observability-local/worker";
-import { connectionAttempt } from "@relkit/inspector-api/connection";
+import { startLocalWorkerEffect } from "../src/observability-local/local/worker.js";
+import { connectionAttempt } from "relkit/inspector-api/connection";
 
 test("shutdown discloses incomplete flush and reaps a frozen owned worker within five seconds", async () => {
   await Effect.runPromise(

@@ -1,5 +1,5 @@
-import type { JsonValue } from "@relkit/contracts";
-import type { NativeScheduleOperations, OperationContext } from "@relkit/jobs/adapter";
+import type { JsonValue } from "relkit/contracts";
+import type { NativeScheduleOperations, OperationContext } from "relkit/jobs/adapter";
 import { Effect } from "effect";
 import { JobStore } from "effect-mq";
 import { createEffectMqScheduleOperations } from "./schedules.js";

@@ -1,4 +1,4 @@
-import type { Diagnostic } from "@relkit/diagnostics";
+import type { Diagnostic } from "relkit/diagnostics";
 import type { BuildResult } from "./build.js";
 
 /**

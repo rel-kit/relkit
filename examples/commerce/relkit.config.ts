@@ -2,7 +2,7 @@
  * Application service data and migration history remain owned by their declared services.
  */
 import "@relkit/pulumi";
-import { defineApp, env as binding } from "@relkit/app/config";
+import { defineApp, env as binding } from "relkit/config";
 import { aws } from "@relkit/aws";
 import { docker } from "@relkit/docker";
 import { inngest } from "@relkit/inngest";

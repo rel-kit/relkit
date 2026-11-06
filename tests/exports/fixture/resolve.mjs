@@ -7,12 +7,15 @@ if (bunOnly && !process.versions.bun) throw new Error("Bun-only public checks re
 
 for (const [packageName, exports] of Object.entries(expected)) {
   for (const [subpath, target] of Object.entries(exports)) {
-    // The Bun creator owner and unchanged named Bun adapter expose paths for tooling, not Node execution.
+    // The Bun creator and CLI and the named Bun adapter expose paths for tooling, not Node execution.
     const nativeBunLeaf =
       packageName === "create-relkit" ||
-      (packageName === "@relkit/runtime-hono" && subpath === "./bun");
+      packageName === "@relkit/cli" ||
+      (packageName === "relkit" && subpath === "./runtime/bun");
     if (bunOnly && !nativeBunLeaf && (typeof target === "string" || target.bun === undefined))
       continue;
+    // A require-only entry, such as the CLI's editor plugin, is not an ESM import target.
+    if (typeof target !== "string" && !target.import && !target.default && !target.bun) continue;
     const specifier = subpath === "." ? packageName : `${packageName}${subpath.slice(1)}`;
     let importTarget = target;
     if (typeof target !== "string") {
@@ -36,6 +39,19 @@ for (const [packageName, exports] of Object.entries(expected)) {
     const specifier = `${packageName}/${internalPath}`;
     await rejectImport(specifier);
   }
+}
+
+if (!bunOnly && expected.relkit?.["."]) {
+  // Applications import core APIs from the root and from focused subpaths that share one identity.
+  const core = await import("relkit");
+  const events = await import("relkit/events");
+  if (typeof core.defineFunction !== "function" || typeof core.defineService !== "function")
+    throw new Error("relkit must export defineFunction and defineService from its root");
+  if (events.defineEvent !== core.defineEvent)
+    throw new Error("relkit/events must export the same defineEvent as the root");
+  const { s } = await import("relkit/schema");
+  if (s?.object?.({ id: s.string() }).parse({ id: "order-1" }).id !== "order-1")
+    throw new Error("relkit/schema must export the built-in builder s");
 }
 
 if (bunOnly) console.log("Export smoke passed: Bun-only public entries resolved.");

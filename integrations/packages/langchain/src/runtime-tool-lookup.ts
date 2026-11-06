@@ -1,11 +1,11 @@
-/** Resolves authored RELKIT tool references against the invocation tool registry before native tool construction. */
+/** Resolves authored RelKit tool references against the invocation tool registry before native tool construction. */
 
-import type { ToolDescriptor, ToolSource } from "@relkit/tools";
+import type { ToolDescriptor, ToolSource } from "relkit/tools";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 
 /** Produces a bounded model-facing name for one tool ID.
- * @param id - RELKIT tool ID.
+ * @param id - RelKit tool ID.
  * @param index - Tool position.
  * @returns An Effect with a stable native name.
  * @example Effect.runSync(modelToolNameEffect("math.add", 0));
@@ -20,7 +20,7 @@ export const modelToolNameEffect = Effect.fn("Agents.runtime.modelToolName")(
 );
 
 /** Produces a native tool name for existing synchronous callers.
- * @param id - RELKIT tool ID.
+ * @param id - RelKit tool ID.
  * @param index - Tool position.
  * @returns Stable native tool name.
  * @example modelToolName("math.add", 0);
@@ -64,7 +64,7 @@ export function findModelTool(
 
 /** Finds a registered tool by map key or descriptor ID.
  * @param source - Registered tool source.
- * @param id - RELKIT tool ID.
+ * @param id - RelKit tool ID.
  * @returns An Effect with a descriptor or undefined.
  * @example Effect.runSync(findToolEffect(tools, "math.add"));
  */
@@ -75,7 +75,7 @@ export const findToolEffect = Effect.fn("Agents.runtime.findTool")(
 
 /** Finds a tool for existing synchronous callers.
  * @param source - Registered tool source.
- * @param id - RELKIT tool ID.
+ * @param id - RelKit tool ID.
  * @returns A tool descriptor or undefined.
  * @example findTool(tools, "math.add");
  */

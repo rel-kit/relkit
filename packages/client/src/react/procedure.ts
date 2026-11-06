@@ -12,7 +12,7 @@ export function procedureUtils(
   selector: string | readonly string[],
 ): ProcedureUtilsLike {
   const value = resolveProcedure(root, selector);
-  if (!isRecord(value)) throw new TypeError(`Unknown Relkit client selector "${selector}"`);
+  if (!isRecord(value)) throw new TypeError(`Unknown RelKit client selector "${selector}"`);
   return value as unknown as ProcedureUtilsLike;
 }
 
@@ -28,7 +28,7 @@ export function procedureCall(
 ): (...args: unknown[]) => unknown {
   const value = resolveProcedure(root, selector);
   if (typeof value !== "function")
-    throw new TypeError(`Unknown Relkit client selector "${selector}"`);
+    throw new TypeError(`Unknown RelKit client selector "${selector}"`);
   return value as (...args: unknown[]) => unknown;
 }
 

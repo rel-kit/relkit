@@ -43,18 +43,18 @@ export const installationRecipes = {
       local,
     ],
   },
-  tools: { title: "Function tools", selections: [{ name: "@relkit/tools" }] },
+  tools: { title: "Function tools", selections: [{ name: "relkit" }] },
   mcp: {
     title: "Tool-only MCP",
-    selections: [{ name: "@relkit/runtime-hono", capabilities: ["mcp"], includeOwner: false }],
+    selections: [{ name: "relkit", capabilities: ["mcp"], includeOwner: false }],
   },
   "ag-ui": {
     title: "AG-UI transport",
-    selections: [{ name: "@relkit/runtime-hono", capabilities: ["ag-ui"], includeOwner: false }],
+    selections: [{ name: "relkit", capabilities: ["ag-ui"], includeOwner: false }],
   },
   scalar: {
     title: "Scalar UI",
-    selections: [{ name: "@relkit/runtime-hono", capabilities: ["scalar"], includeOwner: false }],
+    selections: [{ name: "relkit", capabilities: ["scalar"], includeOwner: false }],
   },
   client: { title: "Framework-independent client", selections: [client] },
   "client-query": {

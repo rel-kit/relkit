@@ -11,7 +11,6 @@ function childDirectories(path: string): string[] {
 export function workspacePackageDirectories(root: string): string[] {
   return [
     ...childDirectories(join(root, "packages")),
-    join(root, "integrations", "catalog"),
     ...childDirectories(join(root, "integrations", "packages")),
   ]
     .filter((path) => existsSync(join(path, "package.json")))

@@ -5,7 +5,7 @@ import type {
   DrizzleActivation,
   DrizzleServiceDescriptor,
   DrizzleFailure,
-} from "@relkit/drizzle/internal";
+} from "@relkit/drizzle/server";
 import type { Auth, BetterAuthOptions } from "better-auth";
 import type { DrizzleAdapterConfig } from "better-auth/adapters/drizzle";
 import type { Effect, ManagedRuntime } from "effect";
@@ -19,7 +19,7 @@ export type {
   InferBetterAuthSession,
 } from "./declaration.types.js";
 
-/** Native options; RELKIT supplies database and the route-derived base path. */
+/** Native options; RelKit supplies database and the route-derived base path. */
 export type BetterAuthServiceOptions = DeclarationOptions & {
   readonly drizzle?: Omit<DrizzleAdapterConfig, "provider">;
 };
@@ -29,8 +29,10 @@ export type AuthDatabase = DrizzleActivation<DrizzleServiceDescriptor<any, any, 
 
 /** Runtime dependencies captured once when constructing a native auth service. */
 export interface AuthConfiguration {
-  readonly options: BetterAuthServiceOptions;
-  readonly database: AuthDatabase;
+  /** Native options; an instance's options may carry their own `database` and `basePath`. */
+  readonly options: BetterAuthServiceOptions | BetterAuthOptions;
+  /** The Drizzle service; unused when the options bring their own `database`. */
+  readonly database: AuthDatabase | undefined;
   readonly basePath: string;
 }
 

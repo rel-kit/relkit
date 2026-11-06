@@ -1,16 +1,16 @@
 /** Resolves native agent model, tool and instruction choices from the existing project before native scaffold sources are planned. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import { GeneratorPrompt } from "create-relkit/internal/generator-prompt";
+import { observeExecution } from "relkit/contracts/operation";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { GeneratorPrompt } from "create-relkit/generator-prompt";
 
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
   type GeneratorPromptError,
-} from "create-relkit/internal/generator-errors";
+} from "create-relkit/generator-errors";
 
 import {
   artifactOptions,

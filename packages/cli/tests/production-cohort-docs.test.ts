@@ -4,13 +4,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vitest";
 import { Effect, Layer } from "effect";
-import { DEFAULT_TOOLING_CONFIG } from "@relkit/compiler";
-import { GRAPH_VERSION } from "@relkit/contracts";
-import { hashGraph } from "@relkit/graph";
-import {
-  DependencySource,
-  SelectedDependenciesLayer,
-} from "@relkit/provider/internal/dependencies";
+import { DEFAULT_TOOLING_CONFIG } from "../src/compiler/index.js";
+import { GRAPH_VERSION } from "relkit/contracts";
+import { hashGraph } from "relkit/graph";
+import { DependencySource, SelectedDependenciesLayer } from "relkit/provider/dependencies";
 import { fileSystemLayer } from "../src/services/filesystem.service.js";
 import { loadBuildStageCohort } from "../src/commands/build-stage-cohort.js";
 
@@ -88,9 +85,7 @@ test.each([
         }).pipe(Effect.provide(authorities)),
       );
       expect(cohort.productionDependencies).toEqual(
-        selected
-          ? { "@relkit/runtime-hono": "0.7.10", "@scalar/hono-api-reference": "0.12.9" }
-          : {},
+        selected ? { relkit: "0.7.10", "@scalar/hono-api-reference": "0.12.9" } : {},
       );
     } finally {
       await rm(root, { recursive: true, force: true });

@@ -1,12 +1,12 @@
 import { Context, Effect, Layer, Ref, Schema } from "effect";
 import { BucketStorageSnapshot } from "./bucket-storage.schemas.js";
 import { InvalidTestSnapshot } from "./storage-failure.js";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import {
   BucketOperationCancelledError,
   BucketOperationTimeoutError,
   type BucketOperationContext,
-} from "@relkit/buckets";
+} from "relkit/buckets";
 import { createHash } from "node:crypto";
 import { createFakeRoot, noFailures, text } from "./fake-utils.js";
 import type { TestBucketFakeOptions, TestBucketObject } from "./buckets-types.js";

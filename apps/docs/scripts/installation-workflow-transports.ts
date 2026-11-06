@@ -47,7 +47,7 @@ const exposeStarterApiDocsInProduction = (app: string) =>
  * @param context - Candidate command owner and registry.
  * @param app - Created starter declaring `@scalar/hono-api-reference`.
  * @returns Completion after a clean install without the SDK. `bun remove` alone can keep it
- * installed as `@relkit/runtime-hono`'s satisfied optional peer, so the lockfile and
+ * installed as `relkit/runtime-hono`'s satisfied optional peer, so the lockfile and
  * node_modules are discarded instead.
  */
 const uninstallStarterScalar = Effect.fn("DocsInstallation.uninstall-scalar")(function* (

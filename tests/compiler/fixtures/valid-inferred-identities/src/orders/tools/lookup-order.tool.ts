@@ -1,4 +1,4 @@
-import { defineTool } from "@relkit/app";
+import { defineTool } from "relkit";
 import getOrder from "../functions/get-order.function.js";
 
 export default defineTool({

@@ -3,8 +3,9 @@ import {
   type RedactedObservabilityRecord,
   type TelemetryExporterFactoryContext,
   type TelemetryExporterRuntime,
-} from "@relkit/observability";
+} from "relkit/observability";
 
+/** @experimental */
 export interface SentryExporterOptions {
   readonly dsn: string;
   readonly environment?: string;
@@ -12,10 +13,12 @@ export interface SentryExporterOptions {
   readonly sdk?: SentrySdk;
 }
 
+/** @experimental */
 export interface SentryScope {
   readonly setTag: (name: string, value: string) => void;
 }
 
+/** @experimental */
 export interface SentrySdk {
   readonly init: (options: Readonly<Record<string, unknown>>) => void;
   readonly withScope: (callback: (scope: SentryScope) => void) => void;
@@ -25,17 +28,19 @@ export interface SentrySdk {
   readonly close: (timeout?: number) => Promise<boolean>;
 }
 
+/** @experimental */
 export interface SentryExporter {
   readonly exportRecord: (record: RedactedObservabilityRecord) => void;
   readonly flush: (timeoutMs?: number) => Promise<boolean>;
   readonly close: (timeoutMs?: number) => Promise<boolean>;
 }
 
+/** @experimental */
 export async function createSentryExporter(
   options: SentryExporterOptions,
 ): Promise<SentryExporter> {
   const dsn = required(options.dsn, "dsn");
-  const sdk = options.sdk ?? ((await import("@sentry/bun")) as SentrySdk);
+  const sdk = options.sdk ?? (await runtimeSdk());
   sdk.init({
     dsn,
     sendDefaultPii: false,
@@ -73,6 +78,7 @@ export async function createSentryExporter(
   });
 }
 
+/** @experimental */
 export async function createTelemetryExporter(
   context: TelemetryExporterFactoryContext,
 ): Promise<TelemetryExporterRuntime> {
@@ -91,6 +97,15 @@ export async function createTelemetryExporter(
     flush: async (timeoutMs?: number) => void (await exporter.flush(timeoutMs)),
     close: async (timeoutMs?: number) => void (await exporter.close(timeoutMs)),
   });
+}
+
+/**
+ * Loads the Sentry SDK for the runtime this process runs on.
+ * @returns `@sentry/bun` on Bun and `@sentry/node` on Node.
+ */
+async function runtimeSdk(): Promise<SentrySdk> {
+  if (typeof process.versions.bun === "string") return (await import("@sentry/bun")) as SentrySdk;
+  return (await import("@sentry/node")) as SentrySdk;
 }
 
 function recordTags(record: RedactedObservabilityRecord): Readonly<Record<string, string>> {

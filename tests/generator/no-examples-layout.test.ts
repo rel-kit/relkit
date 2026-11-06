@@ -4,7 +4,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { Effect } from "effect";
-import { ownedNativePromise } from "@relkit/cli/internal/tooling";
+import { ownedNativePromise } from "@relkit/cli/tooling";
 import { generateProject, normalizeCreateOptions } from "../../packages/create-relkit/src/index.js";
 
 test("grouped candidate example removal retains the useful hello boundary and platform inputs", () =>

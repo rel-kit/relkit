@@ -70,11 +70,11 @@ Security tests SHALL recursively scan terminal, JSON logs, local records, genera
 
 ### Requirement: Packed and production-path acceptance
 
-Release verification SHALL test packed packages and generator artifacts, the self-contained inspector, production builds/containers, real supervisor/browser flows, OpenAPI/Scalar protection, Pulumi preview, and an isolated AWS stack rather than relying solely on workspace links, mocks, or manual checks.
+Release verification SHALL test packed packages and generator artifacts, the separately installed standalone inspector, production builds/containers, real supervisor/browser flows, OpenAPI/Scalar protection, Pulumi preview, and an isolated AWS stack rather than relying solely on workspace links, mocks, or manual checks.
 
 #### Scenario: Workspace tests pass but package is broken
 
-- **WHEN** a packed package cannot generate, install, build, start development without a repository inspector path, serve the documented route/API reference, or shut down cleanly
+- **WHEN** a packed package cannot generate, install, build, start development without a repository inspector path, serve the documented route and explicitly selected API reference, or shut down cleanly
 - **THEN** release acceptance fails even if workspace unit tests passed
 
 ### Requirement: Performance is baselined before optimization
@@ -425,27 +425,34 @@ The benchmark SHALL start a monotonic clock immediately before spawning the gene
 
 ### Requirement: Every supported creation combination passes every measured start
 
-Release readiness SHALL enumerate every valid normalized runtime-affecting combination, including fullstack, jobs, cloud/deploy selections, and examples enabled/disabled. Each shipped combination SHALL pass 20 fresh-installed starts and 20 unchanged restarts, including restart preparation, with pinned Bun, exact complete responses, clean shutdown, and the existing 30-second terminal deadline. Reports SHALL retain every attempt, actual host, exact identities, median, nearest-rank 95th percentile, and maximum without discarding warmups, failures, outliers, or cleanup failures. Strict performance certification SHALL separately require every start below 1,000 ms on its recorded host; a performance failure SHALL remain explicit and SHALL NOT alone reject functional release readiness. Post-install preparation for `--no-install` SHALL receive equivalent functional evidence and separately reported performance evidence.
+Release readiness SHALL measure every valid runtime-affecting combination on every Tier 1 runtime with
+20 fresh-installed starts and 20 unchanged restarts, requiring exact complete responses, clean
+shutdown and the 30-second terminal deadline. Reports SHALL keep every attempt, the host, identities,
+median, p95 and maximum. One-second performance results SHALL be reported separately and SHALL NOT
+alone block readiness. Results SHALL set which combinations creation reports as tested.
 
 #### Scenario: One combination has a slow run
 
 - **WHEN** one required run is at or above 1,000 ms despite a passing median or p95
-- **THEN** strict performance certification fails and the slow attempt remains recorded; release readiness passes only if all functional requirements pass
+- **THEN** strict performance certification fails and the slow attempt remains recorded; release
+  readiness passes only if all functional requirements pass
 
 #### Scenario: Default combination fails
 
-- **WHEN** default minimal creation lacks current passing evidence
-- **THEN** the change is not ready to ship and another template cannot replace the default acceptance gate silently
+- **WHEN** default minimal creation lacks current passing evidence on any Tier 1 runtime
+- **THEN** the release is blocked and another template cannot replace the default acceptance gate
 
 #### Scenario: An offered combination is unmeasured
 
-- **WHEN** the resolver can produce a valid runtime-affecting tuple without current evidence
-- **THEN** release validation fails until it is measured or consistently removed from interactive and explicit creation
+- **WHEN** a valid combination has no current evidence
+- **THEN** creation offers it with an untested warning and release readiness lists it as unmeasured
 
 #### Scenario: Tool or template identity changes
 
-- **WHEN** relevant tool, runtime, package, template, configuration, or protocol identity changes after certification
-- **THEN** affected capability evidence is stale and must be recertified before advertising that tuple
+- **WHEN** relevant tool, runtime, package, template, configuration, or protocol identity changes
+  after measurement
+- **THEN** affected evidence is stale and creation reports the combination as untested until it is
+  measured again
 
 ### Requirement: Readiness probes use actual generated behavior
 
@@ -564,24 +571,36 @@ It SHALL include tooling paths, tests, Drizzle schema configuration, seed/migrat
 
 ### Requirement: Grouped distribution refreshes affected certification
 
-Acceptance SHALL run packed CLI/generator and migrated flat applications outside the monorepo, verify documented install/check/typecheck/test/build/start/dev flows, and refresh readiness evidence invalidated by package, template, or tool changes. All remaining normative obligations below SHALL also hold.
+Acceptance SHALL run packed CLI/generator and migrated flat applications outside the monorepo, verify
+documented install/check/typecheck/test/build/start/dev flows, and refresh readiness evidence
+invalidated by package, template, or tool changes. All remaining normative obligations below SHALL
+also hold.
 
 #### Scenario: All normative obligations are evaluated
 
 - **WHEN** implementation or final acceptance evaluates this requirement
 - **THEN** all of the following remaining obligations hold:
 
-Maintained minimal/API/agent/fullstack template sources SHALL receive candidate coverage, while public creation SHALL remain limited to currently certified tuples. Every offered tuple SHALL retain 20 fresh and 20 restart measurements from literal `bun dev` to the correct complete public response, including preparation, exact identities, clean shutdown, the 30-second functional deadline, and all attempts. Reports SHALL distinguish functional readiness from strict one-second performance certification on the recorded host; shared-host timing failure alone SHALL NOT block release admission. Unavailable required evidence SHALL be recorded as blocked or not run, never passed; no tuple SHALL be promoted using source inspection or snapshots alone.
+Maintained minimal, API, agent, fullstack and tasks templates SHALL receive candidate coverage, and
+public creation SHALL offer all of them. Every measured combination SHALL retain 20 fresh and 20
+restart measurements from literal `dev` to the correct complete public response, with exact
+identities, clean shutdown, the 30-second functional deadline, and all attempts. Reports SHALL
+distinguish functional readiness from strict one-second performance on the recorded host; shared-host
+timing failure alone SHALL NOT block release admission. Unavailable required evidence SHALL be
+recorded as blocked or not run, never passed; no combination SHALL be reported as tested using source
+inspection or snapshots alone.
 
 #### Scenario: Template digest changes
 
 - **WHEN** grouped template changes invalidate existing creation evidence
-- **THEN** affected certification is refreshed for the exact package/tool/template identity before shipment and the default minimal gate remains mandatory
+- **THEN** affected evidence is refreshed in CI for the exact package, tool and template identity
+  before release, and the default minimal gate remains mandatory
 
 #### Scenario: Fullstack candidate is valid but uncertified
 
-- **WHEN** candidate fullstack tests pass without current functional readiness certification
-- **THEN** backend layout correctness is recorded separately and public creation continues rejecting the uncertified tuple
+- **WHEN** candidate fullstack tests pass without current functional readiness evidence
+- **THEN** backend layout correctness is recorded separately, creation offers fullstack with an
+  untested warning, and `--strict` rejects it
 
 ### Requirement: Every changed authored file receives use-effect review
 
@@ -611,6 +630,10 @@ Applicable runtime acceptance SHALL verify real service composition, live/test s
 - **WHEN** a reviewed file is a pure leaf, public RELKIT descriptor, type/schema companion, React presentation module, or Markdown/skill guidance
 - **THEN** review records the applicable checks and preserved boundary without inventing unrelated runtime abstractions or exempting its actual source/type/documentation obligations
 
+#### Scenario: Lean-install or standalone-inspector stage is reviewed
+- **WHEN** either stage reaches its gate
+- **THEN** every changed authored file, including moved and supporting code, receives the existing use-effect review with version/source evidence and applicable behavior checks before stage acceptance
+
 ### Requirement: Skill update acceptance is part of layout completion
 
 Acceptance SHALL reconcile the repository skill/agent-guidance inventory with updated or justified unchanged files, validate affected frontmatter and links, check executable snippets, and exercise applicable grouped creation, flat addition, and migration/rollback instructions. All remaining normative obligations below SHALL also hold.
@@ -626,3 +649,102 @@ Stale unlabeled layout advice, unsupported advertised create options, unresolved
 
 - **WHEN** grouped compiler/runtime tests pass while an affected repository skill still directs all applications to flat roots or creates a mixed layout
 - **THEN** the change remains incomplete until guidance and its instruction-flow validation are corrected
+
+### Requirement: Consumer footprint evidence is reproducible and separate
+Baseline and final measurements SHALL use actual packed external consumers, separately reporting creator-before-install, minimal/API development, production-only server, generic server client, agent/integrations and optional inspector. Installation, evaluated JavaScript, declarations and production artifacts SHALL have independent evidence.
+
+#### Scenario: Measurement is recorded
+- **WHEN** baseline or candidate footprint is measured
+- **THEN** evidence includes package versions, physical instances, compressed bytes, logical/physical unpacked size where measurable, native artifacts, cold/warm observations, OS/architecture, package-manager versions and cache conditions, retaining failed/noisy attempts without double-counting shared dependencies
+
+### Requirement: Packed isolation covers supported resolution layouts
+Acceptance SHALL use controlled candidate artifacts outside the workspace across pinned Bun normal/isolated, npm and pnpm installations and supported bunx/npx creation. Hidden hoisting, workspace links/specifiers, checkout paths and unrelated registry or published-version fallback SHALL fail the gate.
+
+#### Scenario: Workspace passes but consumer fails
+- **WHEN** strict declarations or selected feature startup require an undeclared workspace dependency
+- **THEN** acceptance fails despite source tests passing
+
+### Requirement: Stage one closes before standalone implementation
+Stage 1 SHALL pass functional/isolation checks, record measurements, reconcile release metadata/changesets/docs/examples/skills and enumerate its only remaining CLI legacy-inspector paths before Stage 2 begins. Final forbidden assertions SHALL remain visible rather than weakened.
+
+#### Scenario: Mixed selected capabilities run
+- **WHEN** cache+realtime, jobs+auth and agents+tools packed fixtures execute
+- **THEN** selected semantics pass without duplicate registration or unrelated SDK requirements
+
+#### Scenario: Stage one retains a non-inspector violation
+- **WHEN** any final-policy violation is outside an exact allowed CLI legacy-inspector path
+- **THEN** the Stage 1 gate stays incomplete
+
+### Requirement: Review-focus failure classes have executable evidence
+Acceptance SHALL exercise stale selected dependencies versus unused peers; disabled/production inspection versus core endpoints; committed replay versus legitimate revisions; restart/multiple-session Docker discovery; and relocated production-only native artifacts. Planning prose or unit-only claims SHALL NOT substitute for their owning boundary tests.
+
+#### Scenario: Dependency disappears after preparation
+- **WHEN** a selected SDK is removed but an unused capability also has a missing peer
+- **THEN** stale selected startup fails before readiness and the unused capability is not falsely required
+
+#### Scenario: Inspection is absent or forcibly enabled in production
+- **WHEN** core readiness, client identity, jobs, realtime and RPC run with inspection disabled or production override attempts
+- **THEN** required core behavior passes and rich inspection remains absent in production
+
+#### Scenario: Replay and revision failures are injected
+- **WHEN** storage commits but loses its acknowledgement and the same span later receives another revision
+- **THEN** replay creates no duplicate committed envelope and the later update is retained
+
+#### Scenario: Docker discovery rotates with multiple sessions
+- **WHEN** the backend restarts and two compatible sessions are discoverable
+- **THEN** directory-mounted credentials refresh, stale sessions fail, explicit selection is required and no foreign descriptor is removed
+
+#### Scenario: Production closure moves outside the checkout
+- **WHEN** the artifact is relocated with only production dependencies
+- **THEN** JavaScript startup, selected native modules/workers, readiness and shutdown pass without CLI/compiler/tool fallback
+
+### Requirement: Final isolation is a hard dependency gate
+Stage 2 SHALL remove all temporary exceptions and reject unselected frontend, deployment, agent, auth/database, DuckDB, MCP, AG-UI and Scalar stacks in minimal/API consumers and runtime output. Numeric size/count budgets SHALL derive from measured results; noisy timing SHALL remain explained evidence without invented reduction promises.
+
+#### Scenario: Final footprint is compared
+- **WHEN** candidate and baseline use matching fixtures and measurement conditions
+- **THEN** creator/development/production/inspector costs are reported separately and forbidden families hard-fail even if total size decreased
+
+### Requirement: Final acceptance requires actual required environments
+Required browser, Docker, native, scaffold, focused consumer and lifecycle checks SHALL execute with recorded commands/results before final acceptance. Skipped or blocked required checks SHALL remain incomplete. Local checks, hosted CI, publication and registry-consumer proof SHALL be distinguished; cloud spend and publication require separate authorization.
+
+#### Scenario: Resource or prerequisite is unavailable
+- **WHEN** a required environment cannot run safely
+- **THEN** evidence records the exact limit, preserves prior failures and does not mark acceptance passed or start unapproved paid work
+
+### Requirement: Existing readiness and state guarantees survive isolation
+The active release-readiness functional/performance distinction, existing creation certification, durable semantics, state/history, Drizzle repair and explicitly selected frontend behavior SHALL remain intact. Dependency reduction SHALL NOT waive affected functional tests or rewrite historical evidence.
+
+#### Scenario: Functional readiness passes but performance misses
+- **WHEN** a measured start satisfies functional requirements but fails existing strict one-second performance certification
+- **THEN** reports preserve both outcomes independently without inventing new timing thresholds or hiding the failed sample
+
+### Requirement: Nightly creation canary
+
+A nightly CI job SHALL create every template with the published creator on the latest Bun and Node
+releases, run its dev and test commands, and open or update an issue when any of them fails. The canary
+SHALL also run on pull requests that change creation, templates or the canary itself, using the
+creator packed from the pull request, and SHALL NOT open issues from those runs.
+
+#### Scenario: New Bun release breaks creation
+
+- **WHEN** a new Bun release breaks creation of any template
+- **THEN** the next nightly run fails and opens or updates an issue that names the template and the
+  Bun version
+
+#### Scenario: A pull request changes creation
+
+- **WHEN** a pull request changes the creator, a template or the canary workflow
+- **THEN** the canary runs every template with the creator packed from that pull request, and a
+  failure blocks the pull request
+
+### Requirement: Plan verification matrices join release readiness
+
+Release readiness SHALL include the Tier 1 runtime matrix, the TypeScript 5.9 and 7 matrix, the
+development-loop benchmarks, the Railway newcomer deploy test once Railway ships, and the agent
+evaluations.
+
+#### Scenario: A matrix job fails
+
+- **WHEN** any of those jobs fails for a release candidate
+- **THEN** release readiness fails and names the job

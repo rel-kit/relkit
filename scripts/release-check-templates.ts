@@ -24,29 +24,31 @@ export async function templateInputs(
   rootManifest: RecordValue,
 ): Promise<RecordValue[]> {
   const result: RecordValue[] = [];
-  const scalar = (await readJson(join(root, "packages/runtime-hono/package.json")))
-    .peerDependencies?.["@scalar/hono-api-reference"];
+  const scalar = (await readJson(join(root, "packages/relkit/package.json"))).peerDependencies?.[
+    "@scalar/hono-api-reference"
+  ];
   const forbidden =
-    /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/|@aws-sdk\/|@relkit\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
+    /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/|@aws-sdk\/|@relkit\/(?:cli|aws\/cloud-aws|pulumi\/engine)|relkit\/(?:engine|graph|runtime-effect|runtime-hono|providers-local|deploy|observability|inspector-api))["']/;
   const fullstackForbidden =
-    /(?:from|import)\s*["'](?:effect|hono|@pulumi\/|@aws-sdk\/|@relkit\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
+    /(?:from|import)\s*["'](?:effect|hono|@pulumi\/|@aws-sdk\/|@relkit\/(?:cli|aws\/cloud-aws|pulumi\/engine)|relkit\/(?:engine|graph|runtime-effect|runtime-hono|providers-local|deploy|observability|inspector-api))["']/;
   for (const name of packedTemplates) {
     const directory = join(root, "templates/default/v1", name);
     const manifest = await readJson(join(directory, "package.json"));
     for (const field of packageFields)
       for (const [dependency, spec] of Object.entries(manifest[field] ?? {}))
-        if (dependency.startsWith("@relkit/") && spec !== versions.get(dependency))
+        if (
+          (dependency === "relkit" || dependency.startsWith("@relkit/")) &&
+          spec !== versions.get(dependency)
+        )
           throw new Error(`Template ${name} has incompatible ${dependency}@${spec}`);
     if (manifest.dependencies?.["@scalar/hono-api-reference"] !== scalar)
       throw new Error(`Template ${name} Scalar version differs from @relkit/runtime-hono`);
     if (
       manifest.packageManager !== rootManifest.packageManager ||
+      // Templates ship the default catalog's TypeScript (5.9); the workspace compiles with its
+      // own `catalog:workspace` TypeScript 7 (design D8).
       manifest.devDependencies?.typescript !==
-        resolveCatalogVersion(
-          rootManifest,
-          "typescript",
-          rootManifest.devDependencies?.typescript,
-        ) ||
+        resolveCatalogVersion(rootManifest, "typescript", "catalog:") ||
       manifest.devDependencies?.["@types/bun"] !==
         resolveCatalogVersion(
           rootManifest,

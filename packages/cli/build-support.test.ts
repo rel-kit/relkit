@@ -45,7 +45,7 @@ for (const nested of [false, true]) {
         Effect.gen(function* () {
           const fixture = yield* createBuildSupportFixture();
           const dependency = nested
-            ? join(fixture.modules, "@relkit/agents/node_modules/deepagents")
+            ? join(fixture.modules, "relkit/node_modules/deepagents")
             : join(fixture.modules, "deepagents");
           yield* ownedNativePromise("test.peer", async (signal) => {
             await mkdir(dependency, { recursive: true });

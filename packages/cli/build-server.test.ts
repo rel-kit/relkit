@@ -1,6 +1,6 @@
 /** Verifies activation fences and the runtime-owned lifecycle imports in generated server source. */
 import { expect, test } from "bun:test";
-import { GRAPH_VERSION, type RuntimeActivationFingerprint } from "@relkit/contracts";
+import { GRAPH_VERSION, type RuntimeActivationFingerprint } from "relkit/contracts";
 import { serverSource } from "./src/commands/build-server.ts";
 
 const graphHash = "sha256:graph";
@@ -29,7 +29,7 @@ test("generated runtime carries and verifies its activation fingerprint", () => 
   expect(source).toContain("Runtime integration plan version");
   expect(source).toContain("Runtime integration plan does not match the application graph");
   expect(source).toContain('from "./runtime-integrations.ts"');
-  expect(source).not.toContain("@relkit/cloud-aws/runtime");
+  expect(source).not.toContain("@relkit/aws/cloud-aws");
   expect(source).not.toContain("awsProviderFactories");
   expect(source).toContain(
     "runtimeIntegrationModules, bindingValues: sourceValues, localBindingValues",
@@ -68,7 +68,7 @@ test("generated runtime carries and verifies its activation fingerprint", () => 
 function assertRuntimeOwnership(source: string): void {
   expect(source).toContain('process.env.RELKIT_WORKER_ROLE ?? "worker"');
   expect(source).toContain('!== "api"');
-  expect(source).toContain('from "@relkit/engine/internal/server-runtime"');
+  expect(source).toContain('from "relkit/engine/server-runtime"');
   expect(source).not.toContain("@relkit/cli/");
   expect(source).toContain('runtimeOwner.retry("native-job-registration"');
   expect(source).not.toContain("while (!stopping)");

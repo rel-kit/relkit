@@ -1,7 +1,7 @@
 /** Verifies build failures and published artifacts retain separate cleanup evidence. */
 import { expect, it } from "@effect/vitest";
 import { Effect, Exit, Layer } from "effect";
-import { DependencySourceLive } from "@relkit/provider/internal/dependencies";
+import { DependencySourceLive } from "relkit/provider/dependencies";
 import { CliAdapterError } from "../../src/cli-errors.js";
 import { CliCleanup, cleanupLayer } from "../../src/services/cleanup.service.js";
 import { CliProcess } from "../../src/services/process.service.js";
@@ -16,7 +16,10 @@ const failure = (operation: string) =>
 
 it.effect("failed bundling retains its primary failure and separate unlink evidence", () =>
   Effect.gen(function* () {
-    const exit = yield* Effect.exit(bundleServerEffect("/stage/server", "/project"));
+    // The `bun build` subprocess path, whichever runtime runs the test.
+    const exit = yield* Effect.exit(
+      bundleServerEffect("/stage/server", "/project", false, undefined, [], "bun", "bun"),
+    );
     expect(Exit.isFailure(exit)).toBe(true);
     if (Exit.isFailure(exit))
       expect(

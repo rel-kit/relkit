@@ -40,7 +40,7 @@ export const resolveRootMenuEffect = Effect.fn("Cli.rootMenu")(
       { concurrency: 2 },
     )).every(Boolean);
     const prompt = context.promptDriver ?? createClackPromptDriver("RELKIT_CLI_CANCELLED");
-    prompt.intro("RELKIT");
+    prompt.intro("RelKit");
     const action = yield* (yield* CliInteraction).select(
       prompt,
       {

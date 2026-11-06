@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { defineEnv, env } from "@relkit/config";
+import { defineEnv, env } from "relkit/config";
 import { runEnv } from "./src/commands/env.js";
 
 const definition = defineEnv({

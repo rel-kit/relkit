@@ -5,7 +5,7 @@ import {
   encodeMemberId,
   encodeRouteId,
   encodeSourceHierarchy,
-} from "../../packages/compiler/src/index.ts";
+} from "../../packages/cli/src/compiler/index.ts";
 
 describe("source-scoped ID encoders", () => {
   test("strips conventional source structure and normalizes hierarchy", () => {

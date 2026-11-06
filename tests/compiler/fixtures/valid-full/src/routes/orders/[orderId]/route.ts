@@ -1,6 +1,6 @@
-import { defineRoute, defineTransform, http } from "@relkit/app";
+import { defineRoute, defineTransform, http } from "relkit";
 import orders from "../../../orders/service.js";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 
 export const normalizeOrderId = defineTransform({
   id: "orders.normalize-id",

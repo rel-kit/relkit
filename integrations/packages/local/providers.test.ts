@@ -19,7 +19,7 @@ test("publishes matching local event and job adapters", () => {
   expect(() => localEvent({ root: " " })).toThrow("non-empty path");
 });
 
-test("registers durable local event and unscheduled job runtimes", async () => {
+test("registers the durable local event runtime and the native task jobs runtime", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-local-providers-"));
   try {
     const [eventRegistration, jobRegistration] = runtimeIntegration.registrations;
@@ -37,35 +37,14 @@ test("registers durable local event and unscheduled job runtimes", async () => {
       registerContract: expect.any(Function),
       registerTrigger: expect.any(Function),
     });
-    expect(job.value).toMatchObject({ createQueue: expect.any(Function) });
-
-    await event.release?.();
-    await job.release?.();
-  } finally {
-    await rm(root, { recursive: true, force: true });
-  }
-});
-
-test("selects a separate native task runtime for task-backed jobs", async () => {
-  const root = await mkdtemp(join(tmpdir(), "relkit-local-task-providers-"));
-  try {
-    const registration = runtimeIntegration.registrations[1]!;
-    const context = {
-      generationId: "generation.task",
-      bindingId: "provider.task.default",
-      capability: "job",
-      profile: "default",
-      executionModel: "task" as const,
-      behavior: {},
-      connection: { root },
-    };
-    const task = await registration.create(context);
-    expect(task.value).toMatchObject({
+    expect(job.value).toMatchObject({
       kind: "jobs-adapter-runtime",
       protocolVersion: 1,
       worker: { next: expect.any(Function) },
     });
-    await task.release?.();
+
+    await event.release?.();
+    await job.release?.();
   } finally {
     await rm(root, { recursive: true, force: true });
   }

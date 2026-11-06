@@ -2,14 +2,14 @@ import { expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
-import { z } from "@relkit/app/schema";
-import { defineFunction } from "@relkit/app/functions";
-import { defineService } from "@relkit/app/services";
-import { defineServiceRoutes } from "@relkit/app/routes";
+import { s } from "relkit/schema";
+import { defineFunction } from "relkit/functions";
+import { defineService } from "relkit/services";
+import { defineServiceRoutes } from "relkit/routes";
 import { invokeFunction } from "@relkit/testing";
-import { defineEvent, defineEventFunction } from "@relkit/app/events";
-import { defineJob } from "@relkit/app/jobs";
-import { defineTask } from "@relkit/app/tasks";
+import { defineEvent, defineEventFunction } from "relkit/events";
+import { defineJob } from "relkit/jobs";
+import { defineTask } from "relkit/tasks";
 import ts from "typescript";
 
 async function evaluateSnippet(name: string, bindings: Record<string, unknown>) {
@@ -39,7 +39,7 @@ async function evaluateSnippet(name: string, bindings: Record<string, unknown>) 
 
 test("database excerpt returns exactly the declared output fields", async () => {
   const { default: definition } = await evaluateSnippet("database-usage", {
-    z,
+    z: s,
     defineFunction: (options: unknown) => options,
   });
   const result = await definition.handler(
@@ -92,8 +92,8 @@ test("realtime excerpt appends chat messages without refetching", async () => {
 test("service excerpt exposes its members through real service routes", async () => {
   const operation = () =>
     defineFunction({
-      input: z.object({}),
-      output: z.object({}),
+      input: s.object({}),
+      output: s.object({}),
       handler: async () => ({}),
     });
   const getOrder = operation();
@@ -117,7 +117,7 @@ test("service excerpt exposes its members through real service routes", async ()
 
 test("order creation excerpt validates quantity and returns a price in cents", async () => {
   const { default: definition } = await evaluateSnippet("function-be", {
-    z,
+    z: s,
     defineFunction: (options: unknown) => options,
   });
   const input = { orderId: "order-1", sku: "shirt", quantity: 2 };
@@ -130,13 +130,14 @@ test("order creation excerpt validates quantity and returns a price in cents", a
 
 test("order events connect a schema-valid publication to a durable subscriber", async () => {
   const { default: event, orderConfirmation } = await evaluateSnippet("event-be", {
-    z,
+    z: s,
     defineEvent,
     defineEventFunction,
   });
   const { default: publisher } = await evaluateSnippet("event-usage", {
-    z,
+    z: s,
     defineFunction: (options: unknown) => options,
+    orderCreated: event,
   });
   const deliveries: unknown[] = [];
   const logs: unknown[] = [];
@@ -144,7 +145,7 @@ test("order events connect a schema-valid publication to a durable subscriber", 
     { orderId: "order-1", quantity: 2 },
     {
       events: {
-        [event.id]: {
+        orderCreated: {
           publish: async (payload: unknown) => {
             const validated = event.input.parse(payload);
             deliveries.push(validated);
@@ -167,9 +168,9 @@ test("scheduled export uses the current job API and valid task input", async () 
     id: "orders.export-orders",
     version: "1",
     execution: "durable",
-    input: z.object({ orderIds: z.array(z.string()) }),
-    output: z.object({ csv: z.string(), exported: z.number() }),
-    progress: z.object({ completed: z.number(), total: z.number() }),
+    input: s.object({ orderIds: s.array(s.string()) }),
+    output: s.object({ csv: s.string(), exported: s.number() }),
+    progress: s.object({ completed: s.number(), total: s.number() }),
     handler: ({ orderIds }) => ({ csv: orderIds.join(","), exported: orderIds.length }),
   });
   const { default: job } = await evaluateSnippet("background-job-be", { defineJob, exportOrders });
@@ -180,11 +181,11 @@ test("scheduled export uses the current job API and valid task input", async () 
   expect(schedule.timezone).toBe("UTC");
 });
 
-test("checkout invokes order hooks through the shared runtime", async () => {
+test("checkout calls order hooks through the shared runtime", async () => {
   const logs: unknown[] = [];
-  const { default: createOrder } = await evaluateSnippet("function-be", { z, defineFunction });
+  const { default: createOrder } = await evaluateSnippet("function-be", { z: s, defineFunction });
   const { default: checkout } = await evaluateSnippet("function-usage", {
-    z,
+    z: s,
     defineFunction,
     createOrder,
   });

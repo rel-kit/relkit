@@ -1,36 +1,20 @@
-import { defineJob } from "@relkit/app/jobs/legacy";
-import sendReceipt, { receiptInput } from "./send-receipt.function.js";
+import { defineJob, defineTask } from "relkit/jobs";
+import { z } from "zod";
+import { receiptInput } from "./send-receipt.function.js";
+
+export const sendReceiptTask = defineTask({
+  id: "receipts.send",
+  version: "1",
+  input: receiptInput,
+  output: z.object({ receiptId: z.string() }),
+  handler: async ({ orderId, receiptKey }) => ({ receiptId: `${orderId}:${receiptKey}` }),
+});
 
 const sendReceiptJob = defineJob({
   id: "receipts.send-job",
-  input: receiptInput,
-  target: sendReceipt,
-  profile: "queue",
-  // #region receipt-retry
-  retry: {
-    maxAttempts: 3,
-    initialDelayMs: 500,
-    maxDelayMs: 10_000,
-    multiplier: 2,
-    jitter: "none",
-  },
-  timeoutMs: 5_000,
-  concurrency: 4,
-  // #endregion receipt-retry
-  // #region receipt-schedule
-  schedule: [
-    {
-      id: "receipts.reconcile",
-      cron: "0 * * * *",
-      timezone: "UTC",
-      input: { orderId: "scheduled", receiptKey: "scheduled.json" },
-      overlap: "skip",
-    },
-  ],
-  // #endregion receipt-schedule
-  // #region receipt-idempotency
-  idempotency: { key: "orderId", retentionMs: 86_400_000 },
-  // #endregion receipt-idempotency
+  name: "sendReceipt",
+  task: sendReceiptTask,
+  service: "queue",
 });
 
 export default sendReceiptJob;

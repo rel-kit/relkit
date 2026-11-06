@@ -11,6 +11,19 @@ export { probeDescendants } from "./probe-descendants.js";
 export { probeNestedAuth } from "./probe-nested-auth.js";
 
 /**
+ * Completes the application environment for probes that only choose the SQLite path.
+ * @param databasePath - Explicit SQLite fixture path.
+ * @returns The fixture's full environment with fixed auth settings.
+ */
+export function fixtureEnv(databasePath: string): ApplicationEnv {
+  return {
+    DATABASE_PATH: databasePath,
+    BETTER_AUTH_SECRET: "fixture-secret-at-least-32-bytes-long",
+    BETTER_AUTH_URL: new URL("http://127.0.0.1:3000"),
+  };
+}
+
+/**
  * Uses native SDK lease inheritance while owning isolated acquisitions.
  * @param context - Borrowed context object compared only by identity.
  * @param env - Explicit native environment.
@@ -20,7 +33,7 @@ export async function probeLifecycle(context: object, env: ApplicationEnv): Prom
   shared: boolean; isolated: boolean; recovered: boolean;
 }> {
   const shared = await activateDrizzleService(database, env);
-  const again = await activateDrizzleService(database, { DATABASE_PATH: "ignored.sqlite" });
+  const again = await activateDrizzleService(database, fixtureEnv("ignored.sqlite"));
   const isolated = await activateDrizzleService(database, env, { isolated: true });
   try {
     const sharedAuth = await activateBetterAuthService(auth, shared, "/api/auth");

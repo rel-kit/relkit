@@ -10,7 +10,7 @@ test("the public wrapper starts with Bun installed and Node absent", async () =>
     const executables = join(directory, "bin");
     await mkdir(executables);
     await symlink(process.execPath, join(executables, "bun"));
-    const source = await readFile(join(root, "packages/relkit/src/bin.ts"), "utf8");
+    const source = await readFile(join(root, "packages/relkit/src/launcher/bin.ts"), "utf8");
     const entry = join(directory, "wrapper/relkit");
     await writeFile(entry, source.split("\n")[0] + '\nimport "./index.mjs";\n');
     await chmod(entry, 0o755);

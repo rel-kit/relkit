@@ -1,6 +1,6 @@
 /** Calculates integer order totals at 100 cents per item for the create-order function. */
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "zod";
 
 const priceOrder = defineFunction({
   input: z.object({ quantity: z.number().int().positive() }),

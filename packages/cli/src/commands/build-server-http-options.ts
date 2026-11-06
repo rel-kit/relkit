@@ -3,7 +3,7 @@
  * policy, optional transport dependencies and internal cohort proof stay in
  * canonical order; these pure fragments acquire no resources themselves.
  */
-import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "relkit/contracts";
 import type { ServerSourceConfiguration } from "./build-server.types.js";
 
 /** Emits the complete application configuration without evaluating declarations.
@@ -109,15 +109,24 @@ const HTTP_OPTIONAL_TRANSPORT_SOURCE = `  ...((plan.channels ?? []).length === 0
   }),
 `;
 
+/** Static files read from `public/` beside the server through the runtime adapter. */
+const STATIC_FILES_FROM_DISK = `  staticFiles: {
+    root: process.env.RELKIT_PUBLIC_ROOT ?? new URL("../public", import.meta.url).pathname,
+    ...(relkitRuntime.files === undefined ? {} : { files: relkitRuntime.files }),
+  },
+`;
+
+/** A Worker has no filesystem: Workers static assets serve `public/` before the Worker runs. */
+const STATIC_FILES_FROM_PLATFORM = "";
+
 /** Emits native route policy and the protected active cohort witness.
  * @param configuration - Checked MCP exposure and versioned server settings.
  * @returns Closing application options source, retaining live readiness checks.
  */
 function internalHttpOptionsSource(configuration: ServerSourceConfiguration): string {
-  return `  mcp: { enabled: ${String(configuration.mcp)} },
+  return `  mcp: { enabled: ${String(configuration.mcp)}${configuration.mcpAuth === undefined ? "" : `, auth: "${configuration.mcpAuth}"`} },
   agUi: ${String(configuration.agUi ?? false)},
-  staticFiles: { root: process.env.RELKIT_PUBLIC_ROOT ?? new URL("../public", import.meta.url).pathname },
-  rateLimitRuntime: { resolveStore: resolveRateLimitStore },
+${configuration.runtime === "workers" ? STATIC_FILES_FROM_PLATFORM : STATIC_FILES_FROM_DISK}  rateLimitRuntime: { resolveStore: resolveRateLimitStore },
   ...(authRuntime === undefined ? {} : { auth: authRuntime }),
   internalEndpoints: {
     mode: environment,

@@ -1,8 +1,8 @@
 /** Retains an actual native compiled graph's logical contract while preserving physical graph hashes as separate provenance. */
 import { Schema } from "effect";
-import { validateGraphShape } from "../../../packages/graph/src/index.js";
-import { layoutContract } from "../../../packages/compiler/src/layout-contract.js";
-import type { NormalizedGraph } from "../../../packages/compiler/src/normalize-graph-types.js";
+import { validateGraphShape } from "relkit/graph";
+import { layoutContract } from "../../../packages/cli/src/compiler/layout-contract.js";
+import type { NormalizedGraph } from "../../../packages/cli/src/compiler/normalize-graph-types.js";
 import { CheckedCommerceApplication } from "./paired-commerce.schemas.js";
 
 /**

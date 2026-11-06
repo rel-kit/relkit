@@ -1,5 +1,5 @@
 /** Keeps the selected commerce frontend build and development compilation within
- * one native worker while retaining the existing RELKIT client build wrapper.
+ * one native worker while retaining the existing RelKit client build wrapper.
  */
 import { resolve } from "node:path";
 import type { NextConfig } from "next";

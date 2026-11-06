@@ -1,12 +1,12 @@
 /**
  * Owns atomic creation from normalized options through installed preparation.
  * The creation Scope keeps its private sibling stage until a successful finite
- * check/snapshot operation; failure cleans that stage before the public adapter
+ * check operation; failure cleans that stage before the public adapter
  * returns. Published directories transfer to the user.
  */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import type { CreateOptions } from "./options.js";
 import { validateCreateOptionsEffect } from "./validate.js";
 import { GenerateProjectError, type GenerateProjectContext } from "./generate-types.js";
@@ -46,7 +46,7 @@ export const generateEffect = Effect.fn("ProjectGeneration.execute")(
             ),
           );
         }
-        context.onProgress?.(`Creating a new RELKIT app in ${validated.destination}.`);
+        context.onProgress?.(`Creating a new RelKit app in ${validated.destination}.`);
         const owned = yield* acquireGenerationStage(validated.destination, context);
         yield* materializeGenerationStage(owned.stage, options, context);
         const gitInitialized = yield* installGenerationStage(owned.stage, options, context);

@@ -7,20 +7,20 @@ sidebar:
 ---
 
 Use `@relkit/local` to select local event, job, realtime, and agent-state profiles in
-application configuration. `@relkit/providers-local` contains lower-level implementations
+application configuration. `relkit/providers-local` contains lower-level implementations
 for runtime authors and tests. Creating one directly makes you responsible for its state
 directory and lifetime.
 
 ## Read and write a local object
 
-In a tooling or test package, install `@relkit/providers-local` at the version used by the
+In a tooling or test package, install `relkit/providers-local` at the version used by the
 application. Pass a dedicated directory to this helper:
 
 <include source="apps/docs/examples/public-api/local.ts" lang="ts" meta='title="local-object.ts"'>
   /_snippets/source/apps/docs/examples/public-api/local.ts
 </include>
 
-The result decodes to `Hello, RELKIT!`. The helper closes the provider after reading;
+The result decodes to `Hello, RelKit!`. The helper closes the provider after reading;
 closing does not delete the directory. The caller owns directory creation and removal.
 Local filesystem buckets do not create signed download or upload URLs. Use the
 [S3-compatible storage setup](/docs/modules/storage/local-storage) when you need those capabilities.

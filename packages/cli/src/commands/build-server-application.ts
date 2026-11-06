@@ -15,14 +15,15 @@ export function serverApplicationSource(input: ServerSourceEmission): string {
   const { agentSource } = input;
   return `const jobsRuntimeModule = (plan.jobs ?? []).length === 0
   ? undefined
-  : await import("@relkit/jobs");
+  : await import("relkit/jobs");
 const createJobsControls = jobsRuntimeModule?.createJobsControls;
 const createJobsRuntime = jobsRuntimeModule?.createJobsRuntime;
 const reconcileNativeSchedules = jobsRuntimeModule?.reconcileNativeSchedules;
 const runInJobsRuntime = jobsRuntimeModule?.runInJobsRuntime;
+const submitJob = jobsRuntimeModule?.submitJob;
 const realtimeRuntimeModule = (plan.channels ?? []).length === 0
   ? undefined
-  : await import("@relkit/realtime");
+  : await import("relkit/realtime");
 const createProviderRealtimeDispatcher = realtimeRuntimeModule?.createProviderRealtimeDispatcher;
 const setActiveRealtimeDispatcher = realtimeRuntimeModule?.setActiveRealtimeDispatcher;
 const executableManifest = {
@@ -47,17 +48,26 @@ const specializedInstrumentation = await Effect.runPromise(
   ),
 );
 const databaseStartup = databaseNode === undefined ? undefined : runtimeOwner.resource("database", () => createDatabaseRegistration(databaseNode, runtimeManifest.services, values), (value) => value.close(), () => runtimeOwner.setReady("database", true));
+const otherDatabaseStartups = databaseNodes.filter((node) => node !== databaseNode).map((node) => [node.id, runtimeOwner.resource("database:" + node.id, () => createDatabaseRegistration(node, runtimeManifest.services, values), (value) => value.close())]);
 const authStartup = authNode === undefined ? undefined : runtimeOwner.resource("auth", () => createBetterAuthRegistration(authNode, runtimeManifest.services, databaseStartup), () => {}, () => runtimeOwner.setReady("auth", true));
 const authRequestStorage = new AsyncLocalStorage();
-const authRuntime = createAuthRegistration(graph, runtimeManifest.routes, authStartup);
+const authRuntime = createAuthRegistration(authNode, authStartup);
 const contextResolver = createApplicationContextResolver({
   constants: runtimeManifest.constants,
   prompts: runtimeManifest.prompts,
   env: values,
 });
 ${agentSource.startup}
-const registry = createFunctionRegistry(graph, executableManifest);
-let materializedJobs;
+// The handler table lets \`relkit dev\` swap handlers in place; production never installs the hook.
+const handlerTable = createHandlerTable(createFunctionRegistry(graph, executableManifest), executableManifest);
+const registry = handlerTable.registry;
+if (environment !== "production" && process.env.RELKIT_DEV_RELOAD === "1") installDevelopmentReload({
+  projectRoot: process.cwd(),
+  serverDirectory: import.meta.dirname,
+  table: handlerTable,
+  runtimeManifest,
+  createRegistry: (nextGraph, nextManifest) => createFunctionRegistry(nextGraph, nextManifest),
+});
 let nativeJobsRuntimes = new Map();
 const nativeJobWorkerRegistrations = new Set();
 const nativeJobWorkerReadyHandles = new Set();

@@ -2,6 +2,11 @@ node_modules/
 .env
 .env.*
 !.env.example
-.relkit/
+.relkit/*
+!.relkit/generated/
+.relkit/generated/*
+!.relkit/generated/route-module-checks.ts
+!.relkit/generated/context-registry.d.ts
+!.relkit/generated/event-registry.d.ts
 coverage/
 dist/

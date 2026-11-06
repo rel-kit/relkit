@@ -1,16 +1,19 @@
 import { afterEach, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import ts from "typescript";
-import { generateRouteModuleChecks } from "../../packages/compiler/src/route-module-checks.js";
-import { routeModuleFindings } from "../../packages/compiler/src/route-module-diagnostics.js";
-import { routeSourceFindings } from "../../packages/compiler/src/route-source-checks.js";
-import { readFacts } from "../../packages/compiler/src/discovery/source-facts.js";
+import ts from "relkit-typescript";
+import {
+  generateRouteModuleChecks,
+  ROUTE_MODULE_CHECK_REFERENCES,
+} from "../../packages/cli/src/compiler/route-module-checks.js";
+import { routeModuleFindings } from "../../packages/cli/src/compiler/route-module-diagnostics.js";
+import { routeSourceFindings } from "../../packages/cli/src/compiler/route-source-checks.js";
+import { readFacts } from "../../packages/cli/src/compiler/discovery/source-facts.js";
 
 const repository = resolve(import.meta.dir, "../..");
 const roots: string[] = [];
 const prefix = `import service from "../../users/service.js";
-import { defineRoute, defineServiceRoutes } from "@relkit/app/routes";
+import { defineRoute, defineServiceRoutes } from "relkit/routes";
 `;
 
 afterEach(async () => {
@@ -29,9 +32,9 @@ async function fixture(route: string) {
   await writeFile(
     join(root, "src/users/service.ts"),
     `
-import { defineFunction } from "@relkit/app/functions";
-import { defineService } from "@relkit/app/services";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { defineService } from "relkit/services";
+import { z } from "relkit/schema";
 const example = defineFunction({ id: "users.example", input: z.object({ id: z.string() }),
   output: z.object({ id: z.string() }), handler: async ({ id }) => ({ id }) });
 export default defineService({ functions: { example } });
@@ -42,6 +45,8 @@ export default defineService({ functions: { example } });
     join(root, ".relkit/generated/route-module-checks.ts"),
     generateRouteModuleChecks(["src/routes/users/route.ts"], root),
   );
+  for (const file of ROUTE_MODULE_CHECK_REFERENCES)
+    await writeFile(join(root, ".relkit/generated", file), "export {};\n");
   await writeFile(
     join(root, "tsconfig.json"),
     JSON.stringify({
@@ -74,7 +79,7 @@ test("installed public declarations validate individual routes and service-route
     `${prefix}export const { GET, POST } = defineServiceRoutes(service, { GET: "example", POST: "example" });`,
     `${prefix}export const GET = defineRoute({ handler: () => new Response("ok") });`,
     `${prefix}export const GET = defineRoute({ target: service.example });
-export type { defineServiceRoutes as RouteFactory } from "@relkit/app/routes";`,
+export type { defineServiceRoutes as RouteFactory } from "relkit/routes";`,
   ]) {
     const root = await fixture(route);
     const application = program(root);
@@ -124,7 +129,7 @@ test("module checking follows reexports instead of relying on initializer syntax
   await writeFile(
     join(root, "src/users/routes.ts"),
     `import service from "./service.js";
-import { defineServiceRoutes } from "@relkit/app/routes";
+import { defineServiceRoutes } from "relkit/routes";
 export default defineServiceRoutes(service, { GET: "example" });`,
   );
   const application = program(root);
@@ -155,11 +160,11 @@ export const GET = defineServiceRoutes(service, { GET: "example" });`,
   });
 });
 
-test("source rules recognize import aliases, namespaces and wrapped expressions with a precise fix", () => {
+test("source rules recognize import aliases, namespaces and wrapped expressions", () => {
   for (const [imported, callee] of [
-    ['import { defineServiceRoutes as routes } from "@relkit/app/routes";', "routes"],
-    ['import { defineServiceRoutes as routes } from "@relkit/app";', "routes"],
-    ['import * as routes from "@relkit/routes";', "routes.defineServiceRoutes"],
+    ['import { defineServiceRoutes as routes } from "relkit/routes";', "routes"],
+    ['import { defineServiceRoutes as routes } from "relkit";', "routes"],
+    ['import * as routes from "relkit/routes";', "routes.defineServiceRoutes"],
   ]) {
     const text = `${imported}\n\nexport const GET = (${callee}(service, { GET: "example" }));`;
     const source = ts.createSourceFile(
@@ -170,7 +175,7 @@ test("source rules recognize import aliases, namespaces and wrapped expressions 
     );
     const findings = routeSourceFindings(source);
     expect(findings).toHaveLength(1);
-    expect(findings[0]?.replacement).toBe("{ GET }");
+    expect(findings[0]?.message).toContain("export default defineServiceRoutes(...)");
     expect(source.getLineAndCharacterOfPosition(findings[0]!.node.getStart(source))).toEqual({
       line: 2,
       character: 13,
@@ -183,6 +188,13 @@ test("source rules recognize import aliases, namespaces and wrapped expressions 
     true,
   );
   expect(routeSourceFindings(local)).toEqual([]);
+  const map = ts.createSourceFile(
+    "src/routes/users/route.ts",
+    'import { defineServiceRoutes } from "relkit/routes";\nexport default defineServiceRoutes(service, { GET: "example" });',
+    ts.ScriptTarget.Latest,
+    true,
+  );
+  expect(routeSourceFindings(map)).toEqual([]);
 });
 
 test("route validators sort, deduplicate and support custom output directories", () => {
@@ -219,7 +231,7 @@ test("aliased service-route factories retain static route identity evidence", ()
   const source = ts.createSourceFile(
     "src/routes/users/route.ts",
     `
-import { defineServiceRoutes as expose } from "@relkit/app/routes";
+import { defineServiceRoutes as expose } from "relkit/routes";
 export const { GET } = expose(service, { GET: "example" });`,
     ts.ScriptTarget.Latest,
     true,
@@ -229,4 +241,33 @@ export const { GET } = expose(service, { GET: "example" });`,
   expect(facts.routeOperations).toContainEqual(
     expect.objectContaining({ exportName: "GET", method: "GET" }),
   );
+});
+
+test("plain tsc without the editor plugin rejects every route module the plugin rejects", async () => {
+  const both = 'defineServiceRoutes(service, { GET: "example", POST: "example" })';
+  for (const route of [
+    `${prefix}export const { GET: POST } = defineServiceRoutes(service, { GET: "example" });`,
+    `${prefix}export const { GET: POST, POST: GET } = ${both};`,
+    `${prefix}export const { GET, ...rest } = ${both};`,
+    `${prefix}const { GET } = ${both};\nexport {};`,
+    `${prefix}export const routes = ${both};`,
+  ]) {
+    const root = await fixture(route);
+    const application = program(root);
+    const source = application.getSourceFile(join(root, "src/routes/users/route.ts"))!;
+    const plugin = [...routeSourceFindings(source), ...routeModuleFindings(application, source)];
+    expect(plugin.length).toBeGreaterThan(0);
+    // The fixture's tsconfig lists only route-module-checks.ts and has no plugin.
+    expect(ts.getPreEmitDiagnostics(application).length).toBeGreaterThan(0);
+  }
+}, 60_000);
+
+test("route checks bring the context and event registries into the program", async () => {
+  const root = await fixture(
+    `${prefix}export const GET = defineRoute({ target: service.example });`,
+  );
+  const application = program(root);
+  for (const file of ROUTE_MODULE_CHECK_REFERENCES)
+    expect(application.getSourceFile(join(root, ".relkit/generated", file))).toBeDefined();
+  expect(ts.getPreEmitDiagnostics(application)).toEqual([]);
 });

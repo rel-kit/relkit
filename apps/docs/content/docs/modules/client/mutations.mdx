@@ -17,7 +17,7 @@ Use a mutation for a request that changes application state, and track whether t
 
 `useRouteMutation` never runs on mount and defaults to no retry. Known-offline work fails as
 `not-sent`; after a request is handed to `fetch`, timeout or disconnect is conservatively `unknown`.
-RELKIT stores only scoped reconciliation metadata in `sessionStorage`, never variables or retry
+RelKit stores only scoped reconciliation metadata in `sessionStorage`, never variables or retry
 payloads. Application mutations need an application-owned status endpoint to reconcile an unknown
 outcome.
 
@@ -26,8 +26,9 @@ server authenticates independently and compares them before application code run
 
 ## Call a defined route
 
-The backend's [Echo `defineRoute`](/docs/modules/http/define#expose-one-public-function) generates
-`POST /echo`. Render this component under the provider after pulling that backend's contract:
+The backend's [Echo `defineRoute`](/docs/modules/http/define#expose-one-public-function) targets the
+function `echo.echo`, so its `api` property is `api.echo.echo`. Render this component under the
+provider after pulling that backend's contract:
 
 <include source="apps/docs/examples/frontend/echo.tsx" lang="tsx" meta='title="src/EchoButton.tsx"'>
   /_snippets/source/apps/docs/examples/frontend/echo.tsx
@@ -38,5 +39,24 @@ refresh the affected [`useRoute` query](/docs/modules/client/routes) in `onSucce
 uncertain result before retrying a non-idempotent operation. See
 [`useRouteMutation`](/docs/api/client#useroutemutation) for all options and
 [offline writes](/docs/modules/client/offline) for recovery.
+
+## Handle errors
+
+A mutation's error is a union keyed by `code`, like a [query's error](/docs/modules/client/routes#handle-errors).
+It also includes a write error whose `code` is `WRITE_NOT_SENT` when the request never left the
+browser, or `WRITE_OUTCOME_UNKNOWN` when it left but no answer arrived:
+
+```tsx title="src/CreateOrder.tsx — component body"
+const create = useRouteMutation(api.orders.createOrder);
+
+if (create.error?.code === "WRITE_OUTCOME_UNKNOWN") {
+  return <p role="alert">Check the order list before you try again.</p>;
+}
+if (create.error?.code === "TOO_MANY_REQUESTS") {
+  return <p role="alert">Too many orders. Wait a minute and try again.</p>;
+}
+```
+
+Retry a `WRITE_NOT_SENT` failure freely. Reconcile a `WRITE_OUTCOME_UNKNOWN` failure first.
 
 <include>/_snippets/generated/related/docs-modules-client-mutations.mdx</include>

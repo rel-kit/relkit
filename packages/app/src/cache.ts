@@ -1,1 +1,2 @@
-export * from "@relkit/cache";
+import "./deprecated.js";
+export * from "relkit/cache";

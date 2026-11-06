@@ -1,4 +1,4 @@
-import type { ThreadSnapshot } from "@relkit/contracts";
+import type { ThreadSnapshot } from "relkit/contracts";
 import { snapshotProjection } from "./agent-execution-observation.js";
 import type { AgentBase } from "./agent-hook-types.types.js";
 import { agentContentFromMessages } from "./agent-observation.js";

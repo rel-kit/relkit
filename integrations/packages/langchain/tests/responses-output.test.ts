@@ -1,10 +1,11 @@
 /** Exercises the real native loop with Responses-style JSON output after one tool side effect. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/adapter.js";
 import { AIMessage } from "@langchain/core/messages";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { Effect } from "effect";
 import { expect, test, vi } from "vitest";
 import { ProviderStrategy, ToolStrategy } from "langchain";
-import { defineAgent } from "../src/define-agent.js";
 import { invokeAgent, invokeAgentFunction } from "../src/runtime.js";
 import { responseFormatEffect } from "../src/runtime-native-response-format.js";
 import { createNativeStringTool } from "./test-native-tool.js";
@@ -37,11 +38,11 @@ function fixture(final: string | Error) {
     });
   const agent = defineAgent({
     id: "responses.test",
+    runtime: langchain({ model: responseModel, tools: [tool] }),
     input: z.object({ question: z.string() }),
     output: z.object({ answer: z.string() }),
-    model: responseModel,
     instructions: "Write once, then answer.",
-    tools: [tool],
+    tools: [],
     limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 5000 },
   });
   return {

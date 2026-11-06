@@ -79,7 +79,7 @@ Use `defineRoute` for one method-to-function mapping:
 </include>
 
 This is `POST /echo`. Omit `request` and `responses` when the input schema and output describe ordinary
-JSON correctly. The descriptor selects behavior; it does not call `echo.echo.invoke()` at module load.
+JSON correctly. The descriptor selects behavior; it does not call the `echo` function at module load.
 
 A target must be an ordinary callable function exposed by a service. An event contract, event-only
 subscriber, tool, or agent is not a route target. To expose agent behavior, use a public
@@ -108,8 +108,8 @@ mapping and a `201` success status. Both forms produce the same kind of checked 
 
 <include>/_frontend/orders.mdx</include>
 
-Keep the exported destructuring form. Supported keys are `GET`, `POST`, `PUT`, `PATCH`, `DELETE`,
-`HEAD`, and `OPTIONS`; do not rename the bindings, add a rest binding, or use a default export.
+Export the map as the route module's default export. Supported keys are `GET`, `POST`, `PUT`,
+`PATCH`, `DELETE`, `HEAD`, and `OPTIONS`.
 `ALL` is reserved for [raw handlers](/docs/modules/http/raw-handlers), not `defineServiceRoutes`.
 
 Several route files can use the same service. Individual `defineRoute` exports in one file can target

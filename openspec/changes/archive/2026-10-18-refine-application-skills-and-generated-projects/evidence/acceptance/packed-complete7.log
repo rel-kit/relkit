@@ -33,7 +33,7 @@ AssertionError: false == true
    operator: "==",
        code: "ERR_ASSERTION"
 
-      at protect (/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/packed-auth.ts:25:10)
+      at protect (<repo>/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/packed-auth.ts:25:10)
       at processTicksAndRejections (native:7:39)
 
 Bun v1.3.10 (macOS arm64)

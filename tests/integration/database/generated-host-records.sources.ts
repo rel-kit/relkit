@@ -1,13 +1,13 @@
 /** Native function, service and route source fixtures preserve the public plain TypeScript authoring API. */
 export const generatedRecordsSources = {
   "src/services/records/service.ts": `/** Exposes the records probe through the ordinary native service boundary without acquiring its database. */
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 import probe from "./functions/probe.function.js";
 export default defineService({ functions: { probe } });
 `,
   "src/services/records/functions/probe.function.ts": `/** Dispatches controlled native database/auth acceptance modes and returns observable ownership flags. */
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 export default defineFunction({
   // Mutation modes exercise commit/rollback/numeric precision; remaining modes observe SDK ownership and reentrancy.
   input: z.object({ mode: z.union([z.literal("write"), z.literal("rollback"), z.literal("read"), z.literal("ownership"), z.literal("descendants"), z.literal("numeric"), z.literal("nested-auth")]) }),
@@ -49,7 +49,7 @@ export default defineFunction({
 });
 `,
   "src/routes/records/route.ts": `/** Mounts the public records probe as one native POST route through its service facade. */
-import { defineRoute } from "@relkit/app/routes";
+import { defineRoute } from "relkit/routes";
 import records from "@app/services/records/service.js";
 export const POST = defineRoute({ target: records.probe });
 `,

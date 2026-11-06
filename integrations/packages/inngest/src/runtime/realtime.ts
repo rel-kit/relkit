@@ -1,5 +1,5 @@
 import type { Inngest } from "inngest";
-import type { OperationContext } from "@relkit/jobs/adapter";
+import type { OperationContext } from "relkit/jobs/adapter";
 
 export async function subscribeInngestRun(
   client: Inngest.Any,
@@ -27,16 +27,16 @@ export async function subscribeInngestRun(
     ])) as typeof subscription;
   } catch {
     void pending.then(
-      (value) => value.unsubscribe("Relkit realtime setup timed out"),
+      (value) => value.unsubscribe("RelKit realtime setup timed out"),
       () => undefined,
     );
     return undefined;
   }
-  const abort = () => subscription.unsubscribe("Relkit observation aborted");
+  const abort = () => subscription.unsubscribe("RelKit observation aborted");
   context.signal.addEventListener("abort", abort, { once: true });
   return () => {
     context.signal.removeEventListener("abort", abort);
-    subscription.unsubscribe("Relkit observer released");
+    subscription.unsubscribe("RelKit observer released");
   };
 }
 

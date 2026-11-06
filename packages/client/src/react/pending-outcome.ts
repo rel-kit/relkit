@@ -1,4 +1,4 @@
-import type { JobUnknownOutcome } from "@relkit/contracts/jobs";
+import type { JobUnknownOutcome } from "relkit/contracts/jobs";
 import { candidates, isRecord } from "./pending-support.js";
 /**
  * Extracts recognized recovery authority without manufacturing successful outcomes.

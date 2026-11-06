@@ -12,7 +12,7 @@ packages/cli/tests/migration/active-dev.test.ts:
 16 | const getCurrentSuite = V.TestRunner.getCurrentSuite;
                                ^
 TypeError: undefined is not an object (evaluating 'V.TestRunner.getCurrentSuite')
-      at /Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/@effect+vitest@4.0.1+0bf438fc418a04a6/node_modules/@effect/vitest/dist/internal/internal.js:16:27
+      at <repo>/node_modules/.bun/@effect+vitest@4.0.1+0bf438fc418a04a6/node_modules/@effect/vitest/dist/internal/internal.js:16:27
       at loadAndEvaluateModule (2:1)
 -------------------------------
 
@@ -29,7 +29,7 @@ packages/cli/tests/migration/parser.test.ts:
 7 | it.live("parses preview/write/rollback and exposes shared help/completions", () =>
     ^
 ReferenceError: Cannot access 'it' before initialization.
-      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/migration/parser.test.ts:7:1
+      at <repo>/packages/cli/tests/migration/parser.test.ts:7:1
 -------------------------------
 
 
@@ -45,7 +45,7 @@ packages/cli/tests/migration/crash.test.ts:
 7 | it.live(
     ^
 ReferenceError: Cannot access 'it' before initialization.
-      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/migration/crash.test.ts:7:1
+      at <repo>/packages/cli/tests/migration/crash.test.ts:7:1
       at loadAndEvaluateModule (2:1)
 -------------------------------
 
@@ -62,7 +62,7 @@ packages/cli/tests/migration/recovery.test.ts:
 7 | it.live(
     ^
 ReferenceError: Cannot access 'it' before initialization.
-      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/migration/recovery.test.ts:7:1
+      at <repo>/packages/cli/tests/migration/recovery.test.ts:7:1
       at loadAndEvaluateModule (2:1)
 -------------------------------
 
@@ -79,7 +79,7 @@ packages/cli/tests/migration/failure-presentation.test.ts:
 29 | it.effect("does not recover a recognized failure mixed with a defect or interruption", () =>
      ^
 ReferenceError: Cannot access 'it' before initialization.
-      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/migration/failure-presentation.test.ts:29:1
+      at <repo>/packages/cli/tests/migration/failure-presentation.test.ts:29:1
       at loadAndEvaluateModule (2:1)
 -------------------------------
 
@@ -103,7 +103,7 @@ packages/cli/tests/migration/git.test.ts:
 7 | it.live(
     ^
 ReferenceError: Cannot access 'it' before initialization.
-      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/migration/git.test.ts:7:1
+      at <repo>/packages/cli/tests/migration/git.test.ts:7:1
       at loadAndEvaluateModule (2:1)
 -------------------------------
 
@@ -120,7 +120,7 @@ packages/cli/tests/migration/layout.test.ts:
 7 | it.live(
     ^
 ReferenceError: Cannot access 'it' before initialization.
-      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/migration/layout.test.ts:7:1
+      at <repo>/packages/cli/tests/migration/layout.test.ts:7:1
       at loadAndEvaluateModule (2:1)
 -------------------------------
 
@@ -137,7 +137,7 @@ packages/cli/tests/migration/cancellation.test.ts:
 7 | it.live("reports one secret-safe migration object and status 130 for either native signal", () =>
     ^
 ReferenceError: Cannot access 'it' before initialization.
-      at /Users/mustafaelsayed/Workspace/relkit/packages/cli/tests/migration/cancellation.test.ts:7:1
+      at <repo>/packages/cli/tests/migration/cancellation.test.ts:7:1
 -------------------------------
 
 

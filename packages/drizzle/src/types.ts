@@ -1,6 +1,6 @@
 /** Portable database contracts; native model database types belong to selected dialect entrypoints. */
 import type { Row, Insert, Update, BaseOperations } from "./operations.types.js";
-import type { DescriptorBase, MaybePromise } from "@relkit/contracts";
+import type { DescriptorBase, MaybePromise } from "relkit/contracts";
 import type { Table } from "drizzle-orm";
 import type { ZodType } from "zod";
 import type { ModelDescriptor, ModelExtensionMap } from "./model.types.js";
@@ -121,6 +121,8 @@ export type ApplicationEnv = keyof Relkit.ApplicationEnv extends never
 export interface DrizzleCapability {
   readonly kind: "drizzle";
   readonly dialect: "pg" | "mysql" | "sqlite";
+  /** Set when the service is marked as the application's default database. */
+  readonly default?: true;
   readonly tables: readonly {
     readonly name: string;
     readonly databaseName: string;
@@ -188,3 +190,14 @@ export type DatabaseContext<Service extends DrizzleServiceDescriptor<any, any, a
     >;
   };
 };
+
+declare global {
+  namespace Relkit {
+    /** Maps a Drizzle service declared under `dependencies.databases` to its handler context. */
+    interface DatabaseContexts<Service> {
+      readonly drizzle: Service extends DrizzleServiceDescriptor<any, any, any, any>
+        ? DatabaseContext<Service>
+        : never;
+    }
+  }
+}

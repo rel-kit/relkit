@@ -1,0 +1,11 @@
+import { defineChannel } from "@relkit/app/realtime";
+import { z } from "@relkit/app/schema";
+
+const orderUpdates = defineChannel({
+  id: "orders.updates",
+  params: z.object({ orderId: z.string() }),
+  events: { placed: z.object({ totalCents: z.number() }) },
+  client: { public: true },
+});
+
+export default orderUpdates;

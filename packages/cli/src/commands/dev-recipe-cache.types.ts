@@ -1,4 +1,4 @@
-import type { LocalServiceRecipeInput } from "@relkit/local-service";
+import type { LocalServiceRecipeInput } from "relkit/local-service";
 import type { Effect } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";
 

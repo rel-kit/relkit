@@ -1,9 +1,7 @@
 import assert from "node:assert/strict";
 import { Context, Effect, Metric } from "effect";
-import { z } from "@relkit/schema";
 import { createTestRuntime } from "../../src/runtime.js";
 import { createTestHttpClient } from "../../src/http.js";
-import { createTestJob } from "../../src/jobs.js";
 import { createTestEvent } from "../../src/events.js";
 
 // This fresh Bun process owns the default registry; no other test can mutate it.
@@ -24,21 +22,6 @@ try {
   await http.close();
 }
 
-const job = await createTestJob({
-  target: {
-    id: "test.close-observation",
-    input: z.string(),
-    output: z.number(),
-    handler: async (input: string) => input.length,
-  },
-});
-try {
-  await job.close();
-  await job.close();
-} finally {
-  await job.close();
-}
-
 const event = await createTestEvent({ eventId: "test.close-observation" });
 try {
   await event.close();
@@ -47,7 +30,7 @@ try {
   await event.close();
 }
 
-for (const operation of ["runtime.close", "http.close", "job.close", "event.close"]) {
+for (const operation of ["runtime.close", "http.close", "event.close"]) {
   const counter = [...registry.values()].find(
     (entry) =>
       entry.id === "relkit_execution_operations_total" &&

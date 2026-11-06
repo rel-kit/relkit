@@ -1,6 +1,6 @@
 /** Adapts candidate ownership and resolves fresh per-generation development environment values. */
 import { Context, Effect, Layer, Semaphore } from "effect";
-import { startCandidate, verifyCandidate, type CandidateOptions } from "@relkit/supervisor";
+import { startCandidate, verifyCandidate, type CandidateOptions } from "../supervisor/index.js";
 import { cliPromise } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { ownedNativePromise } from "./owned-promise.js";
@@ -18,7 +18,7 @@ export class CliDevSupervisor extends Context.Service<CliDevSupervisor, DevSuper
  * @example
  * ```ts
  * import { Effect } from "effect";
- * import { createSupervisorProxy } from "@relkit/supervisor";
+ * import { createSupervisorProxy } from "@relkit/cli/supervisor";
  * const proxy = createSupervisorProxy({ port: 0 });
  * await Effect.runPromise(CliDevSupervisor.use((sdk) => sdk.stopProxy(proxy)).pipe(Effect.provide(devSupervisorLayer)));
  * ```

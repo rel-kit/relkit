@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ScaffoldPlan } from "create-relkit/internal/add-types";
+import type { ScaffoldPlan } from "create-relkit/add-types";
 import {
   applyScaffoldPlan,
   type ApplyScaffoldContext,

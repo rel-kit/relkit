@@ -1,6 +1,6 @@
 # Authored TypeScript baseline
 
-Captured from clean HEAD e081bde6054c8395209cdec145d8217c5d9c0dfd. The worktree is /Users/mustafaelsayed/.codex/worktrees/effect-user-entrypoints/relkit; delivery checkout is /Users/mustafaelsayed/Workspace/relkit.
+Captured from clean HEAD e081bde6054c8395209cdec145d8217c5d9c0dfd. The worktree is <home>/.codex/worktrees/effect-user-entrypoints/relkit; delivery checkout is <repo>.
 
 Recursive inventory includes hidden/ignored authored files and excludes node_modules, dist, .turbo, .relkit, .next, .git, coverage and build output. Baseline: 57 generator files and 150 CLI files. Newly introduced authored TS files must be added to package coverage evidence.
 

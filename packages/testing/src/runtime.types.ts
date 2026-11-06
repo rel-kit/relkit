@@ -1,5 +1,5 @@
-import type { EnvDefinition, EnvShape } from "@relkit/config";
-import type { FunctionRegistry } from "@relkit/engine";
+import type { EnvDefinition, EnvShape } from "relkit/config";
+import type { FunctionRegistry } from "relkit/engine";
 import type {
   FunctionContextOf,
   FunctionInput,
@@ -9,7 +9,7 @@ import type {
 } from "./invoke-function.js";
 import type { TestFakes } from "./fakes.js";
 import type { TestProviderReplacements } from "./provider-replacements.js";
-import type { LoggerOptions } from "@relkit/runtime-effect";
+import type { LoggerOptions } from "relkit/runtime-effect";
 
 /** Runtime options retaining the concrete application's environment shape.
  * @typeParam S - Environment declarations inferred from the application.

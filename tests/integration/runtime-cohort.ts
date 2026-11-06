@@ -3,7 +3,7 @@ import {
   MANIFEST_VERSION,
   RUNTIME_INTEGRATION_PLAN_FILE,
   RUNTIME_INTEGRATION_PLAN_VERSION,
-} from "../../packages/contracts/src/index.ts";
+} from "relkit/contracts";
 
 export function runtimeCohort(graphHash: string) {
   return {

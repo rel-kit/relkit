@@ -2,7 +2,7 @@
 import { lstat, readFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { Effect } from "effect";
-import { connectionAttempt, InspectionConnectionError } from "@relkit/inspector-api/connection";
+import { connectionAttempt, InspectionConnectionError } from "relkit/inspector-api/connection";
 import { validateInspectorContainer } from "./container-policy.js";
 import type { InspectorOptions } from "./options.types.js";
 

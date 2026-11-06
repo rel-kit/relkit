@@ -66,12 +66,12 @@ export const httpGuideRelations = [
   {
     path: "docs/modules/http/streaming",
     api: ["routes", "functions", "client"],
-    examples: ["packages/runtime-hono/tests/native-stream.test.ts"],
+    examples: ["packages/relkit/tests/runtime-hono/native-stream.test.ts"],
   },
   {
     path: "docs/modules/http/raw-handlers",
     api: ["routes"],
-    examples: ["examples/commerce/src/routes/api/auth/[[...auth]]/route.ts"],
+    examples: ["examples/commerce/src/routes/orders/export/route.ts"],
   },
   {
     path: "docs/modules/http/openapi",

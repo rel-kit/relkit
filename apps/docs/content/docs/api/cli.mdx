@@ -27,30 +27,31 @@ Convention-first TypeScript application framework
 
 ### `relkit create [name]`
 
-Create a new RELKIT application
+Create a new RelKit application
 
 | Argument | Value    | Description                      |
 | -------- | -------- | -------------------------------- |
 | name     | optional | npm package and application name |
 
-| Option                  | Value                                            | Description                                           |
-| ----------------------- | ------------------------------------------------ | ----------------------------------------------------- |
-| --template              | minimal, api, agent, fullstack                   | Candidate template; certified tuples only             |
-| --cloud                 | aws, none                                        | Candidate cloud selection; certified tuples only      |
-| --deploy                | pulumi, none                                     | Candidate deployment selection; certified tuples only |
-| --jobs                  | inngest-docker, effect-mq-docker, trigger-docker | Candidate jobs service; certified native tuples only  |
-| --directory             | string                                           | Destination directory                                 |
-| --install               | boolean                                          | Install generated project setup                       |
-| --no-install            | boolean                                          | No install generated project setup                    |
-| --git                   | boolean                                          | Git generated project setup                           |
-| --no-git                | boolean                                          | No git generated project setup                        |
-| --examples              | boolean                                          | Examples generated project setup                      |
-| --no-examples           | boolean                                          | No examples generated project setup                   |
-| --force-empty-directory | boolean                                          | Allow an existing empty destination                   |
+| Option                  | Value                                            | Description                                              |
+| ----------------------- | ------------------------------------------------ | -------------------------------------------------------- |
+| --template              | minimal, api, agent, fullstack, tasks            | Starter template                                         |
+| --cloud                 | aws, none                                        | Cloud selection                                          |
+| --deploy                | pulumi, none                                     | Deployment selection                                     |
+| --jobs                  | inngest-docker, effect-mq-docker, trigger-docker | Jobs service for the tasks template                      |
+| --directory             | string                                           | Destination directory                                    |
+| --install               | boolean                                          | Install generated project setup                          |
+| --no-install            | boolean                                          | No install generated project setup                       |
+| --git                   | boolean                                          | Git generated project setup                              |
+| --no-git                | boolean                                          | No git generated project setup                           |
+| --examples              | boolean                                          | Examples generated project setup                         |
+| --no-examples           | boolean                                          | No examples generated project setup                      |
+| --force-empty-directory | boolean                                          | Allow an existing empty destination                      |
+| --strict                | boolean                                          | Refuse combinations CI has not tested instead of warning |
 
 #### Examples
 
-`relkit create` — Create a new RELKIT application
+`relkit create` — Create a new RelKit application
 
 ### `relkit add <kind>`
 
@@ -429,6 +430,36 @@ Create Better Auth and its catch-all route
 
 `relkit add auth` — Create Better Auth and its catch-all route
 
+#### `relkit add jobs`
+
+Add a jobs provider profile
+
+| Option         | Value           | Description                               |
+| -------------- | --------------- | ----------------------------------------- |
+| --project-root | string          | Application directory (defaults to cwd)   |
+| --no-install   | boolean         | Do not install newly required packages    |
+| --provider     | postgres, local | Provider (default: local)                 |
+| --profile      | string          | Profile name (default: the provider name) |
+
+##### Examples
+
+`relkit add jobs` — Add a jobs provider profile
+
+#### `relkit add events`
+
+Add an events provider profile
+
+| Option         | Value           | Description                               |
+| -------------- | --------------- | ----------------------------------------- |
+| --project-root | string          | Application directory (defaults to cwd)   |
+| --no-install   | boolean         | Do not install newly required packages    |
+| --provider     | postgres, local | Provider (default: local)                 |
+| --profile      | string          | Profile name (default: the provider name) |
+
+##### Examples
+
+`relkit add events` — Add an events provider profile
+
 #### `relkit add inspector`
 
 Enable the inspector bridge and its local UI
@@ -442,23 +473,30 @@ Enable the inspector bridge and its local UI
 
 `relkit add inspector` — Enable the inspector bridge and its local UI
 
-### `relkit migrate <command>`
+### `relkit migrate [--write | --rollback <record>]`
 
-Preview and apply source layout migrations
+Preview and apply the 0.9 code migration, or layout migrations
+
+| Option         | Value   | Description                                                                      |
+| -------------- | ------- | -------------------------------------------------------------------------------- |
+| --project-root | string  | Application directory (defaults to cwd)                                          |
+| --write        | boolean | Apply the previewed changes and write a migration record                         |
+| --rollback     | string  | Restore files from a migration record; refuses to overwrite later edits          |
+| --contract     | string  | Client contract (client-contract.json) used to name api properties for hook keys |
 
 #### Examples
 
-`relkit migrate` — Preview and apply source layout migrations
+`relkit migrate` — Preview and apply the 0.9 code migration, or layout migrations
 
 #### `relkit migrate layout`
 
 Move flat services into src/services with guarded rollback
 
-| Option         | Value   | Description                                                   |
-| -------------- | ------- | ------------------------------------------------------------- |
-| --project-root | string  | Application directory (defaults to cwd)                       |
-| --write        | boolean | Validate and apply; stop development first                    |
-| --rollback     | string  | Restore a local migration receipt; conflicts refuse overwrite |
+| Option         | Value   | Description                                                             |
+| -------------- | ------- | ----------------------------------------------------------------------- |
+| --project-root | string  | Application directory (defaults to cwd)                                 |
+| --write        | boolean | Validate and apply; stop development first                              |
+| --rollback     | string  | Restore files from a migration record; refuses to overwrite later edits |
 
 ##### Examples
 
@@ -491,7 +529,7 @@ Run the app and its selected development features
 | Option           | Value                                             | Description                                                                  |
 | ---------------- | ------------------------------------------------- | ---------------------------------------------------------------------------- |
 | --project-root   | string                                            | Application directory (defaults to cwd)                                      |
-| --prepare        | boolean                                           | Prepare a validated dev snapshot and exit without a server                   |
+| --prepare        | boolean                                           | Check the project and exit without starting a server                         |
 | --port           | integer                                           | Application port                                                             |
 | --inspector-port | integer                                           | Retired; configure inspector.connection.port, or run relkit inspector --port |
 | --local          | on, off                                           | Start required local services                                                |
@@ -517,6 +555,18 @@ Run the project-local development inspector UI
 
 `relkit inspector` — Run the project-local development inspector UI
 
+### `relkit mcp`
+
+Serve the running development session to coding agents over MCP (stdio)
+
+| Option         | Value  | Description                             |
+| -------------- | ------ | --------------------------------------- |
+| --project-root | string | Application directory (defaults to cwd) |
+
+#### Examples
+
+`relkit mcp` — Serve the running development session to coding agents over MCP (stdio)
+
 ### `relkit check`
 
 Compile descriptors, infer eligible IDs, and validate the application
@@ -533,9 +583,11 @@ Compile descriptors, infer eligible IDs, and validate the application
 
 Build the checked graph, manifest, OpenAPI, and client
 
-| Option         | Value  | Description                             |
-| -------------- | ------ | --------------------------------------- |
-| --project-root | string | Application directory (defaults to cwd) |
+| Option         | Value              | Description                             |
+| -------------- | ------------------ | --------------------------------------- |
+| --project-root | string             | Application directory (defaults to cwd) |
+| --runtime      | bun, node, workers | Runtime the production server runs on   |
+| --target       | vercel             | Deploy target whose build rules apply   |
 
 #### Examples
 
@@ -1020,28 +1072,34 @@ Check local prerequisites and ports
 
 ### `relkit deploy <command>`
 
-Manage Pulumi deployments
+Manage deployments
 
 #### Examples
 
-`relkit deploy` — Manage Pulumi deployments
+`relkit deploy` — Manage deployments
 
-#### `relkit deploy init`
+#### `relkit deploy init [target]`
 
-Init the Pulumi stack
+Write a deploy target's files, or initialize the Pulumi stack
 
-| Option                    | Value     | Description                               |
-| ------------------------- | --------- | ----------------------------------------- |
-| --project-root            | string    | Application directory (defaults to cwd)   |
-| --stack                   | string    | Pulumi stack name (default: development)  |
-| --backend                 | string    | cloud, local, or object-storage URL       |
-| --config                  | key=value | Set a non-secret Pulumi value; repeatable |
-| --config-secret           | key=value | Set a secret Pulumi value; repeatable     |
-| --non-interactive / --yes | boolean   | Approve protected operations              |
+| Argument | Value    | Description                                                             |
+| -------- | -------- | ----------------------------------------------------------------------- |
+| target   | optional | railway, vercel, cloudflare, or aws for the Pulumi stack (default: aws) |
+
+| Option                    | Value              | Description                                                              |
+| ------------------------- | ------------------ | ------------------------------------------------------------------------ |
+| --project-root            | string             | Application directory (defaults to cwd)                                  |
+| --stack                   | string             | Pulumi stack name (default: development)                                 |
+| --backend                 | string             | cloud, local, or object-storage URL                                      |
+| --config                  | key=value          | Set a non-secret Pulumi value; repeatable                                |
+| --config-secret           | key=value          | Set a secret Pulumi value; repeatable                                    |
+| --non-interactive / --yes | boolean            | Approve protected operations                                             |
+| --runtime                 | bun, node, workers | Server runtime (railway: bun or node; vercel: node; cloudflare: workers) |
+| --force                   | boolean            | Replace existing deploy files that differ (railway, vercel, cloudflare)  |
 
 ##### Examples
 
-`relkit deploy init` — Init the Pulumi stack
+`relkit deploy init` — Write a deploy target's files, or initialize the Pulumi stack
 
 #### `relkit deploy preview`
 
@@ -1142,7 +1200,7 @@ Pull a versioned client contract
 
 | Argument | Value    | Description                    |
 | -------- | -------- | ------------------------------ |
-| baseUrl  | required | Running RELKIT application URL |
+| baseUrl  | required | Running RelKit application URL |
 
 | Option | Value  | Description      |
 | ------ | ------ | ---------------- |
@@ -1158,7 +1216,7 @@ Check a pulled client for contract drift
 
 | Argument | Value    | Description                    |
 | -------- | -------- | ------------------------------ |
-| baseUrl  | required | Running RELKIT application URL |
+| baseUrl  | required | Running RelKit application URL |
 
 | Option | Value  | Description      |
 | ------ | ------ | ---------------- |

@@ -4,8 +4,8 @@ import type {
   LocalServiceRecipeInput,
   LocalServiceState,
   LocalServiceWorkerArtifact,
-} from "@relkit/local-service";
-import { normalizeLocalServiceRecipe } from "@relkit/local-service";
+} from "relkit/local-service";
+import { normalizeLocalServiceRecipe } from "relkit/local-service";
 import { localResourceName } from "./identity.js";
 import type { ProviderOverrideSummary } from "./provider-overrides.js";
 import { environmentFile, environmentFiles } from "./reconciler-environment.js";

@@ -1,5 +1,5 @@
 import type { Effect } from "effect";
-import type * as Compiler from "@relkit/compiler";
+import type * as Compiler from "../compiler/index.js";
 import type { CliAdapterError } from "../cli-errors.js";
 
 /**

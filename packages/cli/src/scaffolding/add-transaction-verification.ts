@@ -7,11 +7,12 @@ import {
   ADD_FAILURE_CODES,
   type ScaffoldPlan,
   type ScaffoldVerification,
-} from "create-relkit/internal/add-types";
+} from "create-relkit/add-types";
 
 import type { ApplyScaffoldContext } from "./add-transaction.types.js";
 
 import { checkEffect, runEffect, packagesAvailableEffect } from "./add-transaction-process.js";
+import { packageManagerCommands, projectPackageManager } from "create-relkit/package-manager";
 export const verifyScaffoldTransaction = Effect.fn("ScaffoldTransaction.verify")(function* (
   plan: ScaffoldPlan,
   context: ApplyScaffoldContext,
@@ -30,7 +31,7 @@ export const verifyScaffoldTransaction = Effect.fn("ScaffoldTransaction.verify")
     context.onProgress?.("Installing dependencies...");
     yield* runEffect(
       context,
-      [context.bunExecutable ?? globalThis.process.execPath, "install"],
+      installCommand(plan.projectRoot, context.bunExecutable),
       ADD_FAILURE_CODES.installation,
       plan.projectRoot,
     );
@@ -77,4 +78,17 @@ export function scaffoldTransactionResult(
         : []),
     ]),
   });
+}
+
+/**
+ * Spells the project's install with its package manager.
+ * @param root - Project root.
+ * @param bunExecutable - Explicit Bun executable, when given.
+ * @returns Executable and arguments.
+ */
+function installCommand(root: string, bunExecutable: string | undefined): string[] {
+  const manager = packageManagerCommands(projectPackageManager(root));
+  if (manager.name !== "bun") return [manager.name, ...manager.install];
+  const onBun = typeof globalThis.process.versions.bun === "string";
+  return [bunExecutable ?? (onBun ? globalThis.process.execPath : "bun"), ...manager.install];
 }

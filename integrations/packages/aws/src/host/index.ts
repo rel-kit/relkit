@@ -1,9 +1,10 @@
 import {
   DEPLOYMENT_INTEGRATION_PROTOCOL_VERSION,
   type DeploymentHostIntegration,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 import { materializeAwsHost } from "./materialize.js";
 
+/** @experimental */
 export const awsHost = Object.freeze({
   kind: "deployment-integration",
   protocolVersion: DEPLOYMENT_INTEGRATION_PROTOCOL_VERSION,
@@ -12,4 +13,5 @@ export const awsHost = Object.freeze({
   materialize: materializeAwsHost,
 }) satisfies DeploymentHostIntegration;
 
+/** @experimental */
 export const deploymentIntegration = awsHost;

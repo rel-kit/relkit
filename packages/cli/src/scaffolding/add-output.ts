@@ -1,6 +1,6 @@
 /** Formats scaffold plans and apply results into terminal or JSON output while preserving verification failures and actionable next steps. */
 
-import type { AddResult, ScaffoldPlan } from "create-relkit/internal/add-types";
+import type { AddResult, ScaffoldPlan } from "create-relkit/add-types";
 
 /**
  * Formats a scaffold plan for review before mutation.

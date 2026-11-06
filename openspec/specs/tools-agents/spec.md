@@ -99,12 +99,16 @@ Prompt and model response content SHALL NOT be stored by default; development ca
 
 ### Requirement: Deterministic fake model provider
 
-The test provider SHALL use supported native LangChain model interfaces to script model turns, tool calls, middleware state updates, interruptions, and final outputs without network access or dependence on model prose.
+The explicitly selected agent testing provider SHALL use supported native LangChain model interfaces to script model turns, tool calls, middleware state updates, interruptions, and final outputs without network access or dependence on model prose.
 
 #### Scenario: Scripted agent test runs
 
 - **WHEN** a test scripts a valid native tool call followed by a final output
 - **THEN** the target runs once and deterministic native and RELKIT results, state, events, and traces can be compared
+
+#### Scenario: General testing is installed
+- **WHEN** a consumer uses only the general harness
+- **THEN** it does not install the native model stack, while explicit agent-testing fixtures retain deterministic native model evidence
 
 ### Requirement: Tools are directly invokable through their runtime
 
@@ -152,24 +156,6 @@ Agents, model turns, tool callbacks, parallel tool calls and approvals SHALL use
 - **WHEN** two model-selected tools execute concurrently and one fails
 - **THEN** each tool's logs and operations have its own active span, the failure is identifiable, and the parallel relationship is preserved
 
-### Requirement: Native LangChain execution is the default agent runtime
-
-RELKIT SHALL execute ordinary agents through supported native LangChain APIs while preserving RELKIT validation, authorization, limits, cancellation, redaction, tracing, and function-engine tool invocation.
-
-#### Scenario: Native agent invokes a RELKIT tool
-
-- **WHEN** a declared native model requests a valid function-backed tool
-- **THEN** the target executes once through the common engine and the native agent receives the validated result
-
-### Requirement: Native models tools and middleware require no adapter wrapper
-
-Agent declarations SHALL accept compatible native model instances or lazy factories, native tools, and native middleware alongside RELKIT tools without public conversion helpers or an application-level runtime adapter.
-
-#### Scenario: Todo middleware is declared
-
-- **WHEN** an agent includes the supported native todo middleware
-- **THEN** its contributed tool and state participate in the same native execution without duplicate declarations
-
 ### Requirement: Middleware state is explicitly exposed
 
 Agent declarations SHALL allow selected native state fields to be exposed through a typed allowlist, and SHALL keep unselected native state private by default.
@@ -188,11 +174,26 @@ The same agent declaration SHALL support subagents, model inheritance, skills, m
 - **WHEN** an agent declares a subagent and delegates work
 - **THEN** child execution is correlated under the supplied root thread with isolated native scope and aggregate limits
 
+#### Scenario: Ordinary agent has no DeepAgents feature
+- **WHEN** an agent selects no DeepAgents-only capability
+- **THEN** DeepAgents is neither required nor loaded
+
 ### Requirement: Optional native packages fail explicitly
 
-DeepAgents, model drivers, stores, checkpointers, and backends SHALL remain optional application dependencies and missing or incompatible capabilities SHALL fail with actionable activation errors.
+LangChain/LangGraph/LangSmith execution requirements, DeepAgents, model drivers, stores, checkpointers and backends SHALL be owned by selected capabilities. Missing or incompatible selected requirements SHALL fail before readiness using shared dependency diagnostics; installed-module failures SHALL retain original causes.
 
 #### Scenario: Deep capability package is missing
 
 - **WHEN** an application declares a DeepAgents-only capability without the required package
 - **THEN** activation fails before execution and identifies the missing dependency
+
+### Requirement: Agent state contracts do not install execution
+Shared state contracts SHALL remain below native execution implementations. Redis cache/realtime and generic local cache/bucket/jobs SHALL register only selected capabilities and SHALL NOT require agent SDKs. Selected agents SHALL preserve streaming, tools, persistence, state identity, interruption/resume, durable versions, retries and cancellation.
+
+#### Scenario: Cache-only consumer runs
+- **WHEN** packed Redis-cache-only and generic local-provider fixtures run without LangChain, LangGraph, LangSmith or DeepAgents
+- **THEN** their selected resources work without attempting agent registration
+
+#### Scenario: Explicit agent resumes persisted work
+- **WHEN** an interrupted selected native agent restarts against its supported existing state
+- **THEN** thread/state identity, durable version routing, limits, tool execution and cancellation semantics remain unchanged

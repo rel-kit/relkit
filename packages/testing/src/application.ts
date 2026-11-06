@@ -1,7 +1,8 @@
 /** General test application ownership with explicitly selected capability helpers. */
 import { Layer, ManagedRuntime } from "effect";
-import { runExecutionPromise } from "@relkit/contracts/operation";
+import { runExecutionPromise } from "relkit/contracts/operation";
 import { acquireApplication } from "./application-acquisition.js";
+import { serverTestApplication, TEST_SERVER_URL_VARIABLE } from "./application-server.js";
 import { TestApplicationHarness, TestApplicationPlatformLive } from "./application-platform.js";
 import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
 import type { TestApplication, TestApplicationOptions } from "./application.types.js";
@@ -16,10 +17,12 @@ export type { TestApplication, TestApplicationOptions } from "./application.type
  * Creates an application owner with HTTP, deterministic runtime and provider services.
  * @param app Application environment declarations.
  * @param options Explicit environment, generated project and capability helpers.
- * @returns The ready harness; close releases resources in reverse acquisition order.
+ * @returns The ready harness; close releases resources in reverse acquisition order. When
+ * `RELKIT_TEST_SERVER_URL` is set, the harness instead sends `http` requests to that running
+ * server, so the same HTTP tests can check a production build.
  * @example
  * ```ts
- * import { defineEnv } from "@relkit/app/config";
+ * import { defineEnv } from "relkit/config";
  * import { createTestApplication } from "@relkit/testing";
  * async function testApplication(projectRoot: string): Promise<void> {
  *   const app = await createTestApplication({ env: defineEnv({}) }, { projectRoot });
@@ -33,6 +36,8 @@ export async function createTestApplication(
   app: { readonly env: object },
   options: TestApplicationOptions = {},
 ): Promise<TestApplication> {
+  const server = process.env[TEST_SERVER_URL_VARIABLE];
+  if (server !== undefined && server !== "") return serverTestApplication(server);
   const owner = ManagedRuntime.make(
     testApplicationLayer(app, options).pipe(
       Layer.provide(TestApplicationPlatformLive),

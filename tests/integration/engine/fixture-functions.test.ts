@@ -1,14 +1,10 @@
 /** Exercises maintained grouped commerce sources through the native acceptance boundary. */
 import { expect, test } from "bun:test";
-import {
-  invokeFunction,
-  type InvocationCompletion,
-  type InvocationContext,
-} from "../../../packages/engine/src/index.ts";
-import { bindDescriptorIdentity } from "../../../packages/invocation/dist/index.js";
+import { invokeFunction, type InvocationCompletion, type InvocationContext } from "relkit/engine";
+import { bindDescriptorIdentity } from "relkit/invocation";
 import createOrder from "../../../examples/commerce/src/services/orders/functions/create-order.function.ts";
 import getOrder from "../../../examples/commerce/src/services/orders/functions/get-order.function.ts";
-import { z } from "../../../packages/schema/src/index.ts";
+import { z } from "relkit/schema";
 
 bindDescriptorIdentity(createOrder, "orders.create-order");
 bindDescriptorIdentity(getOrder, "orders.get-order");

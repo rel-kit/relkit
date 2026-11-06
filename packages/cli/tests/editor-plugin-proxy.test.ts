@@ -1,5 +1,5 @@
 /** Verifies the editor plugin proxy survives plugins that chain it with object spread. */
-import ts from "typescript";
+import ts from "../src/typescript-parser.js";
 import { expect, test } from "vitest";
 import initialize from "../src/editor.js";
 

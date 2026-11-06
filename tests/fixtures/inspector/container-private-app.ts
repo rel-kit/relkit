@@ -4,7 +4,7 @@ import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { Effect, Exit } from "effect";
-import { InspectionFiles } from "@relkit/inspector-api/connection";
+import { InspectionFiles } from "relkit/inspector-api/connection";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 import { dockerCall } from "./container-process.js";
 
@@ -12,7 +12,7 @@ const application = `
 import { mkdir, copyFile } from "node:fs/promises";
 import { Effect, Layer } from "effect";
 import { BunRuntime } from "@effect/platform-bun";
-import { InspectionBridge, InspectionBridgeLive, InspectionFilesLive, InspectionNativeLive, InspectionCapture } from "@relkit/inspector-api/connection";
+import { InspectionBridge, InspectionBridgeLive, InspectionFilesLive, InspectionNativeLive, InspectionCapture } from "relkit/inspector-api/connection";
 import { inspectorContainerTeardown } from "./dist/container-exit.js";
 const program = Effect.gen(function* () {
   yield* Effect.promise(() => mkdir("/tmp/bridge-app", { recursive: true }));

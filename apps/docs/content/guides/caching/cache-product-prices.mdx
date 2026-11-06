@@ -24,7 +24,7 @@ Install the local Redis integration from your app root:
 <include>/_snippets/generated/installations/redis.mdx</include>
 
 In `relkit.config.ts`, import `redis` from `@relkit/redis`, `docker` from `@relkit/docker`, and
-`env as binding` from `@relkit/app/config`. Create a `cache` object inside `defineApp()` if the
+`env as binding` from `relkit/config`. Create a `cache` object inside `defineApp()` if the
 app has none, then add this `requests` entry. It is the only cache profile needed here:
 
 <include
@@ -85,10 +85,10 @@ import getPrice from "./functions/get-price.function.js";
 Create `src/routes/prices/route.ts`:
 
 ```ts title="src/routes/prices/route.ts"
-import { defineServiceRoutes } from "@relkit/app/routes";
+import { defineServiceRoutes } from "relkit/routes";
 import orders from "@app/services/orders/service.js";
 
-export const { GET } = defineServiceRoutes(orders, {
+export default defineServiceRoutes(orders, {
   GET: { member: "getPrice" },
 });
 ```

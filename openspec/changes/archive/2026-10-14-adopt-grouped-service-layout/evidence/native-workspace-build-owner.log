@@ -480,14 +480,14 @@ relkit:build: cache hit, replaying logs 8cb1b163515fb3a7
 relkit:build: $ tsc -b
 @relkit/example-auth-drizzle:build: cache hit, replaying logs ab1f0bca876c510c
 @relkit/example-auth-drizzle:build: $ bun ../../packages/cli/dist/bin.js build
-@relkit/example-auth-drizzle:build: Built /Users/mustafaelsayed/Workspace/relkit/examples/auth-drizzle/.relkit/build
+@relkit/example-auth-drizzle:build: Built <repo>/examples/auth-drizzle/.relkit/build
 @relkit/example-data-model:build: cache hit, replaying logs d267d0aec4273287
 @relkit/example-data-model:build: $ bun ../../packages/cli/dist/bin.js build
-@relkit/example-data-model:build: Built /Users/mustafaelsayed/Workspace/relkit/examples/data-model/.relkit/build
+@relkit/example-data-model:build: Built <repo>/examples/data-model/.relkit/build
 @relkit/example-commerce-web:build: cache miss, executing 76c6200cf39c4a74
 @relkit/example-commerce-web:build: $ bun --cwd ../commerce check && bun run scripts/build.ts
 @relkit/example-commerce-web:build: $ bun ../../packages/cli/dist/bin.js check
-@relkit/example-commerce-web:build: Checked /Users/mustafaelsayed/Workspace/relkit/examples/commerce
+@relkit/example-commerce-web:build: Checked <repo>/examples/commerce
 @relkit/example-commerce-web:build: ▲ Next.js 16.3.8 (Turbopack)
 @relkit/example-commerce-web:build: ✓ Running next.config.ts took 106ms
 @relkit/example-commerce-web:build: 
@@ -509,7 +509,7 @@ relkit:build: $ tsc -b
 @relkit/example-commerce-web:build: 
 @relkit/example-commerce:build: cache miss, executing 4e705480e2a330be
 @relkit/example-commerce:build: $ bun ../../packages/cli/dist/bin.js build
-@relkit/example-commerce:build: Built /Users/mustafaelsayed/Workspace/relkit/examples/commerce/.relkit/build
+@relkit/example-commerce:build: Built <repo>/examples/commerce/.relkit/build
 
  Tasks:    59 successful, 59 total
 Cached:    56 cached, 59 total

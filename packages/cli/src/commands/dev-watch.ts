@@ -9,6 +9,7 @@ import { makeDevWatchOwner } from "./dev-watch-owner.js";
 import { syncWatchConfigurations } from "./dev-watch-config.js";
 import { startWatchWorker } from "./dev-watch-worker.js";
 import { ignoredWatchPath } from "./dev-watch-paths.js";
+import { watchProjectTreeEffect } from "./dev-watch-tree.js";
 import { developmentEnvironmentFiles } from "./dev-environment-files.js";
 import type { DevSession } from "./dev-session.js";
 import type { EffectDevSourceWatcher, DevSourceWatcher } from "./dev-watch.types.js";
@@ -28,16 +29,15 @@ export const makeDevSourceWatcherEffect = Effect.fn("Dev.watch")(
       existsSync(join(root, "src")) ? join(root, "src") : root,
     );
     yield* syncWatchConfigurations(root, native, owner);
+    const sourceChange = (filename: string) => {
+      const file = relative(root, join(sourceRoot, filename)).replaceAll("\\", "/");
+      if (!ignoredWatchPath(file) && file !== relative(root, sourceRoot)) owner.notify([file]);
+    };
+    // A project without `src` is watched per top-level directory, never through `node_modules`.
     yield* owner.register(
-      native.watch(
-        sourceRoot,
-        true,
-        (filename) => {
-          const file = relative(root, join(sourceRoot, filename)).replaceAll("\\", "/");
-          if (!ignoredWatchPath(file) && file !== relative(root, sourceRoot)) owner.notify([file]);
-        },
-        owner.failure,
-      ),
+      sourceRoot === root
+        ? watchProjectTreeEffect(native, root, sourceChange, owner.failure)
+        : native.watch(sourceRoot, true, sourceChange, owner.failure),
     );
     if (sourceRoot !== root)
       yield* owner.register(

@@ -7,7 +7,7 @@ import {
   addSourceImport,
 } from "../../packages/cli/src/scaffolding/index.ts";
 export function case4Edits() {
-  const service = `import { defineService } from "@relkit/app/services";\n\nexport default defineService({ functions: { hello } });\n`;
+  const service = `import { defineService } from "relkit/services";\n\nexport default defineService({ functions: { hello } });\n`;
   const imported = addSourceImport(service, "service.ts", `import added from "./added.js";`);
   const edited = addFactoryObjectMember(
     imported,
@@ -33,7 +33,7 @@ export function case4Edits() {
   const merged = addSourceImport(
     `// keep this byte-for-byte\n${service}`,
     "service.ts",
-    `import { type ServiceDescriptor } from "@relkit/app/services";`,
+    `import { type ServiceDescriptor } from "relkit/services";`,
   );
   expect(merged).toStartWith("// keep this byte-for-byte\n");
   expect(merged).toContain("{ defineService, type ServiceDescriptor }");

@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { hashGeneratedArtifact } from "@relkit/compiler";
+import { hashGeneratedArtifact } from "../compiler/index.js";
 import { cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { localCapabilitiesLayer } from "../services/local-capabilities.js";

@@ -1,17 +1,13 @@
 /** Validates shared and native agent configuration before descriptor assembly, keeping invalid authoring failures out of the invocation path. */
 
-import { isDescriptor } from "@relkit/contracts";
+import { isDescriptor } from "relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
-import { agentDefinitionFailure } from "@relkit/agents/internal/define-agent-error";
-import { isAgentInstructions } from "@relkit/agents/internal/define-agent-support";
-import {
-  isAgentSchema,
-  isPositiveInteger,
-  isRecord,
-} from "@relkit/agents/internal/agent-validation";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { agentDefinitionFailure } from "relkit/agents/define-agent-error";
+import { isAgentInstructions } from "relkit/agents/define-agent-support";
+import { isAgentSchema, isPositiveInteger, isRecord } from "relkit/agents/agent-validation";
 import { isAgentModel } from "./define-agent-native.js";
-import { normalizeModelSelector } from "@relkit/agents/internal/model-selection";
+import { normalizeModelSelector } from "relkit/agents/model-selection";
 import type { AgentDescriptor } from "./define-agent.js";
 import type { AgentModel } from "./define-agent-native.js";
 
@@ -31,6 +27,7 @@ export const isAgentDescriptorEffect = Effect.fn("Agents.definition.isDescriptor
  * @param value - Candidate descriptor.
  * @returns Whether the value is an agent descriptor.
  * @example if (isAgentDescriptor(candidate)) use(candidate);
+ * @experimental
  */
 export function isAgentDescriptor(value: unknown): value is AgentAny {
   return Effect.runSync(isAgentDescriptorEffect(value));
@@ -77,6 +74,7 @@ export const assertAgentDescriptorEffect = Effect.fn("Agents.definition.assertDe
  * @returns Nothing when the descriptor is valid.
  * @throws TypeError when the descriptor is invalid.
  * @example assertAgentDescriptor(candidate);
+ * @experimental
  */
 export function assertAgentDescriptor(value: unknown): asserts value is AgentAny {
   Effect.runSync(

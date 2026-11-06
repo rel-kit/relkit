@@ -1,4 +1,4 @@
-import type { RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunWatchFrame } from "relkit/contracts/jobs";
 
 /**
  * Canonical native frame or physical observation lifecycle publication.

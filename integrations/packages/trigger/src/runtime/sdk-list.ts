@@ -3,7 +3,7 @@ import type {
   NativeRunPage,
   NativeRunQuery,
   OperationContext,
-} from "@relkit/jobs/adapter";
+} from "relkit/jobs/adapter";
 import type { TriggerSdkApi } from "./native.js";
 import { triggerTaskIdentifier } from "./sdk-support.js";
 import { record, triggerSnapshot } from "./sdk-mapping.js";

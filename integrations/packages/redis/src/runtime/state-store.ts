@@ -3,7 +3,7 @@ import type {
   LocalAgentState,
   LocalRealtimeState,
   RealtimeStateStore,
-} from "@relkit/providers-local";
+} from "relkit/providers-local";
 import { createRedisClient, type RedisProtocolClient } from "./client.js";
 
 export interface RedisStateStoreOptions<State> {
@@ -50,6 +50,11 @@ export function createRedisAgentStore(
 }
 
 function createCore<State>(options: RedisStateStoreOptions<State>) {
+  // Waiting for changes blocks on XREAD, which the HTTP protocol cannot do.
+  if (/^https?:\/\//iu.test(options.url))
+    throw new TypeError(
+      "Redis realtime and agent state need a socket URL (redis:// or rediss://); an HTTP Redis URL only serves caches.",
+    );
   const client = createRedisClient(options);
   const streamKey = `${options.key}:notifications`;
   let closed = false;
@@ -64,12 +69,12 @@ function createCore<State>(options: RedisStateStoreOptions<State>) {
       await redis.command("SET", [options.key, JSON.stringify(options.empty()), "NX"]);
       value = await redis.get(options.key);
     }
-    if (value === null) throw new Error("Redis Relkit state initialization failed.");
+    if (value === null) throw new Error("Redis RelKit state initialization failed.");
     return value;
   };
   const parse = (value: string): State => {
     const parsed: unknown = JSON.parse(value);
-    if (!options.valid(parsed)) throw new TypeError("Redis Relkit state is invalid.");
+    if (!options.valid(parsed)) throw new TypeError("Redis RelKit state is invalid.");
     return parsed;
   };
   const read = async (): Promise<State> => parse(await readRaw(await connect()));
@@ -90,9 +95,9 @@ function createCore<State>(options: RedisStateStoreOptions<State>) {
         JSON.stringify(next),
       ]);
       if (Number(committed) === 1) return value;
-      await Bun.sleep(10);
+      await sleep(10);
     }
-    throw new Error("Redis Relkit state update timed out.");
+    throw new Error("Redis RelKit state update timed out.");
   };
   const lifecycle: RedisStateWaiter = {
     ready: async () => {
@@ -145,7 +150,7 @@ async function waitForChange<State>(
       if (await recheck()) return;
     } catch (error) {
       if (signal.aborted) throw signal.reason;
-      await Bun.sleep(Math.min(250, Math.max(0, deadlineMs - Date.now())));
+      await sleep(Math.min(250, Math.max(0, deadlineMs - Date.now())));
       void error;
     } finally {
       signal.removeEventListener("abort", abort);
@@ -153,4 +158,9 @@ async function waitForChange<State>(
     }
   }
   if (signal.aborted) throw signal.reason;
+}
+
+/** Waits without blocking the event loop. @param milliseconds - Delay. @returns After the delay. */
+function sleep(milliseconds: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }

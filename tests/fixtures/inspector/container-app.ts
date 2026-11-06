@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, readFile, rename, rm, writeFile } from "node:fs/promise
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Clock, Effect, Exit, Scope } from "effect";
-import { InspectionBridge, InspectionCapture } from "@relkit/inspector-api/connection";
+import { InspectionBridge, InspectionCapture } from "relkit/inspector-api/connection";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 
 export const containerApplication = Effect.fn("Container.fixtureApplication")(function* () {

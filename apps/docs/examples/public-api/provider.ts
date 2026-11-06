@@ -5,7 +5,7 @@ import {
   defineProviderAdapter,
   defineProviderBehavior,
   defineProviderCapability,
-} from "@relkit/provider";
+} from "relkit/provider";
 
 export const cacheAdapter = defineProviderAdapter({
   integration: defineIntegrationReference("example-cache"),

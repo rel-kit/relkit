@@ -1,4 +1,4 @@
-/** Publishes the native agent test harness helpers from the explicit integration while sharing RELKIT testing ownership and clock boundaries. */
+/** Publishes the native agent test harness helpers from the explicit integration while sharing RelKit testing ownership and clock boundaries. */
 
 import { createAgentState } from "./agent-state.js";
 
@@ -7,9 +7,9 @@ import {
   observeExecution,
   runExecutionPromise,
   runExecutionSync,
-} from "@relkit/contracts/operation";
-import { disposeTestingOwner, testingLoggerLayer } from "@relkit/testing/internal/testing-owner";
-import { combineSignals } from "@relkit/testing/internal/runtime-clock";
+} from "relkit/contracts/operation";
+import { disposeTestingOwner, testingLoggerLayer } from "@relkit/testing/testing-owner";
+import { combineSignals } from "@relkit/testing/runtime-clock";
 import type { AgentHarnessService } from "./agent-harness.types.js";
 
 import { createTestModel } from "./agents-model.js";
@@ -42,7 +42,7 @@ export type {
 export { assertAgentTrace } from "./agents-utils.js";
 export { createTestModel } from "./agents-model.js";
 
-/** Agent decisions, approval ownership and scripted invocation share one service. */
+/** Agent decisions, approval ownership and scripted invocation share one service. @experimental */
 export class TestAgentHarness extends Context.Service<TestAgentHarness, AgentHarnessService>()(
   "relkit/testing/AgentHarness",
 ) {}
@@ -52,6 +52,7 @@ export class TestAgentHarness extends Context.Service<TestAgentHarness, AgentHar
  * @typeParam Agent Descriptor carrying input/output schema inference.
  * @param options Script, tool engine, approval and capture policies.
  * @returns A scoped service Layer; scope release resets outstanding work.
+ * @experimental
  */
 export function testAgentLayer<Agent extends TestAgentDescriptor>(
   options: TestAgentOptions<Agent>,
@@ -74,7 +75,7 @@ export function testAgentLayer<Agent extends TestAgentDescriptor>(
                     const signals = combineSignals(invocation?.signal, signal);
                     try {
                       return await value.invoke(
-                        input as import("@relkit/schema").InferInput<Agent["input"]>,
+                        input as import("relkit/schema").InferInput<Agent["input"]>,
                         { ...invocation, signal: signals.signal },
                       );
                     } finally {
@@ -97,6 +98,7 @@ export function testAgentLayer<Agent extends TestAgentDescriptor>(
  * @typeParam Agent Descriptor determining public input/output types.
  * @param options Network-free script and native engine dependencies.
  * @returns A synchronously ready harness preserving existing results and errors.
+ * @experimental
  */
 export function createTestAgent<Agent extends TestAgentDescriptor>(
   options: TestAgentOptions<Agent>,
@@ -115,7 +117,7 @@ export function createTestAgent<Agent extends TestAgentDescriptor>(
   return Object.freeze({
     ...service.value,
     invoke: (
-      input: import("@relkit/schema").InferInput<Agent["input"]>,
+      input: import("relkit/schema").InferInput<Agent["input"]>,
       options?: TestAgentInvocationOptions,
     ) => runExecutionPromise(owner, service.invoke(input, options)),
     close: () => (closing ??= disposeTestingOwner(owner)),

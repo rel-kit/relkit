@@ -2,7 +2,7 @@
 
 import { createMiddleware, type AnyAgentMiddleware } from "langchain";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import type { AgentLimits } from "./define-agent.js";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { AgentRuntimeError } from "./runtime-errors.js";

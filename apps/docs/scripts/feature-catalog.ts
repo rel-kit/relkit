@@ -12,7 +12,7 @@ export const features = [
     "Define application identity and runtime topology.",
     "docs/learn/concepts/application",
     "app",
-    [["packages/app/src/define-app.ts", "defineApp"]],
+    [["packages/relkit/src/app/define-app.ts", "defineApp"]],
     ["templates/default/v1/api/relkit.config.ts"],
   ),
   feature(
@@ -21,7 +21,7 @@ export const features = [
     "Parse, default, and protect runtime configuration.",
     "docs/learn/concepts/environment",
     "config",
-    [["packages/config/src/env.ts", "defineEnv"]],
+    [["packages/relkit/src/config/env.ts", "defineEnv"]],
     ["templates/default/v1/api/src/platform/env.ts"],
   ),
   feature(
@@ -45,8 +45,8 @@ export const features = [
     "docs/learn/concepts/schemas",
     "schema",
     [
-      ["packages/schema/src/builder.ts", "z"],
-      ["packages/schema/src/standard-schema.ts", "validate"],
+      ["packages/relkit/src/schema/builder.ts", "z"],
+      ["packages/relkit/src/schema/standard-schema.ts", "validate"],
     ],
     ["examples/commerce/src/platform/schemas.ts"],
   ),
@@ -56,7 +56,7 @@ export const features = [
     "Write one validated handler for every invocation transport.",
     "docs/learn/concepts/functions",
     "functions",
-    [["packages/functions/src/define-function.ts", "defineFunction"]],
+    [["packages/relkit/src/functions/define-function.ts", "defineFunction"]],
     ["examples/commerce/src/services/orders/functions/create-order.function.ts"],
   ),
   feature(
@@ -65,7 +65,7 @@ export const features = [
     "Expose stable failures with transport and retry policy.",
     "docs/learn/concepts/errors",
     "functions",
-    [["packages/functions/src/define-error.ts", "defineError"]],
+    [["packages/relkit/src/functions/define-error.ts", "defineError"]],
     ["examples/commerce/src/services/orders/errors/order-not-found.error.ts"],
   ),
   feature(
@@ -74,7 +74,7 @@ export const features = [
     "Organize capabilities by domain and expose a focused public service boundary.",
     "docs/modules/service/define",
     "services",
-    [["packages/services/src/define-service.ts", "defineService"]],
+    [["packages/relkit/src/services/define-service.ts", "defineService"]],
     ["examples/commerce/src/services/orders/service.ts"],
   ),
   databaseFeature,
@@ -85,7 +85,7 @@ export const features = [
     "Map filesystem routes to validated function calls.",
     "docs/modules/http/define",
     "routes",
-    [["packages/routes/src/define-route.ts", "defineRoute"]],
+    [["packages/relkit/src/routes/define-route.ts", "defineRoute"]],
     ["examples/commerce/src/routes/orders/[orderId]/route.ts"],
   ),
   feature(
@@ -94,7 +94,7 @@ export const features = [
     "Apply request policy to explicit path scopes.",
     "docs/modules/http/middleware",
     "routes",
-    [["packages/routes/src/define-middleware.ts", "defineMiddleware"]],
+    [["packages/relkit/src/routes/define-middleware.ts", "defineMiddleware"]],
     ["examples/commerce/src/routes/middleware/order-auth.middleware.ts"],
   ),
   feature(
@@ -114,8 +114,8 @@ export const features = [
     "docs/modules/events/index",
     "events",
     [
-      ["packages/events/src/define-event.ts", "defineEvent"],
-      ["packages/events/src/define-event-function.ts", "defineEventFunction"],
+      ["packages/relkit/src/events/define-event.ts", "defineEvent"],
+      ["packages/relkit/src/events/define-event-function.ts", "defineEventFunction"],
     ],
     ["apps/docs/examples/events/order-created.event.ts"],
   ),
@@ -126,8 +126,8 @@ export const features = [
     "docs/modules/jobs/quickstart",
     "jobs",
     [
-      ["packages/jobs/src/define-task.ts", "defineTask"],
-      ["packages/jobs/src/define-job.ts", "defineJob"],
+      ["packages/relkit/src/jobs/define-task.ts", "defineTask"],
+      ["packages/relkit/src/jobs/define-job.ts", "defineJob"],
     ],
     ["examples/commerce/src/services/orders/tasks/export-orders.task.ts"],
   ),
@@ -137,7 +137,7 @@ export const features = [
     "Trigger a job from explicit cron and timezone rules.",
     "docs/modules/jobs/schedules",
     "jobs",
-    [["packages/jobs/src/define-job.ts", "defineJob"]],
+    [["packages/relkit/src/jobs/define-job.ts", "defineJob"]],
     ["examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts"],
   ),
   feature(
@@ -146,7 +146,7 @@ export const features = [
     "Store, read, and share files from your app.",
     "docs/modules/storage/define",
     "buckets",
-    [["packages/buckets/src/define-bucket.ts", "defineBucket"]],
+    [["packages/relkit/src/buckets/define-bucket.ts", "defineBucket"]],
     ["examples/commerce/src/services/assets/buckets/assets.bucket.ts"],
   ),
   feature(
@@ -155,7 +155,7 @@ export const features = [
     "Reuse expensive lookups and keep cached values fresh.",
     "docs/modules/caching/define",
     "cache",
-    [["packages/cache/src/define-cache.ts", "defineCache"]],
+    [["packages/relkit/src/cache/define-cache.ts", "defineCache"]],
     ["examples/commerce/src/services/orders/cache/prices.cache.ts"],
   ),
   feature(
@@ -164,7 +164,7 @@ export const features = [
     "Let AI agents and MCP clients use your application's functions.",
     "docs/modules/ai/tools",
     "tools",
-    [["packages/tools/src/define-tool.ts", "defineTool"]],
+    [["packages/relkit/src/tools/define-tool.ts", "defineTool"]],
     ["examples/commerce/src/services/orders/tools/lookup-order.tool.ts"],
   ),
   feature(
@@ -174,8 +174,8 @@ export const features = [
     "docs/modules/ai/approvals",
     "agents",
     [
-      ["packages/agents/src/approval.ts", "approveApproval"],
-      ["packages/agents/src/approval.ts", "denyApproval"],
+      ["packages/relkit/src/agents/approval.ts", "approveApproval"],
+      ["packages/relkit/src/agents/approval.ts", "denyApproval"],
     ],
     ["examples/commerce/src/services/orders/tools/cancel-order.tool.ts"],
   ),
@@ -185,7 +185,7 @@ export const features = [
     "Run bounded model workflows with allowlisted tools and offline tests.",
     "docs/modules/ai/agents",
     "agents",
-    [["packages/agents/src/define-agent.ts", "defineAgent"]],
+    [["packages/relkit/src/agents/define-agent.ts", "defineAgent"]],
     ["examples/commerce/src/services/orders/agents/order-support.agent.ts"],
   ),
   testingFeature,

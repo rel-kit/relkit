@@ -8,7 +8,7 @@ import type {
   RunRetryReceipt,
   RunSnapshot,
   RunWatchFrame,
-} from "@relkit/contracts/jobs";
+} from "relkit/contracts/jobs";
 import type {
   JobClientField,
   JobCancelInput,

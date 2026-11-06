@@ -4,7 +4,7 @@ import type {
   AgentExecutionEvent,
   AgentExecutionSnapshot,
   ThreadSnapshot,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 export type { AgentExecutionProjection } from "./agent-execution-observation.types.js";
 
 /**

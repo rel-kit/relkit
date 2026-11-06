@@ -1,0 +1,22 @@
+{
+  "protocol": "relkit.walkthrough-result",
+  "createdAt": "2026-11-06T14:52:11.281Z",
+  "kind": "create-to-railway",
+  "outcome": "passed",
+  "seconds": 100,
+  "steps": [
+    {
+      "name": "create",
+      "seconds": 33
+    },
+    {
+      "name": "deployed",
+      "seconds": 97
+    },
+    {
+      "name": "reachable",
+      "seconds": 100
+    }
+  ],
+  "note": "Railway newcomer test (bun image): creation and install 33 s, then deploy until the app answers over HTTPS; packing the candidate (12 s) is excluded."
+}

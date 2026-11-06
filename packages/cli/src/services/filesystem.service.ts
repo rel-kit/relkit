@@ -17,6 +17,7 @@ import { cliPromise, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import type { FileSystemCapabilities } from "./filesystem.types.js";
 import { writeExclusiveEffect } from "./filesystem-exclusive.js";
+import { globFiles } from "../runtime/glob.js";
 import { CliCleanup, cleanupLayer } from "./cleanup.service.js";
 
 /** Invocation-owned native filesystem access, substitutable by a deterministic Layer. */
@@ -143,8 +144,7 @@ export const fileSystemLayer = Layer.effect(
           cliTry("filesystem.files", () => {
             const files = new Set<string>();
             for (const pattern of patterns)
-              for (const file of new Bun.Glob(pattern).scanSync({ cwd: root, onlyFiles: true }))
-                files.add(file.replaceAll("\\", "/"));
+              for (const file of globFiles(root, pattern)) files.add(file);
             return [...files].sort();
           }),
         ),

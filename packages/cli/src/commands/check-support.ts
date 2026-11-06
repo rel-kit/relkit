@@ -3,9 +3,9 @@
  * The check service supplies source reads; this module preserves cancellation,
  * source locations and actionable current application configuration examples.
  */
-import { canonicalJson, RELKIT_DESCRIPTOR } from "@relkit/contracts";
-import { createDiagnostic, type Diagnostic } from "@relkit/diagnostics";
-import { ConfigValidationError, type GeneratedOutputs } from "@relkit/compiler";
+import { canonicalJson, RELKIT_DESCRIPTOR } from "relkit/contracts";
+import { createDiagnostic, type Diagnostic } from "relkit/diagnostics";
+import { ConfigValidationError, type GeneratedOutputs } from "../compiler/index.js";
 import { Effect } from "effect";
 import { relative } from "node:path";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
@@ -28,6 +28,29 @@ export function evaluatorDiagnostics(
       severity: "error",
       message: safeMessage(failure.message),
       ...(failure.module === undefined ? {} : { file: failure.module, line: 1, column: 1 }),
+    }),
+  );
+}
+
+/** Projects warnings the application reported while it was imported, such as a deprecation.
+ * @param warnings - Evaluator warnings, absent when there were none.
+ * @returns Warning diagnostics located at the importing module; they do not fail the check.
+ */
+export function evaluatorWarningDiagnostics(
+  warnings: readonly {
+    readonly code: string;
+    readonly message: string;
+    readonly module: string;
+  }[] = [],
+): readonly Diagnostic[] {
+  return warnings.map((warning) =>
+    createDiagnostic({
+      code: warning.code,
+      severity: "warning",
+      message: safeMessage(warning.message),
+      file: warning.module,
+      line: 1,
+      column: 1,
     }),
   );
 }

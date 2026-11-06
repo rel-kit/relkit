@@ -9,7 +9,7 @@ import type {
   NativeSubmission,
   NativeWatchRequest,
   OperationContext,
-} from "@relkit/jobs/adapter";
+} from "relkit/jobs/adapter";
 import type { EffectMqWorkerHandle, EffectMqWorkerRegistrationOptions } from "./worker.js";
 import { createEffectMqPostgresSchedules } from "./postgres-schedules.js";
 import { createEffectMqPostgresState, type EffectMqPostgresState } from "./postgres-state.js";
@@ -21,6 +21,7 @@ import {
   submitEffectMq,
 } from "./postgres-operations.js";
 
+/** @experimental */
 export interface EffectMqNativeClient {
   readonly submit: (request: NativeSubmission, context: OperationContext) => Promise<NativeReceipt>;
   readonly get: (runId: string, context: OperationContext) => Promise<NativeRun>;
@@ -40,12 +41,14 @@ export interface EffectMqNativeClient {
   readonly registerWorker?: (options: EffectMqWorkerRegistrationOptions) => EffectMqWorkerHandle;
 }
 
+/** @experimental */
 export interface EffectMqPostgresNativeOptions {
   readonly postgresUrl: string;
   readonly tablePrefix?: string;
   readonly queue?: string;
 }
 
+/** @experimental */
 export function createEffectMqPostgresNativeClient(
   options: EffectMqPostgresNativeOptions,
 ): EffectMqNativeClient {

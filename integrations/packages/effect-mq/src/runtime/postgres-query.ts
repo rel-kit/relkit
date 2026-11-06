@@ -1,5 +1,5 @@
-import type { RunSnapshot } from "@relkit/contracts/jobs";
-import type { NativeRun, NativeRunQuery } from "@relkit/jobs/adapter";
+import type { RunSnapshot } from "relkit/contracts/jobs";
+import type { NativeRun, NativeRunQuery } from "relkit/jobs/adapter";
 import { JobStore } from "effect-mq";
 
 export function metadataFilter(query: NativeRunQuery): Readonly<Record<string, unknown>> {

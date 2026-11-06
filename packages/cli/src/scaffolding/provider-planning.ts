@@ -5,17 +5,17 @@ import { ensureEnvironmentEffect } from "./provider-environment.js";
 export { ensureEnvironmentEffect } from "./provider-environment.js";
 import { Effect } from "effect";
 
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
 
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
-} from "create-relkit/internal/generator-errors";
+} from "create-relkit/generator-errors";
 
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
 
 import { normalizeArtifactName } from "./add-name.js";
 
@@ -38,7 +38,7 @@ export const ensureProviderProfileEffect = Effect.fn("Scaffold.ensureProviderPro
     capability: ProviderCapability,
     options: EnsureProfileOptions = {},
   ): Effect.fn.Return<string, GeneratorDomainError | GeneratorIoError, GeneratorFileSystem> {
-    const configCapability = capability === "job" && options.legacy !== true ? "jobs" : capability;
+    const configCapability = capability === "job" ? "jobs" : capability;
     const profiles = builder.profiles.filter((item) => item.capability === capability);
     const explicitSource = options.provider !== undefined || options.source !== undefined;
     if (options.requested) {

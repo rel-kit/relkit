@@ -5,7 +5,7 @@ import { expect, test } from "bun:test";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { defineEnv } from "@relkit/config";
+import { defineEnv } from "relkit/config";
 import { createTestApplication, type TestApplication } from "../../src/application.js";
 
 test("public application close retains AggregateError and its memoized rejected Promise", async () => {

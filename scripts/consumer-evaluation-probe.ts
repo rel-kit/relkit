@@ -9,7 +9,7 @@ import { realpathSync } from "node:fs";
 import { createRequire } from "node:module";
 import { randomUUID } from "node:crypto";
 import { Effect } from "effect";
-import ts from "typescript";
+import ts from "relkit-typescript";
 import { scaffoldChild } from "./scaffold-process.js";
 import { recordConsumerScripts } from "./consumer-evaluation-native.js";
 import { consumerInputFailure, inspectionNative } from "./consumer-installation-native.js";

@@ -13,10 +13,7 @@ import { resolveConsumerPackage } from "../consumer-installation-native.js";
  */
 async function installedWs() {
   const importer = await realpath(
-    resolve(
-      import.meta.dir,
-      "../../packages/runtime-effect/node_modules/@effect/platform-node-shared",
-    ),
+    resolve(import.meta.dir, "../../packages/relkit/node_modules/@effect/platform-node-shared"),
   );
   const search =
     createRequire(join(importer, "package.json")).resolve.paths("ws/package.json") ?? [];

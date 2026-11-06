@@ -5,7 +5,7 @@
  */
 import { expect, it } from "@effect/vitest";
 import { Deferred, Effect, Exit, Fiber, Layer } from "effect";
-import { createSupervisorProxy, type SupervisorProxy } from "@relkit/supervisor";
+import { createSupervisorProxy, type SupervisorProxy } from "../../src/supervisor/index.js";
 import { CliDevSupervisor, devSupervisorLayer } from "../../src/services/dev-supervisor.service.js";
 import { CliPortProbe } from "../../src/commands/port-availability.service.js";
 import { CliInspectorSupport } from "../../src/commands/dev-inspector-support.service.js";

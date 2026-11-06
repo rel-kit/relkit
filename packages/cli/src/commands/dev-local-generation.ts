@@ -1,7 +1,7 @@
 /** Executes one serialized generation with initial-check reuse, typed diagnostics and local worker activation. */
 import { Effect, Ref } from "effect";
-import type { CandidateCompile, CandidateCompileRequest } from "@relkit/supervisor";
-import { DEFAULT_TOOLING_CONFIG } from "@relkit/compiler";
+import type { CandidateCompile, CandidateCompileRequest } from "../supervisor/index.js";
+import { DEFAULT_TOOLING_CONFIG } from "../compiler/index.js";
 import { cliTry } from "../cli-errors.js";
 import { CliProject } from "../services/project.service.js";
 import { formatDevDiagnostics } from "./dev-local-diagnostics.js";
@@ -41,11 +41,14 @@ export const compileDevGenerationEffect = Effect.fn("Dev.compileGeneration")(fun
           request,
         );
   let local = yield* reconcileGenerationServices(options, state, checked);
+  // Local Docker job workers run the bundled entry and keep their own copy of the handlers.
+  const workers = (local?.workerBindings.length ?? 0) > 0;
   const built = yield* project.build({
     projectRoot: options.projectRoot,
     mode: "development",
     buildDirectory: request.outputDirectory,
     check: async () => checked,
+    ...(workers ? { developmentBundle: true } : {}),
     ...(local?.generationId === undefined
       ? {}
       : { providerOverridesGeneration: local.generationId }),
@@ -55,7 +58,14 @@ export const compileDevGenerationEffect = Effect.fn("Dev.compileGeneration")(fun
       throw new Error(formatDevDiagnostics(options.projectRoot, built.diagnostics, options.color));
     });
   local = yield* activateGenerationWorkers(options, state, checked, request, local);
-  return generationReceipt(local, inspection);
+  // Later saves compare against this check to decide whether they can swap in place; a
+  // generation with local workers is never swapped, because the workers would keep old code.
+  if (!workers)
+    yield* Ref.update(
+      state.checks,
+      (checks) => new Map([...[...checks].slice(-4), [request.token.generationToken, checked]]),
+    );
+  return generationReceipt(local, inspection, workers);
 });
 
 /**
@@ -96,14 +106,17 @@ const selectGenerationCheck = Effect.fn("Dev.selectGenerationCheck")(function* (
  * Projects local reconciliation and inspection evidence into the supervisor's build receipt.
  * @param local - Optional accepted local services and worker environment.
  * @param inspection - Optional inspector credentials selected by this generation's policy.
+ * @param bundled - Whether the generation was bundled for local workers.
  * @returns Backend entrypoint and only the environment selected by this generation.
  */
 function generationReceipt(
   local: DevLocalReconcileResult | undefined,
   inspection: Readonly<Record<string, string | undefined>> | undefined,
+  bundled: boolean,
 ): Awaited<ReturnType<CandidateCompile>> {
   return {
-    entrypoint: "server/index.js",
+    // Bun runs the generated TypeScript entry directly unless local workers needed a bundle.
+    entrypoint: bundled ? "server/index.js" : "server/index.ts",
     ...(local === undefined && inspection === undefined
       ? {}
       : {

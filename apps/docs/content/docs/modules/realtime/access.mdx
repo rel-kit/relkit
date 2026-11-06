@@ -4,6 +4,7 @@ description: Expose only the channel partitions a browser is allowed to observe.
 pagination: false
 sidebar:
   icon: shield-check
+labs: true
 ---
 
 Authorize each realtime channel subscription on the server before sending application data.
@@ -42,11 +43,11 @@ A missing session, thrown error, timeout, malformed result, or unavailable autho
 
 ## How authorization stays current
 
-A successful check creates a short authorization grant for the exact application, identity, session, tenant, channel, and partition. Grants last no longer than 60 seconds. RELKIT authorizes again when the client subscribes, reconnects, replays, renews, changes identity or tenant, or crosses a policy or provider epoch.
+A successful check creates a short authorization grant for the exact application, identity, session, tenant, channel, and partition. Grants last no longer than 60 seconds. RelKit authorizes again when the client subscribes, reconnects, replays, renews, changes identity or tenant, or crosses a policy or provider epoch.
 
 This prevents an old checkpoint or an already-open connection from extending access indefinitely. A replacement login for the same user also receives a new session epoch, so stale callbacks and buffered private data cannot cross into the new session.
 
-When renewal is denied, RELKIT:
+When renewal is denied, RelKit:
 
 - stops the subscription;
 - removes private frames queued under the old grant;
@@ -66,6 +67,6 @@ State-changing HTTP operations that lead to channel publication still use the ro
 
 The client provider uses an opaque server-derived identity scope and session epoch to partition cached and realtime state. A manual `identityKey` may add tenant or application partitioning, but it never authorizes access. The server always derives the current principal independently.
 
-On identity or session replacement, the client aborts active subscriptions, clears private RELKIT state, and ignores callbacks from the previous scope.
+On identity or session replacement, the client aborts active subscriptions, clears private RelKit state, and ignores callbacks from the previous scope.
 
 <include>/_snippets/generated/related/docs-modules-realtime-access.mdx</include>

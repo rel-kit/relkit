@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
-import { API_BASE_PATH } from "@relkit/contracts";
-import { createSupervisorProxy, createSupervisorStateMachine } from "@relkit/supervisor";
+import { API_BASE_PATH } from "relkit/contracts";
+import { createSupervisorProxy, createSupervisorStateMachine } from "@relkit/cli/supervisor";
 import { createPerformanceInspector } from "./performance-core-consumers-fixture.js";
 import { measure } from "./performance-support.js";
 import type { RouteMeasurements } from "./performance-core-consumers.types.js";

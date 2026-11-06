@@ -1,8 +1,8 @@
-/** Adapts a configured RELKIT bucket to the DeepAgents file backend, sharing the invocation scope and preserving bucket failures at the native adapter. */
+/** Adapts a configured RelKit bucket to the DeepAgents file backend, sharing the invocation scope and preserving bucket failures at the native adapter. */
 
 import type { BackendProtocolV2 } from "deepagents";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { deepAgentBucketFailure } from "./deepagent-bucket-error.js";
 import { createBucketContext, type DeepAgentBucketClient } from "./deepagent-bucket-files.js";
 import { readBucket, readBucketRaw } from "./deepagent-bucket-read.js";
@@ -17,7 +17,7 @@ import type { DeepAgentBucketBackendOptions } from "./deepagent-bucket-backend.t
 
 export type { DeepAgentBucketBackendOptions } from "./deepagent-bucket-backend.types.js";
 
-/** Builds a DeepAgents backend from a RELKIT bucket client.
+/** Builds a DeepAgents backend from a RelKit bucket client.
  * @param bucket - Bucket client that owns the backend's files.
  * @param options - Optional key prefix.
  * @returns An Effect with a frozen backend or DeepAgentBucketFailure.

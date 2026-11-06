@@ -1,7 +1,7 @@
 /** Relocated history preserves native validation codes and header negotiation without disclosing causes. */
 import { expect, test } from "vitest";
 import { Effect, Layer, Ref } from "effect";
-import { LocalWorkerError } from "@relkit/observability/local/worker-contract";
+import { LocalWorkerError } from "relkit/observability/local/worker-contract";
 import { InspectorHistory } from "../src/history.service.js";
 import { InspectorHistoryNative } from "../src/history-native.service.js";
 import { inspectorBackend } from "../src/tool-backend.js";

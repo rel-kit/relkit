@@ -1,7 +1,7 @@
 /** Owns release-metadata validation and the complete sequential Turbo build, restoring generated editor declarations after joined child shutdown. */
 import { join, resolve } from "node:path";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { restoreFile, snapshotFile } from "./preserve-build-state.ts";
 import { scaffoldChild } from "./scaffold-process.js";
 import { scaffoldNative } from "./scaffold-native.js";

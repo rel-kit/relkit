@@ -5,7 +5,7 @@ import type {
   BrowserMessage,
   JournalCheckpoint,
   ThreadSnapshot,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import { agentContentFromMessages, applyAgentEvent } from "../../src/react/agent-observation.ts";
 import type { AgentBase } from "../../src/react/agent-hook-types.types.js";
 import { applyAgentSnapshot } from "../../src/react/agent-snapshot-observation.ts";

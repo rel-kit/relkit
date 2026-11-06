@@ -40,7 +40,7 @@ Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
       28 |   await page.unroute(apiOrigin + "/**");
       29 |   await submit.click();
       30 |   await expect(page.getByRole("heading", { name: "Hello, Grace!", exact: true })).toBeVisible();
-        at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-rru7hzrq/case02/tests/browser/greeting.spec.ts:27:40
+        at <tmp>/relkit-guidance-live-rru7hzrq/case02/tests/browser/greeting.spec.ts:27:40
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
     .relkit/browser-test-results/greeting-name-form-updates-11fcb-llstack-content-and-wrapper/test-failed-1.png

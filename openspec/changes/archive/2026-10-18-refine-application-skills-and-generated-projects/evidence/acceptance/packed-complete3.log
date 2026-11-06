@@ -187,7 +187,7 @@ Acceptance: existing-database-auth-install
 102 |     if (code !== 0)
 103 |       return yield* new ScaffoldProcessFailure({
                           ^
-error: --smol install --network-concurrency 1 --force --no-cache --registry http://127.0.0.1:51548 failed in /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-ITuFuv/consumer-direct (1)
+error: --smol install --network-concurrency 1 --force --no-cache --registry http://127.0.0.1:51548 failed in <tmp>/relkit-packed-acceptance-ITuFuv/consumer-direct (1)
 bun install v1.3.10 (30e609e0)
 Resolving dependencies
 Resolved, downloaded and extracted [11]
@@ -197,11 +197,11 @@ error: drizzle-kit@1.0.0-rc.5-ab785fc failed to resolve
  operation: "process.exit",
       _tag: "ScaffoldProcessFailure",
 
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/scripts/scaffold-process.ts:103:21)
-      at ~effect/Effect/successCont (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)
-      at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
-      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
+      at <anonymous> (<repo>/scripts/scaffold-process.ts:103:21)
+      at ~effect/Effect/successCont (<repo>/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)
+      at runLoop (<repo>/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
+      at evaluate (<repo>/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
       at runInAsyncScope (node:async_hooks:137:23)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17)
+      at <anonymous> (<repo>/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17)
 
 Bun v1.3.10 (macOS arm64)

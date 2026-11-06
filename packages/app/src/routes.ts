@@ -1,1 +1,2 @@
-export * from "@relkit/routes";
+import "./deprecated.js";
+export * from "relkit/routes";

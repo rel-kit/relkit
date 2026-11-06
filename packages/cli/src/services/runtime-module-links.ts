@@ -1,7 +1,7 @@
 /** Retains the selected HTTP producer in an owned runnable directory. Build/candidate rollback owns these links; deployment contexts exclude node_modules and install the production manifest instead. */
 import { dirname, join } from "node:path";
 import { Effect } from "effect";
-import type { DependencySourceContract } from "@relkit/provider/internal/dependencies";
+import type { DependencySourceContract } from "relkit/provider/dependencies";
 import { cliAdapterError } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { resolveProductionDependency } from "./production-dependency-source.js";
@@ -24,7 +24,7 @@ export const linkRuntimeModules = Effect.fn("Project.runtimeModuleLinks")(
     projectRoot: string,
     external: readonly string[],
   ) {
-    const name = "@relkit/runtime-hono";
+    const name = "relkit";
     if (!external.includes(name)) return;
     const identity = yield* resolveProductionDependency(source, name, projectRoot).pipe(
       Effect.mapError((cause) => cliAdapterError("runtime.moduleLink.resolve", cause)),

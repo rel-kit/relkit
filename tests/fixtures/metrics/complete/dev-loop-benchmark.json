@@ -1,0 +1,11 @@
+{
+  "protocol": "relkit.dev-loop-benchmark",
+  "version": 1,
+  "createdAt": "2026-11-05T10:00:00.000Z",
+  "sizes": [
+    { "functions": 10, "reload": { "p95Ms": 140 }, "memoryRatio": 0.82 },
+    { "functions": 100, "reload": { "p95Ms": 610 }, "memoryRatio": 0.91 },
+    { "functions": 500, "reload": { "p95Ms": 1420 }, "memoryRatio": 1.2 }
+  ],
+  "passed": true
+}

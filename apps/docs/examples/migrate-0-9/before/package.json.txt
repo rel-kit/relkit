@@ -1,0 +1,13 @@
+{
+  "name": "orders-0-8",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@relkit/app": "0.8.8",
+    "@relkit/better-auth": "0.8.8",
+    "better-auth": "1.7.1"
+  },
+  "devDependencies": {
+    "@relkit/cli": "0.8.8"
+  }
+}

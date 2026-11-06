@@ -1,5 +1,5 @@
-import type { ExpectedClientIdentity } from "@relkit/contracts";
-import type { RunSnapshot } from "@relkit/contracts/jobs";
+import type { ExpectedClientIdentity } from "relkit/contracts";
+import type { RunSnapshot } from "relkit/contracts/jobs";
 import type { JobWatchOptions, JobWatchState } from "../jobs/types.js";
 
 /** Watch request authority and explicit connection/recovery policy for the declared job. */

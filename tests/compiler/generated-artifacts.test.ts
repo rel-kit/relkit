@@ -10,7 +10,7 @@ import {
   writeGeneratedArtifacts,
   createWatchDependencyIndex,
   type GeneratedOutputs,
-} from "../../packages/compiler/src/index.ts";
+} from "../../packages/cli/src/compiler/index.ts";
 
 const outputs: GeneratedOutputs = {
   graph: '{"contractVersion":1}\n',

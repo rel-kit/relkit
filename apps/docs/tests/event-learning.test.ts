@@ -80,7 +80,7 @@ test("introduces the Events API and shows subscribers before the existing-app tu
   const tutorial = await Bun.file(
     resolve(import.meta.dir, "../content/guides/events/react-to-order-events.mdx"),
   ).text();
-  expect(tutorial).toContain("existing RELKIT app");
+  expect(tutorial).toContain("existing RelKit app");
   expect(tutorial).not.toContain("create-relkit");
   expect(tutorial).not.toContain("cp .env");
   expect(tutorial).toContain("src/routes/orders/route.ts");

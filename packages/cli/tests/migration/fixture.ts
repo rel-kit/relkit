@@ -33,6 +33,11 @@ export const migrationFixture = Effect.gen(function* () {
       join(repository, "node_modules/@types/bun"),
       join(root, "node_modules/@types/bun"),
     );
+    // relkit check type-checks with the project's own compiler.
+    await symlink(
+      join(repository, "node_modules/typescript"),
+      join(root, "node_modules/typescript"),
+    );
   }).pipe(Effect.uninterruptible);
   return root;
 });

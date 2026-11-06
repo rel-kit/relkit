@@ -1,4 +1,4 @@
-import type { RuntimeProviderContext, RuntimeProviderIntegration } from "@relkit/provider";
+import type { RuntimeProviderContext, RuntimeProviderIntegration } from "relkit/provider";
 import { createS3BucketProvider } from "./s3.js";
 
 export * from "./s3.js";

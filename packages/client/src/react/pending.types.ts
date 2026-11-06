@@ -1,6 +1,5 @@
-import type { PendingOperationMetadata } from "@relkit/contracts";
-import type { JobUnknownOutcome } from "@relkit/contracts/jobs";
-import type { Effect } from "effect";
+import type { PendingOperationMetadata } from "relkit/contracts";
+import type { JobUnknownOutcome } from "relkit/contracts/jobs";
 
 /** Submission/recovery authority retained from the existing pending API. */
 export interface PendingRememberOptions {
@@ -13,7 +12,7 @@ export interface PendingRememberOptions {
 /** References persisted with metadata; transmitted inputs remain memory-only. */
 export type PendingReferences = Pick<PendingOperationMetadata, "threadId" | "runId">;
 
-/** One browser's pending-operation state with isolated live/test implementations. */
+/** One browser's pending-operation state; tests create isolated instances. */
 export interface PendingOperationService {
   /** Records validated metadata while retaining original input only in opted-in memory.
    * @param scope - Complete application and identity isolation scope.
@@ -22,7 +21,7 @@ export interface PendingOperationService {
    * @param value - Original transmitted request payload.
    * @param references - Existing durable receipt references.
    * @param options - Existing operation identity, reuse and retention policy.
-   * @returns Lazy observed metadata creation or the original hashing/capacity failure. */
+   * @returns The recorded metadata, or a rejection with the original hashing/capacity failure. */
   readonly remember: (
     scope: string,
     kind: PendingOperationMetadata["kind"],
@@ -30,38 +29,38 @@ export interface PendingOperationService {
     value: unknown,
     references: PendingReferences,
     options: PendingRememberOptions,
-  ) => Effect.Effect<PendingOperationMetadata, unknown>;
+  ) => Promise<PendingOperationMetadata>;
   /** Replaces persisted metadata without persisting request inputs.
    * @param scope - Complete pending isolation scope.
    * @param value - Existing receipt metadata with its updated outcome.
-   * @returns A synchronous observed best-effort metadata update. */
-  readonly update: (scope: string, value: PendingOperationMetadata) => Effect.Effect<void>;
+   * @returns Nothing, after a synchronous best-effort metadata update. */
+  readonly update: (scope: string, value: PendingOperationMetadata) => void;
   /** Removes one settled receipt and its memory-only request.
    * @param scope - Complete pending isolation scope.
    * @param id - Existing operation identity.
-   * @returns A synchronous observed state update. */
-  readonly forget: (scope: string, id: string) => Effect.Effect<void>;
+   * @returns Nothing, after a synchronous state update. */
+  readonly forget: (scope: string, id: string) => void;
   /** Lists metadata using the existing selective persistence validation.
    * @param scope - Complete pending isolation scope.
-   * @returns A synchronous observed metadata snapshot. */
-  readonly list: (scope: string) => Effect.Effect<readonly PendingOperationMetadata[]>;
+   * @returns A synchronous metadata snapshot. */
+  readonly list: (scope: string) => readonly PendingOperationMetadata[];
   /** Reads opted-in memory input without recovering payloads from persisted metadata.
    * @param scope - Complete pending isolation scope.
    * @param id - Existing operation identity.
-   * @returns A synchronous observed original input when retained. */
-  readonly request: (scope: string, id: string) => Effect.Effect<unknown>;
+   * @returns The original input when retained, synchronously. */
+  readonly request: (scope: string, id: string) => unknown;
   /** Clears receipt metadata and retained memory input for one isolation scope.
    * @param scope - Complete pending isolation scope.
-   * @returns A synchronous observed state update. */
-  readonly clear: (scope: string) => Effect.Effect<void>;
+   * @returns Nothing, after a synchronous state update. */
+  readonly clear: (scope: string) => void;
   /** Checks a request digest against stored receipt metadata.
    * @param scope - Complete pending isolation scope.
    * @param id - Existing operation identity.
    * @param value - Original request payload whose digest is compared.
-   * @returns A lazy observed match decision or the original hashing failure. */
-  readonly matches: (scope: string, id: string, value: unknown) => Effect.Effect<boolean, unknown>;
+   * @returns The match decision, or a rejection with the original hashing failure. */
+  readonly matches: (scope: string, id: string, value: unknown) => Promise<boolean>;
   /** Hashes canonical JSON through the existing WebCrypto boundary.
    * @param value - Original payload whose canonical representation is hashed.
-   * @returns A lazy observed SHA-256 digest or the original serialization/crypto failure. */
-  readonly digest: (value: unknown) => Effect.Effect<string, unknown>;
+   * @returns The SHA-256 digest, or a rejection with the original serialization/crypto failure. */
+  readonly digest: (value: unknown) => Promise<string>;
 }

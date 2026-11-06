@@ -1,7 +1,7 @@
 import { Context, Deferred, Effect, Exit, Layer, Ref } from "effect";
 import { runOwnedContext } from "./work-ownership.js";
-import { observeExecution } from "@relkit/contracts/operation";
-import type { EnvShape } from "@relkit/config";
+import { observeExecution } from "relkit/contracts/operation";
+import type { EnvShape } from "relkit/config";
 import type { TestRuntimeOptions, TestRuntimeCloseOptions } from "./runtime.js";
 import type { RuntimeExecutionService } from "./runtime-execution.types.js";
 import {

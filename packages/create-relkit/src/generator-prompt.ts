@@ -1,7 +1,7 @@
 /** Provides the prompt service adapter used by creation and CLI scaffolding while preserving cancellation and the selected prompt driver's values. */
 
 import { Context, Effect, Layer, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorPromptError, errorMessage } from "./generator-errors.js";
 import type { GeneratorPromptService } from "./generator-prompt.types.js";
 import type { PromptDriver } from "./prompt-driver.types.js";

@@ -1,8 +1,5 @@
 # my-app
 
-This maintained task/provider candidate is exercised internally. Public jobs
-creation remains disabled until exact native and readiness certification passes.
-
 A small RelKit task and job project with a selected provider and domain-owned worker.
 Its package manifest declares that provider's adapter/native SDKs. Follow the current
 provider guide before running it: Inngest and Effect MQ have documented local paths,

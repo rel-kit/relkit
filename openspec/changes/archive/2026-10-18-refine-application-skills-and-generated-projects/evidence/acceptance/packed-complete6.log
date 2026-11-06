@@ -60,6 +60,6 @@ SQLiteError: no such table: items
 
       at prepare (bun:sqlite:345:37)
       at query (bun:sqlite:367:28)
-      at databaseFlow (/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/packed.ts:161:12)
+      at databaseFlow (<repo>/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/packed.ts:161:12)
 
 Bun v1.3.10 (macOS arm64)

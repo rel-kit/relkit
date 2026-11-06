@@ -6,7 +6,7 @@ import type { BetterAuthRelkitClientProviderProps } from "./react.types.js";
 export type { BetterAuthClientLike, BetterAuthRelkitClientProviderProps } from "./react.types.js";
 
 /**
- * Remounts the RELKIT client whenever native authentication identity changes.
+ * Remounts the RelKit client whenever native authentication identity changes.
  * @typeParam Session - Session type inferred from the browser auth client.
  * @param props - Provider settings and a native useSession hook.
  * @returns React provider with pending authentication gated by a null identity.

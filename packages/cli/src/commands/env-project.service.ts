@@ -2,7 +2,7 @@
 import { isAbsolute, join, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Context, Effect, Layer, Schema } from "effect";
-import type { EnvDefinition, EnvShape } from "@relkit/config";
+import type { EnvDefinition, EnvShape } from "relkit/config";
 import { cliAdapterError, cliOriginalError, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.js";

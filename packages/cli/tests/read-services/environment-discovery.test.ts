@@ -1,6 +1,6 @@
 /** Guards current layout discovery, flat-layout compatibility, and explicit environment authority. */
 import { expect, it } from "@effect/vitest";
-import { defineEnv } from "@relkit/config";
+import { defineEnv } from "relkit/config";
 import { Effect } from "effect";
 import { CliFileSystem } from "../../src/services/filesystem.service.js";
 import { CliModules } from "../../src/services/modules.service.js";

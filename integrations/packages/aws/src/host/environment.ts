@@ -4,7 +4,7 @@ import {
   deploymentJson,
   type DeploymentInput,
   type DeploymentPlan,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 
 export function containerEnvironment(
   plan: DeploymentPlan,

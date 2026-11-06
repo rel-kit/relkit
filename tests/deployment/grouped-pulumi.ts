@@ -4,7 +4,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { Effect, Schema } from "effect";
-import type { NormalizedGraph } from "../../packages/compiler/src/normalize-graph-types.js";
+import type { NormalizedGraph } from "../../packages/cli/src/compiler/normalize-graph-types.js";
 import { groupedDeploymentPlans } from "./grouped-layout-contract.js";
 import { ScaffoldProcess, scaffoldProcessLayer } from "../../scripts/scaffold-process.js";
 import { scaffoldNative } from "../../scripts/scaffold-native.js";

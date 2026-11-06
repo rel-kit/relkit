@@ -1,0 +1,5 @@
+import lookup from "./lookup.tool.js";
+import { graph } from "./graph.js";
+
+export const a = lookup.invokeEffect({ q: "x" });
+export const b = graph.invokeEffect({ q: "x" });

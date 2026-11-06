@@ -6,11 +6,8 @@ import {
   formatDiagnostics,
   serializeDiagnostics,
   toCiAnnotations,
-} from "../../packages/diagnostics/src/index.ts";
-import type {
-  DiagnosticInput,
-  DiagnosticReporterOptions,
-} from "../../packages/diagnostics/src/index.ts";
+} from "relkit/diagnostics";
+import type { DiagnosticInput, DiagnosticReporterOptions } from "relkit/diagnostics";
 
 const repositoryRoot = resolve(import.meta.dir, "../..");
 const alternateRoot = "/tmp/relkit-diagnostics-root-2.12";
@@ -110,7 +107,7 @@ function assertPortable(value: unknown): void {
   expect(serialized).not.toContain(syntheticSecret);
 }
 
-describe.serial("@relkit/diagnostics", () => {
+describe.serial("relkit/diagnostics", () => {
   test("keeps text and JSON output stable across absolute roots", () => {
     const rootOptions = options(repositoryRoot);
     const alternateOptions = options(alternateRoot);

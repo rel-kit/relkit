@@ -1,9 +1,7 @@
-import type { RunSnapshot } from "@relkit/contracts/jobs";
-import { Layer, ManagedRuntime } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
+import type { RunSnapshot } from "relkit/contracts/jobs";
 import { reconnectAfterTeardown } from "./controller-support.js";
-import { JobControllers, JobControllersLive } from "./controller.service.js";
-import { JobFeedRegistryDefault } from "./watch.js";
+import { createJobControllers } from "./controller.service.js";
+import { jobFeedRegistry } from "./watch.js";
 import type { JobRunFor } from "./job-registry-derived.types.js";
 import type {
   JobWatchController,
@@ -12,13 +10,10 @@ import type {
   JobWatchState,
 } from "./types.js";
 
-const factoryOwner = ManagedRuntime.make(
-  JobControllersLive.pipe(Layer.provide(JobFeedRegistryDefault)),
-);
-const factory = runExecutionSync(factoryOwner, JobControllers);
+const factory = createJobControllers(jobFeedRegistry);
 
 /**
- * Passive synchronous external-store facade over scoped physical feed services.
+ * Passive synchronous external-store facade over shared physical feeds.
  * @typeParam Run - Observed job run payload retained in external-store snapshots.
  */
 export class JobRunWatchController<Run = RunSnapshot> implements JobWatchController<Run> {

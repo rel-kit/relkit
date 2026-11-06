@@ -1,7 +1,7 @@
 /** Composes add discovery and interactive resolution into one request workflow, preserving typed cancellation and validation failures. */
 
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { normalizeAddRequest } from "./add-options.js";
 import { usage } from "./add-options-parser.js";
 import { resolveDomainOptionsEffect } from "./add-resolver-domain.js";
@@ -9,13 +9,13 @@ import { resolvePlatformOptionsEffect } from "./add-resolver-platform.js";
 import { resolveResourceOptionsEffect } from "./add-resolver-resources.js";
 import { resolveServiceForKindEffect } from "./add-resolution-discovery.js";
 import { AddResolutionState, choices } from "./add-resolution-state.js";
-import { ADD_KINDS, type AddRequest } from "create-relkit/internal/add-types";
+import { ADD_KINDS, type AddRequest } from "create-relkit/add-types";
 import { ProjectDiscoveryServiceTag, projectDiscoveryLive } from "./project-discovery.js";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import { GeneratorPrompt, generatorPromptLayer } from "create-relkit/internal/generator-prompt";
-import { domainTry, scaffoldErrors } from "create-relkit/internal/generator-errors";
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
-import { createClackPromptDriver } from "create-relkit/internal/prompt-driver";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { GeneratorPrompt, generatorPromptLayer } from "create-relkit/generator-prompt";
+import { domainTry, scaffoldErrors } from "create-relkit/generator-errors";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
+import { createClackPromptDriver } from "create-relkit/prompt-driver";
 import type {
   AddResolutionService,
   ResolveAddContext,

@@ -7,22 +7,18 @@
 import { Effect } from "effect";
 import { dirname } from "node:path";
 import { scaffoldServiceBoundary } from "./scaffold-layout.js";
-import { domainError, domainTry } from "create-relkit/internal/generator-errors";
+import { domainError, domainTry } from "create-relkit/generator-errors";
 import type { RenderedDatabase } from "./render-database.types.js";
 export type { RenderedDatabase } from "./render-database.types.js";
-import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { observeExecution } from "relkit/contracts/operation";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
-} from "create-relkit/internal/generator-errors";
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
-import {
-  ADD_FAILURE_CODES,
-  AddScaffoldError,
-  type AddRequest,
-} from "create-relkit/internal/add-types";
+} from "create-relkit/generator-errors";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
+import { ADD_FAILURE_CODES, AddScaffoldError, type AddRequest } from "create-relkit/add-types";
 import { PlanBuilder } from "./plan-builder.js";
 import { ensureEnvironmentEffect } from "./provider-planning.js";
 import { authSchemaSource } from "./render-auth-schema.js";

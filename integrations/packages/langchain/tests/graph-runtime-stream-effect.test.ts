@@ -1,6 +1,6 @@
 /** Exercises native graph runtime stream effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { Effect } from "effect";
 import { expect, test, vi } from "vitest";
 import { GRAPH_EXECUTION } from "../src/graph-execution-symbol.js";

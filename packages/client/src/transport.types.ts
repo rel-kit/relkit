@@ -1,5 +1,4 @@
 import type { ClientLink, ClientOptions } from "@orpc/client";
-import type { Effect } from "effect";
 
 /** Existing oRPC context retained without translating native error objects. */
 export type TransportContext = Record<PropertyKey, unknown>;
@@ -10,13 +9,23 @@ export interface ClientTransportService {
    * @param path - Exact generated procedure path segments.
    * @param input - Original request payload passed to the native link.
    * @param options - Existing oRPC context, cancellation and request options.
-   * @returns A lazy observed invocation preserving the native result and error identity. */
+   * @returns The native result, or the native rejection with its identity preserved. */
   readonly invoke: (
-    path: string[],
+    path: readonly string[],
     input: unknown,
     options: ClientOptions<TransportContext>,
-  ) => Effect.Effect<unknown, unknown>;
+  ) => Promise<unknown>;
+  /** Aborts the selection and every in-flight invocation, then waits for them to settle.
+   * @returns The same settlement Promise on repeated calls. */
+  readonly close: () => Promise<void>;
 }
 
 /** Native link dependency supplied at transport acquisition. */
 export type TransportLink = ClientLink<TransportContext>;
+
+/**
+ * Lazily chooses the native link once for a transport owner.
+ * @param signal - Aborted when the owner closes; selection must release what it acquired.
+ * @returns The selected native link.
+ */
+export type TransportSelection = (signal: AbortSignal) => Promise<TransportLink>;

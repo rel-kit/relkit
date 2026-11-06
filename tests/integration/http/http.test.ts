@@ -1,17 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import type { MiddlewareHandler } from "hono";
-import { defineError, defineFunction } from "../../../packages/functions/src/index.ts";
-import {
-  invokeFunction,
-  type InvocationCompletion,
-  type InvocationTarget,
-} from "../../../packages/engine/src/index.ts";
+import { defineError, defineFunction } from "relkit/functions";
+import { invokeFunction, type InvocationCompletion, type InvocationTarget } from "relkit/engine";
 import {
   createRegistrationPlan,
   type ApplicationGraph,
   type HttpTriggerRegistration,
   type RegistrationPlan,
-} from "../../../packages/graph/src/index.ts";
+} from "relkit/graph";
 import {
   createApp,
   type FrameworkMiddlewareInput,
@@ -20,17 +16,17 @@ import {
   type RequestMappingOptions,
   type ResponseMappingOptions,
   type RuntimeManifest,
-} from "../../../packages/runtime-hono/src/index.ts";
+} from "relkit/runtime-hono";
 import {
   createTestHttpClient,
   createTestObservability,
   type TestHttpClient,
   type TestObservability,
 } from "../../../packages/testing/src/index.ts";
-import { defineRoute, http } from "../../../packages/routes/src/index.ts";
-import { normalizeCompilation } from "../../../packages/compiler/src/index.ts";
-import { GRAPH_VERSION } from "../../../packages/contracts/src/index.ts";
-import { z } from "../../../packages/schema/src/index.ts";
+import { defineRoute, http } from "relkit/routes";
+import { normalizeCompilation } from "../../../packages/cli/src/compiler/index.ts";
+import { GRAPH_VERSION } from "relkit/contracts";
+import { z } from "relkit/schema";
 import { runtimeCohort } from "../runtime-cohort.ts";
 
 const source = { file: "src/http.ts", line: 1, column: 1 } as const;
@@ -375,7 +371,7 @@ describe("HTTP integration", () => {
         const response = await harness.client.post("/payload", init);
         expect(response.status).toBe(422);
         expect(await response.json()).toMatchObject({
-          error: "validation",
+          code: "validation",
           issues: [{ code: issueCode }],
         });
         expect(harness.calls).toHaveLength(0);
@@ -480,8 +476,9 @@ describe("HTTP integration", () => {
     try {
       const declared = await harness.client.get("/declared");
       expect(declared.status).toBe(404);
+      expect(declared.headers.get("content-type")).toBe("application/problem+json");
       expect(await declared.json()).toMatchObject({
-        outcome: "declared-error",
+        status: 404,
         code: missing.id,
         data: { orderId: "order-1" },
       });
@@ -489,12 +486,15 @@ describe("HTTP integration", () => {
       const defect = await harness.client.get("/defect");
       expect(defect.status).toBe(500);
       const defectBody = await defect.text();
-      expect(defectBody).toBe(JSON.stringify({ error: "internal-error" }));
+      expect(JSON.parse(defectBody)).toMatchObject({
+        code: "internal-error",
+        detail: "The request failed unexpectedly.",
+      });
       expect(defectBody).not.toContain("database-password");
 
       const timeout = await harness.client.get("/timeout");
       expect(timeout.status).toBe(504);
-      expect(await timeout.json()).toEqual({ error: "timeout" });
+      expect(await timeout.json()).toMatchObject({ status: 504, code: "timeout" });
     } finally {
       await harness.close();
     }
@@ -644,7 +644,7 @@ describe("HTTP integration", () => {
     try {
       const response = await harness.client.get("/response");
       expect(response.status).toBe(500);
-      expect(await response.json()).toEqual({ error: "internal-error" });
+      expect(await response.json()).toMatchObject({ code: "internal-error" });
     } finally {
       await harness.close();
     }

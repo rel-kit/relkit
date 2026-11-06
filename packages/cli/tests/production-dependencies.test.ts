@@ -1,11 +1,8 @@
 /** Verifies production manifests follow actual runtime capability/phase selection. */
 import { expect, it } from "@effect/vitest";
 import { Effect, Layer } from "effect";
-import { canonicalJson } from "@relkit/contracts";
-import {
-  DependencySource,
-  SelectedDependenciesLayer,
-} from "@relkit/provider/internal/dependencies";
+import { canonicalJson } from "relkit/contracts";
+import { DependencySource, SelectedDependenciesLayer } from "relkit/provider/dependencies";
 import { captureProductionDependencies } from "../src/commands/build-production-dependencies.js";
 
 const source = Layer.succeed(DependencySource, {
@@ -83,7 +80,7 @@ it.effect(
         ["scalar"],
       );
       expect(dependencies).toEqual({
-        "@relkit/runtime-hono": "0.7.10",
+        relkit: "0.7.10",
         "@scalar/hono-api-reference": "0.12.9",
       });
     }).pipe(Effect.provide(authorities)),
@@ -97,14 +94,12 @@ it.effect("isolated HTTP builds resolve their fixed framework owner from its pro
       resolve: (name: string, from: string) => {
         resolutions.push([name, from]);
         return Effect.succeed(
-          name === "@relkit/runtime-hono" && from === "/consumer"
+          name === "relkit" && from === "/consumer"
             ? null
             : {
                 name,
                 root:
-                  name === "@relkit/runtime-hono"
-                    ? "/producer/runtime-hono"
-                    : `/consumer/node_modules/${name}`,
+                  name === "relkit" ? "/producer/runtime-hono" : `/consumer/node_modules/${name}`,
                 version: name === "@scalar/hono-api-reference" ? "0.12.9" : "0.7.10",
               },
         );
@@ -118,7 +113,7 @@ it.effect("isolated HTTP builds resolve their fixed framework owner from its pro
       ["scalar"],
     ).pipe(Effect.provide(SelectedDependenciesLayer.pipe(Layer.provideMerge(isolated))));
     expect(dependencies).toEqual({
-      "@relkit/runtime-hono": "0.7.10",
+      relkit: "0.7.10",
       "@scalar/hono-api-reference": "0.12.9",
     });
     expect(resolutions).toContainEqual(["@scalar/hono-api-reference", "/producer/runtime-hono"]);

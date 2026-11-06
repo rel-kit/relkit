@@ -29,7 +29,7 @@ export async function installedCliFixture(parent: string, artifactDirectory?: st
     tarballs = await loadReleaseTarballs(artifacts);
   }
   const manifests = await readManifests(resolve(import.meta.dir, "../.."));
-  const appVersion = (await readPackedManifest(tarballs.get("@relkit/app")!)).version;
+  const appVersion = (await readPackedManifest(tarballs.get("relkit")!)).version;
   const testingVersion = (await readPackedManifest(tarballs.get("@relkit/testing")!)).version;
   const packedCli = await readPackedManifest(tarballs.get("@relkit/cli")!);
   const server = await startRegistry(parent, tarballs, manifests);
@@ -100,7 +100,7 @@ export function installedCreateArguments(
   ];
 }
 
-/** Requires an uncertified tuple to reject without creating its destination. */
+/** Requires strict creation of an untested combination to reject without creating its destination. */
 export async function rejectUnsupportedInstalledCreate(fixture: InstalledCliFixture) {
   const unsupported = join(fixture.parent, "unsupported");
   const rejected = Bun.spawn(
@@ -115,6 +115,7 @@ export async function rejectUnsupportedInstalledCreate(fixture: InstalledCliFixt
       "agent",
       "--no-install",
       "--no-git",
+      "--strict",
       "--json",
     ],
     {
@@ -131,8 +132,8 @@ export async function rejectUnsupportedInstalledCreate(fixture: InstalledCliFixt
   ]);
   expect(code, error).toBe(2);
   expect(JSON.parse(output).error).toMatchObject({
-    code: "RELKIT_CREATE_USAGE",
-    message: expect.stringContaining("not certified"),
+    code: "RELKIT_CREATE_UNTESTED",
+    message: expect.stringContaining("--strict refuses untested combinations"),
   });
   await expect(stat(unsupported)).rejects.toMatchObject({ code: "ENOENT" });
 }
@@ -164,9 +165,9 @@ export async function installedCliCommand(
 export async function assertInstalledManifest(fixture: InstalledCliFixture) {
   const manifest = JSON.parse(await readFile(join(fixture.project, "package.json"), "utf8"));
   expect(manifest.dependencies).toEqual({
-    "@relkit/app": fixture.appVersion,
+    relkit: fixture.appVersion,
     "@scalar/hono-api-reference": "0.12.9",
-    effect: fixture.packedCli.dependencies?.effect,
+    zod: expect.stringMatching(/^\d+\.\d+\.\d+$/),
   });
   expect(manifest.devDependencies["@relkit/cli"]).toBe(fixture.packedCli.version);
   expect(manifest.devDependencies["@relkit/testing"]).toBe(fixture.testingVersion);

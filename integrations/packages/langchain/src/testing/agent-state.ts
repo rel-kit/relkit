@@ -1,6 +1,6 @@
 /** Builds an isolated native test facade whose work is joined before release. */
 import { Effect, Ref } from "effect";
-import { runOwnedContext } from "@relkit/testing/internal/work-ownership";
+import { runOwnedContext } from "@relkit/testing/work-ownership";
 import type { TestAgent, TestAgentDescriptor, TestAgentOptions } from "./agents-types.js";
 import { acquireAgentHarness } from "./agent-state-setup.js";
 import { invokeAgentHarness } from "./agent-state-invocation.js";

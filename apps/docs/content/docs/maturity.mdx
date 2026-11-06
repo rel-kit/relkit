@@ -1,0 +1,35 @@
+---
+title: Core and Labs
+description: Which RelKit features are Core and covered by the stability promise, and which are Labs and can change in any release.
+sidebar:
+  icon: flask-conical
+---
+
+Every RelKit package, integration, runtime and deploy target is either **Core** or **Labs**.
+
+- **Core** features are tested on every supported runtime. From 1.0 they follow semantic versioning:
+  an incompatible change ships only in a major release.
+- **Labs** features carry no compatibility promise. They can change or be removed in any release.
+  Their APIs carry the `@experimental` tag, so your editor shows it on hover, and their docs pages show
+  a <Badge variant="warning">Labs</Badge> badge on the page and in the sidebar.
+
+Each package declares its tier in the `relkit.maturity` field of its `package.json`. A repository
+check fails when that field, the `@experimental` tags and the docs badges disagree with the tables
+below.
+
+<include>/_snippets/generated/maturity.mdx</include>
+
+## Moving a feature to Core
+
+A Labs feature moves to Core when it meets the Core bar: tests on every supported runtime, a docs
+guide, and for a deploy target, a newcomer deploy test that passes in CI. The move is a change to
+this table, the package's `relkit.maturity` field, its tags and its docs badges, made in one pull
+request.
+
+## No new feature areas before 1.0
+
+Until Core reaches 1.0, RelKit adds no new feature area, such as a descriptor kind, a provider
+family or an integration, unless an approved OpenSpec change lists it. Bug fixes and hardening
+remain welcome in both Core and Labs.
+
+<include>/_snippets/generated/related/docs-maturity.mdx</include>

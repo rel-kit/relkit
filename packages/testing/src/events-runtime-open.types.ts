@@ -1,6 +1,6 @@
-import type { materializeEvents, InvocationTarget } from "@relkit/engine";
+import type { materializeEvents, InvocationTarget } from "relkit/engine";
 
-import type { InvocationRunner } from "@relkit/runtime-effect";
+import type { InvocationRunner } from "relkit/runtime-effect";
 import type { createEventInvoker } from "./events-runtime-utils.js";
 import type { TestFailureControls } from "./fakes.js";
 import type { TestStateRoot } from "./state-root.js";

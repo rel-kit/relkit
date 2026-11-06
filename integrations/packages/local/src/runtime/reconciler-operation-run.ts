@@ -1,9 +1,9 @@
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import {
   normalizeLocalServiceRecipe,
   type LocalServiceInstance,
   type LocalServicePlanEntry,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import { LOCAL_RESOURCE_LABEL, localEndpointHash, localResourceLabels } from "./identity.js";
 import { readProviderOverrides } from "./provider-overrides.js";
 import { aborted, writeFailureState } from "./reconciler-lifecycle.js";

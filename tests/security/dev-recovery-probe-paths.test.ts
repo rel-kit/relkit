@@ -13,7 +13,6 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import ts from "typescript";
 
 const repository = resolve(import.meta.dirname, "../..");
 const probe = join(repository, "packages/cli/tests/dev-environment/recovery.probe.ts");
@@ -73,32 +72,6 @@ test("recovery probe rejects caller-selected evidence directories before writing
   } finally {
     await rm(app, { recursive: true, force: true });
   }
-});
-
-test("archived probe only uses literal phases in log filenames", async () => {
-  const source = await readFile(
-    resolve(
-      repository,
-      "bug-fix-reports/issues/bf-6c1f59bebfd1c8865038fc52/evidence/001/runtime.probe.ts",
-    ),
-    "utf8",
-  );
-  const file = ts.createSourceFile("probe.ts", source, ts.ScriptTarget.Latest, true);
-  const declarations = file.statements.filter(
-    (statement) =>
-      ts.isVariableStatement(statement) &&
-      statement.declarationList.declarations.some(
-        (declaration) => ts.isIdentifier(declaration.name) && declaration.name.text === "phase",
-      ),
-  );
-  const javascript = ts.transpileModule(declarations.map((node) => node.getText(file)).join("\n"), {
-    compilerOptions: { target: ts.ScriptTarget.ESNext },
-  }).outputText;
-  const phase = new Function("process", javascript + "\nreturn phase;");
-  for (const value of [undefined, "before", "after", "smoke"])
-    expect(phase({ argv: ["bun", "probe", value] })).toBe(value ?? "before");
-  for (const value of ["../../escape", "before/../../escape", "/tmp/escape", "after\\escape", ""])
-    expect(() => phase({ argv: ["bun", "probe", value] })).toThrow("Invalid probe phase");
 });
 
 test("recovery probe rejects external, sibling-prefix and escaping symlink apps", async () => {

@@ -1,4 +1,0 @@
-Checking formatting...
-All matched files use Prettier code style!
-
-Exit code: 0

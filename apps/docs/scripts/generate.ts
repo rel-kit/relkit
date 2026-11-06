@@ -10,9 +10,14 @@ import { format } from "prettier";
 import { getCliHelpModel, type CliHelpCommand } from "@relkit/cli/help";
 import { apiPackageDefinitions } from "./documentation-catalog.js";
 import { renderApi } from "./generate-api.js";
+import { generateErrorPages } from "./generate-error-pages.js";
+import { renderInspectorApiReference } from "./generate-inspector-api.js";
 import { generateGuides } from "./generate-guides.js";
 import { generateInstallations } from "./generate-installations.js";
 import { contentFiles, pruneGenerated } from "./generation-files.js";
+import { labsRoutes, maturityTables, roadmapStatus } from "./maturity-table.js";
+import { devLoopBenchmarks } from "./dev-loop-benchmarks.js";
+import { metricsPage } from "./metrics-page.js";
 import { generateSourceSnippets } from "./source-snippets.js";
 import { referenceOverview } from "./api-related.js";
 import {
@@ -45,7 +50,16 @@ async function main(): Promise<void> {
   await generateGuides(root, content, cliModel, emit);
   await generateInstallations(root, emit);
   await emit("_snippets/generated/api-overview.mdx", referenceOverview());
+  await emit("_snippets/generated/maturity.mdx", maturityTables());
+  await emit("_snippets/generated/roadmap-status.mdx", roadmapStatus());
+  await emit(
+    "_snippets/generated/dev-loop-benchmarks.mdx",
+    devLoopBenchmarks(resolve(import.meta.dir, "..")),
+  );
+  await emit("_snippets/generated/metrics.mdx", metricsPage(resolve(import.meta.dir, "..")));
   await emit("docs/api/cli.mdx", renderCliReference(cliModel));
+  await emit("docs/api/inspector-protocol.mdx", await renderInspectorApiReference());
+  await generateErrorPages(root, content, emit);
   const pages = (await contentFiles(content)).filter(
     (path) =>
       /\.mdx?$/.test(path) &&
@@ -61,6 +75,8 @@ async function main(): Promise<void> {
     }
     expected.add(resolve(content, "docs/api/public.mdx"));
   } else await generateApis();
+  // Read after the API pages, whose `labs` flag comes from their package's tier.
+  await emit("_snippets/generated/labs-routes.json", labsRoutes(root));
   await pruneGenerated(content, expected, checkOnly);
   console.log(
     checkOnly ? "Generated documentation is current." : "Generated documentation updated.",
@@ -87,7 +103,13 @@ async function generateApis(): Promise<void> {
     );
     for (const result of results) if (result.status === "rejected") throw result.reason;
   }
-  const contracts = contractIndex(pages);
+  // Completion order is racy; index in reverse catalog order so the first catalog page that
+  // documents a shared contract owns its link (a later entry overwrites an earlier one).
+  const ordered = apiPackageDefinitions.map(({ slug }): [string, string] => [
+    slug,
+    pages.get(slug)!,
+  ]);
+  const contracts = contractIndex(new Map(ordered.reverse()));
   const missing = missingContracts(inventory, contracts);
   if (missing.length) throw new Error(`Missing public API contracts:\n${missing.join("\n")}`);
   for (const { slug, packageName } of apiPackageDefinitions)

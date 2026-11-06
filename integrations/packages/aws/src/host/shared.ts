@@ -4,7 +4,7 @@ import {
   type DeploymentInput,
   type DeploymentPlan,
   type DeploymentResourceOperation,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 
 export interface HostContext {
   readonly plan: DeploymentPlan;

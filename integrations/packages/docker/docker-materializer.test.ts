@@ -4,7 +4,7 @@ import {
   LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,
   type CompositeLocalServiceRecipe,
   type LocalServiceRecipe,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import {
   createDockerMaterializer,
   type DockerClient,

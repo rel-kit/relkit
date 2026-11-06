@@ -1,4 +1,5 @@
 /** Synchronizes owning manifests, selected dependency metadata and starter catalogs through the release producers. */
+import { packageEngines } from "./package-engines.js";
 import { readFile, writeFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { workspacePackageDirectories } from "./workspace-packages.js";
@@ -39,10 +40,15 @@ await syncJson(rootPath, {
 const catalog = await buildCatalog(root, rootManifest);
 const metadataPackages = new Set(["@relkit/cli", "create-relkit", "@relkit/effect-mq"]);
 const versions = new Map<string, string>();
+const integrations: { id: string; package: string; maturity: unknown }[] = [];
 for (const directory of workspacePackageDirectories(root)) {
   const manifest = JSON.parse(await readFile(join(directory, "package.json"), "utf8"));
   versions.set(manifest.name, manifest.version);
+  const id = manifest.relkit?.integration?.id;
+  if (typeof id === "string")
+    integrations.push({ id, package: manifest.name, maturity: manifest.relkit.maturity });
 }
+integrations.sort((left, right) => left.id.localeCompare(right.id));
 for (const directory of workspacePackageDirectories(root)) {
   const path = join(directory, "package.json");
   const manifest = JSON.parse(await readFile(path, "utf8")) as Record<string, unknown>;
@@ -82,7 +88,7 @@ for (const directory of workspacePackageDirectories(root)) {
           ? ["dist", "src/catalog-resolution.ts", "src/catalog-resolution.types.ts"]
           : ["dist"],
     publishConfig: { access: "public" },
-    engines: { bun: ">=1.3.10", ...(name === "@relkit/inspector" ? { node: ">=20.9.0" } : {}) },
+    engines: packageEngines(name),
     ...rest,
     ...(relkitMetadata === undefined ? {} : { relkit: relkitMetadata }),
     ...(metadataPackages.has(name)
@@ -92,6 +98,7 @@ for (const directory of workspacePackageDirectories(root)) {
             buildCatalog: catalog,
             ...(name === "create-relkit"
               ? {
+                  integrations,
                   providerVersions: Object.fromEntries(
                     generatorProviders.flatMap((provider) => {
                       const version = versions.get(provider);
@@ -117,7 +124,7 @@ for (const template of packedTemplates) {
     const dependencies = manifest[field];
     if (dependencies === undefined) continue;
     for (const name of Object.keys(dependencies)) {
-      if (name.startsWith("@relkit/") || name === "create-relkit") {
+      if (name.startsWith("@relkit/") || name === "create-relkit" || name === "relkit") {
         const dependencyVersion = versions.get(name);
         if (dependencyVersion === undefined)
           throw new Error(`Unknown template dependency: ${name}`);

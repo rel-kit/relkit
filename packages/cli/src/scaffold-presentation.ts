@@ -36,6 +36,6 @@ export function scaffoldProgress(
 ): (message: string) => void {
   return (message) => {
     if (runtime.io) context.io?.stderr(message);
-    else if (!message.startsWith("Creating a new RELKIT app")) status.message(message);
+    else if (!message.startsWith("Creating a new RelKit app")) status.message(message);
   };
 }

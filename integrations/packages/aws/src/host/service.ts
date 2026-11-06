@@ -3,7 +3,7 @@ import {
   deploymentJson,
   type DeploymentHostMaterialization,
   type DeploymentResourceOperation,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 import { type HostContext, name, output, resource } from "./shared.js";
 import { container, role } from "./service-support.js";
 

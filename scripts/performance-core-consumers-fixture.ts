@@ -1,10 +1,10 @@
-import { installInspectorEndpoints } from "@relkit/inspector-api";
+import { installInspectorEndpoints } from "relkit/inspector-api";
 import {
   createObservabilityStream,
   type ObservabilityQuery,
   type ObservabilityQueryRequest,
   type RequestQueryResponse,
-} from "@relkit/observability";
+} from "relkit/observability";
 import { Hono } from "hono";
 import { createPerformanceGeneration } from "./performance-core-consumers-generation.js";
 import type { PerformanceInspector } from "./performance-core-consumers-fixture.types.js";

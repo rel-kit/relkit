@@ -1,15 +1,15 @@
-/** Projects native agent interruption state into RELKIT approval and continuation records without losing native interrupt identity. */
+/** Projects native agent interruption state into RelKit approval and continuation records without losing native interrupt identity. */
 
 import { Command } from "@langchain/langgraph";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { nativeAgentInterruptionFailure } from "./native-agent-interruption-error.js";
 import type { NativeAgent, NativeAgentConfig } from "./native-agent-interruption.types.js";
 import {
   snapshotInterrupts,
   validateNativeAgentResumeInputCore,
 } from "./native-agent-interruption-validation.js";
-import type { AgentWaitingRequest } from "@relkit/agents/internal/state.types";
+import type { AgentWaitingRequest } from "relkit/agents/state.types";
 
 /** Reads native pending requests and constructs a resume command.
  * @param agent - Native agent state provider.
@@ -127,6 +127,7 @@ export const validateNativeAgentResumeInputEffect = Effect.fn("Agents.nativeHitl
  * @returns Validated reply values.
  * @throws The original invalid continuation error.
  * @example const reply = validateNativeAgentResumeInput(requests, value);
+ * @experimental
  */
 export function validateNativeAgentResumeInput(
   requests: readonly AgentWaitingRequest[],

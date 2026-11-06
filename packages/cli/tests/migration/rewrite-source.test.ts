@@ -1,7 +1,7 @@
 /** Verifies asset URL migration against actual source syntax and TypeScript resolution. */
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";
-import { sourceResolutionLayer } from "@relkit/compiler";
+import { sourceResolutionLayer } from "../../src/compiler/index.js";
 import { rewriteLayoutSource } from "../../src/migration/layout-rewrite-source.js";
 
 const moves = [{ from: "src/hello", to: "src/services/hello" }];

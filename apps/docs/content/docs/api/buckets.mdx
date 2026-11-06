@@ -1,6 +1,6 @@
 ---
 title: Buckets API
-description: Generated public TypeScript reference for @relkit/buckets.
+description: Generated public TypeScript reference for relkit/buckets.
 search:
   exclude: true
 sidebar:
@@ -16,6 +16,43 @@ sidebar:
 For configuration and examples, read [define](/docs/modules/storage/define), [organization](/docs/modules/service/organization), [uploads](/docs/modules/http/uploads).
 
 For a complete workflow, follow [upload product images](/guides/storage/upload-product-images).
+
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### defineBucket
+
+Defines a managed object store with explicit visibility and bounded upload policy.
+
+**Throws**
+
+TypeError when the authoring input is invalid.
+
+**Example**
+
+```ts
+import { defineBucket } from "relkit/buckets";
+const assets = defineBucket({
+  id: "assets",
+  visibility: "public",
+  maxObjectBytes: 1_048_576,
+});
+```
+
+**Signature**
+
+```ts
+declare const defineBucket: <const Id extends string>(
+  options: DefineBucketOptions<Id>,
+) => BucketDescriptor<Id>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.ts#L36)
+
+Since v0.1.0
+
+## Complete reference
 
 <include>/_snippets/generated/exports/buckets.mdx</include>
 
@@ -37,7 +74,7 @@ Effect.catchTag(defineBucketEffect(input), "BucketValidationError", () => Effect
 declare class BucketValidationError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/bucket-validation-error.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/bucket-validation-error.ts#L7)
 
 ## `client-abort.ts`
 
@@ -61,7 +98,7 @@ declare const runAbortableEffect: <A, E, R>(
 ) => Effect.Effect<A, E | BucketOperationCancelledError | BucketOperationTimeoutError, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-abort.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-abort.ts#L11)
 
 ## `client-effects.ts`
 
@@ -93,7 +130,7 @@ declare const createBucketReadUrlEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-effects.ts#L141)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L141)
 
 ### createBucketWriteUrlEffect
 
@@ -123,7 +160,7 @@ declare const createBucketWriteUrlEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-effects.ts#L162)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L162)
 
 ### deleteBucketEffect
 
@@ -153,7 +190,7 @@ declare const deleteBucketEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-effects.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L84)
 
 ### existsBucketEffect
 
@@ -183,7 +220,7 @@ declare const existsBucketEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-effects.ts#L103)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L103)
 
 ### getBucketEffect
 
@@ -213,7 +250,7 @@ declare const getBucketEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-effects.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L46)
 
 ### headBucketEffect
 
@@ -243,7 +280,7 @@ declare const headBucketEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-effects.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L65)
 
 ### listBucketEffect
 
@@ -273,7 +310,7 @@ declare const listBucketEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-effects.ts#L122)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L122)
 
 ### putBucketEffect
 
@@ -305,7 +342,7 @@ declare const putBucketEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-effects.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L23)
 
 ## `client-errors.ts`
 
@@ -327,7 +364,7 @@ declare class BucketCapabilityError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-errors.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-errors.ts#L9)
 
 ### code (property)
 
@@ -337,7 +374,7 @@ declare class BucketCapabilityError {
 readonly code: "RELKIT_BUCKET_CAPABILITY_UNSUPPORTED"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-errors.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-errors.ts#L13)
 
 ### BucketDependencyError (class)
 
@@ -357,7 +394,7 @@ declare class BucketDependencyError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-errors.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-errors.ts#L26)
 
 ### code (property)
 
@@ -367,7 +404,7 @@ declare class BucketDependencyError {
 readonly code: "RELKIT_BUCKET_DEPENDENCY_UNDECLARED"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-errors.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-errors.ts#L30)
 
 ### BucketOperationCancelledError (class)
 
@@ -387,7 +424,7 @@ declare class BucketOperationCancelledError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-errors.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-errors.ts#L62)
 
 ### code (property)
 
@@ -397,7 +434,7 @@ declare class BucketOperationCancelledError {
 readonly code: "ABORT_ERR"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-errors.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-errors.ts#L66)
 
 ### BucketOperationTimeoutError (class)
 
@@ -417,7 +454,7 @@ declare class BucketOperationTimeoutError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-errors.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-errors.ts#L81)
 
 ### code (property)
 
@@ -427,7 +464,7 @@ declare class BucketOperationTimeoutError {
 readonly code: "ETIMEDOUT"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-errors.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-errors.ts#L85)
 
 ### BucketProviderError (class)
 
@@ -447,7 +484,7 @@ declare class BucketProviderError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-errors.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-errors.ts#L43)
 
 ### code (property)
 
@@ -457,7 +494,7 @@ declare class BucketProviderError {
 readonly code: "RELKIT_BUCKET_PROVIDER_UNAVAILABLE"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-errors.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-errors.ts#L47)
 
 ### BucketProviderFailureError (class)
 
@@ -475,7 +512,7 @@ new BucketProviderFailureError({ operation: "get", cause: "offline" });
 declare class BucketProviderFailureError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-errors.ts#L101)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-errors.ts#L101)
 
 ## `client-key.ts`
 
@@ -499,7 +536,7 @@ assertKey("images/logo.png");
 declare const assertKey: (value: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-key.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-key.ts#L45)
 
 ### assertPrefix
 
@@ -521,7 +558,7 @@ assertPrefix("images/");
 declare const assertPrefix: (value: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-key.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-key.ts#L55)
 
 ### validateKeyEffect
 
@@ -541,7 +578,7 @@ declare const validateKeyEffect: (
 ) => Effect.Effect<void, BucketValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-key.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-key.ts#L9)
 
 ### validatePrefixEffect
 
@@ -561,7 +598,7 @@ declare const validatePrefixEffect: (
 ) => Effect.Effect<void, BucketValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-key.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-key.ts#L18)
 
 ### validateTextIdEffect
 
@@ -582,7 +619,7 @@ declare const validateTextIdEffect: (
 ) => Effect.Effect<void, BucketValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-key.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-key.ts#L28)
 
 ## `client-observability.ts`
 
@@ -602,7 +639,7 @@ Effect.provide(getBucketEffect("a"), BucketTelemetryLive);
 declare class BucketTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-observability.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-observability.ts#L9)
 
 ### BucketTelemetryLive
 
@@ -620,7 +657,7 @@ Effect.provide(getBucketEffect("a"), BucketTelemetryLive);
 declare const BucketTelemetryLive: Layer.Layer<BucketTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-observability.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-observability.ts#L16)
 
 ### observeBucket
 
@@ -647,7 +684,7 @@ declare const observeBucket: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-observability.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-observability.ts#L30)
 
 ## `client-observability.types.ts`
 
@@ -684,7 +721,7 @@ export interface BucketTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-observability.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-observability.types.ts#L7)
 
 ## `client-operation.ts`
 
@@ -723,7 +760,7 @@ declare const runBucketOperation: <A>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-operation.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-operation.ts#L19)
 
 ## `client-operation.types.ts`
 
@@ -755,7 +792,7 @@ export interface BucketInvocation<A> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-operation.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-operation.types.ts#L8)
 
 ## `client-provider.types.ts`
 
@@ -778,7 +815,7 @@ export interface BucketCapabilities {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-provider.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-provider.types.ts#L17)
 
 ### BucketCapability (type alias)
 
@@ -796,7 +833,7 @@ const capability: BucketCapability = "signedReadUrl";
 type BucketCapability = "signedReadUrl" | "signedWriteUrl";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-provider.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-provider.types.ts#L12)
 
 ### BucketObjectMetadata (interface)
 
@@ -821,7 +858,7 @@ export interface BucketObjectMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-provider.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-provider.types.ts#L34)
 
 ### BucketOperation (type alias)
 
@@ -840,7 +877,7 @@ type BucketOperation =
   "put" | "get" | "head" | "delete" | "exists" | "list" | "createReadUrl" | "createWriteUrl";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-provider.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-provider.types.ts#L6)
 
 ### BucketOperationContext (interface)
 
@@ -862,7 +899,7 @@ export interface BucketOperationContext {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-provider.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-provider.types.ts#L25)
 
 ### BucketProvider (interface)
 
@@ -954,7 +991,7 @@ export interface BucketProvider {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-provider.types.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-provider.types.ts#L54)
 
 ### BucketPutOptions (interface)
 
@@ -975,7 +1012,7 @@ export interface BucketPutOptions extends Readonly<Record<string, unknown>> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-provider.types.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-provider.types.ts#L46)
 
 ## `client-results.ts`
 
@@ -997,7 +1034,7 @@ declare const validateBooleanEffect: (
 ) => Effect.Effect<boolean, BucketProviderFailureError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-results.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-results.ts#L40)
 
 ### validateBytesEffect
 
@@ -1017,7 +1054,7 @@ declare const validateBytesEffect: (
 ) => Effect.Effect<Uint8Array<ArrayBufferLike> | undefined, BucketProviderFailureError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-results.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-results.ts#L14)
 
 ### validateKeysEffect
 
@@ -1037,7 +1074,7 @@ declare const validateKeysEffect: (
 ) => Effect.Effect<Array<string>, BucketProviderFailureError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-results.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-results.ts#L53)
 
 ### validateMetadataEffect
 
@@ -1057,7 +1094,7 @@ declare const validateMetadataEffect: (
 ) => Effect.Effect<BucketObjectMetadata | undefined, BucketProviderFailureError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-results.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-results.ts#L27)
 
 ### validateUrlEffect
 
@@ -1078,7 +1115,7 @@ declare const validateUrlEffect: (
 ) => Effect.Effect<string, BucketProviderFailureError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-results.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-results.ts#L67)
 
 ## `client-runtime.ts`
 
@@ -1098,7 +1135,7 @@ Effect.provide(getBucketEffect("a"), bucketRuntimeLayer(options));
 declare class BucketRuntime
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-runtime.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-runtime.ts#L10)
 
 ### asProvider
 
@@ -1120,7 +1157,7 @@ asProvider(undefined);
 declare const asProvider: (value: unknown) => BucketProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-runtime.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-runtime.ts#L50)
 
 ### asProviderEffect
 
@@ -1140,7 +1177,7 @@ declare const asProviderEffect: (
 ) => Effect.Effect<BucketProvider, BucketProviderError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-runtime.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-runtime.ts#L33)
 
 ### bucketRuntimeLayer
 
@@ -1160,7 +1197,7 @@ declare const bucketRuntimeLayer: (
 ) => Layer.Layer<BucketRuntime, BucketProviderError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-runtime.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-runtime.ts#L19)
 
 ## `client-runtime.types.ts`
 
@@ -1184,7 +1221,7 @@ export interface BucketRuntimeService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-runtime.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-runtime.types.ts#L6)
 
 ## `client-utils.ts`
 
@@ -1206,7 +1243,7 @@ declare const classifyEffect: (
 ) => Effect.Effect<BucketOperationOutcome, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-utils.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-utils.ts#L67)
 
 ### notifyEffect
 
@@ -1227,7 +1264,7 @@ declare const notifyEffect: <T>(
 ) => Effect.Effect<void, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-utils.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-utils.ts#L84)
 
 ### required
 
@@ -1252,7 +1289,7 @@ declare const required: <A>(
 ) => (...args: any[]) => MaybePromise<A>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-utils.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-utils.ts#L37)
 
 ### requiredEffect
 
@@ -1273,7 +1310,7 @@ declare const requiredEffect: <A>(
 ) => Effect.Effect<(...args: any[]) => MaybePromise<A>, BucketProviderError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-utils.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-utils.ts#L22)
 
 ### supportsEffect
 
@@ -1294,7 +1331,7 @@ declare const supportsEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-utils.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-utils.ts#L52)
 
 ## `client.ts`
 
@@ -1308,7 +1345,7 @@ Re-exports all named exports from the "./client.types.js" module.
 export * from "./client.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L35)
 
 ### BucketCapabilityError
 
@@ -1318,7 +1355,7 @@ export * from "./client.types.js";
 declare const BucketCapabilityError: typeof BucketCapabilityError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L28)
 
 ### BucketDependencyError
 
@@ -1328,7 +1365,7 @@ declare const BucketCapabilityError: typeof BucketCapabilityError;
 declare const BucketDependencyError: typeof BucketDependencyError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L29)
 
 ### BucketOperationCancelledError
 
@@ -1338,7 +1375,7 @@ declare const BucketDependencyError: typeof BucketDependencyError;
 declare const BucketOperationCancelledError: typeof BucketOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L30)
 
 ### BucketOperationTimeoutError
 
@@ -1348,7 +1385,7 @@ declare const BucketOperationCancelledError: typeof BucketOperationCancelledErro
 declare const BucketOperationTimeoutError: typeof BucketOperationTimeoutError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L31)
 
 ### BucketProviderError
 
@@ -1358,7 +1395,7 @@ declare const BucketOperationTimeoutError: typeof BucketOperationTimeoutError;
 declare const BucketProviderError: typeof BucketProviderError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L32)
 
 ### BucketProviderFailureError
 
@@ -1368,7 +1405,7 @@ declare const BucketProviderError: typeof BucketProviderError;
 declare const BucketProviderFailureError: typeof BucketProviderFailureError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L33)
 
 ### createBucketClient
 
@@ -1390,7 +1427,7 @@ createBucketClient({ ownerId: "job", bucketId: "assets", source: provider }).get
 declare const createBucketClient: (options: BucketClientOptions) => BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L43)
 
 ### createBucketClientEffect
 
@@ -1410,7 +1447,7 @@ declare const createBucketClientEffect: (
 ) => Effect.Effect<BucketClient, BucketValidationError | BucketProviderError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L56)
 
 ## `client.types.ts`
 
@@ -1424,7 +1461,7 @@ Re-exports all named exports from the "./client-provider.types.js" module.
 export * from "./client-provider.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L8)
 
 ### BucketBridgeOptions (interface)
 
@@ -1447,11 +1484,11 @@ export interface BucketBridgeOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.types.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L71)
 
 ### BucketClient (interface)
 
-Promise adapter used by existing RELKIT application code.
+Promise adapter used by existing RelKit application code.
 
 **Example**
 
@@ -1516,7 +1553,7 @@ export interface BucketClient {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L16)
 
 ### BucketClientOptions (interface)
 
@@ -1544,7 +1581,7 @@ export interface BucketClientOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.types.ts#L110)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L110)
 
 ### BucketInvocationBridge (interface)
 
@@ -1570,7 +1607,7 @@ export interface BucketInvocationBridge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.types.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L80)
 
 ### BucketObservedEdge (interface)
 
@@ -1592,7 +1629,7 @@ export interface BucketObservedEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.types.ts#L92)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L92)
 
 ### BucketOperationObservation (interface)
 
@@ -1616,7 +1653,7 @@ export interface BucketOperationObservation {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.types.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L100)
 
 ### BucketOperationOutcome (type alias)
 
@@ -1629,40 +1666,9 @@ type BucketOperationOutcome =
   "success" | "provider-failure" | "cancelled" | "timeout" | "unsupported";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L11)
 
 ## `define-bucket.ts`
-
-### defineBucket
-
-Defines a managed object store with explicit visibility and bounded upload policy.
-
-**Throws**
-
-TypeError when the authoring input is invalid.
-
-**Example**
-
-```ts
-import { defineBucket } from "@relkit/buckets";
-const assets = defineBucket({
-  id: "assets",
-  visibility: "public",
-  maxObjectBytes: 1_048_576,
-});
-```
-
-**Signature**
-
-```ts
-declare const defineBucket: <const Id extends string>(
-  options: DefineBucketOptions<Id>,
-) => BucketDescriptor<Id>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L36)
-
-Since v0.1.0
 
 ### "./define-bucket.types.js" (namespace export)
 
@@ -1674,7 +1680,7 @@ Re-exports all named exports from the "./define-bucket.types.js" module.
 export * from "./define-bucket.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.ts#L17)
 
 ### BucketValidationError
 
@@ -1684,7 +1690,7 @@ export * from "./define-bucket.types.js";
 declare const BucketValidationError: typeof BucketValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.ts#L18)
 
 ### assertBucketDescriptor
 
@@ -1706,7 +1712,7 @@ assertBucketDescriptor(defineBucket({ id: "assets", visibility: "private" }));
 declare const assertBucketDescriptor: (value: unknown) => asserts value is BucketDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L177)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.ts#L177)
 
 ### assertBucketDescriptorEffect
 
@@ -1726,7 +1732,7 @@ declare const assertBucketDescriptorEffect: (
 ) => Effect.Effect<void, BucketValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L186)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.ts#L186)
 
 ### defineBucketEffect
 
@@ -1746,7 +1752,7 @@ declare const defineBucketEffect: <const Id extends string>(
 ) => Effect.Effect<BucketDescriptor<Id>, BucketValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.ts#L47)
 
 ### isBucketDescriptor
 
@@ -1764,7 +1770,7 @@ isBucketDescriptor(defineBucket({ id: "assets", visibility: "private" }));
 declare const isBucketDescriptor: (value: unknown) => value is BucketDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L124)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.ts#L124)
 
 ### isBucketDescriptorEffect
 
@@ -1782,7 +1788,7 @@ Effect.runSync(isBucketDescriptorEffect({}));
 declare const isBucketDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.ts#L133)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.ts#L133)
 
 ## `define-bucket.types.ts`
 
@@ -1807,7 +1813,7 @@ export interface BucketDescriptor<Id extends string> extends DescriptorBase<"buc
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.types.ts#L11)
 
 ### BucketDescriptorAny (type alias)
 
@@ -1825,7 +1831,7 @@ const bucket: BucketDescriptorAny = defineBucket({ id: "assets", visibility: "pr
 type BucketDescriptorAny = BucketDescriptor<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.types.ts#L21)
 
 ### BucketVisibility (type alias)
 
@@ -1843,7 +1849,7 @@ const visibility: BucketVisibility = "private";
 type BucketVisibility = "private" | "public";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.types.ts#L6)
 
 ### DefineBucketOptions (interface)
 
@@ -1867,7 +1873,7 @@ export interface DefineBucketOptions<Id extends string> extends DescriptorMetada
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/define-bucket.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.types.ts#L26)
 
 ## `index.ts`
 
@@ -1881,7 +1887,7 @@ Re-exports all named exports from the "./bucket-validation-error.js" module.
 export * from "./bucket-validation-error.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/index.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L2)
 
 ### "./client-effects.js" (namespace export)
 
@@ -1893,7 +1899,7 @@ Re-exports all named exports from the "./client-effects.js" module.
 export * from "./client-effects.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L4)
 
 ### "./client-observability.js" (namespace export)
 
@@ -1905,7 +1911,7 @@ Re-exports all named exports from the "./client-observability.js" module.
 export * from "./client-observability.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L6)
 
 ### "./client-runtime.js" (namespace export)
 
@@ -1917,7 +1923,7 @@ Re-exports all named exports from the "./client-runtime.js" module.
 export * from "./client-runtime.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L5)
 
 ### "./client.js" (namespace export)
 
@@ -1929,7 +1935,7 @@ Re-exports all named exports from the "./client.js" module.
 export * from "./client.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L3)
 
 ### "./define-bucket.js" (namespace export)
 
@@ -1941,4 +1947,4 @@ Re-exports all named exports from the "./define-bucket.js" module.
 export * from "./define-bucket.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L1)

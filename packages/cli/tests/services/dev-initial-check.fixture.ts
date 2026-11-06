@@ -1,5 +1,5 @@
 /** Builds isolated initial-validation command Layers; all session resources are forbidden before the barrier completes. */
-import { loadConfig } from "@relkit/compiler";
+import { loadConfig } from "../../src/compiler/index.js";
 import { Effect, Layer } from "effect";
 import { CliDevCapture } from "../../src/commands/dev-capture.service.js";
 import { CliPortProbe } from "../../src/commands/port-availability.service.js";

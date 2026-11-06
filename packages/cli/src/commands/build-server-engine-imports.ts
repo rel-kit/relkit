@@ -1,5 +1,5 @@
 /** Selects engine operations from the accepted graph without acquiring providers. */
-import type { ApplicationGraph } from "@relkit/graph";
+import type { ApplicationGraph } from "relkit/graph";
 
 /**
  * Emits only engine operations required by this graph and inert unselected stubs.
@@ -22,13 +22,15 @@ export function serverEngineImports(graph: ApplicationGraph) {
     "assertRuntimeIntegrationModules",
     "createFunctionRegistry",
     "createProviderRegistry",
+    "createRuntimeHandle",
     ...(hasJobs ? ["createTaskExecutor"] : []),
     "invoke",
     ...(hasEvents ? ["materializeEvents"] : []),
-    ...(hasJobs ? ["materializeJobs"] : []),
     "parseInfrastructureBindingValues",
+    "runWithRelkit",
+    "sessionPrincipalSource",
   ].join(", ");
-  const stubs = `${hasJobs ? "" : "const createTaskExecutor = () => undefined;\nconst materializeJobs = async () => undefined;"}
+  const stubs = `${hasJobs ? "" : "const createTaskExecutor = () => undefined;"}
 ${hasEvents ? "" : "const materializeEvents = async () => undefined;"}`;
   return { imports, stubs };
 }

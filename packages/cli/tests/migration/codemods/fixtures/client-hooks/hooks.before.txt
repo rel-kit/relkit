@@ -1,0 +1,10 @@
+"use client";
+import { useRoute, useRouteMutation, useStream } from "@relkit/client/react";
+
+export function Orders() {
+  const orders = useRoute("GET /orders", { input: {} });
+  const post = useRouteMutation("route.post.announcements", {});
+  const report = useStream("GET /reports/:reportId");
+  const job = useRouteMutation("orders.export", {});
+  return [orders, post, report, job];
+}

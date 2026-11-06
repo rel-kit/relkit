@@ -4,7 +4,7 @@ import { dirname } from "node:path";
 import { access } from "node:fs/promises";
 import { createServer } from "node:net";
 import { Context, Effect, Layer } from "effect";
-import { connectionAttempt, InspectionConnectionError } from "@relkit/inspector-api/connection";
+import { connectionAttempt, InspectionConnectionError } from "relkit/inspector-api/connection";
 import type { InspectorOptions } from "./options.types.js";
 import { probeInspectorUi, waitInspectorUiReady } from "./ui-readiness.js";
 
@@ -59,7 +59,7 @@ export const acquireInspectorUi = Effect.fn("Inspector.startUi")(function* (
     (child) => stopUi(child),
   );
   yield* Effect.raceFirst(waitUiReady(options), uiExit(child));
-  yield* Effect.logInfo(`RELKIT Inspector listening at http://${options.hostname}:${options.port}`);
+  yield* Effect.logInfo(`RelKit Inspector listening at http://${options.hostname}:${options.port}`);
   return uiExit(child);
 });
 

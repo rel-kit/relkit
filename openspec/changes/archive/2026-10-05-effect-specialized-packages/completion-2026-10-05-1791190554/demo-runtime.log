@@ -5,7 +5,7 @@
                domain=supervisor duration_ms=188.298541 operation=activation.source-change outcome=success
 12:02:13.206 INFO  build             Compiling application
 12:02:21.777 WARN  inspector         ⚠ Slow filesystem detected. The benchmark took 930ms. If
-                                     /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/apps/inspector/.next/dev
+                                     <home>/.codex/worktrees/effect-specialized-recovery/relkit/apps/inspector/.next/dev
                                      is a network drive, consider moving it to a local folder.
 12:02:22.020 WARN  inspector         See more: https://nextjs.org/docs/app/guides/local-development
 09:02:38 INFO  supervisor Execution operation completed
@@ -696,9 +696,9 @@
 12:05:30.708 WARN  app               TransportSecurityError: WebSocket origin is not allowed.
                                      code: "ORIGIN_DENIED"
                                      at assertWebSocketOrigin
-                                     (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:96:15)
+                                     (<tmp><home>/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:96:15)
                                      at assertWebSocketRequest
-                                     (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:107:5)
+                                     (<tmp><home>/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:107:5)
 12:05:30.684 ERROR http              GET /rpc → 500 in 130ms
                                      request: request-e5584aa7-fcdd-40a0-b15a-d08f968f4311
                                      trace: c162a980d59322656b054cee34f9b324

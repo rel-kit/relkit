@@ -1,7 +1,7 @@
 /** Verifies production bundling resolves its actual installed consumer context. */
 import { expect, it } from "@effect/vitest";
 import { Effect, Exit, Layer } from "effect";
-import { DependencySource } from "@relkit/provider/internal/dependencies";
+import { DependencySource } from "relkit/provider/dependencies";
 import { bundleServerEffect } from "../../src/commands/build-support.js";
 import { cleanupLayer } from "../../src/services/cleanup.service.js";
 import { CliProcess } from "../../src/services/process.service.js";
@@ -13,7 +13,16 @@ it.effect("ordinary and prepared builds resolve modules from the consuming proje
   Effect.gen(function* () {
     for (const inventory of [undefined, "bun.inputs.json"] as const) {
       const links: string[][] = [];
-      yield* bundleServerEffect("/stage/server", "/consumer", false, inventory).pipe(
+      // The `bun build` subprocess path, whichever runtime runs the test.
+      yield* bundleServerEffect(
+        "/stage/server",
+        "/consumer",
+        false,
+        inventory,
+        [],
+        "bun",
+        "bun",
+      ).pipe(
         Effect.provide(
           Layer.mergeAll(
             cleanupLayer,
@@ -37,9 +46,9 @@ it.effect("ordinary and prepared builds resolve modules from the consuming proje
                 run: (input) =>
                   Effect.sync(() => {
                     expect(input.cwd).toBe("/consumer");
-                    expect(input.args).toContain("--external=@relkit/runtime-hono/mcp");
-                    expect(input.args).toContain("--external=@relkit/runtime-hono/ag-ui");
-                    expect(input.args).toContain("--external=@relkit/runtime-hono/scalar");
+                    expect(input.args).toContain("--external=relkit/runtime-hono/mcp");
+                    expect(input.args).toContain("--external=relkit/runtime-hono/ag-ui");
+                    expect(input.args).toContain("--external=relkit/runtime-hono/scalar");
                     return { exitCode: 0, stdout: "", stderr: "" };
                   }),
               }),
@@ -48,12 +57,8 @@ it.effect("ordinary and prepared builds resolve modules from the consuming proje
         ),
       );
       expect(links).toContainEqual([
-        "/consumer/node_modules/@relkit/engine",
-        "/stage/server/node_modules/@relkit/engine",
-      ]);
-      expect(links).toContainEqual([
-        "/consumer/node_modules/@relkit/provider",
-        "/stage/server/node_modules/@relkit/provider",
+        "/consumer/node_modules/relkit",
+        "/stage/server/node_modules/relkit",
       ]);
       expect(links.every(([target]) => target?.startsWith("/consumer/node_modules/"))).toBe(true);
       expect(links.some(([target]) => /langchain|pulumi|drizzle/.test(target ?? ""))).toBe(false);
@@ -75,7 +80,7 @@ it.effect("rejects a missing selected runtime owner before writing any links", (
           }),
           "/stage/server",
           "/consumer",
-          ["@relkit/runtime-hono"],
+          ["relkit"],
         ),
       ).pipe(
         Effect.provide(

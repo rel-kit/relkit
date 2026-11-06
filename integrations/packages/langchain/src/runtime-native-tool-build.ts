@@ -2,9 +2,9 @@
  * Converts one checked reference into a native tool while preserving common-engine
  * execution, trace context and the deferred approval failure reader.
  */
-import { getJsonSchema } from "@relkit/schema";
-import { frameworkTrace } from "@relkit/invocation";
-import { isToolRef, type ToolDescriptor } from "@relkit/tools";
+import { getJsonSchema } from "relkit/schema";
+import { frameworkTrace } from "relkit/invocation";
+import { isToolRef, type ToolDescriptor } from "relkit/tools";
 import type { ClientTool, ServerTool } from "@langchain/core/tools";
 import { tool } from "langchain";
 import { Effect } from "effect";
@@ -15,7 +15,7 @@ import type { AgentTool } from "./define-agent-native.types.js";
 import type { NativeToolBuildContext } from "./runtime-native-tool-build.types.js";
 
 /** Resolves one authored tool and records its public native mapping.
- * @param entry - RELKIT reference or native tool.
+ * @param entry - RelKit reference or native tool.
  * @param index - Authored position.
  * @param context - Invocation-owned mapping and failure authority.
  * @returns The native tool preserving the original validation boundary.
@@ -47,7 +47,7 @@ export function nativeToolEntry(
 }
 
 /** Creates a callback after its descriptor/schema have been checked.
- * @param registered - RELKIT descriptor.
+ * @param registered - RelKit descriptor.
  * @param schema - Projected native input schema.
  * @param name - Stable model-facing name.
  * @param context - Invocation-owned dependencies.

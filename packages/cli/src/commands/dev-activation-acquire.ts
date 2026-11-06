@@ -3,7 +3,7 @@
  * disposal to the existing generation drain; unsuccessful attempts release locally.
  */
 import { Effect, Ref } from "effect";
-import type { CandidateOptions } from "@relkit/supervisor";
+import type { CandidateOptions } from "../supervisor/index.js";
 import { cliTry } from "../cli-errors.js";
 import { CliDevSupervisor } from "../services/dev-supervisor.service.js";
 import { cleanupEffect } from "../services/cleanup.service.js";

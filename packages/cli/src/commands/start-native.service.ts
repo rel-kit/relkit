@@ -3,6 +3,7 @@ import { cliAdapterError, cliPromise, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { CliCleanup, cleanupEffect } from "../services/cleanup.service.js";
 import type { StartNativeOperations } from "./start.types.js";
+import { runtime } from "../runtime/index.js";
 
 /** Port allocation and cancellable HTTP readiness authority. */
 export class CliStartNative extends Context.Service<CliStartNative, StartNativeOperations>()(
@@ -30,8 +31,8 @@ export function startNativeLive(fetcher: typeof fetch = fetch) {
             return yield* Effect.scoped(
               Effect.gen(function* () {
                 const server = yield* Effect.acquireRelease(
-                  cliTry("start.port.bind", () =>
-                    Bun.serve({ hostname, port: 0, fetch: () => new Response() }),
+                  cliPromise("start.port.bind", () =>
+                    runtime.serve({ hostname, port: 0, fetch: () => new Response() }),
                   ),
                   (server) =>
                     cleanupEffect(

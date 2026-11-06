@@ -3,11 +3,11 @@ import { expect, test } from "bun:test";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Effect, Schema } from "effect";
-import { createJobsRuntime, isJobDescriptor } from "../../../packages/jobs/src/index.js";
+import { createJobsRuntime, isJobDescriptor } from "relkit/jobs";
 import { createTestJobsAdapter } from "../../../packages/testing/src/index.js";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 import { verifyNativeTaskRun } from "./commerce-layout-task-run.js";
-import { JobsManifest } from "../../../packages/compiler/src/jobs/manifest-schema.js";
+import { JobsManifest } from "../../../packages/cli/src/compiler/jobs/manifest-schema.js";
 
 test(
   "paired native task admission retains schedules, pinned builds and original executable ownership",

@@ -1,6 +1,6 @@
 import { Cause, Effect, Exit, Layer, ManagedRuntime, Scope } from "effect";
-import { runExecutionPromise } from "@relkit/contracts/operation";
-import { createLoggerLayer } from "@relkit/runtime-effect";
+import { runExecutionPromise } from "relkit/contracts/operation";
+import { createLoggerLayer } from "relkit/runtime-effect";
 import { cliOriginalError, cliPromise, type CliAdapterError } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliCleanup, cleanupLayer } from "../services/cleanup.service.js";

@@ -8,31 +8,6 @@ type ArtifactReference = {
 };
 
 /**
- * Renders job Source as source text without executing user modules.
- * @param artifact - Normalized artifact identity, source path, binding and export metadata.
- * @param target - Discovered domain or artifact target.
- * @param targetModule - Source module specifier of the referenced callable or task.
- * @param profile - Selected provider profile.
- * @returns Legacy function-targeted job descriptor source with optional provider selection.
- */
-export function jobSource(
-  artifact: DomainArtifact,
-  target: ArtifactReference,
-  targetModule: string,
-  profile?: string,
-): string {
-  return `import { defineJob } from "@relkit/app/jobs/legacy";
-${sourceImport(target.binding, targetModule, target.exportKind)}
-const ${artifact.binding} = defineJob({
-  id: "${artifact.id}",
-  input: ${target.binding}.input,
-  target: ${target.binding},${profile ? `\n  profile: "${profile}",` : ""}
-  retry: { maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
-});
-export default ${artifact.binding};
-`;
-}
-/**
  * Renders task Source as source text without executing user modules.
  * @param artifact - Normalized artifact identity, source path, binding and export metadata.
  * @param version - Task version included in the generated descriptor.
@@ -44,14 +19,14 @@ export function taskSource(
   version: string,
   execution: "durable" | "retryable",
 ): string {
-  return `import { defineTask } from "@relkit/app/tasks";
-import { z } from "@relkit/app/schema";
+  return `import { defineTask } from "relkit/tasks";
+import { s } from "relkit/schema";
 const ${artifact.binding} = defineTask({
   id: "${artifact.id}",
   version: "${version}",
   execution: "${execution}",
-  input: z.object({ value: z.string() }),
-  output: z.object({ accepted: z.literal(true) }),
+  input: s.object({ value: s.string() }),
+  output: s.object({ accepted: s.literal(true) }),
   handler: async ({ value }, context) => {
     context.log.info("${artifact.name.fileStem} task", { value });
     return { accepted: true as const };
@@ -80,7 +55,7 @@ export function taskJobSource(
     domain === undefined
       ? artifact.name.identifier
       : `${domain}${capitalize(artifact.name.identifier)}`;
-  return `import { defineJob } from "@relkit/app/jobs";
+  return `import { defineJob } from "relkit/jobs";
 ${sourceImport(target.binding, targetModule, target.exportKind)}
 const ${artifact.binding} = defineJob({
   id: "${artifact.id}",

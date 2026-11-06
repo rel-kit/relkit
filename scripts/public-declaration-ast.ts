@@ -1,4 +1,4 @@
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import type { DeclarationLeak } from "./check-public-declarations";
 
 export function nonFunctionHandlers(file: string, text: string): DeclarationLeak[] {

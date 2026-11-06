@@ -164,10 +164,18 @@
           "kind": "model"
         }
       ],
+      "runtime": {
+        "adapterId": "langchain",
+        "integrationId": "langchain",
+        "nativeOptions": [
+          "model"
+        ],
+        "protocolVersion": 1
+      },
       "source": {
         "column": 16,
         "file": "src/orders/agents/support.agent.ts",
-        "line": 12
+        "line": 13
       },
       "toolIds": [
         "orders.lookup-order"
@@ -425,7 +433,7 @@
       "source": {
         "column": 18,
         "file": "src/orders/functions/get-order.function.ts",
-        "line": 11
+        "line": 12
       },
       "timeoutMs": null
     },
@@ -460,11 +468,10 @@
         ],
         "type": "object"
       },
-      "publishes": [],
       "source": {
         "column": 16,
         "file": "src/orders/agents/support.agent.ts",
-        "line": 12
+        "line": 13
       }
     },
     {

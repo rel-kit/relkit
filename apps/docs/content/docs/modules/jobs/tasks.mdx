@@ -26,7 +26,7 @@ This creates `src/services/orders/tasks/export-orders.task.ts` with the stable I
 `orders.export-orders-task`, version `1`, and a durable execution model. It registers the
 task on the service. Replace the placeholder schemas and handler with your operation; keep
 its identity and version stable. Expose it through a
-[task-first job](/docs/modules/jobs/quickstart) when callers need admission, run handles, and observation.
+[task-first job](/docs/modules/jobs/quickstart) when callers need accepted runs, run handles, and observation.
 
 For every task scaffolding flag, see the [task command reference](/docs/api/cli#relkit-add-task-name).
 

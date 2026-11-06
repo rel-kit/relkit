@@ -10,7 +10,7 @@ Generate an OpenAPI document from your application's checked routes, schemas, an
 schemas, statuses, declared errors, rate limits, and operation IDs therefore come from authored descriptors
 rather than a separate annotation file.
 
-The document describes HTTP routes, not the generated client's `/rpc` protocol.
+The document describes the HTTP routes, which are also what the generated client calls.
 [Raw handlers](/docs/modules/http/raw-handlers) use a generic response contract because their adapters own the response.
 
 ## Generate the document
@@ -50,6 +50,11 @@ open http://localhost:3000/_relkit/v1/api-reference
 
 Scalar renders the same protected document. Select an operation and verify parameters, request body,
 success response, declared errors, and validation response.
+
+Error responses use the `application/problem+json` media type. Each declared error gets its own
+problem schema, with its `code` and `type` fixed to the error's ID and `data` set to the error's data
+schema. The validation and rate-limit problems have schemas too. See
+[Read an error response](/docs/modules/http/responses#read-an-error-response).
 
 ## Trace a field back to source
 

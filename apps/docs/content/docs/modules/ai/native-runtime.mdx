@@ -1,23 +1,26 @@
 ---
-title: Native runtime and DeepAgents
-description: Choose supported LangChain packages, expose middleware state safely, and add DeepAgents capabilities without adapters.
+title: LangChain adapter and DeepAgents
+description: Choose supported LangChain packages, pass native options through langchain(), expose middleware state safely, and add DeepAgents capabilities.
 pagination: false
 sidebar:
   icon: cpu
+labs: true
 ---
 
-RELKIT runs ordinary agents through LangChain and uses DeepAgents when you select capabilities such as subagents, skills, or memory files. There is no public conversion wrapper or application-level runtime adapter.
+The LangChain adapter runs agents that declare `runtime: langchain({ ... })` and uses DeepAgents when
+the options select capabilities such as subagents, skills, or memory files. Native LangChain values go
+in the adapter's options; see [Agent adapters](/docs/modules/ai/adapters) for what RelKit owns under every adapter.
 
-## Use the certified package cohort
+## Use the tested package versions
 
-Native execution belongs to the explicit `@relkit/langchain` integration. Its selected SDK cohort
-comes from that integration's dependency metadata. The following setup also selects the local runtime
+Native execution belongs to the explicit `@relkit/langchain` integration. Its selected SDK versions
+come from that integration's dependency metadata. The following setup also selects the local runtime
 profiles used by the [first-agent tutorial](/guides/ai/build-an-offline-agent#configure-the-runtime):
 
 <include>/_snippets/generated/installations/agent.mdx</include>
 
-Import native `defineAgent`, `defineGraph`, and persistence resources from `@relkit/langchain`.
-Generic descriptors and public event/state contracts remain available from `@relkit/app/agents`.
+Import `langchain`, `langchainModel`, `defineGraph`, and persistence resources from `@relkit/langchain`, and
+`defineAgent` with the public event/state contracts from `relkit/agents`.
 Install the model-provider package used by the application separately. DeepAgents is required only
 when a declaration selects a deep capability; AG-UI has its own independent
 [transport installation](/docs/modules/ai#observe-durable-execution). Neither belongs in a tool-only MCP app.
@@ -27,10 +30,10 @@ If a deep capability is activated without that package, execution fails with
 packages remain application dependencies; a missing import fails before execution, while an incompatible
 checkpointer or store fails protocol validation instead of being cast to a supported driver.
 
-## Combine native and RELKIT behavior
+## Combine native and RelKit behavior
 
-This agent passes a native model, native tool, real `todoListMiddleware()`, and RELKIT function-backed
-tools through one declaration:
+This agent passes a native model, native tool, real `todoListMiddleware()`, and persistence through
+`langchain({ ... })`, and RelKit function-backed tools through `tools`:
 
 <include
   source="examples/commerce/src/services/orders/agents/order-support.agent.ts"
@@ -40,10 +43,10 @@ tools through one declaration:
   /_snippets/source/examples/commerce/src/services/orders/agents/order-support.agent.ts
 </include>
 
-RELKIT function tools still execute through the common function engine, including schema validation,
+RelKit function tools still execute through the common function engine, including schema validation,
 authorization, cancellation, tracing, approval policy, and output validation. Native tools execute through
 their native contract. Unknown native output remains `unknown` unless the declaration supplies output
-schema metadata; RELKIT does not infer a contract by running the tool.
+schema metadata; RelKit does not infer a contract by running the tool.
 
 Middleware state is private unless `client.state` selects a contributed key. In the example, `todos` is
 inferred from `todoListMiddleware()` and becomes a precise generated status union. `values` remains
@@ -60,7 +63,7 @@ recipe. SDK installation alone does not expand the currently verified native cap
 
 <include>/_snippets/generated/installations/deep-agent.mdx</include>
 
-This declaration adds a subagent, skills, memory files, a RELKIT bucket backend, checkpointer, and store:
+This declaration adds a subagent, skills, memory files, a RelKit bucket backend, checkpointer, and store:
 
 <include
   source="examples/commerce/src/services/orders/agents/order-deep.agent.ts"
@@ -75,8 +78,8 @@ use isolated native checkpoint namespaces; nested scopes do not become independe
 Root cancellation and limits include child execution. Start an unrelated child operation with another
 application-owned thread ID.
 
-RELKIT does not emulate Python-only APIs, LangSmith Agent Server, or arbitrary structured-agent message
-conversion. A RELKIT bucket backend implements the supported DeepAgents filesystem protocol, but Redis
+RelKit does not emulate Python-only APIs, LangSmith Agent Server, or arbitrary structured-agent message
+conversion. A RelKit bucket backend implements the supported DeepAgents filesystem protocol, but Redis
 cache clients are not saver/store drivers and generic S3 clients are not treated as DeepAgents backends.
 
 ## Understand public event semantics

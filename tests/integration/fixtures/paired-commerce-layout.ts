@@ -1,6 +1,6 @@
 /** Projects only owned commerce fixture paths, preserving every native descriptor and non-module source byte. */
 import { dirname, relative, resolve } from "node:path";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 
 /**
  * Removes the evidenced grouping container from an owned application path.

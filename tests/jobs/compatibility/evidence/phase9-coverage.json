@@ -36,13 +36,13 @@
       "packages/client/jobs-watch.test.ts",
       "packages/client/jobs-watch-quality.test.ts",
       "packages/client/pending.test.ts",
-      "packages/jobs/jobs-quality.test.ts",
-      "packages/jobs/resolve-binding.test.ts",
-      "packages/jobs/task-policy.test.ts",
-      "packages/jobs/task-wire.test.ts",
-      "packages/jobs/schedule-reconciliation.test.ts",
-      "packages/jobs/authorization.test.ts",
-      "packages/jobs/authorization-cursor.test.ts"
+      "packages/relkit/jobs-quality.test.ts",
+      "packages/relkit/resolve-binding.test.ts",
+      "packages/relkit/task-policy.test.ts",
+      "packages/relkit/task-wire.test.ts",
+      "packages/relkit/schedule-reconciliation.test.ts",
+      "packages/relkit/authorization.test.ts",
+      "packages/relkit/authorization-cursor.test.ts"
     ]
   },
   "mutation": {

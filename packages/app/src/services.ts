@@ -1,1 +1,2 @@
-export * from "@relkit/services";
+import "./deprecated.js";
+export * from "relkit/services";

@@ -1,0 +1,200 @@
+---
+title: Migrate from Express or Hono
+description: Move an existing Express or Hono API into RelKit one endpoint at a time, keeping the old app serving the rest until every endpoint has moved.
+pagination: false
+search:
+  keywords: [migration, Express, Hono, port an existing API, incremental migration]
+sidebar:
+  icon: arrow-right-left
+---
+
+Move an Orders API from Express or Hono to RelKit without a big-bang rewrite. You will keep the old app serving its endpoints, move `GET /orders/:orderId` and `POST /orders` into RelKit functions and routes, and test both.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  You need Bun **1.3.10 or later** and a RelKit application. Create one with `bunx
+  create-relkit@latest my-api --template api`, or follow [Create and run an
+  API](/docs/learn/create-an-app). The complete example lives in
+  [`apps/docs/examples/migrate`](https://github.com/rel-kit/relkit/tree/main/apps/docs/examples/migrate),
+  and its tests run with the documentation test suite.
+</Callout>
+
+## How the pieces map
+
+| Express or Hono                                        | RelKit                                                                                             |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `app.get("/orders/:orderId", handler)`                 | `src/routes/orders/[orderId]/route.ts` exporting `GET`                                             |
+| The handler body                                       | A function in `src/services/orders/functions` with `input` and `output` schemas                    |
+| Validation middleware such as `zod-validator`          | The function's `input` schema; invalid requests get a 422 response                                 |
+| `res.status(404).json(...)` or `c.json(..., 404)`      | A declared error with `http: { status: 404 }`                                                      |
+| Error-handling middleware                              | Declared errors, returned from the function                                                        |
+| `app.use(middleware)` for CORS, headers or rate limits | [HTTP middleware](/docs/modules/http/middleware) and [rate limits](/docs/modules/http/rate-limits) |
+| `app.listen(3000)`                                     | `server.port` in `relkit.config.ts`, started with `bun run dev`                                    |
+| `supertest` or `app.request()` in tests                | `createTestApplication` from `@relkit/testing`                                                     |
+
+<Steps>
+<Step icon="plug">
+
+## 1. Keep the old app running [#keep-the-old-app-running]
+
+Start from your existing endpoint:
+
+<Tabs sync={false} hash={false}>
+<Tab title="Express" icon="server">
+
+```ts title="server.ts — Express"
+import express from "express";
+
+const app = express();
+
+app.get("/orders/:orderId", (req, res) => {
+  const { orderId } = req.params;
+  if (orderId === "missing")
+    return res.status(404).json({ error: `Order ${orderId} was not found` });
+  res.json({ orderId, status: "confirmed", totalCents: 1_000 });
+});
+
+app.listen(4000);
+```
+
+Express handlers take Node.js request and response objects, so RelKit can't mount an Express app directly. Keep it running on its own port and move endpoints one at a time, pointing your proxy or clients at RelKit as each one moves.
+
+</Tab>
+<Tab title="Hono" icon="flame">
+
+A Hono app answers a web `Request` with a `Response`, so RelKit can serve it from a [raw route](/docs/modules/http/raw-handlers). Give the app a base path that isn't used by RelKit routes:
+
+<include
+  source="apps/docs/examples/migrate/src/legacy/app.ts#hono-before"
+  lang="ts"
+  meta='title="src/legacy/app.ts"'
+>
+  /_snippets/source/apps/docs/examples/migrate/src/legacy/app--hono-before.ts
+</include>
+
+Then mount it with an optional catch-all route, which matches `/legacy` and every path below it:
+
+<include
+  source="apps/docs/examples/migrate/src/routes/legacy/[[...path]]/route.ts"
+  lang="ts"
+  meta='title="src/routes/legacy/[[...path]]/route.ts"'
+>
+  /_snippets/source/apps/docs/examples/migrate/src/routes/legacy/[[...path]]/route.ts
+</include>
+
+Add `hono` to the application with `bun add hono`. Endpoints under `/legacy` keep working while you move them, but they don't get RelKit validation, OpenAPI entries or typed client calls until they move.
+
+</Tab>
+</Tabs>
+
+</Step>
+<Step icon="file-code">
+
+## 2. Move the handler into a function [#move-the-handler]
+
+Declare the not-found failure once. RelKit turns it into a 404 response with a consistent body:
+
+<include
+  source="apps/docs/examples/migrate/src/services/orders/errors/order-not-found.error.ts"
+  lang="ts"
+  meta='title="src/services/orders/errors/order-not-found.error.ts"'
+>
+  /_snippets/source/apps/docs/examples/migrate/src/services/orders/errors/order-not-found.error.ts
+</include>
+
+Move the handler body into a function. The schemas replace manual parameter checks, and the function returns the error instead of building a response:
+
+<include
+  source="apps/docs/examples/migrate/src/services/orders/functions/get-order.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/get-order.function.ts"'
+>
+  /_snippets/source/apps/docs/examples/migrate/src/services/orders/functions/get-order.function.ts
+</include>
+
+</Step>
+<Step icon="route">
+
+## 3. Add the routes [#add-the-routes]
+
+Moving a `POST` handler works the same way. The `input` schema replaces your body parser and validation middleware:
+
+<include
+  source="apps/docs/examples/migrate/src/services/orders/functions/create-order.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/create-order.function.ts"'
+>
+  /_snippets/source/apps/docs/examples/migrate/src/services/orders/functions/create-order.function.ts
+</include>
+
+List both functions in the service, which is the boundary routes and other services call through:
+
+<include
+  source="apps/docs/examples/migrate/src/services/orders/service.ts"
+  lang="ts"
+  meta='title="src/services/orders/service.ts"'
+>
+  /_snippets/source/apps/docs/examples/migrate/src/services/orders/service.ts
+</include>
+
+The file path chooses the URL. `[orderId]` becomes a path parameter, and RelKit passes it to the function's `orderId` input:
+
+<include
+  source="apps/docs/examples/migrate/src/routes/orders/[orderId]/route.ts"
+  lang="ts"
+  meta='title="src/routes/orders/[orderId]/route.ts"'
+>
+  /_snippets/source/apps/docs/examples/migrate/src/routes/orders/[orderId]/route.ts
+</include>
+
+<include
+  source="apps/docs/examples/migrate/src/routes/orders/route.ts"
+  lang="ts"
+  meta='title="src/routes/orders/route.ts"'
+>
+  /_snippets/source/apps/docs/examples/migrate/src/routes/orders/route.ts
+</include>
+
+[File-system routes](/docs/modules/http/routes) explains catch-all segments and matching order.
+
+</Step>
+<Step icon="flask-conical">
+
+## 4. Test the moved and remaining endpoints [#test-the-endpoints]
+
+`createTestApplication` runs the whole application in memory, so one test file covers the moved endpoints and the ones still served by the old app:
+
+<include
+  source="apps/docs/examples/migrate/tests/orders.route.test.ts"
+  lang="ts"
+  meta='title="tests/integration/orders.route.test.ts"'
+>
+  /_snippets/source/apps/docs/examples/migrate/tests/orders.route.test.ts
+</include>
+
+In your application, you can leave out `projectRoot` when you run `bun test` from the application root. From the application root, run:
+
+```sh title="Terminal — application root"
+bun run check
+bun test
+```
+
+`bun run check` checks the application graph, including duplicate or ambiguous routes, and reports each problem with a `RELKIT_*` code. The tests pass when the moved endpoints and the `/legacy` endpoints answer as expected.
+
+</Step>
+<Step icon="circle-check">
+
+## 5. Finish the move [#finish-the-move]
+
+Repeat steps 2 to 4 for each remaining endpoint. When nothing is left under `/legacy`, delete `src/legacy` and `src/routes/legacy`, and remove `hono` from the application if nothing else uses it. For an Express app, stop the old server once your proxy sends every path to RelKit.
+
+</Step>
+</Steps>
+
+## Related tasks
+
+- [Middleware](/docs/modules/http/middleware) for CORS, headers and request policies.
+- [Better Auth](/docs/modules/auth/better-auth) to replace session middleware.
+- [Testing](/docs/modules/operations/testing) for fakes and provider replacements.
+- [Why RelKit](/docs/why-relkit) and the [FAQ](/docs/faq).
+
+<include>/_snippets/generated/related/guides-migrate-from-express-or-hono.mdx</include>

@@ -19,17 +19,12 @@ beforeEach(async () => {
     "examples",
     "templates/default/v1",
     "packages/fixture/dist",
-    "integrations/catalog",
     "packages/cli/editor",
   ])
     await mkdir(join(root, directory), { recursive: true });
   await writeFile(
     join(root, "package.json"),
     JSON.stringify({ name: "workspace", catalog: { effect: "4.0.1" } }),
-  );
-  await writeFile(
-    join(root, "integrations/catalog/package.json"),
-    JSON.stringify({ name: "@relkit/integrations", version: "1.0.0" }),
   );
   await writeFile(
     join(root, "packages/cli/editor/package.json"),
@@ -59,7 +54,7 @@ describe("source consumer ownership", () => {
     );
     const rows = await Effect.runPromise(inventoryConsumerOwnership(root));
     const fixture = rows.find((row) => row.manifest.name === "@relkit/fixture");
-    expect(rows).toHaveLength(4);
+    expect(rows).toHaveLength(3);
     expect(fixture?.dependencies).toHaveLength(3);
     expect(fixture?.dependencies.find((row) => row.dependency === "effect")).toMatchObject({
       version: "4.0.1",

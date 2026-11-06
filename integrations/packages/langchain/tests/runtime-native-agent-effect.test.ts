@@ -1,9 +1,9 @@
 /** Exercises native runtime native agent effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
-import { z } from "@relkit/schema";
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/adapter.js";
+import { z } from "relkit/schema";
 import { Effect, Layer, Result } from "effect";
 import { expect, test } from "vitest";
-import { defineAgent } from "../src/define-agent.js";
 import { createNativeAgentEffect } from "../src/runtime-native-agent.js";
 import { NativeToolIdentity } from "../src/runtime-native-tools.js";
 import { DeepAgentsLoader } from "../src/runtime-native-support.js";
@@ -18,6 +18,7 @@ const services = Layer.merge(
 );
 const agent = defineAgent({
   id: "native",
+  runtime: langchain(),
   input: z.object({ prompt: z.string() }),
   output: z.object({ answer: z.string() }),
   model: "default",

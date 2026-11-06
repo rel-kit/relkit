@@ -1,6 +1,6 @@
 /** Triggers the selected durable task with a stable proof operation identity and returns its actual run ID. */
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 import task from "../tasks/double.task.js";
 
 export default defineFunction({

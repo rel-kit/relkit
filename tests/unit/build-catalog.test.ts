@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { expect, test } from "bun:test";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -70,12 +71,16 @@ test("release staging provides catalogs, overrides, and patch bytes before insta
   try {
     await mkdir(join(root, "patches"));
     await writeFile(join(root, "patches/dependency.patch"), "patch bytes\n");
+    await mkdir(join(root, "tools/tool/node_modules/dependency"), { recursive: true });
+    await writeFile(join(root, "tools/tool/package.json"), '{"name":"tool","private":true}\n');
     await stageReleaseRoot(root, staging, manifest);
     expect(JSON.parse(await readFile(join(staging, "package.json"), "utf8"))).toEqual({
       ...manifest,
       private: true,
-      workspaces: ["packages/*"],
+      workspaces: ["packages/*", "tools/*"],
     });
+    expect(await readFile(join(staging, "tools/tool/package.json"), "utf8")).toContain("tool");
+    expect(existsSync(join(staging, "tools/tool/node_modules"))).toBe(false);
     expect(await readFile(join(staging, "patches/dependency.patch"), "utf8")).toBe("patch bytes\n");
     await expect(
       stageReleaseRoot(root, staging, {

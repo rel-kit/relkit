@@ -5,11 +5,13 @@ import {
   CreateOptionsError,
   type CreateOptionsContext,
 } from "./options.js";
+import type { PackageManagerName } from "./package-manager.js";
 export function createParsingState(context: CreateOptionsContext) {
   return {
     ...CREATE_OPTION_DEFAULTS,
     name: undefined as string | undefined,
     directory: undefined as string | undefined,
+    packageManager: undefined as PackageManagerName | undefined,
     json: CREATE_OPTION_DEFAULTS.json || context.json === true,
   };
 }
@@ -19,6 +21,7 @@ export function applyCreateBoolean(
 ): boolean {
   if (argument === "--json") state.json = true;
   else if (argument === "--force-empty-directory") state.forceEmptyDirectory = true;
+  else if (argument === "--strict") state.strict = true;
   else if (argument === "--install") state.install = true;
   else if (argument === "--no-install") state.install = false;
   else if (argument === "--git") state.git = true;

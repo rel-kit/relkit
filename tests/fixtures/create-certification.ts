@@ -4,8 +4,8 @@ import { CREATE_CAPABILITY_TABLE } from "../../packages/create-relkit/src/create
 export const entry = {
   ...CREATE_CAPABILITY_TABLE.entries[0]!,
   identity: { ...CREATE_CAPABILITY_TABLE.entries[0]!.identity, release: "9.9.9" },
-  freshEvidence: "docs/evidence/create-capabilities/9.9.9/fresh.json",
-  restartEvidence: "docs/evidence/create-capabilities/9.9.9/restart.json",
+  freshEvidence: "create-capabilities/9.9.9/fresh.json",
+  restartEvidence: "create-capabilities/9.9.9/restart.json",
 };
 
 /**
@@ -37,7 +37,8 @@ export function report(set: "fresh" | "restart", readinessOnly = false) {
         hash: `sha256:${"a".repeat(64)}`,
       })),
     },
-    summary: { runs: 20, passed: true, preparationPassed: true },
+    summary: { runs: 20, medianMs: 100, p95Ms: 100, passed: true, preparationPassed: true },
+    environment: { bun: entry.identity.bun, platform: "linux", arch: "x64" },
     attempts: Array.from({ length: 20 }, (_, index) => ({
       run: index + 1,
       sample: {

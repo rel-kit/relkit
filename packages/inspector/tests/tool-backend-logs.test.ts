@@ -1,12 +1,12 @@
 /** UI polling through the backend listener stays out of the terminal like the inspection loop. */
 import { expect, it } from "@effect/vitest";
 import { Deferred, Effect, Fiber, Layer, Ref } from "effect";
-import { ExecutionSuccessLogs } from "@relkit/contracts/operation";
+import { ExecutionSuccessLogs } from "relkit/contracts/operation";
 import {
   InspectionFiles,
   InspectionNative,
   type InspectionConnectionFile,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 import { InspectorTool } from "../src/tool.service.js";
 import { InspectorDiscovery } from "../src/discovery.service.js";
 import { InspectorRemote } from "../src/remote.service.js";

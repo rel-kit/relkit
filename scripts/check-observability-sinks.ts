@@ -1,17 +1,17 @@
 /** Audits authored observability sources for output and record serialization outside their owning adapters. */
 import { readFileSync, realpathSync } from "node:fs";
 import { relative, resolve } from "node:path";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import { resolveOwnedSourceFile, scanLoggerSinks } from "./check-logger-sinks.ts";
 
 export const OBSERVABILITY_SOURCE_ROOTS = Object.freeze([
-  "packages/observability/src",
-  "packages/observability-local/src",
-  "packages/runtime-effect/src",
-  "packages/runtime-hono/src",
-  "packages/engine/src",
-  "packages/agents/src",
-  "packages/inspector-api/src",
+  "packages/relkit/src/observability",
+  "packages/inspector/src/observability-local",
+  "packages/relkit/src/runtime-effect",
+  "packages/relkit/src/runtime-hono",
+  "packages/relkit/src/engine",
+  "packages/relkit/src/agents",
+  "packages/relkit/src/inspector-api",
   "packages/inspector/src",
   "packages/cli/src/commands",
 ] as const);
@@ -24,26 +24,26 @@ export const OBSERVABILITY_DIRECT_OUTPUT_ADAPTERS = Object.freeze([
 
 export const OBSERVABILITY_RECORD_ADAPTERS = Object.freeze([
   "packages/cli/src/commands/dev-logger.ts",
-  "packages/observability/src/redaction.ts",
-  "packages/observability/src/record-admission.ts",
+  "packages/relkit/src/observability/redaction.ts",
+  "packages/relkit/src/observability/record-admission.ts",
   // Byte accounting and search operate on admitted, redacted records.
-  "packages/observability/src/local/batch-queue-effect.ts",
-  "packages/observability/src/stream-subscriber-queue.ts",
+  "packages/relkit/src/observability/local/batch-queue-effect.ts",
+  "packages/relkit/src/observability/stream-subscriber-queue.ts",
   // The standalone collector measures re-admitted redacted persistence envelopes.
   "packages/inspector/src/collector.ts",
-  "packages/observability/src/memory-storage.ts",
-  "packages/observability/src/query.ts",
-  "packages/observability/src/query-detail-effect.ts",
-  "packages/observability/src/query-validation.ts",
-  "packages/observability/src/query-validation-core.ts",
-  "packages/observability/src/storage/segments.ts",
-  "packages/observability/src/storage/index.ts",
-  "packages/observability/src/storage/index-files.ts",
-  "packages/observability/src/storage/segment-files.ts",
-  "packages/runtime-effect/src/logger.ts",
+  "packages/relkit/src/observability/memory-storage.ts",
+  "packages/relkit/src/observability/query.ts",
+  "packages/relkit/src/observability/query-detail-effect.ts",
+  "packages/relkit/src/observability/query-validation.ts",
+  "packages/relkit/src/observability/query-validation-core.ts",
+  "packages/relkit/src/observability/storage/segments.ts",
+  "packages/relkit/src/observability/storage/index.ts",
+  "packages/relkit/src/observability/storage/index-files.ts",
+  "packages/relkit/src/observability/storage/segment-files.ts",
+  "packages/relkit/src/runtime-effect/logger.ts",
   // The response-owned SSE exporter serializes admitted native stream events.
-  "packages/inspector-api/src/observability-stream.ts",
-  "packages/inspector-api/src/observability-utils.ts",
+  "packages/relkit/src/inspector-api/observability-stream.ts",
+  "packages/relkit/src/inspector-api/observability-utils.ts",
 ] as const);
 
 export interface ObservabilitySinkViolation {
@@ -64,7 +64,7 @@ export function scanObservabilitySinks(root: string): ObservabilitySinkViolation
     for (const path of new Bun.Glob("**/*.ts").scanSync({ cwd: directory, onlyFiles: true })) {
       const file = resolveOwnedSourceFile(directory, path);
       const relativeFile = relative(root, file).replaceAll("\\", "/");
-      if (relativeFile === "packages/runtime-effect/src/logger.ts") continue;
+      if (relativeFile === "packages/relkit/src/runtime-effect/logger.ts") continue;
       const source = ts.createSourceFile(
         file,
         readFileSync(file, "utf8"),

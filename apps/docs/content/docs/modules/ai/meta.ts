@@ -8,6 +8,7 @@ export default defineMeta({
     "tools",
     "function-tools",
     "agents",
+    "adapters",
     "native-runtime",
     "graphs-persistence",
     "streaming",

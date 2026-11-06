@@ -3,14 +3,15 @@
  * services and publishes one diagnostic/artifact cohort. Registry writes retain
  * their existing ordering; typed adapter failures remain owned by checkProject.
  */
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import {
   checkConventions,
   extractDescriptors,
   normalizeCompilation,
+  resolvedIdentities,
   type GeneratedOutputs,
-} from "@relkit/compiler";
-import { sortDiagnostics } from "@relkit/diagnostics";
+} from "../compiler/index.js";
+import { sortDiagnostics } from "relkit/diagnostics";
 import { Effect } from "effect";
 import { cliTry } from "../cli-errors.js";
 import { CliCompiler } from "../services/compiler.service.js";
@@ -24,7 +25,9 @@ import { writeContextRegistryEffect } from "./check-context-registry.js";
 import { writeEventRegistryEffect } from "./check-event-registry.js";
 import { packageApplicationIdEffect } from "./check-input.js";
 import { emitCheckResultEffect } from "./check-result.js";
-import { conventionDescriptor } from "./check-support.js";
+import { conventionDescriptor, evaluatorWarningDiagnostics } from "./check-support.js";
+import { vercelRealtimeDiagnosticsEffect } from "./check-vercel-realtime.js";
+import { workersProviderDiagnosticsEffect } from "./check-workers-providers.js";
 import type { evaluateCheckSources } from "./check-evaluation.js";
 import type { CheckOptions } from "./check.types.js";
 
@@ -45,14 +48,6 @@ const normalizeCheckEvaluation = Effect.fn("Project.checkNormalization")(functio
   const extracted = yield* cliTry("project.extract", () =>
     extractDescriptors(evaluator, { projectRoot, sources: discoverySources }),
   );
-  yield* Effect.all(
-    [
-      writeEventRegistryEffect(extracted, projectRoot, config.generatedDirectory),
-      writeContextRegistryEffect(extracted, projectRoot, config.generatedDirectory),
-    ],
-    { concurrency: 2 },
-  );
-  const typeDiagnostics = yield* compiler.typecheck(projectRoot, config.generatedDirectory);
   const hasAgents = extracted.some((entry) => entry.descriptor.kind === "agent");
   const runtimeIntegrationPackages =
     hasAgents && !declaredIntegrations.some((entry) => entry.integrationId === "langchain")
@@ -74,6 +69,8 @@ const normalizeCheckEvaluation = Effect.fn("Project.checkNormalization")(functio
   const normalization = yield* cliTry("project.normalize", () =>
     normalizeCompilation({
       evaluator,
+      // The descriptors were just extracted from this evaluation; normalization reuses them.
+      extracted,
       projectRoot,
       sources: discoverySources,
       appId,
@@ -81,6 +78,20 @@ const normalizeCheckEvaluation = Effect.fn("Project.checkNormalization")(functio
       runtimeIntegrationPackages,
     }),
   );
+  // The registries name inferred IDs, so they are written after normalization resolves them.
+  const identities = resolvedIdentities(normalization.descriptors);
+  yield* Effect.all(
+    [
+      writeEventRegistryEffect(extracted, projectRoot, config.generatedDirectory),
+      writeContextRegistryEffect(extracted, projectRoot, config.generatedDirectory, identities),
+    ],
+    { concurrency: 2 },
+  );
+  options.onWatchIndex?.(normalization.watch);
+  const typeDiagnostics =
+    options.typecheck === false
+      ? []
+      : yield* compiler.typecheck(projectRoot, config.generatedDirectory, config.check);
   return { normalization, extracted, typeDiagnostics };
 });
 
@@ -104,6 +115,9 @@ export const finishCheckEvaluation = Effect.fn("Project.finishCheck")(function* 
   const diagnostics = sortDiagnostics([
     ...typeDiagnostics,
     ...normalization.diagnostics,
+    ...evaluatorWarningDiagnostics(input.evaluator.warnings),
+    ...(yield* vercelRealtimeDiagnosticsEffect(projectRoot, normalization.outputs.graph)),
+    ...(yield* workersProviderDiagnosticsEffect(projectRoot, normalization.outputs.graph)),
     ...extracted.flatMap((entry) =>
       checkConventions({
         descriptor: conventionDescriptor(entry.descriptor.kind, entry.descriptor.id),

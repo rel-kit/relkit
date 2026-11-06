@@ -1,5 +1,5 @@
 /** Static CLI help metadata; rendering never evaluates projects or starts support services. */
-import { deepFreeze } from "@relkit/contracts";
+import { deepFreeze } from "relkit/contracts";
 import { argument, command, devLogOptions, option, title } from "./cli-help-builders.js";
 import type { CliHelpCommand, CliHelpModel } from "./cli-help-model.types.js";
 import { addHelp } from "./cli-help-add.js";
@@ -10,6 +10,7 @@ import { projectRoot } from "./cli-help-options.js";
 import { migrateHelp } from "./cli-help-migrate.js";
 import { dbHelp } from "./cli-help-db.js";
 import { inspectorHelp } from "./cli-help-inspector.js";
+import { mcpHelp } from "./cli-help-mcp.js";
 
 export type * from "./cli-help-model.types.js";
 
@@ -20,34 +21,22 @@ const root = command(
   {
     options: [option("json", "boolean", "Emit machine-readable output")],
     commands: [
-      command("create", "Create a new RELKIT application", "relkit create [name]", {
+      command("create", "Create a new RelKit application", "relkit create [name]", {
         arguments: [argument("name", false, "npm package and application name")],
         options: [
           option(
             "template",
             "choice",
-            "Candidate template; certified tuples only",
+            "Starter template",
             [],
-            ["minimal", "api", "agent", "fullstack"],
+            ["minimal", "api", "agent", "fullstack", "tasks"],
           ),
-          option(
-            "cloud",
-            "choice",
-            "Candidate cloud selection; certified tuples only",
-            [],
-            ["aws", "none"],
-          ),
-          option(
-            "deploy",
-            "choice",
-            "Candidate deployment selection; certified tuples only",
-            [],
-            ["pulumi", "none"],
-          ),
+          option("cloud", "choice", "Cloud selection", [], ["aws", "none"]),
+          option("deploy", "choice", "Deployment selection", [], ["pulumi", "none"]),
           option(
             "jobs",
             "choice",
-            "Candidate jobs service; certified native tuples only",
+            "Jobs service for the tasks template",
             [],
             ["inngest-docker", "effect-mq-docker", "trigger-docker"],
           ),
@@ -56,6 +45,7 @@ const root = command(
             option(name, "boolean", `${title(name)} generated project setup`),
           ),
           option("force-empty-directory", "boolean", "Allow an existing empty destination"),
+          option("strict", "boolean", "Refuse combinations CI has not tested instead of warning"),
         ],
       }),
       addHelp,
@@ -64,11 +54,7 @@ const root = command(
       command("dev", "Run the app and its selected development features", "relkit dev", {
         options: [
           projectRoot,
-          option(
-            "prepare",
-            "boolean",
-            "Prepare a validated dev snapshot and exit without a server",
-          ),
+          option("prepare", "boolean", "Check the project and exit without starting a server"),
           option("port", "integer", "Application port"),
           option(
             "inspector-port",
@@ -80,6 +66,7 @@ const root = command(
         ],
       }),
       inspectorHelp,
+      mcpHelp,
       command(
         "check",
         "Compile descriptors, infer eligible IDs, and validate the application",
@@ -89,7 +76,17 @@ const root = command(
         },
       ),
       command("build", "Build the checked graph, manifest, OpenAPI, and client", "relkit build", {
-        options: [projectRoot],
+        options: [
+          projectRoot,
+          option(
+            "runtime",
+            "choice",
+            "Runtime the production server runs on",
+            [],
+            ["bun", "node", "workers"],
+          ),
+          option("target", "choice", "Deploy target whose build rules apply", [], ["vercel"]),
+        ],
       }),
       command("start", "Start a built application", "relkit start", {
         options: [projectRoot, option("port", "integer", "Application port")],

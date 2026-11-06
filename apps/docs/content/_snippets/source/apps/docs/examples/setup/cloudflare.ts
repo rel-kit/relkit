@@ -1,5 +1,5 @@
 /** Connect existing R2 and KV resources without selecting Cloudflare application hosting. */
-import { defineApp, defineEnv, env as binding } from "@relkit/app/config";
+import { defineApp, defineEnv, env as binding } from "relkit/config";
 import { kv, r2 } from "@relkit/cloudflare";
 
 export default defineApp({

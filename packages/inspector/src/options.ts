@@ -1,7 +1,7 @@
 /** Parses trusted tool launch flags without importing an application's config or dependencies. */
 import { resolve } from "node:path";
 import { Schema } from "effect";
-import { InspectionEndpoint } from "@relkit/inspector-api/connection";
+import { InspectionEndpoint } from "relkit/inspector-api/connection";
 import type { InspectorOptions } from "./options.types.js";
 
 /** Public standalone launch help; tokens are accepted only through private files. */

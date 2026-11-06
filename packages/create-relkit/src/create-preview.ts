@@ -1,13 +1,14 @@
 /** Builds a no-install creation preview from maintained template bytes and metadata without importing or evaluating authored template configuration. */
 
 import { join } from "node:path";
-import ownManifest from "../package.json";
+import ownManifest from "../package.json" with { type: "json" };
 import { Effect, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { EXAMPLE_PATH_PREFIXES, listProjectFilesEffect } from "./generate-files.js";
 import { GeneratorFileSystem } from "./generator-filesystem.js";
 import { domainError, domainTry } from "./generator-errors.js";
 import { runGeneratorPromise } from "./generator-runtime.js";
+import { jobsNativeDependencies } from "./jobs-dependencies.js";
 import type { GenerateProjectContext } from "./generate-types.js";
 import type { CreateOptions } from "./options.js";
 import type { CreateScaffoldPlan } from "./create-preview.types.js";
@@ -42,12 +43,13 @@ export const planCreateEffect = Effect.fn("CreatePreview.plan")(
       Effect.mapError(domainError),
     );
     const dependencies = { ...manifest.dependencies, ...manifest.devDependencies };
-    const version = dependencies["@relkit/app"] ?? ownManifest.version;
+    const version = dependencies.relkit ?? ownManifest.version;
     if (options.cloud === "aws") dependencies["@relkit/aws"] = version;
     if (options.deploy === "pulumi") dependencies["@relkit/pulumi"] = version;
     if (options.jobs !== undefined) {
       dependencies["@relkit/docker"] = version;
       dependencies[`@relkit/${options.jobs.replace(/-docker$/u, "")}`] = version;
+      Object.assign(dependencies, jobsNativeDependencies(options.jobs));
     }
     const files = (yield* listProjectFilesEffect(root))
       .map((path) => (path === "gitignore" ? ".gitignore" : path))

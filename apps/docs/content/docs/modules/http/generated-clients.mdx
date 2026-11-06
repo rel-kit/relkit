@@ -6,14 +6,18 @@ sidebar:
   icon: panels-top-left
 ---
 
-Generate a typed client so callers can use your routes without maintaining their own request and response types. Operation names come from route
-IDs; input, output, and declared application errors come from the target functions.
+Generate a typed client so callers can use your routes without maintaining their own request and response types. Each route
+appears on the `api` object under its target function's ID, in camelCase: `orders.create-order`
+becomes `api.orders.createOrder`. Input, output, and declared application errors come from the
+target functions.
 Raw handlers do not become generated-client operations.
 
-The client uses **RPC over `/rpc`**. Every exposed route has its stable route-ID procedure and a
-deterministic method/path alias. Both execute the original route's authorization, middleware, rate
-limit, timeout, error mapping, and telemetry against its canonical method and path. Use the
-[OpenAPI document](/docs/modules/http/openapi) when you need the native REST request and response shape.
+The client calls **the REST routes themselves**: `api.orders.createOrder(input)` sends the same
+request the [OpenAPI document](/docs/modules/http/openapi) describes, so curl can reproduce any call.
+It reads each route's request mapping from the backend (`/_relkit/v1/client/routes`) and places every
+input field in the path, query, headers or body the route reads it from. A route is also reachable by
+its stable route ID and its `METHOD /path` name on the raw client. Channels, agents and jobs, which
+have no REST route, use RelKit's own endpoint at `/_relkit/v1/rpc`.
 
 <Steps>
 <Step>
@@ -45,7 +49,7 @@ OpenAPI, and JSON client-contract artifacts. Never hand-edit them.
 
 Make the generated contract part of the caller's TypeScript program: import the generated client
 entry point, or explicitly include the generated contract when using `@relkit/client` directly.
-The contract augments the default client registry so operation names and inputs are typed. Merely
+The contract augments the default client registry so the `api` tree and its inputs are typed. Merely
 installing `@relkit/client` in another app does not teach it your server's operations.
 
 Package or share the generated client and contract together with the dependencies they import.
@@ -71,7 +75,7 @@ This repository example configures a client instance:
   /_snippets/source/examples/commerce/src/platform/generated-client.ts
 </include>
 
-Set `baseUrl` to the backend origin, without appending `/rpc`; the client adds that transport path.
+Set `baseUrl` to the backend origin, without a path suffix; the client adds each route path.
 The snippet uses port `3000`, the generated-app default. Change it to `4000` when calling the commerce
 app with its default configuration.
 
@@ -86,17 +90,18 @@ require appropriate browser, cookie, and server CORS configuration. A custom `fe
 
 ## Call with domain input
 
-Select the checked route ID with editor completion. For the unmodified Echo tutorial, the operation
-is `route.post.echo` and the input is `{ message: "hello" }`. It resolves to the function's validated
-output, not a native `Response`.
+Select the route on the `api` tree with editor completion. For the unmodified Echo tutorial, the
+route targets the function `echo.echo`, so you call `backend.echo.echo({ message: "hello" })` on the
+tree that `createApi` returns. It resolves to the function's validated output, not a native
+`Response`.
 
-In a separate frontend using `client pull`, select the route ID directly:
+In a separate frontend using `client pull`:
 
 <include source="apps/docs/examples/frontend/rpc.ts" lang="ts" meta='title="src/api.ts"'>
   /_snippets/source/apps/docs/examples/frontend/rpc.ts
 </include>
 
-The base client does not load identity automatically. This browser example performs the identity
+`createApi` does not load identity automatically. This browser example performs the identity
 handshake first and includes its scope and session epoch on the mutation, as the React provider does.
 
 See [the route declaration and React button](/docs/modules/http/define#use-from-the-frontend)
@@ -109,7 +114,7 @@ WebSocket, and automatic transport selection.
 | Maps path, query, headers, cookies, and body into input | Accepts the target function's input directly              |
 | Uses the route's `request` mappings and transforms      | Does not replay those mappings or transforms              |
 | Returns the selected HTTP success status and body       | Resolves to typed function output                         |
-| Returns an HTTP error envelope                          | Rejects with an RPC error                                 |
+| Returns an HTTP error envelope                          | Rejects with an error keyed by `code`                     |
 | Handles multipart according to the route                | Does not automatically reconstruct that multipart request |
 
 For example, the Orders REST route obtains `orderId` from `idempotency-key`; an RPC caller supplies
@@ -121,9 +126,11 @@ Likewise, catch-all input is an array supplied to the function, not a REST path 
 
 ## Handle failures by contract
 
-RPC failures use `ORPCError`. Declared application errors retain their stable error code and data;
-unexpected failures use transport-level codes. Branch on the code and validated data, not a formatted
-message. Do not expect a REST validation `422` body to be the RPC error shape.
+A rejected call carries a `code`, `status`, and `data`. Declared application errors keep their
+stable error ID as `code`, such as `orders.not-found`, with their validated data. Other failures use a
+fixed list of codes, such as `UNAUTHORIZED` or `INTERNAL_SERVER_ERROR`, and `NETWORK_ERROR` when no
+response arrived. Checking `code` narrows `status` and `data`, so branch on it rather than on
+`instanceof ORPCError` or a formatted message. Do not expect a REST validation `422` body to be the RPC error shape.
 
 A response returned by HTTP middleware is not automatically a declared function error. The RPC
 middleware bridge maps a returned `401` to `UNAUTHORIZED`, a `429` to `TOO_MANY_REQUESTS`, and other
@@ -132,13 +139,13 @@ returned responses to `INTERNAL_SERVER_ERROR`. Test these cases if middleware pr
 ## Test security at both entry points
 
 Registered Better Auth protection and route policy run with the operation's canonical method/path.
-If a policy cannot be reproduced safely over RPC, compilation fails until the route is marked
-`client: false`; that opt-out registers neither RPC identity, and direct calls return `NOT_FOUND`.
+A route marked `client: false` stays out of the generated client and its routes document.
 
 Point the client at a running local test server. The current `createTestApplication` HTTP helper does
-not serve `/rpc`, so connecting it through a custom `fetch` is not an RPC integration test.
+not serve the client routes document, so connecting it through a custom `fetch` is not a client
+integration test.
 Cover success, invalid input, a declared error, missing credentials, and any quota policy.
-Keep REST tests too; RPC tests do not exercise request mapping. See [Testing](/docs/modules/operations/testing)
+Client tests exercise the same request mapping as REST tests. See [Testing](/docs/modules/operations/testing)
 for the other available test layers.
 
 ## Review compatibility changes

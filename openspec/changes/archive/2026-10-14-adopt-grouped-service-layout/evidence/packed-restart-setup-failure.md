@@ -4,7 +4,7 @@
 openspec/changes/adopt-grouped-service-layout/evidence/packed-restart-1.json`
 did not reach any measurement. The retained log is
 `/tmp/grouped-packed-restart-1.log`; the owned temporary root is
-`/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-kvfoOK`.
+`<tmp>/relkit-readiness-kvfoOK`.
 
 Release staging stopped after its last command at 18:10:42 on 2026-10-13.
 After more than six minutes, the owned Bun process had no child processes or

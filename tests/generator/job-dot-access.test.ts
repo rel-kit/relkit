@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
-import { GRAPH_VERSION } from "../../packages/contracts/src/index.ts";
-import type { ApplicationGraph } from "../../packages/graph/src/index.ts";
+import { GRAPH_VERSION } from "relkit/contracts";
+import type { ApplicationGraph } from "relkit/graph";
 import {
   generateClientRegistry,
   generateContract,
   publicFingerprint,
-} from "../../packages/client-generator/src/index.ts";
+} from "../../packages/cli/src/client-generator/index.ts";
 
 test("generates name-based job dot access without exposing private jobs", () => {
   const graph = graphWithJobs();

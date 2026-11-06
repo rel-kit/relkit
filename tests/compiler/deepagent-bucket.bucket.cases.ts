@@ -1,22 +1,23 @@
 /** Retains original bucket assertions for deepagent-bucket, registered by the owning suite. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../../integrations/packages/langchain/src/index.ts";
 import { nativeAgentRuntimePackages } from "./native-agent-runtime.fixture.js";
 import { expect } from "bun:test";
-import { defineAgent } from "../../integrations/packages/langchain/src/index.ts";
-import { defineBucket } from "../../packages/buckets/src/index.ts";
-import { defineCache } from "../../packages/cache/src/index.ts";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { defineBucket } from "relkit/buckets";
+import { defineCache } from "relkit/cache";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
+import { z } from "relkit/schema";
 import { limits } from "./deepagent-bucket.fixture.js";
 export function case1Bucket() {
   const workspace = defineBucket({ id: "agent.workspace", visibility: "private" });
   const agent = defineAgent({
     id: "research.agent",
+    runtime: langchain({ backend: workspace }),
     input: z.string(),
     output: z.string(),
     instructions: "Research safely.",
     tools: [],
     limits,
-    backend: workspace,
   });
 
   const result = normalizeCompilation({
@@ -56,12 +57,12 @@ export function case2Bucket() {
   });
   const agent = defineAgent({
     id: "bad.agent",
+    runtime: langchain({ backend: cache }),
     input: z.string(),
     output: z.string(),
     instructions: "Fail compilation.",
     tools: [],
     limits,
-    backend: cache,
   });
 
   const result = normalizeCompilation({

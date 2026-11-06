@@ -4,7 +4,7 @@
  * shared pins; release synchronization cannot restore a stale duplicated range.
  */
 import { Schema } from "effect";
-import { IntegrationDependencyRequirements } from "@relkit/contracts";
+import { IntegrationDependencyRequirements } from "relkit/contracts";
 import { resolveCatalogVersion } from "./catalog-manifest.js";
 import type { CatalogManifest } from "./catalog-manifest.types.js";
 
@@ -21,7 +21,7 @@ const Manifest = Schema.Struct({
  * @typeParam Input - Parsed JSON manifest decoded before any property access.
  * @param input - Source workspace package manifest.
  * @param root - Root catalog owning shared versions and supported peer ranges.
- * @returns RELKIT metadata with concrete requirement ranges, or no metadata.
+ * @returns RelKit metadata with concrete requirement ranges, or no metadata.
  * @throws Schema errors or missing/unresolved owning dependency declarations.
  */
 export function synchronizeIntegrationDependencies<Input>(input: Input, root: CatalogManifest) {

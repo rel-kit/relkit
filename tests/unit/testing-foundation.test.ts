@@ -2,7 +2,7 @@
 import { expect, test } from "bun:test";
 import { dirname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import ts from "typescript";
+import ts from "relkit-typescript";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 
@@ -20,7 +20,6 @@ for (const task of ["build", "typecheck"]) {
     const foundation = `@relkit/testing#${task}:foundation`;
     expect(tasks.get(`@relkit/langchain#${task}`)).toContain(foundation);
     expect(tasks.has(`@relkit/testing#${task}`)).toBe(false);
-    expect(tasks.has(`@relkit/runtime-hono#${task}`)).toBe(false);
     const ancestors = new Set<string>();
     const pending = [...(tasks.get(foundation) ?? [])];
     while (pending.length > 0) {
@@ -30,19 +29,7 @@ for (const task of ["build", "typecheck"]) {
       ancestors.add(id);
       pending.push(...(tasks.get(id) ?? []));
     }
-    for (const owner of [
-      "buckets",
-      "cache",
-      "config",
-      "contracts",
-      "engine",
-      "graph",
-      "jobs",
-      "providers-local",
-      "runtime-effect",
-      "schema",
-    ])
-      expect(ancestors.has(`@relkit/${owner}#${task}`)).toBe(true);
+    expect(ancestors.has(`relkit#${task}`)).toBe(true);
   });
 }
 

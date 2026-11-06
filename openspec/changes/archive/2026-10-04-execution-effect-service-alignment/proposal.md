@@ -31,5 +31,5 @@ None.
 - Planning reviewed 338 authored TypeScript files (approximately 40,000 lines). Baseline package suites passed 252 tests, skipped one, across 73 suites.
 - Preserve Effect 4.0.0-rc.115, public constructor/error identities, plain authoring/provider contracts, graph/manifest versions, persisted data formats, durable retries, filesystem locks, and existing transport semantics.
 - Implementation uses one worktree with four package lanes after shared contracts are established, followed by dependency-ordered integration. Work remains uncommitted.
-- The ignored, read-only reference at /Users/mustafaelsayed/Workspace/relkit/repos/effect is mandatory API evidence. It is incomplete; specific missing/mismatched sources use installed implementation/examples and focused regression evidence, with version-matched upstream only if still inconclusive.
+- The ignored, read-only reference at <repo>/repos/effect is mandatory API evidence. It is incomplete; specific missing/mismatched sources use installed implementation/examples and focused regression evidence, with version-matched upstream only if still inconclusive.
 - No cloud execution, deployment, dependency upgrade, vendor checkout repair, commit, or push is included.

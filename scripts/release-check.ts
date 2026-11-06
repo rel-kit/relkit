@@ -16,6 +16,10 @@ import {
 } from "./release-check-support.js";
 import { packAll, templateInputs } from "./release-check-artifacts.js";
 import { readReleasePlan, selectReleasePackages } from "./release-plan.js";
+import { changelogSection } from "./version-packages.js";
+
+/** Docs page that shows the plan metrics; every release's notes link it. */
+export const METRICS_URL = "https://relkit.dev/docs/metrics";
 
 export function releaseNotes(data: RecordValue): string {
   const packageRows = (data.packages as RecordValue[])
@@ -29,9 +33,22 @@ export function releaseNotes(data: RecordValue): string {
   const templateRows = (data.templates as RecordValue[])
     .map((item) => `| ${item.name} | ${item.files} | \`${item.sha256}\` |`)
     .join("\n");
+  const changes =
+    typeof data.changes === "string" && data.changes.trim() !== ""
+      ? data.changes.trim()
+      : "No changelog entry for this release.";
   return `# RelKit ${data.version} release candidate
 
 Deterministic release output generated from checked-in package and template metadata.
+
+## Changes
+
+${changes}
+
+## Metrics
+
+The plan's metrics for this release, each with its current value and target, are on the
+[metrics page](${METRICS_URL}).
 
 ## Review status
 
@@ -88,6 +105,7 @@ async function main(): Promise<void> {
   if (writeNotes) allow.add("RELEASE_NOTES.md");
   if (!allowDirty) await assertClean(allow);
   await command(bun, ["run", "scripts/sync-release.ts"]);
+  await command(bun, ["run", "scripts/positioning.ts"]);
   const items = await packages();
   const rootManifest = await readJson(join(root, "package.json"));
   const checked = checkManifests(items, rootManifest);
@@ -102,6 +120,7 @@ async function main(): Promise<void> {
   );
   const input = {
     version,
+    changes: changelogSection(await readFile(join(root, "CHANGELOG.md"), "utf8"), version) ?? "",
     packageManager: rootManifest.packageManager,
     packages: summary,
     templates,

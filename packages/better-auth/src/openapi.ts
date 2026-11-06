@@ -8,8 +8,8 @@ import {
   nativeCall,
   observeSpecializedOperation,
   squashDrizzleCause,
-} from "@relkit/drizzle/internal";
-import type { JsonValue } from "@relkit/contracts";
+} from "@relkit/drizzle/server";
+import type { JsonValue } from "relkit/contracts";
 import type { Auth } from "better-auth";
 import { Cause, Context, Effect, Exit, Layer } from "effect";
 import { AuthFailure } from "./auth.errors.js";
@@ -64,7 +64,7 @@ export class AuthOpenApi extends Context.Service<
 }) {}
 
 /**
- * Projects native core and plugin endpoints for RELKIT's shared API reference.
+ * Projects native core and plugin endpoints for RelKit's shared API reference.
  * @param auth - Activated native auth instance; schema generation performs no database calls.
  * @param instrumentation - Owning application's logger, tracer and metric context.
  * @returns JSON-safe schema with mounted paths and isolated component names.

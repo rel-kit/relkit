@@ -6,7 +6,7 @@ import {
   jobWorkerPath,
   writeJobWorkerEntries,
   type JobsManifestWorkerEntry,
-} from "../../packages/compiler/src/index.ts";
+} from "../../packages/cli/src/compiler/index.ts";
 
 function entry(jobId: string, buildId = "sha256:build-1"): JobsManifestWorkerEntry {
   return {

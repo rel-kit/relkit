@@ -1,7 +1,7 @@
 import type { NormalizedTrigger } from "./events.types.js";
-import { normalizeId, type JsonValue } from "@relkit/contracts";
-import { materializeEvents } from "@relkit/engine";
-import type { InvocationRunner } from "@relkit/runtime-effect";
+import { normalizeId, type JsonValue } from "relkit/contracts";
+import { materializeEvents } from "relkit/engine";
+import type { InvocationRunner } from "relkit/runtime-effect";
 import { createDeterministicClock } from "./runtime-clock.js";
 import { createTestStateRoot } from "./state-root.js";
 import { createFailures, createIdSource, createRandom } from "./jobs-utils.js";

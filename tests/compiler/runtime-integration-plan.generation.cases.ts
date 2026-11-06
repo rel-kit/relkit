@@ -1,11 +1,11 @@
 /** Retains original generation assertions for runtime-integration-plan, registered by the owning suite. */
 import { expect } from "bun:test";
-import { GRAPH_VERSION, type RuntimeIntegrationPlan } from "../../packages/contracts/src/index.ts";
+import { GRAPH_VERSION, type RuntimeIntegrationPlan } from "relkit/contracts";
 import {
   generateRuntimeIntegrationImports,
   generateRuntimeIntegrationPlan,
-} from "../../packages/compiler/src/index.ts";
-import type { ApplicationGraph } from "../../packages/graph/src/index.ts";
+} from "../../packages/cli/src/compiler/index.ts";
+import type { ApplicationGraph } from "relkit/graph";
 import {
   source,
   provider,
@@ -78,5 +78,7 @@ export function case4Generation() {
   expect(source.match(/await import\(/g)).toHaveLength(2);
   expect(source).toContain('await import("@relkit/cloudflare/runtime")');
   expect(source).toContain('await import("@relkit/redis/runtime")');
-  expect(source.indexOf("await Effect.runPromise")).toBeLessThan(source.indexOf("await import("));
+  expect(source.indexOf("await checkRuntimeIntegrations(")).toBeLessThan(
+    source.indexOf("await import("),
+  );
 }

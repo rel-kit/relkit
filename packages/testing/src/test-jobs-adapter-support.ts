@@ -1,8 +1,8 @@
 import type { TestNativeRun } from "./test-jobs-adapter-support.types.js";
 export type { TestNativeRun } from "./test-jobs-adapter-support.types.js";
-import { canonicalJson } from "@relkit/contracts";
-import type { JobErrorEnvelope, RunSnapshot } from "@relkit/contracts/jobs";
-import type { NativeSubmission } from "@relkit/jobs/adapter";
+import { canonicalJson } from "relkit/contracts";
+import type { JobErrorEnvelope, RunSnapshot } from "relkit/contracts/jobs";
+import type { NativeSubmission } from "relkit/jobs/adapter";
 import type { TestClock } from "./runtime.js";
 import type { NativeJobsState } from "./native-jobs.types.js";
 

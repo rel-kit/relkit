@@ -1,24 +1,25 @@
 /** Exposes generated and direct native invocation entrypoints plus dependency and persistence lifecycle operations for the selected integration. */
 
 import { resolveNativeInvocationEffect, invokeNativeWithContextEffect } from "./runtime-invoke.js";
-import { normalizeId } from "@relkit/contracts";
-import { frameworkTrace, unexpectedDefect } from "@relkit/invocation";
+import { normalizeId } from "relkit/contracts";
+import { frameworkTrace, unexpectedDefect } from "relkit/invocation";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import { logAgentFailure } from "./runtime-failure-diagnostics.js";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
-import { createAgentCapturePolicyEffect } from "@relkit/agents/internal/capture-policy";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { createAgentCapturePolicyEffect } from "relkit/agents/capture-policy";
 import { signalFailure, validateValue, withSignal } from "./runtime-utils.js";
 import { acquireExecutionSignalEffect, ExecutionSignalClockLive } from "./signal.js";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
-import { generatedAgentFunctionId } from "@relkit/agents/internal/generated-function";
+import { generatedAgentFunctionId } from "relkit/agents/generated-function";
 import { isGraphDescriptor } from "./define-graph.js";
 import { AgentExecution, AgentExecutionLive } from "./runtime-service.js";
 import type { AgentInvocationOptions, AgentRuntime, AgentRuntimeOptions } from "./runtime.types.js";
 
 export type * from "./runtime.types.js";
 export { runtimeIntegration } from "./runtime-integration.js";
-export { createGeneratedAgentFunction } from "@relkit/agents/internal/generated-function";
+export { langchainAgentRuntime } from "./adapter-runtime.js";
+export { createGeneratedAgentFunction } from "relkit/agents/generated-function";
 export { releaseAgentPersistence } from "./graph-persistence-release.js";
 export { assertAgentRuntimeDependencies } from "./runtime-dependencies.js";
 
@@ -29,6 +30,7 @@ export { AgentInvocationFailure } from "./runtime-effect-error.js";
  * @param options - Runtime dependencies and invocation input.
  * @returns An Effect with the agent result or AgentInvocationFailure.
  * @example Effect.runPromise(Effect.provide(invokeAgentEffect(options), AgentExecutionLive));
+ * @experimental
  */
 export const invokeAgentEffect = Effect.fn("Agents.runtime.invoke")(
   function* (options: AgentRuntimeOptions & AgentInvocationOptions) {
@@ -60,6 +62,7 @@ export const invokeAgentEffect = Effect.fn("Agents.runtime.invoke")(
  * @returns The agent result.
  * @throws The original validation, provider, cancellation, or runtime error.
  * @example await invokeAgent({ ...options, input: { message: "hi" } });
+ * @experimental
  */
 export function invokeAgent(
   options: AgentRuntimeOptions & AgentInvocationOptions,
@@ -78,6 +81,7 @@ export function invokeAgent(
  * @param options - Agent dependencies, invocation identity and cancellation.
  * @returns Validated output; a failed final response does not undo completed tool actions.
  * @example await invokeAgentFunction(options);
+ * @experimental
  */
 export function invokeAgentFunction(options: AgentRuntimeOptions & AgentInvocationOptions) {
   return invokeAgent(options).catch((cause) => {
@@ -95,6 +99,7 @@ export function invokeAgentFunction(options: AgentRuntimeOptions & AgentInvocati
  * @param options - Agent, model, tool, and engine dependencies.
  * @returns An Effect with a frozen runtime and no typed failure.
  * @example Effect.runSync(createAgentRuntimeEffect(options));
+ * @experimental
  */
 export const createAgentRuntimeEffect = Effect.fn("Agents.runtime.create")(
   function* (options: AgentRuntimeOptions) {
@@ -112,9 +117,11 @@ export const createAgentRuntimeEffect = Effect.fn("Agents.runtime.create")(
  * @param options - Agent, model, tool, and engine dependencies.
  * @returns A frozen reusable runtime.
  * @example const runtime = createAgentRuntime(options);
+ * @experimental
  */
 export function createAgentRuntime(options: AgentRuntimeOptions): AgentRuntime {
   return Effect.runSync(createAgentRuntimeEffect(options));
 }
 
+/** @experimental */
 export const runAgent = invokeAgent;

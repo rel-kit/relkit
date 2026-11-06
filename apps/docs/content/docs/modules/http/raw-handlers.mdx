@@ -7,7 +7,7 @@ sidebar:
 ---
 
 Mount a raw route when an integration already provides a native `Request`-to-`Response` handler. Use a [function-backed route](/docs/modules/http/define) for ordinary domain
-operations that need RELKIT input validation, declared errors, and generated contracts.
+operations that need RelKit input validation, declared errors, and generated contracts.
 
 <Callout type="tip" title="Create the route from the terminal" icon="terminal">
   Use [`relkit add route --mode route`](/docs/modules/http/define#scaffold-a-route) to create a raw
@@ -18,25 +18,33 @@ operations that need RELKIT input validation, declared errors, and generated con
 
 ## Mount an HTTP integration
 
-A raw route uses `defineRoute({ handler: ... })` and the named export `ALL`:
-
-The auth example below requires complete [Better Auth installation and configuration](/docs/modules/auth/better-auth)
-first. A minimal app does not acquire the auth SDK or database by copying this route.
+A raw route uses `defineRoute({ handler: ... })` with a named method export. The handler accepts a
+native `Request` and returns a `Response`, synchronously or asynchronously:
 
 <include
-  source="examples/commerce/src/routes/api/auth/[[...auth]]/route.ts"
+  source="examples/commerce/src/routes/orders/export/route.ts"
   lang="ts"
-  meta='title="examples/commerce/src/routes/api/auth/[[...auth]]/route.ts"'
+  meta='title="examples/commerce/src/routes/orders/export/route.ts"'
 >
-  /_snippets/source/examples/commerce/src/routes/api/auth/[[...auth]]/route.ts
+  /_snippets/source/examples/commerce/src/routes/orders/export/route.ts
 </include>
 
-This optional catch-all mounts the auth adapter at `/api/auth` and its nested paths. `ALL` delegates
-every HTTP method at those paths; the adapter decides which operations it accepts.
-The handler accepts a native `Request` and returns a `Response`, synchronously or asynchronously.
+This route reads the native body itself and returns `202` with the started run.
 
-Do not combine `handler` and `target`, export a raw handler as `GET` or `POST`, or pass `ALL` to
-`defineServiceRoutes`. Route file naming and collision checks still apply.
+A raw handler is not a function handler, so it has no `context.functions`. To call a function, use
+`getRelkit()` from `relkit`. It groups functions by service ID and member name:
+
+```ts
+import { getRelkit } from "relkit";
+
+const order = await getRelkit().functions.orders.getOrder({ orderId: "order-1" });
+```
+
+`getRelkit()` works only inside the running application. Elsewhere it throws
+[`RELKIT_APPLICATION_NOT_RUNNING`](/docs/errors/relkit-application-not-running).
+
+Do not combine `handler` and `target`, or pass a raw handler to `defineServiceRoutes`.
+`ALL` is reserved for mounting Better Auth yourself. Route file naming and collision checks still apply.
 
 ## Understand the boundary
 
@@ -54,24 +62,19 @@ makes arbitrary adapter body reads bounded or validates their payloads: configur
 limits, signature checks, session security, and error handling. Use middleware or an upstream gateway
 for transport policy that the raw-route API does not provide.
 
-## Keep Better Auth protection explicit
+## Mount Better Auth yourself
 
-The example's `auth.protected` list protects `/account/*` and `/mcp` using the registered Better Auth
-service. It is not a list of routes created by the auth handler. The adapter owns the `/api/auth`
-endpoints; protected paths select other application entry points that require a session.
-
-The `auth` option is accepted only when `handler` belongs to a recognized Better Auth service.
-It cannot add authentication to an arbitrary raw handler. This route also needs the corresponding
-auth service and database configuration; copying only the route is not a complete auth setup.
-See the [specialized service guidance](/docs/modules/service/organization#resources-do-not-go-in-the-service-member-list)
-for the owning domain and the [Routes API reference](/docs/api/routes) for raw-route options.
-Use [Better Auth service](/docs/modules/auth/better-auth) for a complete setup and
-[Protect routes](/docs/modules/auth/protect-routes) for exact path matching and authorization boundaries.
+RelKit mounts a Better Auth service at its `basePath`, so most applications have no auth route. To mount
+it yourself, pass `mount: false` to `defineBetterAuthService` and export `ALL = defineRoute({ handler:
+auth.handler })` from an optional catch-all route. The adapter owns those endpoints, which never require
+a session; set `auth: "required"` on each function route that needs a signed-in caller. See
+[Better Auth service](/docs/modules/auth/better-auth) for a complete setup and
+[Protect routes](/docs/modules/auth/protect-routes) for requiring sessions and authorization boundaries.
 
 ## Verify the adapter separately
 
-From the application root, run `bun run check`. Then test the base catch-all path, a nested path,
-an unsupported method, a protected request without a session, and one with a valid session.
+From the application root, run `bun run check`. Then test the adapter's paths, an unsupported method,
+and its failure cases.
 Assert the adapter's actual statuses, headers, and cookies; there is no generated route contract
 to supply those assertions. Use the [testing guide](/docs/modules/operations/testing) for the application harness.
 

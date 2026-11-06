@@ -1,70 +1,67 @@
 /** Exposes generated and direct native invocation entrypoints plus dependency and persistence lifecycle operations for the selected integration. This companion preserves the native input and output types without starting runtime work. */
 
-import type { MaybePromise } from "@relkit/contracts";
+import type { MaybePromise } from "relkit/contracts";
 import type { AgentDescriptor } from "./define-agent.js";
 import type { GraphDescriptor } from "./define-graph.js";
-import type { AgentCapturePolicy, AgentRuntimeHooks } from "@relkit/agents/internal/observability";
+import type { AgentCapturePolicy, AgentRuntimeHooks } from "relkit/agents/observability";
 
 type AgentAny = AgentDescriptor<string, unknown, unknown> | GraphDescriptor;
 type ApprovalDecision =
-  "approved" | "denied" | boolean | import("@relkit/agents/internal/approval").ApprovalRecord;
+  "approved" | "denied" | boolean | import("relkit/agents/approval").ApprovalRecord;
 
-/** Resolves a pending tool approval for an invocation. */
+/** Resolves a pending tool approval for an invocation. @experimental */
 export type AgentApprovalHandler = (
-  approval: import("@relkit/agents/internal/approval").PendingApproval,
+  approval: import("relkit/agents/approval").PendingApproval,
 ) => MaybePromise<ApprovalDecision>;
 
-/** Supplies queued steering messages to a running agent. */
+/** Supplies queued steering messages to a running agent. @experimental */
 export interface AgentSteeringSource {
   readonly drain: () => MaybePromise<readonly string[]>;
 }
 
-/** One user or assistant message in a native agent conversation. */
+/** One user or assistant message in a native agent conversation. @experimental */
 export interface AgentConversationMessage {
   readonly role: "user" | "assistant";
   readonly content: string;
 }
 
-/** Sends agent output and events to the surrounding runtime. */
+/** Sends agent output and events to the surrounding runtime. @experimental */
 export interface AgentContentSink {
   readonly emitOutput: (value: unknown, signal: AbortSignal) => MaybePromise<void>;
   readonly finishOutput?: (signal: AbortSignal) => MaybePromise<void>;
   readonly progressSinkForTool?: (tool: {
     readonly toolCallId: string;
     readonly toolId: string;
-  }) => import("@relkit/invocation").ProgressSink;
+  }) => import("relkit/invocation").ProgressSink;
   readonly emitTool?: (
     value: {
       readonly toolCallId: string;
       readonly toolId: string;
-      readonly state: import("@relkit/agents/internal/state.types").ToolPartState;
+      readonly state: import("relkit/agents/state.types").ToolPartState;
       readonly value?: unknown;
     },
     signal: AbortSignal,
   ) => MaybePromise<void>;
   readonly emitEvent?: (
-    value: import("@relkit/agents/internal/runtime-events").AgentExecutionEvent,
+    value: import("relkit/agents/runtime-events").AgentExecutionEvent,
     signal: AbortSignal,
   ) => MaybePromise<void>;
   readonly emitMessage?: (
-    value: import("@relkit/contracts").BrowserMessage,
+    value: import("relkit/contracts").BrowserMessage,
     signal: AbortSignal,
   ) => MaybePromise<void>;
   readonly emitWaiting?: (
-    value: Omit<
-      import("@relkit/agents/internal/state.types").AgentWaitingState,
-      "revision" | "runId"
-    >,
+    value: Omit<import("relkit/agents/state.types").AgentWaitingState, "revision" | "runId">,
     signal: AbortSignal,
   ) => MaybePromise<void>;
 }
 
-/** Common authoring and execution dependencies for an agent runtime. */
+/** Common authoring and execution dependencies for an agent runtime. @experimental */
 export interface AgentRuntimeBaseOptions {
   readonly agent: AgentAny;
-  readonly tools: import("@relkit/tools").ToolSource;
+  readonly tools: import("relkit/tools").ToolSource;
   readonly bucketBackend?: import("./deepagent-bucket-client.types.js").DeepAgentBucketClient;
-  readonly engine: import("@relkit/tools").ToolEngine;
+  readonly engine: import("relkit/tools").ToolEngine;
   readonly maxInputBytes?: number;
   readonly maxOutputBytes?: number;
   readonly approval?: AgentApprovalHandler;
@@ -76,12 +73,12 @@ export interface AgentRuntimeBaseOptions {
   readonly environment?: Readonly<Record<string, unknown>>;
 }
 
-/** Long-lived dependencies shared by agent invocations. */
+/** Long-lived dependencies shared by agent invocations. @experimental */
 export type AgentRuntimeOptions = AgentRuntimeBaseOptions & {
   readonly modelRegistry?: unknown;
 };
 
-/** Per-call identity, input, cancellation, and control options. */
+/** Per-call identity, input, cancellation, and control options. @experimental */
 export interface AgentInvocationOptions {
   readonly input: unknown;
   readonly invocationId?: string;
@@ -97,7 +94,7 @@ export interface AgentInvocationOptions {
   readonly resume?: boolean;
 }
 
-/** Reusable invocation API bound to one agent catalog. */
+/** Reusable invocation API bound to one agent catalog. @experimental */
 export interface AgentRuntime {
   readonly invoke: (
     input: unknown,

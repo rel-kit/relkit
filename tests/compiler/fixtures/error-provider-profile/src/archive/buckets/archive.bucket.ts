@@ -1,4 +1,4 @@
-import { defineBucket } from "@relkit/app";
+import { defineBucket } from "relkit";
 
 const archive = defineBucket({
   id: "archive.objects",

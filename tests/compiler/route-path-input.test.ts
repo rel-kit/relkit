@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
-import { defineFunction } from "../../packages/functions/src/index.js";
-import { defineRoute } from "../../packages/routes/src/index.js";
-import { z } from "../../packages/schema/src/index.js";
-import { normalizeCompilation } from "../../packages/compiler/src/normalize.js";
+import { defineFunction } from "relkit/functions";
+import { defineRoute } from "relkit/routes";
+import { z } from "relkit/schema";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/normalize.js";
 
 test("inferred routes reject path parameters absent from the target input schema", () => {
   const target = defineFunction({

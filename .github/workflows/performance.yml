@@ -36,6 +36,15 @@ jobs:
       - name: Require every packed start below one second
         timeout-minutes: 20
         run: bun scripts/certify-create.ts --performance
+      - name: Build the packages the dev-loop benchmark apps run on
+        run: >-
+          bun x turbo run build --filter=./packages/* --filter=./integrations/*
+          --filter=./integrations/packages/*
+      - name: Measure the development loop and enforce its budgets
+        timeout-minutes: 30
+        run: >-
+          bun scripts/benchmark-dev-loop.ts --enforce
+          --output "$RUNNER_TEMP/relkit-create-certification-dev-loop/report.json"
       - name: Preserve original performance reports
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

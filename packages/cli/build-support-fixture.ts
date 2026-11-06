@@ -3,7 +3,7 @@
  * owned temporary root. Optional peers remain isolated from workspace packages;
  * every write joins native settlement and real Bun children use scoped process authority.
  */
-import { cp, mkdir, mkdtemp, realpath, rm, symlink, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { Effect } from "effect";
@@ -11,23 +11,7 @@ import { ownedNativePromise } from "./src/services/owned-promise.js";
 import { CliProcess } from "./src/services/process.service.js";
 import type { BuildSupportFixture } from "./build-support-fixture.types.js";
 
-const FRAMEWORK_PEERS = [
-  "effect",
-  "@relkit/app",
-  "@relkit/config",
-  "@relkit/contracts",
-  "@relkit/engine",
-  "@relkit/graph",
-  "@relkit/inspector-api",
-  "@relkit/invocation",
-  "@relkit/jobs",
-  "@relkit/local-service",
-  "@relkit/observability",
-  "@relkit/provider",
-  "@relkit/realtime",
-  "@relkit/runtime-effect",
-  "@relkit/runtime-hono",
-];
+const FRAMEWORK_PEERS = ["effect"];
 
 /**
  * Captures one real Bun process through owned process-group and bounded pipe authority.
@@ -77,7 +61,7 @@ export const createBuildSupportFixture = Effect.fn("BuildSupportTest.create")(fu
           "-e",
           `
 import { Effect, Layer } from "effect";
-import { DependencySourceLive } from "@relkit/provider/internal/dependencies";
+import { DependencySourceLive } from "relkit/provider/dependencies";
 import { bundleServerEffect } from ${JSON.stringify(helper)};
 import { fileSystemLayer } from ${JSON.stringify(join(root, "cli/src/services/filesystem.service.ts"))};
 import { processLayer } from ${JSON.stringify(join(root, "cli/src/services/process.service.ts"))};
@@ -100,6 +84,7 @@ function copyHelperFiles(root: string) {
     for (const relative of [
       "commands/build-support.ts",
       "commands/build-bundle-process.ts",
+      "commands/build-bundle-esbuild.ts",
       "commands/build-container.ts",
       "commands/build-module-links.ts",
       "cli-errors.ts",
@@ -117,6 +102,10 @@ function copyHelperFiles(root: string) {
       "services/process.types.ts",
       "services/cleanup.service.ts",
       "services/cleanup.types.ts",
+      "runtime/index.ts",
+      "runtime/glob.ts",
+      "runtime/bun/glob.ts",
+      "runtime/node/glob.ts",
     ]) {
       signal.throwIfAborted();
       const target = join(root, "cli/src", relative);
@@ -127,39 +116,38 @@ function copyHelperFiles(root: string) {
 }
 
 /**
- * Seeds only the helper's runtime peers and a synthetic optional-agent dependency.
+ * Seeds the helper's runtime peers and a relkit whose agents entry has an optional dependency.
  * @param modules - Fixture-only module resolution root.
  * @param server - Owned emitted source directory.
  * @returns Joined native preparation retaining the established missing-peer behavior.
  */
 function seedRuntime(modules: string, server: string) {
   return ownedNativePromise("test.runtime", async (signal) => {
-    await mkdir(join(modules, "@relkit/agents"), { recursive: true });
+    await mkdir(join(modules, "relkit"), { recursive: true });
     await mkdir(server);
     for (const name of FRAMEWORK_PEERS) {
       const target = join(modules, name);
       await mkdir(dirname(target), { recursive: true });
       await symlink(await realpath(join(import.meta.dir, "node_modules", name)), target, "dir");
     }
+    // The real relkit build, except that relkit/agents optionally imports DeepAgents.
+    const relkit = await realpath(join(import.meta.dir, "node_modules/relkit"));
+    const manifest = JSON.parse(await readFile(join(relkit, "package.json"), "utf8"));
+    await symlink(join(relkit, "dist"), join(modules, "relkit/dist"), "dir");
     await writeFile(
-      join(modules, "@relkit/agents/package.json"),
-      JSON.stringify({
-        name: "@relkit/agents",
-        version: "0.0.0",
-        type: "module",
-        exports: "./index.js",
-      }),
+      join(modules, "relkit/package.json"),
+      JSON.stringify({ ...manifest, exports: { ...manifest.exports, "./agents": "./agents.js" } }),
       { signal },
     );
     // Bun recognizes missing imports as optional at the import's own catch boundary.
     await writeFile(
-      join(modules, "@relkit/agents/index.js"),
+      join(modules, "relkit/agents.js"),
       'export const load = async () => { try { return await import("deepagents"); } catch (error) { throw error; } };',
       { signal },
     );
     await writeFile(
       join(server, "index.ts"),
-      `import { load } from "@relkit/agents";
+      `import { load } from "relkit/agents";
 if (process.argv[2] === "invoke") {
   try { console.log((await load()).value); }
   catch { console.log("optional dependency unavailable"); }

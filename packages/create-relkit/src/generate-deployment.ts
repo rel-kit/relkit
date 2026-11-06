@@ -2,7 +2,7 @@
 
 import { join } from "node:path";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { customizeDeploymentManifestEffect } from "./generate-deployment-manifest.js";
 import { replaceOnceEffect } from "./generate-files-utilities.js";
 import type { CreateOptions } from "./options.js";

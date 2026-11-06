@@ -1,0 +1,14 @@
+{
+  "name": "my-app",
+  "dependencies": {
+    "@relkit/app": "0.8.4",
+    "@relkit/integrations": "0.8.4",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@relkit/compiler": "^0.8.4",
+    "@relkit/testing": "0.8.4",
+    "typescript": "5.9.3"
+  },
+  "files": ["dist"]
+}

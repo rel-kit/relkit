@@ -1,0 +1,14 @@
+import { defineFunction } from "relkit/functions";
+import { z } from "zod";
+
+const createOrder = defineFunction({
+  input: z.object({ orderId: z.string() }),
+  output: z.object({ orderId: z.string() }),
+  publishes: ["orders.created"],
+  handler: async (input, context) => {
+    await context.events["orders.created"].publish(input);
+    return input;
+  },
+});
+
+export default createOrder;

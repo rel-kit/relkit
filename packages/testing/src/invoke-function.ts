@@ -17,9 +17,9 @@ import {
   invokeFunction as invokeEngineFunction,
   type InvocationHooks,
   type InvocationTarget,
-} from "@relkit/engine";
+} from "relkit/engine";
 
-import type { InvocationRunner } from "@relkit/runtime-effect";
+import type { InvocationRunner } from "relkit/runtime-effect";
 import { createTestFakes, type TestFakes } from "./fakes.js";
 import { createTestStateRoot } from "./state-root.js";
 
@@ -28,8 +28,8 @@ import { createTestStateRoot } from "./state-root.js";
  *
  * @example
  * ```ts
- * import { defineFunction } from "@relkit/app/functions";
- * import { z } from "@relkit/app/schema";
+ * import { defineFunction } from "relkit/functions";
+ * import { z } from "relkit/schema";
  * import { invokeFunction } from "@relkit/testing";
  *
  * export async function greetingExample(): Promise<string> {
@@ -169,10 +169,7 @@ function freezeEnv(
  * @returns True when a declared dependency needs an engine client.
  */
 function hasDependencies(target: StandaloneFunctionTarget): boolean {
-  return (
-    (target.publishes?.length ?? 0) > 0 ||
-    Object.values(target.dependencies ?? {}).some(
-      (category) => category !== undefined && Object.keys(category).length > 0,
-    )
+  return Object.values(target.dependencies ?? {}).some(
+    (category) => category !== undefined && Object.keys(category).length > 0,
   );
 }

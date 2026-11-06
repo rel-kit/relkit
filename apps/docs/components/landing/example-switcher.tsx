@@ -45,7 +45,7 @@ export function ExampleSwitcher({ examples }: { readonly examples: readonly Hero
               onScroll={updateEdges}
               className="hero-tab-viewport"
             >
-              <TabsList className="hero-tab-list" aria-label="Relkit capabilities">
+              <TabsList className="hero-tab-list" aria-label="RelKit capabilities">
                 {examples.map((example) => (
                   <TabsTrigger
                     className="hero-tab"

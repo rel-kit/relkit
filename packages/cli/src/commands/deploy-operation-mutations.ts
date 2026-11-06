@@ -1,6 +1,6 @@
 /** Executes selected native operations without retaining a global SDK implementation. */
 import { Effect, Ref } from "effect";
-import { diffDeploymentPlans } from "@relkit/deploy";
+import { diffDeploymentPlans } from "relkit/deploy";
 import { cliTry } from "../cli-errors.js";
 import { CliPulumi } from "../services/pulumi.service.js";
 import { CliDeployConfirmation } from "../services/deploy-confirmation.service.js";

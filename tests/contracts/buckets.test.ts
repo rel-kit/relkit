@@ -2,10 +2,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createTestRuntime } from "../../packages/testing/src/index.ts";
-import {
-  createLocalBucketProviderForTest,
-  type LocalBucketProvider,
-} from "../../packages/providers-local/src/index.ts";
+import { createLocalBucketProviderForTest, type LocalBucketProvider } from "relkit/providers-local";
 import { registerBucketContractSuite, type BucketContractTarget } from "./buckets.ts";
 
 const localBuckets: BucketContractTarget = {

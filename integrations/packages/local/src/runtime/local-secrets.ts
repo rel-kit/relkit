@@ -1,4 +1,4 @@
-import { deepFreeze, isStableId, serializeJson } from "@relkit/contracts";
+import { deepFreeze, isStableId, serializeJson } from "relkit/contracts";
 import type { LocalProjectIdentity } from "./identity.js";
 import { readLocalStateText, writeLocalStateText } from "./state-paths.js";
 

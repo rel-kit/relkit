@@ -1,13 +1,8 @@
 import { it } from "@effect/vitest";
 import { expect } from "vitest";
 import { Cause, Effect, Exit } from "effect";
-import { createSpanId, createTraceId } from "@relkit/contracts";
-import {
-  runInExecutionContext,
-  SpanRuntime,
-  spanSnapshot,
-  startRootSpan,
-} from "@relkit/invocation";
+import { createSpanId, createTraceId } from "relkit/contracts";
+import { runInExecutionContext, SpanRuntime, spanSnapshot, startRootSpan } from "relkit/invocation";
 import { runSpecializedTrace } from "../../src/operation-tracing.js";
 
 it.effect("active invocation traces redact native results and rejection messages", () =>

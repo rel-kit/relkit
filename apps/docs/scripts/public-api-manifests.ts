@@ -2,6 +2,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import { Schema } from "effect";
+import { firstPartyExports } from "../../../scripts/first-party-exports.js";
 import { workspacePackageDirectories } from "../../../scripts/workspace-packages.js";
 import { PublicApiManifest } from "./public-api.schemas.js";
 import type { PublicImport } from "./public-api.types.js";
@@ -21,6 +22,40 @@ export function exportSource(directory: string, target: string): string {
   return source;
 }
 
+/** `relkit` areas that applications and integrations do not import directly. */
+const INTERNAL_RELKIT_AREAS = new Set([
+  "contracts",
+  "deploy",
+  "diagnostics",
+  "engine",
+  "graph",
+  "inspector-api",
+  "invocation",
+  "local-service",
+  "observability",
+  "openapi",
+  "runtime",
+  "runtime-effect",
+  "runtime-hono",
+]);
+
+/** Reference page owner of one export: each `relkit` area is documented on its own page.
+ * @param name - Package name. @param subpath - Export map key.
+ * @returns `relkit/<area>` for a `relkit` subpath, otherwise the package name. */
+function referenceOwner(name: string, subpath: string): string {
+  const area = subpath.split("/")[1] ?? "";
+  if (name === "relkit")
+    return subpath === "." ? name : `relkit/${area === "tasks" ? "jobs" : area}`;
+  return MERGED_AREAS[name]?.includes(area) ? `${name}/${area}` : name;
+}
+
+/** Source areas merged into tool packages; only the Inspector's local history is documented. */
+const MERGED_AREAS: Readonly<Record<string, readonly string[]>> = {
+  "@relkit/cli": ["compiler", "client-generator", "supervisor"],
+  "@relkit/inspector": ["observability-local"],
+  "@relkit/pulumi": ["deploy-pulumi"],
+};
+
 /** Inventories supported and explicitly internal import paths independently of the docs catalog.
  * @param root - Repository root. @returns Validated manifests with source locations. */
 export function publicManifests(root: string): PublicImport[] {
@@ -29,14 +64,19 @@ export function publicManifests(root: string): PublicImport[] {
       readFileSync(resolve(directory, "package.json"), "utf8"),
     );
     return Object.entries(manifest.exports).map(([subpath, target]) => ({
-      packageName: manifest.name,
+      packageName: referenceOwner(manifest.name, subpath),
       description: manifest.description,
       directory: relative(root, directory),
       specifier: manifest.name + (subpath === "." ? "" : subpath.slice(1)),
       source: relative(root, exportSource(directory, target.types)),
       internal:
-        /unsupported internal|^internal |^empty compatibility/i.test(manifest.description) ||
-        /\/internal(?:\/|$)/.test(subpath),
+        /unsupported internal|^internal |^empty compatibility|^deprecated/i.test(
+          manifest.description,
+        ) ||
+        firstPartyExports.has(manifest.name + (subpath === "." ? "" : subpath.slice(1))) ||
+        (manifest.name === "relkit" && INTERNAL_RELKIT_AREAS.has(subpath.split("/")[1] ?? "")) ||
+        (manifest.name !== "@relkit/inspector" &&
+          MERGED_AREAS[manifest.name]?.includes(subpath.split("/")[1] ?? "") === true),
       symbols: [],
     }));
   });

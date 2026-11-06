@@ -1,7 +1,8 @@
 /** Owns scoped database/auth activation for a test application in either service layout. */
+import { getDescriptorIdentity } from "relkit/invocation";
 import { activateBetterAuthService } from "@relkit/better-auth/drizzle";
 import { activateDrizzleService } from "@relkit/drizzle";
-import { observeExecution, runExecutionPromise } from "@relkit/contracts/operation";
+import { observeExecution, runExecutionPromise } from "relkit/contracts/operation";
 import { Context, Effect, Layer, ManagedRuntime } from "effect";
 import type { TestRoute } from "./application-routes.js";
 import { acquireApplicationAuth, nativeServiceError } from "./application-service-auth.js";
@@ -69,7 +70,16 @@ export class TestServices extends Context.Service<
         routes,
       );
       return Object.freeze({
-        context: Object.freeze(database === undefined ? {} : { database: database.context }),
+        context: Object.freeze(
+          database === undefined || declaration === undefined
+            ? {}
+            : {
+                database: database.context,
+                databases: Object.freeze({
+                  [getDescriptorIdentity(declaration as object)]: database.context,
+                }),
+              },
+        ),
         ...auth,
       });
     },

@@ -18,7 +18,7 @@ export function dependencyOwner(dependency: string, consumer: string, developmen
   )
     return { capability: "agent-execution", finalOwner: "@relkit/langchain" };
   if (dependency.startsWith("@duckdb/"))
-    return { capability: "inspection-history", finalOwner: "@relkit/observability-local" };
+    return { capability: "inspection-history", finalOwner: "@relkit/inspector" };
   if (/^@pulumi\//.test(dependency))
     return { capability: "deployment", finalOwner: "@relkit/pulumi" };
   if (/^(?:react(?:-dom)?|next)$/.test(dependency) && consumer === "@relkit/cli")

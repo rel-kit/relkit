@@ -7,14 +7,14 @@ import {
 } from "./add-transaction-verification.js";
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
-import { dependencyPatchNeedsInstallEffect } from "create-relkit/internal/dependency-patch-installation";
-import { type ScaffoldPlan } from "create-relkit/internal/add-types";
+import { dependencyPatchNeedsInstallEffect } from "create-relkit/dependency-patch-installation";
+import { type ScaffoldPlan } from "create-relkit/add-types";
 import {
   applyFileOperationsEffect,
   validateOperationActionsEffect,
-} from "create-relkit/internal/add-transaction-files";
+} from "create-relkit/add-transaction-files";
 
 import type { ApplyScaffoldContext } from "./add-transaction.types.js";
 

@@ -1,5 +1,5 @@
 /** Declares backend defaults; inspection remains disabled unless explicitly enabled. */
-import { defineApp } from "@relkit/app/config";
+import { defineApp } from "relkit/config";
 import env from "@app/platform/env.js";
 // relkit:create:deployment-imports
 

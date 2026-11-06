@@ -1,11 +1,11 @@
 /** Preserves creator transactions while checking the isolated launcher and catalog boundaries. */
 import { describe, expect, it } from "vitest";
 import { access, readFile, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { generateProject, planCreate } from "create-relkit";
-import { prepareProjectDependencyPatch } from "create-relkit/internal/dependency-patches";
+import { prepareProjectDependencyPatch } from "create-relkit/dependency-patches";
 import {
   root,
   withFixture,
@@ -125,37 +125,49 @@ async function caseBunAndNodePackageRunnerBootstrapsSelect() {
   });
 }
 
-/** Verifies that missing_bun_diagnostic.
+/** Verifies that Node runs the installed creator without Bun, and that a Bun-invoked launch
+ * without Bun on PATH explains that Bun is required.
  * @returns Completion after fixture assertions and owned cleanup settle.
  */
 async function caseMissingBunDiagnostic() {
   return withFixture(async (directory) => {
     const entry = await wrapperFixture(directory);
-    const result = spawnSync(process.execPath, [entry, "create", "sample"], {
-      cwd: directory,
-      env: { ...process.env, PATH: directory },
-      encoding: "utf8",
-      timeout: 10000,
-    });
-    expect(result.status).toBe(1);
-    expect(result.stderr).toContain("RELKIT_BUN_REQUIRED");
-    expect(result.stdout).toBe("");
+    const launch = (agent: string) =>
+      spawnSync("node", [entry, "create", "sample"], {
+        cwd: directory,
+        env: { ...process.env, PATH: dirname(nodeExecutable()), npm_config_user_agent: agent },
+        encoding: "utf8",
+        timeout: 10000,
+      });
+    const node = launch("npm/10.9.0 node/v22.13.0");
+    expect(node.status).toBe(0);
+    expect(JSON.parse(node.stdout)).toEqual({ kind: "create", args: ["sample"] });
+    const bun = launch("bun/1.3.10 npm/? node/v24.3.0");
+    expect(bun.status).toBe(1);
+    expect(bun.stderr).toContain("RELKIT_BUN_REQUIRED");
+    expect(bun.stdout).toBe("");
   });
 }
 
-/** Verifies that catalog_no_executable_exports.
- * @returns Completion after fixture assertions and owned cleanup settle.
+/** @returns The Node executable on PATH, which this case runs the launcher with. */
+function nodeExecutable(): string {
+  const found = spawnSync("node", ["-p", "process.execPath"], { encoding: "utf8" });
+  return found.stdout.trim();
+}
+
+/** Verifies that the creator bundles the integration catalog as metadata only.
+ * @returns Completion after the manifest assertions settle.
  */
 async function caseCatalogNoExecutableExports() {
   const manifest = JSON.parse(
-    await readFile(join(root, "integrations/catalog/package.json"), "utf8"),
+    await readFile(join(root, "packages/create-relkit/package.json"), "utf8"),
   );
-  expect(Object.keys(manifest.exports)).toEqual(["."]);
-  expect(manifest.dependencies ?? {}).toEqual({});
-  expect(manifest.relkit.catalog["./langchain"]).toBe("@relkit/langchain");
-  expect((await readFile(join(root, "integrations/catalog/src/index.ts"), "utf8")).trim()).toBe(
-    "export {};",
-  );
+  expect(manifest.dependencies["@relkit/langchain"]).toBeUndefined();
+  expect(manifest.relkit.integrations).toContainEqual({
+    id: "langchain",
+    package: "@relkit/langchain",
+    maturity: "labs",
+  });
 }
 
 /** Verifies that drizzle_patch_only_selected.

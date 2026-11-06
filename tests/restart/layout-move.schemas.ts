@@ -19,9 +19,3 @@ export const RestartScheduleReport = Schema.Struct({
   value: Schema.optionalKey(Schema.String),
   buildId: Schema.optionalKey(Schema.String),
 });
-
-/** Exact invocation observations emitted by the native job target. */
-export const RestartJobInvocation = Schema.Struct({
-  orderId: Schema.String,
-  attempt: Schema.Number,
-});

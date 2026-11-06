@@ -8,11 +8,11 @@ import {
   deepFreeze,
   isDescriptor,
   isRef,
-} from "../../packages/contracts/src/index.ts";
-import { defineJob } from "../../packages/jobs/src/define-job.ts";
-import { defineTask } from "../../packages/jobs/src/define-task.ts";
-import { defineService, isServiceDescriptor } from "../../packages/services/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+} from "relkit/contracts";
+import { defineJob } from "../../packages/relkit/src/jobs/define-job.ts";
+import { defineTask } from "../../packages/relkit/src/jobs/define-task.ts";
+import { defineService, isServiceDescriptor } from "relkit/services";
+import { z } from "relkit/schema";
 
 describe("descriptor contracts", () => {
   test("uses the global brand and normalized immutable refs", () => {

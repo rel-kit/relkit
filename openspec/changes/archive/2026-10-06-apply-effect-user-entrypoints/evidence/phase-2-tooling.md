@@ -1,7 +1,7 @@
 # Phase-two catalog and publication tooling evidence
 
 Owner: `/root/plan_cli`. Worktree:
-`/Users/mustafaelsayed/.codex/worktrees/effect-user-entrypoints/relkit`.
+`<home>/.codex/worktrees/effect-user-entrypoints/relkit`.
 No task status or Git staging is changed by this evidence.
 
 ## Delivered foundation

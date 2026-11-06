@@ -1,0 +1,34 @@
+{
+  "protocol": "relkit.walkthrough-result",
+  "createdAt": "2026-11-06T14:47:10.180Z",
+  "kind": "create-to-first-route",
+  "outcome": "passed",
+  "seconds": 90,
+  "steps": [
+    {
+      "name": "bunx:create",
+      "seconds": 8
+    },
+    {
+      "name": "bunx:route-added",
+      "seconds": 8
+    },
+    {
+      "name": "bunx:route-answers",
+      "seconds": 10
+    },
+    {
+      "name": "npx:create",
+      "seconds": 87
+    },
+    {
+      "name": "npx:route-added",
+      "seconds": 87
+    },
+    {
+      "name": "npx:route-answers",
+      "seconds": 90
+    }
+  ],
+  "note": "bunx create-relkit 10 s, npx create-relkit 90 s (the slower is the figure): the minimal template from the packed candidate on a local registry with fresh caches, one route added, run dev answering it; packing is excluded."
+}

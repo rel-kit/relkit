@@ -1,5 +1,5 @@
 /** Exposes user listing, transactional registration and email updates through the immediate users service boundary. */
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 import listUsers from "./functions/list-users.function.js";
 import registerMember from "./functions/register-member.function.js";
 import updateUserEmail from "./functions/update-user-email.function.js";

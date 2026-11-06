@@ -3,11 +3,11 @@
  */
 import { defineBetterAuthService } from "@relkit/better-auth";
 import { defineDrizzleService, defineModel, type DatabaseContext } from "@relkit/drizzle/sqlite";
-import { defineEvent } from "@relkit/events";
-import { defineFunction, type AuthContext } from "@relkit/functions";
-import { defineServiceRoutes, defineServiceRoutesEffect } from "@relkit/routes";
-import { z } from "@relkit/schema";
-import { defineService } from "@relkit/services";
+import { defineEvent } from "relkit/events";
+import { defineFunction, type AuthContext } from "relkit/functions";
+import { defineServiceRoutes, defineServiceRoutesEffect } from "relkit/routes";
+import { z } from "relkit/schema";
+import { defineService } from "relkit/services";
 import {
   sqliteTable,
   text,

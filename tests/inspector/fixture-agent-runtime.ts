@@ -12,13 +12,13 @@ import {
   invokeAgent,
   type AgentContentSink,
 } from "../../integrations/packages/langchain/src/index.ts";
-import type { RegistrationPlan } from "../../packages/graph/src/index.ts";
-import { createLocalAgentStateProvider } from "../../packages/providers-local/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import type { RegistrationPlan } from "relkit/graph";
+import { createLocalAgentStateProvider } from "relkit/providers-local";
+import { z } from "relkit/schema";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { createApp, type RuntimeManifest } from "../../packages/runtime-hono/src/index.ts";
-import { runtimeCohort } from "../../packages/runtime-hono/tests/test-cohort.ts";
+import { createApp, type RuntimeManifest } from "relkit/runtime-hono";
+import { runtimeCohort } from "../../packages/relkit/tests/runtime-hono/test-cohort.ts";
 
 const todo = z.object({
   content: z.string(),

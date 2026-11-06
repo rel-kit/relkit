@@ -1,7 +1,7 @@
 /** Exercises the original deterministic agent through real authenticated HTTP, retaining native receipts and identity-scoped thread state. */
 import { expect } from "bun:test";
 import { Effect } from "effect";
-import { createOperationId } from "../../../packages/realtime/src/operation-id.js";
+import { createOperationId } from "../../../packages/relkit/src/realtime/operation-id.js";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 import { protectionClient } from "./generated-protection-client.js";
 import type { GeneratedHostSession } from "./generated-host.types.js";

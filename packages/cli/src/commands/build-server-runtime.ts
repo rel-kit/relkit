@@ -39,12 +39,21 @@ function createDependencySources(providerRegistry) {
     agents: Object.fromEntries(plan.agents.map((node) => [node.id, registry.get(\`relkit.agent.\${node.id}.invoke\`)])),
     buckets: Object.fromEntries(plan.buckets.map((node) => [node.id, provider(providerRegistry, "bucket", node.profile)])),
     cache: Object.fromEntries(plan.caches.map((node) => [node.id, provider(providerRegistry, "cache", node.profile)])),
-    jobs: Object.fromEntries([
-      ...plan.queues.filter((node) => node.kind === "job").map((node) => [node.id, materializedJobs?.jobs.get(node.id)]),
-      ...(plan.jobs ?? []).map((node) => [node.id, runtimeManifest.jobs?.[node.id]]),
-    ]),
+    jobs: Object.fromEntries((plan.jobs ?? []).map((node) => [node.id, jobTriggerSource(node)])),
     tasks: Object.fromEntries(Object.entries(runtimeManifest.tasks ?? {})),
     events: Object.fromEntries((plan.events ?? []).map((node) => [node.id, provider(providerRegistry, "event", node.profile)])),
+  };
+}
+
+function jobTriggerSource(node) {
+  const descriptor = runtimeManifest.jobs?.[node.id];
+  if (descriptor === undefined) return undefined;
+  return {
+    trigger: (input, options) => {
+      const runtime = nativeJobsRuntimes.get(node.profile);
+      if (runtime === undefined) throw new Error(\`Jobs service "\${node.profile}" is not running.\`);
+      return submitJob(descriptor, input, options, runtime);
+    },
   };
 }
 
@@ -107,25 +116,33 @@ async function nativeJobControl(instanceId, action, reason) {
 async function startNativeJobWorker(runtimes) {
   if (runtimes.size === 0 || (process.env.RELKIT_WORKER_ROLE ?? "worker") === "api") return undefined;
   await runtimeOwner.worker("native-job-worker", async () => {
-        for (const runtime of runtimes.values()) {
-          const nativeWorker = runtime.adapter.worker;
-          if (nativeWorker === undefined || runtime.taskExecutor === undefined) continue;
-          const operation = runtime.operationContext({ signal: shutdownController.signal });
-          const work = await nativeWorker.next(operation);
-          if (work === undefined) continue;
-          try {
-            const output = await runInJobsRuntime(runtime, () => runtime.taskExecutor.execute(work.envelope, work.binding));
-            await nativeWorker.complete(work.envelope.runId, output, operation);
-          } catch (error) {
-            if (work.binding.isSuspension?.(error) === true) {
-              if (nativeWorker.suspend === undefined) throw new Error("Native worker cannot persist task continuation");
-              await nativeWorker.suspend(work.envelope.runId, error, operation);
-            } else {
-              await nativeWorker.fail(work.envelope.runId, error, operation);
-            }
-          }
-        }
+    await processNativeJobPass(runtimes);
   });
+}
+
+/** Leases and settles at most one attempt per jobs runtime; resolves the number that ran. */
+async function processNativeJobPass(runtimes) {
+  let ran = 0;
+  for (const runtime of runtimes.values()) {
+    const nativeWorker = runtime.adapter.worker;
+    if (nativeWorker === undefined || runtime.taskExecutor === undefined) continue;
+    const operation = runtime.operationContext({ signal: shutdownController.signal });
+    const work = await nativeWorker.next(operation);
+    if (work === undefined) continue;
+    ran += 1;
+    try {
+      const output = await runInJobsRuntime(runtime, () => runtime.taskExecutor.execute(work.envelope, work.binding));
+      await nativeWorker.complete(work.envelope.runId, output, operation);
+    } catch (error) {
+      if (work.binding.isSuspension?.(error) === true) {
+        if (nativeWorker.suspend === undefined) throw new Error("Native worker cannot persist task continuation");
+        await nativeWorker.suspend(work.envelope.runId, error, operation);
+      } else {
+        await nativeWorker.fail(work.envelope.runId, error, operation);
+      }
+    }
+  }
+  return ran;
 }
 ${SERVER_RUNTIME_SUPPORT_SOURCE}
 `;

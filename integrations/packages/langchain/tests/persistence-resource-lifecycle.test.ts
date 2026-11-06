@@ -2,7 +2,7 @@
 
 import { describe, expect, test } from "vitest";
 import { END, START, InMemoryStore, MemorySaver, StateSchema } from "@langchain/langgraph";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import {
   defineCheckpointerDb,
   defineGraph,

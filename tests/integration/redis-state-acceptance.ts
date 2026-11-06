@@ -3,8 +3,8 @@ import {
   createRedisAgentStateProvider,
   createRedisRealtimeProvider,
 } from "../../integrations/packages/redis/src/runtime/index.ts";
-import type { AgentRequestScope, AgentStateLimits } from "../../packages/agents/src/index.ts";
-import { createOperationId } from "../../packages/realtime/src/index.ts";
+import type { AgentRequestScope, AgentStateLimits } from "relkit/agents";
+import { createOperationId } from "relkit/realtime";
 
 export async function exerciseSharedRedisProviders(url: string): Promise<void> {
   const profile = `acceptance-${crypto.randomUUID()}`;

@@ -1,5 +1,5 @@
 /**
- * Captures packed default-project starts, optionally reusing one exact release closure across sets.
+ * Captures packed project starts for one template, optionally reusing one exact release closure across sets.
  * Packages and the generated application install outside the workspace; a finite
  * registry scope owns setup, and measured starts own separate process groups.
  * Evidence retains fixture identities and every attempt; historical baseline
@@ -7,7 +7,7 @@
  */
 import { resolve } from "node:path";
 import { rm } from "node:fs/promises";
-import { ownedNativePromise } from "@relkit/cli/internal/tooling";
+import { ownedNativePromise } from "@relkit/cli/tooling";
 import { Effect, Layer } from "effect";
 import { preparePackedFixture } from "./dev-readiness/packed-fixture.js";
 import { packedStartRequest, measurePackedSet } from "./dev-readiness/benchmark-packed-measure.js";
@@ -62,6 +62,7 @@ const main = Effect.fn("ReadinessBenchmark.packedCandidate")(function* () {
     repository,
     process.argv.includes("--no-examples") ? "no-examples" : "examples",
     artifactDirectory === "" ? undefined : artifactDirectory,
+    option("--template", "minimal"),
   );
   const request = yield* packedStartRequest(fixture.projectRoot, backendPort, inspectorPort);
   const identity = yield* packedReadinessIdentity(fixture.projectRoot, fixture.artifacts);

@@ -7,7 +7,7 @@ A generated application has two authoring files at its root: `relkit.config.ts` 
 In `src/platform/env.ts`:
 
 ```ts
-import { defineEnv, env } from "@relkit/app/config";
+import { defineEnv, env } from "relkit/config";
 
 export default defineEnv({
   LOG_LEVEL: env.literal("debug", "info", "warn", "error").default("info"),
@@ -17,13 +17,13 @@ export default defineEnv({
 });
 ```
 
-Builders include `string`, `secret`, `number`, `boolean`, `port`, `url`, `json`, and `literal(...)`. Use `.default(value)` only for intentional safe defaults, `.optional()` for absent values, `.requiredIn("production")` for environment-specific requirements, and `.description(text)` or `.example(value)` for safe metadata. A URL field resolves to a `URL`, a number field to a number, and a Boolean field to a boolean. Do not declare `PORT` or `RELKIT_ENV`; RELKIT reserves them.
+Builders include `string`, `secret`, `number`, `boolean`, `port`, `url`, `json`, and `literal(...)`. Use `.default(value)` only for intentional safe defaults, `.optional()` for absent values, `.requiredIn("production")` for environment-specific requirements, and `.description(text)` or `.example(value)` for safe metadata. A URL field resolves to a `URL`, a number field to a number, and a Boolean field to a boolean. Do not declare `PORT` or `RELKIT_ENV`; RelKit reserves them.
 
 Pass the definition into `defineApp({ env })`. Functions read the resolved, typed values through `context.env`:
 
 ```ts
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "zod";
 
 export default defineFunction({
   input: z.object({}),
@@ -39,7 +39,7 @@ Mark credentials with `env.secret()`; keep actual values outside source control.
 In `relkit.config.ts`, the baseline application contains the environment contract, telemetry redaction and backend settings. Inspection is omitted and disabled:
 
 ```ts
-import { defineApp } from "@relkit/app/config";
+import { defineApp } from "relkit/config";
 import env from "@app/platform/env.js";
 
 export default defineApp({
@@ -49,12 +49,12 @@ export default defineApp({
 });
 ```
 
-`defineApp` also accepts `id`, `defaults`, `deployment`, and provider capabilities `bucket`, `cache`, `jobs`, `event`, `model`, `realtime`, and `"agent-state"`. A capability can have one `default` profile or a named profile map. `defaults.<capability>` must name a configured profile. The `jobs` key is the public spelling for the job provider. Add only providers the app uses; the base template has none. Public creation currently certifies only the minimal starter with examples, no jobs, no cloud, and no deployment. API, agent, fullstack, jobs, and AWS/Pulumi creation tuples are internal candidates and must remain rejected until their exact release evidence is certified. Configure an existing app's optional integrations only when the installed version supports them and the task requires them.
+`defineApp` also accepts `id`, `defaults`, `deployment`, and provider capabilities `bucket`, `cache`, `jobs`, `event`, `model`, `realtime`, and `"agent-state"`. A capability can have one `default` profile or a named profile map. `defaults.<capability>` must name a configured profile. Configure the job provider under `jobs` and select its default with `defaults.jobs`. Add only providers the app uses; the base template has none. Public creation currently certifies only the minimal starter with examples, no jobs, no cloud, and no deployment. API, agent, fullstack, jobs, and AWS/Pulumi creation tuples are internal candidates and must remain rejected until their exact release evidence is certified. Configure an existing app's optional integrations only when the installed version supports them and the task requires them.
 
 For a one-machine realtime provider and a named Docker-backed cache profile, the complete configuration shape is:
 
 ```ts
-import { defineApp, env as binding } from "@relkit/app/config";
+import { defineApp, env as binding } from "relkit/config";
 import { docker } from "@relkit/docker";
 import { localRealtime } from "@relkit/local";
 import { redis } from "@relkit/redis";

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { runInNewContext } from "node:vm";
-import { defineEnv, env, resolveEnv } from "../../packages/config/src/index.js";
+import { defineEnv, env, resolveEnv } from "relkit/config";
 import { SERVER_RUNTIME_SUPPORT_SOURCE } from "../../packages/cli/src/commands/build-server-runtime-support.js";
 
 test("generated runtime uses decoded source values and defaults without changing the process source", () => {

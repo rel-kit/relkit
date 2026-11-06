@@ -8,21 +8,23 @@ import * as motion from "motion/react-m";
 
 export function LandingHero() {
   return (
-    <motion.section className="hero-copy-row" aria-label="The TypeScript Kit Framework">
+    <motion.section className="hero-copy-row" aria-label="RelKit">
       <motion.div
         className="hero-container hero-copy"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45 }}
       >
-        <motion.p className="hero-eyebrow">THE TYPESCRIPT APPLICATION KIT</motion.p>
+        <motion.p className="hero-eyebrow">OPEN SOURCE · MIT LICENSE</motion.p>
         <Heading as="h1" className="hero-title">
           <motion.span>The TypeScript</motion.span>
-          <motion.span>Kit Framework</motion.span>
+          <motion.span>backend framework</motion.span>
         </Heading>
         <motion.p className="hero-description">
-          Everything you need to build reliable, robust, scalable, observable
-          <motion.span>TypeScript applications for agents and engineers.</motion.span>
+          where you write the business logic. RelKit wires the APIs, jobs, events, agents and typed
+          <motion.span>
+            client, and gives you, and your coding agent, a live map of the app.
+          </motion.span>
         </motion.p>
         <motion.div className="hero-actions">
           <Link

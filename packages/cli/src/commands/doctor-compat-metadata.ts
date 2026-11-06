@@ -1,6 +1,6 @@
 /** Reads optional doctor metadata and descriptor markers without loading native integrations. */
 import { Effect, Schema } from "effect";
-import { isDescriptor } from "@relkit/contracts";
+import { isDescriptor } from "relkit/contracts";
 import { cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.js";
@@ -33,12 +33,16 @@ export function readJson(path: string): Promise<PackageJson | undefined> {
 
 /** Resolves the authored Bun compatibility pin without retaining other metadata.
  * @param manifest - Object metadata boundary.
- * @returns Package-manager pin, engine range, or undefined.
+ * @returns Minimum Bun version from a pinned packageManager, the engine range, or undefined.
  */
 export function packageManagerVersion(manifest: PackageJson): string | undefined {
   const value = typeof manifest.packageManager === "string" ? manifest.packageManager : "";
   const engine = record(manifest.engines).bun;
-  return /^bun@(.+)$/.exec(value)?.[1] ?? (typeof engine === "string" ? engine : undefined);
+  const pinned = /^bun@(.+)$/.exec(value)?.[1];
+  // A pinned packageManager names the version the project was created with; newer
+  // Bun releases remain supported, matching the creator's declared engine range.
+  if (pinned !== undefined) return /^\d+\.\d+\.\d+$/.test(pinned) ? `>=${pinned}` : pinned;
+  return typeof engine === "string" ? engine : undefined;
 }
 
 /** Detects the established explicit or dependency-owned Pulumi opt-in.

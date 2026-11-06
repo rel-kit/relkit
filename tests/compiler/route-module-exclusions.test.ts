@@ -1,12 +1,12 @@
 import { expect, test } from "bun:test";
-import ts from "typescript";
-import { generateRouteModuleChecks } from "../../packages/compiler/src/route-module-checks.js";
-import { routeModuleFindings } from "../../packages/compiler/src/route-module-diagnostics.js";
+import ts from "relkit-typescript";
+import { generateRouteModuleChecks } from "../../packages/cli/src/compiler/route-module-checks.js";
+import { routeModuleFindings } from "../../packages/cli/src/compiler/route-module-diagnostics.js";
 import {
   isRouteModule,
   routeSourceFindings,
-} from "../../packages/compiler/src/route-source-checks.js";
-import { prefilterSources } from "../../packages/compiler/src/discovery/ast-prefilter.js";
+} from "../../packages/cli/src/compiler/route-source-checks.js";
+import { prefilterSources } from "../../packages/cli/src/compiler/discovery/ast-prefilter.js";
 
 const excluded = [
   "src/routes/__fixtures__/route.ts",
@@ -29,7 +29,7 @@ test("generated route contracts omit discovery's excluded test and fixture modul
 });
 
 test("shared route findings skip excluded files while preserving errors in application routes", () => {
-  const text = `import { defineServiceRoutes } from "@relkit/app/routes";
+  const text = `import { defineServiceRoutes } from "relkit/routes";
 export const GET = defineServiceRoutes(service, { GET: "example" });`;
   const files = [...excluded, "src/routes/users/route.ts"];
   const sources = new Map(

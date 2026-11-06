@@ -5,7 +5,7 @@ linked to the candidate worktree. The restoration snapshot captures both
 projects' manifests, lockfiles, installed symlink targets, global Bun link
 registrations, and the three historical evidence files touched by existing
 scripts. Fresh results are retained separately under
-`/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/effect-user-entrypoints-2026-10-05/`.
+`<home>/Workspace/relkit-regression-demo/evidence/effect-user-entrypoints-2026-10-05/`.
 
 ## Actual candidate results
 

@@ -4,7 +4,7 @@ tests/items.test.ts:
 
 # Unhandled error between tests
 -------------------------------
-error: Cannot find package 'unavailable-runtime-harness' from '/private/tmp/relkit-skill-forward-d4_6o6f0/case14/app/tests/items.test.ts'
+error: Cannot find package 'unavailable-runtime-harness' from '<tmp>/relkit-skill-forward-d4_6o6f0/case14/app/tests/items.test.ts'
 -------------------------------
 
 

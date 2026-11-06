@@ -2,12 +2,12 @@ import type {
   JobUnknownOutcome,
   RunCancellationReceipt,
   RunRetryReceipt,
-} from "@relkit/contracts/jobs";
+} from "relkit/contracts/jobs";
 import type {
   NativeCancelRequest,
   NativeControlReceipt,
   NativeRetryRequest,
-} from "@relkit/jobs/adapter";
+} from "relkit/jobs/adapter";
 import type { TestClock } from "./runtime.js";
 import { isTerminal, snapshotOf, type TestNativeRun } from "./test-jobs-adapter-support.js";
 import { handle } from "./test-jobs-adapter-work.js";

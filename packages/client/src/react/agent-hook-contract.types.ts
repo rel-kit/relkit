@@ -6,7 +6,7 @@ import type {
   AgentWaitingState,
   ThreadSnapshot,
   ToolPartState,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 
 /**
  * Stable browser projection of canonical tool identity, state, input and output.

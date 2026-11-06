@@ -2,13 +2,9 @@
 import { expect, test } from "bun:test";
 import { resolve } from "node:path";
 import { Effect } from "effect";
-import { generateClient } from "../../packages/client-generator/src/index.ts";
-import {
-  hashGraph,
-  validateGraphShapeEffect,
-  type ApplicationGraph,
-} from "../../packages/graph/src/index.ts";
-import { generateOpenApiJson } from "../../packages/openapi/src/index.ts";
+import { generateClient } from "../../packages/cli/src/client-generator/index.ts";
+import { hashGraph, validateGraphShapeEffect, type ApplicationGraph } from "relkit/graph";
+import { generateOpenApiJson } from "relkit/openapi";
 import { compileProject } from "../compiler/fixture-runner.ts";
 import { scaffoldNative } from "../../scripts/scaffold-native.js";
 import { commerceConsumerOutputs } from "./http/commerce-consistency-outputs.js";

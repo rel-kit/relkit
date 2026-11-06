@@ -96,7 +96,7 @@ events use the [filesystem provider](/docs/modules/events#pre-setup); persist th
 ## Database and authentication
 
 The [database service](/docs/modules/database/define) connects PostgreSQL, MySQL, or SQLite.
-RELKIT does not provision an application database through `defineApp`. Supply its connection via
+RelKit does not provision an application database through `defineApp`. Supply its connection via
 `defineEnv`, migrate once before rollout, and keep backups and connection/network policy with the
 database owner. The Docker PostgreSQL walkthrough is development setup, not a managed cloud database.
 

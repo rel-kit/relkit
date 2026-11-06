@@ -37,7 +37,7 @@ the model import if you only need the generated base operations.
 
 ## Understand what is automatic
 
-For every table exported through `schema`, RELKIT provides:
+For every table exported through `schema`, RelKit provides:
 
 | Generated surface                                | Example                                        | Purpose                                                      |
 | ------------------------------------------------ | ---------------------------------------------- | ------------------------------------------------------------ |
@@ -66,9 +66,38 @@ There is no `dependencies.database` entry and no database provider profile to ad
 `relkit.config.ts`. Do not wrap this descriptor in `defineService`. The database service supplies
 persistence; the [Users service](/docs/modules/service/define) still owns its business operations.
 
-Only one Drizzle service is currently supported per application. Its schema must contain at least one
-table and use one dialect: SQLite, PostgreSQL, or MySQL. These are current integration constraints,
+Each Drizzle service's schema must contain at least one table and use one dialect: SQLite, PostgreSQL, or
+MySQL. These are current integration constraints,
 not promises about future MongoDB or Prisma integrations.
+
+## Use several databases
+
+An application can define several Drizzle services. Mark one with `default: true`: it is `ctx.database`, the
+runtime handle's `database` and the database Better Auth uses. A single service is the default without the
+flag; with several, `relkit check` requires exactly one.
+
+```ts title="src/services/analytics/service.ts"
+import { defineDrizzleService } from "@relkit/drizzle/sqlite";
+import { pageViews } from "./schema/index.js";
+
+export default defineDrizzleService({
+  schema: { pageViews },
+  client: ({ env }) => openAnalytics(env),
+});
+```
+
+A function reaches another service by declaring it under `dependencies.databases`. `ctx.databases.<name>`
+is typed with that service's own models:
+
+```ts
+dependencies: { databases: { analytics } },
+handler: async ({ path }, ctx) => {
+  await ctx.databases.analytics.pageViews.insert({ data: { id: crypto.randomUUID(), path } });
+},
+```
+
+The runtime handle exposes every service as `getRelkit().databases.<service ID>`. Migrations and
+`relkit db` commands act on the default service.
 
 ## Choose the customization point
 

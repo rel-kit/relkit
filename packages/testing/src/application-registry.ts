@@ -8,7 +8,7 @@ import {
   createFunctionRegistry,
   type FunctionRegistryOptions,
   type LoadedRuntimeIntegrationModule,
-} from "@relkit/engine";
+} from "relkit/engine";
 
 /**
  * Loads the generated graph, handlers, and selected integration modules for one test generation.

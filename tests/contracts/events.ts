@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import type { UnknownEventEnvelope } from "../../packages/events/src/index.ts";
-import type { InvocationContext } from "../../packages/engine/src/index.ts";
-import type { RetryPolicy } from "../../packages/jobs/src/legacy.ts";
+import type { UnknownEventEnvelope } from "relkit/events";
+import type { InvocationContext } from "relkit/engine";
+import type { RetryPolicy } from "../../packages/relkit/src/jobs/job.types.ts";
 import type { TestEventFake } from "../../packages/testing/src/index.ts";
 
 export interface EventContractTrigger {

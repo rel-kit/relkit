@@ -10,7 +10,7 @@ import {
   type ProviderAdapter,
   type ProviderBehavior,
   type ProviderConnectionValues,
-} from "@relkit/provider";
+} from "relkit/provider";
 
 const cache = defineProviderCapability("cache");
 const bucket = defineProviderCapability("bucket");
@@ -33,12 +33,14 @@ type TextReference = BindingValueRef<string, string, "string">;
 type SecretReference = BindingValueRef<string, string, "secret-string">;
 type TextValue = string | TextReference;
 
+/** @experimental */
 export interface CloudflareKvOptions {
   readonly accountId: TextValue;
   readonly namespaceId: TextValue;
   readonly apiToken: SecretReference;
 }
 
+/** @experimental */
 export interface CloudflareR2Options {
   readonly accountId: TextValue;
   readonly bucketName: TextValue;
@@ -49,6 +51,7 @@ export interface CloudflareR2Options {
   readonly signedUrlTtlSeconds?: number;
 }
 
+/** @experimental */
 export type CloudflareKvAdapter = ProviderAdapter<
   typeof cache,
   "cloudflare-kv",
@@ -56,6 +59,7 @@ export type CloudflareKvAdapter = ProviderAdapter<
   ProviderBehavior<Readonly<{ minimumTtlMs: 60_000 }>>
 >;
 
+/** @experimental */
 export type CloudflareR2Adapter = ProviderAdapter<
   typeof bucket,
   "cloudflare-r2",
@@ -67,6 +71,7 @@ export type CloudflareR2Adapter = ProviderAdapter<
  * Defines a connected Cloudflare Workers KV cache.
  * @category Integrations
  * @since 0.2.0
+ * @experimental
  */
 export function kv(options: CloudflareKvOptions): CloudflareKvAdapter {
   assertRecord(options, "Cloudflare KV options");
@@ -92,6 +97,7 @@ export function kv(options: CloudflareKvOptions): CloudflareKvAdapter {
  * Defines a connected Cloudflare R2 bucket through its S3-compatible API.
  * @category Integrations
  * @since 0.2.0
+ * @experimental
  */
 export function r2(options: CloudflareR2Options): CloudflareR2Adapter {
   assertRecord(options, "Cloudflare R2 options");

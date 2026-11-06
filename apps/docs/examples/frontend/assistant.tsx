@@ -16,7 +16,7 @@ export function Assistant({ threadId }: { readonly threadId: string }) {
    * @returns Completion after acceptance or displaying the failure. */
   async function sendGreeting() {
     try {
-      await assistant.send("Hello, RELKIT!", { threadId });
+      await assistant.send("Hello, RelKit!", { threadId });
     } catch (error) {
       setFailure(String(error));
     }

@@ -1,9 +1,6 @@
 /** Checks selected native authentication requirements without evaluating the SDK. */
 import { fileURLToPath } from "node:url";
-import {
-  SelectedDependencies,
-  SelectedDependenciesLive,
-} from "@relkit/provider/internal/dependencies";
+import { SelectedDependencies, SelectedDependenciesLive } from "relkit/provider/dependencies";
 import { Effect } from "effect";
 import { AuthFailure } from "./auth.errors.js";
 

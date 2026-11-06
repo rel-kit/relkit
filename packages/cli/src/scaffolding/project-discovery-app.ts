@@ -11,8 +11,8 @@ import {
   optional,
 } from "./project-discovery-app-helpers.js";
 import { dirname, join, resolve } from "node:path";
-import * as ts from "typescript";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import ts from "../typescript-parser.js";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 import type { DiscoveredProfile } from "./project-discovery-types.js";
 import { readFactoryObject, staticPropertyName } from "./source-edit.js";
 /** Provider capabilities recognized in static app configuration. */
@@ -84,7 +84,6 @@ function readProfiles(object: ts.ObjectLiteralExpression): DiscoveredProfile[] {
           ),
           isDefault:
             defaultValue(defaults, capability === "job" ? "jobs" : capability) === name ||
-            (capability === "job" && defaultValue(defaults, "job") === name) ||
             (direct && name === "default"),
         },
       ];

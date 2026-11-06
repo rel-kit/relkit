@@ -7,17 +7,17 @@ import {
 } from "../../src/scaffolding/project-discovery.js";
 import { planAddEffect, scaffoldPlanningLive } from "../../src/scaffolding/add-plan.js";
 import { applyScaffoldPlanEffect } from "../../src/scaffolding/add-transaction.js";
-import { generateProjectEffect } from "create-relkit/internal/generate";
-import { GeneratorPrompt } from "create-relkit/internal/generator-prompt";
-import { generatorFileSystemLive } from "create-relkit/internal/generator-filesystem";
-import { generatorProcessLive } from "create-relkit/internal/generator-process";
-import { generatorPathsLive } from "create-relkit/internal/generator-paths";
-import { generatorPromptLayer } from "create-relkit/internal/generator-prompt";
-import { projectGenerationLive } from "create-relkit/internal/generate";
-import type { PromptDriver } from "create-relkit/internal/prompt-driver";
+import { generateProjectEffect } from "create-relkit/generate";
+import { GeneratorPrompt } from "create-relkit/generator-prompt";
+import { generatorFileSystemLive } from "create-relkit/generator-filesystem";
+import { generatorProcessLive } from "create-relkit/generator-process";
+import { generatorPathsLive } from "create-relkit/generator-paths";
+import { generatorPromptLayer } from "create-relkit/generator-prompt";
+import { projectGenerationLive } from "create-relkit/generate";
+import type { PromptDriver } from "create-relkit/prompt-driver";
 import { normalizeAddRequest } from "../../src/scaffolding/add-options.js";
-import { normalizeCreateOptions } from "create-relkit/internal/options";
-import type { ScaffoldPlan } from "create-relkit/internal/add-types";
+import { normalizeCreateOptions } from "create-relkit/options";
+import type { ScaffoldPlan } from "create-relkit/add-types";
 
 /**
  * Retains negative compiler checks for every independently injectable domain owner.

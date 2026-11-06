@@ -6,7 +6,7 @@ sidebar:
   icon: container
 ---
 
-Connect an existing RELKIT app to PostgreSQL running in local Docker. This is the default
+Connect an existing RelKit app to PostgreSQL running in local Docker. This is the default
 database setup for a new module. The [Orders tutorial](/docs/learn/save-orders) remains a
 separate SQLite walkthrough; keep its database and migration history when continuing that app.
 
@@ -45,7 +45,7 @@ Create `compose.local.yaml`, or merge this service and volume into your existing
   /_snippets/source/apps/docs/examples/setup/compose.yaml
 </include>
 
-This pins the same PostgreSQL image used by RELKIT's local job infrastructure. The named volume
+This pins the same PostgreSQL image used by RelKit's local job infrastructure. The named volume
 keeps data across stops; the published port accepts only loopback connections. Start it:
 
 ```sh title="Terminal — application root"
@@ -53,7 +53,7 @@ docker compose --env-file .env.local -f compose.local.yaml up -d --wait database
 docker compose --env-file .env.local -f compose.local.yaml exec database pg_isready -U relkit -d relkit
 ```
 
-Expect `accepting connections`. RELKIT has no `docker(postgresql())` integration; Compose owns
+Expect `accepting connections`. RelKit has no `docker(postgresql())` integration; Compose owns
 this database lifecycle. Changing `POSTGRES_PASSWORD` does not rotate an initialized volume's
 password. Keep the original value across restarts.
 

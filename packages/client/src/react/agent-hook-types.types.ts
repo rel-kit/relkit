@@ -1,4 +1,4 @@
-import type { AgentWaitingRequest, BrowserMessagePart, ThreadSnapshot } from "@relkit/contracts";
+import type { AgentWaitingRequest, BrowserMessagePart, ThreadSnapshot } from "relkit/contracts";
 import type {
   AgentChat,
   AgentControls,
@@ -78,7 +78,7 @@ interface AgentProgressBase {
 /**
  * Browser progress projection with its canonical run or tool scope.
  */
-export type AgentProgress = AgentProgressBase & import("@relkit/contracts").AgentProgressScope;
+export type AgentProgress = AgentProgressBase & import("relkit/contracts").AgentProgressScope;
 
 /**
  * Ordered browser timeline member retaining stable message, tool and progress identity.

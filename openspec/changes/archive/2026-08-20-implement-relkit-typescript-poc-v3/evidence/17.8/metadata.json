@@ -1,7 +1,7 @@
 {
   "task": "17.8",
   "verificationCandidate": "3f13380f286a2e984e7f7ca14f503b5aaa1a1bf3",
-  "checkout": "/Users/mustafaelsayed/Workspace/relkit",
+  "checkout": "<repo>",
   "capturedAt": "2026-08-18T17:12:54.816Z",
   "cleanTrackedCheckout": true,
   "allowlistedUntracked": [".agents/skills/openspec-iterator/SKILL.md"],

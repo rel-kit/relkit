@@ -5,7 +5,7 @@ import type {
   RunRetryReceipt,
   RunSnapshot,
   RunWatchFrame,
-} from "@relkit/contracts/jobs";
+} from "relkit/contracts/jobs";
 import type { JobCancelInput, JobRetryInput } from "./contracts.types.js";
 import type { JobFor, JobSelector } from "./job-registry.types.js";
 

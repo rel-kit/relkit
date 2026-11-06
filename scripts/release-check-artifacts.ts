@@ -13,7 +13,7 @@ import {
   type RecordValue,
 } from "./release-check-support.js";
 import { assertPackedDependencies } from "./catalog-manifest.js";
-import { stageReleaseRoot } from "./release-stage.js";
+import { stageReleaseRoot, toolPackageVersions } from "./release-stage.js";
 import { assertListing } from "./release-check-listing.js";
 export { templateInputs } from "./release-check-templates.js";
 async function readJsonFromTar(artifact: string): Promise<RecordValue> {
@@ -82,6 +82,8 @@ export async function packAll(items: PackageInfo[], destination: string): Promis
   const workspaceVersions = new Map(
     items.map((item) => [item.name, String(item.manifest.version)]),
   );
+  // Dev dependencies on private tool packages pack as their versions too.
+  const packedVersions = new Map([...workspaceVersions, ...toolPackageVersions(root)]);
   const staging = await stagePackages(ordered);
   try {
     const artifacts: RecordValue[] = [];
@@ -107,9 +109,9 @@ export async function packAll(items: PackageInfo[], destination: string): Promis
         (await readFile(join(root, "LICENSE"), "utf8"))
       )
         throw new Error(`Packed license mismatch: ${item.name}`);
-      assertPackedDependencies(item.manifest, packed, rootManifest, workspaceVersions);
+      assertPackedDependencies(item.manifest, packed, rootManifest, packedVersions);
       if (JSON.stringify(stable(packed.relkit)) !== JSON.stringify(stable(item.manifest.relkit)))
-        throw new Error(`Packed RELKIT metadata mismatch: ${item.name}`);
+        throw new Error(`Packed RelKit metadata mismatch: ${item.name}`);
       if (JSON.stringify(stable(packed.files)) !== JSON.stringify(stable(item.manifest.files)))
         throw new Error(`Packed files allowlist mismatch: ${item.name}`);
       assertListing(item, listing, packed);

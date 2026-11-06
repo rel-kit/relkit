@@ -1,9 +1,9 @@
 import { Schema } from "effect";
-import { CONTRACT_VERSION } from "@relkit/contracts";
+import { CONTRACT_VERSION } from "relkit/contracts";
 import {
   generateClientRegistryFromDocument,
   InvalidClientContract,
-} from "@relkit/client-generator";
+} from "../client-generator/index.js";
 import { fail } from "../main-support.js";
 import {
   clientDocumentSchema,

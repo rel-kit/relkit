@@ -11,14 +11,14 @@ import {
   assertRuntimeIntegrationPlanVersion,
   type RuntimeIntegrationPlan,
   type RuntimeIntegrationPlanReference,
-} from "../../packages/contracts/src/index.ts";
-import { DEPLOYMENT_PLAN_VERSION } from "../../packages/deploy/src/index.ts";
+} from "relkit/contracts";
+import { DEPLOYMENT_PLAN_VERSION } from "relkit/deploy";
 import {
   LOCAL_SERVICE_PLAN_VERSION,
   PROVIDER_OVERRIDE_STATE_VERSION,
   type ProviderOverrideState,
-} from "../../packages/local-service/src/index.ts";
-import { PROVIDER_PROTOCOL_VERSION } from "../../packages/provider/src/index.ts";
+} from "relkit/local-service";
+import { PROVIDER_PROTOCOL_VERSION } from "relkit/provider";
 
 test("exposes the provider-architecture contract cohort", () => {
   expect({

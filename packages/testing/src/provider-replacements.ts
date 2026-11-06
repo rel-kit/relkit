@@ -1,14 +1,14 @@
 import type { TestProviderReplacements } from "./provider-replacements.types.js";
 export type { TestProviderReplacements } from "./provider-replacements.types.js";
-import { isStableId, type JsonValue } from "@relkit/contracts";
+import { isStableId, type JsonValue } from "relkit/contracts";
 import {
   createProviderRegistry,
   type ProviderCapability,
   type ProviderRegistry,
   type ProviderReplacements,
-} from "@relkit/engine";
-import { PROVIDER_CAPABILITIES, type GraphNode, type ProviderBindingNode } from "@relkit/graph";
-import type { DependencyCategory } from "@relkit/engine";
+} from "relkit/engine";
+import { PROVIDER_CAPABILITIES, type GraphNode, type ProviderBindingNode } from "relkit/graph";
+import type { DependencyCategory } from "relkit/engine";
 import type { TestApplicationArtifacts } from "./application-registry.js";
 import type { TestFakes } from "./fakes.js";
 

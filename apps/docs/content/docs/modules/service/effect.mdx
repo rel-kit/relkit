@@ -1,0 +1,54 @@
+---
+title: Write functions with Effect
+description: Return an Effect from a handler and use the relkit/effect helpers when your application already uses Effect.
+pagination: false
+sidebar:
+  icon: workflow
+---
+
+RelKit's API is Promise-based, and a handler can be a plain `async` function. If your application
+already uses [Effect](https://effect.website), a handler can return an Effect instead. RelKit runs
+it with the same cancellation, timeout, tracing and error handling as an `async` handler.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  Start with an [existing application](/docs/learn/create-an-app) and add `effect` to its
+  dependencies. New applications do not depend on `effect` until their own code imports it.
+</Callout>
+
+## Return an Effect from a handler
+
+<include
+  source="apps/docs/examples/effect/get-order.function.ts"
+  lang="ts"
+  meta='title="src/services/orders/functions/get-order.function.ts"'
+>
+  /_snippets/source/apps/docs/examples/effect/get-order.function.ts
+</include>
+
+- `defineFunction` and `defineError` come from `relkit`, as they do for an `async` handler.
+- `failEffect` comes from `relkit/effect`. It fails the Effect with a declared error, which the
+  caller receives exactly as if an `async` handler had returned `fail(orderNotFound, data)`. You
+  can also fail with an instance: `Effect.fail(new orderNotFound({ orderId }))`.
+- The Effect must not need services that RelKit does not provide: its requirements type must be
+  `never`. Type checking reports an Effect that still needs a service, fails with an undeclared
+  error, or succeeds with a value that does not match the output schema.
+
+## How RelKit runs the Effect
+
+- **Cancellation and timeouts.** When the caller cancels the request or the function's
+  `timeoutMs` passes, RelKit interrupts the Effect, so its finalizers run.
+- **Tracing.** The Effect runs inside the function's span. Spans it opens with `Effect.withSpan`
+  appear under that span in the trace and in the [Inspector](/docs/modules/operations/inspector).
+- **Errors.** A declared error becomes the same response as from an `async` handler. Any other
+  failure or defect becomes an internal error, and its details stay out of the response.
+
+## What is in `relkit/effect`
+
+`relkit/effect` holds the Effect form of each `relkit` function, such as `defineFunctionEffect`,
+`defineRouteEffect`, `failEffect` and `streamOfEffect`. Each returns an Effect that builds the same
+descriptor or failure as the Promise-based function. `callToolEffect(tool, input)` and
+`callGraphNodeEffect(node, input)` are the Effect forms of a tool's or graph node's `invoke`. The
+`relkit` entry point itself has no Effect types. See the [Effect API reference](/docs/api/effect)
+for the full list.
+
+<include>/_snippets/generated/related/docs-modules-service-effect.mdx</include>

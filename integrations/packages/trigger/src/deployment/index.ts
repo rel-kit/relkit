@@ -1,3 +1,4 @@
+/** @experimental */
 export interface TriggerDeploymentProfile {
   readonly provider: "trigger";
   readonly compatibility: "unverified";
@@ -16,6 +17,7 @@ export interface TriggerDeploymentProfile {
   readonly policyIdentity: readonly string[];
 }
 
+/** @experimental */
 export interface TriggerWorkerPublication {
   readonly provider: "trigger";
   readonly mechanism: "trigger-sdk";
@@ -26,6 +28,7 @@ export interface TriggerWorkerPublication {
   readonly entrypoint: string;
 }
 
+/** @experimental */
 export const deploymentProfile: TriggerDeploymentProfile = Object.freeze({
   provider: "trigger",
   compatibility: "unverified",
@@ -47,6 +50,7 @@ export const deploymentProfile: TriggerDeploymentProfile = Object.freeze({
   ],
 });
 
+/** @experimental */
 export function nativeWorkerPublication(
   value: Omit<TriggerWorkerPublication, "provider" | "mechanism">,
 ): TriggerWorkerPublication {

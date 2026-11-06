@@ -130,7 +130,7 @@ async function writeInventoryFixture(directory: string): Promise<void> {
       description: "Public tooling",
       exports: {
         ".": { types: "./dist/index.d.ts" },
-        "./internal": { types: "./dist/index.d.ts" },
+        "./tooling": { types: "./dist/index.d.ts" },
       },
     }),
   );

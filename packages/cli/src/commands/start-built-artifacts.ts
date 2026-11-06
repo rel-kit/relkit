@@ -6,8 +6,8 @@ import {
   RUNTIME_INTEGRATION_PLAN_VERSION,
   isRuntimeActivationFingerprint,
   type RuntimeActivationFingerprint,
-} from "@relkit/contracts";
-import { createRuntimeActivationFingerprint } from "@relkit/compiler";
+} from "relkit/contracts";
+import { createRuntimeActivationFingerprint } from "../compiler/index.js";
 import { cliAdapterError, cliOriginalError, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { CliFileSystem } from "../services/filesystem.service.js";
@@ -68,6 +68,9 @@ export const validateBuiltArtifactsEffect = Effect.fn("BuiltProject.artifacts")(
     ...(activation.providerOverridesGeneration === undefined
       ? {}
       : { providerOverridesGeneration: activation.providerOverridesGeneration }),
+    ...(activation.schemaLibrariesHash === undefined
+      ? {}
+      : { schemaLibrariesHash: activation.schemaLibrariesHash }),
   });
 });
 

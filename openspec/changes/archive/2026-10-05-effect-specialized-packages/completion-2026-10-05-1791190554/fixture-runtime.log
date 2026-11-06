@@ -7,7 +7,7 @@
 12:02:24.016 WARN  inspector         ⨯ Another next dev server is already running.
 12:02:24.074 WARN  inspector         - PID: 9254
 12:02:24.116 WARN  inspector         - Dir:
-                                     /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/apps/inspector
+                                     <home>/.codex/worktrees/effect-specialized-recovery/relkit/apps/inspector
 12:02:24.167 WARN  inspector         - Log: .next/dev/logs/next-development.log
 12:02:24.223 WARN  inspector         You can access the existing server at http://127.0.0.1:3210,
 12:02:24.359 WARN  inspector         or run kill 9254 to stop it and start a new one.

@@ -1,6 +1,6 @@
 /** Exercises native runtime helpers effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
 import { selectedStateSchemas, selectedStateSchemasEffect } from "../src/runtime-state-schemas.js";

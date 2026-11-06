@@ -3,7 +3,7 @@
  * settings are outside application doctor ownership; ephemeral bridge ports are
  * allocated by their runtime owner. Every native probe closes before returning.
  */
-import type { LoadedToolingConfig } from "@relkit/compiler";
+import type { LoadedToolingConfig } from "../compiler/index.js";
 import { Effect } from "effect";
 import { cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";

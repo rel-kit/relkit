@@ -67,7 +67,7 @@ query or rollback of an external effect. Configure driver-level timeouts and can
 Publishing an [event](/docs/modules/events), enqueueing a [job](/docs/modules/jobs), or writing a [bucket object](/docs/modules/storage)
 inside this callback does not enlist that system in the database transaction. A rollback cannot undo
 those effects. Use a suitable transactional outbox or reconciliation design when a committed change
-must reliably trigger follow-up work; RELKIT does not create that guarantee merely by awaiting both calls.
+must reliably trigger follow-up work; RelKit does not create that guarantee merely by awaiting both calls.
 
 ## Test the failure path
 

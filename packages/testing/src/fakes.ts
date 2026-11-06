@@ -1,10 +1,10 @@
 import { assertFailurePoint, assertName, lazyRecords } from "./fake-utils.js";
 import { Context, Effect, Layer, ManagedRuntime, Ref } from "effect";
-import { observeExecution, runExecutionSync } from "@relkit/contracts/operation";
+import { observeExecution, runExecutionSync } from "relkit/contracts/operation";
 import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
 import type { TestFailureControls, TestFakesOptions, TestFakes } from "./fakes.types.js";
 export type { TestFailureControls, TestFakesOptions, TestFakes } from "./fakes.types.js";
-import type { DependencyCategory, DependencyClientSources } from "@relkit/engine";
+import type { DependencyCategory, DependencyClientSources } from "relkit/engine";
 import {
   createTestBucketFake,
   type TestBucketFake,

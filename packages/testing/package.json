@@ -1,7 +1,7 @@
 {
   "name": "@relkit/testing",
   "version": "0.8.4",
-  "description": "Testing utilities and local providers for RELKIT applications.",
+  "description": "Testing utilities and local providers for RelKit applications.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -27,23 +27,59 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./internal/fakes": {
+    "./fakes": {
       "types": "./dist/fakes.d.ts",
       "import": "./dist/fakes.js"
     },
-    "./internal/jobs-utils": {
+    "./agents-conformance": {
+      "types": "./dist/agents-conformance.d.ts",
+      "import": "./dist/agents-conformance.js"
+    },
+    "./conformance": {
+      "types": "./dist/conformance.d.ts",
+      "import": "./dist/conformance.js"
+    },
+    "./cache-conformance": {
+      "types": "./dist/cache-conformance.d.ts",
+      "import": "./dist/cache-conformance.js"
+    },
+    "./buckets-conformance": {
+      "types": "./dist/buckets-conformance.d.ts",
+      "import": "./dist/buckets-conformance.js"
+    },
+    "./realtime-conformance": {
+      "types": "./dist/realtime-conformance.d.ts",
+      "import": "./dist/realtime-conformance.js"
+    },
+    "./events-conformance": {
+      "types": "./dist/events-conformance.d.ts",
+      "import": "./dist/events-conformance.js"
+    },
+    "./jobs-conformance": {
+      "types": "./dist/jobs-conformance.d.ts",
+      "import": "./dist/jobs-conformance.js"
+    },
+    "./runtime-conformance": {
+      "types": "./dist/runtime-conformance.d.ts",
+      "import": "./dist/runtime-conformance.js"
+    },
+    "./deploy-target-conformance": {
+      "types": "./dist/deploy-target-conformance.d.ts",
+      "import": "./dist/deploy-target-conformance.js"
+    },
+    "./jobs-utils": {
       "types": "./dist/jobs-utils.d.ts",
       "import": "./dist/jobs-utils.js"
     },
-    "./internal/runtime-clock": {
+    "./runtime-clock": {
       "types": "./dist/runtime-clock.d.ts",
       "import": "./dist/runtime-clock.js"
     },
-    "./internal/testing-owner": {
+    "./testing-owner": {
       "types": "./dist/testing-owner.d.ts",
       "import": "./dist/testing-owner.js"
     },
-    "./internal/work-ownership": {
+    "./work-ownership": {
       "types": "./dist/work-ownership.d.ts",
       "import": "./dist/work-ownership.js"
     },
@@ -57,24 +93,9 @@
     }
   },
   "dependencies": {
-    "@relkit/buckets": "workspace:*",
-    "@relkit/cache": "workspace:*",
-    "@relkit/config": "workspace:*",
-    "@relkit/compiler": "workspace:*",
-    "@relkit/contracts": "workspace:*",
-    "@relkit/engine": "workspace:*",
-    "@relkit/events": "workspace:*",
-    "@relkit/functions": "workspace:*",
-    "@relkit/graph": "workspace:*",
-    "@relkit/invocation": "workspace:*",
-    "@relkit/jobs": "workspace:*",
-    "@relkit/providers-local": "workspace:*",
-    "@relkit/realtime": "workspace:*",
-    "@relkit/runtime-effect": "workspace:*",
-    "@relkit/runtime-hono": "workspace:*",
-    "@relkit/schema": "workspace:*",
-    "@relkit/tools": "workspace:*",
-    "effect": "catalog:"
+    "@relkit/cli": "workspace:*",
+    "effect": "catalog:",
+    "relkit": "workspace:*"
   },
   "peerDependencies": {
     "@relkit/better-auth": "workspace:*",
@@ -96,12 +117,14 @@
     "typecheck": "tsc -b --pretty false && tsc -p tsconfig.tests.json --pretty false"
   },
   "devDependencies": {
+    "@effect/vitest": "catalog:",
     "@relkit/better-auth": "workspace:*",
     "@relkit/drizzle": "workspace:*",
     "@relkit/langchain": "workspace:*",
-    "@effect/vitest": "catalog:",
-    "@relkit/routes": "workspace:*",
     "drizzle-orm": "catalog:",
     "vitest": "catalog:"
+  },
+  "relkit": {
+    "maturity": "core"
   }
 }

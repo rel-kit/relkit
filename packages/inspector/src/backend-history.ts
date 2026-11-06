@@ -4,8 +4,8 @@ import {
   InspectorEndpointError,
   negotiateHeaders,
   readObservabilityQuery,
-} from "@relkit/inspector-api";
-import { InspectionConnectionError } from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api";
+import { InspectionConnectionError } from "relkit/inspector-api/connection";
 import type { InspectorToolState } from "./tool-state.types.js";
 
 /** Decodes only supported query/detail paths and returns their existing public protocol. */

@@ -1,12 +1,10 @@
-# RELKIT
+# RelKit
 
 [![CI](https://github.com/rel-kit/relkit/actions/workflows/checks.yml/badge.svg)](https://github.com/rel-kit/relkit/actions/workflows/checks.yml)
 [![npm](https://img.shields.io/npm/v/%40relkit%2Fapp.svg)](https://www.npmjs.com/package/@relkit/app)
 [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-RELKIT is a Bun and TypeScript monorepo for generating applications whose source
-descriptors compile to one graph, local HTTP runtime, inspector protocol, and
-Pulumi deployment plan.
+The TypeScript backend framework where you write the business logic. RelKit wires the APIs, jobs, events, agents and typed client, and gives you, and your coding agent, a live map of the app.
 
 ## Install
 
@@ -36,17 +34,17 @@ bun add @relkit/app
 
 Application code can import the root API or focused typed paths:
 
-- `@relkit/app/schema`
-- `@relkit/app/config`
-- `@relkit/app/routes`
-- `@relkit/app/functions`
-- `@relkit/app/events`
-- `@relkit/app/agents`
-- `@relkit/app/jobs`
-- `@relkit/app/cache`
-- `@relkit/app/tools`
-- `@relkit/app/buckets`
-- `@relkit/app/services`
+- `relkit/schema`
+- `relkit/config`
+- `relkit/routes`
+- `relkit/functions`
+- `relkit/events`
+- `relkit/agents`
+- `relkit/jobs`
+- `relkit/cache`
+- `relkit/tools`
+- `relkit/buckets`
+- `relkit/services`
 
 Optional integrations such as `@relkit/client`, `@relkit/drizzle`,
 `@relkit/better-auth`, `@relkit/langchain`, providers, testing, the Inspector and CLI remain separate so the
@@ -55,7 +53,7 @@ core API does not install the full AWS, Pulumi, Next.js, or testing stack.
 Follow the selected capability's [installation guide](apps/docs/content/docs/modules/integrations/index.mdx)
 before copying source. Native SDKs and declaration repairs remain application-owned;
 `relkit add` normally installs the requirements it selects, while `--no-install`
-leaves explicit install/check next steps. Public packages have independent versions.
+leaves explicit install/check next steps. All RelKit packages share one version.
 
 ## AI agent skills
 
@@ -67,13 +65,20 @@ repository with the [Skills CLI](https://github.com/vercel-labs/skills):
 npx skills add rel-kit/relkit --skill relkit-app relkit-deploy
 ```
 
-The application skill covers RELKIT code placement, public APIs, and verification.
+The application skill covers RelKit code placement, public APIs, and verification.
 The deployment skill covers AWS/Pulumi checks, preview, apply, and post-deploy
 verification. Both skills are also available directly in this repository under
 `.agents/skills/`.
 
-Agents can read the Fumadocs-generated [documentation index](https://relkit.dev/llms.txt)
-or [full processed documentation](https://relkit.dev/llms-full.txt).
+Coding agents can read the [documentation index](https://relkit.dev/llms.txt) or the
+[full documentation as one file](https://relkit.dev/llms-full.txt).
+
+## Stability and versions
+
+RelKit is pre-1.0. Every feature is Core or Labs: [Core and Labs](https://relkit.dev/docs/maturity)
+lists which, and Labs can change in any release. From 1.0, Core follows semantic versioning.
+[Versioning and upgrades](https://relkit.dev/docs/versioning) states the deprecation window, how
+`relkit migrate` carries you across breaking changes, the 1.0 criteria and the target date.
 
 ## Develop the repository
 
@@ -129,18 +134,15 @@ bun run relkit:local -- create my-app --cloud none --deploy none
 - `apps/inspector` is the private Next.js UI packaged by the independently installed
   `@relkit/inspector` tool, whose UI defaults to port `3210`.
 - `examples/commerce` is the canonical executable, cross-feature example.
-- `integrations/catalog` contains the optional side-effect-free integration
-  catalog; `integrations/packages` contains independently publishable
-  standalone integrations.
+- `integrations/packages` contains independently publishable standalone
+  integrations; the creator bundles their catalog.
 - `packages/` contains the public authoring APIs, compiler, graph, engine,
   runtime, inspector API, providers, CLI, generator, and Pulumi deployment
   packages.
-- `templates/default/v1` contains the `minimal`, `api`, and `agent` project
-  templates.
+- `templates/default/v1` contains the `minimal`, `api`, `agent`, `fullstack`
+  and `tasks` project templates.
 - `tests/` and `scripts/` contain the focused test layers and verification
   tooling.
-- `repos/effect` is local Effect reference source for agents, ignored by Git
-  and not a RELKIT edit target.
 
 Run `bunx turbo run dev --filter=@relkit/docs` for documentation development and
 `bun run test:docs` for generated-reference, doctest, link, and search checks.
@@ -168,9 +170,9 @@ The example route is:
 curl http://localhost:3000/hello\?name=RelKit
 ```
 
-AWS/Pulumi creation flags remain parsed for precise diagnostics but are rejected until that tuple
-has current reference-host readiness evidence. Configure an existing project as described in
-`docs/deployment.md`; deployment itself still requires explicit authorization.
+CI has not tested creation with `--cloud aws --deploy pulumi` yet, so it prints a
+`RELKIT_CREATE_UNTESTED` warning and continues; pass `--strict` to refuse untested combinations.
+Deployment is described in `docs/deployment.md` and still requires explicit authorization.
 
 Useful generated commands are `bun run test`, `bun run check`, `bun run
 typecheck`, `bun run build`, and `bun run start` after a build. Stop a dev or
@@ -187,14 +189,14 @@ development. The CLI owns no Inspector UI, history database or database worker.
 
 ## Releases and support
 
-Public packages retain independent versions. Repository pull
+All RelKit packages share one version, and each release is tagged with it. Repository pull
 requests that change publishable paths receive an automatic patch Changeset;
 forks and minor or major releases use `bun run changeset`. Automation opens the
 release pull request, auto-merges it after `CI Gate`, and publishes through a
 separate GitHub release workflow using npm trusted publishing. Documentation
 and internal chores outside release paths merge without a release.
 
-`@relkit/app`, `create-relkit`, `relkit`, and the explicitly documented optional
+`relkit`, `create-relkit`, and the explicitly documented optional
 integrations are supported public entry points. Packages described as
 unsupported internals are published only so workspace dependencies remain
 resolvable; application code should not depend on them directly.

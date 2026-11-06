@@ -1,6 +1,6 @@
 {
   "root": "/tmp/relkit-core-consumers-agent-held-8b18daca",
-  "candidate": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "candidate": "<home>/.codex/worktrees/core-consumers-effect/relkit",
   "cases": [
     {
       "mode": "return",

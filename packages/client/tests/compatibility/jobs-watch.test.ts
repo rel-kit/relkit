@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import type { RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunSnapshot, RunWatchFrame } from "relkit/contracts/jobs";
 import {
   JobWatchAbortedError,
   JobWatchReadTimeoutError,

@@ -1,9 +1,10 @@
-# RELKIT examples
+# RelKit examples
 
 `commerce` is the canonical executable application. Its grouped service tree keeps
 native authoring APIs, logical IDs, routes and ownership contracts together.
-The generator templates are smaller maintained fixtures; public creation currently
-offers the certified minimal tuple only.
+The generator templates are smaller maintained fixtures; creation offers the
+`minimal`, `api`, `agent`, `fullstack` and `tasks` templates. Contracts use Zod 4;
+`schema-libraries` shows Zod 4, ArkType, Valibot and Effect Schema in one app.
 
 | Feature                                       | Maintained source                                                                | Verification                                                                                           |
 | --------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
@@ -16,6 +17,7 @@ offers the certified minimal tuple only.
 | Native LangChain/LangGraph/DeepAgents         | `commerce/src/services/orders/agents/`, `commerce/src/services/orders/tools/`    | `commerce/src/agent-authoring-assertions.test.ts`, `tests/integration/agents/commerce-example.test.ts` |
 | Realtime channels and authorization           | `commerce/src/services/announcements/`, `commerce/src/services/orders/channels/` | `commerce/tests/channels.test.ts`                                                                      |
 | Native Drizzle models and transactions        | `data-model/src/services/database/`                                              | `data-model/tests/data-model.test.ts`                                                                  |
+| Zod 4, ArkType, Valibot and Effect Schema     | `schema-libraries/src/services/orders/`                                          | `schema-libraries/tests/schema-libraries.test.ts`                                                      |
 | Better Auth and protected routes              | `auth-drizzle/src/services/auth/`, `auth-drizzle/src/routes/`                    | `auth-drizzle/tests/auth.test.ts`                                                                      |
 | Inspector and observability                   | Compiled commerce graph                                                          | `tests/inspector/`, `tests/integration/commerce-example-consistency.test.ts`                           |
 | Offline deployment plans                      | `commerce/relkit.config.ts`                                                      | `tests/deployment/`; real AWS acceptance requires separate authorization                               |

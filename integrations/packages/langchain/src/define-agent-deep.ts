@@ -2,8 +2,8 @@
 
 import { isAgentDescriptor } from "./define-agent-validation.js";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
-import { agentDefinitionFailure } from "@relkit/agents/internal/define-agent-error";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { agentDefinitionFailure } from "relkit/agents/define-agent-error";
 import type { AgentSubagent, DeepAgentCapabilities } from "./define-agent-deep.types.js";
 
 export type * from "./define-agent-deep.types.js";

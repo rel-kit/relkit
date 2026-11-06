@@ -15,7 +15,7 @@ import type {
   LocalServiceStartRequest,
   NormalizedLocalServiceRecipe,
   NormalizedLocalServiceUnit,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 
 export function reusedUnit(
   existing: LocalServiceInstance,

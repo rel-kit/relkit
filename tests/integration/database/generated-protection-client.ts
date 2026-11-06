@@ -1,6 +1,6 @@
 /** Uses the existing native typed protocol fixture client against actual generated network listeners and scope-owned realtime iterators. */
 import { Effect, Schema } from "effect";
-import { createFixtureClient } from "../../../packages/runtime-hono/tests/fixture-client.js";
+import { createFixtureClient } from "../../runtime-rpc/runtime-hono/fixture-client.js";
 import { generatedBody } from "./generated-host-http.js";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 import { ProtectedIdentity } from "./generated-protection.schemas.js";

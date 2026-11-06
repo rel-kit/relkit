@@ -1,7 +1,7 @@
 /** Direct tool services retain outcome/duration/workload evidence without emitting private inputs. */
 import { expect, it } from "@effect/vitest";
 import { Effect, Layer, Logger, Metric } from "effect";
-import { LocalWorkerError } from "@relkit/observability/local/worker-contract";
+import { LocalWorkerError } from "relkit/observability/local/worker-contract";
 import { InspectorHistory } from "../src/history.service.js";
 import { InspectorHistoryNative } from "../src/history-native.service.js";
 

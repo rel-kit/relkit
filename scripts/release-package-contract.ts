@@ -3,7 +3,13 @@
  * Pure tables describe intentional leaf boundaries; callers compare these maps
  * against manifests before accepting package bytes. No filesystem work occurs here.
  */
-import { appSubpaths, integrationSubpaths } from "./release-package-contract-tables.js";
+import {
+  appSubpaths,
+  integrationSubpaths,
+  mergedAreas,
+  relkitAreas,
+  relkitFacadeSubpaths,
+} from "./release-package-contract-tables.js";
 import { packageLeafExports } from "./release-package-leaves.js";
 import type { ReleaseExports } from "./release-package-contract.types.js";
 
@@ -16,21 +22,30 @@ const rootExport = { types: "./dist/index.d.ts", import: "./dist/index.js" };
  * @returns The export map required by manifest and packed-resolution checks.
  */
 export function expectedExports(directoryName: string, packageName?: string): ReleaseExports {
-  if (packageName === "@relkit/integrations") return { ".": rootExport };
+  return {
+    ...ownExports(directoryName, packageName),
+    ...areaExports(mergedAreas[directoryName] ?? []),
+  };
+}
+
+/**
+ * Declares a package's own entry points, without the areas merged into it.
+ * @param directoryName - Workspace directory basename.
+ * @param packageName - Published name for integration-specific subpaths.
+ * @returns The package's own export map.
+ */
+function ownExports(directoryName: string, packageName?: string): ReleaseExports {
   const subpaths = packageName ? integrationSubpaths[packageName] : undefined;
   if (subpaths)
     return Object.fromEntries([
       [".", rootExport],
       ...subpaths.map((subpath) => [`./${subpath}`, leaf(`${subpath}/index`)]),
     ]);
+  if (directoryName === "relkit") return relkitExports();
   if (directoryName === "app")
     return Object.fromEntries([
       [".", rootExport],
-      ...appSubpaths.map((subpath) => {
-        if (subpath === "jobs/legacy") return [`./${subpath}`, leaf("jobs-legacy")];
-        if (subpath === "internal/runtime") return [`./${subpath}`, leaf("internal-runtime")];
-        return [`./${subpath}`, leaf(subpath)];
-      }),
+      ...appSubpaths.map((subpath) => [`./${subpath}`, leaf(subpath)]),
     ]);
   return { ".": rootExport, ...packageLeafExports[directoryName] };
 }
@@ -42,4 +57,44 @@ export function expectedExports(directoryName: string, packageName?: string): Re
  */
 function leaf(path: string) {
   return { types: `./dist/${path}.d.ts`, import: `./dist/${path}.js` };
+}
+
+/**
+ * Declares `relkit`'s map: each area's leaves under `./<area>`, and the application
+ * subpaths at the root, all built into `dist/<area>/`.
+ * @returns The export map of the merged core package.
+ */
+function relkitExports(): ReleaseExports {
+  const entries = Object.entries(areaExports(relkitAreas));
+  for (const [key, value] of Object.entries(expectedExports("app")))
+    entries.push([key, key === "." ? rootExport : inArea(value, "app")]);
+  for (const [subpath, file] of Object.entries(relkitFacadeSubpaths))
+    entries.push([`./${subpath}`, inArea(leaf(file), "app")]);
+  return Object.fromEntries(entries);
+}
+
+/**
+ * Declares merged areas' leaves under `./<area>`, built into `dist/<area>/`.
+ * @param areas - Former package directories merged into one package.
+ * @returns Their export entries.
+ */
+function areaExports(areas: readonly string[]): ReleaseExports {
+  const entries: [string, ReleaseExports[string]][] = [];
+  for (const area of areas)
+    for (const [key, value] of Object.entries({ ".": rootExport, ...packageLeafExports[area] }))
+      entries.push([`./${area}${key === "." ? "" : key.slice(1)}`, inArea(value, area)]);
+  return Object.fromEntries(entries);
+}
+
+/**
+ * Moves one export's conditions into an area's build folder.
+ * @param value - Export conditions. @param area - Source area. @returns Conditions under `dist/<area>/`.
+ */
+function inArea(value: ReleaseExports[string], area: string): ReleaseExports[string] {
+  return Object.fromEntries(
+    Object.entries(value).map(([condition, path]) => [
+      condition,
+      path.replace(/^\.\/dist\//, `./dist/${area}/`),
+    ]),
+  ) as ReleaseExports[string];
 }

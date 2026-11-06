@@ -3,8 +3,8 @@ import {
   type EventInvocationOptions,
   type InvocationIdSource,
   type InvocationTarget,
-} from "@relkit/engine";
-import { canonicalJson, type MaybePromise } from "@relkit/contracts";
+} from "relkit/engine";
+import { canonicalJson, type MaybePromise } from "relkit/contracts";
 import { Clock, Effect } from "effect";
 import type { DeterministicClockService } from "./runtime-clock.types.js";
 import {
@@ -12,10 +12,10 @@ import {
   runInExecutionContext,
   SpanRuntime,
   startRootSpanEffect,
-} from "@relkit/invocation";
-import type { UnknownEventEnvelope } from "@relkit/events";
-import type { EventRouter } from "@relkit/providers-local";
-import type { InvocationRunner } from "@relkit/runtime-effect";
+} from "relkit/invocation";
+import type { UnknownEventEnvelope } from "relkit/events";
+import type { EventRouter } from "relkit/providers-local";
+import type { InvocationRunner } from "relkit/runtime-effect";
 import type { TestFailureControls } from "./fakes.js";
 import type { TestEventOptions } from "./events-types.js";
 import { combineSignals } from "./runtime-clock.js";

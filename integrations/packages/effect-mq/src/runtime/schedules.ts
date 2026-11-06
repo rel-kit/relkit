@@ -1,14 +1,15 @@
 import { JobStore } from "effect-mq";
 import { Effect } from "effect";
-import type { ScheduleDefinition } from "@relkit/jobs";
-import type { NativeScheduleOperations, OperationContext } from "@relkit/jobs/adapter";
-import { durationToMillis } from "@relkit/jobs";
+import type { ScheduleDefinition } from "relkit/jobs";
+import type { NativeScheduleOperations, OperationContext } from "relkit/jobs/adapter";
+import { durationToMillis } from "relkit/jobs";
 
 type EffectScheduleRecord = JobStore.ScheduleRecord;
 type ScheduleKey = JobStore.ScheduleKey;
 const QueueName = JobStore.QueueName;
 const ScheduleKey = JobStore.ScheduleKey;
 
+/** @experimental */
 export interface EffectMqScheduleStore {
   readonly listSchedules: (options?: {
     readonly jobName?: string;
@@ -20,6 +21,7 @@ export interface EffectMqScheduleStore {
   readonly removeSchedule: (key: ScheduleKey) => Effect.Effect<boolean, unknown, unknown>;
 }
 
+/** @experimental */
 export interface EffectMqScheduleBridge {
   readonly store: EffectMqScheduleStore;
   readonly run: <A>(effect: Effect.Effect<A, unknown, unknown>) => Promise<A>;
@@ -27,7 +29,7 @@ export interface EffectMqScheduleBridge {
   readonly queue?: string;
 }
 
-/** Maps effect-mq JobSchedules' native Postgres records to the RELKIT schedule SPI. */
+/** Maps effect-mq JobSchedules' native Postgres records to the RelKit schedule SPI. @experimental */
 export function createEffectMqScheduleOperations(
   options: EffectMqScheduleBridge,
 ): NativeScheduleOperations {

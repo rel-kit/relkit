@@ -2,7 +2,7 @@
  * Accepts an order export through the public orders service and returns its durable
  * run receipt. The service owns the job descriptor; this route owns HTTP transport.
  */
-import { defineRoute } from "@relkit/app/routes";
+import { defineRoute } from "relkit/routes";
 import orders from "../../../services/orders/service.js";
 
 export const POST = defineRoute({

@@ -1,7 +1,7 @@
 /** Exercises native test native tool behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
 import { DynamicStructuredTool } from "langchain";
-import { z, type InferOutput } from "@relkit/schema";
+import { z, type InferOutput } from "relkit/schema";
 
 export function createNativeStringTool(
   name: string,

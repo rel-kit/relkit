@@ -1,9 +1,10 @@
 /** Checks selected native test-helper compatibility through public integration-owned APIs. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import { describe, expect, test } from "bun:test";
-import { defineAgent } from "@relkit/langchain";
-import { defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
-import { defineTool } from "@relkit/tools";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
+import { defineTool } from "relkit/tools";
 import { createTestAgent } from "../fixtures/owned-compatibility.ts";
 
 /**
@@ -27,6 +28,7 @@ function setup(approval?: "approved" | "pending") {
   });
   const agent = defineAgent({
     id: "support.order",
+    runtime: langchain(),
     input: z.object({ question: z.string() }),
     output: z.object({ answer: z.string() }),
     model: "default",

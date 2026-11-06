@@ -1,7 +1,8 @@
 import { createRequire } from "node:module";
-import type { TaskExecutor } from "@relkit/jobs/adapter";
+import type { TaskExecutor } from "relkit/jobs/adapter";
 import { bindingFrom, envelopeFrom, number, record, text } from "./task-binding-support.js";
 
+/** @experimental */
 export interface TriggerTaskDefinition {
   readonly id: string;
   readonly jobId?: string;
@@ -18,6 +19,7 @@ export interface TriggerTaskDefinition {
   };
 }
 
+/** @experimental */
 export interface TriggerSdk {
   readonly createTask?: (options: Readonly<Record<string, unknown>>) => unknown;
   readonly task?: (options: Readonly<Record<string, unknown>>) => unknown;
@@ -25,12 +27,14 @@ export interface TriggerSdk {
     ((options: Readonly<Record<string, unknown>>) => unknown) | Readonly<Record<string, unknown>>;
 }
 
+/** @experimental */
 export interface TriggerWorkerHandle {
   readonly tasks: readonly unknown[];
   readonly ready: () => Promise<void>;
   readonly close: () => Promise<void>;
 }
 
+/** @experimental */
 export function loadTriggerSdk(): TriggerSdk {
   const require = createRequire(import.meta.url);
   try {
@@ -40,6 +44,7 @@ export function loadTriggerSdk(): TriggerSdk {
   }
 }
 
+/** @experimental */
 export function createTriggerTask(
   sdk: TriggerSdk,
   definition: TriggerTaskDefinition,
@@ -57,6 +62,7 @@ export function createTriggerTask(
   });
 }
 
+/** @experimental */
 export function createTriggerTaskConfig(
   definition: TriggerTaskDefinition,
 ): Readonly<Record<string, unknown>> {
@@ -81,6 +87,7 @@ export function createTriggerTaskConfig(
   return Object.freeze(config);
 }
 
+/** @experimental */
 export function createTriggerWorker(options: {
   readonly sdk?: TriggerSdk;
   readonly definitions: readonly TriggerTaskDefinition[];

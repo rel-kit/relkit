@@ -1,6 +1,8 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 /** Builds the creator command presentation and signal scope around pure project creation, returning JSON or terminal results after owned work settles. */
 
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { spinner } from "@clack/prompts";
 import { Effect, Logger, References } from "effect";
 import { generateProjectEffect, projectGenerationLive } from "./generate.js";
@@ -13,14 +15,19 @@ import { generationError } from "./generate-process.js";
 import { GenerateProjectError } from "./generate-types.js";
 import { stageCleanupFor } from "./generate-stage-cleanup.js";
 import { transferCleanupFailures } from "./generator-cleanup.js";
+import { formatCreateHelp, formatCreateWarning } from "./create-help.js";
 
 /**
  * Runs the executable presentation boundary with invocation-owned signal listeners.
- * @param args - Literal command arguments, excluding the Bun and script paths.
+ * @param args - Literal command arguments, excluding the runtime and script paths.
  * @returns Completion after generation scopes and presentation cleanup have settled.
  * @remarks The library barrel has no executable side effects. Generation owns final consent.
  */
 export async function main(args: readonly string[]): Promise<void> {
+  if (args.includes("--help") || args.includes("-h")) {
+    process.stdout.write(formatCreateHelp());
+    return;
+  }
   const json = args.includes("--json");
   const interactive = !json && !process.env.CI && process.stdin.isTTY === true;
   const prompt = createClackPromptDriver("RELKIT_CREATE_CANCELLED");
@@ -28,7 +35,7 @@ export async function main(args: readonly string[]): Promise<void> {
   const controller = new AbortController();
   let progressStarted = false;
   const onProgress = (message: string): void => {
-    if (progress === undefined || message.startsWith("Creating a new RELKIT app")) return;
+    if (progress === undefined || message.startsWith("Creating a new RelKit app")) return;
     if (!progressStarted) {
       progress.start(message);
       progressStarted = true;
@@ -58,7 +65,13 @@ export async function main(args: readonly string[]): Promise<void> {
   }
 }
 
-if (import.meta.main) await main(process.argv.slice(2));
+// Node before 22.18 has no `import.meta.main`; compare the entry script with this module instead.
+const entry = process.argv[1];
+if (
+  import.meta.main ??
+  (entry !== undefined && realpathSync(entry) === realpathSync(fileURLToPath(import.meta.url)))
+)
+  await main(process.argv.slice(2));
 
 function acquireCreationSignals(controller: AbortController) {
   return Effect.acquireRelease(
@@ -110,8 +123,9 @@ function creationProgram(
   return Effect.scoped(
     Effect.gen(function* () {
       yield* acquireCreationSignals(controller);
-      if (interactive) prompt.intro("Create a RELKIT app");
+      if (interactive) prompt.intro("Create a RelKit app");
       const resolved = yield* resolveCreateOptionsDetailsEffect(args, { json, interactive });
+      for (const warning of resolved.warnings) process.stderr.write(formatCreateWarning(warning));
       return yield* generateProjectEffect(resolved.options, {
         interactive,
         signal: controller.signal,

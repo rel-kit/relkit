@@ -64,7 +64,16 @@ test("keeps Core concepts near Start and retires the duplicate Async section", a
   ]);
   expect(guideGroups.find(({ directory }) => directory === "docs/learn/concepts")).toMatchObject({
     title: "Core concepts",
-    pages: ["index", "application", "functions", "schemas", "errors", "context", "environment"],
+    pages: [
+      "index",
+      "application",
+      "functions",
+      "schemas",
+      "errors",
+      "context",
+      "runtime-handle",
+      "environment",
+    ],
   });
   expect(
     guideGroups.find(({ directory }) => directory === "docs/modules/operations"),
@@ -74,6 +83,7 @@ test("keeps Core concepts near Start and retires the duplicate Async section", a
       "index",
       "observability",
       "inspector",
+      "mcp",
       "realtime-agents-streaming",
       "testing",
       "troubleshooting",
@@ -83,7 +93,16 @@ test("keeps Core concepts near Start and retires the duplicate Async section", a
     guideGroups.find(({ directory }) => directory === "docs/modules/deployment"),
   ).toMatchObject({
     title: "Deployment",
-    pages: ["index", "local-docker", "aws", "providers"],
+    pages: [
+      "index",
+      "local-docker",
+      "runtimes",
+      "railway",
+      "vercel",
+      "cloudflare",
+      "aws",
+      "providers",
+    ],
   });
   expect(guideGroups.some(({ directory }) => directory === "async")).toBe(false);
 

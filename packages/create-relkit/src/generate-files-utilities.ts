@@ -2,7 +2,7 @@
 
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { Effect, Exit } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GenerateProjectError } from "./generate-types.js";
 import { GeneratorFileSystem } from "./generator-filesystem.js";
 import { domainError } from "./generator-errors.js";
@@ -159,7 +159,7 @@ export const listProjectFilesEffect = Effect.fn("ProjectFiles.list")(
 );
 
 /**
- * Converts a package name to the existing stable RELKIT application identifier.
+ * Converts a package name to the existing stable RelKit application identifier.
  * @param name - Authored name or declaration key.
  * @returns A safe unscoped project ID, with app as the empty-normalization fallback.
  */

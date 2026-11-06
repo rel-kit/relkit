@@ -1,4 +1,4 @@
-import type { LogRecord } from "@relkit/runtime-effect";
+import type { LogRecord } from "relkit/runtime-effect";
 import { Schema } from "effect";
 import type { DevLogEvent } from "./dev.js";
 import { runtimeLogSchema } from "./dev-log-record.schemas.js";

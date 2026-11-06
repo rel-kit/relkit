@@ -1,7 +1,7 @@
 /** Session capture callbacks never own a database, query store or UI process. */
 import type { Effect, Scope } from "effect";
-import type { ObservabilityRecord, TelemetryConfiguration } from "@relkit/observability";
-import type { InspectionCaptureOperations } from "@relkit/inspector-api/connection";
+import type { ObservabilityRecord, TelemetryConfiguration } from "relkit/observability";
+import type { InspectionCaptureOperations } from "relkit/inspector-api/connection";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { DevOptions } from "./dev.types.js";
 

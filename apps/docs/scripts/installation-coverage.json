@@ -1,10 +1,20 @@
 {
   "docs/modules/integrations/provider-authoring": ["update", "concept", ""],
+  "docs/modules/integrations/provider-kit": ["update", "concept", ""],
   "docs/modules/integrations/local-providers": ["update", "concept", ""],
   "docs/modules/cli/automation": ["update", "concept", ""],
   "guides/cli/create-and-build-an-api": ["update", "concept", ""],
   "docs/modules/service/context-values": ["update", "continuation", "/docs/learn/create-an-app"],
   "docs/index": ["update", "concept", ""],
+  "docs/why-relkit": ["update", "concept", ""],
+  "docs/benchmarks": ["update", "concept", ""],
+  "docs/faq": ["update", "concept", ""],
+  "docs/maturity": ["update", "concept", ""],
+  "docs/metrics": ["update", "concept", ""],
+  "docs/roadmap": ["update", "concept", ""],
+  "docs/versioning": ["update", "concept", ""],
+  "guides/migrate/from-express-or-hono": ["update", "continuation", "/docs/learn/create-an-app"],
+  "guides/migrate/relkit-0-9": ["update", "concept", ""],
   "docs/learn/build-and-run": ["retain", "concept", ""],
   "docs/learn/concepts/application": ["update", "concept", ""],
   "docs/learn/concepts/context": ["update", "continuation", "/guides/caching/cache-product-prices"],
@@ -13,6 +23,7 @@
   "docs/learn/concepts/functions": ["retain", "concept", ""],
   "docs/learn/concepts/index": ["update", "concept", ""],
   "docs/learn/concepts/schemas": ["retain", "concept", ""],
+  "docs/learn/concepts/runtime-handle": ["update", "concept", ""],
   "docs/learn/create-an-app": ["update", "concept", ""],
   "docs/learn/first-route": ["retain", "continuation", "/docs/learn/create-an-app"],
   "docs/learn/index": ["update", "concept", ""],
@@ -20,6 +31,7 @@
   "docs/learn/protect-orders": ["update", "continuation", "/docs/modules/auth/better-auth"],
   "docs/learn/save-orders": ["update", "continuation", "/docs/modules/database/define"],
   "docs/learn/test-orders": ["update", "continuation", "/docs/learn/protect-orders"],
+  "docs/modules/ai/adapters": ["update", "continuation", "/docs/modules/ai/agents"],
   "docs/modules/ai/agents": [
     "update",
     "installation",
@@ -192,6 +204,11 @@
     "/_snippets/generated/installations/effect-mq.mdx"
   ],
   "docs/modules/jobs/providers/index": ["retain", "concept", ""],
+  "docs/modules/jobs/providers/postgres": [
+    "update",
+    "continuation",
+    "/docs/modules/jobs/quickstart"
+  ],
   "docs/modules/jobs/providers/inngest": [
     "update",
     "installation",
@@ -224,6 +241,10 @@
   "docs/modules/database/local-docker": ["update", "continuation", "/docs/learn/save-orders"],
   "docs/modules/deployment/index": ["update", "continuation", "/docs/modules/database"],
   "docs/modules/deployment/local-docker": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/modules/deployment/runtimes": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/modules/deployment/railway": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/modules/deployment/vercel": ["update", "continuation", "/docs/learn/create-an-app"],
+  "docs/modules/deployment/cloudflare": ["update", "continuation", "/docs/learn/create-an-app"],
   "docs/modules/deployment/providers": ["update", "continuation", "/docs/modules/integrations"],
   "docs/modules/deployment/aws": [
     "update",
@@ -236,6 +257,7 @@
     "installation",
     "/_snippets/generated/installations/inspector.mdx"
   ],
+  "docs/modules/operations/mcp": ["update", "continuation", "/docs/modules/operations/inspector"],
   "docs/modules/operations/observability": [
     "update",
     "installation",
@@ -264,6 +286,7 @@
   "docs/modules/realtime/recovery": ["update", "continuation", "/docs/modules/realtime/providers"],
   "docs/modules/service/define": ["update", "continuation", "/docs/learn/create-an-app"],
   "docs/modules/service/domains": ["retain", "concept", ""],
+  "docs/modules/service/effect": ["update", "continuation", "/docs/learn/create-an-app"],
   "docs/modules/service/first-service": ["update", "continuation", "/docs/learn/first-route"],
   "docs/modules/service/index": ["update", "concept", ""],
   "docs/modules/service/migration": ["retain", "concept", ""],
@@ -287,8 +310,10 @@
     "/guides/storage/upload-product-images"
   ],
   "docs/modules/cli/add-artifacts": ["update", "concept", ""],
+  "docs/modules/cli/check": ["update", "concept", ""],
   "docs/modules/cli/create-an-app": ["update", "concept", ""],
   "docs/modules/cli/index": ["update", "concept", ""],
+  "docs/modules/cli/relkit-create-untested": ["update", "concept", ""],
   "guides/ai/build-an-offline-agent": [
     "update",
     "installation",

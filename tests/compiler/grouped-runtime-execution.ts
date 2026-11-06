@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { cp } from "node:fs/promises";
 import { Effect, Schema } from "effect";
-import { invokeFunction } from "../../packages/engine/src/index.js";
+import { invokeFunction } from "relkit/engine";
 import { scaffoldNative } from "../../scripts/scaffold-native.js";
 
 /**

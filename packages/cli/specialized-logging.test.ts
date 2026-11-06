@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
 import { Context, Effect } from "effect";
-import { GRAPH_VERSION } from "@relkit/contracts";
-import { createObservabilityCollector } from "@relkit/observability";
-import { createLoggerLayer, type LogRecord } from "@relkit/runtime-effect";
+import { GRAPH_VERSION } from "relkit/contracts";
+import { createObservabilityCollector } from "relkit/observability";
+import { createLoggerLayer, type LogRecord } from "relkit/runtime-effect";
 import { serverSource } from "./src/commands/build-server.js";
 import { createDevLogger } from "./src/commands/dev-logger.js";
 

@@ -2,29 +2,42 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { agentProviderPropertyOffsets } from "./public-declaration-agent";
 import { nonFunctionHandlers } from "./public-declaration-ast";
+import {
+  effectTypeLeaks,
+  generatedDeclarationFiles,
+  generatedProject,
+  generateProjectDeclarations,
+} from "./public-declaration-effect";
 
-const publicPackages = [
-  "packages/contracts",
-  "packages/schema",
-  "packages/config",
-  "packages/provider",
-  "packages/diagnostics",
-  "packages/functions",
-  "packages/services",
-  "packages/routes",
-  "packages/jobs",
-  "packages/events",
-  "packages/buckets",
-  "packages/cache",
-  "packages/tools",
-  "packages/agents",
-  "packages/app",
-  "packages/testing",
+/** Public declaration entry points: a package and one export subpath. */
+const publicEntries = [
+  ...[
+    "contracts",
+    "schema",
+    "config",
+    "provider",
+    "diagnostics",
+    "functions",
+    "services",
+    "routes",
+    "jobs",
+    "events",
+    "buckets",
+    "cache",
+    "tools",
+    "agents",
+  ].map((area) => ["packages/relkit", `./${area}`] as const),
+  ["packages/relkit", "."],
+  ["packages/testing", "."],
 ] as const;
 
+/** `relkit` areas that public declarations must not reach; `observability/telemetry` is public. */
+const internalAreaFile =
+  /\/packages\/relkit\/dist\/(?:providers-local|runtime-effect|runtime-hono|engine|observability\/(?!telemetry(?:-config\.types)?\.d\.ts$))/;
+
 const forbiddenSymbols = [
-  // Native Effect constructors and injectable services are documented public APIs.
-  // Framework and provider implementations remain forbidden below.
+  // Area subpaths may document native Effect constructors and services. The `relkit` root and
+  // generated application declarations may not reach any Effect type; `effectTypeLeaks` checks them.
   ["Hono", /\bHono(?:Context|Request|Response)?\b/g],
   ["Next.js", /\bNext(?:JS|\.js)?\b/g],
   ["Pulumi", /\bPulumi\b|from ["'](?:pulumi|@pulumi\/)[^"']*["']/g],
@@ -35,7 +48,7 @@ const forbiddenSymbols = [
   ["provider-client", /\b[A-Z][A-Za-z0-9]*ProviderClient\b/g],
   [
     "internal-provider-sdk",
-    /from ["']@relkit\/(?:providers-local|providers-standard|cloud-aws|deploy-pulumi|runtime-effect|runtime-hono|engine|observability(?!\/telemetry["'])|supervisor|inspector-api)(?:\/|["'])/g,
+    /from ["'](?:@relkit\/(?:aws\/cloud-aws|pulumi\/engine|cli)|relkit\/(?:providers-local|runtime-effect|runtime-hono|engine|inspector-api|observability(?!\/telemetry["'])))(?:\/|["'])/g,
   ],
   [
     "framework-or-provider-import",
@@ -44,11 +57,7 @@ const forbiddenSymbols = [
 ] as const;
 
 type PackageManifest = {
-  exports?: {
-    "."?: {
-      types?: unknown;
-    };
-  };
+  exports?: Record<string, { types?: unknown }>;
 };
 
 export type DeclarationLeak = {
@@ -62,11 +71,11 @@ function readPackageManifest(packageRoot: string): PackageManifest {
   return JSON.parse(readFileSync(resolve(packageRoot, "package.json"), "utf8")) as PackageManifest;
 }
 
-function declarationEntry(root: string, packagePath: string): string {
+function declarationEntry(root: string, packagePath: string, subpath: string): string {
   const packageRoot = resolve(root, packagePath);
-  const types = readPackageManifest(packageRoot).exports?.["."]?.types;
+  const types = readPackageManifest(packageRoot).exports?.[subpath]?.types;
   if (typeof types !== "string" || !types.endsWith(".d.ts")) {
-    throw new Error(`${packagePath} must expose a .d.ts types export`);
+    throw new Error(`${packagePath} must expose a .d.ts types export for ${subpath}`);
   }
   const entry = resolve(packageRoot, types);
   if (!existsSync(entry)) throw new Error(`Missing emitted declaration: ${relative(root, entry)}`);
@@ -96,8 +105,15 @@ function lineAndColumn(text: string, offset: number): { line: number; column: nu
 
 export function scanPublicDeclarations(root: string): DeclarationLeak[] {
   const leaks: DeclarationLeak[] = [];
-  for (const packagePath of publicPackages) {
-    const pending = [declarationEntry(root, packagePath)];
+  for (const [packagePath, subpath] of publicEntries) {
+    const entry = declarationEntry(root, packagePath, subpath);
+    // Each entry is scanned within its own folder, as each former package was. The `relkit` root
+    // re-exports the application facade in `dist/app`; each area it reaches is its own entry.
+    const scope =
+      packagePath === "packages/relkit" && subpath === "."
+        ? resolve(root, packagePath, "dist/app")
+        : dirname(entry);
+    const pending = [entry];
     const visited = new Set<string>();
     while (pending.length > 0) {
       const file = pending.pop();
@@ -121,9 +137,41 @@ export function scanPublicDeclarations(root: string): DeclarationLeak[] {
           ...lineAndColumn(text, offset),
           symbol: "agent-provider-details",
         });
-      pending.push(...localDeclarationReferences(file, text));
+      for (const reference of localDeclarationReferences(file, text)) {
+        if (internalAreaFile.test(reference) && !internalAreaFile.test(file))
+          leaks.push({
+            file: relative(root, file),
+            line: 1,
+            column: 1,
+            symbol: "internal-provider-sdk",
+          });
+        else if (reference.startsWith(scope + "/")) pending.push(reference);
+      }
     }
   }
+  leaks.push(
+    ...effectTypeLeaks({ root, entries: [declarationEntry(root, "packages/relkit", ".")] }),
+  );
+  return sortLeaks(leaks);
+}
+
+/**
+ * Scans the declarations `relkit check` generated for a project for Effect types.
+ * @param root - Repository root, for relative paths in findings.
+ * @param projectRoot - Application whose `.relkit/generated` declarations are scanned.
+ * @returns Every generated reference that reaches an Effect type.
+ */
+export function scanGeneratedDeclarations(root: string, projectRoot: string): DeclarationLeak[] {
+  const generated = resolve(projectRoot, ".relkit/generated");
+  const references = generatedDeclarationFiles
+    .map((file) => resolve(generated, file))
+    .filter((file) => existsSync(file));
+  if (references.length === 0)
+    throw new Error(`No generated declarations in ${relative(root, generated)}; run relkit check.`);
+  return sortLeaks(effectTypeLeaks({ root, references }));
+}
+
+function sortLeaks(leaks: DeclarationLeak[]): DeclarationLeak[] {
   return leaks.sort((left, right) =>
     `${left.file}:${left.line}:${left.column}:${left.symbol}`.localeCompare(
       `${right.file}:${right.line}:${right.column}:${right.symbol}`,
@@ -132,7 +180,7 @@ export function scanPublicDeclarations(root: string): DeclarationLeak[] {
 }
 
 function declarationSymbols(file: string): typeof forbiddenSymbols {
-  if (/\/packages\/routes\/dist\/define-middleware(?:\.types)?\.d\.ts$/.test(file))
+  if (/\/packages\/relkit\/dist\/routes\/define-middleware(?:\.types)?\.d\.ts$/.test(file))
     return forbiddenSymbols.filter(
       ([symbol]) => symbol !== "Next.js" && symbol !== "framework-or-provider-import",
     );
@@ -143,7 +191,15 @@ function declarationSymbols(file: string): typeof forbiddenSymbols {
 
 async function emitDeclarations(root: string): Promise<void> {
   const child = Bun.spawn(
-    [process.execPath, "x", "tsc", "-b", ...publicPackages, "--pretty", "false"],
+    [
+      process.execPath,
+      "x",
+      "tsc",
+      "-b",
+      ...new Set(publicEntries.map(([packagePath]) => packagePath)),
+      "--pretty",
+      "false",
+    ],
     { cwd: root, stdout: "pipe", stderr: "pipe" },
   );
   const [stdout, stderr] = await Promise.all([
@@ -159,7 +215,11 @@ async function emitDeclarations(root: string): Promise<void> {
 async function main(): Promise<void> {
   const root = resolve(process.argv[2] ?? resolve(import.meta.dir, ".."));
   await emitDeclarations(root);
-  const leaks = scanPublicDeclarations(root);
+  await generateProjectDeclarations(root);
+  const leaks = [
+    ...scanPublicDeclarations(root),
+    ...scanGeneratedDeclarations(root, resolve(root, generatedProject)),
+  ];
   if (leaks.length > 0) {
     for (const leak of leaks) {
       console.error(
@@ -168,7 +228,9 @@ async function main(): Promise<void> {
     }
     throw new Error(`Public declaration scan failed with ${leaks.length} forbidden symbol(s).`);
   }
-  console.log(`Public declaration scan passed (${publicPackages.length} packages).`);
+  console.log(
+    `Public declaration scan passed (${publicEntries.length} entry points and ${generatedProject}'s generated declarations).`,
+  );
 }
 
 if (import.meta.main) {

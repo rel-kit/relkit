@@ -1,6 +1,6 @@
 /** Verifies the canonical JavaScript startup and complete emitted server context. */
 import { expect, test } from "vitest";
-import { DEFAULT_TOOLING_CONFIG } from "@relkit/compiler";
+import { DEFAULT_TOOLING_CONFIG } from "../src/compiler/index.js";
 import { dockerfile, dockerignore } from "../src/commands/build-container.js";
 import { buildManifest, buildProductionManifest } from "../src/commands/build-manifest.js";
 import { serverImportsSource } from "../src/commands/build-server-imports.js";
@@ -35,8 +35,8 @@ const emission: ServerSourceEmission = {
 test("ordinary production emission gives the lazy inspector an assignable binding", () => {
   const source = serverImportsSource(emission);
   expect(source).toContain("let InspectorQueryError;");
-  expect(source).not.toContain('from "@relkit/inspector-api"');
-  expect(source).toContain('from "@relkit/engine/internal/server-runtime"');
+  expect(source).not.toContain('from "relkit/inspector-api"');
+  expect(source).toContain('from "relkit/engine/server-runtime"');
 });
 
 test("build metadata names the emitted JavaScript entrypoint", () => {

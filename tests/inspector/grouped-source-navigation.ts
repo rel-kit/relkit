@@ -1,7 +1,7 @@
 /** Verifies Inspector consumes actual compiler provenance without inferring current or historical source paths from logical identities. */
 import assert from "node:assert/strict";
 import { sourceLabel, sourceLink } from "../../apps/inspector/lib/source-links.js";
-import type { NormalizedGraph } from "../../packages/compiler/src/normalize-graph-types.js";
+import type { NormalizedGraph } from "../../packages/cli/src/compiler/normalize-graph-types.js";
 
 /**
  * Checks current grouped editor paths and preserves honest historical flat metadata independently of source scanning.

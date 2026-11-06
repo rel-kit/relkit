@@ -1,5 +1,5 @@
 /** Declares private JSON receipt objects with a one-million-byte limit in the receipts provider profile. */
-import { defineBucket } from "@relkit/app/buckets";
+import { defineBucket } from "relkit/buckets";
 
 const receipts = defineBucket({
   id: "receipts.objects",

@@ -1,7 +1,7 @@
 import type { Effect } from "effect";
-import type { EventDeliveryResult } from "@relkit/providers-local";
+import type { EventDeliveryResult } from "relkit/providers-local";
 import type { TestEventCloseOptions } from "./events-types.js";
-import type { EventProvider } from "@relkit/events";
+import type { EventProvider } from "relkit/events";
 
 /** Effect publication, delivery, inspection and lifecycle operations over native authorities. */
 export interface EventControlsService {

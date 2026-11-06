@@ -15,14 +15,14 @@ test("catalog resolution preserves concrete declarations and named peer ranges",
   expect(
     resolveDependencyFields(
       {
-        dependencies: { effect: "catalog:", "@relkit/app": "workspace:*" },
+        dependencies: { effect: "catalog:", relkit: "workspace:*" },
         devDependencies: { typescript: "catalog:" },
         peerDependencies: { react: "catalog:peer" },
       },
       catalog,
     ),
   ).toEqual({
-    dependencies: { effect: "4.0.1", "@relkit/app": "workspace:*" },
+    dependencies: { effect: "4.0.1", relkit: "workspace:*" },
     devDependencies: { typescript: "5.9.3" },
     optionalDependencies: {},
     peerDependencies: { react: ">=18.0.0" },
@@ -62,20 +62,20 @@ test("missing or recursive catalogs fail without inventing a dependency version"
 test("packed dependency validation requires concrete pins in every dependency field", () => {
   const source = {
     name: "fixture",
-    dependencies: { effect: "catalog:", "@relkit/app": "workspace:*" },
+    dependencies: { effect: "catalog:", relkit: "workspace:*" },
     peerDependencies: { react: "catalog:peer" },
   };
   const packed = {
     ...source,
-    dependencies: { effect: "4.0.1", "@relkit/app": "0.6.0" },
+    dependencies: { effect: "4.0.1", relkit: "0.6.0" },
     peerDependencies: { react: ">=18.0.0" },
   };
-  const names = new Map([["@relkit/app", "0.6.0"]]);
+  const names = new Map([["relkit", "0.6.0"]]);
   expect(() => assertPackedDependencies(source, packed, catalog, names)).not.toThrow();
   for (const dependencies of [
     { ...packed.dependencies, effect: "catalog:" },
     { ...packed.dependencies, effect: "4.0.0" },
-    { ...packed.dependencies, "@relkit/app": "workspace:*" },
+    { ...packed.dependencies, relkit: "workspace:*" },
     { effect: "4.0.1" },
     { ...packed.dependencies, unrelated: "1.0.0" },
   ])

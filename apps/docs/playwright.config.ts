@@ -13,8 +13,8 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: "node dist/server/entry.mjs",
-    env: { HOST: "127.0.0.1", PORT: "3002" },
+    // The site builds as static files for Cloudflare; Blume's preview serves that build.
+    command: "bun x blume preview --host=127.0.0.1 --port=3002",
     url: "http://127.0.0.1:3002/docs",
     reuseExistingServer: false,
     timeout: 30_000,

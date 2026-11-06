@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { GRAPH_VERSION } from "@relkit/contracts";
-import type { ApplicationGraph, ProviderBindingNode } from "@relkit/graph";
+import { GRAPH_VERSION } from "relkit/contracts";
+import type { ApplicationGraph, ProviderBindingNode } from "relkit/graph";
 import {
   createTestCacheFake,
   createTestFakes,

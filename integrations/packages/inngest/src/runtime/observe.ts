@@ -1,6 +1,7 @@
-import type { RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
-import type { NativeObservation, NativeWatchRequest, OperationContext } from "@relkit/jobs/adapter";
+import type { RunSnapshot, RunWatchFrame } from "relkit/contracts/jobs";
+import type { NativeObservation, NativeWatchRequest, OperationContext } from "relkit/jobs/adapter";
 
+/** @experimental */
 export interface InngestObservationOptions {
   readonly get: (runId: string, context: OperationContext) => Promise<RunSnapshot>;
   readonly pollIntervalMs?: number;
@@ -13,6 +14,7 @@ export interface InngestObservationOptions {
   ) => Promise<(() => void) | undefined>;
 }
 
+/** @experimental */
 export function observeInngestRun(
   request: NativeWatchRequest,
   context: OperationContext,

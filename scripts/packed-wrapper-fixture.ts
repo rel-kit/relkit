@@ -1,4 +1,4 @@
-/** Builds a candidate-only creator runtime registry and resolves already installed Bun/Node/npm tools. */
+/** Prepares the launcher smoke fixture: owned folders, already installed Bun/Node/npm tools and the candidate registry environment. */
 import { strict as assert } from "node:assert";
 import { access, mkdir, readFile, realpath, symlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -9,9 +9,12 @@ import type { PackedWrapperContext, PackedWrapperRunner } from "./packed-wrapper
 export async function wrapperContext(
   temporary: string,
   registry: string,
-  wrapperVersion: string,
-  creatorVersion: string,
-  cliVersion: string,
+  versions: {
+    readonly wrapperVersion: string;
+    readonly wrapperDependencies: Readonly<Record<string, string>>;
+    readonly creatorVersion: string;
+    readonly cliVersion: string;
+  },
 ): Promise<PackedWrapperContext> {
   const tools = join(temporary, "tools"),
     consumer = join(temporary, "consumer");
@@ -30,6 +33,9 @@ export async function wrapperContext(
   await mkdir(join(temporary, "bun-tmp"));
   await symlink(process.execPath, join(tools, "bun"));
   await symlink(await realpath(node), join(tools, "node"));
+  // `relkit create` under npm runs the creator through `npx`, so the runner needs it on PATH.
+  await symlink(npmScript, join(tools, "npm"));
+  await symlink(npxScript, join(tools, "npx"));
   await writeFile(
     join(consumer, "package.json"),
     '{"name":"empty-wrapper-project","private":true}\n',
@@ -53,9 +59,10 @@ export async function wrapperContext(
     consumer,
     registry,
     env,
-    wrapperVersion,
-    creatorVersion,
-    cliVersion,
+    wrapperVersion: versions.wrapperVersion,
+    wrapperDependencies: versions.wrapperDependencies,
+    creatorVersion: versions.creatorVersion,
+    cliVersion: versions.cliVersion,
     npmScript,
     npxScript,
     npmVersion: npmMetadata.version,
@@ -68,7 +75,7 @@ export function wrapperRunners(context: PackedWrapperContext): readonly PackedWr
     {
       name: "bun",
       executable: "bun",
-      prefix: ["x", "--no-install", `relkit@${context.wrapperVersion}`],
+      prefix: ["x", `relkit@${context.wrapperVersion}`],
       cache: join(context.temporary, "bun-tmp"),
     },
     {
@@ -77,7 +84,6 @@ export function wrapperRunners(context: PackedWrapperContext): readonly PackedWr
       prefix: [
         context.npmScript,
         "exec",
-        "--offline",
         "--yes",
         `--package=relkit@${context.wrapperVersion}`,
         "--",
@@ -94,10 +100,9 @@ export function wrapperCreatorPrefix(
   runner: PackedWrapperRunner,
 ): readonly string[] {
   return runner.name === "bun"
-    ? ["x", "--no-install", `create-relkit@${context.creatorVersion}`]
+    ? ["x", `create-relkit@${context.creatorVersion}`]
     : [
         context.npxScript,
-        "--offline",
         "--yes",
         `--package=create-relkit@${context.creatorVersion}`,
         "create-relkit",

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import { defineEvent, defineEventFunction } from "@relkit/events";
-import { defineError, defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { defineEvent, defineEventFunction } from "relkit/events";
+import { defineError, defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 
 export const created = defineEvent({
   id: "type_order_created",
@@ -25,13 +25,13 @@ defineFunction({
   id: "typed_publisher",
   input: z.unknown(),
   output: z.void(),
-  publishes: ["type_order_created"],
+  dependencies: { events: { orderCreated: created } },
   handler: async (_, context) => {
-    await context.events.type_order_created.publish({ orderId: "1", quantity: "2" });
+    await context.events.orderCreated.publish({ orderId: "1", quantity: "2" });
     // @ts-expect-error publication input is the schema input, not parsed output
-    await context.events.type_order_created.publish({ orderId: "1", quantity: 2 });
+    await context.events.orderCreated.publish({ orderId: "1", quantity: 2 });
     // @ts-expect-error undeclared event
-    context.events.type_receipt_requested;
+    context.events.receiptRequested;
     return undefined;
   },
 });
@@ -40,8 +40,8 @@ defineFunction({
   input: z.unknown(),
   output: z.void(),
   handler: (_, context) => {
-    // @ts-expect-error empty publications expose no event clients
-    context.events.type_order_created;
+    // @ts-expect-error no declared events expose no event clients
+    context.events.orderCreated;
     return undefined;
   },
 });
@@ -49,14 +49,14 @@ defineFunction({
 const consumer = defineEventFunction({
   id: "typed_consumer",
   event: "type_order_created",
-  publishes: ["type_receipt_requested"],
+  dependencies: { events: { receiptRequested: receipt } },
   handler: async (input, context) => {
     const quantity: number = input.quantity;
     const eventId: "type_order_created" = context.trigger.event.id;
     const version: 1 = context.trigger.event.version;
-    await context.events.type_receipt_requested.publish({ orderId: input.orderId });
+    await context.events.receiptRequested.publish({ orderId: input.orderId });
     // @ts-expect-error consumed event is not automatically publishable
-    context.events.type_order_created;
+    context.events.orderCreated;
     void quantity;
     void eventId;
     void version;

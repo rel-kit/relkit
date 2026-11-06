@@ -13,7 +13,7 @@ import {
   InspectionConnectionError,
   InspectionFilesLive,
   InspectionNativeLive,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 import { INSPECTOR_HELP, parseInspectorOptions } from "../src/options.js";
 import type { InspectorOptions } from "../src/options.types.js";
 import { InspectorDiscoveryLive } from "../src/discovery.service.js";
@@ -78,7 +78,7 @@ const startDevUi = Effect.fn("InspectorDev.startUi")(function* (
   );
   const endpoint = `http://${options.hostname}:${options.port}/`;
   yield* Effect.raceFirst(waitInspectorUiReady(probeInspectorUi(fetch, endpoint)), exited);
-  yield* Effect.logInfo(`RELKIT Inspector (dev UI) listening at ${endpoint}`);
+  yield* Effect.logInfo(`RelKit Inspector (dev UI) listening at ${endpoint}`);
   return exited;
 });
 

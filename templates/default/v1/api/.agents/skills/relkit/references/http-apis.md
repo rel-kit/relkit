@@ -7,7 +7,7 @@ Routes live under `src/routes/**/route.ts`. The file path supplies the URL, and 
 In `src/routes/hello/route.ts`, this exposes the service's public `hello` function as `GET /hello`:
 
 ```ts
-import { defineRoute } from "@relkit/app/routes";
+import { defineRoute } from "relkit/routes";
 import hello from "@app/services/hello/service.js";
 
 export const GET = defineRoute({ target: hello.hello });
@@ -20,7 +20,7 @@ A function-backed route can also set `successStatus`, `request`, `responses`, `r
 Use `handler` instead of `target` for a standalone Web `Request`/`Response` handler:
 
 ```ts
-import { defineRoute } from "@relkit/app/routes";
+import { defineRoute } from "relkit/routes";
 
 export const GET = defineRoute({
   handler: async () => Response.json({ ok: true }),
@@ -30,7 +30,7 @@ export const GET = defineRoute({
 A raw handler has a generic OpenAPI response. The recognized Better Auth mount also uses a raw route:
 
 ```ts
-import { defineRoute } from "@relkit/app/routes";
+import { defineRoute } from "relkit/routes";
 import auth from "@app/services/auth/service.js";
 
 export const ALL = defineRoute({ handler: auth.handler });
@@ -39,10 +39,10 @@ export const ALL = defineRoute({ handler: auth.handler });
 ## `defineServiceRoutes`: methods on one service
 
 ```ts
-import { defineServiceRoutes } from "@relkit/app/routes";
+import { defineServiceRoutes } from "relkit/routes";
 import orders from "@app/services/orders/service.js";
 
-export const { GET, POST } = defineServiceRoutes(orders, {
+export default defineServiceRoutes(orders, {
   GET: "listOrders",
   POST: { member: "createOrder", successStatus: 201 },
 });
@@ -53,7 +53,7 @@ export const { GET, POST } = defineServiceRoutes(orders, {
 Use `request` mapping only when inference cannot express headers, cookies, names, or nesting; it replaces the inferred mapping. Use `responses` only when you need an explicit response contract. `defineMiddleware(path, handler)` is for HTTP policy, and `defineTransform({ schema })` is for request transforms:
 
 ```ts
-import { defineMiddleware } from "@relkit/app/routes";
+import { defineMiddleware } from "relkit/routes";
 
 export default defineMiddleware("/orders/*", async (_context, next) => {
   await next();
@@ -61,8 +61,8 @@ export default defineMiddleware("/orders/*", async (_context, next) => {
 ```
 
 ```ts
-import { defineTransform } from "@relkit/app/routes";
-import { z } from "@relkit/app/schema";
+import { defineTransform } from "relkit/routes";
+import { z } from "zod";
 
 export default defineTransform({ schema: z.string() });
 ```

@@ -1,4 +1,4 @@
-import type { RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunSnapshot, RunWatchFrame } from "relkit/contracts/jobs";
 import type { WatchFeedLoop } from "../../src/jobs/watch-feed-loop.types.js";
 import type { JobWatchOptions } from "../../src/jobs/types.js";
 import type { QualityControl, QualityHooks } from "./quality-fixture.types.js";

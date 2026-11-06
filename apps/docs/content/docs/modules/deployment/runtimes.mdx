@@ -1,0 +1,150 @@
+---
+title: Runtime tiers and Node
+description: See which runtimes RelKit supports, build your production server for Node, and run your HTTP tests against it.
+pagination: false
+sidebar:
+  icon: server
+---
+
+RelKit runs on Bun or on Node LTS: you can create, develop and build an app with either, and
+when you build, you choose the runtime the production server and its container image run on.
+
+## Runtime tiers
+
+| Tier   | Runtimes                                     | What is supported                                                                                   |
+| ------ | -------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Tier 1 | Bun `>=1.3.10`, Node 22 (`>=22.13.0`) and 24 | The production server: HTTP, WebSockets and static files, with the Redis, Sentry and SQLite clients |
+| Tier 2 | Cloudflare Workers (Labs)                    | HTTP, with jobs, events and schedules in an external Postgres and realtime on a Durable Object      |
+| Labs   | Anything else                                | Not tested. It may work, but no test covers it                                                      |
+
+Each package's `engines` field lists the runtimes it supports. These still need Bun on your
+machine or in CI:
+
+- `@relkit/testing`'s in-process test application, which `bun test` runs, so the generated
+  `test` script still runs `bun test`;
+- `@relkit/aws`, whose Valkey cache client uses Bun's Redis client.
+
+## Build for Cloudflare Workers
+
+`relkit build --runtime workers` writes a Workers bundle to `.relkit/build/server/index.js`. Its
+`fetch`, `queue` and `scheduled` handlers activate the server once per isolate, without a listener,
+a filesystem or a background loop; it needs the `nodejs_compat` compatibility flag, and `public/` is
+served by Workers static assets. `relkit start` refuses a Workers build: run it with `wrangler dev`,
+or deploy it with the [Cloudflare guide](/docs/modules/deployment/cloudflare), which also lists the
+providers that run on Workers. The nightly runtime matrix runs the `api` template's HTTP tests
+against the Workers bundle in workerd.
+
+## Create and develop on Node
+
+`create-relkit` installs with the package manager that started it, and the generated scripts call
+`relkit`, which runs on the same runtime:
+
+```sh title="Terminal"
+npx create-relkit my-app
+cd my-app
+npm run dev
+```
+
+With pnpm, run `pnpm dlx create-relkit my-app`, then `pnpm run dev`; the project's
+`pnpm-workspace.yaml` lets esbuild run its install script. A project you run with `bun run`
+stays on Bun even when Node is installed. Pass `--package-manager
+bun|npm|pnpm` to choose one yourself. On Node, `relkit` runs your TypeScript sources through
+esbuild (types are removed, not checked; the parallel type-check still reports type errors), and
+`relkit build` bundles with esbuild and builds for Node unless you pass `--runtime bun`.
+
+## Pre-setup
+
+Start with an app you can already build, such as the [`api` template](/docs/learn/create-an-app),
+and install Node 22.13 or later, or Node 24. Check the version:
+
+```sh title="Terminal"
+node --version
+```
+
+## Build and run on Node
+
+<Steps>
+<Step title="Build the server for Node" icon="package">
+
+```sh title="Terminal — application root"
+bun run check
+bun run relkit build --runtime node
+```
+
+The server in `.relkit/build/server/index.js` now listens through Node's HTTP server, and
+`.relkit/build/manifest.json` records `"runtime": "node"`. Without `--runtime`, `relkit build`
+builds for the runtime `relkit` runs on: Bun under Bun, Node under Node.
+
+</Step>
+<Step title="Start it with Node" icon="play">
+
+```sh title="Terminal — application root"
+NODE_ENV=production PORT=3000 node .relkit/build/server/index.js
+```
+
+Node reads no `.env` files, so export the variables your app needs before you start it. Open
+`http://127.0.0.1:3000/_relkit/v1/health/ready` and expect `"status":"ready"`.
+
+</Step>
+<Step title="Run your HTTP tests against the running server" icon="clipboard-check">
+
+In a second terminal, point your route tests at the server:
+
+```sh title="Terminal — application root"
+RELKIT_TEST_SERVER_URL=http://127.0.0.1:3000 bun test tests/integration
+```
+
+With `RELKIT_TEST_SERVER_URL` set, `createTestApplication` sends `testApp.http` requests to that
+server instead of starting the app in the test process. Requests without an `Origin` header get the
+server's own, as a browser on your app would send. Members that need the in-process app, such as
+`testApp.fakes`, throw in this mode, so run unit tests without it.
+
+</Step>
+</Steps>
+
+## Build a Node container image
+
+```sh title="Terminal — application root"
+bun run relkit build --runtime node
+docker build -t my-app:node .relkit/build
+docker run --rm -p 127.0.0.1:3000:3000 my-app:node
+```
+
+The Dockerfile has two stages: the pinned Bun image installs the production dependencies, and the
+pinned `node:24` image runs `node server/index.js` as the `node` user. Bun does the install
+because it applies the dependency patches RelKit selects, which npm does not support.
+
+## Integrations on Node
+
+- **Redis** (`@relkit/redis`) uses `ioredis` on Node and Bun's built-in client on Bun. Both connect
+  once, never retry a failed command and keep no offline queue.
+- **Sentry** (`@relkit/sentry`) loads `@sentry/node` on Node and `@sentry/bun` on Bun. Install
+  both; `relkit add sentry` does.
+- **SQLite** with Drizzle: open the database with `openSqliteDatabase` from
+  `@relkit/drizzle/sqlite`. It uses `node:sqlite` on Node and `bun:sqlite` on Bun:
+
+```ts title="src/services/database/service.ts"
+import { defineDrizzleService } from "@relkit/drizzle";
+import { openSqliteDatabase } from "@relkit/drizzle/sqlite";
+import * as schema from "./schema/index.js";
+
+export default defineDrizzleService({
+  schema,
+  client: ({ env }) => openSqliteDatabase(env.DATABASE_PATH ?? ".relkit/state/app.db"),
+  dispose: (database) => database.$client.close(),
+});
+```
+
+Node 22 and 24 print an `ExperimentalWarning` the first time `node:sqlite` loads. `relkit add
+database --dialect sqlite` still writes a `bun:sqlite` service; switch it to `openSqliteDatabase`
+before you build for Node.
+
+## Limits on Node
+
+- Node's HTTP server sets no request body limit of its own. RelKit's `server.maxBodyBytes` setting
+  still rejects larger bodies with `413`.
+- `relkit dev` on Node starts a new server generation for every change, because Node cannot drop
+  an evaluated module the way Bun's in-process reload does. A reload takes about a second.
+- `relkit start` runs the server on the runtime its build records, Bun unless the build says Node.
+- npm ignores `patchedDependencies`, so with npm the Drizzle declaration repair that Bun applies
+  is not installed; it changes type declarations only.

@@ -4,9 +4,9 @@
  * Resolver authority remains a captured provider service and never installs code.
  */
 import { Effect, Schema } from "effect";
-import { prefilterSources } from "@relkit/compiler";
-import { IntegrationDependencyRequirements } from "@relkit/contracts";
-import { SelectedDependencies } from "@relkit/provider/internal/dependencies";
+import { prefilterSources } from "../compiler/index.js";
+import { IntegrationDependencyRequirements } from "relkit/contracts";
+import { SelectedDependencies } from "relkit/provider/dependencies";
 import { CliCompiler } from "../services/compiler.service.js";
 import { cliAdapterError, cliTry } from "../cli-errors.js";
 import type { CheckSource } from "./check.types.js";
@@ -24,7 +24,7 @@ const Plan = Schema.Struct({
 });
 
 /**
- * Resolves literal RELKIT imports using existing AST facts without evaluation.
+ * Resolves literal RelKit imports using existing AST facts without evaluation.
  * @param projectRoot - Actual consuming application root.
  * @param sources - Unevaluated source snapshots already owned by the caller.
  * @param configurationPath - Exact selected config remains strict even under excluded source paths.

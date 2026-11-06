@@ -1,6 +1,6 @@
 /** Exercises published setup descriptors, local profile selection, and required secret validation. */
 import { expect, test } from "bun:test";
-import { resolveEnv } from "@relkit/app/config";
+import { resolveEnv } from "relkit/config";
 import storage from "../examples/setup/storage.js";
 import caching from "../examples/setup/caching.js";
 import realtime from "../examples/setup/realtime.js";

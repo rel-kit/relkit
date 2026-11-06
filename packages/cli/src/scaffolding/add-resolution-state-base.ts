@@ -1,12 +1,12 @@
 /** Creates the initial add-resolution state from the normalized request and discovered project so explicit arguments remain authoritative. */
 
 import { Effect, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 import { parseAddArguments, type ParsedAddArguments } from "./add-options-parser.js";
 
-import { runGeneratorSync } from "create-relkit/internal/generator-runtime";
-import type { PromptDriver } from "create-relkit/internal/prompt-driver.types";
+import { runGeneratorSync } from "create-relkit/generator-runtime";
+import type { PromptDriver } from "create-relkit/prompt-driver.types";
 import type { AddResolutionSnapshot } from "./add-resolution-state.types.js";
 
 import { addResolutionPrompt } from "./add-resolution-prompt.js";

@@ -1,6 +1,6 @@
 {
   "capturedUtc": "2026-10-03T17:29:08.308Z",
-  "worktree": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "worktree": "<home>/.codex/worktrees/core-consumers-effect/relkit",
   "baseline": "b0f77720764fd61e9872b0995e456014a611ba37",
   "results": [
     {
@@ -77,12 +77,12 @@
   },
   "changedVerificationSources": [
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/scripts/check-observability-sinks.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/scripts/check-observability-sinks.ts",
       "sha256": "ef55f6e7bd4c8b07696c0a3cd32a95fe3c227e473987d566116db7518c4fb5a1",
       "review": "Root independent EOF review requested."
     },
     {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/apps/docs/scripts/feature-catalog.ts",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/apps/docs/scripts/feature-catalog.ts",
       "sha256": "9b9ec2ffab598a547c07fc3174bb23b9fedeb2005d5018eb28afe08eb60ca8a4",
       "review": "Independent full-file review accepted by testing_baseline."
     }

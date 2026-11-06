@@ -1,13 +1,13 @@
-import { defineFunction } from "@relkit/functions";
-import { defineService } from "@relkit/services";
+import { defineFunction } from "relkit/functions";
+import { defineService } from "relkit/services";
 import {
   defineRoute,
   defineServiceRoutes,
   http,
   type RouteModuleContract,
   type ServiceRouteOptions,
-} from "@relkit/routes";
-import { z } from "@relkit/schema";
+} from "relkit/routes";
+import { z } from "relkit/schema";
 
 type Assert<Expected, Actual extends Expected> = Actual;
 const example = defineFunction({

@@ -8,7 +8,7 @@ import { pruneMovedAuthoringArtifacts } from "../prune-moved-authoring-artifacts
 
 test("prunes listed former modules and maps while retaining current and unlisted outputs", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-moved-artifacts-"));
-  const owner = join(root, "packages/agents");
+  const owner = join(root, "packages/relkit");
   try {
     await mkdir(join(owner, "src"), { recursive: true });
     await mkdir(join(owner, "dist"));

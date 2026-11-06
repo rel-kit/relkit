@@ -1,0 +1,10 @@
+import { defineEvent } from "@relkit/app/events";
+import { z } from "@relkit/app/schema";
+
+const orderPlaced = defineEvent({
+  id: "orders.placed",
+  version: 1,
+  input: z.object({ orderId: z.string() }),
+});
+
+export default orderPlaced;

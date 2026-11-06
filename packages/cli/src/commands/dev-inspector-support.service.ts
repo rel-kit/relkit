@@ -9,8 +9,8 @@ import {
   InspectionBridgeLive,
   InspectionFilesLive,
   InspectionNativeLive,
-} from "@relkit/inspector-api/connection";
-import type { InspectionBridgeOperations } from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
+import type { InspectionBridgeOperations } from "relkit/inspector-api/connection";
 import { CliAdapterError } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import type {

@@ -2,15 +2,15 @@ import type {
   FunctionContext,
   FunctionDependencies,
   FunctionHandlerValidation,
-} from "@relkit/functions";
+} from "relkit/functions";
 import { Effect } from "effect";
-import { defineError, defineFunction, defineFunctionEffect } from "@relkit/functions";
-import { defineBucket } from "@relkit/buckets";
-import { defineCache } from "@relkit/cache";
-import { defineEvent } from "@relkit/events";
-import { defineJob } from "@relkit/jobs/legacy";
-import { z, type InferInput, type InferOutput } from "@relkit/schema";
-import { defineTool } from "@relkit/tools";
+import { defineError, defineFunction, defineFunctionEffect } from "relkit/functions";
+import { defineBucket } from "relkit/buckets";
+import { defineCache } from "relkit/cache";
+import { defineEvent } from "relkit/events";
+import { defineJob, defineTask } from "relkit/jobs";
+import { z, type InferInput, type InferOutput } from "relkit/schema";
+import { defineTool } from "relkit/tools";
 
 const transformedInput = z
   .object({ rawId: z.string() })
@@ -47,9 +47,10 @@ const lookup = defineFunction({
       : { orderId: input.orderId, totalCents: 100 },
 });
 
+declare const lookupContext: FunctionContext<{ functions: { lookup: typeof lookup } }>;
 const detachedLookup: (
   input: InferInput<typeof transformedInput>,
-) => Promise<InferOutput<typeof lookup.output>> = lookup.invoke;
+) => Promise<InferOutput<typeof lookup.output>> = lookupContext.functions.lookup;
 const detachedLookupResult = detachedLookup({ rawId: "order-1" });
 void detachedLookupResult;
 
@@ -65,15 +66,15 @@ const lookupEffect = defineFunctionEffect({
 });
 const effectLookup = Effect.runSync(lookupEffect);
 const effectLookupId: "types.inference-effect-lookup" = effectLookup.id;
-const effectLookupResult: Promise<InferOutput<typeof lookupOutput>> = effectLookup.invoke({
-  rawId: "order-1",
-});
+declare const effectContext: FunctionContext<{ functions: { effectLookup: typeof effectLookup } }>;
+const effectLookupResult: Promise<InferOutput<typeof lookupOutput>> =
+  effectContext.functions.effectLookup({ rawId: "order-1" });
 const effectLookupErrorId: "types.inference-not-found" | undefined = effectLookup.errors?.[0]?.id;
 void effectLookupId;
 void effectLookupResult;
 void effectLookupErrorId;
 // @ts-expect-error the Effect descriptor accepts rawId, not the transformed orderId
-effectLookup.invoke({ orderId: "order-1" });
+effectContext.functions.effectLookup({ orderId: "order-1" });
 
 defineFunctionEffect({
   id: "types.inference-effect-invalid-output",
@@ -84,11 +85,17 @@ defineFunctionEffect({
 });
 
 const jobInput = z.object({ rawId: z.string() });
+const sendReceiptTask = defineTask({
+  id: "types.inference-task",
+  version: "1",
+  input: jobInput,
+  output: z.object({ sent: z.boolean() }),
+  handler: async () => ({ sent: true }),
+});
 const sendReceipt = defineJob({
   id: "types.inference-job",
-  input: jobInput,
-  target: lookup,
-  retry: { maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
+  name: "sendReceipt",
+  task: sendReceiptTask,
 });
 export const orderCreated = defineEvent({
   id: "types.inference-event",
@@ -103,6 +110,8 @@ const prices = defineCache({
 });
 
 const dependencies = {
+  functions: { lookup },
+  events: { orderCreated },
   jobs: { sendReceipt },
   buckets: { receiptBucket },
   cache: { prices },
@@ -113,15 +122,16 @@ const createOrder = defineFunction({
   input: z.object({ orderId: z.string(), sku: z.string() }),
   output: z.object({ totalCents: z.number() }),
   dependencies,
-  publishes: ["types.inference-event"],
   handler: async (input, context) => {
-    const lookupResult: InferOutput<typeof lookup.output> = await lookup.invoke({
+    const lookupResult: InferOutput<typeof lookup.output> = await context.functions.lookup({
       rawId: input.orderId,
     });
     const price: number | undefined = await context.cache.prices.get({ sku: input.sku });
     const produced = await context.cache.prices.getOrSet({ sku: input.sku }, () => 100);
     await context.cache.prices.set({ sku: input.sku }, produced);
-    await context.events["types.inference-event"].publish({ orderId: input.orderId });
+    await context.events.orderCreated.publish({ orderId: input.orderId });
+    await context.jobs.sendReceipt.trigger({ rawId: input.orderId });
+    // @ts-expect-error job clients trigger task runs; there is no enqueue
     await context.jobs.sendReceipt.enqueue({ rawId: input.orderId });
     await context.buckets.receiptBucket.put("orders/1.json", new Uint8Array());
     const names: readonly string[] = await context.buckets.receiptBucket.list();
@@ -172,7 +182,7 @@ const inferredFunctionTool = lookup.asTool({
   approval: "never",
 });
 const inferredFunctionToolId: "types.inference-lookup.tool" = inferredFunctionTool.id;
-const functionToolContract: import("@relkit/tools").ToolDescriptor<string> = inferredFunctionTool;
+const functionToolContract: import("relkit/tools").ToolDescriptor<string> = inferredFunctionTool;
 void inferredFunctionToolId;
 void functionToolContract;
 
@@ -192,18 +202,18 @@ lookup.asTool();
 
 type NarrowedContext = FunctionContext<typeof dependencies>;
 declare const narrowed: NarrowedContext;
-const narrowedResult: Promise<InferOutput<typeof lookup.output>> = lookup.invoke({
+const narrowedResult: Promise<InferOutput<typeof lookup.output>> = narrowed.functions.lookup({
   rawId: "order-1",
 });
 void narrowedResult;
 
 // @ts-expect-error transformed function input accepts rawId, not the output property orderId
-lookup.invoke({ orderId: "order-1" });
+narrowed.functions.lookup({ orderId: "order-1" });
 // @ts-expect-error a function's output is validated and cannot be treated as an arbitrary string
-const invalidOutput: Promise<string> = lookup.invoke({ rawId: "order-1" });
+const invalidOutput: Promise<string> = narrowed.functions.lookup({ rawId: "order-1" });
 void invalidOutput;
-// @ts-expect-error function clients were removed; use descriptor.invoke
-narrowed.functions;
+// @ts-expect-error a function not declared on the function is unavailable
+narrowed.functions.missing;
 // @ts-expect-error the job client is named by the dependency map
 narrowed.jobs.missing;
 // @ts-expect-error a bucket not declared on the function is unavailable
@@ -214,11 +224,11 @@ defineFunction({
   input: z.object({}),
   output: z.object({}),
   dependencies: {
-    // @ts-expect-error function dependencies were removed; use descriptor.invoke
     functions: {
       wrong: {
         ref: {
-          kind: "function",
+          // @ts-expect-error a function dependency must reference a function
+          kind: "task",
           id: "types.inference-cache",
         },
         input: z.object({}),
@@ -227,4 +237,47 @@ defineFunction({
     },
   },
   handler: () => ({}),
+});
+
+// A handler may throw a declared error instead of returning it.
+const thrownLookup = defineFunction({
+  id: "types.inference-thrown-lookup",
+  input: transformedInput,
+  output: lookupOutput,
+  errors: [notFound],
+  handler: async (input) => {
+    if (input.orderId === "missing") throw new notFound({ orderId: input.orderId });
+    return { orderId: input.orderId, totalCents: 100 };
+  },
+});
+void thrownLookup;
+
+// Declaring an error the handler never raises is not a type error.
+const unusedErrorLookup = defineFunction({
+  id: "types.inference-unused-error",
+  input: transformedInput,
+  output: lookupOutput,
+  errors: [notFound],
+  handler: async (input) => ({ orderId: input.orderId, totalCents: 100 }),
+});
+void unusedErrorLookup;
+const unusedValidation: FunctionHandlerValidation<
+  Promise<InferOutput<typeof lookupOutput>>,
+  InferOutput<typeof lookupOutput>,
+  [typeof notFound]
+> = {};
+void unusedValidation;
+
+const otherError = defineError({
+  id: "types.inference-other",
+  data: z.object({}),
+  message: "Other",
+});
+defineFunction({
+  id: "types.inference-undeclared-error",
+  input: transformedInput,
+  output: lookupOutput,
+  errors: [notFound],
+  // @ts-expect-error a returned error must be one of the declared errors
+  handler: async () => new otherError({}),
 });

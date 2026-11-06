@@ -1,5 +1,5 @@
 /** Declares the orders service boundary without acquiring native clients. */
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 import createOrder from "./functions/create-order.function.js";
 import deleteOrder from "./functions/delete-order.function.js";
 import getOrder from "./functions/get-order.function.js";

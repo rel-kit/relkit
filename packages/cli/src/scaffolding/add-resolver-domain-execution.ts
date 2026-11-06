@@ -1,16 +1,16 @@
 /** Resolves execution and exposure choices for domain artifacts against the selected service and available job profiles. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import { GeneratorPrompt } from "create-relkit/internal/generator-prompt";
+import { observeExecution } from "relkit/contracts/operation";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { GeneratorPrompt } from "create-relkit/generator-prompt";
 
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
   type GeneratorPromptError,
-} from "create-relkit/internal/generator-errors";
+} from "create-relkit/generator-errors";
 
 import { AddResolutionState, choices } from "./add-resolution-state.js";
 import {

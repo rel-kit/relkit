@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { createClient } from "../../packages/client/src/index.ts";
-import { createOperationId } from "../../packages/realtime/src/index.ts";
+import { createOperationId } from "relkit/realtime";
 import { createInspectorFixture, FIXTURE_GRAPH_HASH, FIXTURE_IDS } from "./fixture-backend.ts";
 
 describe("deterministic inspector fixture backend", () => {

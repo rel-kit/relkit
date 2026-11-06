@@ -11,8 +11,9 @@ import {
   compareRouteFilePaths,
   parseRouteFilePath,
   type ParsedRouteFilePath,
-} from "@relkit/compiler";
-import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
+} from "@relkit/cli/compiler";
+import { getJsonSchema, type StandardSchemaV1 } from "relkit/schema";
+import { canCarryStandardSchema } from "relkit/contracts";
 
 const methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ALL"] as const;
 
@@ -33,8 +34,12 @@ export async function loadTestRoutes(root: string): Promise<readonly TestRoute[]
     const module = (await import(pathToFileURL(join(directory, file)).href)) as Readonly<
       Record<string, unknown>
     >;
+    // A default export is a `defineServiceRoutes` map; named exports take precedence over it.
+    const map = module.default as Readonly<Record<string, unknown>> | undefined;
     for (const method of methods) {
-      const route = module[method];
+      const route =
+        module[method] ??
+        (method !== "ALL" && map !== null && typeof map === "object" ? map[method] : undefined);
       if (method === "ALL" && isRawRoute(route)) {
         loaded.push({ route: normalizeRawRoute(route, parsed), parsed });
       } else if (isRoute(route)) {
@@ -87,6 +92,8 @@ function normalizeRoute(
     target: route.target,
     request: route.request ?? inferRequest(route, method, parsed),
     responses: route.responses ?? inferResponses(route),
+    ...(route.response === undefined ? {} : { response: route.response }),
+    ...(route.auth === undefined ? {} : { auth: route.auth }),
   });
 }
 
@@ -215,7 +222,7 @@ function isRawRoute(
  * @returns True for a usable authored schema.
  */
 function isSchema(value: unknown): value is StandardSchemaV1 {
-  return isRecord(value) && isRecord(value["~standard"]);
+  return canCarryStandardSchema(value) && isRecord(value["~standard"]);
 }
 
 /**

@@ -1,5 +1,5 @@
 /** Selects backend agent bindings independently of the web app and inspection. */
-import { defineApp } from "@relkit/app/config";
+import { defineApp } from "relkit/config";
 import { localAgentState, localRealtime } from "@relkit/local";
 import env from "@app/platform/env.js";
 // relkit:create:deployment-imports

@@ -9,7 +9,7 @@ sidebar:
 ---
 
 <Callout type="tip" title="Start here" icon="terminal">
-  The RELKIT CLI creates projects, adds application files, validates their connections, and runs
+  The RelKit CLI creates projects, adds application files, validates their connections, and runs
   your backend. Start with **[Create and build an API](/guides/cli/create-and-build-an-api)** to add
   an endpoint, call it, and run the production build.
 </Callout>
@@ -40,14 +40,51 @@ The generated project includes package scripts for common commands. Run these fr
 | Stage              | Command              | What happens                                                      | Continue with                                                                |
 | ------------------ | -------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | Add a capability   | `bun run relkit add` | Choose files, their owning service, and any required packages.    | [Add application files](/docs/modules/cli/add-artifacts)                     |
-| Validate structure | `bun run check`      | Check application descriptors and their relationships.            | [`relkit check`](/docs/api/cli#relkit-check)                                 |
+| Validate structure | `bun run check`      | Check application descriptors and their relationships.            | [How `relkit check` works](/docs/modules/cli/check)                          |
 | Check TypeScript   | `bun run typecheck`  | Check source and generated types with TypeScript.                 | [CLI walkthrough](/guides/cli/create-and-build-an-api#check-the-application) |
 | Test behavior      | `bun run test`       | Run the application's tests.                                      | [Testing](/docs/modules/operations/testing)                                  |
 | Develop            | `bun run dev`        | Prepare the application, start the server, and watch for changes. | [`relkit dev`](/docs/api/cli#relkit-dev)                                     |
 | Build              | `bun run build`      | Write the production output into `.relkit/build`.                 | [`relkit build`](/docs/api/cli#relkit-build)                                 |
 | Run the build      | `bun run start`      | Start the built server.                                           | [`relkit start`](/docs/api/cli#relkit-start)                                 |
 
-`check` validates structure; `typecheck` checks types; tests verify behavior. Run all three when changing application code. Build before starting production output, and stop the development server before starting another server on the same port.
+`check` validates structure and runs your modules' top-level code ([what it blocks](/docs/modules/cli/check)); `typecheck` checks types; tests verify behavior. Run all three when changing application code. Build before starting production output, and stop the development server before starting another server on the same port.
+
+## TypeScript versions [#typescript-versions]
+
+Applications type-check with **TypeScript 5.9 or TypeScript 7**. CI type-checks generated
+applications with both. Pick one in `package.json`:
+
+```json title="package.json"
+{
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}
+```
+
+`bun run typecheck` runs that compiler, and `relkit check` runs the same one as a separate process.
+`relkit add` and `relkit migrate` parse your source with a TypeScript 5.9 parser bundled inside
+`@relkit/cli`, so they work with either version and never install a second `typescript`.
+
+Every RelKit type rule reaches plain `tsc` through generated files. Keep
+`.relkit/generated/route-module-checks.ts` in the `files` list of `tsconfig.json`: it checks route
+exports and brings in the generated context and event registries. TypeScript 7 also removes
+`baseUrl`, so write path aliases relative to the configuration, as generated projects do:
+
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "paths": { "@app/*": ["./src/*"] },
+    "plugins": [{ "name": "@relkit/cli/editor" }]
+  },
+  "files": [".relkit/generated/route-module-checks.ts", ".relkit/generated/context-registry.d.ts"]
+}
+```
+
+The `@relkit/cli/editor` plugin is optional. In editors that load TypeScript 5.9 plugins it shows
+route export errors while you type, before you save and run `relkit check`. Removing it, or using
+TypeScript 7, whose editor support does not load plugins, changes no check result: the same errors
+appear from `tsc`, `bun run typecheck` and `relkit check`.
 
 ## Choose a practical task
 

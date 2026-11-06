@@ -11,13 +11,13 @@ import {
   type ProviderAdapter,
   type ProviderBehavior,
   type ProviderConnectionValues,
-} from "@relkit/provider";
+} from "relkit/provider";
 import {
   serializeJobsServiceOptions,
   validateJobsServiceOptions,
   type JobsServiceBehavior,
   type JobsServiceOptions,
-} from "@relkit/jobs";
+} from "relkit/jobs";
 
 const job = defineProviderCapability("job");
 const durable = defineProviderFeature(job, "durable");
@@ -39,6 +39,7 @@ const connectionContract = defineConnectionContract({
 type SecretReference = BindingValueRef<string, string, "secret-string">;
 type TextReference = BindingValueRef<string, string, "string">;
 
+/** @experimental */
 export interface InngestOptions extends JobsServiceOptions {
   readonly appId?: string;
   readonly baseUrl?: string | URL | TextReference;
@@ -46,10 +47,12 @@ export interface InngestOptions extends JobsServiceOptions {
   readonly signingKey?: SecretReference;
   readonly serveOrigin?: string | URL | TextReference;
   readonly appVersion?: string;
-  readonly native?: Readonly<Record<string, import("@relkit/contracts").JsonValue>>;
+  readonly native?: Readonly<Record<string, import("relkit/contracts").JsonValue>>;
 }
 
+/** @experimental */
 export type InngestBehavior = JobsServiceBehavior;
+/** @experimental */
 export type InngestAdapter<Options extends InngestOptions = InngestOptions> = ProviderAdapter<
   typeof job,
   "inngest",
@@ -57,11 +60,14 @@ export type InngestAdapter<Options extends InngestOptions = InngestOptions> = Pr
   ProviderBehavior<InngestBehavior>
 >;
 
+/** @experimental */
 export const inngestIntegration = integration;
+/** @experimental */
 export const inngestConnectionContract = connectionContract;
+/** @experimental */
 export const inngestLocalRecipe = localRecipe;
 
-/** Defines a native Inngest durable-jobs adapter without importing the SDK. */
+/** Defines a native Inngest durable-jobs adapter without importing the SDK. @experimental */
 export function inngest<const Options extends InngestOptions = InngestOptions>(
   options: Options = {} as Options,
 ): InngestAdapter<Options> {

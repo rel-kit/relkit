@@ -6,14 +6,14 @@ import {
   modelScriptReplaceEffect,
 } from "./agents-model-operations.js";
 import { ScriptedChatModel } from "./agents-model-native.js";
-import { combineSignals } from "@relkit/testing/internal/runtime-clock";
+import { combineSignals } from "@relkit/testing/runtime-clock";
 import { Context, Effect, Layer, ManagedRuntime, Ref } from "effect";
 import {
   observeExecution,
   runExecutionPromise,
   runExecutionSync,
-} from "@relkit/contracts/operation";
-import { disposeTestingOwner, testingLoggerLayer } from "@relkit/testing/internal/testing-owner";
+} from "relkit/contracts/operation";
+import { disposeTestingOwner, testingLoggerLayer } from "@relkit/testing/testing-owner";
 
 import type { ModelScriptService, RuntimeTestAgentModel } from "./agents-model.types.js";
 
@@ -24,6 +24,7 @@ import type { TestAgentModelCall, TestAgentModelOptions, TestModelTurn } from ".
  * @param options - Explicit configuration and native dependencies for this test owner.
  * @returns A synchronous model facade owning script state and cancellation-aware turns.
  * @see tests/fixtures/checked-examples.ts ownedHelpersExample for checked script ownership.
+ * @experimental
  */
 export function createTestModel(
   options: TestAgentModelOptions & { readonly script?: readonly TestModelTurn[] } = {},

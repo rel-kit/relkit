@@ -14,7 +14,7 @@ import { ScaffoldProcess, scaffoldProcessLayer } from "./scaffold-process.js";
  * Reuses verified candidate authority and joins installation before releasing both registry listeners.
  * @param artifacts - Mandatory existing final archive directory.
  * @param root - Package-test-owned external temporary consumer.
- * @param packages - Requested unscoped RELKIT package identities.
+ * @param packages - Requested unscoped RelKit package identities.
  * @returns Completion after a physically contained install and candidate identity audit.
  */
 export const preparePackedStorageConsumer = Effect.fn("PackedStorage.prepare")(function* (
@@ -82,7 +82,7 @@ function validatePackedStorageInstallation(
 ): void {
   assert.deepEqual(installation.missing, []);
   for (const installed of installation.instances) {
-    if (!installed.name.startsWith("@relkit/")) continue;
+    if (installed.name !== "relkit" && !installed.name.startsWith("@relkit/")) continue;
     assert.ok(
       candidate.tarballs.has(installed.name),
       `Unpacked first-party installation: ${installed.name}`,

@@ -10,7 +10,7 @@ import {
 } from "../../integrations/packages/langchain/node_modules/@langchain/langgraph/dist/index.js";
 import type { SqliteSaver } from "../../integrations/packages/langchain/node_modules/@langchain/langgraph-checkpoint-sqlite/dist/index.js";
 import { defineGraph, defineGraphNode } from "../../integrations/packages/langchain/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { z } from "relkit/schema";
 
 export function createRestartGraph(root: string, saver: SqliteSaver) {
   const state = new StateSchema({

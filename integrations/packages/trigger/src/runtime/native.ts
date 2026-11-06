@@ -8,14 +8,16 @@ import type {
   NativeScheduleOperations,
   NativeSubmission,
   OperationContext,
-} from "@relkit/jobs/adapter";
+} from "relkit/jobs/adapter";
 import { createTriggerSdkNativeClient } from "./sdk-native.js";
 
+/** @experimental */
 export interface TriggerSubscription {
   readonly stream: AsyncIterable<unknown>;
   readonly unsubscribe?: () => Promise<void> | void;
 }
 
+/** @experimental */
 export interface TriggerSdkApi {
   readonly tasks: {
     readonly trigger: (...args: readonly unknown[]) => Promise<unknown>;
@@ -29,6 +31,7 @@ export interface TriggerSdkApi {
   };
 }
 
+/** @experimental */
 export interface TriggerNativeClient {
   readonly submit: (request: NativeSubmission, context: OperationContext) => Promise<NativeReceipt>;
   readonly get: (runId: string, context: OperationContext) => Promise<NativeRun>;
@@ -53,6 +56,7 @@ export interface TriggerNativeClient {
   readonly close?: () => Promise<void>;
 }
 
+/** @experimental */
 export interface TriggerHttpClientOptions {
   readonly baseUrl: string;
   readonly projectRef: string;
@@ -61,7 +65,7 @@ export interface TriggerHttpClientOptions {
   readonly client?: TriggerSdkApi;
 }
 
-/** Compatibility name retained for callers; the implementation uses the pinned SDK. */
+/** Compatibility name retained for callers; the implementation uses the pinned SDK. @experimental */
 export function createTriggerHttpClient(options: TriggerHttpClientOptions): TriggerNativeClient {
   return createTriggerSdkNativeClient(options);
 }

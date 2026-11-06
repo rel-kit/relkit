@@ -1,1 +1,2 @@
-export * from "@relkit/realtime";
+import "./deprecated.js";
+export * from "relkit/realtime";

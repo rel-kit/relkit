@@ -1,9 +1,9 @@
 /** Creates isolated native deepagent runtime fixtures; each caller owns the returned model, state and provider observations. */
-
-import { type BucketProvider } from "@relkit/buckets";
-import { z } from "@relkit/schema";
-import { defineAgent, invokeAgent } from "../src/index.ts";
-
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/index.ts";
+import { type BucketProvider } from "relkit/buckets";
+import { z } from "relkit/schema";
+import { invokeAgent } from "../src/index.ts";
 import { createTestModel } from "./test-model.ts";
 
 export const limits = { maxSteps: 8, maxToolCalls: 8, timeoutMs: 2_000 };
@@ -11,10 +11,10 @@ export const limits = { maxSteps: 8, maxToolCalls: 8, timeoutMs: 2_000 };
 export function specialist(model?: ReturnType<typeof createTestModel>["model"]) {
   return defineAgent({
     id: "researcher",
+    runtime: langchain(model === undefined ? {} : { model }),
     description: "Research delegated questions.",
     input: z.object({ message: z.string() }),
     output: z.object({ answer: z.string() }),
-    ...(model === undefined ? {} : { model }),
     instructions: "You are the child specialist.",
     tools: [],
     limits,
@@ -28,13 +28,11 @@ export function deepAgent(
 ) {
   return defineAgent({
     id: "assistant",
+    runtime: langchain({ model, subagents: [child], ...persistence }),
     input: z.object({ message: z.string() }),
     output: z.object({ answer: z.string() }),
-    model,
     instructions: "You are the parent assistant.",
     tools: [],
-    subagents: [child],
-    ...persistence,
     limits,
   });
 }
@@ -45,7 +43,7 @@ export function runtime(agent: ReturnType<typeof deepAgent>, threadId: string) {
     input: { message: "Delegate this." },
     threadId,
     tools: [],
-    engine: { invoke: () => Promise.reject(new Error("unexpected RELKIT tool")) },
+    engine: { invoke: () => Promise.reject(new Error("unexpected RelKit tool")) },
   });
 }
 

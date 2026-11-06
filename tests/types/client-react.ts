@@ -1,4 +1,10 @@
 import {
+  api,
+  type ApiRoute,
+  type ClientRouteContract,
+  type ClientStreamContract,
+} from "@relkit/client";
+import {
   useAgent,
   useChannel,
   useRoute,
@@ -6,22 +12,27 @@ import {
   type ClientAgentContract,
   type ClientAgentDynamic,
   type ClientChannelContract,
-  type ClientRouteContract,
-  type ClientStreamContract,
   type CountPresence,
 } from "@relkit/client/react";
 
 declare function expectType<Value>(value: Value): void;
 
-declare module "@relkit/client/react" {
-  interface ClientRegistry {
-    readonly finite: ClientRouteContract<{ id: string }, { value: string }> & {
-      readonly operation: "query";
-    };
-    readonly streaming: ClientStreamContract<{ id: string }, { progress: number }> & {
-      readonly operation: "query";
+declare module "@relkit/client" {
+  interface ClientApi {
+    readonly fixtures: {
+      readonly finite: ApiRoute<
+        ClientRouteContract<{ id: string }, { value: string }> & { readonly operation: "query" }
+      >;
+      readonly streaming: ApiRoute<
+        ClientStreamContract<{ id: string }, { progress: number }> & {
+          readonly operation: "query";
+        }
+      >;
     };
   }
+}
+
+declare module "@relkit/client/react" {
   interface ChannelRegistry {
     readonly count: ClientChannelContract<
       { id: string },
@@ -52,17 +63,19 @@ declare module "@relkit/client/react" {
       { readonly kind: "node"; readonly id: "approve" },
       {
         readonly node: "approve";
-        readonly response: import("@relkit/contracts").JsonValue;
+        readonly response: import("relkit/contracts").JsonValue;
       }
     >;
     readonly exact: ExactContract;
   }
 }
 
-useRoute("finite", { input: { id: "one" } });
-useStream("streaming", { input: { id: "one" } });
-// @ts-expect-error stream selectors are excluded from finite hooks
-useRoute("streaming", { input: { id: "one" } });
+useRoute(api.fixtures.finite, { input: { id: "one" } });
+useStream(api.fixtures.streaming, { input: { id: "one" } });
+// @ts-expect-error stream routes are excluded from finite hooks
+useRoute(api.fixtures.streaming, { input: { id: "one" } });
+// @ts-expect-error hooks take api properties, not string keys
+useRoute("fixtures.finite", { input: { id: "one" } });
 
 const count = useChannel("count", { params: { id: "one" } });
 count.presence.connections;
@@ -146,7 +159,7 @@ type ExactContract = ClientAgentContract<
   {
     readonly node: "review";
     readonly value?: unknown;
-    readonly response: import("@relkit/contracts").JsonValue;
+    readonly response: import("relkit/contracts").JsonValue;
   }
 >;
 declare const exactContract: ExactContract;

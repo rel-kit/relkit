@@ -1,10 +1,10 @@
-/** Converts native graph interrupt observations into RELKIT continuation data while preserving the interrupt identifiers needed for resume. */
+/** Converts native graph interrupt observations into RelKit continuation data while preserving the interrupt identifiers needed for resume. */
 
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { Effect, Metric, Schema } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import type { GraphWaitingInterrupt } from "./graph-interruption.types.js";
-import type { AgentWaitingRequest } from "@relkit/agents/internal/state.types";
+import type { AgentWaitingRequest } from "relkit/agents/state.types";
 
 export type { GraphWaitingInterrupt } from "./graph-interruption.types.js";
 
@@ -13,7 +13,7 @@ const responseFailures = Metric.counter("relkit.agents.graph_interruption.respon
 const requestsCount = Metric.counter("relkit.agents.graph_interruption.requests.total");
 const predicateCount = Metric.counter("relkit.agents.graph_interruption.predicate.total");
 
-/** No pending request is available to form a graph interruption response. */
+/** No pending request is available to form a graph interruption response. @experimental */
 export class GraphWaitingResponseError extends Schema.TaggedError<GraphWaitingResponseError>()(
   "GraphWaitingResponseError",
   { message: Schema.String },
@@ -26,6 +26,7 @@ export class GraphWaitingResponseError extends Schema.TaggedError<GraphWaitingRe
  * @returns An Effect with the response schema or GraphWaitingResponseError.
  * @example
  * const response = Effect.runSync(graphWaitingResponseEffect([{ node: "review", response: true }]));
+ * @experimental
  */
 export const graphWaitingResponseEffect = Effect.fn("Agents.graphInterruption.response")(
   function* (interrupts: readonly GraphWaitingInterrupt[]) {
@@ -59,6 +60,7 @@ export const graphWaitingResponseEffect = Effect.fn("Agents.graphInterruption.re
  * @throws TypeError when no request is pending.
  * @example
  * const response = graphWaitingResponse([{ node: "review", response: true }]);
+ * @experimental
  */
 export function graphWaitingResponse(interrupts: readonly GraphWaitingInterrupt[]): JsonValue {
   return Effect.runSync(
@@ -79,6 +81,7 @@ export function graphWaitingResponse(interrupts: readonly GraphWaitingInterrupt[
  * @returns An Effect with public waiting requests; it has no typed failure.
  * @example
  * const requests = Effect.runSync(publicWaitingRequestsEffect(interrupts));
+ * @experimental
  */
 export const publicWaitingRequestsEffect = Effect.fn("Agents.graphInterruption.requests")(
   function* (interrupts: readonly GraphWaitingInterrupt[]) {
@@ -99,6 +102,7 @@ export const publicWaitingRequestsEffect = Effect.fn("Agents.graphInterruption.r
  * @returns Requests without internal interrupt IDs.
  * @example
  * const requests = publicWaitingRequests(interrupts);
+ * @experimental
  */
 export function publicWaitingRequests(
   interrupts: readonly GraphWaitingInterrupt[],
@@ -111,6 +115,7 @@ export function publicWaitingRequests(
  *
  * @example
  * throw new GraphInterruptedError("thread-1", interrupts);
+ * @experimental
  */
 export class GraphInterruptedError extends Error {
   readonly code = "RELKIT_GRAPH_INTERRUPTED" as const;
@@ -131,6 +136,7 @@ export class GraphInterruptedError extends Error {
  * @returns An Effect with the recognition result; it has no typed failure.
  * @example
  * const interrupted = Effect.runSync(isGraphInterruptedErrorEffect(error));
+ * @experimental
  */
 export const isGraphInterruptedErrorEffect = Effect.fn("Agents.graphInterruption.isError")(
   function* (value: unknown) {
@@ -147,6 +153,7 @@ export const isGraphInterruptedErrorEffect = Effect.fn("Agents.graphInterruption
  * @returns True only for a GraphInterruptedError instance.
  * @example
  * if (isGraphInterruptedError(error)) console.log(error.threadId);
+ * @experimental
  */
 export function isGraphInterruptedError(value: unknown): value is GraphInterruptedError {
   return Effect.runSync(isGraphInterruptedErrorEffect(value));

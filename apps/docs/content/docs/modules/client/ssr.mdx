@@ -15,7 +15,7 @@ Fetch backend data during server rendering, then hydrate the matching frontend c
 
 ## Select the server entry point
 
-[`createClient`](/docs/api/client#createclient) from `@relkit/client` works in a server runtime with
+[`createApi`](/docs/api/client#createapi) from `@relkit/client` works in a server runtime with
 `fetch`. For Bun servers, [`createServerClient`](/docs/api/client#createserverclient) from
 `@relkit/client/server` adds operation-time trace propagation, and
 [`createRelkitServerContext`](/docs/api/client#createrelkitservercontext) from
@@ -30,8 +30,9 @@ before a mutation, forwarding the incoming credentials to both requests.
 
 ## Create request scope
 
-In a Bun server, prefetch the same `GET /hello` selector and input used by the
-[React example](/guides/frontend/connect-react). The query key includes the server-derived identity
+In a Bun server, prefetch the same route and input used by the
+[React example](/guides/frontend/connect-react). The hooks key a route's query by its `api` path,
+so `api.hello.greet` uses `"hello.greet"`. The query key also includes the server-derived identity
 scope so it matches the managed hook during hydration:
 
 This example assumes the incoming request already carries the backend's session or anonymous

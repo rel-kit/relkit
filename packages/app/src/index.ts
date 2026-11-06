@@ -1,18 +1,7 @@
-export * from "./config.js";
-export * from "./context-descriptors.js";
-export * from "./context-resolver.js";
-export { AppConstantRunner, AppConstantRunnerLive } from "./context-resolution-service.js";
-export * from "@relkit/agents";
-export * from "@relkit/buckets";
-export * from "@relkit/cache";
-export * from "@relkit/events";
-export * from "@relkit/functions";
-export { bindDescriptorIdentity } from "@relkit/invocation";
-export type { EventAttributeValue, EventPublishOptions, EventPublishResult } from "@relkit/events";
-export * from "@relkit/jobs";
-export type { TaskClientFor, TaskClients, TaskTriggerOptions } from "@relkit/jobs";
-export * from "./tasks.js";
-export * from "@relkit/realtime";
-export * from "@relkit/routes";
-export * from "@relkit/services";
-export * from "@relkit/tools";
+/**
+ * The deprecated `@relkit/app` root keeps the surface the `relkit` root had before it became a
+ * curated list, so applications keep working until `relkit migrate` rewrites their imports.
+ */
+import "./deprecated.js";
+
+export * from "relkit/app";

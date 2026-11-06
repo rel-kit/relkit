@@ -1,5 +1,6 @@
 /** Declares the full compiler fixture support agent using the explicit native integration owner. */
-import { defineAgent } from "@relkit/langchain";
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import lookupOrder from "../tools/lookup-order.tool.js";
 import { agentInput, agentOutput } from "../../platform/schemas.js";
 
@@ -11,9 +12,9 @@ const fixtureModel = {
 
 const orderSupport = defineAgent({
   id: "orders.support-agent",
+  runtime: langchain({ model: fixtureModel }),
   input: agentInput,
   output: agentOutput,
-  model: fixtureModel,
   instructions: "Answer order questions.",
   tools: [lookupOrder],
   limits: { maxSteps: 2, maxToolCalls: 2, timeoutMs: 1_000 },

@@ -16,7 +16,7 @@ your app: look up an order, search a catalog, or prepare a response using curren
   describe the exact APIs.
 </Callout>
 
-**RELKIT agents run through native LangChain and LangGraph APIs.** RELKIT connects those workflows to
+**RelKit agents run through native LangChain and LangGraph APIs.** RelKit connects those workflows to
 your application's functions, validation, permissions, durable threads, and execution limits. Use
 `defineAgent` for model-driven work, or `defineGraph` and `defineGraphNode` for explicit workflows.
 Adding subagents, skills, memory files, or a backend to `defineAgent` selects native DeepAgents
@@ -28,7 +28,7 @@ Use an agent when the next step depends on a user's question. Use an ordinary fu
 
 ## The AI APIs
 
-Usually, adding tools to a model means writing argument schemas, dispatching tool calls, handling results, and controlling how long the model can keep working. RELKIT lets you reuse validated functions as tools, choose which tools an agent can use, and set limits on each run.
+Usually, adding tools to a model means writing argument schemas, dispatching tool calls, handling results, and controlling how long the model can keep working. RelKit lets you reuse validated functions as tools, choose which tools an agent can use, and set limits on each run.
 
 | API                 | What you use it for                                                       |
 | ------------------- | ------------------------------------------------------------------------- |
@@ -39,13 +39,13 @@ Usually, adding tools to a model means writing argument schemas, dispatching too
 | `function.asTool()` | Turn a function into a tool directly.                                     |
 | `mcp`               | Choose whether a tool is available to external MCP clients.               |
 
-The same tool can serve a RELKIT agent and an external AI client through **Model Context Protocol (MCP)**. You do not need a RELKIT agent just to expose tools over MCP.
+The same tool can serve a RelKit agent and an external AI client through **Model Context Protocol (MCP)**. You do not need a RelKit agent just to expose tools over MCP.
 
 ## Native framework boundary
 
 Pass compatible LangChain models, tools, and middleware directly—there is no public adapter wrapper.
-RELKIT function-backed tools remain native-compatible while preserving function execution, validation,
-authorization, and tool policies. LangGraph owns scheduling and control flow; RELKIT validates declared
+RelKit function-backed tools remain native-compatible while preserving function execution, validation,
+authorization, and tool policies. LangGraph owns scheduling and control flow; RelKit validates declared
 state and public output around it.
 
 ## Observe durable execution

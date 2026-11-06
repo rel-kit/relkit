@@ -2,7 +2,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Context, Effect, Layer, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { ownedNativePromise } from "./src/services/owned-promise.js";
 import { cliAdapterError } from "./src/cli-errors.js";
 import { ProcessIds } from "./dev-check-fixture.schemas.js";

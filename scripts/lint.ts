@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
 import { scanAuthoring } from "./authoring-scan";
 import { authoringFragments } from "./authoring-scan-utils";
+import { checkUserText, formatFinding } from "./user-text";
 
 function main(): void {
   const root = resolve(process.argv[2] ?? resolve(import.meta.dir, ".."));
@@ -14,6 +15,13 @@ function main(): void {
   console.log(
     `Public authoring scan passed (${authoringFragments(root).length} source/example fragments).`,
   );
+  const text = checkUserText(root);
+  for (const finding of text) console.error(formatFinding(finding));
+  if (text.length > 0)
+    throw new Error(
+      `User-facing text check failed with ${text.length} finding(s); see WRITING.md.`,
+    );
+  console.log("User-facing text check passed.");
 }
 
 if (import.meta.main) {

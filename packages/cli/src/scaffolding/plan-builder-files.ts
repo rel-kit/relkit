@@ -1,7 +1,7 @@
 /** Builds the file operations recorded by the request-local plan builder, preserving create versus update collision rules. */
 
 import { Effect, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 import type { ProjectDiscovery } from "./project-discovery-types.js";
 

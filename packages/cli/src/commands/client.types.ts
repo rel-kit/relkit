@@ -1,5 +1,5 @@
 import type { Schema } from "effect";
-import type { ContractProcedureDocument } from "@relkit/client-generator";
+import type { ContractProcedureDocument } from "../client-generator/index.js";
 import type { clientDocumentSchema } from "./client.schemas.js";
 
 /** Client document derived from its runtime schema, retaining portable extra fields. */

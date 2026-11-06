@@ -1,4 +1,4 @@
-import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "relkit/contracts";
 
 /** Pure lookup, health, and structured log adapters for the generated runtime host. */
 export const SERVER_RUNTIME_SUPPORT_SOURCE = `
@@ -73,18 +73,6 @@ async function resolveRateLimitStore(storeId) {
   if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
   return provider(providerRegistry, "cache", cache.profile);
 }
-function queueProvider(providerRegistry, context) {
-  const value = provider(providerRegistry, "job", context.profile);
-  if (value === null || typeof value !== "object" || typeof value.createQueue !== "function")
-    throw new Error(\`Job provider profile "\${context.profile}" cannot materialize queues.\`);
-  return value.createQueue(context);
-}
-async function startJobWorker(jobs) {
-  await runtimeOwner.worker("job-worker", async () => {
-      await jobs.tick(new Date());
-      await runtimeOwner.each([...jobs.jobs.keys()], (jobId) => jobs.runNext(jobId));
-  });
-}
 function errorCode(error) {
   if (error !== null && typeof error === "object" && typeof error.code === "string") return error.code;
   if (error !== null && typeof error === "object" && error.name === "EnvResolutionError") return "RELKIT_ENVIRONMENT_INVALID";
@@ -116,6 +104,9 @@ function writeRuntimeLog(record) {
 }
 function healthResponse(status, code = 200) {
   return Response.json({ protocol: "relkit.inspector", version: 1, status, graphHash, activationFingerprint, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, environmentReady: true, providerReady: runtimeState().ready.provider && runtimeState().ready.nativeWorker && !runtimeState().stopping, databaseReady: runtimeState().ready.database && !runtimeState().stopping, authReady: runtimeState().ready.auth && !runtimeState().stopping, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }, { status: code, headers: { "x-relkit-api-version": "1" } });
+}
+function problemResponse(status, title, code, detail) {
+  return new Response(JSON.stringify({ type: "/errors/" + code, title, status, code, detail }), { status, headers: { "content-type": "application/problem+json" } });
 }
 function resolveRuntimeEnvironment(definition, environment, source) {
   try {

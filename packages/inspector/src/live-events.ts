@@ -1,7 +1,7 @@
 /** UI invalidations borrow the existing bounded stream, while full records stay in history. */
 import { Effect } from "effect";
-import { createObservabilityStream } from "@relkit/observability";
-import type { ObservabilityStream, ObservabilityStreamEventType } from "@relkit/observability";
+import { createObservabilityStream } from "relkit/observability";
+import type { ObservabilityStream, ObservabilityStreamEventType } from "relkit/observability";
 import type { InspectorSelection } from "./discovery.types.js";
 
 /** The tool Scope closes every subscriber before releasing its listener. */

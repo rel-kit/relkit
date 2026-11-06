@@ -1,7 +1,7 @@
 {
   "reviewer": "client_baseline",
   "status": "accepted",
-  "worktree": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "worktree": "<home>/.codex/worktrees/core-consumers-effect/relkit",
   "freezeUtc": "2026-10-03T18:24:32.619146+00:00",
   "files": [
     {

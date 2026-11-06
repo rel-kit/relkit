@@ -16,3 +16,4 @@ export type {
   AuthServiceInterface,
   AuthFactoryInterface,
 } from "./auth.types.js";
+export { resolveBetterAuthAccess } from "./access.js";

@@ -4,8 +4,8 @@
  * promoted children and active-child observers belong to the session lifetime.
  */
 import { Effect, MutableRef, Ref } from "effect";
-import { createSupervisorDrain, type StartedCandidate } from "@relkit/supervisor";
-import type { RuntimeActivationFingerprint } from "@relkit/contracts";
+import { createSupervisorDrain, type StartedCandidate } from "../supervisor/index.js";
+import type { RuntimeActivationFingerprint } from "relkit/contracts";
 import { cliPromise, cliTry } from "../cli-errors.js";
 import { cleanupEffect } from "../services/cleanup.service.js";
 import { tokenKey } from "./dev-generation-key.js";

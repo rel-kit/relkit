@@ -7,6 +7,6 @@ export const realtimeFeature = feature(
   "Append typed events and observe authorized partitions with replay and presence.",
   "docs/modules/realtime/index",
   "realtime",
-  [["packages/realtime/src/channel.ts", "defineChannel"]],
+  [["packages/relkit/src/realtime/channel.ts", "defineChannel"]],
   ["examples/commerce/src/services/announcements/channels/announcements.channel.ts"],
 );

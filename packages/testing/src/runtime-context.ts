@@ -1,4 +1,4 @@
-import type { InvocationContextOptions } from "@relkit/engine";
+import type { InvocationContextOptions } from "relkit/engine";
 
 const noop = (): void => undefined;
 

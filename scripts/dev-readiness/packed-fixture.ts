@@ -14,14 +14,15 @@ import {
   startRegistry,
 } from "../pack-and-smoke-create-relkit-pack.js";
 import { runCommand } from "../pack-and-smoke-create-relkit-support.js";
-import { ownedNativePromise } from "@relkit/cli/internal/tooling";
+import { ownedNativePromise } from "@relkit/cli/tooling";
 import { packBaselineArtifacts } from "./packed-artifacts.js";
 
 /**
- * Packs the candidate and prepares one fresh installed minimal project.
+ * Packs the candidate and prepares one fresh installed project.
  * @param repository - Framework checkout used only for producing tarballs.
  * @param examples - Generated route policy; absence uses protected live graph proof.
  * @param artifactDirectory - Optional previously packed release closure, reused without rebuilding.
+ * @param template - Public starter template to create.
  * @returns The outside-workspace fixture and registry identity in the caller Scope.
  * @remarks Packing utilities lack cancellation; the adapter joins their physical
  * settlement on interruption rather than detaching writes or children.
@@ -30,6 +31,7 @@ export const preparePackedFixture = Effect.fn("ReadinessBenchmark.preparePacked"
   repository: string,
   examples: "examples" | "no-examples" = "examples",
   artifactDirectory?: string,
+  template = "minimal",
 ) {
   const temporary = yield* ownedNativePromise("benchmark.temporary", () =>
     mkdtemp(join(tmpdir(), "relkit-readiness-")),
@@ -64,12 +66,14 @@ export const preparePackedFixture = Effect.fn("ReadinessBenchmark.preparePacked"
     registry,
     "readiness-baseline",
     examples,
+    template,
   );
   return {
     temporary,
     projectRoot,
     version,
     registry,
+    template,
     examples,
     artifacts: [...tarballs.entries()].map(([name, path]) => ({ name, path })),
   };
@@ -81,6 +85,7 @@ export const preparePackedFixture = Effect.fn("ReadinessBenchmark.preparePacked"
  * @param registry - Scoped private registry serving the candidate tarballs.
  * @param name - Unique project and directory name for this evidence attempt.
  * @param examples - Generated readiness route policy.
+ * @param template - Public starter template to create.
  * @returns The absolute outside-workspace project root after preparation succeeds.
  */
 export const createPackedProject = Effect.fn("ReadinessBenchmark.createPackedProject")(function* (
@@ -88,6 +93,7 @@ export const createPackedProject = Effect.fn("ReadinessBenchmark.createPackedPro
   registry: string,
   name: string,
   examples: "examples" | "no-examples",
+  template = "minimal",
 ) {
   const cache = join(temporary, "cache");
   yield* ownedNativePromise("benchmark.create", () =>
@@ -96,7 +102,7 @@ export const createPackedProject = Effect.fn("ReadinessBenchmark.createPackedPro
         join(temporary, "node_modules/.bin/create-relkit"),
         name,
         "--template",
-        "minimal",
+        template,
         "--cloud",
         "none",
         "--deploy",

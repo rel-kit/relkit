@@ -1,9 +1,9 @@
 /** Reuses supervisor request/body ownership so inspection participates in native generation draining. */
 import { Cause, Effect } from "effect";
 import type { Scope } from "effect";
-import { proxyRequest } from "@relkit/supervisor/internal/request";
-import { InspectionConnectionError } from "@relkit/inspector-api/connection";
-import type { InspectionBridgeAuthority } from "@relkit/inspector-api/connection";
+import { proxyRequest } from "../supervisor/proxy-request.js";
+import { InspectionConnectionError } from "relkit/inspector-api/connection";
+import type { InspectionBridgeAuthority } from "relkit/inspector-api/connection";
 import type { DevSession } from "./dev-session.js";
 
 /** Captures the committed candidate and lease before any forwarding await; mutations never retry. */
@@ -82,14 +82,16 @@ export function firstPartyInspectionRequest(
   const headers = new Headers(request.headers);
   headers.set("origin", new URL(origin).origin);
   headers.delete("referer");
-  return new Request(url.href, {
+  // Streaming request bodies need `duplex`, which the DOM `RequestInit` type does not declare.
+  const init: RequestInit & { readonly duplex: "half" } = {
     method: request.method,
     headers,
     body: request.body,
     signal: request.signal,
     redirect: "manual",
     duplex: "half",
-  });
+  };
+  return new Request(url.href, init);
 }
 
 /**

@@ -1,4 +1,4 @@
-import type { BucketOperationContext, BucketProvider, BucketPutOptions } from "@relkit/buckets";
+import type { BucketOperationContext, BucketProvider, BucketPutOptions } from "relkit/buckets";
 import {
   assertR2Response,
   presignR2Url,
@@ -7,6 +7,7 @@ import {
   type R2RequestInit,
 } from "./r2-signing.js";
 
+/** @experimental */
 export interface CloudflareR2BucketOptions extends R2Credentials {
   readonly accountId: string;
   readonly bucketName: string;
@@ -14,6 +15,7 @@ export interface CloudflareR2BucketOptions extends R2Credentials {
   readonly fetch?: typeof globalThis.fetch;
 }
 
+/** @experimental */
 export function createCloudflareR2BucketProvider(
   options: CloudflareR2BucketOptions,
 ): BucketProvider {

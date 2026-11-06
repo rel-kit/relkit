@@ -2,7 +2,7 @@
 
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";
-import type { PendingApproval } from "@relkit/agents";
+import type { PendingApproval } from "relkit/agents";
 import { createAgentApprovalState } from "../../src/testing/agent-approvals.js";
 
 const approval: PendingApproval = {

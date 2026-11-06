@@ -1,6 +1,12 @@
 node_modules
 .next
-.relkit/
+.relkit/*
+!.relkit/generated/
+.relkit/generated/*
+!.relkit/generated/route-module-checks.ts
+!.relkit/generated/context-registry.d.ts
+!.relkit/generated/event-registry.d.ts
+!.relkit/generated/client-registry.d.ts
 .env
 .env.*
 !.env.example

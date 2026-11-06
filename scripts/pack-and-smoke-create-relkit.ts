@@ -5,7 +5,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { strict as assert } from "node:assert";
 import { Context, Effect, Exit, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { ScaffoldProcess, scaffoldProcessLayer } from "./scaffold-process.js";
 import { scaffoldPort } from "./scaffold-http.js";
 import { scaffoldNative } from "./scaffold-native.js";

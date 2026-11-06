@@ -9,7 +9,7 @@ sidebar:
 import inspectorLogs from "../../../../../../tests/e2e/logs.spec.ts-snapshots/logs-workspace-darwin.png";
 import inspectorTrace from "../../../../../../tests/e2e/inspector-redesign.spec.ts-snapshots/trace-waterfall-darwin.png";
 
-Follow a request across routes, functions, and resources using RELKIT's correlated logs and traces. Handlers write structured records through `context.log`; functions, providers, jobs, events, tools,
+Follow a request across routes, functions, and resources using RelKit's correlated logs and traces. Handlers write structured records through `context.log`; functions, providers, jobs, events, tools,
 and agents contribute correlated spans without importing a telemetry SDK.
 
 <include>/_setup/telemetry.mdx</include>
@@ -55,7 +55,7 @@ runtime event
 Local capture is independent of external sampling. With `traceRate: 0.25`, the bounded Inspector store can keep
 a complete redacted local trace even when that trace is not selected for remote export. Spans, logs, and errors
 with the same trace use the same deterministic trace decision. Log export also follows `minimumLogLevel`.
-Configure `traceRate: 1` when a Collector performs tail sampling and needs complete failed traces; RELKIT does
+Configure `traceRate: 1` when a Collector performs tail sampling and needs complete failed traces; RelKit does
 not keep a second in-process tail-sampling buffer.
 
 `localRetention` bounds record count, age, and bytes. It is diagnostic evidence, not durable business storage.
@@ -75,7 +75,7 @@ disable color. Terminal filtering does not reduce captured history.
 
 Persistent development history belongs to the separately installed and launched
 [@relkit/inspector tool](/docs/modules/operations/inspector). Complete its install → bridge enablement → tool
-startup procedure before using these views. It owns `@relkit/observability-local`, DuckDB and the Node
+startup procedure before using these views. It owns `@relkit/inspector/observability-local`, DuckDB and the Node
 worker; the backend-only workflow continues to require only Bun.
 
 The tool defaults to `.relkit/observability/observability.duckdb` under its selected project root.
@@ -85,13 +85,13 @@ backend preserves committed history; removing a package-runner cache does not re
 
 Before collection, an enabled backend bridge holds only a bounded redacted buffer, initially 2,048
 records/2 MiB. With no running tool there is no new persisted tool history. Overflow or failed delivery
-is reported as incomplete capture; collector receipts acknowledge committed session/sequence records
+is reported as incomplete capture; collector acknowledgments confirm committed session/sequence records
 and deduplicate replay. Backend capture limits and tool history retention are separate budgets.
 Exporter delivery remains independent of collector acknowledgments.
 
 The current store uses observability model v2. Moving store ownership preserves existing database schemas,
-receipt identities, imported segment markers, and source history files. Incompatible development state is not
-reset automatically: RELKIT reports `RELKIT_OBSERVABILITY_STATE_INCOMPATIBLE` and preserves the directory for
+acknowledgment identities, imported segment markers, and source history files. Incompatible development state is not
+reset automatically: RelKit reports `RELKIT_OBSERVABILITY_STATE_INCOMPATIBLE` and preserves the directory for
 diagnosis. Diagnostic history does not own durable job, checkpoint, provider, or agent application state.
 
 If storage fails, application requests continue. The Logs workspace reports degraded storage and failed or
@@ -137,7 +137,7 @@ before assuming application capture failed.
 
 ## Add application trace detail
 
-RELKIT already creates spans for routes, functions, declared client operations, jobs, events, tools, and agents.
+RelKit already creates spans for routes, functions, declared client operations, jobs, events, tools, and agents.
 Use `context.trace` only for application work that those boundaries do not describe:
 
 <include
@@ -155,9 +155,9 @@ Use `context.trace` only for application work that those boundaries do not descr
 | `event(name, attributes?)`                   | A point-in-time event on the active span                             |
 | `setAttributes({ key: value })`              | Additional attributes on the active span                             |
 
-The callback passed to `span` runs with a child span as the active span. RELKIT ends it on success or failure and
+The callback passed to `span` runs with a child span as the active span. RelKit ends it on success or failure and
 returns or rethrows the callback result unchanged. The default kind is `internal`; use `client` only for a custom
-outbound dependency RELKIT does not already instrument. Nested and parallel callbacks keep the correct parent.
+outbound dependency RelKit does not already instrument. Nested and parallel callbacks keep the correct parent.
 
 `event` adds a point-in-time event to the active span. `setAttributes` adds facts to that same active span, so a
 call directly in a handler annotates the handler's invocation span while a call inside `span` annotates the child.
@@ -175,7 +175,7 @@ correlated logs, captured redacted input/output, outcome, and safe error details
 
 <img
   src={inspectorTrace.src}
-  alt="RELKIT Inspector trace waterfall showing the nested HTTP request, function, and cache spans"
+  alt="RelKit Inspector trace waterfall showing the nested HTTP request, function, and cache spans"
 />
 
 The Logs workspace preserves structured fields and correlation identities. Selecting a record keeps its associated
@@ -183,7 +183,7 @@ trace beside it so developers and operations teams can move from a symptom to th
 
 <img
   src={inspectorLogs.src}
-  alt="RELKIT Inspector Logs workspace with a selected structured log and its associated trace"
+  alt="RelKit Inspector Logs workspace with a selected structured log and its associated trace"
 />
 
 AWS hosting routes redacted structured stdout to CloudWatch through the host integration. CloudWatch is host

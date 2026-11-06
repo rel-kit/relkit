@@ -1,0 +1,281 @@
+{
+  "integrations/packages/aws/src/cloud-aws/components/RelkitCaches/client.ts": {
+    "bun": 1
+  },
+  "integrations/packages/aws/src/cloud-aws/components/common.ts": {
+    "node": 1
+  },
+  "integrations/packages/inngest/src/local-readiness.ts": {
+    "node": 1
+  },
+  "integrations/packages/inngest/src/runtime/runs-support.ts": {
+    "node": 1
+  },
+  "integrations/packages/inngest/src/runtime/submission.ts": {
+    "node": 1
+  },
+  "integrations/packages/langchain/src/deepagent-bucket-glob.ts": {
+    "node": 1
+  },
+  "integrations/packages/langchain/src/deepagent-bucket-grep.ts": {
+    "node": 1
+  },
+  "integrations/packages/langchain/src/deepagent-bucket-scope.ts": {
+    "node": 1
+  },
+  "integrations/packages/local/src/runtime/identity.ts": {
+    "node": 2
+  },
+  "integrations/packages/local/src/runtime/integration.ts": {
+    "node": 1
+  },
+  "integrations/packages/local/src/runtime/lease-files.ts": {
+    "node": 2
+  },
+  "integrations/packages/local/src/runtime/lease.ts": {
+    "node": 1
+  },
+  "integrations/packages/local/src/runtime/provider-overrides.ts": {
+    "node": 1
+  },
+  "integrations/packages/local/src/runtime/reconciler-support.ts": {
+    "node": 1
+  },
+  "integrations/packages/local/src/runtime/reconciler-worker.ts": {
+    "node": 1
+  },
+  "integrations/packages/local/src/runtime/state-paths.ts": {
+    "node": 3
+  },
+  "integrations/packages/pulumi/src/deploy-pulumi/program.ts": {
+    "node": 2
+  },
+  "integrations/packages/pulumi/src/deploy-pulumi/workspace.ts": {
+    "node": 4
+  },
+  "integrations/packages/trigger/src/runtime/sdk-native-support.ts": {
+    "node": 1
+  },
+  "integrations/packages/trigger/src/runtime/task-binding.ts": {
+    "node": 1
+  },
+  "packages/better-auth/src/dependencies.ts": {
+    "node": 1
+  },
+  "packages/cli/src/compiler/discovery/evaluator-detector-files.ts": {
+    "bun": 1
+  },
+  "packages/cli/src/compiler/discovery/evaluator-detector-network.ts": {
+    "bun": 1
+  },
+  "packages/cli/src/supervisor/proxy-listener-native.ts": {
+    "bun": 4
+  },
+  "packages/cli/src/supervisor/proxy-websocket.ts": {
+    "bun": 1
+  },
+  "packages/cli/src/supervisor/proxy.ts": {
+    "bun": 4
+  },
+  "packages/client/src/build/manifest.ts": {
+    "node": 2
+  },
+  "packages/client/src/build/next.ts": {
+    "node": 2
+  },
+  "packages/drizzle/src/activate.ts": {
+    "node": 1
+  },
+  "packages/drizzle/src/native-leases.ts": {
+    "node": 1
+  },
+  "packages/inspector/src/ui-native.service.ts": {
+    "bun": 3
+  },
+  "packages/relkit/src/app/dev-module-reload.ts": {
+    "node": 2
+  },
+  "packages/relkit/src/app/dev-reload.ts": {
+    "node": 3
+  },
+  "packages/relkit/src/functions/create-relkit.ts": {
+    "node": 3
+  },
+  "packages/relkit/src/functions/runtime-handle.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/graph/hash.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/inspector-api/actions-utils.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/inspector-api/connection/bridge-handler.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/inspector-api/connection/bridge.service.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/inspector-api/connection/files-native.ts": {
+    "node": 4
+  },
+  "packages/relkit/src/inspector-api/connection/files-publish.ts": {
+    "node": 3
+  },
+  "packages/relkit/src/inspector-api/jobs/filters-support.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/invocation/dispatcher-scope.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/jobs/authorization-cursor-codec.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/jobs/run-id-codec.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/jobs/run-id-support.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/jobs/runtime-context.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/jobs/server-manifest.ts": {
+    "node": 2
+  },
+  "packages/relkit/src/launcher/index.ts": {
+    "node": 4
+  },
+  "packages/relkit/src/launcher/launch-bun.ts": {
+    "node": 2
+  },
+  "packages/relkit/src/observability/storage/index-core.ts": {
+    "node": 2
+  },
+  "packages/relkit/src/observability/storage/index-files-core.ts": {
+    "node": 2
+  },
+  "packages/relkit/src/observability/storage/index-retention-core.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/observability/storage/index-state-core.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/observability/storage/segment-files-core.ts": {
+    "node": 3
+  },
+  "packages/relkit/src/observability/storage/segment-files-effect.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/observability/storage/segment-files.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/observability/storage/segment-store-utils.types.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/observability/storage/segments-core.ts": {
+    "node": 2
+  },
+  "packages/relkit/src/observability/telemetry-sampling.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/provider/dependency-project-manager.ts": {
+    "node": 2
+  },
+  "packages/relkit/src/provider/dependency-source.service.ts": {
+    "node": 3
+  },
+  "packages/relkit/src/providers-local/agent-state/continuation-admission.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/providers-local/buckets/keys.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/providers-local/buckets/object-validation.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/providers-local/buckets/storage.ts": {
+    "node": 4
+  },
+  "packages/relkit/src/providers-local/cache/persistence.ts": {
+    "node": 4
+  },
+  "packages/relkit/src/providers-local/events/admin.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/providers-local/events/provider.ts": {
+    "node": 2
+  },
+  "packages/relkit/src/providers-local/events/router.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/providers-local/jobs/admin.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/providers-local/jobs/durable-file.ts": {
+    "node": 3
+  },
+  "packages/relkit/src/providers-local/jobs/native-adapter-runs.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/providers-local/jobs/native.service.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/providers-local/jobs/queue.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/providers-local/jobs/store-files.ts": {
+    "node": 2
+  },
+  "packages/relkit/src/providers-local/state-store.service.ts": {
+    "node": 3
+  },
+  "packages/relkit/src/providers-local/state.ts": {
+    "node": 3
+  },
+  "packages/relkit/src/realtime/dispatch.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/realtime/provider-encoding.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/runtime-effect/native-context.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/runtime-hono/agent-request-validation.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/runtime-hono/http-logging.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/runtime-hono/realtime-observation.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/runtime-hono/realtime-rpc-support.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/runtime-hono/selected-transports.service.ts": {
+    "node": 1
+  },
+  "packages/relkit/src/runtime-hono/static-file-service.ts": {
+    "node": 2
+  },
+  "packages/relkit/src/runtime-hono/static-files.ts": {
+    "node": 1
+  },
+  "packages/testing/src/application-registry.ts": {
+    "bun": 7
+  },
+  "packages/testing/src/application-routes.ts": {
+    "bun": 1
+  },
+  "packages/testing/src/application-service-discovery.ts": {
+    "bun": 2
+  },
+  "packages/testing/src/http-listener.ts": {
+    "bun": 2
+  },
+  "packages/testing/src/http-listener.types.ts": {
+    "bun": 1
+  }
+}

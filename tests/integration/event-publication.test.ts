@@ -2,9 +2,9 @@ import { expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createEventClient, defineEvent } from "../../packages/events/src/index.ts";
-import { createLocalEventProvider } from "../../packages/providers-local/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { createEventClient, defineEvent } from "relkit/events";
+import { createLocalEventProvider } from "relkit/providers-local";
+import { z } from "relkit/schema";
 
 test("publication accepts zero consumers and does not wait for independent consumers", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-event-publication-"));

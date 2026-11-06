@@ -3,18 +3,18 @@ import { createRequire } from "node:module";
 import { mkdir, mkdtemp, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import ts from "typescript";
+import ts from "./src/typescript-parser.js";
 
 const require = createRequire(import.meta.url);
 
-test("the packaged editor plugin reports unsaved route mistakes and offers a working code fix", () => {
+test("the packaged editor plugin accepts a default route map and reports a wrong binding", () => {
   const initialize = require("@relkit/cli/editor") as typeof import("./src/editor.js").default;
   expect(typeof initialize).toBe("function");
   const root = resolve(import.meta.dir, "../../examples/commerce");
   const file = resolve(root, "src/routes/orders/route.ts");
   const original = ts.sys.readFile(file)!;
-  let source = original.replace("export const { GET, POST }", "export const GET");
-  expect(source).not.toBe(original);
+  expect(original).toContain("export default defineServiceRoutes(");
+  let source = original;
   let version = 0;
   const loaded = ts.readConfigFile(resolve(root, "tsconfig.json"), ts.sys.readFile);
   const config = ts.parseJsonConfigFileContent(loaded.config, ts.sys, root);
@@ -38,31 +38,28 @@ test("the packaged editor plugin reports unsaved route mistakes and offers a wor
   const plugin = initialize({ typescript: ts }).create({
     languageService: service,
   } as ts.server.PluginCreateInfo);
+  const relkitDiagnostics = () =>
+    plugin.getSemanticDiagnostics(file).filter((entry) => entry.source === "relkit");
   try {
-    expect(service.getSemanticDiagnostics(file)).toEqual([]);
-    const diagnostics = plugin
-      .getSemanticDiagnostics(file)
-      .filter((entry) => entry.source === "relkit");
-    expect(diagnostics.length).toBeGreaterThan(0);
-    const fix = plugin.getCodeFixesAtPosition(
+    expect(relkitDiagnostics()).toEqual([]);
+    source = original.replace(
+      "export default defineServiceRoutes(",
+      "export const GET = defineServiceRoutes(",
+    );
+    version++;
+    const diagnostics = relkitDiagnostics();
+    expect(diagnostics.map((entry) => entry.messageText)).toContainEqual(
+      expect.stringContaining("export default defineServiceRoutes(...)"),
+    );
+    const fixes = plugin.getCodeFixesAtPosition(
       file,
       diagnostics[0]!.start!,
       diagnostics[0]!.start! + diagnostics[0]!.length!,
       [99001],
       {},
       {},
-    )[0];
-    expect(fix?.fixName).toBe("relkit-destructure-service-routes");
-    const change = fix!.changes[0]!.textChanges[0]!;
-    source =
-      source.slice(0, change.span.start) +
-      change.newText +
-      source.slice(change.span.start + change.span.length);
-    version++;
-    expect(
-      plugin.getSemanticDiagnostics(file).filter((entry) => entry.source === "relkit"),
-    ).toEqual([]);
-    expect(source).toContain("export const { GET }");
+    );
+    expect(fixes.some((fix) => fix.fixName.startsWith("relkit-"))).toBe(false);
   } finally {
     service.dispose();
   }
@@ -79,7 +76,7 @@ test("the editor entry point loads through Node and TypeScript's plugin resolver
       [
         node!,
         "-e",
-        `const ts = require(${JSON.stringify(require.resolve("typescript"))});
+        `const ts = require(${JSON.stringify(require.resolve("relkit-typescript"))});
 const result = ts.sys.require(process.cwd(), "@relkit/cli/editor");
 if (result.error) throw result.error;
 if (typeof require("@relkit/cli/editor") !== "function") throw new Error("Invalid CommonJS entry");

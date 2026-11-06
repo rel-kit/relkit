@@ -1,4 +1,4 @@
-/** Checks export-orders.task through the supported public RELKIT APIs. */
+/** Checks export-orders.task through the supported public RelKit APIs. */
 import { expect, test } from "bun:test";
 import task from "@app/services/orders/tasks/export-orders.task.js";
 

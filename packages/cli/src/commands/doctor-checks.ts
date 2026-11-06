@@ -4,7 +4,7 @@
  * probe the independently installed inspector UI.
  */
 import { Effect, Layer } from "effect";
-import type { LoadedToolingConfig } from "@relkit/compiler";
+import type { LoadedToolingConfig } from "../compiler/index.js";
 import { doctorCommandEffect, availablePortEffect } from "./doctor-native.js";
 import { checkPortsEffect } from "./doctor-ports.js";
 export { checkPortsEffect } from "./doctor-ports.js";
@@ -15,6 +15,8 @@ import { cleanupLayer } from "../services/cleanup.service.js";
 import { fileSystemLayer } from "../services/filesystem.service.js";
 import type { DoctorCheck, DoctorCommandRunner, DoctorOptions } from "./doctor.types.js";
 import { CliDoctorToolchain, doctorToolchainLayer } from "./doctor-toolchain.service.js";
+import { packageManagerCommands, projectPackageManager } from "create-relkit/package-manager";
+import { runtime } from "../runtime/index.js";
 export { checkRootsEffect, availablePortEffect };
 
 /** Checks local Pulumi only when deployment is enabled.
@@ -84,11 +86,12 @@ export function checkAws(
  */
 export const checkLockfileEffect = Effect.fn("Doctor.lockfile")(
   function* (root: string, runner?: DoctorCommandRunner) {
-    const result = yield* doctorCommandEffect(
-      [process.execPath, "install", "--frozen-lockfile", "--dry-run"],
-      root,
-      runner,
-    );
+    const manager = packageManagerCommands(projectPackageManager(root));
+    const executable =
+      manager.name === "bun" && runtime.name === "bun"
+        ? process.execPath
+        : (runtime.processes.which(manager.name) ?? manager.name);
+    const result = yield* doctorCommandEffect([executable, ...manager.frozenCheck], root, runner);
     return {
       name: "lockfile",
       ok: result.exitCode === 0,

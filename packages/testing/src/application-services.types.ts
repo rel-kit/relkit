@@ -1,5 +1,5 @@
 /** Native application service ownership and replaceable activation dependencies. */
-import type { HttpAuthRuntime } from "@relkit/runtime-hono";
+import type { HttpAuthRuntime } from "relkit/runtime-hono";
 import type { TestRoute } from "./application-routes.js";
 import type { TestRuntime, TestRuntimeOptions } from "./runtime.types.js";
 
@@ -11,6 +11,8 @@ export interface TestApplicationServices {
   readonly context: NonNullable<TestRuntimeOptions["context"]>;
   readonly auth?: HttpAuthRuntime;
   readonly authHandler?: (request: Request) => Promise<Response>;
+  /** Where the auth handler is mounted: its route's base path, or the service's own. */
+  readonly authBasePath?: string;
   readonly close: () => Promise<void>;
 }
 

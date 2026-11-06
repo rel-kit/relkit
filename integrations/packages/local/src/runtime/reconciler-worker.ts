@@ -3,7 +3,7 @@ import type {
   LocalServiceBindMount,
   LocalServiceWorkerArtifact,
   NormalizedLocalServiceRecipe,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 
 export interface WorkerStartOptions {
   readonly bindMounts?: Readonly<Record<string, readonly LocalServiceBindMount[]>>;
@@ -38,10 +38,12 @@ export function workerStartOptions(
       ? undefined
       : absoluteDirectory(artifact.nodeModulesDirectory, "worker node_modules directory");
   if (nodeModulesDirectory !== undefined) {
+    // Bun ignores NODE_PATH under --no-install, so packages are mounted where its
+    // parent-directory resolution finds them from /relkit-worker/server.
     bindMounts.push(
       Object.freeze({
         source: nodeModulesDirectory,
-        target: "/relkit-node-modules",
+        target: "/node_modules",
         readOnly: true,
       }),
     );
@@ -49,7 +51,7 @@ export function workerStartOptions(
   const environment = Object.freeze({
     RELKIT_PROVIDER_OVERRIDES_FILE: "/relkit-state/" + basename(providerOverridesFile),
     RELKIT_WORKER_ROLE: "worker",
-    ...(nodeModulesDirectory === undefined ? {} : { NODE_PATH: "/relkit-node-modules" }),
+    ...(nodeModulesDirectory === undefined ? {} : { NODE_PATH: "/node_modules" }),
     ...(artifact.environment ?? {}),
   });
   return Object.freeze({

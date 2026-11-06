@@ -1,9 +1,6 @@
 /** Validates the selected ORM before loading runtime activation or calling the native factory. */
 import { fileURLToPath } from "node:url";
-import {
-  SelectedDependencies,
-  SelectedDependenciesLive,
-} from "@relkit/provider/internal/dependencies";
+import { SelectedDependencies, SelectedDependenciesLive } from "relkit/provider/dependencies";
 import { Effect } from "effect";
 import type { DrizzleServiceDescriptor } from "./types.js";
 import type { DrizzleActivation, DrizzleActivationOptions } from "./activation.types.js";

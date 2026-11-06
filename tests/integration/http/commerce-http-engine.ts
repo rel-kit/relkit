@@ -1,7 +1,7 @@
 /** Invokes concrete native commerce descriptors without erasing heterogeneous target input/output types. */
 import { invokeCommerceTarget as invokeFunction } from "./commerce-native-invocation.js";
-import type { HttpInvocationOptions } from "../../../packages/runtime-hono/src/index.ts";
-import { runWithRealtimeDispatcher } from "../../../packages/realtime/dist/index.js";
+import type { HttpInvocationOptions } from "relkit/runtime-hono";
+import { runWithRealtimeDispatcher } from "relkit/realtime";
 import browsePath from "../../../examples/commerce/src/services/navigation/functions/browse-path.function.ts";
 import deleteOrder from "../../../examples/commerce/src/services/orders/functions/delete-order.function.ts";
 import getOrder from "../../../examples/commerce/src/services/orders/functions/get-order.function.ts";

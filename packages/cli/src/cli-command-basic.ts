@@ -54,6 +54,7 @@ function createCommand(select: SelectInvocation) {
         examples: booleanFlag(createPath, "examples"),
         noExamples: booleanFlag(createPath, "no-examples"),
         forceEmpty: booleanFlag(createPath, "force-empty-directory"),
+        strict: booleanFlag(createPath, "strict"),
       },
       (value) =>
         Effect.sync(() =>
@@ -71,6 +72,7 @@ function createCommand(select: SelectInvocation) {
             ...booleanArgs("examples", value.examples),
             ...booleanArgs("no-examples", value.noExamples),
             ...booleanArgs("force-empty-directory", value.forceEmpty),
+            ...booleanArgs("strict", value.strict),
           ]),
         ),
     ),
@@ -103,6 +105,9 @@ function projectCommand(
         projectRoot: optionalString(path, "project-root"),
         ...(port ? { port: optionalInteger(path, "port", true) } : {}),
         ...(inspectorPort ? { inspectorPort: optionalInteger(path, "inspector-port") } : {}),
+        ...(name === "build"
+          ? { runtime: optionalChoice(path, "runtime"), target: optionalChoice(path, "target") }
+          : {}),
         ...(name === "dev"
           ? {
               local: optionalChoice(path, "local"),
@@ -121,6 +126,8 @@ function projectCommand(
             ...(value && "inspectorPort" in value
               ? optionArgs("inspector-port", value.inspectorPort)
               : []),
+            ...(value && "runtime" in value ? optionArgs("runtime", value.runtime) : []),
+            ...(value && "target" in value ? optionArgs("target", value.target) : []),
             ...(value && "local" in value ? optionArgs("local", value.local) : []),
             ...("logLevel" in value ? optionArgs("log-level", value.logLevel) : []),
             ...("verbose" in value ? booleanArgs("verbose", value.verbose) : []),

@@ -1,6 +1,6 @@
 /** Prices validated order input and persists its selected fields through the tutorial's native database context. */
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "zod";
 import priceOrder from "@app/services/orders/functions/price-order.function.js";
 const order = z.object({
   orderId: z.string().min(1),
@@ -15,8 +15,9 @@ export default defineFunction({
     quantity: z.number().int().positive(),
     totalCents: z.number().int().nonnegative(),
   }),
+  dependencies: { functions: { priceOrder } },
   handler: async (input, context) => {
-    const { totalCents } = await priceOrder.invoke({ quantity: input.quantity });
+    const { totalCents } = await context.functions.priceOrder({ quantity: input.quantity });
     const saved = await context.database.orders.insert({
       data: { ...input, totalCents, ownerId: null },
     });

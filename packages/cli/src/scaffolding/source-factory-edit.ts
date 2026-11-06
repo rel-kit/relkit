@@ -1,8 +1,8 @@
 /** Updates recognized application and service factory syntax for add plans without evaluating the authored module or replacing unrelated configuration. */
 
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 /**
  * Requires exactly one factory call with a static object argument.
  * @param file - TypeScript SourceFile AST.

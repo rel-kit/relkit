@@ -2,8 +2,9 @@
 import {
   DEPLOYMENT_INTEGRATION_PROTOCOL_VERSION,
   type DeploymentIntegrationMetadata,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 
+/** @experimental */
 export const pulumiEngine = Object.freeze({
   kind: "deployment-integration",
   protocolVersion: DEPLOYMENT_INTEGRATION_PROTOCOL_VERSION,
@@ -11,7 +12,8 @@ export const pulumiEngine = Object.freeze({
   role: "engine",
 }) satisfies DeploymentIntegrationMetadata<"pulumi", "engine">;
 
+/** @experimental */
 export const deploymentIntegration = pulumiEngine;
 
 // The selected engine owns the implementation; authoring stays metadata-only.
-export * from "@relkit/deploy-pulumi";
+export * from "../deploy-pulumi/index.js";

@@ -1,3 +1,4 @@
+import type { CreateCapabilityWarning } from "./create-capabilities.types.js";
 import type { CreateOptions } from "./options.js";
 import type { PromptDriver } from "./prompt-driver.types.js";
 
@@ -13,4 +14,6 @@ export interface ResolveCreateContext {
 export interface ResolvedCreateOptions {
   readonly options: CreateOptions;
   readonly prompted: boolean;
+  /** Coded notices to print before creation, such as an untested combination. */
+  readonly warnings: readonly CreateCapabilityWarning[];
 }

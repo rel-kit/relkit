@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { buildCatalogProvider } from "../../packages/create-relkit/src/build-catalog.js";
 import { generateProject, normalizeCreateOptions } from "../../packages/create-relkit/src/index.js";
 test("Docker Jobs starters include the local orchestrator and documented config", async () => {
   const parent = await mkdtemp(join(tmpdir(), "relkit-jobs-starters-"));
@@ -21,10 +22,11 @@ test("Docker Jobs starters include the local orchestrator and documented config"
       const manifest = JSON.parse(
         await readFile(join(generated.destination, "package.json"), "utf8"),
       );
+      // Integrations come from the creator's bundled catalog at their exact published versions.
       expect(manifest.dependencies).toMatchObject({
-        "@relkit/docker": manifest.dependencies["@relkit/app"],
-        "@relkit/local": manifest.dependencies["@relkit/app"],
-        [`@relkit/${provider}`]: manifest.dependencies["@relkit/app"],
+        "@relkit/docker": buildCatalogProvider("@relkit/docker"),
+        "@relkit/local": buildCatalogProvider("@relkit/local"),
+        [`@relkit/${provider}`]: buildCatalogProvider(`@relkit/${provider}`),
       });
       const config = await readFile(join(generated.destination, "relkit.config.ts"), "utf8");
       const example = resolve(

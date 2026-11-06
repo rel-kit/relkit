@@ -1,4 +1,4 @@
-import type { RunListQuery, RunSnapshot } from "@relkit/contracts/jobs";
+import type { RunListQuery, RunSnapshot } from "relkit/contracts/jobs";
 import type { InngestRunMetadata } from "./runs.js";
 
 const MAX_LIMIT = 100;

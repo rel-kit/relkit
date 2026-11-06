@@ -1,0 +1,10 @@
+import { defineError } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
+
+const OrderNotFound = defineError({
+  data: z.object({ orderId: z.string() }),
+  message: ({ orderId }) => `Order ${orderId} was not found`,
+  http: { status: 404 },
+});
+
+export default OrderNotFound;

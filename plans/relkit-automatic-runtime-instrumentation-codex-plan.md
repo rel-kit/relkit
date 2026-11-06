@@ -2,18 +2,18 @@
 
 ## Codex Implementation Plan
 
-| Field | Value |
-| --- | --- |
-| Status | Proposed implementation plan |
-| Audience | Codex and RelKit maintainers |
-| Feature name | Automatic Runtime Instrumentation |
-| Original working name | Auto Annotations |
-| Recommended OpenSpec change ID | `end-to-end-runtime-instrumentation` |
-| Repository | `rel-kit/relkit` |
-| Baseline reviewed | `484fd989ccd8f2cded8f89744eb753e7516535d0` |
-| Baseline date | 2026-09-03 |
-| Runtime | Bun 1.3.10, strict TypeScript, Hono, Effect |
-| Primary outcome | One request-centric causal execution graph across HTTP, middleware, functions, database, cache, buckets, events, jobs, tools, agents, logs, and failures |
+| Field                          | Value                                                                                                                                                    |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Status                         | Proposed implementation plan                                                                                                                             |
+| Audience                       | Codex and RelKit maintainers                                                                                                                             |
+| Feature name                   | Automatic Runtime Instrumentation                                                                                                                        |
+| Original working name          | Auto Annotations                                                                                                                                         |
+| Recommended OpenSpec change ID | `end-to-end-runtime-instrumentation`                                                                                                                     |
+| Repository                     | `rel-kit/relkit`                                                                                                                                         |
+| Baseline reviewed              | `484fd989ccd8f2cded8f89744eb753e7516535d0`                                                                                                               |
+| Baseline date                  | 2026-09-03                                                                                                                                               |
+| Runtime                        | Bun 1.3.10, strict TypeScript, Hono, Effect                                                                                                              |
+| Primary outcome                | One request-centric causal execution graph across HTTP, middleware, functions, database, cache, buckets, events, jobs, tools, agents, logs, and failures |
 
 ---
 
@@ -143,38 +143,38 @@ The implementation must extend the current architecture instead of duplicating i
 
 The reviewed baseline already contains:
 
-| Area | Existing behavior |
-| --- | --- |
-| HTTP | `x-request-id` and `x-trace-id` middleware, request lifecycle hooks, request records, route/mapping/function timeline details |
-| Invocation | Invocation IDs, trace IDs, parent invocation IDs, correlation IDs, deadlines, attempts, sources, cancellation, outcomes |
-| Effect tracing | Root and child invocation spans, captured Effect trace re-entry, span lifecycle observation |
-| Logs | Structured records that can include invocation, trace, span, request, correlation, generation, graph, and service fields |
-| Resources | Cache and bucket operation bridges and operation hooks |
-| Functions | Direct function calls inherit invocation scope and create child spans |
-| Events | Publication carries trace ID, correlation ID, and causation invocation ID |
-| Jobs | Enqueue and execution infrastructure with durable attempts and retries |
-| Database | Centralized logical Drizzle operation and transaction interception points |
-| Observability | Versioned records, redaction, bounded collector, local persistence, index, query, streaming, remote mode, exporters, sampling |
-| Inspector | Existing requests, traces, logs, functions, middleware, events, jobs, and waterfall views |
-| OTLP | Existing publishable OTLP integration with batching and exporter failure isolation |
+| Area           | Existing behavior                                                                                                             |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| HTTP           | `x-request-id` and `x-trace-id` middleware, request lifecycle hooks, request records, route/mapping/function timeline details |
+| Invocation     | Invocation IDs, trace IDs, parent invocation IDs, correlation IDs, deadlines, attempts, sources, cancellation, outcomes       |
+| Effect tracing | Root and child invocation spans, captured Effect trace re-entry, span lifecycle observation                                   |
+| Logs           | Structured records that can include invocation, trace, span, request, correlation, generation, graph, and service fields      |
+| Resources      | Cache and bucket operation bridges and operation hooks                                                                        |
+| Functions      | Direct function calls inherit invocation scope and create child spans                                                         |
+| Events         | Publication carries trace ID, correlation ID, and causation invocation ID                                                     |
+| Jobs           | Enqueue and execution infrastructure with durable attempts and retries                                                        |
+| Database       | Centralized logical Drizzle operation and transaction interception points                                                     |
+| Observability  | Versioned records, redaction, bounded collector, local persistence, index, query, streaming, remote mode, exporters, sampling |
+| Inspector      | Existing requests, traces, logs, functions, middleware, events, jobs, and waterfall views                                     |
+| OTLP           | Existing publishable OTLP integration with batching and exporter failure isolation                                            |
 
 ### 3.2 Primary gaps
 
-| Gap | Why it matters |
-| --- | --- |
-| `TraceId` is currently a generic stable ID | It cannot be safely injected as W3C `traceparent` without a compliant representation |
-| HTTP has no actual server span | Function spans share a string trace ID but are not children of an HTTP span |
-| HTTP parent and invocation parent are conflated | An HTTP span is not an invocation and must not require a fake parent invocation ID |
-| Hono middleware is manually timed | Middleware is not represented as an active child span, so nested logs and operations do not inherit it |
-| Request completion scans collected records | This does not scale and cannot naturally include late asynchronous continuations |
-| Event delivery reuses trace identity without a producer span context | Durable asynchronous causation is ambiguous |
-| Job enqueue does not carry trace or causation context | A worker cannot be linked back to the originating request reliably |
-| Database logical operations are not bridged to tracing | The centralized Drizzle operation layer is invisible in traces |
-| Cache/bucket operation records lack common context and timing | They cannot be queried consistently with spans and logs |
-| Span events are not fully represented | Very short lifecycle phases must otherwise become noisy spans or disappear |
-| Record correlation fields vary by signal | Queries and inspector views require signal-specific heuristics |
-| External sampling can export isolated errors | A backend can receive one error record without the rest of its trace |
-| OTLP adapter exports RelKit-shaped payloads | It must eventually emit valid OTLP signal requests from canonical records |
+| Gap                                                                  | Why it matters                                                                                         |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `TraceId` is currently a generic stable ID                           | It cannot be safely injected as W3C `traceparent` without a compliant representation                   |
+| HTTP has no actual server span                                       | Function spans share a string trace ID but are not children of an HTTP span                            |
+| HTTP parent and invocation parent are conflated                      | An HTTP span is not an invocation and must not require a fake parent invocation ID                     |
+| Hono middleware is manually timed                                    | Middleware is not represented as an active child span, so nested logs and operations do not inherit it |
+| Request completion scans collected records                           | This does not scale and cannot naturally include late asynchronous continuations                       |
+| Event delivery reuses trace identity without a producer span context | Durable asynchronous causation is ambiguous                                                            |
+| Job enqueue does not carry trace or causation context                | A worker cannot be linked back to the originating request reliably                                     |
+| Database logical operations are not bridged to tracing               | The centralized Drizzle operation layer is invisible in traces                                         |
+| Cache/bucket operation records lack common context and timing        | They cannot be queried consistently with spans and logs                                                |
+| Span events are not fully represented                                | Very short lifecycle phases must otherwise become noisy spans or disappear                             |
+| Record correlation fields vary by signal                             | Queries and inspector views require signal-specific heuristics                                         |
+| External sampling can export isolated errors                         | A backend can receive one error record without the rest of its trace                                   |
+| OTLP adapter exports RelKit-shaped payloads                          | It must eventually emit valid OTLP signal requests from canonical records                              |
 
 ### 3.3 Existing files that must be treated as migration points
 
@@ -297,24 +297,24 @@ runtime operation
   -> optional exporter fan-out
 ```
 
-Do not create a separate OpenTelemetry-only store, a separate request timeline store, or a second tracer that bypasses `@relkit/observability`.
+Do not create a separate OpenTelemetry-only store, a separate request timeline store, or a second tracer that bypasses `relkit/observability`.
 
 ### 4.2 Separate identities by purpose
 
 RelKit will not overload one identifier with several meanings.
 
-| Identity | Meaning |
-| --- | --- |
-| `requestId` | One inbound HTTP request handled by one RelKit service |
-| `originRequestId` | The first RelKit HTTP request that causally initiated later work |
-| `traceId` | W3C-compatible distributed trace identity |
-| `spanId` | One timed operation within a trace |
-| `invocationId` | One function invocation attempt |
-| `correlationId` | Optional application/business workflow identity |
-| `causation` | The immediately preceding event, job, invocation, request, tool, or agent operation |
-| `eventInstanceId` | One durable event publication identity |
-| `jobInstanceId` | One durable job identity across retries |
-| `generationId` + `graphHash` | Exact activated runtime/code graph identity |
+| Identity                     | Meaning                                                                             |
+| ---------------------------- | ----------------------------------------------------------------------------------- |
+| `requestId`                  | One inbound HTTP request handled by one RelKit service                              |
+| `originRequestId`            | The first RelKit HTTP request that causally initiated later work                    |
+| `traceId`                    | W3C-compatible distributed trace identity                                           |
+| `spanId`                     | One timed operation within a trace                                                  |
+| `invocationId`               | One function invocation attempt                                                     |
+| `correlationId`              | Optional application/business workflow identity                                     |
+| `causation`                  | The immediately preceding event, job, invocation, request, tool, or agent operation |
+| `eventInstanceId`            | One durable event publication identity                                              |
+| `jobInstanceId`              | One durable job identity across retries                                             |
+| `generationId` + `graphHash` | Exact activated runtime/code graph identity                                         |
 
 ### 4.3 W3C Trace Context at transport boundaries
 
@@ -470,7 +470,7 @@ A compatibility period may read older records where `correlationId === requestId
 
 ## 5. Target identity and propagation contracts
 
-The exact package location may be adjusted to satisfy dependency boundaries, but the public/portable types must live below runtime packages. Prefer `@relkit/contracts` for JSON-safe transport types and `@relkit/invocation` for runtime-only invocation types.
+The exact package location may be adjusted to satisfy dependency boundaries, but the public/portable types must live below runtime packages. Prefer `relkit/contracts` for JSON-safe transport types and `relkit/invocation` for runtime-only invocation types.
 
 ### 5.1 ID contracts
 
@@ -538,13 +538,7 @@ Required parsing rules:
 ### 5.3 Causation and portable propagation envelope
 
 ```ts
-export type CausationKind =
-  | "request"
-  | "invocation"
-  | "event"
-  | "job"
-  | "tool"
-  | "agent";
+export type CausationKind = "request" | "invocation" | "event" | "job" | "tool" | "agent";
 
 export interface CausationRef {
   readonly kind: CausationKind;
@@ -656,12 +650,7 @@ Migration rules:
 RelKit currently emits start and completion lifecycle records. Preserve live streaming capability while making completion records authoritative.
 
 ```ts
-export type SpanKind =
-  | "server"
-  | "client"
-  | "producer"
-  | "consumer"
-  | "internal";
+export type SpanKind = "server" | "client" | "producer" | "consumer" | "internal";
 
 export interface SpanLinkRecord {
   readonly traceId: TraceId;
@@ -789,13 +778,7 @@ Do not persist a copied full timeline in new request records. The query response
 Introduce a general logical operation record instead of continuing to widen `ResourceRecord` indefinitely.
 
 ```ts
-export type OperationCategory =
-  | "database"
-  | "cache"
-  | "bucket"
-  | "http"
-  | "rpc"
-  | "provider";
+export type OperationCategory = "database" | "cache" | "bucket" | "http" | "rpc" | "provider";
 
 export type OperationOutcome =
   | "success"
@@ -806,9 +789,7 @@ export type OperationOutcome =
   | "unsupported"
   | "defect";
 
-export interface OperationRecordV2
-  extends VersionedRecord<"operation">,
-    RecordContextV2 {
+export interface OperationRecordV2 extends VersionedRecord<"operation">, RecordContextV2 {
   readonly category: OperationCategory;
   readonly operation: string;
   readonly targetId: string;
@@ -848,13 +829,7 @@ export interface EventRecordV2 extends VersionedRecord<"event">, RecordContextV2
   readonly triggerId?: string;
   readonly functionId?: string;
   readonly state:
-    | "accepted"
-    | "published"
-    | "started"
-    | "delivered"
-    | "retrying"
-    | "failed"
-    | "dead-lettered";
+    "accepted" | "published" | "started" | "delivered" | "retrying" | "failed" | "dead-lettered";
   readonly occurredAt: string;
   readonly completedAt?: string;
   readonly durationMs?: number;
@@ -873,13 +848,7 @@ export interface JobRecordV2 extends VersionedRecord<"job">, RecordContextV2 {
   readonly instanceId: JobInstanceId;
   readonly functionId: string;
   readonly profile: string;
-  readonly state:
-    | "accepted"
-    | "available"
-    | "leased"
-    | "delayed"
-    | "completed"
-    | "dead-lettered";
+  readonly state: "accepted" | "available" | "leased" | "delayed" | "completed" | "dead-lettered";
   readonly attempt: number;
   readonly acceptedAt: string;
   readonly startedAt?: string;
@@ -1229,14 +1198,9 @@ export interface TraceContext {
     work: () => Value | Promise<Value>,
   ): Promise<Value>;
 
-  event(
-    name: string,
-    attributes?: Readonly<Record<string, AttributeValue>>,
-  ): void;
+  event(name: string, attributes?: Readonly<Record<string, AttributeValue>>): void;
 
-  setAttributes(
-    attributes: Readonly<Record<string, AttributeValue>>,
-  ): void;
+  setAttributes(attributes: Readonly<Record<string, AttributeValue>>): void;
 }
 ```
 
@@ -1344,14 +1308,7 @@ export default defineApp({
 
     redaction: {
       mode: "strict",
-      redactKeys: [
-        "authorization",
-        "cookie",
-        "password",
-        "token",
-        "secret",
-        "apiKey",
-      ],
+      redactKeys: ["authorization", "cookie", "password", "token", "secret", "apiKey"],
     },
 
     exporters: {
@@ -1407,8 +1364,8 @@ route handler
 Compatibility exports may remain temporarily:
 
 ```ts
-requestIdMiddleware // deprecated wrapper
-traceMiddleware     // deprecated wrapper
+requestIdMiddleware; // deprecated wrapper
+traceMiddleware; // deprecated wrapper
 ```
 
 They must delegate to the shared implementation and must not create duplicate spans or IDs.
@@ -1554,15 +1511,15 @@ The finalizer owns:
 
 Required mappings:
 
-| Condition | Request outcome | Suggested status |
-| --- | --- | --- |
-| Success | `success` | Actual response status |
-| Input validation | `validation-error` | 400/422 according to route contract |
-| Declared application error | mapped application outcome | Declared status |
-| Provider failure | `defect` at HTTP boundary, provider failure in child | 500/502 as mapped |
-| Timeout | `timeout` | 504 |
-| Client cancellation | `cancelled` | 499 in internal record; response may be unavailable |
-| Defect | `defect` | 500 |
+| Condition                  | Request outcome                                      | Suggested status                                    |
+| -------------------------- | ---------------------------------------------------- | --------------------------------------------------- |
+| Success                    | `success`                                            | Actual response status                              |
+| Input validation           | `validation-error`                                   | 400/422 according to route contract                 |
+| Declared application error | mapped application outcome                           | Declared status                                     |
+| Provider failure           | `defect` at HTTP boundary, provider failure in child | 500/502 as mapped                                   |
+| Timeout                    | `timeout`                                            | 504                                                 |
+| Client cancellation        | `cancelled`                                          | 499 in internal record; response may be unavailable |
+| Defect                     | `defect`                                             | 500                                                 |
 
 An exception event contains only safe, redacted fields. The original error continues through existing failure mapping.
 
@@ -1615,15 +1572,15 @@ For `ctx.functions.*` or equivalent direct invocation:
 
 Default representation:
 
-| Phase | Representation |
-| --- | --- |
-| Input validation start/end | span events |
-| `onBefore` start/end | span events by default; child span in verbose mode |
-| Handler | body of function span |
-| `onAfter` start/end | span events by default; child span in verbose mode |
-| Output validation start/end | span events |
-| Approval decision | tool span event |
-| Retry scheduled | consumer span event |
+| Phase                       | Representation                                     |
+| --------------------------- | -------------------------------------------------- |
+| Input validation start/end  | span events                                        |
+| `onBefore` start/end        | span events by default; child span in verbose mode |
+| Handler                     | body of function span                              |
+| `onAfter` start/end         | span events by default; child span in verbose mode |
+| Output validation start/end | span events                                        |
+| Approval decision           | tool span event                                    |
+| Retry scheduled             | consumer span event                                |
 
 The lifecycle implementation must keep its existing ordering and failure semantics.
 
@@ -1693,10 +1650,7 @@ export interface ObserveOperationOptions {
 }
 
 export interface OperationObserver {
-  run<Value>(
-    options: ObserveOperationOptions,
-    work: () => Value | Promise<Value>,
-  ): Promise<Value>;
+  run<Value>(options: ObserveOperationOptions, work: () => Value | Promise<Value>): Promise<Value>;
 }
 ```
 
@@ -1718,9 +1672,9 @@ Do not create a package import cycle merely to share an interface.
 
 Preferred strategy:
 
-- Put portable operation record types in `@relkit/observability` or a lower data-only contract module.
+- Put portable operation record types in `relkit/observability` or a lower data-only contract module.
 - Keep resource package bridge interfaces structural.
-- Implement the common observer in `@relkit/runtime-effect` and adapt it through `@relkit/engine`.
+- Implement the common observer in `relkit/runtime-effect` and adapt it through `relkit/engine`.
 - Run `bun run check` after each dependency-edge change.
 
 ### 11.3 Duplicate span prevention
@@ -2263,7 +2217,7 @@ An event or job can finish after the request detail was first loaded.
 
 ### 17.1 API
 
-Extend `@relkit/inspector-api` with:
+Extend `relkit/inspector-api` with:
 
 ```text
 GET /_relkit/v1/requests/:requestId/execution
@@ -3234,30 +3188,30 @@ invoice.generate attempt 2
 
 ### Required assertions
 
-| Concern | Assertion |
-| --- | --- |
-| HTTP root | Exactly one server span |
-| W3C format | Trace and span IDs are valid, nonzero lowercase hex |
-| Middleware | Two nested/in-order authored middleware spans |
-| Function | `orders.create` is descendant of HTTP/middleware span |
-| Direct call | `inventory.reserve` has parent invocation `orders.create` |
-| Database | Insert/update operations are children of correct invocation |
-| Cache | Invalidation is child of `orders.create` and contains no key/value |
-| Event publication | Producer span ends before durable delivery begins |
-| Event delivery | Consumer trace links to producer and preserves origin request |
-| Job enqueue | Producer span and propagation metadata exist |
-| Job attempt 1 | Consumer trace links to enqueue and records provider failure |
-| Retry | Attempt 2 uses new span/invocation and stable job instance ID |
-| Bucket | Operation is child of each job attempt and contains no object key |
-| HTTP boundary | Request/server span ends at response completion, before delayed work finishes |
-| Logs | Every in-context log has correct trace/span/request/origin fields |
-| Query | Request execution endpoint returns root trace plus all continuations |
-| Inspector | One page renders synchronous work and continued-after-response work |
-| Source | Descriptor IDs resolve through matching generation and graph |
-| Privacy | No body, payload, SQL values, keys, secrets, or authorization data |
-| Failure isolation | Exporter outage does not change HTTP, event, job, or retry result |
-| Concurrency | Parallel acceptance runs do not mix IDs |
-| Restart | Event/job propagation survives local provider restart |
+| Concern           | Assertion                                                                     |
+| ----------------- | ----------------------------------------------------------------------------- |
+| HTTP root         | Exactly one server span                                                       |
+| W3C format        | Trace and span IDs are valid, nonzero lowercase hex                           |
+| Middleware        | Two nested/in-order authored middleware spans                                 |
+| Function          | `orders.create` is descendant of HTTP/middleware span                         |
+| Direct call       | `inventory.reserve` has parent invocation `orders.create`                     |
+| Database          | Insert/update operations are children of correct invocation                   |
+| Cache             | Invalidation is child of `orders.create` and contains no key/value            |
+| Event publication | Producer span ends before durable delivery begins                             |
+| Event delivery    | Consumer trace links to producer and preserves origin request                 |
+| Job enqueue       | Producer span and propagation metadata exist                                  |
+| Job attempt 1     | Consumer trace links to enqueue and records provider failure                  |
+| Retry             | Attempt 2 uses new span/invocation and stable job instance ID                 |
+| Bucket            | Operation is child of each job attempt and contains no object key             |
+| HTTP boundary     | Request/server span ends at response completion, before delayed work finishes |
+| Logs              | Every in-context log has correct trace/span/request/origin fields             |
+| Query             | Request execution endpoint returns root trace plus all continuations          |
+| Inspector         | One page renders synchronous work and continued-after-response work           |
+| Source            | Descriptor IDs resolve through matching generation and graph                  |
+| Privacy           | No body, payload, SQL values, keys, secrets, or authorization data            |
+| Failure isolation | Exporter outage does not change HTTP, event, job, or retry result             |
+| Concurrency       | Parallel acceptance runs do not mix IDs                                       |
+| Restart           | Event/job propagation survives local provider restart                         |
 
 Store expected trace relationships as explicit assertions, not broad snapshots alone.
 
@@ -3323,27 +3277,27 @@ Store expected trace relationships as explicit assertions, not broad snapshots a
 
 ## 22. Failure modes and required behavior
 
-| Failure | Required behavior |
-| --- | --- |
-| Invalid `traceparent` | Ignore it, discard dependent `tracestate`, create a new trace |
-| Invalid trusted request ID | Generate a new local request ID |
-| ALS context absent | Safe standalone behavior; no crash |
-| Effect trace absent | Use active ALS span or create documented root |
-| Span observer throws | Swallow and continue application work |
-| Collector rejects record | Emit bounded diagnostic if possible; do not fail operation |
-| Local store unavailable | Continue with bounded memory/diagnostic according to existing runtime policy |
-| Index write fails | Preserve segment append if possible; mark index unhealthy and recover/rebuild |
-| Exporter unavailable | Queue/retry/drop per policy; application continues |
-| Exporter queue full | Drop according to policy and increment counters; do not block request |
-| Event propagation missing | Deliver under fresh trace, no origin request, optional diagnostic |
-| Job propagation missing | Execute legacy job under fresh trace |
-| Malformed propagation metadata | Ignore metadata, do not expose it to handler, continue safely when payload is valid |
-| Stream cancelled | Complete server span as cancelled exactly once |
-| Process shutdown | Drain accepted work, mark unfinished spans, flush telemetry within bound |
-| Generation switch | New work uses new generation context; old in-flight work retains old generation identity |
-| Clock anomaly | Duration clamps to nonnegative and records diagnostic if severe |
-| Excess events/links/attributes | Truncate deterministically and record dropped counts |
-| Causal cycle in malformed records | Query breaks cycle and marks data malformed; no recursion crash |
+| Failure                           | Required behavior                                                                        |
+| --------------------------------- | ---------------------------------------------------------------------------------------- |
+| Invalid `traceparent`             | Ignore it, discard dependent `tracestate`, create a new trace                            |
+| Invalid trusted request ID        | Generate a new local request ID                                                          |
+| ALS context absent                | Safe standalone behavior; no crash                                                       |
+| Effect trace absent               | Use active ALS span or create documented root                                            |
+| Span observer throws              | Swallow and continue application work                                                    |
+| Collector rejects record          | Emit bounded diagnostic if possible; do not fail operation                               |
+| Local store unavailable           | Continue with bounded memory/diagnostic according to existing runtime policy             |
+| Index write fails                 | Preserve segment append if possible; mark index unhealthy and recover/rebuild            |
+| Exporter unavailable              | Queue/retry/drop per policy; application continues                                       |
+| Exporter queue full               | Drop according to policy and increment counters; do not block request                    |
+| Event propagation missing         | Deliver under fresh trace, no origin request, optional diagnostic                        |
+| Job propagation missing           | Execute legacy job under fresh trace                                                     |
+| Malformed propagation metadata    | Ignore metadata, do not expose it to handler, continue safely when payload is valid      |
+| Stream cancelled                  | Complete server span as cancelled exactly once                                           |
+| Process shutdown                  | Drain accepted work, mark unfinished spans, flush telemetry within bound                 |
+| Generation switch                 | New work uses new generation context; old in-flight work retains old generation identity |
+| Clock anomaly                     | Duration clamps to nonnegative and records diagnostic if severe                          |
+| Excess events/links/attributes    | Truncate deterministically and record dropped counts                                     |
+| Causal cycle in malformed records | Query breaks cycle and marks data malformed; no recursion crash                          |
 
 ---
 
@@ -3491,21 +3445,21 @@ The feature is complete only when all statements below are true.
 
 Do not combine these into one pull request unless maintainers explicitly request it.
 
-| PR | Scope | Must remain backward-compatible? |
-| --- | --- | --- |
-| 1 | OpenSpec, ADR, contract test fixtures | Yes |
-| 2 | W3C IDs, propagation contracts, model v2 types/readers | Yes |
-| 3 | AsyncLocalStorage manager and Effect bridge | Yes |
-| 4 | HTTP server span and streaming finalization | Yes, with header compatibility |
-| 5 | Invocation parent correction, middleware spans, logger correlation | Transitional compatibility |
-| 6 | Operation observer plus cache/bucket | Yes |
-| 7 | Drizzle logical operations and transactions | Yes |
-| 8 | Event producer/consumer propagation | Legacy envelopes readable |
-| 9 | Job producer/consumer propagation and queue migration | Legacy entries readable |
-| 10 | Secondary indexes and execution query | Existing endpoints preserved |
-| 11 | Inspector request execution experience | Existing pages preserved |
-| 12 | OTLP mapping, config, sampling hardening | Existing config valid |
-| 13 | Acceptance fixture, performance, docs, changesets, release evidence | Final |
+| PR  | Scope                                                               | Must remain backward-compatible? |
+| --- | ------------------------------------------------------------------- | -------------------------------- |
+| 1   | OpenSpec, ADR, contract test fixtures                               | Yes                              |
+| 2   | W3C IDs, propagation contracts, model v2 types/readers              | Yes                              |
+| 3   | AsyncLocalStorage manager and Effect bridge                         | Yes                              |
+| 4   | HTTP server span and streaming finalization                         | Yes, with header compatibility   |
+| 5   | Invocation parent correction, middleware spans, logger correlation  | Transitional compatibility       |
+| 6   | Operation observer plus cache/bucket                                | Yes                              |
+| 7   | Drizzle logical operations and transactions                         | Yes                              |
+| 8   | Event producer/consumer propagation                                 | Legacy envelopes readable        |
+| 9   | Job producer/consumer propagation and queue migration               | Legacy entries readable          |
+| 10  | Secondary indexes and execution query                               | Existing endpoints preserved     |
+| 11  | Inspector request execution experience                              | Existing pages preserved         |
+| 12  | OTLP mapping, config, sampling hardening                            | Existing config valid            |
+| 13  | Acceptance fixture, performance, docs, changesets, release evidence | Final                            |
 
 Each PR description should include:
 

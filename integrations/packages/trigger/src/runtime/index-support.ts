@@ -1,5 +1,5 @@
-import { durationToMillis, type JobsServiceOptions } from "@relkit/jobs";
-import type { NativeControlReceipt } from "@relkit/jobs/adapter";
+import { durationToMillis, type JobsServiceOptions } from "relkit/jobs";
+import type { NativeControlReceipt } from "relkit/jobs/adapter";
 import type { TriggerObservationOptions } from "./subscription.js";
 import type { TriggerRuntimeOptions } from "./index.js";
 

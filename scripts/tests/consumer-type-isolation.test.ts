@@ -1,6 +1,6 @@
 /** Strict emitted declarations with actual dependencies and deliberately unavailable optional peers. */
 import { resolve } from "node:path";
-import ts from "typescript";
+import ts from "relkit-typescript";
 import { expect, test } from "vitest";
 import {
   authSource as auth,

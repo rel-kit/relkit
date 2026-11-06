@@ -1,5 +1,5 @@
 /** Supplies order middleware with a validated demonstration check for the Bearer authorization prefix. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { authorizationInput, authorizationOutput } from "../../../platform/schemas.js";
 
 const authorizeOrder = defineFunction({

@@ -1,5 +1,5 @@
 import { Cause, Context, Deferred, Effect, Exit, Fiber, Layer, Ref, Scope } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { createTestHttpListener } from "./http-listener.js";
 import { joinOwnedWork, runOwnedContext } from "./work-ownership.js";
 import type { HttpOwnerService, HttpOwnerState, HttpPlatformService } from "./http-owner.types.js";

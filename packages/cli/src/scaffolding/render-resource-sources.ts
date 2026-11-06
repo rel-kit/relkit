@@ -9,14 +9,14 @@ import type { DomainArtifact } from "./domain-planning.js";
  * @returns Cache descriptor source including schemas and bounded example TTL values.
  */
 export function cacheSource(artifact: DomainArtifact, profile: string): string {
-  return `import { defineCache } from "@relkit/app/cache";
-import { z } from "@relkit/app/schema";
+  return `import { defineCache } from "relkit/cache";
+import { s } from "relkit/schema";
 
 const ${artifact.binding} = defineCache({
   id: "${artifact.id}",
   profile: "${profile}",
-  key: z.string().min(1),
-  value: z.string(),
+  key: s.string().min(1),
+  value: s.string(),
   defaultTtlMs: 60_000,
   maxTtlMs: 300_000,
 });
@@ -32,7 +32,7 @@ export default ${artifact.binding};
  * @returns Bucket descriptor source including private visibility and example object limits.
  */
 export function bucketSource(artifact: DomainArtifact, profile: string): string {
-  return `import { defineBucket } from "@relkit/app/buckets";
+  return `import { defineBucket } from "relkit/buckets";
 
 const ${artifact.binding} = defineBucket({
   id: "${artifact.id}",

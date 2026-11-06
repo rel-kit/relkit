@@ -5,7 +5,7 @@ import {
   AGENT_CAPABILITY_VALUE,
   type AgentObservation,
   type JournalCheckpoint,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import { createAgentSseClient } from "../../src/react/agent-sse-client.ts";
 import { ORPCError } from "../../src/index.ts";
 

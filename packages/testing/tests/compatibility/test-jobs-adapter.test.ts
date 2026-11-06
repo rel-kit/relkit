@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { stableIdentityTuple } from "@relkit/jobs";
-import type { NativeSubmission } from "@relkit/jobs/adapter";
+import { stableIdentityTuple } from "relkit/jobs";
+import type { NativeSubmission } from "relkit/jobs/adapter";
 import { createDeterministicJobsAdapter } from "../fixtures/owned-compatibility.ts";
 
 const context = {

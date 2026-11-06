@@ -1,8 +1,8 @@
 import {
   defineTelemetryExporter,
   type TelemetryExporterDescriptor,
-} from "@relkit/observability/telemetry";
-import { isBindingValueRef, type BindingValueRef } from "@relkit/provider";
+} from "relkit/observability/telemetry";
+import { isBindingValueRef, type BindingValueRef } from "relkit/provider";
 
 type TextReference =
   | BindingValueRef<string, string, "string">
@@ -10,19 +10,21 @@ type TextReference =
   | BindingValueRef<string, string, "secret-string">;
 type TextInput = string | TextReference;
 
+/** @experimental */
 export interface SentryOptions {
   readonly dsn: TextInput;
   readonly environment?: TextInput;
   readonly release?: TextInput;
 }
 
+/** @experimental */
 export type SentryTelemetryExporter = TelemetryExporterDescriptor<
   "sentry",
   "sentry",
   SentryOptions
 >;
 
-/** Declares one statically loaded Sentry telemetry exporter. */
+/** Declares one statically loaded Sentry telemetry exporter. @experimental */
 export function sentry(options: SentryOptions): SentryTelemetryExporter {
   if (!record(options)) throw new TypeError("Sentry options are invalid");
   exact(options, ["dsn", "environment", "release"]);

@@ -3,7 +3,7 @@ import {
   type LocalServiceInstance,
   type LocalServiceMaterializerRuntime,
   type LocalServiceStartRequest,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import { createDockerClient } from "./docker-client.js";
 import { publishedPortArguments } from "./docker-health.js";
 import { startComposite } from "./docker-composite.js";

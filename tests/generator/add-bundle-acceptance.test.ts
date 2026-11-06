@@ -2,7 +2,7 @@
 import { expect } from "bun:test";
 import { join } from "node:path";
 import { checkProject } from "../../packages/cli/src/commands/check.ts";
-import { createRegistrationPlan, type ApplicationGraph } from "../../packages/graph/src/index.ts";
+import { createRegistrationPlan, type ApplicationGraph } from "relkit/graph";
 import {
   ADD_FAILURE_CODES,
   normalizeAddRequest,

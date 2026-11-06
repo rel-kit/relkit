@@ -1,9 +1,9 @@
-import type { materializeEvents, InvocationIdSource } from "@relkit/engine";
+import type { materializeEvents, InvocationIdSource } from "relkit/engine";
 import type { Effect } from "effect";
 import type { WorkOwnershipState } from "./work-ownership.types.js";
-import type { UnknownEventEnvelope } from "@relkit/events";
+import type { UnknownEventEnvelope } from "relkit/events";
 
-import type { InvocationRunner } from "@relkit/runtime-effect";
+import type { InvocationRunner } from "relkit/runtime-effect";
 import type { createDeterministicClock } from "./runtime-clock.js";
 
 import type { TestFailureControls } from "./fakes.js";

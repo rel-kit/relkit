@@ -1,12 +1,12 @@
 {
-  "temporary": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7",
+  "temporary": "<tmp>/relkit PG acceptance ejgzjbn7",
   "commands": [
     {
       "label": "initdb",
       "args": [
         "initdb",
         "-D",
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/cluster",
+        "<tmp>/relkit PG acceptance ejgzjbn7/cluster",
         "-U",
         "relkit_acceptance",
         "-A",
@@ -26,12 +26,12 @@
       "args": [
         "pg_ctl",
         "-D",
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/cluster",
+        "<tmp>/relkit PG acceptance ejgzjbn7/cluster",
         "-w",
         "-t",
         "10",
         "-l",
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/postgres.log",
+        "<tmp>/relkit PG acceptance ejgzjbn7/postgres.log",
         "-o",
         "-h 127.0.0.1 -p 52575 -k '' -c shared_buffers=8MB -c max_connections=5 -c autovacuum=off -c max_worker_processes=0 -c max_parallel_workers=0",
         "start"
@@ -48,10 +48,10 @@
         "bun",
         "--smol",
         "--bun",
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/node_modules/drizzle-kit/bin.cjs",
+        "<tmp>/relkit PG acceptance ejgzjbn7/application with spaces/node_modules/drizzle-kit/bin.cjs",
         "generate",
         "--config",
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts",
+        "<tmp>/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts",
         "--name=initial"
       ],
       "beforePressure": 1,
@@ -65,12 +65,12 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "<repo>/packages/cli/dist/bin.js",
         "--json",
         "db",
         "migrate",
         "--config",
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
+        "<tmp>/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
       ],
       "beforePressure": 1,
       "pid": 25995,
@@ -123,12 +123,12 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "<repo>/packages/cli/dist/bin.js",
         "--json",
         "db",
         "migrate",
         "--config",
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
+        "<tmp>/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
       ],
       "beforePressure": 1,
       "pid": 26045,
@@ -162,10 +162,10 @@
         "bun",
         "--smol",
         "--bun",
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/node_modules/drizzle-kit/bin.cjs",
+        "<tmp>/relkit PG acceptance ejgzjbn7/application with spaces/node_modules/drizzle-kit/bin.cjs",
         "generate",
         "--config",
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts",
+        "<tmp>/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts",
         "--name=second"
       ],
       "beforePressure": 1,
@@ -179,12 +179,12 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "<repo>/packages/cli/dist/bin.js",
         "--json",
         "db",
         "migrate",
         "--config",
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
+        "<tmp>/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
       ],
       "beforePressure": 1,
       "pid": 26099,
@@ -237,12 +237,12 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "<repo>/packages/cli/dist/bin.js",
         "--json",
         "db",
         "migrate",
         "--config",
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
+        "<tmp>/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
       ],
       "beforePressure": 1,
       "pid": 26150,
@@ -295,12 +295,12 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "<repo>/packages/cli/dist/bin.js",
         "--json",
         "db",
         "migrate",
         "--config",
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
+        "<tmp>/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
       ],
       "beforePressure": 1,
       "pid": 26194,
@@ -333,12 +333,12 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/packages/cli/dist/bin.js",
+        "<repo>/packages/cli/dist/bin.js",
         "--json",
         "db",
         "migrate",
         "--config",
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
+        "<tmp>/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts"
       ],
       "beforePressure": 1,
       "pid": 26233,
@@ -391,7 +391,7 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/dialect-auth.ts",
+        "<repo>/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/dialect-auth.ts",
         "postgresql",
         "postgresql://relkit_acceptance@127.0.0.1:52575/postgres"
       ],
@@ -406,7 +406,7 @@
       "args": [
         "pg_ctl",
         "-D",
-        "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/cluster",
+        "<tmp>/relkit PG acceptance ejgzjbn7/cluster",
         "-m",
         "fast",
         "-w",
@@ -425,9 +425,9 @@
   "postmasterPid": 25962,
   "initialMigrate": {
     "command": "db migrate",
-    "configPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts",
+    "configPath": "<tmp>/relkit PG acceptance ejgzjbn7/application with spaces/nested config/drizzle.config.ts",
     "dialect": "postgresql",
-    "migrationPath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit PG acceptance ejgzjbn7/application with spaces/src/services/database/migrations",
+    "migrationPath": "<tmp>/relkit PG acceptance ejgzjbn7/application with spaces/src/services/database/migrations",
     "ok": true
   },
   "failedMigration": {

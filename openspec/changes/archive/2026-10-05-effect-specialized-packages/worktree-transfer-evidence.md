@@ -1,8 +1,8 @@
 # Worktree transfer, October 5, 2026
 
 At the user's explicit request, the current changes from
-`/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit` were
-applied to `/Users/mustafaelsayed/Workspace/relkit` as unstaged working changes.
+`<home>/.codex/worktrees/effect-specialized-recovery/relkit` were
+applied to `<repo>` as unstaged working changes.
 Both checkouts have base `0dbc3c445664d53c79d54c3e3e69628f039e6842`.
 The target initially contained only the shared OpenSpec evidence directory, with
 no overlapping tracked or untracked source edits. No staging, commit, checkout,
@@ -42,4 +42,4 @@ Transfer hash manifest and raw check logs are retained in
 runner/build-order diagnostic remains separate from its qualified rerun.
 
 Transfer plan, before-file backups and captured payloads are retained in the
-task-owned `/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-worktree-transfer-d1ovz8wn`.
+task-owned `<tmp>/relkit-worktree-transfer-d1ovz8wn`.

@@ -7,8 +7,8 @@ Use a typed stream when one request returns a sequence to its caller. It ends wi
 Create a function in `src/services/reports/functions/stream-report.function.ts`:
 
 ```ts
-import { defineFunction, streamOf } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction, streamOf } from "relkit/functions";
+import { z } from "zod";
 
 export default defineFunction({
   id: "reports.stream",
@@ -36,7 +36,7 @@ iterator pulls. Keep public descriptors as plain TypeScript.
 In `src/routes/reports/[reportId]/route.ts`, import the public service member:
 
 ```ts
-import { defineRoute, http } from "@relkit/app/routes";
+import { defineRoute, http } from "relkit/routes";
 import reports from "@app/services/reports/service.js";
 
 export const GET = defineRoute({
@@ -51,15 +51,16 @@ A function-backed stream preserves typed items and failures with the managed cli
 
 ## `useStream` in React
 
-With `@relkit/client` and a generated route registry:
+With `@relkit/client` and a generated route registry, pass the route from the generated `api` object. A route's `api` path is its target function ID with each segment in camelCase, so the route targeting `reports.stream` is `api.reports.stream`:
 
 ```tsx
 "use client";
 
+import { api } from "@relkit/client";
 import { useStream } from "@relkit/client/react";
 
 export default function Report() {
-  const report = useStream("GET /reports/:reportId");
+  const report = useStream(api.reports.stream);
 
   return (
     <section>

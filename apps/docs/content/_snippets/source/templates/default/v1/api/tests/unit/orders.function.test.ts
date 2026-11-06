@@ -1,4 +1,4 @@
-/** Checks orders.function through the supported public RELKIT APIs. */
+/** Checks orders.function through the supported public RelKit APIs. */
 import { expect, test } from "bun:test";
 import { invokeFunction } from "@relkit/testing";
 import orders from "@app/services/orders/service.js";

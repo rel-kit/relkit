@@ -1,3 +1,4 @@
+/** @experimental */
 export interface InngestDeploymentProfile {
   readonly provider: "inngest";
   readonly compatibility: "native";
@@ -14,6 +15,7 @@ export interface InngestDeploymentProfile {
   readonly policyIdentity: readonly string[];
 }
 
+/** @experimental */
 export interface InngestWorkerPublication {
   readonly provider: "inngest";
   readonly mechanism: "inngest-sdk";
@@ -24,6 +26,7 @@ export interface InngestWorkerPublication {
   readonly entrypoint: string;
 }
 
+/** @experimental */
 export const deploymentProfile: InngestDeploymentProfile = Object.freeze({
   provider: "inngest",
   compatibility: "native",
@@ -43,6 +46,7 @@ export const deploymentProfile: InngestDeploymentProfile = Object.freeze({
   ],
 });
 
+/** @experimental */
 export function nativeWorkerPublication(
   value: Omit<InngestWorkerPublication, "provider" | "mechanism">,
 ): InngestWorkerPublication {

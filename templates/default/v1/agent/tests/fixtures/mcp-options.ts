@@ -1,4 +1,4 @@
-/** Checks mcp-options.ts through the supported public RELKIT APIs. */
+/** Checks mcp-options.ts through the supported public RelKit APIs. */
 // #region private-tool
 import hello from "@app/services/hello/functions/hello.function.js";
 
@@ -13,7 +13,7 @@ export const privateLookup = hello.asTool({
 });
 // #endregion private-tool
 
-import { defineApp } from "@relkit/app/config";
+import { defineApp } from "relkit/config";
 import env from "@app/platform/env.js";
 
 export const mcpDisabled = defineApp({

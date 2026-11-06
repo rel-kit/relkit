@@ -5,8 +5,8 @@ import {
   RUNTIME_ACTIVATION_FILE,
   isRuntimeActivationFingerprint,
   type RuntimeActivationFingerprint,
-} from "@relkit/contracts";
-import type { StartedCandidate } from "@relkit/supervisor";
+} from "relkit/contracts";
+import type { StartedCandidate } from "../supervisor/index.js";
 import { cliPromise, cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.js";

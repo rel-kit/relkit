@@ -1,8 +1,8 @@
 import { afterEach, expect, test } from "bun:test";
 import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { defineEnv, env } from "@relkit/config";
-import { GRAPH_VERSION } from "@relkit/contracts";
+import { defineEnv, env } from "relkit/config";
+import { GRAPH_VERSION } from "relkit/contracts";
 import { checkProject } from "./src/commands/check.js";
 import { runDoctor } from "./src/commands/doctor.js";
 import { runEnv } from "./src/commands/env.js";

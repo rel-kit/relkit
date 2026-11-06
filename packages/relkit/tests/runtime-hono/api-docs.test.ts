@@ -1,0 +1,149 @@
+/** Verifies core OpenAPI and explicitly selected Scalar through actual Hono requests. */
+import { expect, test } from "vitest";
+import {
+  API_REFERENCE_PATH,
+  ApiDocsConfigurationError,
+  createApp,
+  OPENAPI_PATH,
+} from "../../src/runtime-hono/index.js";
+import { app, source, plan, manifest } from "./api-docs-fixture.js";
+
+test("explicit false keeps OpenAPI while disabling an already loaded UI renderer", async () => {
+  const service = app({ ui: false });
+  expect((await service.request(OPENAPI_PATH)).status).toBe(200);
+  expect((await service.request(API_REFERENCE_PATH)).status).toBe(404);
+});
+
+test("serves raw routes and documents them without a precomputed OpenAPI document", async () => {
+  const service = createApp({
+    plan: {
+      ...plan,
+      httpTriggers: [
+        ...plan.httpTriggers,
+        {
+          kind: "trigger",
+          triggerType: "http",
+          id: "raw.details",
+          targetFunctionId: "raw.details",
+          source,
+          config: {
+            method: "GET",
+            path: "/users/:id/details",
+            rawHandler: true,
+            request: null,
+            responses: [],
+            middleware: [],
+            transforms: [],
+          },
+        },
+      ],
+    },
+    manifest: {
+      ...manifest,
+      routes: { "raw.details": { handler: () => Response.json({ ok: true }) } },
+    },
+    engine: { invoke: async () => ({ ok: true }) },
+  });
+  const response = await service.request("/users/123/details");
+  expect(response.status).toBe(200);
+  expect(await response.json()).toEqual({ ok: true });
+  const document = (await (await service.request(OPENAPI_PATH)).json()) as {
+    paths: {
+      "/users/{id}/details": { get: { responses: unknown; "x-relkit": unknown } };
+      "/hello": { get: { responses: Record<string, unknown> } };
+    };
+  };
+  expect(document.paths["/users/{id}/details"].get.responses).toEqual({
+    default: { description: "Response returned by the route handler" },
+  });
+  expect(document.paths["/hello"].get.responses["200"]).toBeDefined();
+  expect(document.paths["/users/{id}/details"].get["x-relkit"]).not.toHaveProperty("functionId");
+});
+test("serves the active document and URL-backed Scalar page during development", async () => {
+  const service = app();
+  const raw = await service.request(OPENAPI_PATH);
+  const document = await raw.json();
+  const reference = await service.request(API_REFERENCE_PATH);
+  const html = await reference.text();
+
+  expect(raw.status).toBe(200);
+  expect(raw.headers.get("cache-control")).toBe("no-store");
+  expect(document).toMatchObject({
+    openapi: "3.1.0",
+    tags: [{ name: "hello", description: "Hello operations" }],
+    paths: { "/hello": { get: { tags: ["hello"] } } },
+  });
+  expect(reference.status).toBe(200);
+  expect(reference.headers.get("content-type")).toContain("text/html");
+  expect(html).toContain("RelKit API Reference");
+  expect(html).toContain("./openapi.json");
+});
+
+test("requires production opt-in and existing authorization, embedding the protected document", async () => {
+  expect(() => app({ mode: "production", enabledInProduction: true })).toThrow(
+    ApiDocsConfigurationError,
+  );
+  const disabled = app({ mode: "production", bearerToken: "secret" });
+  expect((await disabled.request(OPENAPI_PATH)).status).toBe(404);
+
+  const protectedService = app({
+    mode: "production",
+    enabledInProduction: true,
+    bearerToken: "secret",
+    document: {
+      openapi: "3.1.0",
+      info: { title: "Protected RelKit API", version: "1" },
+      paths: {},
+    },
+  });
+  expect((await protectedService.request(OPENAPI_PATH)).status).toBe(401);
+  expect((await protectedService.request(API_REFERENCE_PATH)).status).toBe(401);
+  const headers = { authorization: "Bearer secret" };
+  const raw = await protectedService.request(OPENAPI_PATH, { headers });
+  const reference = await protectedService.request(API_REFERENCE_PATH, { headers });
+  const html = await reference.text();
+
+  expect(raw.status).toBe(200);
+  expect(await raw.json()).toMatchObject({ info: { title: "Protected RelKit API" } });
+  expect(reference.status).toBe(200);
+  expect(html).toContain("Protected RelKit API");
+  expect(html).not.toContain(`\"url\":\"${OPENAPI_PATH}\"`);
+});
+
+test("excludes domain operations and empty tags without disabling routes", async () => {
+  const document = {
+    openapi: "3.1.0",
+    info: { title: "Commerce", version: "1" },
+    tags: ["orders", "navigation", "receipts"].map((name) => ({ name })),
+    paths: {
+      "/hello": {
+        summary: "Mixed domains",
+        get: { tags: ["navigation"], "x-relkit": { serviceId: "navigation" } },
+        post: { tags: ["orders"], "x-relkit": { serviceId: "orders" } },
+      },
+      "/docs": { get: { tags: ["navigation"], "x-relkit": { serviceId: "navigation" } } },
+    },
+  };
+  const service = app({ document, excludeDomains: ["navigation"] });
+  const response = await service.request(OPENAPI_PATH);
+  const filtered = (await response.json()) as { tags: unknown; paths: unknown };
+  expect(filtered.tags).toEqual([{ name: "orders" }]);
+  expect(filtered.paths).toEqual({
+    "/hello": {
+      summary: "Mixed domains",
+      post: document.paths["/hello"].post,
+    },
+  });
+  expect((await service.request("/hello")).status).toBe(200);
+  expect(document.paths["/hello"].get).toBeDefined();
+
+  const protectedService = app({
+    document,
+    excludeDomains: ["navigation"],
+    bearerToken: "secret",
+  });
+  const reference = await protectedService.request(API_REFERENCE_PATH, {
+    headers: { authorization: "Bearer secret" },
+  });
+  expect(await reference.text()).not.toContain("navigation");
+});

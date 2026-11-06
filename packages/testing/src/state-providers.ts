@@ -1,10 +1,7 @@
 /** Supplies local realtime and agent-state providers without selecting a native agent engine. */
-import type { AgentStateProvider } from "@relkit/contracts";
-import {
-  createLocalAgentStateProvider,
-  createLocalRealtimeProvider,
-} from "@relkit/providers-local";
-import type { RealtimeProvider } from "@relkit/realtime";
+import type { AgentStateProvider } from "relkit/contracts";
+import { createLocalAgentStateProvider, createLocalRealtimeProvider } from "relkit/providers-local";
+import type { RealtimeProvider } from "relkit/realtime";
 
 /**
  * Constructs the native local realtime provider at an explicit test root.

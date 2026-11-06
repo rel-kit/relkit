@@ -1,8 +1,8 @@
 import { createTestEvent } from "../../packages/testing/src/index.ts";
-import type { InvocationContext } from "../../packages/engine/src/index.ts";
-import { defineError } from "../../packages/functions/src/index.ts";
-import { defineEventFunction } from "../../packages/events/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import type { InvocationContext } from "relkit/engine";
+import { defineError } from "relkit/functions";
+import { defineEventFunction } from "relkit/events";
+import { z } from "relkit/schema";
 import {
   registerEventContractSuite,
   type EventContractTarget,

@@ -1,7 +1,7 @@
 import {
   LOCAL_SERVICE_PROTOCOL_VERSION,
   type LocalServiceMaterializerMetadata,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 
 export * from "./docker-client.js";
 export * from "./docker-materializer.js";

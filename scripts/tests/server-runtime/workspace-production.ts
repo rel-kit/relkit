@@ -12,7 +12,7 @@ import { runCommand } from "../../pack-and-smoke-create-relkit-support.js";
  */
 export async function buildWorkspaceProduction(repository: string, root: string): Promise<void> {
   for (const [name, source] of await readManifests(repository)) {
-    if (!name.startsWith("@relkit/")) continue;
+    if (name !== "relkit" && !name.startsWith("@relkit/")) continue;
     const destination = join(root, "node_modules", name);
     await mkdir(dirname(destination), { recursive: true });
     await symlink(source.directory, destination);

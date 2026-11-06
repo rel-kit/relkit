@@ -6,7 +6,7 @@ import { Effect, Exit, Schema } from "effect";
 import { docker } from "../../../scripts/tests/server-runtime/production-docker-owner.js";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 import { scaffoldPort } from "../../../scripts/scaffold-http.js";
-import type { InspectionDescriptor } from "@relkit/inspector-api/connection";
+import type { InspectionDescriptor } from "relkit/inspector-api/connection";
 
 export const dockerCall = (args: readonly string[]) =>
   scaffoldNative("inspector.docker", () => docker(args));

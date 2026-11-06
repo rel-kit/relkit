@@ -1,6 +1,6 @@
 import { Context, Effect, Layer, Ref } from "effect";
-import type { InvocationIdSource } from "@relkit/engine";
-import type { ProtocolId } from "@relkit/contracts";
+import type { InvocationIdSource } from "relkit/engine";
+import type { ProtocolId } from "relkit/contracts";
 import type { TestIdentityService } from "./identity.types.js";
 
 /** Native trace/span/invocation identity sequence belongs to one deterministic owner. */

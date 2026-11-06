@@ -1,13 +1,13 @@
 /**
  * Implements the opt-in Bun server query context and identity-bound hydration.
- * Install @orpc/tanstack-query@2.0.0-beta.31 and @tanstack/query-core@^5 alongside
+ * Install @orpc/tanstack-query@1.16.1 and @tanstack/query-core@^5 alongside
  * @relkit/client and import @relkit/client/server/tanstack-query to select it.
  */
 import type {
   CreateRelkitServerContextOptions,
   RelkitServerContext,
 } from "./server-context.types.js";
-import type { ClientIdentityDocument } from "@relkit/contracts";
+import type { ClientIdentityDocument } from "relkit/contracts";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { dehydrate } from "@tanstack/query-core";
 import { createClient } from "./transport.js";
@@ -32,7 +32,7 @@ export async function createRelkitServerContext(
     cache: "no-store",
   });
   if (!identityResponse.ok) {
-    throw new Error(`Relkit identity request failed (${identityResponse.status})`);
+    throw new Error(`RelKit identity request failed (${identityResponse.status})`);
   }
   const identity = (await identityResponse.json()) as ClientIdentityDocument;
   forwarded.set("x-relkit-identity-scope", identity.identityScope);

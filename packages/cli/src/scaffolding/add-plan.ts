@@ -1,18 +1,19 @@
 /** Composes project discovery, artifact planning and request-local builder state into an immutable scaffold plan before transaction acquisition. */
 
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import { scaffoldErrors } from "create-relkit/internal/generator-errors";
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+import { observeExecution } from "relkit/contracts/operation";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { scaffoldErrors } from "create-relkit/generator-errors";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
 import type { ScaffoldPlanningService } from "./add-plan.types.js";
-import type { AddRequest, ScaffoldPlan } from "create-relkit/internal/add-types";
+import type { AddRequest, ScaffoldPlan } from "create-relkit/add-types";
 import { resolveDomainEffect } from "./domain-planning.js";
 import { PlanBuilder } from "./plan-builder.js";
 import { ProjectDiscoveryServiceTag, projectDiscoveryLive } from "./project-discovery.js";
 import { renderAgentEffect, renderToolEffect } from "./render-ai.js";
 import { renderAuthEffect } from "./render-auth.js";
 import { renderDatabaseEffect } from "./render-database.js";
+import { renderDurableProviderEffect } from "./render-durable-provider.js";
 import { renderInspectorEffect } from "./render-inspector.js";
 import {
   renderConstantsEffect,
@@ -110,6 +111,8 @@ const planDiscoveredRequest = Effect.fn("ScaffoldPlanning.planDiscovered")(funct
   else if (request.kind === "database") yield* renderDatabaseEffect(builder, request);
   else if (request.kind === "auth") yield* renderAuthEffect(builder, request);
   else if (request.kind === "inspector") yield* renderInspectorEffect(builder, request);
+  else if (request.kind === "jobs" || request.kind === "events")
+    yield* renderDurableProviderEffect(builder, request);
   else {
     const target = yield* resolveDomainEffect(builder);
     if (request.kind === "function")

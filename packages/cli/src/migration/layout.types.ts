@@ -1,5 +1,5 @@
 /** Contracts for immutable layout plans and owner-only, guarded recovery records. */
-import type { ApplicationLayout } from "@relkit/contracts";
+import type { ApplicationLayout } from "relkit/contracts";
 import type { Effect, Schema } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { LayoutFile, LayoutEdit, LayoutReceipt } from "./layout.schemas.js";

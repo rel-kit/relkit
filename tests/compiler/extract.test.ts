@@ -3,7 +3,7 @@ import {
   extractDescriptors,
   mapSourceLocations,
   type SourceMapSource,
-} from "../../packages/compiler/src/index.ts";
+} from "../../packages/cli/src/compiler/index.ts";
 
 const source = `const brand = Symbol.for("relkit.descriptor");
 export const named = { [brand]: true, kind: "function", id: "orders.create", ref: { kind: "function", id: "orders.create" }, handler: () => undefined };

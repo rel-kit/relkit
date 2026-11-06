@@ -1,5 +1,5 @@
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "zod";
 
 export const receiptInput = z.object({
   orderId: z.string().min(1),

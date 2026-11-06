@@ -1,4 +1,4 @@
-import type { CacheProvider } from "@relkit/cache";
+import type { CacheProvider } from "relkit/cache";
 import type { Effect } from "effect";
 
 import type { TestFailureControls } from "./fakes.js";

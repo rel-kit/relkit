@@ -1,0 +1,4 @@
+import { defineBetterAuthService } from "@relkit/better-auth";
+import { auth } from "./better-auth.js";
+
+export default defineBetterAuthService({ auth });

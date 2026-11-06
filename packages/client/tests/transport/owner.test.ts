@@ -1,62 +1,47 @@
-import { expect, it } from "@effect/vitest";
-import { Effect, Layer } from "effect";
-import { acquireClientOwner } from "../../src/client-owner.js";
-import { ClientTransport } from "../../src/transport.service.js";
+import { expect, it } from "vitest";
+import { createClientTransport } from "../../src/transport.service.js";
 
-it.effect("close interrupts and joins pending owned work exactly once", () =>
-  Effect.gen(function* () {
-    let finalized = 0;
-    const live = Layer.succeed(
-      ClientTransport,
-      ClientTransport.of({
-        invoke: Effect.fn("ClientTransport.pendingTest")(() =>
-          Effect.never.pipe(
-            Effect.ensuring(
-              Effect.sync(() => {
-                finalized++;
-              }),
-            ),
-          ),
-        ),
-      }),
-    );
-    const owner = yield* Effect.acquireRelease(
-      Effect.sync(() => acquireClientOwner(live, ClientTransport)),
-      (owner) => Effect.promise(() => owner.close()),
-    );
-    const pending = owner
-      .run(owner.service.invoke([], undefined, { context: {} }))
-      .catch((error) => error);
-    const closing = owner.close();
-    expect(owner.close()).toBe(closing);
-    yield* Effect.promise(() => closing);
-    expect(finalized).toBe(1);
-    expect(yield* Effect.promise(() => pending)).toBeInstanceOf(Error);
-  }).pipe(Effect.scoped),
-);
-
-it.effect("failed synchronous acquisition closes its prefix and retains the original defect", () =>
-  Effect.sync(() => {
-    let finalized = 0;
-    const original = { code: "constructor-defect" };
-    const failed = Layer.effect(
-      ClientTransport,
-      Effect.gen(function* () {
-        yield* Effect.addFinalizer(() =>
-          Effect.sync(() => {
+it("close aborts and joins pending owned work exactly once", async () => {
+  let finalized = 0;
+  const started = Promise.withResolvers<void>();
+  const transport = createClientTransport(async () => ({
+    call: (_path, _input, options) =>
+      new Promise((_resolve, reject) => {
+        started.resolve();
+        options.signal?.addEventListener(
+          "abort",
+          () => {
             finalized++;
-          }),
+            reject(options.signal?.reason);
+          },
+          { once: true },
         );
-        return yield* Effect.die(original);
       }),
-    );
-    let caught: unknown;
-    try {
-      acquireClientOwner(failed, ClientTransport);
-    } catch (error) {
-      caught = error;
-    }
-    expect(caught).toBe(original);
-    expect(finalized).toBe(1);
-  }),
-);
+  }));
+  const pending = transport.invoke([], undefined, { context: {} }).catch((error) => error);
+  await started.promise;
+  const closing = transport.close();
+  expect(transport.close()).toBe(closing);
+  await closing;
+  expect(finalized).toBe(1);
+  expect(await pending).toBeInstanceOf(Error);
+  await expect(transport.invoke([], undefined, { context: {} })).rejects.toMatchObject({
+    name: "AbortError",
+  });
+});
+
+it("a failed selection rejects every call with its original identity", async () => {
+  const original = { code: "constructor-defect" };
+  let selections = 0;
+  const transport = createClientTransport(async () => {
+    selections++;
+    throw original;
+  });
+  try {
+    await expect(transport.invoke([], undefined, { context: {} })).rejects.toBe(original);
+    await expect(transport.invoke([], undefined, { context: {} })).rejects.toBe(original);
+    expect(selections).toBe(1);
+  } finally {
+    await transport.close();
+  }
+});

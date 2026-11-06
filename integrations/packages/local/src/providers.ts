@@ -6,7 +6,7 @@ import {
   defineProviderCapability,
   defineProviderFeature,
   type ProviderAdapter,
-} from "@relkit/provider";
+} from "relkit/provider";
 
 const event = defineProviderCapability("event");
 const job = defineProviderCapability("job");
@@ -44,7 +44,7 @@ export function localEvent(options: LocalProviderOptions = {}): LocalEventAdapte
 }
 
 /**
- * Defines the durable filesystem queue provider for unscheduled local jobs.
+ * Defines the local durable jobs provider that runs task-backed jobs from files.
  *
  * @example
  * ```ts
@@ -70,7 +70,7 @@ function adapter(
   capability: typeof event | typeof job | typeof realtime | typeof agentState,
   adapterId: "local-event" | "local-job" | "local-realtime" | "local-agent-state",
   options: LocalProviderOptions,
-  features: readonly import("@relkit/provider").ProviderFeature<"job">[] = [],
+  features: readonly import("relkit/provider").ProviderFeature<"job">[] = [],
 ): ProviderAdapter {
   if (options.root !== undefined && options.root.trim() === "") {
     throw new TypeError("Local provider root must be a non-empty path");

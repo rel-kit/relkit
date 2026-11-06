@@ -6,7 +6,7 @@ dependencies, environment files and Docker sockets are not tool mounts.
 
 ## Build an exact local candidate
 
-From the RELKIT repository root, build the private UI/tool and produce candidate
+From the RelKit repository root, build the private UI/tool and produce candidate
 archives with the existing release packer. Then stage the archive directory that
 contains its `manifest.json`:
 
@@ -42,7 +42,7 @@ Enable the application bridge explicitly. A fixed bridge port keeps a routing
 override valid after app restart; the UI has its own port:
 
 ```ts
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 
 export default defineApp({
   env: defineEnv({}),

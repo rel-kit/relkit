@@ -1,0 +1,176 @@
+---
+title: Deploy to Vercel
+description: Run the Node production server as a Vercel function, with schedules on Vercel Cron and jobs and events in Postgres.
+pagination: false
+sidebar:
+  icon: triangle
+labs: true
+---
+
+Vercel runs your app as one Node function that serves every route, behind HTTPS, and scales it with
+traffic. A function keeps nothing between invocations, so jobs, schedules and events live in an
+external Postgres database through `@relkit/postgres`, and Vercel Cron wakes the deployment to run
+due schedules.
+
+<Callout type="note" title="Labs" icon="flask-conical">
+  The Vercel target stays Labs until its newcomer deploy test passes in CI. That test follows this
+  guide: it creates the `api` template, deploys it to a throwaway Vercel project with its own
+  database, and checks HTTPS, jobs, events and that Vercel Cron runs each schedule occurrence once.
+</Callout>
+
+## What runs where
+
+| Part of the app               | On Vercel                                                                                                     |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Routes, functions, `/healthz` | One Node function (`api/relkit.mjs`) that serves the built server; every path is rewritten to it              |
+| Files in `public/`            | Vercel's CDN, before the function; the build adds `_relkit/vercel-output.txt` so the directory is never empty |
+| Schedules                     | Vercel Cron calls an authenticated endpoint; the database enqueues each occurrence once                       |
+| Jobs and event consumers      | Run inside the function: when Vercel Cron calls, and for up to 5 seconds after other requests                 |
+| Durable state                 | Postgres, through `@relkit/postgres`; the build refuses the local filesystem provider                         |
+| Realtime channels             | Need an external provider, and WebSocket subscriptions need a host that keeps connections open (see below)    |
+
+A function invocation runs for at most 60 seconds. Long tasks belong on a container target such as
+[Railway](/docs/modules/deployment/railway).
+
+## Pre-setup
+
+Start from an app that builds, such as the [`api` template](/docs/learn/create-an-app). Install the
+[Vercel CLI](https://vercel.com/docs/cli) and sign in:
+
+```sh title="Terminal"
+vercel login
+```
+
+You also need a Postgres database that Vercel's functions can reach over the internet, such as one
+from the Vercel Marketplace (Neon) or any hosted Postgres. Schedules that run more often than once a
+day need a Vercel plan with per-minute cron jobs.
+
+## Deploy
+
+<Steps>
+<Step title="Store jobs and events in Postgres" icon="database">
+
+Select the [Postgres backend](/docs/modules/jobs/providers/postgres) for jobs and events, whether or
+not the app has any yet:
+
+```sh title="Terminal — application root"
+bun run relkit add jobs --provider postgres
+bun run relkit add events --provider postgres
+```
+
+Both commands read the connection string from the `DATABASE_URL` secret. The runtime creates its
+tables on first start.
+
+</Step>
+<Step title="Generate the Vercel files" icon="file-plus">
+
+```sh title="Terminal — application root"
+bun run relkit check
+bun run relkit deploy init vercel
+```
+
+`deploy init vercel` reads the schedules from the graph `relkit check` writes, then writes four files
+and changes no cloud resource:
+
+| File                                  | Purpose                                                                                      |
+| ------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `vercel.json`                         | Install from `bun.lock`, build the Node server, route every path to the function, list crons |
+| `api/relkit.mjs`                      | The function entry: activates the built server once per instance and answers Vercel Cron     |
+| `.vercelignore`                       | Keep `node_modules`, `.relkit` and `.env` files out of the upload                            |
+| `.github/workflows/vercel-deploy.yml` | Check, type-check and test, then deploy every push to `main` with the Vercel CLI             |
+
+A file that already exists with different content stops the command; review it, then rerun with
+`--force` to replace it. Commit the files with `bun.lock`.
+
+</Step>
+<Step title="Create the project and set its secrets" icon="cloud">
+
+```sh title="Terminal — application root"
+vercel link
+vercel env add DATABASE_URL production
+vercel env add CRON_SECRET production
+```
+
+`CRON_SECRET` is any random string of 16 characters or more, such as the output of
+`openssl rand -base64 24`. Vercel Cron sends it as `Authorization: Bearer <CRON_SECRET>`, and the
+cron endpoint refuses every caller without it. Add every other required value from your `defineEnv`
+descriptor the same way.
+
+</Step>
+<Step title="Deploy and open the app" icon="rocket">
+
+```sh title="Terminal — application root"
+vercel deploy --prod
+```
+
+Vercel uploads the source, runs `relkit build --runtime node --target vercel` and prints the
+deployment's URL:
+
+```sh title="Terminal"
+curl https://<your-domain>/healthz
+```
+
+Expect `{"status":"ready","live":true,"ready":true}`. The first request to a new instance waits
+until its providers are ready, so it is slower than the ones after it.
+
+</Step>
+</Steps>
+
+## Schedules and Vercel Cron
+
+Vercel Cron runs only on production deployments. Each `crons` entry in `vercel.json` calls
+`/_relkit/v1/vercel/cron/<job>/<schedule>`; every call runs one scheduler pass for all schedules,
+then the due job attempts and event deliveries, for up to 50 seconds. The database records each
+occurrence once (it is unique on schedule and time), so two overlapping calls, or a call and an
+instance that is already draining, never run an occurrence twice.
+
+A schedule written as a UTC cron expression with five numeric fields keeps its expression. A schedule
+with another timezone, an interval (`every`) or another expression wakes the deployment every minute
+instead, and the backend decides which occurrences are due; `deploy init` names those schedules.
+
+`relkit build --target vercel` fails with
+[`RELKIT_VERCEL_CRONS_OUT_OF_DATE`](/docs/errors/relkit-vercel-crons-out-of-date) when `vercel.json`
+no longer matches the schedules. After adding or changing a schedule, run `relkit check`, then
+`relkit deploy init vercel --force`, and commit the new `vercel.json`.
+
+## Jobs and events
+
+A job triggered from a request, or an event published by one, is written to Postgres in the request.
+After the response, the function keeps running for up to 5 seconds (through Vercel's `waitUntil`) to
+run due work, so most jobs and event consumers run within seconds; anything left runs on the next
+cron call. Set `RELKIT_VERCEL_DRAIN_AFTER_REQUEST=0` to run them only from Vercel Cron.
+
+There is no separate worker process on Vercel. The build refuses the local filesystem provider for
+jobs and events ([`RELKIT_VERCEL_LOCAL_DURABLE_STATE`](/docs/errors/relkit-vercel-local-durable-state)),
+and the function refuses to start with it.
+
+## Realtime limits
+
+Vercel functions accept no WebSocket connections and keep nothing between invocations. `relkit check`
+fails with
+[`RELKIT_VERCEL_REALTIME_PROVIDER_REQUIRED`](/docs/errors/relkit-vercel-realtime-provider-required)
+when a project with `vercel.json` has a public or protected channel on the local realtime provider:
+select an external provider such as [`redisRealtime()`](/docs/modules/realtime/providers) so every
+instance shares the channel's events and replay. An external provider does not make WebSocket
+subscriptions possible on Vercel, and RelKit has not verified realtime subscriptions there; deploy
+an app whose clients hold realtime connections to [Railway](/docs/modules/deployment/railway).
+
+## Deploy from GitHub
+
+The generated workflow deploys every push to `main`. Create an access token in Vercel (Account
+Settings → Tokens) and add it as the `VERCEL_TOKEN` secret in the GitHub repository. Add the
+`VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` variables with the values from `.vercel/project.json`, which
+`vercel link` wrote. Do not also connect the repository in Vercel's Git settings, or each push deploys
+twice.
+
+## Troubleshooting
+
+- **Every request answers `503`.** Read the function logs in the Vercel dashboard. A
+  `Provider startup failed` record names the cause, such as a missing `DATABASE_URL` or
+  `RELKIT_LOCAL_DURABLE_STATE_IN_CONTAINER`.
+- **Schedules never run.** Check that the deployment is a production deployment, that `CRON_SECRET`
+  is set, and that the project's plan allows the cron frequency in `vercel.json`.
+- **The build fails with `RELKIT_VERCEL_CRONS_OUT_OF_DATE`.** Rerun `relkit deploy init vercel
+--force` after `relkit check`, and commit `vercel.json`.
+- **POST requests are rejected.** Production servers reject unsafe requests without an `Origin` header
+  that matches the app; browsers send it, and scripts must set it.

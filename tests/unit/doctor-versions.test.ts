@@ -31,15 +31,15 @@ async function check(root: string, dependencies: Readonly<Record<string, string>
 }
 
 test("doctor accepts independently versioned packages with closed metadata exports", async () => {
-  const root = await fixture({ "@relkit/app": "0.7.9", "@relkit/cli": "0.7.10" });
-  expect(await check(root, { "@relkit/app": "0.7.9", "@relkit/cli": "^0.7.10" })).toMatchObject({
+  const root = await fixture({ relkit: "0.7.9", "@relkit/cli": "0.7.10" });
+  expect(await check(root, { relkit: "0.7.9", "@relkit/cli": "^0.7.10" })).toMatchObject({
     ok: true,
   });
 });
 
 test("doctor rejects a wrong installed version even when declarations match each other", async () => {
-  const root = await fixture({ "@relkit/app": "0.7.8", "@relkit/cli": "0.7.9" });
-  expect(await check(root, { "@relkit/app": "0.7.9", "@relkit/cli": "0.7.9" })).toMatchObject({
+  const root = await fixture({ relkit: "0.7.8", "@relkit/cli": "0.7.9" });
+  expect(await check(root, { relkit: "0.7.9", "@relkit/cli": "0.7.9" })).toMatchObject({
     ok: false,
   });
 });
@@ -51,49 +51,62 @@ test("doctor validates the lightweight creator's real package identity", async (
 });
 
 test("doctor rejects missing packages and malformed installed versions", async () => {
-  const root = await fixture({ "@relkit/app": 7 });
-  expect(await check(root, { "@relkit/app": "0.7.9" })).toMatchObject({ ok: false });
+  const root = await fixture({ relkit: 7 });
+  expect(await check(root, { relkit: "0.7.9" })).toMatchObject({ ok: false });
   expect(await check(root, { "@relkit/missing": "0.7.9" })).toMatchObject({ ok: false });
 });
 
 test("doctor resolves hoisted packages from the project and preserves local links", async () => {
-  const root = await fixture({ "@relkit/app": "0.7.9", relkit: "0.7.10" });
+  const root = await fixture({ relkit: "0.7.9", relkit: "0.7.10" });
   const project = join(root, "apps", "api");
   await mkdir(project, { recursive: true });
-  expect(await check(project, { "@relkit/app": "~0.7.9", relkit: "0.7.10" })).toMatchObject({
+  expect(await check(project, { relkit: "~0.7.9", relkit: "0.7.10" })).toMatchObject({
     ok: true,
   });
-  expect(await check(project, { "@relkit/app": "0.7.10", relkit: "0.7.9" })).toMatchObject({
+  expect(await check(project, { relkit: "0.7.10", relkit: "0.7.9" })).toMatchObject({
     ok: false,
   });
   expect(
-    await check(project, { "@relkit/app": "workspace:*", "@relkit/cli": "link:@relkit/cli" }),
+    await check(project, { relkit: "workspace:*", "@relkit/cli": "link:@relkit/cli" }),
   ).toMatchObject({ ok: true });
 });
 
 test("doctor validates independently resolved catalog pins", async () => {
-  const root = await fixture({ "@relkit/app": "0.7.9", "@relkit/cli": "0.7.10" });
+  const root = await fixture({ relkit: "0.7.9", "@relkit/cli": "0.7.10" });
   await writeFile(
     join(root, "package.json"),
     JSON.stringify({
-      workspaces: { catalog: { "@relkit/app": "0.7.9", "@relkit/cli": "0.7.10" } },
+      workspaces: { catalog: { relkit: "0.7.9", "@relkit/cli": "0.7.10" } },
     }),
   );
-  expect(await check(root, { "@relkit/app": "catalog:", "@relkit/cli": "catalog:" })).toMatchObject(
-    { ok: true },
-  );
+  expect(await check(root, { relkit: "catalog:", "@relkit/cli": "catalog:" })).toMatchObject({
+    ok: true,
+  });
 });
 
 test("doctor does not hide a broken nearer installation behind a valid hoisted one", async () => {
-  const root = await fixture({ "@relkit/app": "0.7.9" });
+  const root = await fixture({ relkit: "0.7.9" });
   const project = join(root, "apps", "api");
-  const directory = join(project, "node_modules", "@relkit/app");
+  const directory = join(project, "node_modules", "relkit");
   await mkdir(directory, { recursive: true });
   await writeFile(join(directory, "package.json"), "broken JSON");
-  expect(await check(project, { "@relkit/app": "0.7.9" })).toMatchObject({ ok: false });
+  expect(await check(project, { relkit: "0.7.9" })).toMatchObject({ ok: false });
   await writeFile(
     join(directory, "package.json"),
     JSON.stringify({ name: "@relkit/other", version: "0.7.9" }),
   );
-  expect(await check(project, { "@relkit/app": "0.7.9" })).toMatchObject({ ok: false });
+  expect(await check(project, { relkit: "0.7.9" })).toMatchObject({ ok: false });
+});
+
+test("doctor treats a pinned packageManager Bun version as the minimum", async () => {
+  const root = await fixture({});
+  const bun = async (packageManager: string) =>
+    (await versionChecks({ packageManager, dependencies: {} }, root)).find(
+      (result) => result.name === "bun",
+    );
+  const [major, minor] = Bun.version.split(".").map(Number);
+  expect(await bun(`bun@${major}.${minor! - 1 < 0 ? 0 : minor! - 1}.0`)).toMatchObject({
+    ok: true,
+  });
+  expect(await bun(`bun@${major! + 1}.0.0`)).toMatchObject({ ok: false });
 });

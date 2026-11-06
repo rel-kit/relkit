@@ -1,5 +1,5 @@
 /** Retains the existing role-materialization fixture's real host/cache plan for an external packed mock engine. */
-import type { DeploymentPlan } from "@relkit/deploy";
+import type { DeploymentPlan } from "relkit/deploy";
 
 const reference = <const Role extends "engine" | "host" | "infrastructure" | "access">(
   role: Role,

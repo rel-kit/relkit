@@ -10,6 +10,7 @@ export const aiGuideGroup = {
     "tools",
     "function-tools",
     "agents",
+    "adapters",
     "native-runtime",
     "graphs-persistence",
     "streaming",
@@ -23,7 +24,9 @@ export const aiGuideRelations = aiGuideGroup.pages.map((page) => ({
   path: `docs/modules/ai/${page}`,
   api: [
     "agents",
+    "agent-adapters",
     "integrations/langchain",
+    "integrations/ai-sdk",
     "tools",
     "functions",
     "testing",

@@ -6,7 +6,7 @@ sidebar:
   icon: container
 ---
 
-Use local Docker first. RELKIT can manage development provider recipes while Bun runs your
+Use local Docker first. RelKit can manage development provider recipes while Bun runs your
 application, and its build can produce a server image for a separate container smoke check.
 
 ## Pre-setup
@@ -61,10 +61,10 @@ docker run --rm --name relkit-docs-preview -p 127.0.0.1:3000:3000 -e PORT=3000 r
 In another terminal:
 
 ```sh title="Second terminal"
-curl -i http://127.0.0.1:3000/hello\?name=RELKIT
+curl -i http://127.0.0.1:3000/hello\?name=RelKit
 ```
 
-Expect HTTP `200` and `{"message":"Hello, RELKIT!"}`. Stop this temporary container with Ctrl+C.
+Expect HTTP `200` and `{"message":"Hello, RelKit!"}`. Stop this temporary container with Ctrl+C.
 It has no application data. Apps with file-backed state need an explicitly mounted persistent
 volume before accepting data; do not rely on a disposable container's writable layer.
 
@@ -78,6 +78,13 @@ mechanism. For a local smoke check, Docker supports an explicit `--env-file` con
 non-committed test values; the image itself does not load your project's dotenv files.
 Do not reuse a host-loopback URL inside a container: it addresses the container itself.
 Configure reachable connected resources using [production provider setup](/docs/modules/deployment/providers).
+
+The image runs as a non-root user, answers `/healthz` (`200` once every provider is ready, `503`
+before and while draining) and reports it through a Docker `HEALTHCHECK`. It keeps no durable state
+on its disk: jobs and events on the local filesystem provider stop it from becoming ready
+(`RELKIT_LOCAL_DURABLE_STATE_IN_CONTAINER`) unless a volume is mounted at `/app/.relkit/state` and
+`RELKIT_ALLOW_LOCAL_DURABLE_STATE=1` is set. Behind a proxy that terminates HTTPS, set
+`RELKIT_TRUST_PROXY=1` so the server takes the request scheme from `X-Forwarded-Proto`.
 
 `relkit local` recipes serve development and publish loopback endpoints. The production image
 does not start Docker recipes. Its external services need their own lifecycle, network, credentials,

@@ -5,8 +5,8 @@ import type {
   NativeRunQuery,
   NativeSubmission,
   OperationContext,
-} from "@relkit/jobs/adapter";
-import type { JobUnknownOutcome, RunHandle } from "@relkit/contracts/jobs";
+} from "relkit/jobs/adapter";
+import type { JobUnknownOutcome, RunHandle } from "relkit/contracts/jobs";
 import type { TriggerHttpClientOptions, TriggerNativeClient, TriggerSdkApi } from "./native.js";
 import { record } from "./sdk-mapping.js";
 

@@ -1,9 +1,9 @@
-/** Maps the native event stream into RELKIT execution events and public observations in the order delivered by the native iterator. */
+/** Maps the native event stream into RelKit execution events and public observations in the order delivered by the native iterator. */
 
 import type { ProtocolEvent } from "@langchain/langgraph";
-import type { StandardSchemaV1 } from "@relkit/schema";
+import type { StandardSchemaV1 } from "relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import type { AgentContentSink } from "./runtime.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
@@ -22,7 +22,7 @@ import { signalFailure, withSignal } from "./runtime-utils.js";
  * @param events - Native event stream.
  * @param sink - Optional client content sink.
  * @param toolIds - Public tool name mapping.
- * @param relkitNames - RELKIT owned tool names.
+ * @param relkitNames - RelKit owned tool names.
  * @param signal - Invocation cancellation signal.
  * @param limits - Model and tool call limits.
  * @param stateSchemas - Public state validators.
@@ -80,7 +80,7 @@ export const collectNativeEventsEffect = Effect.fn("Agents.runtime.collectNative
  * @param events - Native event stream.
  * @param sink - Optional client content sink.
  * @param toolIds - Public tool name mapping.
- * @param relkitNames - RELKIT owned tool names.
+ * @param relkitNames - RelKit owned tool names.
  * @param signal - Invocation cancellation signal.
  * @param limits - Model and tool call limits.
  * @param stateSchemas - Public state validators.

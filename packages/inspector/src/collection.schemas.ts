@@ -1,6 +1,6 @@
 /** Validates network records again; in-process redaction brands are never trusted across JSON. */
 import { Schema } from "effect";
-import { validateLocalRecord, type LocalRecord } from "@relkit/observability/local/record";
+import { validateLocalRecord, type LocalRecord } from "relkit/observability/local/record";
 
 const record = Schema.declare<LocalRecord["record"]>((value): value is LocalRecord["record"] => {
   try {

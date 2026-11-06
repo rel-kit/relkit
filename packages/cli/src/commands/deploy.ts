@@ -11,6 +11,7 @@ import {
   safeErrorMessage,
 } from "./deploy-support.js";
 import type { DeployCommandOptions, DeployContext } from "./deploy-support.types.js";
+import { runPlatformInit, selectDeployInit } from "./deploy-init-target.js";
 export { DeployCommandError, parseDeployArgs } from "./deploy-support.js";
 export type {
   DeployCommandOptions,
@@ -30,8 +31,22 @@ export const runDeployEffect = Effect.fn("Cli.runDeploy")(
   function* (args: readonly string[], context: DeployContext, options: DeployCommandOptions = {}) {
     const redactions = yield* Ref.make<readonly string[]>([]);
     return yield* Effect.gen(function* () {
+      const selected = yield* Effect.try({
+        try: () => selectDeployInit(args),
+        catch: (cause) => cause,
+      }).pipe(
+        Effect.catch((cause) =>
+          cause instanceof DeployCommandError ? Effect.fail(cause) : Effect.die(cause),
+        ),
+      );
+      if ("platform" in selected) {
+        const root = resolve(selected.platform.projectRoot ?? options.projectRoot ?? process.cwd());
+        const result = yield* runPlatformInit(root, selected.platform);
+        yield* Effect.sync(() => context.reporter.output(result.value, result.human));
+        return CLI_EXIT_CODES.success;
+      }
       const parsed = yield* Effect.try({
-        try: () => parseDeployArgs(args),
+        try: () => parseDeployArgs(selected.pulumiArgs),
         catch: (cause) => cause,
       }).pipe(
         Effect.catch((cause) =>

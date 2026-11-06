@@ -3,7 +3,7 @@ import type { Effect } from "effect";
 import type {
   InspectionConnectionFile,
   InspectionConnectionError,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 
 /** Single-shot requests preserve native operation IDs; callers never retry mutations. */
 export interface InspectorRemoteOperations {

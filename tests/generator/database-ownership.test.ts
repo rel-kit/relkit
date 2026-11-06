@@ -53,9 +53,7 @@ test("database-only, auth-created and reused histories share the selected owner 
         (await readdir(join(root, "src/services"))).filter((name) => name === "database"),
       ).toHaveLength(1);
       expect(await webFiles(root)).toEqual({});
-      expect(await Bun.file(join(root, "src/routes/api/auth/[[...auth]]/route.ts")).exists()).toBe(
-        true,
-      );
+      expect(await Bun.file(join(root, "src/services/auth/better-auth.ts")).exists()).toBe(true);
     }
   }
 });

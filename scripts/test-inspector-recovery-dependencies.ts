@@ -9,7 +9,7 @@ export async function recoveryDependencies(root: string, repository: string): Pr
     const value = JSON.parse(await readFile(join(repository, path), "utf8"));
     manifests.set(value.name, { path: dirname(path), dependencies: value.dependencies ?? {} });
   }
-  const pending = ["@relkit/app", "@relkit/runtime-hono", "@relkit/providers-local"];
+  const pending = ["relkit", "relkit/runtime-hono", "relkit/providers-local"];
   const copied = new Set<string>();
   const external = new Set(["@types/bun", "typescript"]);
   for (const name of pending) {

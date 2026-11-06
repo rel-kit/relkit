@@ -15,10 +15,11 @@ export function assertGuardedRuntimeImports(
   source: string,
   registrations: readonly RuntimeModuleIdentity[],
 ): void {
-  const preflight = "await Effect.runPromise(checkIntegrationDependencies(";
-  const completion = ".pipe(Effect.provide(SelectedDependenciesLive)));";
+  const preflight = "await checkRuntimeIntegrations(";
+  const completion = 'phase: "runtime" });';
   const preflightEnd = source.indexOf(completion);
-  expect(source).toContain('from "@relkit/app/internal/runtime";');
+  expect(source).toContain('from "relkit/host";');
+  expect(source).not.toMatch(/from ["']effect["']|Effect\./);
   expect(source).not.toContain('from "@relkit/provider/');
   expect(source.split(preflight)).toHaveLength(2);
   expect(preflightEnd).toBeGreaterThan(source.indexOf(preflight));
@@ -26,10 +27,10 @@ export function assertGuardedRuntimeImports(
   expect(source).toContain('projectRoot: fileURLToPath(new URL(".", import.meta.url))');
   expect(source).toContain('phase: "runtime"');
   expect(
-    [...source.matchAll(/(?:from|import)\s+["'](@relkit\/[^"']+\/runtime)["']/g)].map(
+    [...source.matchAll(/(?:from|import)\s+["'](relkit\/host|@?relkit\/[^"']+\/runtime)["']/g)].map(
       (match) => match[1],
     ),
-  ).toEqual(["@relkit/app/internal/runtime"]);
+  ).toEqual(["relkit/host"]);
   const modules = new Map(
     registrations.map((entry) => [
       JSON.stringify([entry.packageName, entry.packageVersion, entry.exportName]),
@@ -45,7 +46,7 @@ export function assertGuardedRuntimeImports(
       "\\u003c",
     );
     const binding = `__relkit_runtime_${index}`;
-    const initialize = `const ${binding} = await Effect.runPromise(initializeIntegration(${owner}, async () => await import(${specifier})));`;
+    const initialize = `const ${binding} = await loadRuntimeIntegration(${owner}, async () => await import(${specifier}));`;
     expect(source.split(initialize)).toHaveLength(2);
     expect(source.indexOf(initialize)).toBeGreaterThan(preflightEnd + completion.length);
     expect(source).toContain(

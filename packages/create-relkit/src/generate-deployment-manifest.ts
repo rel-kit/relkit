@@ -2,13 +2,14 @@
 
 import { join } from "node:path";
 import { Effect, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "./generator-filesystem.js";
 import { GenerateProjectError } from "./generate-types.js";
 import { domainError, domainTry } from "./generator-errors.js";
 import { TemplateManifest, JsonObject } from "./project-manifest.schemas.js";
 import type { CreateOptions } from "./options.js";
 import { buildCatalogProvider } from "./build-catalog.js";
+import { jobsNativeDependencies } from "./jobs-dependencies.js";
 
 /** Applies the original validated manifest patch while preserving unrelated native JSON fields.
  * @param root - Owned staged project root.
@@ -35,13 +36,13 @@ export const customizeDeploymentManifestEffect = Effect.fn(
       dependencies: { ...decoded.dependencies },
       scripts: { ...decoded.scripts },
     };
-    const version = manifest.dependencies["@relkit/app"];
+    const version = manifest.dependencies.relkit;
     if (version === undefined)
       return yield* Effect.fail(
         domainError(
           new GenerateProjectError(
             "RELKIT_CREATE_TEMPLATE_INVALID",
-            "Template has no @relkit/app dependency.",
+            "Template has no relkit dependency.",
           ),
         ),
       );
@@ -57,6 +58,9 @@ export const customizeDeploymentManifestEffect = Effect.fn(
     }
     for (const provider of providers)
       manifest.dependencies[provider] = yield* domainTry(() => buildCatalogProvider(provider));
+    const jobs = options.jobs;
+    if (jobs !== undefined)
+      Object.assign(manifest.dependencies, yield* domainTry(() => jobsNativeDependencies(jobs)));
     if (options.cloud === "aws" && options.deploy === "pulumi") {
       manifest.scripts["deploy:preview"] = "relkit deploy preview";
       manifest.scripts.deploy = "relkit deploy up";

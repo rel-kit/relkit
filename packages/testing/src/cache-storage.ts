@@ -1,6 +1,6 @@
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
 import { Context, Effect, Layer, Ref, Schema } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { clone, createFakeRoot, noFailures, positive, text } from "./fake-utils.js";
 import type { TestCacheFakeOptions } from "./cache-types.js";
 import { cacheStorageOperations } from "./cache-storage-state.js";

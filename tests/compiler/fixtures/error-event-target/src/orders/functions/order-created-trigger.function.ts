@@ -1,4 +1,4 @@
-import { defineEventFunction } from "@relkit/app";
+import { defineEventFunction } from "relkit";
 
 const trigger = defineEventFunction({
   id: "orders.created-trigger",
