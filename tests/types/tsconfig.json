@@ -141,6 +141,15 @@
       "@relkit/langchain": ["../../integrations/packages/langchain/src/index.ts"],
       "@relkit/langchain/testing": ["../../integrations/packages/langchain/src/testing/agents.ts"],
       "@relkit/testing": ["../../packages/testing/src/index.ts"],
+      "@relkit/testing/agents-conformance": ["../../packages/testing/src/agents-conformance.ts"],
+      "@relkit/testing/conformance": ["../../packages/testing/src/conformance.ts"],
+      "@relkit/testing/cache-conformance": ["../../packages/testing/src/cache-conformance.ts"],
+      "@relkit/testing/buckets-conformance": ["../../packages/testing/src/buckets-conformance.ts"],
+      "@relkit/testing/realtime-conformance": [
+        "../../packages/testing/src/realtime-conformance.ts"
+      ],
+      "@relkit/testing/events-conformance": ["../../packages/testing/src/events-conformance.ts"],
+      "@relkit/testing/jobs-conformance": ["../../packages/testing/src/jobs-conformance.ts"],
       "@relkit/testing/drizzle": ["../../packages/testing/src/drizzle.ts"],
       "@relkit/testing/better-auth": ["../../packages/testing/src/better-auth.ts"],
       "@relkit/redis": ["../../integrations/packages/redis/src/index.ts"],

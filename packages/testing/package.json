@@ -35,6 +35,30 @@
       "types": "./dist/agents-conformance.d.ts",
       "import": "./dist/agents-conformance.js"
     },
+    "./conformance": {
+      "types": "./dist/conformance.d.ts",
+      "import": "./dist/conformance.js"
+    },
+    "./cache-conformance": {
+      "types": "./dist/cache-conformance.d.ts",
+      "import": "./dist/cache-conformance.js"
+    },
+    "./buckets-conformance": {
+      "types": "./dist/buckets-conformance.d.ts",
+      "import": "./dist/buckets-conformance.js"
+    },
+    "./realtime-conformance": {
+      "types": "./dist/realtime-conformance.d.ts",
+      "import": "./dist/realtime-conformance.js"
+    },
+    "./events-conformance": {
+      "types": "./dist/events-conformance.d.ts",
+      "import": "./dist/events-conformance.js"
+    },
+    "./jobs-conformance": {
+      "types": "./dist/jobs-conformance.d.ts",
+      "import": "./dist/jobs-conformance.js"
+    },
     "./jobs-utils": {
       "types": "./dist/jobs-utils.d.ts",
       "import": "./dist/jobs-utils.js"

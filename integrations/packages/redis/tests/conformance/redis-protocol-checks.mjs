@@ -1,4 +1,4 @@
-// Redis protocol and cache checks shared by the socket conformance runner (Bun and Node) and the
+// Redis protocol checks shared by the socket conformance runner (Bun and Node) and the
 // Workers conformance Worker, which runs them over HTTP inside workerd.
 import { strict as assert } from "node:assert";
 
@@ -42,29 +42,4 @@ export async function checkRedisProtocol({ createRedisClient }, { url, prefix, u
   const closedPort = createRedisClient({ url: unreachable, connectionTimeoutMs: 500 });
   await assert.rejects(closedPort.connect());
   closedPort.close();
-}
-
-/**
- * Checks the cache provider: canonical keys, counters, deletes and expiry.
- * @param api - `createRedisCacheProvider` from `@relkit/redis/runtime`.
- * @param options - Server URL and a unique key prefix.
- */
-export async function checkRedisCache({ createRedisCacheProvider }, { url, prefix }) {
-  const provider = createRedisCacheProvider({ url, cacheId: `${prefix}-cache` });
-  await provider.ready();
-  try {
-    const key = { sku: "sku-1", region: "eu" };
-    await provider.set(key, 2);
-    assert.equal(await provider.get({ region: "eu", sku: "sku-1" }), 2);
-    assert.equal(await provider.has(key), true);
-    assert.equal(await provider.increment(key, 3), 5);
-    await provider.delete(key);
-    assert.equal(await provider.get(key), undefined);
-    await provider.set(key, { nested: [1, 2] }, { ttlMs: 50 });
-    assert.deepEqual(await provider.get(key), { nested: [1, 2] });
-    await new Promise((resolve) => setTimeout(resolve, 120));
-    assert.equal(await provider.get(key), undefined);
-  } finally {
-    await provider.close();
-  }
 }

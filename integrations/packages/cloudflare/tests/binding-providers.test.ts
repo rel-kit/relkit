@@ -1,8 +1,9 @@
 /**
- * The Workers binding providers run the same checks as in workerd against in-memory stand-ins for a
- * KV namespace and an R2 bucket, read their binding from the Worker's `env` when none is passed, and
- * the authoring helpers record the binding name in the adapter's behavior. The same checks run
- * inside workerd against wrangler's local bindings in `workers-conformance.test.ts`.
+ * The Workers binding providers run the published `@relkit/testing` cache and bucket suites against
+ * in-memory stand-ins for a KV namespace and an R2 bucket, read their binding from the Worker's
+ * `env` when none is passed, and the authoring helpers record the binding name in the adapter's
+ * behavior. The same suites run inside workerd against wrangler's local bindings in
+ * `workers-conformance.test.ts`.
  */
 import { afterEach, expect, test } from "bun:test";
 import { kvBinding, r2Binding } from "../src/bindings.ts";
@@ -12,8 +13,9 @@ import {
   type KvNamespaceBinding,
   type R2BucketBinding,
 } from "../src/runtime/binding-providers.ts";
-// @ts-expect-error -- plain JavaScript checks shared with the conformance Worker.
-import { checkKvCache, checkR2Bucket } from "./conformance/binding-checks.mjs";
+import { createBucketsConformanceHarness } from "@relkit/testing/buckets-conformance";
+import { createCacheConformanceHarness } from "@relkit/testing/cache-conformance";
+import { runConformance, type ConformanceReport } from "@relkit/testing/conformance";
 
 const BINDINGS = Symbol.for("relkit.workers.bindings");
 afterEach(() => {
@@ -48,7 +50,7 @@ function memoryR2(): R2BucketBinding {
     if (object === undefined) return null;
     return {
       key,
-      etag: `"etag-${key}"`,
+      etag: `"etag-${key}-${object.bytes.reduce((sum, byte) => sum + byte, object.bytes.length)}"`,
       size: object.bytes.byteLength,
       ...(object.contentType === undefined
         ? {}
@@ -93,20 +95,42 @@ function memoryR2(): R2BucketBinding {
   };
 }
 
-test("the KV binding cache passes its checks and rounds TTLs up to seconds", async () => {
+test("the KV binding cache passes the cache suite and rounds TTLs up to seconds", async () => {
   const namespace = memoryKv();
-  await checkKvCache(
-    createCloudflareKvBindingCacheProvider({ binding: "CACHE", cacheId: "c", namespace }),
+  const report = await runConformance(
+    createCacheConformanceHarness({
+      create: (cacheId) =>
+        createCloudflareKvBindingCacheProvider({ binding: "CACHE", cacheId, namespace }),
+      failing: () => createCloudflareKvBindingCacheProvider({ binding: "MISSING", cacheId: "c" }),
+      minTtlMs: 60_000,
+    }),
   );
+  expect(failures(report)).toEqual([]);
+  expect(skipped(report)).toEqual(["increment"]);
   expect([...namespace.ttls.values()]).toContain(60);
 });
 
-test("the R2 binding bucket passes its checks across list pages", async () => {
-  await checkR2Bucket(
-    createCloudflareR2BindingBucketProvider({ binding: "UPLOADS", bucket: memoryR2() }),
-    "p",
+test("the R2 binding bucket passes the bucket suite across list pages", async () => {
+  const bucket = memoryR2();
+  const report = await runConformance(
+    createBucketsConformanceHarness({
+      create: () => createCloudflareR2BindingBucketProvider({ binding: "UPLOADS", bucket }),
+      failing: () => createCloudflareR2BindingBucketProvider({ binding: "MISSING" }),
+    }),
   );
+  expect(failures(report)).toEqual([]);
+  expect(skipped(report)).toEqual(["signed-urls", "closed"]);
 });
+
+/** @param report - Conformance report. @returns The failed cases. */
+function failures(report: ConformanceReport) {
+  return report.results.filter((result) => result.outcome === "fail");
+}
+
+/** @param report - Conformance report. @returns Ids of the skipped cases. */
+function skipped(report: ConformanceReport): readonly string[] {
+  return report.results.filter((result) => result.outcome === "skip").map((result) => result.id);
+}
 
 test("providers read their binding from the Worker's env and name a missing one", async () => {
   const namespace = memoryKv();

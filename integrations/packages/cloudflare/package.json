@@ -83,5 +83,8 @@
   },
   "dependencies": {
     "relkit": "workspace:*"
+  },
+  "devDependencies": {
+    "@relkit/testing": "workspace:*"
   }
 }

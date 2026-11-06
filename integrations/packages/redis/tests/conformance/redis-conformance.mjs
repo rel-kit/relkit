@@ -1,5 +1,6 @@
 // Redis conformance for one runtime: run by `bun` and by `node` against the same server. Plain
-// JavaScript importing the built package, so the runtime picks its own native client.
+// JavaScript importing the built package, so the runtime picks its own native client. The cache and
+// realtime providers run the published `@relkit/testing` suites, the same cases every provider runs.
 import { strict as assert } from "node:assert";
 import { randomUUID } from "node:crypto";
 import {
@@ -8,8 +9,10 @@ import {
   createRedisClient,
   createRedisRealtimeProvider,
 } from "@relkit/redis/runtime";
-import { checkRedisCache, checkRedisProtocol } from "./redis-cache-checks.mjs";
-import { checkRealtime } from "./realtime-checks.mjs";
+import { assertConformance, runConformance } from "@relkit/testing/conformance";
+import { createCacheConformanceHarness } from "@relkit/testing/cache-conformance";
+import { createRealtimeConformanceHarness } from "@relkit/testing/realtime-conformance";
+import { checkRedisProtocol } from "./redis-protocol-checks.mjs";
 import { createOperationId } from "relkit/realtime";
 
 const url = process.env.REDIS_URL;
@@ -22,22 +25,42 @@ const prefix = `conformance-${randomUUID()}`;
 
 const runtimeApi = { createRedisClient, createRedisCacheProvider };
 await checkRedisProtocol(runtimeApi, { url, prefix, unreachable: "redis://127.0.0.1:1" });
-await checkRedisCache(runtimeApi, { url, prefix });
-const profile = `${prefix}-shared`;
-const [realtimeA, realtimeB] = [
-  createRedisRealtimeProvider({ url, profile }),
-  createRedisRealtimeProvider({ url, profile }),
+const unreachable = "redis://127.0.0.1:1";
+const reports = [
+  await runConformance(
+    createCacheConformanceHarness({
+      create: (cacheId) => createRedisCacheProvider({ url, cacheId }),
+      failing: () =>
+        createRedisCacheProvider({ url: unreachable, cacheId: prefix, connectionTimeoutMs: 500 }),
+    }),
+  ),
+  await runConformance(
+    createRealtimeConformanceHarness({
+      create: (profile) => createRedisRealtimeProvider({ url, profile }),
+      failing: () =>
+        createRedisRealtimeProvider({
+          url: unreachable,
+          profile: prefix,
+          connectionTimeoutMs: 500,
+        }),
+    }),
+  ),
 ];
+for (const report of reports) {
+  assertConformance(report);
+  const outcomes = report.results.map((result) => `${result.id}=${result.outcome}`);
+  console.log(`${report.suite}: ${outcomes.join(" ")}`);
+}
+const profile = `${prefix}-shared`;
 const [agentA, agentB] = [
   createRedisAgentStateProvider({ url, profile }),
   createRedisAgentStateProvider({ url, profile }),
 ];
-await Promise.all([realtimeA.ready(), realtimeB.ready(), agentA.ready(), agentB.ready()]);
+await Promise.all([agentA.ready(), agentB.ready()]);
 try {
-  await checkRealtime(realtimeA, realtimeB, profile, "redis-conformance");
   await agentState(agentA, agentB);
 } finally {
-  await Promise.all([realtimeA.close(), realtimeB.close(), agentA.close(), agentB.close()]);
+  await Promise.all([agentA.close(), agentB.close()]);
 }
 console.log(`Redis conformance passed on ${runtime}`);
 

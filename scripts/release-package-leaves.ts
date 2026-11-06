@@ -122,6 +122,12 @@ export const packageLeafExports: Readonly<Record<string, ReleaseExports>> = {
   testing: {
     "./fakes": esm("fakes"),
     "./agents-conformance": esm("agents-conformance"),
+    "./conformance": esm("conformance"),
+    "./cache-conformance": esm("cache-conformance"),
+    "./buckets-conformance": esm("buckets-conformance"),
+    "./realtime-conformance": esm("realtime-conformance"),
+    "./events-conformance": esm("events-conformance"),
+    "./jobs-conformance": esm("jobs-conformance"),
     "./jobs-utils": esm("jobs-utils"),
     "./runtime-clock": esm("runtime-clock"),
     "./testing-owner": esm("testing-owner"),

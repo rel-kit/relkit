@@ -4,9 +4,13 @@
  * is known, and fails with the binding's name outside a Worker or when the binding is missing.
  * Only the binding methods RelKit needs are typed here, so the package needs no Workers types.
  */
-import type { BucketObjectMetadata, BucketProvider, BucketPutOptions } from "relkit/buckets";
-import type { CacheOperationOptions } from "relkit/cache";
-import type { CacheProvider } from "relkit/cache";
+import type {
+  BucketObjectMetadata,
+  BucketOperationContext,
+  BucketProvider,
+  BucketPutOptions,
+} from "relkit/buckets";
+import type { CacheOperationContext, CacheOperationOptions, CacheProvider } from "relkit/cache";
 import { canonicalJson } from "relkit/contracts";
 import { workersBinding } from "relkit/runtime/workers";
 
@@ -64,8 +68,9 @@ export function createCloudflareKvBindingCacheProvider(options: {
   readonly namespace?: KvNamespaceBinding;
 }): CloudflareKvBindingCacheProvider {
   let closed = false;
-  const kv = (): KvNamespaceBinding => {
+  const kv = (context?: { readonly signal?: AbortSignal }): KvNamespaceBinding => {
     if (closed) throw new Error("Cloudflare KV cache provider is closed");
+    context?.signal?.throwIfAborted();
     return options.namespace ?? workersBinding<KvNamespaceBinding>(options.binding);
   };
   const encoded = (key: unknown): string => {
@@ -74,14 +79,19 @@ export function createCloudflareKvBindingCacheProvider(options: {
       throw new RangeError("Cloudflare KV key exceeds 512 bytes");
     return value;
   };
-  const get = async (key: unknown): Promise<unknown> => {
-    const text = await kv().get(encoded(key), "text");
+  const get = async (key: unknown, context?: CacheOperationContext): Promise<unknown> => {
+    const text = await kv(context).get(encoded(key), "text");
     return text === null ? undefined : JSON.parse(text);
   };
-  const set = async (key: unknown, value: unknown, settings?: CacheOperationOptions) => {
+  const set = async (
+    key: unknown,
+    value: unknown,
+    settings?: CacheOperationOptions,
+    context?: CacheOperationContext,
+  ) => {
     if (settings?.ttlMs !== undefined && settings.ttlMs < 60_000)
       throw new RangeError("Cloudflare KV ttlMs must be at least 60000");
-    await kv().put(
+    await kv(context).put(
       encoded(key),
       canonicalJson(value),
       settings?.ttlMs === undefined ? {} : { expirationTtl: Math.ceil(settings.ttlMs / 1_000) },
@@ -91,8 +101,10 @@ export function createCloudflareKvBindingCacheProvider(options: {
     capabilities: Object.freeze({ increment: false }),
     get,
     set,
-    delete: async (key: unknown) => kv().delete(encoded(key)),
-    has: async (key: unknown) => (await get(key)) !== undefined,
+    delete: async (key: unknown, context?: CacheOperationContext) =>
+      kv(context).delete(encoded(key)),
+    has: async (key: unknown, context?: CacheOperationContext) =>
+      (await get(key, context)) !== undefined,
     getOrSet: async (
       key: unknown,
       produce: () => unknown | Promise<unknown>,
@@ -120,29 +132,38 @@ export function createCloudflareR2BindingBucketProvider(options: {
   readonly binding: string;
   readonly bucket?: R2BucketBinding;
 }): BucketProvider {
-  const r2 = (): R2BucketBinding =>
-    options.bucket ?? workersBinding<R2BucketBinding>(options.binding);
+  const r2 = (context?: BucketOperationContext): R2BucketBinding => {
+    context?.signal.throwIfAborted();
+    return options.bucket ?? workersBinding<R2BucketBinding>(options.binding);
+  };
   return Object.freeze({
     capabilities: Object.freeze({ signedReadUrl: false, signedWriteUrl: false }),
-    put: async (key: string, bytes: Uint8Array, put?: BucketPutOptions) => {
-      await r2().put(key, bytes, {
+    put: async (
+      key: string,
+      bytes: Uint8Array,
+      put?: BucketPutOptions,
+      context?: BucketOperationContext,
+    ) => {
+      await r2(context).put(key, bytes, {
         ...(put?.contentType === undefined
           ? {}
           : { httpMetadata: { contentType: put.contentType } }),
         ...(put?.metadata === undefined ? {} : { customMetadata: put.metadata }),
       });
     },
-    get: async (key: string) => {
-      const object = await r2().get(key);
+    get: async (key: string, context?: BucketOperationContext) => {
+      const object = await r2(context).get(key);
       return object === null ? undefined : new Uint8Array(await object.arrayBuffer());
     },
-    head: async (key: string) => {
-      const object = await r2().head(key);
+    head: async (key: string, context?: BucketOperationContext) => {
+      const object = await r2(context).head(key);
       return object === null ? undefined : metadata(object);
     },
-    delete: async (key: string) => r2().delete(key),
-    exists: async (key: string) => (await r2().head(key)) !== null,
-    list: async (prefix?: string) => {
+    delete: async (key: string, context?: BucketOperationContext) => r2(context).delete(key),
+    exists: async (key: string, context?: BucketOperationContext) =>
+      (await r2(context).head(key)) !== null,
+    list: async (prefix?: string, context?: BucketOperationContext) => {
+      context?.signal.throwIfAborted();
       const keys: string[] = [];
       let cursor: string | undefined;
       do {

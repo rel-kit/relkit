@@ -1704,6 +1704,53 @@ Decided while applying section 26 (maintainer, 2026-11-05):
   undocumented behavior are outside it. Before 1.0, minor releases can break Core only through the
   deprecation window after `0.9.0`.
 
+### D21. Provider-author kit (#19)
+
+Decided while applying section 25 (maintainer, 2026-11-06):
+
+- **One suite shape for every kind.** Each suite is a leaf of `@relkit/testing`:
+  `./cache-conformance`, `./buckets-conformance`, `./realtime-conformance`, `./events-conformance`
+  and `./jobs-conformance`, beside `./agents-conformance`. Each exports its cases
+  (`CACHE_CONFORMANCE_CASES`, ...) and `create*ConformanceHarness(options)`, which returns
+  `{ suite, cases, run(caseId) }`. `run` resolves on pass, resolves `"skipped"` when the provider
+  declares it lacks what the case checks (no `increment` capability, no signed URLs, no `close`, no
+  failing provider given), and rejects with the first broken expectation. `./conformance` holds
+  `runConformance(harness)`, which reports pass, fail or skip per case, and `assertConformance`.
+  An author can run the report in one test or map `harness.cases` to one test per case.
+- **Failure injection is the provider's own.** The suites cannot break someone else's backend, so
+  each takes `failing()` (cache, buckets, realtime, events): a provider pointed at a backend that
+  cannot answer (an unreachable Redis or Postgres, a missing Workers binding). Its case checks that
+  operations reject rather than report a miss. Jobs keeps its existing fault: `faulty()` is an
+  adapter that commits a submission and loses the response (Postgres `faults.loseSubmitResponse`,
+  the deterministic adapter's `unknown.submit`), and the `unknown-acknowledgement` case runs on it.
+  `createJobsProviderConformanceHarness` wraps the existing `runJobsConformance` cases; the old root
+  exports stay.
+- **The suites use no runtime built-ins.** They import only `relkit` types,
+  `relkit/realtime/operation-id` and `relkit/invocation`, so the same cases run on Bun, on Node and
+  inside workerd.
+- **Cases moved, Redis- and binding-specific checks stayed.** The generic cache checks of
+  `redis-cache-checks.mjs`, `realtime-checks.mjs` and Cloudflare's `binding-checks.mjs` became the
+  suites; the last two files are gone. The Redis protocol checks (`redis-protocol-checks.mjs`) and
+  the agent-state check stay in the Redis runner, and the SQLite runner in `packages/drizzle` stays
+  because it tests a database driver, not one of the five provider kinds.
+- **Running the suites found two gaps, both fixed.** Cloudflare's KV and R2 binding providers
+  ignored an aborted `signal`; they now reject like the local and Redis providers. The in-memory R2
+  stand-in in the binding test returned the same etag for new content.
+- **Where each first-party provider runs them.** Local cache, buckets, realtime and events and the
+  deterministic jobs adapter: `packages/testing/tests/conformance`. Redis cache and realtime on Bun
+  and Node: `integrations/packages/redis/tests/runtime-conformance.test.ts` (now also with
+  `REDIS_URL`). KV and R2 against in-memory bindings: `binding-providers.test.ts`; Redis over HTTP,
+  KV, R2 and Durable Object realtime inside workerd: `workers-conformance.test.ts`. Postgres jobs
+  and events: `jobs-conformance.test.ts` and `events-conformance.test.ts`.
+- **Packed verification.** `scripts/pack-and-smoke-provider-conformance.ts` packs every release
+  package, serves them from the local registry, installs `relkit`, `@relkit/testing`,
+  `@relkit/redis` and `@relkit/postgres` into a standalone consumer and runs the suites from the
+  installed packages on Bun and Node. Run on 2026-11-06 with
+  `REDIS_URL=redis://127.0.0.1:6379 RELKIT_TEST_POSTGRES_URL=postgres://postgres@localhost:55432/postgres bun run scripts/pack-and-smoke-provider-conformance.ts`
+  (Node 24.12.0 on PATH, a local Redis and a throwaway Postgres 14 cluster): every case passed on
+  Bun 1.3.10 and Node 24.12.0 for Redis cache (8) and realtime (7), Postgres jobs (6) and events
+  (5), and the local bucket provider (7 passed, `signed-urls` and `backend-failure` skipped).
+
 ## Risks / Trade-offs
 
 - [The breaking release is large and could stall other work] → Publish a beta first; keep additive
