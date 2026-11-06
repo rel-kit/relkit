@@ -31,6 +31,8 @@ const evaluate = Effect.fn("Discovery.evaluateWarm")(function* (message: WarmEva
   const request = yield* decodeEvaluatorRequest(message.request);
   const root = resolve(request.projectRoot);
   if (message.full) results.clear();
+  // Stamps from before evaluation: a save landing while candidates load is reported next time.
+  const before = reloader.stamps();
   const changed = [...reloader.changed(), ...message.invalidate.map((file) => resolve(root, file))];
   const evicted = new Set(reloader.invalidate(changed));
   const reimported: string[] = [];
@@ -47,7 +49,7 @@ const evaluate = Effect.fn("Discovery.evaluateWarm")(function* (message: WarmEva
     reimported.push(relative(root, file).replaceAll("\\", "/"));
     outcomes.push(result);
   }
-  reloader.record();
+  reloader.record(before);
   const modules: EvaluatorModuleResult[] = [];
   const failures: EvaluatorFailure[] = [];
   for (const outcome of outcomes) {

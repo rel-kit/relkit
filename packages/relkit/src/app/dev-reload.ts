@@ -83,6 +83,8 @@ async function reload(
 ): Promise<{ readonly reply: DevelopmentReloadReply; readonly manifest?: ReloadedManifest }> {
   try {
     const reloader = await loading;
+    // Stamps from before the import: a save landing while modules load is reported next time.
+    const before = reloader.stamps();
     const evicted = reloader.invalidate(reloader.changed());
     const module = (await import(
       pathToFileURL(join(options.serverDirectory, request.manifest)).href
@@ -94,7 +96,7 @@ async function reload(
     const graph = JSON.parse(await readFile(join(options.serverDirectory, request.graph), "utf8"));
     const next = options.createRegistry(graph, manifest);
     options.table.swap(next, manifest);
-    reloader.record();
+    reloader.record(before);
     const reimported = evicted.map((file) =>
       relative(options.projectRoot, file).replaceAll("\\", "/"),
     );
