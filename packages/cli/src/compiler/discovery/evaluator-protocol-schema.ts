@@ -121,12 +121,23 @@ export const EvaluatorFailure = Schema.Struct({
   stderr: Schema.optionalKey(Schema.String),
 });
 
+/**
+ * A warning that application code reported through `relkit/diagnostics` while it was imported,
+ * such as a deprecation. It is not a side effect and does not fail the evaluation.
+ */
+export const EvaluatorWarning = Schema.Struct({
+  code: Schema.String,
+  message: Schema.String,
+  module: Schema.String,
+});
+
 /** Candidate result retains explicit undefined for the absent success/failure branch. */
 export const CandidateResultSchema = Schema.Struct({
   module: Schema.UndefinedOr(EvaluatorModuleResult),
   failure: Schema.UndefinedOr(EvaluatorFailure),
   stdout: Schema.String,
   stderr: Schema.String,
+  warnings: Schema.optionalKey(Schema.Array(EvaluatorWarning)),
 });
 
 /** Complete response validated recursively before compiler consumers read it. */
@@ -141,6 +152,7 @@ export const EvaluatorResponse = Schema.Struct({
   failures: Schema.Array(EvaluatorFailure),
   stdout: Schema.String,
   stderr: Schema.String,
+  warnings: Schema.optionalKey(Schema.Array(EvaluatorWarning)),
 });
 
 /** Parsed final response plus the surrounding candidate output. */

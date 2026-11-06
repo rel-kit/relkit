@@ -11,6 +11,7 @@ import {
 } from "./evaluator-protocol.js";
 import type {
   EvaluatorFailure,
+  EvaluatorWarning,
   EvaluatorModuleResult,
   EvaluatorRequest,
 } from "./evaluator-protocol.types.js";
@@ -35,6 +36,7 @@ export const evaluatorResponse = Effect.fn("Discovery.buildEvaluatorResponse")(
     failures: readonly EvaluatorFailure[],
     stdout: string,
     stderr: string,
+    warnings: readonly EvaluatorWarning[] = [],
   ) {
     return ResponseSchema.make({
       protocol: EVALUATOR_PROTOCOL,
@@ -47,6 +49,7 @@ export const evaluatorResponse = Effect.fn("Discovery.buildEvaluatorResponse")(
       failures: Object.freeze([...failures]),
       stdout,
       stderr,
+      ...(warnings.length === 0 ? {} : { warnings: Object.freeze([...warnings]) }),
     });
   },
   (effect, _request, modules, failures) =>

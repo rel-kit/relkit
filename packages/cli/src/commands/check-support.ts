@@ -32,6 +32,29 @@ export function evaluatorDiagnostics(
   );
 }
 
+/** Projects warnings the application reported while it was imported, such as a deprecation.
+ * @param warnings - Evaluator warnings, absent when there were none.
+ * @returns Warning diagnostics located at the importing module; they do not fail the check.
+ */
+export function evaluatorWarningDiagnostics(
+  warnings: readonly {
+    readonly code: string;
+    readonly message: string;
+    readonly module: string;
+  }[] = [],
+): readonly Diagnostic[] {
+  return warnings.map((warning) =>
+    createDiagnostic({
+      code: warning.code,
+      severity: "warning",
+      message: safeMessage(warning.message),
+      file: warning.module,
+      line: 1,
+      column: 1,
+    }),
+  );
+}
+
 /** Constructs the declaration descriptor used by convention evaluation.
  * @param kind - Compiler convention kind.
  * @param id - Accepted declaration identity.

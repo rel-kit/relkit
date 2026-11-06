@@ -54,7 +54,8 @@ const evaluate = Effect.fn("Discovery.evaluateWarm")(function* (message: WarmEva
     if (outcome.failure !== undefined) failures.push(outcome.failure);
     else if (outcome.module !== undefined) modules.push(outcome.module);
   }
-  const response = yield* evaluatorResponse(request, modules, failures, "", "");
+  const warnings = outcomes.flatMap((outcome) => outcome.warnings ?? []);
+  const response = yield* evaluatorResponse(request, modules, failures, "", "", warnings);
   return { id: message.id, response, reimported } satisfies WarmEvaluatorReply;
 });
 

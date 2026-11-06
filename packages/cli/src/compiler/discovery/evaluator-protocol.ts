@@ -26,6 +26,7 @@ export type {
   EvaluatorSchemaSnapshot,
   EvaluatorSideEffect,
   EvaluatorSideEffectKind,
+  EvaluatorWarning,
 } from "./evaluator-protocol.types.js";
 export {
   isEvaluatorRequest,
