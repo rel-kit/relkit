@@ -20,17 +20,34 @@ type Segments = (string | number)[];
  * @throws JsonValueError naming the first rejected location.
  */
 export function serializeCanonical(value: unknown): string {
-  return serialize(value, [], new Set<object>());
+  return serialize(value, [], new Set<object>(), true);
 }
 
-function serialize(value: unknown, at: Segments, active: Set<object>): string {
+/**
+ * Checks a value against the rules of {@link serializeCanonical} without writing text.
+ * @param value - Candidate JSON value.
+ * @throws JsonValueError naming the first rejected location, exactly as serialization would.
+ */
+export function validateCanonical(value: unknown): void {
+  serialize(value, [], new Set<object>(), false);
+}
+
+/**
+ * Walks a value, writing its canonical text when `write` is set.
+ * @param value - Value at the current location.
+ * @param at - Location below `$`.
+ * @param active - Ancestors, for cycle detection.
+ * @param write - Whether to build text; validation alone returns "".
+ * @returns Canonical text, or "" without `write`.
+ */
+function serialize(value: unknown, at: Segments, active: Set<object>, write: boolean): string {
   if (
     value === null ||
     typeof value === "string" ||
     typeof value === "boolean" ||
     (typeof value === "number" && Number.isFinite(value))
   )
-    return JSON.stringify(value);
+    return write ? JSON.stringify(value) : "";
 
   switch (typeof value) {
     case "undefined":
@@ -44,27 +61,32 @@ function serialize(value: unknown, at: Segments, active: Set<object>): string {
     case "number":
       throw rejected(at, "non-finite numbers are not JSON data");
     case "object":
-      return serializeObject(value, at, active);
+      return serializeObject(value, at, active, write);
     default:
       throw rejected(at, "value is not JSON data");
   }
 }
 
-function serializeObject(value: object, at: Segments, active: Set<object>): string {
+function serializeObject(value: object, at: Segments, active: Set<object>, write: boolean): string {
   if (active.has(value)) throw rejected(at, "cycles are not JSON data");
   active.add(value);
   try {
-    if (Array.isArray(value)) return serializeArray(value, at, active);
+    if (Array.isArray(value)) return serializeArray(value, at, active, write);
     const prototype = Object.getPrototypeOf(value);
     if (prototype !== null && prototype !== Object.prototype)
       throw rejected(at, "only arrays and plain objects are JSON data");
-    return serializeRecord(value, at, active);
+    return serializeRecord(value, at, active, write);
   } finally {
     active.delete(value);
   }
 }
 
-function serializeArray(value: object[], at: Segments, active: Set<object>): string {
+function serializeArray(
+  value: object[],
+  at: Segments,
+  active: Set<object>,
+  write: boolean,
+): string {
   if (Object.getPrototypeOf(value) !== Array.prototype)
     throw rejected(at, "only ordinary arrays are JSON data");
   rejectSymbolKeys(value, at);
@@ -79,13 +101,14 @@ function serializeArray(value: object[], at: Segments, active: Set<object>): str
     at.push(index);
     if (descriptor === undefined) throw rejected(at, "sparse arrays are not JSON data");
     if (!("value" in descriptor)) throw rejected(at, "accessor properties are not JSON data");
-    text += `${index === 0 ? "" : ","}${serialize(descriptor.value, at, active)}`;
+    const item = serialize(descriptor.value, at, active, write);
+    if (write) text += `${index === 0 ? "" : ","}${item}`;
     at.pop();
   }
-  return `${text}]`;
+  return write ? `${text}]` : "";
 }
 
-function serializeRecord(value: object, at: Segments, active: Set<object>): string {
+function serializeRecord(value: object, at: Segments, active: Set<object>, write: boolean): string {
   rejectSymbolKeys(value, at);
   const keys = Object.keys(value).sort();
   let text = "{";
@@ -95,10 +118,11 @@ function serializeRecord(value: object, at: Segments, active: Set<object>): stri
     at.push(key);
     if (descriptor === undefined || !("value" in descriptor))
       throw rejected(at, "accessor properties are not JSON data");
-    text += `${index === 0 ? "" : ","}${quoted(key)}:${serialize(descriptor.value, at, active)}`;
+    const item = serialize(descriptor.value, at, active, write);
+    if (write) text += `${index === 0 ? "" : ","}${quoted(key)}:${item}`;
     at.pop();
   }
-  return `${text}}`;
+  return write ? `${text}}` : "";
 }
 
 function quoted(key: string): string {

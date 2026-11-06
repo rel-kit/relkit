@@ -1,5 +1,4 @@
-import { JsonValueError } from "relkit/contracts";
-import { canonicalJson, type JsonValue } from "relkit/contracts";
+import { canonicalJson, isJsonValue, type JsonValue } from "relkit/contracts";
 
 export { schemaKey, stableKey, taskSchemaKey } from "./normalize-utils-keys.js";
 
@@ -9,13 +8,8 @@ export { schemaKey, stableKey, taskSchemaKey } from "./normalize-utils-keys.js";
  * @returns True when metadata can be canonically serialized as JSON.
  */
 export function json(value: unknown): value is JsonValue {
-  try {
-    canonicalJson(value);
-    return true;
-  } catch (error) {
-    if (!(error instanceof JsonValueError)) throw error;
-    return false;
-  }
+  // Validation walks the value like serialization does but writes no text.
+  return isJsonValue(value);
 }
 
 /**

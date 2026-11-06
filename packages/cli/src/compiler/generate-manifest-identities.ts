@@ -64,14 +64,15 @@ function descriptorBindings(
   const exportName = reference.container ?? reference.exportName;
   const base = reference.container === undefined ? [] : [reference.exportName];
   const entries: IdentityBinding[] = [{ module, exportName, path: base, id: descriptor.id }];
-  collectNested(descriptor.value, base, module, exportName, entries, new Set());
+  collectNested(descriptor.value, [...base], module, exportName, entries, new Set());
   return entries;
 }
 
 /**
  * Collects nested executable bindings with ancestor ownership and cycle detection.
  * @param value - Declared metadata inspected without coercion.
- * @param path - Portable source, property, or runtime path.
+ * @param path - Portable source, property, or runtime path; a stack the walk pushes to and
+ * pops from, copied only into recorded entries.
  * @param module - Authored source module path.
  * @param exportName - Declared source export name.
  * @param entries - Ordered entries to validate or index.
@@ -80,7 +81,7 @@ function descriptorBindings(
  */
 function collectNested(
   value: unknown,
-  path: readonly (string | number)[],
+  path: (string | number)[],
   module: string,
   exportName: string,
   entries: IdentityBinding[],
@@ -89,9 +90,11 @@ function collectNested(
   if (Array.isArray(value)) {
     if (active.has(value)) return;
     active.add(value);
-    value.forEach((entry, index) =>
-      collectNested(entry, [...path, index], module, exportName, entries, active),
-    );
+    value.forEach((entry, index) => {
+      path.push(index);
+      collectNested(entry, path, module, exportName, entries, active);
+      path.pop();
+    });
     active.delete(value);
     return;
   }
@@ -99,14 +102,16 @@ function collectNested(
   active.add(value);
   if (path.length > 0) {
     if (isIdentityRecord(value)) {
-      entries.push({ module, exportName, path, id: value.id });
+      entries.push({ module, exportName, path: [...path], id: value.id });
     } else if (isFunctionTarget(value)) {
-      entries.push({ module, exportName, path, id: value.ref.id });
+      entries.push({ module, exportName, path: [...path], id: value.ref.id });
     }
   }
   const record = value as Record<string, unknown>;
   for (const key of Object.keys(record).sort()) {
-    collectNested(record[key], [...path, key], module, exportName, entries, active);
+    path.push(key);
+    collectNested(record[key], path, module, exportName, entries, active);
+    path.pop();
   }
   active.delete(value);
 }

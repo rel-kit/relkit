@@ -1,6 +1,7 @@
 import { Effect, Exit } from "effect";
 import { observeContract, runContract } from "./contract-observability.js";
 import { serializeJsonEffect } from "./json.js";
+import { validateCanonical } from "./json-serialize.js";
 import type { JsonPrimitive, JsonValue } from "./json.types.js";
 
 /**
@@ -61,7 +62,17 @@ export function isJsonPrimitive(value: unknown): value is JsonPrimitive {
 export function isJsonValueEffect(value: unknown): Effect.Effect<boolean> {
   return observeContract(
     "json.is-value",
-    Effect.map(Effect.exit(serializeJsonEffect(value)), Exit.isSuccess),
+    // The same walk as serialization, without writing the text it would discard.
+    Effect.map(
+      Effect.exit(
+        Effect.try({ try: () => validateCanonical(value), catch: (error) => error }).pipe(
+          Effect.catch((error) =>
+            error instanceof JsonValueError ? Effect.fail(error) : Effect.die(error),
+          ),
+        ),
+      ),
+      Exit.isSuccess,
+    ),
   );
 }
 
