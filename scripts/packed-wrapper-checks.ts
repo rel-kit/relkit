@@ -1,4 +1,4 @@
-/** Checks actual lightweight wrapper output, isolated installation and byte-identical no-install creation. */
+/** Checks the packed `relkit` launcher: its own output, its isolated installation, creation parity and `relkit check` on a created app. */
 import { strict as assert } from "node:assert";
 import { readFile, realpath, readdir } from "node:fs/promises";
 import { isAbsolute, join, relative } from "node:path";
@@ -14,6 +14,7 @@ const Manifest = Schema.fromJsonString(
     version: Schema.String,
     dependencies: Schema.optionalKey(Schema.Record(Schema.String, Schema.String)),
     devDependencies: Schema.optionalKey(Schema.Record(Schema.String, Schema.String)),
+    bin: Schema.optionalKey(Schema.Record(Schema.String, Schema.String)),
   }),
 );
 const Creation = Schema.fromJsonString(Schema.Struct({ destination: Schema.String }));
@@ -46,7 +47,7 @@ export const checkWrapperRunner = Effect.fn("PackedWrapper.runner")(function* (
   return help.stdout;
 });
 
-/** Verifies actual transient package identity, exact creator dependency and absence of any installed CLI. */
+/** Verifies the runner installed the packed `relkit` with its own runtime dependencies and no CLI. */
 export async function checkWrapperInstallation(
   context: PackedWrapperContext,
   runner: PackedWrapperRunner,
@@ -58,7 +59,7 @@ export async function checkWrapperInstallation(
       dot: true,
     }),
   ];
-  assert.ok(packages.length > 0, `${runner.name} did not install its candidate wrapper`);
+  assert.ok(packages.length > 0, `${runner.name} did not install the candidate relkit`);
   for (const path of packages) {
     const physical = await realpath(path),
       child = relative(await realpath(context.temporary), physical);
@@ -69,7 +70,7 @@ export async function checkWrapperInstallation(
     const manifest = Schema.decodeUnknownSync(Manifest)(await readFile(physical, "utf8"));
     assert.equal(manifest.name, "relkit");
     assert.equal(manifest.version, context.wrapperVersion);
-    assert.deepEqual(manifest.dependencies, { "create-relkit": context.creatorVersion });
+    assert.deepEqual(manifest.dependencies ?? {}, context.wrapperDependencies);
   }
   assert.deepEqual(
     [
@@ -82,7 +83,9 @@ export async function checkWrapperInstallation(
   );
   const first = packages[0];
   assert.ok(first);
-  return join(first, "../dist/bin.js");
+  const executable = Schema.decodeUnknownSync(Manifest)(await readFile(first, "utf8")).bin?.relkit;
+  assert.ok(executable, "The packed relkit declares no relkit executable");
+  return join(first, "..", executable);
 }
 
 /** Creates the same project through each actual runner and compares selected output without installing project dependencies. */
@@ -122,4 +125,49 @@ export const checkWrapperCreation = Effect.fn("PackedWrapper.creation")(function
   for (const absent of ["node_modules", "bun.lock", "package-lock.json", ".git"])
     assert.ok(!files.includes(absent));
   return yield* Effect.promise(() => snapshotProject(destination));
+});
+
+/** Creates the minimal app through `relkit create` with its dependencies installed, then runs `relkit check` in it. */
+export const checkCreatedProject = Effect.fn("PackedWrapper.createdProject")(function* (
+  context: PackedWrapperContext,
+  runner: PackedWrapperRunner,
+) {
+  const destination = join(context.consumer, `${runner.name}-installed`);
+  const command = { executable: runner.executable, cwd: context.consumer, env: context.env };
+  const created = yield* packedWrapperCommand(
+    {
+      ...command,
+      args: [
+        ...runner.prefix,
+        "create",
+        "checked-app",
+        "--directory",
+        destination,
+        "--template",
+        "minimal",
+        "--cloud",
+        "none",
+        "--deploy",
+        "none",
+        "--package-manager",
+        "bun",
+        "--no-git",
+        "--json",
+      ],
+    },
+    0,
+    "6 minutes",
+  );
+  assert.equal(Schema.decodeUnknownSync(Creation)(created.stdout).destination, destination);
+  const installed = Schema.decodeUnknownSync(Manifest)(
+    yield* Effect.promise(() =>
+      readFile(join(destination, "node_modules/@relkit/cli/package.json"), "utf8"),
+    ),
+  );
+  assert.equal(installed.version, context.cliVersion);
+  yield* packedWrapperCommand(
+    { ...command, cwd: destination, args: [...runner.prefix, "check"] },
+    0,
+    "4 minutes",
+  );
 });

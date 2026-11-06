@@ -120,6 +120,8 @@ function verifyGeneratedManifest(
       ? {
           "@ag-ui/core": "0.0.59",
           "@relkit/client": clientManifest.version,
+          // The client's React provider imports this optional peer; the template declares it.
+          "@orpc/tanstack-query": clientManifest.peerDependencies["@orpc/tanstack-query"],
           "@tanstack/react-query": workspaceManifest.catalog["@tanstack/react-query"],
           next: workspaceManifest.catalog.next,
           react: workspaceManifest.catalog.react,

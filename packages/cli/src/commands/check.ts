@@ -12,7 +12,11 @@ import { projectCapabilitiesLayer } from "../services/project-capabilities.js";
 import { evaluateCheckSources } from "./check-evaluation.js";
 import { finishCheckEvaluation } from "./check-normalization.js";
 import { emitCheckResultEffect } from "./check-result.js";
-import { checkFailureDiagnosticsEffect, evaluatorDiagnostics } from "./check-support.js";
+import {
+  checkFailureDiagnosticsEffect,
+  evaluatorDiagnostics,
+  evaluatorWarningDiagnostics,
+} from "./check-support.js";
 import type { CheckOptions } from "./check.types.js";
 export type { CheckOptions } from "./check.types.js";
 export type { CheckResult } from "./check-result.types.js";
@@ -50,6 +54,7 @@ export const checkProjectEffect = Effect.fn("Project.check")(
       return yield* emitCheckResultEffect(projectRoot, input.outputDirectory, [
         ...typeDiagnostics,
         ...evaluatorDiagnostics(input.evaluator.failures),
+        ...evaluatorWarningDiagnostics(input.evaluator.warnings),
       ]);
     });
     return yield* work.pipe(

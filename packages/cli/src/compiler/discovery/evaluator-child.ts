@@ -4,6 +4,7 @@ import { realpathSync } from "node:fs";
 import { isAbsolute, relative, resolve } from "node:path";
 import { Effect, Result } from "effect";
 import { acquireEvaluatorDetectors } from "./evaluator-detectors.js";
+import { acquireDiagnosticsReporter } from "./evaluator-diagnostics-reporter.js";
 import { sideEffectFailureEffect, snapshotModuleEffect } from "./evaluator-child-utils.js";
 import { EvaluatorChildBoundaryError } from "./evaluator-child-errors.js";
 import {
@@ -101,7 +102,8 @@ export const evaluateCandidates = Effect.fn("Discovery.evaluateCandidates")(
       if (result.failure !== undefined) failures.push(result.failure);
       else if (result.module !== undefined) modules.push(result.module);
     }
-    return yield* evaluatorResponse(request, modules, failures, stdout, stderr);
+    const warnings = results.flatMap((result) => result.warnings ?? []);
+    return yield* evaluatorResponse(request, modules, failures, stdout, stderr, warnings);
   },
   (effect, request) =>
     observeCompiler(
@@ -143,16 +145,19 @@ export const evaluateCandidate = Effect.fn("Discovery.evaluateCandidate")(
           generatedDirectory: resolve(request.projectRoot, request.generatedDirectory),
           networkAllowlist: request.networkAllowlist,
         });
+        const reported = yield* acquireDiagnosticsReporter(candidate.file);
         const imported = yield* importCandidate(normalized.success, request.generationId).pipe(
           Effect.result,
         );
         const report = yield* detector.finishEffect();
+        const warnings = reported.length === 0 ? {} : { warnings: Object.freeze([...reported]) };
         if (report.sideEffects.length > 0) {
           return CandidateResultSchema.make({
             module: undefined,
             failure: yield* sideEffectFailureEffect(report.sideEffects, candidate.file, request),
             stdout: report.stdout,
             stderr: report.stderr,
+            ...warnings,
           });
         }
         if (Result.isFailure(imported)) {
@@ -161,6 +166,7 @@ export const evaluateCandidate = Effect.fn("Discovery.evaluateCandidate")(
             failure: yield* importFailure(imported.failure.cause, candidate.file, request),
             stdout: report.stdout,
             stderr: report.stderr,
+            ...warnings,
           });
         }
         return CandidateResultSchema.make({
@@ -168,6 +174,7 @@ export const evaluateCandidate = Effect.fn("Discovery.evaluateCandidate")(
           failure: undefined,
           stdout: report.stdout,
           stderr: report.stderr,
+          ...warnings,
         });
       }),
     );

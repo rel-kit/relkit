@@ -25,7 +25,7 @@ import { writeContextRegistryEffect } from "./check-context-registry.js";
 import { writeEventRegistryEffect } from "./check-event-registry.js";
 import { packageApplicationIdEffect } from "./check-input.js";
 import { emitCheckResultEffect } from "./check-result.js";
-import { conventionDescriptor } from "./check-support.js";
+import { conventionDescriptor, evaluatorWarningDiagnostics } from "./check-support.js";
 import { vercelRealtimeDiagnosticsEffect } from "./check-vercel-realtime.js";
 import { workersProviderDiagnosticsEffect } from "./check-workers-providers.js";
 import type { evaluateCheckSources } from "./check-evaluation.js";
@@ -113,6 +113,7 @@ export const finishCheckEvaluation = Effect.fn("Project.finishCheck")(function* 
   const diagnostics = sortDiagnostics([
     ...typeDiagnostics,
     ...normalization.diagnostics,
+    ...evaluatorWarningDiagnostics(input.evaluator.warnings),
     ...(yield* vercelRealtimeDiagnosticsEffect(projectRoot, normalization.outputs.graph)),
     ...(yield* workersProviderDiagnosticsEffect(projectRoot, normalization.outputs.graph)),
     ...extracted.flatMap((entry) =>

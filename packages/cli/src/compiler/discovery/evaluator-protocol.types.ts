@@ -49,6 +49,9 @@ export interface EvaluatorModuleResult extends Schema.Schema.Type<
 /** Structured evaluator failure evidence. */
 export interface EvaluatorFailure extends Schema.Schema.Type<typeof Wire.EvaluatorFailure> {}
 
+/** Warning reported through `relkit/diagnostics` while a candidate was imported. */
+export interface EvaluatorWarning extends Schema.Schema.Type<typeof Wire.EvaluatorWarning> {}
+
 /** Recursively validated evaluator response. */
 export interface EvaluatorResponse extends Schema.Schema.Type<typeof Wire.EvaluatorResponse> {}
 

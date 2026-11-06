@@ -17,6 +17,7 @@
     "@ag-ui/core": "0.0.59",
     "@langchain/core": "1.2.9",
     "@langchain/langgraph": "1.4.14",
+    "@orpc/tanstack-query": "1.16.1",
     "@relkit/client": "0.8.4",
     "@relkit/langchain": "0.7.15",
     "@relkit/local": "0.7.14",

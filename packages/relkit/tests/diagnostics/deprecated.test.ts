@@ -49,6 +49,24 @@ describe("deprecated", () => {
     );
   });
 
+  it("hands the warning to an installed reporter instead of writing it", () => {
+    const key = Symbol.for("relkit.diagnostics.reporter");
+    const reported: unknown[] = [];
+    Reflect.set(globalThis, key, (warning: unknown) => reported.push(warning));
+    try {
+      deprecated("RELKIT_DEPRECATED_APP_PACKAGE", "relkit");
+    } finally {
+      Reflect.deleteProperty(globalThis, key);
+    }
+    expect(output.lines).toEqual([]);
+    expect(reported).toEqual([
+      expect.objectContaining({
+        code: "RELKIT_DEPRECATED_APP_PACKAGE",
+        message: expect.stringContaining("Use relkit instead."),
+      }),
+    ]);
+  });
+
   it("documents every deprecation code", () => {
     const codes = DIAGNOSTIC_CODES.filter(({ code }) => code.startsWith("RELKIT_DEPRECATED_"));
     expect(codes.map(({ code }) => code)).toEqual([

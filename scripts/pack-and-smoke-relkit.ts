@@ -1,4 +1,9 @@
-/** Exercises lightweight wrapper archives through isolated native Bun/npm runners without an installed application CLI. */
+/**
+ * Smokes the packed `relkit` core package and launcher through isolated Bun and npm runners:
+ * `relkit --version`, its help and missing-CLI failure, `relkit create` through the packed
+ * `create-relkit`, and `relkit check` on the created app. Every first-party package comes from the
+ * candidate archives; the fixture registry rejects a first-party name it was not given.
+ */
 import { strict as assert } from "node:assert";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -8,14 +13,14 @@ import { startRegistry } from "./pack-and-smoke-create-relkit-pack.js";
 import { wrapperArchiveInputs } from "./packed-wrapper-archives.js";
 import { packedWrapperCommand } from "./packed-wrapper-command.js";
 import {
+  checkCreatedProject,
   checkWrapperCreation,
   checkWrapperInstallation,
   checkWrapperRunner,
 } from "./packed-wrapper-checks.js";
-import { wrapperContext, wrapperCreatorPrefix, wrapperRunners } from "./packed-wrapper-fixture.js";
+import { wrapperContext, wrapperRunners } from "./packed-wrapper-fixture.js";
 import type { ProjectSnapshot } from "./scaffold-process.types.js";
 
-/** Uses only candidate creator-runtime archives; selected project-local CLI delegation is covered by owning C1 tests. */
 const wrapperSmoke = Effect.fn("PackedWrapper.smoke")(function* (artifacts: string) {
   const temporary = yield* Effect.acquireRelease(
     Effect.promise(() => mkdtemp(join(tmpdir(), "relkit-wrapper-smoke-"))),
@@ -27,13 +32,7 @@ const wrapperSmoke = Effect.fn("PackedWrapper.smoke")(function* (artifacts: stri
     (server) => Effect.promise(() => server.stop(true)),
   );
   const context = yield* Effect.promise(() =>
-    wrapperContext(
-      temporary,
-      `http://127.0.0.1:${server.port}`,
-      input.wrapperVersion,
-      input.creatorVersion,
-      input.cliVersion,
-    ),
+    wrapperContext(temporary, `http://127.0.0.1:${server.port}`, input),
   );
   const npmVersion = yield* packedWrapperCommand({
     executable: "node",
@@ -42,15 +41,16 @@ const wrapperSmoke = Effect.fn("PackedWrapper.smoke")(function* (artifacts: stri
     env: context.env,
   });
   assert.equal(npmVersion.stdout.trim(), context.npmVersion);
-  yield* seedRunnerCaches(context);
-  yield* Effect.promise(() => server.stop(true));
   yield* checkRunners(context);
+  const bun = wrapperRunners(context).find((runner) => runner.name === "bun");
+  assert.ok(bun);
+  yield* checkCreatedProject(context, bun);
   console.log(
-    `Packed wrapper passed: Bun ${process.versions.bun}, npm ${context.npmVersion}; creator-only archives, own help/version, missing CLI, no-install creation parity.`,
+    `Packed relkit passed: Bun ${process.versions.bun}, npm ${context.npmVersion}; runtime closure ${input.runtime.join(", ")}; version, help, missing CLI, creation parity, create and check.`,
   );
 });
 
-/** Runs package-manager paths serially and checks installed wrapper execution separately from binary selection. */
+/** Runs each package runner serially: own output, installed closure and identical no-install creation. */
 const checkRunners = Effect.fn("PackedWrapper.runners")(function* (
   context: Awaited<ReturnType<typeof wrapperContext>>,
 ) {
@@ -71,46 +71,11 @@ const checkRunners = Effect.fn("PackedWrapper.runners")(function* (
     }
     yield* Effect.promise(() => checkWrapperInstallation(context, runner));
   }
-  assert.equal(
-    (yield* packedWrapperCommand({
-      args: ["x", "--no-install", "relkit", "--version"],
-      cwd: context.consumer,
-      env: context.env,
-    })).stdout.trim(),
-    context.wrapperVersion,
-  );
 });
 
-/** Primes only candidate wrapper/creator closures before disabling the registry for offline runner assertions. */
-const seedRunnerCaches = Effect.fn("PackedWrapper.seed")(function* (
-  context: Awaited<ReturnType<typeof wrapperContext>>,
-) {
-  for (const runner of wrapperRunners(context))
-    for (const direct of [false, true]) {
-      const prefix = direct ? wrapperCreatorPrefix(context, runner) : runner.prefix;
-      const output = yield* packedWrapperCommand({
-        executable: runner.executable,
-        cwd: context.consumer,
-        env: context.env,
-        args: [
-          ...prefix.filter((part) => part !== "--offline" && part !== "--no-install"),
-          "--help",
-        ],
-      });
-      if (direct) assert.match(output.stdout, /^Usage: create-relkit <name> \[options\]/m);
-    }
-  for (const specifier of ["relkit", "relkit@latest"])
-    assert.equal(
-      (yield* packedWrapperCommand({
-        args: ["x", specifier, "--version"],
-        cwd: context.consumer,
-        env: context.env,
-      })).stdout.trim(),
-      context.wrapperVersion,
-    );
-});
-
-/** Checks actual candidate archives after joining every owned runner and registry resource. */
+/** Checks the candidate archives listed in a release manifest directory.
+ * @param artifacts - Directory holding the release `manifest.json` and its archives.
+ */
 export function smokePackedRelkit(artifacts: string): Promise<void> {
   return Effect.runPromise(wrapperSmoke(artifacts).pipe(Effect.scoped));
 }
