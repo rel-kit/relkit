@@ -24,7 +24,15 @@ export const effectiveWatchConfigPaths = Effect.fn("Dev.watchConfigPaths")(
       if (ts.sys.fileExists(path)) {
         const config = ts.readConfigFile(path, readFile);
         if (!config.error)
-          ts.parseJsonConfigFileContent(config.config, { ...ts.sys, readFile }, root, {}, path);
+          // Only the configuration files read matter; expanding `include` would walk every
+          // source directory on every save, so the directory listing is left empty.
+          ts.parseJsonConfigFileContent(
+            config.config,
+            { ...ts.sys, readFile, readDirectory: () => [] },
+            root,
+            {},
+            path,
+          );
       }
       return [...files].sort();
     }),

@@ -32,8 +32,11 @@ export const sourceResolutionOptionsEffect = Effect.fn("Compiler.sourceResolutio
         if (!system.fileExists(path)) return { options: {} };
         const config = ts.readConfigFile(path, system.readFile);
         if (config.error) return { errors: [config.error] };
-        const parsed = ts.parseJsonConfigFileContent(config.config, system, root, {}, path);
         // Root-file validation is separate; virtual source fixtures need no native input list.
+        // On the native system the `include` walk would list every source directory on every
+        // check, so it is skipped; a journal-hosted system still observes it.
+        const host = system === ts.sys ? { ...system, readDirectory: () => [] } : system;
+        const parsed = ts.parseJsonConfigFileContent(config.config, host, root, {}, path);
         const errors = parsed.errors.filter((error) => error.code !== 18003);
         return { options: parsed.options, errors };
       },
