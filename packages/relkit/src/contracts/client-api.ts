@@ -128,7 +128,7 @@ export const CLIENT_CONTRACT_EVENTS_PATH = "/_relkit/v1/client/contract-events";
 export const CLIENT_ROUTES_PATH = "/_relkit/v1/client/routes";
 
 /**
- * Framework endpoint for the oRPC procedures that have no REST route: channel
- * subscriptions, agents and jobs, over HTTP and WebSocket. Routes are not served here.
+ * Framework endpoint for the oRPC procedures that have no REST route:
+ * realtime channels, agents and jobs, over HTTP and WebSocket. Routes are not served here.
  */
 export const FRAMEWORK_RPC_PATH = "/_relkit/v1/rpc";
