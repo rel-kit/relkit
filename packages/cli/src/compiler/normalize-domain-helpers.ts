@@ -11,9 +11,8 @@ import {
   type ApplicationLayout,
 } from "relkit/contracts";
 import { createDiagnostic } from "relkit/diagnostics";
-import ts from "../typescript-parser.js";
 import { Effect } from "effect";
-import { readFactsEffect } from "./discovery/source-facts.js";
+import { parseSourceText, sourceFactsEffect } from "./discovery/parsed-sources.js";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
 import {
@@ -50,8 +49,8 @@ export function assignDomain(
 export const validateServiceFileEffect = Effect.fn("Compiler.validateServiceFile")(
   function* (work: NormalizationWork, boundary: string, text: string | undefined) {
     if (text === undefined) return;
-    const source = ts.createSourceFile(boundary, text, ts.ScriptTarget.Latest, true);
-    const facts = yield* readFactsEffect(source);
+    const source = parseSourceText(boundary, text);
+    const facts = yield* sourceFactsEffect(source);
     const factories = facts.factoryBindings.filter(({ kind }) => kind === "service");
     const serviceExports = [...facts.exports.values()].filter(
       ({ factory }) => factory?.kind === "service",

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { runCompilerSync } from "./compatibility.js";
 import { observeCompiler } from "./observability.js";
 import { createDiagnostic } from "relkit/diagnostics";
-import ts from "../typescript-parser.js";
+import { parseSourceText } from "./discovery/parsed-sources.js";
 import { routeSourceFindings } from "./route-source-checks.js";
 import { add } from "./normalize-pass-utils.js";
 import { NORMALIZE_CODES, type NormalizationWork } from "./normalize-types.js";
@@ -139,7 +139,7 @@ function validateAuthMounts(work: NormalizationWork): void {
  */
 function validateServiceRouteBindings(work: NormalizationWork, file: string, text: string): void {
   if (!file.startsWith("src/routes/") || !file.endsWith("/route.ts")) return;
-  const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true);
+  const source = parseSourceText(file, text);
   for (const finding of routeSourceFindings(source)) {
     const position = source.getLineAndCharacterOfPosition(finding.node.getStart(source));
     work.diagnostics.push(

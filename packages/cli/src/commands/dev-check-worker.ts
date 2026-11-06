@@ -9,7 +9,11 @@
  */
 import { statSync } from "node:fs";
 import { Cause, Effect, Schema } from "effect";
-import { createWarmEvaluator, invalidateWatchDependencies } from "../compiler/index.js";
+import {
+  createWarmEvaluator,
+  invalidateWatchDependencies,
+  retainParsedSources,
+} from "../compiler/index.js";
 import type { WatchDependencyIndex } from "../compiler/index.js";
 import { checkProjectEffect } from "./check.js";
 import { devCheckRequestSchema } from "./dev-check.schemas.js";
@@ -18,6 +22,8 @@ import { cliTry } from "../cli-errors.js";
 import { runCliEffect } from "../cli-runtime.js";
 import type { DevCheckResponse } from "./dev-check.types.js";
 
+// Saves usually change one file; every other file keeps its syntax tree and resolutions.
+retainParsedSources();
 const warm = createWarmEvaluator();
 let index: WatchDependencyIndex | undefined;
 const stamps = new Map<string, string>();

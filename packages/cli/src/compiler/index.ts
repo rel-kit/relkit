@@ -17,6 +17,7 @@ export * from "./discovery/evaluator.js";
 export * from "./discovery/evaluator-warm.js";
 export * from "./discovery/extract.js";
 export * from "./discovery/source-map.js";
+export { retainParsedSources } from "./discovery/parsed-sources.js";
 export * from "./discovery/source-id.js";
 export * from "./generate-manifest.js";
 export * from "./event-registry.js";
