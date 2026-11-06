@@ -20,14 +20,14 @@ due schedules.
 
 ## What runs where
 
-| Part of the app               | On Vercel                                                                                                  |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Routes, functions, `/healthz` | One Node function (`api/relkit.mjs`) that serves the built server; every path is rewritten to it           |
-| Files in `public/`            | Vercel's CDN, before the function                                                                          |
-| Schedules                     | Vercel Cron calls an authenticated endpoint; the database enqueues each occurrence once                    |
-| Jobs and event consumers      | Run inside the function: when Vercel Cron calls, and for up to 5 seconds after other requests              |
-| Durable state                 | Postgres, through `@relkit/postgres`; the build refuses the local filesystem provider                      |
-| Realtime channels             | Need an external provider, and WebSocket subscriptions need a host that keeps connections open (see below) |
+| Part of the app               | On Vercel                                                                                                     |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Routes, functions, `/healthz` | One Node function (`api/relkit.mjs`) that serves the built server; every path is rewritten to it              |
+| Files in `public/`            | Vercel's CDN, before the function; the build adds `_relkit/vercel-output.txt` so the directory is never empty |
+| Schedules                     | Vercel Cron calls an authenticated endpoint; the database enqueues each occurrence once                       |
+| Jobs and event consumers      | Run inside the function: when Vercel Cron calls, and for up to 5 seconds after other requests                 |
+| Durable state                 | Postgres, through `@relkit/postgres`; the build refuses the local filesystem provider                         |
+| Realtime channels             | Need an external provider, and WebSocket subscriptions need a host that keeps connections open (see below)    |
 
 A function invocation runs for at most 60 seconds. Long tasks belong on a container target such as
 [Railway](/docs/modules/deployment/railway).

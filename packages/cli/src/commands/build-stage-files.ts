@@ -21,6 +21,10 @@ import { buildManifest, buildProductionManifest } from "./build-manifest.js";
 import type { BuildStageCohort, BuildStageInputs } from "./build.types.js";
 import { defaultBuildRuntime } from "../runtime/index.js";
 import { workersEntryOptions, workersEntrySource } from "./build-workers-entry.js";
+import {
+  VERCEL_PUBLIC_PLACEHOLDER,
+  VERCEL_PUBLIC_PLACEHOLDER_TEXT,
+} from "./build-vercel-public.js";
 
 /**
  * Writes graph, optional workers and public assets into one owned stage.
@@ -52,6 +56,12 @@ export const writeBuildAssets = Effect.fn("Project.buildAssets")(function* (
       return Effect.failCause(cause);
     }),
   );
+  // Vercel refuses an empty output directory; the placeholder keeps a project without `public/` deployable.
+  if (input.options.target === "vercel") {
+    const placeholder = join(input.stage, "public", VERCEL_PUBLIC_PLACEHOLDER);
+    yield* files.mkdir(dirname(placeholder));
+    yield* files.writeText(placeholder, VERCEL_PUBLIC_PLACEHOLDER_TEXT);
+  }
 });
 
 /**
