@@ -81,6 +81,23 @@ function isSourceLocation(value: unknown): value is { file: string; line: number
   );
 }
 function isEphemeralKey(key: string): boolean {
+  let known = ephemeralKeys.get(key);
+  if (known === undefined) {
+    known = ephemeralKeySpelling(key);
+    if (ephemeralKeys.size < 10_000) ephemeralKeys.set(key, known);
+  }
+  return known;
+}
+
+/** Ephemeral-key decisions by key name; graphs repeat the same few keys on every node. */
+const ephemeralKeys = new Map<string, boolean>();
+
+/**
+ * Recognizes the spelling of a run-specific key.
+ * @param key - Object key.
+ * @returns Whether the key names time, process, randomness or generation identity.
+ */
+function ephemeralKeySpelling(key: string): boolean {
   const normalized = key.replaceAll("_", "").replaceAll("-", "").toLowerCase();
   return (
     normalized === "time" ||

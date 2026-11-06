@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { contractMemo } from "./contract-memo.js";
 import { observeContract, runContract } from "./contract-observability.js";
 import { isWithinEffect, joinSegmentsEffect, parsePathEffect } from "./source-path.js";
 import type { ProjectRelativePath, SourceLocation } from "./source-location.types.js";
@@ -72,8 +73,18 @@ export function normalizeSourcePathEffect(
  * @example normalizeSourcePath("src/app.ts");
  */
 export function normalizeSourcePath(filePath: string, projectRoot?: string): ProjectRelativePath {
-  return runContract(normalizeSourcePathEffect(filePath, projectRoot));
+  if (
+    typeof filePath !== "string" ||
+    (projectRoot !== undefined && typeof projectRoot !== "string")
+  )
+    return runContract(normalizeSourcePathEffect(filePath, projectRoot));
+  return normalizedPaths.get(`${projectRoot ?? ""}\0${filePath}`, () =>
+    runContract(normalizeSourcePathEffect(filePath, projectRoot)),
+  );
 }
+
+/** Successful path normalizations; the result depends only on the two texts. */
+const normalizedPaths = contractMemo();
 
 export const toProjectRelativePath = normalizeSourcePath;
 
@@ -123,6 +134,9 @@ export function createSourceLocation(
   column: number,
   projectRoot?: string,
 ): SourceLocation {
+  // A valid position needs only the remembered file; anything else takes the observed path.
+  if (Number.isInteger(line) && line >= 1 && Number.isInteger(column) && column >= 1)
+    return { file: normalizeSourcePath(filePath, projectRoot), line, column };
   return runContract(createSourceLocationEffect(filePath, line, column, projectRoot));
 }
 
@@ -155,5 +169,5 @@ export function normalizeSourceLocation(
   location: SourceLocation,
   projectRoot?: string,
 ): SourceLocation {
-  return runContract(normalizeSourceLocationEffect(location, projectRoot));
+  return createSourceLocation(location.file, location.line, location.column, projectRoot);
 }
