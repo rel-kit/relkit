@@ -1811,6 +1811,26 @@ Decided while applying section 25 (maintainer, 2026-11-06):
   server until `/_relkit/v1/health/ready` answers 200 (the server bundle imports
   `relkit-provider-starter/runtime`). Passed on 2026-11-06 with Bun 1.3.10.
 
+- **The provider contract is a Core row of its own (25.4).** "Provider and adapter contract" lists
+  `relkit/provider`, `relkit/cache`, `relkit/buckets`, `relkit/events`, `relkit/jobs`,
+  `relkit/runtime`, `@relkit/testing` and `@relkit/cli`, documented by the provider-kit and
+  provider-authoring pages. Every one of these was already a Core area, so no `@experimental` tag
+  had to be removed: the suites were written without tags, and the checker forbids tags in Core
+  sources. The row makes the promise explicit in the maturity table and the roadmap status, and
+  the guide states it with a link to the versioning policy.
+- **Two contracts stay Labs.** The realtime provider interface (`relkit/realtime`) and the agent
+  adapter interface (`relkit/agent-adapters`) carry `@experimental` because their features are
+  Labs (Realtime; Agent adapters, D16). Making their contracts Core would freeze APIs whose
+  features may still change, so they keep their tags and the row's note says so. Their suites live
+  in the Core `@relkit/testing` and change with the interface they test. Promoting them is part of
+  promoting those features.
+- **The table moved to `scripts/maturity-features.ts`.** `scripts/maturity.ts` had a size baseline
+  of 401 lines that may only shrink; moving `MATURITY_FEATURES` out (re-exported unchanged) brings
+  it to 249 lines and drops its baseline entry.
+- **Maturity verification.** `bun run scripts/maturity.ts` reports 38 features with no problem;
+  the regenerated `maturity.mdx` snippet shows the row as Core and `roadmap-status.mdx` counts 23
+  Core features; `tests/unit/maturity.test.ts` (now pinning the row) and the docs tests pass.
+
 ## Risks / Trade-offs
 
 - [The breaking release is large and could stall other work] → Publish a beta first; keep additive

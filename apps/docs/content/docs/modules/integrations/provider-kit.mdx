@@ -12,6 +12,12 @@ built this way is checked by the same tests as the first-party ones: the conform
 [Author a provider](/docs/modules/integrations/provider-authoring) covers the descriptor APIs this
 guide uses.
 
+The provider contract is Core: the provider APIs in `relkit/provider`, the cache, bucket, event and
+jobs provider interfaces, the runtime adapter and deploy-target interfaces, and the conformance
+suites. An incompatible change to them ships only in a major release with a migration, as the
+[versioning policy](/docs/versioning) describes. The realtime provider and agent adapter interfaces
+belong to Labs features and can change in a minor release; see [Maturity](/docs/maturity).
+
 ## Start from the starter
 
 Copy [`templates/provider-starter`](https://github.com/rel-kit/relkit/tree/main/templates/provider-starter)

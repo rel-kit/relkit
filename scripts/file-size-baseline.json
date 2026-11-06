@@ -21,6 +21,5 @@
   "packages/relkit/src/diagnostics/codes/jobs.ts": 593,
   "packages/relkit/src/diagnostics/codes/runtime.ts": 323,
   "packages/relkit/src/runtime-hono/materialize-routes-utils.ts": 258,
-  "scripts/maturity.ts": 401,
   "scripts/user-text.ts": 270
 }

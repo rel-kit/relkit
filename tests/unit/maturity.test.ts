@@ -32,6 +32,15 @@ test("the repository agrees with the maturity table", () => {
   expect(maturityProblems(root)).toEqual([]);
 }, 30_000);
 
+test("the provider and adapter contract is Core and documented by the provider-author guide", () => {
+  const row = MATURITY_FEATURES.find(({ name }) => name === "Provider and adapter contract");
+  expect(row?.tier).toBe("core");
+  expect(row?.packages).toEqual(
+    expect.arrayContaining(["relkit/provider", "relkit/runtime", "@relkit/testing", "@relkit/cli"]),
+  );
+  expect(row?.docs).toContain("/docs/modules/integrations/provider-kit");
+});
+
 test("every published package declares a tier", () => {
   const packages = readPackageTiers(root);
   expect(packages.length).toBeGreaterThan(40);

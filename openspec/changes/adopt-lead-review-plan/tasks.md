@@ -272,7 +272,7 @@ build` fails inside the Linux image (see design D19, "Decided while applying sec
 - [x] 25.1 Publish the jobs, events, cache, buckets and realtime conformance suites through `@relkit/testing`, and verify a first-party provider runs them from the packed `@relkit/testing` package
 - [x] 25.2 Write the provider-author guide and a starter package, and verify the starter's tests pass and it installs into an app
 - [x] 25.3 Publish the runtime, deploy-target and agent adapter interfaces with their conformance suites, and verify each first-party adapter runs them
-- [ ] 25.4 Mark the provider contract Core, and verify the maturity table
+- [x] 25.4 Mark the provider contract Core, and verify the maturity table
 
 ## 26. Stability policy and 1.0 (#20)
 
