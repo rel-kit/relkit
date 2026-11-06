@@ -189,6 +189,15 @@ jobs:
             --filter='!@relkit/inngest' \
             --filter='!@relkit/effect-mq' \
             --output-logs=errors-only
+      - name: Build the providers the type-check skips
+        # tests/unit/release-first-party-exports.test.ts packs every published package and expects
+        # its declared exports in the archive, so their dist must exist.
+        run: |
+          bun x turbo run build \
+            --filter=@relkit/trigger \
+            --filter=@relkit/inngest \
+            --filter=@relkit/effect-mq \
+            --output-logs=errors-only
       - name: Run focused tests
         run: |
           bun run test:types
