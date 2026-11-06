@@ -96,15 +96,25 @@ export function vercelDriver(token: string, teamId: string | undefined): VercelD
       );
       const [code, output] = await Promise.all([child.exited, new Response(child.stdout).text()]);
       if (code !== 0) throw new Error(`vercel deploy failed (exit ${code})`);
-      const url = output
-        .trim()
-        .split(/\s+/u)
-        .findLast((word) => word.startsWith("https://"));
-      if (url === undefined) throw new Error(`vercel deploy printed no URL: ${output}`);
-      return url;
+      return deploymentUrl(output);
     },
     deleteProject: async (projectId) => {
       await api("DELETE", `/v9/projects/${projectId}`);
     },
   };
+}
+
+/**
+ * Reads the deployment URL from what `vercel deploy` wrote to stdout. The CLI prints the URL
+ * inside JSON when stdout is not a terminal, so the last `https://` word carried a trailing
+ * `",` and every probe went to a host that does not exist; only the host characters count.
+ * @param output - The CLI's stdout.
+ * @returns The last URL printed, which is the alias when the deployment has one.
+ * @throws Error when the output holds no URL.
+ */
+export function deploymentUrl(output: string): string {
+  const urls = output.match(/https:\/\/[A-Za-z0-9][A-Za-z0-9.-]*[A-Za-z0-9]/gu);
+  const url = urls?.at(-1);
+  if (url === undefined) throw new Error(`vercel deploy printed no URL: ${output}`);
+  return url;
 }
