@@ -17,6 +17,7 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@relkit/example-commerce": "workspace:*",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "typescript": "catalog:"
