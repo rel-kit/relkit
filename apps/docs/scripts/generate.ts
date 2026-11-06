@@ -103,7 +103,13 @@ async function generateApis(): Promise<void> {
     );
     for (const result of results) if (result.status === "rejected") throw result.reason;
   }
-  const contracts = contractIndex(pages);
+  // Completion order is racy; index in reverse catalog order so the first catalog page that
+  // documents a shared contract owns its link (a later entry overwrites an earlier one).
+  const ordered = apiPackageDefinitions.map(({ slug }): [string, string] => [
+    slug,
+    pages.get(slug)!,
+  ]);
+  const contracts = contractIndex(new Map(ordered.reverse()));
   const missing = missingContracts(inventory, contracts);
   if (missing.length) throw new Error(`Missing public API contracts:\n${missing.join("\n")}`);
   for (const { slug, packageName } of apiPackageDefinitions)

@@ -158,8 +158,8 @@ const TSCONFIG = `${JSON.stringify(
       target: "ES2022",
       module: "ESNext",
       moduleResolution: "Bundler",
-      baseUrl: ".",
-      paths: { "@app/*": ["src/*"] },
+      // TypeScript 7 removed `baseUrl`; relative paths match the templates.
+      paths: { "@app/*": ["./src/*"] },
       lib: ["ES2022"],
       types: ["bun"],
       typeRoots: ["./node_modules/@types"],

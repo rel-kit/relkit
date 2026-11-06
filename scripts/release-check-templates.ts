@@ -45,12 +45,10 @@ export async function templateInputs(
       throw new Error(`Template ${name} Scalar version differs from @relkit/runtime-hono`);
     if (
       manifest.packageManager !== rootManifest.packageManager ||
+      // Templates ship the default catalog's TypeScript (5.9); the workspace compiles with its
+      // own `catalog:workspace` TypeScript 7 (design D8).
       manifest.devDependencies?.typescript !==
-        resolveCatalogVersion(
-          rootManifest,
-          "typescript",
-          rootManifest.devDependencies?.typescript,
-        ) ||
+        resolveCatalogVersion(rootManifest, "typescript", "catalog:") ||
       manifest.devDependencies?.["@types/bun"] !==
         resolveCatalogVersion(
           rootManifest,
