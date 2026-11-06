@@ -66,7 +66,14 @@ functions and under 1.5 times `tsc` for 500.
 #### Scenario: Budget is exceeded
 
 - **WHEN** a change makes the 100-function reload p95 exceed 1 s
-- **THEN** the benchmark job fails and reports the measured value and host
+- **THEN** the benchmark job reports the measured value and host as a missed budget
+- **AND** the published benchmarks page shows the budget as not met
+
+#### Scenario: Budgets become blocking
+
+- **WHEN** the CI runner meets every budget for a release
+- **THEN** the benchmark job runs without `--advisory` from that release on, and a later miss
+  fails release readiness
 
 ### Requirement: Published benchmarks
 

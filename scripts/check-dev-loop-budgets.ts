@@ -5,7 +5,11 @@
  * benchmark; `scripts/tests/fixtures/dev-loop-injected-delay.json` is a report whose
  * 100-function reload was slowed on purpose and must fail it.
  *
- * Usage: bun scripts/check-dev-loop-budgets.ts --report <report.json>
+ * With `--advisory` a missed budget is a GitHub warning annotation and the exit code stays 0:
+ * release readiness runs it that way for 0.9.0, where the budgets are published targets the CI
+ * runner does not meet yet (design.md D6).
+ *
+ * Usage: bun scripts/check-dev-loop-budgets.ts --report <report.json> [--advisory]
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -15,9 +19,10 @@ import type { DevLoopReport } from "./dev-loop-benchmark/benchmark.types.js";
 /**
  * Prints the report and its verdict.
  * @param path - Report file.
- * @returns Exit code: 0 when every budget holds.
+ * @param advisory - Report missed budgets as warnings and exit 0.
+ * @returns Exit code: 0 when every budget holds, or always in advisory mode.
  */
-export function checkDevLoopBudgets(path: string): number {
+export function checkDevLoopBudgets(path: string, advisory = false): number {
   const report = JSON.parse(readFileSync(path, "utf8")) as DevLoopReport;
   const host = report.host;
   console.log(
@@ -28,9 +33,11 @@ export function checkDevLoopBudgets(path: string): number {
       `${size.functions} functions: reload p95 ${size.reload.p95Ms.toFixed(1)} ms; check ${mebibytes(size.check.peakBytes)} vs tsc ${mebibytes(size.tsc.peakBytes)} (${size.memoryRatio.toFixed(2)}×)`,
     );
   const violations = reportViolations(report);
-  for (const violation of violations) console.error(`Budget missed: ${violation.message}`);
+  for (const violation of violations)
+    console.error(`${advisory ? "::warning::" : ""}Budget missed: ${violation.message}`);
   if (violations.length === 0) console.log("Every development-loop budget holds.");
-  return violations.length === 0 ? 0 : 1;
+  else if (advisory) console.log(`${violations.length} budget(s) missed; advisory mode exits 0.`);
+  return violations.length === 0 || advisory ? 0 : 1;
 }
 
 if (import.meta.main) {
@@ -40,5 +47,5 @@ if (import.meta.main) {
     console.error("Usage: bun scripts/check-dev-loop-budgets.ts --report <report.json>");
     process.exit(2);
   }
-  process.exit(checkDevLoopBudgets(resolve(report)));
+  process.exit(checkDevLoopBudgets(resolve(report), process.argv.includes("--advisory")));
 }

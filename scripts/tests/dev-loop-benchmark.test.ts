@@ -89,3 +89,21 @@ test("the budget gate fails on the injected-delay fixture and names the value an
   expect(stderr).toContain("Injected-delay fixture");
   expect(stderr.match(/Budget missed/g)).toHaveLength(1);
 });
+
+test("the advisory gate turns a missed budget into a warning annotation and exits 0", () => {
+  const gate = Bun.spawnSync(
+    [
+      process.execPath,
+      "scripts/check-dev-loop-budgets.ts",
+      "--advisory",
+      "--report",
+      "scripts/tests/fixtures/dev-loop-injected-delay.json",
+    ],
+    { cwd: root },
+  );
+  expect(gate.exitCode).toBe(0);
+  expect(gate.stderr.toString()).toContain(
+    "::warning::Budget missed: 100 functions: reload p95 1450.0 ms is not below 1000 ms",
+  );
+  expect(gate.stdout.toString()).toContain("1 budget(s) missed; advisory mode exits 0.");
+});
