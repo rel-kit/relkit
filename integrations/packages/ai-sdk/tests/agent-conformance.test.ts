@@ -1,7 +1,8 @@
 /** Runs the shared agent adapter conformance suite against the AI SDK adapter. */
 import { createAgentConformanceHarness } from "@relkit/testing/agents-conformance";
+import { runConformance } from "@relkit/testing/conformance";
 import { MockLanguageModelV4 } from "ai/test";
-import { describe, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import { aiSdk } from "../src/adapter.js";
 import { aiSdkAgentRuntime } from "../src/adapter-runtime.js";
 
@@ -34,4 +35,8 @@ const harness = createAgentConformanceHarness({
 
 describe("AI SDK adapter conformance", () => {
   for (const item of harness.cases) test(item.description, () => harness.run(item.id));
+  test("runConformance reports every case as passed", async () => {
+    const report = await runConformance(harness);
+    expect(report.results.map((result) => result.outcome)).toEqual(harness.cases.map(() => "pass"));
+  });
 });

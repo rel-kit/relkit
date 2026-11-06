@@ -150,6 +150,11 @@
       ],
       "@relkit/testing/events-conformance": ["../../packages/testing/src/events-conformance.ts"],
       "@relkit/testing/jobs-conformance": ["../../packages/testing/src/jobs-conformance.ts"],
+      "@relkit/cli/deploy-targets": ["../../packages/cli/src/commands/deploy-targets.ts"],
+      "@relkit/testing/runtime-conformance": ["../../packages/testing/src/runtime-conformance.ts"],
+      "@relkit/testing/deploy-target-conformance": [
+        "../../packages/testing/src/deploy-target-conformance.ts"
+      ],
       "@relkit/testing/drizzle": ["../../packages/testing/src/drizzle.ts"],
       "@relkit/testing/better-auth": ["../../packages/testing/src/better-auth.ts"],
       "@relkit/redis": ["../../integrations/packages/redis/src/index.ts"],

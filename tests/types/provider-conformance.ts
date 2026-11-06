@@ -20,6 +20,10 @@ import {
   createJobsProviderConformanceHarness,
 } from "@relkit/testing/jobs-conformance";
 import { createRealtimeConformanceHarness } from "@relkit/testing/realtime-conformance";
+import { DEPLOY_TARGETS, type DeployTarget } from "@relkit/cli/deploy-targets";
+import { createDeployTargetConformanceHarness } from "@relkit/testing/deploy-target-conformance";
+import { createRuntimeConformanceHarness } from "@relkit/testing/runtime-conformance";
+import type { RuntimeAdapter } from "relkit/runtime";
 
 declare const cache: CacheProvider;
 const cacheHarness: ConformanceHarness<CacheConformanceCaseId> = createCacheConformanceHarness({
@@ -38,3 +42,20 @@ createEventsConformanceHarness({
 createJobsProviderConformanceHarness({ create: () => createDeterministicJobsAdapter() });
 // @ts-expect-error A realtime provider implements the whole provider interface.
 createRealtimeConformanceHarness({ create: () => ({ getEpoch: async () => "epoch" }) });
+
+// Runtime adapters and deploy targets have suites of the same shape.
+
+declare const adapter: RuntimeAdapter;
+createRuntimeConformanceHarness({ adapter, kind: "isolate" });
+// @ts-expect-error The kind names the runtime model.
+createRuntimeConformanceHarness({ adapter, kind: "browser" });
+const custom: DeployTarget = {
+  id: "fly",
+  label: "Fly.io",
+  runtimes: ["bun"],
+  defaultRuntime: "bun",
+  needsGraph: false,
+  plan: async () => ({ files: [{ path: "fly.toml", content: "app = 'x'\n" }], nextSteps: [] }),
+};
+createDeployTargetConformanceHarness({ target: custom, root: "/tmp/app" });
+void DEPLOY_TARGETS.map((target) => target.id);

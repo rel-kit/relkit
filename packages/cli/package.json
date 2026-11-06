@@ -56,6 +56,10 @@
       "types": "./dist/tooling.d.ts",
       "import": "./dist/tooling.js"
     },
+    "./deploy-targets": {
+      "types": "./dist/commands/deploy-targets.d.ts",
+      "import": "./dist/commands/deploy-targets.js"
+    },
     "./scaffolding": {
       "types": "./dist/scaffolding/index.d.ts",
       "import": "./dist/scaffolding/index.js"

@@ -61,6 +61,7 @@ export function createAgentConformanceHarness(
   options: AgentConformanceOptions,
 ): AgentConformanceHarness {
   return Object.freeze({
+    suite: "agents",
     cases: AGENT_CONFORMANCE_CASES,
     run: async (caseId: AgentConformanceCase["id"]) => {
       const check = CHECKS[caseId];

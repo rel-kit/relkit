@@ -59,6 +59,14 @@
       "types": "./dist/jobs-conformance.d.ts",
       "import": "./dist/jobs-conformance.js"
     },
+    "./runtime-conformance": {
+      "types": "./dist/runtime-conformance.d.ts",
+      "import": "./dist/runtime-conformance.js"
+    },
+    "./deploy-target-conformance": {
+      "types": "./dist/deploy-target-conformance.d.ts",
+      "import": "./dist/deploy-target-conformance.js"
+    },
     "./jobs-utils": {
       "types": "./dist/jobs-utils.d.ts",
       "import": "./dist/jobs-utils.js"

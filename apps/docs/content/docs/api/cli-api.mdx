@@ -200,6 +200,164 @@ export * from "./generate.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/client-generator/index.ts#L1)
 
+## `deploy-target.types.ts`
+
+The deploy-target contract behind `relkit deploy init <target>`. A target renders the native
+platform configuration and a CI workflow for one project and changes no cloud resource; the
+command writes the files, refusing to overwrite differing ones without `--force`.
+
+### DeployTarget (interface)
+
+A platform target for `relkit deploy init`.
+
+**Signature**
+
+```ts
+export interface DeployTarget {
+  /** The `relkit deploy init <id>` argument, in lower case. */
+  readonly id: string;
+  /** Display name in command output. */
+  readonly label: string;
+  /** Runtimes the target accepts with `--runtime`. */
+  readonly runtimes: readonly RuntimeAdapterName[];
+  /** Runtime used without `--runtime`; one of `runtimes`. */
+  readonly defaultRuntime: RuntimeAdapterName;
+  /** True when the target reads the compiled graph, so `relkit check` must have run. */
+  readonly needsGraph: boolean;
+  /**
+   * Renders the files and next steps. Pure apart from reading project files: it never calls the
+   * platform. Rejects with an Error whose `code` is a `RELKIT_DEPLOY_*` code when the input is
+   * unusable, such as a graph that is not valid JSON.
+   * @param input - Project root, runtime and graph.
+   * @returns The plan.
+   */
+  readonly plan: (input: DeployTargetInput) => Promise<DeployTargetPlan>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/deploy-target.types.ts#L37)
+
+### DeployTargetFile (interface)
+
+One generated file, relative to the project root.
+
+**Signature**
+
+```ts
+export interface DeployTargetFile {
+  /** POSIX path relative to the project root, such as `.github/workflows/deploy.yml`. */
+  readonly path: string;
+  readonly content: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/deploy-target.types.ts#L9)
+
+### DeployTargetInput (interface)
+
+What `relkit deploy init` passes to a target.
+
+**Signature**
+
+```ts
+export interface DeployTargetInput {
+  /** Absolute project root; a target may read project files such as `package.json`. */
+  readonly root: string;
+  /** Runtime selected with `--runtime`, always one of the target's `runtimes`. */
+  readonly runtime: RuntimeAdapterName;
+  /**
+   * The compiled application graph (`.relkit/generated/application.graph.json`) as text, when
+   * the target sets `needsGraph`; undefined otherwise.
+   */
+  readonly graph: string | undefined;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/deploy-target.types.ts#L16)
+
+### DeployTargetPlan (interface)
+
+A target's rendering for one project.
+
+**Signature**
+
+```ts
+export interface DeployTargetPlan {
+  /** Files in write order. */
+  readonly files: readonly DeployTargetFile[];
+  /** What the developer does next, one step per entry. */
+  readonly nextSteps: readonly string[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/deploy-target.types.ts#L29)
+
+## `deploy-targets.ts`
+
+The first-party deploy targets, each an implementation of the public `DeployTarget` contract:
+Railway (Docker image on Bun or Node), Vercel (Node functions) and Cloudflare (Workers). Every
+target passes the shared suite in `@relkit/testing/deploy-target-conformance`.
+
+### "./deploy-target.types.js" (namespace export)
+
+Re-exports all named exports from the "./deploy-target.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./deploy-target.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/deploy-targets.ts#L15)
+
+### DEPLOY_TARGETS
+
+Every platform target `relkit deploy init` accepts, in documentation order.
+
+**Signature**
+
+```ts
+declare const DEPLOY_TARGETS: ReadonlyArray<DeployTarget>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/deploy-targets.ts#L88)
+
+### cloudflareDeployTarget
+
+Cloudflare: `wrangler.jsonc` with bindings derived from the graph and a deploy workflow.
+
+**Signature**
+
+```ts
+declare const cloudflareDeployTarget: DeployTarget;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/deploy-targets.ts#L72)
+
+### railwayDeployTarget
+
+Railway: a source Dockerfile, `railway.json` and a deploy workflow.
+
+**Signature**
+
+```ts
+declare const railwayDeployTarget: DeployTarget;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/deploy-targets.ts#L21)
+
+### vercelDeployTarget
+
+Vercel: `vercel.json` with crons from the graph's schedules, the function entry and a workflow.
+
+**Signature**
+
+```ts
+declare const vercelDeployTarget: DeployTarget;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/deploy-targets.ts#L38)
+
 ## `dev-session.ts`
 
 Owns development session state and its public synchronous/Promise facade over scoped native operations.

@@ -85,7 +85,7 @@ afterAll(async () => {
 });
 
 (enabled ? test : test.skip)(
-  "Redis over HTTP, KV, R2 and Durable Object realtime pass the shared suites in workerd",
+  "the Workers adapter, Redis over HTTP, KV, R2 and Durable Object realtime pass the shared suites in workerd",
   async () => {
     const response = await fetch(`http://127.0.0.1:${port}/run`);
     const body = (await response.json()) as {
@@ -101,6 +101,7 @@ afterAll(async () => {
     expect(body.results.filter((result) => !result.ok)).toEqual([]);
     expect(body.results.map((result) => result.name)).toEqual([
       "runtime is workers",
+      "workers runtime adapter",
       "redis over HTTP: protocol",
       "redis over HTTP: cache",
       "redis socket URL is refused on Workers",
@@ -118,6 +119,7 @@ afterAll(async () => {
         ]),
     );
     expect(skipped).toEqual({
+      "workers runtime adapter": [],
       "redis over HTTP: cache": [],
       "KV binding: cache": ["increment"],
       "R2 binding: bucket": ["signed-urls", "closed"],

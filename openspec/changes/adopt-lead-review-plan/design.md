@@ -1751,6 +1751,36 @@ Decided while applying section 25 (maintainer, 2026-11-06):
   Bun 1.3.10 and Node 24.12.0 for Redis cache (8) and realtime (7), Postgres jobs (6) and events
   (5), and the local bucket provider (7 passed, `signed-urls` and `backend-failure` skipped).
 
+- **Adapters get the same suite shape (25.3).** `@relkit/testing/runtime-conformance` checks a
+  `RuntimeAdapter` from inside the runtime it adapts: naming, SHA-256 and UUIDs, environment,
+  `serve`, the WebSocket helper, files, child processes and module resolution. A `kind` option
+  splits the expectations: `process` adapters (Bun, Node) must serve, open files, spawn and
+  resolve; `isolate` adapters (Workers) must refuse those with an error. Full HTTP behavior of a
+  built app (static files, WebSocket echo) stays in `scripts/runtime-http-suite.ts`. `RuntimeName`
+  stays `"bun" | "node"` and `RuntimeAdapterName` its widening with `"workers"`.
+- **The deploy-target contract is now a named interface.** It was the private shape of
+  `platformFiles` in `deploy-init-target.ts`. `DeployTarget` (`id`, `label`, `runtimes`,
+  `defaultRuntime`, `needsGraph`, `plan(input) => Promise<{ files, nextSteps }>`) and the
+  first-party `railwayDeployTarget`, `vercelDeployTarget`, `cloudflareDeployTarget` and
+  `DEPLOY_TARGETS` are exported from the new `@relkit/cli/deploy-targets` leaf, and
+  `relkit deploy init` dispatches through `DEPLOY_TARGETS`, reading each target's accepted runtimes
+  from it. Output and messages are unchanged (the byte-for-byte deploy-init tests pass);
+  `deploy-init-railway.ts` is untouched. `plan` is Promise-based so an author needs no Effect.
+  `@relkit/testing/deploy-target-conformance` checks naming, every runtime rendering non-empty
+  files, determinism, relative unique paths, a GitHub Actions workflow, next steps and, for targets
+  that read the graph, refusing a missing or broken graph with a `RELKIT_DEPLOY_*` code. The suite
+  cannot check that a target changes no cloud resource; the interface documents it. Registering a
+  third-party target with the CLI is not part of this change: the interface lets one be written and
+  tested, and the guide says so.
+- **The agent suite already existed (section 24).** Its harness gains `suite: "agents"` so
+  `runConformance` reports it like the others; both adapters now also assert the per-case report.
+- **Where the adapters run them.** Bun and Node runtime adapters: a fixture run under each
+  executable from `packages/testing/tests/conformance/runtime-adapters.test.ts` (8 of 8 cases). The
+  Workers adapter: inside workerd in `integrations/packages/cloudflare/tests/workers-conformance.test.ts`
+  (8 of 8, `kind: "isolate"`). Railway, Vercel and Cloudflare targets:
+  `packages/testing/tests/conformance/deploy-targets.test.ts` (Railway skips `graph-required`).
+  AI SDK and LangChain: their `agent-conformance.test.ts` (7 of 7 each).
+
 ## Risks / Trade-offs
 
 - [The breaking release is large and could stall other work] → Publish a beta first; keep additive

@@ -240,18 +240,20 @@ export interface AgentConformanceCase {
 
 ### AgentConformanceHarness (interface)
 
-Cases plus a runner that rejects when the adapter breaks a case.
+Cases plus a runner that rejects when the adapter breaks a case. It is a `ConformanceHarness`,
+so `runConformance` from `@relkit/testing/conformance` reports it per case.
 
 **Signature**
 
 ```ts
 export interface AgentConformanceHarness {
+  readonly suite: "agents";
   readonly cases: readonly AgentConformanceCase[];
   readonly run: (caseId: AgentConformanceCase["id"]) => Promise<void>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L36)
 
 ### AgentConformanceOptions (interface)
 
@@ -2326,6 +2328,120 @@ export interface ConformanceReport {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.types.ts#L30)
+
+## `deploy-target-conformance.ts`
+
+Shared deploy-target conformance suite. The Railway, Vercel and Cloudflare targets of
+`relkit deploy init` run these cases, and a new target runs the same ones.
+
+### "./deploy-target-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./deploy-target-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./deploy-target-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.ts#L14)
+
+### DEPLOY_TARGET_CONFORMANCE_CASES
+
+The cases every deploy target passes.
+
+**Signature**
+
+```ts
+declare const DEPLOY_TARGET_CONFORMANCE_CASES: ReadonlyArray<DeployTargetConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.ts#L17)
+
+### createDeployTargetConformanceHarness
+
+Creates the deploy-target conformance harness for one target.
+
+**Example**
+
+```ts
+import { railwayDeployTarget } from "@relkit/cli/deploy-targets";
+import { runConformance } from "@relkit/testing/conformance";
+import { createDeployTargetConformanceHarness } from "@relkit/testing/deploy-target-conformance";
+
+const harness = createDeployTargetConformanceHarness({
+  target: railwayDeployTarget,
+  root: process.cwd(),
+});
+console.log((await runConformance(harness)).passed);
+```
+
+**Signature**
+
+```ts
+declare const createDeployTargetConformanceHarness: (
+  options: DeployTargetConformanceOptions,
+) => ConformanceHarness<DeployTargetConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.ts#L45)
+
+## `deploy-target-conformance.types.ts`
+
+Inputs of the shared deploy-target conformance suite.
+
+### DeployTargetConformanceCase (type alias)
+
+One deploy-target conformance case.
+
+**Signature**
+
+```ts
+type DeployTargetConformanceCase = ConformanceCase<DeployTargetConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.types.ts#L29)
+
+### DeployTargetConformanceCaseId (type alias)
+
+Case ids of the deploy-target suite.
+
+**Signature**
+
+```ts
+type DeployTargetConformanceCaseId =
+  | "naming"
+  | "every-runtime"
+  | "deterministic"
+  | "relative-paths"
+  | "ci-workflow"
+  | "next-steps"
+  | "graph-required";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.types.ts#L19)
+
+### DeployTargetConformanceOptions (interface)
+
+What a deploy target supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface DeployTargetConformanceOptions {
+  /** The target under test, such as `railwayDeployTarget` from `@relkit/cli/deploy-targets`. */
+  readonly target: DeployTarget;
+  /** Project root passed to `plan`; it holds whatever project files the target reads. */
+  readonly root: string;
+  /**
+   * A compiled application graph for targets that set `needsGraph`. The suite passes it as text
+   * and also checks that a missing or broken graph is refused.
+   */
+  readonly graph?: unknown;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.types.ts#L6)
 
 ## `drizzle.ts`
 
@@ -5760,6 +5876,131 @@ declare const closeRuntime: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-close.ts#L11)
+
+## `runtime-conformance.ts`
+
+Shared runtime adapter conformance suite. The Bun, Node and Workers adapters run these cases
+inside the runtime they adapt, and a new adapter runs the same ones. The full HTTP behavior of a
+built application (static files, WebSocket echo, streaming) stays in the runtime HTTP suite.
+
+### "./runtime-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./runtime-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./runtime-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.ts#L14)
+
+### RUNTIME_CONFORMANCE_CASES
+
+The cases every runtime adapter passes.
+
+**Signature**
+
+```ts
+declare const RUNTIME_CONFORMANCE_CASES: ReadonlyArray<RuntimeConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.ts#L17)
+
+### createRuntimeConformanceHarness
+
+Creates the runtime conformance harness for one adapter. Run it inside the runtime the adapter
+adapts.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import { createRuntimeConformanceHarness } from "@relkit/testing/runtime-conformance";
+import { nodeRuntime } from "relkit/runtime/node";
+
+const harness = createRuntimeConformanceHarness({
+  adapter: nodeRuntime,
+  kind: "process",
+  executable: process.execPath,
+});
+console.log((await runConformance(harness)).results);
+```
+
+**Signature**
+
+```ts
+declare const createRuntimeConformanceHarness: (
+  options: RuntimeConformanceOptions,
+) => ConformanceHarness<RuntimeConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.ts#L50)
+
+## `runtime-conformance.types.ts`
+
+Inputs of the shared runtime adapter conformance suite.
+
+### RuntimeConformanceCase (type alias)
+
+One runtime conformance case.
+
+**Signature**
+
+```ts
+type RuntimeConformanceCase = ConformanceCase<RuntimeConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.types.ts#L37)
+
+### RuntimeConformanceCaseId (type alias)
+
+Case ids of the runtime suite.
+
+**Signature**
+
+```ts
+type RuntimeConformanceCaseId =
+  | "naming"
+  | "crypto"
+  | "environment"
+  | "serve"
+  | "websocket-helper"
+  | "files"
+  | "processes"
+  | "modules";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.types.ts#L26)
+
+### RuntimeConformanceOptions (interface)
+
+What a runtime adapter supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface RuntimeConformanceOptions {
+  /** The adapter under test, such as `nodeRuntime` from `relkit/runtime/node`. */
+  readonly adapter: RuntimeAdapter;
+  /**
+   * `process` for runtimes with a listener, a filesystem and child processes (Bun, Node);
+   * `isolate` for runtimes without them (Cloudflare Workers), whose adapter must refuse those
+   * operations instead.
+   */
+  readonly kind: "process" | "isolate";
+  /** A variable set in the environment of the run, read back through the adapter. */
+  readonly environment?: { readonly name: string; readonly value: string };
+  /** An existing file the `files` case opens (process runtimes). */
+  readonly file?: { readonly path: string; readonly contents: string };
+  /** Executable of the runtime under test, such as `process.execPath` (process runtimes). */
+  readonly executable?: string;
+  /** Directory from which the `modules` case resolves `relkit` (process runtimes). */
+  readonly resolveFrom?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.types.ts#L6)
 
 ## `runtime-context.ts`
 

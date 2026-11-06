@@ -6,6 +6,8 @@
 import { strict as assert } from "node:assert";
 import { createRedisCacheProvider, createRedisClient } from "@relkit/redis/runtime";
 import { detectRuntime } from "relkit/runtime";
+import { workersRuntime } from "relkit/runtime/workers";
+import { createRuntimeConformanceHarness } from "@relkit/testing/runtime-conformance";
 import {
   createCloudflareKvBindingCacheProvider,
   createCloudflareR2BindingBucketProvider,
@@ -43,6 +45,9 @@ export default {
     const redis = { createRedisClient, createRedisCacheProvider };
     const url = env.REDIS_HTTP_URL;
     await run("runtime is workers", () => assert.equal(detectRuntime(), "workers"));
+    await run("workers runtime adapter", () =>
+      suite(createRuntimeConformanceHarness({ adapter: workersRuntime, kind: "isolate" })),
+    );
     await run("redis over HTTP: protocol", () =>
       checkRedisProtocol(redis, { url, prefix, unreachable: "http://127.0.0.1:1" }),
     );

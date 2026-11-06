@@ -29,8 +29,12 @@ export interface AgentConformanceCase {
   readonly description: string;
 }
 
-/** Cases plus a runner that rejects when the adapter breaks a case.*/
+/**
+ * Cases plus a runner that rejects when the adapter breaks a case. It is a `ConformanceHarness`,
+ * so `runConformance` from `@relkit/testing/conformance` reports it per case.
+ */
 export interface AgentConformanceHarness {
+  readonly suite: "agents";
   readonly cases: readonly AgentConformanceCase[];
   readonly run: (caseId: AgentConformanceCase["id"]) => Promise<void>;
 }
