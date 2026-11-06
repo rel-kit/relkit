@@ -1,4 +1,5 @@
 import { Cause, Clock, Context, Effect, Exit, Layer, Metric, Option } from "effect";
+import { attributedMetric } from "../compiler/metric-attributes.js";
 import type {
   GeneratorOperation,
   GeneratorTelemetryService,
@@ -53,13 +54,12 @@ function observeLive<A, E, R>(
   const attributes = { operation };
   return Effect.gen(function* () {
     const started = yield* Clock.currentTimeMillis;
-    yield* Metric.update(Metric.withAttributes(calls, attributes), 1);
+    yield* Metric.update(attributedMetric(calls, attributes), 1);
     return yield* Effect.onExit(effect, (exit) =>
       Effect.gen(function* () {
         const elapsed = (yield* Clock.currentTimeMillis) - started;
-        yield* Metric.update(Metric.withAttributes(duration, attributes), Math.max(0, elapsed));
-        if (Exit.isFailure(exit))
-          yield* Metric.update(Metric.withAttributes(failures, attributes), 1);
+        yield* Metric.update(attributedMetric(duration, attributes), Math.max(0, elapsed));
+        if (Exit.isFailure(exit)) yield* Metric.update(attributedMetric(failures, attributes), 1);
       }),
     );
   });

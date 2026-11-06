@@ -1,4 +1,5 @@
 import { Cause, Clock, Context, Effect, Exit, Metric, Result } from "effect";
+import { attributedMetric } from "./metric-attributes.js";
 import type {
   ExecutionDomain,
   ExecutionOutcome,
@@ -81,10 +82,10 @@ export function observeExecution<A, E, R>(
           // Metric.update delegates to this synchronous mutation with the same
           // context. Batch telemetry bookkeeping without entering the run loop
           // for each counter; registry and inherited metric attributes stay local.
-          Metric.withAttributes(calls, attributes).updateUnsafe(1, fiber.context);
+          attributedMetric(calls, attributes).updateUnsafe(1, fiber.context);
           for (const [kind, count] of Object.entries(workload())) {
             if (Number.isFinite(count) && count >= 0)
-              Metric.withAttributes(workloads, { ...attributes, kind }).updateUnsafe(
+              attributedMetric(workloads, { ...attributes, kind }).updateUnsafe(
                 count,
                 fiber.context,
               );
@@ -110,11 +111,8 @@ export function observeExecution<A, E, R>(
               : undefined;
           yield* Effect.withFiber((fiber) => {
             if (elapsed !== undefined)
-              Metric.withAttributes(duration, attributes).updateUnsafe(elapsed, fiber.context);
-            Metric.withAttributes(outcomes, { ...attributes, outcome }).updateUnsafe(
-              1,
-              fiber.context,
-            );
+              attributedMetric(duration, attributes).updateUnsafe(elapsed, fiber.context);
+            attributedMetric(outcomes, { ...attributes, outcome }).updateUnsafe(1, fiber.context);
             return Effect.void;
           });
           yield* Effect.annotateCurrentSpan({

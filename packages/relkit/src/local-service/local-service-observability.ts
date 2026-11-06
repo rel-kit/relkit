@@ -1,4 +1,5 @@
 import { Cause, Clock, Context, Effect, Exit, Layer, Metric, Option } from "effect";
+import { attributedMetric } from "../contracts/metric-attributes.js";
 import {
   LocalServiceValidationFailure,
   LocalServiceVersionError,
@@ -55,13 +56,12 @@ function observeLive<A, E, R>(
   return Effect.withSpan(
     Effect.gen(function* () {
       const started = yield* Clock.currentTimeMillis;
-      yield* Metric.update(Metric.withAttributes(calls, attributes), 1);
+      yield* Metric.update(attributedMetric(calls, attributes), 1);
       return yield* Effect.onExit(effect, (exit) =>
         Effect.gen(function* () {
           const elapsed = (yield* Clock.currentTimeMillis) - started;
-          yield* Metric.update(Metric.withAttributes(duration, attributes), Math.max(0, elapsed));
-          if (Exit.isFailure(exit))
-            yield* Metric.update(Metric.withAttributes(failures, attributes), 1);
+          yield* Metric.update(attributedMetric(duration, attributes), Math.max(0, elapsed));
+          if (Exit.isFailure(exit)) yield* Metric.update(attributedMetric(failures, attributes), 1);
         }),
       );
     }),

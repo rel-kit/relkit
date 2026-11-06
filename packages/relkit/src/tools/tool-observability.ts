@@ -1,4 +1,5 @@
 import { Cause, Clock, Context, Effect, Exit, Layer, Metric, Option, Schema } from "effect";
+import { attributedMetric } from "../contracts/metric-attributes.js";
 import type { ToolOperation, ToolTelemetryService } from "./tool-observability.types.js";
 import {
   ToolArgumentsFailure,
@@ -60,13 +61,12 @@ function observeLive<A, E, R>(
   const attributes = { operation };
   const measured = Effect.gen(function* () {
     const started = yield* Clock.monotonicTimeNanos;
-    yield* Metric.update(Metric.withAttributes(operations, attributes), 1);
+    yield* Metric.update(attributedMetric(operations, attributes), 1);
     return yield* Effect.onExit(effect, (exit) =>
       Effect.gen(function* () {
         const elapsed = Number((yield* Clock.monotonicTimeNanos) - started) / 1_000_000;
-        yield* Metric.update(Metric.withAttributes(duration, attributes), Math.max(0, elapsed));
-        if (Exit.isFailure(exit))
-          yield* Metric.update(Metric.withAttributes(failures, attributes), 1);
+        yield* Metric.update(attributedMetric(duration, attributes), Math.max(0, elapsed));
+        if (Exit.isFailure(exit)) yield* Metric.update(attributedMetric(failures, attributes), 1);
       }),
     );
   });
