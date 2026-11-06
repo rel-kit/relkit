@@ -8,6 +8,7 @@ import { observeCli } from "../cli-runtime.js";
 import { CliProject } from "../services/project.service.js";
 import { CliSourceWatch } from "../services/source-watch.service.js";
 import { CliCleanup, cleanupEffect } from "../services/cleanup.service.js";
+import { watchProjectTreeEffect } from "./dev-watch-tree.js";
 
 /**
  * Watches before checking so edits during validation or support acquisition invalidate reuse.
@@ -23,9 +24,9 @@ export const checkInitialDevProjectEffect = Effect.fn("Dev.initialCheck")(
     let changed = false;
     const watchScope = yield* Scope.fork(yield* Scope.Scope);
     yield* Effect.acquireRelease(
-      watches.watch(
+      watchProjectTreeEffect(
+        watches,
         projectRoot,
-        true,
         (filename) => {
           const first = filename.replaceAll("\\", "/").split("/")[0];
           if (![".git", ".relkit", ".next"].includes(first ?? "")) changed = true;
