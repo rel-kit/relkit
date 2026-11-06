@@ -158,8 +158,9 @@ jobs:
         run: |
           bun x prettier --check AGENTS.md README.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md RELEASE_NOTES.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .changeset .github apps examples integrations packages scripts templates tests docs/testing.md
           bun run lint
-          bun run check
+          # `check` loads CLI source (the migrate rules) that imports relkit's built entry points.
           bun x turbo run build --filter=relkit --output-logs=errors-only
+          bun run check
           bun test ./tests/phase0-docs-imports.ts
           bun run konsistent -- validate
           bun run scripts/check-observability-sinks.ts
