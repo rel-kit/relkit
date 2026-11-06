@@ -143,17 +143,32 @@ function sensitiveKey(
   );
 }
 function contentKey(key: string): boolean {
-  return /^(?:body|requestbody|responsebody|binary|payload|prompt|result|messages|content|environment|env|modelprompt|modelresult|toolinput|toolresult|request|context|service|servicecontext|principal|tenant)$/.test(
-    normalizeKey(key),
-  );
+  let known = contentKeys.get(key);
+  if (known === undefined) {
+    known =
+      /^(?:body|requestbody|responsebody|binary|payload|prompt|result|messages|content|environment|env|modelprompt|modelresult|toolinput|toolresult|request|context|service|servicecontext|principal|tenant)$/.test(
+        normalizeKey(key),
+      );
+    if (contentKeys.size < KEY_CACHE_LIMIT) contentKeys.set(key, known);
+  }
+  return known;
 }
 function isSensitiveObject(value: object): boolean {
   const record = value as Record<string, unknown>;
   return record.sensitive === true || record.secret === true || record.type === "secret";
 }
 function normalizeKey(value: string): string {
-  return value.toLowerCase().replace(/[\s_-]/g, "");
+  let normalized = normalizedKeys.get(value);
+  if (normalized === undefined) {
+    normalized = value.toLowerCase().replace(/[\s_-]/g, "");
+    if (normalizedKeys.size < KEY_CACHE_LIMIT) normalizedKeys.set(value, normalized);
+  }
+  return normalized;
 }
+// Records repeat the same field names, so key spellings are normalized once per name.
+const KEY_CACHE_LIMIT = 10_000;
+const normalizedKeys = new Map<string, string>();
+const contentKeys = new Map<string, boolean>();
 function redactText(value: string): string {
   return value
     .replace(/\b(?:Bearer|Basic)\s+[^\s]+/gi, (match) => `${match.split(/\s+/, 1)[0]} [REDACTED]`)
