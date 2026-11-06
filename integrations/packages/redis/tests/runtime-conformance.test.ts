@@ -1,6 +1,7 @@
 /**
- * Runs the Redis conformance module on Bun and on Node against one Docker Redis. Opt in with
- * RELKIT_TEST_DOCKER=1, as the local Docker services test does.
+ * Runs the Redis conformance module (the published cache and realtime suites plus the Redis
+ * protocol and agent-state checks) on Bun and on Node against one Redis: a Docker container with
+ * RELKIT_TEST_DOCKER=1, as the local Docker services test does, or the server at REDIS_URL.
  */
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -10,11 +11,12 @@ const IMAGE =
   "redis:7.4.2-alpine@sha256:02419de7eddf55aa5bcf49efb74e88fa8d931b4d77c07eff8a6b2144472b6952";
 const MODULE = fileURLToPath(new URL("./conformance/redis-conformance.mjs", import.meta.url));
 const docker = process.env.RELKIT_TEST_DOCKER === "1";
+const external = process.env.REDIS_URL;
 let container = "";
-let url = "";
+let url = external ?? "";
 
 beforeAll(async () => {
-  if (!docker) return;
+  if (!docker || external !== undefined) return;
   container = command("docker", ["run", "--detach", "--rm", "-p", "127.0.0.1::6379", IMAGE]);
   const port = command("docker", ["port", container, "6379/tcp"]).split(":").at(-1);
   url = `redis://127.0.0.1:${port}`;
@@ -32,7 +34,7 @@ afterAll(() => {
   if (container !== "") spawnSync("docker", ["stop", container]);
 });
 
-(docker ? test : test.skip).each(["bun", "node"])(
+(docker || external !== undefined ? test : test.skip).each(["bun", "node"])(
   "cache, realtime and agent state pass on %s",
   (runtime) => {
     const result = spawnSync(runtime, [MODULE], {

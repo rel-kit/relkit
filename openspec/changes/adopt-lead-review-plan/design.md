@@ -1704,6 +1704,133 @@ Decided while applying section 26 (maintainer, 2026-11-05):
   undocumented behavior are outside it. Before 1.0, minor releases can break Core only through the
   deprecation window after `0.9.0`.
 
+### D21. Provider-author kit (#19)
+
+Decided while applying section 25 (maintainer, 2026-11-06):
+
+- **One suite shape for every kind.** Each suite is a leaf of `@relkit/testing`:
+  `./cache-conformance`, `./buckets-conformance`, `./realtime-conformance`, `./events-conformance`
+  and `./jobs-conformance`, beside `./agents-conformance`. Each exports its cases
+  (`CACHE_CONFORMANCE_CASES`, ...) and `create*ConformanceHarness(options)`, which returns
+  `{ suite, cases, run(caseId) }`. `run` resolves on pass, resolves `"skipped"` when the provider
+  declares it lacks what the case checks (no `increment` capability, no signed URLs, no `close`, no
+  failing provider given), and rejects with the first broken expectation. `./conformance` holds
+  `runConformance(harness)`, which reports pass, fail or skip per case, and `assertConformance`.
+  An author can run the report in one test or map `harness.cases` to one test per case.
+- **Failure injection is the provider's own.** The suites cannot break someone else's backend, so
+  each takes `failing()` (cache, buckets, realtime, events): a provider pointed at a backend that
+  cannot answer (an unreachable Redis or Postgres, a missing Workers binding). Its case checks that
+  operations reject rather than report a miss. Jobs keeps its existing fault: `faulty()` is an
+  adapter that commits a submission and loses the response (Postgres `faults.loseSubmitResponse`,
+  the deterministic adapter's `unknown.submit`), and the `unknown-acknowledgement` case runs on it.
+  `createJobsProviderConformanceHarness` wraps the existing `runJobsConformance` cases; the old root
+  exports stay.
+- **The suites use no runtime built-ins.** They import only `relkit` types,
+  `relkit/realtime/operation-id` and `relkit/invocation`, so the same cases run on Bun, on Node and
+  inside workerd.
+- **Cases moved, Redis- and binding-specific checks stayed.** The generic cache checks of
+  `redis-cache-checks.mjs`, `realtime-checks.mjs` and Cloudflare's `binding-checks.mjs` became the
+  suites; the last two files are gone. The Redis protocol checks (`redis-protocol-checks.mjs`) and
+  the agent-state check stay in the Redis runner, and the SQLite runner in `packages/drizzle` stays
+  because it tests a database driver, not one of the five provider kinds.
+- **Running the suites found two gaps, both fixed.** Cloudflare's KV and R2 binding providers
+  ignored an aborted `signal`; they now reject like the local and Redis providers. The in-memory R2
+  stand-in in the binding test returned the same etag for new content.
+- **Where each first-party provider runs them.** Local cache, buckets, realtime and events and the
+  deterministic jobs adapter: `packages/testing/tests/conformance`. Redis cache and realtime on Bun
+  and Node: `integrations/packages/redis/tests/runtime-conformance.test.ts` (now also with
+  `REDIS_URL`). KV and R2 against in-memory bindings: `binding-providers.test.ts`; Redis over HTTP,
+  KV, R2 and Durable Object realtime inside workerd: `workers-conformance.test.ts`. Postgres jobs
+  and events: `jobs-conformance.test.ts` and `events-conformance.test.ts`.
+- **Packed verification.** `scripts/pack-and-smoke-provider-conformance.ts` packs every release
+  package, serves them from the local registry, installs `relkit`, `@relkit/testing`,
+  `@relkit/redis` and `@relkit/postgres` into a standalone consumer and runs the suites from the
+  installed packages on Bun and Node. Run on 2026-11-06 with
+  `REDIS_URL=redis://127.0.0.1:6379 RELKIT_TEST_POSTGRES_URL=postgres://postgres@localhost:55432/postgres bun run scripts/pack-and-smoke-provider-conformance.ts`
+  (Node 24.12.0 on PATH, a local Redis and a throwaway Postgres 14 cluster): every case passed on
+  Bun 1.3.10 and Node 24.12.0 for Redis cache (8) and realtime (7), Postgres jobs (6) and events
+  (5), and the local bucket provider (7 passed, `signed-urls` and `backend-failure` skipped).
+
+- **Adapters get the same suite shape (25.3).** `@relkit/testing/runtime-conformance` checks a
+  `RuntimeAdapter` from inside the runtime it adapts: naming, SHA-256 and UUIDs, environment,
+  `serve`, the WebSocket helper, files, child processes and module resolution. A `kind` option
+  splits the expectations: `process` adapters (Bun, Node) must serve, open files, spawn and
+  resolve; `isolate` adapters (Workers) must refuse those with an error. Full HTTP behavior of a
+  built app (static files, WebSocket echo) stays in `scripts/runtime-http-suite.ts`. `RuntimeName`
+  stays `"bun" | "node"` and `RuntimeAdapterName` its widening with `"workers"`.
+- **The deploy-target contract is now a named interface.** It was the private shape of
+  `platformFiles` in `deploy-init-target.ts`. `DeployTarget` (`id`, `label`, `runtimes`,
+  `defaultRuntime`, `needsGraph`, `plan(input) => Promise<{ files, nextSteps }>`) and the
+  first-party `railwayDeployTarget`, `vercelDeployTarget`, `cloudflareDeployTarget` and
+  `DEPLOY_TARGETS` are exported from the new `@relkit/cli/deploy-targets` leaf, and
+  `relkit deploy init` dispatches through `DEPLOY_TARGETS`, reading each target's accepted runtimes
+  from it. Output and messages are unchanged (the byte-for-byte deploy-init tests pass);
+  `deploy-init-railway.ts` is untouched. `plan` is Promise-based so an author needs no Effect.
+  `@relkit/testing/deploy-target-conformance` checks naming, every runtime rendering non-empty
+  files, determinism, relative unique paths, a GitHub Actions workflow, next steps and, for targets
+  that read the graph, refusing a missing or broken graph with a `RELKIT_DEPLOY_*` code. The suite
+  cannot check that a target changes no cloud resource; the interface documents it. Registering a
+  third-party target with the CLI is not part of this change: the interface lets one be written and
+  tested, and the guide says so.
+- **The agent suite already existed (section 24).** Its harness gains `suite: "agents"` so
+  `runConformance` reports it like the others; both adapters now also assert the per-case report.
+- **Where the adapters run them.** Bun and Node runtime adapters: a fixture run under each
+  executable from `packages/testing/tests/conformance/runtime-adapters.test.ts` (8 of 8 cases). The
+  Workers adapter: inside workerd in `integrations/packages/cloudflare/tests/workers-conformance.test.ts`
+  (8 of 8, `kind: "isolate"`). Railway, Vercel and Cloudflare targets:
+  `packages/testing/tests/conformance/deploy-targets.test.ts` (Railway skips `graph-required`).
+  AI SDK and LangChain: their `agent-conformance.test.ts` (7 of 7 each).
+
+- **The guide is a new page beside the descriptor page (25.2).**
+  `docs/modules/integrations/provider-kit` ("Build and test a provider") covers the starter, the
+  suites with failure injection, packing into an app, and the runtime, deploy-target and agent
+  adapters. `provider-authoring` keeps the descriptor APIs and links to it. It is listed in the
+  Integrations group, `installation-coverage.json` (concept) and the operations relations; it is not
+  a deployment guide, so `deployment-guide-catalog.ts` is unchanged.
+- **The starter is `templates/provider-starter`, not a `create-relkit` template.** The creator's
+  templates are apps; a provider is a package, so the starter is a directory to copy that the guide
+  points to, outside the workspaces and the creator catalog. `scripts/scope-policy.ts` now approves
+  it as a second template root. It is an in-memory cache provider (`relkit-provider-starter`, id
+  `starter`, adapter `starter-memory-cache`) with an authoring entry, a runtime entry with
+  `runtimeIntegration`, a pluggable store and `tests/conformance.test.ts` running the cache suite
+  (failure injection through a failing store). Its RelKit versions are pinned to the current
+  release (`relkit` 0.8.8, `@relkit/testing` 0.8.4); nothing syncs them on a version bump yet.
+- **Third-party packages were invisible to `relkit check`; fixed with a naming convention.** The
+  syntax-only import scan (`ast-prefilter-scan.ts`) kept only `relkit`, `relkit/*` and `@relkit/*`
+  imports, so an installed provider under any other name failed with
+  `RELKIT_RUNTIME_INTEGRATION_PACKAGE_MISSING`. It now also keeps `relkit-<name>` and
+  `@<scope>/relkit-<name>` (with subpaths), whose `relkit.integration` metadata is then read like a
+  first-party package's. Reading every imported package's manifest would accept any name but needs
+  file reads in a scan that is syntax-only; the convention keeps the scan pure. The guide and the
+  starter's README state the rule.
+- **Starter verification.** `scripts/pack-and-smoke-provider-starter.ts` packs the checkout,
+  creates an `api` app from the packed generator, copies the starter with the packed versions,
+  installs it from the local registry, runs its tests and typecheck, packs it with `bun pm pack`,
+  adds the tarball to the app, selects it as the app's default cache with a cache definition, and
+  runs `relkit check`, the app typecheck, the app tests and `relkit build`, then starts the built
+  server until `/_relkit/v1/health/ready` answers 200 (the server bundle imports
+  `relkit-provider-starter/runtime`). Passed on 2026-11-06 with Bun 1.3.10.
+
+- **The provider contract is a Core row of its own (25.4).** "Provider and adapter contract" lists
+  `relkit/provider`, `relkit/cache`, `relkit/buckets`, `relkit/events`, `relkit/jobs`,
+  `relkit/runtime`, `@relkit/testing` and `@relkit/cli`, documented by the provider-kit and
+  provider-authoring pages. Every one of these was already a Core area, so no `@experimental` tag
+  had to be removed: the suites were written without tags, and the checker forbids tags in Core
+  sources. The row makes the promise explicit in the maturity table and the roadmap status, and
+  the guide states it with a link to the versioning policy.
+- **Two contracts stay Labs.** The realtime provider interface (`relkit/realtime`) and the agent
+  adapter interface (`relkit/agent-adapters`) carry `@experimental` because their features are
+  Labs (Realtime; Agent adapters, D16). Making their contracts Core would freeze APIs whose
+  features may still change, so they keep their tags and the row's note says so. Their suites live
+  in the Core `@relkit/testing` and change with the interface they test. Promoting them is part of
+  promoting those features.
+- **The table moved to `scripts/maturity-features.ts`.** `scripts/maturity.ts` had a size baseline
+  of 401 lines that may only shrink; moving `MATURITY_FEATURES` out (re-exported unchanged) brings
+  it to 249 lines and drops its baseline entry.
+- **Maturity verification.** `bun run scripts/maturity.ts` reports 38 features with no problem;
+  the regenerated `maturity.mdx` snippet shows the row as Core and `roadmap-status.mdx` counts 23
+  Core features; `tests/unit/maturity.test.ts` (now pinning the row) and the docs tests pass.
+
 ## Risks / Trade-offs
 
 - [The breaking release is large and could stall other work] → Publish a beta first; keep additive

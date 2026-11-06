@@ -278,6 +278,9 @@
       "dependencies": {
         "relkit": "workspace:*",
       },
+      "devDependencies": {
+        "@relkit/testing": "workspace:*",
+      },
     },
     "integrations/packages/docker": {
       "name": "@relkit/docker",
@@ -420,6 +423,9 @@
       "dependencies": {
         "ioredis": "5.11.1",
         "relkit": "workspace:*",
+      },
+      "devDependencies": {
+        "@relkit/testing": "workspace:*",
       },
     },
     "integrations/packages/s3": {

@@ -62,6 +62,15 @@ export const operationsGuideRelations = [
     ["apps/docs/examples/public-api/provider.ts"],
   ),
   relation(
+    "docs/modules/integrations/provider-kit",
+    ["testing", "provider", "cli-api"],
+    [
+      "templates/provider-starter/tests/conformance.test.ts",
+      "packages/testing/tests/conformance/local-storage.test.ts",
+      "packages/testing/tests/conformance/deploy-targets.test.ts",
+    ],
+  ),
+  relation(
     "docs/modules/integrations/local-providers",
     ["providers-local", "integrations/local"],
     ["apps/docs/examples/public-api/local.ts"],

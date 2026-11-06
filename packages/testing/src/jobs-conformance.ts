@@ -1,11 +1,23 @@
-import type { JobsConformanceFixture, JobsConformanceHarness } from "./jobs-conformance.types.js";
-export type { JobsConformanceFixture, JobsConformanceHarness } from "./jobs-conformance.types.js";
+import type {
+  JobsConformanceFixture,
+  JobsConformanceHarness,
+  JobsProviderConformanceOptions,
+} from "./jobs-conformance.types.js";
+import type { ConformanceHarness } from "./conformance.types.js";
+import { conformanceHarness, SKIPPED } from "./conformance.js";
+export type {
+  JobsConformanceFixture,
+  JobsConformanceHarness,
+  JobsConformanceProvider,
+  JobsProviderConformanceOptions,
+} from "./jobs-conformance.types.js";
 import type { RunHandle } from "relkit/contracts/jobs";
 import type { JobsAdapterRuntime, NativeSubmission, OperationContext } from "relkit/jobs/adapter";
 import {
   createDeterministicJobsAdapter,
   type TestJobsAdapterOptions,
 } from "./test-jobs-adapter.js";
+export { createDeterministicJobsAdapter } from "./test-jobs-adapter.js";
 
 export const JOBS_CONFORMANCE_FIXTURES: readonly JobsConformanceFixture[] = Object.freeze([
   {
@@ -74,6 +86,48 @@ export async function runJobsConformance(
     passed.push(fixtureId);
   }
   return Object.freeze(passed);
+}
+
+/**
+ * Creates the jobs conformance harness for a jobs provider, with the same cases as every
+ * first-party provider. The ambiguous-write case (`unknown-acknowledgement`) runs against the
+ * `faulty` adapter, the provider's own failure injection, and is skipped without one.
+ * @param options - Adapter factory and the optional fault-injected adapter factory.
+ * @returns Cases and a runner; pass it to `runConformance` or run each case as a test.
+ * @example
+ * ```ts
+ * import { runConformance } from "@relkit/testing/conformance";
+ * import {
+ *   createDeterministicJobsAdapter,
+ *   createJobsProviderConformanceHarness,
+ * } from "@relkit/testing/jobs-conformance";
+ *
+ * const harness = createJobsProviderConformanceHarness({
+ *   create: () => createDeterministicJobsAdapter(),
+ *   faulty: () => createDeterministicJobsAdapter({ unknown: { submit: true } }),
+ * });
+ * console.log((await runConformance(harness)).passed);
+ * ```
+ */
+export function createJobsProviderConformanceHarness(
+  options: JobsProviderConformanceOptions,
+): ConformanceHarness {
+  const checks = Object.fromEntries(
+    JOBS_CONFORMANCE_FIXTURES.map((fixture) => [
+      fixture.id,
+      async () => {
+        const injected = fixture.id === "unknown-acknowledgement";
+        if (injected && options.faulty === undefined) return SKIPPED;
+        const adapter = injected ? options.faulty!() : options.create();
+        try {
+          await runJobsConformance(adapter, [fixture.id]);
+        } finally {
+          await adapter.close?.();
+        }
+      },
+    ]),
+  );
+  return conformanceHarness("jobs", JOBS_CONFORMANCE_FIXTURES, checks);
 }
 
 /**

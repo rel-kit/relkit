@@ -75,5 +75,8 @@
   "dependencies": {
     "ioredis": "5.11.1",
     "relkit": "workspace:*"
+  },
+  "devDependencies": {
+    "@relkit/testing": "workspace:*"
   }
 }

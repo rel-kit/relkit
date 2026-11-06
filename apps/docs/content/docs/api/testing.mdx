@@ -240,18 +240,20 @@ export interface AgentConformanceCase {
 
 ### AgentConformanceHarness (interface)
 
-Cases plus a runner that rejects when the adapter breaks a case.
+Cases plus a runner that rejects when the adapter breaks a case. It is a `ConformanceHarness`,
+so `runConformance` from `@relkit/testing/conformance` reports it per case.
 
 **Signature**
 
 ```ts
 export interface AgentConformanceHarness {
+  readonly suite: "agents";
   readonly cases: readonly AgentConformanceCase[];
   readonly run: (caseId: AgentConformanceCase["id"]) => Promise<void>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L36)
 
 ### AgentConformanceOptions (interface)
 
@@ -1328,6 +1330,138 @@ declare const copyBucketObject: (value: TestBucketObject) => TestBucketObject;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/bucket-validation.ts#L57)
 
+## `buckets-conformance.ts`
+
+Shared bucket provider conformance suite. Every first-party bucket provider (local, S3,
+Cloudflare R2) runs these cases, and provider authors run the same ones.
+
+### "./buckets-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./buckets-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./buckets-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.ts#L15)
+
+### BUCKETS_CONFORMANCE_CASES
+
+The cases every bucket provider passes.
+
+**Signature**
+
+```ts
+declare const BUCKETS_CONFORMANCE_CASES: ReadonlyArray<BucketsConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.ts#L18)
+
+### createBucketsConformanceHarness
+
+Creates the bucket conformance harness for one provider.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import { createBucketsConformanceHarness } from "@relkit/testing/buckets-conformance";
+import { createLocalBucketProvider } from "relkit/providers-local";
+
+const harness = createBucketsConformanceHarness({
+  create: () => createLocalBucketProvider({ root: "/tmp/relkit-bucket-conformance" }),
+});
+console.log((await runConformance(harness)).passed);
+```
+
+**Signature**
+
+```ts
+declare const createBucketsConformanceHarness: (
+  options: BucketsConformanceOptions,
+) => ConformanceHarness<BucketsConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.ts#L48)
+
+## `buckets-conformance.types.ts`
+
+Inputs of the shared bucket provider conformance suite.
+
+### BucketsConformanceCase (type alias)
+
+One bucket conformance case.
+
+**Signature**
+
+```ts
+type BucketsConformanceCase = ConformanceCase<BucketsConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.types.ts#L39)
+
+### BucketsConformanceCaseId (type alias)
+
+Case ids of the bucket suite.
+
+**Signature**
+
+```ts
+type BucketsConformanceCaseId =
+  | "round-trip"
+  | "metadata"
+  | "overwrite"
+  | "list-prefix"
+  | "delete"
+  | "signed-urls"
+  | "cancellation"
+  | "closed"
+  | "backend-failure";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.types.ts#L27)
+
+### BucketsConformanceOptions (interface)
+
+What a bucket provider supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface BucketsConformanceOptions {
+  /**
+   * Creates a provider for one case. Cases write only under the key prefix they pass, so one
+   * bucket can serve every case.
+   * @param prefix - Unique key prefix for the case, without a trailing slash.
+   */
+  readonly create: (prefix: string) => BucketsConformanceProvider;
+  /**
+   * Failure injection: creates a provider whose backend cannot answer (an unreachable endpoint, a
+   * missing binding, a failing `fetch`). The `backend-failure` case is skipped without it.
+   */
+  readonly failing?: () => BucketsConformanceProvider;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.types.ts#L12)
+
+### BucketsConformanceProvider (type alias)
+
+A bucket provider under test, with the optional lifecycle methods first-party providers have.
+
+**Signature**
+
+```ts
+type BucketsConformanceProvider = BucketProvider & {
+  readonly ready?: () => Promise<unknown>;
+  readonly close?: () => Promise<unknown>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.types.ts#L6)
+
 ## `buckets-types.ts`
 
 Preserved compatibility entrypoint for the canonical domain type companion.
@@ -1464,6 +1598,139 @@ export interface TestBucketObject {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets.types.ts#L22)
+
+## `cache-conformance.ts`
+
+Shared cache provider conformance suite. Every first-party cache provider (local, Redis, Redis
+over HTTP, Cloudflare KV) runs these cases, and provider authors run the same ones.
+
+### "./cache-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./cache-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./cache-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache-conformance.ts#L23)
+
+### CACHE_CONFORMANCE_CASES
+
+The cases every cache provider passes.
+
+**Signature**
+
+```ts
+declare const CACHE_CONFORMANCE_CASES: ReadonlyArray<CacheConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache-conformance.ts#L26)
+
+### createCacheConformanceHarness
+
+Creates the cache conformance harness for one provider.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import { createCacheConformanceHarness } from "@relkit/testing/cache-conformance";
+import { createLocalCacheProvider } from "relkit/providers-local";
+
+const harness = createCacheConformanceHarness({
+  create: (cacheId) => createLocalCacheProvider({ cacheId }),
+});
+const report = await runConformance(harness);
+console.log(report.passed);
+```
+
+**Signature**
+
+```ts
+declare const createCacheConformanceHarness: (
+  options: CacheConformanceOptions,
+) => ConformanceHarness<CacheConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache-conformance.ts#L54)
+
+## `cache-conformance.types.ts`
+
+Inputs of the shared cache provider conformance suite.
+
+### CacheConformanceCase (type alias)
+
+One cache conformance case.
+
+**Signature**
+
+```ts
+type CacheConformanceCase = ConformanceCase<CacheConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache-conformance.types.ts#L39)
+
+### CacheConformanceCaseId (type alias)
+
+Case ids of the cache suite.
+
+**Signature**
+
+```ts
+type CacheConformanceCaseId =
+  | "round-trip"
+  | "has-delete"
+  | "get-or-set"
+  | "increment"
+  | "ttl"
+  | "cancellation"
+  | "closed"
+  | "backend-failure";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache-conformance.types.ts#L28)
+
+### CacheConformanceOptions (interface)
+
+What a cache provider supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface CacheConformanceOptions {
+  /**
+   * Creates a provider for one case. Each case passes a fresh cache id, so cases never share keys.
+   * @param cacheId - Unique cache id for the case.
+   */
+  readonly create: (cacheId: string) => CacheConformanceProvider;
+  /**
+   * Failure injection: creates a provider whose backend cannot answer (an unreachable server, a
+   * missing binding, a fault switch). The `backend-failure` case is skipped without it.
+   */
+  readonly failing?: () => CacheConformanceProvider;
+  /** Smallest TTL the backend accepts, such as 60 000 ms on Cloudflare KV; 0 by default. */
+  readonly minTtlMs?: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache-conformance.types.ts#L12)
+
+### CacheConformanceProvider (type alias)
+
+A cache provider under test, with the optional lifecycle methods first-party providers have.
+
+**Signature**
+
+```ts
+type CacheConformanceProvider = CacheProvider & {
+  readonly ready?: () => Promise<unknown>;
+  readonly close?: () => Promise<unknown>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache-conformance.types.ts#L6)
 
 ## `cache-storage-state.ts`
 
@@ -1821,6 +2088,361 @@ export interface TestCacheSnapshot {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache.types.ts#L28)
 
+## `conformance.ts`
+
+Shared runner and assertions of the RelKit conformance suites. The suites use no Node or Bun
+built-ins, so the same cases run on Bun, Node and inside workerd.
+
+### "./conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L11)
+
+### SKIPPED
+
+Returned by a case that the provider does not support.
+
+**Signature**
+
+```ts
+declare const SKIPPED: "skipped";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L14)
+
+### abortedSignal
+
+**Signature**
+
+```ts
+declare const abortedSignal: () => AbortSignal;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L155)
+
+### assertConformance
+
+Throws when a report has a failed case, naming every failure.
+
+**Example**
+
+```ts
+import { assertConformance } from "@relkit/testing/conformance";
+
+assertConformance({ suite: "cache", results: [], passed: true });
+```
+
+**Signature**
+
+```ts
+declare const assertConformance: (report: ConformanceReport) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L65)
+
+### check
+
+Fails the current case when a condition does not hold.
+
+**Signature**
+
+```ts
+declare const check: (condition: boolean, label: string, actual?: unknown) => asserts condition;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L101)
+
+### conformanceHarness
+
+Builds a harness from a table of checks, one per case.
+
+**Signature**
+
+```ts
+declare const conformanceHarness: <Id extends string>(
+  suite: string,
+  cases: readonly { readonly id: Id; readonly description: string }[],
+  checks: Readonly<Record<Id, () => Promise<void | "skipped">>>,
+) => ConformanceHarness<Id>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L79)
+
+### delay
+
+**Signature**
+
+```ts
+declare const delay: (ms: number) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L150)
+
+### eventually
+
+Polls until a condition holds or the timeout passes.
+
+**Signature**
+
+```ts
+declare const eventually: (
+  condition: () => boolean,
+  step: () => Promise<unknown>,
+  timeoutMs: number,
+  label: string,
+) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L135)
+
+### rejects
+
+Expects an operation to reject.
+
+**Signature**
+
+```ts
+declare const rejects: (operation: () => unknown, label: string) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L120)
+
+### runConformance
+
+Runs every case of a harness, one after another, and reports pass, fail or skip per case.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import { createCacheConformanceHarness } from "@relkit/testing/cache-conformance";
+import { createLocalCacheProvider } from "relkit/providers-local";
+
+const report = await runConformance(
+  createCacheConformanceHarness({ create: (cacheId) => createLocalCacheProvider({ cacheId }) }),
+);
+console.log(
+  report.passed,
+  report.results.map((result) => `${result.id}: ${result.outcome}`),
+);
+```
+
+**Signature**
+
+```ts
+declare const runConformance: <Id extends string>(
+  harness: ConformanceHarness<Id>,
+  only?: readonly Id[],
+) => Promise<ConformanceReport>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L33)
+
+### same
+
+Compares two JSON-compatible values structurally, ignoring object key order.
+
+**Signature**
+
+```ts
+declare const same: (left: unknown, right: unknown) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.ts#L110)
+
+## `conformance.types.ts`
+
+One case of a conformance suite. Every provider of a kind runs the same cases.
+
+### ConformanceCase (interface)
+
+One case of a conformance suite. Every provider of a kind runs the same cases.
+
+**Signature**
+
+```ts
+export interface ConformanceCase<Id extends string = string> {
+  readonly id: Id;
+  readonly description: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.types.ts#L4)
+
+### ConformanceCaseResult (interface)
+
+The outcome of one case.
+
+**Signature**
+
+```ts
+export interface ConformanceCaseResult {
+  readonly id: string;
+  readonly description: string;
+  readonly outcome: "pass" | "fail" | "skip";
+  /** The failure message when `outcome` is `"fail"`. */
+  readonly error?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.types.ts#L21)
+
+### ConformanceHarness (interface)
+
+Cases plus a runner. `run` resolves when the provider passes the case, resolves `"skipped"` when
+the provider declares it does not support what the case checks, and rejects with a description
+of the first broken expectation otherwise.
+
+**Signature**
+
+```ts
+export interface ConformanceHarness<Id extends string = string> {
+  readonly suite: string;
+  readonly cases: readonly ConformanceCase<Id>[];
+  readonly run: (caseId: Id) => Promise<void | "skipped">;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.types.ts#L14)
+
+### ConformanceReport (interface)
+
+Results of every case of one suite run against one provider.
+
+**Signature**
+
+```ts
+export interface ConformanceReport {
+  readonly suite: string;
+  readonly results: readonly ConformanceCaseResult[];
+  /** True when no case failed. */
+  readonly passed: boolean;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/conformance.types.ts#L30)
+
+## `deploy-target-conformance.ts`
+
+Shared deploy-target conformance suite. The Railway, Vercel and Cloudflare targets of
+`relkit deploy init` run these cases, and a new target runs the same ones.
+
+### "./deploy-target-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./deploy-target-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./deploy-target-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.ts#L14)
+
+### DEPLOY_TARGET_CONFORMANCE_CASES
+
+The cases every deploy target passes.
+
+**Signature**
+
+```ts
+declare const DEPLOY_TARGET_CONFORMANCE_CASES: ReadonlyArray<DeployTargetConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.ts#L17)
+
+### createDeployTargetConformanceHarness
+
+Creates the deploy-target conformance harness for one target.
+
+**Example**
+
+```ts
+import { railwayDeployTarget } from "@relkit/cli/deploy-targets";
+import { runConformance } from "@relkit/testing/conformance";
+import { createDeployTargetConformanceHarness } from "@relkit/testing/deploy-target-conformance";
+
+const harness = createDeployTargetConformanceHarness({
+  target: railwayDeployTarget,
+  root: process.cwd(),
+});
+console.log((await runConformance(harness)).passed);
+```
+
+**Signature**
+
+```ts
+declare const createDeployTargetConformanceHarness: (
+  options: DeployTargetConformanceOptions,
+) => ConformanceHarness<DeployTargetConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.ts#L45)
+
+## `deploy-target-conformance.types.ts`
+
+Inputs of the shared deploy-target conformance suite.
+
+### DeployTargetConformanceCase (type alias)
+
+One deploy-target conformance case.
+
+**Signature**
+
+```ts
+type DeployTargetConformanceCase = ConformanceCase<DeployTargetConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.types.ts#L29)
+
+### DeployTargetConformanceCaseId (type alias)
+
+Case ids of the deploy-target suite.
+
+**Signature**
+
+```ts
+type DeployTargetConformanceCaseId =
+  | "naming"
+  | "every-runtime"
+  | "deterministic"
+  | "relative-paths"
+  | "ci-workflow"
+  | "next-steps"
+  | "graph-required";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.types.ts#L19)
+
+### DeployTargetConformanceOptions (interface)
+
+What a deploy target supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface DeployTargetConformanceOptions {
+  /** The target under test, such as `railwayDeployTarget` from `@relkit/cli/deploy-targets`. */
+  readonly target: DeployTarget;
+  /** Project root passed to `plan`; it holds whatever project files the target reads. */
+  readonly root: string;
+  /**
+   * A compiled application graph for targets that set `needsGraph`. The suite passes it as text
+   * and also checks that a missing or broken graph is refused.
+   */
+  readonly graph?: unknown;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/deploy-target-conformance.types.ts#L6)
+
 ## `drizzle.ts`
 
 Selected database application harness; database ownership remains scoped to each test.
@@ -1883,6 +2505,193 @@ export interface EventControlsService {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/event-controls.types.ts#L7)
+
+## `events-conformance.ts`
+
+Shared event provider conformance suite. Every first-party event provider (local, Postgres)
+runs these cases, and provider authors run the same ones.
+
+### "./events-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./events-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./events-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.ts#L17)
+
+### EVENTS_CONFORMANCE_CASES
+
+The cases every event provider passes.
+
+**Signature**
+
+```ts
+declare const EVENTS_CONFORMANCE_CASES: ReadonlyArray<EventsConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.ts#L20)
+
+### createEventsConformanceHarness
+
+Creates the events conformance harness for one provider.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import { createEventsConformanceHarness } from "@relkit/testing/events-conformance";
+
+const published: unknown[] = [];
+const harness = createEventsConformanceHarness({
+  create: () => ({
+    publish: async (payload) => {
+      published.push(payload);
+      return { accepted: true, instanceId: `event-${published.length}` };
+    },
+  }),
+});
+console.log((await runConformance(harness, ["publish-accepted"])).passed);
+```
+
+**Signature**
+
+```ts
+declare const createEventsConformanceHarness: (
+  options: EventsConformanceOptions,
+) => ConformanceHarness<EventsConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.ts#L52)
+
+## `events-conformance.types.ts`
+
+Inputs of the shared events provider conformance suite.
+
+### EventsConformanceCase (type alias)
+
+One events conformance case.
+
+**Signature**
+
+```ts
+type EventsConformanceCase = ConformanceCase<EventsConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.types.ts#L73)
+
+### EventsConformanceCaseId (type alias)
+
+Case ids of the events suite.
+
+**Signature**
+
+```ts
+type EventsConformanceCaseId =
+  | "publish-accepted"
+  | "distinct-instances"
+  | "delivery"
+  | "retry-after-failure"
+  | "backend-failure";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.types.ts#L65)
+
+### EventsConformanceEnvelope (interface)
+
+The envelope a consumer receives; every provider's trigger envelope has at least these.
+
+**Signature**
+
+```ts
+export interface EventsConformanceEnvelope {
+  readonly instanceId: string;
+  readonly payload: unknown;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.types.ts#L6)
+
+### EventsConformanceOptions (interface)
+
+What an event provider supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface EventsConformanceOptions {
+  /**
+   * Creates a provider for one case, already set up for `event`: a provider that validates
+   * against registered contracts registers it here.
+   * @param namespace - Unique profile or namespace for the case.
+   * @param event - The event the cases publish.
+   */
+  readonly create: (
+    namespace: string,
+    event: { readonly id: string; readonly version: number },
+  ) => EventsConformanceProvider | Promise<EventsConformanceProvider>;
+  /**
+   * Moves due deliveries forward, for providers that deliver on a poll the test drives (such as
+   * Postgres with `consumers: false`). Background delivery needs nothing here.
+   */
+  readonly deliver?: (provider: EventsConformanceProvider) => Promise<unknown>;
+  /**
+   * The failure a consumer throws to ask for a retry. By default an `applicationFailure` with
+   * `retry: "later"`; a plain `Error` is a permanent failure that is dead-lettered.
+   */
+  readonly retryableFailure?: () => unknown;
+  /** Time limit for a delivery, 10 000 ms by default. */
+  readonly deliveryTimeoutMs?: number;
+  /** Failure injection: a provider whose backend cannot answer. */
+  readonly failing?: () => EventsConformanceProvider | Promise<EventsConformanceProvider>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.types.ts#L37)
+
+### EventsConformanceProvider (type alias)
+
+An event provider under test. Delivery cases need `registerTrigger`.
+
+**Signature**
+
+```ts
+type EventsConformanceProvider = EventProvider & {
+  readonly registerTrigger?: (trigger: EventsConformanceTrigger) => Promise<unknown>;
+  readonly close?: () => Promise<unknown>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.types.ts#L31)
+
+### EventsConformanceTrigger (interface)
+
+A durable consumer, in the shape the local and Postgres event providers register through
+`registerTrigger`.
+
+**Signature**
+
+```ts
+export interface EventsConformanceTrigger {
+  readonly id: string;
+  readonly eventId: string;
+  readonly eventVersion: number;
+  readonly delivery: "durable";
+  readonly retry: {
+    readonly maxAttempts: number;
+    readonly initialDelayMs: number;
+    readonly maxDelayMs: number;
+    readonly multiplier: number;
+    readonly jitter: "none";
+  };
+  readonly invoke: (envelope: EventsConformanceEnvelope) => Promise<unknown>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-conformance.types.ts#L15)
 
 ## `events-inspection.ts`
 
@@ -4372,7 +5181,7 @@ export interface StandaloneFunctionTarget {
 declare const JOBS_CONFORMANCE_FIXTURES: ReadonlyArray<JobsConformanceFixture>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L22)
 
 ### JobsConformanceFixture
 
@@ -4382,7 +5191,7 @@ declare const JOBS_CONFORMANCE_FIXTURES: ReadonlyArray<JobsConformanceFixture>;
 declare const JobsConformanceFixture: JobsConformanceFixture;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L9)
 
 ### JobsConformanceHarness
 
@@ -4392,7 +5201,37 @@ declare const JobsConformanceFixture: JobsConformanceFixture;
 declare const JobsConformanceHarness: JobsConformanceHarness;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L10)
+
+### JobsConformanceProvider
+
+**Signature**
+
+```ts
+declare const JobsConformanceProvider: JobsConformanceProvider;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L11)
+
+### JobsProviderConformanceOptions
+
+**Signature**
+
+```ts
+declare const JobsProviderConformanceOptions: JobsProviderConformanceOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L12)
+
+### createDeterministicJobsAdapter
+
+**Signature**
+
+```ts
+declare const createDeterministicJobsAdapter: (options?: TestJobsAdapterOptions) => TestJobsAdapter;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L20)
 
 ### createJobsConformanceHarness
 
@@ -4406,7 +5245,39 @@ declare const createJobsConformanceHarness: (
 ) => JobsConformanceHarness;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L45)
+
+### createJobsProviderConformanceHarness
+
+Creates the jobs conformance harness for a jobs provider, with the same cases as every
+first-party provider. The ambiguous-write case (`unknown-acknowledgement`) runs against the
+`faulty` adapter, the provider's own failure injection, and is skipped without one.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import {
+  createDeterministicJobsAdapter,
+  createJobsProviderConformanceHarness,
+} from "@relkit/testing/jobs-conformance";
+
+const harness = createJobsProviderConformanceHarness({
+  create: () => createDeterministicJobsAdapter(),
+  faulty: () => createDeterministicJobsAdapter({ unknown: { submit: true } }),
+});
+console.log((await runConformance(harness)).passed);
+```
+
+**Signature**
+
+```ts
+declare const createJobsProviderConformanceHarness: (
+  options: JobsProviderConformanceOptions,
+) => ConformanceHarness;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L112)
 
 ### runJobsConformance
 
@@ -4421,7 +5292,7 @@ declare const runJobsConformance: (
 ) => Promise<readonly string[]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L71)
 
 ## `jobs-conformance.types.ts`
 
@@ -4456,6 +5327,40 @@ export interface JobsConformanceHarness {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.types.ts#L13)
+
+### JobsConformanceProvider (type alias)
+
+A jobs adapter under test; `close` runs after each case when present.
+
+**Signature**
+
+```ts
+type JobsConformanceProvider = JobsAdapterRuntime & {
+  readonly close?: () => Promise<unknown>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.types.ts#L21)
+
+### JobsProviderConformanceOptions (interface)
+
+What a jobs provider supplies to run the shared suite.
+
+**Signature**
+
+```ts
+export interface JobsProviderConformanceOptions {
+  /** Creates an adapter for one case. */
+  readonly create: () => JobsConformanceProvider;
+  /**
+   * Failure injection: an adapter that commits a submission but loses the response, so the
+   * submission's outcome is unknown. The `unknown-acknowledgement` case is skipped without it.
+   */
+  readonly faulty?: () => JobsConformanceProvider;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.types.ts#L26)
 
 ## `jobs-utils.ts`
 
@@ -4721,6 +5626,137 @@ type TestProviderReplacements = Readonly<
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/provider-replacements.types.ts#L4)
 
+## `realtime-conformance.ts`
+
+Shared realtime provider conformance suite. Every first-party realtime provider (local, Redis,
+Cloudflare Durable Objects) runs these cases with two instances on one backend, and provider
+authors run the same ones.
+
+### "./realtime-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./realtime-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./realtime-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/realtime-conformance.ts#L17)
+
+### REALTIME_CONFORMANCE_CASES
+
+The cases every realtime provider passes.
+
+**Signature**
+
+```ts
+declare const REALTIME_CONFORMANCE_CASES: ReadonlyArray<RealtimeConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/realtime-conformance.ts#L20)
+
+### createRealtimeConformanceHarness
+
+Creates the realtime conformance harness for one provider.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import { createRealtimeConformanceHarness } from "@relkit/testing/realtime-conformance";
+import { createLocalRealtimeProvider } from "relkit/providers-local";
+
+const harness = createRealtimeConformanceHarness({
+  create: () => createLocalRealtimeProvider("/tmp/relkit-realtime-conformance", { pollingMs: 50 }),
+});
+console.log((await runConformance(harness)).passed);
+```
+
+**Signature**
+
+```ts
+declare const createRealtimeConformanceHarness: (
+  options: RealtimeConformanceOptions,
+) => ConformanceHarness<RealtimeConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/realtime-conformance.ts#L55)
+
+## `realtime-conformance.types.ts`
+
+Inputs of the shared realtime provider conformance suite.
+
+### RealtimeConformanceCase (type alias)
+
+One realtime conformance case.
+
+**Signature**
+
+```ts
+type RealtimeConformanceCase = ConformanceCase<RealtimeConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/realtime-conformance.types.ts#L37)
+
+### RealtimeConformanceCaseId (type alias)
+
+Case ids of the realtime suite.
+
+**Signature**
+
+```ts
+type RealtimeConformanceCaseId =
+  | "wake-on-append"
+  | "read-after-checkpoint"
+  | "concurrent-appends"
+  | "idempotent-append"
+  | "wait-deadline"
+  | "presence"
+  | "backend-failure";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/realtime-conformance.types.ts#L27)
+
+### RealtimeConformanceOptions (interface)
+
+What a realtime provider supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface RealtimeConformanceOptions {
+  /**
+   * Creates a provider on the shared backend. Each case calls it twice with the same profile and
+   * expects both instances to see each other's events, as two server processes would.
+   * @param profile - Unique profile for the case.
+   */
+  readonly create: (profile: string) => RealtimeConformanceProvider;
+  /**
+   * Failure injection: creates a provider whose backend cannot answer. The `backend-failure` case
+   * is skipped without it.
+   */
+  readonly failing?: () => RealtimeConformanceProvider;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/realtime-conformance.types.ts#L12)
+
+### RealtimeConformanceProvider (type alias)
+
+A realtime provider under test, with the optional lifecycle methods first-party ones have.
+
+**Signature**
+
+```ts
+type RealtimeConformanceProvider = RealtimeProvider & {
+  readonly ready?: () => Promise<unknown>;
+  readonly close?: () => Promise<unknown>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/realtime-conformance.types.ts#L6)
+
 ## `runtime-clock.ts`
 
 ### TestDeterministicClock (class)
@@ -4840,6 +5876,131 @@ declare const closeRuntime: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-close.ts#L11)
+
+## `runtime-conformance.ts`
+
+Shared runtime adapter conformance suite. The Bun, Node and Workers adapters run these cases
+inside the runtime they adapt, and a new adapter runs the same ones. The full HTTP behavior of a
+built application (static files, WebSocket echo, streaming) stays in the runtime HTTP suite.
+
+### "./runtime-conformance.types.js" (namespace export)
+
+Re-exports all named exports from the "./runtime-conformance.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./runtime-conformance.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.ts#L14)
+
+### RUNTIME_CONFORMANCE_CASES
+
+The cases every runtime adapter passes.
+
+**Signature**
+
+```ts
+declare const RUNTIME_CONFORMANCE_CASES: ReadonlyArray<RuntimeConformanceCase>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.ts#L17)
+
+### createRuntimeConformanceHarness
+
+Creates the runtime conformance harness for one adapter. Run it inside the runtime the adapter
+adapts.
+
+**Example**
+
+```ts
+import { runConformance } from "@relkit/testing/conformance";
+import { createRuntimeConformanceHarness } from "@relkit/testing/runtime-conformance";
+import { nodeRuntime } from "relkit/runtime/node";
+
+const harness = createRuntimeConformanceHarness({
+  adapter: nodeRuntime,
+  kind: "process",
+  executable: process.execPath,
+});
+console.log((await runConformance(harness)).results);
+```
+
+**Signature**
+
+```ts
+declare const createRuntimeConformanceHarness: (
+  options: RuntimeConformanceOptions,
+) => ConformanceHarness<RuntimeConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.ts#L50)
+
+## `runtime-conformance.types.ts`
+
+Inputs of the shared runtime adapter conformance suite.
+
+### RuntimeConformanceCase (type alias)
+
+One runtime conformance case.
+
+**Signature**
+
+```ts
+type RuntimeConformanceCase = ConformanceCase<RuntimeConformanceCaseId>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.types.ts#L37)
+
+### RuntimeConformanceCaseId (type alias)
+
+Case ids of the runtime suite.
+
+**Signature**
+
+```ts
+type RuntimeConformanceCaseId =
+  | "naming"
+  | "crypto"
+  | "environment"
+  | "serve"
+  | "websocket-helper"
+  | "files"
+  | "processes"
+  | "modules";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.types.ts#L26)
+
+### RuntimeConformanceOptions (interface)
+
+What a runtime adapter supplies to run the suite.
+
+**Signature**
+
+```ts
+export interface RuntimeConformanceOptions {
+  /** The adapter under test, such as `nodeRuntime` from `relkit/runtime/node`. */
+  readonly adapter: RuntimeAdapter;
+  /**
+   * `process` for runtimes with a listener, a filesystem and child processes (Bun, Node);
+   * `isolate` for runtimes without them (Cloudflare Workers), whose adapter must refuse those
+   * operations instead.
+   */
+  readonly kind: "process" | "isolate";
+  /** A variable set in the environment of the run, read back through the adapter. */
+  readonly environment?: { readonly name: string; readonly value: string };
+  /** An existing file the `files` case opens (process runtimes). */
+  readonly file?: { readonly path: string; readonly contents: string };
+  /** Executable of the runtime under test, such as `process.execPath` (process runtimes). */
+  readonly executable?: string;
+  /** Directory from which the `modules` case resolves `relkit` (process runtimes). */
+  readonly resolveFrom?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-conformance.types.ts#L6)
 
 ## `runtime-context.ts`
 

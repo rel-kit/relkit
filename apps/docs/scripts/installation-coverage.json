@@ -1,5 +1,6 @@
 {
   "docs/modules/integrations/provider-authoring": ["update", "concept", ""],
+  "docs/modules/integrations/provider-kit": ["update", "concept", ""],
   "docs/modules/integrations/local-providers": ["update", "concept", ""],
   "docs/modules/cli/automation": ["update", "concept", ""],
   "guides/cli/create-and-build-an-api": ["update", "concept", ""],

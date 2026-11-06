@@ -85,17 +85,23 @@ afterAll(async () => {
 });
 
 (enabled ? test : test.skip)(
-  "Redis over HTTP, KV, R2 and Durable Object realtime pass their checks in workerd",
+  "the Workers adapter, Redis over HTTP, KV, R2 and Durable Object realtime pass the shared suites in workerd",
   async () => {
     const response = await fetch(`http://127.0.0.1:${port}/run`);
     const body = (await response.json()) as {
       readonly runtime: string;
-      readonly results: readonly { name: string; ok: boolean; error?: string }[];
+      readonly results: readonly {
+        name: string;
+        ok: boolean;
+        error?: string;
+        cases?: Record<string, string>;
+      }[];
     };
     expect(body.runtime).toBe("Cloudflare-Workers");
     expect(body.results.filter((result) => !result.ok)).toEqual([]);
     expect(body.results.map((result) => result.name)).toEqual([
       "runtime is workers",
+      "workers runtime adapter",
       "redis over HTTP: protocol",
       "redis over HTTP: cache",
       "redis socket URL is refused on Workers",
@@ -104,6 +110,21 @@ afterAll(async () => {
       "Durable Object realtime: two providers share one channel",
       "missing binding names itself",
     ]);
+    const skipped = Object.fromEntries(
+      body.results
+        .filter((result) => result.cases !== undefined)
+        .map((result) => [
+          result.name,
+          Object.keys(result.cases!).filter((id) => result.cases![id] === "skip"),
+        ]),
+    );
+    expect(skipped).toEqual({
+      "workers runtime adapter": [],
+      "redis over HTTP: cache": [],
+      "KV binding: cache": ["increment"],
+      "R2 binding: bucket": ["signed-urls", "closed"],
+      "Durable Object realtime: two providers share one channel": [],
+    });
   },
   60_000,
 );
