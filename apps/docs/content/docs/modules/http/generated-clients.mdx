@@ -25,14 +25,12 @@ have no REST route, use RelKit's own endpoint at `/_relkit/v1/rpc`.
 ## Install the caller
 
 The backend's minimal starter already supplies check/generation tooling. In a separate caller package,
-install the framework-independent client and its required peer before importing the generated client:
+install the framework-independent client before importing the generated client:
 
 <include>/_snippets/generated/installations/client.mdx</include>
 
-`@opentelemetry/api` is a type-level peer: the oRPC packages the client is built on import its types in
-their declarations and list it only as an optional peer, so the client requires it to keep those
-types resolvable in every package manager. Nothing in your frontend calls it, and it ships no
-telemetry SDK.
+The client brings `@opentelemetry/api` with it as a dependency: the oRPC packages it is built on
+import that package's types in their declarations, and nothing in your frontend calls it.
 
 Only a selected React/query leaf needs its additional peers; follow [React setup](/docs/modules/client)
 for that path. A standalone frontend also needs the development CLI for `client pull`/`client check`,

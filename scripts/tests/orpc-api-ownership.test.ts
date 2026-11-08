@@ -48,11 +48,12 @@ test("every direct first-party oRPC runtime owner declares its required API", as
   expect(owners.sort()).toEqual(["@relkit/client", "@relkit/inspector-ui", "relkit"]);
 });
 
-test("client exposes a required host API peer while frontend SDK peers remain optional", async () => {
+test("client carries the host API as a dependency while frontend SDK peers remain optional", async () => {
   const client = await Effect.runPromise(readConsumerManifest(join(root, "packages/client")));
-  expect(client.peerDependencies?.[api]).toBe("1.9.1");
-  expect(client.devDependencies?.[api]).toBe("1.9.1");
-  expect(client.peerDependenciesMeta?.[api]?.optional).not.toBe(true);
+  // A dependency, not a peer: oRPC's declarations import the API's types, and a frontend should
+  // not have to install a package it never calls; pnpm resolves oRPC's optional peer from here.
+  expect(client.dependencies?.[api]).toBe("1.9.1");
+  expect(client.peerDependencies?.[api]).toBeUndefined();
   for (const name of [
     "@orpc/tanstack-query",
     "@tanstack/query-core",

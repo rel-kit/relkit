@@ -60,12 +60,12 @@
     }
   },
   "dependencies": {
+    "@opentelemetry/api": "1.9.1",
     "@orpc/client": "catalog:",
     "@orpc/contract": "catalog:",
     "relkit": "workspace:*"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "1.9.1",
     "@orpc/tanstack-query": "1.16.1",
     "@tanstack/query-core": "catalog:peer",
     "@tanstack/react-query": "catalog:peer",
@@ -86,7 +86,6 @@
     }
   },
   "devDependencies": {
-    "@opentelemetry/api": "1.9.1",
     "@orpc/tanstack-query": "1.16.1",
     "@tanstack/query-core": "5.102.3",
     "@tanstack/react-query": "catalog:",
