@@ -29,6 +29,11 @@ install the framework-independent client and its required peer before importing 
 
 <include>/_snippets/generated/installations/client.mdx</include>
 
+`@opentelemetry/api` is a type-level peer: the oRPC packages the client is built on import its types in
+their declarations and list it only as an optional peer, so the client requires it to keep those
+types resolvable in every package manager. Nothing in your frontend calls it, and it ships no
+telemetry SDK.
+
 Only a selected React/query leaf needs its additional peers; follow [React setup](/docs/modules/client)
 for that path. A standalone frontend also needs the development CLI for `client pull`/`client check`,
 as shown there. Keep frontend installation and contract output in the frontend root.
