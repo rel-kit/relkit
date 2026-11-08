@@ -8,7 +8,7 @@ import type { InstallationRecipe } from "./installation-catalog.types.js";
 const database = { name: "@relkit/drizzle", capabilities: ["drizzle"] } as const;
 const local = { name: "@relkit/local" } as const;
 const nativeAgent = { name: "@relkit/langchain", capabilities: ["agent-execution"] } as const;
-const client = { name: "@relkit/client", peers: ["@opentelemetry/api"] } as const;
+const client = { name: "@relkit/client", peers: [] } as const;
 
 export const installationRecipes = {
   database: {
