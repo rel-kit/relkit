@@ -71,6 +71,7 @@
         "@relkit/drizzle": "workspace:*",
         "@relkit/effect-mq": "workspace:*",
         "@relkit/inngest": "workspace:*",
+        "@relkit/langchain": "workspace:*",
         "@relkit/local": "workspace:*",
         "@relkit/otlp": "workspace:*",
         "@relkit/postgres": "workspace:*",
