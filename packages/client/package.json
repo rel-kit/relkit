@@ -65,6 +65,7 @@
     "relkit": "workspace:*"
   },
   "peerDependencies": {
+    "@opentelemetry/api": "1.9.1",
     "@orpc/tanstack-query": "1.16.1",
     "@tanstack/query-core": "catalog:peer",
     "@tanstack/react-query": "catalog:peer",
