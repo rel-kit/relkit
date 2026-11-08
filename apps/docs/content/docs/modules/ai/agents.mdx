@@ -88,19 +88,42 @@ Model-provider packages are application dependencies. The generated sample uses 
 
 ## Define the task
 
-This agent answers greeting questions using a single tool. Create it after [defining the lookup tool](/docs/modules/ai/function-tools).
+This agent answers greeting questions with one tool. Create it after [defining the lookup tool](/docs/modules/ai/function-tools), which turns the `hello` function into a tool with `.asTool()`.
 
 <include
-  source="templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"
+  source="apps/docs/examples/agents/assistant.agent.ts"
   lang="ts"
   meta='title="src/services/hello/agents/assistant.agent.ts"'
 >
-  /_snippets/source/templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts
+  /_snippets/source/apps/docs/examples/agents/assistant.agent.ts
 </include>
 
 `input` describes what your app sends; `output` describes the answer your app expects. RelKit validates both. Output validation checks the shape, not whether the model's answer is factually correct.
 
-Write `instructions` that explain when to use each tool and how to answer. The agent can call only tools in its `tools` array. Start with the smallest set needed for the task.
+Write `instructions` that explain when to use each tool and how to answer. The agent can call only tools in its `tools` array: RelKit tools made with `.asTool()` or [`defineTool`](/docs/modules/ai/tools). Start with the smallest set needed for the task.
+
+`model: "default"` names a model profile bound in `relkit.config.ts`; see [Choose a model](#choose-a-model).
+
+## Add LangChain-native tools and middleware
+
+Two kinds of tools can reach an agent, and they live in different places:
+
+| Tool                                                  | Where it goes                   | What RelKit does with it                                                                                                     |
+| ----------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| A RelKit tool from `.asTool()` or `defineTool`        | `tools: [...]` on `defineAgent` | Validates its schemas, applies its side-effect and approval policy, exposes it to MCP, and keeps it portable across adapters |
+| A LangChain tool from LangChain's own `tool()` helper | `langchain({ tools: [...] })`   | Hands it to LangChain as is; it runs only with this adapter and stays out of MCP                                             |
+
+The scaffolded agent shows both, together with LangChain middleware and the offline `FakeToolCallingModel` its tests run on:
+
+<include
+  source="templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"
+  lang="ts"
+  meta='title="src/services/hello/agents/assistant.agent.ts (scaffold)"'
+>
+  /_snippets/source/templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts
+</include>
+
+`uppercase` is a LangChain tool, so it belongs to the adapter's options; `lookup` is a RelKit tool, so it belongs to the agent. Prefer RelKit tools for anything that touches your application: they are typed end to end and governed by the same policies as the rest of the app.
 
 ### Use this agent from the frontend
 
