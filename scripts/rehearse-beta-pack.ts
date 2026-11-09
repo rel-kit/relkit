@@ -6,6 +6,7 @@
  * packing would. The rehearsal registry serves these archives.
  */
 import { spawnSync } from "node:child_process";
+import { readFileSync, readdirSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import type { Manifest } from "./pack-and-smoke-create-relkit-support.js";
@@ -17,11 +18,14 @@ const fields = ["dependencies", "devDependencies", "peerDependencies", "optional
 export type Sources = Map<string, { directory: string; manifest: Manifest }>;
 
 /**
- * Computes the beta version of the pending release.
+ * Computes the beta version of the pending release. On the release pull request the
+ * changesets are already consumed and the workspace already carries the next version, so
+ * that version is the candidate.
  * @returns `<next shared version>-beta.0`.
  * @throws Error When changesets give no shared next version.
  */
 export function betaVersion(): string {
+  if (!hasPendingChangesets()) return `${workspaceVersion()}-beta.0`;
   const result = spawnSync(process.execPath, ["scripts/version-packages.ts", "--check"], {
     cwd: root,
     encoding: "utf8",
@@ -31,6 +35,24 @@ export function betaVersion(): string {
     throw new Error(`Versioning plan failed:\n${result.stdout}${result.stderr}`);
   const plan = JSON.parse(line) as { version: string };
   return `${plan.version.replace(/-.*$/, "")}-beta.0`;
+}
+
+/** @returns Whether `.changeset` still holds changesets to version. */
+function hasPendingChangesets(): boolean {
+  return readdirSync(join(root, ".changeset")).some(
+    (file) => file.endsWith(".md") && file !== "README.md",
+  );
+}
+
+/** @returns The already-versioned shared version of the release packages. */
+function workspaceVersion(): string {
+  const path = join(root, "packages/relkit/package.json");
+  try {
+    const manifest = JSON.parse(readFileSync(path, "utf8")) as { version: string };
+    return manifest.version.replace(/-.*$/, "");
+  } catch (cause) {
+    throw new Error(`Cannot read the workspace version from ${path}.`, { cause });
+  }
 }
 
 /**
