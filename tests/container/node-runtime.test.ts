@@ -2,6 +2,7 @@
 import { afterEach, expect, test } from "bun:test";
 import { rm } from "node:fs/promises";
 import { buildProject } from "../../packages/cli/src/commands/build.ts";
+import { vendorWorkspacePackages } from "./docker.fixture.ts";
 import { copyProject, roots } from "./lifecycle.fixture.ts";
 
 const successful = new Set<string>();
@@ -32,6 +33,7 @@ test("relkit build --runtime node emits a Node image that serves the application
 
   const image = `relkit-node-runtime-test:${process.pid}-${Date.now()}`;
   images.push(image);
+  await vendorWorkspacePackages(result.buildDirectory);
   expect(await docker(["build", "--quiet", "--tag", image, result.buildDirectory])).toBe(0);
   const name = image.replace(/[:]/g, "-");
   const port = 30_000 + Math.floor(Math.random() * 20_000);
