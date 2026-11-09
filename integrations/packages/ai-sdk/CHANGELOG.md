@@ -1,5 +1,5 @@
 # @relkit/ai-sdk
 
-## 0.8.4
+## 0.9.0
 
-First release: the Vercel AI SDK agent adapter (Labs).
+See the root CHANGELOG.md for this release batch.

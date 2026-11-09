@@ -8,7 +8,14 @@ import { cp, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { buildProject } from "../../packages/cli/src/commands/build.ts";
 import { copyProject, roots } from "./lifecycle.fixture.ts";
-import { containerLogs, docker, dockerOutput, freePort, waitForStatus } from "./docker.fixture.ts";
+import {
+  containerLogs,
+  docker,
+  dockerOutput,
+  freePort,
+  vendorWorkspacePackages,
+  waitForStatus,
+} from "./docker.fixture.ts";
 
 const successful = new Set<string>();
 const images: string[] = [];
@@ -123,6 +130,7 @@ async function buildImage(root: string, runtime: "bun" | "node"): Promise<string
   expect(result.ok, JSON.stringify(result.diagnostics)).toBe(true);
   const image = `relkit-production-image-test:${runtime}-${process.pid}-${Date.now()}`;
   images.push(image);
+  await vendorWorkspacePackages(result.buildDirectory);
   expect(await docker(["build", "--quiet", "--tag", image, result.buildDirectory])).toBe(0);
   return image;
 }
