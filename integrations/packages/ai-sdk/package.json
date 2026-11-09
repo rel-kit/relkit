@@ -1,6 +1,6 @@
 {
   "name": "@relkit/ai-sdk",
-  "version": "0.8.4",
+  "version": "0.9.0",
   "description": "Optional Vercel AI SDK agent adapter for RelKit.",
   "license": "MIT",
   "repository": {

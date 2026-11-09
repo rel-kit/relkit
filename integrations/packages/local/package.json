@@ -1,6 +1,6 @@
 {
   "name": "@relkit/local",
-  "version": "0.7.14",
+  "version": "0.9.0",
   "description": "Local-service orchestration integration for RelKit.",
   "license": "MIT",
   "repository": {
