@@ -25,8 +25,8 @@
   "linesReadThroughEOF": 58,
   "entrypoint": {
     "frameworkMap": {
-      "candidate": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
-      "baseline": "/Users/mustafaelsayed/Workspace/relkit"
+      "candidate": "<home>/.codex/worktrees/core-consumers-effect/relkit",
+      "baseline": "<repo>"
     },
     "selected": "packages/cli/src/local.ts",
     "readThroughEOF": [

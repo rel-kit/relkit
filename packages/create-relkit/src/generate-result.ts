@@ -5,7 +5,7 @@
  */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import type { CreateOptions } from "./options.js";
 import type { GenerateProjectContext } from "./generate-types.js";
 import { listProjectFilesEffect } from "./generate-files.js";
@@ -25,6 +25,7 @@ export const generationResult = Effect.fn("ProjectGeneration.result")(
     gitInitialized: boolean,
     context: GenerateProjectContext,
   ) {
+    const nextSteps = createGenerateNextSteps(options, destination, context.cwd);
     return Object.freeze({
       ok: true as const,
       command: "create" as const,
@@ -42,13 +43,12 @@ export const generationResult = Effect.fn("ProjectGeneration.result")(
           ? [
               {
                 code: "validation-skipped",
-                message:
-                  "Install dependencies, then run bunx --no-install relkit dev --prepare before bun dev. Preparation includes the source check.",
+                message: `Install dependencies, then check the project with ${nextSteps.commands.prepare} before ${nextSteps.commands.dev}.`,
               },
             ]
           : [],
       ),
-      nextSteps: createGenerateNextSteps(options, destination, context.cwd),
+      nextSteps,
     });
   },
   (effect) => observeExecution("generator", "generation.result", effect),

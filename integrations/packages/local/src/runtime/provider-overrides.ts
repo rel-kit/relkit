@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
-import { deepFreeze, isStableId, serializeJson, type JsonValue } from "@relkit/contracts";
+import { deepFreeze, isStableId, serializeJson, type JsonValue } from "relkit/contracts";
 import {
   PROVIDER_OVERRIDE_STATE_FILE,
   PROVIDER_OVERRIDE_STATE_VERSION,
   type ProviderOverrideBinding,
   type ProviderOverrideState,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import type { LocalProjectIdentity } from "./identity.js";
 import { readLocalStateText, removeLocalStateFile, writeLocalStateText } from "./state-paths.js";
 

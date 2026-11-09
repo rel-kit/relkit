@@ -1,5 +1,5 @@
 import { expect, it } from "@effect/vitest";
-import { GRAPH_VERSION } from "@relkit/contracts";
+import { GRAPH_VERSION } from "relkit/contracts";
 import { Cause, Effect, Exit, Layer } from "effect";
 import { cliOriginalError } from "../../src/cli-errors.js";
 import { readBuiltWorkflow } from "../../src/commands/start-built-workflow.js";

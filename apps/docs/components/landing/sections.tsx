@@ -74,7 +74,7 @@ export function Statistics() {
             <SectionHeading
               eyebrow="02 / One source of truth"
               title="Your code is the blueprint."
-              description="Describe your application in TypeScript. Relkit checks the graph that connects your services, routes, resources, and async work."
+              description="Describe your application in TypeScript. RelKit checks the graph that connects your services, routes, resources, and async work."
             />
             <p className={system.description}>
               Development, tests, inspection, and deployment all start from that same model.

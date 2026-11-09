@@ -1,22 +1,18 @@
 /** Exercises native runtime validation behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/index.ts";
 import { describe, expect, test } from "vitest";
-import { defineFunction } from "@relkit/functions";
+import { defineFunction } from "relkit/functions";
 import {
   completeSpan,
   runInExecutionContext,
   SpanRuntime,
   startRootSpan,
   type SpanLifecycle,
-} from "@relkit/invocation";
-import { z } from "@relkit/schema";
-import { defineTool } from "@relkit/tools";
-import {
-  ApprovalRequiredError,
-  defineAgent,
-  invokeAgent,
-  type AgentRuntimeOptions,
-} from "../src/index.ts";
+} from "relkit/invocation";
+import { z } from "relkit/schema";
+import { defineTool } from "relkit/tools";
+import { ApprovalRequiredError, invokeAgent, type AgentRuntimeOptions } from "../src/index.ts";
 import { createHangingTestModel, createTestModel, type TestModelTurn } from "./test-model.ts";
 
 function setup(
@@ -39,6 +35,7 @@ function setup(
   });
   const agent = defineAgent({
     id: "support.order",
+    runtime: langchain(),
     input: z.object({ question: z.string() }),
     output: z.object({ answer: z.string() }),
     model: "default",

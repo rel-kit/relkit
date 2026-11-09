@@ -119,6 +119,7 @@ async function runNodeVitest(
         "--maxWorkers=1",
         "--disableConsoleIntercept",
         "--exclude=apps/docs/content/_snippets/**",
+        "--exclude=.claude/**",
         ...group,
       ],
       environment,

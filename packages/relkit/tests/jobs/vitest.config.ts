@@ -1,0 +1,21 @@
+import { resolve } from "node:path";
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  root: resolve(import.meta.dirname, "../.."),
+  test: {
+    // Projects mode resolves `include` from `dir`, not from `root`.
+    dir: resolve(import.meta.dirname, "../.."),
+    environment: "node",
+    include: ["tests/jobs/**/*.test.ts"],
+    coverage: {
+      provider: "v8",
+      include: ["src/jobs/**/*.ts"],
+      exclude: ["src/jobs/**/*.types.ts", "src/jobs/index.ts", "src/jobs/task-types.ts"],
+      excludeAfterRemap: true,
+      reporter: ["text", "json", "lcov"],
+      reportsDirectory: "coverage/jobs",
+      thresholds: { statements: 80, branches: 71, functions: 86, lines: 83 },
+    },
+  },
+});

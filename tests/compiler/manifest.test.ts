@@ -1,20 +1,20 @@
 import { describe, expect, test } from "bun:test";
-import { defineApp } from "../../packages/app/src/define-app.ts";
-import { defineEnv, env } from "../../packages/config/src/index.ts";
+import { defineApp } from "../../packages/relkit/src/app/define-app.ts";
+import { defineEnv, env } from "relkit/config";
 import {
   GRAPH_VERSION,
   MANIFEST_VERSION,
   RUNTIME_INTEGRATION_PLAN_FILE,
   RUNTIME_INTEGRATION_PLAN_VERSION,
-} from "../../packages/contracts/src/index.ts";
-import { hashGraph } from "../../packages/graph/src/index.ts";
+} from "relkit/contracts";
+import { hashGraph } from "relkit/graph";
 import { redis } from "../../integrations/packages/redis/src/index.ts";
 import {
   generateManifest,
   MANIFEST_CODES,
   normalizeCompilation,
-} from "../../packages/compiler/src/index.ts";
-import { renderManifest } from "../../packages/compiler/src/generate-manifest-format.ts";
+} from "../../packages/cli/src/compiler/index.ts";
+import { renderManifest } from "../../packages/cli/src/compiler/generate-manifest-format.ts";
 
 const graph = { contractVersion: GRAPH_VERSION, nodes: [], edges: [] } as const;
 const graphHash = hashGraph(graph);
@@ -151,15 +151,15 @@ describe("runtime manifest generation", () => {
       { graphHash, descriptors: [] },
       new Map(),
       new Map(),
-      new Map([["orders.created", "__relkit_bindFunctionEvents(target, consumed, published)"]]),
+      new Map([["orders.created", "__relkit_bindFunctionEvents(target, consumed)"]]),
       new Map(),
       new Map(),
       new Map(),
     );
     expect(source).toContain(
-      'import { bindFunctionEvents as __relkit_bindFunctionEvents } from "@relkit/app/events";',
+      'import { bindFunctionEvents as __relkit_bindFunctionEvents } from "relkit/events";',
     );
-    expect(source).not.toContain('from "@relkit/app/functions"');
+    expect(source).not.toContain('from "relkit/functions"');
   });
 
   test("does not activate without executable references or with a hash mismatch", () => {

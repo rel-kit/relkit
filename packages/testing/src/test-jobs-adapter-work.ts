@@ -1,4 +1,4 @@
-import type { RunHandle, RunListQuery, RunPage, RunSnapshot } from "@relkit/contracts/jobs";
+import type { RunHandle, RunListQuery, RunPage, RunSnapshot } from "relkit/contracts/jobs";
 import type {
   NativeRunQuery,
   NativeTaskWork,
@@ -6,7 +6,7 @@ import type {
   NativeSubmission,
   TaskExecutionBinding,
   TaskExecutionEnvelope,
-} from "@relkit/jobs/adapter";
+} from "relkit/jobs/adapter";
 import type { TestClock } from "./runtime.js";
 import { combineSignals } from "./runtime-clock.js";
 import {

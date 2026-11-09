@@ -4,7 +4,7 @@ import { writeFile } from "node:fs/promises";
 import {
   StackNotFoundError,
   type PulumiCommand,
-} from "../../packages/deploy-pulumi/node_modules/@pulumi/pulumi/automation/index.js";
+} from "../../integrations/packages/pulumi/node_modules/@pulumi/pulumi/automation/index.js";
 /** Mutable observations and the exact native SDK-private stub retained by the preview case. */
 export interface PreviewState {
   readonly stack: string;

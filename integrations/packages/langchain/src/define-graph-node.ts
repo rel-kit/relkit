@@ -1,13 +1,13 @@
 /** Creates typed native graph node descriptors from author callbacks and records their execution metadata for later graph compilation. */
 
 import type { LangGraphRunnableConfig } from "@langchain/langgraph";
-import { normalizeId } from "@relkit/contracts";
-import type { InferOutput, StandardSchemaV1 } from "@relkit/schema";
+import { normalizeId } from "relkit/contracts";
+import type { InferOutput, StandardSchemaV1 } from "relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
-import { isAgentSchemaEffect } from "@relkit/agents/internal/agent-validation-schema";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { isAgentSchemaEffect } from "relkit/agents/agent-validation-schema";
 import { validateGraphNodeSchemasEffect } from "./graph-node-schema-validation.js";
-import { isRecordEffect } from "@relkit/agents/internal/agent-validation-value";
+import { isRecordEffect } from "relkit/agents/agent-validation-value";
 import type {
   DefineGraphNodeOptions,
   GraphNodeAny,
@@ -32,6 +32,7 @@ export { assertGraphNodeDestinations } from "./graph-node-validation.js";
  * @param config - LangGraph runnable configuration.
  * @returns A validated node result or GraphNodeValidationFailure.
  * @example await Effect.runPromise(runGraphNodeHandlerEffect(options, [], input));
+ * @experimental
  */
 export const runGraphNodeHandlerEffect = Effect.fn("Agents.graphNode.handle")(
   function* <
@@ -57,10 +58,11 @@ export const runGraphNodeHandlerEffect = Effect.fn("Agents.graphNode.handle")(
   (effect) => observeAgent("graph-node.handle", effect),
 );
 
-/** Defines a native LangGraph node with RELKIT schemas and declared dynamic routes.
+/** Defines a native LangGraph node with RelKit schemas and declared dynamic routes.
  * @param options - Node identity, schemas, destinations, and implementation.
  * @returns An Effect with an immutable descriptor or GraphNodeValidationFailure.
  * @example Effect.runSync(defineGraphNodeEffect({ id: "step", input, output, handler }));
+ * @experimental
  */
 export const defineGraphNodeEffect = Effect.fn("Agents.graphNode.define")(
   function* <
@@ -117,6 +119,7 @@ export const defineGraphNodeEffect = Effect.fn("Agents.graphNode.define")(
  * @returns An immutable graph node descriptor.
  * @throws The original authoring error for invalid options.
  * @example const node = defineGraphNode({ id: "step", input, output, handler });
+ * @experimental
  */
 export function defineGraphNode<
   const Id extends string,
@@ -138,6 +141,7 @@ export function defineGraphNode<
  * @param value - Candidate descriptor.
  * @returns An Effect with a boolean and no typed failure.
  * @example Effect.runSync(isGraphNodeDescriptorEffect(value));
+ * @experimental
  */
 export const isGraphNodeDescriptorEffect = Effect.fn("Agents.graphNode.isDescriptor")(
   function* (value: unknown) {
@@ -162,6 +166,7 @@ export const isGraphNodeDescriptorEffect = Effect.fn("Agents.graphNode.isDescrip
  * @param value - Candidate descriptor.
  * @returns Whether the value is a native graph node descriptor.
  * @example if (isGraphNodeDescriptor(value)) useNode(value);
+ * @experimental
  */
 export function isGraphNodeDescriptor(value: unknown): value is GraphNodeAny {
   return Effect.runSync(isGraphNodeDescriptorEffect(value));

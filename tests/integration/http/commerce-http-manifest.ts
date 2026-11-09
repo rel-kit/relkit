@@ -4,13 +4,13 @@ import {
   MANIFEST_VERSION,
   RUNTIME_INTEGRATION_PLAN_FILE,
   RUNTIME_INTEGRATION_PLAN_VERSION,
-} from "../../../packages/contracts/src/index.ts";
-import type { RegistrationPlan } from "../../../packages/graph/src/index.ts";
-import type { RuntimeManifest } from "../../../packages/runtime-hono/src/index.ts";
+} from "relkit/contracts";
+import type { RegistrationPlan } from "relkit/graph";
+import type { RuntimeManifest } from "relkit/runtime-hono";
 import normalizeOrderId from "../../../examples/commerce/src/routes/transforms/orders/normalize-id.transform.ts";
 import orderAuth from "../../../examples/commerce/src/routes/middleware/order-auth.middleware.ts";
-import { ALL as authRoute } from "../../../examples/commerce/src/routes/api/auth/[[...auth]]/route.ts";
 import { POST as exportOrdersRoute } from "../../../examples/commerce/src/routes/orders/export/route.ts";
+import ordersRoutes from "../../../examples/commerce/src/routes/orders/route.ts";
 
 /**
  * Binds native route handlers without registering service-internal functions as HTTP handlers.
@@ -34,8 +34,9 @@ export function commerceHttpManifest(plan: RegistrationPlan): RuntimeManifest {
     },
     functions: {},
     routes: {
-      "route.all.api.auth.optional-catch-all-auth": { handler: authRoute.handler },
       "orders.export": { handler: exportOrdersRoute.handler },
+      // The generated manifest binds every route descriptor; this one carries a response option.
+      "route.post.orders": ordersRoutes.POST,
     },
     middleware: {
       "order-auth": {

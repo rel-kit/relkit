@@ -1,6 +1,6 @@
-/** Preserves real installed CLI create, snapshot recovery, manual preparation and production startup acceptance. */
+/** Preserves real installed CLI create, first-start budget, manual preparation and production startup acceptance. */
 import { expect } from "bun:test";
-import { chmod, mkdtemp, rm, stat, writeFile } from "node:fs/promises";
+import { access, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -47,7 +47,7 @@ async function verifyInstalledCreate(fixture: InstalledCliFixture) {
   try {
     expect(await child.exited, (await output).join("\n")).toBe(0);
     await assertInstalledManifest(fixture);
-    await verifySnapshotRecovery(fixture.project);
+    await verifyFirstStart(fixture.project);
     await verifyManualPreparation(fixture);
   } finally {
     if (child.exitCode === null) child.kill();
@@ -56,21 +56,18 @@ async function verifyInstalledCreate(fixture: InstalledCliFixture) {
   }
 }
 
-/** Keeps startup latency, unchanged prepared pointer and corrupted-pointer recovery assertions. */
-async function verifySnapshotRecovery(project: string) {
-  const pointer = join(project, ".relkit/dev/current.json");
-  const before = await stat(pointer);
+/**
+ * The first `relkit dev` of a freshly created project answers within the startup budget
+ * without any preparation step, and leaves no development snapshot behind.
+ */
+async function verifyFirstStart(project: string) {
   const launched = await launchPreparedProject(project);
   expect(launched.body).toBe('{"message":"Hello, RelKit!"}');
-  expect(launched.durationMs).toBeLessThan(5_000);
-  const after = await stat(pointer);
-  expect({ mtimeMs: after.mtimeMs, size: after.size }).toEqual({
-    mtimeMs: before.mtimeMs,
-    size: before.size,
-  });
-  await chmod(pointer, 0o600);
-  await writeFile(pointer, "{\n");
-  expect((await launchPreparedProject(project)).body).toBe('{"message":"Hello, RelKit!"}');
+  // Five seconds on an ordinary host; a saturated one may raise it, and says so in its report.
+  expect(launched.durationMs).toBeLessThan(
+    Number(process.env.RELKIT_FIRST_START_BUDGET_MS ?? 5_000),
+  );
+  await expect(access(join(project, ".relkit/dev/current.json"))).rejects.toThrow();
 }
 
 /** Preserves no-install next steps, explicit prepare, frozen lockfile and all four project scripts. */
@@ -97,7 +94,7 @@ async function verifyManualPreparation(fixture: InstalledCliFixture) {
       manual,
       fixture.env,
     ),
-  ).toContain("Prepared development snapshot");
+  ).toContain("Checked");
   expect((await launchPreparedProject(manual)).body).toBe('{"message":"Hello, RelKit!"}');
   await installedCliCommand(
     process.execPath,

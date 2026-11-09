@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createCacheClient, type CacheProvider } from "../../packages/cache/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { createCacheClient, type CacheProvider } from "relkit/cache";
+import { z } from "relkit/schema";
 
 export interface CacheFailureControls {
   readonly once: (point: string, cause?: unknown) => void;

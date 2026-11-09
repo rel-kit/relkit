@@ -1,15 +1,17 @@
 /** Explicit development policy keeps resourceful work in the session's Effect scope. */
-import type { LoggerOptions, LogLevel, LogRecord } from "@relkit/runtime-effect";
+import type { RuntimeProcesses } from "relkit/runtime";
+import type { LoggerOptions, LogLevel, LogRecord } from "relkit/runtime-effect";
 import type { Effect } from "effect";
-import type { JsonValue, RuntimeActivationFingerprint } from "@relkit/contracts";
+import type { JsonValue, RuntimeActivationFingerprint } from "relkit/contracts";
 import type {
   CandidateCompile,
   StartedCandidate,
   SupervisorObservabilityOptions,
-} from "@relkit/supervisor";
-import type { InspectionBridgeOptions } from "@relkit/inspector-api/connection";
+} from "../supervisor/index.js";
+import type { InspectionBridgeOptions } from "relkit/inspector-api/connection";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { DevInspectorPolicy } from "./dev-inspector-support.types.js";
+import type { DevReload } from "../dev-reload/reload.types.js";
 
 /** One admitted development log, rendered by the existing terminal policy. */
 export interface DevLogEvent {
@@ -45,6 +47,8 @@ export interface DevLocalServices {
 export interface DevOptions {
   readonly projectRoot?: string;
   readonly compile: CandidateCompile;
+  /** Offers each save to the in-place handler swap before starting a new generation. */
+  readonly reload?: DevReload;
   readonly activationFingerprint?: DevActivationFingerprint;
   /**
    * Reuses the prepared identity only for a child installed from that validated receipt.
@@ -112,7 +116,7 @@ export interface DevOptions {
   readonly inspectionRejected?: (generationToken: number) => Effect.Effect<void>;
   /** Grace period after backend activation before optional inspector acquisition. */
   readonly supportStartupDelayMs?: number;
-  readonly spawn?: typeof Bun.spawn;
+  readonly spawn?: RuntimeProcesses["spawn"];
   readonly signal?: AbortSignal;
   readonly installSignalHandlers?: boolean;
   readonly logger?: Omit<LoggerOptions, "component">;

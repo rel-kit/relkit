@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { defineEnv } from "@relkit/config";
+import { defineEnv } from "relkit/config";
 import { createTestApplication, type TestApplication } from "../../src/better-auth.js";
 import { auth, clients, releases } from "./service-isolation-resource.js";
 

@@ -26,7 +26,7 @@ export default defineDrizzleService({
   "src/services/database/models/records.model.ts": `/** Exposes native lifecycle probes as model extensions while preserving admitted SDK lease context. */
 import { defineModel } from "@relkit/drizzle/sqlite";
 import { records } from "../schema/index.js";
-import { probeLifecycle, probeDescendants, probeNestedAuth } from "../lifecycle.js";
+import { fixtureEnv, probeLifecycle, probeDescendants, probeNestedAuth } from "../lifecycle.js";
 export default defineModel({
   table: records,
   extend: {
@@ -38,7 +38,7 @@ export default defineModel({
      * @returns Shared, isolated and recovery observations after owned clients close.
      */
     ownership: (_context, context: object, databasePath: string) =>
-    probeLifecycle(context, { DATABASE_PATH: databasePath }),
+    probeLifecycle(context, fixtureEnv(databasePath)),
     /**
      * Exercises native transaction descendant close ordering.
      * @param _context - Borrowed injected table/client context.

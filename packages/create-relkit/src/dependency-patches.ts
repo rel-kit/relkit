@@ -1,6 +1,6 @@
 /** Loads and plans the canonical selected Drizzle repair, validating conflicts before delivery and preserving its release pin and exact patch bytes. */
 
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { createHash } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";

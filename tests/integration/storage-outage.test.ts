@@ -4,9 +4,9 @@ import { expect, test } from "bun:test";
 import type { DockerClient } from "../../integrations/packages/docker/src/runtime/index.ts";
 import { createRedisCacheProvider } from "../../integrations/packages/redis/src/runtime/index.ts";
 import { createS3BucketProvider } from "../../integrations/packages/s3/src/runtime/index.ts";
-import { createBucketClient } from "../../packages/buckets/src/index.ts";
-import { createCacheClient } from "../../packages/cache/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { createBucketClient } from "relkit/buckets";
+import { createCacheClient } from "relkit/cache";
+import { z } from "relkit/schema";
 import { binding, instance, withStorage } from "./storage-outage-fixture.ts";
 
 const dockerTest = process.env.RELKIT_TEST_DOCKER === "1" ? test : test.skip;

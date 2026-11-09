@@ -3,10 +3,10 @@
 import { expect, test } from "bun:test";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { ADD_FAILURE_CODES } from "create-relkit/internal/add-types";
+import { ADD_FAILURE_CODES } from "create-relkit/add-types";
 import { mergeScaffoldManifest } from "../../src/scaffolding/plan-manifest.js";
 import { resolveProjectDependencies } from "../../src/scaffolding/project-catalog.js";
-import { SCAFFOLD_DEPENDENCIES } from "create-relkit/internal/scaffold-catalog";
+import { SCAFFOLD_DEPENDENCIES } from "create-relkit/scaffold-catalog";
 import { patchBuilder, withProject } from "./dependency-patches.fixture.js";
 
 test("resolves default and named workspace catalogs while retaining authored aliases", async () => {
@@ -119,4 +119,23 @@ test("catalog entries cannot hide recursive, workspace, link, file, network or p
       );
     });
   }
+});
+
+test("relkit add accepts only integrations in the bundled catalog", () => {
+  const source = JSON.stringify({ dependencies: {} });
+  expect(mergeScaffoldManifest(source, new Set(["@relkit/redis"]), new Map()).added).toHaveProperty(
+    "@relkit/redis",
+  );
+  expect(() =>
+    mergeScaffoldManifest(
+      source,
+      new Set(["@relkit/unknown"] as unknown as ["@relkit/redis"]),
+      new Map(),
+    ),
+  ).toThrow(
+    expect.objectContaining({
+      code: ADD_FAILURE_CODES.validation,
+      message: expect.stringContaining("@relkit/unknown is not an integration released"),
+    }),
+  );
 });

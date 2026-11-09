@@ -5,7 +5,7 @@ import type {
   BrowserMessage,
   BrowserMessagePart,
   ToolPartState,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import type {
   AgentBase,
   AgentContent,

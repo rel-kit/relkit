@@ -1,7 +1,7 @@
 /** Exercises native deep events.helpers behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
 import type { ProtocolEvent } from "@langchain/langgraph";
-import type { BrowserMessage } from "@relkit/contracts";
+import type { BrowserMessage } from "relkit/contracts";
 import type { AgentContentSink, AgentExecutionEvent } from "../src/index.ts";
 import { collectNativeEvents } from "../src/runtime-native-events.ts";
 import { toolStrategy } from "langchain";

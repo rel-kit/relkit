@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { dirname, join } from "node:path";
 import { Effect, Layer } from "effect";
-import { serializeJson, type JsonValue } from "@relkit/contracts";
+import { serializeJson, type JsonValue } from "relkit/contracts";
 import {
   assertProviderOverrideStateVersion,
   type ProviderOverrideState,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import { cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.js";

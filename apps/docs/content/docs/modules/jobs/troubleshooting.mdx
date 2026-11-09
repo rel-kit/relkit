@@ -39,10 +39,10 @@ An old build may still own active runs or a key/registration may still be refere
 
 Confirm that the backend is running and `jobs list`/`jobs capabilities` identify the selected job and
 binding. Resolve missing SDK, binding and provider-readiness diagnostics before retrying. An accepted
-CLI receipt proves admission; inspect the native run separately before reporting execution success.
+CLI response proves only that the run was accepted; inspect the native run separately before reporting execution success.
 
 When a trigger response is lost, retain the original `operationId`, idempotency key, and request digest. Show
-an unknown outcome and use only the provider-certified recovery action; do not discard the handle or submit a
+an unknown outcome and use only the recovery action the provider supports; do not discard the handle or submit a
 different payload automatically.
 
 Check the [commerce job binding](https://github.com/rel-kit/relkit/blob/main/examples/commerce/relkit.config.ts)

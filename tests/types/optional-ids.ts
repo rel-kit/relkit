@@ -1,4 +1,6 @@
 /** Checks inferred descriptor identities while retaining explicit native graph authoring types. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import {
   defineApp,
   defineBucket,
@@ -15,9 +17,8 @@ import {
   defineTool,
   defineTransform,
   http,
-} from "@relkit/app";
-import { defineAgent } from "@relkit/langchain";
-import { z } from "@relkit/schema";
+} from "relkit";
+import { z } from "relkit/schema";
 
 const input = z.object({ id: z.string() });
 const output = z.object({ ok: z.boolean() });
@@ -31,8 +32,11 @@ const task = defineTask({
 });
 
 const optionalFunction = defineFunction({ input, output, handler: async () => ({ ok: true }) });
-const optionalError = defineError({ data: input, message: "Invalid" });
+// @ts-expect-error an error's ID is its public code, so it is required
+defineError({ data: input, message: "Invalid" });
+const optionalError = defineError({ id: "types.invalid", data: input, message: "Invalid" });
 const optionalDelayedError = defineError({
+  id: "types.retry-later",
   data: input,
   message: "Retry later",
   retry: { kind: "later", afterMs: 1_000 },
@@ -50,6 +54,7 @@ const optionalTool = defineTool({
   approval: "never",
 });
 const optionalAgent = defineAgent({
+  runtime: langchain(),
   input,
   output,
   model: "default",

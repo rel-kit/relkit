@@ -1,18 +1,6 @@
 {
   "version": 1,
   "skills": {
-    "add-lang": {
-      "source": "colbymchenry/codegraph",
-      "sourceType": "github",
-      "skillPath": ".claude/skills/add-lang/SKILL.md",
-      "computedHash": "58fa1bb5728a750f2456d667dad91c8f16395cc07aebf9a07db7a8e1417e9977"
-    },
-    "agent-eval": {
-      "source": "colbymchenry/codegraph",
-      "sourceType": "github",
-      "skillPath": ".claude/skills/agent-eval/SKILL.md",
-      "computedHash": "557d1ffe86c2f1b9b4654713cd5acbfb3e0511a9e61b629573abc9a9c582d23b"
-    },
     "blume": {
       "source": "haydenbleasel/blume",
       "sourceType": "github",
@@ -24,12 +12,6 @@
       "sourceType": "github",
       "skillPath": "clean-code/SKILL.md",
       "computedHash": "917f01d5f5800f1f575c6701a4a34939647e74c423bd3108e894191abb0593f6"
-    },
-    "cloudformation-to-pulumi": {
-      "source": "pulumi/agent-skills",
-      "sourceType": "github",
-      "skillPath": "migration/skills/cloudformation-to-pulumi/SKILL.md",
-      "computedHash": "1fdf5b0d1d0bf20659d6175f5dcea77064e965464efb851f152f60c4273cdb01"
     },
     "code-review": {
       "source": "mattpocock/skills",
@@ -54,12 +36,6 @@
       "sourceType": "github",
       "skillPath": "skills/effect/SKILL.md",
       "computedHash": "f4e0cfeee135a1569fc9e511c26d74fcd29d5ce03bc8066aea268fc87a88019e"
-    },
-    "effect-ts": {
-      "source": "effect-ts/skills",
-      "sourceType": "github",
-      "skillPath": "skills/effect-ts/SKILL.md",
-      "computedHash": "9a425920916902a856c16dd9bd16f61e7276e18b2aaffdc45d55ca84cdd84b3e"
     },
     "hono": {
       "source": "yusukebe/hono-skill",
@@ -91,48 +67,6 @@
       "skillPath": "universal/observability/opentelemetry/SKILL.md",
       "computedHash": "37ca5973657be4a67ff128cd9e0f96eaf32209bc53ee7688ab28b57a81ef1743"
     },
-    "pulumi-arm-to-pulumi": {
-      "source": "pulumi/agent-skills",
-      "sourceType": "github",
-      "skillPath": "migration/skills/pulumi-arm-to-pulumi/SKILL.md",
-      "computedHash": "cedeade1a8386a7e6f11898b6fb8e790b2bf27a273f14ec1bafba9eed47eb96d"
-    },
-    "pulumi-cdk-to-pulumi": {
-      "source": "pulumi/agent-skills",
-      "sourceType": "github",
-      "skillPath": "migration/skills/pulumi-cdk-to-pulumi/SKILL.md",
-      "computedHash": "603c350c0a6fcae99565b1faaddbb5e6848bbcf22a0005d311cbf8a57305aa41"
-    },
-    "pulumi-migrate-from-discovered-stack": {
-      "source": "pulumi/agent-skills",
-      "sourceType": "github",
-      "skillPath": "migration/skills/pulumi-migrate-from-discovered-stack/SKILL.md",
-      "computedHash": "0cafaf13f6487992c3056ced6f05076c2af48398307b18170c19a679af8b072c"
-    },
-    "pulumi-neo-handoff": {
-      "source": "pulumi/agent-skills",
-      "sourceType": "github",
-      "skillPath": "delegation/skills/pulumi-neo-handoff/SKILL.md",
-      "computedHash": "03ec623af7ff27772c6bdcce355fe449a7d2ef447411857445aed4fa6607316a"
-    },
-    "pulumi-terraform-to-pulumi": {
-      "source": "pulumi/agent-skills",
-      "sourceType": "github",
-      "skillPath": "migration/skills/pulumi-terraform-to-pulumi/SKILL.md",
-      "computedHash": "0a42023008823ae9e717e1d45a94d94065a7dc3d56e398f5115a901ba2e98324"
-    },
-    "pulumi-upgrade-provider": {
-      "source": "pulumi/agent-skills",
-      "sourceType": "github",
-      "skillPath": "package-maintenance/skills/pulumi-upgrade-provider/SKILL.md",
-      "computedHash": "9030e46d784020cd527f0f6fda3a25bdee9691f59347e20162224d196e5151f4"
-    },
-    "radix-base-ui-sync": {
-      "source": "fuma-nama/fumadocs",
-      "sourceType": "github",
-      "skillPath": ".cursor/skills/radix-base-ui-sync/SKILL.md",
-      "computedHash": "7594fe0fddf63092d3c8b0af65184434b53ad481f0aab0a562c0dfbf600fb4be"
-    },
     "turborepo": {
       "source": "antfu/skills",
       "sourceType": "github",
@@ -157,12 +91,6 @@
       "sourceType": "well-known",
       "computedHash": "9b73951ae54b7d1eb81e69bb2f47d1622b3813bbefbd6c0aaa36dfcf938f1f27",
       "wellKnownDigest": "sha256:3b88468608bc7ceec66b8333fab1729590e7af62487fcdbdf79ef60ff626def7"
-    },
-    "upstream-patches": {
-      "source": "pulumi/agent-skills",
-      "sourceType": "github",
-      "skillPath": "package-maintenance/skills/upstream-patches/SKILL.md",
-      "computedHash": "dc0dd5ca1db538137a1848d09f592f7345de500bce67341a5229c64e91122903"
     },
     "vitest": {
       "source": "antfu/skills",

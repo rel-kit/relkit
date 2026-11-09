@@ -1,16 +1,16 @@
 /** Resolves provider choices and profile names for the selected resource, rejecting incompatible existing configuration before planning changes. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import { GeneratorPrompt } from "create-relkit/internal/generator-prompt";
+import { observeExecution } from "relkit/contracts/operation";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { GeneratorPrompt } from "create-relkit/generator-prompt";
 
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
   type GeneratorPromptError,
-} from "create-relkit/internal/generator-errors";
+} from "create-relkit/generator-errors";
 
 import { bucketProfileOwnersEffect } from "./bucket-profiles.js";
 import { profiles } from "./add-resolution-discovery.js";

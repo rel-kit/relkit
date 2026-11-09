@@ -19,7 +19,7 @@ test("structured interrupts expose a readable question", () => {
 
 test("announcements restore authoritative state around the live channel", async () => {
   const source = await readFile(new URL("./page.tsx", import.meta.url), "utf8");
-  expect(source).toContain('useRoute("GET /announcements"');
+  expect(source).toContain("useRoute(api.announcements.getAnnouncements");
   expect(source).toContain("onCaughtUp");
   expect(source).toContain("onGap");
   expect(source).toContain("await announcements.refetch()");

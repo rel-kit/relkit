@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createBindingValueRef } from "@relkit/provider";
+import { createBindingValueRef } from "relkit/provider";
 import { s3 } from "./src/index.ts";
 import { localRecipe } from "./src/local-recipe/index.ts";
 import { createS3BucketProvider } from "./src/runtime/index.ts";

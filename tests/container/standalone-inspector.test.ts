@@ -7,7 +7,7 @@ import {
   InspectionBridgeLive,
   InspectionFilesLive,
   InspectionNativeLive,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 import { containerApplication } from "../fixtures/inspector/container-app.js";
 import {
   inspectorContainer,

@@ -5,7 +5,7 @@
  */
 
 import { dirname } from "node:path";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 
 import { normalizeArtifactName, type NormalizedArtifactName } from "./add-name.js";
 
@@ -117,7 +117,7 @@ export function sourceImport(
  * @returns Source importing defineService and declaring the normalized service ID.
  */
 export function serviceSource(domain: NormalizedArtifactName): string {
-  return `import { defineService } from "@relkit/app/services";\n\nexport default defineService({ id: "${domain.idSegment}" });\n`;
+  return `import { defineService } from "relkit/services";\n\nexport default defineService({ id: "${domain.idSegment}" });\n`;
 }
 
 /**

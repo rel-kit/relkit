@@ -1,44 +1,38 @@
+import { langchain } from "@relkit/langchain";
 import { describe, expect, test } from "bun:test";
 import {
   RELKIT_DESCRIPTOR,
   canonicalJson,
   createDescriptorBase,
   isDescriptor,
-} from "../../packages/contracts/src/index.ts";
-import { DeclaredError, defineError, defineFunction } from "../../packages/functions/src/index.ts";
-import { defineBucket, isBucketDescriptor } from "../../packages/buckets/src/index.ts";
-import { defineCache, isCacheDescriptor } from "../../packages/cache/src/index.ts";
-import { defineAgent, isAgentDescriptor } from "../../packages/agents/src/index.ts";
-import { defineEvent, isEventDescriptor } from "../../packages/events/src/index.ts";
-import { defineJob } from "../../packages/jobs/src/legacy.ts";
+} from "relkit/contracts";
+import { DeclaredError, defineError, defineFunction } from "relkit/functions";
+import { defineBucket, isBucketDescriptor } from "relkit/buckets";
+import { defineCache, isCacheDescriptor } from "relkit/cache";
+import { defineAgent, isAgentDescriptor } from "relkit/agents";
+import { defineEvent, isEventDescriptor } from "relkit/events";
+import { defineJob, defineTask } from "relkit/jobs";
 import {
   defineMiddleware,
   defineRoute,
   defineTransform,
   http,
   isMiddlewareDescriptor,
-} from "../../packages/routes/src/index.ts";
-import {
-  defineTool,
-  isToolDescriptor,
-  ToolApprovalRequiredError,
-} from "../../packages/tools/src/index.ts";
-import {
-  defineService,
-  isServiceDescriptor,
-  isServiceRef,
-} from "../../packages/services/src/index.ts";
-import { defineEnv, env, isEnvRef } from "../../packages/config/src/index.ts";
-import { CONVENTION_CODES, checkConventions } from "../../packages/compiler/src/index.ts";
-import { defineApp } from "../../packages/app/src/index.ts";
+} from "relkit/routes";
+import { defineTool, isToolDescriptor, ToolApprovalRequiredError } from "relkit/tools";
+import { defineService, isServiceDescriptor, isServiceRef } from "relkit/services";
+import { defineEnv, env, isEnvRef } from "relkit/config";
+import { CONVENTION_CODES, checkConventions } from "../../packages/cli/src/compiler/index.ts";
+import { defineApp } from "relkit";
 import {
   defineConnectionContract,
   defineIntegrationReference,
   defineProviderAdapter,
   defineProviderBehavior,
   defineProviderCapability,
-} from "../../packages/provider/src/index.ts";
-import { getJsonSchema, z } from "../../packages/schema/src/index.ts";
+} from "relkit/provider";
+import { getJsonSchema, z } from "relkit/schema";
+import { dispatchInvocation } from "relkit/invocation";
 
 const input = z.object({ id: z.string() });
 const output = z.object({ ok: z.boolean() });
@@ -118,12 +112,14 @@ describe.serial("Phase 2 descriptor cohort", () => {
       defaultTtlMs: 1_000,
       maxTtlMs: 10_000,
     });
-    const job = defineJob({
-      id: "orders.reconcile",
+    const reconcile = defineTask({
+      id: "orders.reconcile-task",
+      version: "1",
       input,
-      target: lookup,
-      retry: { maxAttempts: 3, initialDelayMs: 10, maxDelayMs: 100, multiplier: 2, jitter: "none" },
+      output,
+      handler: async () => ({ ok: true }),
     });
+    const job = defineJob({ id: "orders.reconcile", name: "reconcileOrders", task: reconcile });
     const agentTool = defineTool({
       id: "orders.lookup-tool",
       target: lookup,
@@ -133,6 +129,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
     });
     const agent = defineAgent({
       id: "orders.support",
+      runtime: langchain(),
       input: z.object({ prompt: z.string() }),
       output: z.object({ answer: z.string() }),
       model: "default",
@@ -143,10 +140,10 @@ describe.serial("Phase 2 descriptor cohort", () => {
 
     const dependent = defineFunction({
       id: "orders.dependent",
-      publishes: ["orders.created" as never],
       input,
       output,
       dependencies: {
+        events: { created },
         jobs: { reconcile: job },
         buckets: { assets: bucket },
         cache: { prices: cache },
@@ -159,6 +156,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
       "agents",
       "buckets",
       "cache",
+      "events",
       "jobs",
     ]);
 
@@ -269,56 +267,6 @@ describe.serial("Phase 2 descriptor cohort", () => {
     expect(Object.isFrozen(app.cache.profiles.default)).toBe(true);
   });
 
-  test("validates job policies and omits executable handlers", () => {
-    const job = defineJob({
-      id: "orders.scheduled-reconcile",
-      input,
-      target: lookup,
-      profile: "default",
-      retry: {
-        maxAttempts: 4,
-        initialDelayMs: 100,
-        maxDelayMs: 1_000,
-        multiplier: 2,
-        jitter: "full",
-      },
-      timeoutMs: 5_000,
-      concurrency: 2,
-      schedule: [
-        {
-          id: "hourly",
-          cron: "0 * * * *",
-          timezone: "UTC",
-          input: { id: "scheduled" },
-          overlap: "skip",
-        },
-      ],
-      idempotency: { key: "id", retentionMs: 60_000 },
-    });
-
-    expect(job.profile).toBe("default");
-    expect(job.schedule?.[0]?.input).toEqual({ id: "scheduled" });
-    expect(job.idempotency).toEqual({ key: "id", retentionMs: 60_000 });
-    expect(Object.prototype.hasOwnProperty.call(job, "handler")).toBe(false);
-    expect(Object.isFrozen(job.retry)).toBe(true);
-    expect(Object.isFrozen(job.schedule)).toBe(true);
-
-    const invalid = (retry: Record<string, unknown>) =>
-      defineJob({ id: "invalid.job", input, target: lookup, retry } as never);
-    expect(() =>
-      invalid({ maxAttempts: 0, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" }),
-    ).toThrow();
-    expect(() =>
-      invalid({ maxAttempts: 1, initialDelayMs: 2, maxDelayMs: 1, multiplier: 1, jitter: "none" }),
-    ).toThrow();
-    expect(() =>
-      invalid({ maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 1, multiplier: 0, jitter: "none" }),
-    ).toThrow();
-    expect(() =>
-      invalid({ maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 1, multiplier: 1, jitter: "bad" }),
-    ).toThrow();
-  });
-
   test("keeps bucket/cache contracts logical and tools/agents handler-free", () => {
     const bucket = defineBucket({
       id: "orders.assets",
@@ -345,6 +293,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
     });
     const agent = defineAgent({
       id: "orders.support-agent",
+      runtime: langchain(),
       input: z.object({ prompt: z.string() }),
       output: z.object({ answer: z.string() }),
       model: "openai.default",
@@ -373,6 +322,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
     expect(() =>
       defineAgent({
         id: "bad.agent",
+        runtime: langchain(),
         input: z.unknown(),
         output: z.unknown(),
         model: "default",
@@ -403,7 +353,12 @@ describe.serial("Phase 2 descriptor cohort", () => {
     expect(isServiceRef(service)).toBe(true);
     expect(service.get).toBe(member);
 
-    await expect(service.get.invoke({ id: "order-1" })).resolves.toEqual({ ok: true });
+    expect(service.get).not.toHaveProperty("invoke");
+    await expect(
+      dispatchInvocation({ target: service.get, input: { id: "order-1" } }),
+    ).resolves.toEqual({
+      ok: true,
+    });
     const derivedTool = service.get.asTool({
       id: "orders.service-tool",
       description: "Read an order",
@@ -464,11 +419,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
     expect(Object.isFrozen(service)).toBe(true);
     expect(Object.isFrozen(service.get)).toBe(true);
     expect(Object.isFrozen(tool)).toBe(true);
-    expect(Object.getOwnPropertyDescriptor(lookup, "invoke")).toMatchObject({
-      enumerable: false,
-      writable: false,
-      configurable: false,
-    });
+    expect(Object.getOwnPropertyDescriptor(lookup, "invoke")).toBeUndefined();
     expect(Object.getOwnPropertyDescriptor(lookup, "asTool")).toMatchObject({
       enumerable: false,
       writable: false,

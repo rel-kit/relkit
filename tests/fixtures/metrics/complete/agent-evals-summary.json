@@ -1,0 +1,8 @@
+{
+  "runs": 6,
+  "passed": 4,
+  "semanticPassed": 5,
+  "passRate": 66.7,
+  "semanticPassRate": 83.3,
+  "results": []
+}

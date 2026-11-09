@@ -119,13 +119,7 @@ it("rejects retired expanded UI and native storage exceptions", () => {
   } as const;
   const native = {
     boundary: "installation",
-    packages: [
-      "consumer",
-      "@relkit/cli",
-      "@relkit/observability-local",
-      "@duckdb/node-api",
-      "@duckdb/node-bindings",
-    ],
+    packages: ["consumer", "@relkit/cli", "@duckdb/node-api", "@duckdb/node-bindings"],
   } as const;
   const unrelated = { ...ui, packages: [...ui.packages, "langchain"] } as const;
   const policy = { stage: "1", exceptions: [ui, native, unrelated] } as const;

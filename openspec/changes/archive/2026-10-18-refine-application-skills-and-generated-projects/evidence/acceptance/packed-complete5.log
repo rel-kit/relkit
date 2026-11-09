@@ -257,7 +257,7 @@ Acceptance: existing-database-auth-test
 102 |     if (code !== 0)
 103 |       return yield* new ScaffoldProcessFailure({
                           ^
-error: run test failed in /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct (1)
+error: run test failed in <tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct (1)
 bun test v1.3.10 (30e609e0)
 $ bun test
 
@@ -281,26 +281,26 @@ EnvResolutionError: BETTER_AUTH_SECRET: Required value is missing
 ],
    _tag: "EnvResolutionError",
 
-      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/config/dist/resolve.js:27:39)
-      at ~effect/Effect/successCont (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:973:28)
-      at runLoop (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:448:86)
-      at evaluate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:398:23)
-      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2460:9)
-      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2538:19)
-      at runConfigSync (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/config/dist/config-observability.js:47:25)
-      at try (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/testing/dist/application.js:82:17)
-      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:753:22)
-      at runLoop (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:448:86)
-      at evaluate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:398:23)
-      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2460:9)
-      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/ManagedRuntime.js:104:27)
-      at runLoop (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:448:86)
-      at evaluate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:398:23)
-      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2460:9)
-      at <anonymous> (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2512:19)
-      at runExecutionPromise (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/contracts/dist/operation-runtime.js:53:32)
-      at createTestApplication (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/testing/dist/application.js:52:31)
-      at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-acceptance-pDQJ8a/consumer-direct/tests/integration/hello.route.test.ts:5:23
+      at <anonymous> (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/config/dist/resolve.js:27:39)
+      at ~effect/Effect/successCont (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:973:28)
+      at runLoop (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:448:86)
+      at evaluate (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:398:23)
+      at <anonymous> (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2460:9)
+      at <anonymous> (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2538:19)
+      at runConfigSync (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/config/dist/config-observability.js:47:25)
+      at try (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/testing/dist/application.js:82:17)
+      at <anonymous> (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:753:22)
+      at runLoop (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:448:86)
+      at evaluate (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:398:23)
+      at <anonymous> (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2460:9)
+      at <anonymous> (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/ManagedRuntime.js:104:27)
+      at runLoop (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:448:86)
+      at evaluate (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:398:23)
+      at <anonymous> (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2460:9)
+      at <anonymous> (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/effect/dist/internal/effect.js:2512:19)
+      at runExecutionPromise (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/contracts/dist/operation-runtime.js:53:32)
+      at createTestApplication (<tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/node_modules/@relkit/testing/dist/application.js:52:31)
+      at <tmp>/relkit-packed-acceptance-pDQJ8a/consumer-direct/tests/integration/hello.route.test.ts:5:23
 -------------------------------
 
 
@@ -314,11 +314,11 @@ error: script "test" exited with code 1
  operation: "process.exit",
       _tag: "ScaffoldProcessFailure",
 
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/scripts/scaffold-process.ts:103:21)
-      at ~effect/Effect/successCont (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)
-      at runLoop (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
-      at evaluate (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
+      at <anonymous> (<repo>/scripts/scaffold-process.ts:103:21)
+      at ~effect/Effect/successCont (<repo>/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)
+      at runLoop (<repo>/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
+      at evaluate (<repo>/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
       at runInAsyncScope (node:async_hooks:137:23)
-      at <anonymous> (/Users/mustafaelsayed/Workspace/relkit/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17)
+      at <anonymous> (<repo>/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17)
 
 Bun v1.3.10 (macOS arm64)

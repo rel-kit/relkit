@@ -57,7 +57,7 @@ test("failed checks preserve the last valid graph and update diagnostics", async
   const graph = await readFile(graphPath, "utf8");
   await writeFile(
     join(root, "src/routes/hello/[name]/route.ts"),
-    'import { defineRoute } from "@relkit/app";\nexport default defineRoute({});\n',
+    'import { defineRoute } from "relkit";\nexport default defineRoute({});\n',
   );
 
   const invalid = await checkProject({ projectRoot: root });
@@ -100,7 +100,7 @@ test("check locates removed config keys and shows the fixed replacement", async 
       file: "relkit.config.ts",
       line: 2,
       column: 3,
-      message: expect.stringContaining('RELKIT always discovers "src/**/*.ts"'),
+      message: expect.stringContaining('RelKit always discovers "src/**/*.ts"'),
     }),
   );
   expect(result.diagnostics[0]?.message).toContain("defineApp({ env: defineEnv({})");

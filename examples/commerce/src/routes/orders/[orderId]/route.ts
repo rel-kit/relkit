@@ -1,9 +1,9 @@
 /** Maps order methods to service members, normalizing GET identifiers and preserving the deletion 202 response. */
-import { defineServiceRoutes, http } from "@relkit/app/routes";
+import { defineServiceRoutes, http } from "relkit/routes";
 import orders from "../../../services/orders/service.js";
 import normalizeOrderId from "@app/routes/transforms/orders/normalize-id.transform.js";
 
-export const { GET, HEAD, PUT, PATCH, DELETE, OPTIONS } = defineServiceRoutes(orders, {
+export default defineServiceRoutes(orders, {
   GET: {
     member: "getOrder",
     request: http.input({

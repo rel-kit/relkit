@@ -1,6 +1,6 @@
 {
   "capturedUtc": "2026-10-03T18:47:24Z",
-  "worktree": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "worktree": "<home>/.codex/worktrees/core-consumers-effect/relkit",
   "runner": {
     "dependency": "@stryker-mutator/vitest-runner",
     "version": "10.0.0",
@@ -73,7 +73,7 @@
       }
     ],
     "report": {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/reports/mutation/mutation.json",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/reports/mutation/mutation.json",
       "bytes": 598335,
       "sha256": "cc988d0a82bf9887b8b7e55a1b16408d060e1350bf79d1ab7a374be6f4c15785",
       "retention": "Initial observed report descriptor; the native full verification run subsequently replaced this generated path. The original run log remains retained."
@@ -81,7 +81,7 @@
     "log": "/tmp/relkit-jobs-quality-migrated-mutation.log",
     "gate": "Unchanged requirement: zeroError and at least one killed mutant for each of six semantic categories. No excluded static mutants.",
     "finalVerificationReport": {
-      "path": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/reports/mutation/mutation.json",
+      "path": "<home>/.codex/worktrees/core-consumers-effect/relkit/reports/mutation/mutation.json",
       "bytes": 598472,
       "sha256": "616a39a14847525f74a81fd3c5f470e7899a7648a39b35bfbe93a400314e6b72",
       "counts": { "Killed": 501, "Survived": 268, "NoCoverage": 17, "Timeout": 7, "Error": 0 },

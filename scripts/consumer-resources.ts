@@ -8,7 +8,7 @@ import { execFileSync } from "node:child_process";
 import { statfs } from "node:fs/promises";
 import { cpus, loadavg, platform } from "node:os";
 import { Context, Effect, Layer, Schedule } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { inspectionNative } from "./consumer-installation-native.js";
 import type {
   ConsumerResourceMonitorContract,

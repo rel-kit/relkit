@@ -8,7 +8,7 @@ import {
   connectionAttempt,
   InspectionProjectId,
   InspectionConnectionError,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 
 const binding = Schema.fromJsonString(Schema.Struct({ projectId: InspectionProjectId }));
 

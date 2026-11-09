@@ -3,11 +3,14 @@
  * come from successful compilation and contain declarations rather than acquired
  * runtime resources; generated hosts own the resulting process lifecycle.
  */
-import type { JsonValue, RuntimeActivationFingerprint } from "@relkit/contracts";
-import type { ApplicationGraph } from "@relkit/graph";
+import type { JsonValue, RuntimeActivationFingerprint } from "relkit/contracts";
+import type { ApplicationGraph } from "relkit/graph";
+import type { RuntimeAdapterName } from "relkit/runtime";
 
 /** Validated HTTP settings supplied to the pure generated-server emitter. */
 export interface ServerSourceConfiguration {
+  /** Runtime adapter the server is emitted for; defaults to Bun. */
+  readonly runtime?: RuntimeAdapterName;
   /** Prepared capsules embed a checked registration plan instead of rebuilding it. */
   readonly httpApplication?: "prepared";
   readonly maxBodyBytes: number;
@@ -18,6 +21,8 @@ export interface ServerSourceConfiguration {
   };
   readonly clientContract: boolean;
   readonly mcp: boolean;
+  /** MCP answers 401 to callers without a session. */
+  readonly mcpAuth?: "required";
   readonly agUi?: boolean;
   readonly maxPreviewBytes: number;
   readonly inspectorEnabled?: boolean;

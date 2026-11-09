@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { isStableId, serializeJson } from "@relkit/contracts";
+import { isStableId, serializeJson } from "relkit/contracts";
 import {
   LOCAL_SERVICE_PLAN_VERSION,
   LOCAL_SERVICE_PROTOCOL_VERSION,
@@ -8,7 +8,7 @@ import {
   type LocalServicePlanEntry,
   type LocalServiceRecipeInput,
   type ProviderOverrideState,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import { LOCAL_RESOURCE_LABEL } from "./identity.js";
 import type { LocalServiceReconcileRequest } from "./reconciler-types.js";
 import { completeUnits, hash, invalid } from "./reconciler-support-validation.js";

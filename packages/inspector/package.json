@@ -1,7 +1,7 @@
 {
   "name": "@relkit/inspector",
   "version": "0.2.1",
-  "description": "Standalone RELKIT development inspector, collector, and local diagnostic history.",
+  "description": "Standalone RelKit development inspector, collector, and local diagnostic history.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -30,28 +30,39 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./observability-local": {
+      "types": "./dist/observability-local/index.d.ts",
+      "import": "./dist/observability-local/index.js"
+    },
+    "./observability-local/worker": {
+      "types": "./dist/observability-local/local/worker.d.ts",
+      "import": "./dist/observability-local/local/worker.js"
     }
   },
   "dependencies": {
+    "@duckdb/node-api": "1.5.5-r.4",
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node-shared": "catalog:",
-    "@relkit/contracts": "workspace:*",
-    "@relkit/inspector-api": "workspace:*",
-    "@relkit/observability": "workspace:*",
-    "@relkit/observability-local": "workspace:*",
     "effect": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "relkit": "workspace:*"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
-    "typescript": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "relkit-typescript": "workspace:*",
+    "typescript": "catalog:workspace",
     "vitest": "catalog:"
   },
   "scripts": {
     "build": "tsc -b && bun run ../../scripts/package-inspector.ts",
     "check": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false"
+  },
+  "relkit": {
+    "maturity": "core"
   }
 }

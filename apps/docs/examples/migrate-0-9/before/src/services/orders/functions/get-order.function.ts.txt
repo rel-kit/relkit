@@ -1,0 +1,12 @@
+import { defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
+import OrderNotFound from "../errors/order-not-found.error.js";
+
+const getOrder = defineFunction({
+  input: z.object({ orderId: z.string() }),
+  output: z.object({ orderId: z.string() }),
+  errors: [OrderNotFound],
+  handler: async ({ orderId }) => ({ orderId }),
+});
+
+export default getOrder;

@@ -1,0 +1,13 @@
+{
+  "protocol": "relkit.walkthrough-result",
+  "kind": "create-to-railway",
+  "outcome": "passed",
+  "seconds": 640,
+  "steps": [
+    { "name": "create", "seconds": 150 },
+    { "name": "deployed", "seconds": 400 },
+    { "name": "reachable", "seconds": 90 }
+  ],
+  "note": "Sample timing.",
+  "createdAt": "2026-11-05T10:00:00.000Z"
+}

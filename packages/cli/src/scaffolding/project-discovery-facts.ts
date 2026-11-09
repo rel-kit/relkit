@@ -5,12 +5,12 @@
  */
 
 import { join } from "node:path";
-import { discoverApplicationLayout, type AstSourceModule } from "@relkit/compiler";
-import * as ts from "typescript";
+import { discoverApplicationLayout, type AstSourceModule } from "../compiler/index.js";
+import ts from "../typescript-parser.js";
 import type { ProjectDiscovery } from "./project-discovery-types.js";
 import { readAppDiscovery } from "./project-discovery-app.js";
 import { collectProjectArtifacts } from "./project-discovery-artifacts.js";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 
 /**
  * Converts authored syntax into layout-aware scaffold discovery records.

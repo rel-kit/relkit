@@ -1,4 +1,5 @@
-import { API_BASE_PATH } from "@relkit/contracts";
+import type { RuntimeSubprocess } from "relkit/runtime";
+import { API_BASE_PATH } from "relkit/contracts";
 import { Clock, Effect } from "effect";
 import { cliAdapterError, cliOriginalError } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
@@ -17,7 +18,7 @@ export const waitForStartHealthEffect = Effect.fn("Start.health")(
     hostname: string,
     port: number,
     timeoutMs: number,
-    child: Pick<Bun.ReadableSubprocess, "exitCode">,
+    child: Pick<RuntimeSubprocess, "exitCode">,
   ) {
     const native = yield* CliStartNative;
     const deadline = (yield* Clock.currentTimeMillis) + timeoutMs;

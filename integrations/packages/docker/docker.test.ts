@@ -9,7 +9,7 @@ import {
   defineProviderBehavior,
   defineProviderCapability,
   normalizeProviderSource,
-} from "@relkit/provider";
+} from "relkit/provider";
 import { docker } from "./src/index.ts";
 import { owned } from "./src/runtime/docker-composite-support.ts";
 import { dockerMaterializer } from "./src/runtime/index.ts";

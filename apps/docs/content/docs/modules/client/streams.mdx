@@ -28,9 +28,9 @@ breaking iteration cancels upstream work and releases its pinned invocation gene
   /_snippets/source/apps/docs/examples/frontend/report.tsx
 </include>
 
-This selector belongs to the commerce [streaming route](/docs/modules/http/streaming). Its
-`streamOf` item schema determines `report.items`, so do not copy a stream selector into an app
-that has not declared that route and pulled its contract.
+`api.orders.streamOrderReport` is the commerce [streaming route](/docs/modules/http/streaming),
+which targets the function `orders.stream-order-report`. Its `streamOf` item schema determines
+`report.items`. Your app has this property only after it declares the route and pulls its contract.
 
 Use [`useAgent`](/docs/modules/ai/streaming#use-from-the-frontend) for durable agent threads,
 [`useJobRun`](/docs/modules/jobs/clients#use-from-react) for accepted jobs, and

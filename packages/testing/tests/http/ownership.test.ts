@@ -1,6 +1,7 @@
 import { expect, it } from "@effect/vitest";
 import { Cause, Deferred, Effect, Exit, Fiber, Layer } from "effect";
 import type { TestHttpListener } from "../../src/http-listener.js";
+import type { TestHttpRequest } from "../../src/http.types.js";
 import { TestHttpOwner, TestHttpPlatform, httpOwnerLayer } from "../../src/http-owner.js";
 
 it.effect("retains real listener startup after its caller stops waiting", () =>
@@ -20,7 +21,7 @@ it.effect("retains real listener startup after its caller stops waiting", () =>
             get server(): Bun.Server<undefined> {
               throw new Error("This fixture retains a native startup receipt only");
             },
-            request: async () => new Response(),
+            request: (async () => new Response()) as TestHttpRequest,
             close: async () => {
               order.push("listener");
             },
@@ -71,7 +72,7 @@ it.effect(
         get server(): Bun.Server<undefined> {
           throw new Error("This platform fixture never supplies a native server");
         },
-        request: async () => new Response(),
+        request: (async () => new Response()) as TestHttpRequest,
         close: async () => {
           order.push("listener");
         },
@@ -134,7 +135,7 @@ it.effect("attempts sibling listener release and owner callback after native clo
             get server(): Bun.Server<undefined> {
               throw new Error("This fixture tests the platform release contract");
             },
-            request: async () => new Response(),
+            request: (async () => new Response()) as TestHttpRequest,
             close: async () => {
               order.push(String(id));
               if (id === 1) throw sentinel;

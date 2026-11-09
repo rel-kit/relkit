@@ -88,7 +88,7 @@
     {
       "id": "packed-current-consumer",
       "validity": "historical; superseded by later create-relkit product changes",
-      "command": "bun scripts/pack-and-smoke-create-relkit.ts --artifacts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-JEIhPi/release-artifacts",
+      "command": "bun scripts/pack-and-smoke-create-relkit.ts --artifacts <tmp>/relkit-readiness-JEIhPi/release-artifacts",
       "status": "passed",
       "durationMs": 210881.729833,
       "log": "packed-current-consumer.log",
@@ -97,7 +97,7 @@
     {
       "id": "packed-current-docker",
       "validity": "historical; superseded by later create-relkit product changes",
-      "command": "RELKIT_TEST_DOCKER=1 bun scripts/pack-and-smoke-create-relkit.ts --artifacts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-JEIhPi/release-artifacts",
+      "command": "RELKIT_TEST_DOCKER=1 bun scripts/pack-and-smoke-create-relkit.ts --artifacts <tmp>/relkit-readiness-JEIhPi/release-artifacts",
       "status": "passed",
       "durationMs": 350817.153166,
       "log": "packed-current-docker.log",
@@ -226,7 +226,7 @@
     {
       "id": "packed-final-consumer",
       "source": "/tmp/grouped-packed-final-consumer-1.log",
-      "command": "bun run scripts/pack-and-smoke-create-relkit.ts --artifacts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-grouped-final-artifacts-EByLNA",
+      "command": "bun run scripts/pack-and-smoke-create-relkit.ts --artifacts <tmp>/relkit-grouped-final-artifacts-EByLNA",
       "status": "passed",
       "log": "packed-final-consumer.log",
       "sha256": "1fd9965433eb381a20b48884aa37170618f51394b665802361088fe6cb6f8ce9"
@@ -234,7 +234,7 @@
     {
       "id": "packed-final-docker",
       "source": "/tmp/grouped-packed-final-docker-3.log",
-      "command": "RELKIT_TEST_DOCKER=1 bun run scripts/pack-and-smoke-create-relkit.ts --artifacts /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-grouped-final-artifacts-EByLNA",
+      "command": "RELKIT_TEST_DOCKER=1 bun run scripts/pack-and-smoke-create-relkit.ts --artifacts <tmp>/relkit-grouped-final-artifacts-EByLNA",
       "status": "passed",
       "log": "packed-final-docker.log",
       "sha256": "fc9f5658613f8e7419d649efe94963895e8c6c08b799c2502f8b40be7c9bd05c"

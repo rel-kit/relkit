@@ -1,4 +1,4 @@
-# RELKIT metadata assets
+# RelKit metadata assets
 
 The current `public/metadata/og.png` is a 1200×630 imagegen edit of the supplied
 landing-page screenshot. Its editing prompt is saved in `og-image-prompt.md`.

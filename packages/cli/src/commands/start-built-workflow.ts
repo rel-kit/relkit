@@ -8,14 +8,14 @@ import {
   MANIFEST_VERSION,
   RUNTIME_ACTIVATION_FILE,
   RUNTIME_INTEGRATION_PLAN_FILE,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import {
   assertProductionGraph,
   hashGraph,
   validateGraphShapeEffect,
   type ApplicationGraph,
-} from "@relkit/graph";
-import { LOCAL_SERVICE_PLAN_FILE } from "@relkit/local-service";
+} from "relkit/graph";
+import { LOCAL_SERVICE_PLAN_FILE } from "relkit/local-service";
 import { cliAdapterError, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { CliFileSystem } from "../services/filesystem.service.js";
@@ -125,6 +125,15 @@ const validateBuiltPathsEffect = Effect.fn("BuiltProject.paths")(function* (
       cliAdapterError("start.built", new Error("Built manifest paths are invalid.")),
     );
   }
+  if (manifest.runtime === "workers")
+    return yield* Effect.fail(
+      cliAdapterError(
+        "start.built",
+        new Error(
+          "This build is a Cloudflare Workers bundle; run it with `wrangler dev` (see relkit deploy init cloudflare) or rebuild with --runtime bun or node.",
+        ),
+      ),
+    );
   const files = yield* CliFileSystem;
   yield* files.stat(join(buildDirectory, manifest.entrypoint));
   yield* files.stat(join(buildDirectory, manifest.containerEntrypoint));

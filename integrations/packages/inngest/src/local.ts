@@ -2,7 +2,7 @@ import {
   LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,
   type CompositeLocalServiceRecipe,
   type LocalServiceRecipeOutputContext,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import { waitForInngestReadiness } from "./local-readiness.js";
 import { INNGEST_LOCAL_HEALTH_RETRIES } from "./local-timeouts.js";
 
@@ -15,6 +15,7 @@ const REDIS_IMAGE =
 const BUN_IMAGE =
   "oven/bun:1.3.10@sha256:b86c67b531d87b4db11470d9b2bd0c519b1976eee6fcd71634e73abfa6230d2e";
 
+/** @experimental */
 export const localRecipe = Object.freeze({
   kind: "local-service-recipe",
   protocolVersion: LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,

@@ -10,8 +10,8 @@ import {
   type TriggerSdkApi,
 } from "./src/runtime/index.ts";
 import { createTriggerTask } from "./src/runtime/task-binding.ts";
-import type { NativeControlReceipt } from "@relkit/jobs/adapter";
-import { createBindingValueRef } from "@relkit/provider";
+import type { NativeControlReceipt } from "relkit/jobs/adapter";
+import { createBindingValueRef } from "relkit/provider";
 
 test("declares pinned Trigger connections and a separate local recipe", () => {
   const adapter = trigger({

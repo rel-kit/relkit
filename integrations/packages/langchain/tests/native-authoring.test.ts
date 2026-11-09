@@ -1,11 +1,11 @@
 /** Exercises native authoring behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/index.ts";
 import { describe, expect, expectTypeOf, test } from "vitest";
 import { createMiddleware, FakeToolCallingModel, todoListMiddleware, tool } from "langchain";
 import { Annotation } from "@langchain/langgraph";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import {
-  defineAgent,
   isAgentDescriptor,
   type AgentClientStateKey,
   type AgentMiddleware,
@@ -39,12 +39,11 @@ function caseKeepsNativeValuesIntactAndSelectsMiddleware() {
   const todos = todoListMiddleware();
   const agent = defineAgent({
     id: "native.todos",
+    runtime: langchain({ model, middleware: [todos], tools: [nativeTool] }),
     input: z.object({ message: z.string() }),
     output: z.object({ answer: z.string() }),
-    model,
     instructions: "Track the work.",
-    tools: [nativeTool],
-    middleware: [todos],
+    tools: [],
     limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 1000 },
     stateProfile: "public",
     client: { public: true, state: ["todos"] },
@@ -86,19 +85,21 @@ function caseRejectsUndeclaredPublicStateAndDuplicateNative() {
     id: "native.invalid",
     input: z.string(),
     output: z.string(),
-    model,
     instructions: "Answer.",
     tools: [],
-    middleware: [todos],
     limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 1000 },
     stateProfile: "public",
   } as const;
   expect(() =>
-    defineAgent({ ...base, client: { public: true, state: ["missing"] } } as never),
+    defineAgent({
+      ...base,
+      runtime: langchain({ model, middleware: [todos] }),
+      client: { public: true, state: ["missing"] },
+    } as never),
   ).toThrow('state key "missing" is not declared');
-  expect(() => defineAgent({ ...base, middleware: [todos, todos] })).toThrow(
-    'Duplicate agent middleware "todoListMiddleware"',
-  );
+  expect(() =>
+    defineAgent({ ...base, runtime: langchain({ model, middleware: [todos, todos] }) }),
+  ).toThrow('Duplicate agent middleware "todoListMiddleware"');
 }
 
 /** Checks the exact public key vocabulary of real native middleware instances.
@@ -120,6 +121,7 @@ function caseClientStateKeys() {
   expectTypeOf<AgentClientStateKey<readonly [typeof noState]>>().toEqualTypeOf<never>();
   const empty = defineAgent({
     id: "native.empty",
+    runtime: langchain(),
     input: z.string(),
     output: z.string(),
     instructions: "Reply.",

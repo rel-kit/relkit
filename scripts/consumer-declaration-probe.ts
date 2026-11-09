@@ -1,7 +1,7 @@
 /** Compiles actual external declarations without substituting modules or suppressing errors. */
 import { dirname, relative, resolve } from "node:path";
 import { realpathSync } from "node:fs";
-import ts from "typescript";
+import ts from "relkit-typescript";
 import { Effect } from "effect";
 import type { ConsumerInstallation } from "./consumer-installation.types.js";
 import { consumerModulePaths } from "./consumer-module-paths.js";

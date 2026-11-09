@@ -1,6 +1,6 @@
 import { Cause, Context, Effect, Layer, ManagedRuntime, MutableRef, Ref } from "effect";
-import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
-import { createLoggerLayer } from "@relkit/runtime-effect";
+import { runExecutionPromise, runExecutionSync } from "relkit/contracts/operation";
+import { createLoggerLayer } from "relkit/runtime-effect";
 import { cliOriginalError, type CliAdapterError } from "../cli-errors.js";
 import { cliCleanupSnapshotUnsafe, retainCliCleanupFailures } from "../cli-cleanup-evidence.js";
 import { makeDevSessionEngineEffect, devSessionCapabilitiesLayer } from "./dev-session-engine.js";

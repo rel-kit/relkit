@@ -1,7 +1,7 @@
 {
   "name": "@relkit/cli",
   "version": "0.8.8",
-  "description": "The RELKIT development, build, inspection, and deployment CLI.",
+  "description": "The RelKit CLI: compiler, development server, client generator, build, inspection and deployment.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -20,7 +20,8 @@
     "access": "public"
   },
   "engines": {
-    "bun": ">=1.3.10"
+    "bun": ">=1.3.10",
+    "node": ">=22.13.0"
   },
   "type": "module",
   "bin": {
@@ -31,64 +32,76 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./help": {
-      "types": "./dist/cli-help-model.d.ts",
-      "import": "./dist/cli-help-model.js"
+    "./client-generator": {
+      "types": "./dist/client-generator/index.d.ts",
+      "import": "./dist/client-generator/index.js"
+    },
+    "./compiler": {
+      "types": "./dist/compiler/index.d.ts",
+      "import": "./dist/compiler/index.js"
+    },
+    "./compiler/editor": {
+      "types": "./dist/compiler/editor.d.ts",
+      "import": "./dist/compiler/editor.js"
     },
     "./editor": {
       "types": "./dist/editor.d.ts",
       "require": "./dist/editor.cjs"
     },
-    "./internal/tooling": {
-      "types": "./dist/internal/tooling.d.ts",
-      "import": "./dist/internal/tooling.js"
+    "./help": {
+      "types": "./dist/cli-help-model.d.ts",
+      "import": "./dist/cli-help-model.js"
+    },
+    "./tooling": {
+      "types": "./dist/tooling.d.ts",
+      "import": "./dist/tooling.js"
+    },
+    "./deploy-targets": {
+      "types": "./dist/commands/deploy-targets.d.ts",
+      "import": "./dist/commands/deploy-targets.js"
     },
     "./scaffolding": {
       "types": "./dist/scaffolding/index.d.ts",
       "import": "./dist/scaffolding/index.js"
+    },
+    "./supervisor": {
+      "types": "./dist/supervisor/index.d.ts",
+      "import": "./dist/supervisor/index.js"
     }
   },
   "dependencies": {
     "@clack/prompts": "catalog:",
-    "@relkit/agents": "workspace:*",
-    "@relkit/app": "workspace:*",
     "@relkit/client": "workspace:*",
-    "@relkit/config": "workspace:*",
-    "@relkit/compiler": "workspace:*",
-    "@relkit/client-generator": "workspace:*",
-    "@relkit/contracts": "workspace:*",
-    "@relkit/deploy": "workspace:*",
-    "@relkit/diagnostics": "workspace:*",
     "create-relkit": "workspace:*",
-    "@relkit/graph": "workspace:*",
-    "@relkit/engine": "workspace:*",
-    "@relkit/inspector-api": "workspace:*",
-    "@relkit/invocation": "workspace:*",
-    "@relkit/jobs": "workspace:*",
-    "@relkit/local-service": "workspace:*",
-    "@relkit/observability": "workspace:*",
-    "@relkit/provider": "workspace:*",
-    "@relkit/runtime-effect": "workspace:*",
-    "@relkit/runtime-hono": "workspace:*",
-    "@relkit/realtime": "workspace:*",
-    "@relkit/supervisor": "workspace:*",
     "effect": "catalog:",
+    "esbuild": "0.28.2",
     "hono": "catalog:",
-    "typescript": "catalog:"
+    "relkit": "workspace:*"
   },
   "devDependencies": {
-    "@relkit/local": "workspace:*",
-    "@relkit/deploy-pulumi": "workspace:*",
     "@effect/vitest": "catalog:",
-    "@relkit/providers-local": "workspace:*",
+    "@modelcontextprotocol/client": "2.3.0",
+    "@modelcontextprotocol/server": "2.3.0",
+    "@relkit/local": "workspace:*",
+    "@relkit/pulumi": "workspace:*",
+    "relkit-typescript": "workspace:*",
     "vitest": "catalog:"
   },
+  "peerDependencies": {
+    "@modelcontextprotocol/server": "2.3.0"
+  },
+  "peerDependenciesMeta": {
+    "@modelcontextprotocol/server": {
+      "optional": true
+    }
+  },
   "scripts": {
-    "build": "tsc -b && bun run ../../scripts/prune-cli-output.ts && bun run ../../scripts/package-editor.ts && bun run ../../scripts/package-dev-bootstrap.ts",
+    "build": "tsc -b && bun run ../../scripts/prune-cli-output.ts && bun run ../../scripts/package-editor.ts && bun run ../../scripts/package-typescript-parser.ts && bun run ../../scripts/package-dev-bootstrap.ts",
     "check": "tsc -b --pretty false",
-    "typecheck": "tsc -b --pretty false && bun run ../../scripts/package-editor.ts"
+    "typecheck": "tsc -b --pretty false && tsc -p tsconfig.tests.json --pretty false && bun run ../../scripts/package-editor.ts"
   },
   "relkit": {
+    "maturity": "core",
     "buildCatalog": {
       "dependencies": {
         "@better-fetch/fetch": "1.3.2",
@@ -101,8 +114,8 @@
         "@effect/vitest": "4.0.1",
         "@langchain/core": "1.2.9",
         "@langchain/langgraph": "1.4.14",
-        "@orpc/client": "2.0.0-beta.31",
-        "@orpc/contract": "2.0.0-beta.31",
+        "@orpc/client": "1.16.1",
+        "@orpc/contract": "1.16.1",
         "@pulumi/aws": "7.43.0",
         "@pulumi/pulumi": "3.259.0",
         "@tailwindcss/postcss": "4.3.3",
@@ -117,7 +130,7 @@
         "drizzle-orm": "1.0.0-rc.5-169397b",
         "effect": "4.0.1",
         "effect-mq": "0.7.0",
-        "hono": "4.13.7",
+        "hono": "4.13.16",
         "inngest": "4.20.0",
         "langchain": "1.5.10",
         "langsmith": "0.10.8",

@@ -1,0 +1,93 @@
+---
+title: Postgres
+description: Run durable jobs, schedules and events on your own Postgres database.
+pagination: false
+sidebar:
+  icon: database
+labs: true
+---
+
+`@relkit/postgres` keeps jobs, schedules and events in Postgres tables. Pending work survives
+restarts and redeploys, and every instance that connects to the same database shares it. Workers
+lease runs and deliveries with `FOR UPDATE SKIP LOCKED`, so two workers never run the same attempt
+at the same time.
+
+<Callout type="note" title="Before you begin" icon="clipboard-check">
+  Start from an app with a task and a job, as in the [jobs
+  quickstart](/docs/modules/jobs/quickstart). You need a Postgres database (the backend is tested on
+  Postgres 16) and its connection string in `DATABASE_URL`. The runtime creates its tables (prefixed
+  `relkit_`) on first start.
+</Callout>
+
+## Select the provider
+
+Add a jobs profile, an events profile, or both. Each command edits `relkit.config.ts`, installs
+`@relkit/postgres` and declares the `DATABASE_URL` secret in one transaction; if any step fails,
+every file is restored.
+
+```sh
+bun run relkit add jobs --provider postgres
+bun run relkit add events --provider postgres
+```
+
+See [`relkit add jobs`](/docs/api/cli#relkit-add-jobs) and
+[`relkit add events`](/docs/api/cli#relkit-add-events) for every option. The result matches this
+configuration. A new profile becomes the default only when the app has no
+default yet; otherwise the command warns and leaves the existing default in place.
+
+<include source="apps/docs/examples/postgres/config.ts" lang="ts" meta='title="relkit.config.ts"'>
+  /_snippets/source/apps/docs/examples/postgres/config.ts
+</include>
+
+`RELKIT_POSTGRES_URL` overrides the authored URL at runtime. A production `relkit build` warns
+with `RELKIT_BUILD_LOCAL_DURABLE_PROVIDER` while jobs, schedules or events still use the local
+filesystem provider.
+
+## Delivery is at least once
+
+A worker holds a lease on each run it executes and renews it while the task runs. If the worker
+stops, the lease expires (after `leaseMs`, 30 seconds by default) and another worker runs the
+attempt again under the task's retry policy. A worker that crashes after the task succeeded but
+before it recorded the result causes the same re-run. Make every side effect idempotent with a key
+derived from your data, as [Retries and idempotency](/docs/modules/jobs/retries-and-idempotency)
+shows.
+
+A run that fails on its last permitted attempt, or with an error that forbids retries, ends
+`failed` with the diagnostic code `RELKIT_JOB_DEAD_LETTERED`. List failed runs to inspect them and
+call `retry` to start a new run from the same input.
+
+## Schedules run once per occurrence
+
+Every instance can run the scheduler. Each occurrence is claimed with a key on schedule ID and
+occurrence time, so exactly one run is enqueued per occurrence however many instances are running.
+The run carries `<schedule>@<occurrence time>` as its occurrence identity.
+
+## Events and the transactional outbox
+
+Publishing stores the event and one delivery per consumer. Each consumer's delivery is retried
+and dead-lettered on its own, so a failing consumer never re-runs the others. To publish an event
+together with your own writes, use the outbox on the Drizzle transaction: consumers see the event
+only if the transaction commits.
+
+<include
+  source="apps/docs/examples/postgres/place-order.ts"
+  lang="ts"
+  meta='title="src/services/orders/place-order.ts"'
+>
+  /_snippets/source/apps/docs/examples/postgres/place-order.ts
+</include>
+
+Pass the same `schema` and `tablePrefix` to `outbox` as to the provider when you change them.
+
+## Workers in the web process or a separate role
+
+A single instance runs everything: it serves requests, executes jobs, runs the scheduler and
+delivers events. To scale work separately, start the same build twice with different roles:
+
+| `RELKIT_WORKER_ROLE` | Serves requests | Runs jobs, schedules and event consumers |
+| -------------------- | --------------- | ---------------------------------------- |
+| `worker` (default)   | yes             | yes                                      |
+| `api`                | yes             | no                                       |
+
+Run web instances with `RELKIT_WORKER_ROLE=api` and one or more instances with
+`RELKIT_WORKER_ROLE=worker`. They coordinate only through the database.

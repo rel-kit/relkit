@@ -1,9 +1,9 @@
 /** Derives selected native service imports and immutable generated-server verification fragments.
  * Rendering acquires no SDK; runtime acquisition validates those selected dependencies before readiness.
  */
-import { LOCAL_SERVICE_PLAN_VERSION } from "@relkit/local-service";
-import type { ApplicationGraph } from "@relkit/graph";
-import type { RuntimeActivationFingerprint } from "@relkit/contracts";
+import { LOCAL_SERVICE_PLAN_VERSION } from "relkit/local-service";
+import type { ApplicationGraph } from "relkit/graph";
+import type { RuntimeActivationFingerprint } from "relkit/contracts";
 
 import type { ServerSourceOptions } from "./build-server.types.js";
 export type { ServerSourceOptions } from "./build-server.types.js";
@@ -23,10 +23,10 @@ export function serverSourceOptions(
     .map((node) => node.capability?.kind);
   const specializedImports = [
     serviceCapabilities.includes("better-auth")
-      ? 'import { activateBetterAuthService, generateBetterAuthOpenApi } from "@relkit/better-auth/drizzle";'
+      ? 'import { activateBetterAuthService, generateBetterAuthOpenApi, resolveBetterAuthAccess } from "@relkit/better-auth/drizzle";'
       : undefined,
     serviceCapabilities.includes("drizzle")
-      ? 'import { activateDrizzleService } from "@relkit/drizzle/internal";'
+      ? 'import { activateDrizzleService } from "@relkit/drizzle/server";'
       : undefined,
   ]
     .filter((value) => value !== undefined)
@@ -71,7 +71,7 @@ function providerOverridesOptions(activation: RuntimeActivationFingerprint) {
     activation.providerOverridesGeneration === undefined
       ? ""
       : `import { lstatSync, readFileSync } from "node:fs";
-import { providerOverrideBindingValues } from "@relkit/local-service";`;
+import { providerOverrideBindingValues } from "relkit/local-service";`;
   const providerOverridesSource =
     activation.providerOverridesGeneration === undefined
       ? "const localBindingValues = undefined;"

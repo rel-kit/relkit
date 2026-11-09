@@ -15,11 +15,14 @@ describe.serial("Phase 0 guardrails", () => {
   test("reports implementation files over the 250-line limit", async () => {
     return withFixture(
       {
-        "packages/app/src/too-long.ts": Array.from({ length: 251 }, () => "export {};\n").join(""),
+        "packages/relkit/src/app/too-long.ts": Array.from(
+          { length: 251 },
+          () => "export {};\n",
+        ).join(""),
       },
       async (fixture) => {
         expect(implementationSizeOffenders(fixture)).toEqual([
-          "packages/app/src/too-long.ts (251 lines)",
+          "packages/relkit/src/app/too-long.ts (251 lines)",
         ]);
       },
     );

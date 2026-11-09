@@ -1,5 +1,5 @@
-import type { JsonPrimitive, JsonValue } from "@relkit/contracts";
-import type { LogRecord, RedactedObservabilityRecord, SpanRecord } from "@relkit/observability";
+import type { JsonPrimitive, JsonValue } from "relkit/contracts";
+import type { LogRecord, RedactedObservabilityRecord, SpanRecord } from "relkit/observability";
 import type { OtlpSignal } from "./transport.js";
 
 export function otlpPayload(

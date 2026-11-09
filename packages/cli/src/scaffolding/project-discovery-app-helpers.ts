@@ -1,5 +1,5 @@
 /** Reads static app AST values without evaluating authored source. */
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import { staticPropertyName } from "./source-edit.js";
 /**
  * Finds a statically named app configuration property.
@@ -17,9 +17,7 @@ export function objectProperty(object: ts.ObjectLiteralExpression, name: string)
  * @returns The matching capability declaration, or undefined when absent.
  */
 export function profileProperty(object: ts.ObjectLiteralExpression, capability: string) {
-  return capability === "job"
-    ? (objectProperty(object, "jobs") ?? objectProperty(object, "job"))
-    : objectProperty(object, capability);
+  return capability === "job" ? objectProperty(object, "jobs") : objectProperty(object, capability);
 }
 /**
  * Reads a statically declared object-valued property.

@@ -4,6 +4,7 @@
  * optional peer installation without evaluating any integration implementation.
  */
 import { expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   installationDeclarations,
@@ -13,6 +14,9 @@ import { renderInstallation } from "../scripts/generate-installations.js";
 import { installationRecipes } from "../scripts/installation-recipes.js";
 
 const catalog = await loadInstallationCatalog(resolve(import.meta.dir, "../../.."));
+const rootCatalog = JSON.parse(
+  readFileSync(resolve(import.meta.dir, "../../../package.json"), "utf8"),
+).catalog as Record<string, string>;
 
 test("a changed owner release and SDK pin flow into commands without changing neighbors", () => {
   const packages = new Map(catalog.packages);
@@ -63,7 +67,7 @@ test("runtime phase does not silently include a development-only authentication 
     },
     catalog,
   );
-  expect(result.dependencies["better-auth"]).toBe("1.7.1");
+  expect(result.dependencies["better-auth"]).toBe(rootCatalog["better-auth"]);
   expect(result.devDependencies).not.toHaveProperty("@cloudflare/workers-types");
 });
 
@@ -96,7 +100,7 @@ test("conflicting manifest sections cannot generate contradictory install comman
 
 test("HTTP requirement and optional peer drift fails before publishing commands", () => {
   const packages = new Map(catalog.packages);
-  const http = packages.get("@relkit/runtime-hono");
+  const http = packages.get("relkit");
   if (!http) throw new Error("HTTP owner fixture is required.");
   packages.set(http.name, {
     ...http,

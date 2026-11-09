@@ -1,7 +1,7 @@
 {
   "recordedAt": "2026-09-15",
   "phase": "5",
-  "command": "bun test packages/jobs/schedule-reconciliation.test.ts packages/jobs/trigger-schedule.test.ts packages/jobs/boundary-policy.test.ts integrations/packages/inngest/inngest.test.ts integrations/packages/effect-mq/effect-mq.test.ts integrations/packages/trigger/trigger.test.ts",
+  "command": "bun test packages/relkit/schedule-reconciliation.test.ts packages/relkit/trigger-schedule.test.ts packages/relkit/boundary-policy.test.ts integrations/packages/inngest/inngest.test.ts integrations/packages/effect-mq/effect-mq.test.ts integrations/packages/trigger/trigger.test.ts",
   "status": "passed",
   "tests": 33,
   "scope": "local adapter contracts and shared native schedule reconciliation",

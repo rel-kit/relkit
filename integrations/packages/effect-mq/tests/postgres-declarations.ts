@@ -1,5 +1,5 @@
 import { fileURLToPath } from "node:url";
-import ts from "typescript";
+import ts from "relkit-typescript";
 
 /**
  * Checks a native PostgreSQL consumer, including its dependency declarations.

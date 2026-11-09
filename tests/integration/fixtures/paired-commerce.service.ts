@@ -3,7 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { Context, Effect, Exit, Layer, Scope } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 import {
   scaffoldChild,

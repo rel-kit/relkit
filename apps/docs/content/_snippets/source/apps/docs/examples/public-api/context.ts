@@ -1,11 +1,6 @@
 /** Declares shared context values and resolves them without starting an HTTP server or model. */
-import {
-  createApplicationContextResolver,
-  defineConstants,
-  defineEnv,
-  definePrompt,
-  env,
-} from "@relkit/app";
+import { createApplicationContextResolver } from "relkit/app";
+import { defineConstants, defineEnv, definePrompt, env } from "relkit";
 
 const environment = defineEnv({ REGION: env.string() });
 export const limits = defineConstants(

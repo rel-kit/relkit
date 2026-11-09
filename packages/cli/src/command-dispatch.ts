@@ -5,6 +5,7 @@ import { runDbEffect } from "./commands/db.js";
 import { processLayer } from "./services/process.service.js";
 import { fileSystemLayer } from "./services/filesystem.service.js";
 import { layoutMigrationLayer } from "./migration/layout-migration.service.js";
+import { codeMigrationLayer } from "./migration/code-migration.service.js";
 import { executeProjectEffect } from "./command-project.js";
 import { executeStartEffect } from "./command-start.js";
 import { runDevCommandEffect } from "./commands/dev-command.js";
@@ -88,6 +89,12 @@ function selectCommandEffect(invocation: CliInvocation, context: CliCommandConte
     case "doctor":
       return runDoctorEffect(args, context).pipe(Effect.provide(doctorLiveLayer()));
     case "dev":
+      // `dev --prepare` is a finite check: no listener, no Inspector, nothing published.
+      if (args.includes("--prepare"))
+        return executeProjectEffect(
+          { ...invocation, command: "check", args: args.filter((arg) => arg !== "--prepare") },
+          context,
+        ).pipe(Effect.provide(projectLiveLayer));
       return runDevCommandEffect(args, context).pipe(
         Effect.provide(devLiveLayer()),
         Effect.as(CLI_EXIT_CODES.success),
@@ -120,8 +127,24 @@ function selectCommandEffect(invocation: CliInvocation, context: CliCommandConte
       return runInspectorEffect(args, context).pipe(
         Effect.provide(Layer.merge(contributorTerminalLayer, fileSystemLayer)),
       );
+    case "mcp":
+      // Loaded on demand: the MCP server SDK is an optional peer that only `relkit mcp` needs.
+      return Effect.tryPromise({
+        try: () => import("./commands/mcp.js"),
+        catch: () =>
+          fail(
+            "RELKIT_MCP_SERVER_MISSING",
+            "relkit mcp needs the @modelcontextprotocol/server package, which is not installed.",
+          ),
+      }).pipe(
+        Effect.flatMap(({ mcpLiveLayer, runMcpEffect }) =>
+          runMcpEffect(args, context).pipe(Effect.provide(mcpLiveLayer)),
+        ),
+      );
     case "migrate":
-      return runMigrateEffect(args, context).pipe(Effect.provide(layoutMigrationLayer));
+      return runMigrateEffect(args, context).pipe(
+        Effect.provide(Layer.merge(layoutMigrationLayer, codeMigrationLayer)),
+      );
     case "db":
       return runDbEffect(args, context).pipe(
         Effect.provide(Layer.merge(processLayer, fileSystemLayer)),

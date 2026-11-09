@@ -9,9 +9,14 @@ import {
 import { exportNative } from "./pack-export-native.js";
 import type { ExportCommand, ExportInventory } from "./pack-export.types.js";
 import { makeExportInstaller } from "./pack-export-install.js";
+import { assertProductionFootprint, developmentPackages } from "./packed-footprint.js";
+
+/** The integration installed next to `relkit` in the production footprint check. */
+const footprintIntegration = "@relkit/redis";
 
 /**
- * Validates isolated integration installs and then resolves all intentional public entrypoints.
+ * Validates isolated integration installs and a production install's footprint, then resolves all
+ * intentional public entrypoints.
  * @param run - Captured child-group owner.
  * @param temporary - Scope-owned fixture parent.
  * @param repository - Read-only installed native dependency authority.
@@ -40,6 +45,14 @@ export const verifyExportFixture = Effect.fn("ExportSmoke.verify")(function* (
   );
   console.log(
     `Minimal integration installs passed: ${count - Number(inventory.integrationNames.has("@relkit/langchain"))} authoring entries loaded without selected SDKs; ${count} integrations' public entries loaded with declared peers and without unrelated integrations.`,
+  );
+  const footprint = join(temporary, "footprint");
+  yield* install(footprint, ["relkit", footprintIntegration], true);
+  const installed = yield* exportNative("footprint.scan", () =>
+    assertProductionFootprint(footprint),
+  );
+  console.log(
+    `Production footprint passed: relkit and ${footprintIntegration} install ${installed.length} packages, none of ${developmentPackages.join(", ")}.`,
   );
   const fixture = join(temporary, "fixture");
   for (const [name, tarball] of tarballs)

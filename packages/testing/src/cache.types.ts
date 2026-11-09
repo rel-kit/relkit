@@ -1,5 +1,5 @@
-import type { CacheClient, CacheOperationOptions, CacheProvider } from "@relkit/cache";
-import type { StandardSchemaV1 } from "@relkit/schema";
+import type { CacheClient, CacheOperationOptions, CacheProvider } from "relkit/cache";
+import type { StandardSchemaV1 } from "relkit/schema";
 import type { TestFailureControls } from "./fakes.js";
 
 /**
@@ -16,7 +16,7 @@ export interface TestCacheFakeOptions<
   readonly stateRoot?: string;
   readonly clock?: () => number;
   readonly failures?: TestFailureControls;
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly keySchema?: KeySchema;
   readonly valueSchema?: ValueSchema;
   readonly defaultTtlMs?: number;

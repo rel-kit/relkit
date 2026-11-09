@@ -1,4 +1,4 @@
-import type { NamedStreamFrame } from "@relkit/contracts/jobs";
+import type { NamedStreamFrame } from "relkit/contracts/jobs";
 /**
  * Combines every existing named-content generation boundary into its continuity key.
  * @param frame - Original observation frame.

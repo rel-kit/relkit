@@ -1,6 +1,6 @@
 After [frontend installation, contract pull, and provider setup](/guides/frontend/connect-react),
-call this `POST /echo` operation with its domain input. The route produces both the React selector
-`POST /echo` and the TypeScript operation `route.post.echo`.
+call this `POST /echo` route with its domain input. The route targets the function `echo.echo`, so
+both React and TypeScript callers reach it as `api.echo.echo`.
 
 <Tabs sync={false} hash={false}>
 <Tab title="React" icon="panels-top-left">
@@ -26,9 +26,9 @@ The React provider performs this identity step for hooks.
 </Tab>
 </Tabs>
 
-These calls use RPC over `/rpc`, with the same authorization and policy. Pass domain input rather
+These calls send the route's own REST request, the one the OpenAPI document describes, with the same authorization and policy. Pass domain input rather
 than assembling the route's REST mapping. Raw handlers and routes with `client: false` do not
 generate these operations. Never import the backend descriptor into the browser.
 
 Reference: [`useRouteMutation`](/docs/api/client#useroutemutation),
-[`createClient`](/docs/api/client#createclient). Continue with [mutations](/docs/modules/client/mutations).
+[`createApi`](/docs/api/client#createapi). Continue with [mutations](/docs/modules/client/mutations).

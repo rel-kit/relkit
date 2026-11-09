@@ -1,9 +1,9 @@
-/** Builds and validates RELKIT signal descriptors used by native agent execution while retaining their payload schema and stable identity. */
+/** Builds and validates RelKit signal descriptors used by native agent execution while retaining their payload schema and stable identity. */
 
 import { executionDeadline } from "./signal-deadline.js";
-import type { MaybePromise } from "@relkit/contracts";
+import type { MaybePromise } from "relkit/contracts";
 import { Context, Effect, Layer } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import type {

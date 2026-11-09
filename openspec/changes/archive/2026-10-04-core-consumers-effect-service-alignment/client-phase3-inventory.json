@@ -1,6 +1,6 @@
 {
   "freezeUtc": "2026-10-03T18:39:26.442930+00:00",
-  "worktree": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "worktree": "<home>/.codex/worktrees/core-consumers-effect/relkit",
   "baselineCommit": "b0f77720764fd61e9872b0995e456014a611ba37",
   "counts": {
     "currentTs": 169,

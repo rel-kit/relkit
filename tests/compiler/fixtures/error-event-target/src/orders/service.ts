@@ -1,4 +1,4 @@
-import { defineService } from "@relkit/app";
+import { defineService } from "relkit";
 import orderCreated from "./events/order-created.event.js";
 import handleEvent from "./functions/handle-event.function.js";
 

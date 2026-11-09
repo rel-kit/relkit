@@ -19,7 +19,7 @@ the [Orders API tutorial](/docs/learn/build-and-run), not a file replacement in 
 
 When adapting this to a separate lean app, first complete [Inngest's selected installation and
 binding](/docs/modules/jobs/providers/inngest). The repository example already declares its native SDK and
-local tooling; copying task/job files does not install them. Provider creation tuples remain unavailable.
+local tooling; copying task/job files does not install them. Provider creation combinations remain unavailable.
 
 In your own application, with an existing `orders` service and no export task yet, run:
 
@@ -92,7 +92,7 @@ The commerce Orders service exports both the task and job. Its `relkit.config.ts
 `jobs.default` to `docker(inngest())`, so the compiler can check durable capabilities. When
 adapting this to your own app, add a supported job binding before starting a run.
 
-The generated job owns admission and client operations while
+The generated job owns acceptance checks and client operations while
 the task remains the unit of execution and compatibility.
 
 For the browser side of this declaration, follow the
@@ -107,7 +107,7 @@ For the browser side of this declaration, follow the
 The generated trigger receives `{ input, options }` and returns an accepted `RunHandle`. For example,
 call `client.jobs.exportOrders.trigger({ input: { orderIds }, options: { operationId } })`, then read
 `client.jobs.exportOrders.runs.get({ runId: accepted.runId })`. Keep the accepted `runId` and
-`operationId`; a handle is an admission receipt, not the task output.
+`operationId`; a handle confirms that the run was accepted; it is not the task output.
 
 Use [job clients](/docs/modules/jobs/clients) for the complete trigger/watch lifecycle and
 [progress and streams](/docs/modules/jobs/progress-and-streams) for live updates.

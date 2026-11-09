@@ -1,6 +1,6 @@
 /** Attempt state belongs to one activation Scope, never another generation. */
 import type { Ref } from "effect";
-import type { SupervisorCandidateToken } from "@relkit/supervisor";
+import type { SupervisorCandidateToken } from "../supervisor/index.js";
 import type { DevSession } from "./dev-session.js";
 
 /** Admitted source version with cancellation and promotion witnesses. */

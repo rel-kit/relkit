@@ -58,7 +58,7 @@ async function projectWithExperimentalAgent(): Promise<string> {
     await mkdir(dirname(source), { recursive: true });
     await writeFile(
       source,
-      'import { defineAgent } from "@relkit/langchain";\nexport default defineAgent({});\n',
+      'import { langchain } from "@relkit/langchain";\nimport { defineAgent } from "relkit/agents";\nexport default defineAgent({ runtime: langchain() });\n',
     );
     return projectRoot;
   } finally {

@@ -1,8 +1,8 @@
 import type { TestJobsAdapterOptions, TestJobsAdapter } from "./test-jobs-adapter.types.js";
 export type { TestJobsAdapterOptions, TestJobsAdapter } from "./test-jobs-adapter.types.js";
 import { Effect, Layer, ManagedRuntime, Stream } from "effect";
-import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
-import { JOBS_ADAPTER_PROTOCOL_VERSION, type JobsAdapterRuntime } from "@relkit/jobs/adapter";
+import { runExecutionPromise, runExecutionSync } from "relkit/contracts/operation";
+import { JOBS_ADAPTER_PROTOCOL_VERSION, type JobsAdapterRuntime } from "relkit/jobs/adapter";
 
 import { TestNativeJobs, nativeJobsLayer } from "./native-jobs-service.js";
 import {

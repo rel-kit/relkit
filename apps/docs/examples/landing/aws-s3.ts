@@ -1,5 +1,5 @@
 import "@relkit/pulumi";
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 import { aws } from "@relkit/aws";
 import { s3 } from "@relkit/s3";
 

@@ -19,14 +19,18 @@ export const ADD_KINDS = [
   "database",
   "auth",
   "inspector",
+  "jobs",
+  "events",
 ] as const;
 /** Supported relkit add artifact discriminant. */
 export type AddKind = (typeof ADD_KINDS)[number];
 /** Artifact kinds that can be included in a generic service scaffold. */
 export type ServiceInclude = Exclude<
   AddKind,
-  "service" | "database" | "auth" | "inspector" | "middleware" | "transform"
+  "service" | "database" | "auth" | "inspector" | "jobs" | "events" | "middleware" | "transform"
 >;
+/** Provider a `relkit add jobs` or `relkit add events` request selects. */
+export type DurableProvider = "postgres" | "local";
 /** Supported HTTP method used by generated route mappings. */
 export type RouteMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
 /** Supported database dialect for Drizzle and authentication scaffolds. */
@@ -115,7 +119,13 @@ export type AddRequest =
       readonly basePath: string;
     })
   /** Enables the development bridge and installs the project-local inspector UI. */
-  | (AddRequestBase & { readonly kind: "inspector" });
+  | (AddRequestBase & { readonly kind: "inspector" })
+  /** Adds a jobs or events provider profile, defaulting to it when no default exists. */
+  | (AddRequestBase & {
+      readonly kind: "jobs" | "events";
+      readonly provider: DurableProvider;
+      readonly profile?: string;
+    });
 /** Stable warning category and user-facing message retained in plans and results. */
 export interface ScaffoldWarning {
   readonly code: string;

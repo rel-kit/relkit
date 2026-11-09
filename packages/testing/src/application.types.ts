@@ -1,7 +1,7 @@
 /** Describes the owned test application and replaceable acquisition platform.
  * Generic contracts retain existing runtime environment/context semantics without a native auth or database SDK edge.
  */
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import type { TestRuntimeOptions, TestRuntime, TestClock } from "./runtime.js";
 import type { TestFakes } from "./fakes.js";
 import type { TestHttpClient, TestObservability } from "./http.js";

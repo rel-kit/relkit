@@ -1,5 +1,5 @@
 /** Selects local durable jobs and production Scalar rendering for canonical JavaScript closure acceptance. */
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 import { localJob } from "@relkit/local";
 
 export default defineApp({

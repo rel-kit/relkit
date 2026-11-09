@@ -2,8 +2,8 @@
  * Executes one native agent stream while retaining model failure precedence.
  * Public wrappers own Effect interruption; state helpers use the same signal.
  */
-import { frameworkTrace } from "@relkit/invocation";
-import type { AgentCapturePolicy } from "@relkit/agents/internal/observability";
+import { frameworkTrace } from "relkit/invocation";
+import type { AgentCapturePolicy } from "relkit/agents/observability";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import { createLoopTelemetry } from "./runtime-loop-telemetry.js";
 import { createNativeAgent, StructuredOutputParsingError } from "./runtime-native-agent.js";

@@ -40,7 +40,7 @@ Connected Cloudflare KV/R2, hosted models, Sentry, and OTLP have no bundled loca
   `@relkit/docker`; installing the materializer alone supplies no Redis/S3 adapter or binding.
 </Callout>
 
-The integration packages pin an immutable digest. A RELKIT package release therefore
+The integration packages pin an immutable digest. A RelKit package release therefore
 selects an exact local-service image rather than whatever a mutable tag points to later.
 
 | Adapter    | Image reference          | Immutable digest                                                          |
@@ -51,7 +51,7 @@ selects an exact local-service image rather than whatever a mutable tag points t
 The MinIO reference uses a public mirror of `RELEASE.2025-04-22T22-12-26Z` with the same digest as the
 original image.
 
-RELKIT discovers the Docker server version at startup but does not currently enforce a minimum engine
+RelKit discovers the Docker server version at startup but does not currently enforce a minimum engine
 version. Use a maintained Docker Engine or Docker Desktop release with the `docker` CLI available on `PATH`:
 
 ```sh
@@ -69,14 +69,14 @@ Docker starts Redis with a persistent `/data` volume and waits for `redis-cli PI
 project-local credentials, persists `/data`, waits for its readiness endpoint, and initializes the `relkit`
 bucket. Both publish random loopback ports instead of claiming fixed host ports.
 
-## Optional file-backed events and legacy jobs
+## Optional file-backed events and jobs
 
-The filesystem event and legacy job profiles do not use Docker. `localEvent()` and `localJob()` from `@relkit/local` register
-the existing durable filesystem runtimes and store their state under `.relkit/state` by default. The `event`,
+The filesystem event and job profiles do not use Docker. `localEvent()` and `localJob()` from `@relkit/local` register
+durable filesystem runtimes and store their state under `.relkit/state` by default. The `event`,
 `event-function`, and `job` add commands reuse compatible profiles; a full service bundle creates these local
 profiles when no configured defaults exist. See the [Local API](/docs/api/integrations/local) for direct
 authoring. Use a different `root` only when the application needs an isolated local state directory.
-New task-first jobs use a native Docker provider from the table above; `localJob()` is not that provider.
+For provider features such as native schedules, use a Docker provider from the table above.
 
 The corresponding scaffold normally installs the owner. For manual file-backed configuration,
 select this installation before importing those profiles:

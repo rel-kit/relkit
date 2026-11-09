@@ -9,8 +9,9 @@ import {
   canonicalJson,
   RUNTIME_ACTIVATION_FILE,
   RUNTIME_INTEGRATION_PLAN_FILE,
-} from "@relkit/contracts";
-import { GENERATED_ARTIFACT_FILES } from "@relkit/compiler";
+} from "relkit/contracts";
+import { GENERATED_ARTIFACT_FILES } from "../compiler/index.js";
+import { generateRuntimeIntegrationImports } from "../compiler/runtime-integration-imports.js";
 import { cliOriginalError, cliTry, type CliAdapterError } from "../cli-errors.js";
 import { CliFileSystem } from "../services/filesystem.service.js";
 import { stageJobsEffect } from "./build-jobs.js";
@@ -18,6 +19,12 @@ import { serverSource } from "./build-server.js";
 import { dockerfile, dockerignore } from "./build-container.js";
 import { buildManifest, buildProductionManifest } from "./build-manifest.js";
 import type { BuildStageCohort, BuildStageInputs } from "./build.types.js";
+import { defaultBuildRuntime } from "../runtime/index.js";
+import { workersEntryOptions, workersEntrySource } from "./build-workers-entry.js";
+import {
+  VERCEL_PUBLIC_PLACEHOLDER,
+  VERCEL_PUBLIC_PLACEHOLDER_TEXT,
+} from "./build-vercel-public.js";
 
 /**
  * Writes graph, optional workers and public assets into one owned stage.
@@ -49,6 +56,12 @@ export const writeBuildAssets = Effect.fn("Project.buildAssets")(function* (
       return Effect.failCause(cause);
     }),
   );
+  // Vercel refuses an empty output directory; the placeholder keeps a project without `public/` deployable.
+  if (input.options.target === "vercel") {
+    const placeholder = join(input.stage, "public", VERCEL_PUBLIC_PLACEHOLDER);
+    yield* files.mkdir(dirname(placeholder));
+    yield* files.writeText(placeholder, VERCEL_PUBLIC_PLACEHOLDER_TEXT);
+  }
 });
 
 /**
@@ -65,6 +78,7 @@ export const writeBuildServer = Effect.fn("Project.buildServer")(function* (
   const outputs = input.checked.outputs;
   const development =
     input.options.mode === "development" || input.options.bundleInputInventory !== undefined;
+  const runtime = input.options.runtime ?? defaultBuildRuntime();
   const entrypoint = yield* cliTry("build.serverSource", () =>
     serverSource(
       cohort.graph,
@@ -74,6 +88,8 @@ export const writeBuildServer = Effect.fn("Project.buildServer")(function* (
       Schema.decodeUnknownSync(Schema.Json)(JSON.parse(outputs.clientContract || "{}")),
       {
         ...cohort.tooling.server,
+        // Recorded only for Node and Workers, so Bun output stays byte-identical.
+        ...(runtime === "bun" ? {} : { runtime }),
         maxPreviewBytes: cohort.tooling.inspector.maxPreviewBytes,
         inspectorEnabled: development && cohort.tooling.inspector.enabled,
         jobsAdministration: development && cohort.jobsManifest !== undefined,
@@ -87,11 +103,22 @@ export const writeBuildServer = Effect.fn("Project.buildServer")(function* (
     ["runtime.manifest.ts", cohort.manifestSource],
     [RUNTIME_ACTIVATION_FILE, `${canonicalJson(cohort.activationFingerprint)}\n`],
     [RUNTIME_INTEGRATION_PLAN_FILE, outputs.runtimeIntegrations],
-    [GENERATED_ARTIFACT_FILES.runtimeIntegrationImports, outputs.runtimeIntegrationImports],
+    [
+      GENERATED_ARTIFACT_FILES.runtimeIntegrationImports,
+      runtime === "workers"
+        ? generateRuntimeIntegrationImports(JSON.parse(outputs.runtimeIntegrations), {
+            workers: true,
+          })
+        : outputs.runtimeIntegrationImports,
+    ],
     ...(cohort.localServicesPlanSource === undefined
       ? []
       : [[GENERATED_ARTIFACT_FILES.localServices, cohort.localServicesPlanSource] as const]),
     ["index.ts", entrypoint],
+    // The Workers bundle's entry; it imports index.ts lazily from its handlers.
+    ...(runtime === "workers"
+      ? [["worker.ts", workersEntrySource(workersEntryOptions(cohort.graph))] as const]
+      : []),
   ];
   yield* Effect.forEach(
     members,
@@ -129,12 +156,21 @@ export const writeBuildMetadata = Effect.fn("Project.buildMetadata")(function* (
       activationFingerprint: cohort.activationFingerprint,
       hasJobs: cohort.jobsManifest !== undefined,
       hasLocalServices: cohort.localServicesPlanSource !== undefined,
+      ...((input.options.runtime ?? defaultBuildRuntime()) === "bun"
+        ? {}
+        : { runtime: input.options.runtime ?? defaultBuildRuntime() }),
       tooling: cohort.tooling,
     }),
   );
+  // A Workers bundle deploys with wrangler, not as a container image.
+  if (input.options.runtime === "workers") return;
   yield* files.writeText(
     join(input.stage, "Dockerfile"),
-    dockerfile(cohort.jobsManifest !== undefined, cohort.productionRepairs.assets.length > 0),
+    dockerfile(
+      cohort.jobsManifest !== undefined,
+      cohort.productionRepairs.assets.length > 0,
+      input.options.runtime ?? defaultBuildRuntime(),
+    ),
   );
   yield* files.writeText(
     join(input.stage, ".dockerignore"),

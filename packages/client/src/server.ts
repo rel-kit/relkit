@@ -3,9 +3,9 @@
  * bindings. TanStack hydration is exposed by @relkit/client/server/tanstack-query
  * and requires that integration's documented frontend peers.
  */
-import { injectTraceContext } from "@relkit/contracts";
-import { currentExecutionContext, publicTrace, RelkitSpan, spanContext } from "@relkit/invocation";
-import type { RouterContract, RouterContractClient } from "@orpc/contract";
+import { injectTraceContext } from "relkit/contracts";
+import { currentExecutionContext, publicTrace, RelkitSpan, spanContext } from "relkit/invocation";
+import type { AnyContractRouter, ContractRouterClient } from "@orpc/contract";
 import { createClient } from "./transport.js";
 import type { CreateClientOptions } from "./index.types.js";
 import type { DefaultContract } from "./index.js";
@@ -15,9 +15,9 @@ import type { DefaultContract } from "./index.js";
  * @param options - Existing public configuration and authority.
  * @returns A typed Bun client with operation-time trace propagation.
  */
-export function createServerClient<Contract extends RouterContract = DefaultContract>(
+export function createServerClient<Contract extends AnyContractRouter = DefaultContract>(
   options: CreateClientOptions,
-): RouterContractClient<Contract> {
+): ContractRouterClient<Contract> {
   const fetcher = options.fetch ?? globalThis.fetch;
   return createClient<Contract>({
     ...options,

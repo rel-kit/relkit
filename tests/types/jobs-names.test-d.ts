@@ -1,6 +1,6 @@
-import { defineJob } from "@relkit/app/jobs";
-import { defineTask } from "@relkit/app/tasks";
-import { defineError, defineFunction } from "@relkit/app/functions";
+import { defineJob } from "relkit/jobs";
+import { defineTask } from "relkit/tasks";
+import { defineError, defineFunction } from "relkit/functions";
 import type {
   TaskCallerInput,
   TaskCanonicalInput,
@@ -12,12 +12,11 @@ import type {
   TaskStreamOutput,
   TaskSuccessHook,
   TaskValidatedOutput,
-} from "@relkit/app/tasks";
-import type { JobsAdapterRuntime } from "@relkit/jobs/adapter";
-import type { TaskRef } from "@relkit/contracts/jobs";
-import type { RunWithJobsConfig, TriggerOptions } from "@relkit/jobs/server";
-import { defineJob as defineLegacyJob } from "@relkit/jobs/legacy";
-import { z } from "@relkit/schema";
+} from "relkit/tasks";
+import type { JobsAdapterRuntime } from "relkit/jobs/adapter";
+import type { TaskRef } from "relkit/contracts/jobs";
+import type { RunWithJobsConfig, TriggerOptions } from "relkit/jobs/server";
+import { z } from "relkit/schema";
 
 const input = z.object({ id: z.string(), tenantId: z.string() });
 const output = z.object({ accepted: z.literal(true) });
@@ -87,7 +86,7 @@ const progressInput: TaskProgressInput<typeof transformedOutput> = "7";
 const progressOutput: TaskProgressOutput<typeof transformedOutput> = 7;
 const streamInput: TaskStreamInput<typeof transformedOutput> = "7";
 const streamOutput: TaskStreamOutput<typeof transformedOutput> = 7;
-const successHook: TaskSuccessHook<typeof transformedOutput, {}, []> = async (value) => {
+const successHook: TaskSuccessHook<typeof transformedOutput, {}> = async (value) => {
   const canonical: number = value;
   void canonical;
 };
@@ -98,8 +97,7 @@ type DirectionalHandler = TaskHandler<
   {},
   readonly [],
   undefined,
-  {},
-  readonly []
+  {}
 >;
 void callerInput;
 void canonicalInput;
@@ -228,16 +226,3 @@ declare const adapter: JobsAdapterRuntime;
 const serverConfig: RunWithJobsConfig = { projectRoot: "/tmp/project" };
 void adapter;
 void serverConfig;
-
-const legacyTarget = defineFunction({
-  input,
-  output,
-  handler: async () => ({ accepted: true as const }),
-});
-const legacy = defineLegacyJob({
-  id: "types.legacy-job",
-  input,
-  target: legacyTarget,
-  retry: { maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
-});
-void legacy;

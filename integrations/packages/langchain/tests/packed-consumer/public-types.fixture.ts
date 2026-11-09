@@ -1,10 +1,12 @@
 /** Checks native model, tool, checkpointer and public helper inference without executing the probe. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import type { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import { MemorySaver } from "@langchain/langgraph";
 import { tool } from "langchain";
-import { defineAgent, type AgentRuntimeOptions } from "@relkit/langchain";
+import { type AgentRuntimeOptions } from "@relkit/langchain";
 import { createTestAgent, createTestModel, type TestModelTurn } from "@relkit/langchain/testing";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 
 /** Accepts real engine authority while the compiler checks native objects and inferred input/output. */
 export function nativePublicTypes(engine: AgentRuntimeOptions["engine"]) {
@@ -18,12 +20,15 @@ export function nativePublicTypes(engine: AgentRuntimeOptions["engine"]) {
   });
   const agent = defineAgent({
     id: "packed.public-types",
+    runtime: langchain({
+      model: nativeModel,
+      checkpointer: new MemorySaver(),
+      tools: [nativeTool],
+    }),
     input: z.object({ message: z.string() }),
     output: z.object({ answer: z.string() }),
-    model: nativeModel,
     instructions: "Use the selected native tool.",
-    tools: [nativeTool],
-    checkpointer: new MemorySaver(),
+    tools: [],
     limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 5_000 },
   });
   const helper = createTestAgent({ agent, tools: [], engine, script });

@@ -1,6 +1,6 @@
 /** Describes native compiler, route client and observation owners for grouped commerce acceptance. */
-import type { ApplicationGraph } from "../../../packages/graph/src/index.ts";
-import type { HttpInvocationOptions } from "../../../packages/runtime-hono/src/index.ts";
+import type { ApplicationGraph } from "relkit/graph";
+import type { HttpInvocationOptions } from "relkit/runtime-hono";
 import type { createTestHttpClient } from "../../../packages/testing/src/index.ts";
 import type { compileProject } from "../../compiler/fixture-runner.ts";
 

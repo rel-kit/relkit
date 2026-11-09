@@ -24,6 +24,8 @@ test("sidebar links every documentation page exactly once", async () => {
         .replace(/\/index$/, ""),
     )
     .filter((path) => path === "docs" || path.startsWith("docs/") || path.startsWith("guides"))
+    // Each error code page is reached from the error index and search, not the sidebar.
+    .filter((path) => !path.startsWith("docs/errors/"))
     .map((path) => `/${path}`);
   const actual = routes(documentationSidebar);
   expect(new Set(actual).size).toBe(actual.length);

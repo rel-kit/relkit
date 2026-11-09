@@ -6,7 +6,7 @@ import {
   ADD_KINDS,
   AddScaffoldError,
   type AddKind,
-} from "create-relkit/internal/add-types";
+} from "create-relkit/add-types";
 
 /**
  * Add flags that consume a string value.

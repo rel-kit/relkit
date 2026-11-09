@@ -7,7 +7,7 @@
       "summary": "Define application identity and runtime topology.",
       "guide": "docs/learn/concepts/application",
       "apiPackage": "app",
-      "entrypoints": [{ "source": "packages/app/src/define-app.ts", "name": "defineApp" }],
+      "entrypoints": [{ "source": "packages/relkit/src/app/define-app.ts", "name": "defineApp" }],
       "examples": ["templates/default/v1/api/relkit.config.ts"]
     },
     {
@@ -16,7 +16,7 @@
       "summary": "Parse, default, and protect runtime configuration.",
       "guide": "docs/learn/concepts/environment",
       "apiPackage": "config",
-      "entrypoints": [{ "source": "packages/config/src/env.ts", "name": "defineEnv" }],
+      "entrypoints": [{ "source": "packages/relkit/src/config/env.ts", "name": "defineEnv" }],
       "examples": ["templates/default/v1/api/src/platform/env.ts"]
     },
     {
@@ -40,8 +40,8 @@
       "guide": "docs/learn/concepts/schemas",
       "apiPackage": "schema",
       "entrypoints": [
-        { "source": "packages/schema/src/builder.ts", "name": "z" },
-        { "source": "packages/schema/src/standard-schema.ts", "name": "validate" }
+        { "source": "packages/relkit/src/schema/builder.ts", "name": "z" },
+        { "source": "packages/relkit/src/schema/standard-schema.ts", "name": "validate" }
       ],
       "examples": ["examples/commerce/src/platform/schemas.ts"]
     },
@@ -52,7 +52,7 @@
       "guide": "docs/learn/concepts/functions",
       "apiPackage": "functions",
       "entrypoints": [
-        { "source": "packages/functions/src/define-function.ts", "name": "defineFunction" }
+        { "source": "packages/relkit/src/functions/define-function.ts", "name": "defineFunction" }
       ],
       "examples": ["examples/commerce/src/services/orders/functions/create-order.function.ts"]
     },
@@ -63,7 +63,7 @@
       "guide": "docs/learn/concepts/errors",
       "apiPackage": "functions",
       "entrypoints": [
-        { "source": "packages/functions/src/define-error.ts", "name": "defineError" }
+        { "source": "packages/relkit/src/functions/define-error.ts", "name": "defineError" }
       ],
       "examples": ["examples/commerce/src/services/orders/errors/order-not-found.error.ts"]
     },
@@ -74,7 +74,7 @@
       "guide": "docs/modules/service/define",
       "apiPackage": "services",
       "entrypoints": [
-        { "source": "packages/services/src/define-service.ts", "name": "defineService" }
+        { "source": "packages/relkit/src/services/define-service.ts", "name": "defineService" }
       ],
       "examples": ["examples/commerce/src/services/orders/service.ts"]
     },
@@ -108,7 +108,9 @@
       "summary": "Map filesystem routes to validated function calls.",
       "guide": "docs/modules/http/define",
       "apiPackage": "routes",
-      "entrypoints": [{ "source": "packages/routes/src/define-route.ts", "name": "defineRoute" }],
+      "entrypoints": [
+        { "source": "packages/relkit/src/routes/define-route.ts", "name": "defineRoute" }
+      ],
       "examples": ["examples/commerce/src/routes/orders/[orderId]/route.ts"]
     },
     {
@@ -118,7 +120,7 @@
       "guide": "docs/modules/http/middleware",
       "apiPackage": "routes",
       "entrypoints": [
-        { "source": "packages/routes/src/define-middleware.ts", "name": "defineMiddleware" }
+        { "source": "packages/relkit/src/routes/define-middleware.ts", "name": "defineMiddleware" }
       ],
       "examples": ["examples/commerce/src/routes/middleware/order-auth.middleware.ts"]
     },
@@ -137,7 +139,9 @@
       "summary": "Append typed events and observe authorized partitions with replay and presence.",
       "guide": "docs/modules/realtime/index",
       "apiPackage": "realtime",
-      "entrypoints": [{ "source": "packages/realtime/src/channel.ts", "name": "defineChannel" }],
+      "entrypoints": [
+        { "source": "packages/relkit/src/realtime/channel.ts", "name": "defineChannel" }
+      ],
       "examples": ["examples/commerce/src/services/announcements/channels/announcements.channel.ts"]
     },
     {
@@ -147,8 +151,11 @@
       "guide": "docs/modules/events/index",
       "apiPackage": "events",
       "entrypoints": [
-        { "source": "packages/events/src/define-event.ts", "name": "defineEvent" },
-        { "source": "packages/events/src/define-event-function.ts", "name": "defineEventFunction" }
+        { "source": "packages/relkit/src/events/define-event.ts", "name": "defineEvent" },
+        {
+          "source": "packages/relkit/src/events/define-event-function.ts",
+          "name": "defineEventFunction"
+        }
       ],
       "examples": ["apps/docs/examples/events/order-created.event.ts"]
     },
@@ -159,8 +166,8 @@
       "guide": "docs/modules/jobs/quickstart",
       "apiPackage": "jobs",
       "entrypoints": [
-        { "source": "packages/jobs/src/define-task.ts", "name": "defineTask" },
-        { "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }
+        { "source": "packages/relkit/src/jobs/define-task.ts", "name": "defineTask" },
+        { "source": "packages/relkit/src/jobs/define-job.ts", "name": "defineJob" }
       ],
       "examples": ["examples/commerce/src/services/orders/tasks/export-orders.task.ts"]
     },
@@ -170,7 +177,7 @@
       "summary": "Trigger a job from explicit cron and timezone rules.",
       "guide": "docs/modules/jobs/schedules",
       "apiPackage": "jobs",
-      "entrypoints": [{ "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }],
+      "entrypoints": [{ "source": "packages/relkit/src/jobs/define-job.ts", "name": "defineJob" }],
       "examples": ["examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts"]
     },
     {
@@ -180,7 +187,7 @@
       "guide": "docs/modules/storage/define",
       "apiPackage": "buckets",
       "entrypoints": [
-        { "source": "packages/buckets/src/define-bucket.ts", "name": "defineBucket" }
+        { "source": "packages/relkit/src/buckets/define-bucket.ts", "name": "defineBucket" }
       ],
       "examples": ["examples/commerce/src/services/assets/buckets/assets.bucket.ts"]
     },
@@ -190,7 +197,9 @@
       "summary": "Reuse expensive lookups and keep cached values fresh.",
       "guide": "docs/modules/caching/define",
       "apiPackage": "cache",
-      "entrypoints": [{ "source": "packages/cache/src/define-cache.ts", "name": "defineCache" }],
+      "entrypoints": [
+        { "source": "packages/relkit/src/cache/define-cache.ts", "name": "defineCache" }
+      ],
       "examples": ["examples/commerce/src/services/orders/cache/prices.cache.ts"]
     },
     {
@@ -199,7 +208,9 @@
       "summary": "Let AI agents and MCP clients use your application's functions.",
       "guide": "docs/modules/ai/tools",
       "apiPackage": "tools",
-      "entrypoints": [{ "source": "packages/tools/src/define-tool.ts", "name": "defineTool" }],
+      "entrypoints": [
+        { "source": "packages/relkit/src/tools/define-tool.ts", "name": "defineTool" }
+      ],
       "examples": ["examples/commerce/src/services/orders/tools/lookup-order.tool.ts"]
     },
     {
@@ -209,8 +220,8 @@
       "guide": "docs/modules/ai/approvals",
       "apiPackage": "agents",
       "entrypoints": [
-        { "source": "packages/agents/src/approval.ts", "name": "approveApproval" },
-        { "source": "packages/agents/src/approval.ts", "name": "denyApproval" }
+        { "source": "packages/relkit/src/agents/approval.ts", "name": "approveApproval" },
+        { "source": "packages/relkit/src/agents/approval.ts", "name": "denyApproval" }
       ],
       "examples": ["examples/commerce/src/services/orders/tools/cancel-order.tool.ts"]
     },
@@ -220,7 +231,9 @@
       "summary": "Run bounded model workflows with allowlisted tools and offline tests.",
       "guide": "docs/modules/ai/agents",
       "apiPackage": "agents",
-      "entrypoints": [{ "source": "packages/agents/src/define-agent.ts", "name": "defineAgent" }],
+      "entrypoints": [
+        { "source": "packages/relkit/src/agents/define-agent.ts", "name": "defineAgent" }
+      ],
       "examples": ["examples/commerce/src/services/orders/agents/order-support.agent.ts"]
     },
     {
@@ -250,6 +263,33 @@
       "next": "docs/learn/create-an-app"
     },
     { "path": "docs/modules/index", "api": ["app"], "examples": [] },
+    { "path": "docs/why-relkit", "api": ["app"], "examples": [] },
+    { "path": "docs/maturity", "api": ["app"], "examples": [] },
+    { "path": "docs/versioning", "api": ["app"], "examples": [] },
+    { "path": "docs/benchmarks", "api": ["app"], "examples": ["scripts/benchmark-dev-loop.ts"] },
+    { "path": "docs/metrics", "api": ["app"], "examples": ["scripts/metrics.ts"] },
+    { "path": "docs/roadmap", "api": ["app"], "examples": ["scripts/maturity.ts"] },
+    {
+      "path": "docs/faq",
+      "api": ["app", "functions"],
+      "examples": [
+        "apps/docs/examples/migrate/src/services/orders/functions/create-order.function.ts"
+      ]
+    },
+    {
+      "path": "guides/migrate/from-express-or-hono",
+      "api": ["functions", "routes", "testing"],
+      "examples": [
+        "apps/docs/examples/migrate/src/routes/legacy/[[...path]]/route.ts",
+        "apps/docs/examples/migrate/src/services/orders/functions/get-order.function.ts",
+        "apps/docs/examples/migrate/tests/orders.route.test.ts"
+      ]
+    },
+    {
+      "path": "guides/migrate/relkit-0-9",
+      "api": ["functions", "routes"],
+      "examples": ["apps/docs/tests/migrate-0-9.test.ts"]
+    },
     { "path": "guides/index", "api": ["app"], "examples": [] },
     {
       "path": "guides/storage/upload-product-images",
@@ -285,6 +325,15 @@
       "path": "guides/ai/build-an-offline-agent",
       "api": ["agents", "tools", "testing"],
       "examples": ["templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"]
+    },
+    {
+      "path": "docs/modules/jobs/providers/postgres",
+      "api": ["jobs", "integrations/postgres"],
+      "examples": [
+        "apps/docs/examples/postgres/config.ts",
+        "apps/docs/examples/postgres/place-order.ts",
+        "integrations/packages/postgres/tests/jobs-conformance.test.ts"
+      ]
     },
     {
       "path": "docs/modules/jobs/providers/comparison",
@@ -378,12 +427,25 @@
     {
       "path": "docs/learn/concepts/context",
       "api": ["functions"],
-      "examples": ["examples/commerce/src/services/orders/functions/create-order.function.ts"]
+      "examples": ["apps/docs/examples/context/create-order.function.ts"]
+    },
+    {
+      "path": "docs/learn/concepts/runtime-handle",
+      "api": ["functions"],
+      "examples": [
+        "examples/commerce/scripts/seed.ts",
+        "examples/commerce/src/routes/middleware/order-auth.middleware.ts"
+      ]
     },
     {
       "path": "docs/learn/concepts/environment",
       "api": ["config"],
       "examples": ["templates/default/v1/api/src/platform/env.ts"]
+    },
+    {
+      "path": "docs/modules/service/effect",
+      "api": ["effect", "functions"],
+      "examples": ["apps/docs/examples/effect/get-order.function.ts"]
     },
     {
       "path": "docs/modules/service/migration",
@@ -469,12 +531,12 @@
     {
       "path": "docs/modules/http/streaming",
       "api": ["routes", "functions", "client"],
-      "examples": ["packages/runtime-hono/tests/native-stream.test.ts"]
+      "examples": ["packages/relkit/tests/runtime-hono/native-stream.test.ts"]
     },
     {
       "path": "docs/modules/http/raw-handlers",
       "api": ["routes"],
-      "examples": ["examples/commerce/src/routes/api/auth/[[...auth]]/route.ts"]
+      "examples": ["examples/commerce/src/routes/orders/export/route.ts"]
     },
     {
       "path": "docs/modules/http/openapi",
@@ -558,7 +620,8 @@
       "api": ["jobs", "testing"],
       "examples": [
         "examples/commerce/src/services/orders/tasks/export-orders.task.ts",
-        "packages/jobs/tests/task-policy.test.ts"
+        "apps/docs/examples/postgres/charge-order.job.ts",
+        "packages/relkit/tests/jobs/task-policy.test.ts"
       ]
     },
     {
@@ -581,7 +644,7 @@
       "api": ["jobs", "integrations/inngest", "integrations/effect-mq"],
       "examples": [
         "examples/commerce/src/services/orders/jobs/cleanup-orders.job.ts",
-        "packages/jobs/tests/schedule-reconciliation.test.ts"
+        "packages/relkit/tests/jobs/schedule-reconciliation.test.ts"
       ]
     },
     {
@@ -615,7 +678,7 @@
       "path": "docs/modules/jobs/testing",
       "api": ["jobs", "testing", "client"],
       "examples": [
-        "packages/jobs/tests/task-wire.test.ts",
+        "packages/relkit/tests/jobs/task-wire.test.ts",
         "packages/client/tests/compatibility/jobs-watch.test.ts"
       ]
     },
@@ -623,7 +686,7 @@
       "path": "docs/modules/jobs/migration",
       "api": ["app", "jobs"],
       "examples": [
-        "packages/jobs/tests/migration.test.ts",
+        "packages/relkit/tests/jobs/migration.test.ts",
         "apps/docs/examples/jobs/send-receipt.job.ts"
       ]
     },
@@ -726,7 +789,7 @@
     {
       "path": "docs/modules/auth/protect-routes",
       "api": ["better-auth", "routes"],
-      "examples": ["examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"]
+      "examples": ["examples/auth-drizzle/src/routes/account/profile/route.ts"]
     },
     {
       "path": "docs/modules/auth/clients",
@@ -828,7 +891,15 @@
     },
     {
       "path": "docs/modules/ai/index",
-      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
+      "api": [
+        "agents",
+        "agent-adapters",
+        "integrations/langchain",
+        "integrations/ai-sdk",
+        "tools",
+        "functions",
+        "testing"
+      ],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -836,7 +907,15 @@
     },
     {
       "path": "docs/modules/ai/tools",
-      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
+      "api": [
+        "agents",
+        "agent-adapters",
+        "integrations/langchain",
+        "integrations/ai-sdk",
+        "tools",
+        "functions",
+        "testing"
+      ],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -844,7 +923,15 @@
     },
     {
       "path": "docs/modules/ai/function-tools",
-      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
+      "api": [
+        "agents",
+        "agent-adapters",
+        "integrations/langchain",
+        "integrations/ai-sdk",
+        "tools",
+        "functions",
+        "testing"
+      ],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -852,7 +939,31 @@
     },
     {
       "path": "docs/modules/ai/agents",
-      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
+      "api": [
+        "agents",
+        "agent-adapters",
+        "integrations/langchain",
+        "integrations/ai-sdk",
+        "tools",
+        "functions",
+        "testing"
+      ],
+      "examples": [
+        "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
+      ]
+    },
+    {
+      "path": "docs/modules/ai/adapters",
+      "api": [
+        "agents",
+        "agent-adapters",
+        "integrations/langchain",
+        "integrations/ai-sdk",
+        "tools",
+        "functions",
+        "testing"
+      ],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -860,7 +971,15 @@
     },
     {
       "path": "docs/modules/ai/native-runtime",
-      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
+      "api": [
+        "agents",
+        "agent-adapters",
+        "integrations/langchain",
+        "integrations/ai-sdk",
+        "tools",
+        "functions",
+        "testing"
+      ],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -868,7 +987,15 @@
     },
     {
       "path": "docs/modules/ai/graphs-persistence",
-      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
+      "api": [
+        "agents",
+        "agent-adapters",
+        "integrations/langchain",
+        "integrations/ai-sdk",
+        "tools",
+        "functions",
+        "testing"
+      ],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -876,7 +1003,15 @@
     },
     {
       "path": "docs/modules/ai/streaming",
-      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
+      "api": [
+        "agents",
+        "agent-adapters",
+        "integrations/langchain",
+        "integrations/ai-sdk",
+        "tools",
+        "functions",
+        "testing"
+      ],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -884,7 +1019,15 @@
     },
     {
       "path": "docs/modules/ai/threads-recovery",
-      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
+      "api": [
+        "agents",
+        "agent-adapters",
+        "integrations/langchain",
+        "integrations/ai-sdk",
+        "tools",
+        "functions",
+        "testing"
+      ],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -892,7 +1035,15 @@
     },
     {
       "path": "docs/modules/ai/approvals",
-      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
+      "api": [
+        "agents",
+        "agent-adapters",
+        "integrations/langchain",
+        "integrations/ai-sdk",
+        "tools",
+        "functions",
+        "testing"
+      ],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -900,7 +1051,15 @@
     },
     {
       "path": "docs/modules/ai/mcp",
-      "api": ["agents", "integrations/langchain", "tools", "functions", "testing"],
+      "api": [
+        "agents",
+        "agent-adapters",
+        "integrations/langchain",
+        "integrations/ai-sdk",
+        "tools",
+        "functions",
+        "testing"
+      ],
       "examples": [
         "templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/services/hello/tools/lookup.tool.ts"
@@ -984,7 +1143,6 @@
     {
       "path": "docs/modules/integrations/index",
       "api": [
-        "integrations/catalog",
         "integrations/docker",
         "integrations/redis",
         "integrations/s3",
@@ -1017,9 +1175,14 @@
       "examples": ["tests/e2e/inspector-redesign.spec.ts"]
     },
     {
+      "path": "docs/modules/operations/mcp",
+      "api": ["cli-api", "inspector"],
+      "examples": ["packages/cli/tests/commands/mcp.test.ts"]
+    },
+    {
       "path": "docs/modules/operations/realtime-agents-streaming",
       "api": ["realtime", "agents", "client"],
-      "examples": ["packages/runtime-hono/tests/realtime-rpc.test.ts"]
+      "examples": ["tests/runtime-rpc/runtime-hono/realtime-rpc.test.ts"]
     },
     {
       "path": "docs/modules/operations/testing",
@@ -1035,6 +1198,15 @@
       "path": "docs/modules/integrations/provider-authoring",
       "api": ["provider"],
       "examples": ["apps/docs/examples/public-api/provider.ts"]
+    },
+    {
+      "path": "docs/modules/integrations/provider-kit",
+      "api": ["testing", "provider", "cli-api"],
+      "examples": [
+        "templates/provider-starter/tests/conformance.test.ts",
+        "packages/testing/tests/conformance/local-storage.test.ts",
+        "packages/testing/tests/conformance/deploy-targets.test.ts"
+      ]
     },
     {
       "path": "docs/modules/integrations/local-providers",
@@ -1055,6 +1227,35 @@
       "path": "docs/modules/deployment/local-docker",
       "api": ["app", "integrations/docker"],
       "examples": ["templates/default/v1/minimal/relkit.config.ts"]
+    },
+    {
+      "path": "docs/modules/deployment/runtimes",
+      "api": ["app", "testing", "drizzle", "integrations/redis", "integrations/sentry"],
+      "examples": ["templates/default/v1/api/relkit.config.ts"]
+    },
+    {
+      "path": "docs/modules/deployment/railway",
+      "api": ["app", "jobs", "events", "integrations/postgres"],
+      "examples": ["templates/default/v1/api/relkit.config.ts"]
+    },
+    {
+      "path": "docs/modules/deployment/vercel",
+      "api": ["app", "jobs", "events", "realtime", "integrations/postgres"],
+      "examples": ["templates/default/v1/api/relkit.config.ts"]
+    },
+    {
+      "path": "docs/modules/deployment/cloudflare",
+      "api": [
+        "app",
+        "jobs",
+        "events",
+        "realtime",
+        "cache",
+        "buckets",
+        "integrations/postgres",
+        "integrations/cloudflare"
+      ],
+      "examples": ["templates/default/v1/api/relkit.config.ts"]
     },
     {
       "path": "docs/modules/deployment/aws",
@@ -1089,9 +1290,19 @@
       "examples": ["templates/default/v1/api/src/services/orders/service.ts"]
     },
     {
+      "path": "docs/modules/cli/check",
+      "api": ["app"],
+      "examples": ["packages/cli/src/commands/check-evaluation.ts"]
+    },
+    {
       "path": "docs/modules/cli/automation",
-      "api": ["cli-api", "create-relkit", "relkit"],
+      "api": ["cli-api", "create-relkit"],
       "examples": ["apps/docs/examples/public-api/tooling.ts"]
+    },
+    {
+      "path": "docs/modules/cli/relkit-create-untested",
+      "api": ["create-relkit"],
+      "examples": ["packages/create-relkit/src/create-capabilities.ts"]
     },
     {
       "path": "guides/cli/create-and-build-an-api",

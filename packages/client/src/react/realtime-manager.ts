@@ -1,16 +1,16 @@
-import type { ClientIdentityDocument } from "@relkit/contracts";
-import { ManagedRuntime } from "effect";
-import { runExecutionSync } from "@relkit/contracts/operation";
-import { runClientSync } from "../client-runtime.js";
-import { RealtimeSessions, realtimeSessionsLayer } from "./realtime-session.service.js";
-import type { RealtimeFrame, RealtimeStatus } from "./realtime-manager.types.js";
+import type { ClientIdentityDocument } from "relkit/contracts";
+import { createRealtimeSessions } from "./realtime-session.service.js";
+import type {
+  RealtimeFrame,
+  RealtimeSessionService,
+  RealtimeStatus,
+} from "./realtime-manager.types.js";
 export type { RealtimeFrame, RealtimeStatus } from "./realtime-manager.types.js";
 export { realtimeSubscriptionKey } from "./realtime-session-key.js";
 
-/** Synchronous external-store adapter over one scoped realtime session owner. */
+/** Synchronous external-store adapter over one realtime session owner. */
 export class RealtimeManager {
-  private readonly owner;
-  private readonly service;
+  private readonly service: RealtimeSessionService;
   private closing: Promise<void> | undefined;
 
   /**
@@ -23,8 +23,7 @@ export class RealtimeManager {
     client: unknown,
     identity?: Pick<ClientIdentityDocument, "identityScope" | "sessionEpoch">,
   ) {
-    this.owner = ManagedRuntime.make(realtimeSessionsLayer(client, identity));
-    this.service = runExecutionSync(this.owner, RealtimeSessions);
+    this.service = createRealtimeSessions(client, identity);
   }
 
   /** Shared sessions owned by this manager, exposed for existing diagnostics. */
@@ -39,7 +38,7 @@ export class RealtimeManager {
 
   /** Current external-store connection state. */
   get status(): RealtimeStatus {
-    return runClientSync(this.service.snapshot());
+    return this.service.snapshot();
   }
 
   /**
@@ -56,12 +55,9 @@ export class RealtimeManager {
     listener: (frame: RealtimeFrame) => void,
     statusListener?: (status: RealtimeStatus) => void,
   ): () => void {
-    const release = runExecutionSync(
-      this.owner,
-      this.service.subscribe(channel, params, listener, statusListener),
-    );
+    const release = this.service.subscribe(channel, params, listener, statusListener);
     return () => {
-      if (this.closing === undefined) runExecutionSync(this.owner, release);
+      if (this.closing === undefined) release();
     };
   }
 
@@ -80,8 +76,7 @@ export class RealtimeManager {
    */
   dispose(): void {
     if (this.closing !== undefined) return;
-    runExecutionSync(this.owner, this.service.stop());
-    this.closing = this.owner.dispose();
+    this.closing = this.service.close();
   }
 
   /**

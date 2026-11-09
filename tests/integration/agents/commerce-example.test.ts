@@ -16,7 +16,7 @@ const runSupportAgent = () =>
               agent: orderSupport,
               tools: [getOrderTool, cancelOrderTool],
               engine: {
-                invoke: () => Promise.reject(new Error("Unexpected RELKIT tool invocation.")),
+                invoke: () => Promise.reject(new Error("Unexpected RelKit tool invocation.")),
               },
             }),
           ),

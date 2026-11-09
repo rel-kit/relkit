@@ -4,7 +4,7 @@
  * no connection, transaction or provider ownership is acquired by planning.
  */
 
-import type { AddRequest } from "create-relkit/internal/add-types";
+import type { AddRequest } from "create-relkit/add-types";
 
 /** Validated discovered/planned native database and registered schema locations. */
 export interface RenderedDatabase {

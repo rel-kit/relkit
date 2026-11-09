@@ -1,4 +1,4 @@
-import type { DependencyCategory, DependencyClientSources } from "@relkit/engine";
+import type { DependencyCategory, DependencyClientSources } from "relkit/engine";
 import type { TestBucketFake, TestBucketFakeOptions } from "./buckets.js";
 import type { TestCacheFake, TestCacheFakeOptions } from "./cache.js";
 import type { TestProviderReplacements } from "./provider-replacements.js";
@@ -13,7 +13,7 @@ export interface TestFailureControls {
 
 /** Explicit clock, logger and provider replacement policy for one fake owner. */
 export interface TestFakesOptions {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly clock?: () => number;
   readonly providers?: TestProviderReplacements;
 }

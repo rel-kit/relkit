@@ -1,4 +1,4 @@
-import type { BucketClient } from "@relkit/buckets";
+import type { BucketClient } from "relkit/buckets";
 
 /** Native dependency facade retained to prove implicit invocation storage ownership. */
 export interface DetachedInvocationContext {

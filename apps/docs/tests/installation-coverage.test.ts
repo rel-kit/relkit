@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { Schema } from "effect";
-import { guideGroups } from "../scripts/guide-catalog.js";
+import { guideGroups, overviewPages } from "../scripts/guide-catalog.js";
 
 const root = resolve(import.meta.dir, "..");
 const policy = Schema.Record(
@@ -20,9 +20,7 @@ test("every authored page is navigable and has a reviewed installation dispositi
     readFileSync(resolve(root, "scripts/installation-coverage.json"), "utf8"),
   );
   const catalog = [
-    "docs/index",
-    "docs/modules/index",
-    "guides/index",
+    ...overviewPages,
     ...guideGroups.flatMap(({ directory, pages }) =>
       pages
         .filter((page) => !guideGroups.some((group) => group.directory === `${directory}/${page}`))
@@ -34,6 +32,7 @@ test("every authored page is navigable and has a reviewed installation dispositi
       (path) =>
         path.endsWith(".mdx") &&
         !path.startsWith("docs/api/") &&
+        !path.startsWith("docs/errors/") &&
         !path.startsWith("blog/") &&
         !path.split("/").some((segment) => segment.startsWith("_")),
     )

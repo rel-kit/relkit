@@ -132,7 +132,7 @@ Specific gaps and domain exceptions are recorded in design.md.
 
 The follow-up resolves the earlier line-limit, public JSDoc, LISTEN compatibility,
 packed HMR and latency findings. All implementation remains uncommitted in
-/Users/mustafaelsayed/Workspace/relkit.
+<repo>.
 
 - The first primary `bun run verify` passed its complete fixed fail-fast pipeline
   at 17:49:45 UTC, before the final logging and absent-hook optimizations. Frozen

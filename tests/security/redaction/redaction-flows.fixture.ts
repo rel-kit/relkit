@@ -1,24 +1,22 @@
 /** Retains the original redaction flows helpers and exact synthetic credential assertions. */
-import { Effect } from "../../../packages/runtime-effect/node_modules/effect/dist/index.js";
-import { z } from "../../../packages/schema/src/index.ts";
-import { defineEventFunction } from "../../../packages/events/src/index.ts";
-import { defineAgent } from "../../../integrations/packages/langchain/src/index.ts";
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../../../integrations/packages/langchain/src/index.ts";
+import { Effect } from "../../../packages/relkit/node_modules/effect/dist/index.js";
+import { z } from "relkit/schema";
+import { defineEventFunction } from "relkit/events";
 import {
   type InvocationContextOptions,
   type InvocationHooks,
   type InvocationTarget,
-} from "../../../packages/engine/src/index.ts";
-import {
-  type LogRecord,
-  type ObservabilityCollector,
-} from "../../../packages/observability/src/index.ts";
+} from "relkit/engine";
+import { type LogRecord, type ObservabilityCollector } from "relkit/observability";
 import { createTestAgent } from "../../../integrations/packages/langchain/src/testing/agents.js";
-import { createTestEvent, createTestJob } from "../../../packages/testing/src/index.ts";
+import { createTestEvent } from "../../../packages/testing/src/index.ts";
 import {
   createLoggerLayer,
   type HumanLogSink,
   type JsonLogSink,
-} from "../../../packages/runtime-effect/src/logger.ts";
+} from "../../../packages/relkit/src/runtime-effect/logger.ts";
 import { secrets, flowInput, retry, secretLog } from "./redaction-records.fixture.js";
 import { assertNoSecrets } from "./redaction-runtime.fixture.js";
 export async function emitLoggerRecord(
@@ -51,6 +49,7 @@ export async function flushTelemetry(): Promise<void> {
 export async function runAgent(collector: ObservabilityCollector) {
   const agent = defineAgent({
     id: "security.agent",
+    runtime: langchain(),
     input: z.object({
       password: z.string(),
       authorization: z.string(),
@@ -78,22 +77,6 @@ export async function runAgent(collector: ObservabilityCollector) {
     return trace;
   } finally {
     await harness.close();
-  }
-}
-
-export async function runJob(collector: ObservabilityCollector): Promise<void> {
-  const job = await createTestJob({
-    jobId: "security.job",
-    target: flowTarget("security.job"),
-    retry,
-    hooks: hooks(collector),
-  });
-  try {
-    await job.enqueue(flowInput);
-    await job.drain();
-    assertNoSecrets("job admin API", job.admin.query());
-  } finally {
-    await job.close();
   }
 }
 

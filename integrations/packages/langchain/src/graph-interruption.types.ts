@@ -1,6 +1,6 @@
-/** Converts native graph interrupt observations into RELKIT continuation data while preserving the interrupt identifiers needed for resume. This companion preserves the native input and output types without starting runtime work. */
+/** Converts native graph interrupt observations into RelKit continuation data while preserving the interrupt identifiers needed for resume. This companion preserves the native input and output types without starting runtime work. */
 
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 
 /**
  * Pending graph interruption and its public response schema.
@@ -8,6 +8,7 @@ import type { JsonValue } from "@relkit/contracts";
  *
  * @example
  * const interrupt: GraphWaitingInterrupt = { node: "review", response: true };
+ * @experimental
  */
 export interface GraphWaitingInterrupt {
   readonly id?: string;

@@ -1,0 +1,11 @@
+"use client";
+import { useRoute, useRouteMutation, useStream } from "@relkit/client/react";
+import { api } from "@relkit/client";
+
+export function Orders() {
+  const orders = useRoute(api.orders.searchOrders, { input: {} });
+  const post = useRouteMutation(api.announcements.postAnnouncement, {});
+  const report = useStream(api.orders.streamOrderReport);
+  const job = useRouteMutation("orders.export", {});
+  return [orders, post, report, job];
+}

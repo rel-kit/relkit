@@ -1,5 +1,5 @@
 {
-  "temporary": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb",
+  "temporary": "<tmp>/relkit-guidance-live-41wzbazb",
   "workspaceLinked": true,
   "commands": [
     {
@@ -7,11 +7,11 @@
       "args": [
         "bun",
         "--smol",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/drizzle-kit",
+        "<tmp>/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/drizzle-kit",
         "generate",
         "--name=before"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case01/before",
       "exit": 0,
       "expected": 0,
       "seconds": 0.3755482090055011,
@@ -22,11 +22,11 @@
       "args": [
         "bun",
         "--smol",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
+        "<tmp>/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
         "db",
         "migrate"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case01/before",
       "exit": 0,
       "expected": 0,
       "seconds": 1.2451295829960145,
@@ -40,7 +40,7 @@
         "-e",
         "import {Database} from \"bun:sqlite\"; const db=new Database(process.env.DATABASE_PATH); db.exec(\"INSERT INTO notes(id,content) VALUES (0,'Preserve this existing record')\"); db.close();"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case01/before",
       "exit": 0,
       "expected": 0,
       "seconds": 0.03939250000985339,
@@ -51,11 +51,11 @@
       "args": [
         "bun",
         "--smol",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/drizzle-kit",
+        "<tmp>/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/drizzle-kit",
         "generate",
         "--name=orders"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case01/before",
       "exit": 0,
       "expected": 0,
       "seconds": 0.3602846249996219,
@@ -66,11 +66,11 @@
       "args": [
         "bun",
         "--smol",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
+        "<tmp>/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
         "db",
         "migrate"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case01/before",
       "exit": 0,
       "expected": 0,
       "seconds": 1.190641624998534,
@@ -81,11 +81,11 @@
       "args": [
         "bun",
         "--smol",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
+        "<tmp>/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
         "db",
         "migrate"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case01/before",
       "exit": 0,
       "expected": 0,
       "seconds": 0.9581181250105146,
@@ -96,10 +96,10 @@
       "args": [
         "bun",
         "--smol",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
+        "<tmp>/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
         "check"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case01/before",
       "exit": 0,
       "expected": 0,
       "seconds": 8.590966666000895,
@@ -110,10 +110,10 @@
       "args": [
         "node",
         "--max-old-space-size=512",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/typescript/bin/tsc",
+        "<tmp>/relkit-guidance-live-41wzbazb/case01/before/node_modules/typescript/bin/tsc",
         "--noEmit"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case01/before",
       "exit": 0,
       "expected": 0,
       "seconds": 1.5782041249913163,
@@ -129,7 +129,7 @@
         "--timeout",
         "30000"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case01/before",
       "exit": 0,
       "expected": 0,
       "seconds": 1.10413249998237,
@@ -140,10 +140,10 @@
       "args": [
         "bun",
         "--smol",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
+        "<tmp>/relkit-guidance-live-41wzbazb/case01/before/node_modules/.bin/relkit",
         "build"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case01/before",
       "exit": 0,
       "expected": 0,
       "seconds": 3.627151083026547,
@@ -154,10 +154,10 @@
       "args": [
         "bun",
         "--smol",
-        "/Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/guidance-network.ts",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before"
+        "<repo>/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/guidance-network.ts",
+        "<tmp>/relkit-guidance-live-41wzbazb/case01/before"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case01/before",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case01/before",
       "exit": 0,
       "expected": 0,
       "seconds": 1.6897988749842625,
@@ -168,10 +168,10 @@
       "args": [
         "bun",
         "--smol",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02/node_modules/.bin/relkit",
+        "<tmp>/relkit-guidance-live-41wzbazb/case02/node_modules/.bin/relkit",
         "check"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case02",
       "exit": 0,
       "expected": 0,
       "seconds": 7.75255066700629,
@@ -182,10 +182,10 @@
       "args": [
         "node",
         "--max-old-space-size=512",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02/node_modules/typescript/bin/tsc",
+        "<tmp>/relkit-guidance-live-41wzbazb/case02/node_modules/typescript/bin/tsc",
         "--noEmit"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case02",
       "exit": 0,
       "expected": 0,
       "seconds": 1.5378508330031764,
@@ -196,12 +196,12 @@
       "args": [
         "node",
         "--max-old-space-size=512",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02/node_modules/typescript/bin/tsc",
+        "<tmp>/relkit-guidance-live-41wzbazb/case02/node_modules/typescript/bin/tsc",
         "--noEmit",
         "-p",
         "web/tsconfig.json"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case02",
       "exit": 0,
       "expected": 0,
       "seconds": 1.1344338330090977,
@@ -215,7 +215,7 @@
         "test",
         "tests/integration/greeting.test.ts"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case02",
       "exit": 0,
       "expected": 0,
       "seconds": 0.7612509590107948,
@@ -226,10 +226,10 @@
       "args": [
         "bun",
         "--smol",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02/node_modules/.bin/relkit",
+        "<tmp>/relkit-guidance-live-41wzbazb/case02/node_modules/.bin/relkit",
         "build"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case02",
       "exit": 0,
       "expected": 0,
       "seconds": 2.938555458007613,
@@ -240,12 +240,12 @@
       "args": [
         "node",
         "--max-old-space-size=512",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02/node_modules/next/dist/bin/next",
+        "<tmp>/relkit-guidance-live-41wzbazb/case02/node_modules/next/dist/bin/next",
         "build",
         "web",
         "--webpack"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case02",
       "exit": 0,
       "expected": 0,
       "seconds": 14.229792832979001,
@@ -256,13 +256,13 @@
       "args": [
         "bun",
         "--smol",
-        "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02/node_modules/.bin/playwright",
+        "<tmp>/relkit-guidance-live-41wzbazb/case02/node_modules/.bin/playwright",
         "test",
         "--config",
         "playwright.config.ts",
         "--workers=1"
       ],
-      "cwd": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-guidance-live-41wzbazb/case02",
+      "cwd": "<tmp>/relkit-guidance-live-41wzbazb/case02",
       "exit": 0,
       "expected": 0,
       "seconds": 1.5984319999988656,

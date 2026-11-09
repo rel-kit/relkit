@@ -1,6 +1,6 @@
 ---
 title: Application API
-description: Generated public TypeScript reference for @relkit/app.
+description: Generated public TypeScript reference for relkit.
 search:
   exclude: true
 sidebar:
@@ -17,21 +17,61 @@ For configuration and examples, read [Application configuration](/docs/learn/con
 
 For a complete workflow, follow [upload product images](/guides/storage/upload-product-images).
 
-<include>/_snippets/generated/exports/app.mdx</include>
+## Most-used APIs
 
-## `agents.ts`
+These entries carry each API's contract and example. The complete reference follows.
 
-### "@relkit/agents" (namespace export)
+### defineApp
 
-Re-exports all named exports from the "@relkit/agents" module.
+Defines one immutable application topology synchronously.
+
+**Throws**
+
+The original validation error for invalid options.
+
+**Example**
+
+```ts
+import { defineApp } from "relkit";
+import { defineEnv } from "relkit/config";
+const app = defineApp({ env: defineEnv({}), server: { port: 3000 } });
+```
 
 **Signature**
 
 ```ts
-export * from "@relkit/agents";
+declare const defineApp: <
+  const Shape extends EnvShape,
+  const Providers extends AppProviderInputs,
+  const Exporters extends TelemetryExporterMap = Readonly<
+    Record<string, TelemetryExporterDescriptor<string, string, object>>
+  >,
+>(
+  options: DefineAppOptions<Shape, Providers, Exporters>,
+) => ApplicationDescriptor<Shape, Providers, Exporters>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/agents.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L110)
+
+Since v0.2.0
+
+## Complete reference
+
+<include>/_snippets/generated/exports/app.mdx</include>
+
+## `agents.ts`
+
+### "../agents/index.js" (namespace export)
+
+Re-exports all named exports from the "../agents/index.js" module.
+
+**Signature**
+
+```ts
+export * from "../agents/index.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/agents.ts#L1)
 
 ## `app-config.types.ts`
 
@@ -60,27 +100,7 @@ export interface ApiDocsConfig {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L10)
-
-### AppCompatibilityConfig (interface)
-
-Transitional compatibility switches for application authoring.
-
-**Example**
-
-```ts
-const compatibility: AppCompatibilityConfig = { legacyJobs: true };
-```
-
-**Signature**
-
-```ts
-export interface AppCompatibilityConfig {
-  readonly legacyJobs?: boolean;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L10)
 
 ### InspectorConfig (interface)
 
@@ -98,7 +118,7 @@ const inspector: InspectorConfig = { enabled: true };
 export interface InspectorConfig extends InspectorConfigurationInput {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L39)
 
 ### ServerConfig (interface)
 
@@ -118,13 +138,19 @@ export interface ServerConfig {
   readonly maxBodyBytes?: number;
   readonly apiDocs?: ApiDocsConfig;
   readonly clientContract?: boolean;
-  readonly mcp?: boolean;
+  /** Enables the MCP endpoint; `{ auth: "required" }` limits it to signed-in callers. */
+  readonly mcp?: boolean | { readonly auth?: "required" };
   /** Explicitly selects the optional AG-UI HTTP protocol independently of agent RPC. */
   readonly agUi?: boolean;
+  /** Runs once after the application's providers are ready and before the server accepts
+   * requests; `getRelkit()` returns the application's handle inside it. A rejection stops startup.
+   * @example onStart: async () => { await getRelkit().functions.catalog.warmPrices({}); }
+   */
+  readonly onStart?: () => void | Promise<void>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-config.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L20)
 
 ## `app-observability.ts`
 
@@ -144,7 +170,7 @@ Effect.provide(defineAppEffect(options), AppTelemetryLive);
 declare class AppTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-observability.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-observability.ts#L8)
 
 ### AppTelemetryLive
 
@@ -162,7 +188,7 @@ Effect.provide(defineAppEffect(options), AppTelemetryLive);
 declare const AppTelemetryLive: Layer.Layer<AppTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-observability.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-observability.ts#L15)
 
 ### observeApp
 
@@ -183,7 +209,7 @@ declare const observeApp: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-observability.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-observability.ts#L29)
 
 ## `app-observability.types.ts`
 
@@ -208,16 +234,14 @@ type AppOperation =
   | "define"
   | "env.isDefinition"
   | "id.derive"
-  | "compatibility.normalize"
   | "runtimeMetadata.normalize"
-  | "alias.assertExclusive"
   | "constants.define"
   | "prompt.define"
   | "context.create"
   | "context.resolve";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-observability.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-observability.types.ts#L11)
 
 ### AppTelemetryService (interface)
 
@@ -246,7 +270,7 @@ export interface AppTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-observability.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-observability.types.ts#L24)
 
 ## `app-provider-capabilities.ts`
 
@@ -270,13 +294,13 @@ declare const APP_PROVIDER_CAPABILITIES: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider-capabilities.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider-capabilities.ts#L2)
 
 ## `app-provider-normalization.ts`
 
 ### copyEffect
 
-Copies a serializable configuration value through RELKIT's serializer.
+Copies a serializable configuration value through RelKit's serializer.
 
 **Example**
 
@@ -292,7 +316,7 @@ declare const copyEffect: <Value>(
 ) => Effect.Effect<Value, AppValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider-normalization.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider-normalization.ts#L77)
 
 ### normalizeDefaultsEffect
 
@@ -330,7 +354,7 @@ declare const normalizeDefaultsEffect: <Providers extends AppProviderInputs>(
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider-normalization.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider-normalization.ts#L45)
 
 ### normalizeProvidersEffect
 
@@ -359,7 +383,7 @@ declare const normalizeProvidersEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider-normalization.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider-normalization.ts#L19)
 
 ## `app-provider.types.ts`
 
@@ -379,7 +403,7 @@ const capability: AppProviderCapability = "cache";
 type AppProviderCapability = (typeof APP_PROVIDER_CAPABILITIES)[number];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L13)
 
 ### AppProviderDefaults (type alias)
 
@@ -398,12 +422,12 @@ type AppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
   [Capability in Exclude<AppProviderCapability, "job">]?: ProfileFor<Providers, Capability>;
 }> & {
   readonly jobs?: ProfileFor<Providers, "job">;
-  /** @deprecated Use `jobs`. */
-  readonly job?: ProfileFor<Providers, "job">;
+  /** Removed: the jobs default is spelled `jobs`. */
+  readonly job?: never;
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider.types.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L54)
 
 ### AppProviderInputs (interface)
 
@@ -421,10 +445,7 @@ const providers: AppProviderInputs = { cache: redisAdapter };
 export interface AppProviderInputs {
   readonly bucket?: CapabilityInput<"bucket">;
   readonly cache?: CapabilityInput<"cache">;
-  /** Public plural spelling for the jobs provider capability. */
   readonly jobs?: CapabilityInput<"job">;
-  /** @deprecated Use `jobs`. */
-  readonly job?: CapabilityInput<"job">;
   readonly event?: CapabilityInput<"event">;
   readonly model?: CapabilityInput<"model">;
   readonly realtime?: CapabilityInput<"realtime">;
@@ -432,7 +453,7 @@ export interface AppProviderInputs {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L22)
 
 ### NormalizedAppProviderDefaults (type alias)
 
@@ -452,7 +473,7 @@ type NormalizedAppProviderDefaults<Providers extends AppProviderInputs> = Readon
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider.types.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L65)
 
 ### NormalizedProviders (type alias)
 
@@ -476,7 +497,7 @@ type NormalizedProviders<Providers extends AppProviderInputs> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-provider.types.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L72)
 
 ## `app-runtime-metadata.ts`
 
@@ -492,19 +513,29 @@ Normalizes immutable runtime policy without starting its selected features.
 
 ```ts
 declare const normalizeAppRuntimeMetadataEffect: (
-  options: Pick<ApplicationDescriptor, "server" | "inspector" | "deployment">,
+  options: Pick<ApplicationDescriptor, "server" | "inspector" | "deployment" | "check">,
 ) => Effect.Effect<
   {
-    server: ServerConfig | undefined;
+    server:
+      | {
+          port?: number;
+          maxBodyBytes?: number;
+          apiDocs?: ApiDocsConfig;
+          clientContract?: boolean;
+          mcp?: boolean | { readonly auth?: "required" };
+          agUi?: boolean;
+        }
+      | undefined;
     inspector: InspectorConfiguration | undefined;
     deployment: Readonly<Record<string, JsonValue>> | undefined;
+    check: AppCheckConfig | undefined;
   },
   AppValidationFailure,
   never
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-runtime-metadata.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-runtime-metadata.ts#L18)
 
 ## `app-validation.ts`
 
@@ -524,57 +555,7 @@ if (error._tag === "AppValidationFailure") console.error(error.message);
 declare class AppValidationFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L10)
-
-### assertExclusiveAlias
-
-Synchronous alias exclusivity adapter.
-
-**Throws**
-
-TypeError when both aliases are present.
-
-**Example**
-
-```ts
-assertExclusiveAlias(options, "jobs", "job", "defineApp");
-```
-
-**Signature**
-
-```ts
-declare const assertExclusiveAlias: (
-  value: Record<string, unknown>,
-  primary: string,
-  legacy: string,
-  label: string,
-) => void;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L146)
-
-### assertExclusiveAliasEffect
-
-Rejects simultaneous current and legacy aliases in Effect.
-
-**Example**
-
-```ts
-Effect.runSync(assertExclusiveAliasEffect(options, "jobs", "job", "defineApp"));
-```
-
-**Signature**
-
-```ts
-declare const assertExclusiveAliasEffect: (
-  value: Record<string, unknown>,
-  primary: string,
-  legacy: string,
-  label: string,
-) => Effect.Effect<void, AppValidationFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L9)
 
 ### deriveApplicationId
 
@@ -596,7 +577,7 @@ deriveApplicationId("@acme/orders");
 declare const deriveApplicationId: (packageName: string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L74)
 
 ### deriveApplicationIdEffect
 
@@ -616,7 +597,7 @@ declare const deriveApplicationIdEffect: (
 ) => Effect.Effect<StableId, AppValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L54)
 
 ### isEnvDefinition
 
@@ -634,7 +615,7 @@ if (isEnvDefinition(value)) console.log(value.shape);
 declare const isEnvDefinition: (value: unknown) => value is EnvDefinition<EnvShape>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L45)
 
 ### isEnvDefinitionEffect
 
@@ -652,81 +633,49 @@ Effect.runSync(isEnvDefinitionEffect(value));
 declare const isEnvDefinitionEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L20)
-
-### normalizeCompatibility
-
-Synchronous compatibility normalizer.
-
-**Throws**
-
-TypeError for an invalid compatibility flag.
-
-**Example**
-
-```ts
-normalizeCompatibility({ legacyJobs: true });
-```
-
-**Signature**
-
-```ts
-declare const normalizeCompatibility: (value: AppCompatibilityConfig | undefined) => {
-  readonly legacyJobs: boolean;
-};
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L109)
-
-### normalizeCompatibilityEffect
-
-Normalizes the legacy jobs compatibility flag in Effect.
-
-**Example**
-
-```ts
-Effect.runSync(normalizeCompatibilityEffect({ legacyJobs: true }));
-```
-
-**Signature**
-
-```ts
-declare const normalizeCompatibilityEffect: (
-  value: AppCompatibilityConfig | undefined,
-) => Effect.Effect<Readonly<{ legacyJobs: boolean }>, AppValidationFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-validation.ts#L19)
 
 ## `buckets.ts`
 
-### "@relkit/buckets" (namespace export)
+### "../buckets/index.js" (namespace export)
 
-Re-exports all named exports from the "@relkit/buckets" module.
+Re-exports all named exports from the "../buckets/index.js" module.
 
 **Signature**
 
 ```ts
-export * from "@relkit/buckets";
+export * from "../buckets/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/buckets.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/buckets.ts#L1)
 
 ## `cache.ts`
 
-### "@relkit/cache" (namespace export)
+### "../cache/index.js" (namespace export)
 
-Re-exports all named exports from the "@relkit/cache" module.
+Re-exports all named exports from the "../cache/index.js" module.
 
 **Signature**
 
 ```ts
-export * from "@relkit/cache";
+export * from "../cache/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/cache.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/cache.ts#L1)
 
 ## `config.ts`
+
+### "../config/index.js" (namespace export)
+
+Re-exports all named exports from the "../config/index.js" module.
+
+**Signature**
+
+```ts
+export * from "../config/index.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/config.ts#L4)
 
 ### "./app-validation.js" (namespace export)
 
@@ -738,7 +687,19 @@ Re-exports all named exports from the "./app-validation.js" module.
 export * from "./app-validation.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/config.ts#L1)
+
+### "./context-descriptors.js" (namespace export)
+
+Re-exports all named exports from the "./context-descriptors.js" module.
+
+**Signature**
+
+```ts
+export * from "./context-descriptors.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/config.ts#L6)
 
 ### "./define-app.js" (namespace export)
 
@@ -750,19 +711,7 @@ Re-exports all named exports from the "./define-app.js" module.
 export * from "./define-app.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L3)
-
-### "@relkit/config" (namespace export)
-
-Re-exports all named exports from the "@relkit/config" module.
-
-**Signature**
-
-```ts
-export * from "@relkit/config";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/config.ts#L3)
 
 ### AppTelemetry
 
@@ -772,7 +721,7 @@ export * from "@relkit/config";
 declare const AppTelemetry: typeof AppTelemetry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/config.ts#L2)
 
 ### AppTelemetryLive
 
@@ -782,7 +731,7 @@ declare const AppTelemetry: typeof AppTelemetry;
 declare const AppTelemetryLive: Layer<AppTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/config.ts#L2)
 
 ## `context-descriptors.ts`
 
@@ -796,7 +745,7 @@ Re-exports all named exports from the "./context-descriptors.types.js" module.
 export * from "./context-descriptors.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.ts#L13)
 
 ### ContextDescriptorFailure (class)
 
@@ -814,7 +763,7 @@ if (error._tag === "ContextDescriptorFailure") console.error(error.message);
 declare class ContextDescriptorFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.ts#L17)
 
 ### defineConstants
 
@@ -827,7 +776,7 @@ The original validation error for invalid values.
 **Example**
 
 ```ts
-import { defineConstants, defineEnv, env } from "@relkit/app";
+import { defineConstants, defineEnv, env } from "relkit";
 const environment = defineEnv({ REGION: env.string() });
 const limits = defineConstants({ maxItems: 20, region: environment.REGION });
 // Literal values are immutable; the environment reference resolves with the context.
@@ -846,7 +795,7 @@ declare const defineConstants: <const Values extends ConstantsShape>(
 ) => ConstantsDescriptor<Values>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.ts#L69)
 
 ### defineConstantsEffect
 
@@ -867,7 +816,7 @@ declare const defineConstantsEffect: <const Values extends ConstantsShape>(
 ) => Effect.Effect<ConstantsDescriptor<Values>, ContextDescriptorFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.ts#L27)
 
 ### definePrompt
 
@@ -880,7 +829,7 @@ The original validation error for invalid text.
 **Example**
 
 ```ts
-import { definePrompt } from "@relkit/app";
+import { definePrompt } from "relkit";
 const support = definePrompt(["Use the order details.", "Do not invent delivery dates."]);
 // support.value preserves the two fragments in order.
 ```
@@ -898,7 +847,7 @@ declare const definePrompt: <const Value extends PromptValue>(
 ) => PromptDescriptor<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L121)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.ts#L121)
 
 ### definePromptEffect
 
@@ -919,7 +868,7 @@ declare const definePromptEffect: <const Value extends PromptValue>(
 ) => Effect.Effect<PromptDescriptor<Value>, ContextDescriptorFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.ts#L81)
 
 ## `context-descriptors.types.ts`
 
@@ -939,7 +888,7 @@ const region: ConstantResolver<string> = ({ env }) => String(env.REGION);
 type ConstantResolver<Value = unknown> = (options: ContextResolverOptions) => MaybePromise<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.types.ts#L17)
 
 ### ConstantValue (type alias)
 
@@ -957,7 +906,7 @@ const value: ConstantValue = "eu-west-1";
 type ConstantValue = JsonValue | EnvRef | ConstantResolver;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.types.ts#L24)
 
 ### ConstantsDescriptor (interface)
 
@@ -979,7 +928,7 @@ export interface ConstantsDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.types.ts#L34)
 
 ### ConstantsShape (type alias)
 
@@ -997,7 +946,7 @@ const values: ConstantsShape = { region: "eu-west-1" };
 type ConstantsShape = Readonly<Record<string, ConstantValue>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.types.ts#L29)
 
 ### ContextDescriptorOptions (interface)
 
@@ -1017,7 +966,7 @@ export interface ContextDescriptorOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.types.ts#L58)
 
 ### ContextResolverOptions (interface)
 
@@ -1039,7 +988,7 @@ export interface ContextResolverOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.types.ts#L8)
 
 ### PromptDescriptor (interface)
 
@@ -1062,7 +1011,7 @@ export interface PromptDescriptor<Value extends PromptValue = PromptValue> exten
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.types.ts#L48)
 
 ### PromptValue (type alias)
 
@@ -1080,7 +1029,7 @@ const prompt: PromptValue = ["Be concise.", "Use tools."];
 type PromptValue = string | readonly string[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.types.ts#L43)
 
 ### ResolvedConstants (type alias)
 
@@ -1100,7 +1049,7 @@ type ResolvedConstants<Descriptor extends ConstantsDescriptor> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.types.ts#L65)
 
 ### ResolvedPrompt (type alias)
 
@@ -1118,7 +1067,7 @@ type Text = ResolvedPrompt<typeof prompt>;
 type ResolvedPrompt<Descriptor extends PromptDescriptor> = Descriptor["value"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.types.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-descriptors.types.ts#L72)
 
 ## `context-resolution-service.ts`
 
@@ -1138,7 +1087,7 @@ Effect.provide(resolver.resolveEffect(context), AppConstantRunnerLive);
 declare class AppConstantRunner
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolution-service.ts#L8)
 
 ### AppConstantRunnerLive
 
@@ -1156,7 +1105,7 @@ Effect.provide(resolver.resolveEffect(context), AppConstantRunnerLive);
 declare const AppConstantRunnerLive: Layer.Layer<AppConstantRunner, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolution-service.ts#L15)
 
 ### AppConstantRunnerPromiseLive
 
@@ -1168,7 +1117,7 @@ Compatibility runner that passes the caller's exact signal to callbacks.
 declare const AppConstantRunnerPromiseLive: Layer.Layer<AppConstantRunner, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolution-service.ts#L27)
 
 ### AppConstantRunnerService
 
@@ -1178,7 +1127,7 @@ declare const AppConstantRunnerPromiseLive: Layer.Layer<AppConstantRunner, never
 declare const AppConstantRunnerService: AppConstantRunnerService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolution-service.ts#L4)
 
 ## `context-resolution-service.types.ts`
 
@@ -1213,7 +1162,7 @@ export interface AppConstantRunnerService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolution-service.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolution-service.types.ts#L9)
 
 ## `context-resolver.ts`
 
@@ -1227,7 +1176,7 @@ Re-exports all named exports from the "./context-resolver.types.js" module.
 export * from "./context-resolver.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolver.ts#L12)
 
 ### ContextResolutionFailure (class)
 
@@ -1245,7 +1194,7 @@ if (error._tag === "ContextResolutionFailure") console.error(error.message);
 declare class ContextResolutionFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolver.ts#L16)
 
 ### createApplicationContextResolver
 
@@ -1269,7 +1218,7 @@ declare const createApplicationContextResolver: (
 ) => ApplicationContextResolver;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.ts#L111)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolver.ts#L111)
 
 ### createApplicationContextResolverEffect
 
@@ -1289,7 +1238,7 @@ declare const createApplicationContextResolverEffect: (
 ) => Effect.Effect<ApplicationContextResolver, ContextResolutionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolver.ts#L25)
 
 ## `context-resolver.types.ts`
 
@@ -1313,7 +1262,7 @@ export interface ApplicationContextOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolver.types.ts#L14)
 
 ### ApplicationContextResolver (interface)
 
@@ -1346,7 +1295,7 @@ export interface ApplicationContextResolver {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolver.types.ts#L39)
 
 ### ApplicationResolveOptions (interface)
 
@@ -1367,7 +1316,7 @@ export interface ApplicationResolveOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolver.types.ts#L23)
 
 ### ResolvedApplicationContext (interface)
 
@@ -1388,47 +1337,13 @@ export interface ResolvedApplicationContext {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolver.types.ts#L31)
 
 ## `define-app.ts`
 
 Constructs immutable application descriptors without acquiring providers or
 optional tools. Shared bridge validation rejects obsolete inspection settings;
 the synchronous facade preserves original validation errors for authors.
-
-### defineApp
-
-Defines one immutable application topology synchronously.
-
-**Throws**
-
-The original validation error for invalid options.
-
-**Example**
-
-```ts
-import { defineApp } from "@relkit/app";
-import { defineEnv } from "@relkit/config";
-const app = defineApp({ env: defineEnv({}), server: { port: 3000 } });
-```
-
-**Signature**
-
-```ts
-declare const defineApp: <
-  const Shape extends EnvShape,
-  const Providers extends AppProviderInputs,
-  const Exporters extends TelemetryExporterMap = Readonly<
-    Record<string, TelemetryExporterDescriptor<string, string, object>>
-  >,
->(
-  options: DefineAppOptions<Shape, Providers, Exporters>,
-) => ApplicationDescriptor<Shape, Providers, Exporters>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L127)
-
-Since v0.2.0
 
 ### "./define-app.types.js" (namespace export)
 
@@ -1440,7 +1355,7 @@ Re-exports all named exports from the "./define-app.types.js" module.
 export * from "./define-app.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L25)
 
 ### APP_PROVIDER_CAPABILITIES
 
@@ -1458,7 +1373,7 @@ declare const APP_PROVIDER_CAPABILITIES: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L26)
 
 ### defineAppEffect
 
@@ -1484,7 +1399,7 @@ declare const defineAppEffect: <
 ) => Effect.Effect<ApplicationDescriptor<Shape, Providers, Exporters>, AppValidationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L49)
 
 ## `define-app.types.ts`
 
@@ -1496,17 +1411,28 @@ declare const defineAppEffect: <
 declare const ApiDocsConfig: ApiDocsConfig;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L12)
 
-### AppCompatibilityConfig
+### AppCheckConfig (interface)
+
+Opt-in `relkit check` rules.
+
+**Example**
+
+```ts
+const check: AppCheckConfig = { unusedErrors: true };
+```
 
 **Signature**
 
 ```ts
-declare const AppCompatibilityConfig: AppCompatibilityConfig;
+export interface AppCheckConfig {
+  /** Warn when a function declares an error that its handler never raises. Defaults to `false`. */
+  readonly unusedErrors?: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L34)
 
 ### AppDeploymentConfig (type alias)
 
@@ -1524,7 +1450,7 @@ const deployment: AppDeploymentConfig = { engine: "pulumi" };
 type AppDeploymentConfig = Readonly<Record<string, JsonValue>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L29)
 
 ### AppProviderCapability
 
@@ -1535,7 +1461,7 @@ declare const AppProviderCapability:
   "bucket" | "cache" | "job" | "event" | "model" | "realtime" | "agent-state";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L14)
 
 ### AppProviderDefaults
 
@@ -1545,7 +1471,7 @@ declare const AppProviderCapability:
 declare const AppProviderDefaults: AppProviderDefaults<Providers>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L16)
 
 ### AppProviderInputs
 
@@ -1555,7 +1481,7 @@ declare const AppProviderDefaults: AppProviderDefaults<Providers>;
 declare const AppProviderInputs: AppProviderInputs;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L15)
 
 ### AppTelemetryConfig (type alias)
 
@@ -1574,7 +1500,7 @@ type AppTelemetryConfig<Exporters extends TelemetryExporterMap = TelemetryExport
   TelemetryConfiguration<Exporters>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L23)
 
 ### ApplicationDescriptor (type alias)
 
@@ -1597,15 +1523,15 @@ type ApplicationDescriptor<
   NormalizedProviders<Providers> & {
     readonly env: EnvDefinition<Shape>;
     readonly defaults: NormalizedAppProviderDefaults<Providers>;
-    readonly compatibility: { readonly legacyJobs: boolean };
     readonly telemetry?: AppTelemetryConfig<Exporters>;
     readonly server?: ServerConfig;
     readonly inspector?: InspectorConfig;
     readonly deployment?: AppDeploymentConfig;
+    readonly check?: AppCheckConfig;
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L61)
 
 ### DefineAppOptions (type alias)
 
@@ -1629,15 +1555,15 @@ type DefineAppOptions<
     readonly id?: string;
     readonly env: EnvDefinition<Shape>;
     readonly defaults?: AppProviderDefaults<Providers>;
-    readonly compatibility?: AppCompatibilityConfig;
     readonly telemetry?: AppTelemetryConfig<Exporters>;
     readonly server?: ServerConfig;
     readonly inspector?: InspectorConfig;
     readonly deployment?: AppDeploymentConfig;
+    readonly check?: AppCheckConfig;
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L42)
 
 ### InspectorConfig
 
@@ -1647,7 +1573,7 @@ type DefineAppOptions<
 declare const InspectorConfig: InspectorConfig;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L12)
 
 ### NormalizedAppProviderDefaults
 
@@ -1665,7 +1591,7 @@ declare const NormalizedAppProviderDefaults: Readonly<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L17)
 
 ### ServerConfig
 
@@ -1675,61 +1601,888 @@ declare const NormalizedAppProviderDefaults: Readonly<{
 declare const ServerConfig: ServerConfig;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L12)
+
+## `dev-handler-table.ts`
+
+Holds the function handler table of a generated server behind a stable registry object,
+so `relkit dev` can replace every handler at once without restarting the process. The
+generated server passes the stable registry to invocation and keeps its executable
+manifest object; `swap` replaces the registry and the manifest's `functions` and
+`targets` entries in one synchronous step, so a request sees either the old table or the
+new one, never a mix. Requests already running keep the handler they resolved.
+
+### HandlerTable
+
+**Signature**
+
+```ts
+declare const HandlerTable: HandlerTable;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.ts#L15)
+
+### SwappableManifest
+
+**Signature**
+
+```ts
+declare const SwappableManifest: SwappableManifest;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.ts#L15)
+
+### createHandlerTable
+
+Wraps a verified registry and the manifest whose entries routes resolve per request.
+
+**Signature**
+
+```ts
+declare const createHandlerTable: (
+  initial: SwappableRegistry,
+  manifest: SwappableManifest,
+) => HandlerTable;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.ts#L23)
+
+## `dev-handler-table.types.ts`
+
+Contracts of the development handler table and its reload hook.
+
+### DevelopmentReloadOptions (interface)
+
+Inputs the generated server supplies to the reload hook.
+
+**Signature**
+
+```ts
+export interface DevelopmentReloadOptions {
+  readonly projectRoot: string;
+  /** Directory of the running server's `index.ts`. */
+  readonly serverDirectory: string;
+  readonly table: HandlerTable;
+  /** Manifest the server started with; later reloads compare against the last one applied. */
+  readonly runtimeManifest: ReloadedManifest;
+  /**
+   * Verifies a graph and manifest pair the same way startup does.
+   * @param graph - Graph of the new generation.
+   * @param manifest - Manifest module's `runtimeManifest` export.
+   * @returns The verified registry.
+   */
+  readonly createRegistry: (
+    graph: ApplicationGraph,
+    manifest: SwappableManifest,
+  ) => SwappableRegistry;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L81)
+
+### DevelopmentReloadReply (type alias)
+
+The server's answer to a reload request.
+
+**Signature**
+
+```ts
+type DevelopmentReloadReply =
+  | {
+      readonly type: "relkit.dev.reloaded";
+      readonly id: number;
+      readonly ok: true;
+      /** Application modules evaluated again, project-relative. */
+      readonly reimported: readonly string[];
+      readonly pid: number;
+    }
+  | {
+      readonly type: "relkit.dev.reloaded";
+      readonly id: number;
+      readonly ok: false;
+      readonly error: string;
+      readonly pid: number;
+    };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L63)
+
+### DevelopmentReloadRequest (interface)
+
+A request from `relkit dev` to load a new handler table.
+
+**Signature**
+
+```ts
+export interface DevelopmentReloadRequest {
+  readonly type: "relkit.dev.reload";
+  /** Correlates the acknowledgement. */
+  readonly id: number;
+  /** Manifest module file name in the server directory. */
+  readonly manifest: string;
+  /** Graph JSON file name in the server directory. */
+  readonly graph: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L52)
+
+### HandlerTable (interface)
+
+A stable registry whose table can be replaced atomically.
+
+**Signature**
+
+```ts
+export interface HandlerTable {
+  /** Registry object handed to invocation; it always delegates to the current table. */
+  readonly registry: SwappableRegistry;
+  /** Number of swaps applied since startup. */
+  readonly generation: number;
+  /**
+   * Replaces the registry and the manifest's function and target entries in one step.
+   * @param next - Registry verified against the new graph and manifest.
+   * @param manifest - The new generation's manifest maps.
+   */
+  readonly swap: (next: SwappableRegistry, manifest: SwappableManifest) => void;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L38)
+
+### ReloadedManifest (interface)
+
+Manifest maps that a reload must leave untouched; a re-evaluated entry forces a restart.
+
+**Signature**
+
+```ts
+export interface ReloadedManifest extends SwappableManifest {
+  readonly middleware?: Readonly<Record<string, object>>;
+  readonly hooks?: Readonly<Record<string, object>>;
+  readonly requestTransforms?: Readonly<Record<string, object>>;
+  readonly agents?: Readonly<Record<string, object>>;
+  readonly tools?: Readonly<Record<string, object>>;
+  readonly channels?: Readonly<Record<string, object>>;
+  readonly tasks?: Readonly<Record<string, object>>;
+  readonly jobs?: Readonly<Record<string, object>>;
+  readonly application?: object;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L25)
+
+### SwappableHandler (type alias)
+
+A handler as the generated server stores it: a function or a handler-bearing descriptor.
+
+**Signature**
+
+```ts
+type SwappableHandler = object;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L5)
+
+### SwappableManifest (interface)
+
+The manifest maps the running server reads handlers and targets from.
+
+**Signature**
+
+```ts
+export interface SwappableManifest {
+  readonly functions?: Record<string, SwappableHandler>;
+  readonly targets?: Record<string, object>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L19)
+
+### SwappableRegistry (interface)
+
+The function registry shape the engine's verified registry has; declared structurally
+here because `relkit/host` may not depend on the engine.
+
+**Signature**
+
+```ts
+export interface SwappableRegistry extends ReadonlyMap<string, SwappableHandler> {
+  readonly graphHash: string;
+  readonly functionIds: readonly string[];
+  readonly handlers: Readonly<Record<string, SwappableHandler>>;
+  readonly targets: Readonly<Record<string, object>>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L11)
+
+## `dev-module-reload.ts`
+
+Tracks the application modules a development process has loaded and evicts the changed
+ones, together with every loaded module that imports them, from the runtime's module registry.
+The warm evaluator and the development server both use it: after eviction the next
+import evaluates a fresh module record for each evicted file while every other module
+keeps its cached instance. Bun keys ES modules by path, and a fresh query string alone
+would still bind static imports to the old dependency, so eviction is what makes a
+re-import observe the edit. Only files below the project root and outside
+`node_modules` and `.relkit` are tracked. Development-only; the registry comes from the runtime
+adapter, and runtimes without one (Node) restart the process instead.
+
+### ModuleReloader
+
+**Signature**
+
+```ts
+declare const ModuleReloader: ModuleReloader;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-module-reload.ts#L20)
+
+### createModuleReloader
+
+Creates a reloader for one project root.
+
+**Signature**
+
+```ts
+declare const createModuleReloader: (
+  projectRoot: string,
+  modules: RuntimeModules,
+) => ModuleReloader;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-module-reload.ts#L40)
+
+## `dev-module-reload.types.ts`
+
+Loaded-module tracking and eviction for one project root.
+
+### ModuleReloader (interface)
+
+Loaded-module tracking and eviction for one project root.
+
+**Signature**
+
+```ts
+export interface ModuleReloader {
+  /**
+   * Records the modification stamp of every loaded application module.
+   * @param before - Stamps taken with {@link ModuleReloader.stamps} before the modules were
+   * imported; a file changed while they loaded keeps its earlier stamp, so the next `changed`
+   * reports it instead of the loaded module silently standing for the newer file.
+   */
+  readonly record: (before?: ReadonlyMap<string, string>) => void;
+  /** @returns The current modification stamp of every loaded application module. */
+  readonly stamps: () => ReadonlyMap<string, string>;
+  /** @returns Every application module currently in the registry, sorted. */
+  readonly loaded: () => readonly string[];
+  /** @returns Loaded application modules whose file changed or disappeared since `record`. */
+  readonly changed: () => readonly string[];
+  /**
+   * Evicts files and every loaded module that transitively imports them.
+   * @param files - Absolute or project-relative changed files.
+   * @returns Every evicted absolute file, sorted.
+   */
+  readonly invalidate: (files: readonly string[]) => readonly string[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-module-reload.types.ts#L4)
+
+## `dev-reload.ts`
+
+The development reload hook a generated server installs when `relkit dev` starts it with
+an IPC channel. On a `relkit.dev.reload` message it evicts the application modules that
+changed since the last load, together with their importers, imports the new generation's
+manifest module from the server directory (which re-evaluates exactly those modules),
+verifies it against the new graph like startup does, and swaps the handler table. The
+reply says whether the swap happened; on failure the previous table keeps serving and
+`relkit dev` falls back to starting a new generation.
+
+### DevelopmentReloadOptions
+
+**Signature**
+
+```ts
+declare const DevelopmentReloadOptions: DevelopmentReloadOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L22)
+
+### DevelopmentReloadReply
+
+**Signature**
+
+```ts
+declare const DevelopmentReloadReply: DevelopmentReloadReply;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L23)
+
+### DevelopmentReloadRequest
+
+**Signature**
+
+```ts
+declare const DevelopmentReloadRequest: DevelopmentReloadRequest;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L24)
+
+### installDevelopmentReload
+
+Listens for reload requests on the process IPC channel.
+
+**Signature**
+
+```ts
+declare const installDevelopmentReload: (options: DevelopmentReloadOptions) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L44)
+
+## `effect.ts`
+
+The Effect form of each root API, for applications written with Effect. Handlers may return an
+Effect without importing anything from here; these helpers build descriptors and failures as
+Effects instead of plain values.
+
+### FunctionOperationError
+
+**Signature**
+
+```ts
+declare const FunctionOperationError: typeof FunctionOperationError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L13)
+
+### callGraphNodeEffect
+
+**Signature**
+
+```ts
+declare const callGraphNodeEffect: <
+  Id extends string,
+  FunctionId extends string,
+  Input,
+  Output,
+  Errors extends readonly ErrorDescriptorAny[],
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+  Dependencies extends FunctionDependencies,
+>(
+  node: FunctionGraphNodeDescriptor<
+    Id,
+    FunctionId,
+    Input,
+    Output,
+    Errors,
+    InputSchema,
+    OutputSchema,
+    Dependencies
+  >,
+  input: InferInput<InputSchema>,
+) => Effect<Output, FunctionOperationError>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L14)
+
+### callToolEffect
+
+**Signature**
+
+```ts
+declare const callToolEffect: <const Id extends string, const Target extends FunctionRefAny>(
+  tool: FunctionToolDescriptor<Id, Target>,
+  input: InferInput<Target["input"]>,
+  options?: FunctionToolInvokeOptions,
+) => ReturnType<FunctionToolInvokeEffect<Target>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L15)
+
+### defineAgentEffect
+
+**Signature**
+
+```ts
+declare const defineAgentEffect: <
+  const Id extends string,
+  const InputSchema extends StandardSchemaV1,
+  const OutputSchema extends StandardSchemaV1,
+  const Tools extends readonly ToolRefAny[],
+  const Runtime extends AgentRuntimeAdapterAny,
+>(
+  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools, Runtime>,
+) => Effect<
+  AgentDefinition<Id, InputSchema, OutputSchema, Tools, Runtime>,
+  AgentDefinitionFailure,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L31)
+
+### defineAppEffect
+
+**Signature**
+
+```ts
+declare const defineAppEffect: <
+  const Shape extends EnvShape,
+  const Providers extends AppProviderInputs,
+  const Exporters extends TelemetryExporterMap = Readonly<
+    Record<string, TelemetryExporterDescriptor<string, string, object>>
+  >,
+>(
+  options: DefineAppOptions<Shape, Providers, Exporters>,
+) => Effect<ApplicationDescriptor<Shape, Providers, Exporters>, AppValidationFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L6)
+
+### defineBucketEffect
+
+**Signature**
+
+```ts
+declare const defineBucketEffect: <const Id extends string>(
+  options: DefineBucketOptions<Id>,
+) => Effect<BucketDescriptor<Id>, BucketValidationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L28)
+
+### defineCacheEffect
+
+**Signature**
+
+```ts
+declare const defineCacheEffect: <
+  const Id extends string,
+  const KeySchema extends StandardSchemaV1,
+  const ValueSchema extends StandardSchemaV1,
+>(
+  options: DefineCacheOptions<Id, KeySchema, ValueSchema>,
+) => Effect<
+  CacheDescriptor<Id, InferInput<KeySchema>, InferOutput<ValueSchema>, KeySchema, ValueSchema>,
+  CacheDescriptorError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L29)
+
+### defineChannelEffect
+
+**Signature**
+
+```ts
+declare const defineChannelEffect: <
+  const Id extends string,
+  const ParamsSchema extends StandardSchemaV1,
+  const Events extends Readonly<Record<string, StandardSchemaV1>>,
+  const Client extends ChannelClientPolicy<ChannelGuard<InferOutput<ParamsSchema>>> | undefined,
+  const Presence extends ChannelPresence<InferOutput<ParamsSchema>> | undefined = undefined,
+>(
+  options: DefineChannelOptions<Id, ParamsSchema, Events, Client, Presence>,
+) => Effect<
+  ChannelDescriptor<Id, ParamsSchema, Events, Client, Presence>,
+  ChannelValidationError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L27)
+
+### defineConstantsEffect
+
+**Signature**
+
+```ts
+declare const defineConstantsEffect: <const Values extends ConstantsShape>(
+  values: Values,
+  options?: ContextDescriptorOptions | undefined,
+) => Effect<ConstantsDescriptor<Values>, ContextDescriptorFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L7)
+
+### defineEnvEffect
+
+**Signature**
+
+```ts
+declare const defineEnvEffect: <const S extends EnvShape>(
+  shape: S & { readonly PORT?: never; readonly RELKIT_ENV?: never },
+) => Effect<EnvDefinition<S>, ConfigValidationError>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L8)
+
+### defineErrorEffect
+
+**Signature**
+
+```ts
+declare const defineErrorEffect: <
+  const Id extends string,
+  const DataSchema extends StandardSchemaV1,
+>(
+  options: DefineErrorOptions<Id, DataSchema>,
+) => Effect<
+  ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema>,
+  FunctionOperationError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L10)
+
+### defineFunctionEffect
+
+**Signature**
+
+```ts
+declare const defineFunctionEffect: DefineFunctionEffect;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L11)
+
+### defineJobEffect
+
+**Signature**
+
+```ts
+declare const defineJobEffect: <
+  const Name extends string,
+  const Task extends TaskDescriptorAny,
+  const Id extends string = Name,
+>(
+  options: DefineJobOptions<Name, Task, Id>,
+) => Effect<JobDescriptor<Name, Id, Task>, JobDefinitionFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L26)
+
+### defineMiddlewareEffect
+
+**Signature**
+
+```ts
+declare const defineMiddlewareEffect: (
+  path: string,
+  definition: MiddlewareHandler | TypedMiddlewareOptions<StandardSchemaV1<unknown, unknown>>,
+) => Effect<MiddlewareDescriptor<string, any>, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L20)
+
+### definePromptEffect
+
+**Signature**
+
+```ts
+declare const definePromptEffect: <const Value extends PromptValue>(
+  value: Value,
+  options?: ContextDescriptorOptions | undefined,
+) => Effect<PromptDescriptor<Value>, ContextDescriptorFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L7)
+
+### defineRouteEffect
+
+**Signature**
+
+```ts
+declare const defineRouteEffect: {
+  <const Id extends string, const Handler extends RawRouteOptions<Id>["handler"]>(
+    options: RawRouteOptions<Id, Handler>,
+  ): Effect<RawRouteDescriptor<Id, Handler>, RouteOperationError>;
+  <
+    const Id extends string,
+    const Target extends FunctionRefAny,
+    const Request extends HttpRequestMapping | undefined = undefined,
+  >(
+    options: FunctionRouteOptions<Id, Target, Request>,
+  ): Effect<FunctionRouteDescriptor<Id, Target, Request>, RouteOperationError>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L21)
+
+### defineServiceEffect
+
+**Signature**
+
+```ts
+declare const defineServiceEffect: <
+  const Id extends string,
+  const Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
+  const Events extends ServiceEventMap = Readonly<Record<never, never>>,
+  const Tasks extends ServiceTaskMap = Readonly<Record<never, never>>,
+  const Jobs extends ServiceJobMap = Readonly<Record<never, never>>,
+>(
+  options: DefineServiceOptions<Id, Functions, Events, Tasks, Jobs>,
+) => Effect<ServiceDescriptor<Id, Functions, Events, Tasks, Jobs>, ServiceValidationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L18)
+
+### defineServiceRoutesEffect
+
+**Signature**
+
+```ts
+declare const defineServiceRoutesEffect: <
+  const Service extends ServiceDescriptor<string, any, any>,
+  const Options extends Partial<Readonly<Record<ServiceRouteMethod, ServiceRouteEntry<Service>>>>,
+>(
+  service: Service,
+  options: Options & Record<Exclude<keyof Options, ServiceRouteMethod>, never>,
+) => Effect<
+  Readonly<{
+    [Method in keyof Options]: FunctionRouteDescriptor<
+      string,
+      Extract<
+        ServiceFunctions<Service>[Extract<
+          EntryName<Options[Method]>,
+          Extract<keyof ServiceFunctions<Service>, string>
+        >],
+        FunctionRefAny
+      >,
+      EntryRequest<Options[Method]>
+    > &
+      ServiceRouteMethodMarker<Method>;
+  }>,
+  RouteOperationError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L22)
+
+### defineTaskEffect
+
+**Signature**
+
+```ts
+declare const defineTaskEffect: <
+  const Id extends string,
+  const Version extends string,
+  const InputSchema extends StandardSchemaV1,
+  const OutputSchema extends StandardSchemaV1,
+  const Dependencies extends TaskDependencies = {},
+  const Errors extends readonly ErrorDescriptorAny[] = readonly [],
+  const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
+  const Streams extends Readonly<Record<string, StandardSchemaV1<unknown, unknown>>> = {},
+  const Execution extends TaskExecution = "durable",
+>(
+  options: DefineTaskOptions<
+    Id,
+    Version,
+    InputSchema,
+    OutputSchema,
+    Dependencies,
+    Errors,
+    ProgressSchema,
+    Streams,
+    Execution
+  >,
+) => Effect<
+  TaskDescriptor<
+    Id,
+    Version,
+    InputSchema,
+    OutputSchema,
+    Dependencies,
+    Errors,
+    ProgressSchema,
+    Streams,
+    Execution
+  >,
+  TaskDefinitionFailure,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L26)
+
+### defineToolEffect
+
+**Signature**
+
+```ts
+declare const defineToolEffect: <const Id extends string, const Target extends FunctionRefAny>(
+  options: DefineToolOptions<Id, Target>,
+) => Effect<ToolDescriptor<Id, Target>, ToolOperationFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L30)
+
+### defineTransformEffect
+
+**Signature**
+
+```ts
+declare const defineTransformEffect: <
+  const Id extends string,
+  const Schema extends StandardSchemaV1,
+>(
+  options: DefineTransformOptions<Id, Schema>,
+) => Effect<HttpTransformDescriptor<Id, Schema>, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L23)
+
+### failEffect
+
+**Signature**
+
+```ts
+declare const failEffect: <const Descriptor extends ErrorDescriptorAny>(
+  descriptor: Descriptor,
+  data: Parameters<Descriptor["create"]>[0],
+) => Effect<never, DeclaredErrorOf<Descriptor>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L12)
+
+### httpEffects
+
+**Signature**
+
+```ts
+declare const httpEffects: {
+  constant: <const V extends JsonValue>(
+    value: V,
+  ) => Effect<HttpConstantMapping<V>, RouteOperationError, never>;
+  optional: <const M extends HttpMappingNode>(
+    value: M,
+  ) => Effect<HttpOptionalMapping<M>, RouteOperationError, never>;
+  default: <const M extends HttpMappingNode, const V extends JsonValue>(
+    value: M,
+    fallback: V,
+  ) => Effect<HttpDefaultMapping<M, V>, RouteOperationError, never>;
+  transform: <const T extends HttpTransformRef | string, const M extends HttpMappingNode>(
+    transform: T,
+    value?: M | undefined,
+  ) => Effect<HttpTransformMapping<TransformOutput<T>>, RouteOperationError, never>;
+  success: (
+    status: number,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect<HttpResponseMapping, RouteOperationError, never>;
+  error: (
+    errorId: string,
+    status: number,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect<HttpResponseMapping, RouteOperationError, never>;
+  validationError: (
+    status?: number | undefined,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect<HttpResponseMapping, RouteOperationError, never>;
+  response: (
+    id: string,
+    status: number,
+    schema?: StandardSchemaV1<unknown, unknown> | undefined,
+  ) => Effect<HttpResponseMapping, RouteOperationError, never>;
+  continue: () => Effect<ContinueMapping, RouteOperationError, never>;
+  respond: (
+    response: string | HttpResponseMapping,
+    body?: HttpMappingNode | undefined,
+  ) => Effect<RespondMapping, RouteOperationError, never>;
+  input: <const S extends HttpMappingShape>(
+    fields: S,
+  ) => Effect<HttpInputMapping<S>, RouteOperationError, never>;
+  nested: <const S extends HttpMappingShape>(
+    fields: S,
+  ) => Effect<HttpNestedMapping<S>, RouteOperationError, never>;
+  path: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+  pathSegments: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+  query: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+  header: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+  cookie: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+  body: (
+    name?: string | undefined,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+  wholeBody: () => Effect<HttpWholeBodyMapping<unknown>, RouteOperationError, never>;
+  multipart: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+  multipartAll: (
+    name: string,
+    options?: HttpSourceOptions | undefined,
+  ) => Effect<HttpMappingNode, RouteOperationError, never>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L24)
+
+### streamOfEffect
+
+**Signature**
+
+```ts
+declare const streamOfEffect: <const ItemSchema extends StandardSchemaV1>(
+  item: ItemSchema,
+) => Effect<StreamOutputSchema<ItemSchema>, FunctionOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L16)
 
 ## `events.ts`
 
-### "@relkit/events" (namespace export)
+### "../events/index.js" (namespace export)
 
-Re-exports all named exports from the "@relkit/events" module.
+Re-exports all named exports from the "../events/index.js" module.
 
 **Signature**
 
 ```ts
-export * from "@relkit/events";
+export * from "../events/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/events.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/events.ts#L1)
 
 ## `functions.ts`
 
-### "@relkit/functions" (namespace export)
+### "../functions/index.js" (namespace export)
 
-Re-exports all named exports from the "@relkit/functions" module.
-
-**Signature**
-
-```ts
-export * from "@relkit/functions";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/functions.ts#L1)
-
-## `index.ts`
-
-### "./config.js" (namespace export)
-
-Re-exports all named exports from the "./config.js" module.
+Re-exports all named exports from the "../functions/index.js" module.
 
 **Signature**
 
 ```ts
-export * from "./config.js";
+export * from "../functions/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/functions.ts#L1)
 
-### "./context-descriptors.js" (namespace export)
+## `host.ts`
 
-Re-exports all named exports from the "./context-descriptors.js" module.
-
-**Signature**
-
-```ts
-export * from "./context-descriptors.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L2)
+Exposes the framework-owned descriptor identity and application context wiring
+needed by emitted hosts, including selected dependency preflight. Re-exports
+preserve identity while resolving framework dependencies from their owning app.
 
 ### "./context-resolver.js" (namespace export)
 
@@ -1741,7 +2494,308 @@ Re-exports all named exports from the "./context-resolver.js" module.
 export * from "./context-resolver.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L9)
+
+### AppConstantRunner
+
+**Signature**
+
+```ts
+declare const AppConstantRunner: typeof AppConstantRunner;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L10)
+
+### AppConstantRunnerLive
+
+**Signature**
+
+```ts
+declare const AppConstantRunnerLive: Layer<AppConstantRunner, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L10)
+
+### DevelopmentReloadOptions
+
+**Signature**
+
+```ts
+declare const DevelopmentReloadOptions: DevelopmentReloadOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L20)
+
+### DevelopmentReloadReply
+
+**Signature**
+
+```ts
+declare const DevelopmentReloadReply: DevelopmentReloadReply;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L21)
+
+### DevelopmentReloadRequest
+
+**Signature**
+
+```ts
+declare const DevelopmentReloadRequest: DevelopmentReloadRequest;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L22)
+
+### HandlerTable
+
+**Signature**
+
+```ts
+declare const HandlerTable: HandlerTable;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L17)
+
+### ModuleReloader
+
+**Signature**
+
+```ts
+declare const ModuleReloader: ModuleReloader;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L25)
+
+### SwappableManifest
+
+**Signature**
+
+```ts
+declare const SwappableManifest: SwappableManifest;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L17)
+
+### bindDescriptorIdentity
+
+**Signature**
+
+```ts
+declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: string) => T;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L6)
+
+### checkRuntimeIntegrations
+
+**Signature**
+
+```ts
+declare const checkRuntimeIntegrations: (
+  plan: RuntimeIntegrationPlan,
+  options: { readonly projectRoot: string; readonly phase: IntegrationDependencyPhase },
+) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L12)
+
+### createHandlerTable
+
+**Signature**
+
+```ts
+declare const createHandlerTable: (
+  initial: SwappableRegistry,
+  manifest: SwappableManifest,
+) => HandlerTable;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L16)
+
+### createModuleReloader
+
+**Signature**
+
+```ts
+declare const createModuleReloader: (
+  projectRoot: string,
+  modules: RuntimeModules,
+) => ModuleReloader;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L24)
+
+### installDevelopmentReload
+
+**Signature**
+
+```ts
+declare const installDevelopmentReload: (options: DevelopmentReloadOptions) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L18)
+
+### loadRuntimeIntegration
+
+**Signature**
+
+```ts
+declare const loadRuntimeIntegration: <Module>(
+  packageName: string,
+  load: () => Promise<Module>,
+) => Promise<Module>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L13)
+
+## `index.ts`
+
+The surface the `relkit` root had before it became a curated list. The curated root picks its
+names from here, and the deprecated `@relkit/app` re-exports all of it as `relkit/app`.
+
+### "../agents/index.js" (namespace export)
+
+Re-exports all named exports from the "../agents/index.js" module.
+
+**Signature**
+
+```ts
+export * from "../agents/index.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L8)
+
+### "../buckets/index.js" (namespace export)
+
+Re-exports all named exports from the "../buckets/index.js" module.
+
+**Signature**
+
+```ts
+export * from "../buckets/index.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L9)
+
+### "../cache/index.js" (namespace export)
+
+Re-exports all named exports from the "../cache/index.js" module.
+
+**Signature**
+
+```ts
+export * from "../cache/index.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L10)
+
+### "../events/index.js" (namespace export)
+
+Re-exports all named exports from the "../events/index.js" module.
+
+**Signature**
+
+```ts
+export * from "../events/index.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L11)
+
+### "../functions/index.js" (namespace export)
+
+Re-exports all named exports from the "../functions/index.js" module.
+
+**Signature**
+
+```ts
+export * from "../functions/index.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L12)
+
+### "../jobs/index.js" (namespace export)
+
+Re-exports all named exports from the "../jobs/index.js" module.
+
+**Signature**
+
+```ts
+export * from "../jobs/index.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L19)
+
+### "../realtime/index.js" (namespace export)
+
+Re-exports all named exports from the "../realtime/index.js" module.
+
+**Signature**
+
+```ts
+export * from "../realtime/index.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L22)
+
+### "../routes/index.js" (namespace export)
+
+Re-exports all named exports from the "../routes/index.js" module.
+
+**Signature**
+
+```ts
+export * from "../routes/index.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L23)
+
+### "../services/index.js" (namespace export)
+
+Re-exports all named exports from the "../services/index.js" module.
+
+**Signature**
+
+```ts
+export * from "../services/index.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L24)
+
+### "../tools/index.js" (namespace export)
+
+Re-exports all named exports from the "../tools/index.js" module.
+
+**Signature**
+
+```ts
+export * from "../tools/index.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L25)
+
+### "./config.js" (namespace export)
+
+Re-exports all named exports from the "./config.js" module.
+
+**Signature**
+
+```ts
+export * from "./config.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L5)
+
+### "./context-resolver.js" (namespace export)
+
+Re-exports all named exports from the "./context-resolver.js" module.
+
+**Signature**
+
+```ts
+export * from "./context-resolver.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L6)
 
 ### "./tasks.js" (namespace export)
 
@@ -1753,127 +2807,7 @@ Re-exports all named exports from the "./tasks.js" module.
 export * from "./tasks.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L14)
-
-### "@relkit/agents" (namespace export)
-
-Re-exports all named exports from the "@relkit/agents" module.
-
-**Signature**
-
-```ts
-export * from "@relkit/agents";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L5)
-
-### "@relkit/buckets" (namespace export)
-
-Re-exports all named exports from the "@relkit/buckets" module.
-
-**Signature**
-
-```ts
-export * from "@relkit/buckets";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L6)
-
-### "@relkit/cache" (namespace export)
-
-Re-exports all named exports from the "@relkit/cache" module.
-
-**Signature**
-
-```ts
-export * from "@relkit/cache";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L7)
-
-### "@relkit/events" (namespace export)
-
-Re-exports all named exports from the "@relkit/events" module.
-
-**Signature**
-
-```ts
-export * from "@relkit/events";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L8)
-
-### "@relkit/functions" (namespace export)
-
-Re-exports all named exports from the "@relkit/functions" module.
-
-**Signature**
-
-```ts
-export * from "@relkit/functions";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L9)
-
-### "@relkit/jobs" (namespace export)
-
-Re-exports all named exports from the "@relkit/jobs" module.
-
-**Signature**
-
-```ts
-export * from "@relkit/jobs";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
-
-### "@relkit/realtime" (namespace export)
-
-Re-exports all named exports from the "@relkit/realtime" module.
-
-**Signature**
-
-```ts
-export * from "@relkit/realtime";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L15)
-
-### "@relkit/routes" (namespace export)
-
-Re-exports all named exports from the "@relkit/routes" module.
-
-**Signature**
-
-```ts
-export * from "@relkit/routes";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L16)
-
-### "@relkit/services" (namespace export)
-
-Re-exports all named exports from the "@relkit/services" module.
-
-**Signature**
-
-```ts
-export * from "@relkit/services";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L17)
-
-### "@relkit/tools" (namespace export)
-
-Re-exports all named exports from the "@relkit/tools" module.
-
-**Signature**
-
-```ts
-export * from "@relkit/tools";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L21)
 
 ### AppConstantRunner
 
@@ -1883,7 +2817,7 @@ export * from "@relkit/tools";
 declare const AppConstantRunner: typeof AppConstantRunner;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L7)
 
 ### AppConstantRunnerLive
 
@@ -1893,7 +2827,7 @@ declare const AppConstantRunner: typeof AppConstantRunner;
 declare const AppConstantRunnerLive: Layer<AppConstantRunner, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L7)
 
 ### EventAttributeValue
 
@@ -1903,7 +2837,7 @@ declare const AppConstantRunnerLive: Layer<AppConstantRunner, never, never>;
 declare const EventAttributeValue: EventAttributeValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L15)
 
 ### EventPublishOptions
 
@@ -1913,7 +2847,7 @@ declare const EventAttributeValue: EventAttributeValue;
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L16)
 
 ### EventPublishResult
 
@@ -1923,7 +2857,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L17)
 
 ### TaskClientFor
 
@@ -1933,7 +2867,7 @@ declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 declare const TaskClientFor: TaskClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L20)
 
 ### TaskClients
 
@@ -1943,7 +2877,7 @@ declare const TaskClientFor: TaskClientFor<T>;
 declare const TaskClients: TaskClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L20)
 
 ### TaskTriggerOptions
 
@@ -1953,7 +2887,7 @@ declare const TaskClients: TaskClients<M>;
 declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L20)
 
 ### bindDescriptorIdentity
 
@@ -1963,108 +2897,21 @@ declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
 declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: string) => T;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L10)
-
-## `internal-runtime.ts`
-
-Exposes the framework-owned descriptor identity and application context wiring
-needed by emitted hosts, including selected dependency preflight. Re-exports
-preserve identity while resolving framework dependencies from their owning app.
-
-### SelectedDependenciesLive
-
-**Signature**
-
-```ts
-declare const SelectedDependenciesLive: Layer<SelectedDependencies, never, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/internal-runtime.ts#L10)
-
-### bindDescriptorIdentity
-
-**Signature**
-
-```ts
-declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: string) => T;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/internal-runtime.ts#L6)
-
-### checkIntegrationDependencies
-
-**Signature**
-
-```ts
-declare const checkIntegrationDependencies: (
-  plan: RuntimeIntegrationPlan,
-  options: {
-    readonly projectRoot: string;
-    readonly phase: IntegrationDependencyPhase;
-    readonly manager?: DependencyPackageManager;
-  },
-) => Effect<
-  import("@relkit/provider/internal/dependencies").InstalledPackageIdentity[][],
-  | import("@relkit/provider/internal/dependencies").DependencyResolutionFailure
-  | import("@relkit/provider/internal/dependencies").SelectedDependencyFailure,
-  SelectedDependencies
->;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/internal-runtime.ts#L9)
-
-### createApplicationContextResolver
-
-**Signature**
-
-```ts
-declare const createApplicationContextResolver: (
-  options: ApplicationContextOptions,
-) => ApplicationContextResolver;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/internal-runtime.ts#L7)
-
-### initializeIntegration
-
-**Signature**
-
-```ts
-declare const initializeIntegration: <Module>(
-  packageName: string,
-  load: () => Promise<Module>,
-) => Effect<Module, SelectedDependencyInitializationFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/internal-runtime.ts#L11)
-
-## `jobs-legacy.ts`
-
-### "@relkit/jobs/legacy" (namespace export)
-
-Re-exports all named exports from the "@relkit/jobs/legacy" module.
-
-**Signature**
-
-```ts
-export * from "@relkit/jobs/legacy";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/jobs-legacy.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/index.ts#L13)
 
 ## `jobs.ts`
 
-### "@relkit/jobs" (namespace export)
+### "../jobs/index.js" (namespace export)
 
-Re-exports all named exports from the "@relkit/jobs" module.
+Re-exports all named exports from the "../jobs/index.js" module.
 
 **Signature**
 
 ```ts
-export * from "@relkit/jobs";
+export * from "../jobs/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/jobs.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/jobs.ts#L1)
 
 ### RunStatus
 
@@ -2074,63 +2921,63 @@ export * from "@relkit/jobs";
 declare const RunStatus: JobRunStatus;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/jobs.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/jobs.ts#L2)
 
 ## `realtime.ts`
 
-### "@relkit/realtime" (namespace export)
+### "../realtime/index.js" (namespace export)
 
-Re-exports all named exports from the "@relkit/realtime" module.
+Re-exports all named exports from the "../realtime/index.js" module.
 
 **Signature**
 
 ```ts
-export * from "@relkit/realtime";
+export * from "../realtime/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/realtime.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/realtime.ts#L1)
 
 ## `routes.ts`
 
-### "@relkit/routes" (namespace export)
+### "../routes/index.js" (namespace export)
 
-Re-exports all named exports from the "@relkit/routes" module.
+Re-exports all named exports from the "../routes/index.js" module.
 
 **Signature**
 
 ```ts
-export * from "@relkit/routes";
+export * from "../routes/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/routes.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/routes.ts#L1)
 
 ## `schema.ts`
 
-### "@relkit/schema" (namespace export)
+### "../schema/index.js" (namespace export)
 
-Re-exports all named exports from the "@relkit/schema" module.
+Re-exports all named exports from the "../schema/index.js" module.
 
 **Signature**
 
 ```ts
-export * from "@relkit/schema";
+export * from "../schema/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/schema.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/schema.ts#L1)
 
 ## `services.ts`
 
-### "@relkit/services" (namespace export)
+### "../services/index.js" (namespace export)
 
-Re-exports all named exports from the "@relkit/services" module.
+Re-exports all named exports from the "../services/index.js" module.
 
 **Signature**
 
 ```ts
-export * from "@relkit/services";
+export * from "../services/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/services.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/services.ts#L1)
 
 ## `tasks.ts`
 
@@ -2146,14 +2993,13 @@ declare const DefineTaskOptions: DefineTaskOptions<
   OutputSchema,
   Dependencies,
   Errors,
-  Publishes,
   ProgressSchema,
   Streams,
   Execution
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L3)
 
 ### JobDescriptorForThisTask
 
@@ -2163,7 +3009,7 @@ declare const DefineTaskOptions: DefineTaskOptions<
 declare const JobDescriptorForThisTask: JobDescriptorForThisTask<Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L4)
 
 ### NormalizedTaskRetryPolicy
 
@@ -2173,7 +3019,7 @@ declare const JobDescriptorForThisTask: JobDescriptorForThisTask<Task>;
 declare const NormalizedTaskRetryPolicy: NormalizedTaskRetryPolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L5)
 
 ### RunResultOptions
 
@@ -2183,7 +3029,7 @@ declare const NormalizedTaskRetryPolicy: NormalizedTaskRetryPolicy;
 declare const RunResultOptions: RunResultOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L6)
 
 ### ServerTriggerOptions
 
@@ -2193,7 +3039,7 @@ declare const RunResultOptions: RunResultOptions;
 declare const ServerTriggerOptions: ServerTriggerOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L7)
 
 ### TaskAuthContext
 
@@ -2203,7 +3049,7 @@ declare const ServerTriggerOptions: ServerTriggerOptions;
 declare const TaskAuthContext: TaskAuthContext<Session>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L8)
 
 ### TaskCallerInput
 
@@ -2213,7 +3059,7 @@ declare const TaskAuthContext: TaskAuthContext<Session>;
 declare const TaskCallerInput: TaskCallerInput<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L9)
 
 ### TaskCanonicalInput
 
@@ -2223,7 +3069,7 @@ declare const TaskCallerInput: TaskCallerInput<T>;
 declare const TaskCanonicalInput: TaskCanonicalInput<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L10)
 
 ### TaskConcurrency
 
@@ -2233,27 +3079,27 @@ declare const TaskCanonicalInput: TaskCanonicalInput<T>;
 declare const TaskConcurrency: TaskConcurrency<InputKey>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L11)
 
 ### TaskContext
 
 **Signature**
 
 ```ts
-declare const TaskContext: TaskContext<Execution, Dependencies, ProgressSchema, Streams, Publishes>;
+declare const TaskContext: TaskContext<Execution, Dependencies, ProgressSchema, Streams>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L12)
 
 ### TaskContextBase
 
 **Signature**
 
 ```ts
-declare const TaskContextBase: TaskContextBase<Dependencies, Publishes>;
+declare const TaskContextBase: TaskContextBase<Dependencies>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L13)
 
 ### TaskDependencies
 
@@ -2263,7 +3109,7 @@ declare const TaskContextBase: TaskContextBase<Dependencies, Publishes>;
 declare const TaskDependencies: TaskDependencies;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L14)
 
 ### TaskDescriptor
 
@@ -2277,14 +3123,13 @@ declare const TaskDescriptor: TaskDescriptor<
   OutputSchema,
   Dependencies,
   Errors,
-  Publishes,
   ProgressSchema,
   Streams,
   Execution
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L15)
 
 ### TaskDescriptorAny
 
@@ -2294,7 +3139,7 @@ declare const TaskDescriptor: TaskDescriptor<
 declare const TaskDescriptorAny: TaskDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L16)
 
 ### TaskExecution
 
@@ -2304,17 +3149,17 @@ declare const TaskDescriptorAny: TaskDescriptorAny;
 declare const TaskExecution: TaskExecution;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L17)
 
 ### TaskFailureHook
 
 **Signature**
 
 ```ts
-declare const TaskFailureHook: TaskFailureHook<Dependencies, Publishes>;
+declare const TaskFailureHook: TaskFailureHook<Dependencies>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L18)
 
 ### TaskHandler
 
@@ -2328,12 +3173,11 @@ declare const TaskHandler: TaskHandler<
   Dependencies,
   Errors,
   ProgressSchema,
-  Streams,
-  Publishes
+  Streams
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L19)
 
 ### TaskHandlerResult
 
@@ -2343,17 +3187,17 @@ declare const TaskHandler: TaskHandler<
 declare const TaskHandlerResult: TaskHandlerResult<Output, Errors>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L20)
 
 ### TaskHookContext
 
 **Signature**
 
 ```ts
-declare const TaskHookContext: TaskHookContext<Dependencies, Publishes>;
+declare const TaskHookContext: TaskHookContext<Dependencies>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L21)
 
 ### TaskInput
 
@@ -2363,7 +3207,7 @@ declare const TaskHookContext: TaskHookContext<Dependencies, Publishes>;
 declare const TaskInput: TaskInput<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L22)
 
 ### TaskLogging
 
@@ -2373,7 +3217,7 @@ declare const TaskInput: TaskInput<T>;
 declare const TaskLogging: TaskLogging;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L23)
 
 ### TaskOutput
 
@@ -2383,7 +3227,7 @@ declare const TaskLogging: TaskLogging;
 declare const TaskOutput: TaskOutput<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L24)
 
 ### TaskProgressEmitter
 
@@ -2393,7 +3237,7 @@ declare const TaskOutput: TaskOutput<T>;
 declare const TaskProgressEmitter: TaskProgressEmitter<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L27)
 
 ### TaskProgressInput
 
@@ -2403,7 +3247,7 @@ declare const TaskProgressEmitter: TaskProgressEmitter<Value>;
 declare const TaskProgressInput: TaskProgressInput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L25)
 
 ### TaskProgressOutput
 
@@ -2413,7 +3257,7 @@ declare const TaskProgressInput: TaskProgressInput<Schema>;
 declare const TaskProgressOutput: TaskProgressOutput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L26)
 
 ### TaskRawHandlerOutput
 
@@ -2423,7 +3267,7 @@ declare const TaskProgressOutput: TaskProgressOutput<Schema>;
 declare const TaskRawHandlerOutput: TaskRawHandlerOutput<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L42)
 
 ### TaskResources
 
@@ -2433,7 +3277,7 @@ declare const TaskRawHandlerOutput: TaskRawHandlerOutput<T>;
 declare const TaskResources: TaskResources;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L28)
 
 ### TaskRetryPolicy
 
@@ -2443,7 +3287,7 @@ declare const TaskResources: TaskResources;
 declare const TaskRetryPolicy: TaskRetryPolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L29)
 
 ### TaskRunContext
 
@@ -2453,7 +3297,7 @@ declare const TaskRetryPolicy: TaskRetryPolicy;
 declare const TaskRunContext: TaskRunContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L30)
 
 ### TaskSleepOptions
 
@@ -2463,17 +3307,17 @@ declare const TaskRunContext: TaskRunContext;
 declare const TaskSleepOptions: TaskSleepOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L31)
 
 ### TaskStartHook
 
 **Signature**
 
 ```ts
-declare const TaskStartHook: TaskStartHook<InputSchema, Dependencies, Publishes>;
+declare const TaskStartHook: TaskStartHook<InputSchema, Dependencies>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L32)
 
 ### TaskStreamEmitter
 
@@ -2483,7 +3327,7 @@ declare const TaskStartHook: TaskStartHook<InputSchema, Dependencies, Publishes>
 declare const TaskStreamEmitter: TaskStreamEmitter<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L33)
 
 ### TaskStreamEmitters
 
@@ -2493,7 +3337,7 @@ declare const TaskStreamEmitter: TaskStreamEmitter<Value>;
 declare const TaskStreamEmitters: TaskStreamEmitters<Streams>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L34)
 
 ### TaskStreamFrames
 
@@ -2503,7 +3347,7 @@ declare const TaskStreamEmitters: TaskStreamEmitters<Streams>;
 declare const TaskStreamFrames: TaskStreamFrames<Streams>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L35)
 
 ### TaskStreamInput
 
@@ -2513,7 +3357,7 @@ declare const TaskStreamFrames: TaskStreamFrames<Streams>;
 declare const TaskStreamInput: TaskStreamInput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L37)
 
 ### TaskStreamItem
 
@@ -2523,7 +3367,7 @@ declare const TaskStreamInput: TaskStreamInput<Schema>;
 declare const TaskStreamItem: TaskStreamItem<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L36)
 
 ### TaskStreamOutput
 
@@ -2533,7 +3377,7 @@ declare const TaskStreamItem: TaskStreamItem<Schema>;
 declare const TaskStreamOutput: TaskStreamOutput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L38)
 
 ### TaskStreamSchemas
 
@@ -2543,17 +3387,17 @@ declare const TaskStreamOutput: TaskStreamOutput<Schema>;
 declare const TaskStreamSchemas: Readonly<Record<string, StandardSchemaV1<unknown, unknown>>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L39)
 
 ### TaskSuccessHook
 
 **Signature**
 
 ```ts
-declare const TaskSuccessHook: TaskSuccessHook<OutputSchema, Dependencies, Publishes>;
+declare const TaskSuccessHook: TaskSuccessHook<OutputSchema, Dependencies>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L40)
 
 ### TaskTriggerOptions
 
@@ -2563,7 +3407,7 @@ declare const TaskSuccessHook: TaskSuccessHook<OutputSchema, Dependencies, Publi
 declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L41)
 
 ### TaskValidatedOutput
 
@@ -2573,7 +3417,7 @@ declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
 declare const TaskValidatedOutput: TaskValidatedOutput<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L43)
 
 ### TriggerOptions
 
@@ -2583,7 +3427,7 @@ declare const TaskValidatedOutput: TaskValidatedOutput<T>;
 declare const TriggerOptions: TriggerOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L44)
 
 ### assertTaskDescriptor
 
@@ -2593,7 +3437,7 @@ declare const TriggerOptions: TriggerOptions;
 declare const assertTaskDescriptor: (value: unknown) => asserts value is TaskDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L1)
 
 ### defineTask
 
@@ -2607,7 +3451,6 @@ declare const defineTask: <
   const OutputSchema extends StandardSchemaV1,
   const Dependencies extends TaskDependencies = {},
   const Errors extends readonly ErrorDescriptorAny[] = readonly [],
-  const Publishes extends readonly PublishedEventName[] = readonly [],
   const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   const Streams extends TaskStreamSchemas = {},
   const Execution extends TaskExecution = "durable",
@@ -2619,7 +3462,6 @@ declare const defineTask: <
     OutputSchema,
     Dependencies,
     Errors,
-    Publishes,
     ProgressSchema,
     Streams,
     Execution
@@ -2631,14 +3473,13 @@ declare const defineTask: <
   OutputSchema,
   Dependencies,
   Errors,
-  Publishes,
   ProgressSchema,
   Streams,
   Execution
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L1)
 
 ### isTaskDescriptor
 
@@ -2648,21 +3489,21 @@ declare const defineTask: <
 declare const isTaskDescriptor: (value: unknown) => value is TaskDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L1)
 
 ## `tools.ts`
 
-### "@relkit/tools" (namespace export)
+### "../tools/index.js" (namespace export)
 
-Re-exports all named exports from the "@relkit/tools" module.
+Re-exports all named exports from the "../tools/index.js" module.
 
 **Signature**
 
 ```ts
-export * from "@relkit/tools";
+export * from "../tools/index.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tools.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tools.ts#L1)
 
 ## `agent-content.ts`
 
@@ -2680,7 +3521,7 @@ type AgentProgressScope =
   | { readonly scope: "tool"; readonly toolCallId: string; readonly toolId: string };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-content.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-content.ts#L36)
 
 ### BrowserMessage (interface)
 
@@ -2698,7 +3539,7 @@ export interface BrowserMessage {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-content.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-content.ts#L2)
 
 ### BrowserMessagePart (type alias)
 
@@ -2732,7 +3573,7 @@ type BrowserMessagePart =
     } & AgentProgressScope);
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-content.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-content.ts#L11)
 
 ### ToolPartState (type alias)
 
@@ -2752,7 +3593,7 @@ type ToolPartState =
   | "denied";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-content.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-content.ts#L41)
 
 ## `agent-events.ts`
 
@@ -2777,7 +3618,7 @@ type AgentClientEvent =
     });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-events.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-events.ts#L40)
 
 ### AgentObservation (type alias)
 
@@ -2796,7 +3637,7 @@ type AgentObservation =
     };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-events.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-events.ts#L54)
 
 ### AgentProgressEvent (type alias)
 
@@ -2813,7 +3654,7 @@ type AgentProgressEvent = AgentClientEventBase & {
 } & AgentProgressScope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-events.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-events.ts#L32)
 
 ### AgentToolEvent (type alias)
 
@@ -2839,7 +3680,7 @@ type AgentToolEvent = AgentClientEventBase & {
   );
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-events.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-events.ts#L15)
 
 ## `agent-execution.ts`
 
@@ -2868,7 +3709,7 @@ export interface AgentExecutionEvent {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-execution.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-execution.ts#L2)
 
 ### AgentExecutionSnapshot (interface)
 
@@ -2888,7 +3729,7 @@ export interface AgentExecutionSnapshot {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-execution.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-execution.ts#L18)
 
 ## `agent-state-control-requests.types.ts`
 
@@ -2912,7 +3753,7 @@ export interface AcceptControlRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-control-requests.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-control-requests.types.ts#L10)
 
 ### AdmitContinuationRequest (type alias)
 
@@ -2929,7 +3770,7 @@ type AdmitContinuationRequest = ContinuationAdmission &
   );
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-control-requests.types.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-control-requests.types.ts#L108)
 
 ### ClaimControlRequest (interface)
 
@@ -2946,7 +3787,7 @@ export interface ClaimControlRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-control-requests.types.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-control-requests.types.ts#L51)
 
 ### ContinuationIdentity (interface)
 
@@ -2960,7 +3801,7 @@ export interface ContinuationIdentity {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-control-requests.types.ts#L95)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-control-requests.types.ts#L95)
 
 ### ControlLimits (interface)
 
@@ -2973,7 +3814,7 @@ export interface ControlLimits {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-control-requests.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-control-requests.types.ts#L5)
 
 ### ControlPage (interface)
 
@@ -2987,7 +3828,7 @@ export interface ControlPage {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-control-requests.types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-control-requests.types.ts#L37)
 
 ### LookupContinuationReceiptRequest (interface)
 
@@ -3004,7 +3845,7 @@ export interface LookupContinuationReceiptRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-control-requests.types.ts#L117)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-control-requests.types.ts#L117)
 
 ### LookupControlReceiptRequest (interface)
 
@@ -3020,7 +3861,7 @@ export interface LookupControlReceiptRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-control-requests.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-control-requests.types.ts#L22)
 
 ### MarkControlEffectStartedRequest (interface)
 
@@ -3036,7 +3877,7 @@ export interface MarkControlEffectStartedRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-control-requests.types.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-control-requests.types.ts#L67)
 
 ### ReadControlsRequest (interface)
 
@@ -3051,7 +3892,7 @@ export interface ReadControlsRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-control-requests.types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-control-requests.types.ts#L30)
 
 ### RecoverAbandonedControlRequest (interface)
 
@@ -3068,7 +3909,7 @@ export interface RecoverAbandonedControlRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-control-requests.types.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-control-requests.types.ts#L86)
 
 ### RenewControlClaimRequest (interface)
 
@@ -3083,7 +3924,7 @@ export interface RenewControlClaimRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-control-requests.types.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-control-requests.types.ts#L60)
 
 ### SettleControlRequest (interface)
 
@@ -3102,7 +3943,7 @@ export interface SettleControlRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-control-requests.types.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-control-requests.types.ts#L75)
 
 ### WaitForControlsRequest (interface)
 
@@ -3118,7 +3959,7 @@ export interface WaitForControlsRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-control-requests.types.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-control-requests.types.ts#L43)
 
 ## `agent-state-provider.types.ts`
 
@@ -3161,7 +4002,7 @@ export interface AgentStateProvider {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-provider.types.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-provider.types.ts#L50)
 
 ## `agent-state-receipts.types.ts`
 
@@ -3181,7 +4022,7 @@ export interface AcceptRunReceipt {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-receipts.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-receipts.types.ts#L17)
 
 ### CompletionReceipt (interface)
 
@@ -3198,7 +4039,7 @@ export interface CompletionReceipt {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-receipts.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-receipts.types.ts#L31)
 
 ### ContinuationReceipt (interface)
 
@@ -3216,7 +4057,7 @@ export interface ContinuationReceipt {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-receipts.types.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-receipts.types.ts#L65)
 
 ### ContinuationReceiptLookup (type alias)
 
@@ -3226,7 +4067,7 @@ export interface ContinuationReceipt {
 type ContinuationReceiptLookup = ReceiptLookup<ContinuationReceipt>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-receipts.types.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-receipts.types.ts#L77)
 
 ### ControlReceipt (interface)
 
@@ -3243,7 +4084,7 @@ export interface ControlReceipt {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-receipts.types.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-receipts.types.ts#L56)
 
 ### ControlReceiptLookup (type alias)
 
@@ -3253,7 +4094,7 @@ export interface ControlReceipt {
 type ControlReceiptLookup = ReceiptLookup<ControlReceipt>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-receipts.types.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-receipts.types.ts#L76)
 
 ### CreateThreadReceipt (interface)
 
@@ -3267,7 +4108,7 @@ export interface CreateThreadReceipt {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-receipts.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-receipts.types.ts#L11)
 
 ### InterruptionReceipt (interface)
 
@@ -3283,7 +4124,7 @@ export interface InterruptionReceipt {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-receipts.types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-receipts.types.ts#L40)
 
 ### JournalReceipt (interface)
 
@@ -3297,7 +4138,7 @@ export interface JournalReceipt {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-receipts.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-receipts.types.ts#L25)
 
 ### RunReceiptLookup (type alias)
 
@@ -3307,7 +4148,7 @@ export interface JournalReceipt {
 type RunReceiptLookup = ReceiptLookup<AcceptRunReceipt | CompletionReceipt>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-receipts.types.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-receipts.types.ts#L75)
 
 ### SuspensionReceipt (interface)
 
@@ -3323,7 +4164,7 @@ export interface SuspensionReceipt {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-receipts.types.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-receipts.types.ts#L48)
 
 ## `agent-state-thread-requests.types.ts`
 
@@ -3347,7 +4188,7 @@ export interface AcceptRunRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L60)
 
 ### AgentStateLimits (interface)
 
@@ -3368,7 +4209,7 @@ export interface AgentStateLimits {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L14)
 
 ### AppendJournalRequest (interface)
 
@@ -3386,7 +4227,7 @@ export interface AppendJournalRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L116)
 
 ### ClaimRunRequest (interface)
 
@@ -3402,7 +4243,7 @@ export interface ClaimRunRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L101)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L101)
 
 ### CompleteRunRequest (interface)
 
@@ -3422,7 +4263,7 @@ export interface CompleteRunRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L126)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L126)
 
 ### CreateThreadRequest (interface)
 
@@ -3438,7 +4279,7 @@ export interface CreateThreadRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L27)
 
 ### InterruptOwnedRunRequest (interface)
 
@@ -3457,7 +4298,7 @@ export interface InterruptOwnedRunRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L147)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L147)
 
 ### JournalPage (interface)
 
@@ -3472,7 +4313,7 @@ export interface JournalPage {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L87)
 
 ### ListThreadsRequest (interface)
 
@@ -3484,7 +4325,7 @@ export interface ListThreadsRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L40)
 
 ### LoadThreadRequest (interface)
 
@@ -3497,7 +4338,7 @@ export interface LoadThreadRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L35)
 
 ### LookupRunReceiptRequest (interface)
 
@@ -3513,7 +4354,7 @@ export interface LookupRunReceiptRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L72)
 
 ### ReadJournalRequest (interface)
 
@@ -3528,7 +4369,7 @@ export interface ReadJournalRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L80)
 
 ### ReadSnapshotHistoryRequest (interface)
 
@@ -3543,7 +4384,7 @@ export interface ReadSnapshotHistoryRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L48)
 
 ### RenewRunClaimRequest (interface)
 
@@ -3558,7 +4399,7 @@ export interface RenewRunClaimRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L109)
 
 ### SnapshotHistoryPage (interface)
 
@@ -3571,7 +4412,7 @@ export interface SnapshotHistoryPage {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L55)
 
 ### SuspendRunRequest (interface)
 
@@ -3588,7 +4429,7 @@ export interface SuspendRunRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L138)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L138)
 
 ### ThreadList (interface)
 
@@ -3600,7 +4441,7 @@ export interface ThreadList {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L44)
 
 ### WaitForJournalRequest (interface)
 
@@ -3615,7 +4456,7 @@ export interface WaitForJournalRequest extends AgentRequestScope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state-thread-requests.types.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state-thread-requests.types.ts#L94)
 
 ## `agent-state.ts`
 
@@ -3637,7 +4478,7 @@ export interface AgentRequestScope extends ExpectedClientIdentity {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L143)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L143)
 
 ### AgentRunCompatibility (interface)
 
@@ -3655,7 +4496,7 @@ export interface AgentRunCompatibility {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L58)
 
 ### AgentWaitingRequest (interface)
 
@@ -3671,7 +4512,7 @@ export interface AgentWaitingRequest {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L111)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L111)
 
 ### AgentWaitingState (interface)
 
@@ -3688,7 +4529,7 @@ export interface AgentWaitingState {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L117)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L117)
 
 ### ControlClaim (interface)
 
@@ -3707,7 +4548,7 @@ export interface ControlClaim {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L162)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L162)
 
 ### ControlEffectOutcome (type alias)
 
@@ -3719,7 +4560,7 @@ Whether a control's external effect is known to have occurred.
 type ControlEffectOutcome = "not-started" | "confirmed" | "unknown";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L77)
 
 ### ControlRecord (interface)
 
@@ -3741,7 +4582,7 @@ export interface ControlRecord {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L79)
 
 ### ControlStatus (type alias)
 
@@ -3753,7 +4594,7 @@ Persistence lifecycle of a control request.
 type ControlStatus = "accepted" | "processing" | "applied" | "rejected" | "cancelled";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L75)
 
 ### ExecutionClaim (interface)
 
@@ -3772,7 +4613,7 @@ export interface ExecutionClaim {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L153)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L153)
 
 ### JournalCheckpoint (interface)
 
@@ -3791,7 +4632,7 @@ export interface JournalCheckpoint {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L91)
 
 ### JournalRecord (interface)
 
@@ -3812,7 +4653,7 @@ export interface JournalRecord {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L100)
 
 ### RunOwner (interface)
 
@@ -3830,7 +4671,7 @@ export interface RunOwner {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L21)
 
 ### RunStatus (type alias)
 
@@ -3851,7 +4692,7 @@ type RunStatus =
   | "worker-interrupted";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L10)
 
 ### StoredApproval (interface)
 
@@ -3870,7 +4711,7 @@ export interface StoredApproval {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L66)
 
 ### StoredRun (interface)
 
@@ -3889,7 +4730,7 @@ export interface StoredRun extends StoredRunRouting {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L49)
 
 ### StoredRunRouting (interface)
 
@@ -3905,7 +4746,7 @@ export interface StoredRunRouting {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L29)
 
 ### StoredThread (interface)
 
@@ -3925,7 +4766,7 @@ export interface StoredThread {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L35)
 
 ### ThreadListItem (interface)
 
@@ -3939,7 +4780,7 @@ export interface ThreadListItem extends StoredThread {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L45)
 
 ### ThreadSnapshot (interface)
 
@@ -3968,7 +4809,7 @@ export interface ThreadSnapshot {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L124)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L124)
 
 ### ThreadStatus (type alias)
 
@@ -3981,7 +4822,7 @@ type ThreadStatus =
   "idle" | "running" | "waiting" | "approval-interrupted" | "stopping" | "worker-interrupted";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-state.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-state.ts#L7)
 
 ## `agent-thread-transition.types.ts`
 
@@ -4002,7 +4843,7 @@ type AgentTransitionError =
   | "AGENT_INVALID_CONTROL";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-thread-transition.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-thread-transition.types.ts#L8)
 
 ### ThreadAction (type alias)
 
@@ -4014,7 +4855,7 @@ Actions that a caller may request for an agent thread.
 type ThreadAction = "send" | "steer" | "follow-up" | "stop" | "approve" | "deny";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-thread-transition.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-thread-transition.types.ts#L5)
 
 ### ThreadTransition (type alias)
 
@@ -4032,7 +4873,7 @@ type ThreadTransition =
     };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/agent-thread-transition.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/agent-thread-transition.types.ts#L16)
 
 ## `jobs-access.ts`
 
@@ -4049,7 +4890,7 @@ export interface JobAccessGrant {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-access.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-access.ts#L17)
 
 ### JobAccessRequest (interface)
 
@@ -4067,7 +4908,7 @@ export interface JobAccessRequest {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-access.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-access.ts#L8)
 
 ### JobClientOperation (type alias)
 
@@ -4079,7 +4920,7 @@ Client action requiring a job access grant.
 type JobClientOperation = "trigger" | "get" | "list" | "watch" | "cancel" | "retry" | "stream";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-access.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-access.ts#L4)
 
 ### JobUnknownOutcome (interface)
 
@@ -4100,7 +4941,7 @@ export interface JobUnknownOutcome {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-access.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-access.ts#L23)
 
 ## `jobs-progress.ts`
 
@@ -4119,7 +4960,7 @@ export interface ProgressEmitReceipt {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-progress.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-progress.ts#L7)
 
 ### ProgressOutcome (type alias)
 
@@ -4131,7 +4972,7 @@ Delivery outcome of an emitted progress item.
 type ProgressOutcome = "persisted" | "sent" | "dropped" | "unavailable";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-progress.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-progress.ts#L4)
 
 ### StreamItem (type alias)
 
@@ -4143,7 +4984,7 @@ JSON-safe item carried by a named job stream.
 type StreamItem = JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-progress.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-progress.ts#L21)
 
 ### StreamSchemaDescriptor (interface)
 
@@ -4158,7 +4999,7 @@ export interface StreamSchemaDescriptor<Name extends string = string> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-progress.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-progress.ts#L15)
 
 ## `jobs-refs.ts`
 
@@ -4184,7 +5025,7 @@ export interface JobRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-refs.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-refs.ts#L47)
 
 ### JobRefAny (type alias)
 
@@ -4196,7 +5037,7 @@ Job reference with unconstrained type parameters.
 type JobRefAny = JobRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-refs.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-refs.ts#L62)
 
 ### SchemaInput (type alias)
 
@@ -4212,7 +5053,7 @@ type SchemaInput<S> = S extends {
   : unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-refs.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-refs.ts#L17)
 
 ### SchemaLike (interface)
 
@@ -4228,7 +5069,7 @@ export interface SchemaLike<Input = unknown, Output = Input> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-refs.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-refs.ts#L10)
 
 ### SchemaOutput (type alias)
 
@@ -4244,7 +5085,7 @@ type SchemaOutput<S> = S extends {
   : unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-refs.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-refs.ts#L24)
 
 ### SchemaTypeParameters (interface)
 
@@ -4259,7 +5100,7 @@ export interface SchemaTypeParameters<Input = unknown, Output = Input> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-refs.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-refs.ts#L4)
 
 ### TaskRef (interface)
 
@@ -4281,7 +5122,7 @@ export interface TaskRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-refs.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-refs.ts#L31)
 
 ### TaskRefAny (type alias)
 
@@ -4293,7 +5134,7 @@ Task reference with unconstrained type parameters.
 type TaskRefAny = TaskRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-refs.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-refs.ts#L44)
 
 ## `jobs-run-stream.ts`
 
@@ -4319,7 +5160,7 @@ type NamedStreamFrame<Item = JsonValue> =
   | (StreamIdentity & { readonly kind: "end" });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run-stream.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run-stream.ts#L55)
 
 ### RunConnection (type alias)
 
@@ -4340,7 +5181,7 @@ type RunConnection =
   | "disposed";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run-stream.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run-stream.ts#L5)
 
 ### RunWatchFrame (type alias)
 
@@ -4378,7 +5219,7 @@ type RunWatchFrame<Run = RunSnapshot> =
     };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run-stream.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run-stream.ts#L17)
 
 ### StreamIdentity (interface)
 
@@ -4396,7 +5237,7 @@ export interface StreamIdentity {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run-stream.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run-stream.ts#L46)
 
 ## `jobs-run.ts`
 
@@ -4416,7 +5257,7 @@ export interface JobErrorEnvelope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L49)
 
 ### JobRunStatus (type alias)
 
@@ -4438,7 +5279,7 @@ type JobRunStatus =
   | "unknown";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L11)
 
 ### NamedStreamFrame
 
@@ -4448,7 +5289,7 @@ type JobRunStatus =
 declare const NamedStreamFrame: NamedStreamFrame<Item>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L4)
 
 ### ResultAvailability (type alias)
 
@@ -4468,7 +5309,7 @@ type ResultAvailability =
   | "unavailable";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L26)
 
 ### RunAvailability (interface)
 
@@ -4484,7 +5325,7 @@ export interface RunAvailability {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L137)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L137)
 
 ### RunCancellationReceipt (interface)
 
@@ -4502,7 +5343,7 @@ export interface RunCancellationReceipt {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L58)
 
 ### RunConnection
 
@@ -4512,7 +5353,7 @@ export interface RunCancellationReceipt {
 declare const RunConnection: RunConnection;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L5)
 
 ### RunHandle (interface)
 
@@ -4533,7 +5374,7 @@ export interface RunHandle {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L37)
 
 ### RunListQuery (interface)
 
@@ -4565,7 +5406,7 @@ export interface RunListQuery {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L114)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L114)
 
 ### RunPage (interface)
 
@@ -4583,7 +5424,7 @@ export interface RunPage<Run = RunSnapshot> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L144)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L144)
 
 ### RunRetryReceipt (interface)
 
@@ -4597,7 +5438,7 @@ export interface RunRetryReceipt extends RunHandle {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L153)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L153)
 
 ### RunSnapshot (type alias)
 
@@ -4628,7 +5469,7 @@ type RunSnapshot<
     });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L92)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L92)
 
 ### RunStatus (type alias)
 
@@ -4640,7 +5481,7 @@ Backward-compatible alias for a job run status.
 type RunStatus = JobRunStatus;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L23)
 
 ### RunWatchFrame
 
@@ -4650,7 +5491,7 @@ type RunStatus = JobRunStatus;
 declare const RunWatchFrame: RunWatchFrame<Run>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L6)
 
 ### StreamIdentity
 
@@ -4660,7 +5501,7 @@ declare const RunWatchFrame: RunWatchFrame<Run>;
 declare const StreamIdentity: StreamIdentity;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-run.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-run.ts#L7)
 
 ## `jobs-wire.types.ts`
 
@@ -4674,7 +5515,7 @@ Versioned result representation on the jobs wire.
 type JobWireEnvelope = JsonWireEnvelope | VoidWireEnvelope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-wire.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-wire.types.ts#L18)
 
 ### JsonWireEnvelope (interface)
 
@@ -4690,7 +5531,7 @@ export interface JsonWireEnvelope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-wire.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-wire.types.ts#L5)
 
 ### VoidWireEnvelope (interface)
 
@@ -4705,7 +5546,7 @@ export interface VoidWireEnvelope {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs-wire.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs-wire.types.ts#L12)
 
 ## `jobs.ts`
 
@@ -4719,7 +5560,7 @@ Re-exports all named exports from the "./jobs-contracts.js" module.
 export * from "./jobs-contracts.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs.ts#L7)
 
 ### JOBS_MANIFEST_PROTOCOL
 
@@ -4729,7 +5570,7 @@ export * from "./jobs-contracts.js";
 declare const JOBS_MANIFEST_PROTOCOL: "relkit.jobs-manifest";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs.ts#L3)
 
 ### JOBS_MANIFEST_VERSION
 
@@ -4739,7 +5580,7 @@ declare const JOBS_MANIFEST_PROTOCOL: "relkit.jobs-manifest";
 declare const JOBS_MANIFEST_VERSION: 1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs.ts#L4)
 
 ### JOBS_PROTOCOL
 
@@ -4749,7 +5590,7 @@ declare const JOBS_MANIFEST_VERSION: 1;
 declare const JOBS_PROTOCOL: "relkit.jobs";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs.ts#L1)
 
 ### JOBS_PROTOCOL_VERSION
 
@@ -4759,7 +5600,7 @@ declare const JOBS_PROTOCOL: "relkit.jobs";
 declare const JOBS_PROTOCOL_VERSION: 1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs.ts#L2)
 
 ### JOB_NAME_MAX_LENGTH
 
@@ -4769,4 +5610,4 @@ declare const JOBS_PROTOCOL_VERSION: 1;
 declare const JOB_NAME_MAX_LENGTH: 64;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/contracts/src/jobs.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/contracts/jobs.ts#L5)

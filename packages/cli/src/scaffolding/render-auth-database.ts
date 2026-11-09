@@ -6,10 +6,10 @@
 
 import { Effect } from "effect";
 import { dirname, posix } from "node:path";
-import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import { scaffoldErrors, domainError } from "create-relkit/internal/generator-errors";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { observeExecution } from "relkit/contracts/operation";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { scaffoldErrors, domainError } from "create-relkit/generator-errors";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 import { authSchemaSource } from "./render-auth-schema.js";
 import { addSourceExport } from "./source-edit.js";
 import type { PlanBuilder } from "./plan-builder.js";

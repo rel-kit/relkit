@@ -1,5 +1,5 @@
 /** Returns a validated demonstration search count for the route's optional status query. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import { orderSearchInput, orderSearchOutput } from "../../../platform/schemas.js";
 
 const searchOrders = defineFunction({

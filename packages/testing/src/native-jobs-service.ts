@@ -1,7 +1,7 @@
 import { notifyNativeJobs } from "./native-jobs-state.js";
 import { nativeJobObservation } from "./native-jobs-observe.js";
 import { Context, Deferred, Effect, Layer, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 import { createDeterministicClock } from "./runtime-clock.js";
 import type { TestJobsAdapterOptions } from "./test-jobs-adapter.js";

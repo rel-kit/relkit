@@ -14,12 +14,6 @@ export function record(value: unknown): InspectorObject | undefined {
     : undefined;
 }
 
-export function records(value: unknown): InspectorObject[] {
-  return Array.isArray(value)
-    ? value.filter((item): item is InspectorObject => record(item) !== undefined)
-    : [];
-}
-
 /** Elapsed milliseconds between two ISO stamps, when both are present and ordered. */
 export function elapsed(start: unknown, end: unknown): number | undefined {
   const from = typeof start === "string" ? Date.parse(start) : Number.NaN;

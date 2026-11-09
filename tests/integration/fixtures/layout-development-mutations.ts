@@ -38,11 +38,11 @@ export async function addBoundary(root: string): Promise<void> {
   await mkdir(join(root, "src/services/other/functions"));
   await writeFile(
     join(root, "src/services/other/functions/probe.function.ts"),
-    '/** Supplies one useful original descriptor to the added domain. */\nimport { defineFunction } from "@relkit/app/functions";\nimport { z } from "@relkit/app/schema";\nexport default defineFunction({ input: z.object({}), output: z.string(), handler: async () => "native other" });\n',
+    '/** Supplies one useful original descriptor to the added domain. */\nimport { defineFunction } from "relkit/functions";\nimport { z } from "relkit/schema";\nexport default defineFunction({ input: z.object({}), output: z.string(), handler: async () => "native other" });\n',
   );
   await writeFile(
     join(root, "src/services/other/service.ts"),
-    '/** Declares the added native boundary without acquiring clients. */\nimport { defineService } from "@relkit/app/services";\nimport probe from "./functions/probe.function.js";\nexport default defineService({ functions: { probe } });\n',
+    '/** Declares the added native boundary without acquiring clients. */\nimport { defineService } from "relkit/services";\nimport probe from "./functions/probe.function.js";\nexport default defineService({ functions: { probe } });\n',
   );
   await writeFile(
     join(root, "src/services/other/helpers/unused.ts"),
@@ -107,7 +107,7 @@ async function platformConfig(root: string): Promise<void> {
   await writeFile(join(root, "src/platform/server.ts"), "export const server = { port: 3009 };\n");
   await writeFile(
     join(root, "relkit.config.ts"),
-    'import { defineApp, defineEnv, env } from "@relkit/app";\nimport { server } from "./src/platform/server.js";\nexport default defineApp({ id: "layout-migration-test", server, env: defineEnv({ LABEL: env.string().default("native default") }) });\n',
+    'import { defineApp, defineEnv, env } from "relkit";\nimport { server } from "./src/platform/server.js";\nexport default defineApp({ id: "layout-migration-test", server, env: defineEnv({ LABEL: env.string().default("native default") }) });\n',
   );
 }
 

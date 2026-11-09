@@ -9,7 +9,7 @@ import type { MutationReport } from "../../scripts/jobs-coverage/verify-mutation
 function successfulReport(): MutationReport {
   return {
     files: {
-      "packages/jobs/src/authorization-grant.ts": {
+      "packages/relkit/src/jobs/authorization-grant.ts": {
         mutants: [{ status: "Killed", location: { start: { line: 26 } } }],
       },
       "packages/client/src/jobs/controller.service.ts": {
@@ -18,13 +18,13 @@ function successfulReport(): MutationReport {
           { status: "Killed", location: { start: { line: 112 } } },
         ],
       },
-      "packages/jobs/src/task-policy-value.ts": {
+      "packages/relkit/src/jobs/task-policy-value.ts": {
         mutants: [
           { status: "Killed", location: { start: { line: 74 } } },
           { status: "Killed", location: { start: { line: 113 } } },
         ],
       },
-      "packages/jobs/src/duration.ts": {
+      "packages/relkit/src/jobs/duration.ts": {
         mutants: [{ status: "Killed", location: { start: { line: 60 } } }],
       },
     },

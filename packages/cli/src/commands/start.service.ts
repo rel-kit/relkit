@@ -1,6 +1,6 @@
 import { join, resolve } from "node:path";
 import { Context, Effect, Layer } from "effect";
-import { DEFAULT_CANDIDATE_HEALTH_TIMEOUT_MS } from "@relkit/supervisor";
+import { DEFAULT_CANDIDATE_HEALTH_TIMEOUT_MS } from "../supervisor/index.js";
 import { cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { fileSystemLayer } from "../services/filesystem.service.js";
@@ -10,6 +10,7 @@ import { CliBuiltProject, builtProjectLive } from "./start-built.js";
 import { CliStartNative, startNativeLive } from "./start-native.service.js";
 import { CliStartProcess, startProcessLive } from "./start-process.service.js";
 import { waitForStartHealthEffect } from "./start-health.js";
+import { builtServerCommand } from "../runtime/index.js";
 import type { StartOperations, StartOptions } from "./start.types.js";
 
 /** Production process domain whose returned resources belong to the caller's Scope. */
@@ -76,14 +77,11 @@ function makeStartLive(defaults: StartOptions) {
             );
             const port = yield* native.allocate(requested, hostname);
             const owned = yield* processes.spawn({
-              command: [
-                process.execPath,
-                "run",
-                "--no-env-file",
-                "--no-install",
-                "--silent",
+              // Workers builds are refused while the manifest is validated.
+              command: builtServerCommand(
+                artifacts.manifest.runtime === "node" ? "node" : "bun",
                 join(buildDirectory, artifacts.manifest.containerEntrypoint),
-              ],
+              ),
               cwd: projectRoot,
               environment: {
                 ...source,

@@ -16,13 +16,13 @@ All five commands in `/tmp/relkit-s1-final-stage1-gates-2/index.json` physically
 closed with exit zero. Each log has its exact invocation in `.command.json` and
 its verified SHA-256/exit code in `.closed.json`:
 
-| Gate | Actual command/result | Log in that directory |
-| --- | --- | --- |
-| S1.7 C3 | `bun scripts/tests/server-runtime/packed-production.acceptance.ts /tmp/relkit-stage1-candidate-20261022-b22/artifacts`; relocated host and Docker production pass | `01-packed-production.log` |
-| S1.7 C1 | `bun run vitest run --maxWorkers=1 --no-file-parallelism packages/engine/tests/server-runtime`; 30 cases across eight files pass | `02-s17-lifecycle.log` |
-| S1.7 C2 | `bun run test:deployment`; 14 pass, existing opt-in AWS case skipped | `03-s17-deployment.log` |
-| Regular gate | `bun run prepush`; complete command passes | `04-prepush.log` |
-| Full gate | `bun run prepush:full`; complete uninterrupted command passes | `05-prepush-full.log` |
+| Gate         | Actual command/result                                                                                                                                             | Log in that directory      |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| S1.7 C3      | `bun scripts/tests/server-runtime/packed-production.acceptance.ts /tmp/relkit-stage1-candidate-20261022-b22/artifacts`; relocated host and Docker production pass | `01-packed-production.log` |
+| S1.7 C1      | `bun run vitest run --maxWorkers=1 --no-file-parallelism packages/engine/tests/server-runtime`; 30 cases across eight files pass                                  | `02-s17-lifecycle.log`     |
+| S1.7 C2      | `bun run test:deployment`; 14 pass, existing opt-in AWS case skipped                                                                                              | `03-s17-deployment.log`    |
+| Regular gate | `bun run prepush`; complete command passes                                                                                                                        | `04-prepush.log`           |
+| Full gate    | `bun run prepush:full`; complete uninterrupted command passes                                                                                                     | `05-prepush-full.log`      |
 
 The full-command log SHA-256 is
 `19f401c9a4f5bc2b62ddb3b5bb8548349830d4c2e8e5869d71a5f37861ce10d1`.
@@ -75,16 +75,16 @@ total is inferred. General testing has no comparable baseline because its native
 Bun listener-typing fixture changed. All selected-integration and other-manager
 measurements remain in the full matrix.
 
-| Fixture | Baseline instances | b22 instances | Baseline logical bytes | b22 logical bytes |
-| --- | ---: | ---: | ---: | ---: |
-| creator-only | 18 | 10 | 79,525,134 | 51,140,055 |
-| wrapper-only | 352 | 11 | 690,886,689 | 51,157,044 |
-| minimal-development | 380 | 97 | 731,050,304 | 561,618,853 |
-| api-development | 379 | 97 | 724,901,360 | 561,618,853 |
-| production-only | 55 | 20 | 251,490,410 | 57,276,987 |
-| generic-server-client | 32 | 19 | 60,734,255 | 54,497,350 |
-| general-testing | n/a | 60 | n/a | 103,717,230 |
-| agent-development | 382 | 121 | 740,357,855 | 615,917,853 |
+| Fixture               | Baseline instances | b22 instances | Baseline logical bytes | b22 logical bytes |
+| --------------------- | -----------------: | ------------: | ---------------------: | ----------------: |
+| creator-only          |                 18 |            10 |             79,525,134 |        51,140,055 |
+| wrapper-only          |                352 |            11 |            690,886,689 |        51,157,044 |
+| minimal-development   |                380 |            97 |            731,050,304 |       561,618,853 |
+| api-development       |                379 |            97 |            724,901,360 |       561,618,853 |
+| production-only       |                 55 |            20 |            251,490,410 |        57,276,987 |
+| generic-server-client |                 32 |            19 |             60,734,255 |        54,497,350 |
+| general-testing       |                n/a |            60 |                    n/a |       103,717,230 |
+| agent-development     |                382 |           121 |            740,357,855 |       615,917,853 |
 
 ### Production contract and Docker resolution
 
@@ -106,7 +106,7 @@ owned resources settle. Existing data/migrations and the Drizzle repair are pres
 The first fresh attempt reproduced Docker image-import `no space left on device`:
 `/tmp/relkit-s1-final-stage1-gates-1/01-packed-production.log`. Its complete failed
 root remains at
-`/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-production-vpRmnX`.
+`<tmp>/relkit-packed-production-vpRmnX`.
 A bounded native probe identified Docker's virtual disk at 99% usage. With no
 running containers, only `DiskSizeMiB` changed from 14,924 to 32,768, followed by a
 Docker restart. The native filesystem then reported about 25 GiB available.
@@ -179,7 +179,7 @@ Current checkpoint (2026-10-23):
   Relocated host production passes native workers, Scalar, auth/database/jobs
   and shutdown. The owning production command then fails Docker image export
   with `no space left on device`; its complete failed fixture is preserved at
-  `/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-packed-production-qsQU4E`.
+  `<tmp>/relkit-packed-production-qsQU4E`.
   Log: `/tmp/relkit-s1-b22-proof-gates-3/03-packed-production.log`.
   No storage cleanup or Docker settings changes were performed; environment work is out
   of scope under the user's latest instruction. Items 7.5/10.2/10.3 remain open.
@@ -849,7 +849,7 @@ installation or four-boundary acceptance.
 - Runtime lifecycle is below CLI. Production preflight resolves from the
   executable module directory, matching relocated native import ancestry.
 - Core observability uses bounded in-memory storage; explicit local history
-  belongs to `@relkit/observability-local`. Only measured CLI inspector paths
+  belongs to `@relkit/inspector/observability-local`. Only measured CLI inspector paths
   can receive temporary Stage 1 admissions.
 - Creator and wrapper bootstrap avoid compiler-backed existing-project editing;
   that work belongs to CLI. The catalog supplies metadata, and selected starters

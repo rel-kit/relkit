@@ -1,0 +1,124 @@
+/**
+ * Defines accepted server/tooling data and defaults without acquiring transports.
+ * Optional MCP, AG-UI and Scalar remain explicit selections; inspection selects
+ * a development bridge whose listener is independent of the standalone UI.
+ */
+export type {
+  ConfigIssueCode,
+  ConfigIssue,
+  ToolingConfigInput,
+  LoadedToolingConfig,
+  InspectorConfigInput,
+  InspectorConfig,
+  RelkitConfig,
+  ConfigLoaderOptions,
+} from "./config-loader-types.types.js";
+import { Schema } from "effect";
+import {
+  DEFAULT_INSPECTOR_CONFIGURATION,
+  InspectorConfigurationSchema,
+  InspectorConfigurationInputSchema,
+} from "relkit/contracts";
+
+/** Validated TCP port shared by field-level readers and normalized records. */
+export const ConfigPort = Schema.Number.check(
+  Schema.isInt(),
+  Schema.isBetween({ minimum: 1, maximum: 65_535 }),
+);
+
+/** Positive integer byte limit shared by tooling field readers. */
+export const ConfigPositive = Schema.Number.check(Schema.isInt(), Schema.isGreaterThan(0));
+export const CONFIG_CODES = Object.freeze({
+  root: "RELKIT_CONFIG_ROOT_INVALID",
+  key: "RELKIT_CONFIG_KEY_NOT_ALLOWED",
+  behavior: "RELKIT_CONFIG_APPLICATION_BEHAVIOR",
+  path: "RELKIT_CONFIG_PATH_INVALID",
+  outsideRoot: "RELKIT_CONFIG_PATH_OUTSIDE_ROOT",
+  source: "RELKIT_CONFIG_SOURCE_INVALID",
+  exclude: "RELKIT_CONFIG_EXCLUDE_INVALID",
+  inspector: "RELKIT_CONFIG_INSPECTOR_INVALID",
+  port: "RELKIT_CONFIG_PORT_INVALID",
+  legacy: "RELKIT_CONFIG_LEGACY_KEY",
+} as const);
+
+/** Accepted tooling input, before defaults and cross-field checks are applied. */
+export const ToolingConfigInputSchema = Schema.Struct({
+  server: Schema.optionalKey(
+    Schema.Struct({
+      port: Schema.optionalKey(Schema.Number),
+      maxBodyBytes: Schema.optionalKey(Schema.Number),
+      apiDocs: Schema.optionalKey(
+        Schema.Struct({
+          ui: Schema.optionalKey(Schema.Literals(["scalar", false])),
+          enabledInProduction: Schema.optionalKey(Schema.Boolean),
+          excludeDomains: Schema.optionalKey(Schema.Array(Schema.String)),
+        }),
+      ),
+      clientContract: Schema.optionalKey(Schema.Boolean),
+      mcp: Schema.optionalKey(
+        Schema.Union([
+          Schema.Boolean,
+          Schema.Struct({ auth: Schema.optionalKey(Schema.Literal("required")) }),
+        ]),
+      ),
+      agUi: Schema.optionalKey(Schema.Boolean),
+    }),
+  ),
+  inspector: Schema.optionalKey(InspectorConfigurationInputSchema),
+  deployment: Schema.optionalKey(Schema.Struct({ engine: Schema.String, host: Schema.String })),
+  check: Schema.optionalKey(Schema.Struct({ unusedErrors: Schema.optionalKey(Schema.Boolean) })),
+});
+
+/** Fully defaulted data-only tooling configuration produced by the parser. */
+export const LoadedToolingConfigSchema = Schema.Struct({
+  projectRoot: Schema.String,
+  source: Schema.Array(Schema.String),
+  exclude: Schema.Array(Schema.String),
+  generatedDirectory: Schema.String,
+  server: Schema.Struct({
+    port: ConfigPort,
+    maxBodyBytes: ConfigPositive,
+    apiDocs: Schema.Struct({
+      ui: Schema.optionalKey(Schema.Literals(["scalar", false])),
+      enabledInProduction: Schema.Boolean,
+      excludeDomains: Schema.optionalKey(Schema.Array(Schema.String)),
+    }),
+    clientContract: Schema.Boolean,
+    mcp: Schema.Boolean,
+    mcpAuth: Schema.optionalKey(Schema.Literal("required")),
+    agUi: Schema.optionalKey(Schema.Boolean),
+  }),
+  inspector: InspectorConfigurationSchema,
+  deployment: Schema.optionalKey(Schema.Struct({ engine: Schema.String, host: Schema.String })),
+  check: Schema.optionalKey(Schema.Struct({ unusedErrors: Schema.Boolean })),
+});
+
+/** Configuration issue evidence kept in declaration order. */
+export const ConfigIssueSchema = Schema.Struct({
+  code: Schema.Literals(Object.values(CONFIG_CODES)),
+  path: Schema.String,
+  message: Schema.String,
+});
+
+export const DEFAULT_TOOLING_CONFIG = Object.freeze({
+  source: Object.freeze(["src/**/*.ts"]),
+  exclude: Object.freeze([
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.d.ts",
+    "src/**/__tests__/**",
+    "src/**/__fixtures__/**",
+  ]),
+  generatedDirectory: ".relkit/generated",
+  server: Object.freeze({
+    port: 3000,
+    maxBodyBytes: 1_048_576,
+    apiDocs: Object.freeze({ enabledInProduction: false, ui: false as const }),
+    clientContract: true,
+    mcp: false,
+    agUi: false,
+  }),
+  inspector: DEFAULT_INSPECTOR_CONFIGURATION,
+});
+
+export const DEFAULT_CONFIG = DEFAULT_TOOLING_CONFIG;

@@ -1,1 +1,0 @@
-$ tsc -b --pretty false && tsc -p tsconfig.tests.json --pretty false

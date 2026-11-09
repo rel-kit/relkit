@@ -1,8 +1,5 @@
 # my-app
 
-This maintained agent candidate is exercised internally. Public agent creation remains
-disabled until its exact native and readiness certification passes.
-
 A RelKit TypeScript/Bun project with a bounded native LangChain agent and a
 native LangGraph review workflow. The starter uses LangChain's deterministic
 model plus local realtime and thread-state providers, so it runs without an API

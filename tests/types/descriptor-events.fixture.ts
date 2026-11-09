@@ -1,7 +1,7 @@
 /** Preserves single and discriminated event-envelope inference plus the original public event descriptor exports. */
-import { defineEvent, type EventEnvelope } from "@relkit/events";
-import { defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { defineEvent, type EventEnvelope } from "relkit/events";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 import { output } from "./descriptor-schemas.fixture.js";
 const createdPayload = z.object({ orderId: z.string() });
 

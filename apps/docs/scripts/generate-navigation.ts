@@ -1,4 +1,7 @@
 /** Shares catalog ordering between generated metadata and the site-wide Blume sidebar. */
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { SidebarDisplay, SidebarItemConfig } from "blume/schema";
 import { apiPackageDefinitions } from "./documentation-catalog.js";
 import { guideGroups } from "./guide-catalog.js";
@@ -9,7 +12,20 @@ const groups = [
     directory: "docs",
     title: "Documentation",
     icon: "book-open",
-    pages: ["index", "learn", "modules", "api"],
+    pages: [
+      "index",
+      "why-relkit",
+      "faq",
+      "maturity",
+      "versioning",
+      "benchmarks",
+      "metrics",
+      "roadmap",
+      "learn",
+      "modules",
+      "api",
+      "errors",
+    ],
     display: "flat",
   },
   {
@@ -40,7 +56,18 @@ const groups = [
     directory: "guides",
     title: "Guides",
     icon: "book-open",
-    pages: ["index", "cli", "frontend", "storage", "caching", "events", "database", "auth", "ai"],
+    pages: [
+      "index",
+      "migrate",
+      "cli",
+      "frontend",
+      "storage",
+      "caching",
+      "events",
+      "database",
+      "auth",
+      "ai",
+    ],
     display: "flat",
   },
   ...guideGroups.map(({ directory, title, icon, pages }) => ({
@@ -58,6 +85,7 @@ const groups = [
       "index",
       "public",
       "cli",
+      "inspector-protocol",
       ...apiPackageDefinitions.filter(({ group }) => group === "core").map(({ slug }) => slug),
       "integrations",
     ],
@@ -74,16 +102,45 @@ const groups = [
   },
 ];
 
+const content = fileURLToPath(new URL("../content", import.meta.url));
+
+/** Reads the frontmatter of a page that sets `labs: true`, so its sidebar row carries the badge.
+ * @param route - Page route without the leading slash.
+ * @returns The page's sidebar label and icon, or undefined for a Core page. */
+function labsPage(route: string): { label: string; icon?: string } | undefined {
+  const file = [`${route}.mdx`, `${route}/index.mdx`]
+    .map((path) => resolve(content, path))
+    .find(existsSync);
+  const meta = file && /^---\n([\s\S]*?)\n---/u.exec(readFileSync(file, "utf8"))?.[1];
+  if (!meta || !/^labs:\s*true\s*$/mu.test(meta)) return undefined;
+  const value = (pattern: RegExp) =>
+    pattern
+      .exec(meta)?.[1]
+      ?.trim()
+      .replace(/^"(.*)"$/u, "$1");
+  const icon = value(/^ {2}icon:\s*(.+)$/mu);
+  return {
+    label: value(/^ {2}label:\s*(.+)$/mu) ?? value(/^title:\s*(.+)$/mu) ?? route,
+    ...(icon ? { icon } : {}),
+  };
+}
+
 /** Builds one catalog group, linking its overview once through the group heading.
  * @param directory - Content directory or leaf page slug.
- * @returns A native Blume group or page route, preserving catalog order. */
+ * @returns A native Blume group or page route, preserving catalog order; Labs pages and
+ * groups whose overview is a Labs page carry a "Labs" badge. */
 function sidebarItem(directory: string): SidebarItemConfig {
   const group = groups.find((item) => item.directory === directory);
-  if (!group) return `/${directory}`;
+  if (!group) {
+    const labs = labsPage(directory);
+    return labs ? { ...labs, root: `/${directory}`, badge: "Labs" } : `/${directory}`;
+  }
+  const hasIndex = group.pages.some((page) => page === "index");
   return {
     label: group.title,
     icon: group.icon,
-    ...(group.pages.some((page) => page === "index") ? { root: `/${directory}` } : {}),
+    ...(hasIndex ? { root: `/${directory}` } : {}),
+    ...(hasIndex && labsPage(directory) ? { badge: "Labs" } : {}),
     display: group.display as SidebarDisplay,
     items: group.pages
       .filter((page) => page !== "index")
@@ -111,7 +168,19 @@ const coreReference = new Set(
     .filter(({ group }) => group === "core")
     .map(({ slug }) => `/docs/api/${slug}`),
 );
-const referencePages = groupItems("docs/api").filter((item) => typeof item === "string");
+/** Tells a page row (a route, or a badged Labs page) from a group of rows.
+ * @param item - Sidebar row. @returns Whether the row links a single page. */
+function isPage(item: SidebarItemConfig): boolean {
+  return typeof item === "string" || item.items === undefined;
+}
+
+/** Reads the route a page row links. @param item - Page row. @returns Its route. */
+function pageRoute(item: SidebarItemConfig): string | undefined {
+  return typeof item === "string" ? item : item.root;
+}
+
+const referencePages = groupItems("docs/api").filter(isPage);
+const isCoreReference = (item: SidebarItemConfig) => coreReference.has(pageRoute(item) ?? "");
 
 /**
  * Header tabs scope this tree: the root "Docs" tab shows the groups no other tab owns, while
@@ -119,23 +188,28 @@ const referencePages = groupItems("docs/api").filter((item) => typeof item === "
  */
 export const documentationSidebar: SidebarItemConfig[] = [
   "/docs",
-  section(
-    "docs/learn",
-    groupItems("docs/learn").filter((item) => typeof item === "string"),
-  ),
+  "/docs/why-relkit",
+  "/docs/faq",
+  "/docs/maturity",
+  "/docs/versioning",
+  "/docs/benchmarks",
+  "/docs/metrics",
+  "/docs/roadmap",
+  section("docs/learn", groupItems("docs/learn").filter(isPage)),
   section("docs/learn/concepts"),
   section("docs/modules"),
   section("guides"),
   section("docs/api", [
-    ...referencePages.filter((page) => !coreReference.has(page)),
+    ...referencePages.filter((page) => !isCoreReference(page)),
     {
       label: "Core packages",
       icon: "package",
       display: "flat",
-      items: referencePages.filter((page) => coreReference.has(page)),
+      items: referencePages.filter(isCoreReference),
     },
     section("docs/api/integrations"),
   ]),
+  "/docs/errors",
 ];
 
 /** Emits ordered section and module navigation without maintaining a second tree.

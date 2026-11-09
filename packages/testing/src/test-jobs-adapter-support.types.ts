@@ -1,5 +1,5 @@
-import type { JobErrorEnvelope, JobWireEnvelope, RunSnapshot } from "@relkit/contracts/jobs";
-import type { NativeSubmission } from "@relkit/jobs/adapter";
+import type { JobErrorEnvelope, JobWireEnvelope, RunSnapshot } from "relkit/contracts/jobs";
+import type { NativeSubmission } from "relkit/jobs/adapter";
 
 /** Mutable deterministic native run state with owned worker cancellation. */
 export interface TestNativeRun {

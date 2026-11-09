@@ -1,4 +1,4 @@
-type RelkitApplicationEnv = import("@relkit/config").ResolvedEnv<typeof import("../../relkit.config.js")["default"]["env"]["shape"]>;
+type RelkitApplicationEnv = import("relkit/config").ResolvedEnv<typeof import("../../relkit.config.js")["default"]["env"]["shape"]>;
 
 declare global {
   namespace Relkit {
@@ -9,6 +9,21 @@ declare global {
     interface TaskRegistry {
     }
     interface JobRegistry {
+    }
+    interface HandleServices {
+    readonly "database": typeof import("../../src/services/database/service.js")["default"];
+    readonly "users": typeof import("../../src/services/users/service.js")["default"];
+    }
+    interface HandleDatabases {
+    readonly "database": typeof import("../../src/services/database/service.js")["default"];
+    }
+    interface HandleCaches {
+    }
+    interface HandleBuckets {
+    }
+    interface HandleChannels {
+    }
+    interface HandleAgents {
     }
   }
 }

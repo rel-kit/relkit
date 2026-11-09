@@ -21,7 +21,7 @@ import {
 import type { TopologyScene } from "./topology-controller";
 import styles from "./topology.module.css";
 
-/** Original RELKIT topology; sparse cell outlines are inspired by ns-ui's
+/** Original RelKit topology; sparse cell outlines are inspired by ns-ui's
  * Delta Frame Macroblock. No reference implementation or assets are copied.
  */
 export function createTopologyScene(host: HTMLDivElement): TopologyScene {

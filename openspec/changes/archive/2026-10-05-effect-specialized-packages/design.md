@@ -95,7 +95,7 @@ Every phase ends with an independent reviewer loading use-effect/Effect guidance
 
 ### 9. Reproduce existing demo checks against the candidate build
 
-Use `/Users/mustafaelsayed/Workspace/relkit-regression-demo` and the retained `evidence/ai-validation-2026-10-03/agent-starter` fixture. The linked chat `01a0fee1-8e3b-7761-acfb-393c901f5648`, `AI_REPAIR_VALIDATION.md`, and `AI_INDEPENDENT_VALIDATION.md` provide replay context; prior passing results are historical, not candidate evidence.
+Use `<home>/Workspace/relkit-regression-demo` and the retained `evidence/ai-validation-2026-10-03/agent-starter` fixture. The linked chat `01a0fee1-8e3b-7761-acfb-393c901f5648`, `AI_REPAIR_VALIDATION.md`, and `AI_INDEPENDENT_VALIDATION.md` provide replay context; prior passing results are historical, not candidate evidence.
 
 Before live tests, inspect running processes/ports and actual dependency realpaths. Build the candidate framework/CLI and deliberately prepare demo/fixture links with `RELKIT_ROOT` pointing to that candidate. The demo's `scripts/setup-local.mjs` supports that setting but global Bun links may affect other sessions: serialize link changes, record prior targets and restore them afterward. Prefer isolated local runtime state and unused ports where probes support overrides; hard-coded 3000/3210 checks require exclusive ownership or a narrowly scoped parameterization. Preserve existing servers, user data, and evidence; do not silently test an old running build.
 

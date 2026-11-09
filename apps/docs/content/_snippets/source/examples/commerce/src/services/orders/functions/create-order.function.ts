@@ -1,11 +1,11 @@
 /** Prices validated order input through the declared cache, records request tracing and derives its receipt key. */
-import { defineFunction } from "@relkit/app/functions";
+import { defineFunction } from "relkit/functions";
 import prices from "../cache/prices.cache.js";
 import { receiptObjectName } from "../../../platform/receipt-object.js";
 import { createOrderOutput, orderInput } from "../../../platform/schemas.js";
 
 const createOrder = defineFunction({
-  // RELKIT validates these schemas before the handler runs.
+  // RelKit validates these schemas before the handler runs.
   input: orderInput,
   output: createOrderOutput,
   dependencies: {

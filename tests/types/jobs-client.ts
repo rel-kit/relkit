@@ -1,7 +1,6 @@
 import {
   useRoute,
   useRouteMutation,
-  useStream,
   useJobCancel,
   useJobRetry,
   useJobRun,
@@ -9,8 +8,8 @@ import {
   type JobContract,
   type JobProcedureSelector,
 } from "@relkit/client/react";
-import type { PendingOperationMetadata } from "@relkit/contracts";
-import type { RunHandle } from "@relkit/contracts/jobs";
+import type { PendingOperationMetadata } from "relkit/contracts";
+import type { RunHandle } from "relkit/contracts/jobs";
 import type { JobRegistry } from "@relkit/client/jobs";
 
 declare module "@relkit/client/jobs" {
@@ -33,7 +32,7 @@ declare module "@relkit/client/react" {
   interface ClientRegistry {
     readonly "jobs.exportOrders.trigger": {
       readonly input: { readonly input: { readonly orderId: string } };
-      readonly output: import("@relkit/contracts/jobs").RunHandle;
+      readonly output: import("relkit/contracts/jobs").RunHandle;
       readonly error: Error;
       readonly operation: "mutation";
       readonly stream: false;
@@ -53,8 +52,8 @@ declare module "@relkit/client/react" {
     };
     readonly "jobs.exportOrders.runs.watch": {
       readonly input: { readonly runId: string };
-      readonly output: AsyncIterable<import("@relkit/contracts/jobs").RunWatchFrame>;
-      readonly item: import("@relkit/contracts/jobs").RunWatchFrame;
+      readonly output: AsyncIterable<import("relkit/contracts/jobs").RunWatchFrame>;
+      readonly item: import("relkit/contracts/jobs").RunWatchFrame;
       readonly error: Error;
       readonly operation: "query";
       readonly stream: true;
@@ -67,9 +66,8 @@ declare const registry: JobRegistry;
 void selectors;
 void registry.exportOrders.trigger;
 
-useRouteMutation("jobs.exportOrders.trigger").mutate({ input: { orderId: "order-1" } });
-useRoute("jobs.exportOrders.runs.get", { input: { runId: "run-1" } });
-useStream("jobs.exportOrders.runs.watch", { input: { runId: "run-1" } });
+// @ts-expect-error route hooks take api properties; jobs use the job hooks
+useRouteMutation("jobs.exportOrders.trigger");
 useJobTrigger("exportOrders").mutate({ input: { orderId: "order-1" } });
 useJobRun("exportOrders", { runId: "run-1", enabled: false }).run?.status;
 useJobCancel("exportOrders").mutate({ runId: "run-1", operationId: "operation-1" });

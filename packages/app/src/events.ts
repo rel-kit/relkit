@@ -1,1 +1,2 @@
-export * from "@relkit/events";
+import "./deprecated.js";
+export * from "relkit/events";

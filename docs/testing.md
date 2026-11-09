@@ -1,6 +1,6 @@
 # Testing
 
-RELKIT tests exercise the same function engine and canonical graph used by
+RelKit tests exercise the same function engine and canonical graph used by
 development, the inspector, and deployment. Keep tests deterministic and use
 the smallest layer that proves the behavior.
 
@@ -77,7 +77,7 @@ replacements fail before the test application becomes ready; `RELKIT_ENV=test`
 does not change provider selection.
 
 Use `createTestCacheFake` and `createTestBucketFake` for deterministic resource
-behavior, `createTestJob` and `createTestEvent` for async delivery contracts, and a
+behavior, `createTestJobsAdapter` for task-backed jobs, `createTestEvent` for event delivery, and a
 scripted native LangChain model for agents. Explicit protocol integration tests
 may instead opt into configured adapters. Tests that exercise restart and recovery
 should use a disposable state directory and assert durable duplicate behavior
@@ -90,7 +90,7 @@ It uses fresh agents and isolated projects to inspect actual ownership and execu
 business rules, including a single-domain counterexample. Run it explicitly; the
 generator suite checks template consistency without invoking models or proving semantic design.
 
-From the RELKIT repository root, the shipped focused commands are:
+From the RelKit repository root, the shipped focused commands are:
 
 | Concern                          | Command                         |
 | -------------------------------- | ------------------------------- |

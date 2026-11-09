@@ -16,205 +16,205 @@
     ]
   },
   "fixture": {
-    "temporary": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ",
-    "projectRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/readiness-baseline",
+    "temporary": "<tmp>/relkit-readiness-IKQMfJ",
+    "projectRoot": "<tmp>/relkit-readiness-IKQMfJ/readiness-baseline",
     "version": "0.7.2",
     "registry": "http://127.0.0.1:61301",
     "examples": "examples",
     "artifacts": [
       {
         "name": "@relkit/contracts",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-contracts-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-contracts-0.7.2.tgz"
       },
       {
         "name": "@relkit/schema",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-schema-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-schema-0.7.2.tgz"
       },
       {
         "name": "@relkit/buckets",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-buckets-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-buckets-0.7.2.tgz"
       },
       {
         "name": "@relkit/cache",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-cache-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-cache-0.7.2.tgz"
       },
       {
         "name": "@relkit/diagnostics",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-diagnostics-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-diagnostics-0.7.2.tgz"
       },
       {
         "name": "@relkit/graph",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-graph-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-graph-0.7.2.tgz"
       },
       {
         "name": "@relkit/invocation",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-invocation-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-invocation-0.7.2.tgz"
       },
       {
         "name": "@relkit/observability",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-observability-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-observability-0.7.2.tgz"
       },
       {
         "name": "@relkit/provider",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-provider-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-provider-0.7.2.tgz"
       },
       {
         "name": "@relkit/realtime",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-realtime-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-realtime-0.7.2.tgz"
       },
       {
         "name": "@relkit/client",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-client-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-client-0.7.2.tgz"
       },
       {
         "name": "@relkit/client-generator",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-client-generator-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-client-generator-0.7.2.tgz"
       },
       {
         "name": "@relkit/config",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-config-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-config-0.7.2.tgz"
       },
       {
         "name": "@relkit/deploy",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-deploy-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-deploy-0.7.2.tgz"
       },
       {
         "name": "@relkit/drizzle",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-drizzle-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-drizzle-0.7.2.tgz"
       },
       {
         "name": "@relkit/functions",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-functions-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-functions-0.7.2.tgz"
       },
       {
         "name": "@relkit/local-service",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-local-service-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-local-service-0.7.2.tgz"
       },
       {
         "name": "@relkit/openapi",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-openapi-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-openapi-0.7.2.tgz"
       },
       {
         "name": "@relkit/compiler",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-compiler-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-compiler-0.7.2.tgz"
       },
       {
         "name": "@relkit/docker",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-docker-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-docker-0.7.2.tgz"
       },
       {
         "name": "@relkit/jobs",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-jobs-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-jobs-0.7.2.tgz"
       },
       {
         "name": "@relkit/runtime-effect",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-runtime-effect-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-runtime-effect-0.7.2.tgz"
       },
       {
         "name": "@relkit/s3",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-s3-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-s3-0.7.2.tgz"
       },
       {
         "name": "@relkit/tools",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-tools-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-tools-0.7.2.tgz"
       },
       {
         "name": "@relkit/agents",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-agents-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-agents-0.7.2.tgz"
       },
       {
         "name": "@relkit/deploy-pulumi",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-deploy-pulumi-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-deploy-pulumi-0.7.2.tgz"
       },
       {
         "name": "@relkit/effect-mq",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-effect-mq-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-effect-mq-0.7.2.tgz"
       },
       {
         "name": "@relkit/events",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-events-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-events-0.7.2.tgz"
       },
       {
         "name": "@relkit/inngest",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-inngest-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-inngest-0.7.2.tgz"
       },
       {
         "name": "@relkit/inspector-api",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-inspector-api-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-inspector-api-0.7.2.tgz"
       },
       {
         "name": "@relkit/supervisor",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-supervisor-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-supervisor-0.7.2.tgz"
       },
       {
         "name": "@relkit/trigger",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-trigger-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-trigger-0.7.2.tgz"
       },
       {
         "name": "create-relkit",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/create-relkit-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/create-relkit-0.7.2.tgz"
       },
       {
         "name": "@relkit/providers-local",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-providers-local-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-providers-local-0.7.2.tgz"
       },
       {
         "name": "@relkit/services",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-services-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-services-0.7.2.tgz"
       },
       {
         "name": "@relkit/local",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-local-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-local-0.7.2.tgz"
       },
       {
         "name": "@relkit/redis",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-redis-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-redis-0.7.2.tgz"
       },
       {
         "name": "@relkit/routes",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-routes-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-routes-0.7.2.tgz"
       },
       {
         "name": "@relkit/app",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-app-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-app-0.7.2.tgz"
       },
       {
         "name": "@relkit/better-auth",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-better-auth-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-better-auth-0.7.2.tgz"
       },
       {
         "name": "@relkit/engine",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-engine-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-engine-0.7.2.tgz"
       },
       {
         "name": "@relkit/runtime-hono",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-runtime-hono-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-runtime-hono-0.7.2.tgz"
       },
       {
         "name": "@relkit/cli",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-cli-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-cli-0.7.2.tgz"
       },
       {
         "name": "@relkit/testing",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-testing-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-testing-0.7.2.tgz"
       },
       {
         "name": "relkit",
-        "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/release-artifacts/relkit-0.7.2.tgz"
+        "path": "<tmp>/relkit-readiness-IKQMfJ/release-artifacts/relkit-0.7.2.tgz"
       }
     ]
   },
   "identity": {
     "bun": {
-      "path": "/Users/mustafaelsayed/.bun/bin/bun",
-      "realpath": "/Users/mustafaelsayed/.bun/bin/bun",
+      "path": "<home>/.bun/bin/bun",
+      "realpath": "<home>/.bun/bin/bun",
       "version": "1.3.10"
     },
     "cli": {
       "name": "@relkit/cli",
       "version": "0.7.2",
-      "path": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/.bin/relkit",
-      "realpath": "/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/bin.js"
+      "path": "<tmp>/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/.bin/relkit",
+      "realpath": "<tmp>/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/bin.js"
     },
     "typescript": {
       "name": "typescript",
@@ -406,7 +406,7 @@
     "inspectorOverride": "absent"
   },
   "request": {
-    "projectRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/readiness-baseline",
+    "projectRoot": "<tmp>/relkit-readiness-IKQMfJ/readiness-baseline",
     "url": "http://127.0.0.1:61038/hello?name=RelKit",
     "expectedBody": "{\"message\":\"Hello, RelKit!\"}"
   },
@@ -417,7 +417,7 @@
         "durationMs": 10394.104958,
         "outcome": "child-exited",
         "exitCode": 1,
-        "output": "$ relkit dev\n19:25:37.318 INFO  relkit            Starting development server\n19:25:37.331 INFO  build             Compiling application\n19:25:37.377 \u001b[33mWARN \u001b[0m app               6 | \"use strict\";\n                                     7 | \n                                     8 | //\n                                     9 | if (entry.instantiate)\n19:25:37.378 \u001b[33mWARN \u001b[0m app               10 | return entry.instantiate;\n19:25:37.378 \u001b[33mWARN \u001b[0m app               11 | var instantiatePromise = (async () => {\n                                     ^\n19:25:37.379 \u001b[33mWARN \u001b[0m app               TypeError: Expected CommonJS module to have a function wrapper.\n                                     If you weren't messing around with Bun's internals, this is a\n                                     bug in Bun\n19:25:37.379 \u001b[33mWARN \u001b[0m app               note: missing sourcemaps for\n                                     /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/readiness-baseline/.relkit/generated/dev-session-MUpBbJ/generation-1/server/index.js\n19:25:37.380 \u001b[33mWARN \u001b[0m app               note: consider bundling with '--sourcemap' to get unminified\n                                     traces\n19:25:37.380 \u001b[33mWARN \u001b[0m app               Bun v1.3.10 (macOS arm64)\n19:25:47.378 INFO  relkit            Stopping development server\n19:25:47.382 INFO  relkit            Development server stopped\n 8 | `)),x=[T,...z0].flatMap((R)=>{if(Q===\"dev.ready\"||X.verbose)return[R];return VX(R,C)});return`${O}${x[0]??\"\"}`+x.slice(1).map((R)=>`\n 9 | ${w}${R}`).join(\"\")}function VX($,X){let Y=[],Q=\"\";for(let K of $.split(/\\s+/)){if(Q&&Q.length+1+K.length>X)Y.push(Q),Q=\"\";Q+=`${Q?\" \":\"\"}${K}`}return[...Y,Q]}function OX($){return Object.fromEntries([\"requestId\",\"traceId\",\"spanId\",\"functionId\",\"serviceId\"].flatMap((X)=>{let Y=$[X];return Y?[[X,Y]]:[]}))}function FX($){let X=new Date($);if(!Number.isFinite(X.getTime()))return $;return[X.getHours(),X.getMinutes(),X.getSeconds()].map((Y)=>String(Y).padStart(2,\"0\")).join(\":\")+`.${String(X.getMilliseconds()).padStart(3,\"0\")}`}function DX($,X){if($.length<=X)return $;let Y=Math.floor((X-1)/2);return`${$.slice(0,Y)}\\u2026${$.slice(-(X-Y-1))}`}function AX($,X,Y=!1){let Q=X===\"error\"||X===\"fatal\"?31:X===\"warn\"?33:X===\"debug\"||X===\"trace\"?2:0;return Y&&Q?`\\x1B[${Q}m${$}\\x1B[0m`:$}function U7($,X=(Y)=>process.stderr.write(`${Y}\n10 | `)){return{human:$?!1:{write:X},json:$?{write:(Y)=>X(f0(Y))}:!1}}function I7($){let X=!1,Y=!1;return(Q)=>{try{let{record:K,origin:J,forwarded:Z,transient:G}=_7(Q),z=d1($.logger?.redact?.(K)??K);if(z?.signal!==\"log\")return;if(!Z&&!G)$.onRecord?.(z,J);if(!G)$.logger?.collector?.collect(z);$.onLog?.({...Q,level:z.level,fields:Q.fields?.output===void 0?z.fields:{...z.fields,output:z.message}});let W=$.logger?.minimumLevel??($.terminal?.verbose?\"debug\":\"info\");if(z.message===\"dev.build.started\")X=!1;if(z.message===\"dev.shutdown.started\")Y=!0;if(!H7(z.level,W))return;if($.logger?.json)$.logger.json.write(z);if($.logger?.human===!1)return;if(Y&&J===\"inspector\"&&!$.terminal?.verbose)return;if(!$.terminal?.verbose&&W!==\"debug\"&&W!==\"trace\"&&W!==\"all\"&&typeof z.fields.domain===\"string\"&&typeof z.fields.operation===\"string\"&&/^Execution operation (?:completed|failed|interrupted)$/.test(z.message))return;if(/^runtime\\.(provider|database|auth)$/.test(z.component)&&z.level===\"error\"&&z.message.includes(\"startup failed\"))X=\n11 | `)}catch{}}}function d3($,X){let Y=new Headers;if(X!==void 0&&($===w1||$.startsWith(`${w1}/`)))Y.set(\"authorization\",`Bearer ${X}`);return Y}function MX($){return Object.assign(async(Y,Q)=>{let K=new URL(Y instanceof Request?Y.url:String(Y)),J=new Headers(Q?.headers??(Y instanceof Request?Y.headers:void 0));if(K.protocol===\"http:\"&&K.hostname===\"127.0.0.1\")d3(K.pathname,$()).forEach((Z,G)=>J.set(G,Z));return fetch(Y,{...Q,headers:J,redirect:\"error\"})},{preconnect:fetch.preconnect})}var V7=MX(()=>process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN);var l3=50;function O7($,X,Y,Q,K,J){let{options:Z,snapshot:G,projectRoot:z}=$;return{projectRoot:z,generatedDirectory:J,stablePort:Q,signal:K,installSignalHandlers:!1,compile:X.compile,preparedActivationFingerprint:X.fingerprint,candidateVerificationEffect:X.verify,candidateVerificationFetch:V7,candidateAdmission:X.admission,supportStartupDelayMs:l3,inspector:z7(T5({...Z.inspectorPort===void 0?{}:{flag:Z.inspectorPort},source:process.env,...G.receipt.ports===void 0?{}:{config\n12 | `}${x}`,clearTimeout(T),T=setTimeout(()=>{try{S()}catch(p0){Z=!0,G=p0,z(p0)}},25)},z0=(x)=>{for(let R of x)if(R===`\n13 | `)C();else{let p0=Buffer.byteLength(R);if(!O&&I+p0<=Math.max(0,Q-19))H+=R,I+=p0;else O=!0}};try{while(!0){let x=await K.read();if(Z)throw G;if(x.done)break;Y.retain?.(x.value),z0(B.decode(x.value,{stream:!0}))}}catch(x){throw Z=!0,await z(x),x}finally{Y.signal?.removeEventListener(\"abort\",W);try{if(!Z){if(z0(B.decode()),H.length>0||O)C();S()}}catch(x){throw await z(x),x}finally{if(clearTimeout(T),J!==void 0)await J;K.releaseLock()}}}function i3($,X,Y,Q,K,J){let Z={remaining:K,truncated:!1};return Promise.all([E7($.stdout,\"stdout\",X,Y,Q,Z,J),E7($.stderr,\"stderr\",X,Y,Q,Z,J)]).then(([G,z])=>({stdout:G.text,stderr:z.text,truncated:Z.truncated||G.truncated||z.truncated}))}async function E7($,X,Y,Q,K,J,Z){let G=[],z=!1;try{await $3($,(W)=>PX(Y,Q,K,X,W),{...Z===void 0?{}:{signal:Z},retain:(W)=>{let B=W.subarray(0,Math.max(0,J.remaining));if(B.byteLength>0)G.push(B.slice());if(J.remaining-=B.byteLength,B.byteLength<W.byteLength)z=J.truncated=!0}})}catch{z=!0}return{text:Buffer.concat(G).toString(\"utf8\").replace(/\\uFF\n\nCandidateVerificationError: RELKIT_CANDIDATE_HEALTH_TIMEOUT: Candidate health checks did not complete before the timeout.\n code: \"RELKIT_CANDIDATE_HEALTH_TIMEOUT\"\n\n      at Q5 (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/dev-snapshot/snapshot-command-entry.js:13:12361)\n      at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/dev-snapshot/snapshot-command-entry.js:13:13286\n      at ~effect/Effect/successCont (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/dev-snapshot/prepared-k87t38rp.js:24:8546)\n      at runLoop (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/dev-snapshot/prepared-k87t38rp.js:24:2548)\n      at evaluate (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/dev-snapshot/prepared-k87t38rp.js:24:1685)\n      at runInAsyncScope (node:async_hooks:137:23)\n      at /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/dev-snapshot/prepared-k87t38rp.js:24:6357\nnote: missing sourcemaps for /private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/bin.js\nnote: consider bundling with '--sourcemap' to get unminified traces\n\nBun v1.3.10 (macOS arm64)\nerror: script \"dev\" exited with code 1\n"
+        "output": "$ relkit dev\n19:25:37.318 INFO  relkit            Starting development server\n19:25:37.331 INFO  build             Compiling application\n19:25:37.377 \u001b[33mWARN \u001b[0m app               6 | \"use strict\";\n                                     7 | \n                                     8 | //\n                                     9 | if (entry.instantiate)\n19:25:37.378 \u001b[33mWARN \u001b[0m app               10 | return entry.instantiate;\n19:25:37.378 \u001b[33mWARN \u001b[0m app               11 | var instantiatePromise = (async () => {\n                                     ^\n19:25:37.379 \u001b[33mWARN \u001b[0m app               TypeError: Expected CommonJS module to have a function wrapper.\n                                     If you weren't messing around with Bun's internals, this is a\n                                     bug in Bun\n19:25:37.379 \u001b[33mWARN \u001b[0m app               note: missing sourcemaps for\n                                     <tmp>/relkit-readiness-IKQMfJ/readiness-baseline/.relkit/generated/dev-session-MUpBbJ/generation-1/server/index.js\n19:25:37.380 \u001b[33mWARN \u001b[0m app               note: consider bundling with '--sourcemap' to get unminified\n                                     traces\n19:25:37.380 \u001b[33mWARN \u001b[0m app               Bun v1.3.10 (macOS arm64)\n19:25:47.378 INFO  relkit            Stopping development server\n19:25:47.382 INFO  relkit            Development server stopped\n 8 | `)),x=[T,...z0].flatMap((R)=>{if(Q===\"dev.ready\"||X.verbose)return[R];return VX(R,C)});return`${O}${x[0]??\"\"}`+x.slice(1).map((R)=>`\n 9 | ${w}${R}`).join(\"\")}function VX($,X){let Y=[],Q=\"\";for(let K of $.split(/\\s+/)){if(Q&&Q.length+1+K.length>X)Y.push(Q),Q=\"\";Q+=`${Q?\" \":\"\"}${K}`}return[...Y,Q]}function OX($){return Object.fromEntries([\"requestId\",\"traceId\",\"spanId\",\"functionId\",\"serviceId\"].flatMap((X)=>{let Y=$[X];return Y?[[X,Y]]:[]}))}function FX($){let X=new Date($);if(!Number.isFinite(X.getTime()))return $;return[X.getHours(),X.getMinutes(),X.getSeconds()].map((Y)=>String(Y).padStart(2,\"0\")).join(\":\")+`.${String(X.getMilliseconds()).padStart(3,\"0\")}`}function DX($,X){if($.length<=X)return $;let Y=Math.floor((X-1)/2);return`${$.slice(0,Y)}\\u2026${$.slice(-(X-Y-1))}`}function AX($,X,Y=!1){let Q=X===\"error\"||X===\"fatal\"?31:X===\"warn\"?33:X===\"debug\"||X===\"trace\"?2:0;return Y&&Q?`\\x1B[${Q}m${$}\\x1B[0m`:$}function U7($,X=(Y)=>process.stderr.write(`${Y}\n10 | `)){return{human:$?!1:{write:X},json:$?{write:(Y)=>X(f0(Y))}:!1}}function I7($){let X=!1,Y=!1;return(Q)=>{try{let{record:K,origin:J,forwarded:Z,transient:G}=_7(Q),z=d1($.logger?.redact?.(K)??K);if(z?.signal!==\"log\")return;if(!Z&&!G)$.onRecord?.(z,J);if(!G)$.logger?.collector?.collect(z);$.onLog?.({...Q,level:z.level,fields:Q.fields?.output===void 0?z.fields:{...z.fields,output:z.message}});let W=$.logger?.minimumLevel??($.terminal?.verbose?\"debug\":\"info\");if(z.message===\"dev.build.started\")X=!1;if(z.message===\"dev.shutdown.started\")Y=!0;if(!H7(z.level,W))return;if($.logger?.json)$.logger.json.write(z);if($.logger?.human===!1)return;if(Y&&J===\"inspector\"&&!$.terminal?.verbose)return;if(!$.terminal?.verbose&&W!==\"debug\"&&W!==\"trace\"&&W!==\"all\"&&typeof z.fields.domain===\"string\"&&typeof z.fields.operation===\"string\"&&/^Execution operation (?:completed|failed|interrupted)$/.test(z.message))return;if(/^runtime\\.(provider|database|auth)$/.test(z.component)&&z.level===\"error\"&&z.message.includes(\"startup failed\"))X=\n11 | `)}catch{}}}function d3($,X){let Y=new Headers;if(X!==void 0&&($===w1||$.startsWith(`${w1}/`)))Y.set(\"authorization\",`Bearer ${X}`);return Y}function MX($){return Object.assign(async(Y,Q)=>{let K=new URL(Y instanceof Request?Y.url:String(Y)),J=new Headers(Q?.headers??(Y instanceof Request?Y.headers:void 0));if(K.protocol===\"http:\"&&K.hostname===\"127.0.0.1\")d3(K.pathname,$()).forEach((Z,G)=>J.set(G,Z));return fetch(Y,{...Q,headers:J,redirect:\"error\"})},{preconnect:fetch.preconnect})}var V7=MX(()=>process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN);var l3=50;function O7($,X,Y,Q,K,J){let{options:Z,snapshot:G,projectRoot:z}=$;return{projectRoot:z,generatedDirectory:J,stablePort:Q,signal:K,installSignalHandlers:!1,compile:X.compile,preparedActivationFingerprint:X.fingerprint,candidateVerificationEffect:X.verify,candidateVerificationFetch:V7,candidateAdmission:X.admission,supportStartupDelayMs:l3,inspector:z7(T5({...Z.inspectorPort===void 0?{}:{flag:Z.inspectorPort},source:process.env,...G.receipt.ports===void 0?{}:{config\n12 | `}${x}`,clearTimeout(T),T=setTimeout(()=>{try{S()}catch(p0){Z=!0,G=p0,z(p0)}},25)},z0=(x)=>{for(let R of x)if(R===`\n13 | `)C();else{let p0=Buffer.byteLength(R);if(!O&&I+p0<=Math.max(0,Q-19))H+=R,I+=p0;else O=!0}};try{while(!0){let x=await K.read();if(Z)throw G;if(x.done)break;Y.retain?.(x.value),z0(B.decode(x.value,{stream:!0}))}}catch(x){throw Z=!0,await z(x),x}finally{Y.signal?.removeEventListener(\"abort\",W);try{if(!Z){if(z0(B.decode()),H.length>0||O)C();S()}}catch(x){throw await z(x),x}finally{if(clearTimeout(T),J!==void 0)await J;K.releaseLock()}}}function i3($,X,Y,Q,K,J){let Z={remaining:K,truncated:!1};return Promise.all([E7($.stdout,\"stdout\",X,Y,Q,Z,J),E7($.stderr,\"stderr\",X,Y,Q,Z,J)]).then(([G,z])=>({stdout:G.text,stderr:z.text,truncated:Z.truncated||G.truncated||z.truncated}))}async function E7($,X,Y,Q,K,J,Z){let G=[],z=!1;try{await $3($,(W)=>PX(Y,Q,K,X,W),{...Z===void 0?{}:{signal:Z},retain:(W)=>{let B=W.subarray(0,Math.max(0,J.remaining));if(B.byteLength>0)G.push(B.slice());if(J.remaining-=B.byteLength,B.byteLength<W.byteLength)z=J.truncated=!0}})}catch{z=!0}return{text:Buffer.concat(G).toString(\"utf8\").replace(/\\uFF\n\nCandidateVerificationError: RELKIT_CANDIDATE_HEALTH_TIMEOUT: Candidate health checks did not complete before the timeout.\n code: \"RELKIT_CANDIDATE_HEALTH_TIMEOUT\"\n\n      at Q5 (<tmp>/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/dev-snapshot/snapshot-command-entry.js:13:12361)\n      at <tmp>/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/dev-snapshot/snapshot-command-entry.js:13:13286\n      at ~effect/Effect/successCont (<tmp>/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/dev-snapshot/prepared-k87t38rp.js:24:8546)\n      at runLoop (<tmp>/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/dev-snapshot/prepared-k87t38rp.js:24:2548)\n      at evaluate (<tmp>/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/dev-snapshot/prepared-k87t38rp.js:24:1685)\n      at runInAsyncScope (node:async_hooks:137:23)\n      at <tmp>/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/dev-snapshot/prepared-k87t38rp.js:24:6357\nnote: missing sourcemaps for <tmp>/relkit-readiness-IKQMfJ/readiness-baseline/node_modules/@relkit/cli/dist/bin.js\nnote: consider bundling with '--sourcemap' to get unminified traces\n\nBun v1.3.10 (macOS arm64)\nerror: script \"dev\" exited with code 1\n"
       }
     }
   ],

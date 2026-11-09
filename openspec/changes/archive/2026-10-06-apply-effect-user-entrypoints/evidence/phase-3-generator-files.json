@@ -14,7 +14,7 @@
     ],
     "acceptedSemanticChange": "Use basename for missing segments beneath filesystem root and cover it with an explicit GeneratorPaths test Layer."
   },
-  "worktree": "/Users/mustafaelsayed/.codex/worktrees/effect-user-entrypoints/relkit",
+  "worktree": "<home>/.codex/worktrees/effect-user-entrypoints/relkit",
   "scope": "Every authored TypeScript file under packages/create-relkit, including package-root tests/config.",
   "counts": {
     "source": 122,

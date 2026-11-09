@@ -1,7 +1,7 @@
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";
 import { fileURLToPath } from "node:url";
-import ts from "typescript";
+import ts from "../../src/typescript-parser.js";
 
 const probe = `import { Effect } from "effect";
 import { CliGenerator, generatorLayer } from "../../src/services/generator.service.js";

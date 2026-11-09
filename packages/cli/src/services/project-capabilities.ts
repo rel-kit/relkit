@@ -5,10 +5,7 @@ import { fileSystemLayer } from "./filesystem.service.js";
 import { moduleLayer } from "./modules.service.js";
 import { processLayer } from "./process.service.js";
 import { cleanupLayer } from "./cleanup.service.js";
-import {
-  DependencySourceLive,
-  SelectedDependenciesLive,
-} from "@relkit/provider/internal/dependencies";
+import { DependencySourceLive, SelectedDependenciesLive } from "relkit/provider/dependencies";
 
 /** Invocation-owned project execution graph; service workflows never build this Layer themselves. */
 export const projectCapabilitiesLayer = Layer.mergeAll(

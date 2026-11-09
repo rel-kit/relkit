@@ -9,7 +9,7 @@ import {
   InspectionFilesLive,
   InspectionNativeLive,
   InspectionCapture,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 import {
   loadReleaseTarballs,
   readManifests,

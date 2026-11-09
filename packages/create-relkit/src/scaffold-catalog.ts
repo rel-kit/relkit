@@ -7,6 +7,7 @@ export type {
   ScaffoldDependency,
   ScaffoldDependencyName,
 } from "./scaffold-catalog.types.js";
+export { bundledIntegration, bundledIntegrations } from "./integration-catalog.js";
 
 /** Versions copied into generated projects from each package's own release metadata. */
 export const SCAFFOLD_DEPENDENCIES = Object.freeze({
@@ -39,6 +40,11 @@ export const SCAFFOLD_DEPENDENCIES = Object.freeze({
     version: buildCatalogProvider("@relkit/langchain"),
     section: "dependencies",
   },
+  "@relkit/postgres": {
+    version: buildCatalogProvider("@relkit/postgres"),
+    section: "dependencies",
+  },
+  "@relkit/ai-sdk": { version: buildCatalogProvider("@relkit/ai-sdk"), section: "dependencies" },
   "@relkit/pulumi": { version: buildCatalogProvider("@relkit/pulumi"), section: "dependencies" },
   "@relkit/redis": { version: buildCatalogProvider("@relkit/redis"), section: "dependencies" },
   "@relkit/s3": { version: buildCatalogProvider("@relkit/s3"), section: "dependencies" },

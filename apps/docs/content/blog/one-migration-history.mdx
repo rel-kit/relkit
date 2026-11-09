@@ -1,15 +1,15 @@
 ---
-title: One migration history, run by RELKIT
-description: Database migrations now live beside the service that owns them, and installed RELKIT tooling runs them for every dialect.
+title: One migration history, run by RelKit
+description: Database migrations now live beside the service that owns them, and installed RelKit tooling runs them for every dialect.
 type: blog
 date: 2026-10-18
 category: engineering
 illustration: bars
 authors:
-  - name: RELKIT Team
+  - name: RelKit Team
 ---
 
-A migration applies a reviewed schema change to a database. RELKIT has always generated those migrations from your TypeScript tables with Drizzle Kit. What changed is where the history lives and who runs it.
+A migration applies a reviewed schema change to a database. RelKit has always generated those migrations from your TypeScript tables with Drizzle Kit. What changed is where the history lives and who runs it.
 
 ## Migrations beside their service
 
@@ -17,7 +17,7 @@ Generated SQL and its metadata now stay in `src/services/database/migrations`, n
 
 ## One command to apply them
 
-Shared migration execution moved into installed RELKIT tooling:
+Shared migration execution moved into installed RelKit tooling:
 
 ```sh title="Terminal"
 bun --bun drizzle-kit generate --name=initial

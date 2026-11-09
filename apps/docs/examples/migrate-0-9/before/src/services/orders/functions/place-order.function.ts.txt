@@ -1,0 +1,18 @@
+import { defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
+import priceOrder from "./price-order.function.js";
+import orderUpdates from "../channels/order-updates.channel.js";
+
+const placeOrder = defineFunction({
+  input: z.object({ orderId: z.string(), quantity: z.number().int().positive() }),
+  output: z.object({ orderId: z.string(), totalCents: z.number() }),
+  publishes: ["orders.placed"],
+  handler: async ({ orderId, quantity }, context) => {
+    const { totalCents } = await priceOrder.invoke({ quantity });
+    await context.events["orders.placed"].publish({ orderId });
+    await orderUpdates.trigger({ orderId }, "placed", { totalCents });
+    return { orderId, totalCents };
+  },
+});
+
+export default placeOrder;

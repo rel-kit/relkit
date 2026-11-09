@@ -1,28 +1,27 @@
 /** Plans selected job and workflow artifacts with the existing execution profile and service boundary, retaining durable version and exposure choices. */
 
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { observeExecution } from "relkit/contracts/operation";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
 import {
   scaffoldErrors,
   type GeneratorDomainError,
   type GeneratorIoError,
-} from "create-relkit/internal/generator-errors";
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
-import type { AddRequest } from "create-relkit/internal/add-types";
+} from "create-relkit/generator-errors";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
+import type { AddRequest } from "create-relkit/add-types";
 
 import {
   addPublicMemberEffect,
   assertAvailableId,
   domainArtifact,
-  resolveArtifact,
   sourceModule,
   type DomainTarget,
 } from "./domain-planning.js";
 import { PlanBuilder } from "./plan-builder.js";
 import { registerEffect } from "./render-domain-register.js";
 import { ensureProviderProfileEffect } from "./provider-planning.js";
-import { jobSource, taskJobSource, taskSource } from "./render-domain-sources.js";
+import { taskJobSource, taskSource } from "./render-domain-sources.js";
 
 import type { RenderedArtifact } from "./render-domain.types.js";
 /**
@@ -42,43 +41,29 @@ export const renderJobEffect = Effect.fn("Scaffold.renderJob")(
     GeneratorDomainError | GeneratorIoError,
     GeneratorFileSystem
   > {
-    const artifact = domainArtifact(target, request.name, "jobs", "job", "job");
-    const taskTarget = taskJobTarget(builder, target, request.target);
-    if (taskTarget) {
-      const profile = yield* ensureProviderProfileEffect(builder, "job", {
-        requested: request.profile,
-      });
-      const artifact = domainArtifact(target, request.name, "jobs", "job", "job");
-      assertAvailableId(builder, artifact.id);
-      yield* builder.createEffect(
-        artifact.path,
-        taskJobSource(
-          artifact,
-          taskTarget,
-          sourceModule(taskTarget.path),
-          profile,
-          target.domain.identifier,
-        ),
-      );
-      yield* registerEffect(builder, target, "job", artifact);
-      yield* addPublicMemberEffect(builder, target, "jobs", artifact, artifact.path);
-      return artifact;
-    }
-    const functionTarget =
-      target.service ||
-      builder.artifacts.some(
-        (item) => item.domain === target.domain.fileStem && item.kind === "function",
-      )
-        ? resolveArtifact(builder, target, "function", request.target)
-        : yield* renderFunctionEffect(builder, target, request.target);
+    const taskTarget =
+      taskJobTarget(builder, target, request.target) ??
+      (yield* renderTaskEffect(builder, target, {
+        ...request,
+        kind: "task",
+        name: request.target,
+        version: "1",
+        execution: "durable",
+      }));
     const profile = yield* ensureProviderProfileEffect(builder, "job", {
       requested: request.profile,
-      legacy: true,
     });
+    const artifact = domainArtifact(target, request.name, "jobs", "job", "job");
     assertAvailableId(builder, artifact.id);
     yield* builder.createEffect(
       artifact.path,
-      jobSource(artifact, functionTarget, sourceModule(functionTarget.path), profile),
+      taskJobSource(
+        artifact,
+        taskTarget,
+        sourceModule(taskTarget.path),
+        profile,
+        target.domain.identifier,
+      ),
     );
     yield* registerEffect(builder, target, "job", artifact);
     yield* addPublicMemberEffect(builder, target, "jobs", artifact, artifact.path);
@@ -146,8 +131,6 @@ export function renderTask(
 ): Promise<RenderedArtifact> {
   return runGeneratorPromise(renderTaskEffect(builder, target, request));
 }
-
-import { renderFunctionEffect } from "./render-domain-callables.js";
 
 function taskJobTarget(builder: PlanBuilder, target: DomainTarget, requested: string) {
   return builder.artifacts.find(

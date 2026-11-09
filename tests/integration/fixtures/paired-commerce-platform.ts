@@ -1,5 +1,5 @@
 /** Splits an owned acceptance fixture's unchanged native configuration into explicit Platform fragments without registration or autoloading. */
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 
 const providerKeys = new Set(["bucket", "cache", "realtime", "agent-state", "jobs", "defaults"]);
 

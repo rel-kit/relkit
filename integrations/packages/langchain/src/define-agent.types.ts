@@ -1,13 +1,9 @@
 /** Exposes SDK-native agent authoring with inferred input and output types; validation and descriptor assembly are delegated to the integration's owning helpers. This companion preserves the native input and output types without starting runtime work. */
 
-import type { DescriptorBase, DescriptorMetadata } from "@relkit/contracts";
-import type { AgentRef } from "@relkit/functions";
-import type { StandardSchemaV1 } from "@relkit/schema";
-import type {
-  AgentChatMapping,
-  AgentClientPolicy,
-  AgentControl,
-} from "@relkit/agents/internal/agent-client";
+import type { DescriptorBase, DescriptorMetadata } from "relkit/contracts";
+import type { AgentRef } from "relkit/functions";
+import type { StandardSchemaV1 } from "relkit/schema";
+import type { AgentChatMapping, AgentClientPolicy, AgentControl } from "relkit/agents/agent-client";
 import type { AgentClientContractMetadata } from "./client-contract-metadata.js";
 import type {
   AgentClientStateKey,
@@ -17,11 +13,13 @@ import type {
 } from "./define-agent-native.js";
 import type { DeepAgentCapabilities } from "./define-agent-deep.js";
 
+/** @experimental */
 export interface PromptTemplate {
   readonly template: string;
   readonly variables?: readonly string[];
 }
 
+/** @experimental */
 export interface PromptInstructions {
   readonly kind: "prompt";
   readonly id: string;
@@ -29,14 +27,17 @@ export interface PromptInstructions {
   readonly value: string | readonly string[];
 }
 
+/** @experimental */
 export type AgentInstructions = string | PromptTemplate | PromptInstructions;
 
+/** @experimental */
 export interface AgentLimits {
   readonly maxSteps: number;
   readonly maxToolCalls: number;
   readonly timeoutMs: number;
 }
 
+/** @experimental */
 export interface AgentDescriptor<
   Id extends string,
   Input,
@@ -51,6 +52,8 @@ export interface AgentDescriptor<
     AgentRef<Id, InputSchema, OutputSchema>,
     DeepAgentCapabilities {
   readonly model?: AgentModel;
+  /** Adapter that executes the agent; set by `defineAgent` from `relkit`. */
+  readonly runtime?: import("relkit/agent-adapters").AgentRuntimeReference;
   readonly instructions: AgentInstructions;
   readonly tools: Tools;
   readonly middleware: Middleware;
@@ -62,6 +65,7 @@ export interface AgentDescriptor<
   readonly clientContract: AgentClientContractMetadata;
 }
 
+/** @experimental */
 export interface DefineAgentOptions<
   Id extends string,
   InputSchema extends StandardSchemaV1,

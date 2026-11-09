@@ -1,0 +1,205 @@
+import { Cause, Clock, Context, Effect, Exit, Metric, Result } from "effect";
+import { attributedMetric } from "./metric-attributes.js";
+import type {
+  ExecutionDomain,
+  ExecutionOutcome,
+  ExecutionTerminalPolicy,
+  ExecutionWorkload,
+} from "./operation.types.js";
+
+export type {
+  ExecutionDomain,
+  ExecutionOutcome,
+  ExecutionTerminalPolicy,
+  ExecutionWorkload,
+} from "./operation.types.js";
+
+/**
+ * Controls successful operation completion logs in an explicitly provided context.
+ * @remarks Background polling can retain metrics, spans, failures, interruption,
+ * and application logs without persisting a success record for every idle pass.
+ * Existing consumers retain successful completion logs by default. Children and
+ * native adapters inherit a local override; unrelated invocations remain unchanged.
+ * @example
+ * ```ts
+ * const polling = observeExecution("runtime", "poll", Effect.void).pipe(
+ *   Effect.provideService(ExecutionSuccessLogs, false));
+ * ```
+ */
+export const ExecutionSuccessLogs = Context.Reference<boolean>(
+  "@relkit/contracts/ExecutionSuccessLogs",
+  { defaultValue: () => true },
+);
+
+const calls = Metric.counter("relkit_execution_operations_total", { incremental: true });
+
+const outcomes = Metric.counter("relkit_execution_outcomes_total", { incremental: true });
+
+const duration = Metric.histogram("relkit_execution_duration_ms", {
+  boundaries: [0.01, 0.1, 1, 5, 10, 50, 100, 1000, 10000],
+});
+
+const workloads = Metric.counter("relkit_execution_workload_total", { incremental: true });
+
+/**
+ * Observes a lazy domain operation using the caller's logger, tracer and metric registry.
+ * @typeParam A - Successful value.
+ * @typeParam E - Expected typed failures.
+ * @typeParam R - Required services.
+ * @param domain - Fixed package owner.
+ * @param operation - Declaration-owned operation label; never a path, ID or input value.
+ * @param effect - Lazy operation, normally defined with a named Effect.fn.
+ * @param workload - Lazy bounded workload counts evaluated once when execution starts.
+ * @param terminal - Terminal decision or domain outcome override; false for suspension.
+ * @returns An effect preserving the original value, failure, defect and interruption.
+ * @remarks Observation failures are isolated. Compatibility adapters must not count again.
+ * @example
+ * ```ts
+ * import { Effect } from "effect";
+ * import { observeExecution } from "relkit/contracts/operation";
+ * const inspect = Effect.fn("Runtime.inspect")((values: readonly number[]) =>
+ *   observeExecution("runtime", "inspect", Effect.succeed(values.length),
+ *     () => ({ entries: values.length })));
+ * const count = await Effect.runPromise(inspect([1, 2]));
+ * ```
+ */
+export function observeExecution<A, E, R>(
+  domain: ExecutionDomain,
+  operation: string,
+  effect: Effect.Effect<A, E, R>,
+  workload: () => ExecutionWorkload = () => ({}),
+  terminal: ExecutionTerminalPolicy<A, E> = () => true,
+): Effect.Effect<A, E, R> {
+  const attributes = { domain, operation };
+  return Effect.gen(function* () {
+    const start = yield* Effect.exit(Clock.monotonicTimeNanos);
+    if (Exit.isFailure(start) && Cause.hasInterruptsOnly(start.cause))
+      return yield* Effect.failCause(start.cause);
+    const started = Exit.isSuccess(start) ? start.value : undefined;
+    yield* isolateObservation(
+      Effect.gen(function* () {
+        yield* Effect.withFiber((fiber) => {
+          // Metric.update delegates to this synchronous mutation with the same
+          // context. Batch telemetry bookkeeping without entering the run loop
+          // for each counter; registry and inherited metric attributes stay local.
+          attributedMetric(calls, attributes).updateUnsafe(1, fiber.context);
+          for (const [kind, count] of Object.entries(workload())) {
+            if (Number.isFinite(count) && count >= 0)
+              attributedMetric(workloads, { ...attributes, kind }).updateUnsafe(
+                count,
+                fiber.context,
+              );
+          }
+          return Effect.void;
+        });
+        yield* Effect.annotateCurrentSpan({
+          "execution.domain": domain,
+          "execution.operation": operation,
+        });
+      }),
+    );
+    return yield* Effect.onExit(effect, (exit) =>
+      isolateObservation(
+        Effect.gen(function* () {
+          const decision = terminal(exit);
+          if (decision === false) return;
+          const outcome = typeof decision === "string" ? decision : operationOutcome(exit);
+          const end = yield* Effect.exit(Clock.monotonicTimeNanos);
+          const elapsed =
+            started !== undefined && Exit.isSuccess(end)
+              ? Math.max(0, Number(end.value - started) / 1_000_000)
+              : undefined;
+          yield* Effect.withFiber((fiber) => {
+            if (elapsed !== undefined)
+              attributedMetric(duration, attributes).updateUnsafe(elapsed, fiber.context);
+            attributedMetric(outcomes, { ...attributes, outcome }).updateUnsafe(1, fiber.context);
+            return Effect.void;
+          });
+          yield* Effect.annotateCurrentSpan({
+            "execution.outcome": outcome,
+            ...(elapsed === undefined ? {} : { "execution.duration_ms": elapsed }),
+          });
+          if (outcome === "success" && !(yield* ExecutionSuccessLogs)) return;
+          const log =
+            outcome === "failure" || outcome === "defect"
+              ? Effect.logError("Execution operation failed")
+              : outcome === "interrupted"
+                ? Effect.logDebug("Execution operation interrupted")
+                : Effect.logInfo("Execution operation completed");
+          yield* Effect.annotateLogs(log, {
+            ...attributes,
+            outcome,
+            ...(elapsed === undefined ? {} : { duration_ms: elapsed }),
+            ...(Exit.isFailure(exit) && outcome !== "interrupted" ? causeSummary(exit.cause) : {}),
+          });
+        }),
+      ),
+    );
+  });
+}
+
+/**
+ * Classifies a completed operation without discarding mixed failure causes.
+ * @typeParam A - Successful value.
+ * @typeParam E - Typed failure.
+ * @param exit - Completed operation exit.
+ * @returns A bounded outcome label.
+ */
+function operationOutcome<A, E>(exit: Exit.Exit<A, E>): ExecutionOutcome {
+  if (Exit.isSuccess(exit)) return "success";
+  if (Cause.hasDies(exit.cause)) return "defect";
+  return Cause.hasInterruptsOnly(exit.cause) ? "interrupted" : "failure";
+}
+
+/**
+ * Identifies why an operation failed without logging native messages, which may hold
+ * paths, URLs or credentials.
+ * @param cause - Failed operation cause.
+ * @returns Bounded error tag, safe operation label, native code and HTTP status when present.
+ * @remarks Mixed causes are classified as defects, so the first defect is named in
+ * preference to a typed failure. Codes must be constant-case (`ENOENT`,
+ * `RELKIT_TIMEOUT`) or errno integers, which excludes IDs and token-shaped values.
+ */
+function causeSummary(cause: Cause.Cause<unknown>): Record<string, string | number> {
+  const defect = Cause.findDefect(cause);
+  const error = Result.isSuccess(defect) ? defect.success : Cause.squash(cause);
+  if (typeof error !== "object" || error === null) return { error: typeof error };
+  const field = (value: unknown, key: string) =>
+    typeof value === "object" && value !== null && key in value
+      ? (value as Record<string, unknown>)[key]
+      : undefined;
+  const matching = (pattern: RegExp) => (value: unknown) =>
+    typeof value === "string" && pattern.test(value) ? value : undefined;
+  const tag = matching(/^[A-Za-z_$][\w$]{0,79}$/);
+  const label = matching(/^[\w.:-]{1,80}$/);
+  const constant = matching(/^[A-Z][A-Z0-9_]{1,79}$/);
+  const code = (value: unknown) =>
+    typeof value === "number" && Number.isInteger(value) ? value : constant(value);
+  const status = (value: unknown) =>
+    typeof value === "number" && Number.isInteger(value) && value >= 100 && value <= 599
+      ? value
+      : undefined;
+  const nested = field(error, "cause");
+  const summary: Record<string, string | number> = {};
+  const name = tag(field(error, "_tag")) ?? tag(field(error, "name"));
+  const operation = label(field(error, "operation"));
+  const errorCode = code(field(error, "code")) ?? code(field(nested, "code"));
+  const errorStatus = status(field(error, "status")) ?? status(field(nested, "status"));
+  if (name !== undefined) summary.error = name;
+  if (operation !== undefined) summary.error_operation = operation;
+  if (errorCode !== undefined) summary.error_code = errorCode;
+  if (errorStatus !== undefined) summary.error_status = errorStatus;
+  return summary;
+}
+
+/**
+ * Keeps best-effort telemetry from changing authoritative domain results.
+ * @param observation - Telemetry-only work with no application authority.
+ * @returns Observation that succeeds even if a logger or observer defects.
+ */
+function isolateObservation(observation: Effect.Effect<unknown>): Effect.Effect<void> {
+  return observation.pipe(
+    Effect.asVoid,
+    Effect.catchCause(() => Effect.void),
+  );
+}

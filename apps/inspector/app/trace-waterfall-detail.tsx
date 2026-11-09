@@ -14,7 +14,7 @@ import { cn } from "../lib/utils";
 import { SourceLink } from "./source-link";
 
 /**
- * Everything RELKIT retained for one step, laid out top to bottom: identity, timing on the trace
+ * Everything RelKit retained for one step, laid out top to bottom: identity, timing on the trace
  * clock, input and output, failure, events, attributes, correlations and logs. Nothing is behind
  * tabs; empty sections say why they are empty.
  */

@@ -1,4 +1,4 @@
-# Writing RELKIT documentation
+# Writing RelKit documentation
 
 Blume 2.2.5 has a small Bun patch in `patches/blume@2.2.5.patch` that displays existing search breadcrumbs. Keep it until upstream renders section context; browser tests cover the result.
 
@@ -19,7 +19,7 @@ Write in direct, friendly language. Name the file or terminal before asking the
 reader to change or run something. Explain the expected result. Define a new term
 beside its first use; introduce the application graph after the first working API.
 Avoid “simply,” “just,” and unexplained implementation vocabulary. Application
-examples use plain TypeScript and public RELKIT APIs. AI is an optional later path.
+examples use plain TypeScript and public RelKit APIs. AI is an optional later path.
 
 Keep configuration in Modules and complete workflows in Guides. A guide may link
 to deeper explanations, but it must include the installation, files, configuration,

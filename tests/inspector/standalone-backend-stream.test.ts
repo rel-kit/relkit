@@ -1,7 +1,7 @@
 /** Exercises standalone SSE cursor failures through the native listener and browser reset decoder. */
 import { expect, test } from "bun:test";
 import { Cause, Effect, Exit, Ref, Result } from "effect";
-import { createObservabilityStream } from "@relkit/observability";
+import { createObservabilityStream } from "relkit/observability";
 import { inspectorBackend } from "../../packages/inspector/src/tool-backend.js";
 import { connectStream } from "../../apps/inspector/lib/stream-reader.js";
 import { InspectorApiError } from "../../apps/inspector/lib/api-types.js";

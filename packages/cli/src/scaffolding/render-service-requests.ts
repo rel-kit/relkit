@@ -4,7 +4,7 @@
  * installation policy and supported capability relationships.
  */
 
-import type { AddRequest, ServiceInclude } from "create-relkit/internal/add-types";
+import type { AddRequest, ServiceInclude } from "create-relkit/add-types";
 import type { PlanBuilder } from "./plan-builder.js";
 
 /** Artifacts in the existing explicit full service preset. */

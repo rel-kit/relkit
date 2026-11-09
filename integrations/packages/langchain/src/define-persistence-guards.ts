@@ -2,15 +2,16 @@
 
 import type { BaseCheckpointSaver, BaseStore } from "@langchain/langgraph";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { RELKIT_PERSISTENCE } from "./persistence-symbol.js";
 import type { PersistenceResource } from "./define-persistence.types.js";
 import { agentPersistenceFailure } from "./persistence-error.js";
 
-/** Checks whether a value is a RELKIT persistence resource descriptor.
+/** Checks whether a value is a RelKit persistence resource descriptor.
  * @param value - Candidate descriptor.
  * @returns An Effect with a boolean and no typed failure.
  * @example Effect.runSync(isPersistenceResourceEffect(candidate));
+ * @experimental
  */
 export const isPersistenceResourceEffect = Effect.fn("Agents.persistence.isResource")(
   (value: unknown) =>
@@ -30,6 +31,7 @@ export const isPersistenceResourceEffect = Effect.fn("Agents.persistence.isResou
  * @param value - Candidate descriptor.
  * @returns Whether the descriptor follows the persistence protocol.
  * @example if (isPersistenceResource(value)) await value.acquire(context);
+ * @experimental
  */
 export function isPersistenceResource(value: unknown): value is PersistenceResource<any, any> {
   return Effect.runSync(isPersistenceResourceEffect(value));
@@ -40,6 +42,7 @@ export function isPersistenceResource(value: unknown): value is PersistenceResou
  * @param value - Resolved client handle.
  * @returns An Effect with void or AgentPersistenceFailure.
  * @example Effect.runSync(assertPersistenceProtocolEffect("memory", store));
+ * @experimental
  */
 export const assertPersistenceProtocolEffect = Effect.fn("Agents.persistence.assertProtocol")(
   (resource: "checkpointer" | "memory", value: unknown) =>
@@ -64,6 +67,7 @@ export const assertPersistenceProtocolEffect = Effect.fn("Agents.persistence.ass
  * @returns Nothing when the protocol is present.
  * @throws The original protocol TypeError.
  * @example assertPersistenceProtocol("memory", store);
+ * @experimental
  */
 export function assertPersistenceProtocol(
   resource: "checkpointer" | "memory",

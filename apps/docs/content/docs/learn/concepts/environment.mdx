@@ -11,7 +11,7 @@ secrets, and controls the values available through `context.env`.
 [defineEnv](/docs/api/config#defineenv) declares these settings in `src/platform/env.ts`.
 The [env builders](/docs/api/config#env) describe each field. Pass the declaration to
 [defineApp](/docs/api/app#defineapp) in `relkit.config.ts` to make it part of your application.
-Declaring the contract does not read environment values; RELKIT resolves them when starting the runtime.
+Declaring the contract does not read environment values; RelKit resolves them when starting the runtime.
 
 ## Declare values with defineEnv [#define-application-values]
 
@@ -56,13 +56,13 @@ so generated types and graph metadata stay current.
 
 Generated commands run under Bun, which loads its normal dotenv files for the process.
 For one-shot and production commands, an existing process environment value takes precedence. `.env.example` is an informational
-template; RELKIT does not load it as runtime configuration. Keep its placeholder values
+template; RelKit does not load it as runtime configuration. Keep its placeholder values
 separate from real credentials. Moving services leaves the root dotenv files in place.
 
-During `bun dev`, RELKIT reloads active dotenv files for each candidate, including after a
+During `bun dev`, RelKit reloads active dotenv files for each candidate, including after a
 failed reload. Keys declared in those files are managed by the files: additions and edits
 replace startup values, and deleting a key removes its previous file-managed value. Other
-inherited environment values and explicit RELKIT runtime settings remain in effect.
+inherited environment values and explicit RelKit runtime settings remain in effect.
 
 The startup `NODE_ENV` selects `.env.development`, `.env.production`, or `.env.test`, with
 development as the fallback for an absent or custom value. `.env.local` has higher precedence
@@ -72,7 +72,7 @@ A rejected candidate leaves the previous valid version serving until the repair 
 neither ordinary nor prepared startup requires restarting the CLI after a dotenv repair.
 
 The CLI's `--environment` selects the command's provider environment. It does not turn a
-custom application field named `RELKIT_ENV` into business configuration. RELKIT owns that
+custom application field named `RELKIT_ENV` into business configuration. RelKit owns that
 reserved runtime selector; the application contract continues to describe its own values.
 
 <Callout type="warning" title="Framework-owned variables">

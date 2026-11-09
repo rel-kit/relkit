@@ -1,0 +1,10 @@
+/** Minimal function descriptor accepted by event contract binding.
+ * @example const target: FunctionWithEvents = { id: "orders.on-created", event: "orders.created" }
+ */
+export interface FunctionWithEvents {
+  readonly id: string;
+  readonly invocationMode?: "callable" | "event-only";
+  readonly event?: string;
+  readonly input?: unknown;
+}
+export type { EventDescriptorAny } from "./define-event.types.js";

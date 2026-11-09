@@ -1,7 +1,7 @@
 /**
  * Exposes React providers and hooks backed by the selected query adapter. Install
  * react, @tanstack/react-query@^5, @tanstack/query-core@^5 and
- * @orpc/tanstack-query@2.0.0-beta.31 alongside @relkit/client for this entrypoint.
+ * @orpc/tanstack-query@1.16.1 alongside @relkit/client for this entrypoint.
  * TypeScript consumers also install @types/react for React's public types.
  */
 export * from "./context.js";
@@ -14,7 +14,7 @@ export * from "./pending.js";
 export * from "./realtime-hook.js";
 export * from "./registry.js";
 export * from "./stream-hook.js";
-export type { CountPresence, MemberPresence } from "@relkit/realtime";
+export type { CountPresence, MemberPresence } from "relkit/realtime";
 export type {
   JobContract,
   JobClientField,

@@ -1,4 +1,4 @@
-import type { TaskExecutionBinding, TaskExecutor } from "@relkit/jobs/adapter";
+import type { TaskExecutionBinding, TaskExecutor } from "relkit/jobs/adapter";
 import { Inngest } from "inngest";
 import type { Context, InngestFunction } from "inngest";
 import type { InngestTaskDefinition } from "./task-binding.js";
@@ -12,6 +12,7 @@ import {
   wireInput,
 } from "./task-binding-support.js";
 
+/** @experimental */
 export function createInngestFunction(
   client: Inngest.Any,
   definition: InngestTaskDefinition,

@@ -93,7 +93,7 @@ jobs:
           APP_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
         run: |
           test -n "$APP_ID" && test -n "$APP_KEY" || {
-            echo "::error::Configure RELEASE_APP_CLIENT_ID and RELEASE_APP_PRIVATE_KEY; see CONTRIBUTING.md"
+            echo "::error::Configure RELEASE_APP_CLIENT_ID and RELEASE_APP_PRIVATE_KEY; see docs/maintainers/releasing.md"
             exit 1
           }
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -137,9 +137,16 @@ jobs:
         with:
           github-token: ${{ steps.release-app.outputs.token }}
           script: bun run version:packages
-          commit-message: "chore: version RELKIT packages"
-          pr-title: "chore: release RELKIT"
+          commit-message: "chore: version RelKit packages"
+          pr-title: "chore: release RelKit"
           pr-base-branch: main
+      - name: Upload full creation certification reports
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-evidence-version-${{ github.run_id }}-${{ github.run_attempt }}
+          path: test-results/evidence
+          if-no-files-found: ignore
+          retention-days: 90
       - name: Preserve failed creation certification reports
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -164,6 +171,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
+      actions: read
       contents: read
     outputs:
       artifact_id: ${{ steps.archives.outputs.artifact-id }}
@@ -187,9 +195,33 @@ jobs:
           bun-version: "1.3.10"
       - run: bun install --frozen-lockfile
       - name: Build and validate the exact release archives
+        env:
+          # Reads the repository description for the positioning check.
+          GITHUB_TOKEN: ${{ github.token }}
         run: bun run release:pack --ci-pack --output "$RUNNER_TEMP/npm-release"
       - name: Verify the release manifest independently
         run: node --experimental-strip-types scripts/publish-release.ts --directory "$RUNNER_TEMP/npm-release"
+      - name: Download the verifying CI run's full reports
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: "{release-evidence-*,create-capability-table-*}"
+          run-id: ${{ github.event.workflow_run.id || inputs.ci_run_id }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/evidence
+      - name: Bundle full reports and summaries as a release asset
+        # Same layout as scripts/release-evidence.ts bundle. Plain shell only: no
+        # repository code or package manager runs after the artifact download.
+        run: |
+          version="$(jq -r .version .changeset/release.json)"
+          name="evidence-$version"
+          output="$RUNNER_TEMP/npm-release"
+          stage="$(mktemp -d)"
+          test -n "$(find "$RUNNER_TEMP/evidence" -type f -print -quit)"
+          mkdir -p "$stage/$name/reports" "$stage/$name/summaries"
+          cp -R "$RUNNER_TEMP/evidence" "$stage/$name/reports/evidence"
+          cp -R docs/evidence/. "$stage/$name/summaries/"
+          tar -czf "$output/$name.tar.gz" -C "$stage" "$name"
+          (cd "$output" && sha256sum "$name.tar.gz" > "$name.tar.gz.sha256")
       - id: archives
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -271,7 +303,9 @@ jobs:
           if test "$state" = missing; then
             gh release create "$tag" --draft --target "$RELEASE_SHA" --title "$tag" --notes-file npm-release/RELEASE_NOTES.md
           fi
-          gh release upload "$tag" npm-release/*.tgz npm-release/SHA256SUMS npm-release/SHA512SUMS npm-release/manifest.json npm-release/RELEASE_NOTES.md --clobber
+          shopt -s nullglob
+          evidence=(npm-release/evidence-*.tar.gz npm-release/evidence-*.tar.gz.sha256)
+          gh release upload "$tag" npm-release/*.tgz npm-release/SHA256SUMS npm-release/SHA512SUMS npm-release/manifest.json npm-release/RELEASE_NOTES.md "${evidence[@]}" --clobber
           latest="$(gh api graphql -f owner="${GITHUB_REPOSITORY%/*}" -f repo="${GITHUB_REPOSITORY#*/}" -f query='query($owner: String!, $repo: String!) { repository(owner: $owner, name: $repo) { latestRelease { tagName } } }' --jq '.data.repository.latestRelease.tagName // ""')"
           latest="${latest#v}"
           make_latest=true

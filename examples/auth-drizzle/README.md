@@ -17,11 +17,11 @@ Open `http://127.0.0.1:3000`. Use the same hostname for the page and API. The se
 above is for a fresh local session; store a stable secret securely for subsequent
 runs and deployments. Never commit secrets or database files.
 
-Better Auth owns sign-up, sign-in, sign-out, and cookies. RELKIT functions read
+Better Auth owns sign-up, sign-in, sign-out, and cookies. RelKit functions read
 `context.auth.getSession()`. `/session` is public; `/account/profile` requires a
 valid session. The HTML page exercises these flows without a frontend framework.
 `src/platform/auth-client.ts` shows the native Better Auth TypeScript client.
-`src/platform/browser-client.ts` is a separate RELKIT transport-header example:
+`src/platform/browser-client.ts` is a separate RelKit transport-header example:
 setting a bearer header does not enable server-side bearer authentication.
 
 Tables live in `src/services/database/schema/index.ts`; tracked SQL and metadata

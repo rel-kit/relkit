@@ -1,16 +1,17 @@
 /** Exercises native model selection behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/index.ts";
 import { describe, expect, test } from "vitest";
 import { Effect } from "effect";
-import { defineAgent, isAgentDescriptor } from "../src/index.ts";
+import { isAgentDescriptor } from "../src/index.ts";
 import {
   normalizeModelSelectorEffect,
   parseModelProviderConfiguration,
   parseModelProviderConfigurationEffect,
   resolveModelSelector,
   resolveModelSelectorEffect,
-} from "@relkit/agents/internal/model-selection";
-import { z } from "@relkit/schema";
+} from "relkit/agents/model-selection";
+import { z } from "relkit/schema";
 
 const configuration = parseModelProviderConfiguration({
   defaultProvider: "openai",
@@ -68,6 +69,7 @@ function caseResolvesOmittedProviderDefaultAndExactSelectors() {
 function caseKeepsModelSelectionOptionalAndAcceptsNative() {
   const omitted = defineAgent({
     id: "support.omitted",
+    runtime: langchain(),
     input: z.string(),
     output: z.string(),
     instructions: "Answer safely.",
@@ -76,6 +78,7 @@ function caseKeepsModelSelectionOptionalAndAcceptsNative() {
   });
   const selected = defineAgent({
     id: "support.selected",
+    runtime: langchain(),
     input: z.string(),
     output: z.string(),
     model: "openai:gpt-4.1",
@@ -89,9 +92,9 @@ function caseKeepsModelSelectionOptionalAndAcceptsNative() {
   const native = { invoke: async () => ({ content: "ok" }) };
   const direct = defineAgent({
     id: "support.live",
+    runtime: langchain({ model: native }),
     input: z.string(),
     output: z.string(),
-    model: native,
     instructions: "Answer safely.",
     tools: [],
     limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 1000 },

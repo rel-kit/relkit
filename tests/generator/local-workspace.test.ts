@@ -48,7 +48,7 @@ test("local create installs workspace links after jobs and final confirmation", 
   expect(result.output).not.toContain("Planned project");
   expect(await Bun.file(join(parent, "app/package.json")).exists()).toBe(true);
   const manifest = await Bun.file(join(parent, "app/package.json")).json();
-  expect(manifest.dependencies["@relkit/app"]).toBe("link:@relkit/app");
+  expect(manifest.dependencies["relkit"]).toBe("link:relkit");
   const graph = Bun.file(join(parent, "app/.relkit/generated/application.graph.json"));
   expect(await graph.exists()).toBe(true);
   successful.add(parent);
@@ -61,7 +61,7 @@ afterEach(async () => {
   }
 });
 
-test("local create preserves unrelated dependency versions when linking RELKIT packages", async () => {
+test("local create preserves unrelated dependency versions when linking RelKit packages", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-local-workspace-"));
   roots.push(root);
   await writeFile(
@@ -77,21 +77,22 @@ test("local create preserves unrelated dependency versions when linking RELKIT p
 
   expect(names).toContain("@relkit/app");
   expect(names).toContain("@relkit/cli");
-  expect(names).toContain("@relkit/engine");
+  // The deprecated @relkit/app re-exports relkit, so linking it links relkit too.
+  expect(names).toContain("relkit");
   expect(manifest.dependencies).toEqual({ "@relkit/app": "link:@relkit/app", hono: "4.11.7" });
   expect(manifest.devDependencies).toMatchObject({
     "@relkit/cli": "link:@relkit/cli",
-    "@relkit/engine": "link:@relkit/engine",
+    relkit: "link:relkit",
     typescript: "5.9.3",
   });
   successful.add(root);
 });
 
-test("doctor accepts local RELKIT package links", async () => {
+test("doctor accepts local RelKit package links", async () => {
   const checks = await versionChecks(
     {
       packageManager: `bun@${Bun.version}`,
-      dependencies: { "@relkit/app": "link:@relkit/app" },
+      dependencies: { "@relkit/app": "link:@relkit/app", relkit: "link:relkit" },
       devDependencies: { "@relkit/cli": "link:@relkit/cli", typescript: "5.9.3" },
     },
     process.cwd(),

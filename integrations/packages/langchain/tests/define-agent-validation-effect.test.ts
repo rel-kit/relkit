@@ -1,9 +1,9 @@
 /** Exercises native define agent validation effect behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/adapter.js";
 import { Effect, Result } from "effect";
 import { expect, test } from "vitest";
-import { z } from "@relkit/schema";
-import { defineAgent } from "../src/define-agent.js";
+import { z } from "relkit/schema";
 import {
   assertAgentDescriptor,
   assertAgentDescriptorEffect,
@@ -14,6 +14,7 @@ import {
 test("agent descriptor Effects accept valid authoring output", () => {
   const agent = defineAgent({
     id: "validated.agent",
+    runtime: langchain(),
     input: z.object({ question: z.string() }),
     output: z.object({ answer: z.string() }),
     instructions: "Answer.",

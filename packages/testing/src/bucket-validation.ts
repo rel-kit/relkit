@@ -1,5 +1,5 @@
 import { isAbsolute } from "node:path";
-import type { BucketObjectMetadata } from "@relkit/buckets";
+import type { BucketObjectMetadata } from "relkit/buckets";
 import type { TestBucketObject } from "./buckets-types.js";
 
 /**

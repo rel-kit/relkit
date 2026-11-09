@@ -5,14 +5,14 @@ import type { InterruptOnConfig } from "langchain";
 import type { CheckpointerResource, MemoryResource } from "./define-persistence.js";
 import type { AgentDescriptor } from "./define-agent.js";
 
-/** Agent descriptor nested under a DeepAgent. */
+/** Agent descriptor nested under a DeepAgent. @experimental */
 export type AgentSubagent = AgentDescriptor<string, unknown, unknown>;
 
-/** DeepAgents filesystem backend or a state-bound backend factory. */
+/** DeepAgents filesystem backend or a state-bound backend factory. @experimental */
 export type AgentFilesystemBackend =
   object | ((context: { readonly state: unknown; readonly store?: unknown }) => object);
 
-/** Optional capabilities enabled for a DeepAgent. */
+/** Optional capabilities enabled for a DeepAgent. @experimental */
 export interface DeepAgentCapabilities {
   readonly subagents?: readonly AgentSubagent[];
   readonly skills?: readonly string[];

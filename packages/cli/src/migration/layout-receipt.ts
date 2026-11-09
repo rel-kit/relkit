@@ -83,7 +83,7 @@ export const readLayoutReceipt = Effect.fn("Migration.receipt.read")(function* (
     )
       throw fail(
         "RELKIT_LAYOUT_RECEIPT_INVALID",
-        "Rollback requires this project's restricted local receipt path.",
+        "Rollback needs a migration record from this project's .relkit/migrations directory.",
       );
   });
   yield* cliPromise("migration.receipt.permissions", async () => {
@@ -93,7 +93,7 @@ export const readLayoutReceipt = Effect.fn("Migration.receipt.read")(function* (
       if (metadata.isSymbolicLink() || (metadata.mode & 0o077) !== 0)
         throw fail(
           "RELKIT_LAYOUT_RECEIPT_INVALID",
-          "Recovery receipt permissions or ownership are invalid.",
+          "The migration record has the wrong permissions or owner.",
         );
     }
   });
@@ -104,7 +104,7 @@ export const readLayoutReceipt = Effect.fn("Migration.receipt.read")(function* (
     Effect.mapError(() =>
       fail(
         "RELKIT_LAYOUT_RECEIPT_INVALID",
-        "Local recovery receipt is malformed; its contents were not disclosed.",
+        "The migration record is malformed; its contents were not shown.",
       ),
     ),
   );

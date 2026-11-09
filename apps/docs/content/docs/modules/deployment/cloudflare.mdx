@@ -1,0 +1,187 @@
+---
+title: Deploy to Cloudflare
+description: Run the production server as a Cloudflare Worker, with jobs and events in Postgres run from Cloudflare Queues, schedules on Cron Triggers and realtime on a Durable Object.
+pagination: false
+sidebar:
+  icon: cloud
+labs: true
+---
+
+Cloudflare runs your app as a Worker: the `relkit build --runtime workers` bundle, served from
+Cloudflare's network over HTTPS and scaled with traffic. A Worker has no filesystem and no process
+that outlives a request, so jobs, schedules and events live in an external Postgres database
+through `@relkit/postgres`, Cloudflare Queues and a Cron Trigger wake the Worker to run them, and
+realtime channels keep their state in a Durable Object.
+
+<Callout type="note" title="Labs" icon="flask-conical">
+  The Cloudflare target and the Workers runtime stay Labs until the Cloudflare newcomer deploy test
+  passes in CI. That test follows this guide: it creates the `api` template, deploys it as a
+  throwaway Worker with its own queue and database, and checks HTTPS, jobs, events and that the Cron
+  Trigger runs each schedule occurrence once.
+</Callout>
+
+## What runs where
+
+| Part of the app               | On Cloudflare                                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------------------------------ |
+| Routes, functions, `/healthz` | The Worker's `fetch` handler, which activates the built server once per isolate                  |
+| Files in `public/`            | Workers static assets, before the Worker runs                                                    |
+| Jobs and event consumers      | The Worker's `queue` handler: every request that may submit work wakes the `RELKIT_WORK` queue   |
+| Schedules                     | A `* * * * *` Cron Trigger runs the scheduler; the database enqueues each occurrence once        |
+| Durable state                 | Postgres, through `@relkit/postgres`, connected once per operation (Hyperdrive keeps that cheap) |
+| Realtime channels             | A Durable Object (`durableObjectRealtime()` from `@relkit/cloudflare`) shared by every isolate   |
+| Caches and buckets            | Workers KV (`kvBinding()`), R2 (`r2Binding()`), Redis over HTTPS, or S3                          |
+
+A Worker runs with the `nodejs_compat` compatibility flag. Code that needs a filesystem, a child
+process or a raw TCP Redis connection does not run there, and `relkit check` says so before you
+deploy (see [What does not run on Workers](#what-does-not-run-on-workers)).
+
+## Pre-setup
+
+Start from an app that builds, such as the [`api` template](/docs/learn/create-an-app), and sign in
+to Cloudflare with wrangler:
+
+```sh title="Terminal"
+bunx wrangler login
+```
+
+If the app has jobs, schedules or events, you also need a Postgres database the Worker can reach
+over the internet. Put [Cloudflare Hyperdrive](https://developers.cloudflare.com/hyperdrive/) in
+front of it for production traffic: the Worker opens a connection for each database operation.
+
+## Deploy
+
+<Steps>
+<Step title="Store jobs and events in Postgres" icon="database">
+
+Select the [Postgres backend](/docs/modules/jobs/providers/postgres) for jobs and events:
+
+```sh title="Terminal — application root"
+bun run relkit add jobs --provider postgres
+bun run relkit add events --provider postgres
+```
+
+Both read the connection string from the `DATABASE_URL` secret. For realtime channels, add
+`@relkit/cloudflare` and select a Durable Object for the profile in `relkit.config.ts`:
+
+```ts title="relkit.config.ts"
+import { durableObjectRealtime } from "@relkit/cloudflare";
+
+export default defineApp({
+  // ...
+  realtime: { default: durableObjectRealtime({ binding: "RELKIT_REALTIME" }) },
+});
+```
+
+</Step>
+<Step title="Generate the Cloudflare files" icon="file-plus">
+
+```sh title="Terminal — application root"
+bun run relkit check
+bun run relkit deploy init cloudflare
+```
+
+`deploy init cloudflare` reads the graph `relkit check` writes, then writes three files and changes
+no cloud resource:
+
+| File                                      | Purpose                                                                                                    |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `wrangler.jsonc`                          | Build with `relkit build --runtime workers`, `nodejs_compat`, static assets, and the bindings the app uses |
+| `worker.mjs`                              | The Worker entry: re-exports the built handlers and Durable Objects; add your own handlers here            |
+| `.github/workflows/cloudflare-deploy.yml` | Check, type-check and test, create the work queue once, then `wrangler deploy` every push to `main`        |
+
+The bindings come from the graph: a KV namespace for each `kvBinding()`, an R2 bucket for each
+`r2Binding()`, the `RelkitRealtimeState` Durable Object for `durableObjectRealtime()`, and the
+`RELKIT_WORK` queue with a Cron Trigger when jobs or events use Postgres. A file that already exists
+with different content stops the command; review it, then rerun with `--force`. Commit the files with
+`bun.lock`, and rerun the command after adding caches, buckets, realtime or durable work.
+
+Once `wrangler.jsonc` exists, `relkit check` applies the Workers rules to the project.
+
+</Step>
+<Step title="Create the queue and set the secrets" icon="cloud">
+
+```sh title="Terminal — application root"
+bunx wrangler queues create <name>-relkit-work
+bunx wrangler secret put DATABASE_URL
+```
+
+`deploy init` prints the queue's name. Add every other required value from your `defineEnv`
+descriptor with `wrangler secret put` (secrets) or `vars` in `wrangler.jsonc` (plain values). KV
+namespaces and R2 buckets need no step: wrangler creates them on the first deploy.
+
+</Step>
+<Step title="Deploy and open the app" icon="rocket">
+
+```sh title="Terminal — application root"
+bunx wrangler deploy
+```
+
+Wrangler runs `relkit build --runtime workers`, uploads the bundle and prints the Worker's URL:
+
+```sh title="Terminal"
+curl https://<name>.<subdomain>.workers.dev/healthz
+```
+
+Expect `{"status":"ready","live":true,"ready":true}`. The first request to a new isolate waits until
+its providers are ready, so it is slower than the ones after it.
+
+</Step>
+</Steps>
+
+## Jobs, events and schedules
+
+A job triggered from a request, or an event published by one, is written to Postgres in the request.
+The Worker then sends one message to the `RELKIT_WORK` queue, and the queue's consumer (the same
+Worker) runs due job attempts and event deliveries for up to 25 seconds. A failed batch is retried by
+Cloudflare Queues, so the wake-up is delivered at least once; Postgres keeps the job and delivery
+records, their retries and their results.
+
+The Cron Trigger calls the Worker every minute to run one scheduler pass and anything left over, such
+as a retry whose backoff has passed. The database records each schedule occurrence once (it is unique
+on schedule and time), so overlapping Cron calls and queue batches never run an occurrence twice.
+
+## Realtime on a Durable Object
+
+Every isolate of the Worker shares a realtime profile's channels, retained events and presence through
+one `RelkitRealtimeState` Durable Object, and subscribers wait on the object for new events instead of
+polling. `relkit check` fails when a channel on a Workers project uses the local realtime provider, or
+none.
+
+## What does not run on Workers
+
+With a wrangler configuration in the project, `relkit check` reports
+[`RELKIT_WORKERS_PROVIDER_UNSUPPORTED`](/docs/errors/relkit-workers-provider-unsupported) for a used
+profile whose provider needs local files or a process of its own, and names one that runs on Workers:
+
+| Capability  | Refused on Workers                                  | Use instead                                                      |
+| ----------- | --------------------------------------------------- | ---------------------------------------------------------------- |
+| Jobs        | local, effect-mq, Inngest, Trigger.dev, no provider | Postgres (`postgresJob()`), run from Queues and the Cron Trigger |
+| Events      | local, Inngest, Trigger.dev, no provider            | Postgres (`postgresEvent()`), delivered from Queues              |
+| Realtime    | local, Redis, no provider                           | `durableObjectRealtime()`                                        |
+| Caches      | local, no provider                                  | `kvBinding()`, `kv()`, or `redis()` with an `https://` URL       |
+| Buckets     | local, no provider                                  | `r2Binding()`, `r2()`, or `s3()`                                 |
+| Agent state | every provider                                      | Deploy apps with agents to Railway                               |
+
+A Drizzle database with the SQLite dialect fails with
+[`RELKIT_WORKERS_SQLITE_UNSUPPORTED`](/docs/errors/relkit-workers-sqlite-unsupported); use Postgres.
+Redis on Workers speaks HTTP: set the cache's URL to `https://:<token>@<host>`, an endpoint that
+serves the Upstash REST protocol. A `redis://` URL fails when the Worker starts.
+
+## Deploy from GitHub
+
+The generated workflow deploys every push to `main`. Create an API token in Cloudflare (My Profile →
+API Tokens) with Workers Scripts, Workers KV, Workers R2 and Queues edit permissions, and add it as the
+`CLOUDFLARE_API_TOKEN` secret in the GitHub repository; add your account ID as the
+`CLOUDFLARE_ACCOUNT_ID` variable.
+
+## Troubleshooting
+
+- **Every request answers `503`.** Run `bunx wrangler tail` and read the Worker's logs. A
+  `Provider startup failed` record names the cause, such as a missing `DATABASE_URL`.
+- **Jobs and event consumers never run.** Check that the queue in `wrangler.jsonc` exists
+  (`bunx wrangler queues list`) and that its consumer is the Worker.
+- **The deploy fails on the bundle.** A dependency that needs Bun or a native module cannot run on
+  Workers; `relkit check` names the providers, and the build log names the module.
+- **POST requests are rejected.** Production servers reject unsafe requests without an `Origin` header
+  that matches the app; browsers send it, and scripts must set it.

@@ -1,7 +1,7 @@
 /** Generated-runtime producer queues redact before transport and disclose loss without failing application work. */
 import { expect, test } from "bun:test";
 import { Effect } from "effect";
-import { createObservabilityRuntime } from "@relkit/observability";
+import { createObservabilityRuntime } from "relkit/observability";
 import { CliDevCapture, devCaptureLayer } from "../../src/commands/dev-capture.service.js";
 
 test("remote capture reports oversize queue loss and preserves subsequent records", async () => {

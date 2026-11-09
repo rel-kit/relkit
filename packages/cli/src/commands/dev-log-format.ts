@@ -1,5 +1,6 @@
-import type { LogRecord } from "@relkit/runtime-effect";
+import type { LogRecord } from "relkit/runtime-effect";
 import { devLogDetails } from "./dev-log-details.js";
+import { reloadLogLine } from "./dev-log-reload-format.js";
 import type { DevLogFormatOptions } from "./dev-log-format.types.js";
 export type { DevLogFormatOptions } from "./dev-log-format.types.js";
 
@@ -18,7 +19,9 @@ export function formatDevLog(record: LogRecord, options: DevLogFormatOptions = {
   let details: string[] = [];
   const milliseconds = Number(f.durationMs);
   const duration = Number.isFinite(milliseconds) ? ` in ${Math.round(milliseconds)}ms` : "";
-  if (scope === "cli.dev") {
+  const reload = scope === "cli.dev" ? reloadLogLine(event, f, duration) : undefined;
+  if (reload !== undefined) ({ scope, message, details } = reload);
+  else if (scope === "cli.dev") {
     scope =
       event.startsWith("dev.build") || event.startsWith("dev.generation") ? "build" : "relkit";
     if (event === "dev.starting") message = "Starting development server";

@@ -4,7 +4,7 @@ import {
   type DeploymentInfrastructureMaterialization,
   type DeploymentPlan,
   type InfrastructureOperationPlan,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 import { assertAdapter, context, name, output, resource, settings } from "./shared.js";
 
 export function materializeRedis(

@@ -13,7 +13,7 @@ import {
   invokeAgent,
   releaseAgentPersistence,
 } from "../../../integrations/packages/langchain/src/index.ts";
-import { z } from "../../../packages/schema/src/index.ts";
+import { z } from "relkit/schema";
 
 const [borrowedPath, ownedPath] = process.argv.slice(2);
 if (borrowedPath === undefined || ownedPath === undefined) {

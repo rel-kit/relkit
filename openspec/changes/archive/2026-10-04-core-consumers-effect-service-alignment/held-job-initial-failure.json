@@ -1,6 +1,6 @@
 {
   "root": "/tmp/relkit-core-consumers-job-held-39c7e6b8",
-  "candidate": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "candidate": "<home>/.codex/worktrees/core-consumers-effect/relkit",
   "cases": [
     {
       "mode": "return",
@@ -16,13 +16,13 @@
       },
       "error": {
         "message": "Job run data is not available.",
-        "stack": "ORPCError: Job run data is not available.\n    at createORPCErrorFromJson (/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@orpc+client@2.0.0-beta.31+e40b0dfdd726a224/node_modules/@orpc/client/dist/shared/client.BnATe4Ob.mjs:22:21)\n    at decodeResponse (/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@orpc+client@2.0.0-beta.31+e40b0dfdd726a224/node_modules/@orpc/client/dist/shared/client.vEM0O_Eg.mjs:156:40)\n    at processTicksAndRejections (native:7:39)"
+        "stack": "ORPCError: Job run data is not available.\n    at createORPCErrorFromJson (<home>/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@orpc+client@2.0.0-beta.31+e40b0dfdd726a224/node_modules/@orpc/client/dist/shared/client.BnATe4Ob.mjs:22:21)\n    at decodeResponse (<home>/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@orpc+client@2.0.0-beta.31+e40b0dfdd726a224/node_modules/@orpc/client/dist/shared/client.vEM0O_Eg.mjs:156:40)\n    at processTicksAndRejections (native:7:39)"
       }
     }
   ],
   "failure": {
     "message": "Job run data is not available.",
-    "stack": "ORPCError: Job run data is not available.\n    at createORPCErrorFromJson (/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@orpc+client@2.0.0-beta.31+e40b0dfdd726a224/node_modules/@orpc/client/dist/shared/client.BnATe4Ob.mjs:22:21)\n    at decodeResponse (/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@orpc+client@2.0.0-beta.31+e40b0dfdd726a224/node_modules/@orpc/client/dist/shared/client.vEM0O_Eg.mjs:156:40)\n    at processTicksAndRejections (native:7:39)"
+    "stack": "ORPCError: Job run data is not available.\n    at createORPCErrorFromJson (<home>/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@orpc+client@2.0.0-beta.31+e40b0dfdd726a224/node_modules/@orpc/client/dist/shared/client.BnATe4Ob.mjs:22:21)\n    at decodeResponse (<home>/.codex/worktrees/core-consumers-effect/relkit/node_modules/.bun/@orpc+client@2.0.0-beta.31+e40b0dfdd726a224/node_modules/@orpc/client/dist/shared/client.vEM0O_Eg.mjs:156:40)\n    at processTicksAndRejections (native:7:39)"
   },
   "claims": {
     "realTestingApplication": true,

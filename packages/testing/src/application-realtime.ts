@@ -1,6 +1,6 @@
-import type { ProviderRegistry } from "@relkit/engine";
-import { createProviderRealtimeDispatcher, runWithRealtimeDispatcher } from "@relkit/realtime";
-import type { RealtimeProvider } from "@relkit/realtime";
+import type { ProviderRegistry } from "relkit/engine";
+import { createProviderRealtimeDispatcher, runWithRealtimeDispatcher } from "relkit/realtime";
+import type { RealtimeProvider } from "relkit/realtime";
 import type { TestApplicationArtifacts } from "./application-registry.js";
 import type { TestRuntime } from "./runtime.js";
 

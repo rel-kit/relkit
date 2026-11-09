@@ -16,7 +16,7 @@
     ]
   },
   "request": {
-    "projectRoot": "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-readiness-cNXlxy/readiness-baseline",
+    "projectRoot": "<tmp>/relkit-readiness-cNXlxy/readiness-baseline",
     "url": "http://127.0.0.1:3000/hello?name=RelKit",
     "expectedStatus": 200,
     "expectedBody": "{\"message\":\"Hello, RelKit!\"}"

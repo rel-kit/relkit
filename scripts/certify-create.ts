@@ -8,12 +8,14 @@ import {
   templateDigest,
   validateCreationReport,
 } from "./release-create-evidence.js";
+import { CREATION_SUMMARIES, EVIDENCE_REPORTS, creationSummary } from "./release-evidence.js";
 import type { CreateCapabilityEvidence } from "create-relkit";
 
 type Run = (args: string[]) => Promise<void>;
 
 /**
- * Measures the versioned candidate before retaining its allow-list and evidence.
+ * Measures the versioned candidate before retaining its allow-list and evidence summary.
+ * Full reports go to the ignored `test-results/evidence` directory for CI to upload.
  * A provisional identity is needed to exercise the packed public creation gate;
  * every failed measurement or validation restores the original owned bytes.
  */
@@ -29,6 +31,18 @@ export async function certifyCreation(
     join(process.env.RUNNER_TEMP ?? tmpdir(), "relkit-create-certification-"),
   );
   const previous = new Map<string, string | undefined>([[sourcePath, source]]);
+  const retain = async (target: string, bytes: string) => {
+    previous.set(
+      target,
+      await readFile(target, "utf8").catch((error: NodeJS.ErrnoException) => {
+        if (error.code !== "ENOENT") throw error;
+        return undefined;
+      }),
+    );
+    await mkdir(dirname(target), { recursive: true });
+    await writeFile(target, bytes);
+  };
+  const reports: Record<string, unknown> = {};
   let passed = false;
   try {
     const config = await resolveConfig(sourcePath);
@@ -67,17 +81,20 @@ export async function certifyCreation(
         const message = `${set}: functional readiness passed; one-second performance target failed. See retained samples and host identity.`;
         console.warn(process.env.GITHUB_ACTIONS === "true" ? `::warning::${message}` : message);
       }
-      const target = join(root, entry[`${set}Evidence`]);
-      previous.set(
-        target,
-        await readFile(target, "utf8").catch((error: NodeJS.ErrnoException) => {
-          if (error.code !== "ENOENT") throw error;
-          return undefined;
-        }),
-      );
-      await mkdir(dirname(target), { recursive: true });
-      await writeFile(target, await format(report, { ...config, parser: "json" }));
+      reports[set] = parsed;
+      await retain(join(root, EVIDENCE_REPORTS, entry[`${set}Evidence`]), report);
     }
+    const summary = creationSummary(
+      entry.identity.release,
+      { fresh: reports.fresh, restart: reports.restart },
+      process.env.GITHUB_ACTIONS === "true"
+        ? undefined
+        : "a local run's `test-results/evidence` only; `bun scripts/certify-create.ts` measures them again",
+    );
+    await retain(
+      join(root, CREATION_SUMMARIES, `${entry.identity.release}.md`),
+      await format(summary, { ...config, parser: "markdown" }),
+    );
     await run(["test", "tests/unit/release-check.test.ts"]);
     await run([
       "x",
@@ -151,8 +168,8 @@ async function main(): Promise<void> {
     ...previous,
     identity,
     templateDigest: await templateDigest(join(root, "templates/default/v1/minimal")),
-    freshEvidence: `docs/evidence/create-capabilities/${identity.release}/fresh.json`,
-    restartEvidence: `docs/evidence/create-capabilities/${identity.release}/restart.json`,
+    freshEvidence: `create-capabilities/${identity.release}/fresh.json`,
+    restartEvidence: `create-capabilities/${identity.release}/restart.json`,
   };
   await certifyCreation(
     root,

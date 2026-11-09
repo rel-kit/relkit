@@ -1,5 +1,5 @@
-import type { JobErrorEnvelope, RunSnapshot } from "@relkit/contracts/jobs";
-import type { NativeRun, OperationContext } from "@relkit/jobs/adapter";
+import type { JobErrorEnvelope, RunSnapshot } from "relkit/contracts/jobs";
+import type { NativeRun, OperationContext } from "relkit/jobs/adapter";
 import { Exit, Option } from "effect";
 import type { JobStore } from "effect-mq";
 import type { EffectMqPostgresState } from "./postgres-state.js";

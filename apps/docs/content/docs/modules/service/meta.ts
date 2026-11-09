@@ -10,6 +10,7 @@ export default defineMeta({
     "organization",
     "define",
     "context-values",
+    "effect",
     "routes",
     "migration",
   ],

@@ -1,5 +1,5 @@
 import { Schema } from "effect";
-import type { PulumiBackend } from "@relkit/deploy-pulumi";
+import type { PulumiBackend } from "@relkit/pulumi/deploy-pulumi";
 import { CliFailureError } from "../cli-errors.js";
 import { DEPLOY_COMMANDS, deployOperationSchema } from "./deploy.schemas.js";
 import type { ConfigMap, ParsedDeployArgs } from "./deploy-support.types.js";
@@ -46,7 +46,7 @@ export function parseDeployArgs(args: readonly string[]): ParsedDeployArgs {
   if (!Schema.is(deployOperationSchema)(command))
     throw new DeployCommandError(
       "RELKIT_DEPLOY_USAGE",
-      "Usage: relkit deploy init|preview|up|refresh|outputs|destroy [options]",
+      "Usage: relkit deploy init [railway|aws]|preview|up|refresh|outputs|destroy [options]",
     );
   let projectRoot: string | undefined;
   let stack = "development";

@@ -27,7 +27,7 @@ import {
   toInvocationId,
   toRequestId,
   toTraceId,
-} from "../../packages/contracts/src/index.ts";
+} from "relkit/contracts";
 
 describe.serial("canonical contracts", () => {
   test("sorts object keys recursively while preserving array order", () => {

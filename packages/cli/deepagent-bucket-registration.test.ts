@@ -1,6 +1,6 @@
 /** Verifies optional generated agent wiring uses the declared native bucket and stays absent when no agent is declared. */
 import { expect, test } from "bun:test";
-import { GRAPH_VERSION, type RuntimeActivationFingerprint } from "@relkit/contracts";
+import { GRAPH_VERSION, type RuntimeActivationFingerprint } from "relkit/contracts";
 import { serverSource } from "./src/commands/build-server.ts";
 
 const graphHash = "sha256:deepagent-bucket";

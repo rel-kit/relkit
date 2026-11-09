@@ -1,4 +1,0 @@
-error: Module not found "/Users/mustafaelsayed/Workspace/packages/cli/src/bin.ts"
-
-native preparation exit: 1
-PASS native CLI rejects ambient asTool construction and publishes no snapshot

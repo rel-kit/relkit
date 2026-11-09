@@ -1,5 +1,5 @@
 ---
-title: Introducing Relkit
+title: Introducing RelKit
 description: A TypeScript backend framework where you only write the business logic
 type: blog
 date: 2026-10-29
@@ -14,13 +14,13 @@ I’ve spent years building products end to end: backends, web and mobile fronte
 
 I always wanted something that would take care of all of that, every setup and every decision, and just let me focus on the product.
 
-## Relkit
+## RelKit
 
-I built Relkit from a developer-experience perspective. That was 99% of my focus while working on the first implementation with my coding agents :)
+I built RelKit from a developer-experience perspective. That was 99% of my focus while working on the first implementation with my coding agents :)
 
-Just to be clear from the start: Relkit is a **backend** framework. It doesn’t care what’s on the other side. React, Vue, Svelte, a mobile app or even another server can all talk to it: every route is plain REST with an OpenAPI spec, and TypeScript callers get a generated typed client on top.
+Just to be clear from the start: RelKit is a **backend** framework. It doesn’t care what’s on the other side. React, Vue, Svelte, a mobile app or even another server can all talk to it: every route is plain REST with an OpenAPI spec, and TypeScript callers get a generated typed client on top.
 
-Relkit covers almost everything your application might need:
+RelKit covers almost everything your application might need:
 
 - Authentication
 - Database
@@ -37,7 +37,7 @@ Relkit covers almost everything your application might need:
 - Docker support for local providers (Redis, MinIO, Inngest and friends)
 - An Inspector that lets you visualize every piece of your application without reading a single line of code
 
-And you won’t wire any of this by hand. Relkit ships with a CLI that does the heavy lifting, from creating the project to scaffolding every piece you’ll see in this article:
+And you won’t wire any of this by hand. RelKit ships with a CLI that does the heavy lifting, from creating the project to scaffolding every piece you’ll see in this article:
 
 ```bash
 bunx create-relkit@latest my-app
@@ -53,7 +53,7 @@ This is my favorite feature so far. Every piece of your code is presented in a c
 
 In the Inspector you can see your application graph and how the pieces connect. You can see your agents, tools, functions, caches, database tables, jobs and storage files, plus the observability stuff like logs, traces and environments.
 
-![The Relkit Inspector showing the Routes page for the active workspace](/blog/introducing-relkit/inspector-routes.png)
+![The RelKit Inspector showing the Routes page for the active workspace](/blog/introducing-relkit/inspector-routes.png)
 
 It’s an optional companion, so you turn it on when you want it:
 
@@ -66,9 +66,9 @@ Throughout this article we’ll build one small thing: an **orders** backend. Ev
 
 ## Functions
 
-Functions are the heartbeat of Relkit. Every function is one piece of your system, responsible for one small, clear job. Keeping them that small helps in a lot of ways: testing gets easy, and you can compose little pieces to achieve a bigger task.
+Functions are the heartbeat of RelKit. Every function is one piece of your system, responsible for one small, clear job. Keeping them that small helps in a lot of ways: testing gets easy, and you can compose little pieces to achieve a bigger task.
 
-To create a function, start with the Relkit CLI:
+To create a function, start with the RelKit CLI:
 
 ```bash
 bun run relkit add function create-order
@@ -79,39 +79,39 @@ The CLI is interactive, so it simply asks you for anything it needs (like which 
 This generates a file you then fill in, something like this:
 
 ```ts
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "zod";
+import orderCreated from "../events/order-created.event.js";
 const createOrder = defineFunction({
   input: z.object({}),
   output: z.object({}),
-  publishes: ["orders.created"],
+  dependencies: { events: { orderCreated } },
   handler: async (input, context) => {
     const order = {};
-    await context.events["orders.created"].publish(order);
+    await context.events.orderCreated.publish(order);
     return order;
   },
 });
 export default createOrder;
 ```
 
-Fill `input` and `output` with your own schemas; they're validated on every call, and `publishes` is how a function declares, up front, which events it's allowed to send. No surprise side effects.
+Fill `input` and `output` with your own schemas; they're validated on every call, and `dependencies` is how a function declares, up front, everything it calls: the events it sends, the functions it uses, its caches and its database. No surprise side effects.
 
 You can use the same function in different places:
 
-- Inside its own domain, call it directly: `createOrder.invoke({ ... })`
-- From another domain, go through its service: `orders.createOrder.invoke({ ... })`
+- From another function, declare it under `dependencies.functions` and call `context.functions.createOrder({ ... })`
 - From HTTP, give it to a route as a target: `defineRoute({ target: orders.createOrder })`
 
 And since it’s just a function, testing it doesn’t need a server: `invokeFunction(orders.createOrder, { ... })` from `@relkit/testing` and you're done.
 
-Functions aren’t locked inside handlers either. A function is just a module you import, so any backend code in your app can call it, and it still goes through the same validation, timeouts and tracing as an HTTP request:
+Functions aren’t locked inside handlers either. Code outside a handler, such as middleware or a raw route, gets the running application with `getRelkit()`, and its calls go through the same validation, timeouts and tracing as an HTTP request:
 
 ```ts
-import orders from "@app/services/orders/service.js";
-const order = await orders.createOrder.invoke({});
+import { getRelkit } from "relkit";
+const order = await getRelkit().functions.orders.createOrder({});
 ```
 
-The same goes for other pieces: start a job with `orders.exportOrders.trigger(input)` or push a live update with `orderStatus.trigger(...)`, straight from a route or any other backend code. The one thing that stays inside a function is resource access. Caches, buckets and the database reach you through the function’s `context`, so every access is declared and shows up in the graph.
+Inside a function, everything it touches, from caches and buckets to the database, other functions, events and live updates, reaches it through its `context` and is declared under `dependencies`, so every call shows up in the graph.
 
 ## Routes
 
@@ -126,9 +126,9 @@ bun run relkit add route /orders/:orderId
 This generates:
 
 ```ts
-import { defineServiceRoutes } from "@relkit/app/routes";
+import { defineServiceRoutes } from "relkit/routes";
 import orders from "@app/services/orders/service.js";
-export const { GET } = defineServiceRoutes(orders, {
+export default defineServiceRoutes(orders, {
   GET: "getOrder",
 });
 ```
@@ -160,7 +160,7 @@ server: { apiDocs: { ui: "scalar" } },
 
 Restart the app and open `http://localhost:3000/_relkit/v1/api-reference`. Every route is listed with its parameters, request body, responses and validation errors, all generated from the same schemas your functions use. Change a schema and the docs change with it.
 
-![The Scalar API reference sending a request to a Relkit route](/blog/introducing-relkit/scalar-api-reference.png)
+![The Scalar API reference sending a request to a RelKit route](/blog/introducing-relkit/scalar-api-reference.png)
 
 Scalar is off in production by default, and turning it on there requires protecting the docs endpoints. Docs visibility isn’t access control.
 
@@ -168,7 +168,7 @@ Scalar is off in production by default, and turning it on there requires protect
 
 You may have noticed that routes don’t import functions directly. They go through a **service**.
 
-A service is the public front door of a domain. You organize your code by what your product does (orders, receipts, accounts), not by technology, and each domain gets its own folder:
+A service is the public front door of a domain. You organize your code by what your product does (orders, invoices, accounts), not by technology, and each domain gets its own folder:
 
 ```text
 src/services/orders/
@@ -183,7 +183,7 @@ src/services/orders/
 The `service.ts` file picks which functions the rest of the app is allowed to use:
 
 ```ts
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 import createOrder from "./functions/create-order.function.js";
 import getOrder from "./functions/get-order.function.js";
 import orderCreated from "./events/order-created.event.js";
@@ -205,7 +205,7 @@ To scaffold a new one: `bun run relkit add service`.
 
 ## Buckets
 
-Every orders app eventually needs files: invoices, product images, receipts. A **bucket** gives your files a home, with rules built in.
+Every orders app eventually needs files: invoices, product images, PDFs. A **bucket** gives your files a home, with rules built in.
 
 ```bash
 bun run relkit add bucket invoices
@@ -222,7 +222,7 @@ defaults: { bucket: "assets" },
 Then you define the bucket with its rules:
 
 ```ts
-import { defineBucket } from "@relkit/app/buckets";
+import { defineBucket } from "relkit/buckets";
 export default defineBucket({
   id: "orders.invoices",
   profile: "assets",
@@ -253,15 +253,15 @@ Reading files back is just as friendly: `get`, `head`, `exists`, `list`, `delete
 
 ## Events
 
-Remember `publishes: ["orders.created"]` in our first function? Here's the other side of it.
+Remember `dependencies: { events: { orderCreated } }` in our first function? Here's the other side of it.
 
 An event says “something happened”, and other functions can react to it without the original operation waiting for them. Perfect for “send a confirmation email” or “record analytics” kinds of work.
 
 First, define the event and what it carries:
 
 ```ts
-import { defineEvent } from "@relkit/app/events";
-import { z } from "@relkit/app/schema";
+import { defineEvent } from "relkit/events";
+import { z } from "zod";
 export default defineEvent({
   id: "orders.created",
   input: z.object({ orderId: z.string() }),
@@ -271,7 +271,7 @@ export default defineEvent({
 Then subscribe to it from anywhere:
 
 ```ts
-import { defineEventFunction } from "@relkit/app/events";
+import { defineEventFunction } from "relkit/events";
 export default defineEventFunction({
   id: "orders.confirmation",
   event: "orders.created",
@@ -296,8 +296,8 @@ bun run relkit add cache prices
 Define what the key and value look like, and how long values live:
 
 ```ts
-import { defineCache } from "@relkit/app/cache";
-import { z } from "@relkit/app/schema";
+import { defineCache } from "relkit/cache";
+import { z } from "zod";
 export default defineCache({
   id: "orders.prices",
   profile: "requests",
@@ -328,7 +328,7 @@ No Redis client, no key-string gymnastics, no `JSON.parse`. Keys and values are 
 
 ## Database
 
-Relkit’s database service is built on Drizzle (MongoDB and Prisma integrations are on the way). One command sets it up:
+RelKit’s database service is built on Drizzle (MongoDB and Prisma integrations are on the way). One command sets it up:
 
 ```bash
 bun run relkit add database
@@ -427,14 +427,15 @@ export default function App() {
 
 By default the provider talks to the same origin, which works nicely with a Vite or Next.js dev proxy. If your backend lives on another origin, pass `baseUrl` to the provider. For production builds, add `relkit()` to your Vite config or `withRelkit()` to your Next.js config so the frontend knows exactly which backend version it was built for.
 
-That’s it. Every route, job, agent and channel is now typed, with autocomplete on the route names:
+That’s it. Every route, job, agent and channel is now typed. Routes live on an `api` object shaped like your services, so autocomplete walks you from `api.orders` to `getOrder`:
 
 ```tsx
+import { api } from "@relkit/client";
 import { useRelkitClient, useRoute, useRouteMutation } from "@relkit/client/react";
 export function Orders() {
   const { status } = useRelkitClient();
-  const order = useRoute("GET /orders/:orderId", { input: { orderId: "order-1" } });
-  const create = useRouteMutation("POST /orders");
+  const order = useRoute(api.orders.getOrder, { input: { orderId: "order-1" } });
+  const create = useRouteMutation(api.orders.createOrder);
   if (order.isPending) return <p>Loading…</p>;
   return (
     <button
@@ -447,17 +448,17 @@ export function Orders() {
 }
 ```
 
-Inputs, outputs and errors all come from your backend’s schemas. Change a field on the backend and TypeScript tells the frontend right away. And `relkit client check` in CI catches any drift before you ship. No more "hey, what does this endpoint return?" messages :)
+Inputs, outputs and errors all come from your backend’s schemas. Change a field on the backend and TypeScript tells the frontend right away. Errors are typed too: check `error.code === "orders.not-found"` and TypeScript knows the error's `data`. Under `relkit dev`, the page even picks up a changed contract without a frontend restart. And `relkit client check` in CI catches any drift before you ship. No more "hey, what does this endpoint return?" messages :)
 
-Not using React? The same typed client works without it: `createClient` from `@relkit/client` runs in any TypeScript app, in the browser or on another server (on Bun, `createServerClient` also forwards tracing). And because every route is plain REST described by OpenAPI, a mobile app or a service written in any language can call your backend too.
+Not using React? The same typed client works without it: `createApi` from `@relkit/client` gives you the same `api` tree with every route callable (`await backend.orders.createOrder(input)`). It runs in any TypeScript app, in the browser or on another server (on Bun, `createServerClient` also forwards tracing). And because every route is plain REST described by OpenAPI, a mobile app or a service written in any language can call your backend too.
 
 ## Realtime
 
 Want the order page to update the moment the order ships? That’s a **realtime channel**.
 
 ```ts
-import { defineChannel } from "@relkit/app/realtime";
-import { z } from "@relkit/app/schema";
+import { defineChannel } from "relkit/realtime";
+import { z } from "zod";
 
 export default defineChannel({
   id: "orders.status",
@@ -468,10 +469,10 @@ export default defineChannel({
 });
 ```
 
-The backend triggers an update:
+A backend function declares the channel under `dependencies: { channels: { orderStatus } }` and triggers an update:
 
 ```ts
-await orderStatus.trigger({ orderId }, "updated", { status: "shipped" });
+await context.channels.orderStatus.trigger({ orderId }, "updated", { status: "shipped" });
 ```
 
 And the browser listens, with fully typed callbacks:
@@ -490,7 +491,7 @@ One little piece of wisdom from the docs that I love: the channel is **not** you
 Sometimes a response should arrive bit by bit instead of all at once: progress bars, long reports, AI output. Declare the output with `streamOf` and return an async generator:
 
 ```ts
-import { defineFunction, streamOf } from "@relkit/app/functions";
+import { defineFunction, streamOf } from "relkit/functions";
 
 const streamOrderReport = defineFunction({
   input: z.object({ reportId: z.string().min(1) }),
@@ -515,13 +516,13 @@ export const GET = defineRoute({
 });
 ```
 
-And on the frontend, `useStream("GET /reports/:reportId")` gives you `start()`, `cancel()` and typed `items`. Every streamed item is validated against the schema. Even streams don't get to skip the rules.
+And on the frontend, `useStream(api.orders.streamOrderReport)` gives you `start()`, `cancel()` and typed `items`. Every streamed item is validated against the schema. Even streams don't get to skip the rules.
 
 ## Jobs
 
 Some work should outlive the request that started it: exporting orders, sending a batch of invoices, syncing with another system. That’s what jobs are for.
 
-Relkit jobs are task-first. A **task** owns the work, and a **job** gives it a public name. Under the hood you choose the engine: Inngest, Trigger.dev or Effect MQ, all with local Docker recipes.
+RelKit jobs are task-first. A **task** owns the work, and a **job** gives it a public name. Under the hood you choose the engine: Inngest, Trigger.dev or Effect MQ, all with local Docker recipes.
 
 ```bash
 bun run relkit add task export-orders
@@ -531,7 +532,7 @@ bun run relkit add job export-orders
 The task, with typed progress:
 
 ```ts
-import { defineTask } from "@relkit/app/tasks";
+import { defineTask } from "relkit/tasks";
 
 export default defineTask({
   id: "orders.export-orders",
@@ -552,7 +553,7 @@ export default defineTask({
 The job:
 
 ```ts
-import { defineJob } from "@relkit/app/jobs";
+import { defineJob } from "relkit/jobs";
 export default defineJob({
   name: "exportOrders",
   id: "orders.export-orders",
@@ -569,23 +570,26 @@ Retries (three attempts with backoff by default), progress, schedules and cancel
 
 ## Agents
 
-Here’s where it gets really fun. An **agent** lets a model decide which steps to take, using your app’s own functions as its tools. Relkit runs agents on native LangChain and LangGraph, so you’re not locked into some custom wrapper.
+Here’s where it gets really fun. An **agent** lets a model decide which steps to take, using your app’s own functions as its tools. RelKit runs agents on native LangChain and LangGraph, so you’re not locked into some custom wrapper.
 
 ```bash
 bun run relkit add agent support
 ```
 
 ```ts
-import { defineAgent } from "@relkit/langchain";
-import { z } from "@relkit/app/schema";
+import { langchain } from "@relkit/langchain";
+import { z } from "zod";
 import { supportModel } from "@app/platform/model.js"; // any LangChain chat model
 import lookupOrder from "@app/services/orders/tools/lookup-order.tool.js";
+import { defineAgent } from "relkit/agents";
 
 export default defineAgent({
   id: "orders.support",
+  runtime: langchain({
+    model: supportModel,
+  }),
   input: z.object({ message: z.string().min(1) }),
   output: z.object({ answer: z.string() }),
-  model: supportModel,
   instructions: "Help customers with their orders. Look the order up before answering.",
   tools: [lookupOrder],
   client: { public: true },
@@ -626,7 +630,7 @@ No duplicated schemas and no separate “AI layer”. The tool has the same inpu
 
 ## Graphs
 
-When you already know the steps, and you want branches, loops or a human in the loop, a free-thinking agent isn’t the right fit. Reach for a **graph** instead. It’s native LangGraph, with Relkit validating the state at each node.
+When you already know the steps, and you want branches, loops or a human in the loop, a free-thinking agent isn’t the right fit. Reach for a **graph** instead. It’s native LangGraph, with RelKit validating the state at each node.
 
 ```ts
 // trimmed from the docs' order-review example
@@ -656,7 +660,7 @@ Each node is defined with `defineGraphNode` and has its own input and output sch
 
 ## MCP
 
-Want Claude, Cursor or any other MCP client to use your app’s tools? You don’t need to write an MCP server. Relkit already has one; you just switch it on:
+Want Claude, Cursor or any other MCP client to use your app’s tools? You don’t need to write an MCP server. RelKit already has one; you just switch it on:
 
 ```bash
 bun add @modelcontextprotocol/server
@@ -673,7 +677,7 @@ Want to keep a tool internal? Add `mcp: false` to it. And before you put this on
 
 ## Observability
 
-Here’s the “done under the hood” promise in action. Relkit automatically creates spans for routes, functions, jobs, events, tools and agents, all correlated together. You just log:
+Here’s the “done under the hood” promise in action. RelKit automatically creates spans for routes, functions, jobs, events, tools and agents, all correlated together. You just log:
 
 ```ts
 context.log.info("order.created", { orderId });
@@ -771,13 +775,13 @@ bun run relkit deploy up --stack production
 
 Full setup for the engine and host (roles, stacks and state backends): [Deploy to AWS with Pulumi](/docs/modules/deployment/aws).
 
-Relkit generates the Pulumi program straight from your application graph: ECS/Fargate, networking, a load balancer and CloudWatch logs. Preview always comes first, so you see every create, update and delete before anything gets billed. AWS is the first built-in cloud host, and the Docker image covers everywhere else.
+RelKit generates the Pulumi program straight from your application graph: ECS/Fargate, networking, a load balancer and CloudWatch logs. Preview always comes first, so you see every create, update and delete before anything gets billed. AWS is the first built-in cloud host, and the Docker image covers everywhere else.
 
-Want AWS to own the resources too, not just host the app? Wrap them in `aws(...)`, like `aws(s3(...))` or `aws(redis(...))`, and the stack creates and manages them for you. Leave them unwrapped and Relkit simply connects to resources you already run elsewhere. More in [Configure production providers](/docs/modules/deployment/providers).
+Want AWS to own the resources too, not just host the app? Wrap them in `aws(...)`, like `aws(s3(...))` or `aws(redis(...))`, and the stack creates and manages them for you. Leave them unwrapped and RelKit simply connects to resources you already run elsewhere. More in [Configure production providers](/docs/modules/deployment/providers).
 
 ## Big thanks
 
-Relkit stands on the shoulders of giants. A huge thank you to the people behind the core projects that make it possible:
+RelKit stands on the shoulders of giants. A huge thank you to the people behind the core projects that make it possible:
 
 - **Effect**, the backbone of the runtime, schemas and CLI
 - **Bun**, for making TypeScript tooling fast and fun

@@ -2,7 +2,7 @@
 
 import { Command, END, START, StateSchema } from "@langchain/langgraph";
 
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { defineGraph, defineGraphNode } from "../src/index.js";
 
 export const limits = { maxSteps: 20, maxToolCalls: 5, timeoutMs: 10_000 };

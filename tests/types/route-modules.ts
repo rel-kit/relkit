@@ -1,7 +1,7 @@
-import { defineRoute, defineServiceRoutes, type RouteModuleContract } from "@relkit/app/routes";
-import { defineFunction } from "@relkit/app/functions";
-import { defineService } from "@relkit/app/services";
-import { z } from "@relkit/app/schema";
+import { defineRoute, defineServiceRoutes, type RouteModuleContract } from "relkit/routes";
+import { defineFunction } from "relkit/functions";
+import { defineService } from "relkit/services";
+import { z } from "relkit/schema";
 
 type AssertModule<Expected, Actual extends Expected> = Actual;
 const example = defineFunction({
@@ -32,4 +32,14 @@ type Empty = AssertModule<RouteModuleContract<{}>, {}>;
 // @ts-expect-error ALL requires a raw route, with auth ownership checked by the compiler
 type All = AssertModule<RouteModuleContract<{ ALL: typeof table.GET }>, { ALL: typeof table.GET }>;
 
-export type CheckedModules = Valid | Raw;
+type Post = { POST: typeof table.GET };
+// @ts-expect-error a service route bound to GET cannot be exported as POST
+type Renamed = AssertModule<RouteModuleContract<Post>, Post>;
+const both = defineServiceRoutes(service, { GET: "example", POST: "example" });
+type Matching = AssertModule<
+  RouteModuleContract<{ GET: typeof both.GET; POST: typeof both.POST }>,
+  { GET: typeof both.GET; POST: typeof both.POST }
+>;
+type Map = AssertModule<RouteModuleContract<{ default: typeof both }>, { default: typeof both }>;
+
+export type CheckedModules = Valid | Raw | Matching | Map;

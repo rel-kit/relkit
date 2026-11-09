@@ -5,8 +5,8 @@ export default defineMeta({
   icon: "plug",
   pages: [
     "langchain",
+    "ai-sdk",
     "aws",
-    "catalog",
     "cloudflare",
     "docker",
     "local",
@@ -18,6 +18,7 @@ export default defineMeta({
     "inngest",
     "trigger",
     "effect-mq",
+    "postgres",
   ],
   display: "page",
 });

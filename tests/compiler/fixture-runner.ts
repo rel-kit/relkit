@@ -1,5 +1,5 @@
-import { canonicalJson, RELKIT_DESCRIPTOR } from "../../packages/contracts/src/index.ts";
-import { canonicalGraphJson } from "../../packages/graph/src/index.ts";
+import { canonicalJson, RELKIT_DESCRIPTOR } from "relkit/contracts";
+import { canonicalGraphJson } from "relkit/graph";
 import {
   checkConventions,
   evaluateCandidates,
@@ -10,11 +10,11 @@ import {
   resolveRuntimeIntegrationPackages,
   type NormalizationResult,
   type RuntimeIntegrationPackage,
-} from "../../packages/compiler/src/index.ts";
+} from "../../packages/cli/src/compiler/index.ts";
 import { workspacePackageDirectories } from "../../scripts/workspace-packages.ts";
-import type { ExtractedDescriptor } from "../../packages/compiler/src/discovery/extract.ts";
-import type { EvaluatorResponse } from "../../packages/compiler/src/discovery/evaluator-protocol.ts";
-import type { Diagnostic } from "../../packages/diagnostics/src/index.ts";
+import type { ExtractedDescriptor } from "../../packages/cli/src/compiler/discovery/extract.ts";
+import type { EvaluatorResponse } from "../../packages/cli/src/compiler/discovery/evaluator-protocol.ts";
+import type { Diagnostic } from "relkit/diagnostics";
 import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -29,6 +29,7 @@ export const COMPILER_FIXTURES = Object.freeze([
   "warning-wrong-suffix",
   "error-duplicate-id",
   "error-ambiguous-id",
+  "error-missing-error-id",
   "error-inferred-collision",
   "error-route-collision",
   "error-missing-target",
@@ -206,7 +207,7 @@ async function prepareRoot(fixtureRoot: string, temporaryRoot: string): Promise<
     const manifest = JSON.parse(await readFile(join(packageRoot, "package.json"), "utf8")) as {
       readonly name?: string;
     };
-    if (manifest.name?.startsWith("@relkit/")) {
+    if (manifest.name === "relkit" || manifest.name?.startsWith("@relkit/")) {
       await symlink(packageRoot, join(temporaryRoot, "node_modules", manifest.name), "dir");
     }
   }
@@ -221,7 +222,7 @@ async function linkFixtureDependencies(fixtureRoot: string, temporaryRoot: strin
   };
   const names = Object.keys({ ...manifest.dependencies, ...manifest.devDependencies }).sort();
   for (const name of names) {
-    if (name.startsWith("@relkit/")) continue;
+    if (name === "relkit" || name.startsWith("@relkit/")) continue;
     const source = join(fixtureRoot, "node_modules", name);
     if (!existsSync(source)) continue;
     const target = join(temporaryRoot, "node_modules", name);

@@ -1,5 +1,5 @@
-import type { ApplicationGraph } from "../../../packages/graph/src/index.ts";
-import { GRAPH_VERSION } from "../../../packages/contracts/src/index.ts";
+import type { ApplicationGraph } from "relkit/graph";
+import { GRAPH_VERSION } from "relkit/contracts";
 
 const input = {
   type: "object",

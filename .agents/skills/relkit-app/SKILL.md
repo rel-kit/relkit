@@ -1,13 +1,13 @@
 ---
 name: relkit-app
-description: Build or extend a RELKIT TypeScript backend using domain services, validated functions, routes, and tests. Use for RELKIT application work, not framework internals or cloud deployment.
+description: Build or extend a RelKit TypeScript backend using domain services, validated functions, routes, and tests. Use for RelKit application work, not framework internals or cloud deployment.
 ---
 
-# Build a RELKIT application
+# Build a RelKit application
 
 Work in the application's root, where `relkit.config.ts` and `package.json` live. If it is an
 existing app, read its domains, routes, configuration, and tests before adding files. Keep its
-installed RELKIT version and conventions. For a new app, start with
+installed RelKit version and conventions. For a new app, start with
 `bunx create-relkit@latest <name>`. The publicly certified tuple is minimal with
 examples enabled, no jobs, no cloud, and no deployment. API/agent/fullstack/jobs
 and cloud creation are internal candidates until their exact release evidence is certified.
@@ -89,7 +89,7 @@ agent declarations remain SDK-free. Keep generic tests on `@relkit/testing`, dat
 tests on `@relkit/testing/drizzle`, and auth tests on `@relkit/testing/better-auth`.
 Native agent helpers come from `@relkit/langchain/testing`. Install only selected peers
 and use the project manager shown by its manifest rather than inferring it from a runner. Do not
-import RELKIT compiler/runtime internals or edit `.relkit/generated` or `.relkit/build`.
+import RelKit compiler/runtime internals or edit `.relkit/generated` or `.relkit/build`.
 Use `bun run relkit add --help` for available scaffolding commands, then inspect the files
 created; do not create a second service for an existing domain.
 

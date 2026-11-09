@@ -1,8 +1,8 @@
 /** Keeps history acquisition attached to the tool and hides retiring writers before native cleanup. */
 import { join } from "node:path";
 import { Effect, Exit, Ref, Scope } from "effect";
-import { InspectionConnectionError } from "@relkit/inspector-api/connection";
-import type { InspectionFilesOperations } from "@relkit/inspector-api/connection";
+import { InspectionConnectionError } from "relkit/inspector-api/connection";
+import type { InspectionFilesOperations } from "relkit/inspector-api/connection";
 import { InspectorHistory } from "./history.service.js";
 import type { InspectorOptions } from "./options.types.js";
 import type { InspectorToolStateRef } from "./tool-state.types.js";

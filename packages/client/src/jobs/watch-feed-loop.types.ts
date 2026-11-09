@@ -1,4 +1,4 @@
-import type { RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunWatchFrame } from "relkit/contracts/jobs";
 import type { JobWatchOptions } from "./types.js";
 import type { FeedEvent } from "./watch-feed.types.js";
 

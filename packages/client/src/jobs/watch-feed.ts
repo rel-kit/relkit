@@ -1,9 +1,8 @@
-import type { RunWatchFrame } from "@relkit/contracts/jobs";
-import { acquireClientOwner } from "../client-owner.js";
+import type { RunWatchFrame } from "relkit/contracts/jobs";
 import { verifyWatchTerminal } from "./watch-feed-terminal.js";
 import { isTerminalRun, JobWatchAbortedError, type JobWatchOptions } from "./types.js";
 import { deferred, type Pending } from "./watch-feed-support.js";
-import { JobObservation, JobObservationLive } from "./observation.service.js";
+import { jobObservation } from "./observation.service.js";
 import { acceptWatchFrame, emptyWatchFeedState, type WatchFeedState } from "./watch-feed-state.js";
 import type { FeedEvent, FeedObserver } from "./watch-feed.types.js";
 import { refetchSharedWatchFeed } from "./watch-feed-refetch.js";
@@ -17,12 +16,11 @@ import {
 export type { FeedEvent, FeedStatus } from "./watch-feed.types.js";
 
 /**
- * Scoped physical native observation shared by independently retired view leases.
+ * Physical native observation shared by independently retired view leases.
  * @typeParam Run - Application-specific run payload retained by authoritative frames.
  */
 export class SharedWatchFeed<Run> {
-  private readonly owner = acquireClientOwner(JobObservationLive, JobObservation);
-  private readonly observation = this.owner.service;
+  private readonly closed = new AbortController();
   private readonly observers = new Map<
     string,
     { readonly observer: FeedObserver<Run>; readonly first: Pending }
@@ -30,6 +28,7 @@ export class SharedWatchFeed<Run> {
   private runTask: Promise<void> | undefined;
   private teardownPending: Promise<void> | undefined;
   private abort: AbortController | undefined;
+  private worker: AbortController | undefined;
   private generation = 0;
   private failures = 0;
   private closing: Promise<void> | undefined;
@@ -86,15 +85,16 @@ export class SharedWatchFeed<Run> {
     if (this.teardownPending !== undefined) return this.teardownPending;
     this.generation += 1;
     this.abort?.abort();
-    const closing = this.owner.close();
+    this.worker?.abort();
     const running = this.runTask?.catch(() => undefined) ?? Promise.resolve();
-    const teardown = joinFeedTeardown(closing, running);
+    const teardown = joinFeedTeardown(running);
     this.teardownPending = teardown;
     try {
       await teardown;
     } finally {
       this.runTask = undefined;
       this.abort = undefined;
+      this.worker = undefined;
       if (this.teardownPending === teardown) {
         this.teardownPending = undefined;
         if (
@@ -128,19 +128,17 @@ export class SharedWatchFeed<Run> {
   }
 
   /**
-   * Closes the service owner after the sharing registry removes its final entry.
-   * @returns Joined scoped cleanup; callers must first release every observer.
+   * Permanently stops observation after the sharing registry removes its final entry.
+   * @returns Joined native cleanup; callers must first release every observer.
    */
   close(): Promise<void> {
     if (this.closing !== undefined) return this.closing;
     this.generation++;
+    this.closed.abort();
     this.abort?.abort();
     rejectObserverFirsts(this.observers, new JobWatchAbortedError());
     this.observers.clear();
-    return (this.closing = Promise.all([
-      this.owner.close(),
-      this.runTask?.catch(() => undefined) ?? Promise.resolve(),
-    ]).then(() => undefined));
+    return (this.closing = Promise.resolve(this.runTask).then(() => undefined));
   }
 
   /**
@@ -149,6 +147,7 @@ export class SharedWatchFeed<Run> {
    */
   private ensureRunning(): void {
     if (
+      this.closed.signal.aborted ||
       this.teardownPending !== undefined ||
       this.runTask !== undefined ||
       this.observers.size === 0
@@ -156,13 +155,21 @@ export class SharedWatchFeed<Run> {
       return;
     this.failures = 0;
     const generation = ++this.generation;
-    const task = this.owner
-      .run(this.observation.consume(this.loop(generation), generation))
+    const worker = new AbortController();
+    this.worker = worker;
+    // Starts synchronously so the first native request opens within this call.
+    const task = jobObservation
+      .consume(
+        this.loop(generation),
+        generation,
+        AbortSignal.any([worker.signal, this.closed.signal]),
+      )
       .catch(() => undefined);
     const managed = task.finally(() => {
       if (this.runTask !== managed) return;
       this.runTask = undefined;
       this.abort = undefined;
+      this.worker = undefined;
     });
     this.runTask = managed;
     void managed.catch(() => undefined);

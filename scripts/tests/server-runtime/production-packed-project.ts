@@ -37,7 +37,7 @@ export async function preparePackedProduction(
       private: true,
       type: "module",
       dependencies: {
-        "@relkit/app": version("@relkit/app"),
+        relkit: version("relkit"),
         "@relkit/local": version("@relkit/local"),
         "@scalar/hono-api-reference": "0.12.9",
       },
@@ -136,14 +136,14 @@ async function minimalSources(root: string) {
   await rm(join(root, "src/services/probe/tasks/double.task.ts"));
   await writeFile(
     join(root, "relkit.config.ts"),
-    'import { defineApp, defineEnv } from "@relkit/app/config"; export default defineApp({ id: "production-minimal", env: defineEnv({}) });\n',
+    'import { defineApp, defineEnv } from "relkit/config"; export default defineApp({ id: "production-minimal", env: defineEnv({}) });\n',
   );
   await writeFile(
     join(root, "src/services/probe/service.ts"),
-    'import { defineService } from "@relkit/app/services"; import submit from "./functions/submit.function.js"; export default defineService({ functions: { submit } });\n',
+    'import { defineService } from "relkit/services"; import submit from "./functions/submit.function.js"; export default defineService({ functions: { submit } });\n',
   );
   await writeFile(
     join(root, "src/services/probe/functions/submit.function.ts"),
-    'import { defineFunction } from "@relkit/app/functions"; import { z } from "@relkit/app/schema"; export default defineFunction({ id: "probe.submit", input: z.object({ value: z.number() }), output: z.object({ doubled: z.number() }), handler: async ({ value }) => ({ doubled: value * 2 }) });\n',
+    'import { defineFunction } from "relkit/functions"; import { z } from "relkit/schema"; export default defineFunction({ id: "probe.submit", input: z.object({ value: z.number() }), output: z.object({ doubled: z.number() }), handler: async ({ value }) => ({ doubled: value * 2 }) });\n',
   );
 }

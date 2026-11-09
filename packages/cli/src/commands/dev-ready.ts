@@ -1,7 +1,7 @@
 /** Projects activated manifest documentation selection into truthful development ready links. */
 import { join } from "node:path";
 import { Effect, Schema } from "effect";
-import type { LoadedToolingConfig } from "@relkit/compiler";
+import type { LoadedToolingConfig } from "../compiler/index.js";
 import { CliFileSystem } from "../services/filesystem.service.js";
 import type { DevLog } from "./dev.js";
 

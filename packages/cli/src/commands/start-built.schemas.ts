@@ -1,5 +1,5 @@
 import { Schema } from "effect";
-import { isRuntimeActivationFingerprint } from "@relkit/contracts";
+import { isRuntimeActivationFingerprint } from "relkit/contracts";
 
 /** Owner-validated activation identity at the manifest JSON boundary. */
 export const builtActivationSchema = Schema.declare(isRuntimeActivationFingerprint);
@@ -20,6 +20,8 @@ export const builtManifestSchema = Schema.Struct({
   runtimeIntegrationsPlanFile: Schema.String,
   localServicesPlanFile: Schema.optionalKey(Schema.String),
   server: Schema.optionalKey(Schema.Struct({ port: Schema.optionalKey(Schema.Number) })),
+  /** Runtime the server was built for; absent for Bun builds. */
+  runtime: Schema.optionalKey(Schema.Literals(["bun", "node", "workers"])),
 });
 
 /** Untrusted artifact object; domain owners validate semantic and version contracts. */

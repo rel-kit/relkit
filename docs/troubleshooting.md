@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Start with the first failing command and preserve its diagnostic code. RELKIT
+Start with the first failing command and preserve its diagnostic code. RelKit
 uses exit code `0` for success, `1` for an operation failure, `2` for usage,
 `130` for `SIGINT`, and `143` for `SIGTERM`.
 

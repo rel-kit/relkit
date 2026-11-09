@@ -1,0 +1,9 @@
+{
+  "protocol": "relkit.walkthrough-result",
+  "kind": "create-to-railway",
+  "outcome": "stubbed",
+  "seconds": null,
+  "steps": [],
+  "note": "The Railway CLI was not signed in.",
+  "createdAt": "2026-11-05T10:00:00.000Z"
+}

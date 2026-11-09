@@ -22,20 +22,27 @@ Each service selects its own operations; another service must not act as a barre
 
 ```ts
 // src/services/pricing/service.ts
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 import calculateQuote from "./functions/calculate-quote.function.js";
 
 export default defineService({ functions: { calculateQuote } });
 ```
 
-An orders function can call the public pricing contract. For a pure calculation that needs no provider state:
+An orders function can call the public pricing contract. It declares the function under `dependencies.functions` and calls it through its context:
 
 ```ts
 import pricing from "@app/services/pricing/service.js";
 
-// Inside an orders function handler:
-const quote = await pricing.calculateQuote.invoke({ sku, quantity });
-// Apply the order's acceptance rules to the validated quote.
+export default defineFunction({
+  input,
+  output,
+  dependencies: { functions: { calculateQuote: pricing.calculateQuote } },
+  handler: async ({ sku, quantity }, ctx) => {
+    const quote = await ctx.functions.calculateQuote({ sku, quantity });
+    // Apply the order's acceptance rules to the validated quote.
+    return quote;
+  },
+});
 ```
 
 Use the installed declarations for the calculation's actual input/output. Do not import `pricing/functions/*`, call a foreign handler, or expose the same function as a member of two services. A route for orders targets the orders service; separate URLs alone do not establish domain boundaries.
@@ -44,7 +51,7 @@ For an asynchronous reaction, orders owns and exposes `orders.created`; a consum
 
 ### Invariants and transactions
 
-Name one owner for a command's consistency rules. For example, accepting an order and reserving stock may require one atomic decision. A service call followed by a second write is not proof of an atomic transaction, and `.invoke()` must not be assumed to inherit the caller's transaction or resources.
+Name one owner for a command's consistency rules. For example, accepting an order and reserving stock may require one atomic decision. A service call followed by a second write is not proof of an atomic transaction, and a call through `ctx.functions` must not be assumed to inherit the caller's transaction or resources.
 
 Inspect installed transaction/invocation behavior before composing provider-backed commands. Choose a supported transaction coordinator or keep tightly coupled invariants within one cohesive owner. Define narrow public operations for other domains; do not duplicate another domain's rules or silently write its owned state from arbitrary helpers. Use events for reactions that can occur after commit, with an outbox when publication must survive a crash. Events alone do not preserve synchronous atomicity.
 
@@ -61,8 +68,8 @@ Compare the actual service graph and routes with the ownership map. Check that e
 Put domain behavior in `src/services/<domain>/functions/*.function.ts`. A function validates input before its handler and validates the returned output:
 
 ```ts
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "zod";
 
 const greet = defineFunction({
   id: "hello.greet",
@@ -77,7 +84,7 @@ export default greet;
 Expose selected functions from `src/services/<domain>/service.ts`:
 
 ```ts
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 import greet from "@app/services/hello/functions/greet.function.js";
 
 export default defineService({ functions: { greet } });
@@ -87,15 +94,15 @@ The service also accepts `events`, `tasks`, and `jobs` maps. Its members appear 
 
 Each `service.ts` constructs and exports exactly one runtime service value. Keep ordinary helpers and error descriptors inside their owning domain; expose callable operations through the service's `functions` map. Do not re-export helpers or descriptors from a specialized database or auth `service.ts`.
 
-Within a domain, import a sibling function directly. Across domains and from routes, import the other domain's `service.ts`. Invoke a function descriptor with `await service.greet.invoke(input)`; do not call its handler directly. Leave an internal function out of the service map. Tools, agents, caches, buckets, and event-only functions are not service members.
+Within a domain, import a sibling function directly. Across domains and from routes, import the other domain's `service.ts`. Declare a function you call under `dependencies.functions` and call it with `await ctx.functions.greet(input)`; do not call its handler directly. Code outside handlers, such as raw routes and middleware, uses `getRelkit().functions.<service>.<member>(input)`. Leave an internal function out of the service map. Tools, agents, caches, buckets, and event-only functions are not service members.
 
 ## `defineEvent` and `defineEventFunction`
 
 Declare an event payload in `src/services/<domain>/events/*.event.ts`:
 
 ```ts
-import { defineEvent } from "@relkit/app/events";
-import { z } from "@relkit/app/schema";
+import { defineEvent } from "relkit/events";
+import { z } from "zod";
 
 const orderCreated = defineEvent({
   id: "orders.created",
@@ -114,12 +121,12 @@ declare global {
 export default orderCreated;
 ```
 
-Expose it through `defineService({ events: { orderCreated } })` when other domains need it. A publisher declares the exact ID in `publishes: ["orders.created"]` and calls `await context.events["orders.created"].publish({ orderId })`.
+Expose it through `defineService({ events: { orderCreated } })` when other domains need it. A publisher declares the event under `dependencies: { events: { orderCreated } }` and calls `await ctx.events.orderCreated.publish({ orderId })`.
 
 An event-only consumer in `src/services/notifications/functions/` reacts without returning a result to its publisher:
 
 ```ts
-import { defineEventFunction } from "@relkit/app/events";
+import { defineEventFunction } from "relkit/events";
 
 export default defineEventFunction({
   id: "notifications.order-created",
@@ -133,8 +140,8 @@ export default defineEventFunction({
 ## `defineError`
 
 ```ts
-import { defineError } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineError } from "relkit/functions";
+import { z } from "zod";
 
 export default defineError({
   id: "orders.not-found",
@@ -148,8 +155,8 @@ export default defineError({
 Declare only expected failures callers should handle on a function. Return each declared error through the public `fail` helper so it appears in the inferred handler result; throwing a declared error from an ordinary helper does not satisfy that contract. Use the route layer for HTTP-specific request mapping and middleware.
 
 ```ts
-import { defineFunction, fail } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction, fail } from "relkit/functions";
+import { z } from "zod";
 import AuthenticationRequired from "../errors/authentication-required.error.js";
 
 export default defineFunction({

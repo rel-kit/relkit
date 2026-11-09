@@ -3,7 +3,7 @@
 import type { UseJobRunOptions, UseJobRunResult } from "./job-hooks.types.js";
 export type { UseJobRunOptions, UseJobRunResult } from "./job-hooks.types.js";
 
-import type { RunSnapshot } from "@relkit/contracts/jobs";
+import type { RunSnapshot } from "relkit/contracts/jobs";
 import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import type { JobRunFor, JobWatchName } from "../jobs/job-registry-derived.types.js";
 import type { JobWatchController, JobWatchOptions, JobWatchState } from "../jobs/types.js";

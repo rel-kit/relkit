@@ -1,6 +1,6 @@
 import { Effect, Schema } from "effect";
-import { validateGraphShapeEffect, type ApplicationGraph } from "@relkit/graph";
-import { normalizeTelemetryConfigurationEffect } from "@relkit/observability";
+import { validateGraphShapeEffect, type ApplicationGraph } from "relkit/graph";
+import { normalizeTelemetryConfigurationEffect } from "relkit/observability";
 import { cliAdapterError, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { telemetryConfigurationSchema } from "./dev-telemetry-config.schemas.js";

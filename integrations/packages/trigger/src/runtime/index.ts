@@ -5,14 +5,14 @@ import type {
   NativeScheduleOperations,
   NativeWatchRequest,
   OperationContext,
-} from "@relkit/jobs/adapter";
+} from "relkit/jobs/adapter";
 import {
   assertSupportedJobsServiceOptions,
   deserializeJobsServiceOptions,
   durationToMillis,
   type JobsServiceOptions,
-} from "@relkit/jobs";
-import type { RuntimeProviderContext, RuntimeProviderIntegration } from "@relkit/provider";
+} from "relkit/jobs";
+import type { RuntimeProviderContext, RuntimeProviderIntegration } from "relkit/provider";
 import { createTriggerHttpClient, type TriggerNativeClient } from "./native.js";
 import { observeTriggerRun, type TriggerObservationOptions } from "./subscription.js";
 import {
@@ -27,6 +27,7 @@ export * from "./native.js";
 export * from "./subscription.js";
 export * from "./task-binding.js";
 
+/** @experimental */
 export interface TriggerRuntimeOptions {
   readonly projectRef: string;
   readonly secretKey?: string;
@@ -40,17 +41,20 @@ export interface TriggerRuntimeOptions {
   readonly serviceOptions?: JobsServiceOptions;
 }
 
+/** @experimental */
 export interface TriggerWorkerRegistrationOptions {
   readonly definitions: readonly TriggerTaskDefinition[];
-  readonly executor: import("@relkit/jobs/adapter").TaskExecutor;
+  readonly executor: import("relkit/jobs/adapter").TaskExecutor;
   readonly startWorker?: boolean;
   readonly register?: (tasks: readonly unknown[]) => Promise<void> | void;
 }
 
+/** @experimental */
 export interface TriggerRuntime extends JobsAdapterRuntime {
   readonly registerWorker: (options: TriggerWorkerRegistrationOptions) => TriggerWorkerHandle;
 }
 
+/** @experimental */
 export function createTriggerRuntime(options: TriggerRuntimeOptions): TriggerRuntime {
   assertSupportedJobsServiceOptions(options.serviceOptions ?? {}, ["observation"]);
   text(options.projectRef, "Trigger projectRef");
@@ -169,6 +173,7 @@ export function createTriggerRuntime(options: TriggerRuntimeOptions): TriggerRun
   return Object.freeze(adapter);
 }
 
+/** @experimental */
 export const runtimeIntegration: RuntimeProviderIntegration<"trigger"> = Object.freeze({
   kind: "runtime-integration",
   integrationId: "trigger",

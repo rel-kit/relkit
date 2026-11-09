@@ -1,5 +1,5 @@
 /** Retains the original redaction records helpers and exact synthetic credential assertions. */
-import { type ObservabilityRecord } from "../../../packages/observability/src/index.ts";
+import { type ObservabilityRecord } from "relkit/observability";
 
 export const secrets = Object.freeze({
   password: "super-secret-password",

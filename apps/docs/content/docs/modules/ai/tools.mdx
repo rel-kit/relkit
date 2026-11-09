@@ -8,7 +8,7 @@ sidebar:
 
 A tool names an action an AI client can request, such as looking up an order or cancelling it. Use `defineTool` to name the action, explain when to use it, and point it at an existing function.
 
-Function-backed tools use the lean app's `@relkit/app` authoring facades; they need no native
+Function-backed tools use the `relkit` authoring facades; they need no native
 model SDK. Choose [native agent installation](/guides/ai/build-an-offline-agent) only for model execution,
 or [MCP installation](/docs/modules/ai/mcp) only for that external protocol.
 
@@ -80,9 +80,9 @@ This tool calls the [greeting function](/docs/modules/ai/function-tools#define-t
 `defineTool` has no separate `input` or `output` options: it inherits both from `target`. You do not repeat the schemas in the tool definition. To expose a different input or output, define a function with those schemas and use it as the target.
 
 Native LangChain `tool()` values can appear directly in an agent's `tools` array. Use `defineTool` or
-`.asTool()` when the action should run through a RELKIT function or needs RELKIT side-effect, approval,
+`.asTool()` when the action should run through a RelKit function or needs RelKit side-effect, approval,
 timeout, or MCP metadata. Do not wrap native tools in a public adapter. Use the
-[RELKIT tool reference](/docs/api/tools#definetool) for the supported policy fields.
+[RelKit tool reference](/docs/api/tools#definetool) for the supported policy fields.
 
 Give the tool a stable `id` and a specific `description`: explain what it does, when to use it, and what it returns. “Look up an order by ID” is more useful than “Handle orders.”
 
@@ -110,4 +110,4 @@ Set `timeoutMs` to limit how long the tool can run. It is optional in the tool A
 
 Add the tool to an [agent's `tools` array](/docs/modules/ai/agents) to let that agent call it.
 
-Tools are also available through [MCP](/docs/modules/ai/mcp) by default. Set `mcp: false` in the tool options to keep a tool out of MCP; it can still be used by your RELKIT agents.
+Tools are also available through [MCP](/docs/modules/ai/mcp) by default. Set `mcp: false` in the tool options to keep a tool out of MCP; it can still be used by your RelKit agents.

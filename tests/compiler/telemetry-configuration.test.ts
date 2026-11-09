@@ -3,10 +3,10 @@
  * Secrets remain environment references throughout generated compiler artifacts.
  */
 import { expect, test } from "bun:test";
-import { defineApp } from "../../packages/app/src/define-app.ts";
-import { defineEnv, env } from "../../packages/config/src/index.ts";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
-import { validateGraphShape } from "../../packages/graph/src/index.ts";
+import { defineApp } from "../../packages/relkit/src/app/define-app.ts";
+import { defineEnv, env } from "relkit/config";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
+import { validateGraphShape } from "relkit/graph";
 import { otlp } from "../../integrations/packages/otlp/src/index.ts";
 import { sentry } from "../../integrations/packages/sentry/src/index.ts";
 import { assertGuardedRuntimeImports } from "./runtime-import-assertions.ts";

@@ -5,9 +5,17 @@ sidebar:
   icon: shapes
 ---
 
-A schema checks whether a value has the shape your application accepts, including when that value arrives over HTTP. RELKIT schemas stay executable, so functions, routes, jobs, events,
+A schema checks whether a value has the shape your application accepts, including when that value arrives over HTTP. RelKit schemas stay executable, so functions, routes, jobs, events,
 caches, tools, generated OpenAPI, and clients can share one contract. Treat values arriving from a caller,
 transport, persisted payload, or provider as unknown until a schema accepts them.
+
+## Write schemas with Zod [#choose-a-schema-library]
+
+RelKit applications write schemas with [Zod 4](https://zod.dev). New projects list `zod` as a dependency,
+and contracts import `z` from it. RelKit reads each schema through the
+[Standard Schema](https://standardschema.dev) interface and turns it into JSON Schema for OpenAPI and
+clients. A schema it cannot describe as JSON Schema fails `relkit check` with
+[`RELKIT_SCHEMA_UNAVAILABLE`](/docs/errors/relkit-schema-unavailable).
 
 ## Model domain values
 

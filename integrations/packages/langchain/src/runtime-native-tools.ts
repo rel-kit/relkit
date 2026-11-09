@@ -1,13 +1,13 @@
-/** Combines authored native tools and RELKIT callable adapters for invocation, retaining input schemas and native dispatch identity. */
+/** Combines authored native tools and RelKit callable adapters for invocation, retaining input schemas and native dispatch identity. */
 
 import { nativeToolEntry } from "./runtime-native-tool-build.js";
-import { getJsonSchema } from "@relkit/schema";
-import { frameworkTrace } from "@relkit/invocation";
-import { isToolRef } from "@relkit/tools";
+import { getJsonSchema } from "relkit/schema";
+import { frameworkTrace } from "relkit/invocation";
+import { isToolRef } from "relkit/tools";
 import type { ClientTool, ServerTool } from "@langchain/core/tools";
 import { tool } from "langchain";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { AgentInvocationFailure, agentInvocationFailure } from "./runtime-effect-error.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import { NativeToolIdentity, NativeToolIdentityLive } from "./runtime-native-tools-identity.js";

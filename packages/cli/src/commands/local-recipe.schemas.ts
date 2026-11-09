@@ -3,7 +3,7 @@ import {
   LOCAL_SERVICE_PROTOCOL_VERSION,
   LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,
   type LocalServiceRecipeInput,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 
 const outputs = Schema.declare<LocalServiceRecipeInput["outputs"]>(
   (value): value is LocalServiceRecipeInput["outputs"] => typeof value === "function",

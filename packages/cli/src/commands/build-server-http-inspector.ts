@@ -35,7 +35,7 @@ export function inspectorEndpointsSource(configuration: ServerSourceConfiguratio
 ${NATIVE_JOBS_INSPECTOR_SOURCE}    actions: {
       functions: {
         exists: (functionId) => registry.has(functionId),
-        invoke: (request) => invokeHttp({ functionId: request.functionId, input: request.input, source: "direct", ...(request.signal === undefined ? {} : { signal: request.signal }) }),
+        invoke: (request) => invokeHttp({ functionId: request.functionId, input: request.input, source: "direct", ...(request.traceId === undefined ? {} : { traceId: request.traceId }), ...(request.signal === undefined ? {} : { signal: request.signal }) }),
       },
       jobs: {
         protocol: "relkit.jobs.admin",

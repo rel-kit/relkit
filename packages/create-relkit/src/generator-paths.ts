@@ -1,7 +1,7 @@
 import { lstatSync, readdirSync, realpathSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorIoError, errorMessage, hasErrno } from "./generator-errors.js";
 import type { GeneratorPathsService } from "./generator-paths.types.js";
 

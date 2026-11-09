@@ -1,7 +1,7 @@
 import { expect, it } from "@effect/vitest";
-import { defineEnv, env, projectEnv } from "@relkit/config";
-import { GRAPH_VERSION } from "@relkit/contracts";
-import { createLoggerLayer, type RedactedLogRecord } from "@relkit/runtime-effect";
+import { defineEnv, env, projectEnv } from "relkit/config";
+import { GRAPH_VERSION } from "relkit/contracts";
+import { createLoggerLayer, type RedactedLogRecord } from "relkit/runtime-effect";
 import { Cause, Effect, Exit, Layer, Logger, Metric } from "effect";
 import { cliAdapterError, cliOriginalError } from "../../src/cli-errors.js";
 import { CliFileSystem } from "../../src/services/filesystem.service.js";

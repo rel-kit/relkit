@@ -248,13 +248,13 @@ create-relkit:build: $ tsc -b && bun ../../scripts/package-create-relkit-templat
 @relkit/example-data-model:build: cache hit, replaying logs 98e7c363df77f247
 @relkit/example-auth-drizzle:build: cache hit, replaying logs 9fff26c4f5a667f4
 @relkit/example-data-model:build: $ bun ../../packages/cli/dist/index.js build
-@relkit/example-data-model:build: Built /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/data-model/.relkit/build
+@relkit/example-data-model:build: Built <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/data-model/.relkit/build
 @relkit/example-auth-drizzle:build: $ bun ../../packages/cli/dist/index.js build
-@relkit/example-auth-drizzle:build: Built /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/auth-drizzle/.relkit/build
+@relkit/example-auth-drizzle:build: Built <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/auth-drizzle/.relkit/build
 @relkit/example-commerce-web:build: cache hit, replaying logs cd01cbc12e54a9e7
 @relkit/example-commerce-web:build: $ bun --cwd ../commerce check && bun run scripts/build.ts
 @relkit/example-commerce-web:build: $ bun ../../packages/cli/dist/index.js check
-@relkit/example-commerce-web:build: Checked /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
+@relkit/example-commerce-web:build: Checked <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce
 @relkit/example-commerce-web:build: ▲ Next.js 16.3.3 (Turbopack)
 @relkit/example-commerce-web:build: ✓ Running next.config.ts took 75ms
 @relkit/example-commerce-web:build:
@@ -427,7 +427,7 @@ create-relkit:build: $ tsc -b && bun ../../scripts/package-create-relkit-templat
 @relkit/docs:build: generated apps/docs/content/docs/operations/cli-reference.mdx
 @relkit/docs:build: generated apps/docs/content/docs/api/config.mdx
 @relkit/docs:build: generated apps/docs/content/docs/api/schema.mdx
-@relkit/example-commerce:build: Built /Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce/.relkit/build
+@relkit/example-commerce:build: Built <home>/.codex/worktrees/effect-specialized-recovery/relkit/examples/commerce/.relkit/build
 @relkit/docs:build: generated apps/docs/content/docs/api/functions.mdx
 @relkit/docs:build: generated apps/docs/content/docs/api/drizzle.mdx
 @relkit/docs:build: generated apps/docs/content/docs/api/services.mdx

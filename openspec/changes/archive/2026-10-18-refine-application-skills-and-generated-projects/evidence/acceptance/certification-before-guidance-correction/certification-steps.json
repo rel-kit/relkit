@@ -16,9 +16,9 @@
       "--cleanup",
       "--readiness-only",
       "--output",
-      "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-8EdrMF/fresh.json",
+      "<tmp>/relkit-create-certification-8EdrMF/fresh.json",
       "--artifacts",
-      "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-awqQkg"
+      "<tmp>/relkit-certified-artifacts-awqQkg"
     ],
     "passed": true,
     "ms": 263862
@@ -33,9 +33,9 @@
       "--cleanup",
       "--readiness-only",
       "--output",
-      "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-create-certification-8EdrMF/restart.json",
+      "<tmp>/relkit-create-certification-8EdrMF/restart.json",
       "--artifacts",
-      "/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-certified-artifacts-awqQkg"
+      "<tmp>/relkit-certified-artifacts-awqQkg"
     ],
     "passed": true,
     "ms": 82859

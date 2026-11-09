@@ -1,4 +1,4 @@
-import { defineApp, defineEnv, env as binding } from "@relkit/app/config";
+import { defineApp, defineEnv, env as binding } from "relkit/config";
 import { otlp } from "@relkit/otlp";
 import { sentry } from "@relkit/sentry";
 

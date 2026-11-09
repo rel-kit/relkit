@@ -1,6 +1,6 @@
 /** Projects secret-free migration results; byte snapshots never reach stdout. */
 import type { MigrationPlan, MigrationResult, MigrationReceipt } from "./layout.types.js";
-import { serviceSource } from "@relkit/contracts";
+import { serviceSource } from "relkit/contracts";
 
 /**
  * Projects a preview or publication result without bytes, environment values or private causes.

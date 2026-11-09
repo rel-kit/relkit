@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { prefilterSources } from "../../packages/compiler/src/discovery/ast-prefilter.ts";
+import { prefilterSources } from "../../packages/cli/src/compiler/discovery/ast-prefilter.ts";
 
 describe("AST discovery prefilter", () => {
   test("finds syntax candidates without evaluating ordinary source", () => {
@@ -12,7 +12,7 @@ describe("AST discovery prefilter", () => {
       },
       {
         fileName: "src/orders.function.ts",
-        text: `import { defineFunction } from "@relkit/functions";
+        text: `import { defineFunction } from "relkit/functions";
           export default defineFunction({ id: "orders.create", handler: async () => ({}) });`,
       },
       {
@@ -29,11 +29,11 @@ describe("AST discovery prefilter", () => {
       },
       {
         fileName: "src/ignored.test.ts",
-        text: `import { defineFunction } from "@relkit/functions"; throw new Error("must not run"); export default defineFunction({});`,
+        text: `import { defineFunction } from "relkit/functions"; throw new Error("must not run"); export default defineFunction({});`,
       },
       {
         fileName: "src/a/__fixtures__/ignored.ts",
-        text: `import { defineRoute } from "@relkit/routes"; throw new Error("must not run"); export default defineRoute({});`,
+        text: `import { defineRoute } from "relkit/routes"; throw new Error("must not run"); export default defineRoute({});`,
       },
     ]);
 
@@ -47,7 +47,7 @@ describe("AST discovery prefilter", () => {
       (candidate) => candidate.fileName === "src/orders.function.ts",
     );
     expect(functionCandidate).toMatchObject({
-      imports: ["@relkit/functions"],
+      imports: ["relkit/functions"],
       factories: ["defineFunction"],
       defaultExports: ["default"],
       facts: {
@@ -94,7 +94,7 @@ describe("AST discovery prefilter", () => {
     const result = prefilterSources([
       {
         fileName: "src/types.ts",
-        text: `import type { FunctionRef } from "@relkit/functions"; export type { FunctionRef };`,
+        text: `import type { FunctionRef } from "relkit/functions"; export type { FunctionRef };`,
       },
       {
         fileName: "src/fixture.test.ts",
@@ -111,6 +111,25 @@ describe("AST discovery prefilter", () => {
       { fileName: "src/__fixtures__/fixture.ts", reason: "excluded" },
       { fileName: "src/fixture.test.ts", reason: "excluded" },
       { fileName: "src/types.ts", reason: "no-candidate-indicator" },
+    ]);
+  });
+
+  test("records community integration imports beside first-party ones", () => {
+    const result = prefilterSources([
+      {
+        fileName: "relkit.config.ts",
+        text: `import { defineApp } from "relkit/config";
+          import { starterCache } from "relkit-provider-starter";
+          import { queue } from "@acme/relkit-queue/authoring";
+          import { z } from "zod";
+          import { helper } from "relkitty";
+          export default defineApp({ cache: { memory: starterCache() } });`,
+      },
+    ]);
+    expect([...result.candidates[0]!.imports].sort()).toEqual([
+      "@acme/relkit-queue/authoring",
+      "relkit-provider-starter",
+      "relkit/config",
     ]);
   });
 });

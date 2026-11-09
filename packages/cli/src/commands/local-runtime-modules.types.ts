@@ -5,7 +5,7 @@ import type {
   LocalServiceInstance,
   LocalServiceState,
   LocalServiceWorkerArtifact,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 
 /** Owner-validated identity used for leases, state files and container labels. */
 export interface LoadedLocalIdentity {

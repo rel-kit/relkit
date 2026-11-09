@@ -1,8 +1,9 @@
 import { Schema } from "effect";
-import { LoadedToolingConfigSchema } from "@relkit/compiler";
+import { LoadedToolingConfigSchema } from "../compiler/index.js";
 
 /** Data-only request admitted by the isolated compiler process. */
 export const devCheckRequestSchema = Schema.Struct({
+  id: Schema.Number,
   projectRoot: Schema.String,
   generationId: Schema.String,
 });
@@ -43,8 +44,10 @@ const outputs = Schema.Struct({
 });
 /** Complete response record accepted at the private IPC boundary. */
 export const devCheckResponseSchema = Schema.Union([
-  Schema.Struct({ error: Schema.String }),
+  Schema.Struct({ id: Schema.Number, error: Schema.String }),
   Schema.Struct({
+    id: Schema.Number,
+    reimported: Schema.optionalKey(Schema.Array(Schema.String)),
     result: Schema.Struct({
       ok: Schema.Boolean,
       activatable: Schema.Boolean,

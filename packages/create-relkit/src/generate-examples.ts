@@ -2,7 +2,7 @@
 
 import { join } from "node:path";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { GeneratorFileSystem } from "./generator-filesystem.js";
 
 /** Canonical example-only paths removed by the existing --no-examples flag. */

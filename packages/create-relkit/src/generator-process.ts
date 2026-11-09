@@ -1,7 +1,8 @@
 /** Provides the scoped native process adapter for creator workflows, joining exit and output drains before release or transactional rollback. */
 
 import { Cause, Context, Effect, Exit, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
+import { currentRuntime, type RuntimeSubprocess } from "relkit/runtime";
 import { GeneratorProcessError, errorMessage } from "./generator-errors.js";
 import type { GeneratorCommandRunner, GeneratorProcessService } from "./generator-process.types.js";
 import { recordCleanupFailure } from "./generator-cleanup.js";
@@ -20,7 +21,7 @@ export class GeneratorProcess extends Context.Service<GeneratorProcess, Generato
   "create-relkit/GeneratorProcess",
 ) {}
 
-/** Live scoped Bun child-process implementation. */
+/** Live scoped child-process implementation over the runtime adapter. */
 export const generatorProcessLive = generatorProcessLayer();
 
 /**
@@ -47,8 +48,8 @@ export function generatorProcessLayer(
           observeExecution(
             "generator",
             "process.which",
-            Effect.try({
-              try: () => Bun.which(executable),
+            Effect.tryPromise({
+              try: async () => (await currentRuntime()).processes.which(executable),
               catch: (cause) => processError("which", cause),
             }),
           ),
@@ -112,9 +113,14 @@ const nativeRun = Effect.fn("GeneratorProcess.nativeRun")(
     Effect.scoped(
       Effect.gen(function* () {
         const child = yield* Effect.acquireRelease(
-          Effect.try({
-            try: () => {
-              const process = Bun.spawn([...command], { cwd, stdout: "pipe", stderr: "pipe" });
+          Effect.tryPromise({
+            try: async () => {
+              const runtime = await currentRuntime();
+              const process = runtime.processes.spawn(command, {
+                cwd,
+                stdout: "pipe",
+                stderr: "pipe",
+              });
               const stdout = Promise.resolve().then(() => new Response(process.stdout).text());
               const stderr = Promise.resolve().then(() => new Response(process.stderr).text());
               return {
@@ -160,7 +166,7 @@ function processError(operation: string, cause: unknown): GeneratorProcessError 
 }
 
 const waitForNativeOutput = Effect.fn("GeneratorProcess.waitOutput")(function* (child: {
-  readonly process: Pick<Bun.Subprocess, "exited">;
+  readonly process: Pick<RuntimeSubprocess, "exited">;
   readonly stdout: Promise<string>;
   readonly stderr: Promise<string>;
 }) {

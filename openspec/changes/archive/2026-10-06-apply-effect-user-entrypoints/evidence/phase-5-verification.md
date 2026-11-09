@@ -1,7 +1,7 @@
 # Final verification progress
 
 Executor: root. Candidate checkout:
-`/Users/mustafaelsayed/.codex/worktrees/effect-user-entrypoints/relkit`.
+`<home>/.codex/worktrees/effect-user-entrypoints/relkit`.
 Original checkout remains clean at captured HEAD
 `e081bde6054c8395209cdec145d8217c5d9c0dfd` as of 2026-10-06 06:26 UTC.
 No synchronization has occurred yet.
@@ -117,7 +117,7 @@ probe history; the byte-original first smoke's record volume was not snapshotted
 This establishes collector throughput pressure in the diagnostic cold cohort;
 it does not establish a fix.
 The counts-only diagnostic handoff is retained at:
-`/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-immutable-shutdown-probe-CGnqKD/HANDOFF.md`.
+`<tmp>/relkit-immutable-shutdown-probe-CGnqKD/HANDOFF.md`.
 
 A fresh registry-only installed-consumer experiment suppressed only private
 invocation bookkeeping success logs. Its first strict session still failed with
@@ -195,7 +195,7 @@ specific cause of every deadline failure. The restored comparison retained the
 proof's history and added live route; it verified that route rather than adding
 another one. Its readiness/shutdown results therefore do not replace a fresh
 full packed scaffold exercise. Timing-only receipts remain in
-`/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-cold-start-probe-57uOYb`.
+`<tmp>/relkit-cold-start-probe-57uOYb`.
 
 The follow-up source correction preserves the project's substitutable service
 boundary while moving initial development validation into the existing scoped
@@ -448,7 +448,7 @@ exited 0 in 4.566 seconds with all 264 boundaries complete. Compiler work,
 evaluator pipe/exit ownership, logger draining, scope closure, contributor joining,
 and runtime disposal all settled. Both diagnostic processes exited naturally
 without signals or remnants. Their trace and receipts remain under
-`/private/tmp/relkit-effect-private-check-xUrfjv`. Different private filesystem
+`<tmp>/relkit-effect-private-check-xUrfjv`. Different private filesystem
 identity and instrumentation mean these passes neither explain nor supersede the
 actual matrix failure. No source fix is justified by these traces alone.
 
@@ -475,7 +475,7 @@ files were verified against the current 52 archives. It reused the unchanged
 The isolated decline-consent case passed in 8.344 seconds: cache publication,
 decline guidance, absence of descriptor output, and physical exit of the parent,
 check, and evaluator were verified. Receipt:
-`/private/tmp/relkit-effect-pristine-parent-3wg5t957/isolated-acceptance.json`.
+`<tmp>/relkit-effect-pristine-parent-3wg5t957/isolated-acceptance.json`.
 This is targeted isolated acceptance; the complete matrix still has exit 1 and
 the original intermittent wait remains unexplained. No production fix or test
 relaxation was introduced.
@@ -503,7 +503,7 @@ installation took 9.698 seconds; agent installation took 18.755 seconds. Effect,
 LangGraph, and Drizzle metadata advertised public HTTPS npm tarballs, and all
 three tarball HEAD checks and 36 local-registry samples returned 200. The registry
 closed after installation completed. Receipt:
-`/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-agent-registry-diagnostic-KJJjj0/diagnostic.jsonl`.
+`<tmp>/relkit-agent-registry-diagnostic-KJJjj0/diagnostic.jsonl`.
 This omitted preceding templates and is diagnostic evidence, not whole-matrix
 acceptance. The network failure's cause remains unproved. No production fix,
 skipped check, or relaxed deadline was introduced.
@@ -568,7 +568,7 @@ acceptance remains unexecuted.
 ### Event-publication diagnostic attempts
 
 The single-cohort timing fixture was retained at
-`/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-inngest-native-diagnostic-5Wo8rv`.
+`<tmp>/relkit-inngest-native-diagnostic-5Wo8rv`.
 All 52 archive hashes matched. Bootstrap, creation, starter test/build, full
 Billing/Shipping additions, and terminal assertions passed. Session 23003 then
 failed before development because the temporary installer incorrectly resolved
@@ -704,7 +704,7 @@ total streamed execution of 5914 ms. Existing 60-second model and 65-second
 request limits, 90-second readiness, and two-second shutdown were retained.
 
 Fresh evidence is under
-`/Users/mustafaelsayed/Workspace/relkit-regression-demo/evidence/effect-user-entrypoints-2026-10-05/paid-luna-20261006T1830Z/`.
+`<home>/Workspace/relkit-regression-demo/evidence/effect-user-entrypoints-2026-10-05/paid-luna-20261006T1830Z/`.
 The immutable `replay-receipt.json` SHA256 is
 `5f160ffa0f0c5f90290f22225f0eba901f6f8792aaddd61510b343f5976f8e82`;
 `luna-results.json` SHA256 is

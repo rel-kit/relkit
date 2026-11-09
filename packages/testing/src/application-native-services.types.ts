@@ -1,7 +1,7 @@
 /** Drizzle/Better Auth contracts reachable only through the selected testing helper. */
 import type { activateBetterAuthService } from "@relkit/better-auth/drizzle";
 import type { activateDrizzleService } from "@relkit/drizzle";
-import type { DescriptorAny, SourceLocationError } from "@relkit/contracts";
+import type { DescriptorAny, SourceLocationError } from "relkit/contracts";
 import type { Effect } from "effect";
 
 export type NativeDatabase = Awaited<ReturnType<typeof activateDrizzleService>>;

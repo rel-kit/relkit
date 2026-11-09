@@ -1,4 +1,4 @@
-/** Checks echo.function through the supported public RELKIT APIs. */
+/** Checks echo.function through the supported public RelKit APIs. */
 import { expect, test } from "bun:test";
 import { invokeFunction } from "@relkit/testing";
 import echo from "@app/services/echo/functions/echo.function.js";

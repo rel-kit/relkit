@@ -1,6 +1,6 @@
 ---
 title: Local history API
-description: Generated public TypeScript reference for @relkit/observability-local.
+description: Generated public TypeScript reference for @relkit/inspector/observability-local.
 search:
   exclude: true
 sidebar:
@@ -27,7 +27,7 @@ Re-exports all named exports from the "./local/duckdb-database-effect.js" module
 export * from "./local/duckdb-database-effect.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/index.ts#L3)
 
 ### "./local/duckdb-database.js" (namespace export)
 
@@ -39,7 +39,7 @@ Re-exports all named exports from the "./local/duckdb-database.js" module.
 export * from "./local/duckdb-database.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/index.ts#L4)
 
 ### "./local/duckdb-driver.js" (namespace export)
 
@@ -51,7 +51,7 @@ Re-exports all named exports from the "./local/duckdb-driver.js" module.
 export * from "./local/duckdb-driver.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/index.ts#L5)
 
 ### "./local/duckdb-error.js" (namespace export)
 
@@ -63,7 +63,7 @@ Re-exports all named exports from the "./local/duckdb-error.js" module.
 export * from "./local/duckdb-error.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/index.ts#L6)
 
 ### "./local/duckdb-worker-effect.js" (namespace export)
 
@@ -75,7 +75,7 @@ Re-exports all named exports from the "./local/duckdb-worker-effect.js" module.
 export * from "./local/duckdb-worker-effect.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/index.ts#L7)
 
 ### "./local/worker-client.js" (namespace export)
 
@@ -87,19 +87,19 @@ Re-exports all named exports from the "./local/worker-client.js" module.
 export * from "./local/worker-client.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/index.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/index.ts#L2)
 
-### "@relkit/observability/local/record" (namespace export)
+### "relkit/observability/local/record" (namespace export)
 
-Re-exports all named exports from the "@relkit/observability/local/record" module.
+Re-exports all named exports from the "relkit/observability/local/record" module.
 
 **Signature**
 
 ```ts
-export * from "@relkit/observability/local/record";
+export * from "relkit/observability/local/record";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/index.ts#L8)
 
 ## `duckdb-database-effect.ts`
 
@@ -124,7 +124,7 @@ yield * database.flush();
 declare class DuckdbDatabaseService
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/duckdb-database-effect.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-database-effect.ts#L27)
 
 ### duckdbDatabaseLayer
 
@@ -149,7 +149,7 @@ declare const duckdbDatabaseLayer: (
 ) => Layer.Layer<DuckdbDatabaseService, DuckdbError, DuckdbDriverService>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/duckdb-database-effect.ts#L95)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-database-effect.ts#L95)
 
 ### openDuckdbDatabaseEffect
 
@@ -235,7 +235,7 @@ declare const openDuckdbDatabaseEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/duckdb-database-effect.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-database-effect.ts#L46)
 
 ## `duckdb-database.ts`
 
@@ -385,7 +385,7 @@ declare const openDuckdbDatabase: (
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/duckdb-database.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-database.ts#L27)
 
 ## `duckdb-driver.ts`
 
@@ -410,7 +410,7 @@ const instance = yield * driver.create(path);
 declare class DuckdbDriverService
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/duckdb-driver.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-driver.ts#L17)
 
 ### duckdbDriverLayer
 
@@ -428,7 +428,7 @@ const database = yield * openDuckdbDatabaseEffect(root).pipe(Effect.provide(duck
 declare const duckdbDriverLayer: Layer.Layer<DuckdbDriverService, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/duckdb-driver.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-driver.ts#L38)
 
 ## `duckdb-error.ts`
 
@@ -452,7 +452,7 @@ const failure = new DuckdbError({ operation: "connect", message: "failed", cause
 declare class DuckdbError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/duckdb-error.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-error.ts#L14)
 
 ### duckdbError
 
@@ -470,7 +470,7 @@ const error = duckdbError("connect", cause);
 declare const duckdbError: <Cause>(operation: string, cause: Cause) => DuckdbError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/duckdb-error.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-error.ts#L30)
 
 ## `duckdb-worker-effect.ts`
 
@@ -487,7 +487,7 @@ Injectable command executor whose owner must close its database.
 declare class DuckdbWorkerService
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/duckdb-worker-effect.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-effect.ts#L14)
 
 ### duckdbWorkerLayer
 
@@ -499,7 +499,7 @@ Owns the command service and releases native state on every scope exit.
 declare const duckdbWorkerLayer: Layer.Layer<DuckdbWorkerService, never, DuckdbDriverService>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/duckdb-worker-effect.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-effect.ts#L43)
 
 ### makeDuckdbWorkerEffect
 
@@ -525,13 +525,7 @@ declare const makeDuckdbWorkerEffect: () => Effect.Effect<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/duckdb-worker-effect.ts#L20)
-
-## `duckdb-worker.ts`
-
-Owns duckdb worker for the optional local history store.
-Shared records and query contracts come from lightweight observability; native
-handles and worker lifetimes remain owned by this storage package.
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-worker-effect.ts#L20)
 
 ## `worker-client-effect.ts`
 
@@ -550,7 +544,7 @@ declare const startLocalWorkerEffect: (
 ) => Effect.Effect<LocalWorkerEffects, LocalWorkerError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/worker-client-effect.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-effect.ts#L23)
 
 ## `worker-client-service.ts`
 
@@ -578,7 +572,7 @@ const program = Effect.gen(function* () {
 declare class LocalWorkerService
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/worker-client-service.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-service.ts#L20)
 
 ### localWorkerLayer
 
@@ -598,7 +592,7 @@ declare const localWorkerLayer: (
 ) => Layer.Layer<LocalWorkerService, LocalWorkerError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/worker-client-service.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-service.ts#L38)
 
 ## `worker-client.ts`
 
@@ -614,7 +608,7 @@ handles and worker lifetimes remain owned by this storage package.
 declare const LocalWorkerEffects: LocalWorkerEffects;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/worker-client.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client.ts#L15)
 
 ### LocalWorkerError
 
@@ -624,7 +618,7 @@ declare const LocalWorkerEffects: LocalWorkerEffects;
 declare const LocalWorkerError: typeof LocalWorkerError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/worker-client.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client.ts#L12)
 
 ### LocalWorkerService
 
@@ -634,7 +628,7 @@ declare const LocalWorkerError: typeof LocalWorkerError;
 declare const LocalWorkerService: typeof LocalWorkerService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/worker-client.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client.ts#L14)
 
 ### localWorkerLayer
 
@@ -646,7 +640,7 @@ declare const localWorkerLayer: (
 ) => Layer<LocalWorkerService, LocalWorkerError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/worker-client.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client.ts#L14)
 
 ### startLocalWorker
 
@@ -677,7 +671,7 @@ declare const startLocalWorker: (onFailure?: (error: Error) => void) => {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/worker-client.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client.ts#L30)
 
 ### startLocalWorkerEffect
 
@@ -689,7 +683,7 @@ declare const startLocalWorkerEffect: (
 ) => Effect.Effect<LocalWorkerEffects, LocalWorkerError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/worker-client.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client.ts#L13)
 
 ## `worker.ts`
 
@@ -705,7 +699,7 @@ retains the transport's explicit close operation and physical child identity.
 declare const LocalWorkerCommand: LocalWorkerCommand;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/worker.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker.ts#L14)
 
 ### LocalWorkerEffects
 
@@ -715,7 +709,7 @@ declare const LocalWorkerCommand: LocalWorkerCommand;
 declare const LocalWorkerEffects: LocalWorkerEffects;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/worker.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker.ts#L12)
 
 ### LocalWorkerError
 
@@ -725,7 +719,7 @@ declare const LocalWorkerEffects: LocalWorkerEffects;
 declare const LocalWorkerError: LocalWorkerError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/worker.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker.ts#L13)
 
 ### startLocalWorkerEffect
 
@@ -737,7 +731,7 @@ declare const startLocalWorkerEffect: (
 ) => Effect<LocalWorkerEffects, LocalWorkerError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability-local/src/local/worker.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker.ts#L11)
 
 ## `types.ts`
 
@@ -753,7 +747,7 @@ Re-exports all named exports from the "./types.types.js" module.
 export * from "./types.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.ts#L6)
 
 ### LocalRecordValidationError (class)
 
@@ -775,7 +769,7 @@ Effect.runSync(
 declare class LocalRecordValidationError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.ts#L16)
 
 ### recordTime
 
@@ -793,7 +787,7 @@ recordTime(logRecord);
 declare const recordTime: (record: ObservabilityRecord) => number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.ts#L135)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.ts#L135)
 
 ### recordTimeEffect
 
@@ -813,7 +807,7 @@ declare const recordTimeEffect: (
 ) => Effect.Effect<number, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.ts#L96)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.ts#L96)
 
 ### validateLocalRecord
 
@@ -835,7 +829,7 @@ validateLocalRecord(envelope);
 declare const validateLocalRecord: <Input>(value: Input) => asserts value is Input & LocalRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.ts#L115)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.ts#L115)
 
 ### validateLocalRecordEffect
 
@@ -855,7 +849,7 @@ declare const validateLocalRecordEffect: <Input>(
 ) => Effect.Effect<Input & LocalRecord, LocalRecordValidationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.ts#L54)
 
 ## `types.types.ts`
 
@@ -871,7 +865,7 @@ A stable origin assigned to local telemetry records.
 type LocalLogOrigin = "application" | "relkit" | "inspector";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.types.ts#L10)
 
 ### LocalRecord (interface)
 
@@ -893,7 +887,7 @@ export interface LocalRecord {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.types.ts#L18)
 
 ### LocalWorkerCommand (type alias)
 
@@ -924,7 +918,7 @@ type LocalWorkerCommand =
   | { readonly type: "flush" | "close" };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.types.ts#L31)
 
 ### LocalWorkerResponse (interface)
 
@@ -942,7 +936,7 @@ export interface LocalWorkerResponse {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.types.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.types.ts#L53)
 
 ### StoredLocalRecord (type alias)
 
@@ -957,7 +951,7 @@ type StoredLocalRecord = ObservabilityRecord & {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/types.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.types.ts#L25)
 
 ## `worker-client-error.ts`
 
@@ -983,7 +977,7 @@ Effect.runPromise(
 declare class LocalWorkerError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/worker-client-error.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/worker-client-error.ts#L13)
 
 ### WorkerTransportError (class)
 
@@ -998,7 +992,7 @@ declare class WorkerTransportError { constructor(
   ) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/worker-client-error.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/worker-client-error.ts#L25)
 
 ### workerFailure
 
@@ -1013,7 +1007,7 @@ declare const workerFailure: <Failure>(
 ) => LocalWorkerError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/worker-client-error.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/worker-client-error.ts#L35)
 
 ## `worker-client.types.ts`
 
@@ -1045,4 +1039,4 @@ export interface LocalWorkerEffects {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/observability/src/local/worker-client.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/worker-client.types.ts#L14)

@@ -4,7 +4,7 @@ import type {
   InspectionConnectionFile,
   InspectionHandshake,
   InspectionConnectionError,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 import type { InspectorOptions } from "./options.types.js";
 
 /** Only an authenticated matching handshake grants live forwarding authority. */

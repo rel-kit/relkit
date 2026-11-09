@@ -8,7 +8,7 @@ import {
   type BaseChatModelParams,
   type BindToolsInput,
 } from "@langchain/core/language_models/chat_models";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 import { modelToolName } from "../src/runtime-tools.ts";
 
 const STRUCTURED_OUTPUT_TOOL = "relkit_output";

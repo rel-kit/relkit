@@ -19,31 +19,90 @@ For configuration and examples, read [Database](/docs/modules/database), [local 
 
 For a complete workflow, follow [register users in a transaction](/guides/database/register-users-in-a-transaction), [email password sign in](/guides/auth/email-password-sign-in).
 
-<include>/_snippets/generated/exports/drizzle.mdx</include>
+## Most-used APIs
 
-## `activate.ts`
+These entries carry each API's contract and example. The complete reference follows.
 
-Validates the selected ORM before loading runtime activation or calling the native factory.
+### defineDrizzleService
 
-### activateDrizzleService
+Defines the application's Drizzle service, table operations, and model customizations.
+The client factory runs at activation, not during descriptor discovery.
 
-Acquires a database using the existing owner after selected dependency validation.
+**Throws**
+
+TypeError for invalid declarations, dialects, models or overrides.
+
+**Example**
+
+```ts
+import { defineDrizzleService } from "@relkit/drizzle";
+import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+const users = sqliteTable("users", { id: integer().primaryKey() });
+const service = defineDrizzleService({
+  schema: { users },
+  client: () => {
+    throw new Error("Configure a Drizzle driver before activation");
+  },
+});
+console.assert(service.capability.dialect === "sqlite");
+```
 
 **Signature**
 
 ```ts
-declare const activateDrizzleService: <
-  Service extends DrizzleServiceDescriptor<any, any, any, any>,
+declare const defineDrizzleService: <
+  Client,
+  const Schema extends Readonly<Record<string, unknown>>,
+  const Models extends DrizzleModelMap<TablesOf<Schema>> = {},
 >(
-  service: Service,
-  env: Readonly<Record<string, unknown>>,
-  options?: DrizzleActivationOptions,
-) => Promise<DrizzleActivation<Service>>;
+  options: DefineDrizzleServiceOptions<Client, Schema, Models>,
+) => DrizzleServiceDescriptor<string, Client, Schema, Models>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activate.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/service.ts#L39)
 
-## `activation.ts`
+Since v0.1.0
+
+### defineModel
+
+Adds named table methods with an injected table and transaction-aware Drizzle client.
+Use service overrides, not extensions, to replace the six reserved CRUD operations.
+Select a dialect entrypoint when an extension uses the injected native database.
+
+**Throws**
+
+TypeError for missing, non-callable or reserved extensions.
+
+**Example**
+
+```ts
+import { defineModel } from "@relkit/drizzle/sqlite";
+import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
+
+const users = sqliteTable("users", { id: integer().primaryKey() });
+const model = defineModel({
+  table: users,
+  extend: { firstTen: ({ table, database }) => database.select().from(table).limit(10) },
+});
+console.assert(model.extensionNames.includes("firstTen"));
+```
+
+**Signature**
+
+```ts
+declare const defineModel: <
+  const T extends Table,
+  const Extensions extends ModelExtensionMap<T>,
+>(options: {
+  readonly table: T;
+  readonly extend: NonEmptyExtensions<Extensions>;
+}) => ModelDescriptor<T, Extensions>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.ts#L54)
+
+Since v0.1.0
 
 ### activateDrizzleService
 
@@ -90,6 +149,34 @@ declare const activateDrizzleService: <
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activation.ts#L58)
 
 Since v0.1.0
+
+## Complete reference
+
+<include>/_snippets/generated/exports/drizzle.mdx</include>
+
+## `activate.ts`
+
+Validates the selected ORM before loading runtime activation or calling the native factory.
+
+### activateDrizzleService
+
+Acquires a database using the existing owner after selected dependency validation.
+
+**Signature**
+
+```ts
+declare const activateDrizzleService: <
+  Service extends DrizzleServiceDescriptor<any, any, any, any>,
+>(
+  service: Service,
+  env: Readonly<Record<string, unknown>>,
+  options?: DrizzleActivationOptions,
+) => Promise<DrizzleActivation<Service>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activate.ts#L9)
+
+## `activation.ts`
 
 ### DrizzleActivation
 
@@ -248,7 +335,7 @@ Executes a compatibility edge retaining original native rejection identity.
 
 ```ts
 import { Effect, Layer, ManagedRuntime } from "effect";
-import { runDrizzlePromise } from "@relkit/drizzle/internal";
+import { runDrizzlePromise } from "@relkit/drizzle/server";
 const owner = ManagedRuntime.make(Layer.empty);
 try {
   await runDrizzlePromise(owner, Effect.succeed(1));
@@ -593,241 +680,6 @@ declare const defineModel: <
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L7)
 
-## `internal.ts`
-
-Server-only runtime ownership, typed failures and borrowed-work composition.
-
-### DrizzleActivation
-
-**Signature**
-
-```ts
-declare const DrizzleActivation: DrizzleActivation<Service>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L6)
-
-### DrizzleFailure
-
-**Signature**
-
-```ts
-declare const DrizzleFailure: typeof DrizzleFailure;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L9)
-
-### DrizzleOwner
-
-**Signature**
-
-```ts
-declare const DrizzleOwner: typeof DrizzleOwner;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L11)
-
-### DrizzleOwnerInterface
-
-**Signature**
-
-```ts
-declare const DrizzleOwnerInterface: DrizzleOwnerInterface;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L18)
-
-### DrizzleServiceDescriptor
-
-**Signature**
-
-```ts
-declare const DrizzleServiceDescriptor: DrizzleServiceDescriptor<Id, Client, Schema, Models>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L8)
-
-### activateDrizzleService
-
-**Signature**
-
-```ts
-declare const activateDrizzleService: <
-  Service extends DrizzleServiceDescriptor<any, any, any, any>,
->(
-  service: Service,
-  env: Readonly<Record<string, unknown>>,
-  options?: DrizzleActivationOptions,
-) => Promise<DrizzleActivation<Service>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L5)
-
-### drizzleInstrumentationOf
-
-**Signature**
-
-```ts
-declare const drizzleInstrumentationOf: (activation: object) => Context<never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L14)
-
-### drizzleOwnerLayer
-
-**Signature**
-
-```ts
-declare const drizzleOwnerLayer: (
-  declaration: DrizzleServiceRuntime,
-  env: Readonly<Record<string, unknown>>,
-) => Layer<DrizzleOwner, DrizzleFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L12)
-
-### drizzleRuntimeOf
-
-**Signature**
-
-```ts
-declare const drizzleRuntimeOf: (value: object) => DrizzleServiceRuntime;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L7)
-
-### inheritNativeLeases
-
-**Signature**
-
-```ts
-declare const inheritNativeLeases: <A, E, R>(effect: Effect<A, E, R>) => Effect<A, E, R>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L21)
-
-### nativeCall
-
-**Signature**
-
-```ts
-declare const nativeCall: <A>(
-  operation: string,
-  run: () => A | PromiseLike<A>,
-) => Effect<A, DrizzleFailure, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L9)
-
-### observeSpecializedOperation
-
-**Signature**
-
-```ts
-declare const observeSpecializedOperation: <A, E, R>(
-  operation: `database.${string}` | `auth.${string}`,
-  effect: Effect<A, E, R>,
-) => Effect<A, E, R>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L17)
-
-### operationEffect
-
-**Signature**
-
-```ts
-declare const operationEffect: (
-  binding: ModelBinding,
-  name: string,
-  args: unknown,
-) => Effect<unknown, DrizzleFailure>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L19)
-
-### redactSpecializedTrace
-
-**Signature**
-
-```ts
-declare const redactSpecializedTrace: <A, E, R>(
-  effect: Effect<A, E, R>,
-) => Effect<A, E, Exclude<R, never>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L22)
-
-### runDrizzlePromise
-
-**Signature**
-
-```ts
-declare const runDrizzlePromise: <A, E, R, ER>(
-  runtime: ManagedRuntime<R, ER>,
-  effect: Effect<A, E, R>,
-  options?: RunOptions,
-) => Promise<A>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L9)
-
-### runDrizzleWorkPromise
-
-**Signature**
-
-```ts
-declare const runDrizzleWorkPromise: <A, E>(activation: object, effect: Effect<A, E>) => Promise<A>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L15)
-
-### runSpecializedTrace
-
-**Signature**
-
-```ts
-declare const runSpecializedTrace: <A>(operation: string, run: () => Promise<A>) => Promise<A>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L17)
-
-### squashDrizzleCause
-
-**Signature**
-
-```ts
-declare const squashDrizzleCause: <E>(cause: Cause<E>) => unknown;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L9)
-
-### withDrizzleSqliteWork
-
-**Signature**
-
-```ts
-declare const withDrizzleSqliteWork: <A, E, R>(
-  activation: object,
-  effect: Effect<A, E, R>,
-) => Effect<A, E | DrizzleFailure, R>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L20)
-
-### withDrizzleWork
-
-**Signature**
-
-```ts
-declare const withDrizzleWork: <A, E, R>(
-  activation: object,
-  effect: Effect<A, E, R>,
-) => Effect<A, E | DrizzleFailure, R>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/internal.ts#L13)
-
 ## `metadata.ts`
 
 Extracts native table and column metadata for portable model validation and activation.
@@ -888,46 +740,6 @@ declare const inspectTables: (tables: TableMap) => {
 
 Declares frozen model extensions and binds their native calls to the owning database admission scope.
 Dialect leaves provide precise database methods while shared descriptors preserve authored operation inference.
-
-### defineModel
-
-Adds named table methods with an injected table and transaction-aware Drizzle client.
-Use service overrides, not extensions, to replace the six reserved CRUD operations.
-Select a dialect entrypoint when an extension uses the injected native database.
-
-**Throws**
-
-TypeError for missing, non-callable or reserved extensions.
-
-**Example**
-
-```ts
-import { defineModel } from "@relkit/drizzle/sqlite";
-import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
-
-const users = sqliteTable("users", { id: integer().primaryKey() });
-const model = defineModel({
-  table: users,
-  extend: { firstTen: ({ table, database }) => database.select().from(table).limit(10) },
-});
-console.assert(model.extensionNames.includes("firstTen"));
-```
-
-**Signature**
-
-```ts
-declare const defineModel: <
-  const T extends Table,
-  const Extensions extends ModelExtensionMap<T>,
->(options: {
-  readonly table: T;
-  readonly extend: NonEmptyExtensions<Extensions>;
-}) => ModelDescriptor<T, Extensions>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.ts#L54)
-
-Since v0.1.0
 
 ### RESERVED_OPERATIONS
 
@@ -1317,7 +1129,7 @@ Observes specialized work once through the configured caller sinks.
 
 ```ts
 import { Effect } from "effect";
-import { observeSpecializedOperation } from "@relkit/drizzle/internal";
+import { observeSpecializedOperation } from "@relkit/drizzle/server";
 await Effect.runPromise(observeSpecializedOperation("auth.session", Effect.succeed(null)));
 ```
 
@@ -1357,7 +1169,7 @@ Compose a page with an existing owner and table binding
 ```ts
 import { Effect } from "effect";
 import type { ManagedRuntime } from "effect";
-import { DrizzleFailure, DrizzleOwner, operationEffect, runDrizzlePromise } from "@relkit/drizzle/internal";
+import { DrizzleFailure, DrizzleOwner, operationEffect, runDrizzlePromise } from "@relkit/drizzle/server";
 function page(owner: ManagedRuntime.ManagedRuntime<DrizzleOwner, DrizzleFailure>, binding: Parameters<typeof operationEffect>[0]) {
   return runDrizzlePromise(owner, Effect.gen(function* () {
     const service = yield* DrizzleOwner;
@@ -1782,7 +1594,7 @@ Acquires one client into a Layer scope.
 import { ManagedRuntime } from "effect";
 import { sqliteTable, integer } from "drizzle-orm/sqlite-core";
 import { defineDrizzleService } from "@relkit/drizzle";
-import { DrizzleOwner, drizzleOwnerLayer, drizzleRuntimeOf } from "@relkit/drizzle/internal";
+import { DrizzleOwner, drizzleOwnerLayer, drizzleRuntimeOf } from "@relkit/drizzle/server";
 const records = sqliteTable("records", { id: integer().primaryKey() });
 const declaration = drizzleRuntimeOf(
   defineDrizzleService({ schema: { records }, client: () => ({}) }),
@@ -1866,7 +1678,7 @@ Compose work with an existing activation
 ```ts
 import { Effect } from "effect";
 import { activateDrizzleService } from "@relkit/drizzle";
-import { withDrizzleWork } from "@relkit/drizzle/internal";
+import { withDrizzleWork } from "@relkit/drizzle/server";
 function borrowedWork(active: Awaited<ReturnType<typeof activateDrizzleService>>) {
   return withDrizzleWork(active, Effect.succeed(1));
 }
@@ -2163,48 +1975,242 @@ export interface TableMetadata {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/runtime-types.ts#L14)
 
-## `service.ts`
+## `server.ts`
 
-### defineDrizzleService
+Server-only runtime ownership, typed failures and borrowed-work composition.
 
-Defines the application's Drizzle service, table operations, and model customizations.
-The client factory runs at activation, not during descriptor discovery.
-
-**Throws**
-
-TypeError for invalid declarations, dialects, models or overrides.
-
-**Example**
-
-```ts
-import { defineDrizzleService } from "@relkit/drizzle";
-import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
-
-const users = sqliteTable("users", { id: integer().primaryKey() });
-const service = defineDrizzleService({
-  schema: { users },
-  client: () => {
-    throw new Error("Configure a Drizzle driver before activation");
-  },
-});
-console.assert(service.capability.dialect === "sqlite");
-```
+### DrizzleActivation
 
 **Signature**
 
 ```ts
-declare const defineDrizzleService: <
-  Client,
-  const Schema extends Readonly<Record<string, unknown>>,
-  const Models extends DrizzleModelMap<TablesOf<Schema>> = {},
->(
-  options: DefineDrizzleServiceOptions<Client, Schema, Models>,
-) => DrizzleServiceDescriptor<string, Client, Schema, Models>;
+declare const DrizzleActivation: DrizzleActivation<Service>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/service.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L6)
 
-Since v0.1.0
+### DrizzleFailure
+
+**Signature**
+
+```ts
+declare const DrizzleFailure: typeof DrizzleFailure;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L9)
+
+### DrizzleOwner
+
+**Signature**
+
+```ts
+declare const DrizzleOwner: typeof DrizzleOwner;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L11)
+
+### DrizzleOwnerInterface
+
+**Signature**
+
+```ts
+declare const DrizzleOwnerInterface: DrizzleOwnerInterface;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L18)
+
+### DrizzleServiceDescriptor
+
+**Signature**
+
+```ts
+declare const DrizzleServiceDescriptor: DrizzleServiceDescriptor<Id, Client, Schema, Models>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L8)
+
+### activateDrizzleService
+
+**Signature**
+
+```ts
+declare const activateDrizzleService: <
+  Service extends DrizzleServiceDescriptor<any, any, any, any>,
+>(
+  service: Service,
+  env: Readonly<Record<string, unknown>>,
+  options?: DrizzleActivationOptions,
+) => Promise<DrizzleActivation<Service>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L5)
+
+### drizzleInstrumentationOf
+
+**Signature**
+
+```ts
+declare const drizzleInstrumentationOf: (activation: object) => Context<never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L14)
+
+### drizzleOwnerLayer
+
+**Signature**
+
+```ts
+declare const drizzleOwnerLayer: (
+  declaration: DrizzleServiceRuntime,
+  env: Readonly<Record<string, unknown>>,
+) => Layer<DrizzleOwner, DrizzleFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L12)
+
+### drizzleRuntimeOf
+
+**Signature**
+
+```ts
+declare const drizzleRuntimeOf: (value: object) => DrizzleServiceRuntime;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L7)
+
+### inheritNativeLeases
+
+**Signature**
+
+```ts
+declare const inheritNativeLeases: <A, E, R>(effect: Effect<A, E, R>) => Effect<A, E, R>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L21)
+
+### nativeCall
+
+**Signature**
+
+```ts
+declare const nativeCall: <A>(
+  operation: string,
+  run: () => A | PromiseLike<A>,
+) => Effect<A, DrizzleFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L9)
+
+### observeSpecializedOperation
+
+**Signature**
+
+```ts
+declare const observeSpecializedOperation: <A, E, R>(
+  operation: `database.${string}` | `auth.${string}`,
+  effect: Effect<A, E, R>,
+) => Effect<A, E, R>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L17)
+
+### operationEffect
+
+**Signature**
+
+```ts
+declare const operationEffect: (
+  binding: ModelBinding,
+  name: string,
+  args: unknown,
+) => Effect<unknown, DrizzleFailure>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L19)
+
+### redactSpecializedTrace
+
+**Signature**
+
+```ts
+declare const redactSpecializedTrace: <A, E, R>(
+  effect: Effect<A, E, R>,
+) => Effect<A, E, Exclude<R, never>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L22)
+
+### runDrizzlePromise
+
+**Signature**
+
+```ts
+declare const runDrizzlePromise: <A, E, R, ER>(
+  runtime: ManagedRuntime<R, ER>,
+  effect: Effect<A, E, R>,
+  options?: RunOptions,
+) => Promise<A>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L9)
+
+### runDrizzleWorkPromise
+
+**Signature**
+
+```ts
+declare const runDrizzleWorkPromise: <A, E>(activation: object, effect: Effect<A, E>) => Promise<A>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L15)
+
+### runSpecializedTrace
+
+**Signature**
+
+```ts
+declare const runSpecializedTrace: <A>(operation: string, run: () => Promise<A>) => Promise<A>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L17)
+
+### squashDrizzleCause
+
+**Signature**
+
+```ts
+declare const squashDrizzleCause: <E>(cause: Cause<E>) => unknown;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L9)
+
+### withDrizzleSqliteWork
+
+**Signature**
+
+```ts
+declare const withDrizzleSqliteWork: <A, E, R>(
+  activation: object,
+  effect: Effect<A, E, R>,
+) => Effect<A, E | DrizzleFailure, R>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L20)
+
+### withDrizzleWork
+
+**Signature**
+
+```ts
+declare const withDrizzleWork: <A, E, R>(
+  activation: object,
+  effect: Effect<A, E, R>,
+) => Effect<A, E | DrizzleFailure, R>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L13)
+
+## `service.ts`
 
 ### DefineDrizzleServiceOptions
 
@@ -2230,7 +2236,7 @@ TypeError for unbranded declarations.
 declare const drizzleRuntimeOf: (value: object) => DrizzleServiceRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/service.ts#L136)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/service.ts#L139)
 
 ## `service.types.ts`
 
@@ -2247,6 +2253,11 @@ export interface DefineDrizzleServiceOptions<
   Models extends DrizzleModelMap<TablesOf<Schema>>,
 > {
   readonly id?: string;
+  /**
+   * Makes this service `ctx.database` and the Better Auth database when an application defines
+   * several Drizzle services. A single service is the default without it.
+   */
+  readonly default?: boolean;
   readonly schema: Schema;
   /**
    * Acquires a native client when the owner Layer is first built.
@@ -2266,6 +2277,142 @@ export interface DefineDrizzleServiceOptions<
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/service.types.ts#L9)
+
+## `index.ts`
+
+SQLite on Bun: `bun:sqlite` through Drizzle's `bun-sqlite` driver.
+
+### openBunSqlite
+
+Opens a database file with `bun:sqlite`, creating its folder.
+
+**Signature**
+
+```ts
+declare const openBunSqlite: OpenSqlite;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/bun/index.ts#L9)
+
+## `index.ts`
+
+Opens a SQLite database with the driver of the runtime the application runs on.
+
+### openSqliteDatabase
+
+Opens a SQLite database file, creating its folder, with `bun:sqlite` on Bun and `node:sqlite`
+on Node, so one Drizzle service runs on both.
+
+**Example**
+
+```ts
+import { openSqliteDatabase } from "@relkit/drizzle/sqlite";
+import { sql } from "drizzle-orm";
+
+const database = await openSqliteDatabase(":memory:");
+try {
+  console.assert((await database.all(sql`select 1 as one`)).length === 1);
+} finally {
+  database.$client.close();
+}
+```
+
+**Signature**
+
+```ts
+declare const openSqliteDatabase: <Relations extends AnyRelations = EmptyRelations>(
+  path: string,
+  config?: SqliteDatabaseConfig<Relations>,
+) => Promise<SqliteDatabase<Relations>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/index.ts#L24)
+
+Since v0.9.0
+
+### SqliteDatabase
+
+**Signature**
+
+```ts
+declare const SqliteDatabase: SqliteDatabase<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/index.ts#L4)
+
+### SqliteDatabaseConfig
+
+**Signature**
+
+```ts
+declare const SqliteDatabaseConfig: SqliteDatabaseConfig<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/index.ts#L4)
+
+## `index.ts`
+
+SQLite on Node: the built-in `node:sqlite` through Drizzle's `node-sqlite` driver.
+
+### openNodeSqlite
+
+Opens a database file with `node:sqlite` (Node 22.13 or later), creating its folder.
+
+**Signature**
+
+```ts
+declare const openNodeSqlite: OpenSqlite;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/node/index.ts#L9)
+
+## `sqlite-client.types.ts`
+
+The Drizzle SQLite database `openSqliteDatabase` returns on either runtime.
+
+### OpenSqlite (type alias)
+
+Opens one database file with a runtime's driver.
+
+**Signature**
+
+```ts
+type OpenSqlite = <Relations extends AnyRelations = EmptyRelations>(
+  path: string,
+  config?: SqliteDatabaseConfig<Relations>,
+) => SqliteDatabase<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/sqlite-client.types.ts#L18)
+
+### SqliteDatabase (type alias)
+
+A synchronous-driver Drizzle database whose native client can be closed.
+
+**Signature**
+
+```ts
+type SqliteDatabase<Relations extends AnyRelations = EmptyRelations> = SQLiteAsyncDatabase<
+  "sync",
+  unknown,
+  Relations
+> & { readonly $client: { close(): void } };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/sqlite-client.types.ts#L7)
+
+### SqliteDatabaseConfig (type alias)
+
+Drizzle settings passed through to the runtime's driver.
+
+**Signature**
+
+```ts
+type SqliteDatabaseConfig<Relations extends AnyRelations = EmptyRelations> =
+  DrizzleSQLiteConfig<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/sqlite-client.types.ts#L14)
 
 ## `sqlite.ts`
 
@@ -2293,7 +2440,27 @@ Native database injected into model extensions for the selected dialect.
 type DialectDatabase = Omit<SQLiteAsyncDatabase<any, any, any>, "query">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L10)
+
+### SqliteDatabase
+
+**Signature**
+
+```ts
+declare const SqliteDatabase: SqliteDatabase<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L7)
+
+### SqliteDatabaseConfig
+
+**Signature**
+
+```ts
+declare const SqliteDatabaseConfig: SqliteDatabaseConfig<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L7)
 
 ### defineModel
 
@@ -2305,7 +2472,20 @@ Declares lazy native extensions with this dialect's real transaction client type
 declare const defineModel: DefineModel<DialectDatabase>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L13)
+
+### openSqliteDatabase
+
+**Signature**
+
+```ts
+declare const openSqliteDatabase: <Relations extends AnyRelations = EmptyRelations>(
+  path: string,
+  config?: SqliteDatabaseConfig<Relations>,
+) => Promise<SqliteDatabase<Relations>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L6)
 
 ## `table.schemas.ts`
 
@@ -2480,7 +2660,7 @@ type DatabaseContext<Service extends DrizzleServiceDescriptor<any, any, any, any
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L168)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L170)
 
 ### DeleteArgs
 
@@ -2502,6 +2682,8 @@ Pure compiler-visible dialect, tables, constraints and custom methods.
 export interface DrizzleCapability {
   readonly kind: "drizzle";
   readonly dialect: "pg" | "mysql" | "sqlite";
+  /** Set when the service is marked as the application's default database. */
+  readonly default?: true;
   readonly tables: readonly {
     readonly name: string;
     readonly databaseName: string;
@@ -2572,7 +2754,7 @@ type DrizzleServiceDescriptor<
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L150)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L152)
 
 ### FindManyArgs
 

@@ -1,7 +1,7 @@
 /** Browser requests cannot select targets/credentials; live errors and stream invalidations retain their protocol. */
 import { expect, test, vi } from "vitest";
 import { Effect, Ref } from "effect";
-import type { InspectionConnectionFile } from "@relkit/inspector-api/connection";
+import type { InspectionConnectionFile } from "relkit/inspector-api/connection";
 import { inspectorBackend } from "../src/tool-backend.js";
 import { InspectorRemote } from "../src/remote.service.js";
 import { forwardBackend } from "../src/backend-forward.js";

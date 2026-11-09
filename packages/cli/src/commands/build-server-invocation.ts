@@ -10,6 +10,11 @@ async function invokeHttp(request) {
   if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
   const target = request.target ?? targetFor(request.functionId);
   let invocationSpanId;
+  // Handle calls run as system unless relkit.as(session) supplied a user; others use the session.
+  const callerAuth = request.auth ?? authRequestStorage.getStore();
+  const principal = request.principal ?? (request.source === "system" || callerAuth === undefined
+    ? undefined
+    : sessionPrincipalSource(() => callerAuth.getSession(), authRuntime?.resolveAccess));
   const execute = () => {
     const run = () => invoke({
       input: request.input,
@@ -27,6 +32,7 @@ async function invokeHttp(request) {
       clients: createDependencySources(providerRegistry),
       serviceId: graph.nodes.find((node) => node.kind === "function" && node.id === request.functionId)?.domainId,
       ...(request.parent === undefined ? {} : { parent: request.parent }),
+      ...(principal === undefined ? {} : { principal }),
       ...(request.inputSchema === undefined ? {} : { inputSchema: request.inputSchema }),
       ...(request.outputSchema === undefined ? {} : { outputSchema: request.outputSchema }),
       ...(request.errors === undefined ? {} : { errors: request.errors }),
@@ -89,7 +95,37 @@ async function invocationContext({ invocation, signal, env, time }, spanId) {
   const database = databaseStartup === undefined
     ? Object.freeze({})
     : (await databaseStartup).context;
-  return { invocation, signal, env, time, auth, log, trace: publicTrace, database, ...resolved };
+  const databases = await activeDatabases();
+  return { invocation, signal, env, time, auth, log, trace: publicTrace, database, databases, ...resolved };
+}
+
+/** Builds the application's runtime handle once providers and the database are ready. */
+function relkitHandle() {
+  relkitHandle.promise ??= (async () => {
+    const providerRegistry = await providerStartup;
+    if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
+    const database = databaseStartup === undefined ? undefined : (await databaseStartup).context;
+    const refs = (kind, nodes) => Object.fromEntries((nodes ?? []).map((node) => [node.id, { ref: { kind, id: node.id } }]));
+    return createRuntimeHandle({
+      services: runtimeManifest.services ?? {},
+      invoke: (functionId, input, call) => invokeHttp({ functionId, input, source: "system", ...(call?.principal === undefined ? {} : { principal: call.principal }) }),
+      ...(authRuntime?.resolveAccess === undefined ? {} : { resolveAccess: authRuntime.resolveAccess }),
+      descriptors: { channels: runtimeManifest.channels ?? {}, agents: runtimeManifest.agents ?? {}, cache: refs("cache", plan.caches), buckets: refs("bucket", plan.buckets) },
+      sources: createDependencySources(providerRegistry),
+      ...(database === undefined ? {} : { database }),
+      databases: await activeDatabases(),
+    });
+  })();
+  return relkitHandle.promise;
+}
+
+/** Every Drizzle service's context keyed by service ID, for ctx.databases and the handle. */
+async function activeDatabases() {
+  const entries = await Promise.all([
+    ...(databaseNode === undefined ? [] : [databaseStartup.then((active) => [databaseNode.id, active.context])]),
+    ...otherDatabaseStartups.map(([id, startup]) => startup.then((active) => [id, active.context])),
+  ]);
+  return Object.freeze(Object.fromEntries(entries));
 }
 
 function createDatabaseRegistration(node, services, env) {
@@ -101,31 +137,24 @@ function createDatabaseRegistration(node, services, env) {
 
 function createBetterAuthRegistration(node, services, database) {
   if (node === undefined) return undefined;
-  if (database === undefined) return Promise.reject(new Error("Better Auth requires Drizzle."));
   const service = services?.[node.id];
   if (service === undefined) return Promise.reject(new Error("Better Auth service is unavailable."));
+  // An instance that brings its own database needs no Drizzle service.
+  if (node.capability.database === "custom") return activateBetterAuthService(service, undefined, node.capability.basePath);
+  if (database === undefined) return Promise.reject(new Error("Better Auth requires Drizzle."));
   return database.then((active) => activateBetterAuthService(service, active, node.capability.basePath));
 }
 
-function createAuthRegistration(applicationGraph, routes = {}, authStartup) {
-  const brand = Symbol.for("relkit.better-auth.handler");
-  for (const [routeId, route] of Object.entries(routes)) {
-    if (route?.auth?.kind !== "better-auth") continue;
-    const registration = route.handler?.[brand];
-    if (registration?.kind !== "better-auth") throw new Error("Better Auth registration is unavailable.");
-    const trigger = applicationGraph.nodes.find((node) => node.kind === "trigger" && node.id === routeId);
-    const publicPaths = trigger?.config?.runtimePaths ?? [trigger?.config?.path].filter(Boolean);
-    return createHttpAuthRuntime({
-      protected: route.auth.protected,
-      publicPaths,
-      getOpenApiDocument: async () => generateBetterAuthOpenApi(await authStartup, specializedInstrumentation),
-      getSession: async (headers) => {
-        const auth = await authStartup;
-        return (await auth.api.getSession({ headers })) ?? null;
-      },
-    });
-  }
-  return undefined;
+function createAuthRegistration(node, authStartup) {
+  if (node === undefined || authStartup === undefined) return undefined;
+  return createHttpAuthRuntime({
+    getOpenApiDocument: async () => generateBetterAuthOpenApi(await authStartup, specializedInstrumentation),
+    resolveAccess: async (session) => resolveBetterAuthAccess(await authStartup, session),
+    getSession: async (headers) => {
+      const auth = await authStartup;
+      return (await auth.api.getSession({ headers })) ?? null;
+    },
+  });
 }
 
 `;

@@ -4,7 +4,7 @@
  * exact physical source paths and does not import application modules.
  */
 
-import type { AstPrefilterCandidate, AstSourceModule } from "@relkit/compiler";
+import type { AstPrefilterCandidate, AstSourceModule } from "../compiler/index.js";
 import type { DiscoveredArtifact, DiscoveredService } from "./project-discovery-types.js";
 
 /** One statically recognized descriptor factory and its source provenance. */

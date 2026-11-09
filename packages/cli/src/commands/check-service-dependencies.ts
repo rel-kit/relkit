@@ -1,7 +1,7 @@
 /** Validates graph-selected native services through their owning manifest metadata. */
 import { Effect, Schema } from "effect";
-import { SelectedDependencies } from "@relkit/provider/internal/dependencies";
-import type { AstPrefilterCandidate } from "@relkit/compiler";
+import { SelectedDependencies } from "relkit/provider/dependencies";
+import type { AstPrefilterCandidate } from "../compiler/index.js";
 import { cliAdapterError } from "../cli-errors.js";
 
 const Graph = Schema.Struct({ nodes: Schema.Array(Schema.Json) });

@@ -92,11 +92,10 @@ function createApplicationClient(
   identity: ClientIdentityDocument | undefined,
   generation: string | undefined,
 ): ApplicationClient {
-  const endpoint = new URL("rpc", baseUrl);
+  const endpoint = new URL("_relkit/v1/rpc", baseUrl);
   return createORPCClient(
     new RPCLink({
-      origin: endpoint.origin,
-      url: endpoint.pathname as `/${string}`,
+      url: endpoint.href,
       headers:
         identity === undefined
           ? agentCapabilityHeaders
@@ -109,7 +108,7 @@ function createApplicationClient(
                 ? {}
                 : { "x-relkit-csrf": browserCookie("relkit_csrf")! }),
             },
-      fetch: (url, init) => fetch(url, { ...init, credentials: "include" }),
+      fetch: (request, init) => fetch(request, { ...init, credentials: "include" }),
     }),
   );
 }

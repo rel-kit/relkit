@@ -17,6 +17,6 @@ AssertionError: Final consumers require certification of current template bytes
    operator: "strictEqual",
        code: "ERR_ASSERTION"
 
-      at /Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/final-packed.ts:9:8
+      at <repo>/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/final-packed.ts:9:8
 
 Bun v1.3.10 (macOS arm64)

@@ -1,4 +1,4 @@
-import type { DeploymentHostIntegration } from "@relkit/deploy";
+import type { DeploymentHostIntegration } from "relkit/deploy";
 import { network } from "./network.js";
 import { service } from "./service.js";
 import { hostContext } from "./shared.js";

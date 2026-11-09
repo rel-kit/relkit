@@ -3,13 +3,14 @@ export const probeNestedAuthSource = `/** Native nested auth callback preserves 
 import { activateDrizzleService } from "@relkit/drizzle";
 import { activateBetterAuthService, defineBetterAuthService } from "@relkit/better-auth/drizzle";
 import database from "./service.js";
+import { fixtureEnv } from "./lifecycle.js";
 /**
  * Acquires nested auth inside native admitted work while borrowing the host's owner.
  * @param databasePath - Explicit native database path.
  * @returns Whether native auth factories initialized and answered session queries.
  */
 export async function probeNestedAuth(databasePath: string): Promise<boolean> {
-  const active = await activateDrizzleService(database, { DATABASE_PATH: databasePath });
+  const active = await activateDrizzleService(database, fixtureEnv(databasePath));
   const options = { baseURL: "http://localhost", secret: "nested-fixture-secret-at-least-32-bytes" };
   const secondary = defineBetterAuthService(options);
   let initialized = false;

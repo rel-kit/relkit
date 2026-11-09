@@ -1,5 +1,5 @@
 /** Declares the landing backend example with inspection disabled by default. */
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 
 export default defineApp({
   id: "commerce-api",

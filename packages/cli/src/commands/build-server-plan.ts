@@ -4,8 +4,8 @@
  * production and safe edited generations keep the existing runtime planner.
  * Graph/hash disagreement aborts preparation before any snapshot publication.
  */
-import { canonicalJson } from "@relkit/contracts";
-import { createRegistrationPlan } from "@relkit/graph";
+import { canonicalJson } from "relkit/contracts";
+import { createRegistrationPlan } from "relkit/graph";
 import type { ServerSourceEmission } from "./build-server.types.js";
 
 /**

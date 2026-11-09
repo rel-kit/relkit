@@ -1,8 +1,10 @@
+import { packageEngines } from "./package-engines.js";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { basename, join, relative, resolve } from "node:path";
 import { expectedExports } from "./release-package-contract.js";
 import { workspacePackageDirectories } from "./workspace-packages.js";
+import { toolPackageVersions } from "./release-stage.js";
 import {
   dependencyFields,
   exactVersion,
@@ -141,6 +143,8 @@ export function checkManifests(
   summary: RecordValue[];
 } {
   const workspaceNames = new Set(items.map((item) => item.name));
+  // Private tool packages are development-only workspace dependencies and are never published.
+  const toolNames = new Set(toolPackageVersions(root).keys());
   if (items.length === 0 || items.some((item) => !exactVersion(item.manifest.version)))
     throw new Error("Every package must have an exact release version.");
   const version = String(
@@ -151,11 +155,9 @@ export function checkManifests(
   for (const item of items) {
     const directoryName = basename(item.directory);
     const expectedName =
-      relative(root, item.directory) === "integrations/catalog"
-        ? "@relkit/integrations"
-        : directoryName === "create-relkit" || directoryName === "relkit"
-          ? directoryName
-          : `@relkit/${directoryName}`;
+      directoryName === "create-relkit" || directoryName === "relkit"
+        ? directoryName
+        : `@relkit/${directoryName}`;
     if (item.name !== expectedName)
       throw new Error(`Package name mismatch: ${relative(root, item.directory)}`);
     if (
@@ -164,13 +166,15 @@ export function checkManifests(
     )
       throw new Error(`Export map mismatch: ${item.name}`);
     const expectedBin =
-      directoryName === "cli" || directoryName === "relkit"
+      directoryName === "cli"
         ? { relkit: "./dist/bin.js" }
-        : directoryName === "create-relkit"
-          ? { "create-relkit": "./dist/bin.js" }
-          : directoryName === "inspector"
-            ? { "relkit-inspector": "./dist/bin.js" }
-            : undefined;
+        : directoryName === "relkit"
+          ? { relkit: "./dist/launcher/bin.js" }
+          : directoryName === "create-relkit"
+            ? { "create-relkit": "./dist/bin.js" }
+            : directoryName === "inspector"
+              ? { "relkit-inspector": "./dist/bin.js" }
+              : undefined;
     if (JSON.stringify(stable(item.manifest.bin)) !== JSON.stringify(stable(expectedBin)))
       throw new Error(`Binary map mismatch: ${item.name}`);
     if (
@@ -190,17 +194,18 @@ export function checkManifests(
               : ["dist"],
         ) ||
       item.manifest.publishConfig?.access !== "public" ||
-      item.manifest.engines?.bun !== ">=1.3.10" ||
-      (directoryName === "inspector" && item.manifest.engines?.node !== ">=20.9.0") ||
+      JSON.stringify(item.manifest.engines) !== JSON.stringify(packageEngines(item.name)) ||
       item.manifest.private === true
     )
       throw new Error(`Release metadata mismatch: ${item.name}`);
     const dependencies = resolveDependencyFields(item.manifest, rootManifest);
     for (const field of packageFields)
       for (const [name, spec] of Object.entries(dependencies[field])) {
-        const valid = workspaceNames.has(name)
-          ? spec === "workspace:*"
-          : field === "peerDependencies" || exactVersion(spec);
+        const valid = toolNames.has(name)
+          ? field === "devDependencies" && spec === "workspace:*"
+          : workspaceNames.has(name)
+            ? spec === "workspace:*"
+            : field === "peerDependencies" || exactVersion(spec);
         if (!valid)
           throw new Error(`Dependency is not pinned correctly: ${item.name} -> ${name}@${spec}`);
       }

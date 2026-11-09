@@ -1,5 +1,6 @@
 /** Declares the native support agent whose stable identity is inferred from its fixture source. */
-import { defineAgent } from "@relkit/langchain";
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import lookupOrder from "../tools/lookup-order.tool.js";
 import { emptyInput, orderOutput } from "../../platform/schemas.js";
 
@@ -10,9 +11,9 @@ const fixtureModel = {
 } as never;
 
 export default defineAgent({
+  runtime: langchain({ model: fixtureModel }),
   input: emptyInput,
   output: orderOutput,
-  model: fixtureModel,
   instructions: "Answer order questions.",
   tools: [lookupOrder],
   limits: { maxSteps: 2, maxToolCalls: 2, timeoutMs: 1_000 },

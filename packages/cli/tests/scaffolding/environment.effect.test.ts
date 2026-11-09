@@ -3,7 +3,7 @@
 import { expect, it } from "@effect/vitest";
 import { resolve } from "node:path";
 import { Effect } from "effect";
-import ts from "typescript";
+import ts from "../../src/typescript-parser.js";
 
 it.live(
   "compiles positive service examples and detects mutation that erases environment requirements",

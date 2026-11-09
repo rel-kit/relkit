@@ -1,6 +1,6 @@
 import { expect, it } from "@effect/vitest";
 import { Context, Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { createExecutionEvidence } from "../fixtures/execution-evidence.ts";
 import { runBunFixture } from "../fixtures/bun-process.js";
 

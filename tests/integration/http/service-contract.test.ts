@@ -2,26 +2,20 @@
  * Explicit Scalar selection preserves the expected reference endpoint without adding it to core runtime imports.
  */
 import { expect, test } from "bun:test";
-import { defineFunction, defineService } from "../../../packages/app/src/index.ts";
-import {
-  invokeFunction,
-  createInspectableObservabilityHooks,
-} from "../../../packages/engine/src/index.ts";
-import {
-  createRegistrationPlan,
-  type ApplicationGraph,
-} from "../../../packages/graph/src/index.ts";
-import { generateClient } from "../../../packages/client-generator/src/index.ts";
-import { generateOpenApi, type OpenApiDocument } from "../../../packages/openapi/src/index.ts";
+import { defineFunction, defineService } from "relkit";
+import { invokeFunction, createInspectableObservabilityHooks } from "relkit/engine";
+import { createRegistrationPlan, type ApplicationGraph } from "relkit/graph";
+import { generateClient } from "../../../packages/cli/src/client-generator/index.ts";
+import { generateOpenApi, type OpenApiDocument } from "relkit/openapi";
 import {
   API_REFERENCE_PATH,
   OPENAPI_PATH,
   createApp,
   type RuntimeManifest,
-} from "../../../packages/runtime-hono/src/index.ts";
-import { z } from "../../../packages/schema/src/index.ts";
+} from "relkit/runtime-hono";
+import { z } from "relkit/schema";
 import { runtimeCohort } from "../runtime-cohort.ts";
-import { scalarReference } from "../../../packages/runtime-hono/src/scalar.ts";
+import { scalarReference } from "../../../packages/relkit/src/runtime-hono/scalar.ts";
 
 import { serviceGraph } from "./service-contract-graph.ts";
 

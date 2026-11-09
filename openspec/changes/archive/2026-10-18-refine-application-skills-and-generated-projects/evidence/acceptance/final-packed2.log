@@ -51,220 +51,220 @@ Staging release package: @relkit/runtime-hono
 Staging release package: @relkit/cli
 Staging release package: @relkit/testing
 Staging release package: relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun install --lockfile-only --ignore-scripts in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/contracts
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-contracts-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-contracts-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-contracts-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/providers-standard
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-providers-standard-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-providers-standard-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-providers-standard-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/schema
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-schema-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-schema-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-schema-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/buckets
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-buckets-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-buckets-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-buckets-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/cache
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-cache-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-cache-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-cache-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/diagnostics
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-diagnostics-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-diagnostics-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-diagnostics-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/graph
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-graph-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-graph-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-graph-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/invocation
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-invocation-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-invocation-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-invocation-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/observability
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-observability-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-observability-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-observability-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/provider
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-provider-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-provider-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-provider-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/realtime
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-realtime-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-realtime-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-realtime-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/client
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-client-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-client-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-client-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/client-generator
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-client-generator-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-client-generator-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-client-generator-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/cloudflare
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-cloudflare-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-cloudflare-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-cloudflare-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/config
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-config-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-config-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-config-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/deploy
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-deploy-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-deploy-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-deploy-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/drizzle
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-drizzle-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-drizzle-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-drizzle-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/functions
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-functions-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-functions-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-functions-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/local-service
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-local-service-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-local-service-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-local-service-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/openapi
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-openapi-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-openapi-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-openapi-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/otlp
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-otlp-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-otlp-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-otlp-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/sentry
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-sentry-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-sentry-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-sentry-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/aws
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-aws-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-aws-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-aws-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/compiler
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-compiler-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-compiler-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-compiler-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/docker
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-docker-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-docker-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-docker-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/jobs
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-jobs-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-jobs-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-jobs-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/pulumi
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-pulumi-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-pulumi-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-pulumi-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/runtime-effect
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-runtime-effect-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-runtime-effect-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-runtime-effect-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/s3
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-s3-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-s3-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-s3-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/tools
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-tools-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-tools-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-tools-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/agents
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-agents-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-agents-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-agents-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/deploy-pulumi
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-deploy-pulumi-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-deploy-pulumi-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-deploy-pulumi-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/effect-mq
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-effect-mq-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-effect-mq-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-effect-mq-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/events
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-events-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-events-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-events-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/inngest
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-inngest-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-inngest-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-inngest-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/inspector-api
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-inspector-api-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-inspector-api-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-inspector-api-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/supervisor
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-supervisor-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-supervisor-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-supervisor-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/trigger
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-trigger-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-trigger-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-trigger-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/create-relkit
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/create-relkit-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/create-relkit-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/create-relkit-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/providers-local
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-providers-local-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-providers-local-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-providers-local-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/services
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-services-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-services-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-services-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/local
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-local-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-local-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-local-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/redis
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-redis-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-redis-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-redis-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/routes
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-routes-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-routes-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-routes-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/app
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-app-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-app-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-app-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/better-auth
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-better-auth-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-better-auth-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-better-auth-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/catalog
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-integrations-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-integrations-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-integrations-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/engine
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-engine-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-engine-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-engine-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/cloud-aws
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-cloud-aws-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-cloud-aws-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-cloud-aws-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/runtime-hono
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-runtime-hono-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-runtime-hono-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-runtime-hono-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/cli
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-cli-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-cli-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-cli-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/testing
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-testing-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-testing-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-testing-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Release command: /Users/mustafaelsayed/.bun/bin/bun pm pack --ignore-scripts --destination /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr --quiet in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-release-stage-C8X1Y7/packages/relkit
-Release command: tar -tzf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-0.7.7.tgz in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-0.7.7.tgz package/package.json in /Users/mustafaelsayed/Workspace/relkit
-Release command: tar -xOf /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr/relkit-0.7.7.tgz package/LICENSE in /Users/mustafaelsayed/Workspace/relkit
-Verified 53 candidate archives in /var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-acceptance-artifacts-y0lPnr
+Release command: <home>/.bun/bin/bun install --lockfile-only --ignore-scripts in <tmp>/relkit-release-stage-C8X1Y7
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/contracts
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-contracts-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-contracts-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-contracts-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/providers-standard
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-providers-standard-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-providers-standard-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-providers-standard-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/schema
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-schema-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-schema-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-schema-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/buckets
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-buckets-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-buckets-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-buckets-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/cache
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-cache-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-cache-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-cache-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/diagnostics
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-diagnostics-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-diagnostics-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-diagnostics-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/graph
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-graph-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-graph-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-graph-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/invocation
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-invocation-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-invocation-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-invocation-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/observability
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-observability-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-observability-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-observability-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/provider
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-provider-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-provider-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-provider-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/realtime
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-realtime-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-realtime-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-realtime-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/client
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-client-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-client-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-client-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/client-generator
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-client-generator-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-client-generator-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-client-generator-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/cloudflare
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-cloudflare-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-cloudflare-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-cloudflare-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/config
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-config-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-config-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-config-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/deploy
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-deploy-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-deploy-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-deploy-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/drizzle
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-drizzle-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-drizzle-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-drizzle-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/functions
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-functions-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-functions-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-functions-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/local-service
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-local-service-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-local-service-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-local-service-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/openapi
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-openapi-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-openapi-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-openapi-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/otlp
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-otlp-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-otlp-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-otlp-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/sentry
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-sentry-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-sentry-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-sentry-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/aws
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-aws-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-aws-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-aws-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/compiler
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-compiler-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-compiler-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-compiler-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/docker
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-docker-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-docker-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-docker-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/jobs
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-jobs-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-jobs-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-jobs-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/pulumi
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-pulumi-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-pulumi-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-pulumi-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/runtime-effect
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-runtime-effect-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-runtime-effect-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-runtime-effect-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/s3
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-s3-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-s3-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-s3-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/tools
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-tools-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-tools-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-tools-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/agents
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-agents-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-agents-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-agents-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/deploy-pulumi
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-deploy-pulumi-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-deploy-pulumi-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-deploy-pulumi-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/effect-mq
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-effect-mq-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-effect-mq-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-effect-mq-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/events
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-events-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-events-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-events-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/inngest
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-inngest-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-inngest-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-inngest-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/inspector-api
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-inspector-api-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-inspector-api-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-inspector-api-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/supervisor
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-supervisor-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-supervisor-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-supervisor-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/trigger
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-trigger-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-trigger-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-trigger-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/create-relkit
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/create-relkit-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/create-relkit-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/create-relkit-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/providers-local
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-providers-local-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-providers-local-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-providers-local-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/services
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-services-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-services-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-services-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/local
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-local-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-local-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-local-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/redis
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-redis-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-redis-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-redis-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/routes
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-routes-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-routes-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-routes-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/app
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-app-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-app-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-app-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/better-auth
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-better-auth-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-better-auth-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-better-auth-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/catalog
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-integrations-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-integrations-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-integrations-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/engine
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-engine-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-engine-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-engine-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/cloud-aws
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-cloud-aws-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-cloud-aws-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-cloud-aws-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/runtime-hono
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-runtime-hono-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-runtime-hono-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-runtime-hono-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/cli
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-cli-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-cli-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-cli-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/testing
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-testing-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-testing-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-testing-0.7.7.tgz package/LICENSE in <repo>
+Release command: <home>/.bun/bin/bun pm pack --ignore-scripts --destination <tmp>/relkit-acceptance-artifacts-y0lPnr --quiet in <tmp>/relkit-release-stage-C8X1Y7/packages/relkit
+Release command: tar -tzf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-0.7.7.tgz in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-0.7.7.tgz package/package.json in <repo>
+Release command: tar -xOf <tmp>/relkit-acceptance-artifacts-y0lPnr/relkit-0.7.7.tgz package/LICENSE in <repo>
+Verified 53 candidate archives in <tmp>/relkit-acceptance-artifacts-y0lPnr
 Acceptance: parent-install
 [20:30:27.796] INFO (#1): Execution operation completed {
   domain: "testing",

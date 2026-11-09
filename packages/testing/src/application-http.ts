@@ -1,26 +1,41 @@
 import type { TestRoute } from "./application-routes.js";
-import { InvocationValidationError } from "@relkit/engine";
-import { normalizeFailure, toPublicEnvelope } from "@relkit/runtime-effect";
+import { InvocationValidationError } from "relkit/engine";
+import { problemResponse } from "relkit/contracts";
+import { applyRouteResponse } from "relkit/routes";
+import { normalizeFailure } from "relkit/runtime-effect";
 import type { TestRuntime } from "./runtime.js";
 /**
  * Dispatches a matched route through existing engine validation and error mapping.
  * @param routes - Loaded native filesystem routes.
  * @param runtime - Acquired deterministic invocation runtime.
  * @param request - Native operation input carrying explicit identity and execution context.
- * @returns The native HTTP response with the established status and error envelope.
+ * @param getSession - The request's memoized session lookup, for routes with `auth: "required"`.
+ * @returns The native HTTP response; errors are Problem Details like the runtime's.
  */
 export async function handleTestRequest(
   routes: readonly TestRoute[],
   runtime: TestRuntime,
   request: Request,
+  getSession: () => Promise<unknown> = () => Promise.resolve(null),
 ): Promise<Response> {
   const url = new URL(request.url);
   const matched = routes.find(
     (route) =>
       (route.method === request.method || route.method === "ALL") && match(route.path, url),
   );
-  if (matched === undefined) return new Response("Not found", { status: 404 });
+  if (matched === undefined)
+    return problemResponse({
+      status: 404,
+      code: "not-found",
+      detail: "No route matches this request.",
+    });
   if ("handler" in matched) return matched.handler(request);
+  if (matched.auth === "required" && (await getSession()) == null)
+    return problemResponse({
+      status: 401,
+      code: "unauthenticated",
+      detail: "This route requires a signed-in session.",
+    });
   const params = match(matched.path, url) ?? {};
   const body = await readBody(request);
   try {
@@ -29,10 +44,14 @@ export async function handleTestRequest(
       mapInput(matched.request, url, params, request, body),
     );
     const status = matched.responses.find((response) => response.kind === "success")?.status ?? 200;
-    const response = new Response(value === undefined ? null : JSON.stringify(value), {
+    const mapped = new Response(value === undefined ? null : JSON.stringify(value), {
       status,
       headers: { "content-type": "application/json" },
     });
+    const response =
+      matched.response === undefined
+        ? mapped
+        : applyRouteResponse(mapped, (matched.response as (output: unknown) => unknown)(value));
     return request.method === "HEAD"
       ? new Response(null, { status: response.status, headers: response.headers })
       : response;
@@ -40,20 +59,21 @@ export async function handleTestRequest(
     if (error instanceof InvocationValidationError && error.phase === "input") {
       const status =
         matched.responses.find((response) => response.kind === "validation-error")?.status ?? 422;
-      return Response.json(
-        {
-          error: "validation",
-          issues: error.issues.map((issue) => ({
-            code: "validation",
-            message: issue.message.slice(0, 500),
-            path:
-              issue.path?.map((part) =>
-                typeof part === "object" && part !== null && "key" in part ? part.key : part,
-              ) ?? [],
-          })),
-        },
-        { status },
-      );
+      return problemResponse({
+        status,
+        code: "validation",
+        detail: "The request input is invalid.",
+        issues: error.issues.map((issue) => ({
+          code: "validation",
+          message: issue.message.slice(0, 500),
+          path:
+            issue.path?.map((part) => {
+              const key =
+                typeof part === "object" && part !== null && "key" in part ? part.key : part;
+              return typeof key === "number" ? key : String(key);
+            }) ?? [],
+        })),
+      });
     }
     const failure = normalizeFailure(error);
     if (failure.kind === "application") {
@@ -63,19 +83,23 @@ export async function handleTestRequest(
           (response.errorId === failure.id || response.id === failure.id),
       );
       if (declaration !== undefined) {
-        return new Response(JSON.stringify(toPublicEnvelope(failure)), {
+        return problemResponse({
           status: declaration.status ?? failure.status ?? 500,
-          headers: { "content-type": "application/json" },
+          code: failure.id,
+          detail: failure.message,
+          ...(failure.data === undefined ? {} : { data: failure.data }),
+          ...(failure.retry === "later" && failure.afterMs !== undefined
+            ? { retryAfterMs: failure.afterMs }
+            : {}),
         });
       }
     }
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : String(error) }),
-      {
-        status: 500,
-        headers: { "content-type": "application/json" },
-      },
-    );
+    // Tests see the cause, as the runtime shows it in development and test mode.
+    return problemResponse({
+      status: 500,
+      code: "internal-error",
+      detail: error instanceof Error ? error.message : String(error),
+    });
   }
 }
 
@@ -128,6 +152,8 @@ function mapInput(
     return body instanceof FormData ? body.getAll(String(mapping.name)) : [];
   }
   if (mapping.kind === "transform") return mapInput(mapping.value, url, params, request, body);
+  // The test dispatcher runs no route middleware, so middleware-provided fields are absent.
+  if (mapping.kind === "middleware") return undefined;
   throw new TypeError(`Unsupported test HTTP mapping: ${String(mapping.kind)}`);
 }
 

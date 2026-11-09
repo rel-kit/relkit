@@ -1,5 +1,6 @@
-import type { TaskExecutor } from "@relkit/jobs/adapter";
+import type { TaskExecutor } from "relkit/jobs/adapter";
 
+/** @experimental */
 export interface EffectMqTaskDefinition {
   readonly id: string;
   readonly jobId: string;
@@ -11,6 +12,7 @@ export interface EffectMqTaskDefinition {
   readonly schedules?: readonly unknown[];
 }
 
+/** @experimental */
 export interface EffectMqWorkerRegistrationOptions {
   readonly definitions: readonly EffectMqTaskDefinition[];
   readonly executor: TaskExecutor;
@@ -18,12 +20,14 @@ export interface EffectMqWorkerRegistrationOptions {
   readonly register?: (definitions: readonly EffectMqTaskDefinition[]) => Promise<void> | void;
 }
 
+/** @experimental */
 export interface EffectMqWorkerHandle {
   readonly definitions: readonly EffectMqTaskDefinition[];
   readonly ready: () => Promise<void>;
   readonly close: () => Promise<void>;
 }
 
+/** @experimental */
 export function createEffectMqWorker(
   options: EffectMqWorkerRegistrationOptions,
 ): EffectMqWorkerHandle {

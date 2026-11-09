@@ -4,7 +4,7 @@ import {
   assertJobName,
   isJobName,
   normalizeJobName,
-} from "../../packages/jobs/src/job-name.ts";
+} from "../../packages/relkit/src/jobs/job-name.ts";
 
 test("accepts safe camelCase job names", () => {
   for (const name of ["sendEmail", "a", "job2", "a".repeat(64)]) {

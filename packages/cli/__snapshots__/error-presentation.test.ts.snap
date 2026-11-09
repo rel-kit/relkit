@@ -1,0 +1,47 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`check errors 1`] = `
+{
+  "code": 1,
+  "stderr": "",
+  "stdout": [
+    "error RELKIT_CHECK_FAILED: relkit.config.ts was not found.
+  next: Read the message above, fix the file it names, then run \`relkit check\` again.
+  docs: https://relkit.dev/docs/errors/relkit-check-failed",
+  ],
+}
+`;
+
+exports[`check errors 2`] = `
+"src/services/orders/functions/create-order.function.ts:6:3 - error RELKIT_SCHEMA_UNAVAILABLE: input cannot produce deterministic JSON Schema: Schema does not expose a deterministic projection.
+  next: Use a Standard Schema library with JSON Schema support, such as Zod 4, ArkType, Valibot with \`@valibot/to-json-schema\`, or Effect Schema.
+  docs: https://relkit.dev/docs/errors/relkit-schema-unavailable"
+`;
+
+exports[`creation errors 1`] = `
+{
+  "code": 2,
+  "stderr": "RELKIT_CREATE_UNTESTED: template=minimal/jobs=none/cloud=aws/deploy=pulumi/examples=on has not been tested with <versions>, and --strict refuses untested combinations. Tested: <combinations>. See https://relkit.dev/docs/modules/cli/relkit-create-untested
+  next: Pick a tested combination listed in the message, or continue without \`--strict\` and check the new project with \`bun run check\`.",
+}
+`;
+
+exports[`deploy errors 1`] = `
+{
+  "code": 1,
+  "stderr": "RELKIT_DEPLOY_CHECK_FAILED: Project check failed: RELKIT_CHECK_FAILED.
+  next: Run \`relkit check\`, fix the errors it reports, then run \`relkit deploy\` again.
+  docs: https://relkit.dev/docs/errors/relkit-deploy-check-failed",
+  "stdout": [],
+}
+`;
+
+exports[`dev errors 1`] = `
+{
+  "code": 2,
+  "stderr": "RELKIT_CLI_USAGE: Invalid value for flag --port: "70000". Expected: port must be between 0 and 65535
+  next: Run \`relkit --help\` to see the commands and options, then run the command again.
+  docs: https://relkit.dev/docs/errors/relkit-cli-usage",
+  "stdout": [],
+}
+`;

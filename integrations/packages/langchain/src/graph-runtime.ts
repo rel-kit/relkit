@@ -1,10 +1,10 @@
 /** Composes graph compilation, scoped persistence and execution into the native invocation entrypoint, retaining stream and continuation behavior. */
 
-import { normalizeId } from "@relkit/contracts";
-import { frameworkTrace } from "@relkit/invocation";
+import { normalizeId } from "relkit/contracts";
+import { frameworkTrace } from "relkit/invocation";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
-import { generatedAgentFunctionId } from "@relkit/agents/internal/generated-function";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { generatedAgentFunctionId } from "relkit/agents/generated-function";
 import { graphInvocationFailure } from "./graph-runtime-error.js";
 import { runCompiledGraph } from "./graph-runtime-execution.js";
 import { GraphInvocationIdentity, GraphInvocationIdentityLive } from "./graph-runtime-identity.js";
@@ -21,6 +21,7 @@ export { GraphInvocationIdentity, GraphInvocationIdentityLive } from "./graph-ru
  * @param options - Graph, engine, input, and invocation integrations.
  * @returns An Effect with graph output or GraphInvocationFailure.
  * @example Effect.runPromise(Effect.provide(invokeGraphEffect(options), GraphInvocationIdentityLive));
+ * @experimental
  */
 export const invokeGraphEffect = Effect.fn("Agents.graph.invoke")(
   function* (options: GraphRuntimeOptions) {
@@ -80,6 +81,7 @@ export const invokeGraphEffect = Effect.fn("Agents.graph.invoke")(
  * @returns Validated graph output.
  * @throws The original graph, provider, validation, or cancellation error.
  * @example await invokeGraph(options);
+ * @experimental
  */
 export function invokeGraph(options: GraphRuntimeOptions): Promise<unknown> {
   return Effect.runPromise(

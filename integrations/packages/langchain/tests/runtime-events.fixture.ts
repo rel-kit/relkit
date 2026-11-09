@@ -1,10 +1,10 @@
 /** Creates isolated native runtime events fixtures; each caller owns the returned model, state and provider observations. */
-
-import { defineFunction } from "@relkit/functions";
-
-import { z } from "@relkit/schema";
-import { defineTool } from "@relkit/tools";
-import { defineAgent, type AgentRuntimeOptions } from "../src/index.ts";
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/index.ts";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
+import { defineTool } from "relkit/tools";
+import { type AgentRuntimeOptions } from "../src/index.ts";
 import { createTestModel, type TestModelTurn } from "./test-model.ts";
 
 export const expectedToolEvents = [
@@ -44,6 +44,7 @@ export function setup(
   });
   const agent = defineAgent({
     id: "support.order",
+    runtime: langchain(),
     input: z.object({ question: z.string() }),
     output: z.object({ answer: z.string() }),
     model: "default",

@@ -7,7 +7,7 @@ The database and auth integrations are specialized services, separate from `defi
 ## `defineEnv` and `defineDrizzleService`
 
 ```ts
-import { defineEnv, env as envFactory } from "@relkit/app/config";
+import { defineEnv, env as envFactory } from "relkit/config";
 
 export default defineEnv({
   DATABASE_PATH: envFactory.string().default(".relkit/app.sqlite"),
@@ -44,7 +44,7 @@ bun run db:generate
 bun run db:migrate
 ```
 
-`db:generate` uses the installed Drizzle Kit. `db:migrate` invokes installed RELKIT tooling, `relkit db migrate`, without copying a runner into the app. Root `drizzle.config.ts` explicitly owns dialect, schema, migration output, connection and supported log options. To select another config, use `bun run relkit db migrate --config configs/database.ts`; relative output/database paths still use the application root. Keep delegated PostgreSQL/MySQL config deterministic because Kit loads it again. Existing shell variables take precedence over Bun's normal dotenv loading; `.env.example` is documentation only.
+`db:generate` uses the installed Drizzle Kit. `db:migrate` invokes installed RelKit tooling, `relkit db migrate`, without copying a runner into the app. Root `drizzle.config.ts` explicitly owns dialect, schema, migration output, connection and supported log options. To select another config, use `bun run relkit db migrate --config configs/database.ts`; relative output/database paths still use the application root. Keep delegated PostgreSQL/MySQL config deterministic because Kit loads it again. Existing shell variables take precedence over Bun's normal dotenv loading; `.env.example` is documentation only.
 
 Migration applies pending SQL only when explicitly invoked; scaffolding and service startup do not apply it, generate secrets or open the database. SQLite uses the Bun-native driver. PostgreSQL/MySQL delegate to the app's installed Kit under Bun. Missing/empty/incompatible history requires generation or a compatible ORM/Kit pair, not a reset or fallback directory. Review failures before another manual run: SQL is not automatically retried, and dialect-specific partial DDL is not guaranteed to roll back. Keep the generated dependency patch and registration while required by the installed release.
 
@@ -66,8 +66,8 @@ The selected auth scaffold keeps Better Auth 1.7.1 and the existing migration co
 ## `defineCache` and `defineBucket`
 
 ```ts
-import { defineCache } from "@relkit/app/cache";
-import { z } from "@relkit/app/schema";
+import { defineCache } from "relkit/cache";
+import { z } from "zod";
 
 export default defineCache({
   id: "orders.prices",
@@ -80,7 +80,7 @@ export default defineCache({
 ```
 
 ```ts
-import { defineBucket } from "@relkit/app/buckets";
+import { defineBucket } from "relkit/buckets";
 
 export default defineBucket({
   id: "assets.objects",

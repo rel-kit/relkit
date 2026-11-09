@@ -1,4 +1,4 @@
-import ts from "typescript";
+import ts from "relkit-typescript";
 
 /** Compiler tooling settings are distinct from product navigation names. */
 export function isTypeScriptPluginSetting(path: string, text: string, offset: number): boolean {

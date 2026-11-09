@@ -115,7 +115,7 @@ bun run typecheck
 - secret values cannot be serialized into metadata;
 - JSON Schema output is stable;
 - absolute paths are removed from golden output;
-- public examples use `@relkit/schema`, not Effect Schema.
+- public examples use `relkit/schema`, not Effect Schema.
 
 ### Reject when
 

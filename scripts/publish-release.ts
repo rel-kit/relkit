@@ -3,6 +3,7 @@ import { appendFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { readManifest, type Artifact, type Manifest } from "./release-manifest.ts";
 import { publishWithProvenanceRetry } from "./release-publish-retry.ts";
+import { deprecationCommands } from "./release-deprecations.ts";
 
 let logFile: string | undefined;
 const visibilityAttempts = 180;
@@ -189,6 +190,8 @@ async function main(): Promise<void> {
     console.log(
       `verified all ${manifest.packages.length} published packages for ${manifest.version}`,
     );
+    // The final @relkit/app re-exports relkit; npm shows its message on every install.
+    for (const command of deprecationCommands(manifest.packages)) run(command);
   } else {
     console.log(`verified ${manifest.packages.length} release artifacts for ${manifest.version}`);
   }

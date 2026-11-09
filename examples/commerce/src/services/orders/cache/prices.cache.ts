@@ -1,6 +1,6 @@
 /** Declares integer SKU prices in the requests cache profile with a one-minute default and five-minute maximum TTL. */
-import { defineCache } from "@relkit/app/cache";
-import { z } from "@relkit/app/schema";
+import { defineCache } from "relkit/cache";
+import { z } from "zod";
 
 const prices = defineCache({
   id: "orders.prices",

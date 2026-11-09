@@ -29,7 +29,7 @@ export function runOperation(binding: ModelBinding, name: string, args: unknown)
  * ```ts
  * import { Effect } from "effect";
  * import type { ManagedRuntime } from "effect";
- * import { DrizzleFailure, DrizzleOwner, operationEffect, runDrizzlePromise } from "@relkit/drizzle/internal";
+ * import { DrizzleFailure, DrizzleOwner, operationEffect, runDrizzlePromise } from "@relkit/drizzle/server";
  * function page(owner: ManagedRuntime.ManagedRuntime<DrizzleOwner, DrizzleFailure>, binding: Parameters<typeof operationEffect>[0]) {
  *   return runDrizzlePromise(owner, Effect.gen(function* () {
  *     const service = yield* DrizzleOwner;

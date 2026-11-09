@@ -1,8 +1,8 @@
 /** Native producer callbacks retain their owning logger, correlation and metric registry. */
 import { expect, test } from "bun:test";
 import { Effect, Metric } from "effect";
-import { createLoggerLayer } from "@relkit/runtime-effect";
-import type { LogRecord } from "@relkit/observability";
+import { createLoggerLayer } from "relkit/runtime-effect";
+import type { LogRecord } from "relkit/observability";
 import { CliDevCapture, devCaptureLayer } from "../../src/commands/dev-capture.service.js";
 
 test("one native ingress operation uses the acquired instrumentation context", async () => {

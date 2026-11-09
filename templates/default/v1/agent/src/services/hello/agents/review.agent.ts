@@ -1,6 +1,6 @@
 /** Checkpoints a review graph in memory, interrupts for a boolean decision, and resumes to its final result. */
 import { defineGraph, defineGraphNode } from "@relkit/langchain";
-import { z } from "@relkit/app/schema";
+import { z } from "zod";
 import { END, MemorySaver, START, StateSchema, interrupt } from "@langchain/langgraph";
 
 const state = new StateSchema({

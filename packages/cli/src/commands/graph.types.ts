@@ -1,4 +1,4 @@
-import type { ApplicationGraph, GraphDiff } from "@relkit/graph";
+import type { ApplicationGraph, GraphDiff } from "relkit/graph";
 import type { Effect } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";
 

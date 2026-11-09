@@ -1,5 +1,5 @@
 /** Acquires compiler/telemetry support with shared logger policy and per-generation telemetry reconfiguration. */
-import { admitObservabilityRecord } from "@relkit/observability";
+import { admitObservabilityRecord } from "relkit/observability";
 import { Effect, Ref } from "effect";
 import { makeDevLocalCompilerEffect } from "./dev-local-compiler.js";
 import { createDevLogger, devLogSinks } from "./dev-logger.js";

@@ -1,8 +1,8 @@
 /** Retains original selection assertions for runtime-integration-plan, registered by the owning suite. */
 import { expect } from "bun:test";
-import { GRAPH_VERSION } from "../../packages/contracts/src/index.ts";
-import { generateRuntimeIntegrationPlan } from "../../packages/compiler/src/index.ts";
-import type { ApplicationGraph } from "../../packages/graph/src/index.ts";
+import { GRAPH_VERSION } from "relkit/contracts";
+import { generateRuntimeIntegrationPlan } from "../../packages/cli/src/compiler/index.ts";
+import type { ApplicationGraph } from "relkit/graph";
 import { provider, runtimePackage } from "./runtime-integration-plan.fixture.js";
 export function case1Selection() {
   const graph: ApplicationGraph = {

@@ -2,13 +2,13 @@
 
 import { resolve } from "node:path";
 import { Effect, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { observeExecution } from "relkit/contracts/operation";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 import type { ProjectDiscovery } from "./project-discovery-types.js";
 
 import type { PlanBuilderState } from "./plan-builder.types.js";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import { domainError, scaffoldErrors } from "create-relkit/internal/generator-errors";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { domainError, scaffoldErrors } from "create-relkit/generator-errors";
 
 import type { PlanBuilderFileOperations } from "./plan-builder-files.types.js";
 

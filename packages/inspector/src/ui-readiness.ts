@@ -1,6 +1,6 @@
 /** Requires complete UI response bytes and joins cancellation before advertising listening. */
 import { Effect, Schedule } from "effect";
-import { InspectionConnectionError } from "@relkit/inspector-api/connection";
+import { InspectionConnectionError } from "relkit/inspector-api/connection";
 
 /** The caller supplies native authority; expected connection failures retry within one minute. */
 export function waitInspectorUiReady(probe: Effect.Effect<boolean, InspectionConnectionError>) {

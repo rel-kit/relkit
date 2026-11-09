@@ -3,9 +3,9 @@
  * retain that builder's closure so duplicate checks and mutation order stay local.
  */
 import { END, START, type LangGraphRunnableConfig } from "@langchain/langgraph";
-import type { MaybePromise } from "@relkit/contracts";
+import type { MaybePromise } from "relkit/contracts";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { graphDefinitionFailure } from "./define-graph-error.js";
 import { assertEndpoint, copyDestinations, addUnique } from "./graph-edge-destinations.js";
 import type { GraphEdgeOperation } from "./graph-edges.types.js";

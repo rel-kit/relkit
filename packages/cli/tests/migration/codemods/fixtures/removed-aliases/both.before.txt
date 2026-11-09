@@ -1,0 +1,6 @@
+import { getJsonSchema, toJsonSchema } from "relkit/schema";
+import { defineJob } from "relkit/jobs";
+
+export const a = toJsonSchema(schema);
+export const b = getJsonSchema(schema);
+export const job = defineJob({ name: "n", task, profile: "queue", service: "jobs" });

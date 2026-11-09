@@ -1,16 +1,16 @@
 /** Retains original workflow assertions for langgraph-authoring, registered by the owning suite. */
 import { nativeAgentRuntimePackages } from "./native-agent-runtime.fixture.js";
 import { expect } from "bun:test";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import {
   END,
   START,
   StateSchema,
 } from "../../integrations/packages/langchain/node_modules/@langchain/langgraph/dist/index.js";
 import { defineGraph, defineGraphNode } from "../../integrations/packages/langchain/src/index.ts";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
-import { readFacts } from "../../packages/compiler/src/discovery/source-facts.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
+import { readFacts } from "../../packages/cli/src/compiler/discovery/source-facts.ts";
+import { z } from "relkit/schema";
 export function case1Workflow() {
   const source = ts.createSourceFile(
     "src/order.agent.ts",

@@ -1,19 +1,19 @@
-/** Projects native tool events into RELKIT tool lifecycle observations while preserving tool call identifiers and status order. */
+/** Projects native tool events into RelKit tool lifecycle observations while preserving tool call identifiers and status order. */
 
 import type { ProtocolEvent } from "@langchain/langgraph";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { publicToolValueEffect } from "./runtime-native-public-tools.js";
 import type { AgentContentSink } from "./runtime.types.js";
 import { signalFailure, withSignal } from "./signal.js";
-import type { ToolPartState } from "@relkit/agents/internal/state.types";
+import type { ToolPartState } from "relkit/agents/state.types";
 
 /** Emits public lifecycle updates for a native tool event.
  * @param event - Native event.
  * @param sink - Optional client sink.
  * @param toolIds - Public tool name mapping.
- * @param relkitNames - RELKIT owned tool names.
+ * @param relkitNames - RelKit owned tool names.
  * @param toolNames - Mutable call name map.
  * @param signal - Invocation cancellation signal.
  * @returns An Effect with void or AgentInvocationFailure.
@@ -76,7 +76,7 @@ export const emitToolEventEffect = Effect.fn("Agents.runtime.emitNativeToolEvent
  * @param event - Native event.
  * @param sink - Optional client sink.
  * @param toolIds - Public tool name mapping.
- * @param relkitNames - RELKIT owned tool names.
+ * @param relkitNames - RelKit owned tool names.
  * @param toolNames - Mutable call name map.
  * @param signal - Invocation cancellation signal.
  * @returns A Promise that resolves after all lifecycle emissions.

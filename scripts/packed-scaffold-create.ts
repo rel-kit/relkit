@@ -1,4 +1,4 @@
-/** Verifies certified public creation, post-install preparation and exact byte parity through the installed direct and relkit CLIs. */
+/** Verifies public creation of every template, strict refusals, post-install preparation and exact byte parity through the installed direct and relkit CLIs. */
 import { strict as assert } from "node:assert";
 import { join } from "node:path";
 import { realpath } from "node:fs/promises";
@@ -8,10 +8,11 @@ import { PackedCreation } from "./packed-scaffold.schemas.js";
 import { authoredProjectSnapshot } from "./scaffold-project-files.js";
 import { verifyPackedMigration } from "./packed-scaffold-migration.js";
 import { scaffoldNative } from "./scaffold-native.js";
+import { packedTemplates } from "./release-templates.js";
 import type { PackedCommand, PackedScaffoldFixture } from "./packed-scaffold.types.js";
 
 /**
- * Creates one certified minimal application using its actual packed executable.
+ * Creates one tested minimal application using its actual packed executable.
  * @param run - Captured finite command authority.
  * @param fixture - Exact installed generator and registry identity.
  * @param variant - Consumer path under test.
@@ -58,12 +59,12 @@ const create = Effect.fn("PackedScaffold.create")(function* (
 });
 
 /**
- * Requires uncertified public tuples to fail before creating a destination.
+ * Requires strict creation of untested combinations to fail before creating a destination.
  * @param run - Captured finite command authority.
  * @param fixture - Exact packed public CLI.
- * @returns Completion after native unsupported-template, jobs and cloud refusals.
+ * @returns Completion after native strict refusals of untested templates, jobs and cloud.
  */
-const rejectedTuples = Effect.fn("PackedScaffold.rejections")(function* (
+const strictRefusals = Effect.fn("PackedScaffold.strictRefusals")(function* (
   run: PackedCommand,
   fixture: PackedScaffoldFixture,
 ) {
@@ -71,6 +72,7 @@ const rejectedTuples = Effect.fn("PackedScaffold.rejections")(function* (
     ["--template", "api"],
     ["--template", "agent"],
     ["--template", "fullstack"],
+    ["--template", "tasks"],
     ["--template", "minimal", "--jobs", "effect-mq-docker"],
     ["--template", "minimal", "--cloud", "aws", "--deploy", "pulumi"],
   ];
@@ -83,12 +85,13 @@ const rejectedTuples = Effect.fn("PackedScaffold.rejections")(function* (
           ...tuple,
           "--no-install",
           "--no-git",
+          "--strict",
           "--json",
         ],
         cwd: fixture.temporary,
       }),
     );
-    assert.equal(exit._tag, "Failure", "Uncertified tuple unexpectedly succeeded");
+    assert.equal(exit._tag, "Failure", "Strict creation of an untested combination succeeded");
     if (exit._tag !== "Failure") continue;
     const reason = exit.cause.reasons[0];
     if (
@@ -97,7 +100,47 @@ const rejectedTuples = Effect.fn("PackedScaffold.rejections")(function* (
       !(reason.error instanceof ScaffoldProcessFailure)
     )
       return yield* Effect.failCause(exit.cause);
-    assert.match(reason.error.message, /not certified/);
+    assert.match(reason.error.message, /RELKIT_CREATE_UNTESTED/);
+    const missing = yield* Effect.exit(
+      scaffoldNative("create.refused-destination", () =>
+        realpath(join(fixture.temporary, "rejected-" + index)),
+      ),
+    );
+    assert.equal(missing._tag, "Failure", "Strict refusal created its destination");
+  }
+});
+
+/**
+ * Creates every offered template through the packed executable without installing it.
+ * @param run - Captured finite command authority.
+ * @param fixture - Exact packed public CLI.
+ * @returns Completion after each template's destination is published.
+ */
+const everyTemplate = Effect.fn("PackedScaffold.everyTemplate")(function* (
+  run: PackedCommand,
+  fixture: PackedScaffoldFixture,
+) {
+  for (const template of packedTemplates) {
+    const directory = "every-" + template;
+    const text = yield* run({
+      args: [
+        fixture.createBin,
+        directory,
+        "--template",
+        template,
+        "--no-install",
+        "--no-git",
+        "--json",
+      ],
+      cwd: fixture.temporary,
+    });
+    const output = text.trim().split(/\r?\n/).at(-1);
+    assert.ok(output);
+    const result = Schema.decodeUnknownSync(Schema.fromJsonString(PackedCreation))(output);
+    const expected = yield* scaffoldNative("create.template-destination", () =>
+      realpath(join(fixture.temporary, directory)),
+    );
+    assert.equal(result.destination, expected);
   }
 });
 
@@ -111,7 +154,8 @@ export const createPackedScaffolds = Effect.fn("PackedScaffold.consumers")(funct
   run: PackedCommand,
   fixture: PackedScaffoldFixture,
 ) {
-  yield* rejectedTuples(run, fixture);
+  yield* strictRefusals(run, fixture);
+  yield* everyTemplate(run, fixture);
   const direct = yield* create(run, fixture, "tarball", true);
   const cli = yield* create(run, fixture, "cli", true);
   assert.deepEqual(yield* authoredProjectSnapshot(direct), yield* authoredProjectSnapshot(cli));

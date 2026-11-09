@@ -1,6 +1,6 @@
 /** Owns the production probe function, immutable task descriptor and durable job binding. */
-import { defineService } from "@relkit/app/services";
-import { defineJob } from "@relkit/app/jobs";
+import { defineService } from "relkit/services";
+import { defineJob } from "relkit/jobs";
 import task from "./tasks/double.task.js";
 import submit from "./functions/submit.function.js";
 

@@ -1,10 +1,10 @@
-# Testing a RELKIT application
+# Testing a RelKit application
 
 Generated projects use Bun's test runner and `@relkit/testing`. Start with the existing `tests/unit` and `tests/integration` examples, then test the boundary that owns the behavior. Keep external providers and test state explicit; `RELKIT_ENV=test` alone does not select fakes.
 
 ## Direct function tests
 
-`invokeFunction` runs a function descriptor through RELKIT's input/output validation and handler path without an HTTP server. Import a service's public function through its `service.ts` when testing the public member:
+`invokeFunction` runs a function descriptor through RelKit's input/output validation and handler path without an HTTP server. Import a service's public function through its `service.ts` when testing the public member:
 
 ```ts
 import { expect, test } from "bun:test";
@@ -49,11 +49,11 @@ Use `app.http.request`, `get`, or other client methods to assert status, body, a
 
 ## Provider and feature tests
 
-- `createTestCacheFake`, `createTestBucketFake`, `createTestJobFake`, and `createTestEventFake` provide owned, inspectable test dependencies. `createTestFakes` groups native clients. Close any separately created fake after use. Replace every configured provider profile the graph needs, not only the one under direct assertion.
+- `createTestCacheFake`, `createTestBucketFake`, and `createTestEventFake` provide owned, inspectable test dependencies. `createTestFakes` groups native clients. Close any separately created fake after use. Replace every configured provider profile the graph needs, not only the one under direct assertion.
 - `createTestHttpClient` exercises a standalone in-memory HTTP application. Use `createTestApplication` when route discovery and service wiring matter. `createTestRealtimeProvider` and `createTestAgentStateProvider` supply local stateful provider replacements.
 - Import `createTestModel`, `createTestAgent`, and `assertAgentTrace` from `@relkit/langchain/testing` for deterministic native agent execution. Use scripted responses and inspect tool calls or traces instead of live model calls or sleeps.
 - For jobs, assert behavior beyond the descriptor shape: input/output, accepted run handle, progress, retry or cancellation policy, and idempotency where applicable. Use the test job adapter or fake appropriate to the contract.
-- Import `createTestApplication` from `@relkit/testing/drizzle` for database services, or `@relkit/testing/better-auth` for auth with its borrowed database. The generic root does not acquire native auth/database dependencies. For database and auth integration, migrate an isolated temporary database before starting the application. Supply both parsed RELKIT environment and any native auth process environment required by the provider; close the app before removing test-owned files. Test public and protected requests with real cookies and separate users. A direct function mock does not verify migrations, sessions, or route protection.
+- Import `createTestApplication` from `@relkit/testing/drizzle` for database services, or `@relkit/testing/better-auth` for auth with its borrowed database. The generic root does not acquire native auth/database dependencies. For database and auth integration, migrate an isolated temporary database before starting the application. Supply both parsed RelKit environment and any native auth process environment required by the provider; close the app before removing test-owned files. Test public and protected requests with real cookies and separate users. A direct function mock does not verify migrations, sessions, or route protection.
 - For realtime, streaming, and observability, test the exposed route or channel contract and recorded events/spans as applicable. Use a running backend for actual transport, connection, and browser behavior.
 
 ## Run the generated project checks

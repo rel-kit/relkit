@@ -1,6 +1,6 @@
 /** Selects the structural JSON-schema subset that can use provider enforcement without making optional fields required. */
-import type { JsonSchema } from "@relkit/schema";
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonSchema } from "relkit/schema";
+import type { JsonValue } from "relkit/contracts";
 
 const keywords = new Set([
   "type",

@@ -1,5 +1,5 @@
 import type { Clock, Effect } from "effect";
-import type { InvocationRunner } from "@relkit/runtime-effect";
+import type { InvocationRunner } from "relkit/runtime-effect";
 import type { TestClock } from "./runtime.js";
 
 /** Owned deterministic deadline and its native completion callback. */

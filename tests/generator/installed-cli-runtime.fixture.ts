@@ -64,7 +64,7 @@ async function expectDevelopmentSurfaces(
   expect(document.paths).toHaveProperty("/hello");
   const reference = await fetch(`http://127.0.0.1:${port}/_relkit/v1/api-reference`);
   expect(reference.status).toBe(200);
-  expect(await reference.text()).toContain("RELKIT API Reference");
+  expect(await reference.text()).toContain("RelKit API Reference");
   await expect(
     fetch(`http://127.0.0.1:${inspectorPort}`, {
       signal: AbortSignal.timeout(250),

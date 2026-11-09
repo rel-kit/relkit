@@ -1,5 +1,5 @@
 import { strict as assert } from "node:assert";
-import type { RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunSnapshot, RunWatchFrame } from "relkit/contracts/jobs";
 import { watchJobRun } from "@relkit/client/jobs";
 import { measure } from "./performance-support.js";
 import type { WatchMeasurement, WatchResourceCounts } from "./performance-core-consumers.types.js";

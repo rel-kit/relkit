@@ -1,7 +1,7 @@
 {
   "name": "relkit",
   "version": "0.8.8",
-  "description": "The RELKIT CLI for bunx relkit and global installation.",
+  "description": "The TypeScript backend framework where you write the business logic. RelKit wires the APIs, jobs, events, agents and typed client, and gives you, and your coding agent, a live map of the app.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -19,24 +19,431 @@
     "access": "public"
   },
   "engines": {
-    "bun": ">=1.3.10"
+    "bun": ">=1.3.10",
+    "node": ">=22.13.0"
   },
   "type": "module",
   "bin": {
-    "relkit": "./dist/bin.js"
+    "relkit": "./dist/launcher/bin.js"
   },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./agent-adapters": {
+      "types": "./dist/agent-adapters/index.d.ts",
+      "import": "./dist/agent-adapters/index.js"
+    },
+    "./agents": {
+      "types": "./dist/app/agents.d.ts",
+      "import": "./dist/app/agents.js"
+    },
+    "./agents/client-events": {
+      "types": "./dist/agents/client-events.d.ts",
+      "import": "./dist/agents/client-events.js"
+    },
+    "./agents/agent-client": {
+      "types": "./dist/agents/agent-client.d.ts",
+      "import": "./dist/agents/agent-client.js"
+    },
+    "./agents/agent-telemetry": {
+      "types": "./dist/agents/agent-telemetry.d.ts",
+      "import": "./dist/agents/agent-telemetry.js"
+    },
+    "./agents/agent-validation": {
+      "types": "./dist/agents/agent-validation.d.ts",
+      "import": "./dist/agents/agent-validation.js"
+    },
+    "./agents/agent-validation-schema": {
+      "types": "./dist/agents/agent-validation-schema.d.ts",
+      "import": "./dist/agents/agent-validation-schema.js"
+    },
+    "./agents/agent-validation-value": {
+      "types": "./dist/agents/agent-validation-value.d.ts",
+      "import": "./dist/agents/agent-validation-value.js"
+    },
+    "./agents/approval": {
+      "types": "./dist/agents/approval.d.ts",
+      "import": "./dist/agents/approval.js"
+    },
+    "./agents/capture": {
+      "types": "./dist/agents/capture.d.ts",
+      "import": "./dist/agents/capture.js"
+    },
+    "./agents/capture-policy": {
+      "types": "./dist/agents/capture-policy.d.ts",
+      "import": "./dist/agents/capture-policy.js"
+    },
+    "./agents/client-contract-schema.types": {
+      "types": "./dist/agents/client-contract-schema.types.d.ts",
+      "import": "./dist/agents/client-contract-schema.types.js"
+    },
+    "./agents/define-agent-error": {
+      "types": "./dist/agents/define-agent-error.d.ts",
+      "import": "./dist/agents/define-agent-error.js"
+    },
+    "./agents/define-agent-limits": {
+      "types": "./dist/agents/define-agent-limits.d.ts",
+      "import": "./dist/agents/define-agent-limits.js"
+    },
+    "./agents/define-agent-support": {
+      "types": "./dist/agents/define-agent-support.d.ts",
+      "import": "./dist/agents/define-agent-support.js"
+    },
+    "./agents/generated-function": {
+      "types": "./dist/agents/generated-function.d.ts",
+      "import": "./dist/agents/generated-function.js"
+    },
+    "./agents/model-selection": {
+      "types": "./dist/agents/model-selection.d.ts",
+      "import": "./dist/agents/model-selection.js"
+    },
+    "./agents/observability": {
+      "types": "./dist/agents/observability.d.ts",
+      "import": "./dist/agents/observability.js"
+    },
+    "./agents/runtime-events": {
+      "types": "./dist/agents/runtime-events.d.ts",
+      "import": "./dist/agents/runtime-events.js"
+    },
+    "./agents/state-control-requests.types": {
+      "types": "./dist/agents/state-control-requests.types.d.ts",
+      "import": "./dist/agents/state-control-requests.types.js"
+    },
+    "./agents/state-provider.types": {
+      "types": "./dist/agents/state-provider.types.d.ts",
+      "import": "./dist/agents/state-provider.types.js"
+    },
+    "./agents/state-receipts.types": {
+      "types": "./dist/agents/state-receipts.types.d.ts",
+      "import": "./dist/agents/state-receipts.types.js"
+    },
+    "./agents/state-thread-requests.types": {
+      "types": "./dist/agents/state-thread-requests.types.d.ts",
+      "import": "./dist/agents/state-thread-requests.types.js"
+    },
+    "./agents/state.types": {
+      "types": "./dist/agents/state.types.d.ts",
+      "import": "./dist/agents/state.types.js"
+    },
+    "./agents/thread-transition": {
+      "types": "./dist/agents/thread-transition.d.ts",
+      "import": "./dist/agents/thread-transition.js"
+    },
+    "./app": {
+      "types": "./dist/app/index.d.ts",
+      "import": "./dist/app/index.js"
+    },
+    "./buckets": {
+      "types": "./dist/app/buckets.d.ts",
+      "import": "./dist/app/buckets.js"
+    },
+    "./cache": {
+      "types": "./dist/app/cache.d.ts",
+      "import": "./dist/app/cache.js"
+    },
+    "./config": {
+      "types": "./dist/app/config.d.ts",
+      "import": "./dist/app/config.js"
+    },
+    "./config/resolution": {
+      "types": "./dist/config/resolution.d.ts",
+      "import": "./dist/config/resolution.js"
+    },
+    "./contracts": {
+      "types": "./dist/contracts/index.d.ts",
+      "import": "./dist/contracts/index.js"
+    },
+    "./contracts/jobs": {
+      "types": "./dist/contracts/jobs.d.ts",
+      "import": "./dist/contracts/jobs.js"
+    },
+    "./contracts/operation": {
+      "types": "./dist/contracts/operation.d.ts",
+      "import": "./dist/contracts/operation.js"
+    },
+    "./deploy": {
+      "types": "./dist/deploy/index.d.ts",
+      "import": "./dist/deploy/index.js"
+    },
+    "./diagnostics": {
+      "types": "./dist/diagnostics/index.d.ts",
+      "import": "./dist/diagnostics/index.js"
+    },
+    "./diagnostics/codes": {
+      "types": "./dist/diagnostics/codes/index.d.ts",
+      "import": "./dist/diagnostics/codes/index.js"
+    },
+    "./engine": {
+      "types": "./dist/engine/index.d.ts",
+      "import": "./dist/engine/index.js"
+    },
+    "./engine/server-runtime": {
+      "types": "./dist/engine/server-runtime.d.ts",
+      "import": "./dist/engine/server-runtime.js"
+    },
+    "./effect": {
+      "types": "./dist/app/effect.d.ts",
+      "import": "./dist/app/effect.js"
+    },
+    "./events": {
+      "types": "./dist/app/events.d.ts",
+      "import": "./dist/app/events.js"
+    },
+    "./events/effect": {
+      "types": "./dist/events/effect.d.ts",
+      "import": "./dist/events/effect.js"
+    },
+    "./functions": {
+      "types": "./dist/app/functions.d.ts",
+      "import": "./dist/app/functions.js"
+    },
+    "./functions/descriptor-factory": {
+      "types": "./dist/functions/descriptor-factory.d.ts",
+      "import": "./dist/functions/descriptor-factory.js"
+    },
+    "./graph": {
+      "types": "./dist/graph/index.d.ts",
+      "import": "./dist/graph/index.js"
+    },
+    "./inspector-api": {
+      "types": "./dist/inspector-api/index.d.ts",
+      "import": "./dist/inspector-api/index.js"
+    },
+    "./inspector-api/connection": {
+      "types": "./dist/inspector-api/connection.d.ts",
+      "import": "./dist/inspector-api/connection.js"
+    },
+    "./host": {
+      "types": "./dist/app/host.d.ts",
+      "import": "./dist/app/host.js"
+    },
+    "./invocation": {
+      "types": "./dist/invocation/index.d.ts",
+      "import": "./dist/invocation/index.js"
+    },
+    "./jobs": {
+      "types": "./dist/app/jobs.d.ts",
+      "import": "./dist/app/jobs.js"
+    },
+    "./jobs/adapter": {
+      "types": "./dist/jobs/adapter.d.ts",
+      "import": "./dist/jobs/adapter.js"
+    },
+    "./jobs/server": {
+      "types": "./dist/jobs/server.d.ts",
+      "import": "./dist/jobs/server.js"
+    },
+    "./local-service": {
+      "types": "./dist/local-service/index.d.ts",
+      "import": "./dist/local-service/index.js"
+    },
+    "./observability": {
+      "types": "./dist/observability/index.d.ts",
+      "import": "./dist/observability/index.js"
+    },
+    "./observability/early": {
+      "types": "./dist/observability/early-records.service.d.ts",
+      "import": "./dist/observability/early-records.service.js"
+    },
+    "./observability/query": {
+      "types": "./dist/observability/query-validation.d.ts",
+      "import": "./dist/observability/query-validation.js"
+    },
+    "./observability/local": {
+      "types": "./dist/observability/local/index.d.ts",
+      "import": "./dist/observability/local/index.js"
+    },
+    "./observability/local/protocol": {
+      "types": "./dist/observability/local/protocol.d.ts",
+      "import": "./dist/observability/local/protocol.js"
+    },
+    "./observability/local/queue": {
+      "types": "./dist/observability/local/batch-queue-effect.d.ts",
+      "import": "./dist/observability/local/batch-queue-effect.js"
+    },
+    "./observability/local/record": {
+      "types": "./dist/observability/local/types.d.ts",
+      "import": "./dist/observability/local/types.js"
+    },
+    "./observability/local/worker-contract": {
+      "types": "./dist/observability/local/worker-contract.d.ts",
+      "import": "./dist/observability/local/worker-contract.js"
+    },
+    "./observability/telemetry": {
+      "types": "./dist/observability/telemetry.d.ts",
+      "import": "./dist/observability/telemetry.js"
+    },
+    "./openapi": {
+      "types": "./dist/openapi/index.d.ts",
+      "import": "./dist/openapi/index.js"
+    },
+    "./provider": {
+      "types": "./dist/provider/index.d.ts",
+      "import": "./dist/provider/index.js"
+    },
+    "./provider/dependencies": {
+      "types": "./dist/provider/dependency-preflight.service.d.ts",
+      "import": "./dist/provider/dependency-preflight.service.js"
+    },
+    "./providers-local": {
+      "types": "./dist/providers-local/index.d.ts",
+      "import": "./dist/providers-local/index.js"
+    },
+    "./realtime": {
+      "types": "./dist/app/realtime.d.ts",
+      "import": "./dist/app/realtime.js"
+    },
+    "./realtime/operation-id": {
+      "types": "./dist/realtime/operation-id.d.ts",
+      "import": "./dist/realtime/operation-id.js"
+    },
+    "./routes": {
+      "types": "./dist/app/routes.d.ts",
+      "import": "./dist/app/routes.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime/index.d.ts",
+      "import": "./dist/runtime/index.js"
+    },
+    "./runtime/bun": {
+      "types": "./dist/runtime/bun/index.d.ts",
+      "import": "./dist/runtime/bun/index.js"
+    },
+    "./runtime/node": {
+      "types": "./dist/runtime/node/index.d.ts",
+      "import": "./dist/runtime/node/index.js"
+    },
+    "./runtime/workers": {
+      "types": "./dist/runtime/workers/index.d.ts",
+      "import": "./dist/runtime/workers/index.js"
+    },
+    "./runtime-effect": {
+      "types": "./dist/runtime-effect/index.d.ts",
+      "import": "./dist/runtime-effect/index.js"
+    },
+    "./runtime-effect/logger": {
+      "types": "./dist/runtime-effect/logger.d.ts",
+      "import": "./dist/runtime-effect/logger.js"
+    },
+    "./runtime-hono": {
+      "types": "./dist/runtime-hono/index.d.ts",
+      "import": "./dist/runtime-hono/index.js"
+    },
+    "./runtime-hono/ag-ui": {
+      "types": "./dist/runtime-hono/agent-protocol.d.ts",
+      "import": "./dist/runtime-hono/agent-protocol.js"
+    },
+    "./runtime-hono/prepared": {
+      "types": "./dist/runtime-hono/prepared-app.d.ts",
+      "import": "./dist/runtime-hono/prepared-app.js"
+    },
+    "./runtime-hono/mcp": {
+      "types": "./dist/runtime-hono/mcp.d.ts",
+      "import": "./dist/runtime-hono/mcp.js"
+    },
+    "./runtime-hono/scalar": {
+      "types": "./dist/runtime-hono/scalar.d.ts",
+      "import": "./dist/runtime-hono/scalar.js"
+    },
+    "./schema": {
+      "types": "./dist/app/schema.d.ts",
+      "import": "./dist/app/schema.js"
+    },
+    "./services": {
+      "types": "./dist/app/services.d.ts",
+      "import": "./dist/app/services.js"
+    },
+    "./tasks": {
+      "types": "./dist/app/tasks.d.ts",
+      "import": "./dist/app/tasks.js"
+    },
+    "./tools": {
+      "types": "./dist/app/tools.d.ts",
+      "import": "./dist/app/tools.js"
     }
   },
   "dependencies": {
-    "create-relkit": "workspace:*"
+    "@effect/platform-bun": "catalog:",
+    "@effect/platform-node-shared": "catalog:",
+    "@hono/node-server": "2.1.5",
+    "@opentelemetry/api": "1.9.1",
+    "@orpc/contract": "catalog:",
+    "@orpc/server": "1.16.1",
+    "cron-parser": "5.10.1",
+    "effect": "catalog:",
+    "hono": "catalog:",
+    "hono-rate-limiter": "0.5.4",
+    "semver": "7.8.5",
+    "ws": "8.22.0"
   },
   "scripts": {
     "build": "tsc -b",
     "check": "tsc -b --pretty false",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "tsc -b --pretty false && tsc -p tsconfig.tests.json --pretty false",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "relkit": {
+    "maturity": "core",
+    "labs": [
+      "agent-adapters",
+      "realtime"
+    ]
+  },
+  "peerDependencies": {
+    "@ag-ui/core": "0.0.59",
+    "@modelcontextprotocol/server": "2.3.0",
+    "@relkit/langchain": "workspace:*",
+    "@scalar/hono-api-reference": "0.12.9",
+    "@valibot/to-json-schema": ">=1.3.0 <2",
+    "arktype": ">=2.1.0 <3",
+    "valibot": ">=1.0.0 <2",
+    "zod": ">=4.2.0 <5"
+  },
+  "devDependencies": {
+    "@effect/vitest": "catalog:",
+    "@langchain/core": "catalog:",
+    "@langchain/langgraph": "catalog:",
+    "@langchain/langgraph-checkpoint-mongodb": "1.4.1",
+    "@langchain/langgraph-checkpoint-postgres": "1.0.5",
+    "@langchain/langgraph-checkpoint-redis": "1.0.11",
+    "@langchain/langgraph-checkpoint-sqlite": "1.0.4",
+    "@modelcontextprotocol/client": "2.3.0",
+    "@orpc/client": "catalog:",
+    "@types/semver": "7.8.0",
+    "@types/ws": "8.18.1",
+    "@vitest/coverage-v8": "catalog:",
+    "deepagents": "catalog:",
+    "langchain": "catalog:",
+    "relkit-typescript": "workspace:*",
+    "typescript": "catalog:workspace",
+    "vitest": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "@valibot/to-json-schema": {
+      "optional": true
+    },
+    "arktype": {
+      "optional": true
+    },
+    "valibot": {
+      "optional": true
+    },
+    "zod": {
+      "optional": true
+    },
+    "@relkit/langchain": {
+      "optional": true
+    },
+    "@ag-ui/core": {
+      "optional": true
+    },
+    "@modelcontextprotocol/server": {
+      "optional": true
+    },
+    "@scalar/hono-api-reference": {
+      "optional": true
+    }
   }
 }

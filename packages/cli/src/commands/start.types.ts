@@ -1,3 +1,4 @@
+import type { RuntimeProcesses, RuntimeSubprocess } from "relkit/runtime";
 import type { Effect, Scope } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";
 
@@ -12,7 +13,7 @@ export interface StartOptions {
   readonly environment?: Readonly<Record<string, string | undefined>>;
   readonly signal?: AbortSignal;
   readonly fetch?: typeof fetch;
-  readonly spawn?: typeof Bun.spawn;
+  readonly spawn?: RuntimeProcesses["spawn"];
 }
 
 /** Caller-owned production handle; stop settles process and response drains exactly once. */
@@ -21,7 +22,7 @@ export interface StartedProject {
   readonly buildDirectory: string;
   readonly hostname: string;
   readonly port: number;
-  readonly process: Bun.ReadableSubprocess;
+  readonly process: RuntimeSubprocess;
   readonly exited: Promise<number>;
   readonly stop: () => Promise<void>;
 }
@@ -64,7 +65,7 @@ export interface StartProcessOperations {
    */
   readonly spawn: (request: StartProcessRequest) => Effect.Effect<
     {
-      readonly child: Bun.ReadableSubprocess;
+      readonly child: RuntimeSubprocess;
       readonly stop: Effect.Effect<void, CliAdapterError>;
     },
     CliAdapterError,

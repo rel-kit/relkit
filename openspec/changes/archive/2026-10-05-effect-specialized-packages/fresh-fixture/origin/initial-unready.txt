@@ -5,6 +5,6 @@
 5 | const functionId = graph.graph.nodes.some((node) => node.id === "hello.greet")
                              ^
 TypeError: undefined is not an object (evaluating 'graph.graph.nodes')
-      at /Users/mustafaelsayed/Workspace/relkit-regression-demo/scripts/verify-dev-origin.mjs:5:26
+      at <home>/Workspace/relkit-regression-demo/scripts/verify-dev-origin.mjs:5:26
 
 Bun v1.3.10 (macOS arm64)

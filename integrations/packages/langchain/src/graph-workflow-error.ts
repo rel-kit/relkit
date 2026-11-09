@@ -1,4 +1,4 @@
-/** Defines graph workflow failures at the RELKIT execution boundary, preserving graph identity and the native failure cause. */
+/** Defines graph workflow failures at the RelKit execution boundary, preserving graph identity and the native failure cause. */
 
 import { Schema } from "effect";
 

@@ -1,4 +1,4 @@
-import { defineFunction } from "@relkit/app";
+import { defineFunction } from "relkit";
 import prices from "../cache/prices.cache.js";
 import { orderInput, orderOutput } from "../../platform/schemas.js";
 

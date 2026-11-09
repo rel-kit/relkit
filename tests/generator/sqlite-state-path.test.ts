@@ -26,7 +26,7 @@ test("generated SQLite activation creates missing parent directories lazily", as
     `
     import assert from "node:assert/strict";
     import database from "./src/services/database/service.ts";
-    import { drizzleRuntimeOf } from "@relkit/drizzle/internal";
+    import { drizzleRuntimeOf } from "@relkit/drizzle/server";
     assert.equal(await Bun.file(${JSON.stringify(path)}).exists(), false, "discovery must not acquire a database");
     const runtime = drizzleRuntimeOf(database);
     for (const env of [{}, {DATABASE_PATH: ""}]) {

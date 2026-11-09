@@ -4,282 +4,313 @@
 
 ## 0.7.20
 
-### Changes
+### Fixed
 
-- Two Inspectors connected to the same `relkit dev` session no longer lose each other's records. Each Inspector now identifies itself when it collects, and the session only discards records that every Inspector still collecting has saved; an Inspector that stops collecting for 30 seconds no longer holds records back. Previously, whichever Inspector confirmed a batch first discarded it for both, so the other one's request, trace and log history silently missed requests. When an Inspector does miss records, it now saves an "Inspection is incomplete" diagnostic naming the skipped range instead of losing them silently. The early-retention status also reports the latest admitted `sequence`.
-- Requests sent from the Inspector's API reference now reach origin-checked endpoints such as Better Auth sign-in and sign-up. The Inspector UI strips the browser's `Origin` before forwarding, and Better Auth answered `403 MISSING_OR_NULL_ORIGIN` because Node's `fetch` adds `sec-fetch-mode`, which makes Better Auth require an origin. `relkit dev` now addresses every token-authenticated Inspector request to the application's public listener with a matching `Origin`, so it is handled like a call from the application's own page. When the app's `BETTER_AUTH_URL` is a loopback URL, its origin is sent instead, so it matches Better Auth's trusted origin: for example `http://localhost:3000` rather than `http://127.0.0.1:3000`, or a frontend served on another port. Cross-origin browser requests to the Inspector are still rejected, and the bridge still requires its session token.
-- The API reference now documents every Better Auth query parameter. Better Auth's generator only reads a plain object query schema and never marks a field required, so endpoints such as `GET /account-info` (a union of `accountId` or `useAccountCookie`), `GET /get-session`, `POST /reset-password`, the OAuth callback and several organization, admin and magic-link endpoints showed no query fields, and Scalar sent requests that failed with `[query] Invalid input`. Query parameters are now derived from each endpoint's own schema, required fields are marked, and union endpoints describe their alternatives. Parameters an endpoint authors explicitly are kept.
+- Two Inspectors connected to the same `relkit dev` session no longer lose each other's request, trace and log records. When an Inspector does miss records, it saves an "Inspection is incomplete" diagnostic naming the skipped range.
+- Requests sent from the Inspector's API reference now reach origin-checked endpoints such as Better Auth sign-in and sign-up instead of failing with `403 MISSING_OR_NULL_ORIGIN`.
+- The API reference now lists every Better Auth query parameter, marks required ones and describes union alternatives, so requests to endpoints such as `GET /account-info` no longer fail with `[query] Invalid input`.
 - Refresh bundled dependency versions.
-- The Inspector no longer answers `503 remote.error-invalid` when the application returns an error or redirect with a JSON content type and an empty body. Better Auth does this for redirects such as `GET /api/auth/callback/{id}` and `GET /api/auth/reset-password/{token}`, and for disabled routes such as `POST /api/auth/delete-user`. These responses now reach the API reference with their own status and headers.
-- A request body that cannot be read, such as malformed JSON, the wrong content type or a body over the size limit, is now reported as one validation issue for the whole body (`path: []`) instead of the same issue repeated once for every body field.
-- A value rejected by a union of literals, such as an enum built from `z.union([z.literal("a"), z.literal("b")])`, now reports the accepted values, for example `Expected one of: "a", "b"`, instead of `Value did not match any union member`.
-- Better Auth validation errors now say which fields are wrong. Better Auth reports only each issue's top-level message, so a request that matched none of an endpoint's accepted query shapes answered `[query] Invalid input`. When Better Auth answers `400 VALIDATION_ERROR`, RELKIT re-runs that endpoint's own schema on the same input and returns a message that names each missing or invalid field, for example `[query] Must match one of 2 shapes: (accountId: required, expected string) or (useAccountCookie: required, expected true)`, plus an `issues` list with each field's path. A field that belongs to a different accepted shape is named, for example `[query.useAccountCookie] Cannot be combined with the other fields sent; send one of: accountId, userId? | useAccountCookie, userId?`. A value of the wrong type shows what was received, such as `expected true, received the text "true"`. The `code` and status are unchanged, and any other response is returned as is.
-- Declared errors and validation failures no longer turn into `500 internal-error` when two copies of `@relkit/invocation` are loaded. This happened in `relkit dev` whenever Scalar, MCP or AG-UI was enabled, because the generated server bundles the framework while `@relkit/runtime-hono` loads its own copy from `node_modules`. A function's `fail(Unauthenticated)` therefore answered 500 instead of 401, and invalid query input answered 500 instead of 422. `RuntimeFailure`, `InvocationValidationError`, `RecursionPolicyError` and `DescriptorIdentityError` are now recognized across package copies, and the private failure cause store and descriptor identity registry are shared between copies. In development, a `500 internal-error` response now includes the redacted cause message, the same way provider failures already do.
-- Request records and traces for raw routes, such as a Better Auth handler or a `/health` route defined with only a `handler`, now carry the route's ID instead of `unknown`, so the Inspector can group and filter them like other routes.
-- Requests that return a 4xx response without throwing are no longer recorded as successful. Raw routes such as Better Auth, unknown-route 404s and middleware rejections returned their error response directly, so traces and request records showed `success` next to `HTTP 400`. A response that is still `success` when it finishes is now classified by its status: 400 and 422 as `validation-error`, other 4xx as `declared-error`, and 5xx as `defect` as before. Failures already recorded from a thrown error keep their outcome.
-- Requests that match no route now receive JSON like other framework errors: `404 {"error":"not-found"}` instead of the plain-text `404 Not Found`. When the path exists under other methods, the response is `405 {"error":"method-not-allowed"}` with an `Allow` header listing them.
-- The Inspector's API reference keeps working after the app reloads. It used to pin the generation it was opened with, so after any source edit every POST, PUT, PATCH or DELETE it sent failed with `409 generation.stale` until the page was reloaded by hand. Before each request it now reads the app's current generation with a lightweight `HEAD` request and sends against the current code. When the generation changed, the reference document is downloaded once and shown after that request's response arrives.
+- The Inspector no longer answers `503 remote.error-invalid` when the application returns an error or redirect with a JSON content type and an empty body. The API reference shows the response's own status and headers.
+- A request body that cannot be read, such as malformed JSON, the wrong content type or a body over the size limit, is reported as one validation issue for the whole body (`path: []`) instead of one per body field.
+- A value rejected by a union of literals now reports the accepted values, for example `Expected one of: "a", "b"`, instead of `Value did not match any union member`.
+- Better Auth `400 VALIDATION_ERROR` responses now name each missing or invalid field and include an `issues` list with each field's path. The `code` and status are unchanged.
+- Declared errors and validation failures in `relkit dev` no longer turn into `500 internal-error` when Scalar, MCP or AG-UI is enabled. In development, a `500 internal-error` response now includes the redacted cause message.
+- Request records and traces for raw routes, such as a Better Auth handler or a `/health` route defined with only a `handler`, now carry the route's ID instead of `unknown`.
+- Requests that return a 4xx response without throwing are no longer recorded as successful in traces and request records.
+- Requests that match no route now receive `404 {"error":"not-found"}` instead of plain text, or `405 {"error":"method-not-allowed"}` with an `Allow` header when the path exists under other methods.
+- The Inspector's API reference keeps working after the app reloads instead of failing with `409 generation.stale` until the page is reloaded.
 
 ## 0.7.19
 
-### Changes
+### New
 
-- Stopping the inspector no longer hangs when a browser is attached. Bun can leave a forced listener stop unconfirmed when a peer was killed mid-stream (the UI holding a browser's live feed), and the inspector waited on it forever, leaving the process running after Ctrl+C, `kill` or a closed terminal. Listener retirement now waits at most two seconds for that confirmation, logs a warning, and finishes shutting down.
+- The Inspector UI is redesigned as a dense, dark-first developer tool with a light theme option, a ⌘K command palette, compact list and detail pages, and a full trace view with a span waterfall and step details.
+
+### Fixed
+
+- Stopping the Inspector no longer hangs when a browser is attached.
 - Refresh bundled dependency versions.
-- Redesign the Inspector UI as a dense, dark-first developer tool. Dark is the default theme (light is still one click away and remembered), with Geist Sans/Mono, OKLCH design tokens and no theme flash on load. The shell gains per-page entity counts in the sidebar, a compact generation pill, and a command palette (⌘K) that searches routes, functions, jobs, events, agents and tools as well as pages. Every list page uses a one-line filter bar and a compact table; every detail page shares one layout with an identity header, copyable ids and a contract rail. Logs, requests and trace lists follow Neon UI's logs viewer and query-history patterns (level chips, ANSI colours, duration bars). Traces open as a full view: a summary of the request, its lifecycle phases in time order, a tree waterfall on the trace's own clock (nested spans as bars, events as points, collapsible parents, arrow-key navigation) and the selected step's timing, input, output, error, events and attributes always visible beside it; domains, environment and bucket/cache browsers become searchable trees, and the overview becomes a dashboard of health, counts, recent requests and generation history. Components adapted from Neon UI and dashboardblocks are MIT-licensed; their notices ship in `THIRD_PARTY_NOTICES.txt`.
-- The Jobs pages no longer report "The jobs API is unavailable" for applications that define no jobs. Jobs routes are mounted only when an application declares jobs, so the inspector now shows "This application defines no jobs." on Definitions, Runs, Schedules and Services. A plain-text error reply keeps its HTTP status instead of being treated as invalid JSON, which also stops the burst of retried 404 requests.
-- Recover from a stale inspector that is still running. The inspector now checks that its UI port is free before starting the UI, and fails with a clear "port is already in use" message that names the address, instead of reporting "listening" while another server answers on that port. When project history is locked by another process, a warning names the lock holder's PID and suggests `--history-directory`. After three quick attempts the inspector keeps retrying every 30 seconds, so history resumes without a restart once the other process exits. Closing the terminal (SIGHUP) now shuts the inspector down like Ctrl+C, so its UI and history worker no longer outlive it.
-- feat(inspector): dark-first UI redesign, clearer traces, and shutdown fixes
+- The Jobs pages show "This application defines no jobs." instead of "The jobs API is unavailable" for applications without jobs.
+- The Inspector fails with a "port is already in use" message when its UI port is taken, and shuts down when the terminal closes. When another process holds project history, it names that process, suggests `--history-directory` and keeps retrying.
 
 ## 0.7.18
 
-### Changes
+### Fixed
 
-- Fix four inspector terminal problems. The editor plugin keeps its forwarded language-service methods enumerable, so editor plugins chained after it that copy the service with object spread no longer crash tsserver (#160). `relkit inspector` no longer starts a spinner, so Ctrl+C exits 130 and stops the inspector instead of leaving it running in the background (#162). Successful UI polling is no longer logged at INFO (#163). Failure logs from observed operations name their cause (error tag, operation label, native code, HTTP status) without native messages, and the history worker survives a process-group SIGTERM until the inspector flushes and closes it (#164).
+- The RelKit editor plugin no longer crashes tsserver when a plugin chained after it copies the language service.
+- Ctrl+C stops `relkit inspector` and exits with code 130 instead of leaving it running in the background.
+- Successful Inspector UI polling is no longer logged at INFO.
+- Inspector failure logs name their cause, and a process-group SIGTERM no longer stops the history worker before the Inspector saves its history.
 
 ## 0.7.17
 
-### Changes
+### New
+
+- The Inspector's application graph is a hierarchical explorer with overview, domain and request flow views. Agent graphs move under a new AI sidebar group.
+
+### Fixed
 
 - Refresh bundled dependency versions.
-- Redesign the Inspector application graph as a hierarchical explorer. The default view shows route groups, domains, events and channels with auth and the database in a side column; a domain view opens one domain's routes, functions and neighbours; a flow view follows a request from route through middleware, handler, calls, tables, events, listeners and realtime channels to its response. Routes behind middleware carry a lock with the ordered middleware names, selecting a card lights its full downstream path, and an icon bar shows only the selected kinds. Agent graphs move under a new AI sidebar group.
 
 ## 0.7.16
 
-### Changes
+### Fixed
 
 - Refresh bundled dependency versions.
-- Point the TSDoc `@see` links for `defineConstants`, `definePrompt`, `RelkitClientProvider` and `useRelkitClient` at the documentation on relkit.dev instead of the retired Railway host.
+- The TSDoc `@see` links for `defineConstants`, `definePrompt`, `RelkitClientProvider` and `useRelkitClient` point at relkit.dev instead of a retired host.
 
 ## 0.7.15
 
-### Changes
+### New
 
-- Add `relkit add inspector`, which enables `inspector.enabled`, installs `@relkit/inspector` as a project devDependency and adds an `inspector` script, and `relkit inspector [--port] [--hostname]`, which runs that project-local UI, so inspection no longer needs a global install. New applications select the Scalar API reference (`server.apiDocs.ui: "scalar"`), so `relkit dev` advertises it, and the create summary's backend link now points at a served endpoint instead of the unrouted root.
+- `relkit add inspector` sets up the Inspector as a project devDependency and `relkit inspector [--port] [--hostname]` runs it, so inspection no longer needs a global install.
+- New applications use the Scalar API reference (`server.apiDocs.ui: "scalar"`), and the create summary links to a served backend endpoint.
 
 ## 0.7.14
 
-### Changes
+### New
 
-- `relkit dev` now applies `inspector.enabled` and `inspector.connection` changes on reload. Enabling inspection starts the session bridge, telemetry capture and discovery descriptor once the rebuilt generation is serving, so an already-running standalone Inspector connects without restarting `relkit dev`; disabling it stops the bridge and closes the telemetry ingress once the previous generation has drained, and a connection change rebinds the bridge. Re-enabling keeps recording history under the same session, and a bridge that failed to start is retried on the next reload.
+- `relkit dev` applies `inspector.enabled` and `inspector.connection` changes on reload, so a running Inspector connects without restarting `relkit dev`.
+
+### Fixed
+
 - Refresh bundled dependency versions.
 
 ## 0.7.13
 
-### Changes
+### Fixed
 
-- chore(deps): bump the npm_and_yarn group across 5 directories with 3 updates
+- Refresh bundled dependency versions.
 
 ## 0.7.12
 
-### Changes
+### Breaking
 
-- Bootstrap release tooling in clean installations and validate versioning and packaging before merging. Normalize dependency security updates through their owning catalog and lockfile, with automatic Changesets prepared by trusted repository automation.
-- Fix/lean installation and standalone inspector
-- Keep ordinary backend, generic client and testing installations free of unselected native SDKs. Selected integrations declare optional peers and validate their actual installed versions before configuration evaluation, startup or deployment. Move native agent APIs and test helpers to `@relkit/langchain`, local diagnostic storage to `@relkit/observability-local`, and native auth/database testing to explicit testing leaves. Frontend clients and optional HTTP transports remain explicit selections. Runtime lifecycle belongs to the engine; production starts emitted JavaScript with an exact selected dependency manifest. The legacy CLI inspector remains a Stage 1 development dependency. The lightweight creator owns new project creation; existing project editing belongs to the CLI. The wrapper resolves compatible project-local tooling, and the catalog contains metadata only. Selected auth scaffolds preserve Better Auth 1.7.1 schema history and the existing Drizzle patch while carrying the official fetch typing fix. These packages retain independent versions. Existing package minor releases carry the intentional import and dependency-policy changes; the new native packages have their own initial release identities. No publication or version command is included.
-- Disable development inspection by default and move the UI, collector and diagnostic history into the separately installed `@relkit/inspector` tool. Enabled applications publish a private authenticated bridge that survives reloads; the CLI no longer installs or starts Next.js, React, DuckDB or a history worker. Production excludes rich inspection even when development inspection is enabled. Preserve project history with transactional replay receipts, bounded redacted capture and explicit incomplete states. Ship an independent non-root Docker build with directory credentials and persistent project-bound history. The tool keeps its own release identity; image and package publication require separate authorization.
+- Development inspection is off by default, and the Inspector UI, collector and history move to the separately installed `@relkit/inspector` package. [Migration](https://relkit.dev/docs/modules/operations/inspector)
+
+### New
+
+- Native agent APIs and test helpers ship in `@relkit/langchain`, local diagnostic storage in `@relkit/observability-local`, and native auth and database testing in separate testing entry points, so ordinary installations carry no native SDKs you did not select.
+- The Inspector has its own Docker build that runs as a non-root user and keeps project history between runs.
+
+### Fixed
+
+- Selected integrations check their installed peer versions before configuration, startup or deployment.
+- Production builds leave out rich inspection even when development inspection is enabled.
+- Auth scaffolds keep Better Auth 1.7.1 schema history and include the official fetch typing fix.
+- Versioning and packaging are checked before each merge, and dependency security updates go through each package's catalog and lockfile.
 
 ## 0.7.11
 
-### Changes
+### Fixed
 
-- Fix Inspector cold startup, failed reload visibility, and decoded runtime environment values.
+- Fix Inspector cold startup, failed reload visibility and decoded runtime environment values.
 
 ## 0.7.10
 
-### Changes
+### Fixed
 
-- Validate installed RELKIT packages against their own declared versions so doctor accepts independently versioned releases and still reports missing or incompatible installations. Use each optional scaffold dependency's own version rather than the generator version, and refresh the generator when any bundled scaffold dependency changes.
-- Resolve generated provider dependencies using each package's own release version.
+- `relkit doctor` accepts independently versioned RelKit packages and still reports missing or incompatible ones.
+- Scaffolds install each optional dependency at its own version instead of the generator's version.
+- Generated provider dependencies resolve to each package's own release version.
 
 ## 0.7.9
 
-### Changes
+### New
 
-- Guide cohesive domain services and add agent evaluations
+- The bundled application skills guide agents toward cohesive domain services.
 
 ## 0.7.8
 
-### Changes
+### New
 
-- feat: centralize database migrations and refine application guidance
+- Database migrations are centralized in the CLI, and the application guidance is refined.
 
 ## 0.7.7
 
-### Changes
+### New
 
-- Handle SIGHUP through invocation cancellation so prepared development joins its backend, inspector, and storage workers before exiting with status 129. Terminal hangup now retains shutdown diagnostics instead of leaving orphaned children.
-- Require complete packed creation functionality for release admission and report shared-host startup performance separately without discarding slow samples.
-- Generate a native Bun SQLite migration runner so database and auth apps can apply Drizzle migrations without selecting a Node-only driver. Include generated context declarations in every starter's TypeScript program so database and auth context types are available to application functions.
-- Refresh development candidate environments after dotenv edits and observe dotenv repairs in prepared sessions. Preserve the last valid server during failed reloads and remove deleted file-managed values from subsequent candidates. Forward resolved application environment values to HTTP function invocations. Keep manual source-watcher admission synchronous while retaining lazy watcher loading for CLI sessions.
-- Require proven function descriptor provenance for eager `asTool` construction during prepared startup. Isolate dotenv helper execution from application preload configuration and inherited runtime options while preserving those options for application candidates.
-- Accept the generated context declaration and parameter route folders during development snapshot preparation, integrity verification, and input watching while retaining containment and generated-root checks.
-- Support declarative SQLite/Drizzle and Better Auth applications in prepared development startup. Audit SQLite metadata callbacks and literal descriptor options, defer native database client lifecycle work until activation, and reject ambient values, eager clients and imports outside the audited backend sources. Tooling stays fingerprinted without being evaluated during eligibility checking. Generated SQLite services store mutable data under `.relkit/state` and create missing parent directories only during migration or runtime client acquisition. Validate and narrow database paths before filesystem setup so generated services also compile with the generic environment context.
+- Database and auth apps apply Drizzle migrations with a generated Bun SQLite migration runner, without a Node-only driver.
+- Prepared development startup supports declarative SQLite/Drizzle and Better Auth applications. Generated SQLite services store their data under `.relkit/state`.
+
+### Fixed
+
+- Closing the terminal (SIGHUP) stops development with status 129 without leaving backend, Inspector or storage processes behind.
+- Every starter's TypeScript program includes the generated context declarations, so database and auth context types are available in application functions.
+- `relkit dev` picks up `.env` edits, keeps the last valid server during failed reloads, drops deleted values and forwards environment values to HTTP function invocations.
+- Prepared startup isolates dotenv helpers from application preload settings and builds `asTool` tools eagerly only for verified functions.
+- Prepared development accepts the generated context declaration and route parameter folders.
+- Generated SQLite services validate database paths before setup and compile with the generic environment context.
+- Releases are checked against complete packed project creation, and startup timing on shared hosts is reported separately.
 
 ## 0.7.6
 
-### Changes
+### New
 
-- feat(generator): bundle RELKIT application skills in every starter
-- feat: adopt grouped service layout and guarded migrations
+- Every starter bundles the RelKit application skills.
+- New applications use the grouped `src/services/<name>/service.ts` layout, with a guarded layout migration for existing applications.
 
 ## 0.7.5
 
-### Changes
+### Fixed
 
-- fix: document auth endpoints and reuse initial dev validation
+- The API reference documents auth endpoints, and `relkit dev` reuses its initial validation instead of repeating it.
 
 ## 0.7.4
 
-### Changes
+### Fixed
 
-- fix: restore certified creation and prepared bundles
+- Project creation and prepared bundles work again.
 
 ## 0.7.3
 
-### Changes
+### New
 
-- feat: serve prepared generated apps in under 500 ms
+- Prepared generated apps start serving in under 500 ms.
 
 ## 0.7.2
 
-### Changes
+### New
 
-- Publish the unscoped relkit package so bunx relkit runs the existing RELKIT CLI.
+- The unscoped `relkit` package is published, so `bunx relkit` runs the RelKit CLI.
 
 ## 0.7.1
 
-### Changes
+### Fixed
 
-- Update shared Next.js and Hono dependencies to patched versions and retain the Next.js template security fix through release synchronization.
-- chore(deps): bump next from 16.3.6 to 16.3.8 in /templates/default/v1/fullstack
-- chore(deps): bump the bun-dependencies group across 1 directory with 24 updates
+- Next.js and Hono are updated to patched versions, including `next` 16.3.8 in the full-stack template.
+- Refresh bundled dependency versions.
 
 ## 0.7.0
 
-### Changes
+### New
 
-- Expose generator services built with Effect and resolve portable dependency catalogs and declaration patches. Preserve existing Promise APIs, move command execution to dedicated bins, and give CLI operations explicit cancellation and cleanup ownership.
+- The generator exposes Effect services next to its existing Promise APIs, and CLI operations support cancellation and clean up after themselves.
 
 ## 0.6.0
 
-### Changes
+### New
 
-- Add Effect-native database ownership and authentication services while preserving existing Promise APIs. Keep transaction descendants and native auth initialization within database admission, validate native numeric schema ranges, and expose redacted specialized operation telemetry.
+- Database and authentication are available as Effect services next to the existing Promise APIs, with redacted telemetry for their operations. Native numeric schema ranges are validated.
 
 ## 0.5.6
 
-### Changes
+### Fixed
 
-- Refactor core consumer workflows into scoped Effect services
+- Core workflows run as scoped Effect services.
 
 ## 0.5.5
 
-### Changes
+### Fixed
 
-- Refactor execution services with Effect and fix runtime regressions
+- Fix runtime regressions, and run execution services on Effect.
 
 ## 0.5.4
 
-### Changes
+### Fixed
 
-- Allow development and production builds without the optional DeepAgents peer installed. Keep installed DeepAgents dependencies bundled for standalone production containers.
+- Development and production builds no longer require the optional DeepAgents peer, and production containers still bundle it when it is installed.
 
 ## 0.5.3
 
-### Changes
+### Fixed
 
-- chore(deps): bump next from 16.3.3 to 16.3.6 in /packages/cli
-- Refactor compilation and generated contracts and enforce route authoring
-- Refactor RELKIT authoring packages and refresh API docs
+- Update `next` from 16.3.3 to 16.3.6 in the CLI.
+- Routes are checked against their method and inferred path input contracts, and `relkit dev` shows reload diagnostics.
+- The API reference is refreshed for the reorganized authoring packages.
 
 ## 0.5.2
 
-### Changes
+### Fixed
 
-- Refactor RELKIT foundations and stabilize fast CI
+- Reorganize RelKit's internal foundations and make CI more stable.
 
 ## 0.5.1
 
-### Changes
+### New
 
-- docs: guide developers through a verified Orders API
+- The documentation walks through building and testing an Orders API.
 
 ## 0.5.0
 
-### Changes
+### Breaking
 
-- test(runtime-hono): make temp state cleanup idempotent
-- Adopt task-first durable jobs with explicit task identity, job admission, generated clients, and provider-specific capability diagnostics. Legacy function-target jobs and enqueue helpers remain behind the one-release compatibility window; migrate with the jobs migration guide before the next major release.
+- Jobs are task-first, with explicit task IDs, generated clients and provider capability diagnostics. Legacy function-target jobs and enqueue helpers remain only for a one-release compatibility window. [Migration](https://relkit.dev/docs/modules/jobs/migration)
+
+### Fixed
+
+- `@relkit/runtime-hono` tests clean up temporary state safely when cleanup runs more than once.
 
 ## 0.4.1
 
-### Changes
+### New
 
-- fix(scaffold): follow release package version
-- Add generic streaming, realtime channels and presence, typed React clients, durable agent lifecycle support, shared Redis providers, and full-stack examples and documentation.
-- feat(cli): add interactive scaffolding and comprehensive artifact guides
+- Streaming, realtime channels and presence, typed React clients, durable agent lifecycle support and shared Redis providers are available, with full-stack examples and documentation.
+- The CLI scaffolds interactively, and new guides cover each kind of artifact.
+
+### Fixed
+
+- Scaffolds follow the release package version.
 
 ## 0.4.0
 
-### Changes
+### New
 
-- Add request-centric runtime instrumentation, canonical model v2 execution records, live Inspector span details, strict W3C propagation, and OTLP/HTTP JSON trace and log export.
+- Requests are traced end to end, with live span details in the Inspector, strict W3C trace context propagation and OTLP/HTTP JSON export of traces and logs.
 
 ## 0.3.0
 
-### Changes
+### New
 
-- Make development terminal logs readable and persist local telemetry in a CLI-owned DuckDB store. Add searchable inspector logs with stable live updates and request lifecycle traces that keep correlated details beside the list.
+- Development terminal logs are easier to read, and the Inspector has searchable logs and request traces stored in a local DuckDB database.
 
 ## 0.2.0
 
-### Changes
+### Breaking
 
-- Replace the pre-1.0 provider ownership contract and legacy provider package exports with `defineApp` bindings, explicit test replacements, and independently installable integration packages. This breaking cohort intentionally ships without compatibility aliases, old artifact readers, or migration tooling.
+- `defineApp` bindings, explicit test replacements and separately installable integration packages replace the provider ownership contract and the old provider package exports, with no compatibility aliases. [Migration](https://relkit.dev/docs/learn/concepts/application)
 
 ## 0.1.0
 
-### Changes
+### Breaking
 
-- Replace `onEvent` and selectors with authored `defineEventFunction` consumers. Events declare `input`, and functions declare exact publication permissions with `publishes`. Event-only functions accept delivery and replay through the common runtime and cannot be invoked through HTTP, jobs, tools, services, or direct calls. This pre-1.0 breaking release updates compiler and manifest contracts, local and AWS delivery, deployment permissions, Inspector views, test helpers, examples, and generated templates together. Existing applications must migrate their event authoring and regenerate their artifacts; no compatibility aliases or persisted-state migration are provided. API documentation can also exclude selected domains.
+- `defineEventFunction` consumers replace `onEvent` and selectors; events declare `input`, and functions declare the events they publish with `publishes`. [Migration](https://relkit.dev/docs/modules/events/consume)
+
+### New
+
+- API documentation can exclude selected domains.
 
 ## 0.0.5
 
-### Changes
+### New
 
-- Redesign services around domain-first applications
+- Services are redesigned around domain-first applications.
 
 ## 0.0.4
 
-### Changes
+### Fixed
 
-- chore(deps): bump the bun-dependencies group with 2 updates
+- Refresh bundled dependency versions.
 
 ## 0.0.3
 
-### Changes
+### Fixed
 
-- chore(deps): bump the bun-dependencies group with 6 updates
+- Refresh bundled dependency versions.
 
 ## 0.0.2
 
-### Changes
+### Fixed
 
-- chore(deps): bump the bun-dependencies group across 1 directory with 27 updates
+- Refresh bundled dependency versions.
 
 ## 0.0.1 — Breaking
 
-This pre-1.0 release intentionally breaks the previous authoring conventions:
+### New
 
-- HTTP routes now use named method exports from `src/routes/**/route.ts`; method and path are derived from the file system, and routine request/response contracts are inferred.
-- Event listeners now use typed `onEvent(name, handler, options?)` callbacks backed by the generated event registry.
-- Configuration now uses `defineConfig` from `@relkit/app/config`, fixed source/generated paths, and `server`/`inspector` port settings.
-- The CLI now has nested Effect CLI help and completions, and development ships the inspector plus OpenAPI and Scalar.
-- `examples/commerce` is the canonical executable example; the searchable Fumadocs application and redesigned inspector cover the public framework surface.
-
-There is no compatibility layer or codemod. Follow the [breaking-change migration guide](apps/docs/content/docs/operations/migration.mdx) and preserve explicit descriptor IDs while moving files.
-
-### Changes
-
-- Publish the first supported RELKIT release with protected CI, typed application subpaths, self-contained project templates, and trusted npm publishing.
+- The first supported RelKit release, with typed application subpaths, self-contained project templates and trusted npm publishing.
+- HTTP routes use named method exports from `src/routes/**/route.ts`, with method and path derived from the file system and routine request and response contracts inferred.
+- Event listeners use typed `onEvent(name, handler, options?)` callbacks.
+- Configuration uses `defineConfig` from `@relkit/app/config`, with fixed source and generated paths and `server` and `inspector` port settings.
+- The CLI has nested help and completions, and development includes the Inspector, OpenAPI and Scalar.
+- `examples/commerce` is the main runnable example, alongside a searchable documentation site and a redesigned Inspector.

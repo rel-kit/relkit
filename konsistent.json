@@ -25,22 +25,32 @@
       }
     },
     {
-      "name": "integration-catalog-shell-files",
-      "description": "The integration catalog owns one manifest, TypeScript project, and public entry file.",
-      "paths": "integrations/catalog",
+      "name": "relkit-area-entry",
+      "description": "Every relkit source area keeps one entry file that its subpath export points at.",
+      "paths": "packages/relkit/src/{area}",
       "must": {
         "haveType": "directory",
-        "haveFiles": ["package.json", "tsconfig.json", "src/index.ts"]
+        "haveFiles": ["index.ts"]
       }
     },
     {
-      "name": "integration-catalog-entry-barrel",
-      "description": "The integration catalog public entry stays a pure barrel.",
-      "paths": "integrations/catalog/src/index.ts",
-      "must": {
-        "areBarrelFiles": true,
-        "importFromCurrentDir": false,
-        "importFromParents": false
+      "name": "relkit-graph-without-runtime",
+      "description": "The application graph area stays independent of the HTTP runtime and of deployment engines.",
+      "paths": "packages/relkit/src/graph/**/*.ts",
+      "mustNot": {
+        "importFrom": ["hono", "hono/*", "@pulumi/*", "../runtime-hono/*", "../../runtime-hono/*"]
+      }
+    },
+    {
+      "name": "relkit-engine-without-local-providers",
+      "description": "The engine depends on provider contracts, never on the local provider implementations.",
+      "paths": "packages/relkit/src/engine/**/*.ts",
+      "mustNot": {
+        "importFrom": [
+          "../providers-local/*",
+          "../../providers-local/*",
+          "../../../providers-local/*"
+        ]
       }
     }
   ]

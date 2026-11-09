@@ -1,5 +1,5 @@
 /** Rewrites syntax-recognized JSON/JSONC path fields without replacing metadata or comments. */
-import * as ts from "typescript";
+import ts from "../typescript-parser.js";
 import { applyTextEdits, mentionsMovedRoot, rewrittenToolPath } from "./layout-rewrite-paths.js";
 import { rewriteLayoutShell } from "./layout-rewrite-shell.js";
 import type { MigrationMove } from "./layout.types.js";

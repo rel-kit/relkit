@@ -3,8 +3,8 @@ import {
   deserializeJobsServiceOptions,
   durationToMillis,
   type JobsServiceOptions,
-} from "@relkit/jobs";
-import type { JobsAdapterRuntime, NativeControlReceipt, NativeReceipt } from "@relkit/jobs/adapter";
+} from "relkit/jobs";
+import type { JobsAdapterRuntime, NativeControlReceipt, NativeReceipt } from "relkit/jobs/adapter";
 import { createInngestRunApi, type InngestRunMetadata } from "./runs.js";
 import { observeInngestRun } from "./observe.js";
 import { listInngestRuns, readInngestRun } from "./run-operations.js";
@@ -18,14 +18,16 @@ import {
   loadInngestSdk,
 } from "./task-binding.js";
 import { optionalText, text, url } from "./support.js";
-import type { RuntimeProviderContext, RuntimeProviderIntegration } from "@relkit/provider";
+import type { RuntimeProviderContext, RuntimeProviderIntegration } from "relkit/provider";
 import { providerEventId, submitInngestEvent } from "./submission.js";
 import { duplicateReceipt, observationOptions } from "./support.js";
 
+/** @experimental */
 export interface InngestRuntime extends JobsAdapterRuntime {
   readonly registerWorker: (options: InngestWorkerRegistrationOptions) => InngestWorkerHandle;
 }
 
+/** @experimental */
 export interface InngestRuntimeOptions {
   readonly appId: string;
   readonly baseUrl: string;
@@ -39,6 +41,7 @@ export interface InngestRuntimeOptions {
   readonly serviceOptions?: JobsServiceOptions;
 }
 
+/** @experimental */
 export function createInngestRuntime(options: InngestRuntimeOptions): InngestRuntime {
   assertSupportedJobsServiceOptions(options.serviceOptions ?? {}, ["observation"]);
   text(options.appId, "Inngest appId");
@@ -150,6 +153,7 @@ export function createInngestRuntime(options: InngestRuntimeOptions): InngestRun
   return Object.freeze(adapter);
 }
 
+/** @experimental */
 export const runtimeIntegration: RuntimeProviderIntegration<"inngest"> = Object.freeze({
   kind: "runtime-integration",
   integrationId: "inngest",

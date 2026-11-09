@@ -48,22 +48,22 @@ The repository and provider documentation were inspected. No proposed API was im
 
 # 1. Revision decisions
 
-| Requested correction | v1.1 decision |
-|---|---|
-| A job targets a task, not a request-time function. | Introduce `defineTask()`. `defineJob({ task })` accepts only a task reference. A function reference is a type error and a runtime validation error. |
+| Requested correction                                      | v1.1 decision                                                                                                                                                                             |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A job targets a task, not a request-time function.        | Introduce `defineTask()`. `defineJob({ task })` accepts only a task reference. A function reference is a type error and a runtime validation error.                                       |
 | Background execution settings do not belong on functions. | Tasks own retries, sleep access, CPU/memory requests, execution limits, concurrency, logging policy, lifecycle hooks, and semantic versions. Existing function behavior is not rewritten. |
-| Configure multiple job services. | Add public `defineApp({ jobs: { ... } })` and `defaults.jobs`. Named services reuse existing provider-profile machinery. |
-| Direct and context-based calls. | Support `task.trigger(input)`, `job.trigger(input)`, `ctx.tasks.alias.trigger(input)`, and `ctx.jobs.alias.trigger(input)`, through one submission implementation. |
-| Do not require both execution and state configuration. | Remove public `job-state`, `stateProfile`, a mandatory second store, and a universal Relkit run journal. A service adapter owns its necessary persistence. |
-| Defer workflows. | Remove the proposed workflow descriptor and all workflow-only implementation phases. No public step/checkpoint DSL is added in this revision. |
-| Human-readable durations. | Author durations as `"1 second"`, `"2 days"`, and similar Effect-style strings. Normalize once before provider conversion. |
-| Reuse provider clients. | Adapter observation uses the provider's supported SDK/client first. Relkit supplies typed contracts, authorization, normalization, lifecycle ownership, and React integration. |
-| Complete documentation updates. | Ship guides, API reference, provider comparison, local setup, examples, migration pages, generated-client docs, and doctests with the feature. |
-| Inspector listing/filtering. | Provide separate job definitions and run views, server-side filters, cursor pagination, live detail, and capability-aware controls. |
-| Docker without third-party registration. | Add job recipes to the existing `docker(adapter())` flow. An account-free Docker quickstart is a release requirement, not an optional follow-up. |
-| Restrict provider scope. | Implement only Inngest, Trigger.dev, and effect-mq integrations, recipes, docs, and certification gates. No fourth provider is part of this plan. |
-| Dot-access job names. | Require an explicit camelCase `name` for authored jobs; use it in typed clients, hooks, context aliases, and Inspector labels. Keep optional durable `id` separate. |
-| Explain how a task works end to end. | Specify discovery, binding, validation, submission, durable acceptance, execution, sleep, retry, observation, cancellation, deployment, and retirement. |
+| Configure multiple job services.                          | Add public `defineApp({ jobs: { ... } })` and `defaults.jobs`. Named services reuse existing provider-profile machinery.                                                                  |
+| Direct and context-based calls.                           | Support `task.trigger(input)`, `job.trigger(input)`, `ctx.tasks.alias.trigger(input)`, and `ctx.jobs.alias.trigger(input)`, through one submission implementation.                        |
+| Do not require both execution and state configuration.    | Remove public `job-state`, `stateProfile`, a mandatory second store, and a universal Relkit run journal. A service adapter owns its necessary persistence.                                |
+| Defer workflows.                                          | Remove the proposed workflow descriptor and all workflow-only implementation phases. No public step/checkpoint DSL is added in this revision.                                             |
+| Human-readable durations.                                 | Author durations as `"1 second"`, `"2 days"`, and similar Effect-style strings. Normalize once before provider conversion.                                                                |
+| Reuse provider clients.                                   | Adapter observation uses the provider's supported SDK/client first. Relkit supplies typed contracts, authorization, normalization, lifecycle ownership, and React integration.            |
+| Complete documentation updates.                           | Ship guides, API reference, provider comparison, local setup, examples, migration pages, generated-client docs, and doctests with the feature.                                            |
+| Inspector listing/filtering.                              | Provide separate job definitions and run views, server-side filters, cursor pagination, live detail, and capability-aware controls.                                                       |
+| Docker without third-party registration.                  | Add job recipes to the existing `docker(adapter())` flow. An account-free Docker quickstart is a release requirement, not an optional follow-up.                                          |
+| Restrict provider scope.                                  | Implement only Inngest, Trigger.dev, and effect-mq integrations, recipes, docs, and certification gates. No fourth provider is part of this plan.                                         |
+| Dot-access job names.                                     | Require an explicit camelCase `name` for authored jobs; use it in typed clients, hooks, context aliases, and Inspector labels. Keep optional durable `id` separate.                       |
+| Explain how a task works end to end.                      | Specify discovery, binding, validation, submission, durable acceptance, execution, sleep, retry, observation, cancellation, deployment, and retirement.                                   |
 
 **Primary design rule:** Same Relkit API and the same meaning for every advertised capability. Different provider capabilities must be visible before deployment. An unsupported combination must fail clearly instead of silently changing its semantics.
 
@@ -85,7 +85,7 @@ bun add @relkit/app @relkit/docker @relkit/inngest
 
 ```ts
 // relkit.config.ts
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 import { docker } from "@relkit/docker";
 import { inngest } from "@relkit/inngest";
 
@@ -122,7 +122,7 @@ This recipe owns a persistent native store and task workers, without another pub
 ## 2.2 Multiple services, one execution API
 
 ```ts
-import { defineApp, defineEnv, env } from "@relkit/app/config";
+import { defineApp, defineEnv, env } from "relkit/config";
 import { docker } from "@relkit/docker";
 import { trigger } from "@relkit/trigger";
 import { inngest } from "@relkit/inngest";
@@ -154,8 +154,8 @@ Each object value is one complete jobs service, not an execution/state pair. Pro
 
 ```ts
 // src/tasks/send-follow-up.ts
-import { defineTask } from "@relkit/app/tasks";
-import { z } from "@relkit/app/schema";
+import { defineTask } from "relkit/tasks";
+import { z } from "relkit/schema";
 import { mail } from "../domain/mail";
 
 export const sendFollowUp = defineTask({
@@ -215,7 +215,7 @@ A task with one unambiguous valid camelCase source export and no explicit job re
 
 ```ts
 // src/jobs/send-follow-up.ts
-import { defineJob } from "@relkit/app/jobs";
+import { defineJob } from "relkit/jobs";
 import { sendFollowUp } from "../tasks/send-follow-up";
 
 export const followUpJob = defineJob({
@@ -248,8 +248,8 @@ This ambiguity is checked during compilation where possible and at runtime other
 ## 2.6 Trigger through context
 
 ```ts
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 import { sendFollowUp } from "../tasks/send-follow-up";
 import { followUpJob } from "../jobs/send-follow-up";
 
@@ -393,9 +393,9 @@ const unsubscribe = watch.subscribe((state) => {
 
 await watch.connect();
 await watch.disconnect(); // Stops observation only. The task continues.
-await watch.connect();    // Native resume where supported; otherwise reset + fresh snapshot.
+await watch.connect(); // Native resume where supported; otherwise reset + fresh snapshot.
 unsubscribe();
-await watch.dispose();    // Permanent cleanup; calling connect again throws a typed error.
+await watch.dispose(); // Permanent cleanup; calling connect again throws a typed error.
 ```
 
 ## 2.10 React and TanStack Query
@@ -414,10 +414,12 @@ export function ExportStatus({ runId }: { runId?: string }) {
     <section>
       <button
         disabled={trigger.isPending}
-        onClick={() => trigger.mutate({
-          input: { accountId: "account_123" },
-          options: { idempotencyKey: crypto.randomUUID() },
-        })}
+        onClick={() =>
+          trigger.mutate({
+            input: { accountId: "account_123" },
+            options: { idempotencyKey: crypto.randomUUID() },
+          })
+        }
       >
         Export orders
       </button>
@@ -440,17 +442,17 @@ A real application must retain the successful trigger's `runId` in its state or 
 
 ## 3.1 Resource vocabulary
 
-| Concept | Responsibility | Public surface |
-|---|---|---|
-| Function | Immediate application computation within the existing runtime invocation model. | `defineFunction`, `.invoke()` |
-| Task | Background executable with schemas, task policies, version, and its own context. | `defineTask`, `.trigger()` |
-| Job | Named submission binding from a task to a configured jobs service; may carry schedules and client policy. | `defineJob`, `.trigger()` |
-| Jobs service | A named provider binding and its worker/state/observation configuration. | `defineApp({ jobs })` |
-| Run | One logical accepted execution of a job. | `RunHandle`, `RunSnapshot` |
-| Attempt | A provider-authorized attempt to execute application work after a failure. | Run metadata, Inspector |
-| Resume/replay | Re-entering a durable task to continue an existing wait or recover execution. | Runtime metadata; not automatically another retry attempt |
-| Schedule | A durable recurrence that submits new runs for one job. | `job.schedules.*` and job schedule declarations |
-| Watch | A connection observing a run or filtered collection. It is not the execution itself. | Raw stream, `watchJobRun`, `useJobRun` |
+| Concept       | Responsibility                                                                                            | Public surface                                            |
+| ------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Function      | Immediate application computation within the existing runtime invocation model.                           | `defineFunction`, `.invoke()`                             |
+| Task          | Background executable with schemas, task policies, version, and its own context.                          | `defineTask`, `.trigger()`                                |
+| Job           | Named submission binding from a task to a configured jobs service; may carry schedules and client policy. | `defineJob`, `.trigger()`                                 |
+| Jobs service  | A named provider binding and its worker/state/observation configuration.                                  | `defineApp({ jobs })`                                     |
+| Run           | One logical accepted execution of a job.                                                                  | `RunHandle`, `RunSnapshot`                                |
+| Attempt       | A provider-authorized attempt to execute application work after a failure.                                | Run metadata, Inspector                                   |
+| Resume/replay | Re-entering a durable task to continue an existing wait or recover execution.                             | Runtime metadata; not automatically another retry attempt |
+| Schedule      | A durable recurrence that submits new runs for one job.                                                   | `job.schedules.*` and job schedule declarations           |
+| Watch         | A connection observing a run or filtered collection. It is not the execution itself.                      | Raw stream, `watchJobRun`, `useJobRun`                    |
 
 A service profile and a domain `defineService()` are different concepts. The former selects infrastructure; the latter groups application capabilities. Documentation must use “jobs service” for the former and “domain service” for the latter.
 
@@ -488,18 +490,24 @@ The following is a contract sketch, not a complete generic implementation. Produ
 type TaskExecution = "durable" | "retryable";
 
 type DurationUnit =
-  | "millisecond" | "milliseconds"
-  | "second" | "seconds"
-  | "minute" | "minutes"
-  | "hour" | "hours"
-  | "day" | "days"
-  | "week" | "weeks";
+  | "millisecond"
+  | "milliseconds"
+  | "second"
+  | "seconds"
+  | "minute"
+  | "minutes"
+  | "hour"
+  | "hours"
+  | "day"
+  | "days"
+  | "week"
+  | "weeks";
 
 type DurationInput = `${number} ${DurationUnit}`;
 type MemoryInput = `${number} MiB` | `${number} GiB`;
 
 interface TaskRetryPolicy {
-  maxAttempts: number;          // Total logical application attempts, including the first.
+  maxAttempts: number; // Total logical application attempts, including the first.
   initialDelay?: DurationInput;
   maxDelay?: DurationInput;
   factor?: number;
@@ -507,23 +515,23 @@ interface TaskRetryPolicy {
 }
 
 interface TaskResources {
-  cpu: number;                 // Minimum vCPU allocation; positive finite value.
-  memory: MemoryInput;         // Minimum memory allocation; converted to bytes.
+  cpu: number; // Minimum vCPU allocation; positive finite value.
+  memory: MemoryInput; // Minimum memory allocation; converted to bytes.
 }
 
 interface TaskConcurrency<InputKey extends string = string> {
-  limit: number;               // Shared active-slot upper bound for this task/service.
-  key?: InputKey;              // Validated payload field used to partition the cap.
+  limit: number; // Shared active-slot upper bound for this task/service.
+  key?: InputKey; // Validated payload field used to partition the cap.
 }
 
 interface TaskSleepOptions {
-  key: string;                 // Stable inside this task version; required in v1.1.
+  key: string; // Stable inside this task version; required in v1.1.
 }
 
 interface TriggerOptions {
   idempotencyKey?: string;
   delay?: DurationInput;
-  at?: string;                 // RFC 3339 instant with timezone; exclusive with delay.
+  at?: string; // RFC 3339 instant with timezone; exclusive with delay.
   tags?: readonly string[];
   correlationId?: string;
 }
@@ -578,18 +586,18 @@ Registered application context fields such as database clients, constants, promp
 
 ## 4.4 Methods and signatures
 
-| Surface | Method | Result and behavior |
-|---|---|---|
-| Task | `trigger(input, options?)` | Promise of a serializable accepted run handle; optional typed `job` selector for explicit binding. |
-| Job | `trigger(input, options?)` | Same submission behavior, already bound to one service. |
-| Task/job context client | `trigger(input, options?)` | Same validation, trace, identity, and provider code path. |
-| Job server client | `runs.get(runId)` | Authorized current snapshot; typed output/progress. |
-| Job server client | `runs.list(query)` | Bounded, indexed/pushed-down pagination. |
-| Job server client | `runs.watch(runId, options?)` | Async iterable of normalized observation frames; cleanup on iterator return or abort. |
-| Job server client | `runs.cancel(runId, options?)` | Cancellation request receipt; not immediate completion. |
-| Job server client | `runs.retry(runId, options?)` | Explicit new run, linked to original; never rewinds a terminal run in place. |
-| Job server client | `runs.result(runId, options?)` | Bounded observer wait for typed terminal result, allowed outside task handlers only. |
-| Job schedule client | `list/get/upsert/pause/resume/delete` | Capability-gated schedule administration; no process-local cron substitute. |
+| Surface                 | Method                                | Result and behavior                                                                                |
+| ----------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Task                    | `trigger(input, options?)`            | Promise of a serializable accepted run handle; optional typed `job` selector for explicit binding. |
+| Job                     | `trigger(input, options?)`            | Same submission behavior, already bound to one service.                                            |
+| Task/job context client | `trigger(input, options?)`            | Same validation, trace, identity, and provider code path.                                          |
+| Job server client       | `runs.get(runId)`                     | Authorized current snapshot; typed output/progress.                                                |
+| Job server client       | `runs.list(query)`                    | Bounded, indexed/pushed-down pagination.                                                           |
+| Job server client       | `runs.watch(runId, options?)`         | Async iterable of normalized observation frames; cleanup on iterator return or abort.              |
+| Job server client       | `runs.cancel(runId, options?)`        | Cancellation request receipt; not immediate completion.                                            |
+| Job server client       | `runs.retry(runId, options?)`         | Explicit new run, linked to original; never rewinds a terminal run in place.                       |
+| Job server client       | `runs.result(runId, options?)`        | Bounded observer wait for typed terminal result, allowed outside task handlers only.               |
+| Job schedule client     | `list/get/upsert/pause/resume/delete` | Capability-gated schedule administration; no process-local cron substitute.                        |
 
 Keep legacy `ctx.jobs.alias.enqueue()` as a deprecated compatibility alias where legacy mode is enabled. The new documentation uses `.trigger()` consistently. Do not silently change the shape of an old enqueue result while calling it backward compatible.
 
@@ -620,8 +628,16 @@ interface RunHandle {
 }
 
 type RunStatus =
-  | "queued" | "delayed" | "running" | "sleeping" | "retrying"
-  | "completed" | "failed" | "cancelled" | "timed-out" | "unknown";
+  | "queued"
+  | "delayed"
+  | "running"
+  | "sleeping"
+  | "retrying"
+  | "completed"
+  | "failed"
+  | "cancelled"
+  | "timed-out"
+  | "unknown";
 
 interface RunListQuery {
   readonly status?: readonly RunStatus[];
@@ -680,13 +696,13 @@ await ctx.jobs.sendFollowUp.trigger(input);
 
 The samples show alternative submission surfaces; do not submit three times for one intended operation. Browser input retains the generated `{ input, options? }` envelope, while server descriptor/context calls accept `(input, options?)`.
 
-| Field | Contract |
-|---|---|
-| `name` | Explicit, literal camelCase API name; unique across all application jobs. Used in generated `jobs.<jobName>`, hook selectors, and Inspector labels. |
-| `id` | Optional stable durable identity; defaults to `name` for a newly authored explicit job. May retain dots/hyphens. Not emitted as a public jobs property. |
-| Task export | A unique valid canonical export supplies the implicit private job name only when no explicit job exists. The task ID remains that implicit job's durable ID. |
-| Context dependency alias | A validated camelCase local name. Prefer the job's `name`; an intentional different alias is allowed and does not rename the global job. |
-| Provider-native identifier | Encoded by the adapter from stable identities/builds; not exposed as a client namespace key. |
+| Field                      | Contract                                                                                                                                                     |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `name`                     | Explicit, literal camelCase API name; unique across all application jobs. Used in generated `jobs.<jobName>`, hook selectors, and Inspector labels.          |
+| `id`                       | Optional stable durable identity; defaults to `name` for a newly authored explicit job. May retain dots/hyphens. Not emitted as a public jobs property.      |
+| Task export                | A unique valid canonical export supplies the implicit private job name only when no explicit job exists. The task ID remains that implicit job's durable ID. |
+| Context dependency alias   | A validated camelCase local name. Prefer the job's `name`; an intentional different alias is allowed and does not rename the global job.                     |
+| Provider-native identifier | Encoded by the adapter from stable identities/builds; not exposed as a client namespace key.                                                                 |
 
 **Validation.** Use the portable identifier grammar `^[a-z][A-Za-z0-9]*$`, with a length of 1–64 ASCII characters, and document lowerCamelCase as the convention. Accept `sendEmail`, `exportOrders`, and `syncInventoryV2`. Reject dotted, hyphenated, spaced, leading-digit, `$`/underscore-prefixed, non-ASCII, empty, or overlong names. Do not trim, sanitize, camel-case, suffix, or silently normalize an authored name. Invalid name errors must identify the source and suggested valid examples, not mutate the definition.
 
@@ -736,27 +752,28 @@ Production changes to provider bindings apply only to newly accepted runs. Exist
 `defineTask`, `defineJob`, and integration factories must not start workers, connect SDKs, mutate environment variables, register cron schedules, create Docker containers, or inspect the current user session. Runtime materialization creates isolated SDK clients for each service binding. Two services using the same provider with different credentials must coexist safely in one process.
 
 ---
+
 # 6. Task execution lifecycle and correctness
 
 ## 6.1 Lifecycle from source to result
 
-| Stage | Required behavior | Persisted owner / artifact |
-|---|---|---|
-| Author | Declare task and optional job; validate shape without I/O. | Application source. |
-| Discover | Locate exported descriptors using existing compiler discovery. | Compiled registry with source/export identities. |
-| Bind | Resolve job, service, native definition, task version, and build. | Versioned jobs manifest. |
-| Validate | Check schemas, capabilities, policy limits, duration conversions, and deployment compatibility. | Diagnostics; no accepted run on failure. |
-| Trigger | Resolve invocation scope, authorize, validate input, construct stable submission identity, and call native SDK. | Provider acceptance record. |
-| Acknowledge | Return a handle only after the provider confirms durable acceptance. | Native receipt and its routable Relkit handle. |
-| Admit | Observe initial delay, queue policy, capacity, and native rate restrictions. | Provider queue. |
-| Execute | Load the pinned task implementation in a worker, rehydrate safe context, validate canonical input, and run the handler. | Native execution record. |
-| Sleep | Record the keyed native timer; suspend or park according to the certified deployment mode. | Native timer/waitpoint. |
-| Resume | Continue or replay the handler using the same task/build and logical run identity. | Same native run; replay is distinguished from retries. |
-| Retry | Apply one task retry owner and persisted retry policy after a qualifying application failure. | Native retry state. |
-| Observe | Map native state and supported live events to normalized client snapshots/frames. | Provider state; no mandatory shadow journal. |
-| Complete | Validate output and expose success only after terminal native completion. | Provider final output/error. |
-| Retain | Keep records according to native retention and declared client availability. | Provider store. |
-| Retire | Keep old bindings/builds resolvable until their runs and supported history are drained. | Deployment manifest and provider history. |
+| Stage       | Required behavior                                                                                                       | Persisted owner / artifact                             |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| Author      | Declare task and optional job; validate shape without I/O.                                                              | Application source.                                    |
+| Discover    | Locate exported descriptors using existing compiler discovery.                                                          | Compiled registry with source/export identities.       |
+| Bind        | Resolve job, service, native definition, task version, and build.                                                       | Versioned jobs manifest.                               |
+| Validate    | Check schemas, capabilities, policy limits, duration conversions, and deployment compatibility.                         | Diagnostics; no accepted run on failure.               |
+| Trigger     | Resolve invocation scope, authorize, validate input, construct stable submission identity, and call native SDK.         | Provider acceptance record.                            |
+| Acknowledge | Return a handle only after the provider confirms durable acceptance.                                                    | Native receipt and its routable Relkit handle.         |
+| Admit       | Observe initial delay, queue policy, capacity, and native rate restrictions.                                            | Provider queue.                                        |
+| Execute     | Load the pinned task implementation in a worker, rehydrate safe context, validate canonical input, and run the handler. | Native execution record.                               |
+| Sleep       | Record the keyed native timer; suspend or park according to the certified deployment mode.                              | Native timer/waitpoint.                                |
+| Resume      | Continue or replay the handler using the same task/build and logical run identity.                                      | Same native run; replay is distinguished from retries. |
+| Retry       | Apply one task retry owner and persisted retry policy after a qualifying application failure.                           | Native retry state.                                    |
+| Observe     | Map native state and supported live events to normalized client snapshots/frames.                                       | Provider state; no mandatory shadow journal.           |
+| Complete    | Validate output and expose success only after terminal native completion.                                               | Provider final output/error.                           |
+| Retain      | Keep records according to native retention and declared client availability.                                            | Provider store.                                        |
+| Retire      | Keep old bindings/builds resolvable until their runs and supported history are drained.                                 | Deployment manifest and provider history.              |
 
 ## 6.2 Acceptance, idempotency, and ambiguous responses
 
@@ -871,12 +888,12 @@ Hooks cannot become another retry owner. Document `onStart`/`onSuccess`/`onFailu
 
 ## 7.4 Duration clocks and enforcement
 
-| Field | Clock and scope | Includes durable sleep? | Required enforcement |
-|---|---|---:|---|
-| `maxDuration` | Active execution wall time within one application attempt, including ordinary asynchronous I/O; excludes acknowledged parked intervals. | No | Native equivalent or an owned worker supervisor with durable accounting through native execution records. |
-| `maxElapsed` | Wall-clock from durable acceptance through terminal outcome. | Yes | Native absolute deadline or certified native cancellation scheduling. |
-| `delay` | Earliest initial execution relative to acceptance. | Not applicable | Native delayed submission. |
-| `runs.result(...timeout)` | Caller observation time only. | Not applicable | Abort observation; never cancel the run implicitly. |
+| Field                     | Clock and scope                                                                                                                         | Includes durable sleep? | Required enforcement                                                                                      |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------: | --------------------------------------------------------------------------------------------------------- |
+| `maxDuration`             | Active execution wall time within one application attempt, including ordinary asynchronous I/O; excludes acknowledged parked intervals. |                      No | Native equivalent or an owned worker supervisor with durable accounting through native execution records. |
+| `maxElapsed`              | Wall-clock from durable acceptance through terminal outcome.                                                                            |                     Yes | Native absolute deadline or certified native cancellation scheduling.                                     |
+| `delay`                   | Earliest initial execution relative to acceptance.                                                                                      |          Not applicable | Native delayed submission.                                                                                |
+| `runs.result(...timeout)` | Caller observation time only.                                                                                                           |          Not applicable | Abort observation; never cancel the run implicitly.                                                       |
 
 Keep native CPU-time, billable-time, active-wall-time, and total-elapsed metrics distinct. Trigger describes its duration setting per attempt and excludes waits; Inngest exposes different start/finish timeout controls. Neither a field name nor a similar example is enough to prove identical clocks. [T3] [I2]
 
@@ -912,7 +929,7 @@ Use native distributed admission or an existing certified engine mechanism. An i
 
 ## 8.1 Adapter responsibility
 
-Evolve `@relkit/jobs` as the core task/job abstraction. Keep integrations independently installable under `integrations/packages/*`, following the repository's integration metadata, authoring/runtime exports, provider capability registration, and local recipe references. [R2] [R11]
+Evolve `relkit/jobs` as the core task/job abstraction. Keep integrations independently installable under `integrations/packages/*`, following the repository's integration metadata, authoring/runtime exports, provider capability registration, and local recipe references. [R2] [R11]
 
 Each adapter has four responsibilities: compile task/job definitions into native executable registrations; submit/control/query native runs; bind task context to native execution; and expose normalized observations using supported provider SDKs/APIs.
 
@@ -928,12 +945,15 @@ interface JobsCapabilityReport {
   sdkVersion: string;
   backendVersion?: string;
   deployment: "cloud" | "self-hosted" | "docker" | "local-test";
-  features: Record<string, {
-    support: "native" | "adapter" | "unsupported" | "unverified";
-    limits?: Readonly<Record<string, unknown>>;
-    constraints?: readonly string[];
-    testEvidence?: readonly string[];
-  }>;
+  features: Record<
+    string,
+    {
+      support: "native" | "adapter" | "unsupported" | "unverified";
+      limits?: Readonly<Record<string, unknown>>;
+      constraints?: readonly string[];
+      testEvidence?: readonly string[];
+    }
+  >;
 }
 ```
 
@@ -943,11 +963,11 @@ At minimum distinguish: durable acceptance; task retry scope; backoff/jitter; ke
 
 ## 8.3 Verified upstream facts and their implications
 
-| Provider | Verified relevant capabilities | Consequence for Relkit |
-|---|---|---|
-| Trigger.dev | Native tasks/retries, time waits with wait idempotency, machine configuration, backend run subscriptions, scoped realtime authorization, and self-hosted Docker are documented. Cloud wait behavior differs from Docker self-hosting, whose guide explicitly omits checkpoint support. [T1] [T2] [T3] [T4] [T5] [T6] [T7] | First rich managed-task reference. Use official clients. Test cloud and Docker separately; never infer cloud suspension guarantees for self-hosting. |
-| Inngest | Functions with retry/concurrency controls, keyed sleeps, SDK realtime, and self-hosting with external state stores are documented. [I1] [I2] [I3] [I4] | Default account-free durable-task and recurring-job adapter, but root retries, replay-safe handlers, timeout clocks, and worker resource ownership need explicit mappings. |
-| effect-mq | Persisted job retry budgets, workers, delayed/repeatable jobs, and storage options are documented. [M1] [M2] [M3] | Queue/retryable task adapter. The reviewed material does not establish durable suspension of arbitrary async handlers; do not advertise `ctx.sleep` until proven by a native supported mechanism. |
+| Provider    | Verified relevant capabilities                                                                                                                                                                                                                                                                                            | Consequence for Relkit                                                                                                                                                                            |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Trigger.dev | Native tasks/retries, time waits with wait idempotency, machine configuration, backend run subscriptions, scoped realtime authorization, and self-hosted Docker are documented. Cloud wait behavior differs from Docker self-hosting, whose guide explicitly omits checkpoint support. [T1] [T2] [T3] [T4] [T5] [T6] [T7] | First rich managed-task reference. Use official clients. Test cloud and Docker separately; never infer cloud suspension guarantees for self-hosting.                                              |
+| Inngest     | Functions with retry/concurrency controls, keyed sleeps, SDK realtime, and self-hosting with external state stores are documented. [I1] [I2] [I3] [I4]                                                                                                                                                                    | Default account-free durable-task and recurring-job adapter, but root retries, replay-safe handlers, timeout clocks, and worker resource ownership need explicit mappings.                        |
+| effect-mq   | Persisted job retry budgets, workers, delayed/repeatable jobs, and storage options are documented. [M1] [M2] [M3]                                                                                                                                                                                                         | Queue/retryable task adapter. The reviewed material does not establish durable suspension of arbitrary async handlers; do not advertise `ctx.sleep` until proven by a native supported mechanism. |
 
 The capability table is intentionally not a claim that all requested settings are interchangeable on every provider. The invariant is identical meaning where support is advertised, with preflight rejection elsewhere.
 
@@ -1043,11 +1063,11 @@ The wrapper syntax stays `docker(adapter())`; only integrations declaring a vali
 
 ## 10.2 Required recipes
 
-| Recipe | Proposed components | Initial acceptance focus |
-|---|---|---|
-| `docker(inngest())` | Inngest server, external persistent Redis, PostgreSQL, generated authenticated task worker/serve entry point. | Default account-free durable tasks, sleep/replay, schedules, native run queries and watch recovery; abrupt-stop durability tests. |
-| `docker(effectMq())` | Recipe-owned PostgreSQL store, pinned schema/migration setup, Relkit task worker; Redis is a separately certified variant. | Queue/retryable tasks, schedules, filters, lease recovery; no durable-sleep claim. |
-| `docker(trigger())` | Upstream-supported self-hosted stack, registry/storage dependencies, supervisor and task workers. | Rich native controls and resource limits; separately certified from Trigger Cloud. |
+| Recipe               | Proposed components                                                                                                        | Initial acceptance focus                                                                                                          |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `docker(inngest())`  | Inngest server, external persistent Redis, PostgreSQL, generated authenticated task worker/serve entry point.              | Default account-free durable tasks, sleep/replay, schedules, native run queries and watch recovery; abrupt-stop durability tests. |
+| `docker(effectMq())` | Recipe-owned PostgreSQL store, pinned schema/migration setup, Relkit task worker; Redis is a separately certified variant. | Queue/retryable tasks, schedules, filters, lease recovery; no durable-sleep claim.                                                |
+| `docker(trigger())`  | Upstream-supported self-hosted stack, registry/storage dependencies, supervisor and task workers.                          | Rich native controls and resource limits; separately certified from Trigger Cloud.                                                |
 
 The default quickstart is `docker(inngest())`, with both durable-task and native-scheduling acceptance required. `docker(effectMq())` supplies the smaller queue/retryable alternative, using a recipe-owned PostgreSQL store by default; a Redis variant is certified separately. `docker(trigger())` is a separate self-hosted mode, not a claim of managed-cloud checkpoint parity. All three recipes are in implementation scope; the core release requires the Inngest path, and the complete three-provider milestone requires each declared Docker variant to pass its own gates. No recipe may be advertised merely because a factory exists.
 
@@ -1084,6 +1104,7 @@ Use pinned image tags plus immutable digests in the release compatibility manife
 Resource declarations must be enforced on task worker containers, not merely the service dependencies. Test CPU-heavy handlers, memory exhaustion, forced termination, and cleanup of abandoned execution containers.
 
 ---
+
 # 11. Typed generated clients and reliable watch lifecycle
 
 ## 11.1 Generated contract, not imported server implementations
@@ -1094,15 +1115,15 @@ Generate a `JobRegistry` entry for each explicitly client-exposed job. It carrie
 
 Generate these procedures only when authorized by the job's declared operations:
 
-| Procedure | Input | Output |
-|---|---|---|
-| `jobs.<jobName>.trigger` | `{ input, options? }` | Accepted `RunHandle`; never final task output. |
-| `jobs.<jobName>.runs.get` | `{ runId }` | Projected typed snapshot. |
-| `jobs.<jobName>.runs.list` | Validated run filters and cursor. | Typed page with service availability and cursor. |
-| `jobs.<jobName>.runs.watch` | `{ runId, after? }` | Async iterable of projected observation frames. |
-| `jobs.<jobName>.runs.cancel` | `{ runId, operationId, reason? }` | Control receipt with current native state. |
-| `jobs.<jobName>.runs.retry` | `{ runId, operationId }` | New run handle, linked to original. |
-| `jobs.<jobName>.runs.stream` | `{ runId, name, after? }` | Typed named stream frames. |
+| Procedure                    | Input                             | Output                                           |
+| ---------------------------- | --------------------------------- | ------------------------------------------------ |
+| `jobs.<jobName>.trigger`     | `{ input, options? }`             | Accepted `RunHandle`; never final task output.   |
+| `jobs.<jobName>.runs.get`    | `{ runId }`                       | Projected typed snapshot.                        |
+| `jobs.<jobName>.runs.list`   | Validated run filters and cursor. | Typed page with service availability and cursor. |
+| `jobs.<jobName>.runs.watch`  | `{ runId, after? }`               | Async iterable of projected observation frames.  |
+| `jobs.<jobName>.runs.cancel` | `{ runId, operationId, reason? }` | Control receipt with current native state.       |
+| `jobs.<jobName>.runs.retry`  | `{ runId, operationId }`          | New run handle, linked to original.              |
+| `jobs.<jobName>.runs.stream` | `{ runId, name, after? }`         | Typed named stream frames.                       |
 
 A disabled operation is absent from the generated type and rejected by the server even when manually constructed. Public client names never allow selection of private jobs by adding arbitrary strings. Incompatible old task versions return a typed version incompatibility result rather than deserializing old output using a new schema.
 
@@ -1114,8 +1135,15 @@ The generated public snapshot is a discriminated union. A `completed` run has va
 
 ```ts
 type RunConnection =
-  | "idle" | "connecting" | "connected" | "reconnecting"
-  | "disconnected" | "completed" | "unauthorized" | "error" | "disposed";
+  | "idle"
+  | "connecting"
+  | "connected"
+  | "reconnecting"
+  | "disconnected"
+  | "completed"
+  | "unauthorized"
+  | "error"
+  | "disposed";
 
 type RunWatchFrame<Run> =
   | {
@@ -1174,18 +1202,18 @@ An iterator that closes before a terminal state is known triggers reconnect/reco
 
 ## 11.5 Controller state machine
 
-| Action/event | Required transition and cleanup |
-|---|---|
-| Construct controller | `idle`; no network, timers, or provider subscription. |
-| `connect()` | `connecting`; concurrent calls share one connection promise. |
-| First authorized state arrives | `connected`; publish snapshot atomically. |
-| Transient transport loss | `reconnecting`; mark stale, retain safe last snapshot, start bounded jittered retry. |
-| Manual `disconnect()` | `disconnected`; abort reads and retry timers, return native iterator, release upstream subscription. |
-| `connect()` after disconnect | New epoch; native resume or reset/current snapshot. |
-| Terminal run is confirmed | Deliver final snapshot, release the feed, then `completed`. |
-| Authorization denied/revoked | `unauthorized`; stop all retries and remove sensitive cached state. |
-| Nonretryable schema/protocol error | `error`; preserve a safe diagnostic, close resources. |
-| `dispose()` | `disposed`; unsubscribe callbacks and permanently release all resources. |
+| Action/event                       | Required transition and cleanup                                                                      |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Construct controller               | `idle`; no network, timers, or provider subscription.                                                |
+| `connect()`                        | `connecting`; concurrent calls share one connection promise.                                         |
+| First authorized state arrives     | `connected`; publish snapshot atomically.                                                            |
+| Transient transport loss           | `reconnecting`; mark stale, retain safe last snapshot, start bounded jittered retry.                 |
+| Manual `disconnect()`              | `disconnected`; abort reads and retry timers, return native iterator, release upstream subscription. |
+| `connect()` after disconnect       | New epoch; native resume or reset/current snapshot.                                                  |
+| Terminal run is confirmed          | Deliver final snapshot, release the feed, then `completed`.                                          |
+| Authorization denied/revoked       | `unauthorized`; stop all retries and remove sensitive cached state.                                  |
+| Nonretryable schema/protocol error | `error`; preserve a safe diagnostic, close resources.                                                |
+| `dispose()`                        | `disposed`; unsubscribe callbacks and permanently release all resources.                             |
 
 Manual disconnection remains in effect across re-renders, visibility changes, and network recovery until the caller explicitly reconnects or changes the selected run. An automatic online event must not override the user's disconnect choice.
 
@@ -1267,8 +1295,7 @@ Even public jobs require rate limits, payload limits, allowed operations, and sa
 Define a typed callback, implemented by the application:
 
 ```ts
-type JobClientOperation =
-  | "trigger" | "get" | "list" | "watch" | "cancel" | "retry" | "stream";
+type JobClientOperation = "trigger" | "get" | "list" | "watch" | "cancel" | "retry" | "stream";
 
 interface JobAccessRequest {
   operation: JobClientOperation;
@@ -1279,7 +1306,7 @@ interface JobAccessRequest {
 }
 
 interface JobAccessGrant {
-  scope: string;  // Stable application-controlled tenant/owner scope.
+  scope: string; // Stable application-controlled tenant/owner scope.
   expiresAt?: string;
 }
 
@@ -1354,7 +1381,7 @@ Do not add another event-subscription DSL in this release. Existing Relkit event
 
 ## 13.4 Agents and native graphs
 
-A task can invoke a declared agent through `ctx.agents` and pass cancellation, trace, and explicit thread/run correlation. Existing agent state providers and native graph checkpointers remain authoritative for agent continuation. This proposal removes only the earlier *new job-state requirement*, not existing agent-state configuration needed by agent features.
+A task can invoke a declared agent through `ctx.agents` and pass cancellation, trace, and explicit thread/run correlation. Existing agent state providers and native graph checkpointers remain authoritative for agent continuation. This proposal removes only the earlier _new job-state requirement_, not existing agent-state configuration needed by agent features.
 
 Task retries around an agent do not automatically resume the same agent turn. The application must use the existing supported agent identity/continuation contract or accept a fresh invocation. Reuse agent receipts where available and test replayed task invocation against tool side effects. Do not invent a new human-approval inbox or combine graph and task state machines.
 
@@ -1384,18 +1411,18 @@ Definition rows show the API job name as the primary label, durable job ID as se
 
 ## 14.2 Required run filters
 
-| Filter | Semantics |
-|---|---|
-| Status | Multi-select normalized queued, delayed, running, sleeping, retrying, completed, failed, cancelled, timed-out states. |
-| Activity preset | `active` means nonterminal; `running` means executing, not merely accepted. |
-| Job/task | Search/select by declared job name or exact durable job/task IDs; resolve names to IDs before bounded native queries. No implicit punctuation conversion. |
-| Jobs service/provider | Isolate a configured binding; include service generation when viewing history. |
-| Task version/build | Separate semantic version from immutable deployed build. |
-| Time range | Accepted/started/completed timestamps with explicitly selected field and timezone. |
-| Scope | Authorized tenant/owner scope; privileged Inspector permission required to broaden it. |
-| Tags | Supported native exact matching with explicit AND/OR behavior. |
-| Run/correlation/parent IDs | Exact or supported indexed lookup; no arbitrary unbounded fuzzy scan. |
-| Failure/attempt | Safe normalized failure kind and supported attempt filters. |
+| Filter                     | Semantics                                                                                                                                                 |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Status                     | Multi-select normalized queued, delayed, running, sleeping, retrying, completed, failed, cancelled, timed-out states.                                     |
+| Activity preset            | `active` means nonterminal; `running` means executing, not merely accepted.                                                                               |
+| Job/task                   | Search/select by declared job name or exact durable job/task IDs; resolve names to IDs before bounded native queries. No implicit punctuation conversion. |
+| Jobs service/provider      | Isolate a configured binding; include service generation when viewing history.                                                                            |
+| Task version/build         | Separate semantic version from immutable deployed build.                                                                                                  |
+| Time range                 | Accepted/started/completed timestamps with explicitly selected field and timezone.                                                                        |
+| Scope                      | Authorized tenant/owner scope; privileged Inspector permission required to broaden it.                                                                    |
+| Tags                       | Supported native exact matching with explicit AND/OR behavior.                                                                                            |
+| Run/correlation/parent IDs | Exact or supported indexed lookup; no arbitrary unbounded fuzzy scan.                                                                                     |
+| Failure/attempt            | Safe normalized failure kind and supported attempt filters.                                                                                               |
 
 Core release requires at least service/job/task/status/accepted-time filtering and run-ID lookup. Inspector must display `jobs.<jobName>.trigger()` in copyable usage examples; provider IDs remain secondary diagnostics. Additional filters are capability-visible; disabled UI explains why rather than accepting a filter and ignoring it. “Running” must not match a native sleeping record just because its provider's broad status label is running.
 
@@ -1452,12 +1479,14 @@ export const cleanupJob = defineJob({
   id: "maintenance.cleanup",
   task: cleanup,
   service: "scheduled",
-  schedules: [{
-    id: "nightly",
-    cron: "0 2 * * *",
-    timezone: "Asia/Riyadh",
-    input: { olderThanDays: 30 },
-  }],
+  schedules: [
+    {
+      id: "nightly",
+      cron: "0 2 * * *",
+      timezone: "Asia/Riyadh",
+      input: { olderThanDays: 30 },
+    },
+  ],
 });
 ```
 
@@ -1492,11 +1521,12 @@ Validate delay/horizon against provider limits before acceptance wherever possib
 Test duplicate deployments, concurrent reconciliation, native outage during update, worker downtime spanning multiple ticks, timezone/DST transitions, leap-day input, paused schedules, deleted targets, preview isolation, and schedule target version changes. A second deployment must not create a second copy of a due execution under the same native schedule identity.
 
 ---
+
 # 16. Compiler, packages, deployment, and versioning
 
 ## 16.1 Package ownership and dependency direction
 
-Keep core implementation in `packages/jobs`. Public authoring uses `@relkit/app/tasks` and `@relkit/app/jobs`. Add server-only and adapter-author contracts as focused exports rather than installing every provider into `@relkit/app`.
+Keep core implementation in `packages/jobs`. Public authoring uses `relkit/tasks` and `relkit/jobs`. Add server-only and adapter-author contracts as focused exports rather than installing every provider into `relkit`.
 
 The dependency direction is contracts/schema/provider/invocation primitives -> jobs authoring/runtime contracts -> engine/runtime integration -> optional provider integration. Browser client packages depend only on safe run contracts and generated schemas. If current function-owned job types create a circular dependency, move the minimal serializable reference/client types into a lower-level contract module and re-export old names temporarily. Do not solve the cycle with untyped dynamic imports in public declarations.
 
@@ -1518,7 +1548,10 @@ interface JobsAdapterRuntime {
     request: NativeWatchRequest,
     context: OperationContext,
   ) => AsyncIterable<NativeObservation>;
-  readonly cancel: (request: NativeCancelRequest, context: OperationContext) => Promise<NativeControlReceipt>;
+  readonly cancel: (
+    request: NativeCancelRequest,
+    context: OperationContext,
+  ) => Promise<NativeControlReceipt>;
   readonly close: () => Promise<void>;
   readonly schedules?: NativeScheduleOperations;
   readonly streams?: NativeStreamOperations;
@@ -1595,27 +1628,27 @@ Documentation must clearly distinguish **existing functions**, **new tasks**, **
 
 These are proposed canonical content paths under `apps/docs/content/docs`. Integrate redirects and sidebar metadata with the actual existing navigation during implementation.
 
-| Path | Required content and example |
-|---|---|
-| `jobs/index.mdx` | Function/task/job/service/run vocabulary; scope and no workflow prerequisite. |
-| `jobs/quickstart.mdx` | Fresh account-free Docker project, first task, trigger, watch, restart, cleanup. |
-| `jobs/tasks.mdx` | Full task declaration, schemas, context, retries, replay-safe handler, hooks. |
-| `jobs/bindings.mdx` | CamelCase names versus durable IDs, implicit-name resolution, explicit jobs, defaults, multiple services, direct/context dot-access trigger. |
-| `jobs/durations-and-sleep.mdx` | Effect-style strings, stable sleep keys, replay caveats, delay versus sleep. |
-| `jobs/execution-policy.mdx` | CPU/memory, concurrency scope, duration clocks, limits, typed capability errors. |
-| `jobs/retries-and-idempotency.mdx` | Attempt versus resume, external idempotency, unknown acknowledgements, manual retry. |
-| `jobs/clients.mdx` | `client.jobs.exportOrders.trigger`, named selectors, generated plain client, controller, React/TanStack, SSR, connect/disconnect/cleanup. |
-| `jobs/progress-and-streams.mdx` | Native metadata versus content streams, native retention, reset/gap behavior. |
-| `jobs/security.mdx` | Private defaults, public/authorized exposure, scope ownership, redaction, tokens. |
-| `jobs/schedules.mdx` | Cron/interval syntax, native policy differences, reconciliation and pause/resume. |
-| `jobs/inspector.mdx` | Definition/run lists, running/status filters, native gaps, controls and permissions. |
-| `jobs/docker.mdx` | Recipes, persistence, port routing, volumes, startup, restart, supported host architectures. |
-| `jobs/deployment.mdx` | Worker topology, Pulumi/native publication, version pinning, draining, rollback. |
-| `jobs/testing.mdx` | Test harness, fake clock, adapter conformance, Docker, failure injection. |
-| `jobs/migration.mdx` | Old function targets/config/enqueue, new task extraction, compatibility and historical runs. |
-| `jobs/troubleshooting.mdx` | Unknown submission, unavailable workers, retry duplication, sleep limits, stale watch. |
-| `jobs/providers/{trigger,inngest,effect-mq}.mdx` | Installation, connection/Docker, worker deployment, verified capability table and limits. |
-| `jobs/providers/comparison.mdx` | Actual certified deployment variants; no provider-brand all-feature promises. |
+| Path                                             | Required content and example                                                                                                                 |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `jobs/index.mdx`                                 | Function/task/job/service/run vocabulary; scope and no workflow prerequisite.                                                                |
+| `jobs/quickstart.mdx`                            | Fresh account-free Docker project, first task, trigger, watch, restart, cleanup.                                                             |
+| `jobs/tasks.mdx`                                 | Full task declaration, schemas, context, retries, replay-safe handler, hooks.                                                                |
+| `jobs/bindings.mdx`                              | CamelCase names versus durable IDs, implicit-name resolution, explicit jobs, defaults, multiple services, direct/context dot-access trigger. |
+| `jobs/durations-and-sleep.mdx`                   | Effect-style strings, stable sleep keys, replay caveats, delay versus sleep.                                                                 |
+| `jobs/execution-policy.mdx`                      | CPU/memory, concurrency scope, duration clocks, limits, typed capability errors.                                                             |
+| `jobs/retries-and-idempotency.mdx`               | Attempt versus resume, external idempotency, unknown acknowledgements, manual retry.                                                         |
+| `jobs/clients.mdx`                               | `client.jobs.exportOrders.trigger`, named selectors, generated plain client, controller, React/TanStack, SSR, connect/disconnect/cleanup.    |
+| `jobs/progress-and-streams.mdx`                  | Native metadata versus content streams, native retention, reset/gap behavior.                                                                |
+| `jobs/security.mdx`                              | Private defaults, public/authorized exposure, scope ownership, redaction, tokens.                                                            |
+| `jobs/schedules.mdx`                             | Cron/interval syntax, native policy differences, reconciliation and pause/resume.                                                            |
+| `jobs/inspector.mdx`                             | Definition/run lists, running/status filters, native gaps, controls and permissions.                                                         |
+| `jobs/docker.mdx`                                | Recipes, persistence, port routing, volumes, startup, restart, supported host architectures.                                                 |
+| `jobs/deployment.mdx`                            | Worker topology, Pulumi/native publication, version pinning, draining, rollback.                                                             |
+| `jobs/testing.mdx`                               | Test harness, fake clock, adapter conformance, Docker, failure injection.                                                                    |
+| `jobs/migration.mdx`                             | Old function targets/config/enqueue, new task extraction, compatibility and historical runs.                                                 |
+| `jobs/troubleshooting.mdx`                       | Unknown submission, unavailable workers, retry duplication, sleep limits, stale watch.                                                       |
+| `jobs/providers/{trigger,inngest,effect-mq}.mdx` | Installation, connection/Docker, worker deployment, verified capability table and limits.                                                    |
+| `jobs/providers/comparison.mdx`                  | Actual certified deployment variants; no provider-brand all-feature promises.                                                                |
 
 Update existing function, service, event, agent, graph, realtime, generated-client, configuration, CLI, deployment, and Inspector pages to link to task/job behavior. Clarify that existing agent graphs and state remain separate; removing the workflow proposal does not remove shipped agent graph features.
 
@@ -1657,20 +1690,20 @@ Prevent accidental billable operations: PR gates use local owned fixtures; manag
 
 ## 18.2 Suite ownership
 
-| Layer | Main responsibilities | Release condition |
-|---|---|---|
-| Type and package | Task/job branding; schema inference; selectors; no function targets; server/browser boundaries. | All public declarations and package smoke imports pass. |
-| Unit | Duration/policy validation; binding resolution; state mapping; cursor validation; error projection. | Deterministic cases and regressions pass. |
-| Model/property | State/connection transitions, cursor epochs, bounded deduplication, policy precedence. | Seeded randomized transitions satisfy invariants. |
-| Compiler/graph | Discovery, implicit/default bindings, output determinism, client exposure, new edges. | Golden artifacts plus semantic assertions pass. |
-| Adapter contract | Native request/receipt mapping, required features, unsupported diagnostics. | Shared suite passes for every advertised adapter feature. |
-| Native integration | Real submission, read/filter/control, waits, attempts, scopes, version routing. | Capability-specific native fixtures pass. |
-| Restart/fault | Worker/store/server/browser failure at controlled boundaries. | No silent loss beyond documented durability window; correct ambiguity and recovery. |
-| Client/React | Connect/disconnect, auth changes, gaps, SDK cleanup, cache isolation. | Unit controller tests plus real browser/native feed tests pass. |
-| Inspector | Lists/filters/pagination/actions, outages, permissions, accessibility. | API and browser acceptance pass. |
-| Deployment/Docker | Composite recipes, lifecycle, isolation, rollback, old versions. | Account-free clean-machine acceptance and existing storage/cache regression pass. |
-| Docs/scaffold | Executable examples, generated API, links, templates, package installation. | Docs and packed scaffold smoke pass. |
-| Load/security | Bounded observation, distributed caps, malicious inputs, tenant isolation. | Defined resource envelopes and security invariants pass. |
+| Layer              | Main responsibilities                                                                               | Release condition                                                                   |
+| ------------------ | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Type and package   | Task/job branding; schema inference; selectors; no function targets; server/browser boundaries.     | All public declarations and package smoke imports pass.                             |
+| Unit               | Duration/policy validation; binding resolution; state mapping; cursor validation; error projection. | Deterministic cases and regressions pass.                                           |
+| Model/property     | State/connection transitions, cursor epochs, bounded deduplication, policy precedence.              | Seeded randomized transitions satisfy invariants.                                   |
+| Compiler/graph     | Discovery, implicit/default bindings, output determinism, client exposure, new edges.               | Golden artifacts plus semantic assertions pass.                                     |
+| Adapter contract   | Native request/receipt mapping, required features, unsupported diagnostics.                         | Shared suite passes for every advertised adapter feature.                           |
+| Native integration | Real submission, read/filter/control, waits, attempts, scopes, version routing.                     | Capability-specific native fixtures pass.                                           |
+| Restart/fault      | Worker/store/server/browser failure at controlled boundaries.                                       | No silent loss beyond documented durability window; correct ambiguity and recovery. |
+| Client/React       | Connect/disconnect, auth changes, gaps, SDK cleanup, cache isolation.                               | Unit controller tests plus real browser/native feed tests pass.                     |
+| Inspector          | Lists/filters/pagination/actions, outages, permissions, accessibility.                              | API and browser acceptance pass.                                                    |
+| Deployment/Docker  | Composite recipes, lifecycle, isolation, rollback, old versions.                                    | Account-free clean-machine acceptance and existing storage/cache regression pass.   |
+| Docs/scaffold      | Executable examples, generated API, links, templates, package installation.                         | Docs and packed scaffold smoke pass.                                                |
+| Load/security      | Bounded observation, distributed caps, malicious inputs, tenant isolation.                          | Defined resource envelopes and security invariants pass.                            |
 
 ## 18.3 Required type tests
 
@@ -1690,36 +1723,36 @@ Each fixture declares required capabilities. A provider may mark an optional cap
 
 ## 18.5 Crash and race scenario matrix
 
-| ID | Injection / setup | Required assertion |
-|---|---|---|
-| F01 | Lose HTTP response after native acceptance. | Caller sees unknown outcome; original key recovers the same run when receipt capability is advertised. |
-| F02 | Submit same key concurrently from two API replicas. | One logical native run within native dedupe scope; both handles resolve consistently. |
-| F03 | Kill worker immediately after claim, before handler. | Native recovery makes work eligible; no permanent invisible lease. |
-| F04 | Kill after business effect, before native completion. | Replay may occur; idempotent fixture produces one business effect and correct final output. |
-| F05 | Kill after sleep was committed. | Restart resumes/replays same run; completed wait does not restart a full duration. |
-| F06 | Crash before/after two different sleep keys. | Stable wait ordering and due times; no repeated full wait or phantom attempt. |
-| F07 | Fail before first sleep and after second sleep. | Total application retry budget is enforced; no native step budget multiplication. |
-| F08 | Restart engine/storage while work is queued/delayed. | Acceptance durability matches configured persisted backend; no memory fallback. |
-| F09 | Native lease expires while old worker is paused. | Native fencing rules prevent stale terminal overwrite; external idempotency remains necessary. |
-| F10 | Cancel races with successful completion. | One native terminal result; request receipt differs from finality. |
-| F11 | Cancel while asleep and while in uncooperative I/O. | No new durable wake after confirmed cancel; external call limits honestly reported. |
-| F12 | Exceed active duration and elapsed deadline separately. | Correct clock/reason; sleep excluded only from active clock; retry does not reset elapsed deadline. |
-| F13 | Memory exhaustion/process kill. | Native failed/recovered state remains queryable; supervisor doesn't strand invisible work. |
-| F14 | Concurrent replicas and old/new versions hit one cap. | Declared distributed upper bound is not exceeded within that service scope. |
-| F15 | Deploy new code while old run sleeps. | Old run resumes old build; new submissions use activated new build. |
-| F16 | Schedule reconcile interrupted after native create. | Reconcile retry does not duplicate owned schedules. |
-| F17 | Scheduler/worker down across multiple due slots. | Observed catch-up behavior matches advertised native policy. |
-| F18 | Native source closes watch before terminal frame. | Client re-reads/reconnects; it does not mark a run successful from EOF. |
-| F19 | Browser disconnects immediately before completion. | Reconnect obtains authoritative terminal output and closes cleanly. |
-| F20 | Switch run or tenant during pending snapshot read. | Old epoch/identity data cannot overwrite new state or leak output. |
-| F21 | Native stream token expires. | Refresh only with renewed authorization; denied access stops all reconnects. |
-| F22 | Cursor retention expires or buffer overflows. | Explicit reset/gap or typed failure; no silent lossless-history claim. |
-| F23 | Two observers share feed, one disconnects. | Other continues; last observer cleanup releases SDK resources and timers. |
-| F24 | Repeated React Strict Mode mount/unmount. | No subscription/listener growth; manual disconnect remains respected. |
-| F25 | One of multiple jobs services is unavailable. | Inspector lists other services and marks partial results, not false zero counts. |
-| F26 | Tamper with run locator/scope/projection cursor. | Authorized read fails safely before private payload serialization. |
-| F27 | Retire service or rotate locator key with retained runs. | Old run references remain routable or retirement is blocked with explicit impact. |
-| F28 | Same provider used by two different configured services. | SDK credentials, worker identities, polling and native calls never cross bindings. |
+| ID  | Injection / setup                                        | Required assertion                                                                                     |
+| --- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| F01 | Lose HTTP response after native acceptance.              | Caller sees unknown outcome; original key recovers the same run when receipt capability is advertised. |
+| F02 | Submit same key concurrently from two API replicas.      | One logical native run within native dedupe scope; both handles resolve consistently.                  |
+| F03 | Kill worker immediately after claim, before handler.     | Native recovery makes work eligible; no permanent invisible lease.                                     |
+| F04 | Kill after business effect, before native completion.    | Replay may occur; idempotent fixture produces one business effect and correct final output.            |
+| F05 | Kill after sleep was committed.                          | Restart resumes/replays same run; completed wait does not restart a full duration.                     |
+| F06 | Crash before/after two different sleep keys.             | Stable wait ordering and due times; no repeated full wait or phantom attempt.                          |
+| F07 | Fail before first sleep and after second sleep.          | Total application retry budget is enforced; no native step budget multiplication.                      |
+| F08 | Restart engine/storage while work is queued/delayed.     | Acceptance durability matches configured persisted backend; no memory fallback.                        |
+| F09 | Native lease expires while old worker is paused.         | Native fencing rules prevent stale terminal overwrite; external idempotency remains necessary.         |
+| F10 | Cancel races with successful completion.                 | One native terminal result; request receipt differs from finality.                                     |
+| F11 | Cancel while asleep and while in uncooperative I/O.      | No new durable wake after confirmed cancel; external call limits honestly reported.                    |
+| F12 | Exceed active duration and elapsed deadline separately.  | Correct clock/reason; sleep excluded only from active clock; retry does not reset elapsed deadline.    |
+| F13 | Memory exhaustion/process kill.                          | Native failed/recovered state remains queryable; supervisor doesn't strand invisible work.             |
+| F14 | Concurrent replicas and old/new versions hit one cap.    | Declared distributed upper bound is not exceeded within that service scope.                            |
+| F15 | Deploy new code while old run sleeps.                    | Old run resumes old build; new submissions use activated new build.                                    |
+| F16 | Schedule reconcile interrupted after native create.      | Reconcile retry does not duplicate owned schedules.                                                    |
+| F17 | Scheduler/worker down across multiple due slots.         | Observed catch-up behavior matches advertised native policy.                                           |
+| F18 | Native source closes watch before terminal frame.        | Client re-reads/reconnects; it does not mark a run successful from EOF.                                |
+| F19 | Browser disconnects immediately before completion.       | Reconnect obtains authoritative terminal output and closes cleanly.                                    |
+| F20 | Switch run or tenant during pending snapshot read.       | Old epoch/identity data cannot overwrite new state or leak output.                                     |
+| F21 | Native stream token expires.                             | Refresh only with renewed authorization; denied access stops all reconnects.                           |
+| F22 | Cursor retention expires or buffer overflows.            | Explicit reset/gap or typed failure; no silent lossless-history claim.                                 |
+| F23 | Two observers share feed, one disconnects.               | Other continues; last observer cleanup releases SDK resources and timers.                              |
+| F24 | Repeated React Strict Mode mount/unmount.                | No subscription/listener growth; manual disconnect remains respected.                                  |
+| F25 | One of multiple jobs services is unavailable.            | Inspector lists other services and marks partial results, not false zero counts.                       |
+| F26 | Tamper with run locator/scope/projection cursor.         | Authorized read fails safely before private payload serialization.                                     |
+| F27 | Retire service or rotate locator key with retained runs. | Old run references remain routable or retirement is blocked with explicit impact.                      |
+| F28 | Same provider used by two different configured services. | SDK credentials, worker identities, polling and native calls never cross bindings.                     |
 
 Use real native process/container termination for durable scenarios, not only throwing an exception in the handler. Control storage failure modes and assert the native acknowledgement boundary. Every discovered production-style failure receives a minimized deterministic regression where possible and a native conformance fixture when necessary.
 
@@ -1735,21 +1768,21 @@ Inspector tests use server-generated large histories with bounded pages and mali
 
 Add `tests/types/jobs-names.test-d.ts`, `tests/unit/job-name.test.ts`, `tests/compiler/job-names.test.ts`, `tests/generator/job-dot-access.test.ts`, and `tests/inspector/job-name-filters.test.ts`, or their repository-conventional equivalents. They must cover these invariants:
 
-| Case | Expected result |
-|---|---|
-| `name: "exportOrders"`, `id: "orders.export"` | Generated `jobs.exportOrders.trigger()` and `runs.watch()` work; durable ID remains unchanged. |
-| Missing `id` with a valid explicit name | Effective durable ID is persisted as that name in the manifest; no second user field required. |
-| Dots, hyphens, spaces, leading digits, non-ASCII, reserved/prototype names | Type/runtime rejection; no sanitizer fallback. |
-| Equal names in separate services or private/exposed definitions | Compile failure identifying both source locations. |
-| Implicit task names collide or are ambiguous | Actionable explicit-job diagnostic; never append counters or path fragments. |
-| Valid task/job re-export | One descriptor and one name mapping, independent of discovery order. |
-| Unknown name in generated client or hook selector | Type error and server-side refusal for forged runtime requests. |
-| Name-only rename with pinned durable ID | API fingerprint changes; stored run, schedule, and dedup identities do not change. |
-| Rename with default-derived ID and no preservation | Migration diagnostic rather than silent history loss. |
-| Watch across a public-contract name change | Old observer cleans up; stale selectors cannot attach to an unrelated job. |
-| Inspector name filter | Resolves to stable native identity and uses bounded queries; displays both values. |
-| Provider catalog, Docker presets, package/export/docs manifests | Exactly Inngest, Trigger.dev, and effect-mq are in this implementation milestone. |
-| Queue-only task on effect-mq; durable-sleep task on effect-mq | First can pass native conformance; second is rejected, never silently substituted. |
+| Case                                                                       | Expected result                                                                                |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `name: "exportOrders"`, `id: "orders.export"`                              | Generated `jobs.exportOrders.trigger()` and `runs.watch()` work; durable ID remains unchanged. |
+| Missing `id` with a valid explicit name                                    | Effective durable ID is persisted as that name in the manifest; no second user field required. |
+| Dots, hyphens, spaces, leading digits, non-ASCII, reserved/prototype names | Type/runtime rejection; no sanitizer fallback.                                                 |
+| Equal names in separate services or private/exposed definitions            | Compile failure identifying both source locations.                                             |
+| Implicit task names collide or are ambiguous                               | Actionable explicit-job diagnostic; never append counters or path fragments.                   |
+| Valid task/job re-export                                                   | One descriptor and one name mapping, independent of discovery order.                           |
+| Unknown name in generated client or hook selector                          | Type error and server-side refusal for forged runtime requests.                                |
+| Name-only rename with pinned durable ID                                    | API fingerprint changes; stored run, schedule, and dedup identities do not change.             |
+| Rename with default-derived ID and no preservation                         | Migration diagnostic rather than silent history loss.                                          |
+| Watch across a public-contract name change                                 | Old observer cleans up; stale selectors cannot attach to an unrelated job.                     |
+| Inspector name filter                                                      | Resolves to stable native identity and uses bounded queries; displays both values.             |
+| Provider catalog, Docker presets, package/export/docs manifests            | Exactly Inngest, Trigger.dev, and effect-mq are in this implementation milestone.              |
+| Queue-only task on effect-mq; durable-sleep task on effect-mq              | First can pass native conformance; second is rejected, never silently substituted.             |
 
 ## 18.7 Coverage and mutation gates
 
@@ -1798,16 +1831,16 @@ Prove stable duplicate receipt recovery, replay after two sleeps, exact retry/ba
 
 **Dependencies:** Phase 0. **Output:** immutable validated authoring APIs and declaration tests, no workers yet.
 
-| Proposed/existing file | Responsibility |
-|---|---|
-| `packages/jobs/src/define-task.ts` (new) | Construct/freeze task descriptors with branded refs and inferred schemas. |
-| `packages/jobs/src/task-types.ts` (new) | Authoring generics, mode-specific context, retry/resource/logging declarations. |
-| `packages/jobs/src/define-job.ts` (existing) | Require camelCase name and task target, resolve optional durable ID, jobs-service binding, schedules, client policy; gated legacy diagnostics. |
-| `packages/jobs/src/job-name.ts` (new) | Shared name grammar/reserved-set validation and literal-type helper; no normalization or discovery-order aliases. |
-| `packages/jobs/src/duration.ts` (new) | Validate readable public duration subset and normalize using installed Effect. |
-| `packages/jobs/src/run-contracts.ts` (new, or lower-level contract split) | Serializable handles, statuses, errors, snapshots, controls and watch frames. |
-| `packages/app/src/tasks.ts` (new), app export map | Focused public authoring entry point; root exports. |
-| `packages/contracts/src/*` (existing/new scoped module) | Descriptor kind/ref support without jobs/functions import cycle. |
+| Proposed/existing file                                                    | Responsibility                                                                                                                                 |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/jobs/src/define-task.ts` (new)                                  | Construct/freeze task descriptors with branded refs and inferred schemas.                                                                      |
+| `packages/jobs/src/task-types.ts` (new)                                   | Authoring generics, mode-specific context, retry/resource/logging declarations.                                                                |
+| `packages/jobs/src/define-job.ts` (existing)                              | Require camelCase name and task target, resolve optional durable ID, jobs-service binding, schedules, client policy; gated legacy diagnostics. |
+| `packages/jobs/src/job-name.ts` (new)                                     | Shared name grammar/reserved-set validation and literal-type helper; no normalization or discovery-order aliases.                              |
+| `packages/jobs/src/duration.ts` (new)                                     | Validate readable public duration subset and normalize using installed Effect.                                                                 |
+| `packages/jobs/src/run-contracts.ts` (new, or lower-level contract split) | Serializable handles, statuses, errors, snapshots, controls and watch frames.                                                                  |
+| `packages/app/src/tasks.ts` (new), app export map                         | Focused public authoring entry point; root exports.                                                                                            |
+| `packages/contracts/src/*` (existing/new scoped module)                   | Descriptor kind/ref support without jobs/functions import cycle.                                                                               |
 
 **Gate:** Type/runtime reject invalid/reserved job names, functions as tasks, job-owned handlers, invalid durations, unsafe schemas, and unsupported context methods. Imports cause no network/Docker/worker side effects.
 
@@ -1892,6 +1925,7 @@ Publish migration diagnostics/codemod fixtures before removing legacy aliases. V
 **Gate:** Clean install/scaffold, compile, Docker startup, trigger/watch/restart, Inspector filters, docs, package checks, all advertised adapter conformance, and existing repository verification pass. API review approves explicit feature limitations; no production support claim relies only on planning prose.
 
 ---
+
 # 20. OpenSpec-ready requirements and scenarios
 
 Use these identifiers unchanged when splitting the work into OpenSpec changes. “MUST” is normative for advertised/supported capabilities. Optional native features are enabled only after their capability gates; unsupported features must fail, not degrade silently. Each requirement references its design section and corresponding phase/tests.
@@ -2124,37 +2158,37 @@ The repository reference is fixed for reproducibility. Provider documentation is
 
 ## 22.2 Repository evidence
 
-| Reference | Source and finding |
-|---|---|
-| [R0] | Current commit and parent relationship; current reference `1e7f3ce9bf29ded4f10fc75d25672b5946b25e60`. |
-| [R1] | Existing job descriptor validates a function target and does not own a handler; intentional migration needed. |
-| [R2] | Existing provider capability, integration registration, bindings and feature protocol to reuse. |
-| [R3] | Existing application provider configuration and singular `job` capability. |
-| [R4] | `docker(adapter())` is a declarative local-provider wrapper. |
-| [R5] | Current local-service recipe has one image and optional volume; composite jobs stacks need an extension. |
-| [R6] | Domain services currently group functions/events; tasks/jobs require typed integration. |
-| [R7] | Inspector generic runtime collection projection; jobs-specific bounded queries are necessary. |
-| [R8] | React route/mutation hooks already use identity-scoped TanStack infrastructure and ambiguous-write handling. |
-| [R9] | Documentation content tree and generated API layout. |
-| [R10] | Agent client policies use mutually exclusive public/authorize exposure. |
-| [R11] | Existing integration package metadata and runtime capability registrations. |
-| [R12] | Function descriptor/context dependencies and invocation behavior. |
-| [R13] | Native graph descriptor and persistence ownership. |
-| [R14] | Repository commands, package boundaries, verification and local development conventions. |
-| [R15] | Rechecked generated oRPC contract construction; job name-based entries must extend it rather than changing existing route keys. |
+| Reference | Source and finding                                                                                                              |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| [R0]      | Current commit and parent relationship; current reference `1e7f3ce9bf29ded4f10fc75d25672b5946b25e60`.                           |
+| [R1]      | Existing job descriptor validates a function target and does not own a handler; intentional migration needed.                   |
+| [R2]      | Existing provider capability, integration registration, bindings and feature protocol to reuse.                                 |
+| [R3]      | Existing application provider configuration and singular `job` capability.                                                      |
+| [R4]      | `docker(adapter())` is a declarative local-provider wrapper.                                                                    |
+| [R5]      | Current local-service recipe has one image and optional volume; composite jobs stacks need an extension.                        |
+| [R6]      | Domain services currently group functions/events; tasks/jobs require typed integration.                                         |
+| [R7]      | Inspector generic runtime collection projection; jobs-specific bounded queries are necessary.                                   |
+| [R8]      | React route/mutation hooks already use identity-scoped TanStack infrastructure and ambiguous-write handling.                    |
+| [R9]      | Documentation content tree and generated API layout.                                                                            |
+| [R10]     | Agent client policies use mutually exclusive public/authorize exposure.                                                         |
+| [R11]     | Existing integration package metadata and runtime capability registrations.                                                     |
+| [R12]     | Function descriptor/context dependencies and invocation behavior.                                                               |
+| [R13]     | Native graph descriptor and persistence ownership.                                                                              |
+| [R14]     | Repository commands, package boundaries, verification and local development conventions.                                        |
+| [R15]     | Rechecked generated oRPC contract construction; job name-based entries must extend it rather than changing existing route keys. |
 
 Implementation files originally inspected at the preceding commit are linked to that exact source below; newly reread configuration/runtime examples use the current commit. The current release commit does not substitute for re-running implementation tests.
 
 ## 22.3 Official provider and duration evidence
 
-| References | Relevant native area | Required implementation verification |
-|---|---|---|
-| [T1], [T2], [T3], [T4] | Trigger task retries, waits, duration and machine settings. | Attempt accounting, wait identity/retention, exact time clocks, resource class mapping. |
-| [T5], [T6], [T8], [T9] | Trigger subscriptions, realtime auth, output streams and metadata. | Cancellation of iterators, projection/token scope, stream generations, cursor/retention support. |
-| [T7] | Trigger Docker self-hosting. | Checkpoint limitation, local bootstrap, worker resources and separate Docker certification. |
-| [I1], [I2], [I3], [I4] | Inngest self-hosting, native function policy, keyed sleep, realtime subscribing. | Persisted queue mode, total task retry budget, event/run identity, deployment/version routing, native observation. |
-| [M1], [M2], [M3], [M4] | effect-mq retries, workers, repeatable jobs, setup/storage. | Effect dependency compatibility, persisted driver, distributed admission, native schedules and queue-only task mode. |
-| [E1] | Effect's duration input conventions. | Public finite string subset and installed runtime parser compatibility. |
+| References             | Relevant native area                                                             | Required implementation verification                                                                                 |
+| ---------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| [T1], [T2], [T3], [T4] | Trigger task retries, waits, duration and machine settings.                      | Attempt accounting, wait identity/retention, exact time clocks, resource class mapping.                              |
+| [T5], [T6], [T8], [T9] | Trigger subscriptions, realtime auth, output streams and metadata.               | Cancellation of iterators, projection/token scope, stream generations, cursor/retention support.                     |
+| [T7]                   | Trigger Docker self-hosting.                                                     | Checkpoint limitation, local bootstrap, worker resources and separate Docker certification.                          |
+| [I1], [I2], [I3], [I4] | Inngest self-hosting, native function policy, keyed sleep, realtime subscribing. | Persisted queue mode, total task retry budget, event/run identity, deployment/version routing, native observation.   |
+| [M1], [M2], [M3], [M4] | effect-mq retries, workers, repeatable jobs, setup/storage.                      | Effect dependency compatibility, persisted driver, distributed admission, native schedules and queue-only task mode. |
+| [E1]                   | Effect's duration input conventions.                                             | Public finite string subset and installed runtime parser compatibility.                                              |
 
 ## 22.4 Outstanding evidence, not hidden assumptions
 

@@ -6,7 +6,7 @@ export function traceOperationType(span: InspectorObject): string {
   const source = text(span.source);
   if (kind === "server") return "route";
   if (name.startsWith("relkit.middleware.")) return "middleware";
-  if (name.startsWith("relkit.invoke.")) return "function";
+  if (name.startsWith("relkit.invoke.")) return source === "system" ? "system call" : "function";
   if (name.startsWith("relkit.database.")) return "database call";
   if (name.startsWith("relkit.cache.")) return "cache call";
   if (name.startsWith("relkit.bucket.")) return "bucket call";

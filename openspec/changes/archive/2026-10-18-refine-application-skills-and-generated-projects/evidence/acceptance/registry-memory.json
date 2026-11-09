@@ -7,7 +7,7 @@
     "--timeout",
     "15000"
   ],
-  "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+  "cwd": "<repo>",
   "before": {
     "at": "2026-10-18T16:59:26.387662+00:00",
     "cpu": 10,

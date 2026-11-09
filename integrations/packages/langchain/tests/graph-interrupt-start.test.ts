@@ -11,7 +11,7 @@ import {
   StateSchema,
   interrupt,
 } from "@langchain/langgraph";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import {
   AgentRuntimeError,
   GraphInterruptedError,

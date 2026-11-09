@@ -3,7 +3,7 @@
  * existing generator owns formatting, freshness checks and output files; this
  * producer resolves commands and application-owned repairs without SDK startup.
  */
-import { buildCatalogDependency, buildCatalogPatch } from "create-relkit/internal/build-catalog";
+import { buildCatalogDependency, buildCatalogPatch } from "create-relkit/build-catalog";
 import { resolveCatalogVersion } from "create-relkit/catalog-resolution";
 import { Effect } from "effect";
 import { installationDeclarations, loadInstallationCatalog } from "./installation-catalog.js";

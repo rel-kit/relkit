@@ -1,4 +1,7 @@
 import { expect, test } from "bun:test";
+import { ORPCError } from "@orpc/client";
+import { createMutationOperations } from "../../src/react/mutation.service.ts";
+import { createPendingOperations } from "../../src/react/pending.service.ts";
 import {
   clearPendingOperations,
   digestPendingRequest,
@@ -103,4 +106,47 @@ test("unknown job intents require an active same-key recovery window before reus
     }),
   ).rejects.toMatchObject({ code: "RELKIT_PENDING_RECOVERY_UNAVAILABLE" });
   clearPendingOperations(scope);
+});
+
+test("mutation submission forgets on success and settles failures before rethrowing", async () => {
+  const pending = createPendingOperations({ memory: new Map(), storage: () => undefined });
+  const mutations = createMutationOperations(pending);
+  const seen: number[] = [];
+  const submit = (operationId: string, execute: () => Promise<unknown>) =>
+    mutations.submit(
+      "scope",
+      "job-trigger",
+      "exports",
+      { operationId },
+      {},
+      { operationId },
+      () => {
+        seen.push(pending.list("scope").length);
+        return execute();
+      },
+    );
+  expect(await submit("ok", async () => "receipt")).toBe("receipt");
+  expect(pending.list("scope")).toHaveLength(0);
+  const lost = { code: "transport-lost" };
+  await expect(submit("lost", () => Promise.reject(lost))).rejects.toBe(lost);
+  expect(pending.list("scope")).toMatchObject([{ operationId: "lost", state: "unknown" }]);
+  const declared = new ORPCError("FORBIDDEN");
+  await expect(submit("declared", () => Promise.reject(declared))).rejects.toBe(declared);
+  expect(pending.list("scope").map((entry) => String(entry.operationId))).toEqual(["lost"]);
+  const unknown = {
+    data: {
+      code: "RELKIT_JOB_SUBMISSION_UNKNOWN",
+      outcome: "unknown",
+      operationId: "recover",
+      idempotencyKey: "key-2",
+      recovery: { action: "inspect-native" },
+    },
+  };
+  await expect(submit("recover", () => Promise.reject(unknown))).rejects.toBe(unknown);
+  expect(pending.list("scope").find((entry) => entry.operationId === "recover")).toMatchObject({
+    state: "unknown",
+    idempotencyKey: "key-2",
+    recovery: { action: "inspect-native" },
+  });
+  expect(seen).toEqual([1, 1, 2, 2]);
 });

@@ -1,11 +1,11 @@
 /** Supplies the selected deployment engine and test-owned stack, planning and reporting adapters. */
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { DeploymentPlan } from "@relkit/deploy";
-import * as pulumi from "@relkit/deploy-pulumi";
-import { GRAPH_VERSION } from "@relkit/contracts";
-import { hashGraph, type ApplicationGraph } from "@relkit/graph";
-import { loadConfig } from "@relkit/compiler";
+import type { DeploymentPlan } from "relkit/deploy";
+import * as pulumi from "@relkit/pulumi/deploy-pulumi";
+import { GRAPH_VERSION } from "relkit/contracts";
+import { hashGraph, type ApplicationGraph } from "relkit/graph";
+import { loadConfig } from "./src/compiler/index.js";
 import { emptyCheckOutputs } from "./src/commands/check-support.js";
 import type { CheckResult } from "./src/commands/check.js";
 import type { DeployCommandOptions } from "./src/commands/deploy-support.types.js";

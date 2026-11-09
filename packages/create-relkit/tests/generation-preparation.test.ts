@@ -5,7 +5,7 @@
  * untouched. These tests do not claim packed runtime or timing acceptance.
  */
 import { afterEach, expect, test } from "bun:test";
-import { access, mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { generateProject } from "../src/generate.js";
@@ -18,31 +18,22 @@ afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
 });
 
-test("finite preparation is the only compiler command and its artifact survives atomic rename", async () => {
+test("the finite check is the only compiler command and creation publishes after it", async () => {
   const root = await temporaryRoot();
   const executed: string[][] = [];
   const result = await generateProject(normalizeCreateOptions(["prepared", "--no-git"]), {
     cwd: root,
     templateRoot,
     relkitExecutable: "relkit",
-    commandRunner: async (command, stage) => {
+    commandRunner: async (command) => {
       executed.push([...command]);
       expect((await readdir(root)).includes("prepared")).toBe(false);
-      if (command[1] === "dev") {
-        await mkdir(join(stage, ".relkit/dev-snapshot"), { recursive: true });
-        await writeFile(
-          join(stage, ".relkit/dev-snapshot/prepared-test.json"),
-          '{"portable":true}\n',
-        );
-      }
       return { exitCode: 0 };
     },
   });
   expect(executed.map((command) => command[1])).toEqual(["install", "doctor", "dev"]);
   expect(executed[2]?.slice(1, 4)).toEqual(["dev", "--prepare", "--project-root"]);
-  expect(
-    await readFile(join(result.destination, ".relkit/dev-snapshot/prepared-test.json"), "utf8"),
-  ).toBe('{"portable":true}\n');
+  expect(result.installed).toBe(true);
   expect((await readdir(root)).filter((name) => name.startsWith(".prepared-relkit-"))).toEqual([]);
 });
 
@@ -77,7 +68,7 @@ test("no-install performs no preparation subprocess and reports the finite workf
     },
   );
   expect(result.warnings[0]?.message).toContain("relkit dev --prepare");
-  await expect(access(join(result.destination, ".relkit/dev-snapshot"))).rejects.toThrow();
+  await expect(access(join(result.destination, ".relkit"))).rejects.toThrow();
 });
 
 /** Allocates and registers a root owned only by this suite.

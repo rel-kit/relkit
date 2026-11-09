@@ -1,22 +1,15 @@
 import { describe, expect, test } from "bun:test";
-import { itemsForJob, nextRunValue, queueCounts } from "./jobs-model";
+import { itemsForJob, runCounts } from "./jobs-model";
 
 describe("inspector job projections", () => {
-  test("keeps per-job queue counts and safe next-run metadata", () => {
+  test("keeps per-job run counts", () => {
     const items = [
-      { jobId: "orders.send", instanceId: "one", state: "available" },
-      { jobId: "orders.send", instanceId: "two", state: "dead-lettered" },
-      { jobId: "other.job", instanceId: "three", state: "completed" },
+      { jobId: "orders.send", runId: "one", status: "running" },
+      { jobId: "orders.send", runId: "two", status: "failed" },
+      { jobId: "other.job", runId: "three", status: "completed" },
     ];
     const selected = itemsForJob(items, "orders.send", ["orders.send", "other.job"]);
     expect(selected).toHaveLength(2);
-    expect(queueCounts(selected)).toMatchObject({ available: 1, "dead-lettered": 1 });
-    expect(
-      nextRunValue(
-        { schedule: [{ id: "hourly" }] },
-        [{ schedules: [{ id: "hourly", nextRunAt: 1_700_000_000_000 }] }],
-        "hourly",
-      ),
-    ).toBe(1_700_000_000_000);
+    expect(runCounts(selected)).toMatchObject({ running: 1, failed: 1, completed: 0 });
   });
 });

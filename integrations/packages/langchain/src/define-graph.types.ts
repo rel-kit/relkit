@@ -1,10 +1,10 @@
 /** Exposes typed LangGraph authoring and delegates descriptor validation and construction before any graph execution can begin. This companion preserves the native input and output types without starting runtime work. */
 
 import type { AnyStateSchema, BaseCheckpointSaver, BaseStore } from "@langchain/langgraph";
-import type { DescriptorBase, DescriptorMetadata } from "@relkit/contracts";
-import type { AgentRef, FunctionGraphNodeDescriptor } from "@relkit/functions";
-import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
-import type { AgentClientPolicy, AgentControl } from "@relkit/agents/internal/agent-client";
+import type { DescriptorBase, DescriptorMetadata } from "relkit/contracts";
+import type { AgentRef, FunctionGraphNodeDescriptor } from "relkit/functions";
+import type { InferInput, InferOutput, StandardSchemaV1 } from "relkit/schema";
+import type { AgentClientPolicy, AgentControl } from "relkit/agents/agent-client";
 import type { AgentLimits } from "./define-agent.types.js";
 import type { GraphNodeAny } from "./define-graph-node.js";
 import type { GraphEdgeBuilder, GraphEdgeOperation } from "./graph-edges.js";
@@ -14,16 +14,16 @@ import type { AgentClientContractMetadata } from "./client-contract-metadata.js"
 import type { GraphAsNodeOptions, SubgraphNodeDescriptor } from "./graph-subgraph.js";
 import type { GRAPH_EXECUTION } from "./graph-execution-symbol.js";
 
-/** Authored node accepted by a graph descriptor. */
+/** Authored node accepted by a graph descriptor. @experimental */
 export type GraphNodeLike = GraphNodeAny | FunctionGraphNodeDescriptor | SubgraphNodeDescriptor;
 
-/** ID union of a graph's authored nodes. */
+/** ID union of a graph's authored nodes. @experimental */
 export type GraphNodeId<Nodes extends readonly GraphNodeLike[]> = Nodes[number]["id"];
 
-/** State value inferred from a LangGraph StateSchema. */
+/** State value inferred from a LangGraph StateSchema. @experimental */
 export type GraphState<State extends AnyStateSchema> = State["State"];
 
-/** Public state keys selected from a LangGraph StateSchema. */
+/** Public state keys selected from a LangGraph StateSchema. @experimental */
 export type GraphStateKey<State extends AnyStateSchema> = Extract<keyof GraphState<State>, string>;
 
 type UniqueNodes<
@@ -39,7 +39,7 @@ type UniqueNodes<
         : Nodes
     : Nodes;
 
-/** Runtime state and persistence declarations hidden on a graph descriptor. */
+/** Runtime state and persistence declarations hidden on a graph descriptor. @experimental */
 export interface GraphExecution<State = any> {
   readonly state: AnyStateSchema;
   readonly operations: readonly GraphEdgeOperation<string, State>[];
@@ -47,7 +47,7 @@ export interface GraphExecution<State = any> {
   readonly store?: BaseStore | MemoryResource;
 }
 
-/** Inspectable agent descriptor backed by a native LangGraph graph. */
+/** Inspectable agent descriptor backed by a native LangGraph graph. @experimental */
 export interface GraphDescriptor<
   Id extends string = string,
   InputSchema extends StandardSchemaV1 = StandardSchemaV1,
@@ -75,7 +75,7 @@ export interface GraphDescriptor<
   ) => SubgraphNodeDescriptor<NodeId, InputSchema, OutputSchema>;
 }
 
-/** Authoring options for a native LangGraph agent descriptor. */
+/** Authoring options for a native LangGraph agent descriptor. @experimental */
 export interface DefineGraphOptions<
   Id extends string,
   InputSchema extends StandardSchemaV1,
@@ -99,8 +99,8 @@ export interface DefineGraphOptions<
   readonly store?: BaseStore | MemoryResource;
 }
 
-/** Input inferred from a graph descriptor. */
+/** Input inferred from a graph descriptor. @experimental */
 export type GraphInput<Graph extends GraphDescriptor> = InferInput<Graph["input"]>;
 
-/** Output inferred from a graph descriptor. */
+/** Output inferred from a graph descriptor. @experimental */
 export type GraphOutput<Graph extends GraphDescriptor> = InferOutput<Graph["output"]>;

@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
-import { captureOutputLines } from "@relkit/supervisor";
+import { captureOutputLines } from "./src/supervisor/index.js";
 import { createDevLogger, devLogSinks } from "./src/commands/dev-logger";
 import { formatDevLog } from "./src/commands/dev-log-format";
 import { parseProjectArgs } from "./src/commands/project-args";
-import type { LogRecord } from "@relkit/runtime-effect";
-import { redactFailureDetail } from "@relkit/runtime-effect";
+import type { LogRecord } from "relkit/runtime-effect";
+import { redactFailureDetail } from "relkit/runtime-effect";
 import type { DevLogEvent } from "./src/commands/dev";
 
 test("scaffold rebuild output is concise while verbose and JSON retain diagnostic details", () => {

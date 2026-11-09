@@ -1,6 +1,4 @@
-import { runExecutionPromise } from "@relkit/contracts/operation";
-import { Effect } from "effect";
-import { agentOperations, agentRuntime } from "./agent-runtime.js";
+import { agentOperations } from "./agent-operations.service.js";
 import type { AgentIdentity, AgentUpdate } from "./agent-operations.types.js";
 
 /**
@@ -24,13 +22,9 @@ export function restoreAndObserve<Output>(
   signal: AbortSignal,
   update: AgentUpdate<Output>,
 ): Promise<void> {
-  return runExecutionPromise(
-    agentRuntime,
-    agentOperations
-      .observe(client, streamClient, agentId, threadId, identity, signal, update)
-      .pipe(Effect.catchCause((cause) => (signal.aborted ? Effect.void : Effect.failCause(cause)))),
-    { signal },
-  ).catch((error) => {
-    if (!signal.aborted) throw error;
-  });
+  return agentOperations
+    .observe(client, streamClient, agentId, threadId, identity, signal, update)
+    .catch((error: unknown) => {
+      if (!signal.aborted) throw error;
+    });
 }

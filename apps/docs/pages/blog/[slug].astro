@@ -60,12 +60,12 @@ const jsonLd = {
   url,
   image: `${site}/og${post.href}.png`,
   author: post.authors.map((author) => ({ "@type": "Person", name: author.name, url: author.url })),
-  publisher: { "@type": "Organization", name: "RELKIT", url: site },
+  publisher: { "@type": "Organization", name: "RelKit", url: site },
 };
 ---
 
 <BlogLayout
-  title={`${post.title} — RELKIT Blog`}
+  title={`${post.title} — RelKit Blog`}
   description={post.description}
   path={post.href}
   ogImage={`/og${post.href}.png`}

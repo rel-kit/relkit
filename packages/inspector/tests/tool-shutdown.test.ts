@@ -2,7 +2,7 @@
 import { expect, it } from "@effect/vitest";
 import { Deferred, Effect, Fiber, Layer } from "effect";
 import { TestClock } from "effect/testing";
-import { InspectionFiles, InspectionNative } from "@relkit/inspector-api/connection";
+import { InspectionFiles, InspectionNative } from "relkit/inspector-api/connection";
 import { InspectorTool } from "../src/tool.service.js";
 import { InspectorDiscovery } from "../src/discovery.service.js";
 import { InspectorRemote } from "../src/remote.service.js";

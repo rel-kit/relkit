@@ -1,12 +1,13 @@
 /** Exercises native ai test matrix behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/index.ts";
 import { describe, expect, test } from "vitest";
-import { z } from "@relkit/schema";
-import { defineAgent, invokeAgent } from "../src/index.ts";
+import { z } from "relkit/schema";
+import { invokeAgent } from "../src/index.ts";
 import {
   parseModelProviderConfiguration,
   resolveModelSelector,
-} from "@relkit/agents/internal/model-selection";
+} from "relkit/agents/model-selection";
 import { createTestModel } from "./test-model.ts";
 
 const modelCases = [
@@ -43,6 +44,7 @@ describe("offline native model matrix", () => {
       const selected: unknown[] = [];
       const agent = defineAgent({
         id: `matrix.${entry.name.toLowerCase().replaceAll(" ", ".")}`,
+        runtime: langchain(),
         input: z.object({ question: z.string() }),
         output: z.object({ answer: z.string() }),
         ...(entry.selector === undefined ? {} : { model: entry.selector }),

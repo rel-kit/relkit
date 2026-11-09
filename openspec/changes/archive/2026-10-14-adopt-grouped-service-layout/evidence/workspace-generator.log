@@ -7,7 +7,7 @@ generator strict services: 4.3s
   duration_ms: 4319.649208,
 }
 
- RUN  v5.0.1 /Users/mustafaelsayed/Workspace/relkit
+ RUN  v5.0.1 <repo>
 
 
  Test Files  10 passed (10)

@@ -2,7 +2,7 @@
 import { expect, test } from "bun:test";
 import { readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { GRAPH_VERSION } from "@relkit/contracts";
+import { GRAPH_VERSION } from "relkit/contracts";
 import { buildProject } from "./src/commands/build.js";
 import { checkProject } from "./src/commands/check.js";
 
@@ -113,7 +113,7 @@ test("build carries server port, body limit, and API docs settings into runtime 
   const root = await copyProject("tests/compiler/fixtures/valid-minimal");
   await writeFile(
     join(root, "relkit.config.ts"),
-    'import { defineApp, defineEnv } from "@relkit/app/config";\nexport default defineApp({ env: defineEnv({}), server: { port: 4321, maxBodyBytes: 2048, apiDocs: { enabledInProduction: true } } });\n',
+    'import { defineApp, defineEnv } from "relkit/config";\nexport default defineApp({ env: defineEnv({}), server: { port: 4321, maxBodyBytes: 2048, apiDocs: { enabledInProduction: true } } });\n',
   );
   const built = await buildProject({ projectRoot: root });
   expect(built.ok).toBe(true);

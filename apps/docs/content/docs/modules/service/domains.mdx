@@ -6,11 +6,11 @@ sidebar:
   icon: network
 ---
 
-A domain is a part of your product with its own responsibility, such as Orders, Receipts, or Accounts. Orders knows what it
-means to create, price, update, or cancel an order. Receipts knows how to prepare and send a receipt.
+A domain is a part of your product with its own responsibility, such as Orders, Invoices, or Accounts. Orders knows what it
+means to create, price, update, or cancel an order. Invoices knows how to prepare and send an invoice.
 Both may use functions, events, and storage, but those technologies do not define their boundaries.
 
-In RELKIT, a domain is an immediate child of the selected service root, such as `src/services/orders/`
+In RelKit, a domain is an immediate child of the selected service root, such as `src/services/orders/`
 in a new grouped app or `src/orders/` in an existing flat app. One `service.ts` describes what other
 domains and routes may use. Keep the app's boundary shape consistent.
 
@@ -31,7 +31,7 @@ The benefit is a shorter change path, not a promise that adding folders makes ex
 - **Reuse an operation.** An HTTP route and an AI tool can use the same validated function instead of
   maintaining separate implementations.
 - **Review a smaller contract.** Callers depend on selected service members, not every helper file.
-- **Add independent reactions.** Receipts can subscribe to an order event without adding receipt logic
+- **Add independent reactions.** Invoices can subscribe to an order event without adding invoice logic
   to the order-creation handler.
 - **Catch misplaced dependencies early.** `bun run check` reports invalid domain boundaries and public
   members before the application activates.
@@ -44,7 +44,7 @@ Ask: “Which part of the product is responsible for this rule or result?”
 | ------------------------------------------------ | ------------ | ------------------------------------------------- |
 | Calculate an order total                         | Orders       | It defines order pricing behavior.                |
 | Add a tool that looks up an order                | Orders       | AI access does not change who owns the lookup.    |
-| React to an order by sending a receipt           | Receipts     | The reaction belongs to the receiving domain.     |
+| React to an order by sending an invoice          | Invoices     | The reaction belongs to the receiving domain.     |
 | Parse an HTTP header                             | Routes       | It is a transport detail, not an order rule.      |
 | Declare a provider endpoint environment variable | Platform     | It supports runtime configuration across domains. |
 
@@ -59,8 +59,8 @@ feature. Nested directories remain part of that owning domain. A nested `service
 independent child service; add another immediate service-root child when a separate boundary is needed.
 
 Consider a separate domain when it has a responsibility you can name independently, can expose a small
-useful contract, and evolves without requiring callers to understand its internal details. Receipts is
-a useful separation when receipt delivery has its own retry, scheduling, and formatting concerns.
+useful contract, and evolves without requiring callers to understand its internal details. Invoices is
+a useful separation when invoice delivery has its own retry, scheduling, and formatting concerns.
 
 Do not create an empty domain for a future feature. A normal domain must own a graph-visible artifact
 in addition to its service, even if it has no public functions.

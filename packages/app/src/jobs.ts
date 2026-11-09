@@ -1,2 +1,2 @@
-export * from "@relkit/jobs";
-export type { RunStatus } from "@relkit/contracts/jobs";
+import "./deprecated.js";
+export * from "relkit/jobs";

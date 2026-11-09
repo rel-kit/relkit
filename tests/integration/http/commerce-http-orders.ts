@@ -22,6 +22,7 @@ export const verifyOrderReads = Effect.fn("test.commerce.http.reads")(function* 
     }),
   );
   expect(created.status).toBe(201);
+  expect(created.headers.get("location")).toBe("/orders/order-1");
   expect(yield* Effect.tryPromise(() => created.json())).toEqual({
     orderId: "order-1",
     receiptKey: "order-1.json",

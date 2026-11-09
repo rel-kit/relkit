@@ -1,5 +1,5 @@
-import type ts from "typescript";
-import { routeSourceFindings, routeModuleFindings } from "@relkit/compiler/editor";
+import type ts from "./typescript-parser.js";
+import { routeSourceFindings, routeModuleFindings } from "./compiler/editor.js";
 import type { EditorModules } from "./editor.types.js";
 
 const ROUTE_DIAGNOSTIC = 99001;
@@ -13,7 +13,7 @@ const ROUTE_DIAGNOSTIC = 99001;
 export default function initialize(modules: EditorModules): ts.server.PluginModule {
   const typescript = modules.typescript;
   return {
-    /** Adds RELKIT findings and fixes while forwarding all other host methods.
+    /** Adds RelKit findings and fixes while forwarding all other host methods.
      * @param info - Host language service and plugin context.
      * @returns A synchronous proxy backed by the existing language service.
      */
@@ -34,7 +34,7 @@ export default function initialize(modules: EditorModules): ts.server.PluginModu
       }
       /** Reads current host snapshots and appends route findings.
        * @param file - Source file requested by the editor.
-       * @returns Host diagnostics followed by RELKIT diagnostics, or just host results
+       * @returns Host diagnostics followed by RelKit diagnostics, or just host results
        * when the file or current program is unavailable.
        */
       proxy.getSemanticDiagnostics = (file) => {
@@ -56,45 +56,6 @@ export default function initialize(modules: EditorModules): ts.server.PluginModu
             source: "relkit",
             messageText: message,
           })),
-        ];
-      };
-      /** Adds the destructuring fix only for an overlapping RELKIT finding.
-       * @param file - Requested source file.
-       * @param start - Start of the editor selection.
-       * @param end - End of the editor selection.
-       * @param codes - Diagnostic codes selected for fixing.
-       * @param format - Host formatting options passed through unchanged.
-       * @param preferences - Host code-fix preferences passed through unchanged.
-       * @returns Existing host fixes followed by applicable RELKIT fixes.
-       */
-      proxy.getCodeFixesAtPosition = (file, start, end, codes, format, preferences) => {
-        const fixes = service.getCodeFixesAtPosition(file, start, end, codes, format, preferences);
-        if (!codes.includes(ROUTE_DIAGNOSTIC)) return fixes;
-        const source = service.getProgram()?.getSourceFile(file);
-        if (!source) return fixes;
-        return [
-          ...fixes,
-          ...routeSourceFindings(source, typescript).flatMap(({ node, replacement }) =>
-            replacement && node.getStart(source) < end && node.end > start
-              ? [
-                  {
-                    fixName: "relkit-destructure-service-routes",
-                    description: "Destructure the HTTP method from the service route table",
-                    changes: [
-                      {
-                        fileName: file,
-                        textChanges: [
-                          {
-                            span: { start: node.getStart(source), length: node.getWidth(source) },
-                            newText: replacement,
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ]
-              : [],
-          ),
         ];
       };
       return proxy;

@@ -8,17 +8,17 @@ import {
   applyScaffoldPlanEffect,
   scaffoldTransactionLive,
 } from "../../src/scaffolding/add-transaction.js";
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import { GeneratorProcess } from "create-relkit/internal/generator-process";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { GeneratorProcess } from "create-relkit/generator-process";
 import {
   GeneratorIoError,
   GeneratorProcessError,
   publicFailure,
-} from "create-relkit/internal/generator-errors";
-import { generatorCleanupFailures } from "create-relkit/internal/generator-cleanup";
+} from "create-relkit/generator-errors";
+import { generatorCleanupFailures } from "create-relkit/generator-cleanup";
 import { memoryFileSystem } from "./generator-services.fixture.js";
-import { restoreFilesEffect } from "create-relkit/internal/add-transaction-files";
+import { restoreFilesEffect } from "create-relkit/add-transaction-files";
 import {
   ignoredRunnerSetupEffect,
   ignoredRunnerTaskEffect,

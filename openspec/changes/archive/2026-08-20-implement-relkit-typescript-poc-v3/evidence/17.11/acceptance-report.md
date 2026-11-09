@@ -12,9 +12,9 @@ Bun: `1.3.10`
 ## Getting started flow
 
 The flow used a fresh parent under
-`/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-getting-started-5prpLq`
+`<tmp>/relkit-getting-started-5prpLq`
 and the exact generated project path
-`/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/T/relkit-getting-started-5prpLq/my-app`.
+`<tmp>/relkit-getting-started-5prpLq/my-app`.
 The local registry
 served the freshly packed artifacts at `http://127.0.0.1:49646`.
 

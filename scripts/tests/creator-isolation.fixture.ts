@@ -3,7 +3,6 @@ import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
-import ts from "typescript";
 import { readFileSync } from "node:fs";
 import { Schema } from "effect";
 export const root = resolve(import.meta.dirname, "../..");
@@ -36,16 +35,26 @@ export async function templateFixture(directory: string): Promise<string> {
 
 export async function wrapperFixture(directory: string): Promise<string> {
   await mkdir(join(directory, "wrapper"));
-  const source = (await readFile(join(root, "packages/relkit/src/index.ts"), "utf8"))
-    .replace('"create-relkit/launcher"', '"../launcher.mjs"')
-    .replace('"../package.json"', '"../wrapper-manifest.json"');
-  await writeFile(join(directory, "wrapper-manifest.json"), JSON.stringify(manifest));
-  await writeFile(
-    join(directory, "launcher.mjs"),
-    transpile(await readFile(join(root, "packages/create-relkit/src/launcher.ts"), "utf8")),
+  // One bundled file keeps the launcher's own modules without the workspace's node_modules.
+  const bundle = join(directory, "wrapper/launcher.mjs");
+  const built = spawnSync(
+    "bun",
+    [
+      "build",
+      join(root, "packages/relkit/src/launcher/index.ts"),
+      "--target=node",
+      "--format=esm",
+      "--outfile",
+      bundle,
+    ],
+    { encoding: "utf8" },
   );
+  if (built.status !== 0) throw new Error(`Launcher bundle failed: ${built.stderr}`);
   const entry = join(directory, "wrapper/index.mjs");
-  await writeFile(entry, transpile(source) + "\nprocess.exitCode = await main();\n");
+  await writeFile(
+    entry,
+    'import { main } from "./launcher.mjs";\nprocess.exitCode = await main();\n',
+  );
   await writeFile(
     join(directory, "package.json"),
     JSON.stringify({ devDependencies: { "@relkit/cli": version } }),
@@ -90,9 +99,4 @@ export function runWrapper(
     encoding: "utf8",
     timeout: 10_000,
   });
-}
-function transpile(source: string): string {
-  return ts.transpileModule(source, {
-    compilerOptions: { target: ts.ScriptTarget.ESNext, module: ts.ModuleKind.ESNext },
-  }).outputText;
 }

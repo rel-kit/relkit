@@ -1,0 +1,4 @@
+import { defineServiceRoutes } from "@relkit/app/routes";
+import orders from "../../services/orders/service.js";
+
+export const { POST } = defineServiceRoutes(orders, { POST: "placeOrder" });

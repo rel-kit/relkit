@@ -1,6 +1,6 @@
 /** Owns native child termination, output draining and finite command deadlines for scaffold evidence. */
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { ScaffoldProcessFailure } from "./scaffold-process.errors.js";
 import type { ScaffoldChild, ScaffoldCommand } from "./scaffold-process.types.js";
 import { spawnScaffoldProcess } from "./scaffold-process-spawn.js";

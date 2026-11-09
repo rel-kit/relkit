@@ -1,10 +1,13 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 /**
- * Native argv/signal edge selects the owning Effect command before importing it.
- * Prepared and safe commands each own their service graph and physical cleanup;
- * this edge awaits that lifetime and removes only its native signal listeners.
+ * Native argv/signal edge: loads the CLI, which selects the owning Effect command.
+ * Each command owns its service graph and physical cleanup; this edge awaits that
+ * lifetime and removes only its native signal listeners.
  */
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { installInvocationSignals } from "./invocation-signals.js";
+import { handOffToBun, shouldHandOffToBun } from "./runtime/bun-handoff.js";
 
 /**
  * Runs one executable invocation and removes its temporary native signal handlers.
@@ -31,28 +34,30 @@ export async function run(args: readonly string[] = process.argv.slice(2)): Prom
 }
 
 /**
- * Loads only the selected startup graph; help/global syntax retains the full parser.
+ * Loads the CLI parser and runs the selected command.
  * @param args - Literal native invocation arguments.
  * @param signal - Existing invocation-owned cancellation.
  * @returns Established exit status after the selected command's lifetime joins.
  */
 async function selectedCommand(args: readonly string[], signal: AbortSignal): Promise<number> {
-  if (args[0] === "dev" && args.includes("--prepare") && !args.includes("--help")) {
-    const prepared = await import("./dev-snapshot/snapshot-preparation-entry.js");
-    return prepared.runSnapshotPreparation(args.slice(1), signal);
-  }
-  if (
-    args[0] === "dev" &&
-    !args.some(
-      (argument) =>
-        ["--help", "--version", "--prepare"].includes(argument) || argument.startsWith("--json"),
-    )
-  ) {
-    const prepared = await import("./dev-snapshot/snapshot-command-entry.js");
-    if (await prepared.runPreparedDev(args.slice(1), signal)) return 0;
-  }
   const { runCli } = await import("./main.js");
   return runCli(args, { signal, installSignalHandlers: false });
 }
 
-if (import.meta.main) process.exitCode = await run();
+// Node 22 has no `import.meta.main`; compare the entry script with this module instead.
+const main =
+  import.meta.main ??
+  (process.argv[1] !== undefined &&
+    realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)));
+if (main) {
+  const handedOff = shouldHandOffToBun()
+    ? await handOffToBun(fileURLToPath(import.meta.url), process.argv.slice(2))
+    : undefined;
+  if (handedOff !== undefined) process.exitCode = handedOff;
+  else {
+    // On Node the CLI imports `relkit.config.ts` itself, so it registers the TypeScript hooks.
+    if (typeof process.versions.bun !== "string")
+      await import("./runtime/node/typescript-register.js");
+    process.exitCode = await run();
+  }
+}

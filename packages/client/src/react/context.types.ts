@@ -1,4 +1,4 @@
-import type { ClientIdentityDocument } from "@relkit/contracts";
+import type { ClientIdentityDocument } from "relkit/contracts";
 import type { QueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import type { ClientHeaders } from "../index.types.js";

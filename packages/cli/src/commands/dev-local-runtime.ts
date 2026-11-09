@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { Deferred, Effect, Layer, Ref } from "effect";
-import { PROVIDER_OVERRIDE_STATE_FILE } from "@relkit/local-service";
+import { PROVIDER_OVERRIDE_STATE_FILE } from "relkit/local-service";
 import { cliPromise, cliTry, type CliAdapterError } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliCleanup, cleanupEffect, cleanupLayer } from "../services/cleanup.service.js";

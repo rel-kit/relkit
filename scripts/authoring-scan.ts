@@ -1,4 +1,4 @@
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import { dependencyName, importReferences, isFixtureForbidden } from "./boundary-imports";
 import { repositoryIntegrationPackageNames } from "./boundary-directions";
 import {

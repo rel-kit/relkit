@@ -1,9 +1,12 @@
 import { afterEach, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import ts from "typescript";
-import { generateRouteModuleChecks } from "../../packages/compiler/src/route-module-checks.js";
-import { routeModuleFindings } from "../../packages/compiler/src/route-module-diagnostics.js";
+import ts from "relkit-typescript";
+import {
+  generateRouteModuleChecks,
+  ROUTE_MODULE_CHECK_REFERENCES,
+} from "../../packages/cli/src/compiler/route-module-checks.js";
+import { routeModuleFindings } from "../../packages/cli/src/compiler/route-module-diagnostics.js";
 
 const repository = resolve(import.meta.dir, "../..");
 const roots: string[] = [];
@@ -23,20 +26,22 @@ test("built declarations and editor findings reject missing inferred input while
   await writeFile(
     join(root, "src/users/service.ts"),
     `
-import { defineFunction } from "@relkit/app/functions";
-import { defineService } from "@relkit/app/services";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { defineService } from "relkit/services";
+import { z } from "relkit/schema";
 const example = defineFunction({ input: z.object({ value: z.string() }),
   output: z.object({ value: z.string() }), handler: async ({ value }) => ({ value }) });
 export default defineService({ functions: { example } });`,
   );
   const route = join(root, "src/routes/users/[id]/route.ts");
   const prefix = `import service from "../../../users/service.js";
-import { defineServiceRoutes, http, type ServiceRouteOptions } from "@relkit/app/routes";`;
+import { defineServiceRoutes, http, type ServiceRouteOptions } from "relkit/routes";`;
   await writeFile(
     join(root, ".relkit/generated/route-module-checks.ts"),
     generateRouteModuleChecks(["src/routes/users/[id]/route.ts"], root),
   );
+  for (const file of ROUTE_MODULE_CHECK_REFERENCES)
+    await writeFile(join(root, ".relkit/generated", file), "export {};\n");
   const options: ts.CompilerOptions = {
     target: ts.ScriptTarget.ES2022,
     module: ts.ModuleKind.ESNext,

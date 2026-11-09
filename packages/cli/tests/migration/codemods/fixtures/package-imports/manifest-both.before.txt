@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@relkit/app": "workspace:*",
+    "relkit": "workspace:*"
+  }
+}

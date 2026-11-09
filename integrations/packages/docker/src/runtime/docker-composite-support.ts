@@ -2,7 +2,7 @@ import type {
   LocalServiceBindMount,
   LocalServiceStartRequest,
   NormalizedLocalServiceRecipe,
-} from "@relkit/local-service";
+} from "relkit/local-service";
 import type { DockerClient } from "./docker-types.js";
 
 export function volumeNames(

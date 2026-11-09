@@ -1,0 +1,105 @@
+/**
+ * Builds agent descriptors without loading an execution SDK. The agent's `runtime` adapter names
+ * the integration the compiler selects to execute it.
+ */
+import { createUnboundIdentityEffect } from "../invocation/index.js";
+import type { StandardSchemaV1 } from "../schema/index.js";
+import type { ToolRefAny } from "../tools/index.js";
+import { Effect } from "effect";
+import { observeAgent } from "./agent-telemetry.js";
+import { isRecordEffect } from "./agent-validation-value.js";
+import { prepareAgentDescriptor } from "./define-agent-build.js";
+import { agentDefinitionFailure } from "./define-agent-error.js";
+import type { AgentRuntimeAdapterAny } from "../agent-adapters/index.js";
+import type { AgentDefinition, DefineAgentOptions } from "./define-agent.types.js";
+
+export { assertAgentDescriptor, isAgentDescriptor } from "./define-agent-validation.js";
+export { copyAgentLimits, copyAgentLimitsEffect } from "./define-agent-limits.js";
+export type * from "./define-agent.types.js";
+export type { AgentChatMapping, AgentClientPolicy, AgentControl } from "./agent-client.js";
+
+/** Validates plain authoring inputs and preserves source identity generation.
+ * @param options - Schemas, selector model, RelKit tools, limits and client policy.
+ * @returns A frozen descriptor or AgentDefinitionFailure.
+ */
+export const defineAgentEffect = Effect.fn("Agents.definition.define")(
+  function* <
+    const Id extends string,
+    const InputSchema extends StandardSchemaV1,
+    const OutputSchema extends StandardSchemaV1,
+    const Tools extends readonly ToolRefAny[],
+    const Runtime extends AgentRuntimeAdapterAny,
+  >(options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools, Runtime>) {
+    if (!(yield* isRecordEffect(options))) {
+      return yield* Effect.fail(
+        agentDefinitionFailure(new TypeError("Agent options must be an object")),
+      );
+    }
+    if (Object.hasOwn(options, "handler")) {
+      return yield* Effect.fail(
+        agentDefinitionFailure(new TypeError("Agents cannot own handlers")),
+      );
+    }
+    const assemble = yield* Effect.try({
+      try: () => prepareAgentDescriptor(options),
+      catch: agentDefinitionFailure,
+    });
+    const id =
+      options.id === undefined
+        ? yield* createUnboundIdentityEffect().pipe(
+            Effect.mapError((error) => agentDefinitionFailure(error.cause)),
+          )
+        : options.id;
+    return yield* Effect.try({ try: () => assemble(id as Id), catch: agentDefinitionFailure });
+  },
+  (effect) => observeAgent("definition.define", effect),
+);
+
+/** Defines an agent from validated schemas, RelKit tool references, a model profile and the
+ * `runtime` adapter that executes it.
+ * @typeParam Id - Explicit or source-inferred agent identity.
+ * @typeParam InputSchema - Runtime input validator.
+ * @typeParam OutputSchema - Runtime output validator.
+ * @typeParam Tools - Authored tool tuple retained in the descriptor.
+ * @typeParam Runtime - The adapter value; its native fields join the returned descriptor.
+ * @param options - Portable authoring inputs plus `runtime`; adapter-specific options go in the adapter.
+ * @returns Frozen metadata consumed by compilation and the selected adapter.
+ * @throws The original authoring validation or identity error.
+ * @example
+ * ```ts
+ * import { defineAgentRuntime } from "relkit/agent-adapters";
+ * import { defineAgent } from "relkit/agents";
+ * import { z } from "relkit/schema";
+ *
+ * // Applications use an adapter package, such as `langchain()` from `@relkit/langchain`.
+ * const runtime = defineAgentRuntime({ adapterId: "echo", integrationId: "echo", options: {} });
+ * const support = defineAgent({
+ *   id: "support",
+ *   runtime,
+ *   model: "default",
+ *   input: z.object({ message: z.string() }),
+ *   output: z.object({ answer: z.string() }),
+ *   instructions: "Reply briefly.",
+ *   tools: [],
+ *   limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 30_000 },
+ * });
+ * void support;
+ * ```
+ * @category Agents
+ * @since 0.4.0
+ */
+export function defineAgent<
+  const Id extends string,
+  const InputSchema extends StandardSchemaV1,
+  const OutputSchema extends StandardSchemaV1,
+  const Tools extends readonly ToolRefAny[],
+  const Runtime extends AgentRuntimeAdapterAny,
+>(
+  options: DefineAgentOptions<Id, InputSchema, OutputSchema, Tools, Runtime>,
+): AgentDefinition<Id, InputSchema, OutputSchema, Tools, Runtime> {
+  return Effect.runSync(
+    defineAgentEffect(options).pipe(
+      Effect.catchTag("AgentDefinitionFailure", (failure) => Effect.fail(failure.cause)),
+    ),
+  );
+}

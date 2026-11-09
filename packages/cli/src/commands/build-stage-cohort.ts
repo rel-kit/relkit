@@ -5,8 +5,8 @@
  */
 import { dirname, join } from "node:path";
 import { Effect, Schema } from "effect";
-import { createRuntimeActivationFingerprint, DEFAULT_TOOLING_CONFIG } from "@relkit/compiler";
-import { hashGraph, validateGraphShapeEffect, type ApplicationGraph } from "@relkit/graph";
+import { createRuntimeActivationFingerprint, DEFAULT_TOOLING_CONFIG } from "../compiler/index.js";
+import { hashGraph, validateGraphShapeEffect, type ApplicationGraph } from "relkit/graph";
 import { cliAdapterError, cliTry } from "../cli-errors.js";
 import { CliFileSystem } from "../services/filesystem.service.js";
 import { selectedLocalServicePlan } from "./build-cohort.js";
@@ -14,7 +14,7 @@ import { parseJobsManifest } from "./build-jobs.js";
 import { rebaseManifest } from "./build-support.js";
 import { preparedRuntimeManifest } from "./build-prepared-manifest.js";
 import { captureProductionDependencies } from "./build-production-dependencies.js";
-import { selectedHttpCapabilities } from "@relkit/runtime-hono/internal/prepared";
+import { selectedHttpCapabilities } from "relkit/runtime-hono/prepared";
 import type { BuildStageCohort, BuildStageInputs } from "./build.types.js";
 import { captureProductionRepairs } from "./build-production-repairs.js";
 
@@ -52,7 +52,12 @@ export const loadBuildStageCohort = Effect.fn("Project.buildCohort")(function* (
   const tooling = checked.config ?? DEFAULT_TOOLING_CONFIG;
   const httpCapabilities = selectedHttpCapabilities({
     apiDocs: { ...tooling.server.apiDocs, mode: input.options.mode ?? "production" },
-    mcp: { enabled: tooling.server.mcp },
+    mcp: {
+      enabled: tooling.server.mcp,
+      ...("mcpAuth" in tooling.server && tooling.server.mcpAuth !== undefined
+        ? { auth: tooling.server.mcpAuth }
+        : {}),
+    },
     agUi: tooling.server.agUi ?? false,
   });
   const productionDependencies = yield* captureProductionDependencies(
@@ -120,8 +125,20 @@ function stageActivation(
       ...(input.options.providerOverridesGeneration === undefined
         ? {}
         : { providerOverridesGeneration: input.options.providerOverridesGeneration }),
+      ...schemaLibrariesHash(outputs.runtimeActivation),
     }),
   );
+}
+
+/**
+ * Carries the compiler's schema-library hash into the build's fingerprint.
+ * @param source - Compiler runtime activation JSON, or empty when not activatable.
+ * @returns The hash field, or nothing when the app uses no third-party schema library.
+ */
+function schemaLibrariesHash(source: string): { readonly schemaLibrariesHash?: string } {
+  if (source.trim() === "") return {};
+  const value = (JSON.parse(source) as { schemaLibrariesHash?: unknown }).schemaLibrariesHash;
+  return typeof value === "string" ? { schemaLibrariesHash: value } : {};
 }
 
 /**

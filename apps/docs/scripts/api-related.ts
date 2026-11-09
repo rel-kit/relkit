@@ -1,7 +1,7 @@
 /** Connects generated contracts to the authored configuration and task owners. */
 import { features } from "./feature-catalog.js";
 import { guideRelations } from "./guide-catalog.js";
-import { apiPackageDefinitions } from "./documentation-catalog.js";
+import { apiPackageDefinitions, sourceDirectory } from "./documentation-catalog.js";
 import { frontendUsage } from "./client-guide-catalog.js";
 
 /** Selects the authored usage page for a package, keeping examples with their module owner.
@@ -75,6 +75,12 @@ export function referenceOverview(): string {
   ].join("\n\n");
 }
 
+/** Names the most-used APIs of a package, in the order its guides present them.
+ * @param slug - Reference package route. @returns Unique symbol names, empty when none are cataloged. */
+export function authoringNames(slug: string): string[] {
+  return authoringLinks(slug).map((link) => link.slice(1, link.indexOf("]")));
+}
+
 /** Links symbols to their defining package, including integration APIs cataloged with application setup.
  * @param slug - Reference package route. @returns Unique links to existing generated symbol headings. */
 function authoringLinks(slug: string): string[] {
@@ -82,7 +88,7 @@ function authoringLinks(slug: string): string[] {
   if (!definition) return [];
   const names = features
     .flatMap(({ entrypoints }) => entrypoints)
-    .filter(({ source }) => source.startsWith(`${definition.directory}/src/`))
+    .filter(({ source }) => source.startsWith(`${sourceDirectory(definition.directory)}/`))
     .map(({ name }) => name);
   return [...new Set(names)].map((name) => `[${name}](/docs/api/${slug}#${name.toLowerCase()})`);
 }

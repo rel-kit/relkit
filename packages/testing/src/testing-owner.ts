@@ -1,5 +1,5 @@
 import { Cause, Context, Effect, Exit, Layer, ManagedRuntime } from "effect";
-import { createLoggerLayer, type LoggerOptions } from "@relkit/runtime-effect";
+import { createLoggerLayer, type LoggerOptions } from "relkit/runtime-effect";
 
 /**
  * Provisions redacting server logging once at a test helper's ownership boundary.

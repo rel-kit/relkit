@@ -1,7 +1,7 @@
 /** Moves an owned grouped specialized fixture to flat compatibility layout using only resolved TypeScript module literals. */
 import { lstat, readdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import { Effect } from "effect";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 

@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
-import { defineEvent, defineEventFunction } from "../../packages/events/src/index.ts";
-import { defineFunction } from "../../packages/functions/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
+import { defineEvent, defineEventFunction } from "relkit/events";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 
 const event = defineEvent({ id: "order_created", input: z.object({ orderId: z.string() }) });
 const consumer = defineEventFunction({
@@ -64,25 +64,25 @@ test("preserves explicit event delivery limits in the graph", () => {
   });
 });
 
-test("diagnoses unknown publications and duplicate publication IDs", () => {
+test("derives publishes-event edges and node publishes from dependencies.events", () => {
   const publisher = defineFunction({
     id: "publisher",
-    input: z.unknown(),
+    input: z.object({ orderId: z.string() }),
     output: z.void(),
-    handler: () => {},
+    dependencies: { events: { orderCreated: event } },
+    handler: async (input, context) => {
+      await context.events.orderCreated.publish(input);
+    },
   });
-  const result = normalizeCompilation({
-    descriptors: [
-      event,
-      { ...publisher, publishes: ["order_created", "order_created", "missing"] },
-    ],
+  const result = normalizeCompilation({ descriptors: [event, publisher] });
+  expect(result.diagnostics).toEqual([]);
+  expect(result.graph?.nodes.find((node) => node.id === "publisher")).toMatchObject({
+    kind: "function",
+    publishes: ["order_created"],
   });
-  expect(result.diagnostics.map((entry) => entry.code)).toEqual(
-    expect.arrayContaining([
-      "RELKIT_EVENT_PUBLICATION_DUPLICATE",
-      "RELKIT_EVENT_PUBLICATION_UNKNOWN",
-    ]),
-  );
+  expect(result.graph?.edges.filter((edge) => edge.kind === "publishes-event")).toEqual([
+    expect.objectContaining({ from: "publisher", to: "order_created" }),
+  ]);
 });
 
 test("reserves generated trigger identities and rejects unknown consumer events", () => {

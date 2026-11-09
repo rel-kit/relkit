@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { defineJob, defineTask, submitCanonicalTask, submitTask } from "@relkit/jobs";
-import { z } from "@relkit/schema";
+import { defineJob, defineTask, submitCanonicalTask, submitTask } from "relkit/jobs";
+import { z } from "relkit/schema";
 import {
   createDeterministicJobsAdapter,
   createJobsRuntime,

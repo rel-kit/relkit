@@ -29,7 +29,7 @@
 - [x] 5.1 Migrate CLI generation/runtime activation, doctor checks, templates, commerce, and canonical fixtures to one topology without `RELKIT_ENV` schemas.
 - [x] 5.2 Update inspector provider views and links to show capability, profile, adapter, ownership, and safe references.
 - [x] 5.3 Update provider, environment, deployment, testing, and migration documentation with MinIO/Redis, R2/Upstash, and managed AWS examples.
-- [x] 5.4 Migrate `/Users/mustafaelsayed/Workspace/typescripts/my-relkit-app-7` to `external(s3(...))` and `external(redis(...))`, preserving unrelated user edits.
+- [x] 5.4 Migrate `<home>/Workspace/typescripts/my-relkit-app-7` to `external(s3(...))` and `external(redis(...))`, preserving unrelated user edits.
 
 ## 6. Verification
 

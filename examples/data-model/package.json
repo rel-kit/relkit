@@ -13,16 +13,17 @@
     "db:migrate": "relkit db migrate"
   },
   "dependencies": {
-    "@relkit/app": "workspace:*",
     "@relkit/drizzle": "workspace:*",
-    "drizzle-orm": "catalog:"
+    "drizzle-orm": "catalog:",
+    "relkit": "workspace:*",
+    "zod": "4.6.7"
   },
   "devDependencies": {
-    "@types/bun": "catalog:",
     "@relkit/cli": "workspace:*",
     "@relkit/testing": "workspace:*",
+    "@types/bun": "catalog:",
     "drizzle-kit": "catalog:",
     "effect": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:workspace"
   }
 }

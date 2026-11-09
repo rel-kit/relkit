@@ -1,12 +1,12 @@
 ---
 name: documentation-writer
-description: Write and review RELKIT documentation using Relkit, repository-backed examples, and the Next.js/Fumadocs authoring workflow. Use for guides, contributor docs, and API or CLI documentation changes.
+description: Write and review RelKit documentation using repository-backed examples, the Blume docs site and the writing standard in WRITING.md. Use for guides, contributor docs, and API or CLI documentation changes.
 ---
 
-# RELKIT Documentation Writer
+# RelKit Documentation Writer
 
 Write clear, task-focused documentation grounded in the current repository.
-Use Relkit to separate reader needs. Change navigation through the guide catalogs when the task
+Follow `WRITING.md` for the product name, voice, banned terms and message structure, and use the four page types below to separate reader needs. Change navigation through the guide catalogs when the task
 explicitly calls for a new learning sequence.
 
 ## Choose the reader's goal
@@ -50,29 +50,31 @@ All repository paths below are relative to the repository root.
   separately launched `@relkit/inspector` owns UI (`3210`) and history. Document separate
   commands, private session selection, Bun/Node prerequisites and production exclusion.
   Generated API/CLI references must come from source producers, not hand-edited promises.
-- Verify create examples against exact current certification. Only minimal, examples enabled,
-  no jobs/cloud/deployment is currently publicly offered. Candidate API/agent/fullstack/jobs
-  and AWS/Pulumi templates are not supported public creation tuples merely because tests pass.
-  Document optional `relkit migrate layout` preview, validated `--write`, guarded
-  `--rollback <receipt>`, and fresh `dev --prepare` after either operation.
+- Verify create examples against the current creation options. `create-relkit` offers the
+  `minimal`, `api`, `agent`, `fullstack` and `tasks` templates; a combination CI has not tested
+  prints `RELKIT_CREATE_UNTESTED` and continues, and `--strict` refuses it. Document optional
+  `relkit migrate layout` preview, validated `--write`, guarded `--rollback <migration-record>`,
+  and fresh `dev --prepare` after either operation.
 - Use local repository sources freely. Consult external websites only when the user provides
   a link and asks you to consult it; report uncertainty when local evidence is insufficient.
 
 ## Edit the source of truth
 
-- **Authored site pages:** Edit MDX under `apps/docs/content/docs`, following neighboring
-  Next.js/Fumadocs pages. Use `title` and `description` frontmatter and existing MDX components.
+- **Authored site pages:** Edit MDX under `apps/docs/content/docs` and `apps/docs/content/guides`,
+  following neighboring Blume pages (see `node_modules/blume/docs` in `apps/docs`). Use `title` and `description` frontmatter and existing MDX components.
 - **Contributor documentation:** Edit the relevant Markdown under `docs/` or the appropriate
   README. Keep contributor internals distinct from application-user instructions.
 - **API reference:** Edit package-source JSDoc, not `apps/docs/content/docs/api/*.mdx`.
   Cataloged public APIs require a description, `@category`, `@since`, and an executable
   TypeScript `@example`; see `apps/docs/scripts/check-jsdoc.ts`.
 - **CLI reference:** Edit the CLI help model exposed by `@relkit/cli/help`, not
-  `apps/docs/content/docs/operations/cli-reference.mdx`.
+  `apps/docs/content/docs/api/cli.mdx`.
+- **Error code pages:** Edit the code's entry in `packages/relkit/src/diagnostics/codes/`, not
+  `apps/docs/content/docs/errors/*.mdx`. Docs generation fails when a code has no entry.
 - **Navigation and related content:** Update `apps/docs/scripts/guide-catalog.ts` and any
   relevant imported catalogs when adding or moving guides. Update
   `apps/docs/scripts/feature-catalog.ts` when capability coverage changes. Navigation
-  `meta.json` files and `apps/docs/content/generated` are generated; do not hand-edit them.
+  `meta.ts` files and `apps/docs/content/_snippets/generated` are generated; do not hand-edit them.
 
 Inspect `apps/docs/scripts/generate.ts` and `apps/docs/scripts/generate-guides.ts` when
 ownership is unclear. Use the existing generator after generated-input changes; inspect its
@@ -86,8 +88,12 @@ duplicate snippets that can drift. Follow the existing include syntax and workin
 convention, for example:
 
 ```mdx
-<include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/[orderId]/route.ts"'>
-  ../../examples/commerce/src/routes/orders/[orderId]/route.ts
+<include
+  source="examples/commerce/src/routes/orders/[orderId]/route.ts"
+  lang="ts"
+  meta='title="src/routes/orders/[orderId]/route.ts"'
+>
+  /_snippets/source/examples/commerce/src/routes/orders/[orderId]/route.ts
 </include>
 ```
 
@@ -99,7 +105,7 @@ Keep guides focused on one reader outcome. Include actionable commands or source
 describe the expected result, and include the catalog-generated related-content block:
 
 ```mdx
-<include cwd>content/generated/related/http-routes.mdx</include>
+<include>/_snippets/generated/related/docs-modules-http-routes.mdx</include>
 ```
 
 Use the filename generated for the actual page, not the example filename above.

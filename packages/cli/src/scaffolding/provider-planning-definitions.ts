@@ -1,7 +1,7 @@
 /** Defines the concrete configuration and dependencies delivered by selected provider additions, keeping backend choices explicit in generated platform source. */
 
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
-import type { ScaffoldDependencyName } from "create-relkit/internal/scaffold-catalog";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
+import type { ScaffoldDependencyName } from "create-relkit/scaffold-catalog";
 
 /**
  * Provider constructor source, imports, dependencies and environment declarations.
@@ -71,7 +71,7 @@ function connectedRedis(): ProviderDefinition {
     adapter: "redis",
     expression: `redis({ url: binding.secret("REDIS_URL") })`,
     imports: [
-      `import { env as binding } from "@relkit/app/config";`,
+      `import { env as binding } from "relkit/config";`,
       `import { redis } from "@relkit/redis";`,
     ],
     dependencies: ["@relkit/redis"],
@@ -88,7 +88,7 @@ function connectedS3(): ProviderDefinition {
     adapter: "s3",
     expression: `s3({ endpoint: binding.url("S3_ENDPOINT"), bucketName: binding.string("S3_BUCKET"), region: binding.string("S3_REGION"), credentials: { accessKeyId: binding.secret("S3_ACCESS_KEY_ID"), secretAccessKey: binding.secret("S3_SECRET_ACCESS_KEY") } })`,
     imports: [
-      `import { env as binding } from "@relkit/app/config";`,
+      `import { env as binding } from "relkit/config";`,
       `import { s3 } from "@relkit/s3";`,
     ],
     dependencies: ["@relkit/s3"],
@@ -115,7 +115,7 @@ function connectedCloudflare(adapter: "kv" | "r2"): ProviderDefinition {
       ? `r2({ accountId: binding.string("CLOUDFLARE_ACCOUNT_ID"), bucketName: binding.string("CLOUDFLARE_R2_BUCKET"), credentials: { accessKeyId: binding.secret("CLOUDFLARE_R2_ACCESS_KEY_ID"), secretAccessKey: binding.secret("CLOUDFLARE_R2_SECRET_ACCESS_KEY") } })`
       : `kv({ accountId: binding.string("CLOUDFLARE_ACCOUNT_ID"), namespaceId: binding.string("CLOUDFLARE_KV_NAMESPACE_ID"), apiToken: binding.secret("CLOUDFLARE_API_TOKEN") })`,
     imports: [
-      `import { env as binding } from "@relkit/app/config";`,
+      `import { env as binding } from "relkit/config";`,
       `import { ${adapter} } from "@relkit/cloudflare";`,
     ],
     dependencies: ["@relkit/cloudflare"],
@@ -158,7 +158,8 @@ export function defaultProviderProfile(
   provider?: string,
   source?: "docker" | "connected" | "aws",
 ): string {
-  if (provider === "cloudflare-kv" || provider === "cloudflare-r2") return provider;
+  if (provider === "cloudflare-kv" || provider === "cloudflare-r2" || provider === "postgres")
+    return provider;
   if (source === "connected") return capability === "cache" ? "redis" : "s3";
   if (source === "aws") return "aws";
   return "local";

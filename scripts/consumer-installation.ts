@@ -5,7 +5,7 @@
  */
 import { realpath } from "node:fs/promises";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import {
   inspectionNative,
   consumerInputFailure,

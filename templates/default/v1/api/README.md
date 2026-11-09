@@ -1,8 +1,5 @@
 # my-app
 
-This maintained API candidate is exercised internally. Public API creation remains
-disabled until its exact native and readiness certification passes.
-
 A RelKit TypeScript/Bun API project with greeting, echo, and order routes.
 Functions own the application handlers; routes describe transport mapping and
 responses. Source-scoped IDs are inferred where safe, the order route targets a

@@ -6,7 +6,7 @@
 import { describe, expect, test } from "bun:test";
 import { resolve } from "node:path";
 import { Data, Effect } from "effect";
-import { hashGraph } from "../../packages/graph/src/index.ts";
+import { hashGraph } from "relkit/graph";
 import { compileProject } from "./fixture-runner.ts";
 import {
   assertCommerceApplication,

@@ -2,8 +2,8 @@
 
 import { MIDDLEWARE_BRAND } from "langchain";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
-import { agentDefinitionFailure } from "@relkit/agents/internal/define-agent-error";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { agentDefinitionFailure } from "relkit/agents/define-agent-error";
 import type { AgentClientStateKey, AgentMiddleware } from "./define-agent-native.types.js";
 
 /** Validates middleware names and brands, retaining input order.

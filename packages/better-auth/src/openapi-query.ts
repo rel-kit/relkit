@@ -3,7 +3,7 @@
  * a top-level object schema and never marks a query field required, so wrapped
  * (`optional`, `default`) and union schemas publish no parameters at all.
  */
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue } from "relkit/contracts";
 
 /** The native endpoint fields this projection reads. */
 export interface QueryEndpoint {

@@ -1,4 +1,4 @@
-import type { NativeSubmission, OperationContext } from "@relkit/jobs/adapter";
+import type { NativeSubmission, OperationContext } from "relkit/jobs/adapter";
 
 export function submissionId(request: NativeSubmission): string {
   return `relkit/${request.acceptanceIdentity ?? request.idempotencyKey ?? request.operationId}`;

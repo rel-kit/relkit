@@ -1,5 +1,5 @@
-import { canonicalJson } from "@relkit/contracts";
-import type { EnvMetadata, EnvProjection, EnvValueType } from "@relkit/config";
+import { canonicalJson } from "relkit/contracts";
+import type { EnvMetadata, EnvProjection, EnvValueType } from "relkit/config";
 import type {
   EnvStatus,
   ParsedEnvArgs,

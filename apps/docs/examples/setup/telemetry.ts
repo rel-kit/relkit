@@ -1,5 +1,5 @@
 /** Local telemetry works without a remote exporter or extra environment secrets. */
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 
 export default defineApp({
   env: defineEnv({}),

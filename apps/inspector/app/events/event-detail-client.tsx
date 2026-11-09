@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { InspectorEventRuntime, InspectorGraph } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
 import { eventView, type EventView } from "../../lib/events-model";
@@ -12,25 +12,35 @@ import { DetailLayout } from "../detail-layout";
 import { SourceLink } from "../source-link";
 import { DetailPending, ExposureBadge, GraphAction, MetaItem } from "../domains/catalog-kit";
 import { EventContract, EventFacts, eventRecord } from "./event-contract";
+import { EventActions } from "./event-actions";
+import type { ActionIdentity } from "../../lib/inspector-actions";
 
 export function EventDetailClient() {
   const params = useParams<{ id: string }>();
   const id = typeof params?.id === "string" ? params.id : "";
   const [view, setView] = useState<EventView>();
+  const [identity, setIdentity] = useState<ActionIdentity>();
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     if (id === "") return;
     const api = createInspectorClient();
-    void Promise.all([api.graph(), api.eventRuntime({ eventId: id, limit: 100 })])
-      .then(([graph, runtime]: [InspectorGraph, InspectorEventRuntime]) => {
-        const next = eventView(graph, runtime, id);
-        if (next === undefined) throw new Error("Event unavailable");
-        setView(next);
-        setState("ready");
-      })
-      .catch(() => setState("error"));
+    api.invalidate(["events", "runtime"]);
+    const [graph, runtime]: [InspectorGraph, InspectorEventRuntime] = await Promise.all([
+      api.graph(),
+      api.eventRuntime({ eventId: id, limit: 100 }),
+    ]);
+    const next = eventView(graph, runtime, id);
+    if (next === undefined) throw new Error("Event unavailable");
+    setView(next);
+    if (graph.generationId !== undefined && graph.graphHash !== undefined)
+      setIdentity({ generationId: graph.generationId, graphHash: graph.graphHash });
+    setState("ready");
   }, [id]);
+
+  useEffect(() => {
+    void load().catch(() => setState("error"));
+  }, [load]);
 
   if (state !== "ready" || view === undefined) {
     return (
@@ -83,6 +93,16 @@ export function EventDetailClient() {
       aside={<EventFacts view={view} />}
     >
       <EventContract view={view} />
+      {identity === undefined ? null : (
+        <EventActions
+          eventId={eventId}
+          {...(typeof event.version === "number" ? { eventVersion: event.version } : {})}
+          identity={identity}
+          publications={view.publications}
+          deliveries={view.deliveries}
+          onChange={load}
+        />
+      )}
     </DetailLayout>
   );
 }

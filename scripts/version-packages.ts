@@ -1,17 +1,25 @@
-/** Applies Changesets, certifies changed generator assets and refreshes version-derived documentation before the release action commits its candidate; check mode only reports the plan. */
+/** Applies Changesets to the one fixed package group, certifies the generator and refreshes version-derived documentation before the release action commits its candidate; check mode only reports the plan. */
 import { spawn } from "node:child_process";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { workspacePackageDirectories } from "./workspace-packages.js";
-import { generatorProviders, nextReleaseVersion, type ReleasePlan } from "./release-plan.js";
-import { packedTemplates } from "./release-templates.js";
-import { dependencyFields } from "./catalog-manifest.js";
+import { sharedReleaseVersion, type ReleasePlan } from "./release-plan.js";
 
 type ChangesetStatus = {
-  changesets: { summary: string }[];
+  changesets: { summary: string; releases?: { name: string; type: string }[] }[];
   releases: { name: string; type: string; newVersion?: string }[];
 };
+
+/** Changelog groups, in the order a release section lists them. See WRITING.md. */
+export const CHANGE_KINDS = ["Breaking", "New", "Fixed"] as const;
+export type ChangeKind = (typeof CHANGE_KINDS)[number];
+
+/** One changelog line and its group. */
+export interface ChangelogChange {
+  readonly kind: ChangeKind;
+  readonly summary: string;
+}
 
 const root = resolve(import.meta.dirname, "..");
 const changesetCli = join(root, "node_modules", "@changesets", "cli", "bin.js");
@@ -38,10 +46,40 @@ async function readStatus(): Promise<ChangesetStatus> {
   }
 }
 
+/**
+ * Groups a changeset: a summary starting with `Breaking:`, `New:` or `Fixed:` names its group;
+ * otherwise a major bump is Breaking, a minor bump New and a patch Fixed.
+ * @param changeset - Summary and the package bumps it declares.
+ * @returns The change as one changelog line; a Breaking change must link its migration note.
+ */
+export function classifyChange(changeset: ChangesetStatus["changesets"][number]): ChangelogChange {
+  const text = changeset.summary.trim().replace(/\s+/g, " ");
+  const prefix = /^(Breaking|New|Fixed):\s*/i.exec(text);
+  const types = new Set((changeset.releases ?? []).map(({ type }) => type));
+  const kind: ChangeKind = prefix
+    ? (CHANGE_KINDS.find((name) => name.toLowerCase() === prefix[1]!.toLowerCase()) ?? "Fixed")
+    : types.has("major")
+      ? "Breaking"
+      : types.has("minor")
+        ? "New"
+        : "Fixed";
+  const summary = prefix ? text.slice(prefix[0].length) : text;
+  if (kind === "Breaking" && !/\]\([^)]*migrat[^)]*\)/i.test(summary))
+    throw new Error(`Breaking change has no migration link: ${summary}`);
+  return { kind, summary };
+}
+
+/**
+ * Promotes Unreleased into a release section with Breaking, New and Fixed groups.
+ * @param source - Current CHANGELOG.md.
+ * @param version - Release version.
+ * @param changes - Changes from this release's changesets.
+ * @returns The new changelog.
+ */
 export function renderChangelog(
   source: string,
   version: string,
-  summaries: readonly string[],
+  changes: readonly ChangelogChange[],
 ): string {
   const heading = /^## Unreleased([^\n]*)\n/m.exec(source);
   if (heading?.index === undefined) throw new Error("CHANGELOG.md has no Unreleased section");
@@ -50,53 +88,41 @@ export function renderChangelog(
   const bodyEnd = nextHeading ? bodyStart + nextHeading.index : source.length;
   const body = source.slice(bodyStart, bodyEnd).trim();
   const rest = source.slice(bodyEnd).trim();
-  const bullets = summaries
-    .map((summary) => summary.trim().replace(/\s+/g, " "))
-    .filter((summary) => summary !== "" && !body.includes(summary))
-    .map((summary) => `- ${summary}`)
-    .join("\n");
+  const groups = CHANGE_KINDS.map((kind) => {
+    const lines = changes
+      .filter((change) => change.kind === kind && change.summary !== "")
+      .filter((change) => !body.includes(change.summary))
+      .map((change) => `- ${change.summary}`);
+    return lines.length === 0 ? "" : `### ${kind}\n\n${lines.join("\n")}`;
+  });
   const sections = [
     source.slice(0, heading.index).trimEnd(),
     "## Unreleased",
     `## ${version}${heading[1] ?? ""}`,
     body,
-    bullets === "" ? "" : `### Changes\n\n${bullets}`,
+    ...groups,
     rest,
   ].filter((section) => section !== "");
   return `${sections.join("\n\n")}\n`;
 }
 
-export function renderActionChangelog(name: string, version: string): string {
-  return `# ${name}\n\n## ${version}\n\nSee the root CHANGELOG.md for this release batch.\n`;
+/**
+ * Reads one release's section from the changelog.
+ * @param changelog - CHANGELOG.md source.
+ * @param version - Release version.
+ * @returns The section body without its heading, or undefined when the release has none.
+ */
+export function changelogSection(changelog: string, version: string): string | undefined {
+  const escaped = version.replaceAll(".", "\\.");
+  const heading = new RegExp(`^## ${escaped}(?:\\s[^\\n]*)?\\n`, "m").exec(changelog);
+  if (heading?.index === undefined) return undefined;
+  const start = heading.index + heading[0].length;
+  const next = /^## /m.exec(changelog.slice(start));
+  return changelog.slice(start, next ? start + next.index : undefined).trim();
 }
 
-/** Template and optional-provider pins are bundled assets, not runtime imports. */
-async function includeGenerator(status: ChangesetStatus): Promise<ChangesetStatus> {
-  const inputs = new Set<string>(generatorProviders);
-  for (const template of packedTemplates) {
-    const manifest = JSON.parse(
-      await readFile(join(root, "templates/default/v1", template, "package.json"), "utf8"),
-    );
-    for (const field of dependencyFields)
-      for (const name of Object.keys(manifest[field] ?? {})) inputs.add(name);
-  }
-  if (
-    status.releases.some((item) => item.type !== "none" && inputs.has(item.name)) &&
-    !status.releases.some((item) => item.name === "create-relkit" && item.type !== "none")
-  ) {
-    const path = join(root, ".changeset/relkit-template-inputs.md");
-    await writeFile(
-      path,
-      '---\n"create-relkit": patch\n---\n\nRefresh bundled dependency versions.\n',
-      { flag: "wx" },
-    );
-    try {
-      return await readStatus();
-    } finally {
-      if (process.argv.includes("--check")) await rm(path);
-    }
-  }
-  return status;
+export function renderActionChangelog(name: string, version: string): string {
+  return `# ${name}\n\n## ${version}\n\nSee the root CHANGELOG.md for this release batch.\n`;
 }
 
 async function writeActionChangelogs(status: ChangesetStatus): Promise<void> {
@@ -124,27 +150,19 @@ async function writeActionChangelogs(status: ChangesetStatus): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  let status = await readStatus();
+  const status = await readStatus();
   if (status.changesets.length === 0) throw new Error("No changesets are available to version");
   const changelogPath = join(root, "CHANGELOG.md");
   const source = await readFile(changelogPath, "utf8");
-  const version = nextReleaseVersion(source);
-  status = await includeGenerator(status);
-  const plan: ReleasePlan = {
-    protocol: "relkit.release-plan.v1",
-    version,
-    packages: status.releases
-      .filter((item) => item.type !== "none")
-      .map((item) => {
-        if (!item.newVersion) throw new Error(`Missing next version: ${item.name}`);
-        return { name: item.name, version: item.newVersion };
-      }),
-  };
-  const changelog = renderChangelog(
-    source,
-    version,
-    status.changesets.map((changeset) => changeset.summary),
-  );
+  const packages = status.releases
+    .filter((item) => item.type !== "none")
+    .map((item) => {
+      if (!item.newVersion) throw new Error(`Missing next version: ${item.name}`);
+      return { name: item.name, version: item.newVersion };
+    });
+  const version = sharedReleaseVersion(packages);
+  const plan: ReleasePlan = { protocol: "relkit.release-plan.v1", version, packages };
+  const changelog = renderChangelog(source, version, status.changesets.map(classifyChange));
   if (process.argv.includes("--check")) {
     console.log(JSON.stringify(plan));
     return;
@@ -152,8 +170,8 @@ async function main(): Promise<void> {
   await run(process.execPath, [changesetCli, "version"]);
   await run("bun", ["run", "scripts/sync-release.ts", "--write"]);
   await run("bun", ["install", "--lockfile-only"]);
-  if (plan.packages.some((item) => item.name === "create-relkit"))
-    await run("bun", ["run", "scripts/certify-create.ts"]);
+  // The fixed group always includes the generator.
+  await run("bun", ["run", "scripts/certify-create.ts"]);
   await run("bun", ["run", "version:docs"]);
   await writeFile(join(root, ".changeset/release.json"), `${JSON.stringify(plan, null, 2)}\n`);
   await writeFile(changelogPath, changelog);

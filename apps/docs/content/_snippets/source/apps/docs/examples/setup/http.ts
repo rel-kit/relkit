@@ -1,5 +1,5 @@
 /** HTTP needs listener settings but no external provider or custom PORT field. */
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 
 export default defineApp({
   env: defineEnv({}),

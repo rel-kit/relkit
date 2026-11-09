@@ -1,19 +1,15 @@
 /**
  * Joins native feed completion within the public teardown deadline.
- * @param interrupted - Scoped worker interruption, already initiated by its owner.
- * @param running - The same worker's native completion Promise.
+ * @param running - The aborted worker's completion Promise.
  * @returns Completion after cleanup or the existing five-second deadline.
- * @remarks The owner aborts the request before calling this browser timer boundary.
- * Registry disposal subsequently joins the service scope itself.
+ * @remarks The owner aborts the worker before calling this browser timer boundary.
+ * Registry disposal subsequently joins the feed itself.
  */
-export async function joinFeedTeardown(
-  interrupted: Promise<void>,
-  running: Promise<void>,
-): Promise<void> {
+export async function joinFeedTeardown(running: Promise<void>): Promise<void> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     await Promise.race([
-      Promise.all([interrupted, running]).then(() => undefined),
+      running,
       new Promise<void>((resolve) => {
         timer = setTimeout(resolve, 5_000);
       }),

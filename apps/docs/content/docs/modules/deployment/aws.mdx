@@ -4,7 +4,22 @@ description: Generate, preview, apply, inspect, and destroy Pulumi stacks from t
 pagination: false
 sidebar:
   icon: cloud-upload
+labs: true
 ---
+
+<Callout type="warning" title="Labs: what AWS hosting is missing" icon="flask-conical">
+  AWS hosting stays Labs until it meets these criteria, which it does not yet:
+
+- **Image build and push.** The stack creates an ECR repository but does not build the
+  application image or push it; the service runs an image you built and pushed yourself.
+- **HTTPS.** The load balancer listens on HTTP only; there is no certificate or HTTPS listener.
+- **More than one task.** The service runs a single Fargate task, with no scaling across tasks.
+- **A real deploy test.** CI never deploys a stack to a real AWS account; real AWS acceptance is
+  an opt-in local run.
+
+For a target that an end-to-end deploy test covers, see [Deploy to Railway](/docs/modules/deployment/railway).
+
+</Callout>
 
 Deploy an application after its local checks and production build pass. Pulumi is the
 deployment engine and AWS is the first host integration, but engine, host, application resources, access, and
@@ -47,8 +62,8 @@ NODE_ENV=production bun run --no-env-file .relkit/build/server/index.js
 ```
 
 The framework runtime is bundled. This production installation does not need the development CLI,
-compiler, Inspector application, or unselected SDKs. `relkit start` remains a convenience command
-where the CLI is installed; the generated `start` script uses the JavaScript command above.
+compiler, Inspector application, or unselected SDKs. The generated `start` script runs `relkit start`, which needs the CLI that development installs. A
+production application root without the CLI uses the JavaScript command above.
 
 Supply required application environment values through the process environment. Startup does not
 automatically read dotenv files, and build output does not inline their values. `PORT` overrides the
@@ -62,9 +77,9 @@ files, existing local state, and temporary build module links are excluded from 
 
 ## Install deployment tooling for an existing app
 
-Cloud and deployment default to `none`. The `--cloud aws --deploy pulumi` creation tuple is
+Cloud and deployment default to `none`. The `--cloud aws --deploy pulumi` creation combination is
 currently rejected before staging because public certification is incomplete. Configure deployment
-only on an existing app; installing these packages does not make that creation tuple available.
+only on an existing app; installing these packages does not make that creation combination available.
 
 From its development root, install the selected host/engine and deploy-only SDK peers:
 

@@ -31,7 +31,7 @@ test("selected auth emits exact official fetch repair for Bun, npm and pnpm with
   };
   const first = merge(source);
   const result = JSON.parse(first.content);
-  expect(result.dependencies["better-auth"]).toBe("1.7.1");
+  expect(result.dependencies["better-auth"]).toBe(SCAFFOLD_DEPENDENCIES["better-auth"].version);
   expect(result.devDependencies["@cloudflare/workers-types"]).toBe("4.20250121.0");
   expect(result.overrides).toEqual({ ...source.overrides, "@better-fetch/fetch": "1.3.2" });
   expect(result.pnpm).toEqual({

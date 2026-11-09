@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 
 const page = String.raw`<!doctype html>
 <meta charset="utf-8">
-<title>RELKIT job client acceptance</title>
+<title>RelKit job client acceptance</title>
 <pre id="result">running</pre>
 <script>
 void import("/jobs/index.js").then(async ({ watchJobRun }) => {

@@ -75,10 +75,10 @@ test("tool-only MCP and independently selected HTTP transports do not acquire a 
   expect(fragment("mcp")).not.toContain("@scalar/hono-api-reference@");
 });
 
-test("frontend recipes select required OTel and only the peers used by their public leaf", async () => {
+test("frontend recipes select only the peers used by their public leaf", async () => {
   const client = fragment("client");
   expect(client).toContain("@relkit/client@");
-  expect(client).toContain("@opentelemetry/api@1.9.1");
+  expect(client).not.toContain("@opentelemetry/");
   expect(client).not.toContain("react@");
   expect(client).not.toContain("@tanstack/");
   const react = fragment("client-react");

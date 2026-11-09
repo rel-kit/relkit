@@ -33,7 +33,7 @@ test("common links and section sublinks remain available without duplicate desti
     expect(new Set(hrefs).size).toBe(hrefs.length);
     await expect(sidebar.locator(`a[href="${route}"]`)).toHaveAttribute("aria-current", "page");
     await expect(
-      page.getByRole("banner").getByRole("link", { name: "RELKIT", exact: true }).locator("svg"),
+      page.getByRole("banner").getByRole("link", { name: "RelKit", exact: true }).locator("svg"),
     ).toBeVisible();
   }
 });

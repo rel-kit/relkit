@@ -23,7 +23,11 @@ test("orders persist and remain private to their owner", async () => {
     sqlite.close();
   }
   const app = await createTestApplication(config, {
-    env: { DATABASE_PATH: path, BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET },
+    env: {
+      DATABASE_PATH: path,
+      BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
+      BETTER_AUTH_URL: "http://127.0.0.1:3000",
+    },
   });
   try {
     expect((await app.http.get("/orders/order-1")).status).toBe(401);

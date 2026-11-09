@@ -1,7 +1,7 @@
 import { expect, it } from "@effect/vitest";
 import { Deferred, Effect, Exit, Fiber, Scope } from "effect";
 import { makeDevCompilerBridgeEffect } from "../../src/commands/dev-compiler-bridge.js";
-import type { CandidateCompileRequest } from "@relkit/supervisor";
+import type { CandidateCompileRequest } from "../../src/supervisor/index.js";
 
 /**
  * Creates one accepted foreign supervisor request for deterministic bridge tests.

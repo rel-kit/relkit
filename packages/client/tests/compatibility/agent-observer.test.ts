@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import type { AgentBase } from "../../src/react/agent-hook-types.types.js";
 import { emptyAgentContent } from "../../src/react/agent-observation.ts";
 import { restoreAndObserve } from "../../src/react/agent-observer.ts";
-import type { AgentObservation, JournalCheckpoint, ThreadSnapshot } from "@relkit/contracts";
+import type { AgentObservation, JournalCheckpoint, ThreadSnapshot } from "relkit/contracts";
 
 test("reconnects from the last cursor and replaces a declared gap with its snapshot", async () => {
   const controller = new AbortController();

@@ -1,13 +1,14 @@
 "use client";
 
 /** Calls the API example's Orders function through its public route, retaining the generated input and price result. */
+import { api } from "@relkit/client";
 import { useRelkitClient, useRouteMutation } from "@relkit/client/react";
 
 /** Creates one order in the API example without importing the backend service.
  * @returns A guarded submission action and its typed price or failure. */
 export function CreateOrder() {
   const { status } = useRelkitClient();
-  const create = useRouteMutation("POST /orders");
+  const create = useRouteMutation(api.orders.createOrder);
 
   return (
     <section>

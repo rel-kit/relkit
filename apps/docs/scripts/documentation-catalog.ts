@@ -1,20 +1,27 @@
 /** Maps public package identities and feature entrypoints to generated documentation. */
 export const apiPackageDefinitions = [
-  apiPackage("app", "Application", "@relkit/app", "packages/app", "core"),
-  apiPackage("config", "Configuration", "@relkit/config", "packages/config", "core"),
-  apiPackage("provider", "Provider authoring", "@relkit/provider", "packages/provider", "core"),
+  apiPackage("app", "Application", "relkit", "packages/relkit/src/app", "core"),
+  apiPackage("config", "Configuration", "relkit/config", "packages/relkit/src/config", "core"),
+  apiPackage("effect", "Effect", "relkit/effect", "packages/relkit/src/app", "core"),
+  apiPackage(
+    "provider",
+    "Provider authoring",
+    "relkit/provider",
+    "packages/relkit/src/provider",
+    "core",
+  ),
   apiPackage(
     "providers-local",
     "Local providers",
-    "@relkit/providers-local",
-    "packages/providers-local",
+    "relkit/providers-local",
+    "packages/relkit/src/providers-local",
     "core",
   ),
   apiPackage(
     "observability-local",
     "Local history",
-    "@relkit/observability-local",
-    "packages/observability-local",
+    "@relkit/inspector/observability-local",
+    "packages/inspector/src/observability-local",
     "core",
   ),
   apiPackage("cli-api", "CLI automation", "@relkit/cli", "packages/cli", "core"),
@@ -25,19 +32,25 @@ export const apiPackageDefinitions = [
     "packages/create-relkit",
     "core",
   ),
-  apiPackage("relkit", "CLI launcher", "relkit", "packages/relkit", "core"),
-  apiPackage("schema", "Schema", "@relkit/schema", "packages/schema", "core"),
-  apiPackage("functions", "Functions", "@relkit/functions", "packages/functions", "core"),
-  apiPackage("services", "Services", "@relkit/services", "packages/services", "core"),
+  apiPackage("schema", "Schema", "relkit/schema", "packages/relkit/src/schema", "core"),
+  apiPackage("functions", "Functions", "relkit/functions", "packages/relkit/src/functions", "core"),
+  apiPackage("services", "Services", "relkit/services", "packages/relkit/src/services", "core"),
   apiPackage("drizzle", "Drizzle", "@relkit/drizzle", "packages/drizzle", "core"),
   apiPackage("better-auth", "Better Auth", "@relkit/better-auth", "packages/better-auth", "core"),
-  apiPackage("routes", "Routes", "@relkit/routes", "packages/routes", "core"),
-  apiPackage("events", "Events", "@relkit/events", "packages/events", "core"),
-  apiPackage("jobs", "Jobs", "@relkit/jobs", "packages/jobs", "core"),
-  apiPackage("buckets", "Buckets", "@relkit/buckets", "packages/buckets", "core"),
-  apiPackage("cache", "Cache", "@relkit/cache", "packages/cache", "core"),
-  apiPackage("tools", "Tools", "@relkit/tools", "packages/tools", "core"),
-  apiPackage("agents", "Agents", "@relkit/agents", "packages/agents", "core"),
+  apiPackage("routes", "Routes", "relkit/routes", "packages/relkit/src/routes", "core"),
+  apiPackage("events", "Events", "relkit/events", "packages/relkit/src/events", "core"),
+  apiPackage("jobs", "Jobs", "relkit/jobs", "packages/relkit/src/jobs", "core"),
+  apiPackage("buckets", "Buckets", "relkit/buckets", "packages/relkit/src/buckets", "core"),
+  apiPackage("cache", "Cache", "relkit/cache", "packages/relkit/src/cache", "core"),
+  apiPackage("tools", "Tools", "relkit/tools", "packages/relkit/src/tools", "core"),
+  apiPackage("agents", "Agents", "relkit/agents", "packages/relkit/src/agents", "core"),
+  apiPackage(
+    "agent-adapters",
+    "Agent adapters",
+    "relkit/agent-adapters",
+    "packages/relkit/src/agent-adapters",
+    "core",
+  ),
   apiPackage(
     "integrations/langchain",
     "LangChain",
@@ -45,8 +58,15 @@ export const apiPackageDefinitions = [
     "integrations/packages/langchain",
     "integrations",
   ),
+  apiPackage(
+    "integrations/ai-sdk",
+    "AI SDK",
+    "@relkit/ai-sdk",
+    "integrations/packages/ai-sdk",
+    "integrations",
+  ),
   apiPackage("client", "Client", "@relkit/client", "packages/client", "core"),
-  apiPackage("realtime", "Realtime", "@relkit/realtime", "packages/realtime", "core"),
+  apiPackage("realtime", "Realtime", "relkit/realtime", "packages/relkit/src/realtime", "core"),
   apiPackage("testing", "Testing", "@relkit/testing", "packages/testing", "core"),
   apiPackage(
     "inspector",
@@ -56,13 +76,6 @@ export const apiPackageDefinitions = [
     "core",
   ),
   apiPackage("integrations/aws", "AWS", "@relkit/aws", "integrations/packages/aws", "integrations"),
-  apiPackage(
-    "integrations/catalog",
-    "Integration catalog",
-    "@relkit/integrations",
-    "integrations/catalog",
-    "integrations",
-  ),
   apiPackage(
     "integrations/cloudflare",
     "Cloudflare",
@@ -134,7 +147,29 @@ export const apiPackageDefinitions = [
     "integrations/packages/effect-mq",
     "integrations",
   ),
+  apiPackage(
+    "integrations/postgres",
+    "Postgres",
+    "@relkit/postgres",
+    "integrations/packages/postgres",
+    "integrations",
+  ),
 ] as const;
+
+/** A source area merged into a package, such as `packages/relkit/src/functions`. */
+const AREA_DIRECTORY = /^(?:packages|integrations\/packages)\/[^/]+\/src\/[^/]+$/;
+
+/** Source folder documented for a catalog directory: a `relkit` area is its own source folder.
+ * @param directory - Workspace package or a merged area's folder. @returns Folder holding the sources. */
+export function sourceDirectory(directory: string): string {
+  return AREA_DIRECTORY.test(directory) ? directory : `${directory}/src`;
+}
+
+/** Workspace package that owns a catalog directory.
+ * @param directory - Workspace package or a merged area's folder. @returns Package directory. */
+export function packageDirectory(directory: string): string {
+  return AREA_DIRECTORY.test(directory) ? directory.replace(/\/src\/[^/]+$/, "") : directory;
+}
 
 export type ApiPackage = (typeof apiPackageDefinitions)[number]["slug"];
 

@@ -17,7 +17,7 @@ test("route type failures retain the last valid manifest and recover after the e
   const route = join(root, "src/routes/users/route.ts");
   await mkdir(join(root, "src/routes/users"));
   const source = `import hello from "@app/services/hello/service.js";
-import { defineServiceRoutes as expose } from "@relkit/app/routes";
+import { defineServiceRoutes as expose } from "relkit/routes";
 export const GET = expose(hello, { GET: "hello" });\n`;
   await writeFile(route, source);
   const failed = await checkProject({ projectRoot: root });

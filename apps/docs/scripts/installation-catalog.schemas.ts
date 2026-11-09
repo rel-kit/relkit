@@ -3,7 +3,7 @@
  * Only fields used by installation recipes cross this boundary; runtime SDK
  * requirements reuse the contracts package's own capability/phase schema.
  */
-import { IntegrationDependencyRequirements } from "@relkit/contracts";
+import { IntegrationDependencyRequirements } from "relkit/contracts";
 import { Schema } from "effect";
 
 export const InstallationManifest = Schema.Struct({

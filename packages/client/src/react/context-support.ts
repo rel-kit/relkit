@@ -1,4 +1,4 @@
-import type { ClientIdentityDocument } from "@relkit/contracts";
+import type { ClientIdentityDocument } from "relkit/contracts";
 import { createAutoClient, createClient, createWebSocketClient } from "../transport.js";
 import type { ClientHeaders } from "../index.types.js";
 import type { RelkitKeyScope } from "./keys.js";
@@ -16,9 +16,9 @@ export function browserOrigin(): string {
 }
 
 /**
- * Selects query entries owned by RELKIT's existing key prefix.
+ * Selects query entries owned by RelKit's existing key prefix.
  * @param query - Existing query descriptor.
- * @returns Whether the query key belongs to RELKIT.
+ * @returns Whether the query key belongs to RelKit.
  */
 export function isRelkitQuery(query: { readonly queryKey: readonly unknown[] }): boolean {
   return query.queryKey[0] === "relkit";
@@ -52,7 +52,7 @@ export async function loadIdentity(
     cache: "no-store",
     signal,
   });
-  if (!response.ok) throw new Error(`Relkit identity request failed (${response.status})`);
+  if (!response.ok) throw new Error(`RelKit identity request failed (${response.status})`);
   return response.json() as Promise<ClientIdentityDocument>;
 }
 

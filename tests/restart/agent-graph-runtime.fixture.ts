@@ -1,16 +1,16 @@
 /** Constructs the original restart RPC client and persisted inspection snapshot without changing worker process or saver ownership. */
 import { invokeAgent } from "../../integrations/packages/langchain/src/index.ts";
 import { createClient } from "../../packages/client/src/index.ts";
-import { createRegistrationPlan } from "../../packages/graph/src/index.ts";
-import { createLocalAgentStateProvider } from "../../packages/providers-local/src/index.ts";
-import { createApp, type RuntimeManifest } from "../../packages/runtime-hono/src/index.ts";
-import { digest } from "../../packages/runtime-hono/src/agent-rpc-support.ts";
-import { runtimeCohort } from "../../packages/runtime-hono/tests/test-cohort.ts";
+import { createRegistrationPlan } from "relkit/graph";
+import { createLocalAgentStateProvider } from "relkit/providers-local";
+import { createApp, type RuntimeManifest } from "relkit/runtime-hono";
+import { digest } from "../../packages/relkit/src/runtime-hono/agent-rpc-support.ts";
+import { runtimeCohort } from "../../packages/relkit/tests/runtime-hono/test-cohort.ts";
 import { createRestartGraph } from "./agent-graph-fixture.ts";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Schema } from "effect";
-import { IntegrationDependencyRequirements } from "../../packages/contracts/src/integration-dependencies.js";
+import { IntegrationDependencyRequirements } from "../../packages/relkit/src/contracts/integration-dependencies.js";
 
 const RuntimePackages = Schema.fromJsonString(
   Schema.Array(

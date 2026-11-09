@@ -55,7 +55,8 @@ test("main CI cannot replace another commit and release snapshots reconcile with
   const select = release.jobs["select-release-mode"];
   expect(select.steps[0]?.with?.ref).toBe("${{ github.sha }}");
   expect(release.jobs.pack.name).toContain("${{ needs.select-release-mode.outputs.sha }}");
-  expect(release.jobs.pack.permissions).toEqual({ contents: "read" });
+  // Read-only artifact access downloads the verifying CI run's evidence reports.
+  expect(release.jobs.pack.permissions).toEqual({ actions: "read", contents: "read" });
   const follow = release.jobs.reconcile;
   expect(follow.permissions).toEqual({ contents: "read", actions: "write" });
   expect(follow.if).toContain("needs.select-release-mode.outputs.mode == 'none'");

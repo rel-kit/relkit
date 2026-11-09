@@ -35,7 +35,6 @@ export function makeContributorRoots(
           const manifests = yield* files.files(root, [
             "packages/*/package.json",
             "integrations/packages/*/package.json",
-            "integrations/catalog/package.json",
           ]);
           const entries = yield* Effect.forEach(
             manifests,

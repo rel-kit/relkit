@@ -1,7 +1,7 @@
 $ docker info >/dev/null && bun run verify && bun run test:jobs:docker && bun run test:scaffold && bun run test:container && bun run test:local-docker && bun run test:deployment && bun run test:inspector:browser && bun run test:e2e
 $ bun run scripts/verify.ts
 
-▶ frozen install: /Users/mustafaelsayed/.bun/bin/bun install --frozen-lockfile
+▶ frozen install: <home>/.bun/bin/bun install --frozen-lockfile
 [0.02ms] ".env"
 bun install v1.3.10 (30e609e0)
 Resolving dependencies
@@ -11,30 +11,30 @@ Checked 1455 installs across 1554 packages (no changes) [658.00ms]
 ✓ frozen install
 ✓ frozen install no-diff
 
-▶ format check: /Users/mustafaelsayed/.bun/bin/bun x prettier --check AGENTS.md README.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md RELEASE_NOTES.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .changeset .github apps examples integrations packages scripts templates tests
+▶ format check: <home>/.bun/bin/bun x prettier --check AGENTS.md README.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md RELEASE_NOTES.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .changeset .github apps examples integrations packages scripts templates tests
 Checking formatting...
 All matched files use Prettier code style!
 ✓ format check
 
-▶ lint: /Users/mustafaelsayed/.bun/bin/bun run lint
+▶ lint: <home>/.bun/bin/bun run lint
 $ bun run scripts/lint.ts
 Public authoring scan passed (92 source/example fragments).
 ✓ lint
 
-▶ ESLint configuration check: /Users/mustafaelsayed/.bun/bin/bun x eslint eslint.config.mjs
+▶ ESLint configuration check: <home>/.bun/bin/bun x eslint eslint.config.mjs
 ✓ ESLint configuration check
 
-▶ boundaries and scope: /Users/mustafaelsayed/.bun/bin/bun run check
+▶ boundaries and scope: <home>/.bun/bin/bun run check
 $ bun run scripts/check-boundaries.ts
 Boundary check passed (62 roots, 4927 TypeScript files).
 ✓ boundaries and scope
 
-▶ observability sink source scan: /Users/mustafaelsayed/.bun/bin/bun run scripts/check-observability-sinks.ts
+▶ observability sink source scan: <home>/.bun/bin/bun run scripts/check-observability-sinks.ts
 Observability sink source scan passed.
 ✓ observability sink source scan
 ✓ implementation-file limit (maximum 250 lines)
 
-▶ Konsistent configuration validation: /Users/mustafaelsayed/.bun/bin/bun run konsistent -- validate
+▶ Konsistent configuration validation: <home>/.bun/bin/bun run konsistent -- validate
 $ konsistent validate
 Configuration is valid.
 ✓ Konsistent configuration validation
@@ -659,7 +659,7 @@ Configuration is valid.
 $ konsistent check "--format=json" "--max-diagnostics=1000"
 error: script "konsistent" exited with code 1
 
-▶ build: /Users/mustafaelsayed/.bun/bin/bun run build
+▶ build: <home>/.bun/bin/bun run build
 $ bun run scripts/build.ts
 
    • turbo 2.11.7
@@ -1070,12 +1070,12 @@ relkit:build: $ tsc -b
 @relkit/docs:build: generated apps/docs/content/docs/operations/cli-reference.mdx
 @relkit/docs:build: generated apps/docs/content/docs/api/config.mdx
 @relkit/docs:build: generated apps/docs/content/docs/api/schema.mdx
-@relkit/example-data-model:build: Built /Users/mustafaelsayed/Workspace/relkit/examples/data-model/.relkit/build
-@relkit/example-auth-drizzle:build: Built /Users/mustafaelsayed/Workspace/relkit/examples/auth-drizzle/.relkit/build
+@relkit/example-data-model:build: Built <repo>/examples/data-model/.relkit/build
+@relkit/example-auth-drizzle:build: Built <repo>/examples/auth-drizzle/.relkit/build
 @relkit/example-commerce-web:build: error RELKIT_EVALUATOR_TIMEOUT: Evaluator exceeded 10000ms and was killed.
 @relkit/example-commerce-web:build: error: script "check" exited with code 1
 @relkit/example-commerce-web:build: error: script "build" exited with code 1
-@relkit/example-commerce-web#build:  ERROR  command (/Users/mustafaelsayed/Workspace/relkit/examples/commerce-web) /Users/mustafaelsayed/.bun/bin/bun run build exited (1)
+@relkit/example-commerce-web#build:  ERROR  command (<repo>/examples/commerce-web) <home>/.bun/bin/bun run build exited (1)
 
  Tasks:    56 successful, 59 total
 Cached:    0 cached, 59 total
@@ -1091,7 +1091,7 @@ Failed:    @relkit/example-commerce-web#build
 26 | if (exitCode !== 0) throw new Error(`Workspace build failed with exit code ${exitCode}.`);
                                    ^
 error: Workspace build failed with exit code 1.
-      at /Users/mustafaelsayed/Workspace/relkit/scripts/build.ts:26:31
+      at <repo>/scripts/build.ts:26:31
 
 Bun v1.3.10 (macOS arm64)
 error: script "build" exited with code 1

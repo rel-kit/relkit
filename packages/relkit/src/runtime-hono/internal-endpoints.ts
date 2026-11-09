@@ -1,0 +1,182 @@
+import * as contracts from "../contracts/index.js";
+import type { RegistrationPlan } from "../graph/index.js";
+import type { Context, Hono } from "hono";
+import {
+  INTERNAL_ENDPOINT_PROTOCOL,
+  INTERNAL_ENDPOINT_VERSION,
+} from "./internal-endpoint-paths.js";
+import {
+  isAuthorized,
+  isInvalidQueryError,
+  jsonResponse,
+  listResponse,
+  readQuery,
+  resolveQuery,
+  resolveValue,
+  streamBody,
+} from "./internal-endpoints-utils.js";
+import type { InternalEndpointMode, InternalEndpointOptions } from "./internal-endpoints.types.js";
+export type {
+  InternalEndpointMode,
+  InternalEndpointOptions,
+  InternalPage,
+  InternalQuery,
+  InternalReadiness,
+  InternalStreamEvent,
+  QuerySource,
+  ValueSource,
+} from "./internal-endpoints.types.js";
+
+export {
+  INTERNAL_ENDPOINT_PATHS,
+  INTERNAL_ENDPOINT_PROTOCOL,
+  INTERNAL_ENDPOINT_VERSION,
+} from "./internal-endpoint-paths.js";
+
+export class InternalEndpointConfigurationError extends TypeError {
+  constructor(message: string) {
+    super(message);
+    this.name = "InternalEndpointConfigurationError";
+  }
+}
+
+/** Install the versioned inspector endpoints backed by configured runtime sources.
+ * @param app - Hono application receiving the configured endpoints or middleware.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns Nothing; installs enabled, authorized inspector health, graph, query and stream endpoints.
+ */
+export function installInternalEndpoints(app: Hono, options: InternalEndpointOptions = {}): void {
+  const mode = options.environment ?? options.mode ?? "development";
+  const enabled = options.enabled ?? mode !== "production";
+  validateConfiguration(mode, enabled, options);
+  if (!enabled) return;
+
+  /** Protect inspector handlers and map query/native failures to stable JSON errors.
+   * @param handler - Inspector endpoint callback invoked only after authorization.
+   * @returns A handler yielding the endpoint response or a sanitized 4xx/5xx response.
+   */
+  const handle =
+    (handler: (context: Context) => Promise<Response>) =>
+    async (context: Context): Promise<Response> => {
+      if (!(await isAuthorized(context.req.raw, options)))
+        return jsonResponse({ error: "internal-endpoint-protected" }, 401, {
+          "www-authenticate": "Bearer",
+        });
+      try {
+        return await handler(context);
+      } catch (error) {
+        if (isInvalidQueryError(error)) return jsonResponse({ error: "invalid-query" }, 400);
+        return jsonResponse({ error: "internal-error" }, 500);
+      }
+    };
+
+  app.get(
+    `${contracts.API_BASE_PATH}/health/live`,
+    handle(async () => jsonResponse({ status: "ok" })),
+  );
+  app.get(
+    `${contracts.API_BASE_PATH}/health/ready`,
+    handle(async () => {
+      const readiness = await resolveValue(options.readiness ?? options.ready ?? { ready: true });
+      return jsonResponse(
+        readiness.ready
+          ? { status: "ready" }
+          : { status: "not-ready", reason: readiness.reason ?? "unavailable" },
+        readiness.ready ? 200 : 503,
+      );
+    }),
+  );
+  app.get(
+    `${contracts.API_BASE_PATH}/graph`,
+    handle(async () => jsonResponse(await resolveValue(options.graph ?? { graph: null }))),
+  );
+  for (const [name, source] of [
+    ["requests", options.requests],
+    ["logs", options.logs],
+    ["traces", options.traces],
+    ["diagnostics", options.diagnostics],
+  ] as const) {
+    if (source === undefined && name !== "diagnostics") continue;
+    app.get(
+      `${contracts.API_BASE_PATH}/${name}`,
+      handle(async (context) => listResponse(source, context)),
+    );
+  }
+  if (options.stream !== undefined)
+    app.get(
+      `${contracts.API_BASE_PATH}/stream`,
+      handle(async (context) => streamResponse(options.stream, context)),
+    );
+}
+/** Builds the structural graph snapshot exposed by internal inspection.
+ * @param plan - Validated application registration plan.
+ * @returns Versioned structural graph metadata for the active registration plan.
+ */
+export function graphSnapshot(plan: RegistrationPlan): contracts.JsonValue {
+  return {
+    protocol: INTERNAL_ENDPOINT_PROTOCOL,
+    version: INTERNAL_ENDPOINT_VERSION,
+    graphHash: plan.graphHash,
+    manifestGraphHash: plan.graphHash,
+    graphContractVersion: contracts.GRAPH_VERSION,
+    manifestContractVersion: contracts.MANIFEST_VERSION,
+    manifestGeneratorVersion: contracts.GENERATOR_VERSION,
+    functions: plan.functions,
+    tasks: plan.tasks ?? [],
+    jobs: plan.jobs ?? [],
+    httpTriggers: plan.httpTriggers,
+    queues: plan.queues,
+    schedules: plan.schedules,
+    eventTriggers: plan.eventTriggers,
+    buckets: plan.buckets,
+    caches: plan.caches,
+    tools: plan.tools,
+    agents: plan.agents,
+    services: plan.services ?? [],
+  } as unknown as contracts.JsonValue;
+}
+
+/** Checks internal endpoint exposure policy before route registration.
+ * @param mode - Configured runtime exposure or response-validation mode.
+ * @param enabled - Whether the feature is enabled by application configuration.
+ * @param options - Application dependencies and configuration for this domain.
+ * @returns Nothing for a valid exposure policy; otherwise throws the existing configuration error.
+ */
+function validateConfiguration(
+  mode: InternalEndpointMode,
+  enabled: boolean,
+  options: InternalEndpointOptions,
+): void {
+  if (!("development" === mode || "test" === mode || "production" === mode))
+    throw new InternalEndpointConfigurationError("mode must be development, test, or production.");
+  if (
+    mode === "production" &&
+    enabled &&
+    options.bearerToken === undefined &&
+    options.authorize === undefined
+  )
+    throw new InternalEndpointConfigurationError(
+      "Production internal endpoints require bearerToken or authorize protection.",
+    );
+  if (options.bearerToken !== undefined && options.bearerToken.trim().length === 0)
+    throw new InternalEndpointConfigurationError("bearerToken must not be empty.");
+}
+/** Encode the resolved inspector event batch as an SSE response.
+ * @param source - Native iterable or declared request-key source.
+ * @param context - Trusted Hono or oRPC request context containing request state and authentication.
+ * @returns An SSE response containing the resolved inspector event batch.
+ */
+async function streamResponse(
+  source: InternalEndpointOptions["stream"],
+  context: Context,
+): Promise<Response> {
+  const events = source === undefined ? [] : await resolveQuery(source, readQuery(context.req.raw));
+  return new Response(streamBody(events), {
+    headers: {
+      "cache-control": "no-store",
+      "content-type": "text/event-stream; charset=utf-8",
+      connection: "keep-alive",
+      "x-relkit-api-version": String(INTERNAL_ENDPOINT_VERSION),
+    },
+  });
+}

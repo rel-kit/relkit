@@ -10,8 +10,8 @@ import {
   StateGraph,
   StateSchema,
 } from "@langchain/langgraph";
-import { defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 import { defineGraph, defineGraphNode, invokeAgent } from "../src/index.js";
 import { limits, parallelLoopFixture, parallelLoopNodes } from "./graph-runtime-flow.fixture.js";
 const unusedEngine = {
@@ -30,7 +30,7 @@ describe("native graph runtime", () => {
   );
 
   test(
-    "routes function nodes through the RELKIT engine once",
+    "routes function nodes through the RelKit engine once",
     caseRoutesFunctionNodesThroughTheRELKITEngine,
   );
 });
@@ -88,7 +88,7 @@ async function caseSupportsParallelJoinsConditionalLoopsAndUpdate() {
   ).resolves.toEqual({ answer: 9 });
 }
 
-/** Verifies that routes function nodes through the RELKIT engine once.
+/** Verifies that routes function nodes through the RelKit engine once.
  * @returns Completion after fixture assertions and owned cleanup settle.
  */
 async function caseRoutesFunctionNodesThroughTheRELKITEngine() {

@@ -39,7 +39,7 @@ test("agent closure rejects DuckDB history packages while allowing its lightweig
   for (const name of ["@duckdb/node-api", "@duckdb/node-bindings", "@relkit/inspector", "next"]) {
     expect(agentForbiddenPackages.test(name), name).toBe(true);
   }
-  for (const name of ["@relkit/inspector-api", "@relkit/langchain", "langchain"]) {
+  for (const name of ["relkit", "@relkit/langchain", "langchain"]) {
     expect(agentForbiddenPackages.test(name), name).toBe(false);
   }
 });

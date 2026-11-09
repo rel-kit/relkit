@@ -5,12 +5,12 @@ import {
   InspectionFilesLive,
   InspectionHandshakeSchema,
   InspectionConnectionError,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 import { InspectorRemote, InspectorRemoteLive } from "./remote.service.js";
 import type {
   InspectionFilesOperations,
   InspectionConnectionFile,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 import type { InspectorRemoteOperations } from "./remote.types.js";
 import type { InspectorDiscoveryOperations, InspectorSelection } from "./discovery.types.js";
 import type { InspectorOptions } from "./options.types.js";

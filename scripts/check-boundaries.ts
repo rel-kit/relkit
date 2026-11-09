@@ -1,7 +1,7 @@
 /** Checks every workspace's package/import ownership and source scope; documentation build-only edges have a separate finite policy. */
 import { readFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
-import * as ts from "typescript";
+import * as ts from "relkit-typescript";
 import {
   dependencyName,
   descriptorPackages,
@@ -12,10 +12,13 @@ import {
   isFixtureForbidden,
   isFrameworkRuntime,
   isWithin,
+  moduleOwnerName,
   nodeBuiltins,
   publicApplicationPackages,
   readManifest,
+  relkitAreaOwner,
 } from "./boundary-imports";
+import { areaViolation } from "./boundary-areas";
 import { dependencyDirectionViolations, integrationPackageNames } from "./boundary-directions";
 import { scanScope } from "./scope-scan";
 import { isDocumentationBuildImport } from "./docs-build-imports.js";
@@ -41,8 +44,8 @@ function reportImport(
   sourceFile: ts.SourceFile,
   reference: ImportReference,
 ): Violation[] {
-  const dependency = dependencyName(reference.specifier);
-  const ownerName = owner.manifest?.name ?? owner.path;
+  const packageDependency = dependencyName(reference.specifier);
+  const ownerName = relkitAreaOwner(root, file) ?? owner.manifest?.name ?? owner.path;
   const location = sourceFile.getLineAndCharacterOfPosition(reference.position);
   const base = {
     file: relative(root, file),
@@ -64,39 +67,54 @@ function reportImport(
       );
     }
   }
+  // Inside relkit, a relative import into another area depends on that area.
+  const areaTarget = reference.specifier.startsWith(".")
+    ? relkitAreaOwner(root, resolve(dirname(file), reference.specifier))
+    : undefined;
+  const dependency =
+    areaTarget !== undefined && areaTarget !== ownerName && relkitAreaOwner(root, file)
+      ? areaTarget
+      : moduleOwnerName(reference.specifier);
   if (!dependency) return violations;
+  // The specifier the relative import stands for, such as `relkit/observability/telemetry`.
+  const areaSpecifier =
+    dependency === areaTarget
+      ? `${areaTarget}/${relative(resolve(root, "packages/relkit/src", areaTarget.slice("relkit/".length)), resolve(dirname(file), reference.specifier)).replace(/\.(?:js|ts)$/, "")}`
+      : reference.specifier;
   if (
+    packageDependency &&
     owner.manifest &&
-    dependency !== owner.manifest.name &&
-    dependency !== "bun" &&
+    packageDependency !== owner.manifest.name &&
+    packageDependency !== "bun" &&
     !(reference.specifier === "mdx/types" && owner.declaredDependencies.has("@types/mdx")) &&
-    !nodeBuiltins.has(dependency) &&
-    !owner.declaredDependencies.has(dependency)
+    !nodeBuiltins.has(packageDependency) &&
+    !owner.declaredDependencies.has(packageDependency)
   ) {
     add(
       "undeclared-dependency",
-      `${ownerName} imports undeclared dependency "${dependency}" via "${reference.specifier}"`,
+      `${ownerName} imports undeclared dependency "${packageDependency}" via "${reference.specifier}"`,
     );
   }
   if (
     descriptorPackages.has(ownerName) &&
     isFrameworkRuntime(dependency) &&
     !descriptorRuntimeDependencies.get(ownerName)?.has(dependency) &&
-    !descriptorRuntimeDependencies.get(ownerName)?.has(reference.specifier)
+    !descriptorRuntimeDependencies.get(ownerName)?.has(areaSpecifier)
   ) {
     add("descriptor-runtime-import", `${ownerName} imports runtime package "${dependency}"`);
   }
   if (
-    ownerName === "@relkit/graph" &&
+    ownerName === "relkit/graph" &&
     (dependency === "hono" ||
       dependency.startsWith("@hono/") ||
-      dependency === "@relkit/runtime-hono" ||
+      dependency === "relkit/runtime-hono" ||
       dependency.startsWith("@pulumi/") ||
-      dependency === "@relkit/deploy-pulumi" ||
-      dependency === "@relkit/cloud-aws")
+      dependency === "@relkit/pulumi")
   ) {
-    add("graph-hono-pulumi-import", `@relkit/graph imports Hono/Pulumi package "${dependency}"`);
+    add("graph-hono-pulumi-import", `relkit/graph imports Hono/Pulumi package "${dependency}"`);
   }
+  const area = areaViolation(ownerName, owner.path, base.file, dependency);
+  if (area) add(area.rule, area.message);
   const fixturePackage = scopes.find((scope) => scope.path === "examples/commerce")?.manifest?.name;
   if (
     owner.path === "apps/inspector" &&

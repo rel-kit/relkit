@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { type LocalServicePlanEntry, type LocalServiceWorkerArtifact } from "@relkit/local-service";
+import { type LocalServicePlanEntry, type LocalServiceWorkerArtifact } from "relkit/local-service";
 
 /**
  * Associates local worker bindings with the accepted job generation for their profile.

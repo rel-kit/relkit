@@ -25,10 +25,75 @@ The default retry policy is three attempts with a one-second initial delay, a 30
 </include>
 
 Set `retry` on `defineTask`, using `maxAttempts`, readable `initialDelay` and `maxDelay`, `factor`, and
-`jitter`. A job can add an admission idempotency key and retention policy, but it cannot multiply the
+`jitter`. A job can add an idempotency key for accepting runs and retention policy, but it cannot multiply the
 task's retry budget.
 
 Retries are at-least-once. Use an idempotency key for every external side effect and store the result before acknowledging the step. A run ID is not an idempotency key: a retry keeps the run identity but may execute the task again.
+
+## At-least-once delivery and re-runs after recovery
+
+A run executes **at least once**, never exactly once. A handler can run again for these reasons:
+
+- **A retry.** An attempt that throws a retryable error runs again, up to `maxAttempts`.
+- **Recovery after a crash.** The local provider keeps run records in `.relkit/state/jobs`. When the
+  process restarts and the provider first opens that journal, every run that was `running` goes
+  back to `queued` and starts again from the beginning of the handler. Queue entries whose worker lease (30 seconds by default) has
+  expired are made available again in the same way.
+  The run keeps its ID, but side effects the earlier attempt already performed are not undone.
+- **A lost response.** If the caller never saw the trigger response, it may trigger again.
+
+Write every handler so that running it twice, or running it again after it stopped halfway, leaves
+the same result.
+
+## Make a handler idempotent
+
+Pass a key derived from the business operation, such as the order ID, to every external write. The
+run ID and `context.run.attempt` are not suitable keys, because a retry changes the attempt and a
+new trigger creates a new run.
+
+<include
+  source="apps/docs/examples/jobs/charge-order.job.ts"
+  lang="ts"
+  meta='title="apps/docs/examples/jobs/charge-order.job.ts"'
+>
+  /_snippets/source/apps/docs/examples/jobs/charge-order.job.ts
+</include>
+
+Use the same idea when accepting work. An `idempotencyKey` on `trigger` makes the provider return
+the existing run for a repeated key, with `duplicate: true` on the handle, instead of accepting a
+second one. The key is scoped to the application, environment, scope and job, and the mapping is
+rebuilt from the journal after a restart.
+
+<include
+  source="apps/docs/examples/jobs/queue-charge.function.ts"
+  lang="ts"
+  meta='title="apps/docs/examples/jobs/queue-charge.function.ts"'
+>
+  /_snippets/source/apps/docs/examples/jobs/queue-charge.function.ts
+</include>
+
+The two keys protect different steps. The trigger key stops duplicate runs from being accepted. The
+key inside the handler stops a single run from repeating an external side effect when it is
+re-run.
+
+## Durable providers
+
+Durable providers such as `@relkit/postgres` follow the same rule with a lease instead of a journal.
+When a worker stops while it holds a run, its lease expires and another worker starts the attempt
+over; when it stops after the task succeeded but before the result was recorded, the task runs a
+second time. Set the job's `admission.idempotency.key` so a repeated submission for the same order
+reuses the first run instead of starting another.
+
+<include
+  source="apps/docs/examples/postgres/charge-order.job.ts"
+  lang="ts"
+  meta='title="src/services/orders/jobs/charge-order.job.ts"'
+>
+  /_snippets/source/apps/docs/examples/postgres/charge-order.job.ts
+</include>
+
+Event consumers follow the same rule: a consumer may receive the same event again after a crash,
+with the same `instanceId`, so use the instance ID or a business key to skip work already done.
 
 The dedupe scope is part of compatibility. Changing it can create duplicate work even when the task source is unchanged, so migration diagnostics treat it as a deliberate change.
 

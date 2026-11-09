@@ -6,15 +6,30 @@
 
 import { Schema } from "effect";
 
+/**
+ * Accepts one script run by any supported package manager.
+ * @param script - Script name.
+ * @returns The literal union for Bun, npm and pnpm.
+ */
+function runScript<const Script extends string>(script: Script) {
+  return Schema.Literals([`bun run ${script}`, `npm run ${script}`, `pnpm run ${script}`] as const);
+}
+
 /** Local commands reflect whether installation and preparation already ran. */
 const Commands = Schema.Struct({
   cd: Schema.String,
-  install: Schema.optionalKey(Schema.Literal("bun install")),
-  prepare: Schema.optionalKey(Schema.Literal("bunx --no-install relkit dev --prepare")),
-  dev: Schema.Literal("bun run dev"),
-  test: Schema.Literal("bun run test"),
-  check: Schema.Literal("bun run check"),
-  build: Schema.Literal("bun run build"),
+  install: Schema.optionalKey(Schema.Literals(["bun install", "npm install", "pnpm install"])),
+  prepare: Schema.optionalKey(
+    Schema.Literals([
+      "bunx --no-install relkit dev --prepare",
+      "npx --no-install relkit dev --prepare",
+      "pnpm exec relkit dev --prepare",
+    ]),
+  ),
+  dev: runScript("dev"),
+  test: runScript("test"),
+  check: runScript("check"),
+  build: runScript("build"),
 });
 
 /** Only an example-bearing project advertises the generated hello route. */

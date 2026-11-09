@@ -4,6 +4,10 @@ import { group, relation } from "./guide-catalog-helpers.js";
 export const deploymentGuideGroup = group("docs/modules/deployment", "Deployment", "CloudUpload", [
   "index",
   "local-docker",
+  "runtimes",
+  "railway",
+  "vercel",
+  "cloudflare",
   "aws",
   "providers",
 ]);
@@ -18,6 +22,35 @@ export const deploymentGuideRelations = [
     "docs/modules/deployment/local-docker",
     ["app", "integrations/docker"],
     ["templates/default/v1/minimal/relkit.config.ts"],
+  ),
+  relation(
+    "docs/modules/deployment/runtimes",
+    ["app", "testing", "drizzle", "integrations/redis", "integrations/sentry"],
+    ["templates/default/v1/api/relkit.config.ts"],
+  ),
+  relation(
+    "docs/modules/deployment/railway",
+    ["app", "jobs", "events", "integrations/postgres"],
+    ["templates/default/v1/api/relkit.config.ts"],
+  ),
+  relation(
+    "docs/modules/deployment/vercel",
+    ["app", "jobs", "events", "realtime", "integrations/postgres"],
+    ["templates/default/v1/api/relkit.config.ts"],
+  ),
+  relation(
+    "docs/modules/deployment/cloudflare",
+    [
+      "app",
+      "jobs",
+      "events",
+      "realtime",
+      "cache",
+      "buckets",
+      "integrations/postgres",
+      "integrations/cloudflare",
+    ],
+    ["templates/default/v1/api/relkit.config.ts"],
   ),
   relation(
     "docs/modules/deployment/aws",

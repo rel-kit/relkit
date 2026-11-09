@@ -1,7 +1,7 @@
 {
   "name": "create-relkit",
   "version": "0.8.8",
-  "description": "Create a RELKIT application from a supported project template.",
+  "description": "The TypeScript backend framework where you write the business logic. RelKit wires the APIs, jobs, events, agents and typed client, and gives you, and your coding agent, a live map of the app.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -21,7 +21,8 @@
     "access": "public"
   },
   "engines": {
-    "bun": ">=1.3.10"
+    "bun": ">=1.3.10",
+    "node": ">=22.13.0"
   },
   "type": "module",
   "bin": {
@@ -40,105 +41,106 @@
       "types": "./dist/launcher.d.ts",
       "import": "./dist/launcher.js"
     },
-    "./internal/add-transaction-files": {
+    "./add-transaction-files": {
       "types": "./dist/add-transaction-files.d.ts",
       "import": "./dist/add-transaction-files.js"
     },
-    "./internal/add-types": {
+    "./add-types": {
       "types": "./dist/add-types.d.ts",
       "import": "./dist/add-types.js"
     },
-    "./internal/build-catalog": {
+    "./build-catalog": {
       "types": "./dist/build-catalog.d.ts",
       "import": "./dist/build-catalog.js"
     },
-    "./internal/catalog-resolution": {
-      "types": "./dist/catalog-resolution.d.ts",
-      "import": "./dist/catalog-resolution.js"
-    },
-    "./internal/dependency-patch-installation": {
+    "./dependency-patch-installation": {
       "types": "./dist/dependency-patch-installation.d.ts",
       "import": "./dist/dependency-patch-installation.js"
     },
-    "./internal/dependency-patches": {
+    "./dependency-patches": {
       "types": "./dist/dependency-patches.d.ts",
       "import": "./dist/dependency-patches.js"
     },
-    "./internal/generate": {
+    "./generate": {
       "types": "./dist/generate.d.ts",
       "import": "./dist/generate.js"
     },
-    "./internal/generate-process": {
+    "./generate-process": {
       "types": "./dist/generate-process.d.ts",
       "import": "./dist/generate-process.js"
     },
-    "./internal/generator-cleanup": {
+    "./generator-cleanup": {
       "types": "./dist/generator-cleanup.d.ts",
       "import": "./dist/generator-cleanup.js"
     },
-    "./internal/generator-errors": {
+    "./generator-errors": {
       "types": "./dist/generator-errors.d.ts",
       "import": "./dist/generator-errors.js"
     },
-    "./internal/generator-filesystem": {
+    "./generator-filesystem": {
       "types": "./dist/generator-filesystem.d.ts",
       "import": "./dist/generator-filesystem.js"
     },
-    "./internal/generator-filesystem.types": {
+    "./generator-filesystem.types": {
       "types": "./dist/generator-filesystem.types.d.ts",
       "import": "./dist/generator-filesystem.types.js"
     },
-    "./internal/generator-paths": {
+    "./generator-paths": {
       "types": "./dist/generator-paths.d.ts",
       "import": "./dist/generator-paths.js"
     },
-    "./internal/generator-process": {
+    "./generator-process": {
       "types": "./dist/generator-process.d.ts",
       "import": "./dist/generator-process.js"
     },
-    "./internal/generator-process.types": {
+    "./generator-process.types": {
       "types": "./dist/generator-process.types.d.ts",
       "import": "./dist/generator-process.types.js"
     },
-    "./internal/generator-prompt": {
+    "./generator-prompt": {
       "types": "./dist/generator-prompt.d.ts",
       "import": "./dist/generator-prompt.js"
     },
-    "./internal/generator-runtime": {
+    "./generator-runtime": {
       "types": "./dist/generator-runtime.d.ts",
       "import": "./dist/generator-runtime.js"
     },
-    "./internal/options": {
+    "./options": {
       "types": "./dist/options.d.ts",
       "import": "./dist/options.js"
     },
-    "./internal/project-manifest.schemas": {
+    "./package-manager": {
+      "types": "./dist/package-manager.d.ts",
+      "import": "./dist/package-manager.js"
+    },
+    "./project-manifest.schemas": {
       "types": "./dist/project-manifest.schemas.d.ts",
       "import": "./dist/project-manifest.schemas.js"
     },
-    "./internal/prompt-driver": {
+    "./prompt-driver": {
       "types": "./dist/prompt-driver.d.ts",
       "import": "./dist/prompt-driver.js"
     },
-    "./internal/prompt-driver.types": {
+    "./prompt-driver.types": {
       "types": "./dist/prompt-driver.types.d.ts",
       "import": "./dist/prompt-driver.types.js"
     },
-    "./internal/scaffold-catalog": {
+    "./scaffold-catalog": {
       "types": "./dist/scaffold-catalog.d.ts",
       "import": "./dist/scaffold-catalog.js"
     },
-    "./internal/scaffold-catalog.types": {
+    "./scaffold-catalog.types": {
       "types": "./dist/scaffold-catalog.types.d.ts",
       "import": "./dist/scaffold-catalog.types.js"
     },
-    "./internal/validate-paths": {
+    "./validate-paths": {
       "types": "./dist/validate-paths.d.ts",
       "import": "./dist/validate-paths.js"
     },
     "./catalog-resolution": {
       "types": "./src/catalog-resolution.ts",
-      "default": "./src/catalog-resolution.ts"
+      "bun": "./src/catalog-resolution.ts",
+      "default": "./dist/catalog-resolution.js"
     }
   },
   "scripts": {
@@ -149,13 +151,14 @@
   "dependencies": {
     "@clack/prompts": "catalog:",
     "effect": "catalog:",
-    "@relkit/contracts": "workspace:*"
+    "relkit": "workspace:*"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
     "vitest": "catalog:"
   },
   "relkit": {
+    "maturity": "core",
     "buildCatalog": {
       "dependencies": {
         "@better-fetch/fetch": "1.3.2",
@@ -168,8 +171,8 @@
         "@effect/vitest": "4.0.1",
         "@langchain/core": "1.2.9",
         "@langchain/langgraph": "1.4.14",
-        "@orpc/client": "2.0.0-beta.31",
-        "@orpc/contract": "2.0.0-beta.31",
+        "@orpc/client": "1.16.1",
+        "@orpc/contract": "1.16.1",
         "@pulumi/aws": "7.43.0",
         "@pulumi/pulumi": "3.259.0",
         "@tailwindcss/postcss": "4.3.3",
@@ -184,7 +187,7 @@
         "drizzle-orm": "1.0.0-rc.5-169397b",
         "effect": "4.0.1",
         "effect-mq": "0.7.0",
-        "hono": "4.13.7",
+        "hono": "4.13.16",
         "inngest": "4.20.0",
         "langchain": "1.5.10",
         "langsmith": "0.10.8",
@@ -213,15 +216,104 @@
       "@relkit/docker": "0.7.13",
       "@relkit/local": "0.7.14",
       "@relkit/langchain": "0.7.15",
+      "@relkit/ai-sdk": "0.8.4",
       "@relkit/inngest": "0.8.3",
       "@relkit/trigger": "0.8.3",
       "@relkit/effect-mq": "0.8.3",
+      "@relkit/postgres": "0.1.0",
       "@relkit/better-auth": "0.8.4",
       "@relkit/cloudflare": "0.7.14",
       "@relkit/drizzle": "0.8.3",
       "@relkit/redis": "0.8.3",
       "@relkit/s3": "0.7.13",
       "@relkit/inspector": "0.2.1"
-    }
+    },
+    "integrations": [
+      {
+        "id": "ai-sdk",
+        "package": "@relkit/ai-sdk",
+        "maturity": "labs"
+      },
+      {
+        "id": "aws",
+        "package": "@relkit/aws",
+        "maturity": "labs"
+      },
+      {
+        "id": "better-auth",
+        "package": "@relkit/better-auth",
+        "maturity": "core"
+      },
+      {
+        "id": "cloudflare",
+        "package": "@relkit/cloudflare",
+        "maturity": "labs"
+      },
+      {
+        "id": "docker",
+        "package": "@relkit/docker",
+        "maturity": "core"
+      },
+      {
+        "id": "drizzle",
+        "package": "@relkit/drizzle",
+        "maturity": "core"
+      },
+      {
+        "id": "effect-mq",
+        "package": "@relkit/effect-mq",
+        "maturity": "labs"
+      },
+      {
+        "id": "inngest",
+        "package": "@relkit/inngest",
+        "maturity": "labs"
+      },
+      {
+        "id": "langchain",
+        "package": "@relkit/langchain",
+        "maturity": "labs"
+      },
+      {
+        "id": "local",
+        "package": "@relkit/local",
+        "maturity": "core"
+      },
+      {
+        "id": "otlp",
+        "package": "@relkit/otlp",
+        "maturity": "labs"
+      },
+      {
+        "id": "postgres",
+        "package": "@relkit/postgres",
+        "maturity": "labs"
+      },
+      {
+        "id": "pulumi",
+        "package": "@relkit/pulumi",
+        "maturity": "labs"
+      },
+      {
+        "id": "redis",
+        "package": "@relkit/redis",
+        "maturity": "core"
+      },
+      {
+        "id": "s3",
+        "package": "@relkit/s3",
+        "maturity": "core"
+      },
+      {
+        "id": "sentry",
+        "package": "@relkit/sentry",
+        "maturity": "labs"
+      },
+      {
+        "id": "trigger",
+        "package": "@relkit/trigger",
+        "maturity": "labs"
+      }
+    ]
   }
 }

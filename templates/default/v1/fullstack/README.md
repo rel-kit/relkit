@@ -1,9 +1,6 @@
 # my-app
 
-This maintained fullstack candidate is exercised internally. Public fullstack creation
-remains disabled until its exact native and readiness certification passes.
-
-A Relkit backend and Next.js typed client. The example includes an offline
+A RelKit backend and Next.js typed client. The example includes an offline
 native LangChain agent with typed todo/tool state, a LangGraph interrupt and
 resume flow, explicit application-owned thread IDs, and selectable SSE or
 WebSocket streaming. `bun run dev` serves the API on port 3000 and the web app on

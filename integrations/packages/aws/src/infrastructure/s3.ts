@@ -3,7 +3,7 @@ import {
   type DeploymentInfrastructureMaterialization,
   type DeploymentPlan,
   type InfrastructureOperationPlan,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 import { assertAdapter, context, output, resource, settings } from "./shared.js";
 
 export function materializeS3(

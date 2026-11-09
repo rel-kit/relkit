@@ -5,7 +5,6 @@ export const operationsGuideRelations = [
   relation(
     "docs/modules/integrations/index",
     [
-      "integrations/catalog",
       "integrations/docker",
       "integrations/redis",
       "integrations/s3",
@@ -38,9 +37,14 @@ export const operationsGuideRelations = [
     ["tests/e2e/inspector-redesign.spec.ts"],
   ),
   relation(
+    "docs/modules/operations/mcp",
+    ["cli-api", "inspector"],
+    ["packages/cli/tests/commands/mcp.test.ts"],
+  ),
+  relation(
     "docs/modules/operations/realtime-agents-streaming",
     ["realtime", "agents", "client"],
-    ["packages/runtime-hono/tests/realtime-rpc.test.ts"],
+    ["tests/runtime-rpc/runtime-hono/realtime-rpc.test.ts"],
   ),
   relation(
     "docs/modules/operations/testing",
@@ -56,6 +60,15 @@ export const operationsGuideRelations = [
     "docs/modules/integrations/provider-authoring",
     ["provider"],
     ["apps/docs/examples/public-api/provider.ts"],
+  ),
+  relation(
+    "docs/modules/integrations/provider-kit",
+    ["testing", "provider", "cli-api"],
+    [
+      "templates/provider-starter/tests/conformance.test.ts",
+      "packages/testing/tests/conformance/local-storage.test.ts",
+      "packages/testing/tests/conformance/deploy-targets.test.ts",
+    ],
   ),
   relation(
     "docs/modules/integrations/local-providers",

@@ -1,5 +1,5 @@
 /** Local MinIO supplies connection values without application-owned credentials. */
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 import { docker } from "@relkit/docker";
 import { s3 } from "@relkit/s3";
 

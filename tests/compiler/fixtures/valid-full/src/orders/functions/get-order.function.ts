@@ -1,4 +1,4 @@
-import { defineFunction } from "@relkit/app";
+import { defineFunction } from "relkit";
 import { lookupInput, orderOutput } from "../../platform/schemas.js";
 
 const getOrder = defineFunction({

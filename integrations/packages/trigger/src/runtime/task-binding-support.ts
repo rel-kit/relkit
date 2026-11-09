@@ -1,5 +1,5 @@
-import { parseTracePropagation, type JsonValue } from "@relkit/contracts";
-import type { TaskExecutionBinding, TaskExecutionEnvelope } from "@relkit/jobs/adapter";
+import { parseTracePropagation, type JsonValue } from "relkit/contracts";
+import type { TaskExecutionBinding, TaskExecutionEnvelope } from "relkit/jobs/adapter";
 import type { TriggerTaskDefinition } from "./task-binding.js";
 
 export function envelopeFrom(

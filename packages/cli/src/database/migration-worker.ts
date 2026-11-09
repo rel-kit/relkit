@@ -5,6 +5,7 @@ import { basename, dirname, join, resolve, sep } from "node:path";
 import { loadMigrationConfig } from "./migration-config.js";
 import { migrateServer, migrateSqlite, preflightHistory } from "./migration-execute.js";
 import { MigrationFailure, type MigrationResponse } from "./migration.schemas.js";
+import { isMainModule } from "../compiler/discovery/evaluator-child-framing.js";
 
 async function execute(): Promise<MigrationResponse> {
   const root = process.cwd();
@@ -40,7 +41,7 @@ async function resultDirectory(path: string | undefined): Promise<string> {
   return canonicalDirectory;
 }
 
-if (import.meta.main) {
+if (import.meta.main ?? isMainModule(import.meta.url)) {
   const directory = await resultDirectory(process.argv[3]);
   const output = await open(join(directory, "result.json"), "wx", 0o600);
   try {

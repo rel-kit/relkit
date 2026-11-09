@@ -1,9 +1,10 @@
-import { Hono } from "../../packages/inspector-api/node_modules/hono";
+import type { RunSnapshot } from "relkit/contracts/jobs";
+import { Hono } from "../../packages/relkit/node_modules/hono";
 import { Schema } from "effect";
-import { telemetryRecordSchema } from "@relkit/observability/local/protocol";
+import { telemetryRecordSchema } from "relkit/observability/local/protocol";
 // @ts-expect-error The workspace package exposes this runtime subpath without a relative declaration path.
-import { cors } from "../../packages/inspector-api/node_modules/hono/dist/middleware/cors/index.js";
-import { PROTOCOL_VERSION } from "../../packages/contracts/src/index.ts";
+import { cors } from "../../packages/relkit/node_modules/hono/dist/middleware/cors/index.js";
+import { PROTOCOL_VERSION } from "relkit/contracts";
 import {
   assembleRequestExecution,
   createObservabilityStream,
@@ -11,12 +12,12 @@ import {
   type ObservabilityQueryRequest,
   type ObservabilityStream,
   type ObservabilityRecord,
-} from "../../packages/observability/src/index.ts";
+} from "relkit/observability";
 import {
   installInspectorEndpoints,
   type InspectorActionServices,
   type InspectorActiveGeneration,
-} from "../../packages/inspector-api/src/index.ts";
+} from "../../packages/relkit/src/inspector-api/index.ts";
 import { createAgentApplicationFixture } from "./fixture-agent-runtime.ts";
 
 export const FIXTURE_GRAPH_HASH = "sha256:commerce-inspector-fixture-v1";
@@ -179,6 +180,14 @@ const graph = {
     {
       kind: "job",
       id: "receipts.send-job",
+      jobId: "receipts.send-job",
+      name: "receipts.send-job",
+      taskId: "receipts.send-task",
+      taskVersion: "1",
+      buildId: "fixture-build",
+      serviceGeneration: FIXTURE_GENERATION_ID,
+      executionModel: "task",
+      default: true,
       targetFunctionId: "orders.send-receipt",
       profile: "default",
       input: { type: "object", properties: { orderId: schema("string") } },
@@ -186,6 +195,15 @@ const graph = {
       concurrency: 4,
       schedule: [{ id: "receipts.reconcile", cron: "0 * * * *", timezone: "UTC", nextRunAt: now }],
       source: source("src/jobs/send-receipt.job.ts", 3),
+    },
+    {
+      kind: "task",
+      id: "receipts.send-task",
+      taskId: "receipts.send-task",
+      version: "1",
+      execution: "durable",
+      input: { type: "object", properties: { orderId: schema("string") } },
+      output: { type: "object" },
     },
     {
       kind: "event",
@@ -263,6 +281,7 @@ const graph = {
       description: "Read one order by ID",
       sideEffect: "read",
       approval: "never",
+      mcp: true,
       timeoutMs: 2_000,
       source: source("src/tools/lookup-order.tool.ts", 3),
     },
@@ -475,13 +494,77 @@ export function createInspectorFixture(): InspectorFixture {
   let requests = [...initialRequests];
   let logs = [...initialLogs];
   let traces = [...initialTraces];
+  let publications: InspectorObjectRecord[] = [...eventPublications];
+  let deliveries: InspectorObjectRecord[] = [...eventDeliveries];
+  let triggeredRuns: InspectorObjectRecord[] = [];
+  const jobRuns = () => [
+    jobRun(FIXTURE_IDS.jobInstance, jobState === "available" ? "queued" : "failed"),
+    ...(jobState === "available" ? [jobRun(`${FIXTURE_IDS.jobInstance}-retry`, "queued")] : []),
+    ...triggeredRuns.map((run) => jobRun(String(run.instanceId), "queued")),
+  ];
   let releasePaused: (() => void) | undefined;
   const agentApplication = createAgentApplicationFixture();
   const stream = createObservabilityStream({ maxEvents: 100 });
   const actionServices: InspectorActionServices = {
     functions: {
-      exists: async (id) => id === FIXTURE_IDS.function,
-      invoke: async () => ({ ok: true, orderId: "order-100", totalCents: 1000 }),
+      exists: async (id) => id === FIXTURE_IDS.function || id === "orders.get",
+      invoke: async ({ functionId, traceId }) => {
+        if (traceId !== undefined) {
+          const at = new Date().toISOString();
+          traces = [...traces, ...makeTraceRecords(traceId, `inspector-call-${traceId}`, at)];
+          logs = [
+            ...logs,
+            makeLog(
+              String(logs.length + 1),
+              traceId,
+              functionId,
+              `Inspector called ${functionId}.`,
+            ),
+          ];
+        }
+        return functionId === "orders.get"
+          ? { orderId: "order-100", status: "confirmed" }
+          : { ok: true, orderId: "order-100", totalCents: 1000 };
+      },
+    },
+    events: {
+      protocol: "relkit.events.admin",
+      version: PROTOCOL_VERSION,
+      status: async (deliveryId) => deliveries.find((item) => item.deliveryId === deliveryId),
+      retry: async ({ deliveryId }) => {
+        deliveries = deliveries.map((item) =>
+          item.deliveryId === deliveryId ? { ...item, state: "delivered" } : item,
+        );
+        return { action: "retry", status: { deliveryId, state: "delivered" } };
+      },
+      cancel: async ({ deliveryId }) => {
+        deliveries = deliveries.map((item) =>
+          item.deliveryId === deliveryId ? { ...item, state: "cancelled" } : item,
+        );
+        return { action: "cancel", status: { deliveryId, state: "cancelled" } };
+      },
+      publish: async ({ eventId, payload }) => {
+        const instanceId = `event-instance-${publications.length + 1}`;
+        publications = [
+          ...publications,
+          { ...eventPublications[0]!, instanceId, eventId, sequence: publications.length + 1 },
+        ];
+        deliveries = [
+          ...deliveries,
+          fixtureDelivery(instanceId, deliveries.length + 1, "delivered"),
+        ];
+        return { publicationId: instanceId, payload, deliveries: 1 };
+      },
+      replay: async ({ publicationId }) => {
+        if (!publications.some((item) => item.instanceId === publicationId))
+          throw new Error("Publication not found");
+        // A replayed delivery waits for its consumer, so the Inspector can still cancel it.
+        deliveries = [
+          ...deliveries,
+          fixtureDelivery(publicationId, deliveries.length + 1, "available"),
+        ];
+        return { publicationId, deliveries: 1 };
+      },
     },
     jobs: {
       protocol: "relkit.jobs.admin",
@@ -494,6 +577,14 @@ export function createInspectorFixture(): InspectorFixture {
       cancel: async ({ instanceId }) => {
         jobState = "cancelled";
         return { action: "cancel", status: { instanceId, state: jobState } };
+      },
+      trigger: async ({ jobId }) => {
+        const instanceId = `${jobId}-run-${triggeredRuns.length + 1}`;
+        triggeredRuns = [
+          ...triggeredRuns,
+          { id: instanceId, jobId, instanceId, state: "available", attempt: 1, acceptedAt: now },
+        ];
+        return { instanceId, state: "available" };
       },
     },
     approvals: {
@@ -527,8 +618,8 @@ export function createInspectorFixture(): InspectorFixture {
     }),
   );
   for (const path of [
-    "/rpc",
-    "/rpc/*",
+    "/_relkit/v1/rpc",
+    "/_relkit/v1/rpc/*",
     "/_relkit/v1/client/identity",
     "/_relkit/v1/agents/:agentId/workflow",
     "/_relkit/v1/runtime/agents/:agentId/executions",
@@ -724,6 +815,35 @@ export function createInspectorFixture(): InspectorFixture {
             },
           }
         : {}),
+      jobs: {
+        bindings: [
+          {
+            service: "default",
+            serviceGeneration: FIXTURE_GENERATION_ID,
+            capabilities: { features: { cancel: true, retry: true } },
+            list: async () => ({
+              items: jobRuns(),
+              hasMore: false,
+              availability: [],
+              count: { value: jobRuns().length, accuracy: "exact" },
+            }),
+            get: async (runId: string) => {
+              const found = jobRuns().find((run) => run.runId === runId);
+              if (found === undefined) throw new Error("Run not found");
+              return found;
+            },
+            retry: async (runId: string) => {
+              jobState = "available";
+              return jobRun(`${runId}-retry`, "queued");
+            },
+            cancel: async (runId: string, operationId: string) => ({
+              runId,
+              operationId,
+              outcome: "requested",
+            }),
+          },
+        ],
+      },
       runtime: {
         functions: [
           { id: FIXTURE_IDS.function, functionId: FIXTURE_IDS.function, status: "ready" },
@@ -738,6 +858,7 @@ export function createInspectorFixture(): InspectorFixture {
             acceptedAt: now,
             failure: { code: "RECEIPT_DELIVERY_FAILED", message: "safe fixture failure" },
           },
+          ...triggeredRuns,
         ],
         events: {
           query: async () => ({
@@ -757,8 +878,8 @@ export function createInspectorFixture(): InspectorFixture {
                 orderedByKey: false,
               },
             ],
-            publications: eventPublications,
-            deliveries: eventDeliveries,
+            publications,
+            deliveries,
           }),
         },
         buckets: [
@@ -1137,6 +1258,38 @@ function makeOutcomeRecords(
   });
   return { request, records };
 }
+
+/** A native run snapshot of the fixture job. */
+function jobRun(runId: string, status: string) {
+  return {
+    accepted: true,
+    runId,
+    jobId: FIXTURE_IDS.job,
+    taskId: "receipts.send-task",
+    taskVersion: "1",
+    buildId: "fixture-build",
+    service: "default",
+    acceptedAt: now,
+    observedAt: now,
+    status,
+    attempt: status === "failed" ? 3 : 1,
+    resultAvailability: "not-selected",
+  } as unknown as RunSnapshot;
+}
+
+/** A delivered attempt of a fixture publication to the projector trigger. */
+function fixtureDelivery(eventInstanceId: string, sequence: number, state: string) {
+  return {
+    ...eventDeliveries[0]!,
+    deliveryId: `delivery-${sequence}`,
+    eventInstanceId,
+    state,
+    attempt: 1,
+    failure: undefined,
+  };
+}
+
+type InspectorObjectRecord = Record<string, unknown>;
 
 function makeTraceRecords(traceId: string, requestId: string, at: string) {
   const rootSpanId = fixtureSpanId(traceId, "1");

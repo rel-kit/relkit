@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { defineError, defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { defineError, defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 import { handleTestRequest } from "../../src/application-http.ts";
 import { createTestRuntime, type TestRuntime } from "../../src/runtime.ts";
 import type { TestRoute } from "../../src/application-routes.ts";
@@ -36,9 +36,10 @@ test("maps inferred declared errors in the in-process HTTP harness", async () =>
       new Request("http://relkit.test/orders"),
     );
     expect(response.status).toBe(500);
+    expect(response.headers.get("content-type")).toBe("application/problem+json");
     expect(await response.json()).toMatchObject({
       code: unavailable.id,
-      outcome: "declared-error",
+      status: 500,
       data: { reason: "sold out" },
     });
   } finally {
@@ -112,7 +113,7 @@ test("returns validation 422 for invalid function input", async () => {
       }),
     );
     expect(response.status).toBe(422);
-    expect(await response.json()).toMatchObject({ error: "validation" });
+    expect(await response.json()).toMatchObject({ code: "validation" });
   } finally {
     await runtime.close();
   }

@@ -1,10 +1,13 @@
 import { Layer, ManagedRuntime } from "effect";
-import { runExecutionPromise, runExecutionSync } from "@relkit/contracts/operation";
+import { runExecutionPromise, runExecutionSync } from "relkit/contracts/operation";
 import { TestHttpOwner, httpOwnerLayer, TestHttpPlatformLive } from "./http-owner.js";
 import { disposeTestingOwner, testingLoggerLayer } from "./testing-owner.js";
+import { toRequestInit } from "./http-request-init.js";
 import type {
   TestHttpInput,
   TestHttpRequest,
+  TestHttpRequestInit,
+  TestHttpResponse,
   TestHttpApplication,
   TestHttpClientOptions,
   TestHttpClient,
@@ -13,6 +16,9 @@ import type {
 export type {
   TestHttpInput,
   TestHttpRequest,
+  TestHttpRequestInit,
+  TestHttpResponse,
+  TestProblemResponse,
   TestHttpApplication,
   TestHttpClientOptions,
   TestHttpClient,
@@ -25,7 +31,7 @@ import {
   OBSERVABILITY_HOOK_VERSION,
   type InspectableObservabilityHooks,
   type ObservabilityHookEvent,
-} from "@relkit/engine";
+} from "relkit/engine";
 import {
   createTestHttpListener,
   type TestHttpListener,
@@ -57,8 +63,14 @@ export function createTestHttpClient(
     throw error;
   }
   let closing: Promise<void> | undefined;
-  const request: TestHttpRequest = (input, init) =>
-    dispatchInMemory(app, makeRequest(input, init, baseUrl));
+  const request: TestHttpRequest = async <Body, Json>(
+    input: TestHttpInput,
+    init?: TestHttpRequestInit<Json>,
+  ) =>
+    (await dispatchInMemory(
+      app,
+      makeRequest(input, toRequestInit(init), baseUrl),
+    )) as TestHttpResponse<Body>;
   const listen = (listenerOptions?: TestHttpListenerOptions) =>
     closing === undefined
       ? runExecutionPromise(owner, service.listen(listenerOptions))
@@ -185,7 +197,8 @@ export function assertObservabilityHookTypes(
  * @returns A request function retaining all other RequestInit fields.
  */
 function method(request: TestHttpRequest, verb: string): TestHttpRequest {
-  return (input, init) => request(input, { ...(init ?? {}), method: verb });
+  return <Body, Json>(input: TestHttpInput, init?: TestHttpRequestInit<Json>) =>
+    request<Body, Json>(input, { ...(init ?? {}), method: verb });
 }
 
 /**

@@ -7,8 +7,8 @@ Use a channel to notify connected clients about a change. Keep the authoritative
 Create `src/services/announcements/channels/announcements.channel.ts`:
 
 ```ts
-import { defineChannel } from "@relkit/app/realtime";
-import { z } from "@relkit/app/schema";
+import { defineChannel } from "relkit/realtime";
+import { z } from "zod";
 
 const announcements = defineChannel({
   id: "announcements.feed",
@@ -28,16 +28,17 @@ export default announcements;
 After the application change succeeds, publish one validated event from a backend function:
 
 ```ts
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "zod";
 import announcements from "@app/services/announcements/channels/announcements.channel.js";
 
 export default defineFunction({
   id: "announcements.post",
   input: z.object({ message: z.string().min(1) }),
   output: z.object({ accepted: z.literal(true) }),
-  handler: async ({ message }) => {
-    await announcements.trigger({}, "posted", {
+  dependencies: { channels: { announcements } },
+  handler: async ({ message }, ctx) => {
+    await ctx.channels.announcements.trigger({}, "posted", {
       message,
       postedAt: new Date().toISOString(),
     });
@@ -46,17 +47,18 @@ export default defineFunction({
 });
 ```
 
-The `trigger()` receipt confirms the provider accepted the append; it does not prove delivery to every browser. If a database write and publication must be atomic, use an outbox in the database transaction. A retryable publish can pass a RELKIT-issued `idempotencyKey` as the fourth argument.
+The `trigger()` receipt confirms the provider accepted the append; it does not prove delivery to every browser. If a database write and publication must be atomic, use an outbox in the database transaction. A retryable publish can pass a RelKit-issued `idempotencyKey` as the fourth argument.
 
-In a React client with `@relkit/client`, subscribe using the generated channel registry:
+In a React client with `@relkit/client`, subscribe using the generated channel registry. Channels keep their declared ID; routes come from the generated `api` object, named after their target function ID in camelCase. This example assumes a `GET /announcements` route that targets `announcements.get-announcements`:
 
 ```tsx
 "use client";
 
+import { api } from "@relkit/client";
 import { useChannel, useRoute } from "@relkit/client/react";
 
 export default function Announcements() {
-  const announcements = useRoute("GET /announcements", { input: {} });
+  const announcements = useRoute(api.announcements.getAnnouncements, { input: {} });
   const channel = useChannel("announcements.feed", {
     params: {},
     on: { posted: () => void announcements.refetch() },
@@ -79,7 +81,7 @@ Load authoritative state through a route before relying on updates. `onGap` must
 Configure a compatible `realtime` provider and `defaults.realtime` in `relkit.config.ts`. For a one-machine app with `@relkit/local` installed, the relevant configuration is:
 
 ```ts
-import { defineApp } from "@relkit/app/config";
+import { defineApp } from "relkit/config";
 import { localRealtime } from "@relkit/local";
 import env from "@app/platform/env.js";
 

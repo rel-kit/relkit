@@ -14,8 +14,8 @@ request JSON; the server gets that identity from the session. Stop `bun run dev`
 
 ## 1. Add authentication to the existing database [#add-authentication-to-the-existing-database]
 
-The auth scaffold installs Better Auth and creates its service and `/api/auth` route. It reuses
-the database service already in the app. It does not apply a migration or create a secret.
+The auth scaffold installs Better Auth and creates its Better Auth file and service; RelKit serves
+the auth endpoints at `/api/auth`. It reuses the database service already in the app. It does not apply a migration or create a secret.
 
 ```sh title="Terminal — relkit-orders"
 bun run relkit add auth --adapter better-auth --database-dialect sqlite
@@ -62,7 +62,18 @@ printf 'BETTER_AUTH_URL=%s\nBETTER_AUTH_SECRET=%s\n' \
   "$BETTER_AUTH_URL" "$BETTER_AUTH_SECRET" >> .env
 ```
 
-Review `src/services/auth/service.ts` and make it match the email/password configuration below:
+Review the Better Auth file `src/services/auth/better-auth.ts` and make it match the email/password
+configuration below. Better Auth's own options go here:
+
+<include
+  source="apps/docs/examples/orders-tutorial/steps/auth/src/services/auth/better-auth.ts"
+  lang="ts"
+  meta='title="src/services/auth/better-auth.ts"'
+>
+  /_snippets/source/apps/docs/examples/orders-tutorial/steps/auth/src/services/auth/better-auth.ts
+</include>
+
+`src/services/auth/service.ts` serves that instance; RelKit adds the database and mounts it at `/api/auth`:
 
 <include
   source="apps/docs/examples/orders-tutorial/steps/auth/src/services/auth/service.ts"
@@ -72,15 +83,23 @@ Review `src/services/auth/service.ts` and make it match the email/password confi
   /_snippets/source/apps/docs/examples/orders-tutorial/steps/auth/src/services/auth/service.ts
 </include>
 
-The auth mount handles `/api/auth` and rejects signed-out calls to both `/orders` and
-`/orders/*`. Replace the scaffolded route with:
+Then protect both Orders routes. Each takes one line on the route, `auth: "required"`, and a
+signed-out request gets `401` before any middleware or the function runs:
 
 <include
-  source="apps/docs/examples/orders-tutorial/steps/auth/src/routes/api/auth/[[...auth]]/route.ts"
+  source="apps/docs/examples/orders-tutorial/steps/auth/src/routes/orders/route.ts"
   lang="ts"
-  meta='title="src/routes/api/auth/[[...auth]]/route.ts"'
+  meta='title="src/routes/orders/route.ts"'
 >
-  /_snippets/source/apps/docs/examples/orders-tutorial/steps/auth/src/routes/api/auth/[[...auth]]/route.ts
+  /_snippets/source/apps/docs/examples/orders-tutorial/steps/auth/src/routes/orders/route.ts
+</include>
+
+<include
+  source="apps/docs/examples/orders-tutorial/steps/auth/src/routes/orders/[orderId]/route.ts"
+  lang="ts"
+  meta='title="src/routes/orders/[orderId]/route.ts"'
+>
+  /_snippets/source/apps/docs/examples/orders-tutorial/steps/auth/src/routes/orders/[orderId]/route.ts
 </include>
 
 Generate a second migration and inspect its SQL before applying it. This keeps the existing

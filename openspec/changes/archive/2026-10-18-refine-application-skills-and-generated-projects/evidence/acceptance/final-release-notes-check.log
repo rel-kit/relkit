@@ -1,2 +1,2 @@
-Release command: /Users/mustafaelsayed/.bun/bin/bun run scripts/sync-release.ts in /Users/mustafaelsayed/Workspace/relkit
+Release command: <home>/.bun/bin/bun run scripts/sync-release.ts in <repo>
 {"protocol":"relkit.release-notes","version":"0.7.7","packages":53}

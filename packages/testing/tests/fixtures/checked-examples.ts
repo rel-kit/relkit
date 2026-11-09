@@ -1,7 +1,7 @@
 /** Typechecks documented testing patterns with explicit reverse-order resource cleanup. */
 import { Effect, Layer, ManagedRuntime } from "effect";
-import { defineEnv } from "@relkit/config";
-import { z } from "@relkit/schema";
+import { defineEnv } from "relkit/config";
+import { z } from "relkit/schema";
 import { createTestRuntime } from "../../src/runtime.js";
 import { createTestBucketFake } from "../../src/buckets.js";
 import { createTestCacheFake } from "../../src/cache.js";

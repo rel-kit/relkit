@@ -1,6 +1,6 @@
 {
   "change": "core-consumers-effect-service-alignment",
-  "framework": "/Users/mustafaelsayed/.codex/worktrees/core-consumers-effect/relkit",
+  "framework": "<home>/.codex/worktrees/core-consumers-effect/relkit",
   "sourceBaseline": "b0f77720764fd61e9872b0995e456014a611ba37",
   "sourceDisposition": "Uncommitted managed implementation worktree; primary user-owned checkout preserved.",
   "finalSourceFixes": [
@@ -82,7 +82,7 @@
     }
   },
   "demo": {
-    "original": "/Users/mustafaelsayed/Workspace/relkit-regression-demo",
+    "original": "<home>/Workspace/relkit-regression-demo",
     "originalHead": "1faed92bfd52a71771251f995a46c88daab8bf40",
     "baselineOwner": "/tmp/relkit-core-consumers-demo-baseline-nnq5hlav",
     "candidateOwner": "/tmp/relkit-core-consumers-demo-3d6cp84c",

@@ -68,12 +68,16 @@ Reference: [`withRelkit`](/docs/api/client#withrelkit).
 
 ## Coordinate updates
 
-After changing backend routes or public resource policies, regenerate the backend, pull its current
-contract into the frontend, and typecheck the caller. Restart the frontend dev server after a pull;
-build plugins read the fingerprint when configuration loads.
+Under `relkit dev`, you do not restart the frontend when a route changes. The backend serves
+`GET /_relkit/v1/client/contract-events` on its public port. `RelkitClientProvider` follows it, and
+when the contract changes, it reads the identity document again and adopts the new contract. Your
+editor picks up the new types from the regenerated `client-registry.d.ts`. A separate frontend that
+pulls its contract still runs `client pull` to refresh those types.
 
-The React provider compares that compiled fingerprint with the server identity response. A mismatch
-produces `application-updated` and blocks new typed work. Update the deployed frontend and backend
+Outside development, that stream answers 404. The React provider compares the compiled fingerprint
+with the server identity response. A mismatch produces `application-updated` and blocks new typed
+work. Pull the current contract, typecheck the caller, and rebuild the frontend; build plugins read
+the fingerprint when configuration loads. Update the deployed frontend and backend
 together. Do not clear pending-operation metadata or replay writes to get past a mismatch.
 
 Use [`client check`](/docs/api/cli#relkit-client-check-baseurl---out-directory) before the frontend's production build.

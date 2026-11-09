@@ -357,9 +357,9 @@
 12:10:22.989 WARN  app               TransportSecurityError: WebSocket origin is not allowed.
                                      code: "ORIGIN_DENIED"
                                      at assertWebSocketOrigin
-                                     (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:96:15)
+                                     (<tmp><home>/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:96:15)
                                      at assertWebSocketRequest
-                                     (/private/var/folders/54/3l8wd4hj6c36slgt3rl572sr0000gp/Users/mustafaelsayed/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:107:5)
+                                     (<tmp><home>/.codex/worktrees/effect-specialized-recovery/relkit/packages/runtime-hono/dist/transport-security.js:107:5)
 12:10:22.965 ERROR http              GET /rpc → 500 in 151ms
                                      request: request-c5bb630d-41e5-49ae-b296-979fc59bd176
                                      trace: 135915be9e2114b3e9e9eb75f97faf8a

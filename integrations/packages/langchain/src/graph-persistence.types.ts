@@ -3,13 +3,13 @@
 import type { BaseCheckpointSaver, BaseStore } from "@langchain/langgraph";
 import type { PersistenceResource } from "./define-persistence.js";
 
-/** Resolved handles passed to a compiled graph. */
+/** Resolved handles passed to a compiled graph. @experimental */
 export interface ResolvedGraphPersistence {
   readonly checkpointer?: BaseCheckpointSaver;
   readonly store?: BaseStore;
 }
 
-/** Optional checkpointer and store declarations on an agent. */
+/** Optional checkpointer and store declarations on an agent. @experimental */
 export interface AgentPersistenceDeclaration {
   readonly checkpointer?: unknown;
   readonly store?: unknown;

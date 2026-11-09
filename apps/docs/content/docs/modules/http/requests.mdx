@@ -12,7 +12,7 @@ in the [function's schema](/docs/learn/concepts/schemas).
 
 ## Start with inference
 
-When `request` is omitted, RELKIT projects the target's object input schema:
+When `request` is omitted, RelKit projects the target's object input schema:
 
 | Method                             | Properties matching path parameters | Remaining properties       |
 | ---------------------------------- | ----------------------------------- | -------------------------- |
@@ -52,7 +52,7 @@ The public Create Order input remains independent of HTTP. This route chooses to
 and `customerEmail` from headers, and `sku` and `quantity` from the JSON body.
 
 An explicit `request` replaces inference completely. Include every required input field, including
-matching path properties; RELKIT does not merge omitted fields back into the mapping.
+matching path properties; RelKit does not merge omitted fields back into the mapping.
 If the input schema cannot be projected as an object, the compiler asks for an explicit mapping.
 The mapping root is still `http.input`, which constructs an object: wrap a scalar or array body in a
 named function-input property rather than expecting arbitrary non-object root input.

@@ -8,7 +8,14 @@ export type {
   TestHttpListenerOptions,
   TestHttpListener,
 } from "./http-listener.types.js";
-import type { TestHttpApplication, TestHttpInput, TestHttpRequest } from "./http.js";
+import type {
+  TestHttpApplication,
+  TestHttpInput,
+  TestHttpRequest,
+  TestHttpRequestInit,
+  TestHttpResponse,
+} from "./http.js";
+import { toRequestInit } from "./http-request-init.js";
 
 /**
  * Starts the real-socket path reserved for disconnect, streaming, and proxy tests.
@@ -30,8 +37,13 @@ export async function createTestHttpListener(
     fetch: (request) => dispatchFetch(app, request),
   });
   let closing: Promise<void> | undefined;
-  const request: TestHttpRequest = (input, init) =>
-    globalThis.fetch(makeRequest(input, init, server.url));
+  const request: TestHttpRequest = async <Body, Json>(
+    input: TestHttpInput,
+    init?: TestHttpRequestInit<Json>,
+  ) =>
+    (await globalThis.fetch(
+      makeRequest(input, toRequestInit(init), server.url),
+    )) as TestHttpResponse<Body>;
   const close = (): Promise<void> => {
     if (closing !== undefined) return closing;
     closing = stopServer(server, closeTimeoutMs);

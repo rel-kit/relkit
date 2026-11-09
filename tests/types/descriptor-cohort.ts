@@ -1,15 +1,16 @@
 /** Checks the retained cross-domain descriptor inference and negative authoring contracts against public package APIs. */
-import { defineApp, defineService } from "@relkit/app";
-import { defineAgent } from "@relkit/langchain";
-import { defineBucket } from "@relkit/buckets";
-import { defineCache } from "@relkit/cache";
-import { defineEnv, env, type EnvRef } from "@relkit/config";
-import { defineEvent, defineEventFunction, type EventEnvelope } from "@relkit/events";
-import { defineError, defineFunction } from "@relkit/functions";
-import { defineJob } from "@relkit/jobs/legacy";
-import { defineRoute, http } from "@relkit/routes";
-import { z, type InferInput, type InferOutput } from "@relkit/schema";
-import { defineTool } from "@relkit/tools";
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
+import { defineApp, defineService } from "relkit";
+import { defineBucket } from "relkit/buckets";
+import { defineCache } from "relkit/cache";
+import { defineEnv, env, type EnvRef } from "relkit/config";
+import { defineEvent, defineEventFunction, type EventEnvelope } from "relkit/events";
+import { defineError, defineFunction } from "relkit/functions";
+import { defineJob, defineTask } from "relkit/jobs";
+import { defineRoute, http } from "relkit/routes";
+import { z, type InferInput, type InferOutput } from "relkit/schema";
+import { defineTool } from "relkit/tools";
 
 const input = z.object({ id: z.string() });
 import { output } from "./descriptor-schemas.fixture.js";
@@ -25,13 +26,16 @@ const child = defineFunction({
   output,
   handler: async () => ({ ok: true }),
 });
+import { eventCreated } from "./descriptor-events.fixture.js";
 export { eventCreated, eventChanged } from "./descriptor-events.fixture.js";
-const job = defineJob({
-  id: "types.job",
+const childTask = defineTask({
+  id: "types.child-task",
+  version: "1",
   input,
-  target: child,
-  retry: { maxAttempts: 2, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
+  output,
+  handler: async () => ({ ok: true }),
 });
+const job = defineJob({ id: "types.job", name: "typesJob", task: childTask });
 const bucket = defineBucket({ id: "types.bucket", visibility: "private" });
 const cache = defineCache({
   id: "types.cache",
@@ -52,6 +56,7 @@ const tool = defineTool({
 });
 const agent = defineAgent({
   id: "types.agent",
+  runtime: langchain(),
   input: z.object({ prompt: z.string() }),
   output: z.object({ answer: z.string() }),
   model: "default",
@@ -64,17 +69,18 @@ const parent = defineFunction({
   id: "types.parent",
   input,
   output,
-  publishes: ["types.created"],
   dependencies: {
+    functions: { child },
+    events: { created: eventCreated },
     jobs: { job },
     buckets: { bucket },
     cache: { cache, numericCache },
     agents: { agent },
   },
   handler: async (value, context) => {
-    const childResult: InferOutput<typeof output> = await child.invoke({ id: value.id });
-    const queued = await context.jobs.job.enqueue({ id: value.id });
-    const published = await context.events["types.created"].publish({ orderId: value.id });
+    const childResult: InferOutput<typeof output> = await context.functions.child({ id: value.id });
+    const queued = await context.jobs.job.trigger({ id: value.id });
+    const published = await context.events.created.publish({ orderId: value.id });
     const object = await context.buckets.bucket.get("orders/1");
     const cached: { price: number } | undefined = await context.cache.cache.get({
       sku: value.id,
@@ -111,10 +117,11 @@ void mapped;
 const reaction = defineEventFunction({
   id: "types.reaction",
   event: "types.created",
+  dependencies: { functions: { child } },
   handler: async (input, context) => {
     const orderId: string = input.orderId;
     const eventId: "types.created" = context.trigger.event.id;
-    await child.invoke({ id: orderId });
+    await context.functions.child({ id: orderId });
     void eventId;
   },
 });
@@ -146,9 +153,20 @@ const service = defineService({
   id: "types.orders",
   functions: { lookup: child },
 });
-const serviceInput: Parameters<typeof service.lookup.invoke>[0] = { id: "order-1" };
-const serviceOutput: Promise<InferOutput<typeof child.output>> =
-  service.lookup.invoke(serviceInput);
+const serviceCaller = defineFunction({
+  id: "types.orders.caller",
+  input,
+  output,
+  dependencies: { functions: { lookup: service.lookup } },
+  handler: async (value, context) => {
+    const serviceInput: Parameters<typeof context.functions.lookup>[0] = { id: value.id };
+    const serviceOutput: Promise<InferOutput<typeof child.output>> =
+      context.functions.lookup(serviceInput);
+    // @ts-expect-error service member calls use the original function input
+    await context.functions.lookup({ orderId: "order-1" });
+    return serviceOutput;
+  },
+});
 const serviceTool = service.lookup.asTool({
   id: "types.orders.lookup-tool",
   description: "Look up an order",
@@ -162,7 +180,7 @@ const directToolOutput: Promise<InferOutput<typeof child.output>> = tool.invoke(
   id: "order-1",
 });
 const originalMember: typeof child = service.lookup;
-void serviceOutput;
+void serviceCaller;
 void serviceToolOutput;
 void directToolOutput;
 void originalMember;
@@ -171,7 +189,5 @@ void originalMember;
 defineService({ id: "types.invalid-service-member", functions: { broken: {} } });
 // @ts-expect-error zero-argument asTool requires complete function tool metadata
 child.asTool();
-// @ts-expect-error service member invoke uses the original function input
-service.lookup.invoke({ orderId: "order-1" });
 // @ts-expect-error direct service members are immutable
 service.lookup = child;

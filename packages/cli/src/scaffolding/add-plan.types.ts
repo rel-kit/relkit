@@ -1,11 +1,8 @@
 /** Composes project discovery, artifact planning and request-local builder state into an immutable scaffold plan before transaction acquisition. This companion contains the shared planning contracts without executing work. */
 
 import type { Effect } from "effect";
-import type { AddRequest, ScaffoldPlan } from "create-relkit/internal/add-types";
-import type {
-  GeneratorDomainError,
-  GeneratorIoError,
-} from "create-relkit/internal/generator-errors";
+import type { AddRequest, ScaffoldPlan } from "create-relkit/add-types";
+import type { GeneratorDomainError, GeneratorIoError } from "create-relkit/generator-errors";
 
 /** Discovery and rendering owner; its acquired capabilities remain explicit Layer dependencies. */
 export interface ScaffoldPlanningService {

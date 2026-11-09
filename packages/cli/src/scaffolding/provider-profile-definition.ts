@@ -1,6 +1,6 @@
 /** Builds provider profile source definitions and their imports from the selected backend so generated configuration has one explicit integration owner. */
 
-import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/internal/add-types";
+import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 
 import { providerDefinitions, type ProviderDefinition } from "./provider-planning-definitions.js";
 
@@ -20,6 +20,8 @@ export function definitionFor(
   capability: ProviderCapability,
   options: EnsureProfileOptions,
 ): ProviderDefinition {
+  if ((capability === "event" || capability === "job") && options.provider === "postgres")
+    return postgresDefinition(capability);
   if (capability === "event" || capability === "job") return localDefinition(capability);
   if (capability === "cache") return cacheDefinition(options);
   return bucketDefinition(options);
@@ -39,6 +41,25 @@ export function localDefinition(capability: "event" | "job"): ProviderDefinition
     ],
     dependencies: ["@relkit/local"],
     environment: [],
+  };
+}
+
+/**
+ * Builds a durable Postgres jobs or events provider definition reading `DATABASE_URL`.
+ * @param capability - Requested provider capability.
+ * @returns The Postgres adapter constructor source, imports, dependency and secret declaration.
+ */
+export function postgresDefinition(capability: "event" | "job"): ProviderDefinition {
+  const adapter = capability === "event" ? "postgresEvent" : "postgresJob";
+  return {
+    adapter,
+    expression: `${adapter}({ url: binding.secret("DATABASE_URL") })`,
+    imports: [
+      `import { env as binding } from "relkit/config";`,
+      `import { ${adapter} } from "@relkit/postgres";`,
+    ],
+    dependencies: ["@relkit/postgres"],
+    environment: [{ name: "DATABASE_URL", definition: "env.secret()" }],
   };
 }
 

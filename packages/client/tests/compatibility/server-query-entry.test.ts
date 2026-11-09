@@ -5,7 +5,7 @@
  */
 import { expect, test } from "bun:test";
 import { QueryClient } from "@tanstack/query-core";
-import type { ClientIdentityDocument } from "@relkit/contracts";
+import type { ClientIdentityDocument } from "relkit/contracts";
 import { createRelkitServerContext } from "@relkit/client/server/tanstack-query";
 import { createTanstackQueryUtils } from "@relkit/client/tanstack-query";
 import { mockFetch } from "../fixtures/fetch.ts";
@@ -57,7 +57,7 @@ test("public server query entry preserves identity-fetch failures", async () => 
         request: new Request("https://app.example.test"),
         queryClient,
       }),
-    ).rejects.toThrow("Relkit identity request failed (401)");
+    ).rejects.toThrow("RelKit identity request failed (401)");
   } finally {
     globalThis.fetch = original;
     queryClient.clear();

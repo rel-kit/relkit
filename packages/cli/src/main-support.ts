@@ -1,6 +1,7 @@
 /** Presents CLI output, help and terminal failures while keeping command cancellation scoped to its invocation; optional scaffold loading has a separate lazy owner. */
 
-import { canonicalJson } from "@relkit/contracts";
+import { canonicalJson } from "relkit/contracts";
+import { diagnosticCode, diagnosticDocsUrl } from "relkit/diagnostics/codes";
 import type { CliFailure, CliIo, CliReporter } from "./main-support-types.js";
 import manifest from "../package.json" with { type: "json" };
 import { findCliHelp, getCliHelpModel } from "./cli-help-model.js";
@@ -37,9 +38,24 @@ export function createReporter(json: boolean, io: CliIo): CliReporter {
     error: (code, message) => {
       const value = { ok: false, error: { code, message } };
       if (json) io.stdout(canonicalJson(value));
-      else io.stderr(`${code}: ${message}`);
+      else for (const line of errorLines(code, message)) io.stderr(line);
     },
   };
+}
+/**
+ * Formats a terminal failure as its code and message, then the next step and docs link.
+ * @param code - Public failure code.
+ * @param message - Public failure message.
+ * @returns Lines to print; the docs line is left out when the message already links the page.
+ */
+export function errorLines(code: string, message: string): string[] {
+  const lines = [`${code}: ${message}`];
+  if (!code.startsWith("RELKIT_")) return lines;
+  const fix = diagnosticCode(code)?.fix;
+  if (fix !== undefined) lines.push(`  next: ${fix}`);
+  const docs = diagnosticDocsUrl(code);
+  if (!message.includes(docs)) lines.push(`  docs: ${docs}`);
+  return lines;
 }
 /**
  * Projects public machine-readable help from pure command metadata.

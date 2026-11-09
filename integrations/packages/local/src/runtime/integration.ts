@@ -4,8 +4,8 @@ import {
   createLocalEventProvider,
   createLocalJobProvider,
   createLocalRealtimeProvider,
-} from "@relkit/providers-local";
-import type { RuntimeProviderContext, RuntimeProviderIntegration } from "@relkit/provider";
+} from "relkit/providers-local";
+import type { RuntimeProviderContext, RuntimeProviderIntegration } from "relkit/provider";
 
 export const runtimeIntegration: RuntimeProviderIntegration<"local"> = Object.freeze({
   kind: "runtime-integration",
@@ -24,11 +24,8 @@ export const runtimeIntegration: RuntimeProviderIntegration<"local"> = Object.fr
       capability: "job",
       adapterId: "local-job",
       protocolVersion: 1,
-      create: ({ profile, connection, executionModel }: RuntimeProviderContext) => {
-        const provider =
-          executionModel === "task"
-            ? createLocalJobProvider(root(connection), profile, "task")
-            : createLocalJobProvider(root(connection), profile);
+      create: ({ profile, connection }: RuntimeProviderContext) => {
+        const provider = createLocalJobProvider(root(connection), profile);
         return { value: provider, release: provider.close };
       },
     },

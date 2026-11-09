@@ -1,8 +1,8 @@
 /** Verifies generation inspector policy selects backend credentials before promotion applies it. */
 import { expect, test } from "bun:test";
 import { Effect, Ref } from "effect";
-import { DEFAULT_TOOLING_CONFIG } from "@relkit/compiler";
-import type { CandidateCompileRequest } from "@relkit/supervisor";
+import { DEFAULT_TOOLING_CONFIG } from "../../src/compiler/index.js";
+import type { CandidateCompileRequest } from "../../src/supervisor/index.js";
 import { makeDevInspectionControl } from "../../src/commands/dev-inspection-control.js";
 import type { DevCapture } from "../../src/commands/dev-capture.types.js";
 

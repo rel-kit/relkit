@@ -4,7 +4,7 @@
     "--smol",
     "openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/identity.ts"
   ],
-  "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+  "cwd": "<repo>",
   "before": {
     "at": "2026-10-18T15:12:41.505892+00:00",
     "cpu": 10,

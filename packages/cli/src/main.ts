@@ -67,7 +67,7 @@ export async function runCli(
       database
         ? "Database migration stopped without success. Inspect configuration and SQL; rollback is not guaranteed."
         : migration
-          ? "Migration stopped without reporting successful publication; inspect retained local recovery receipts."
+          ? "Migration stopped without reporting successful publication; check the migration records in .relkit/migrations."
           : failure.message,
     );
     return (migration || database) && signal.aborted ? 130 : failure.exitCode;

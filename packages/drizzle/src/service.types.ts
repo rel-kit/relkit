@@ -12,6 +12,11 @@ export interface DefineDrizzleServiceOptions<
   Models extends DrizzleModelMap<TablesOf<Schema>>,
 > {
   readonly id?: string;
+  /**
+   * Makes this service `ctx.database` and the Better Auth database when an application defines
+   * several Drizzle services. A single service is the default without it.
+   */
+  readonly default?: boolean;
   readonly schema: Schema;
   /**
    * Acquires a native client when the owner Layer is first built.

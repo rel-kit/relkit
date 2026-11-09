@@ -101,7 +101,7 @@ function deepTurn(messages: BaseMessage[]) {
       );
 }
 
-/** Constructs the native final-answer tool call consumed by RELKIT output validation.
+/** Constructs the native final-answer tool call consumed by RelKit output validation.
  * @param answer - Deterministic answer text.
  * @returns The established relkit_output call envelope. */
 function output(answer: string) {

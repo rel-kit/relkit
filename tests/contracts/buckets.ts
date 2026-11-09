@@ -1,9 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import {
-  createBucketClient,
-  type BucketCapabilities,
-  type BucketProvider,
-} from "../../packages/buckets/src/index.ts";
+import { createBucketClient, type BucketCapabilities, type BucketProvider } from "relkit/buckets";
 
 export interface BucketFailureControls {
   readonly once: (point: string, cause?: unknown) => void;

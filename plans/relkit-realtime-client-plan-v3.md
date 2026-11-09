@@ -19,28 +19,28 @@ All new exports, descriptor fields, diagnostics, endpoint families, paths marked
 
 ## 1. Decisions at a glance
 
-| Area | Decision |
-|---|---|
-| Backend realtime | `channel.trigger(params, event, data, options?)`. No transport objects in business functions. |
-| Channel access | Omitted `client` means internal; `client: { public: true }` is explicitly public; `client: { authorize: guard }` is protected. |
-| Browser realtime | `useChannel(name, options)`; imperative `subscribe` / `bind` remains available through `useRealtime()`. |
-| Presence | Opt-in. Count-only reports connections; member presence separately reports distinct authenticated members and safe member information. |
-| React setup | `RelkitClientProvider` owns the client runtime and integrates a TanStack `QueryClient`. |
-| Route reads | `useRoute('GET /orders/:orderId', { input, ...queryOptions })`, returning the real TanStack query result. |
-| Route writes | `useRouteMutation('PATCH /orders/:orderId', mutationOptions)`, returning the real TanStack mutation result. |
-| Advanced route reads | `useInfiniteRoute`, `useSuspenseRoute`, and URL-indexed `useRouteUtils`. |
-| Frontend contracts | Compiler-generated registry and manifest are included automatically; no imports from `../generated`. |
-| Agent selection | `useAgent('orders.assistant', { threadId, input })`. |
-| Agent protocol | Use a version-pinned AG-UI event profile and a real AG-UI interoperability endpoint. Offer a separately tested AI SDK UI Message Stream adapter. |
-| Pi influence | Adopt lifecycle, partial tool input/progress, steering, follow-up, safe turn boundaries, and context/message separation. Do not replace Relkit's function engine or adopt Pi as a mandatory dependency. |
-| Recovery | Distinguish reconnect, replay, state restoration, approval continuation, and worker-crash recovery. |
-| Documentation | New Client and Realtime sections; expand HTTP, AI, Inspector, operations, examples, and generated API references in the same implementation phases. |
+| Area                 | Decision                                                                                                                                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backend realtime     | `channel.trigger(params, event, data, options?)`. No transport objects in business functions.                                                                                                           |
+| Channel access       | Omitted `client` means internal; `client: { public: true }` is explicitly public; `client: { authorize: guard }` is protected.                                                                          |
+| Browser realtime     | `useChannel(name, options)`; imperative `subscribe` / `bind` remains available through `useRealtime()`.                                                                                                 |
+| Presence             | Opt-in. Count-only reports connections; member presence separately reports distinct authenticated members and safe member information.                                                                  |
+| React setup          | `RelkitClientProvider` owns the client runtime and integrates a TanStack `QueryClient`.                                                                                                                 |
+| Route reads          | `useRoute('GET /orders/:orderId', { input, ...queryOptions })`, returning the real TanStack query result.                                                                                               |
+| Route writes         | `useRouteMutation('PATCH /orders/:orderId', mutationOptions)`, returning the real TanStack mutation result.                                                                                             |
+| Advanced route reads | `useInfiniteRoute`, `useSuspenseRoute`, and URL-indexed `useRouteUtils`.                                                                                                                                |
+| Frontend contracts   | Compiler-generated registry and manifest are included automatically; no imports from `../generated`.                                                                                                    |
+| Agent selection      | `useAgent('orders.assistant', { threadId, input })`.                                                                                                                                                    |
+| Agent protocol       | Use a version-pinned AG-UI event profile and a real AG-UI interoperability endpoint. Offer a separately tested AI SDK UI Message Stream adapter.                                                        |
+| Pi influence         | Adopt lifecycle, partial tool input/progress, steering, follow-up, safe turn boundaries, and context/message separation. Do not replace Relkit's function engine or adopt Pi as a mandatory dependency. |
+| Recovery             | Distinguish reconnect, replay, state restoration, approval continuation, and worker-crash recovery.                                                                                                     |
+| Documentation        | New Client and Realtime sections; expand HTTP, AI, Inspector, operations, examples, and generated API references in the same implementation phases.                                                     |
 
 The URL selector is an application route identity, not an instruction to bypass oRPC. Relkit maps it to the existing exposed oRPC procedure behind the scenes. Channel and agent hooks continue using resource IDs such as `orders.updates` and `orders.assistant`.
 
 ## 2. Verified baseline and compatibility work
 
-The current `@relkit/client` package already depends on `@orpc/tanstack-query` at `2.0.0-beta.31`, alongside the matching oRPC client/contract packages. Its `./tanstack-query` entry point currently re-exports `createTanstackQueryUtils`; React hooks and a React provider are additions. `@relkit/agents` currently declares `ai: 7.0.79`. [R1] [R2] [R3]
+The current `@relkit/client` package already depends on `@orpc/tanstack-query` at `2.0.0-beta.31`, alongside the matching oRPC client/contract packages. Its `./tanstack-query` entry point currently re-exports `createTanstackQueryUtils`; React hooks and a React provider are additions. `relkit/agents` currently declares `ai: 7.0.79`. [R1] [R2] [R3]
 
 Relkit's existing default contract registry and generator provide the starting point for automatic module augmentation. Extend that machinery rather than introducing a second independent type generator. Route procedures must continue entering the common engine and retaining middleware, validation, error mapping, authentication, limits, and telemetry. [R4] [R5] [R6]
 
@@ -67,14 +67,14 @@ Do not silently upgrade the complete AI/oRPC stack as part of a UI feature. Any 
 ```ts
 // Internal: backend consumers only.
 defineChannel({
-  id: 'internal.metrics',
+  id: "internal.metrics",
   params: z.object({}),
   events: { sampled: MetricsSample },
 });
 
 // Public: anonymous subscription is deliberately allowed.
 defineChannel({
-  id: 'announcements',
+  id: "announcements",
   params: z.object({}),
   events: { published: Announcement },
   client: { public: true },
@@ -82,9 +82,9 @@ defineChannel({
 
 // Protected: authentication plus application authorization.
 defineChannel({
-  id: 'orders.updates',
+  id: "orders.updates",
   params: z.object({ orderId: z.string() }),
-  events: { 'status.changed': OrderStatusChanged },
+  events: { "status.changed": OrderStatusChanged },
   client: { authorize: canReadOrder },
 });
 ```
@@ -107,21 +107,21 @@ A channel with public access exposes every event in that channel partition to it
 
 ```ts
 // src/orders/channels/updates.channel.ts
-import { defineChannel } from '@relkit/app/realtime';
-import { z } from '@relkit/app/schema';
-import { canReadOrder } from '../functions/can-read-order.function.js';
+import { defineChannel } from "relkit/realtime";
+import { z } from "relkit/schema";
+import { canReadOrder } from "../functions/can-read-order.function.js";
 
 export const updates = defineChannel({
-  id: 'orders.updates',
+  id: "orders.updates",
   params: z.object({ orderId: z.string() }),
   events: {
-    'status.changed': z.object({
-      status: z.enum(['pending', 'paid', 'shipped', 'delivered']),
+    "status.changed": z.object({
+      status: z.enum(["pending", "paid", "shipped", "delivered"]),
       revision: z.number().int().nonnegative(),
     }),
   },
   client: { authorize: canReadOrder },
-  presence: 'count',
+  presence: "count",
   replay: { retentionMs: 300_000 },
 });
 ```
@@ -132,11 +132,10 @@ The example assumes globally unique order IDs. Tenant-local IDs require a tenant
 
 ```ts
 // Inside a route-target function, job, service function, or function-backed tool:
-await updates.trigger(
-  { orderId: savedOrder.id },
-  'status.changed',
-  { status: savedOrder.status, revision: savedOrder.revision },
-);
+await updates.trigger({ orderId: savedOrder.id }, "status.changed", {
+  status: savedOrder.status,
+  revision: savedOrder.revision,
+});
 ```
 
 Trigger receipt means provider acceptance under its declared durability guarantees, not browser receipt or an exactly-once business transaction. Use an application transaction/outbox and stable event ID where missing the notification is unacceptable. This feature does not introduce a framework-owned database.
@@ -144,13 +143,13 @@ Trigger receipt means provider acceptance under its declared durability guarante
 ### 3.3 Identical frontend code for public and protected channels
 
 ```tsx
-useChannel('announcements', {
+useChannel("announcements", {
   on: { published: showAnnouncement },
 });
 
-const orderChannel = useChannel('orders.updates', {
+const orderChannel = useChannel("orders.updates", {
   params: { orderId },
-  on: { 'status.changed': handleStatusChanged },
+  on: { "status.changed": handleStatusChanged },
 });
 ```
 
@@ -188,11 +187,11 @@ Protected is access-controlled, not end-to-end encrypted. The server and its con
 
 ### 4.1 Do not use one ambiguous number
 
-| Value | Meaning |
-|---|---|
-| `presence.connectionCount` | Active logical client subscriptions to this partition, based on server leases. |
-| `presence.memberCount` | Distinct authenticated member identities with at least one active subscription. Available only with member presence. |
-| `presence.members` | Bounded safe member records, not raw sessions or tokens. Available only with member presence. |
+| Value                      | Meaning                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `presence.connectionCount` | Active logical client subscriptions to this partition, based on server leases.                                       |
+| `presence.memberCount`     | Distinct authenticated member identities with at least one active subscription. Available only with member presence. |
+| `presence.members`         | Bounded safe member records, not raw sessions or tokens. Available only with member presence.                        |
 
 Pusher also distinguishes subscription counting from identified presence, and deduplicates member add/remove notifications across a user's multiple connections. Relkit should document the distinction equally clearly. [P2] [P3]
 
@@ -202,23 +201,23 @@ Count-only presence is suitable for anonymous public audiences. It cannot truthf
 
 ```ts
 const announcements = defineChannel({
-  id: 'announcements',
+  id: "announcements",
   params: z.object({}),
   events: { published: Announcement },
   client: { public: true },
-  presence: 'count',
+  presence: "count",
 });
 ```
 
 ```tsx
-const channel = useChannel('announcements');
+const channel = useChannel("announcements");
 
 return (
   <span>
     {channel.presence.connectionCount === undefined
-      ? 'Connecting…'
+      ? "Connecting…"
       : `${channel.presence.connectionCount} connected`}
-    {channel.presence.status === 'stale' ? ' (last known)' : ''}
+    {channel.presence.status === "stale" ? " (last known)" : ""}
   </span>
 );
 ```
@@ -231,7 +230,7 @@ Presence omission means disabled: no global tracking work and no generated prese
 
 ```ts
 const viewers = defineChannel({
-  id: 'orders.viewers',
+  id: "orders.viewers",
   params: z.object({ orderId: z.string() }),
   events: {},
   client: { authorize: canReadOrder },
@@ -250,7 +249,7 @@ const viewers = defineChannel({
 Do not automatically forward the entire auth session/user record. The member schema is an explicit disclosure contract. Require protected access for identified member lists in the initial release. Public channels may expose counts, not authenticated user directories.
 
 ```tsx
-const viewers = useChannel('orders.viewers', {
+const viewers = useChannel("orders.viewers", {
   params: { orderId },
   onPresence: {
     join: (member) => console.log(member.info.displayName),
@@ -296,17 +295,14 @@ Presence is ephemeral. After a provider restart or expired cursor, obtain a fres
 
 ```tsx
 // app/providers.tsx
-'use client';
+"use client";
 
-import type { ReactNode } from 'react';
-import { RelkitClientProvider } from '@relkit/client/react';
+import type { ReactNode } from "react";
+import { RelkitClientProvider } from "@relkit/client/react";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <RelkitClientProvider
-      baseUrl={process.env.NEXT_PUBLIC_RELKIT_URL}
-      credentials="include"
-    >
+    <RelkitClientProvider baseUrl={process.env.NEXT_PUBLIC_RELKIT_URL} credentials="include">
       {children}
     </RelkitClientProvider>
   );
@@ -320,9 +316,7 @@ The provider owns the typed RPC client, oRPC TanStack utilities, QueryClient con
 Applications with an existing TanStack QueryClient may pass it explicitly:
 
 ```tsx
-<RelkitClientProvider queryClient={queryClient}>
-  {children}
-</RelkitClientProvider>
+<RelkitClientProvider queryClient={queryClient}>{children}</RelkitClientProvider>
 ```
 
 Document which client is used; do not accidentally create two independent caches. Do not require developers to nest another QueryClientProvider for the standard setup. An external shared QueryClient must be cleaned only within Relkit's affected namespace on logout, without removing unrelated application caches.
@@ -331,18 +325,18 @@ The root Next.js layout remains a Server Component and renders the client provid
 
 ### 5.2 Hook surface
 
-| Hook | Return / behavior |
-|---|---|
-| `useRoute(selector, options)` | Real TanStack query result for query-capable routes. |
+| Hook                                  | Return / behavior                                                         |
+| ------------------------------------- | ------------------------------------------------------------------------- |
+| `useRoute(selector, options)`         | Real TanStack query result for query-capable routes.                      |
 | `useRouteMutation(selector, options)` | Real TanStack mutation result; execution only through mutate/mutateAsync. |
-| `useInfiniteRoute(selector, options)` | Real TanStack infinite-query result. |
-| `useSuspenseRoute(selector, options)` | Real TanStack suspense-query result. |
-| `useRouteUtils()` | URL-indexed oRPC utilities for options, keys, prefetch, and invalidation. |
-| `useRelkitClient()` | Existing low-level typed RPC client for imperative access. |
-| `useRealtime()` | Connection state and imperative typed subscribe/bind. |
-| `useChannel(name, options)` | Shared channel subscription state, handlers, and optional presence. |
-| `useAgent(name, options)` | Typed agent/thread state and explicit execution/control methods. |
-| `useStream(selector, options)` | Explicit, request-bound generic stream consumption. |
+| `useInfiniteRoute(selector, options)` | Real TanStack infinite-query result.                                      |
+| `useSuspenseRoute(selector, options)` | Real TanStack suspense-query result.                                      |
+| `useRouteUtils()`                     | URL-indexed oRPC utilities for options, keys, prefetch, and invalidation. |
+| `useRelkitClient()`                   | Existing low-level typed RPC client for imperative access.                |
+| `useRealtime()`                       | Connection state and imperative typed subscribe/bind.                     |
+| `useChannel(name, options)`           | Shared channel subscription state, handlers, and optional presence.       |
+| `useAgent(name, options)`             | Typed agent/thread state and explicit execution/control methods.          |
+| `useStream(selector, options)`        | Explicit, request-bound generic stream consumption.                       |
 
 Do not add a hook for every transport. SSE and WS are implementation choices beneath the resource API.
 
@@ -358,7 +352,7 @@ const {
   isFetching,
   isError,
   refetch,
-} = useRoute('GET /orders/:orderId', {
+} = useRoute("GET /orders/:orderId", {
   input: { orderId },
   staleTime: 30_000,
   enabled: orderId.length > 0,
@@ -376,7 +370,7 @@ Include only routes with actual callable client contracts. Raw Hono handlers wit
 ### 6.2 Queries and mutations need distinct hooks
 
 ```tsx
-const update = useRouteMutation('PATCH /orders/:orderId', {
+const update = useRouteMutation("PATCH /orders/:orderId", {
   retry: false,
   onSuccess: (updatedOrder) => {
     console.log(updatedOrder.status);
@@ -384,7 +378,7 @@ const update = useRouteMutation('PATCH /orders/:orderId', {
 });
 
 // Event handler, not render:
-await update.mutateAsync({ orderId, status: 'shipped' });
+await update.mutateAsync({ orderId, status: "shipped" });
 ```
 
 The result includes TanStack `mutate`, `mutateAsync`, `reset`, `data`, `error`, `variables`, `isPending`, and the other native result fields. Mutation variables are passed at execution time, not bound to an automatically executing read hook.
@@ -398,34 +392,36 @@ Use separate, conventional hook functions for infinite/suspense variants. Avoid 
 ### 6.3 Invalidation without generated imports
 
 ```tsx
-import { useQueryClient } from '@tanstack/react-query';
-import {
-  useChannel,
-  useRoute,
-  useRouteMutation,
-  useRouteUtils,
-} from '@relkit/client/react';
+import { useQueryClient } from "@tanstack/react-query";
+import { useChannel, useRoute, useRouteMutation, useRouteUtils } from "@relkit/client/react";
 
 const queryClient = useQueryClient();
 const routes = useRouteUtils();
 
-const order = useRoute('GET /orders/:orderId', {
+const order = useRoute("GET /orders/:orderId", {
   input: { orderId },
 });
 
-const invalidateOrder = () => queryClient.invalidateQueries({
-  queryKey: routes['GET /orders/:orderId'].queryKey({
-    input: { orderId },
-  }),
-});
+const invalidateOrder = () =>
+  queryClient.invalidateQueries({
+    queryKey: routes["GET /orders/:orderId"].queryKey({
+      input: { orderId },
+    }),
+  });
 
-useChannel('orders.updates', {
+useChannel("orders.updates", {
   params: { orderId },
-  on: { 'status.changed': () => { void invalidateOrder(); } },
-  onGap: () => { void invalidateOrder(); },
+  on: {
+    "status.changed": () => {
+      void invalidateOrder();
+    },
+  },
+  onGap: () => {
+    void invalidateOrder();
+  },
 });
 
-const update = useRouteMutation('PATCH /orders/:orderId', {
+const update = useRouteMutation("PATCH /orders/:orderId", {
   onSuccess: () => invalidateOrder(),
 });
 ```
@@ -439,13 +435,13 @@ Two route aliases that map to the same exposed procedure may share a key only wh
 ### 6.4 Infinite and selected queries
 
 ```tsx
-const orders = useInfiniteRoute('GET /orders', {
+const orders = useInfiniteRoute("GET /orders", {
   input: (cursor: string | undefined) => ({ cursor, limit: 20 }),
   initialPageParam: undefined,
   getNextPageParam: (page) => page.nextCursor ?? undefined,
 });
 
-const status = useRoute('GET /orders/:orderId', {
+const status = useRoute("GET /orders/:orderId", {
   input: { orderId },
   select: (order) => order.status,
 });
@@ -482,7 +478,7 @@ import {
   useRouteMutation,
   useChannel,
   useAgent,
-} from '@relkit/client/react';
+} from "@relkit/client/react";
 ```
 
 Internally generate and automatically include:
@@ -532,22 +528,22 @@ After HTTP headers are committed, emit the applicable safe protocol error/termin
 
 The review covered Pi's agent README, types, and loop implementation at the pinned commit—not an older description of the project and not the whole coding-agent application. Pi separates application messages from model messages, provides lifecycle and tool execution events, supports steering/follow-up queues, and distinguishes the event order of concurrent tool completion from the order of model transcript results. [PI1] [PI2] [PI3]
 
-| Observed in Pi | Relkit action | Acceptance requirement |
-|---|---|---|
-| Agent, turn, and message lifecycle | Make run, step, message, and final-result state distinct. | An empty output, tool-only message, failed turn, and completed run all render correctly. |
-| Incremental assistant events | Preserve text/part identity and deltas; do not resend full growing snapshots per token. | Interleaved parts have stable IDs and bounded reducer work. |
-| Tool argument streaming | Show incomplete tool arguments as drafts, not executable validated input. | Split JSON tokens and truncated arguments never trigger execution. |
-| Tool execution updates | Add typed, bounded progress for function-backed tools. | Progress appears before completion without becoming the final output. |
-| Parallel and sequential tools | Separate scheduling policy, completion order, and transcript order. | Out-of-order completion does not attach results to the wrong tool or reorder model artifacts. |
-| Before/after tool policy | Retain Relkit validation, authorization, approval, result validation, and audit in the common engine. | Approval occurs after validated arguments and before the actual side effect. |
-| Steering | Add `steer` at safe turn boundaries. | A steering message does not falsely imply that a running tool was cancelled. |
-| Follow-up queue | Add explicit, bounded `followUp`. | Accepted work survives observer reconnect; no implicit send queue. |
-| Graceful stopping | Distinguish immediate cancellation request from stop-after-turn. | Current side effects are not reported as rolled back. |
-| Context transform and model-message conversion | Keep UI-only state/tool details out of model context; add a budget/pruning seam. | UI state and model prompt are independently validated/redacted. |
-| Images and structured tool results | Preserve attachments and structured outputs in the transcript model. | Validate type/size/authorization and do not treat arbitrary URLs as trusted files. |
-| Dynamic model/credential resolution | Resolve provider credentials at execution boundaries. | No browser credential exposure; expired credentials fail safely. |
-| Awaited Agent-class event subscribers | Distinguish durable engine barriers from browser observers. | Journal/approval barriers are awaited; a slow browser cannot indefinitely block a model/tool loop. |
-| Explicit error/aborted outcomes | Preserve partial output and clear terminal status. | EOF without terminal confirmation is not interpreted as successful completion. |
+| Observed in Pi                                 | Relkit action                                                                                         | Acceptance requirement                                                                             |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Agent, turn, and message lifecycle             | Make run, step, message, and final-result state distinct.                                             | An empty output, tool-only message, failed turn, and completed run all render correctly.           |
+| Incremental assistant events                   | Preserve text/part identity and deltas; do not resend full growing snapshots per token.               | Interleaved parts have stable IDs and bounded reducer work.                                        |
+| Tool argument streaming                        | Show incomplete tool arguments as drafts, not executable validated input.                             | Split JSON tokens and truncated arguments never trigger execution.                                 |
+| Tool execution updates                         | Add typed, bounded progress for function-backed tools.                                                | Progress appears before completion without becoming the final output.                              |
+| Parallel and sequential tools                  | Separate scheduling policy, completion order, and transcript order.                                   | Out-of-order completion does not attach results to the wrong tool or reorder model artifacts.      |
+| Before/after tool policy                       | Retain Relkit validation, authorization, approval, result validation, and audit in the common engine. | Approval occurs after validated arguments and before the actual side effect.                       |
+| Steering                                       | Add `steer` at safe turn boundaries.                                                                  | A steering message does not falsely imply that a running tool was cancelled.                       |
+| Follow-up queue                                | Add explicit, bounded `followUp`.                                                                     | Accepted work survives observer reconnect; no implicit send queue.                                 |
+| Graceful stopping                              | Distinguish immediate cancellation request from stop-after-turn.                                      | Current side effects are not reported as rolled back.                                              |
+| Context transform and model-message conversion | Keep UI-only state/tool details out of model context; add a budget/pruning seam.                      | UI state and model prompt are independently validated/redacted.                                    |
+| Images and structured tool results             | Preserve attachments and structured outputs in the transcript model.                                  | Validate type/size/authorization and do not treat arbitrary URLs as trusted files.                 |
+| Dynamic model/credential resolution            | Resolve provider credentials at execution boundaries.                                                 | No browser credential exposure; expired credentials fail safely.                                   |
+| Awaited Agent-class event subscribers          | Distinguish durable engine barriers from browser observers.                                           | Journal/approval barriers are awaited; a slow browser cannot indefinitely block a model/tool loop. |
+| Explicit error/aborted outcomes                | Preserve partial output and clear terminal status.                                                    | EOF without terminal confirmation is not interpreted as successful completion.                     |
 
 Pi's current loop does not skip the already issued tool batch when a steering message arrives; it consumes steering at the defined boundary. Relkit must not document steering as an instantaneous interrupt. Pi's loop also refuses to execute tool calls from a token-truncated assistant message; adopt an equivalent safety test, not merely JSON-fragment concatenation. [PI2] [PI3]
 
@@ -582,20 +578,20 @@ The native AG-UI response must contain actual AG-UI event objects, not a custom 
 
 ### 10.2 Event mapping
 
-| Meaning | AG-UI representation |
-|---|---|
-| Execution segment begins | `RUN_STARTED` with thread/run IDs. |
-| Turn/step boundary | `STEP_STARTED` / `STEP_FINISHED` with a stable step name. |
-| Assistant text | `TEXT_MESSAGE_START`, `TEXT_MESSAGE_CONTENT`, `TEXT_MESSAGE_END`. |
-| Model specifies tool and arguments | `TOOL_CALL_START`, `TOOL_CALL_ARGS`, `TOOL_CALL_END`. |
-| Actual tool execution result | `TOOL_CALL_RESULT`, with the correlated tool-call ID and a protocol-valid content encoding. |
-| Tool execution state/progress | `ACTIVITY_SNAPSHOT` / `ACTIVITY_DELTA`, with a documented Relkit activity type and tool-call correlation. |
-| Restorable UI state/history | `STATE_SNAPSHOT`, `STATE_DELTA`, `MESSAGES_SNAPSHOT`. |
-| Validated final application output | `RUN_FINISHED.result` after validation, plus supported usage metadata. |
-| Approval / required input | Interrupt-aware `RUN_FINISHED.outcome`, followed by standard resume input in a new run. |
-| Fatal failure | `RUN_ERROR` with sanitized code/message. |
-| Explicit cancellation | `RUN_ERROR` with the documented `RELKIT_CANCELLED` code in this profile; render as cancelled, not a generic failure. |
-| Relkit-specific queue acknowledgements | Namespaced `CUSTOM` events or reserved application metadata, with generated schemas. |
+| Meaning                                | AG-UI representation                                                                                                 |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Execution segment begins               | `RUN_STARTED` with thread/run IDs.                                                                                   |
+| Turn/step boundary                     | `STEP_STARTED` / `STEP_FINISHED` with a stable step name.                                                            |
+| Assistant text                         | `TEXT_MESSAGE_START`, `TEXT_MESSAGE_CONTENT`, `TEXT_MESSAGE_END`.                                                    |
+| Model specifies tool and arguments     | `TOOL_CALL_START`, `TOOL_CALL_ARGS`, `TOOL_CALL_END`.                                                                |
+| Actual tool execution result           | `TOOL_CALL_RESULT`, with the correlated tool-call ID and a protocol-valid content encoding.                          |
+| Tool execution state/progress          | `ACTIVITY_SNAPSHOT` / `ACTIVITY_DELTA`, with a documented Relkit activity type and tool-call correlation.            |
+| Restorable UI state/history            | `STATE_SNAPSHOT`, `STATE_DELTA`, `MESSAGES_SNAPSHOT`.                                                                |
+| Validated final application output     | `RUN_FINISHED.result` after validation, plus supported usage metadata.                                               |
+| Approval / required input              | Interrupt-aware `RUN_FINISHED.outcome`, followed by standard resume input in a new run.                              |
+| Fatal failure                          | `RUN_ERROR` with sanitized code/message.                                                                             |
+| Explicit cancellation                  | `RUN_ERROR` with the documented `RELKIT_CANCELLED` code in this profile; render as cancelled, not a generic failure. |
+| Relkit-specific queue acknowledgements | Namespaced `CUSTOM` events or reserved application metadata, with generated schemas.                                 |
 
 `TOOL_CALL_END` means the argument specification is complete. It does not mean that a payment/refund/file write has succeeded. Actual execution progress and result are separate. [G2]
 
@@ -645,12 +641,12 @@ Validate ordered lifecycle rules, stable message/tool IDs, event size, increment
 ## 11. Named useAgent API and controls
 
 ```tsx
-const assistant = useAgent('orders.assistant', {
+const assistant = useAgent("orders.assistant", {
   threadId,
   input: { orderId },
 });
 
-await assistant.send('Where is my order?');
+await assistant.send("Where is my order?");
 
 assistant.messages;
 assistant.output;
@@ -664,10 +660,10 @@ The backend still explicitly declares which input field is the chat message and 
 
 ```ts
 // Optional capabilities, when enabled for this named agent:
-await assistant.steer('Check the shipping address first.');
-await assistant.followUp('Then summarize the delivery options.');
-await assistant.stop();                    // Immediate cooperative cancellation request.
-await assistant.stop({ after: 'turn' });   // Finish the current turn, then stop.
+await assistant.steer("Check the shipping address first.");
+await assistant.followUp("Then summarize the delivery options.");
+await assistant.stop(); // Immediate cooperative cancellation request.
+await assistant.stop({ after: "turn" }); // Finish the current turn, then stop.
 await assistant.approve(approvalId);
 await assistant.deny(approvalId);
 ```
@@ -686,14 +682,14 @@ Application thread ownership, public-agent access, controls, and attachments req
 
 ### 12.1 Guarantees by resource
 
-| Situation | Channel / presence | TanStack route | Agent thread/run |
-|---|---|---|---|
-| Brief disconnection | Reconnect, reauthorize, replay retained channel events; refresh presence snapshot. | Queries can pause/refetch; writes are not silently replayed. | Reattach to the same active run journal. |
-| Page refresh | Restore authoritative UI state, then subscribe/resume; a saved cursor alone is insufficient. | Re-query or hydrate a scoped persisted snapshot. | Load thread/history and observe its existing active run. |
-| Retention exceeded | Report gap, reread authoritative state, obtain fresh presence. | Re-query. | Load durable transcript/snapshot; report unavailable fine-grained history if necessary. |
-| User/tenant change | Drop old grants, leases, private state and cursors. | Isolate/purge scoped caches and late responses. | Detach and clear private transcript/controls before changing identity. |
-| API worker loss | Shared log/lease store enables another instance; local-only state resets explicitly. | Read retry subject to contract; uncertain writes require reconciliation. | Restore history; mark lost execution interrupted unless a verified checkpoint exists. |
-| Approval continuation | Not a connection event. | Explicit idempotent control request. | Resolve interrupts and start the next segment, without rerunning completed tools. |
+| Situation             | Channel / presence                                                                           | TanStack route                                                           | Agent thread/run                                                                        |
+| --------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| Brief disconnection   | Reconnect, reauthorize, replay retained channel events; refresh presence snapshot.           | Queries can pause/refetch; writes are not silently replayed.             | Reattach to the same active run journal.                                                |
+| Page refresh          | Restore authoritative UI state, then subscribe/resume; a saved cursor alone is insufficient. | Re-query or hydrate a scoped persisted snapshot.                         | Load thread/history and observe its existing active run.                                |
+| Retention exceeded    | Report gap, reread authoritative state, obtain fresh presence.                               | Re-query.                                                                | Load durable transcript/snapshot; report unavailable fine-grained history if necessary. |
+| User/tenant change    | Drop old grants, leases, private state and cursors.                                          | Isolate/purge scoped caches and late responses.                          | Detach and clear private transcript/controls before changing identity.                  |
+| API worker loss       | Shared log/lease store enables another instance; local-only state resets explicitly.         | Read retry subject to contract; uncertain writes require reconciliation. | Restore history; mark lost execution interrupted unless a verified checkpoint exists.   |
+| Approval continuation | Not a connection event.                                                                      | Explicit idempotent control request.                                     | Resolve interrupts and start the next segment, without rerunning completed tools.       |
 
 ### 12.2 Reconnect and replay algorithm
 
@@ -723,12 +719,12 @@ Use a stable tool-effect key across approval run segments, such as logical-opera
 
 ### 12.5 Provider capabilities
 
-| Provider tier | Permitted claims |
-|---|---|
-| In-memory local | Same-process live delivery, bounded local replay, process-local presence; restart loses volatile state. |
-| Shared retained log + leases | Cross-node replay/fanout and shared presence within configured retention/availability limits. |
-| Durable thread/run store | Thread history, idempotent acceptance, approvals, run journal reattachment. |
-| Verified execution checkpoints | Safe continuation from supported boundaries with explicit tool-effect reconciliation. |
+| Provider tier                  | Permitted claims                                                                                        |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| In-memory local                | Same-process live delivery, bounded local replay, process-local presence; restart loses volatile state. |
+| Shared retained log + leases   | Cross-node replay/fanout and shared presence within configured retention/availability limits.           |
+| Durable thread/run store       | Thread history, idempotent acceptance, approvals, run journal reattachment.                             |
+| Verified execution checkpoints | Safe continuation from supported boundaries with explicit tool-effect reconciliation.                   |
 
 Production multi-instance deployment requires shared components for every claimed shared guarantee. Redis Pub/Sub alone is not a replay log. Choose a retained-log provider separately from a live notification mechanism. [D1]
 
@@ -740,15 +736,15 @@ The Inspector uses the same protocol reducers and public-like SDK primitives, bu
 
 ### Required screens
 
-| Screen | Required behavior |
-|---|---|
-| Channel catalog | Show internal/public/protected badges, schemas, replay tier, presence mode, and safe subscription diagnostics. |
-| Channel detail | Trigger with validated input in authorized dev mode; subscribe/bind; show event IDs, replay/live distinction, gaps, connection/member counts, and stale indicators. |
-| Route explorer | Show actual method/path selectors, corresponding procedure identity, query/mutation classification, streaming format, and generated hook snippets. |
-| Agent catalog | List discoverable agents, inputs/outputs, model selector, tools, limits, supported controls, protocol profile, and chat capability. |
-| Agent chat | Restore thread; stream parts; show step/activity/tool timeline; stop/steer/follow-up; reconnect without starting another run. |
-| Approval panel | Safe arguments, side-effect warning, expiry, per-interrupt decision collection, and batch continuation status. |
-| Run diagnostics | Logical operation and segment run IDs, protocol events, accepted/applied queue controls, usage, replay scope, terminal/interrupted status. |
+| Screen          | Required behavior                                                                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Channel catalog | Show internal/public/protected badges, schemas, replay tier, presence mode, and safe subscription diagnostics.                                                      |
+| Channel detail  | Trigger with validated input in authorized dev mode; subscribe/bind; show event IDs, replay/live distinction, gaps, connection/member counts, and stale indicators. |
+| Route explorer  | Show actual method/path selectors, corresponding procedure identity, query/mutation classification, streaming format, and generated hook snippets.                  |
+| Agent catalog   | List discoverable agents, inputs/outputs, model selector, tools, limits, supported controls, protocol profile, and chat capability.                                 |
+| Agent chat      | Restore thread; stream parts; show step/activity/tool timeline; stop/steer/follow-up; reconnect without starting another run.                                       |
+| Approval panel  | Safe arguments, side-effect warning, expiry, per-interrupt decision collection, and batch continuation status.                                                      |
+| Run diagnostics | Logical operation and segment run IDs, protocol events, accepted/applied queue controls, usage, replay scope, terminal/interrupted status.                          |
 
 Raw events, tool arguments/results, provider errors, attachments, and transcript storage require redaction/size limits. Do not display raw reasoning or secret-bearing provider payloads by default. Read-only mode and disabled production endpoints remain enforced.
 
@@ -803,34 +799,34 @@ Operations                            (expanded)
 
 Paths below are relative to `apps/docs/content/docs/`; **new** files must be created, while existing related pages should be updated rather than duplicated.
 
-| File | Required content | Executable proof |
-|---|---|---|
-| `client/index.mdx` **new** | One provider + first typed route + no generated imports. | Fresh Next/Vite example compiles. |
-| `client/provider.mdx` **new** | Owned/external QueryClient, credentials, lazy lifecycle, identity changes. | Existing QueryClient integration test. |
-| `client/use-route.mdx` **new** | Method/path selectors, canonical input, native TanStack result/options, raw-route limits. | Query/select/disabled/error fixtures. |
-| `client/mutations.mdx` **new** | mutateAsync, invalidation, optimistic rollback, unknown outcomes, no hidden queue. | Mutation + lost acknowledgement test. |
-| `client/infinite-and-suspense.mdx` **new** | Page inference, QueryClient utilities, suspense boundaries, no conditional hooks. | Infinite/select/suspense type tests. |
-| `client/type-generation.mdx` **new** | Automatic linking, separate repos, CI generation, stale contracts, multi-app limitation. | Clean checkout generates before typecheck. |
-| `client/nextjs.mdx` **new** | Client provider/root layout, server prefetch/hydration, per-request cache, streaming proxy limits. | Next production build + SSR isolation. |
-| `client/authentication.mdx` **new** | Cookie/token setup, query isolation, refresh/logout/tenant switch, CSRF boundaries. | Identity-switch leak tests. |
-| `client/offline.mdx` **new** | Query reconnect vs mutation execution; stored data scope; troubleshooting. | Browser offline tests. |
-| `realtime/index.mdx` **new** | First public channel, backend trigger, useChannel in a complete app. | Scaffolded walkthrough. |
-| `realtime/access.mdx` **new** | Internal/public/protected union, trusted guard, history/presence access, revocation. | Anonymous/allowed/forbidden fixtures. |
-| `realtime/events.mdx` **new** | trigger receipts, subscribe/bind/unbind, schemas, handler cleanup, outbox caveat. | Zero-subscriber and duplicate-handler tests. |
-| `realtime/react.mdx` **new** | Declarative handlers, stable callbacks, status, onGap, refcounting. | StrictMode and two-component tests. |
-| `realtime/presence.mdx` **new** | Connection vs member count, safe profiles, tabs, stale state, lease expiry, limits. | Multi-tab and dead-client tests. |
-| `realtime/recovery.mdx` **new** | Per-channel cursors, replay/live handoff, snapshot restoration, gaps, refresh. | Replay-fence and cursor-expiry tests. |
-| `realtime/providers.mdx` **new** | Local/shared capability tiers, retained logs vs Pub/Sub, limits, deployment. | Multi-node provider tests. |
-| `http/streaming.mdx` **new** | streamOf, native SSE/text/bytes vs typed oRPC, cancellation and post-header errors. | Real streaming wire tests. |
-| `http/generated-clients.mdx` **update** | Default hook journey; low-level client remains; no feature-file generated imports. | Snippet generation/typecheck. |
-| `ai/streaming.mdx` **new or merge with existing equivalent** | Named useAgent, chat mapping, typed parts, final output. | Mock multi-step chat example. |
-| `ai/tool-progress-and-approvals.mdx` **new** | Draft arguments, validated execution, progress, parallel tools, interrupt decisions. | Truncated JSON + duplicate approval tests. |
-| `ai/steering-and-follow-up.mdx` **new** | Safe boundaries, explicit queues, busy errors, stop-after-turn. | Run-end race and queue tests. |
-| `ai/threads-and-recovery.mdx` **new** | Thread identity, same-run reattach, new-run approval continuation, interruption limits. | Refresh + approval + worker loss. |
-| `ai/protocols.mdx` **new** | Exact AG-UI profile/versions, extensions, AI SDK adapter, framing, capability matrix. | External-client interoperability tests. |
-| `operations/inspector-realtime.mdx` **new** | Channel access/count diagnostics and protocol inspection. | Inspector browser journey. |
-| `operations/inspector-agents.mdx` **new** | Chat/tools/approvals/controls with generation/auth auditing. | Inspector chat recovery journey. |
-| `operations/streaming.mdx` **new** | Proxy timeouts, heartbeats, shutdown, memory, observability, provider tier. | Deployment smoke tests. |
+| File                                                         | Required content                                                                                   | Executable proof                             |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `client/index.mdx` **new**                                   | One provider + first typed route + no generated imports.                                           | Fresh Next/Vite example compiles.            |
+| `client/provider.mdx` **new**                                | Owned/external QueryClient, credentials, lazy lifecycle, identity changes.                         | Existing QueryClient integration test.       |
+| `client/use-route.mdx` **new**                               | Method/path selectors, canonical input, native TanStack result/options, raw-route limits.          | Query/select/disabled/error fixtures.        |
+| `client/mutations.mdx` **new**                               | mutateAsync, invalidation, optimistic rollback, unknown outcomes, no hidden queue.                 | Mutation + lost acknowledgement test.        |
+| `client/infinite-and-suspense.mdx` **new**                   | Page inference, QueryClient utilities, suspense boundaries, no conditional hooks.                  | Infinite/select/suspense type tests.         |
+| `client/type-generation.mdx` **new**                         | Automatic linking, separate repos, CI generation, stale contracts, multi-app limitation.           | Clean checkout generates before typecheck.   |
+| `client/nextjs.mdx` **new**                                  | Client provider/root layout, server prefetch/hydration, per-request cache, streaming proxy limits. | Next production build + SSR isolation.       |
+| `client/authentication.mdx` **new**                          | Cookie/token setup, query isolation, refresh/logout/tenant switch, CSRF boundaries.                | Identity-switch leak tests.                  |
+| `client/offline.mdx` **new**                                 | Query reconnect vs mutation execution; stored data scope; troubleshooting.                         | Browser offline tests.                       |
+| `realtime/index.mdx` **new**                                 | First public channel, backend trigger, useChannel in a complete app.                               | Scaffolded walkthrough.                      |
+| `realtime/access.mdx` **new**                                | Internal/public/protected union, trusted guard, history/presence access, revocation.               | Anonymous/allowed/forbidden fixtures.        |
+| `realtime/events.mdx` **new**                                | trigger receipts, subscribe/bind/unbind, schemas, handler cleanup, outbox caveat.                  | Zero-subscriber and duplicate-handler tests. |
+| `realtime/react.mdx` **new**                                 | Declarative handlers, stable callbacks, status, onGap, refcounting.                                | StrictMode and two-component tests.          |
+| `realtime/presence.mdx` **new**                              | Connection vs member count, safe profiles, tabs, stale state, lease expiry, limits.                | Multi-tab and dead-client tests.             |
+| `realtime/recovery.mdx` **new**                              | Per-channel cursors, replay/live handoff, snapshot restoration, gaps, refresh.                     | Replay-fence and cursor-expiry tests.        |
+| `realtime/providers.mdx` **new**                             | Local/shared capability tiers, retained logs vs Pub/Sub, limits, deployment.                       | Multi-node provider tests.                   |
+| `http/streaming.mdx` **new**                                 | streamOf, native SSE/text/bytes vs typed oRPC, cancellation and post-header errors.                | Real streaming wire tests.                   |
+| `http/generated-clients.mdx` **update**                      | Default hook journey; low-level client remains; no feature-file generated imports.                 | Snippet generation/typecheck.                |
+| `ai/streaming.mdx` **new or merge with existing equivalent** | Named useAgent, chat mapping, typed parts, final output.                                           | Mock multi-step chat example.                |
+| `ai/tool-progress-and-approvals.mdx` **new**                 | Draft arguments, validated execution, progress, parallel tools, interrupt decisions.               | Truncated JSON + duplicate approval tests.   |
+| `ai/steering-and-follow-up.mdx` **new**                      | Safe boundaries, explicit queues, busy errors, stop-after-turn.                                    | Run-end race and queue tests.                |
+| `ai/threads-and-recovery.mdx` **new**                        | Thread identity, same-run reattach, new-run approval continuation, interruption limits.            | Refresh + approval + worker loss.            |
+| `ai/protocols.mdx` **new**                                   | Exact AG-UI profile/versions, extensions, AI SDK adapter, framing, capability matrix.              | External-client interoperability tests.      |
+| `operations/inspector-realtime.mdx` **new**                  | Channel access/count diagnostics and protocol inspection.                                          | Inspector browser journey.                   |
+| `operations/inspector-agents.mdx` **new**                    | Chat/tools/approvals/controls with generation/auth auditing.                                       | Inspector chat recovery journey.             |
+| `operations/streaming.mdx` **new**                           | Proxy timeouts, heartbeats, shutdown, memory, observability, provider tier.                        | Deployment smoke tests.                      |
 
 Create/update `meta.json` for each section, root navigation, generated API docs, related-page metadata, search indexing, and CLI option tables. Update `start/create-an-app`, first-route/client examples, AI starter, and local-development/Inspector guides to point to the new workflow. Preserve existing URLs where practical and use redirects for renamed pages.
 
@@ -852,46 +848,46 @@ Run existing `test:docs` checks, link checks, generated-reference checks, and se
 
 Paths reflect the existing repository organization. New filenames are proposed; confirm neighboring conventions before implementation. Do not create duplicate services where an existing internal module owns the same responsibility.
 
-| Package / file | Change | Input → output / responsibility |
-|---|---|---|
-| `packages/realtime/src/define-channel.ts` | **new** | Params/event schemas + access/presence → immutable descriptor. |
-| `packages/realtime/src/access.ts` | **new** | Trusted principal + params → authorized scoped grant; revocation/renewal. |
-| `packages/realtime/src/presence.ts` | **new** | Fenced leases → counts/member snapshots/changes. |
-| `packages/realtime/src/provider.ts` | **new** | Append/tail, replay, lease, and capability interfaces. |
-| `packages/realtime/src/trigger.ts` | **new** | Validated event → invocation-scoped provider receipt/telemetry. |
-| `packages/services/src/define-service.ts`, related types/guards | extend | Identity-preserving channel/agent members and collision validation. |
-| `packages/functions/src/*types*`, descriptor factory, context assembly | extend | Stream/progress contracts and context capabilities without changing unary behavior. |
-| `packages/app/src/*` and package exports | extend | Public `realtime` / streaming APIs; keep internals unsupported. |
-| `packages/compiler/src/route-client-metadata.ts` | **new** | Resolved HTTP triggers → normalized URL selector map and operation class. |
-| `packages/compiler` descriptor discovery/validation | extend | Explicit exposure/access/presence capabilities in checked graph. |
-| `packages/graph` / `packages/contracts` | extend | Versioned route/channel/agent/protocol metadata and diagnostics. |
-| `packages/engine` / `packages/runtime-effect` | extend | Managed iterator/progress lifetime, cancellation, finalization, errors. |
-| `packages/runtime-hono/src/rpc.ts` | extend | Shared procedure materialization with streaming and existing middleware/policy. |
-| `packages/runtime-hono/src/realtime.ts` | **new** | Authorized shared WS and HTTP observation/control adapters. |
-| `packages/runtime-hono/src/agent-runs.ts` | **new** | Exposed thread/run/control operations through engine-owned execution. |
-| `packages/runtime-hono/src/agent-protocols.ts` | **new** | Native AG-UI endpoint and optional AI UI adapter; negotiated framing. |
-| `packages/client-generator/src/generate-contract.ts` | extend | Existing contracts plus stream/client metadata, preserve RPC compatibility. |
-| `packages/client-generator/src/generate-registry.ts` | **new** | Browser-safe typed route/channel/agent maps, automatically included declarations. |
-| `packages/client-generator/src/generate-client-manifest.ts` | **new** | Safe runtime selector/endpoints/capability map and compatibility hash. |
-| `packages/client/src/react/provider.tsx` | **new** | Shared client + QueryClient contexts; identity isolation and lifecycle. |
-| `packages/client/src/react/use-route.ts` | **new** | URL selector + query opts → native UseQueryResult through oRPC utils. |
-| `packages/client/src/react/use-route-mutation.ts` | **new** | URL selector + mutation opts → native mutation result with explicit offline policy. |
-| `packages/client/src/react/use-infinite-route.ts` / `use-suspense-route.ts` | **new** | Native TanStack variants with generated inference. |
-| `packages/client/src/react/use-route-utils.ts` | **new** | Scoped URL-keyed oRPC utilities. |
-| `packages/client/src/react/use-channel.ts`, `use-realtime.ts` | **new** | Stable subscriptions/bindings, presence state, recovery notifications. |
-| `packages/client/src/react/use-agent.ts`, `use-stream.ts` | **new** | Typed named state/actions; no implicit side-effectful mounts. |
-| `packages/client/src/recovery/*` | **new** | Transport owner, checkpoints, identity epochs, gap/state coordination. |
-| `packages/client/src/agent-reducer.ts` | **new** | Validated protocol events → typed transcript, tools, approvals, output. |
-| `packages/agents/src/runtime-loop.ts`, related tool/runtime modules | extend | Stream lifecycle, bounded progress, tool ordering, safe control boundaries. |
-| `packages/agents/src/run-manager.ts`, `thread-store.ts` | **new** | Idempotent acceptance, journal, continuation checkpoints, execution fencing. |
-| `packages/agents/src/controls.ts` | **new** | Accepted/applied steering/follow-up/stop/approval state transitions. |
-| `packages/agents/src/protocol/*` | **new** | AG-UI mapper/profile validation and optional AI UI mapping. |
-| `packages/inspector-api/src/actions.ts`, run/channel endpoint modules | extend | Authorized, generation-scoped read/control actions and audit. |
-| `apps/inspector` | extend | Channel/presence explorer, typed route examples, agent chat/tool controls. |
-| `packages/cli`, generator, templates | extend | Automatic client linking, channel/stream scaffolding, checks/diagnostics. |
-| `apps/docs/content/docs`, generated references | extend | Documentation work in section 14. |
-| `examples/commerce` and dedicated React/Next.js example | extend/new | Executable cross-feature journey with mock identities/model/provider. |
-| `tests/types`, `tests/integration`, `tests/security`, `tests/inspector`, browser tests | extend | Gates in sections 16–17; follow existing test directory conventions. |
+| Package / file                                                                         | Change     | Input → output / responsibility                                                     |
+| -------------------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------- |
+| `packages/realtime/src/define-channel.ts`                                              | **new**    | Params/event schemas + access/presence → immutable descriptor.                      |
+| `packages/realtime/src/access.ts`                                                      | **new**    | Trusted principal + params → authorized scoped grant; revocation/renewal.           |
+| `packages/realtime/src/presence.ts`                                                    | **new**    | Fenced leases → counts/member snapshots/changes.                                    |
+| `packages/realtime/src/provider.ts`                                                    | **new**    | Append/tail, replay, lease, and capability interfaces.                              |
+| `packages/realtime/src/trigger.ts`                                                     | **new**    | Validated event → invocation-scoped provider receipt/telemetry.                     |
+| `packages/services/src/define-service.ts`, related types/guards                        | extend     | Identity-preserving channel/agent members and collision validation.                 |
+| `packages/functions/src/*types*`, descriptor factory, context assembly                 | extend     | Stream/progress contracts and context capabilities without changing unary behavior. |
+| `packages/app/src/*` and package exports                                               | extend     | Public `realtime` / streaming APIs; keep internals unsupported.                     |
+| `packages/compiler/src/route-client-metadata.ts`                                       | **new**    | Resolved HTTP triggers → normalized URL selector map and operation class.           |
+| `packages/compiler` descriptor discovery/validation                                    | extend     | Explicit exposure/access/presence capabilities in checked graph.                    |
+| `packages/graph` / `packages/contracts`                                                | extend     | Versioned route/channel/agent/protocol metadata and diagnostics.                    |
+| `packages/engine` / `packages/runtime-effect`                                          | extend     | Managed iterator/progress lifetime, cancellation, finalization, errors.             |
+| `packages/runtime-hono/src/rpc.ts`                                                     | extend     | Shared procedure materialization with streaming and existing middleware/policy.     |
+| `packages/runtime-hono/src/realtime.ts`                                                | **new**    | Authorized shared WS and HTTP observation/control adapters.                         |
+| `packages/runtime-hono/src/agent-runs.ts`                                              | **new**    | Exposed thread/run/control operations through engine-owned execution.               |
+| `packages/runtime-hono/src/agent-protocols.ts`                                         | **new**    | Native AG-UI endpoint and optional AI UI adapter; negotiated framing.               |
+| `packages/client-generator/src/generate-contract.ts`                                   | extend     | Existing contracts plus stream/client metadata, preserve RPC compatibility.         |
+| `packages/client-generator/src/generate-registry.ts`                                   | **new**    | Browser-safe typed route/channel/agent maps, automatically included declarations.   |
+| `packages/client-generator/src/generate-client-manifest.ts`                            | **new**    | Safe runtime selector/endpoints/capability map and compatibility hash.              |
+| `packages/client/src/react/provider.tsx`                                               | **new**    | Shared client + QueryClient contexts; identity isolation and lifecycle.             |
+| `packages/client/src/react/use-route.ts`                                               | **new**    | URL selector + query opts → native UseQueryResult through oRPC utils.               |
+| `packages/client/src/react/use-route-mutation.ts`                                      | **new**    | URL selector + mutation opts → native mutation result with explicit offline policy. |
+| `packages/client/src/react/use-infinite-route.ts` / `use-suspense-route.ts`            | **new**    | Native TanStack variants with generated inference.                                  |
+| `packages/client/src/react/use-route-utils.ts`                                         | **new**    | Scoped URL-keyed oRPC utilities.                                                    |
+| `packages/client/src/react/use-channel.ts`, `use-realtime.ts`                          | **new**    | Stable subscriptions/bindings, presence state, recovery notifications.              |
+| `packages/client/src/react/use-agent.ts`, `use-stream.ts`                              | **new**    | Typed named state/actions; no implicit side-effectful mounts.                       |
+| `packages/client/src/recovery/*`                                                       | **new**    | Transport owner, checkpoints, identity epochs, gap/state coordination.              |
+| `packages/client/src/agent-reducer.ts`                                                 | **new**    | Validated protocol events → typed transcript, tools, approvals, output.             |
+| `packages/agents/src/runtime-loop.ts`, related tool/runtime modules                    | extend     | Stream lifecycle, bounded progress, tool ordering, safe control boundaries.         |
+| `packages/agents/src/run-manager.ts`, `thread-store.ts`                                | **new**    | Idempotent acceptance, journal, continuation checkpoints, execution fencing.        |
+| `packages/agents/src/controls.ts`                                                      | **new**    | Accepted/applied steering/follow-up/stop/approval state transitions.                |
+| `packages/agents/src/protocol/*`                                                       | **new**    | AG-UI mapper/profile validation and optional AI UI mapping.                         |
+| `packages/inspector-api/src/actions.ts`, run/channel endpoint modules                  | extend     | Authorized, generation-scoped read/control actions and audit.                       |
+| `apps/inspector`                                                                       | extend     | Channel/presence explorer, typed route examples, agent chat/tool controls.          |
+| `packages/cli`, generator, templates                                                   | extend     | Automatic client linking, channel/stream scaffolding, checks/diagnostics.           |
+| `apps/docs/content/docs`, generated references                                         | extend     | Documentation work in section 14.                                                   |
+| `examples/commerce` and dedicated React/Next.js example                                | extend/new | Executable cross-feature journey with mock identities/model/provider.               |
+| `tests/types`, `tests/integration`, `tests/security`, `tests/inspector`, browser tests | extend     | Gates in sections 16–17; follow existing test directory conventions.                |
 
 Keep React/TanStack React dependencies isolated to the client React export and its supported peer-dependency policy. Keep Pi optional/non-required. Add protocol and provider dependencies only in the packages that own those boundaries.
 
@@ -900,8 +896,8 @@ Keep React/TanStack React dependencies isolated to the client React export and i
 ```ts
 interface ChannelProvider {
   readonly capabilities: {
-    readonly replay: 'none' | 'memory' | 'durable';
-    readonly presenceScope: 'process' | 'shared';
+    readonly replay: "none" | "memory" | "durable";
+    readonly presenceScope: "process" | "shared";
   };
   // Concrete types are package-internal and versioned.
   append(request: ValidatedChannelEvent): Promise<TriggerReceipt>;
@@ -1012,50 +1008,50 @@ Each phase is reviewed against working tests before later layers mask defects. A
 
 ## 17. Mandatory acceptance matrix
 
-| Test | Expected assertion |
-|---|---|
-| Public channel, anonymous browser | Subscribe and receive valid events without login. |
-| Protected channel, no principal | Denied before any event, replay, or count is exposed. |
-| Protected channel, wrong order/tenant | Denied even if socket authentication succeeded. |
-| Mixed public/private connection | Private denial does not suppress permitted public subscriptions. |
-| Missing/contradictory client policy | Compile/startup error; never default to public. |
-| Revocation during queued replay | Stop affected delivery and presence; queued frames do not leak. |
-| Native SSE vs WS security | Same guard/history/presence policy over both. |
-| Public event binds | Unbound private-looking event is still public; docs/test fixture prevents relying on bind for secrecy. |
-| Count before snapshot | Undefined/loading, not zero. |
-| Two components, same params | One logical subscription and independent callbacks. |
-| Two tabs, same principal | Two connections, one identified member. |
-| Client death without close | Lease expires and counts converge within documented bounds. |
-| Stalled SSE receiver | Renewal/ack expires; server writes alone do not renew forever. |
-| Provider restart | Fresh presence epoch and snapshot; no stale joins replayed as live. |
-| Presence profile | Only declared safe fields; no auth/session payload. |
-| Known URL selector | Maps to the correct existing procedure/method contract. |
-| Unknown/concrete/internal/raw-untyped selector | Compile error or clearly excluded contract. |
-| Query select/infinite/suspense | Native selected-data/page/error inference preserved. |
-| Mutation mounting | Zero server execution until explicit action. |
-| Changing selector kind | Cannot switch useRoute into useMutation through a runtime hook branch. |
-| Shared cache invalidation | Fetch, prefetch, optimistic updates and invalidation use identical scoped keys. |
-| Offline write | No hidden resume/retry queue by default. |
-| Logout/tenant switch during response | Old data, placeholder, mutation result and stream callbacks are discarded. |
-| SSR | Fresh request-scoped auth/cache; no browser socket during render. |
-| Reconnect replay/live fence | No gap or out-of-order handoff within a partition. |
-| Cursor expired/foreign/future | Explicit gap/error and reauthorization, not silent acceptance. |
-| Refresh event-derived UI | Snapshot restored before cursor advance. |
-| Tool argument fragments | Incomplete JSON is display-only. |
-| Truncated tool specification | Tool not executed. |
-| Parallel tools complete out of order | Correct correlation and deterministic model transcript ordering. |
-| Tool progress after settlement | Ignored/rejected safely; no event escapes closed scope. |
-| Slow browser | Bounded backlog; does not hold engine durability barriers indefinitely. |
-| Standard AG-UI client | Valid lifecycle, tool, snapshot, interrupt and resume decoding. |
-| AI SDK UI adapter | Correct header/chunks/termination; no proxy cloning error. |
-| Approval batch | Individual decisions collected; continuation covers all open interrupts. |
-| Duplicate/conflicting approval | Same idempotent response or explicit conflict; no duplicate accepted tool plan. |
-| Steering during active tool | Applied at safe boundary; no false hard-cancel claim. |
-| Follow-up/run-end race | Exactly one accepted queue transition or explicit rejection. |
-| Refresh agent | Same active run reattached, no repeated prompt/model request. |
-| Worker lost during side effect | Unknown/interrupted outcome reported; no unsafe automatic repeat. |
-| Inspector production/read-only boundary | Privileged actions remain protected/disabled and audited. |
-| Docs/examples | New public API and all snippets match generated contract; no hand-edited generated imports. |
+| Test                                           | Expected assertion                                                                                     |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Public channel, anonymous browser              | Subscribe and receive valid events without login.                                                      |
+| Protected channel, no principal                | Denied before any event, replay, or count is exposed.                                                  |
+| Protected channel, wrong order/tenant          | Denied even if socket authentication succeeded.                                                        |
+| Mixed public/private connection                | Private denial does not suppress permitted public subscriptions.                                       |
+| Missing/contradictory client policy            | Compile/startup error; never default to public.                                                        |
+| Revocation during queued replay                | Stop affected delivery and presence; queued frames do not leak.                                        |
+| Native SSE vs WS security                      | Same guard/history/presence policy over both.                                                          |
+| Public event binds                             | Unbound private-looking event is still public; docs/test fixture prevents relying on bind for secrecy. |
+| Count before snapshot                          | Undefined/loading, not zero.                                                                           |
+| Two components, same params                    | One logical subscription and independent callbacks.                                                    |
+| Two tabs, same principal                       | Two connections, one identified member.                                                                |
+| Client death without close                     | Lease expires and counts converge within documented bounds.                                            |
+| Stalled SSE receiver                           | Renewal/ack expires; server writes alone do not renew forever.                                         |
+| Provider restart                               | Fresh presence epoch and snapshot; no stale joins replayed as live.                                    |
+| Presence profile                               | Only declared safe fields; no auth/session payload.                                                    |
+| Known URL selector                             | Maps to the correct existing procedure/method contract.                                                |
+| Unknown/concrete/internal/raw-untyped selector | Compile error or clearly excluded contract.                                                            |
+| Query select/infinite/suspense                 | Native selected-data/page/error inference preserved.                                                   |
+| Mutation mounting                              | Zero server execution until explicit action.                                                           |
+| Changing selector kind                         | Cannot switch useRoute into useMutation through a runtime hook branch.                                 |
+| Shared cache invalidation                      | Fetch, prefetch, optimistic updates and invalidation use identical scoped keys.                        |
+| Offline write                                  | No hidden resume/retry queue by default.                                                               |
+| Logout/tenant switch during response           | Old data, placeholder, mutation result and stream callbacks are discarded.                             |
+| SSR                                            | Fresh request-scoped auth/cache; no browser socket during render.                                      |
+| Reconnect replay/live fence                    | No gap or out-of-order handoff within a partition.                                                     |
+| Cursor expired/foreign/future                  | Explicit gap/error and reauthorization, not silent acceptance.                                         |
+| Refresh event-derived UI                       | Snapshot restored before cursor advance.                                                               |
+| Tool argument fragments                        | Incomplete JSON is display-only.                                                                       |
+| Truncated tool specification                   | Tool not executed.                                                                                     |
+| Parallel tools complete out of order           | Correct correlation and deterministic model transcript ordering.                                       |
+| Tool progress after settlement                 | Ignored/rejected safely; no event escapes closed scope.                                                |
+| Slow browser                                   | Bounded backlog; does not hold engine durability barriers indefinitely.                                |
+| Standard AG-UI client                          | Valid lifecycle, tool, snapshot, interrupt and resume decoding.                                        |
+| AI SDK UI adapter                              | Correct header/chunks/termination; no proxy cloning error.                                             |
+| Approval batch                                 | Individual decisions collected; continuation covers all open interrupts.                               |
+| Duplicate/conflicting approval                 | Same idempotent response or explicit conflict; no duplicate accepted tool plan.                        |
+| Steering during active tool                    | Applied at safe boundary; no false hard-cancel claim.                                                  |
+| Follow-up/run-end race                         | Exactly one accepted queue transition or explicit rejection.                                           |
+| Refresh agent                                  | Same active run reattached, no repeated prompt/model request.                                          |
+| Worker lost during side effect                 | Unknown/interrupted outcome reported; no unsafe automatic repeat.                                      |
+| Inspector production/read-only boundary        | Privileged actions remain protected/disabled and audited.                                              |
+| Docs/examples                                  | New public API and all snippets match generated contract; no hand-edited generated imports.            |
 
 Use deterministic fake clocks/models/auth, seeded IDs, shared-provider integration fixtures, real browser tabs, and real connection failures. Keep compile-time fixtures, wire conformance, runtime validation, and operational load tests separate; success in one layer does not prove another.
 
@@ -1070,32 +1066,32 @@ uncertain-run recovery, contract negotiation, or second RPC protocol.
 
 ### 18.1 Requirement traceability
 
-| ID | Capability | Status | Slice | Primary files | Executable acceptance |
-|---|---|---|---:|---|---|
-| STR-01 | streamOf inference and graph projection | required | 2 | functions, graph, compiler | Type/compiler fixtures |
-| STR-02 | lazy lifecycle, validation, cancellation, backpressure | required | 2 | engine, invocation | Cleanup and blocked-flow tests |
-| STR-03 | finite and tool progress | required | 2, 6 | functions, agents | Observed and unobserved progress |
-| HTTP-01 | Typed oRPC iterators through Hono | required | 1, 2 | runtime-hono, client | Real Bun transport |
-| HTTP-02 | Native SSE, text, and bytes | required | 2 | routes, runtime-hono | Post-header failure tests |
-| HTTP-03 | Raw user-owned Hono escape hatch | required | 2 | routes | Mounted Hono fixture |
-| RT-01 | Trigger, subscribe, bind | required | 3 | realtime, client | Trigger-to-browser journey |
-| RT-02 | Internal, public, and protected exposure | required | 3, 4 | compiler, runtime | Negative access tests |
-| RT-03 | Replay, recovery, fallback, overload | required | 3, 4, 9 | providers, client | Gap and restart tests |
-| RT-04 | Connections, members, leases | required | 5 | realtime, client | Multi-tab and expiry tests |
-| CLI-01 | Provider and public React hooks | required | 1-7 | client/react | Type and browser tests |
-| CLI-02 | Query, mutation, infinite, suspense, utilities | required | 1 | client, compiler | Native inference fixtures |
-| CLI-03 | Registry, artifacts, build adapters, drift | required | 1 | generator, CLI, client | Clean-checkout fixture |
-| CLI-04 | SSR, identity, hydration, compatibility | required | 1, 4 | client, auth, runtime | Scoped hydration |
-| AG-01 | Text, parts, tools, progress, results | required | 6 | agents, reducer | Incremental protocol |
-| AG-02 | Threads, claims, controls, generations | required | 0, 7 | agents, providers | Crash and race tests |
-| AG-03 | Applicable Pi behavior and deferrals | required | 0, 6 | compatibility fixtures | Capability matrix |
-| AG-04 | AG-UI and AI SDK interoperability | required | 6 | agents, runtime, ai-sdk | External parsers |
-| SVC-01 | Existing-service composition | required | 2, 6 | function engine | Service stream and agent |
-| INS-01 | Inspector routes, channels, chat | required | 8 | inspector app/API | Browser journey |
-| EX-01 | Backend and Next.js examples | required | all, 10 | commerce examples | Executable journeys |
-| DOC-01 | Tutorials, reference, operations | required | all, 10 | docs app | Documentation verification |
-| BUILD-01 | Graph, manifests, exports, templates | required | 0-10 | compiler, CLI, scaffold | Generated application |
-| OPS-01 | Providers, limits, deployment, observability | required | 9, 10 | local, Redis, deploy | Two-node tests |
+| ID       | Capability                                             | Status   |   Slice | Primary files              | Executable acceptance            |
+| -------- | ------------------------------------------------------ | -------- | ------: | -------------------------- | -------------------------------- |
+| STR-01   | streamOf inference and graph projection                | required |       2 | functions, graph, compiler | Type/compiler fixtures           |
+| STR-02   | lazy lifecycle, validation, cancellation, backpressure | required |       2 | engine, invocation         | Cleanup and blocked-flow tests   |
+| STR-03   | finite and tool progress                               | required |    2, 6 | functions, agents          | Observed and unobserved progress |
+| HTTP-01  | Typed oRPC iterators through Hono                      | required |    1, 2 | runtime-hono, client       | Real Bun transport               |
+| HTTP-02  | Native SSE, text, and bytes                            | required |       2 | routes, runtime-hono       | Post-header failure tests        |
+| HTTP-03  | Raw user-owned Hono escape hatch                       | required |       2 | routes                     | Mounted Hono fixture             |
+| RT-01    | Trigger, subscribe, bind                               | required |       3 | realtime, client           | Trigger-to-browser journey       |
+| RT-02    | Internal, public, and protected exposure               | required |    3, 4 | compiler, runtime          | Negative access tests            |
+| RT-03    | Replay, recovery, fallback, overload                   | required | 3, 4, 9 | providers, client          | Gap and restart tests            |
+| RT-04    | Connections, members, leases                           | required |       5 | realtime, client           | Multi-tab and expiry tests       |
+| CLI-01   | Provider and public React hooks                        | required |     1-7 | client/react               | Type and browser tests           |
+| CLI-02   | Query, mutation, infinite, suspense, utilities         | required |       1 | client, compiler           | Native inference fixtures        |
+| CLI-03   | Registry, artifacts, build adapters, drift             | required |       1 | generator, CLI, client     | Clean-checkout fixture           |
+| CLI-04   | SSR, identity, hydration, compatibility                | required |    1, 4 | client, auth, runtime      | Scoped hydration                 |
+| AG-01    | Text, parts, tools, progress, results                  | required |       6 | agents, reducer            | Incremental protocol             |
+| AG-02    | Threads, claims, controls, generations                 | required |    0, 7 | agents, providers          | Crash and race tests             |
+| AG-03    | Applicable Pi behavior and deferrals                   | required |    0, 6 | compatibility fixtures     | Capability matrix                |
+| AG-04    | AG-UI and AI SDK interoperability                      | required |       6 | agents, runtime, ai-sdk    | External parsers                 |
+| SVC-01   | Existing-service composition                           | required |    2, 6 | function engine            | Service stream and agent         |
+| INS-01   | Inspector routes, channels, chat                       | required |       8 | inspector app/API          | Browser journey                  |
+| EX-01    | Backend and Next.js examples                           | required | all, 10 | commerce examples          | Executable journeys              |
+| DOC-01   | Tutorials, reference, operations                       | required | all, 10 | docs app                   | Documentation verification       |
+| BUILD-01 | Graph, manifests, exports, templates                   | required |    0-10 | compiler, CLI, scaffold    | Generated application            |
+| OPS-01   | Providers, limits, deployment, observability           | required |   9, 10 | local, Redis, deploy       | Two-node tests                   |
 
 ### 18.2 Identity, compatibility, and managed writes
 
@@ -1297,8 +1293,7 @@ Defaults are 128 subscriptions per connection, 10,000 active partitions and live
 connections per app, 256 MiB retained channel data per app/profile, 1,000 returned
 presence members, 16 MiB journal per thread, 1 GiB agent state per app/profile, 100
 threads per principal, 4/100 active runs per principal/app, and 32/10,000 queued
-controls per run/app. Principal overload is typed 429; app/provider overload is typed
-503. Existing work is not evicted for admission.
+controls per run/app. Principal overload is typed 429; app/provider overload is typed 503. Existing work is not evicted for admission.
 
 ## 19. Implementation slices and gates
 
@@ -1378,16 +1373,16 @@ Repository files and primary upstream documentation were reviewed for this speci
 [W2]: https://websockets.spec.whatwg.org/
 [D1]: https://redis.io/docs/latest/develop/pubsub/
 
-| Source group | Why it matters |
-|---|---|
-| Relkit repository [R1–R8] | Real package seams, existing TanStack support, type generation, RPC path, and docs navigation. |
-| Pi agent source [PI1–PI3] | Detailed lifecycle/control/tool/context behavior used in the gap review. |
-| Pusher docs [P1–P3] | Public/private/presence inspiration and connection-vs-member semantics. |
-| oRPC/Hono [O1–O3, H1] | Existing typed query/stream and HTTP/WS adapter foundations. |
-| AG-UI [G1–G6] | Public event schemas, metadata and interrupt/resume conformance. |
-| AI SDK [A1] | Optional ecosystem-compatible UI stream encoding. |
-| React/TanStack/Next [F1, T1, N1] | Hook call order, offline scheduling, and SSR/client boundaries. |
-| Browser/Redis [W1, W2, D1] | Transport limitations and the difference between reconnect and retained recovery. |
+| Source group                     | Why it matters                                                                                 |
+| -------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Relkit repository [R1–R8]        | Real package seams, existing TanStack support, type generation, RPC path, and docs navigation. |
+| Pi agent source [PI1–PI3]        | Detailed lifecycle/control/tool/context behavior used in the gap review.                       |
+| Pusher docs [P1–P3]              | Public/private/presence inspiration and connection-vs-member semantics.                        |
+| oRPC/Hono [O1–O3, H1]            | Existing typed query/stream and HTTP/WS adapter foundations.                                   |
+| AG-UI [G1–G6]                    | Public event schemas, metadata and interrupt/resume conformance.                               |
+| AI SDK [A1]                      | Optional ecosystem-compatible UI stream encoding.                                              |
+| React/TanStack/Next [F1, T1, N1] | Hook call order, offline scheduling, and SSR/client boundaries.                                |
+| Browser/Redis [W1, W2, D1]       | Transport limitations and the difference between reconnect and retained recovery.              |
 
 **Deliverable verification:** implementation evidence belongs in repository tests and
 release checks. This document defines behavior; it does not substitute for those

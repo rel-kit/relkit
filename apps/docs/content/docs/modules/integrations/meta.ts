@@ -3,6 +3,6 @@ import { defineMeta } from "blume";
 export default defineMeta({
   title: "Integrations",
   icon: "plug",
-  pages: ["index", "local-docker", "provider-authoring", "local-providers"],
+  pages: ["index", "local-docker", "provider-authoring", "provider-kit", "local-providers"],
   display: "page",
 });

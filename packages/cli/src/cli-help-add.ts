@@ -38,6 +38,22 @@ const named = (
     options: [...common, ...options],
   });
 
+/**
+ * Builds the help node for a provider-profile command such as `relkit add jobs`.
+ * @param name - `jobs` or `events`.
+ * @param description - Command purpose.
+ * @returns The pure command node.
+ */
+const durableProvider = (name: "jobs" | "events", description: string) =>
+  command(name, description, `relkit add ${name}`, {
+    options: [
+      projectRoot,
+      option("no-install", "boolean", "Do not install newly required packages"),
+      option("provider", "choice", "Provider (default: local)", [], ["postgres", "local"]),
+      option("profile", "string", "Profile name (default: the provider name)"),
+    ],
+  });
+
 /** Pure artifact command tree; prompting and transactions belong to generator services. */
 export const addHelp = command("add", "Add a compile-ready artifact", "relkit add <kind>", {
   commands: [
@@ -189,6 +205,8 @@ export const addHelp = command("add", "Add a compile-ready artifact", "relkit ad
         option("base-path", "string", "Auth base path (default: /api/auth)"),
       ],
     }),
+    durableProvider("jobs", "Add a jobs provider profile"),
+    durableProvider("events", "Add an events provider profile"),
     command("inspector", "Enable the inspector bridge and its local UI", "relkit add inspector", {
       options: [projectRoot, option("no-install", "boolean", "Do not install @relkit/inspector")],
     }),

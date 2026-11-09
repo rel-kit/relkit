@@ -1,5 +1,5 @@
-import { parseTracePropagation } from "@relkit/contracts";
-import type { TaskExecutionBinding, TaskExecutionEnvelope } from "@relkit/jobs/adapter";
+import { parseTracePropagation } from "relkit/contracts";
+import type { TaskExecutionBinding, TaskExecutionEnvelope } from "relkit/jobs/adapter";
 import { Worker } from "effect-mq";
 import type { EffectMqTaskDefinition } from "./worker.js";
 

@@ -1,7 +1,7 @@
 # Phase-one baseline
 
 - Started 2026-10-05 16:21 UTC; original checkout clean at e081bde6054c8395209cdec145d8217c5d9c0dfd.
-- Candidate: /Users/mustafaelsayed/.codex/worktrees/effect-user-entrypoints/relkit.
+- Candidate: <home>/.codex/worktrees/effect-user-entrypoints/relkit.
 - Frozen install in candidate: passed on Bun 1.3.10, 2715 packages, 7.22 seconds.
 - OpenSpec strict validation: passed.
 - Original checkout phase-zero suite: 28 passed, 0 failed, 127.49 seconds.

@@ -1,14 +1,14 @@
 /** Captures exactly selected installed runtime packages for portable production installs. */
 import { Effect, Schema } from "effect";
-import { IntegrationDependencyRequirements } from "@relkit/contracts";
-import { DependencySource, SelectedDependencies } from "@relkit/provider/internal/dependencies";
+import { IntegrationDependencyRequirements } from "relkit/contracts";
+import { DependencySource, SelectedDependencies } from "relkit/provider/dependencies";
 import { cliAdapterError } from "../cli-errors.js";
-import { HTTP_TRANSPORT_REQUIREMENTS } from "@relkit/runtime-hono/internal/prepared";
-import type { ApplicationGraph } from "@relkit/graph";
+import { HTTP_TRANSPORT_REQUIREMENTS } from "relkit/runtime-hono/prepared";
+import type { ApplicationGraph } from "relkit/graph";
 import type {
   DependencySourceContract,
   InstalledPackageIdentity,
-} from "@relkit/provider/internal/dependencies";
+} from "relkit/provider/dependencies";
 import type { ProductionSelection } from "./build-production.types.js";
 import { resolveProductionDependency } from "../services/production-dependency-source.js";
 
@@ -48,7 +48,7 @@ export const captureProductionDependencies = Effect.fn("Project.productionDepend
       ? []
       : [
           {
-            packageName: "@relkit/runtime-hono",
+            packageName: "relkit",
             packageVersion: undefined,
             capabilities: httpCapabilities,
             requirements: HTTP_TRANSPORT_REQUIREMENTS,

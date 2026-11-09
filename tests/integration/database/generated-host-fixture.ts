@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { Effect, Schema } from "effect";
 import { generatedDatabaseSources } from "./generated-host-database.sources.js";
 import { generatedRecordsSources } from "./generated-host-records.sources.js";
+import { generatedHandleSources } from "./generated-host-handle.sources.js";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 
 const tsconfigSchema = Schema.Struct({ files: Schema.Array(Schema.String) });
@@ -60,6 +61,7 @@ const writeFixture = Effect.fn("GeneratedHost.writeFixture")(function* (
   for (const [path, source] of Object.entries({
     ...generatedDatabaseSources,
     ...generatedRecordsSources,
+    ...generatedHandleSources,
   })) {
     const target = join(root, path);
     yield* scaffoldNative("generated.fixture.source.directory", () =>

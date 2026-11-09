@@ -1,1 +1,2 @@
-export * from "@relkit/buckets";
+import "./deprecated.js";
+export * from "relkit/buckets";

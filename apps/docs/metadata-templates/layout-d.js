@@ -1,4 +1,4 @@
-/** RELKIT's white frame, four-square mark, and editorial hierarchy. */
+/** RelKit's white frame, four-square mark, and editorial hierarchy. */
 export function layoutD({ headline, tagline, colors, logoBase64 }) {
   const box = (style, children) => ({
     type: "div",

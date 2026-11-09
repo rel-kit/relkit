@@ -6,6 +6,7 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { assertPackedDependencies } from "./catalog-manifest.js";
+import { toolPackageVersions } from "./release-stage.js";
 import type { Manifest } from "./scaffold-process.types.js";
 import type { Sources } from "./packed-registry-runtime.types.js";
 
@@ -24,7 +25,11 @@ export async function registryPackages(
   const bytes = new Map<string, Uint8Array>();
   const manifests = new Map<string, Manifest>();
   const root = JSON.parse(await readFile(resolve(import.meta.dirname, "../package.json"), "utf8"));
-  const versions = new Map([...sources].map(([name, source]) => [name, source.manifest.version]));
+  const versions = new Map([
+    ...[...sources].map(([name, source]) => [name, source.manifest.version] as const),
+    // Dev dependencies on private tool packages pack as their versions too.
+    ...toolPackageVersions(resolve(import.meta.dirname, "..")),
+  ]);
   for (const [name, path] of tarballs) {
     const packed = await readManifest(path);
     const source = sources.get(name)?.manifest;

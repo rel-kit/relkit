@@ -1,4 +1,4 @@
-import { defineEventFunction } from "@relkit/app/events";
+import { defineEventFunction } from "relkit/events";
 
 const orderConfirmation = defineEventFunction({
   id: "orders.confirmation",

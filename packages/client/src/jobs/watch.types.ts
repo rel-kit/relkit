@@ -1,5 +1,5 @@
-import type { ExpectedClientIdentity } from "@relkit/contracts";
-import type { RunConnection, RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
+import type { ExpectedClientIdentity } from "relkit/contracts";
+import type { RunConnection, RunSnapshot, RunWatchFrame } from "relkit/contracts/jobs";
 
 /** Complete watch sharing authority, cursor/projection fields and retry/read bounds. */
 export interface JobWatchOptions {

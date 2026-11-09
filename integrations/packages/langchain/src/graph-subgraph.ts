@@ -1,10 +1,10 @@
 /** Creates nested graph descriptors with their native execution metadata so parent compilation can retain subgraph state and interruption semantics. */
 
-import { normalizeId } from "@relkit/contracts";
-import type { StandardSchemaV1 } from "@relkit/schema";
+import { normalizeId } from "relkit/contracts";
+import type { StandardSchemaV1 } from "relkit/schema";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
-import { isRecordEffect } from "@relkit/agents/internal/agent-validation-value";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { isRecordEffect } from "relkit/agents/agent-validation-value";
 import type { GraphDescriptor } from "./define-graph.js";
 import { graphNodeValidationFailure } from "./graph-node-validation-error.js";
 import { copyGraphNodeEndsEffect } from "./graph-node-validation.js";
@@ -18,6 +18,7 @@ export type * from "./graph-subgraph.types.js";
  * @param options - Optional node identity and destinations.
  * @returns An Effect with a frozen node or GraphNodeValidationFailure.
  * @example Effect.runSync(createSubgraphNodeEffect(graph, { id: "nested" }));
+ * @experimental
  */
 export const createSubgraphNodeEffect = Effect.fn("Agents.graph.subgraphCreate")(
   function* <
@@ -58,6 +59,7 @@ export const createSubgraphNodeEffect = Effect.fn("Agents.graph.subgraphCreate")
  * @returns A frozen subgraph node.
  * @throws The original invalid options or destination error.
  * @example const node = createSubgraphNode(graph, { id: "nested" });
+ * @experimental
  */
 export function createSubgraphNode<
   const Id extends string,
@@ -78,6 +80,7 @@ export function createSubgraphNode<
  * @param value - Candidate node.
  * @returns An Effect with a boolean and no typed failure.
  * @example Effect.runSync(isSubgraphNodeEffect(value));
+ * @experimental
  */
 export const isSubgraphNodeEffect = Effect.fn("Agents.graph.subgraphIsNode")(
   function* (value: unknown) {
@@ -98,6 +101,7 @@ export const isSubgraphNodeEffect = Effect.fn("Agents.graph.subgraphIsNode")(
  * @param value - Candidate node.
  * @returns Whether the value is an embedded graph node.
  * @example if (isSubgraphNode(value)) subgraphForNode(value);
+ * @experimental
  */
 export function isSubgraphNode(value: unknown): value is SubgraphNodeDescriptor {
   return Effect.runSync(isSubgraphNodeEffect(value));
@@ -107,6 +111,7 @@ export function isSubgraphNode(value: unknown): value is SubgraphNodeDescriptor 
  * @param value - Embedded graph node.
  * @returns An Effect with the source descriptor.
  * @example Effect.runSync(subgraphForNodeEffect(node));
+ * @experimental
  */
 export const subgraphForNodeEffect = Effect.fn("Agents.graph.subgraphSource")(
   (value: SubgraphNodeDescriptor) => Effect.sync(() => value[RELKIT_SUBGRAPH]),
@@ -117,6 +122,7 @@ export const subgraphForNodeEffect = Effect.fn("Agents.graph.subgraphSource")(
  * @param value - Embedded graph node.
  * @returns The source graph descriptor.
  * @example const nested = subgraphForNode(node);
+ * @experimental
  */
 export function subgraphForNode(value: SubgraphNodeDescriptor): GraphDescriptor {
   return Effect.runSync(subgraphForNodeEffect(value));

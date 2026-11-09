@@ -5,7 +5,8 @@ import { createClient, createAutoClient } from "../../src/index.ts";
 const schema = {
   "~standard": { version: 1 as const, vendor: "test", validate: (value: unknown) => ({ value }) },
 };
-const contract = { watch: oc.input(schema).output(schema) };
+// Framework procedures (`jobs`, `relkit.*`) keep the RPC protocol; routes use REST.
+const contract = { jobs: { watch: oc.input(schema).output(schema) } };
 
 test.each([createClient, createAutoClient])(
   "HTTP iterator return cancels its request",
@@ -35,7 +36,7 @@ test.each([createClient, createAutoClient])(
         { preconnect: fetch.preconnect },
       ),
     });
-    const stream = await client.watch({}, { signal: caller.signal });
+    const stream = await client.jobs.watch({}, { signal: caller.signal });
     if (stream === null || typeof stream !== "object" || !(Symbol.asyncIterator in stream)) {
       throw new Error("Expected a stream");
     }

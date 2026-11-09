@@ -1,15 +1,15 @@
 /** Finds native service declarations through the shared, syntax-only layout model. */
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { discoverApplicationLayoutEffect } from "@relkit/compiler";
+import { discoverApplicationLayoutEffect } from "@relkit/cli/compiler";
 import {
   isDescriptor,
   selectApplicationLayout,
   serviceSource,
   type DescriptorAny,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { nativeServiceError } from "./application-errors.js";
 
 /**

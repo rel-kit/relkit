@@ -1,4 +1,4 @@
-import { formatDiagnostics, type Diagnostic } from "@relkit/diagnostics";
+import { formatDiagnostics, type Diagnostic } from "relkit/diagnostics";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 

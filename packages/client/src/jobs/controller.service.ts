@@ -1,50 +1,31 @@
-import { Context, Effect, Layer, MutableRef, Ref } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
-import { nativeCall } from "../native-stream.js";
-import { runClient } from "../client-runtime.js";
+import { abortable } from "../native/iterate.js";
 import { freeze, notify, resumedOptions } from "./controller-support.js";
 import { stateFromFeedEvent } from "./controller-state.js";
 import { JobWatchAbortedError, JobWatchDisposedError } from "./types.js";
 import type { JobWatchListener, JobWatchOptions, JobWatchState } from "./types.js";
-import { JobFeedRegistry } from "./feed-registry.service.js";
 import type { JobFeedRegistryService, WatchFeedBorrow } from "./feed-registry.types.js";
 import type { FeedEvent } from "./watch-feed.types.js";
 import type { JobControllerFactory, JobControllerView } from "./controller.service.types.js";
 
-/** Creates passive external-store views over scoped physical observation services. */
-export class JobControllers extends Context.Service<JobControllers, JobControllerFactory>()(
-  "@relkit/client/JobControllers",
-) {}
-
 let nextControllerId = 1;
 
-/** Acquires the controller factory once without opening native requests.
- * @returns A resource-free factory Layer requiring the complete-key feed registry.
+/** Creates the controller factory without opening native requests.
+ * @param registry - Complete-key physical feed registry shared by every view.
+ * @returns A resource-free factory of passive external-store views.
  * @example
  * ```ts
- * import { Layer, ManagedRuntime } from "effect";
- * import { runExecutionSync } from "@relkit/contracts/operation";
- * import { JobControllers, JobControllersLive } from "./controller.service.js";
- * import { JobFeedRegistryLive } from "./feed-registry.service.js";
- * export async function observeJob(client: unknown): Promise<void> {
- *   const owner = ManagedRuntime.make(JobControllersLive.pipe(Layer.provide(JobFeedRegistryLive)));
- *   try {
- *     const factory = runExecutionSync(owner, JobControllers);
- *     const view = factory.view(client, "job", { runId: "run" });
- *     try { await view.connect(); } finally { await view.dispose(); }
- *   } finally { await owner.dispose(); }
+ * import { createJobControllers } from "./controller.service.js";
+ * import { createJobFeedRegistry } from "./feed-registry.service.js";
+ * export async function connectOnce(client: Parameters<ReturnType<typeof createJobControllers>["view"]>[0]) {
+ *   const factory = createJobControllers(createJobFeedRegistry());
+ *   const view = factory.view(client, "job", { runId: "run" });
+ *   try { await view.connect(); } finally { await view.dispose(); }
  * }
  * ```
  */
-export const JobControllersLive = Layer.effect(
-  JobControllers,
-  Effect.gen(function* () {
-    const registry = yield* JobFeedRegistry;
-    return JobControllers.of({
-      view: (client, name, options) => createView(registry, client, name, options),
-    });
-  }),
-);
+export function createJobControllers(registry: JobFeedRegistryService): JobControllerFactory {
+  return { view: (client, name, options) => createView(registry, client, name, options) };
+}
 
 /** Allocates a passive view of authoritative observation state.
  * @param registry - Once-acquired physical feed registry.
@@ -58,9 +39,7 @@ function createView(
   name: string,
   options: JobWatchOptions,
 ): JobControllerView {
-  const state = Ref.makeUnsafe<JobWatchState<unknown>>(
-    freeze({ connection: "idle", isStale: false }),
-  );
+  let state: JobWatchState<unknown> = freeze({ connection: "idle", isStale: false });
   const listeners = new Set<JobWatchListener<unknown>>();
   const id = `watch-${nextControllerId++}`;
   let borrow: WatchFeedBorrow | undefined;
@@ -71,7 +50,7 @@ function createView(
   let closing: Promise<void> | undefined;
   let refetchAbort: AbortController | undefined;
   const refetches = new Set<Promise<void>>();
-  const snapshot = (): JobWatchState<unknown> => Ref.getUnsafe(state);
+  const snapshot = (): JobWatchState<unknown> => state;
   const assertLive = (): void => {
     if (disposed) throw new JobWatchDisposedError();
   };
@@ -79,9 +58,8 @@ function createView(
    * @param value - Next immutable view state.
    * @returns Nothing after isolated synchronous callbacks. */
   const publish = (value: JobWatchState<unknown>): void => {
-    const frozen = freeze(value);
-    MutableRef.set(state.ref, frozen);
-    for (const listener of listeners) notify(listener, frozen);
+    state = freeze(value);
+    for (const listener of listeners) notify(listener, state);
   };
   /** Accepts publication only while this view retains its epoch.
    * @param event - Frame or status supplied by the scoped observation.
@@ -140,7 +118,7 @@ function createView(
         throw error;
       });
   };
-  /** Delegates an authoritative read to the interruptible domain workflow.
+  /** Reads authoritative state through the bound feed, or a temporary borrow when idle.
    * @returns The original read result or rejection after temporary borrow cleanup. */
   const refetch = (): Promise<void> => {
     assertLive();
@@ -148,39 +126,23 @@ function createView(
     const controller = new AbortController();
     refetchAbort = controller;
     const requestedEpoch = epoch;
-    const work = runClient(
-      observeExecution(
-        "client",
-        "jobs.refetch",
-        Effect.fn("JobControllers.refetch")(function* () {
-          const previousConnection = snapshot().connection;
-          yield* Effect.acquireUseRelease(
-            borrow === undefined
-              ? registry.borrow(client, name, resumedOptions(options, snapshot()))
-              : Effect.succeed(undefined),
-            (temporary) =>
-              Effect.gen(function* () {
-                const current = borrow ?? temporary!;
-                const frame = yield* nativeCall((owned) =>
-                  current.feed.refetch(AbortSignal.any([controller.signal, owned])),
-                );
-                if (frame === undefined || controller.signal.aborted || disposed) return;
-                receive({ kind: "frame", frame }, requestedEpoch);
-                if (disconnected && previousConnection === "disconnected")
-                  publish({ ...snapshot(), connection: "disconnected" });
-              }),
-            (temporary) => temporary?.release ?? Effect.void,
-          ).pipe(
-            Effect.ensuring(
-              Effect.sync(() => {
-                if (refetchAbort === controller) refetchAbort = undefined;
-              }),
-            ),
-          );
-        })(),
-      ),
-      controller.signal,
-    );
+    const previousConnection = snapshot().connection;
+    const work = (async () => {
+      let temporary: WatchFeedBorrow | undefined;
+      try {
+        if (borrow === undefined)
+          temporary = registry.borrowView(client, name, resumedOptions(options, snapshot()));
+        const current = borrow ?? temporary!;
+        const frame = await abortable(current.feed.refetch(controller.signal), controller.signal);
+        if (frame === undefined || controller.signal.aborted || disposed) return;
+        receive({ kind: "frame", frame }, requestedEpoch);
+        if (disconnected && previousConnection === "disconnected")
+          publish({ ...snapshot(), connection: "disconnected" });
+      } finally {
+        await temporary?.releaseView();
+        if (refetchAbort === controller) refetchAbort = undefined;
+      }
+    })();
     const tracked = work.finally(() => {
       refetches.delete(tracked);
     });

@@ -48,7 +48,7 @@ test("keeps routable blog entries only, newest first, with defaults", () => {
   });
   expect(result[1]).toMatchObject({
     category: "company",
-    authors: [{ name: "RELKIT Team" }],
+    authors: [{ name: "RelKit Team" }],
     minutes: 3,
   });
 });

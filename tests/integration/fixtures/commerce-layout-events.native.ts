@@ -3,8 +3,8 @@ import { expect, test } from "bun:test";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Effect, Schema } from "effect";
-import { validateGraphShape, type ApplicationGraph } from "../../../packages/graph/src/index.js";
-import { createFunctionRegistry, invoke } from "../../../packages/engine/src/index.js";
+import { validateGraphShape, type ApplicationGraph } from "relkit/graph";
+import { createFunctionRegistry, invoke } from "relkit/engine";
 import { createTestRuntime } from "../../../packages/testing/src/index.js";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 

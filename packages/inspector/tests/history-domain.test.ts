@@ -1,8 +1,8 @@
 /** Validates the history domain's resource/IPC contracts through an explicit native test Layer. */
 import { expect, it } from "@effect/vitest";
 import { Cause, Effect, Exit, Layer } from "effect";
-import type { LocalWorkerEffects } from "@relkit/observability/local/worker-contract";
-import { LocalWorkerError } from "@relkit/observability/local/worker-contract";
+import type { LocalWorkerEffects } from "relkit/observability/local/worker-contract";
+import { LocalWorkerError } from "relkit/observability/local/worker-contract";
 import { InspectorHistory } from "../src/history.service.js";
 import { InspectorHistoryNative } from "../src/history-native.service.js";
 

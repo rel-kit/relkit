@@ -1,4 +1,4 @@
-import type { SupervisorCandidateToken } from "@relkit/supervisor";
+import type { SupervisorCandidateToken } from "../supervisor/index.js";
 
 /** Builds the generation identity used by session-owned drain lookups.
  * @param token - SDK identity pair.

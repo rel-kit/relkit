@@ -2,7 +2,7 @@ import type {
   DependencyClientSources,
   EventInvocationOptions,
   InvocationHooks,
-} from "@relkit/engine";
+} from "relkit/engine";
 import type {
   EventClient,
   EventDescriptorAny,
@@ -10,11 +10,11 @@ import type {
   EventProvider,
   EventPublishResult,
   UnknownEventEnvelope,
-} from "@relkit/events";
+} from "relkit/events";
 
-import type { RetryPolicy } from "@relkit/jobs/legacy";
-import type { EventDeliveryResult, EventDeliveryLedgerRecord } from "@relkit/providers-local";
-import type { StandardSchemaV1 } from "@relkit/schema";
+import type { RetryPolicy } from "relkit/jobs";
+import type { EventDeliveryResult, EventDeliveryLedgerRecord } from "relkit/providers-local";
+import type { StandardSchemaV1 } from "relkit/schema";
 import type { TestFailureControls } from "./fakes.js";
 import type { TestClock } from "./runtime.js";
 
@@ -38,9 +38,8 @@ export interface TestEventTriggerOptions<Output = unknown> {
  * @typeParam Output - Output validated by the native target schema.
  */
 export interface TestEventOptions<Payload = unknown, Output = unknown> {
-  readonly logger?: import("@relkit/runtime-effect").LoggerOptions;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
   readonly event?: EventDescriptorAny;
-  readonly events?: readonly EventDescriptorAny[];
   readonly eventId?: string;
   readonly version?: number;
   readonly payloadSchema?: StandardSchemaV1;

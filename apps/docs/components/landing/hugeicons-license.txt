@@ -1,7 +1,7 @@
 Hugeicons Animated — https://github.com/enesgules/hugeicons-animated
 Source icons: icons/database.tsx, icons/folder-01.tsx, icons/link-01.tsx,
 icons/cloud-upload.tsx. SVG geometry is from Hugeicons' free MIT icon set.
-Adapted to server-rendered SVG and shared pausable CSS timelines for RELKIT.
+Adapted to server-rendered SVG and shared pausable CSS timelines for RelKit.
 
 MIT License
 

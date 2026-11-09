@@ -1,4 +1,4 @@
-import type { LocalServiceInstance } from "@relkit/local-service";
+import type { LocalServiceInstance } from "relkit/local-service";
 import { LOCAL_RESOURCE_LABEL } from "./identity.js";
 
 /** Refuses an unsafe source-generation swap while an older service is owned. */

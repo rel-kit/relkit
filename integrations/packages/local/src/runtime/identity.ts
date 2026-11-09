@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { realpathSync, statSync } from "node:fs";
-import { isStableId } from "@relkit/contracts";
+import { isStableId } from "relkit/contracts";
 
 export const LOCAL_RESOURCE_LABEL = Object.freeze({
   managed: "dev.relkit.managed",

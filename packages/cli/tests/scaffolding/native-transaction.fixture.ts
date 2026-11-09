@@ -4,7 +4,7 @@ import { expect } from "@effect/vitest";
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { normalizeAddRequest } from "../../src/scaffolding/add-options.js";
-import { AddScaffoldError, type ScaffoldPlan } from "create-relkit/internal/add-types";
+import { AddScaffoldError, type ScaffoldPlan } from "create-relkit/add-types";
 
 /** Opens the original readiness barrier for parent and descendant process identities.
  * @returns Native server and test-owned entered/release barriers; caller must stop and release them.

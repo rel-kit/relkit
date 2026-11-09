@@ -1,4 +1,4 @@
-import { resolveEnv, type EnvShape } from "@relkit/config";
+import { resolveEnv, type EnvShape } from "relkit/config";
 import type { TestRuntimeOptions } from "./runtime.js";
 
 /**

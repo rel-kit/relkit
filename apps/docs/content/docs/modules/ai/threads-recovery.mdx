@@ -32,12 +32,12 @@ authenticated cursor pagination tied to the pinned snapshot.
 
 Each execution segment has immutable run state. A settled segment returns its thread to idle when no
 approval or follow-up remains; approval and worker interruption stay visible. Lost responses are
-reconciled through scoped receipts. Claim expiry, generation loss, or an uncertain external effect
+reconciled through scoped acceptance records. Claim expiry, generation loss, or an uncertain external effect
 never causes automatic restart.
 
 ## Keep interrupted nodes safe to re-enter
 
-LangGraph starts an interrupted node again when its thread resumes. RELKIT binds the reply to the
+LangGraph starts an interrupted node again when its thread resumes. RelKit binds the reply to the
 persisted waiting revision, admits it once, and fences competing workers, but it cannot make an
 arbitrary database write, payment, email, or third-party request exactly once. Place the interrupt
 before an irreversible effect, or make the effect idempotent with a durable business key or a

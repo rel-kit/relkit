@@ -25,7 +25,7 @@ test("native tool factory Effect maps native tool names", () => {
   expect(created.publicIds.get("search")).toBe("search");
 });
 
-test("native tool factory Effect tags an unregistered RELKIT tool", () => {
+test("native tool factory Effect tags an unregistered RelKit tool", () => {
   const options = {
     agent: { tools: [{ ref: { kind: "tool", id: "missing" } }] },
     tools: [],

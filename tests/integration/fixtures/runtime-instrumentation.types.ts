@@ -1,9 +1,5 @@
 /** Native test owners and captured propagation domains for the receipt continuation fixture. */
-import type {
-  TestBucketFake,
-  TestEventFake,
-  TestJobFake,
-} from "../../../packages/testing/src/index.js";
+import type { TestBucketFake, TestEventFake } from "../../../packages/testing/src/index.js";
 export interface ReceiptPayload {
   readonly orderId: string;
   readonly receiptKey: string;
@@ -15,8 +11,6 @@ export interface CapturedSpan {
 }
 export interface InstrumentationFixture {
   readonly receipts: TestBucketFake;
-  readonly job: TestJobFake<ReceiptPayload, { readonly receiptId: string }>;
   readonly event: TestEventFake<ReceiptPayload, void>;
-  readonly jobSpans: CapturedSpan[];
   readonly eventSpans: CapturedSpan[];
 }

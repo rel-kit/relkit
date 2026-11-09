@@ -11,7 +11,7 @@ import {
   InspectionFilesLive,
   InspectionNativeLive,
   connectionAttempt,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 import { InspectorDiscovery, InspectorDiscoveryLive } from "../src/discovery.service.js";
 
 const live = Layer.merge(

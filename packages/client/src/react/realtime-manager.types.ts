@@ -1,5 +1,4 @@
-import type { ChannelCheckpoint, PresenceSnapshot } from "@relkit/realtime";
-import type { Effect, Fiber } from "effect";
+import type { ChannelCheckpoint, PresenceSnapshot } from "relkit/realtime";
 
 /** Existing realtime external-store states. */
 export type RealtimeStatus = "idle" | "connecting" | "connected" | "stale" | "error";
@@ -23,29 +22,32 @@ export interface SharedSubscription {
   readonly statusListeners: Set<(status: RealtimeStatus) => void>;
   status: RealtimeStatus;
   checkpoint?: ChannelCheckpoint;
-  fiber?: Fiber.Fiber<void, unknown>;
 }
 
-/** Realtime state and scoped workflows supplied by live and test Layers. */
+/** Realtime state and owned connection workers of one manager. */
 export interface RealtimeSessionService {
   readonly feeds: Map<string, SharedSubscription>;
   readonly statusListeners: Set<() => void>;
-  /** Reads the current pure external-store status.
-   * @returns A synchronous state read without native acquisition. */
-  readonly snapshot: () => Effect.Effect<RealtimeStatus>;
-  /** Registers a manager-local view over a complete-key scoped native connection.
+  /** Reads the current external-store status.
+   * @returns The status, synchronously and without native acquisition. */
+  readonly snapshot: () => RealtimeStatus;
+  /** Registers a manager-local view over a complete-key shared native connection.
    * @param channel - Declared channel key.
    * @param params - Complete native channel parameters.
    * @param listener - Isolated synchronous frame publication.
    * @param statusListener - Optional isolated lifecycle publication.
-   * @returns A synchronous registration Effect yielding independently releasable view ownership. */
+   * @returns An idempotent synchronous release of this view.
+   * @throws Error when the sessions are stopped. */
   readonly subscribe: (
     channel: string,
     params: unknown,
     listener: (frame: RealtimeFrame) => void,
     statusListener?: (status: RealtimeStatus) => void,
-  ) => Effect.Effect<Effect.Effect<void>>;
-  /** Initiates cancellation of all scoped native connections and resets idle state.
-   * @returns A synchronous cancellation request; owner closure joins native workers. */
-  readonly stop: () => Effect.Effect<void>;
+  ) => () => void;
+  /** Aborts every shared connection and resets idle state, synchronously.
+   * @returns Nothing; {@link RealtimeSessionService.close} waits for the workers. */
+  readonly stop: () => void;
+  /** Stops the sessions and waits for every connection worker, pull and retry to settle.
+   * @returns The same settlement Promise on repeated calls. */
+  readonly close: () => Promise<void>;
 }

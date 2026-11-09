@@ -38,7 +38,7 @@ test("places AI beside Caching and keeps practical table-of-contents headings", 
 
 test("documents an existing-app tutorial and MCP's exposure and approval boundaries", async () => {
   const tutorial = await Bun.file(resolve(content, "guides/ai/build-an-offline-agent.mdx")).text();
-  expect(tutorial).toContain("existing RELKIT app");
+  expect(tutorial).toContain("existing RelKit app");
   expect(tutorial).not.toContain("create-relkit");
   expect(tutorial).toContain("tests/unit/assistant.agent.test.ts");
   expect(tutorial).toContain("web/app/agent-config.ts");
@@ -86,7 +86,7 @@ test("documents native compatibility, typed state, graphs, persistence, and resu
   ).text();
   expect(installation).toContain("@relkit/langchain@");
   expect(installation).toContain("langsmith@");
-  expect(native).not.toContain("runtime dependencies of `@relkit/agents`");
+  expect(native).not.toContain("runtime dependencies of `relkit/agents`");
 
   const graph = await Bun.file(resolve(content, "docs/modules/ai/graphs-persistence.mdx")).text();
   expect(graph).toContain("order-review.agent.ts");

@@ -1,6 +1,6 @@
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";
-import type { NativeSubmission, OperationContext } from "@relkit/jobs/adapter";
+import type { NativeSubmission, OperationContext } from "relkit/jobs/adapter";
 import { createDeterministicJobsAdapter } from "../../src/test-jobs-adapter.js";
 
 const context: OperationContext = {

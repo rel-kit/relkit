@@ -2,7 +2,7 @@
 
 import type { BaseCheckpointSaver, BaseStore } from "@langchain/langgraph";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { graphExecution, type GraphDescriptor } from "./define-graph.js";
 import { assertPersistenceProtocol, isPersistenceResource } from "./define-persistence.js";
 import type {
@@ -30,6 +30,7 @@ const resolutions = new WeakMap<AnyPersistenceResource, ResolutionState>();
  * @param signal - Optional invocation cancellation signal.
  * @returns An Effect with resolved handles or AgentPersistenceFailure.
  * @example Effect.runPromise(resolveGraphPersistenceEffect(graph, {}));
+ * @experimental
  */
 export const resolveGraphPersistenceEffect = Effect.fn("Agents.persistence.resolveGraph")(
   (descriptor: GraphDescriptor, env: Readonly<Record<string, unknown>>) =>
@@ -49,6 +50,7 @@ export const resolveGraphPersistenceEffect = Effect.fn("Agents.persistence.resol
  * @returns Resolved graph handles.
  * @throws The original factory or protocol error.
  * @example await resolveGraphPersistence(graph, {});
+ * @experimental
  */
 export function resolveGraphPersistence(
   descriptor: GraphDescriptor,
@@ -69,6 +71,7 @@ export function resolveGraphPersistence(
  * @param signal - Optional invocation cancellation signal.
  * @returns An Effect with resolved handles or AgentPersistenceFailure.
  * @example Effect.runPromise(resolveAgentPersistenceEffect(agent, {}));
+ * @experimental
  */
 export const resolveAgentPersistenceEffect = Effect.fn("Agents.persistence.resolveAgent")(
   (descriptor: AgentPersistenceDeclaration, env: Readonly<Record<string, unknown>>) =>
@@ -85,6 +88,7 @@ export const resolveAgentPersistenceEffect = Effect.fn("Agents.persistence.resol
  * @returns Resolved agent handles.
  * @throws The original factory or protocol error.
  * @example await resolveAgentPersistence(agent, {});
+ * @experimental
  */
 export function resolveAgentPersistence(
   descriptor: AgentPersistenceDeclaration,

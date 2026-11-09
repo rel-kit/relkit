@@ -7,18 +7,18 @@
  */
 import { randomBytes, randomUUID } from "node:crypto";
 import { Context, Effect, Exit, Layer, Ref, Scope, Semaphore } from "effect";
-import { admitObservabilityRecord } from "@relkit/observability";
+import { admitObservabilityRecord } from "relkit/observability";
 import {
   InspectionCapture,
   InspectionNative,
   InspectionNativeLive,
-} from "@relkit/inspector-api/connection";
+} from "relkit/inspector-api/connection";
 import type {
   InspectionCaptureOperations,
   InspectionNativeOperations,
-} from "@relkit/inspector-api/connection";
-import type { TelemetryConfiguration } from "@relkit/observability";
-import { runExecutionSyncWith } from "@relkit/contracts/operation";
+} from "relkit/inspector-api/connection";
+import type { TelemetryConfiguration } from "relkit/observability";
+import { runExecutionSyncWith } from "relkit/contracts/operation";
 import { cliAdapterError } from "../cli-errors.js";
 import type { DevCapture, DevCaptureOperations } from "./dev-capture.types.js";
 
@@ -141,7 +141,7 @@ const openCapture = Effect.fn("Dev.openCapture")(function* (configuration: Telem
 /** Transport failure is diagnostic degradation; invalid configuration remains a startup error. */
 const optionalIngress = Effect.fn("Dev.optionalCaptureIngress")(function* (
   native: InspectionNativeOperations,
-  capture: import("@relkit/inspector-api/connection").InspectionCaptureOperations,
+  capture: import("relkit/inspector-api/connection").InspectionCaptureOperations,
 ) {
   return yield* acquireIngress(native, capture.producer).pipe(
     Effect.catchTag("CliAdapterError", () =>
@@ -160,7 +160,7 @@ const optionalIngress = Effect.fn("Dev.optionalCaptureIngress")(function* (
 /** Holds bounded authenticated producer ingress in the command's existing Scope. */
 const acquireIngress = Effect.fn("Dev.captureIngress")(function* (
   native: InspectionNativeOperations,
-  producer: import("@relkit/inspector-api/connection").InspectionCaptureOperations["producer"],
+  producer: import("relkit/inspector-api/connection").InspectionCaptureOperations["producer"],
 ) {
   const token = randomBytes(32).toString("base64url");
   let host = "";

@@ -1,7 +1,7 @@
 /** Prepares selected deployment implementations and deterministic programs. */
 import { join, resolve } from "node:path";
 import { Effect } from "effect";
-import { fromGraph } from "@relkit/deploy";
+import { fromGraph } from "relkit/deploy";
 import { Schema } from "effect";
 import { deploymentEngineSchema } from "./deployment-engine.schemas.js";
 import { cliPromise, cliTry } from "../cli-errors.js";

@@ -2,11 +2,11 @@ import { describe, expect, test } from "bun:test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { evaluateCandidates } from "../../packages/compiler/src/discovery/evaluator.ts";
+import { evaluateCandidates } from "../../packages/cli/src/compiler/discovery/evaluator.ts";
 import {
   snapshotDescriptor,
   type SnapshotDescriptorLike,
-} from "../../packages/compiler/src/discovery/evaluator-snapshot.ts";
+} from "../../packages/cli/src/compiler/discovery/evaluator-snapshot.ts";
 
 const brand = 'Symbol.for("relkit.descriptor")';
 

@@ -1,4 +1,4 @@
-import { canonicalGraphJson } from "@relkit/graph";
+import { canonicalGraphJson } from "relkit/graph";
 import { Effect } from "effect";
 import { cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";

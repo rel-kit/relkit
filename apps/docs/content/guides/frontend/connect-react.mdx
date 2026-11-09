@@ -10,14 +10,14 @@ search:
   boost: 5
 ---
 
-Show **Hello, RELKIT!** in a React page using the same `GET /hello` operation you ran in
+Show **Hello, RelKit!** in a React page using the same `GET /hello` operation you ran in
 [Create and run an API](/docs/learn/create-an-app). Your backend owns its input and output
 schemas; the frontend receives generated types and calls it through RPC.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
   Keep that backend running on `http://127.0.0.1:3000`. You'll also need an existing Vite React or
   Next.js App Router TypeScript app with its dependencies installed. Run frontend commands in that
-  app's root. This guide adds RELKIT to it; it does not require the fullstack or agent starter.
+  app's root. This guide adds RelKit to it; it does not require the fullstack or agent starter.
 </Callout>
 
 Select your framework in the tabs below. Your selection carries through the remaining steps.
@@ -88,8 +88,10 @@ Next.js plugin, and any additional entries your application already uses:
 </Tab>
 </Tabs>
 
-Your editor should now offer `GET /hello` as a selector and an optional `name` string as its input.
-If the selector is missing, check the backend URL, the pull output, and the TypeScript `include` list.
+Your editor should now offer `api.hello.greet` on the `api` object from `@relkit/client`, with an
+optional `name` string as its input. The property comes from the route's target function,
+`hello.greet`. If it is missing, check the backend URL, the pull output, and the TypeScript `include`
+list.
 
 </Step>
 <Step icon="plug">
@@ -113,8 +115,8 @@ Keep your framework's existing plugins:
   /_snippets/source/apps/docs/examples/frontend/vite.config.ts
 </include>
 
-The browser sends `/rpc` calls and the `/_relkit/v1/client/identity` handshake to the frontend
-origin; Vite forwards them to the backend. This lets the provider use the current page's origin.
+The browser sends route calls such as `GET /hello` and RelKit's `/_relkit` requests to the frontend
+origin; Vite forwards them to the backend. Add a proxy entry for each route path your frontend calls. This lets the provider use the current page's origin.
 Keep `127.0.0.1` consistent in these local URLs.
 
 The development proxy is not part of the production build. Before publishing, configure equivalent
@@ -137,10 +139,11 @@ its `rewrites`. Keep the other options and any existing rules:
 
 [`withRelkit`](/docs/api/client#withrelkit) embeds the pulled contract fingerprint.
 The [Next.js rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites)
-forward `/rpc` calls and the `/_relkit/v1/client/identity` handshake to RELKIT. The browser stays
+forward route calls such as `GET /hello` and RelKit's `/_relkit` requests to the backend; add a rule
+for each route path your frontend calls. The browser stays
 on the frontend origin, so the provider needs no separate `baseUrl`.
 
-Keep RELKIT running as a separate backend on port `3000`; run Next.js on port `3002` in step 5.
+Keep RelKit running as a separate backend on port `3000`; run Next.js on port `3002` in step 5.
 These rewrites also run in production: replace their local destinations with your backend's server URL
 before deploying. Static exports cannot run rewrites; use your gateway or a public backend URL with
 [credentialed CORS and cookies](/docs/modules/client/authentication) instead.
@@ -155,8 +158,8 @@ If your app adds sign-in, forward its [auth mount](/docs/modules/client/authenti
 
 ## 4. Render the typed response
 
-`RelkitClientProvider` owns the connection and query cache; `useRoute` calls the generated
-operation with domain input. Both frameworks use the same component.
+`RelkitClientProvider` owns the connection and query cache; `useRoute` takes a route from the `api`
+object and calls it with domain input. Both frameworks use the same component.
 
 <Tabs syncKey="frontend-framework" hash={false}>
 <Tab title="Vite" icon="zap">
@@ -185,7 +188,7 @@ Render it from your page. Keep your existing `app/layout.tsx`, including its `<h
 </include>
 
 Keep React hooks in the Client Component. For calls from a Node.js Server Component or Route Handler,
-use [`createClient`](/docs/modules/client/transports) with an explicit backend URL and the appropriate
+use [`createApi`](/docs/modules/client/transports) with an explicit backend URL and the appropriate
 request identity. The `/server` and `/server/react` helpers require Bun; see
 [server rendering](/docs/modules/client/ssr) before selecting a server-side API.
 
@@ -193,8 +196,8 @@ request identity. The `/server` and `/server/react` helpers require Bun; see
 </Tabs>
 
 `greeting.data.message` is inferred from the backend function's output schema. No shared handwritten
-response interface is needed. The `GET /hello` selector identifies that route, but the client sends
-RPC over `/rpc`; it does not construct a REST query string. Raw handlers are not generated operations.
+response interface is needed. `api.hello.greet` identifies that route, and the client sends
+its REST request, `GET /hello?name=…`, as curl would. Raw handlers are not generated operations.
 
 </Step>
 <Step icon="circle-check">
@@ -212,7 +215,7 @@ bun run relkit client check http://127.0.0.1:3000 --out .relkit/generated
 bun run dev
 ```
 
-Open `http://127.0.0.1:5173`. Expect a loading message followed by **Hello, RELKIT!**. In the browser's
+Open `http://127.0.0.1:5173`. Expect a loading message followed by **Hello, RelKit!**. In the browser's
 Network panel, the identity request and the RPC request should succeed. Stop the backend and reload
 to check the connection error message.
 
@@ -227,17 +230,18 @@ bun run relkit client check http://127.0.0.1:3000 --out .relkit/generated
 bun run dev --hostname 127.0.0.1 --port 3002
 ```
 
-Open `http://127.0.0.1:3002`. Expect a loading message followed by **Hello, RELKIT!**. In the browser's
+Open `http://127.0.0.1:3002`. Expect a loading message followed by **Hello, RelKit!**. In the browser's
 Network panel, the identity and RPC requests should use port `3002` and succeed through the rewrites.
 Stop the backend and reload to check the connection error message.
 
 </Tab>
 </Tabs>
 
-After changing the public backend contract, run `client pull` again, typecheck, and restart the
-frontend dev server so the plugin loads the new fingerprint. Use `client check` before a frontend
-build. A fingerprint mismatch blocks new typed work with `application-updated`; coordinate frontend
-and backend releases instead of bypassing the check.
+While the backend runs under `relkit dev`, the provider follows its contract changes. When you
+change a route, the page keeps working without a frontend restart. Run `client pull` again to update
+the types, then typecheck. Use `client check` before a frontend build. Outside development, a
+fingerprint mismatch blocks new typed work with `application-updated`; coordinate frontend and
+backend releases instead of bypassing the check.
 
 </Step>
 </Steps>
@@ -248,13 +252,13 @@ Each module documents its backend declaration next to the corresponding frontend
 
 | Backend capability                    | Frontend entry point                                             | Continue with                                                                                             |
 | ------------------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `defineRoute` / `defineServiceRoutes` | `useRoute`, `useRouteMutation`, or `createClient`                | [Call a defined route](/docs/modules/http/define#use-from-the-frontend)                                   |
+| `defineRoute` / `defineServiceRoutes` | `useRoute`, `useRouteMutation`, or `createApi`                   | [Call a defined route](/docs/modules/http/define#use-from-the-frontend)                                   |
 | `streamOf` route output               | `useStream`                                                      | [Consume a response stream](/docs/modules/http/streaming#use-from-the-frontend)                           |
 | `defineJob` with a client policy      | `useJobTrigger`, `useJobRun`, or the generated `client.jobs` API | [Trigger and observe a job](/docs/modules/jobs/quickstart#use-this-job-from-the-frontend)                 |
 | Agent with a client policy            | `useAgent`                                                       | [Run an agent](/docs/modules/ai/agents#use-this-agent-from-the-frontend)                                  |
 | `defineGraph` with a client policy    | `useAgent` with typed initial input and resume replies           | [Run and resume a graph](/docs/modules/ai/graphs-persistence#run-and-resume-this-graph-from-the-frontend) |
 | `defineChannel` with browser access   | `useChannel`, `useRealtime`                                      | [Subscribe to a channel](/docs/modules/realtime#subscribe-from-the-frontend)                              |
-| Better Auth mount                     | Better Auth's browser client and the RELKIT identity provider    | [Sign-in clients](/docs/modules/auth/clients)                                                             |
+| Better Auth mount                     | Better Auth's browser client and the RelKit identity provider    | [Sign-in clients](/docs/modules/auth/clients)                                                             |
 
 Buckets, caches, database models, and backend events have no direct generated browser API.
 Expose an authorized function through a route when the frontend needs that operation. File uploads

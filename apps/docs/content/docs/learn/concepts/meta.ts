@@ -3,6 +3,15 @@ import { defineMeta } from "blume";
 export default defineMeta({
   title: "Core concepts",
   icon: "blocks",
-  pages: ["index", "application", "functions", "schemas", "errors", "context", "environment"],
+  pages: [
+    "index",
+    "application",
+    "functions",
+    "schemas",
+    "errors",
+    "context",
+    "runtime-handle",
+    "environment",
+  ],
   display: "page",
 });

@@ -1,4 +1,4 @@
-import { defineApp, defineEnv, env as binding } from "@relkit/app/config";
+import { defineApp, defineEnv, env as binding } from "relkit/config";
 import { docker } from "@relkit/docker";
 import { redis } from "@relkit/redis";
 

@@ -1,10 +1,10 @@
 /** Exercises native runtime effect interruption behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
-
+import { defineAgent } from "relkit/agents";
+import { langchain } from "../src/adapter.js";
 import { Effect, Layer } from "effect";
 import { expect, test } from "vitest";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 import { END, START, StateSchema } from "@langchain/langgraph";
-import { defineAgent } from "../src/define-agent.js";
 import { defineGraph } from "../src/define-graph.js";
 import { defineGraphNode } from "../src/define-graph-node.js";
 import { invokeAgentEffect } from "../src/runtime.js";
@@ -114,6 +114,7 @@ function modelInterruptionFixture() {
   });
   const agent = defineAgent({
     id: "test.interrupt",
+    runtime: langchain(),
     input: z.object({ question: z.string() }),
     output: z.object({ answer: z.string() }),
     model: "test",

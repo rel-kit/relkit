@@ -1,7 +1,7 @@
 /** Shares the native signal owner between package and restricted container entries. */
 import { BunRuntime } from "@effect/platform-bun";
 import { Cause, Effect } from "effect";
-import { InspectionConnectionError } from "@relkit/inspector-api/connection";
+import { InspectionConnectionError } from "relkit/inspector-api/connection";
 import { parseInspectorOptions, INSPECTOR_HELP } from "./options.js";
 import { InspectorTool, InspectorToolLive } from "./tool.service.js";
 import { requireInspectorContainer } from "./container-native.js";

@@ -1,4 +1,4 @@
-import { defineService } from "@relkit/app";
+import { defineService } from "relkit";
 import check from "./functions/health.function.js";
 
 export default defineService({ functions: { check } });

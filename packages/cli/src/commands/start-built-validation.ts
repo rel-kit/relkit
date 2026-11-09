@@ -1,4 +1,4 @@
-import { LOCAL_SERVICE_PLAN_VERSION } from "@relkit/local-service";
+import { LOCAL_SERVICE_PLAN_VERSION } from "relkit/local-service";
 
 /** Retains version mismatch diagnostics before production startup.
  * @param actual - Authored contract value.

@@ -1,7 +1,7 @@
 /** Strict consumers retain explicit native and Scope authority after moving history out of the CLI. */
 import { expect, test } from "vitest";
 import { fileURLToPath } from "node:url";
-import ts from "typescript";
+import ts from "relkit-typescript";
 
 const probe = `import { Effect, Scope } from "effect";
 import { InspectorHistory } from "../src/history.service.js";

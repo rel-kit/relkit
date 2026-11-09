@@ -1,5 +1,5 @@
 import { Schema } from "effect";
-import type { LocalServiceMaterializerRuntime } from "@relkit/local-service";
+import type { LocalServiceMaterializerRuntime } from "relkit/local-service";
 import type { LoadedLocalRuntime } from "./local-runtime-modules.types.js";
 
 /**

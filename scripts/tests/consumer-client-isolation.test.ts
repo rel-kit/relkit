@@ -6,7 +6,7 @@
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import ts from "typescript";
+import ts from "relkit-typescript";
 import { expect, test } from "vitest";
 import {
   clientContractSource as contract,

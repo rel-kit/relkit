@@ -1,4 +1,4 @@
-import "@relkit/events";
+import "relkit/events";
 
 declare global {
   namespace Relkit {

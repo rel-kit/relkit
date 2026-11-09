@@ -1,4 +1,4 @@
-import type { ChannelCheckpoint } from "@relkit/realtime";
+import type { ChannelCheckpoint } from "relkit/realtime";
 import type { RealtimeFrame, RealtimeStatus } from "./realtime-manager.js";
 import type { ChannelRegistry } from "./registry.js";
 import type { ChannelSelector } from "./registry.types.js";

@@ -2,7 +2,7 @@
 import { copyFile, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect } from "effect";
-import { buildCatalogDependency } from "create-relkit/internal/build-catalog";
+import { buildCatalogDependency } from "create-relkit/build-catalog";
 import { inspectionNative } from "../../../scripts/consumer-installation-native.js";
 import {
   installWorkflowGuide,
@@ -53,7 +53,7 @@ export const frontendWorkflow = Effect.fn("DocsInstallation.frontend")(function*
   );
 });
 
-/** Creates ordinary frontend type tooling independently of the RELKIT installation recipe.
+/** Creates ordinary frontend type tooling independently of the RelKit installation recipe.
  * @param app - Fresh outside-workspace frontend root.
  * @returns Finite creation of its baseline package manifest.
  */

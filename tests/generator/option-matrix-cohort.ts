@@ -8,13 +8,15 @@ import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { Schema } from "effect";
 import { generateProject } from "../../packages/create-relkit/src/generate.js";
-import appManifest from "../../packages/app/package.json" with { type: "json" };
+import relkitManifest from "../../packages/relkit/package.json" with { type: "json" };
 import cliManifest from "../../packages/cli/package.json" with { type: "json" };
 import clientManifest from "../../packages/client/package.json" with { type: "json" };
 import testingManifest from "../../packages/testing/package.json" with { type: "json" };
 import localManifest from "../../integrations/packages/local/package.json" with { type: "json" };
 import nativeManifest from "../../integrations/packages/langchain/package.json" with { type: "json" };
 import workspaceManifest from "../../package.json" with { type: "json" };
+import creatorManifest from "../../packages/create-relkit/package.json" with { type: "json" };
+import { CREATE_TASKS_DEFAULT_JOBS } from "../../packages/create-relkit/src/options.js";
 import { createOptions, contextFor, templateRoot } from "./option-matrix-fixture.js";
 import { GeneratedManifest, GeneratedTsconfig } from "./option-matrix.schemas.js";
 import { scanGeneratedProject } from "./option-matrix-scan.js";
@@ -29,7 +31,13 @@ export async function verifyCreationTuple(root: string, selection: CreationTuple
   const { template, examples, install, git } = selection;
   const name = `${template}-${examples ? "examples" : "plain"}-${install ? "install" : "no-install"}-${git ? "git" : "no-git"}`;
   const commands: string[][] = [];
-  const result = await generateProject(createOptions(name, selection), contextFor(root, commands));
+  const result = await generateProject(
+    createOptions(name, {
+      ...selection,
+      ...(template === "tasks" ? { jobs: CREATE_TASKS_DEFAULT_JOBS } : {}),
+    }),
+    contextFor(root, commands),
+  );
   const manifest = Schema.decodeUnknownSync(GeneratedManifest)(
     JSON.parse(await readFile(join(result.destination, "package.json"), "utf8")),
   );
@@ -40,8 +48,14 @@ export async function verifyCreationTuple(root: string, selection: CreationTuple
   expect(result.installed).toBe(install);
   expect(result.gitInitialized).toBe(git);
   verifyGeneratedManifest(manifest, template);
-  expect(tsconfig.compilerOptions).toMatchObject({ baseUrl: ".", paths: { "@app/*": ["src/*"] } });
-  expect(result.files.some((path) => path.startsWith("src/services/hello/functions/"))).toBe(true);
+  expect(tsconfig.compilerOptions).toMatchObject({ paths: { "@app/*": ["./src/*"] } });
+  expect(tsconfig.compilerOptions).not.toHaveProperty("baseUrl");
+  if (template === "tasks")
+    expect(result.files.some((path) => path.startsWith("src/services/orders/"))).toBe(examples);
+  else
+    expect(result.files.some((path) => path.startsWith("src/services/hello/functions/"))).toBe(
+      true,
+    );
   expect(result.files.some((path) => path.startsWith("tests/"))).toBe(examples);
   for (const path of [
     ".agents/skills/relkit/SKILL.md",
@@ -56,6 +70,7 @@ export async function verifyCreationTuple(root: string, selection: CreationTuple
     ".agents/skills/relkit/references/realtime-apis.md",
     ".agents/skills/relkit/references/observability-apis.md",
     ".agents/skills/relkit/references/testing-apis.md",
+    ".agents/skills/relkit/references/deployment.md",
   ]) {
     expect(result.files).toContain(path);
     expect(await readFile(join(result.destination, path), "utf8")).toBe(
@@ -90,12 +105,23 @@ function verifyGeneratedManifest(
           langsmith: workspaceManifest.catalog.langsmith,
         }
       : {}),
-    "@relkit/app": appManifest.version,
-    effect: workspaceManifest.catalog.effect,
+    relkit: relkitManifest.version,
+    "@scalar/hono-api-reference": "0.12.9",
+    zod: "4.6.7",
+    ...(template === "tasks"
+      ? {
+          "@relkit/docker": creatorManifest.relkit.providerVersions["@relkit/docker"],
+          "@relkit/inngest": creatorManifest.relkit.providerVersions["@relkit/inngest"],
+          "@relkit/local": creatorManifest.relkit.providerVersions["@relkit/local"],
+          inngest: workspaceManifest.catalog.inngest,
+        }
+      : {}),
     ...(template === "fullstack"
       ? {
           "@ag-ui/core": "0.0.59",
           "@relkit/client": clientManifest.version,
+          // The client's React provider imports this optional peer; the template declares it.
+          "@orpc/tanstack-query": clientManifest.peerDependencies["@orpc/tanstack-query"],
           "@tanstack/react-query": workspaceManifest.catalog["@tanstack/react-query"],
           next: workspaceManifest.catalog.next,
           react: workspaceManifest.catalog.react,

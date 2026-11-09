@@ -1,45 +1,52 @@
 # Agents, tools, and prompts
 
-| API                                                    | Import               | Role                                      |
-| ------------------------------------------------------ | -------------------- | ----------------------------------------- |
-| Generic `defineAgent`                                  | `@relkit/app/agents` | SDK-free agent declaration                |
-| Native `defineAgent`, `defineGraph`, `defineGraphNode` | `@relkit/langchain`  | LangChain model execution or native graph |
-| `defineTool`                                           | `@relkit/app/tools`  | Policy-controlled view of a function      |
-| `definePrompt`                                         | `@relkit/app`        | Reusable instructions                     |
-| `z`                                                    | `@relkit/app/schema` | Agent and tool schemas                    |
+| API                              | Import              | Role                                        |
+| -------------------------------- | ------------------- | ------------------------------------------- |
+| `defineAgent`                    | `relkit/agents`     | Agent declaration with a `runtime` adapter  |
+| `langchain`, `langchainModel`    | `@relkit/langchain` | LangChain adapter (Labs) and model profiles |
+| `defineGraph`, `defineGraphNode` | `@relkit/langchain` | Native LangGraph workflow (Labs)            |
+| `aiSdk`                          | `@relkit/ai-sdk`    | Optional Vercel AI SDK adapter (Labs)       |
+| `defineTool`                     | `relkit/tools`      | Policy-controlled view of a function        |
+| `definePrompt`                   | `relkit`            | Reusable instructions                       |
+| `z`                              | `zod`               | Agent and tool schemas                      |
 
-The native integration requires application-installed `@langchain/core`, `@langchain/langgraph`, `langchain` and `langsmith` at the supported versions. Add `deepagents` only for a deep-agent declaration. Check/build/start validate selected requirements before readiness; they do not install missing peers. Generic descriptors, tools and agent-state provider contracts do not select a native engine.
+The native integration requires application-installed `@langchain/core`, `@langchain/langgraph`, `langchain` and `langsmith` at the supported versions. Add `deepagents` only for a deep-agent declaration. Check/build/start validate selected requirements before readiness; they do not install missing peers. Every agent selects its adapter with `runtime`; LangChain-native models, tools, middleware and persistence go in `langchain({ ... })`, and `model` names a model profile bound in `relkit.config.ts`. Apps that never select `aiSdk()` install no AI SDK package.
 
 ## `defineAgent`
 
 Use `defineAgent` when a model should choose among tools. The agent template provides an executable offline LangChain model example. This shortened form uses the same public options:
 
 ```ts
-import { defineAgent } from "@relkit/langchain";
-import { z } from "@relkit/app/schema";
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
+import { z } from "zod";
 import { FakeToolCallingModel } from "langchain";
 import lookup from "@app/services/hello/tools/lookup.tool.js";
 export default defineAgent({
   id: "hello.assistant",
+  runtime: langchain({
+    model: new FakeToolCallingModel({
+      toolCalls: [
+        [{ name: "relkit_output", args: { value: { answer: "Hello!" } }, id: "output-1" }],
+      ],
+    }),
+  }),
   input: z.object({ message: z.string().min(1) }),
   output: z.object({ answer: z.string() }),
-  model: new FakeToolCallingModel({
-    toolCalls: [[{ name: "relkit_output", args: { value: { answer: "Hello!" } }, id: "output-1" }]],
-  }),
   instructions: "Answer greeting questions with the available tools.",
   tools: [lookup],
   limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 10_000 },
 });
 ```
 
-Other generated projects may need a native model package and application-owned provider configuration. `limits` requires positive `maxSteps`, `maxToolCalls`, and `timeoutMs`. `instructions` can be text or a `definePrompt` descriptor. A model can call only tools listed in the agent's `tools` array. A fixed sequence can be a function; a stateful explicit workflow can use `defineGraph` and `defineGraphNode`.
+Other generated projects bind a model profile instead, such as `model: { default: langchainModel({ model: "openai:gpt-5" }) }` in `relkit.config.ts`, and install that provider's package. `limits` requires positive `maxSteps`, `maxToolCalls`, and `timeoutMs`. `instructions` can be text or a `definePrompt` descriptor. A model can call only tools listed in the agent's `tools` array. A fixed sequence can be a function; a stateful explicit workflow can use `defineGraph` and `defineGraphNode`.
 
 ## `defineTool` and `definePrompt`
 
-A RELKIT tool wraps a callable function without duplicating its schemas:
+A RelKit tool wraps a callable function without duplicating its schemas:
 
 ```ts
-import { defineTool } from "@relkit/app/tools";
+import { defineTool } from "relkit/tools";
 import lookup from "@app/services/orders/functions/lookup.function.js";
 export default defineTool({
   id: "orders.lookup",
@@ -52,7 +59,7 @@ export default defineTool({
 ```
 
 ```ts
-import { definePrompt } from "@relkit/app";
+import { definePrompt } from "relkit";
 export default definePrompt("Answer using the available tools.", {
   id: "hello.assistant-instructions",
 });

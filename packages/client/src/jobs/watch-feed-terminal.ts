@@ -1,4 +1,4 @@
-import type { RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunWatchFrame } from "relkit/contracts/jobs";
 import { authoritativeFrame } from "./reconcile.js";
 import { isTerminalRun } from "./types.js";
 import type { JobWatchOptions } from "./watch.types.js";

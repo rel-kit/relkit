@@ -1,4 +1,4 @@
-import type { BucketOperationContext, BucketProvider, BucketPutOptions } from "@relkit/buckets";
+import type { BucketOperationContext, BucketProvider, BucketPutOptions } from "relkit/buckets";
 import {
   assertResponse,
   presignS3Url,

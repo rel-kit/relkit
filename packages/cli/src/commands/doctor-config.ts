@@ -1,6 +1,6 @@
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { ConfigValidationError, loadConfig, type LoadedToolingConfig } from "@relkit/compiler";
+import { ConfigValidationError, loadConfig, type LoadedToolingConfig } from "../compiler/index.js";
 import { Effect } from "effect";
 import { cliOriginalError, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";

@@ -8,7 +8,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import { isStableId } from "@relkit/contracts";
+import { isStableId } from "relkit/contracts";
 import type { LocalProjectIdentity } from "./identity.js";
 import {
   LOCAL_PROJECT_LEASE_VERSION,

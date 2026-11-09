@@ -4,7 +4,7 @@ import {
   type DeploymentInput,
   type DeploymentResourceOperation,
   type InfrastructureOperationPlan,
-} from "@relkit/deploy";
+} from "relkit/deploy";
 
 export interface InfrastructureContext {
   readonly stackName: string;

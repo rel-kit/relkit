@@ -12,9 +12,11 @@ export default defineFunction({
     totalCents: z.number(),
   }),
 
-  handler: async (input) => {
-    // Invoke with validation, hooks, and tracing.
-    const order = await createOrder.invoke(input);
+  dependencies: { functions: { createOrder } },
+
+  handler: async (input, context) => {
+    // Call with validation, hooks, and tracing.
+    const order = await context.functions.createOrder(input);
 
     return order;
   },

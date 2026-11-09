@@ -1,4 +1,4 @@
-import type { RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunSnapshot, RunWatchFrame } from "relkit/contracts/jobs";
 import type { FeedEvent } from "../../src/jobs/watch-feed.types.js";
 
 /** Assertion-bearing mutable controls for a deterministic physical observation. */

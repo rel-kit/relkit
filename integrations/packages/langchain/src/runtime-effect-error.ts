@@ -3,7 +3,7 @@
 import { Schema } from "effect";
 import { AgentRuntimeError } from "./runtime-errors.js";
 
-/** A typed Effect failure that retains the public invocation error as its cause. */
+/** A typed Effect failure that retains the public invocation error as its cause. @experimental */
 export class AgentInvocationFailure extends Schema.TaggedError<AgentInvocationFailure>()(
   "AgentInvocationFailure",
   { code: Schema.String, message: Schema.String, cause: Schema.Unknown },

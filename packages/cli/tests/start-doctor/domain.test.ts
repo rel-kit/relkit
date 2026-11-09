@@ -1,10 +1,10 @@
 import { expect, it } from "@effect/vitest";
-import { defineApp } from "@relkit/app/config";
-import { defineEnv } from "@relkit/config";
+import { defineApp } from "relkit/config";
+import { defineEnv } from "relkit/config";
 import { Deferred, Effect, Fiber, Layer, Logger, Ref } from "effect";
 import { TestClock } from "effect/testing";
 import { generatorFileSystemLive } from "create-relkit";
-import ts from "typescript";
+import ts from "../../src/typescript-parser.js";
 import { CliFileSystem } from "../../src/services/filesystem.service.js";
 import { CliModules } from "../../src/services/modules.service.js";
 import { CliProcess } from "../../src/services/process.service.js";
@@ -22,6 +22,7 @@ import { runDoctorEffect } from "../../src/commands/doctor.js";
 import { CliStartNative } from "../../src/commands/start-native.service.js";
 import { waitForStartHealthEffect } from "../../src/commands/start-health.js";
 import { testFiles } from "../read-services/test-files.js";
+import { runtime } from "../../src/runtime/index.js";
 
 it.effect("collects ordered checks using the same live domain with deterministic authority", () =>
   Effect.gen(function* () {
@@ -69,7 +70,8 @@ it.effect("collects ordered checks using the same live domain with deterministic
     );
     expect(report.ok).toBe(true);
     expect(report.checks.map((check) => check.name)).toEqual([
-      "bun",
+      // The runtime check is named after the runtime the CLI runs on.
+      runtime.name,
       "typescript",
       "relkit-packages",
       "config",

@@ -154,8 +154,8 @@ async function configureProductFixture(root: string): Promise<void> {
     agentPath,
     agent
       .replace(
-        'import { defineAgent } from "@relkit/langchain";',
-        'import { defineAgent } from "@relkit/langchain";\nimport { createTestModel } from "@relkit/langchain/testing";',
+        'import { langchain } from "@relkit/langchain";',
+        'import { langchain } from "@relkit/langchain";\nimport { createTestModel } from "@relkit/langchain/testing";',
       )
       .replace(
         /const fixtureModel = \{[\s\S]*?\} as never;/,

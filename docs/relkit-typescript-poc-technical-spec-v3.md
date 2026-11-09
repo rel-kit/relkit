@@ -83,7 +83,7 @@ construct Layers
 understand fibers
 ```
 
-The public schema boundary accepts Standard Schema-compatible schemas. The scaffold uses `@relkit/schema`; it is not Effect Schema.
+The public schema boundary accepts Standard Schema-compatible schemas. The scaffold uses `relkit/schema`; it is not Effect Schema.
 
 ### 2.4 Pulumi is the deployment decision
 
@@ -446,20 +446,20 @@ templates/
 
 | Package           | Responsibility                                                   |
 | ----------------- | ---------------------------------------------------------------- |
-| `@relkit/app`       | `defineApp` and re-exports for common descriptor factories       |
-| `@relkit/schema`    | supported schema builder plus Standard Schema bridge             |
-| `@relkit/config`    | environment declaration DSL                                      |
-| `@relkit/functions` | function, error, and reference contracts                         |
-| `@relkit/routes`    | HTTP route declaration and mapping DSL                           |
-| `@relkit/jobs`      | job and schedule declarations                                    |
-| `@relkit/events`    | event contracts, selectors, `onEvent`, and publishing references |
-| `@relkit/buckets`   | logical bucket declarations                                      |
-| `@relkit/cache`     | typed cache declarations                                         |
-| `@relkit/tools`     | function-to-tool declarations                                    |
-| `@relkit/agents`    | agent declarations and model profiles                            |
+| `relkit`       | `defineApp` and re-exports for common descriptor factories       |
+| `relkit/schema`    | supported schema builder plus Standard Schema bridge             |
+| `relkit/config`    | environment declaration DSL                                      |
+| `relkit/functions` | function, error, and reference contracts                         |
+| `relkit/routes`    | HTTP route declaration and mapping DSL                           |
+| `relkit/jobs`      | job and schedule declarations                                    |
+| `relkit/events`    | event contracts, selectors, `onEvent`, and publishing references |
+| `relkit/buckets`   | logical bucket declarations                                      |
+| `relkit/cache`     | typed cache declarations                                         |
+| `relkit/tools`     | function-to-tool declarations                                    |
+| `relkit/agents`    | agent declarations and model profiles                            |
 | `@relkit/testing`   | application test harness and provider fakes                      |
 
-`@relkit/app` SHOULD re-export the common surface so a generated project normally needs only:
+`relkit` SHOULD re-export the common surface so a generated project normally needs only:
 
 ```ts
 import {
@@ -473,27 +473,27 @@ import {
   defineCache,
   defineTool,
   defineAgent,
-} from "@relkit/app";
+} from "relkit";
 ```
 
 ### 6.3 Internal packages
 
 | Package                 | Responsibility                                                       |
 | ----------------------- | -------------------------------------------------------------------- |
-| `@relkit/contracts`       | JSON values, branded IDs, source locations, versioned protocol types |
-| `@relkit/diagnostics`     | structured errors and warnings                                       |
-| `@relkit/graph`           | normalized graph schema, hashing, sorting, compatibility diff        |
-| `@relkit/compiler`        | discovery, evaluation, normalization, code generation                |
-| `@relkit/engine`          | invocation protocol, lifecycle, concurrency, cancellation            |
-| `@relkit/runtime-effect`  | Effect runtime, Layers, internal error causes, loggers, tracing      |
-| `@relkit/runtime-hono`    | graph-driven Hono materialization                                    |
-| `@relkit/providers-local` | local bucket, cache, jobs, events, and fake model providers          |
-| `@relkit/observability`   | request records, logs, traces, storage, query protocol               |
-| `@relkit/supervisor`      | candidate generation, readiness, switching, draining                 |
-| `@relkit/inspector-api`   | versioned inspector HTTP/SSE protocol                                |
-| `@relkit/deploy`          | provider-neutral deployment plan                                     |
-| `@relkit/deploy-pulumi`   | Pulumi Automation API integration                                    |
-| `@relkit/cloud-aws`       | AWS runtime providers and Pulumi resource mapping                    |
+| `relkit/contracts`       | JSON values, branded IDs, source locations, versioned protocol types |
+| `relkit/diagnostics`     | structured errors and warnings                                       |
+| `relkit/graph`           | normalized graph schema, hashing, sorting, compatibility diff        |
+| `@relkit/cli/compiler`        | discovery, evaluation, normalization, code generation                |
+| `relkit/engine`          | invocation protocol, lifecycle, concurrency, cancellation            |
+| `relkit/runtime-effect`  | Effect runtime, Layers, internal error causes, loggers, tracing      |
+| `relkit/runtime-hono`    | graph-driven Hono materialization                                    |
+| `relkit/providers-local` | local bucket, cache, jobs, events, and fake model providers          |
+| `relkit/observability`   | request records, logs, traces, storage, query protocol               |
+| `@relkit/cli/supervisor`      | candidate generation, readiness, switching, draining                 |
+| `relkit/inspector-api`   | versioned inspector HTTP/SSE protocol                                |
+| `relkit/deploy`          | provider-neutral deployment plan                                     |
+| `@relkit/pulumi/deploy-pulumi`   | Pulumi Automation API integration                                    |
+| `@relkit/aws/cloud-aws`       | AWS runtime providers and Pulumi resource mapping                    |
 | `@relkit/cli`             | `relkit` commands and terminal UX                                      |
 | `create-relkit`           | new-project generator                                                |
 
@@ -505,7 +505,7 @@ These dependencies are hidden behind RelKit packages in generated applications:
 | -------------------------------------------- | ----------------------------------------------------------------- |
 | `effect`                                     | internal execution, lifecycle, logs, tracing, config, concurrency |
 | `hono`                                       | internal HTTP runtime                                             |
-| `zod` or equivalent supported implementation | `@relkit/schema` default builder                                    |
+| `zod` or equivalent supported implementation | `relkit/schema` default builder                                    |
 | `typescript`                                 | compiler AST, type checks, declaration emission                   |
 | `next`, `react`, `react-dom`                 | inspector application                                             |
 | `@pulumi/pulumi`                             | deployment engine and Automation API                              |
@@ -577,7 +577,7 @@ export interface RelkitSchema<TInput = unknown, TOutput = TInput> {
 The official scaffold uses:
 
 ```ts
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 ```
 
 Other Standard Schema-compatible libraries MAY be accepted if RelKit can obtain or generate the required JSON Schema. Effect Schema is not required or exposed by the scaffold.
@@ -1038,7 +1038,7 @@ Internal package tests MAY use Effect directly.
 Every generated project contains `src/env.ts`:
 
 ```ts
-import { defineEnv, env } from "@relkit/config";
+import { defineEnv, env } from "relkit/config";
 
 export default defineEnv({
   RELKIT_ENV: env.literal("development", "test", "production").default("development"),
@@ -1144,7 +1144,7 @@ Concrete providers are selected globally in `src/app.ts`. Resource descriptors d
 
 ```ts
 // src/app.ts
-import { defineApp, localProviders, testProviders, awsProviders } from "@relkit/app";
+import { defineApp, localProviders, testProviders, awsProviders } from "relkit";
 import env from "./env";
 
 export default defineApp({
@@ -1626,8 +1626,8 @@ The command classifies changes as informational, compatible, potentially breakin
 
 ```ts
 // src/functions/orders/create-order.function.ts
-import { defineError, defineFunction } from "@relkit/app";
-import { z } from "@relkit/schema";
+import { defineError, defineFunction } from "relkit";
+import { z } from "relkit/schema";
 import { orderCreated } from "../../events/orders/order-created.event";
 import { sendReceiptJob } from "../../jobs/receipts/send-receipt.job";
 import { priceCache } from "../../cache/prices.cache";
@@ -1781,7 +1781,7 @@ createTestRuntime.describe(app, "orders.create", ({ runtime, fakes }) => {
 
 ```ts
 // src/routes/orders/create-order.route.ts
-import { defineRoute, http } from "@relkit/app";
+import { defineRoute, http } from "relkit";
 import { createOrder } from "../../functions/orders/create-order.function";
 
 export default defineRoute({
@@ -1830,7 +1830,7 @@ Arbitrary mapping closures are excluded because they cannot be represented in th
 
 ### 14.3 Hono materialization
 
-`@relkit/runtime-hono`:
+`relkit/runtime-hono`:
 
 1. sorts routes by deterministic precedence;
 2. creates a Hono application;
@@ -1914,8 +1914,8 @@ A job is a typed queue contract that targets a function. It provides asynchronou
 
 ```ts
 // src/jobs/receipts/send-receipt.job.ts
-import { defineJob } from "@relkit/app";
-import { z } from "@relkit/schema";
+import { defineJob } from "relkit";
+import { z } from "relkit/schema";
 import { sendReceipt } from "../../functions/receipts/send-receipt.function";
 
 export const SendReceiptInput = z.object({
@@ -2073,8 +2073,8 @@ files.uploaded
 
 ```ts
 // src/events/orders/order-created.event.ts
-import { defineEvent } from "@relkit/app";
-import { z } from "@relkit/schema";
+import { defineEvent } from "relkit";
+import { z } from "relkit/schema";
 
 export const orderCreated = defineEvent({
   id: "orders.created",
@@ -2131,7 +2131,7 @@ The event provider validates the payload before acceptance.
 
 ```ts
 // src/events/orders/send-receipt-on-order-created.event.ts
-import { onEvent } from "@relkit/app";
+import { onEvent } from "relkit";
 import { orderCreated } from "./order-created.event";
 import { sendReceiptFromEvent } from "../../functions/receipts/send-receipt-from-event.function";
 
@@ -2286,7 +2286,7 @@ no subscription descriptor is emitted
 
 ```ts
 // src/buckets/assets.bucket.ts
-import { defineBucket } from "@relkit/app";
+import { defineBucket } from "relkit";
 
 export const assets = defineBucket({
   id: "assets",
@@ -2353,8 +2353,8 @@ Providers MUST enforce declared object size and content-type policy. The runtime
 
 ```ts
 // src/cache/prices.cache.ts
-import { defineCache } from "@relkit/app";
-import { z } from "@relkit/schema";
+import { defineCache } from "relkit";
+import { z } from "relkit/schema";
 
 export const priceCache = defineCache({
   id: "prices",
@@ -2450,7 +2450,7 @@ A tool contains no separate handler. It exposes a function to an agent runtime w
 
 ```ts
 // src/tools/orders/get-order.tool.ts
-import { defineTool } from "@relkit/app";
+import { defineTool } from "relkit";
 import { getOrder } from "../../functions/orders/get-order.function";
 
 export default defineTool({
@@ -2496,8 +2496,8 @@ The inspector uses this classification when showing tool approval prompts.
 
 ```ts
 // src/agents/support/order-support.agent.ts
-import { defineAgent } from "@relkit/app";
-import { z } from "@relkit/schema";
+import { defineAgent } from "relkit";
+import { z } from "relkit/schema";
 import getOrderTool from "../../tools/orders/get-order.tool";
 
 export default defineAgent({
@@ -3069,9 +3069,9 @@ my-app/
     "deploy": "relkit deploy up"
   },
   "dependencies": {
-    "@relkit/app": "<compatible-version>",
-    "@relkit/config": "<compatible-version>",
-    "@relkit/schema": "<compatible-version>"
+    "relkit": "<compatible-version>",
+    "relkit/config": "<compatible-version>",
+    "relkit/schema": "<compatible-version>"
   },
   "devDependencies": {
     "@types/bun": "<compatible-version>",
@@ -3087,7 +3087,7 @@ Version placeholders are resolved by the generator; they are not left in the pro
 ### 21.7 Generated `src/env.ts`
 
 ```ts
-import { defineEnv, env } from "@relkit/config";
+import { defineEnv, env } from "relkit/config";
 
 export default defineEnv({
   RELKIT_ENV: env.literal("development", "test", "production").default("development"),
@@ -3100,7 +3100,7 @@ export default defineEnv({
 ### 21.8 Generated `src/app.ts`
 
 ```ts
-import { defineApp, localProviders, testProviders, awsProviders } from "@relkit/app";
+import { defineApp, localProviders, testProviders, awsProviders } from "relkit";
 import env from "./env";
 
 export default defineApp({
@@ -3131,8 +3131,8 @@ The default production block is intentionally minimal. Managed capabilities add 
 
 ```ts
 // src/functions/hello.function.ts
-import { defineFunction } from "@relkit/app";
-import { z } from "@relkit/schema";
+import { defineFunction } from "relkit";
+import { z } from "relkit/schema";
 
 export const hello = defineFunction({
   id: "hello",
@@ -3156,7 +3156,7 @@ export default hello;
 
 ```ts
 // src/routes/hello.route.ts
-import { defineRoute, http } from "@relkit/app";
+import { defineRoute, http } from "relkit";
 import { hello } from "../functions/hello.function";
 
 export default defineRoute({
@@ -3309,7 +3309,7 @@ The plan contains no Pulumi `Input` or `Output` values.
 
 ### 22.3 Generated Pulumi program
 
-`@relkit/deploy-pulumi` converts the deployment plan into a Pulumi program. Generated files may be materialized under:
+`@relkit/pulumi/deploy-pulumi` converts the deployment plan into a Pulumi program. Generated files may be materialized under:
 
 ```text
 .relkit/generated/pulumi/
@@ -3333,7 +3333,7 @@ A source file rename must not replace a cloud resource when the stable descripto
 
 ### 22.5 Pulumi component structure
 
-`@relkit/cloud-aws` SHOULD define reusable component resources:
+`@relkit/aws/cloud-aws` SHOULD define reusable component resources:
 
 ```text
 RelkitNetwork
@@ -4257,7 +4257,7 @@ canonical JSON requirements
 1. Implement `JsonValue` guards and canonical serializer.
 2. Implement stable ID validation and normalization without deriving IDs from paths.
 3. Define source locations relative to project root.
-4. Expose a familiar `z` builder from `@relkit/schema`.
+4. Expose a familiar `z` builder from `relkit/schema`.
 5. Accept any Standard Schema-compatible object through a bridge.
 6. Implement deterministic JSON Schema generation with stable property ordering.
 7. Fail clearly when a third-party schema cannot provide the information needed for OpenAPI.

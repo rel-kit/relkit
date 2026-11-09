@@ -1,5 +1,5 @@
-import { defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 
 const handler = defineFunction({
   id: "types.http-handler-boundary",

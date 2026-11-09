@@ -38,7 +38,7 @@ export const generatedBrowserProject = Effect.gen(function* () {
         "@langchain/langgraph",
         join(repository, "integrations/packages/langchain/node_modules/@langchain/langgraph"),
       ],
-      ["@ag-ui/core", join(repository, "packages/runtime-hono/node_modules/@ag-ui/core")],
+      ["@ag-ui/core", join(repository, "packages/relkit/node_modules/@ag-ui/core")],
       ["@types/bun", join(repository, "node_modules/@types/bun")],
     ]) {
       await mkdir(dirname(join(root, "node_modules", name)), { recursive: true });

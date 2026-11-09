@@ -57,9 +57,8 @@ test("separates identity, integration, transport protection, and business author
   expect(read("better-auth")).toContain("not an `({ env })` factory");
   expect(read("sessions")).toContain("not an application-wide identity cache");
   expect(read("sessions")).toContain("resolves to `null`");
-  expect(read("protect-routes")).toContain(
-    "mounted auth base path and its descendants remain reachable",
-  );
+  expect(read("protect-routes")).toContain("Auth endpoints never require a session");
+  expect(read("protect-routes")).toContain('Set `auth: "required"` on each function route');
   expect(read("protect-routes")).toContain("not every direct invocation");
   expect(read("clients")).toContain("`trustedOrigins` is not CORS");
   expect(read("clients")).toContain("does **not** enable Better Auth bearer-token support");
@@ -69,7 +68,7 @@ test("separates identity, integration, transport protection, and business author
 });
 test("teaches a migrated existing-app flow without hard-coded server secrets", async () => {
   const tutorial = read("first-auth");
-  expect(tutorial).toContain("existing RELKIT app");
+  expect(tutorial).toContain("existing RelKit app");
   for (const path of [
     "relkit.config.ts",
     "drizzle.config.ts",
@@ -80,7 +79,7 @@ test("teaches a migrated existing-app flow without hard-coded server secrets", a
     "src/services/account/functions/session.function.ts",
     "src/routes/session/route.ts",
     "src/routes/account/profile/route.ts",
-    "src/routes/api/auth/[[...auth]]/route.ts",
+    "src/services/auth/better-auth.ts",
   ])
     expect(tutorial).toContain(`examples/auth-drizzle/${path}`);
   for (const operation of ["sign-up/email", "sign-in/email", "sign-out", "account/profile"]) {

@@ -2,7 +2,7 @@ import type {
   FunctionRegistry,
   FunctionRegistryOptions,
   LoadedRuntimeIntegrationModule,
-} from "@relkit/engine";
+} from "relkit/engine";
 
 /** Compiled graph, registry and native integration evidence acquired by an application. */
 export interface TestApplicationArtifacts {

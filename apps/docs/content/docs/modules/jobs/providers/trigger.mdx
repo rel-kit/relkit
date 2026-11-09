@@ -4,9 +4,10 @@ description: Configure Trigger.dev for an Orders CSV task and check worker publi
 pagination: false
 sidebar:
   icon: workflow
+labs: true
 ---
 
-Trigger.dev needs a project, environment API key, and published worker generation alongside the RELKIT job binding. This page shows the RELKIT side and the exact
+Trigger.dev needs a project, environment API key, and published worker generation alongside the RelKit job binding. This page shows the RelKit side and the exact
 registration checks; it is a compatibility guide, not a passing setup tutorial. For a
 verified local run today, use [Inngest](/docs/modules/jobs/providers/inngest) or
 [Effect MQ](/docs/modules/jobs/providers/effect-mq).
@@ -18,7 +19,7 @@ verified local run today, use [Inngest](/docs/modules/jobs/providers/inngest) or
 
 ## Configure an existing app
 
-The `--jobs trigger-docker` creation tuple is currently rejected before staging because its native
+The `--jobs trigger-docker` creation combination is currently rejected before staging because its native
 and timing evidence is incomplete. Begin with an existing project and install the selected adapter,
 native SDK and Docker materializer before applying the configuration below:
 
@@ -44,12 +45,12 @@ Trigger's [official Docker Compose setup](https://trigger.dev/docs/self-hosting/
 runs a webapp, database, Redis, and worker supervisor. After bringing that stack up, an
 operator creates a project, obtains a development environment API key, configures the SDK
 base URL and key, and deploys a worker containing the task before triggering a run. These
-are provider-side steps; the RELKIT binding above does not replace them. The generated
-`trigger-docker` recipe instead starts a pinned webapp image with PostgreSQL and a RELKIT
+are provider-side steps; the RelKit binding above does not replace them. The generated
+`trigger-docker` recipe instead starts a pinned webapp image with PostgreSQL and a RelKit
 worker, generates a random `projectRef` and `secretKey`, and passes them to the SDK. It does
 not create those credentials in Trigger.dev or publish a worker generation. Its pinned
 webapp also fails its current environment and port configuration. Running the official
-Compose stack separately does **not** make this generated RELKIT profile compatible by
+Compose stack separately does **not** make this generated RelKit profile compatible by
 itself. The adapter currently imports `@trigger.dev/sdk/v3`; Trigger's
 [self-hosting guidance](https://trigger.dev/docs/self-hosting/overview) says 4.5.0 is the
 last server release supporting v3 tasks. The server, SDK, task publication, and project
@@ -125,8 +126,8 @@ return `orderCount: 2`, `totalCents: 2100`, and CSV line totals `900` and `1200`
 
 ## Check the local profile before submitting
 
-The task source can pass RELKIT checks, but these commands are a diagnostic gate. If
-`local status` reports an unhealthy provider, stop here; a RELKIT `jobs list` result only
+The task source can pass RelKit checks, but these commands are a diagnostic gate. If
+`local status` reports an unhealthy provider, stop here; a RelKit `jobs list` result only
 proves that the compiler discovered the job, not that Trigger.dev registered it.
 
 ```sh title="Terminal — relkit-trigger"
@@ -139,7 +140,7 @@ docker ps --filter name=service-trigger --format '{{.Names}} {{.Status}} {{.Port
 
 If the Trigger container exits, stop here and inspect its logs. If a future compatibility
 fix makes the provider and worker ready, start `bun run dev`, then use `jobs list` to
-confirm RELKIT discovered `exportOrders`, then submit the input. An accepted receipt is
+confirm RelKit discovered `exportOrders`, then submit the input. An accepted `runId` is
 only an enqueueing signal. Require **all three** before claiming the integration works:
 the task appears in Trigger.dev's project dashboard, its native run reaches `COMPLETED`,
 and the run output includes `orderCount: 2` and `totalCents: 2100`.
@@ -154,14 +155,14 @@ bun run relkit jobs runs get --run-id <runId>
 Replace `<runId>` with the accepted handle only if submission succeeds. Compare it with the
 native Trigger.dev run ID and worker logs. No screenshot of a completed native run is shown
 here because this profile did not reach that state in a fresh app. A screenshot of
-`jobs list`, an accepted receipt, or a healthy Docker container would not prove that the
+`jobs list`, an accepted `runId`, or a healthy Docker container would not prove that the
 task was published and executed.
 
 **Current verification limit:** The local-source task passes `check` and `typecheck`, but
 the pinned Trigger image requires service environment variables absent from the current
 recipe and listens on a different port. Once the image was cached, `local up` briefly
 reported healthy while the Trigger container exited. Adding the SDK manually allowed the
-RELKIT backend to start during a diagnostic run, but submission returned an unknown outcome
+RelKit backend to start during a diagnostic run, but submission returned an unknown outcome
 and the worker never became ready. We therefore have **no proof** that this task was
 registered with Trigger.dev or executed there. This provider's runtime compatibility remains
 **unverified** in the [capability evidence](/docs/modules/jobs/providers). Do not rely on

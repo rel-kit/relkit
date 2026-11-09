@@ -1,6 +1,6 @@
 # Deployment
 
-RELKIT deployment is generated from the checked application graph. Pulumi is the
+RelKit deployment is generated from the checked application graph. Pulumi is the
 first deployment engine and AWS ECS is the first host, but engine, host,
 application infrastructure, access, and runtime wiring are separate roles.
 

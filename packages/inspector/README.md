@@ -1,6 +1,6 @@
 # @relkit/inspector
 
-The standalone RELKIT development inspector owns its UI, collector and local
+The standalone RelKit development inspector owns its UI, collector and local
 diagnostic history. The backend and `@relkit/cli` run independently of this package.
 It requires Bun 1.3.10 or newer and Node.js 20.9.0 or newer.
 
@@ -9,7 +9,7 @@ It requires Bun 1.3.10 or newer and Node.js 20.9.0 or newer.
 Select inspection explicitly in the application's `relkit.config.ts`:
 
 ```ts
-import { defineApp, defineEnv } from "@relkit/app/config";
+import { defineApp, defineEnv } from "relkit/config";
 
 export default defineApp({ env: defineEnv({}), inspector: { enabled: true } });
 ```

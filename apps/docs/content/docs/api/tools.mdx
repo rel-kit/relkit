@@ -1,6 +1,6 @@
 ---
 title: Tools API
-description: Generated public TypeScript reference for @relkit/tools.
+description: Generated public TypeScript reference for relkit/tools.
 search:
   exclude: true
 sidebar:
@@ -16,6 +16,53 @@ sidebar:
 For configuration and examples, read [tools](/docs/modules/ai/tools), [organization](/docs/modules/service/organization), [ai](/docs/modules/ai).
 
 For a complete workflow, follow [build an offline agent](/guides/ai/build-an-offline-agent).
+
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### defineTool
+
+Defines a frozen, handler-free tool view over one function.
+
+**Throws**
+
+TypeError for malformed target, metadata, or ID.
+
+**Example**
+
+```ts
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
+import { defineTool } from "relkit/tools";
+const lookup = defineFunction({
+  id: "orders.lookup",
+  input: z.string(),
+  output: z.string(),
+  handler: (id) => id,
+});
+const tool = defineTool({
+  id: "orders.lookup-tool",
+  target: lookup,
+  description: "Read order",
+  sideEffect: "read",
+  approval: "never",
+});
+```
+
+**Signature**
+
+```ts
+declare const defineTool: <const Id extends string, const Target extends FunctionRefAny>(
+  options: DefineToolOptions<Id, Target>,
+) => ToolDescriptor<Id, Target>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L137)
+
+Since v0.1.0
+
+## Complete reference
 
 <include>/_snippets/generated/exports/tools.mdx</include>
 
@@ -41,7 +88,7 @@ assertToolDescriptor(value);
 declare const assertToolDescriptor: (value: unknown) => asserts value is ToolDescriptor<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-predicates.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-predicates.ts#L78)
 
 ### assertToolDescriptorEffect
 
@@ -61,7 +108,7 @@ declare const assertToolDescriptorEffect: (
 ) => Effect.Effect<ToolDescriptor<string>, ToolOperationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-predicates.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-predicates.ts#L54)
 
 ### isToolDescriptor
 
@@ -79,7 +126,7 @@ if (isToolDescriptor(value)) await value.invoke({});
 declare const isToolDescriptor: (value: unknown) => value is ToolDescriptor<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-predicates.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-predicates.ts#L45)
 
 ### isToolDescriptorEffect
 
@@ -97,7 +144,7 @@ Effect.runSync(isToolDescriptorEffect(tool));
 declare const isToolDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-predicates.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-predicates.ts#L19)
 
 ### isToolRef
 
@@ -115,7 +162,7 @@ isToolRef({ ref: { kind: "tool", id: "orders.lookup" } });
 declare const isToolRef: (value: unknown) => value is ToolRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-predicates.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-predicates.ts#L102)
 
 ### isToolRefEffect
 
@@ -133,7 +180,7 @@ Effect.runSync(isToolRefEffect({ ref: { kind: "tool", id: "orders.lookup" } }));
 declare const isToolRefEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-predicates.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-predicates.ts#L87)
 
 ## `define-tool-validation.ts`
 
@@ -159,7 +206,7 @@ declare const copyFunctionTarget: <Target extends FunctionRefAny>(
 ) => FunctionToolTarget<Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L75)
 
 ### copyFunctionTargetEffect
 
@@ -179,7 +226,7 @@ declare const copyFunctionTargetEffect: <Target extends FunctionRefAny>(
 ) => Effect.Effect<FunctionToolTarget<Target>, ToolOperationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L36)
 
 ### hasOwn
 
@@ -189,7 +236,7 @@ declare const copyFunctionTargetEffect: <Target extends FunctionRefAny>(
 declare const hasOwn: (value: object, key: PropertyKey) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L15)
 
 ### hasOwnEffect
 
@@ -202,7 +249,7 @@ declare const hasOwnEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L16)
 
 ### isFunctionTarget
 
@@ -211,10 +258,10 @@ declare const hasOwnEffect: (
 ```ts
 declare const isFunctionTarget: (
   value: unknown,
-) => value is import("@relkit/functions").FunctionRefAny;
+) => value is import("../functions/index.js").FunctionRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L17)
 
 ### isFunctionTargetEffect
 
@@ -224,7 +271,7 @@ declare const isFunctionTarget: (
 declare const isFunctionTargetEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L18)
 
 ### isNonEmptyString
 
@@ -234,7 +281,7 @@ declare const isFunctionTargetEffect: (value: unknown) => Effect.Effect<boolean,
 declare const isNonEmptyString: (value: unknown) => value is string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L19)
 
 ### isNonEmptyStringEffect
 
@@ -244,7 +291,7 @@ declare const isNonEmptyString: (value: unknown) => value is string;
 declare const isNonEmptyStringEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L20)
 
 ### isPositiveInteger
 
@@ -254,7 +301,7 @@ declare const isNonEmptyStringEffect: (value: unknown) => Effect.Effect<boolean,
 declare const isPositiveInteger: (value: unknown) => value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L21)
 
 ### isPositiveIntegerEffect
 
@@ -264,7 +311,7 @@ declare const isPositiveInteger: (value: unknown) => value is number;
 declare const isPositiveIntegerEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L22)
 
 ### isRecord
 
@@ -274,7 +321,7 @@ declare const isPositiveIntegerEffect: (value: unknown) => Effect.Effect<boolean
 declare const isRecord: (value: unknown) => value is Record<PropertyKey, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L23)
 
 ### isRecordEffect
 
@@ -284,7 +331,7 @@ declare const isRecord: (value: unknown) => value is Record<PropertyKey, unknown
 declare const isRecordEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L24)
 
 ### isToolApproval
 
@@ -296,7 +343,7 @@ declare const isToolApproval: (
 ) => value is import("./define-tool.types.js").ToolApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L25)
 
 ### isToolApprovalEffect
 
@@ -306,7 +353,7 @@ declare const isToolApproval: (
 declare const isToolApprovalEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L26)
 
 ### isToolSideEffect
 
@@ -318,7 +365,7 @@ declare const isToolSideEffect: (
 ) => value is import("./define-tool.types.js").ToolSideEffect;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L27)
 
 ### isToolSideEffectEffect
 
@@ -328,7 +375,7 @@ declare const isToolSideEffect: (
 declare const isToolSideEffectEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L28)
 
 ### positiveInteger
 
@@ -350,7 +397,7 @@ positiveInteger(5, "timeoutMs");
 declare const positiveInteger: (value: unknown, name: string) => asserts value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L180)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L180)
 
 ### positiveIntegerEffect
 
@@ -371,7 +418,7 @@ declare const positiveIntegerEffect: (
 ) => Effect.Effect<number, ToolOperationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L162)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L162)
 
 ### requiredText
 
@@ -393,7 +440,7 @@ requiredText(" read ", "description");
 declare const requiredText: (value: unknown, name: string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L152)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L152)
 
 ### requiredTextEffect
 
@@ -414,7 +461,7 @@ declare const requiredTextEffect: (
 ) => Effect.Effect<string, ToolOperationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L137)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L137)
 
 ### validateApproval
 
@@ -436,7 +483,7 @@ validateApproval("never");
 declare const validateApproval: (value: unknown) => ToolApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L127)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L127)
 
 ### validateApprovalEffect
 
@@ -456,7 +503,7 @@ declare const validateApprovalEffect: (
 ) => Effect.Effect<FunctionToolApproval, ToolOperationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L111)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L111)
 
 ### validateSideEffect
 
@@ -478,7 +525,7 @@ validateSideEffect("read");
 declare const validateSideEffect: (value: unknown) => ToolSideEffect;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L102)
 
 ### validateSideEffectEffect
 
@@ -498,50 +545,9 @@ declare const validateSideEffectEffect: (
 ) => Effect.Effect<FunctionToolSideEffect, ToolOperationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool-validation.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool-validation.ts#L86)
 
 ## `define-tool.ts`
-
-### defineTool
-
-Defines a frozen, handler-free tool view over one function.
-
-**Throws**
-
-TypeError for malformed target, metadata, or ID.
-
-**Example**
-
-```ts
-import { defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
-import { defineTool } from "@relkit/tools";
-const lookup = defineFunction({
-  id: "orders.lookup",
-  input: z.string(),
-  output: z.string(),
-  handler: (id) => id,
-});
-const tool = defineTool({
-  id: "orders.lookup-tool",
-  target: lookup,
-  description: "Read order",
-  sideEffect: "read",
-  approval: "never",
-});
-```
-
-**Signature**
-
-```ts
-declare const defineTool: <const Id extends string, const Target extends FunctionRefAny>(
-  options: DefineToolOptions<Id, Target>,
-) => ToolDescriptor<Id, Target>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L137)
-
-Since v0.1.0
 
 ### "./define-tool.types.js" (namespace export)
 
@@ -553,7 +559,7 @@ Re-exports all named exports from the "./define-tool.types.js" module.
 export * from "./define-tool.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L29)
 
 ### ToolApprovalDeniedError
 
@@ -563,7 +569,7 @@ export * from "./define-tool.types.js";
 declare const ToolApprovalDeniedError: typeof FunctionToolApprovalDeniedError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L39)
 
 ### ToolApprovalRequiredError
 
@@ -573,7 +579,7 @@ declare const ToolApprovalDeniedError: typeof FunctionToolApprovalDeniedError;
 declare const ToolApprovalRequiredError: typeof FunctionToolApprovalRequiredError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L40)
 
 ### ToolArgumentValidationError
 
@@ -583,7 +589,7 @@ declare const ToolApprovalRequiredError: typeof FunctionToolApprovalRequiredErro
 declare const ToolArgumentValidationError: typeof FunctionToolArgumentValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L41)
 
 ### ToolOperationCancelledError
 
@@ -593,7 +599,7 @@ declare const ToolArgumentValidationError: typeof FunctionToolArgumentValidation
 declare const ToolOperationCancelledError: typeof FunctionToolOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L42)
 
 ### assertToolDescriptor
 
@@ -603,7 +609,7 @@ declare const ToolOperationCancelledError: typeof FunctionToolOperationCancelled
 declare const assertToolDescriptor: (value: unknown) => asserts value is ToolDescriptor<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L31)
 
 ### assertToolDescriptorEffect
 
@@ -615,7 +621,7 @@ declare const assertToolDescriptorEffect: (
 ) => Effect.Effect<ToolDescriptor<string>, ToolOperationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L32)
 
 ### defineToolEffect
 
@@ -643,7 +649,7 @@ declare const defineToolEffect: <const Id extends string, const Target extends F
 ) => Effect.Effect<ToolDescriptor<Id, Target>, ToolOperationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L50)
 
 ### isToolDescriptor
 
@@ -653,7 +659,7 @@ declare const defineToolEffect: <const Id extends string, const Target extends F
 declare const isToolDescriptor: (value: unknown) => value is ToolDescriptor<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L33)
 
 ### isToolDescriptorEffect
 
@@ -663,7 +669,7 @@ declare const isToolDescriptor: (value: unknown) => value is ToolDescriptor<stri
 declare const isToolDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L34)
 
 ### isToolRef
 
@@ -673,7 +679,7 @@ declare const isToolDescriptorEffect: (value: unknown) => Effect.Effect<boolean,
 declare const isToolRef: (value: unknown) => value is ToolRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L35)
 
 ### isToolRefEffect
 
@@ -683,7 +689,7 @@ declare const isToolRef: (value: unknown) => value is ToolRefAny;
 declare const isToolRefEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.ts#L36)
 
 ## `define-tool.types.ts`
 
@@ -712,16 +718,16 @@ export interface DefineToolOptions<
 > extends FunctionToolMetadata {
   readonly id?: Id;
   readonly target: Target;
-  readonly onBefore?: import("@relkit/functions").FunctionToolHook<
-    import("@relkit/schema").InferInput<Target["input"]>
+  readonly onBefore?: import("../functions/index.js").FunctionToolHook<
+    import("../schema/index.js").InferInput<Target["input"]>
   >;
-  readonly onAfter?: import("@relkit/functions").FunctionToolHook<
-    import("@relkit/schema").InferOutput<Target["output"]>
+  readonly onAfter?: import("../functions/index.js").FunctionToolHook<
+    import("../schema/index.js").InferOutput<Target["output"]>
   >;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.types.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.types.ts#L51)
 
 ### ToolApproval (type alias)
 
@@ -733,7 +739,7 @@ Approval policy inherited from a function tool.
 type ToolApproval = FunctionToolApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.types.ts#L17)
 
 ### ToolApprovalDecision (type alias)
 
@@ -745,7 +751,7 @@ Decision returned by a tool approval resolver.
 type ToolApprovalDecision = FunctionToolApprovalDecision;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.types.ts#L19)
 
 ### ToolApprovalRequest (type alias)
 
@@ -757,7 +763,7 @@ Request passed to a tool approval resolver.
 type ToolApprovalRequest = FunctionToolApprovalRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.types.ts#L21)
 
 ### ToolApprovalResolver (type alias)
 
@@ -769,7 +775,7 @@ Resolver for tool approval requests.
 type ToolApprovalResolver = FunctionToolApprovalResolver;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.types.ts#L23)
 
 ### ToolDescriptor (type alias)
 
@@ -790,7 +796,7 @@ type ToolDescriptor<
 > = FunctionToolDescriptor<Id, Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.types.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.types.ts#L43)
 
 ### ToolInvokeOptions (type alias)
 
@@ -802,7 +808,7 @@ Options for invoking the function view of a tool.
 type ToolInvokeOptions = FunctionToolInvokeOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.types.ts#L25)
 
 ### ToolRef (interface)
 
@@ -822,7 +828,7 @@ export interface ToolRef<Id extends string = string> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.types.ts#L30)
 
 ### ToolRefAny (type alias)
 
@@ -834,7 +840,7 @@ Any stable tool reference.
 type ToolRefAny = ToolRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.types.ts#L35)
 
 ### ToolSideEffect (type alias)
 
@@ -846,7 +852,7 @@ Effect policy inherited from a function tool.
 type ToolSideEffect = FunctionToolSideEffect;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.types.ts#L15)
 
 ### ToolTarget (type alias)
 
@@ -864,7 +870,7 @@ const copied: ToolTarget<typeof target> = copyFunctionTarget(target);
 type ToolTarget<Target extends FunctionRefAny> = FunctionToolTarget<Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/define-tool.types.ts#L39)
 
 ## `index.ts`
 
@@ -878,7 +884,7 @@ Re-exports all named exports from the "./define-tool.js" module.
 export * from "./define-tool.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/index.ts#L1)
 
 ### "./runtime.js" (namespace export)
 
@@ -890,7 +896,7 @@ Re-exports all named exports from the "./runtime.js" module.
 export * from "./runtime.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/index.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/index.ts#L2)
 
 ### ToolOperation
 
@@ -900,7 +906,7 @@ export * from "./runtime.js";
 declare const ToolOperation: ToolOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/index.ts#L9)
 
 ### ToolOperationFailure
 
@@ -910,7 +916,7 @@ declare const ToolOperation: ToolOperation;
 declare const ToolOperationFailure: typeof ToolOperationFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/index.ts#L4)
 
 ### ToolTelemetry
 
@@ -920,7 +926,7 @@ declare const ToolOperationFailure: typeof ToolOperationFailure;
 declare const ToolTelemetry: typeof ToolTelemetry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/index.ts#L5)
 
 ### ToolTelemetryLive
 
@@ -930,7 +936,7 @@ declare const ToolTelemetry: typeof ToolTelemetry;
 declare const ToolTelemetryLive: Layer<ToolTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/index.ts#L6)
 
 ### ToolTelemetryService
 
@@ -940,7 +946,7 @@ declare const ToolTelemetryLive: Layer<ToolTelemetry, never, never>;
 declare const ToolTelemetryService: ToolTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/index.ts#L9)
 
 ### observeTool
 
@@ -953,7 +959,7 @@ declare const observeTool: <A, E, R>(
 ) => Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/index.ts#L7)
 
 ## `runtime-engine.ts`
 
@@ -977,7 +983,7 @@ ToolEngineLive({ invoke: async ({ input }) => input });
 declare const ToolEngineLive: (engine: ToolEngine) => Layer.Layer<ToolEngineService, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-engine.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-engine.ts#L30)
 
 ### ToolEngineLiveEffect
 
@@ -997,7 +1003,7 @@ declare const ToolEngineLiveEffect: (
 ) => Effect.Effect<Layer.Layer<ToolEngineService, never, never>, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-engine.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-engine.ts#L17)
 
 ### ToolEngineService (class)
 
@@ -1015,7 +1021,7 @@ Effect.provide(invokeToolEffect(request), ToolEngineLive(engine));
 declare class ToolEngineService
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-engine.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-engine.ts#L8)
 
 ## `runtime-errors.ts`
 
@@ -1027,7 +1033,7 @@ declare class ToolEngineService
 declare const ToolArgumentValidationError: typeof ToolArgumentValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-errors.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-errors.ts#L71)
 
 ### ToolArgumentsFailure (class)
 
@@ -1045,7 +1051,7 @@ Effect.catchTag(invokeToolEffect(request), "ToolArgumentsFailure", () => Effect.
 declare class ToolArgumentsFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-errors.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-errors.ts#L50)
 
 ### ToolCancelledFailure (class)
 
@@ -1063,7 +1069,7 @@ Effect.catchTag(invokeToolEffect(request), "ToolCancelledFailure", () => Effect.
 declare class ToolCancelledFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-errors.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-errors.ts#L58)
 
 ### ToolEngineFailure (class)
 
@@ -1081,7 +1087,7 @@ Effect.catchTag(invokeToolEffect(request), "ToolEngineFailure", () => Effect.voi
 declare class ToolEngineFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-errors.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-errors.ts#L66)
 
 ### ToolNotAllowedError (class)
 
@@ -1099,7 +1105,7 @@ throw new ToolNotAllowedError("orders.delete");
 declare class ToolNotAllowedError { constructor(readonly toolId: string) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-errors.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-errors.ts#L22)
 
 ### code (property)
 
@@ -1109,7 +1115,7 @@ declare class ToolNotAllowedError { constructor(readonly toolId: string) }
 readonly code: "RELKIT_TOOL_NOT_ALLOWED"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-errors.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-errors.ts#L23)
 
 ### ToolNotAllowedFailure (class)
 
@@ -1127,7 +1133,7 @@ Effect.catchTag(invokeToolEffect(request), "ToolNotAllowedFailure", () => Effect
 declare class ToolNotAllowedFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-errors.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-errors.ts#L42)
 
 ### ToolOperationCancelledError
 
@@ -1137,7 +1143,7 @@ declare class ToolNotAllowedFailure
 declare const ToolOperationCancelledError: typeof ToolOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-errors.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-errors.ts#L71)
 
 ### ToolUnknownError (class)
 
@@ -1155,7 +1161,7 @@ throw new ToolUnknownError("orders.missing");
 declare class ToolUnknownError { constructor(readonly toolId: string) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-errors.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-errors.ts#L10)
 
 ### code (property)
 
@@ -1165,7 +1171,7 @@ declare class ToolUnknownError { constructor(readonly toolId: string) }
 readonly code: "RELKIT_TOOL_UNKNOWN"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-errors.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-errors.ts#L11)
 
 ### ToolUnknownFailure (class)
 
@@ -1183,7 +1189,7 @@ Effect.catchTag(invokeToolEffect(request), "ToolUnknownFailure", () => Effect.vo
 declare class ToolUnknownFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-errors.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-errors.ts#L34)
 
 ## `runtime-input.ts`
 
@@ -1205,7 +1211,7 @@ declare const parseToolArgumentsEffect: (
 ) => Effect.Effect<unknown, ToolArgumentsFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-input.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-input.ts#L11)
 
 ### validateToolArgumentsEffect
 
@@ -1226,7 +1232,7 @@ declare const validateToolArgumentsEffect: (
 ) => Effect.Effect<void, ToolArgumentsFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-input.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-input.ts#L32)
 
 ## `runtime-resolution.ts`
 
@@ -1249,7 +1255,7 @@ declare const findToolEffect: (
 ) => Effect.Effect<any, ToolOperationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-resolution.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-resolution.ts#L64)
 
 ### isToolAllowedEffect
 
@@ -1270,7 +1276,7 @@ declare const isToolAllowedEffect: (
 ) => Effect.Effect<boolean, ToolOperationFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-resolution.ts#L89)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-resolution.ts#L92)
 
 ### resolveToolTarget
 
@@ -1292,7 +1298,7 @@ resolveToolTarget(tool);
 declare const resolveToolTarget: (tool: ToolDescriptor<string>) => ResolvedToolTarget;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-resolution.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-resolution.ts#L54)
 
 ### resolveToolTargetEffect
 
@@ -1319,7 +1325,7 @@ declare const resolveToolTargetEffect: (tool: ToolDescriptor<string>) => Effect.
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime-resolution.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime-resolution.ts#L17)
 
 ## `runtime.ts`
 
@@ -1333,7 +1339,7 @@ Re-exports all named exports from the "./runtime.types.js" module.
 export * from "./runtime.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L34)
 
 ### ToolArgumentValidationError
 
@@ -1343,7 +1349,7 @@ export * from "./runtime.types.js";
 declare const ToolArgumentValidationError: typeof FunctionToolArgumentValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L36)
 
 ### ToolArgumentsFailure
 
@@ -1353,7 +1359,7 @@ declare const ToolArgumentValidationError: typeof FunctionToolArgumentValidation
 declare const ToolArgumentsFailure: typeof ToolArgumentsFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L43)
 
 ### ToolCancelledFailure
 
@@ -1363,7 +1369,7 @@ declare const ToolArgumentsFailure: typeof ToolArgumentsFailure;
 declare const ToolCancelledFailure: typeof ToolCancelledFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L42)
 
 ### ToolEngineFailure
 
@@ -1373,7 +1379,7 @@ declare const ToolCancelledFailure: typeof ToolCancelledFailure;
 declare const ToolEngineFailure: typeof ToolEngineFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L44)
 
 ### ToolEngineLive
 
@@ -1383,7 +1389,7 @@ declare const ToolEngineFailure: typeof ToolEngineFailure;
 declare const ToolEngineLive: (engine: ToolEngine) => Layer<ToolEngineService, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L46)
 
 ### ToolEngineLiveEffect
 
@@ -1395,7 +1401,7 @@ declare const ToolEngineLiveEffect: (
 ) => Effect.Effect<Layer<ToolEngineService, never, never>, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L46)
 
 ### ToolEngineService
 
@@ -1405,7 +1411,7 @@ declare const ToolEngineLiveEffect: (
 declare const ToolEngineService: typeof ToolEngineService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L46)
 
 ### ToolNotAllowedError
 
@@ -1415,7 +1421,7 @@ declare const ToolEngineService: typeof ToolEngineService;
 declare const ToolNotAllowedError: typeof ToolNotAllowedError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L39)
 
 ### ToolNotAllowedFailure
 
@@ -1425,7 +1431,7 @@ declare const ToolNotAllowedError: typeof ToolNotAllowedError;
 declare const ToolNotAllowedFailure: typeof ToolNotAllowedFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L41)
 
 ### ToolOperationCancelledError
 
@@ -1435,7 +1441,7 @@ declare const ToolNotAllowedFailure: typeof ToolNotAllowedFailure;
 declare const ToolOperationCancelledError: typeof ToolOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L37)
 
 ### ToolUnknownError
 
@@ -1445,7 +1451,7 @@ declare const ToolOperationCancelledError: typeof ToolOperationCancelledError;
 declare const ToolUnknownError: typeof ToolUnknownError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L38)
 
 ### ToolUnknownFailure
 
@@ -1455,7 +1461,7 @@ declare const ToolUnknownError: typeof ToolUnknownError;
 declare const ToolUnknownFailure: typeof ToolUnknownFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L40)
 
 ### createToolRuntime
 
@@ -1477,7 +1483,7 @@ const runtime = createToolRuntime({ tools: [tool], engine });
 declare const createToolRuntime: (options: ToolRuntimeOptions) => ToolRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L179)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L179)
 
 ### createToolRuntimeEffect
 
@@ -1498,7 +1504,7 @@ declare const createToolRuntimeEffect: (
 ) => Effect.Effect<ToolRuntime, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L152)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L152)
 
 ### invokeTool
 
@@ -1520,7 +1526,7 @@ await invokeTool({ tools: [tool], engine, toolId: "orders.lookup", arguments: {}
 declare const invokeTool: (options: ToolRuntimeOptions & ToolEffectOptions) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L142)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L142)
 
 ### invokeToolEffect
 
@@ -1557,7 +1563,7 @@ declare const invokeToolEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L57)
 
 ### resolveToolTarget
 
@@ -1567,7 +1573,7 @@ declare const invokeToolEffect: (
 declare const resolveToolTarget: (tool: ToolDescriptor<string>) => ResolvedToolTarget;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L47)
 
 ### resolveToolTargetEffect
 
@@ -1586,7 +1592,7 @@ declare const resolveToolTargetEffect: (tool: ToolDescriptor<string>) => Effect.
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.ts#L47)
 
 ## `runtime.types.ts`
 
@@ -1611,7 +1617,7 @@ export interface ResolvedToolTarget {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.types.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.types.ts#L102)
 
 ### ToolAllowlistEntry (type alias)
 
@@ -1629,7 +1635,7 @@ const allowed: ToolAllowlistEntry = "orders.lookup.tool";
 type ToolAllowlistEntry = string | ToolRefAny | ToolRefAny["ref"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.types.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.types.ts#L46)
 
 ### ToolEffectOptions (type alias)
 
@@ -1647,7 +1653,7 @@ const request: ToolEffectOptions = { tools: [tool], toolId: tool.id, arguments: 
 type ToolEffectOptions = Omit<ToolRuntimeOptions, "engine"> & ToolInvocationRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.types.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.types.ts#L60)
 
 ### ToolEngine (interface)
 
@@ -1672,7 +1678,7 @@ export interface ToolEngine {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.types.ts#L27)
 
 ### ToolEngineInvocation (interface)
 
@@ -1709,7 +1715,7 @@ export interface ToolEngineInvocation {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.types.ts#L9)
 
 ### ToolInvocationContext (interface)
 
@@ -1729,7 +1735,7 @@ export interface ToolInvocationContext {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.types.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.types.ts#L77)
 
 ### ToolInvocationRequest (interface)
 
@@ -1754,7 +1760,7 @@ export interface ToolInvocationRequest {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.types.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.types.ts#L65)
 
 ### ToolRuntime (interface)
 
@@ -1785,7 +1791,7 @@ export interface ToolRuntime {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.types.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.types.ts#L84)
 
 ### ToolRuntimeOptions (interface)
 
@@ -1807,7 +1813,7 @@ export interface ToolRuntimeOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.types.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.types.ts#L51)
 
 ### ToolSource (type alias)
 
@@ -1828,7 +1834,7 @@ type ToolSource =
   | Readonly<Record<string, ToolDescriptor<string>>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/runtime.types.ts#L39)
 
 ## `tool-observability.ts`
 
@@ -1840,7 +1846,7 @@ type ToolSource =
 declare const ToolOperation: ToolOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-observability.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L12)
 
 ### ToolOperationFailure (class)
 
@@ -1858,7 +1864,7 @@ Effect.catchTag(defineToolEffect(options), "ToolOperationFailure", () => Effect.
 declare class ToolOperationFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-observability.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L17)
 
 ### ToolTelemetry (class)
 
@@ -1876,7 +1882,7 @@ Effect.provide(defineToolEffect(options), ToolTelemetryLive);
 declare class ToolTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-observability.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L25)
 
 ### ToolTelemetryLive
 
@@ -1894,7 +1900,7 @@ Effect.runSync(Effect.provide(Effect.void, ToolTelemetryLive));
 declare const ToolTelemetryLive: Layer.Layer<ToolTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-observability.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L38)
 
 ### ToolTelemetryService
 
@@ -1904,7 +1910,7 @@ declare const ToolTelemetryLive: Layer.Layer<ToolTelemetry, never, never>;
 declare const ToolTelemetryService: ToolTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-observability.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L12)
 
 ### observeTool
 
@@ -1925,7 +1931,7 @@ declare const observeTool: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-observability.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L46)
 
 ### runToolPromise
 
@@ -1947,7 +1953,7 @@ await runToolPromise(Effect.succeed(1));
 declare const runToolPromise: <A, E>(effect: Effect.Effect<A, E>) => Promise<A>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-observability.ts#L96)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L96)
 
 ### runToolSync
 
@@ -1969,7 +1975,7 @@ runToolSync(Effect.succeed(1));
 declare const runToolSync: <A, E>(effect: Effect.Effect<A, E>) => A;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-observability.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L82)
 
 ### toolAttempt
 
@@ -1990,7 +1996,7 @@ declare const toolAttempt: <A>(
 ) => Effect.Effect<A, ToolOperationFailure>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-observability.ts#L142)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L142)
 
 ### toolTry
 
@@ -2011,7 +2017,7 @@ declare const toolTry: <A>(
 ) => Effect.Effect<A, ToolOperationFailure>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-observability.ts#L129)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.ts#L129)
 
 ## `tool-observability.types.ts`
 
@@ -2051,7 +2057,7 @@ type ToolOperation =
   | "create-runtime";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-observability.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.types.ts#L6)
 
 ### ToolTelemetryService (interface)
 
@@ -2074,7 +2080,7 @@ export interface ToolTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-observability.types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-observability.types.ts#L29)
 
 ## `tool-predicates.ts`
 
@@ -2094,7 +2100,7 @@ hasOwn({ id: 1 }, "id");
 declare const hasOwn: (value: object, key: PropertyKey) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-predicates.ts#L136)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-predicates.ts#L136)
 
 ### hasOwnEffect
 
@@ -2115,7 +2121,7 @@ declare const hasOwnEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-predicates.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-predicates.ts#L123)
 
 ### isFunctionTarget
 
@@ -2132,10 +2138,10 @@ isFunctionTarget(target);
 ```ts
 declare const isFunctionTarget: (
   value: unknown,
-) => value is import("@relkit/functions").FunctionRefAny;
+) => value is import("../functions/index.js").FunctionRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-predicates.ts#L167)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-predicates.ts#L167)
 
 ### isFunctionTargetEffect
 
@@ -2153,7 +2159,7 @@ Effect.runSync(isFunctionTargetEffect(target));
 declare const isFunctionTargetEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-predicates.ts#L145)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-predicates.ts#L145)
 
 ### isNonEmptyString
 
@@ -2171,7 +2177,7 @@ isNonEmptyString("hello");
 declare const isNonEmptyString: (value: unknown) => value is string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-predicates.ts#L92)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-predicates.ts#L92)
 
 ### isNonEmptyStringEffect
 
@@ -2189,7 +2195,7 @@ Effect.runSync(isNonEmptyStringEffect("hello"));
 declare const isNonEmptyStringEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-predicates.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-predicates.ts#L80)
 
 ### isPositiveInteger
 
@@ -2207,7 +2213,7 @@ isPositiveInteger(2);
 declare const isPositiveInteger: (value: unknown) => value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-predicates.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-predicates.ts#L71)
 
 ### isPositiveIntegerEffect
 
@@ -2225,7 +2231,7 @@ Effect.runSync(isPositiveIntegerEffect(2));
 declare const isPositiveIntegerEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-predicates.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-predicates.ts#L59)
 
 ### isRecord
 
@@ -2243,7 +2249,7 @@ isRecord({ id: 1 });
 declare const isRecord: (value: unknown) => value is Record<PropertyKey, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-predicates.ts#L113)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-predicates.ts#L113)
 
 ### isRecordEffect
 
@@ -2261,7 +2267,7 @@ Effect.runSync(isRecordEffect({ id: 1 }));
 declare const isRecordEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-predicates.ts#L101)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-predicates.ts#L101)
 
 ### isToolApproval
 
@@ -2281,7 +2287,7 @@ declare const isToolApproval: (
 ) => value is import("./define-tool.types.js").ToolApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-predicates.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-predicates.ts#L48)
 
 ### isToolApprovalEffect
 
@@ -2299,7 +2305,7 @@ Effect.runSync(isToolApprovalEffect("never"));
 declare const isToolApprovalEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-predicates.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-predicates.ts#L36)
 
 ### isToolSideEffect
 
@@ -2319,7 +2325,7 @@ declare const isToolSideEffect: (
 ) => value is import("./define-tool.types.js").ToolSideEffect;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-predicates.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-predicates.ts#L25)
 
 ### isToolSideEffectEffect
 
@@ -2337,4 +2343,4 @@ Effect.runSync(isToolSideEffectEffect("read"));
 declare const isToolSideEffectEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/tool-predicates.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/tools/tool-predicates.ts#L11)

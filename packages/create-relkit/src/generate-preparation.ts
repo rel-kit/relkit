@@ -1,16 +1,20 @@
 /**
- * Materializes, installs and validates a private creation stage. Finite dev
- * --prepare owns one full check and reuses it for bundling; creation publishes
- * only after its complete snapshot is durable. No development listener or
- * support process is started here.
+ * Materializes, installs and validates a private creation stage. The finite
+ * `relkit dev --prepare` checks the project; creation publishes only after it
+ * passes. No development listener or support process is started here.
  */
 
 import { join } from "node:path";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import type { CreateOptions } from "./options.js";
 import type { GenerateProjectContext } from "./generate-types.js";
 import { GeneratorProcess } from "./generator-process.js";
+import {
+  creationPackageManager,
+  packageManagerCommands,
+  type PackageManagerName,
+} from "./package-manager.js";
 import { resolveTemplateRootEffect } from "./template-root.js";
 import { prepareProjectDependencyPatchEffect } from "./dependency-patches.js";
 import { domainTry } from "./generator-errors.js";
@@ -63,9 +67,10 @@ export const installGenerationStage = Effect.fn("ProjectGeneration.installStage"
   function* (stage: string, options: CreateOptions, context: GenerateProjectContext) {
     if (options.install) {
       context.onProgress?.("Installing dependencies...");
+      const manager = packageManagerCommands(creationPackageManager(options.packageManager));
       yield* runProjectStepEffect(
         context,
-        [context.bunExecutable ?? globalThis.process.execPath, "install"],
+        [yield* packageManagerExecutable(manager.name, context), ...manager.install],
         stage,
         "install",
         "install",
@@ -84,7 +89,7 @@ export const installGenerationStage = Effect.fn("ProjectGeneration.installStage"
   (effect) => observeExecution("generator", "generation.installStage", effect),
 );
 
-/** Checks prerequisites and prepares a snapshot from one source validation.
+/** Checks prerequisites and the project's source.
  * @param stage - Installed private project root.
  * @param options - Cloud/deployment options controlling existing doctor checks.
  * @param context - Native executable, progress and cancellation authority.
@@ -109,9 +114,8 @@ export const verifyGenerationStage = Effect.fn("ProjectGeneration.prepareStage")
       "doctor",
       "doctor",
     );
-    context.onProgress?.("Checking and preparing development snapshot...");
-    // Keep the existing check failure-injection contract. The finite command
-    // checks once and supplies its accepted result to snapshot preparation.
+    context.onProgress?.("Checking the project...");
+    // Keeps the existing check failure-injection contract; `dev --prepare` is the check.
     yield* runProjectStepEffect(
       context,
       [relkit, "dev", "--prepare", "--project-root", stage],
@@ -122,3 +126,20 @@ export const verifyGenerationStage = Effect.fn("ProjectGeneration.prepareStage")
   },
   (effect) => observeExecution("generator", "generation.prepareStage", effect),
 );
+
+/**
+ * Locates the selected package manager.
+ * @param manager - Selected package manager.
+ * @param context - Explicit Bun executable and injected command runner.
+ * @returns The running Bun for Bun under Bun, else the executable on `PATH`, else its name.
+ */
+const packageManagerExecutable = Effect.fn("ProjectGeneration.packageManager")(function* (
+  manager: PackageManagerName,
+  context: GenerateProjectContext,
+) {
+  if (manager === "bun" && context.bunExecutable !== undefined) return context.bunExecutable;
+  if (manager === "bun" && typeof globalThis.process.versions.bun === "string")
+    return globalThis.process.execPath;
+  if (context.commandRunner !== undefined) return manager;
+  return (yield* (yield* GeneratorProcess).which(manager)) ?? manager;
+});

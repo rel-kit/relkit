@@ -1,11 +1,10 @@
 /**
  * Narrows named Effect barrel imports during prepared-command packaging only.
  * Each accepted name is the same public namespace reexported by pinned Effect 4.0.1;
- * unsupported imports remain unchanged. Native Bun build owns every load callback,
- * and this adapter never edits installed or authored module files.
+ * unsupported imports remain unchanged. The Bun build plugin lives in
+ * `narrow-effect-imports.bun.ts`; nothing here edits installed or authored module files.
  */
-import { readFile } from "node:fs/promises";
-import ts from "typescript";
+import ts from "../typescript-parser.js";
 
 const namespaces = new Set([
   "Array",
@@ -103,35 +102,4 @@ export function narrowEffectImports(source: string, path: string): string {
   for (const replacement of replacements.reverse())
     result = result.slice(0, replacement.start) + replacement.text + result.slice(replacement.end);
   return result;
-}
-
-/**
- * Supplies a finite native loader transform to Bun's owned packaging operation.
- * @returns Plugin whose asynchronous reads settle before the enclosing build returns.
- */
-export function narrowEffectImportPlugin(): Bun.BunPlugin {
-  return {
-    name: "relkit-prepared-effect-owners",
-    setup(builder) {
-      builder.onLoad({ filter: /\.[cm]?[jt]sx?$/ }, async ({ path }) => {
-        const source = await readFile(path, "utf8");
-        const contents = narrowEffectImports(source, path);
-        if (contents === source) return undefined;
-        const loader = effectImportLoader(path);
-        return { contents, loader };
-      });
-    },
-  };
-}
-
-/**
- * Retains the input language after the finite import-only transform.
- * @param path - Native module filename supplied by Bun's loader.
- * @returns Exact supported loader; extensions outside TypeScript retain JavaScript behavior.
- */
-function effectImportLoader(path: string): "tsx" | "jsx" | "ts" | "js" {
-  if (path.endsWith(".tsx")) return "tsx";
-  if (path.endsWith(".jsx")) return "jsx";
-  if (path.endsWith(".ts")) return "ts";
-  return "js";
 }

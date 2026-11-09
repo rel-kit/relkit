@@ -5,7 +5,7 @@
  */
 import { expect } from "bun:test";
 import { Schema } from "effect";
-import type { JsonValue } from "../../packages/contracts/src/index.ts";
+import type { JsonValue } from "relkit/contracts";
 import type { FixtureCompilation } from "./fixture-runner.ts";
 import { CommerceLocalBindings, CommerceRuntimePackages } from "./commerce-example.schemas.ts";
 import { assertGuardedRuntimeImports } from "./runtime-import-assertions.ts";
@@ -30,8 +30,8 @@ export function assertCommerceArtifacts(run: FixtureCompilation): void {
     "provider.realtime.default",
   ]);
   assertRuntimeIntegrations(run);
-  expect(run.manifest).toContain('from "@relkit/app/internal/runtime";');
-  expect(run.manifest).toContain('from "@relkit/app/agents";');
+  expect(run.manifest).toContain('from "relkit/host";');
+  expect(run.manifest).toContain('from "relkit/agents";');
   expect(run.manifest).not.toMatch(/from "@relkit\/(?:agents|events|invocation)"/);
   expect(run.manifest).not.toContain("providerFactories");
   const graph = Schema.decodeUnknownSync(Schema.Json)(JSON.parse(run.graphBytes));

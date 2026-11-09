@@ -1,6 +1,6 @@
 ---
 title: Routes API
-description: Generated public TypeScript reference for @relkit/routes.
+description: Generated public TypeScript reference for relkit/routes.
 search:
   exclude: true
 sidebar:
@@ -16,251 +16,15 @@ sidebar:
 
 For configuration and examples, read [define](/docs/modules/http/define), [middleware](/docs/modules/http/middleware), [routes](/docs/modules/service/routes).
 
-For a complete workflow, follow [upload product images](/guides/storage/upload-product-images), [connect react](/guides/frontend/connect-react), [register users in a transaction](/guides/database/register-users-in-a-transaction), [email password sign in](/guides/auth/email-password-sign-in), [create and build an api](/guides/cli/create-and-build-an-api).
+For a complete workflow, follow [from express or hono](/guides/migrate/from-express-or-hono), [relkit 0 9](/guides/migrate/relkit-0-9), [upload product images](/guides/storage/upload-product-images), [connect react](/guides/frontend/connect-react), [register users in a transaction](/guides/database/register-users-in-a-transaction), [email password sign in](/guides/auth/email-password-sign-in), [create and build an api](/guides/cli/create-and-build-an-api).
 
 ## Frontend usage
 
 [Call a defined route](/docs/modules/http/define#use-from-the-frontend) shows the client side of this capability.
 
-<include>/_snippets/generated/exports/routes.mdx</include>
+## Most-used APIs
 
-## `define-middleware.ts`
-
-### defineMiddleware
-
-Defines one automatically discovered path-scoped HTTP middleware handler.
-
-**Throws**
-
-TypeError for an invalid path or handler.
-
-**Example**
-
-```ts
-import { defineMiddleware } from "@relkit/app/routes";
-
-export default defineMiddleware("/orders/*", async (context, next) => {
-  if (context.req.header("authorization") === undefined) {
-    return context.json({ error: "unauthorized" }, 401);
-  }
-  await next();
-});
-```
-
-**Signature**
-
-```ts
-declare const defineMiddleware: (
-  path: string,
-  handler: MiddlewareHandler,
-) => MiddlewareDescriptor<string>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L72)
-
-Since v0.1.0
-
-### MiddlewareContext
-
-**Signature**
-
-```ts
-declare const MiddlewareContext: MiddlewareContext;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L15)
-
-### MiddlewareDescriptor
-
-**Signature**
-
-```ts
-declare const MiddlewareDescriptor: MiddlewareDescriptor<Id>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L16)
-
-### MiddlewareHandler
-
-**Signature**
-
-```ts
-declare const MiddlewareHandler: MiddlewareHandler;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L17)
-
-### defineMiddlewareEffect
-
-Defines path-scoped middleware through a typed Effect.
-
-**Example**
-
-```ts
-Effect.runSync(defineMiddlewareEffect("/orders/*", handler));
-```
-
-**Signature**
-
-```ts
-declare const defineMiddlewareEffect: (
-  path: string,
-  handler: MiddlewareHandler,
-) => Effect.Effect<MiddlewareDescriptor<string>, RouteOperationError, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L26)
-
-### isMiddlewareDescriptor
-
-Checks a middleware descriptor synchronously.
-
-**Example**
-
-```ts
-isMiddlewareDescriptor(value);
-```
-
-**Signature**
-
-```ts
-declare const isMiddlewareDescriptor: (value: unknown) => value is MiddlewareDescriptor;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L94)
-
-### isMiddlewareDescriptorEffect
-
-Checks a middleware descriptor through Effect.
-
-**Example**
-
-```ts
-Effect.runSync(isMiddlewareDescriptorEffect(value));
-```
-
-**Signature**
-
-```ts
-declare const isMiddlewareDescriptorEffect: (
-  value: unknown,
-) => Effect.Effect<boolean, RouteOperationError, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L84)
-
-### isMiddlewarePath
-
-Checks a middleware path synchronously.
-
-**Example**
-
-```ts
-isMiddlewarePath("/orders/*");
-```
-
-**Signature**
-
-```ts
-declare const isMiddlewarePath: (value: unknown) => value is string;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L122)
-
-### isMiddlewarePathEffect
-
-Checks an HTTP middleware path through Effect.
-
-**Example**
-
-```ts
-Effect.runSync(isMiddlewarePathEffect("/orders/*"));
-```
-
-**Signature**
-
-```ts
-declare const isMiddlewarePathEffect: (
-  value: unknown,
-) => Effect.Effect<boolean, RouteOperationError, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L113)
-
-## `define-middleware.types.ts`
-
-### MiddlewareContext (interface)
-
-Invocation-scoped capabilities provided to middleware.
-
-**Example**
-
-```ts
-const context: MiddlewareContext = relkit;
-```
-
-**Signature**
-
-```ts
-export interface MiddlewareContext {
-  readonly signal: AbortSignal;
-  readonly env: ResolvedApplicationEnv;
-  readonly auth: AuthContext;
-  readonly log: PublicLogger;
-  readonly time: PublicClock;
-  readonly trace: PublicTrace;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.types.ts#L9)
-
-### MiddlewareDescriptor (interface)
-
-Frozen descriptor for one middleware handler.
-
-**Example**
-
-```ts
-const descriptor: MiddlewareDescriptor = defineMiddleware("/orders", handler);
-```
-
-**Signature**
-
-```ts
-export interface MiddlewareDescriptor<Id extends string = string> extends DescriptorBase<
-  "middleware",
-  Id
-> {
-  readonly path: string;
-  readonly handler: MiddlewareHandler;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.types.ts#L30)
-
-### MiddlewareHandler (type alias)
-
-A path-scoped HTTP middleware callback.
-
-**Example**
-
-```ts
-const handler: MiddlewareHandler = async (_context, next) => next();
-```
-
-**Signature**
-
-```ts
-type MiddlewareHandler = (
-  context: Context,
-  next: Next,
-  relkit: MiddlewareContext,
-) => MaybePromise<Response | void>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.types.ts#L21)
-
-## `define-route.ts`
+These entries carry each API's contract and example. The complete reference follows.
 
 ### defineRoute
 
@@ -281,9 +45,9 @@ TypeError for invalid authoring input.
 ````ts
 A GET route with inferred path and query input
 ```ts
-import { defineFunction } from "@relkit/app/functions"
-import { defineRoute } from "@relkit/app/routes"
-import { z } from "@relkit/app/schema"
+import { defineFunction } from "relkit/functions"
+import { defineRoute } from "relkit/routes"
+import { z } from "relkit/schema"
 
 const listOrders = defineFunction({
   id: "orders.list",
@@ -303,7 +67,7 @@ export const GET = defineRoute({ target: listOrders })
 declare const defineRoute: { <const Id extends string, const Handler extends RawRouteOptions<Id>["handler"]>(options: RawRouteOptions<Id, Handler>): RawRouteDescriptor<Id, Handler>; <const Id extends string, const Target extends FunctionRefAny, const Request extends HttpRequestMapping | undefined = undefined>(options: FunctionRouteOptions<Id, Target, Request>): FunctionRouteDescriptor<Id, Target, Request>; }
 ````
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L103)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-route.ts#L103)
 
 Since v0.1.0
 
@@ -323,6 +87,343 @@ Since v0.1.0
 
 <include>/_frontend/echo.mdx</include>
 
+### defineMiddleware
+
+Defines one automatically discovered path-scoped HTTP middleware handler.
+
+**Throws**
+
+TypeError for an invalid path or handler.
+
+**Example**
+
+```ts
+import { defineMiddleware } from "relkit/routes";
+
+export default defineMiddleware("/orders/*", async (context, next) => {
+  if (context.req.header("authorization") === undefined) {
+    return context.json({ error: "unauthorized" }, 401);
+  }
+  await next();
+});
+```
+
+**Signature**
+
+```ts
+declare const defineMiddleware: {
+  (path: string, handler: MiddlewareHandler): MiddlewareDescriptor<string>;
+  <const Schema extends StandardSchemaV1>(
+    path: string,
+    options: TypedMiddlewareOptions<Schema>,
+  ): MiddlewareDescriptor<string, ProvidedData<Schema>>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L104)
+
+Since v0.1.0
+
+## Complete reference
+
+<include>/_snippets/generated/exports/routes.mdx</include>
+
+## `define-middleware.ts`
+
+### MiddlewareContext
+
+**Signature**
+
+```ts
+declare const MiddlewareContext: MiddlewareContext<Provided>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L22)
+
+### MiddlewareDescriptor
+
+**Signature**
+
+```ts
+declare const MiddlewareDescriptor: MiddlewareDescriptor<Id, Provided>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L23)
+
+### MiddlewareHandler
+
+**Signature**
+
+```ts
+declare const MiddlewareHandler: MiddlewareHandler<Provided>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L24)
+
+### MiddlewareServices
+
+**Signature**
+
+```ts
+declare const MiddlewareServices: MiddlewareServices;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L25)
+
+### ProvidedData
+
+**Signature**
+
+```ts
+declare const ProvidedData: ProvidedData<Schema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L26)
+
+### TypedMiddlewareOptions
+
+**Signature**
+
+```ts
+declare const TypedMiddlewareOptions: TypedMiddlewareOptions<Schema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L27)
+
+### defineMiddlewareEffect
+
+Defines path-scoped middleware through a typed Effect.
+
+**Example**
+
+```ts
+Effect.runSync(defineMiddlewareEffect("/orders/*", handler));
+```
+
+**Signature**
+
+```ts
+declare const defineMiddlewareEffect: (
+  path: string,
+  definition: MiddlewareHandler | TypedMiddlewareOptions<StandardSchemaV1<unknown, unknown>>,
+) => Effect.Effect<MiddlewareDescriptor<string, any>, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L36)
+
+### isMiddlewareDescriptor
+
+Checks a middleware descriptor synchronously.
+
+**Example**
+
+```ts
+isMiddlewareDescriptor(value);
+```
+
+**Signature**
+
+```ts
+declare const isMiddlewareDescriptor: (value: unknown) => value is MiddlewareDescriptor;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L134)
+
+### isMiddlewareDescriptorEffect
+
+Checks a middleware descriptor through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isMiddlewareDescriptorEffect(value));
+```
+
+**Signature**
+
+```ts
+declare const isMiddlewareDescriptorEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L124)
+
+### isMiddlewarePath
+
+Checks a middleware path synchronously.
+
+**Example**
+
+```ts
+isMiddlewarePath("/orders/*");
+```
+
+**Signature**
+
+```ts
+declare const isMiddlewarePath: (value: unknown) => value is string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L162)
+
+### isMiddlewarePathEffect
+
+Checks an HTTP middleware path through Effect.
+
+**Example**
+
+```ts
+Effect.runSync(isMiddlewarePathEffect("/orders/*"));
+```
+
+**Signature**
+
+```ts
+declare const isMiddlewarePathEffect: (
+  value: unknown,
+) => Effect.Effect<boolean, RouteOperationError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L153)
+
+## `define-middleware.types.ts`
+
+### MiddlewareContext (interface)
+
+Invocation-scoped capabilities provided to middleware.
+
+**Example**
+
+```ts
+const context: MiddlewareContext = relkit;
+```
+
+**Signature**
+
+```ts
+export interface MiddlewareContext<Provided = never> {
+  /** Validates data against the middleware's `provides` schema and makes it available to
+   * routes through `http.from(middleware, field)`.
+   * @param data - Data for this request.
+   * @returns After validation; invalid data fails the request with a 500.
+   * @example await relkit.provide({ tenantId: "acme" });
+   */
+  readonly provide: (data: Provided) => Promise<void>;
+  readonly signal: AbortSignal;
+  readonly env: ResolvedApplicationEnv;
+  readonly auth: AuthContext;
+  readonly log: PublicLogger;
+  readonly time: PublicClock;
+  readonly trace: PublicTrace;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.types.ts#L10)
+
+### MiddlewareDescriptor (interface)
+
+Frozen descriptor for one middleware handler.
+
+**Example**
+
+```ts
+const descriptor: MiddlewareDescriptor = defineMiddleware("/orders", handler);
+```
+
+**Signature**
+
+```ts
+export interface MiddlewareDescriptor<
+  Id extends string = string,
+  Provided = never,
+> extends DescriptorBase<"middleware", Id> {
+  readonly path: string;
+  readonly handler: MiddlewareHandler<any>;
+  /** Schema of the data the middleware provides to `http.from`. */
+  readonly provides?: StandardSchemaV1;
+  /** Phantom type of the provided data, read by `http.from`. */
+  readonly __provides?: Provided;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.types.ts#L51)
+
+### MiddlewareHandler (type alias)
+
+A path-scoped HTTP middleware callback.
+
+**Example**
+
+```ts
+const handler: MiddlewareHandler = async (_context, next) => next();
+```
+
+**Signature**
+
+```ts
+type MiddlewareHandler<Provided = never> = (
+  context: Context,
+  next: Next,
+  relkit: MiddlewareContext<Provided>,
+) => MaybePromise<Response | void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.types.ts#L34)
+
+### MiddlewareServices (type alias)
+
+Request-scoped services a host supplies to middleware; RelKit adds `provide`.
+
+**Example**
+
+```ts
+const services: MiddlewareServices = { signal, env, auth, log, time, trace };
+```
+
+**Signature**
+
+```ts
+type MiddlewareServices = Omit<MiddlewareContext<never>, "provide">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.types.ts#L29)
+
+### ProvidedData (type alias)
+
+Provided data type of a schema, for typed middleware descriptors.
+
+**Signature**
+
+```ts
+type ProvidedData<Schema extends StandardSchemaV1> = InferOutput<Schema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.types.ts#L64)
+
+### TypedMiddlewareOptions (interface)
+
+Typed middleware: a schema for the data it provides and its handler.
+
+**Example**
+
+```ts
+const options: TypedMiddlewareOptions<typeof tenant> = { provides: tenant, handler };
+```
+
+**Signature**
+
+```ts
+export interface TypedMiddlewareOptions<Schema extends StandardSchemaV1> {
+  readonly provides: Schema;
+  readonly handler: MiddlewareHandler<InferInput<Schema>>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.types.ts#L43)
+
+## `define-route.ts`
+
 ### "./route.types.js" (namespace export)
 
 Re-exports all named exports from the "./route.types.js" module.
@@ -333,7 +434,7 @@ Re-exports all named exports from the "./route.types.js" module.
 export * from "./route.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-route.ts#L20)
 
 ### defineRouteEffect
 
@@ -362,7 +463,7 @@ declare const defineRouteEffect: {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-route.ts#L55)
 
 ## `define-service-routes.ts`
 
@@ -382,7 +483,7 @@ declare const SERVICE_ROUTE_METHODS: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L26)
 
 ### ServiceRouteEntry
 
@@ -392,7 +493,7 @@ declare const SERVICE_ROUTE_METHODS: readonly [
 declare const ServiceRouteEntry: ServiceRouteEntry<Service>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L21)
 
 ### ServiceRouteMethod
 
@@ -402,7 +503,17 @@ declare const ServiceRouteEntry: ServiceRouteEntry<Service>;
 declare const ServiceRouteMethod: ServiceRouteMethod;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L18)
+
+### ServiceRouteMethodMarker
+
+**Signature**
+
+```ts
+declare const ServiceRouteMethodMarker: ServiceRouteMethodMarker<Method>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L19)
 
 ### ServiceRouteOptions
 
@@ -412,7 +523,7 @@ declare const ServiceRouteMethod: ServiceRouteMethod;
 declare const ServiceRouteOptions: ServiceRouteOptions<Name, Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L20)
 
 ### ServiceRoutesOptions
 
@@ -424,7 +535,7 @@ declare const ServiceRoutesOptions: Partial<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L22)
 
 ### ServiceRoutesResult
 
@@ -442,11 +553,12 @@ declare const ServiceRoutesResult: Readonly<{
       FunctionRefAny
     >,
     EntryRequest<Options[Method]>
-  >;
+  > &
+    ServiceRouteMethodMarker<Method>;
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L23)
 
 ### defineServiceRoutes
 
@@ -474,7 +586,7 @@ declare const defineServiceRoutes: <
 ) => ServiceRoutesResult<Service, Options>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L83)
 
 #### Backend and frontend example
 
@@ -523,14 +635,15 @@ declare const defineServiceRoutesEffect: <
         FunctionRefAny
       >,
       EntryRequest<Options[Method]>
-    >;
+    > &
+      ServiceRouteMethodMarker<Method>;
   }>,
   RouteOperationError,
   never
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L42)
 
 ## `define-service-routes.types.ts`
 
@@ -553,7 +666,7 @@ type ServiceRouteEntry<Service> = {
 }[ServiceFunctionName<Service>];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L27)
 
 ### ServiceRouteMethod (type alias)
 
@@ -571,7 +684,29 @@ const method: ServiceRouteMethod = "GET";
 type ServiceRouteMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L9)
+
+### ServiceRouteMethodMarker (interface)
+
+Type-only record of the method a service route table created a descriptor for. The
+generated route module checks compare it with the export name, so plain `tsc` rejects
+`export const { GET: POST } = defineServiceRoutes(...)` without the editor plugin.
+
+**Example**
+
+```ts
+type Marker = ServiceRouteMethodMarker<"GET">;
+```
+
+**Signature**
+
+```ts
+export interface ServiceRouteMethodMarker<Method> {
+  readonly __relkit_service_route_method?: Method;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L56)
 
 ### ServiceRouteOptions (type alias)
 
@@ -592,7 +727,7 @@ type ServiceRouteOptions<Name extends string, Target extends FunctionRefAny> = O
 > & { readonly member: Name };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L19)
 
 ### ServiceRoutesOptions (type alias)
 
@@ -612,7 +747,7 @@ type ServiceRoutesOptions<Service> = Partial<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L35)
 
 ### ServiceRoutesResult (type alias)
 
@@ -632,11 +767,12 @@ type ServiceRoutesResult<Service, Options> = Readonly<{
     string,
     ServiceFunction<Service, Extract<EntryName<Options[Method]>, ServiceFunctionName<Service>>>,
     EntryRequest<Options[Method]>
-  >;
+  > &
+    ServiceRouteMethodMarker<Method>;
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.types.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L63)
 
 ## `http-dsl-mapping-validation.ts`
 
@@ -660,7 +796,7 @@ assertMapping(http.path("id"));
 declare const assertMapping: (value: unknown) => asserts value is HttpMappingNode;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-mapping-validation.ts#L80)
 
 ### assertMappingEffect
 
@@ -680,7 +816,7 @@ declare const assertMappingEffect: (
 ) => Effect.Effect<void, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-mapping-validation.ts#L70)
 
 ### assertMappingValue
 
@@ -702,7 +838,7 @@ assertMappingValue({ kind: "path", name: "id" });
 declare const assertMappingValue: (value: unknown) => asserts value is HttpMappingNode;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L89)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-mapping-validation.ts#L90)
 
 ### assertRequestMapping
 
@@ -724,7 +860,7 @@ assertRequestMapping(http.input({}));
 declare const assertRequestMapping: (value: unknown) => asserts value is HttpRequestMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L130)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-mapping-validation.ts#L131)
 
 ### assertRequestMappingEffect
 
@@ -744,7 +880,7 @@ declare const assertRequestMappingEffect: (
 ) => Effect.Effect<void, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L120)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-mapping-validation.ts#L121)
 
 ### assertRequestMappingValue
 
@@ -766,7 +902,7 @@ assertRequestMappingValue({ kind: "input", fields: {} });
 declare const assertRequestMappingValue: (value: unknown) => asserts value is HttpRequestMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L140)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-mapping-validation.ts#L141)
 
 ### isHttpMapping
 
@@ -784,7 +920,7 @@ isHttpMapping(http.path("id"));
 declare const isHttpMapping: (value: unknown) => value is HttpMappingNode;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-mapping-validation.ts#L21)
 
 ### isHttpMappingEffect
 
@@ -804,7 +940,7 @@ declare const isHttpMappingEffect: (
 ) => Effect.Effect<boolean, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-mapping-validation.ts#L12)
 
 ### isHttpRequestMapping
 
@@ -822,7 +958,7 @@ isHttpRequestMapping(http.input({}));
 declare const isHttpRequestMapping: (value: unknown) => value is HttpRequestMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-mapping-validation.ts#L109)
 
 ### isHttpRequestMappingEffect
 
@@ -842,7 +978,7 @@ declare const isHttpRequestMappingEffect: (
 ) => Effect.Effect<boolean, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-mapping-validation.ts#L100)
 
 ### isMappingValue
 
@@ -860,7 +996,7 @@ isMappingValue(http.path("id"));
 declare const isMappingValue: (value: unknown) => value is HttpMappingNode;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-mapping-validation.ts#L149)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-mapping-validation.ts#L150)
 
 ## `http-dsl-methods.types.ts`
 
@@ -978,7 +1114,7 @@ export interface HttpDslMethods extends HttpDslSources {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-methods.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-methods.types.ts#L25)
 
 ## `http-dsl-operations.ts`
 
@@ -1075,7 +1211,7 @@ declare const httpEffects: {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-operations.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-operations.ts#L12)
 
 ## `http-dsl-response-validation.ts`
 
@@ -1099,7 +1235,7 @@ assertResponse(http.success(200));
 declare const assertResponse: (value: unknown) => HttpResponseMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-response-validation.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-response-validation.ts#L56)
 
 ### assertResponseEffect
 
@@ -1119,7 +1255,7 @@ declare const assertResponseEffect: (
 ) => Effect.Effect<HttpResponseMapping, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-response-validation.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-response-validation.ts#L46)
 
 ### assertResponseValue
 
@@ -1141,7 +1277,7 @@ assertResponseValue({ kind: "success", id: "success.200", status: 200 });
 declare const assertResponseValue: (value: unknown) => HttpResponseMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-response-validation.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-response-validation.ts#L66)
 
 ### isHttpResponseMapping
 
@@ -1159,7 +1295,7 @@ isHttpResponseMapping(http.success(200));
 declare const isHttpResponseMapping: (value: unknown) => value is HttpResponseMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-response-validation.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-response-validation.ts#L27)
 
 ### isHttpResponseMappingEffect
 
@@ -1179,7 +1315,7 @@ declare const isHttpResponseMappingEffect: (
 ) => Effect.Effect<boolean, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-response-validation.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-response-validation.ts#L18)
 
 ### isMiddlewareDecision
 
@@ -1197,7 +1333,7 @@ isMiddlewareDecision(http.continue());
 declare const isMiddlewareDecision: (value: unknown) => value is MiddlewareDecisionMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-response-validation.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-response-validation.ts#L85)
 
 ### isMiddlewareDecisionEffect
 
@@ -1217,7 +1353,7 @@ declare const isMiddlewareDecisionEffect: (
 ) => Effect.Effect<boolean, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-response-validation.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-response-validation.ts#L76)
 
 ## `http-dsl-source-operations.ts`
 
@@ -1277,7 +1413,7 @@ declare const httpSourceEffects: {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-source-operations.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-source-operations.ts#L9)
 
 ## `http-dsl-sources.types.ts`
 
@@ -1432,10 +1568,24 @@ export interface HttpDslSources {
    * @example http.multipartAll("files", { optional: true });
    */
   multipartAll(name: string, options: HttpSourceOptions): HttpMappingNode;
+  /** One field a typed middleware provides, validated by the middleware's `provides` schema.
+   * @param middleware - Middleware defined with `provides`.
+   * @param field - Field of the provided data.
+   * @returns A middleware source mapping; clients and OpenAPI never see it.
+   * @throws TypeError when the field name is empty.
+   * @example http.from(tenant, "tenantId");
+   */
+  from<
+    const Middleware extends { readonly __provides?: object },
+    const Field extends keyof ProvidedBy<Middleware> & string,
+  >(
+    middleware: Middleware,
+    field: Field,
+  ): HttpMiddlewareMapping<ProvidedBy<Middleware>[Field]>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-sources.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-sources.types.ts#L19)
 
 ## `http-dsl-validation.ts`
 
@@ -1449,7 +1599,7 @@ Re-exports all named exports from the "./http-dsl-mapping-validation.js" module.
 export * from "./http-dsl-mapping-validation.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-validation.ts#L2)
 
 ### "./http-dsl-response-validation.js" (namespace export)
 
@@ -1461,7 +1611,7 @@ Re-exports all named exports from the "./http-dsl-response-validation.js" module
 export * from "./http-dsl-response-validation.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-validation.ts#L3)
 
 ### "./http-dsl-value-validation.js" (namespace export)
 
@@ -1473,7 +1623,7 @@ Re-exports all named exports from the "./http-dsl-value-validation.js" module.
 export * from "./http-dsl-value-validation.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-validation.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-validation.ts#L1)
 
 ## `http-dsl-value-validation.ts`
 
@@ -1497,7 +1647,7 @@ assertSchema(schema, "response schema");
 declare const assertSchema: (value: unknown, name: string) => asserts value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-value-validation.ts#L55)
 
 ### assertSchemaEffect
 
@@ -1518,7 +1668,7 @@ declare const assertSchemaEffect: (
 ) => Effect.Effect<void, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-value-validation.ts#L43)
 
 ### assertSchemaValue
 
@@ -1543,7 +1693,7 @@ declare const assertSchemaValue: (
 ) => asserts value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-value-validation.ts#L66)
 
 ### isJsonValue
 
@@ -1561,7 +1711,7 @@ isJsonValue({ ok: true });
 declare const isJsonValue: (value: unknown) => value is JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L101)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-value-validation.ts#L101)
 
 ### isRecord
 
@@ -1579,7 +1729,7 @@ isRecord({});
 declare const isRecord: (value: unknown) => value is Record<string, any>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L132)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-value-validation.ts#L132)
 
 ### isRecordEffect
 
@@ -1599,7 +1749,7 @@ declare const isRecordEffect: (
 ) => Effect.Effect<boolean, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-value-validation.ts#L123)
 
 ### isRecordValue
 
@@ -1617,7 +1767,7 @@ isRecordValue({ kind: "path" });
 declare const isRecordValue: (value: unknown) => value is Record<string, any>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L140)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-value-validation.ts#L140)
 
 ### isSchema
 
@@ -1635,7 +1785,7 @@ isSchema(schema);
 declare const isSchema: (value: unknown) => value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-value-validation.ts#L21)
 
 ### isSchemaEffect
 
@@ -1655,7 +1805,7 @@ declare const isSchemaEffect: (
 ) => Effect.Effect<boolean, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-value-validation.ts#L12)
 
 ### isSchemaValue
 
@@ -1673,7 +1823,7 @@ isSchemaValue(z.string());
 declare const isSchemaValue: (value: unknown) => value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-value-validation.ts#L29)
 
 ### isStatus
 
@@ -1691,7 +1841,7 @@ isStatus(200);
 declare const isStatus: (value: unknown) => value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-value-validation.ts#L85)
 
 ### isStatusEffect
 
@@ -1711,7 +1861,7 @@ declare const isStatusEffect: (
 ) => Effect.Effect<boolean, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-value-validation.ts#L76)
 
 ### isStatusValue
 
@@ -1729,7 +1879,7 @@ isStatusValue(200);
 declare const isStatusValue: (value: unknown) => value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-value-validation.ts#L93)
 
 ### ownKeys
 
@@ -1747,7 +1897,7 @@ ownKeys({ kind: "continue" }, "kind");
 declare const ownKeys: (value: object, ...keys: string[]) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-value-validation.ts#L115)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-value-validation.ts#L115)
 
 ## `http-dsl-values.ts`
 
@@ -1761,7 +1911,7 @@ Internal pure constructors evaluated only inside the public Effect operations.
 declare const httpValue: HttpDsl;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-values.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-values.ts#L26)
 
 ### isTransformRefValue
 
@@ -1779,7 +1929,7 @@ isTransformRefValue({ ref: { kind: "transform", id: "x" }, schema });
 declare const isTransformRefValue: (value: unknown) => value is HttpTransformRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl-values.ts#L137)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl-values.ts#L138)
 
 ## `http-dsl.ts`
 
@@ -1793,7 +1943,7 @@ Re-exports all named exports from the "./http-dsl.types.js" module.
 export * from "./http-dsl.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L23)
 
 ### assertRequestMapping
 
@@ -1803,7 +1953,7 @@ export * from "./http-dsl.types.js";
 declare const assertRequestMapping: (value: unknown) => asserts value is HttpRequestMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L25)
 
 ### assertRequestMappingEffect
 
@@ -1815,7 +1965,7 @@ declare const assertRequestMappingEffect: (
 ) => Effect.Effect<void, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L26)
 
 ### assertResponse
 
@@ -1825,7 +1975,7 @@ declare const assertRequestMappingEffect: (
 declare const assertResponse: (value: unknown) => HttpResponseMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L27)
 
 ### assertResponseEffect
 
@@ -1837,57 +1987,7 @@ declare const assertResponseEffect: (
 ) => Effect.Effect<HttpResponseMapping, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L28)
-
-### defineRequestTransform
-
-Alias for request transform definitions.
-
-**Throws**
-
-TypeError for invalid transform input.
-
-**Example**
-
-```ts
-defineRequestTransform({ schema });
-```
-
-**Signature**
-
-```ts
-declare const defineRequestTransform: <
-  const Id extends string,
-  const Schema extends StandardSchemaV1,
->(
-  options: DefineTransformOptions<Id, Schema>,
-) => HttpTransformDescriptor<Id, Schema>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L84)
-
-### defineRequestTransformEffect
-
-Effect alias for request transform definitions.
-
-**Example**
-
-```ts
-Effect.runSync(defineRequestTransformEffect({ schema }));
-```
-
-**Signature**
-
-```ts
-declare const defineRequestTransformEffect: <
-  const Id extends string,
-  const Schema extends StandardSchemaV1,
->(
-  options: DefineTransformOptions<Id, Schema>,
-) => Effect.Effect<HttpTransformDescriptor<Id, Schema>, RouteOperationError, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L28)
 
 ### defineTransform
 
@@ -1911,7 +2011,7 @@ declare const defineTransform: <const Id extends string, const Schema extends St
 ) => HttpTransformDescriptor<Id, Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L72)
 
 ### defineTransformEffect
 
@@ -1934,7 +2034,7 @@ declare const defineTransformEffect: <
 ) => Effect.Effect<HttpTransformDescriptor<Id, Schema>, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L45)
 
 ### http
 
@@ -1952,7 +2052,7 @@ const request = http.input({ id: http.path("id") });
 declare const http: HttpDsl;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L131)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L116)
 
 ### httpEffects
 
@@ -2039,7 +2139,7 @@ declare const httpEffects: {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L38)
 
 ### isHttpMapping
 
@@ -2049,7 +2149,7 @@ declare const httpEffects: {
 declare const isHttpMapping: (value: unknown) => value is HttpMappingNode;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L29)
 
 ### isHttpMappingEffect
 
@@ -2061,7 +2161,7 @@ declare const isHttpMappingEffect: (
 ) => Effect.Effect<boolean, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L30)
 
 ### isHttpRequestMapping
 
@@ -2071,7 +2171,7 @@ declare const isHttpMappingEffect: (
 declare const isHttpRequestMapping: (value: unknown) => value is HttpRequestMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L31)
 
 ### isHttpRequestMappingEffect
 
@@ -2083,7 +2183,7 @@ declare const isHttpRequestMappingEffect: (
 ) => Effect.Effect<boolean, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L32)
 
 ### isHttpResponseMapping
 
@@ -2093,7 +2193,7 @@ declare const isHttpRequestMappingEffect: (
 declare const isHttpResponseMapping: (value: unknown) => value is HttpResponseMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L33)
 
 ### isHttpResponseMappingEffect
 
@@ -2105,7 +2205,7 @@ declare const isHttpResponseMappingEffect: (
 ) => Effect.Effect<boolean, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L34)
 
 ### isMiddlewareDecision
 
@@ -2115,7 +2215,7 @@ declare const isHttpResponseMappingEffect: (
 declare const isMiddlewareDecision: (value: unknown) => value is MiddlewareDecisionMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L35)
 
 ### isMiddlewareDecisionEffect
 
@@ -2127,7 +2227,7 @@ declare const isMiddlewareDecisionEffect: (
 ) => Effect.Effect<boolean, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L36)
 
 ### isTransformRef
 
@@ -2145,7 +2245,7 @@ isTransformRef(transform);
 declare const isTransformRef: (value: unknown) => value is HttpTransformRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L108)
 
 ### isTransformRefEffect
 
@@ -2165,7 +2265,7 @@ declare const isTransformRefEffect: (
 ) => Effect.Effect<boolean, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.ts#L114)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.ts#L99)
 
 ## `http-dsl.types.ts`
 
@@ -2179,7 +2279,7 @@ Re-exports all named exports from the "./http-mapping.types.js" module.
 export * from "./http-mapping.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.types.ts#L6)
 
 ### ContinueMapping (interface)
 
@@ -2199,7 +2299,7 @@ export interface ContinueMapping {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.types.ts#L75)
 
 ### DefineTransformOptions (interface)
 
@@ -2223,7 +2323,7 @@ export interface DefineTransformOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.types.ts#L54)
 
 ### HttpDsl (interface)
 
@@ -2241,7 +2341,7 @@ const request = http.input({ id: http.path("id") });
 export interface HttpDsl extends HttpDslMethods {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.types.ts#L94)
 
 ### HttpMethod (type alias)
 
@@ -2259,7 +2359,7 @@ const method: HttpMethod = "GET";
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS" | "ALL";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.types.ts#L11)
 
 ### HttpRequestContentType (type alias)
 
@@ -2277,7 +2377,7 @@ const accept: HttpRequestContentType = "application/json";
 type HttpRequestContentType = "application/json" | "multipart/form-data";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.types.ts#L15)
 
 ### HttpResponseMapping (interface)
 
@@ -2301,7 +2401,7 @@ export interface HttpResponseMapping {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.types.ts#L65)
 
 ### HttpTransformDescriptor (interface)
 
@@ -2325,7 +2425,7 @@ export interface HttpTransformDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.types.ts#L36)
 
 ### HttpTransformRef (interface)
 
@@ -2349,7 +2449,7 @@ export interface HttpTransformRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.types.ts#L26)
 
 ### MiddlewareDecisionMapping (type alias)
 
@@ -2367,7 +2467,7 @@ const decision: MiddlewareDecisionMapping = http.continue();
 type MiddlewareDecisionMapping = ContinueMapping | RespondMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L89)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.types.ts#L89)
 
 ### RespondMapping (interface)
 
@@ -2389,7 +2489,7 @@ export interface RespondMapping {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.types.ts#L81)
 
 ### TransformOutput (type alias)
 
@@ -2411,7 +2511,7 @@ type TransformOutput<T> = T extends { readonly schema: infer Schema }
   : unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.types.ts#L46)
 
 ### TransformReference (interface)
 
@@ -2432,7 +2532,7 @@ export interface TransformReference<Id extends string = string> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-dsl.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-dsl.types.ts#L19)
 
 ## `http-mapping.types.ts`
 
@@ -2455,7 +2555,7 @@ export interface HttpBodyMapping<Output = unknown> extends HttpMapping<Output> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L68)
 
 ### HttpConstantMapping (interface)
 
@@ -2478,7 +2578,7 @@ export interface HttpConstantMapping<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L97)
 
 ### HttpCookieMapping (interface)
 
@@ -2499,7 +2599,7 @@ export interface HttpCookieMapping<Output = string> extends HttpMapping<Output> 
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L61)
 
 ### HttpDefaultMapping (interface)
 
@@ -2524,7 +2624,7 @@ export interface HttpDefaultMapping<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L126)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L133)
 
 ### HttpHeaderMapping (interface)
 
@@ -2545,7 +2645,7 @@ export interface HttpHeaderMapping<Output = string> extends HttpMapping<Output> 
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L54)
 
 ### HttpInputMapping (interface)
 
@@ -2568,7 +2668,7 @@ export interface HttpInputMapping<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L115)
 
 ### HttpMapping (interface)
 
@@ -2588,7 +2688,7 @@ export interface HttpMapping<Output = unknown> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L6)
 
 ### HttpMappingNode (type alias)
 
@@ -2604,6 +2704,7 @@ const mapping: HttpMappingNode = http.path("id");
 
 ```ts
 type HttpMappingNode =
+  | HttpMiddlewareMapping
   | HttpPathMapping
   | HttpPathSegmentsMapping
   | HttpQueryMapping
@@ -2621,7 +2722,7 @@ type HttpMappingNode =
   | HttpTransformMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L145)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L152)
 
 ### HttpMappingOutput (type alias)
 
@@ -2639,7 +2740,7 @@ type Output = HttpMappingOutput<HttpPathMapping>;
 type HttpMappingOutput<M> = M extends HttpMapping<infer Output> ? Output : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L22)
 
 ### HttpMappingShape (type alias)
 
@@ -2657,7 +2758,28 @@ const fields: HttpMappingShape = { id: http.path("id") };
 type HttpMappingShape = Readonly<Record<string, HttpMappingNode>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L12)
+
+### HttpMiddlewareMapping (interface)
+
+One field a typed middleware provided for this request.
+
+**Example**
+
+```ts
+const mapping: HttpMiddlewareMapping<string> = http.from(tenant, "tenantId");
+```
+
+**Signature**
+
+```ts
+export interface HttpMiddlewareMapping<Output = unknown> extends HttpMapping<Output> {
+  readonly kind: "middleware";
+  readonly name: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L26)
 
 ### HttpMultipartAllMapping (interface)
 
@@ -2680,7 +2802,7 @@ export interface HttpMultipartAllMapping<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L88)
 
 ### HttpMultipartMapping (interface)
 
@@ -2701,7 +2823,7 @@ export interface HttpMultipartMapping<Output = string | File> extends HttpMappin
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L81)
 
 ### HttpNestedMapping (interface)
 
@@ -2724,7 +2846,7 @@ export interface HttpNestedMapping<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L106)
 
 ### HttpOptionalMapping (interface)
 
@@ -2747,7 +2869,7 @@ export interface HttpOptionalMapping<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L117)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L124)
 
 ### HttpPathMapping (interface)
 
@@ -2768,7 +2890,7 @@ export interface HttpPathMapping<Output = string> extends HttpMapping<Output> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L33)
 
 ### HttpPathSegmentsMapping (interface)
 
@@ -2789,7 +2911,7 @@ export interface HttpPathSegmentsMapping<Output = readonly string[]> extends Htt
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L40)
 
 ### HttpQueryMapping (interface)
 
@@ -2810,7 +2932,7 @@ export interface HttpQueryMapping<Output = string> extends HttpMapping<Output> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L47)
 
 ### HttpRequestMapping (type alias)
 
@@ -2828,7 +2950,7 @@ const mapping: HttpRequestMapping = http.input({ id: http.path("id") });
 type HttpRequestMapping = HttpInputMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L164)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L172)
 
 ### HttpSourceOptions (interface)
 
@@ -2849,7 +2971,7 @@ export interface HttpSourceOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L168)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L176)
 
 ### HttpTransformMapping (interface)
 
@@ -2871,7 +2993,7 @@ export interface HttpTransformMapping<Output = unknown> extends HttpMapping<Outp
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L137)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L144)
 
 ### HttpWholeBodyMapping (interface)
 
@@ -2891,7 +3013,7 @@ export interface HttpWholeBodyMapping<Output = unknown> extends HttpMapping<Outp
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L75)
 
 ### MappingShapeOutput (type alias)
 
@@ -2911,7 +3033,7 @@ type MappingShapeOutput<S extends HttpMappingShape> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/http-mapping.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/http-mapping.types.ts#L16)
 
 ## `index.ts`
 
@@ -2925,7 +3047,7 @@ Re-exports all named exports from the "./define-middleware.js" module.
 export * from "./define-middleware.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L2)
 
 ### "./define-route.js" (namespace export)
 
@@ -2937,7 +3059,7 @@ Re-exports all named exports from the "./define-route.js" module.
 export * from "./define-route.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L3)
 
 ### "./define-service-routes.js" (namespace export)
 
@@ -2949,7 +3071,7 @@ Re-exports all named exports from the "./define-service-routes.js" module.
 export * from "./define-service-routes.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L4)
 
 ### "./http-dsl.js" (namespace export)
 
@@ -2961,7 +3083,7 @@ Re-exports all named exports from the "./http-dsl.js" module.
 export * from "./http-dsl.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L1)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L1)
 
 ### "./route-module.types.js" (namespace export)
 
@@ -2973,7 +3095,7 @@ Re-exports all named exports from the "./route-module.types.js" module.
 export * from "./route-module.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L14)
 
 ### "./route.types.js" (namespace export)
 
@@ -2985,7 +3107,7 @@ Re-exports all named exports from the "./route.types.js" module.
 export * from "./route.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L13)
 
 ### HttpRateLimitKey
 
@@ -2995,7 +3117,7 @@ export * from "./route.types.js";
 declare const HttpRateLimitKey: HttpRateLimitKey;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L15)
 
 ### RouteInputError
 
@@ -3005,7 +3127,7 @@ declare const HttpRateLimitKey: HttpRateLimitKey;
 declare const RouteInputError: typeof RouteInputError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L7)
 
 ### RouteOperation
 
@@ -3015,7 +3137,7 @@ declare const RouteInputError: typeof RouteInputError;
 declare const RouteOperation: RouteOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L12)
 
 ### RouteOperationError
 
@@ -3025,7 +3147,7 @@ declare const RouteOperation: RouteOperation;
 declare const RouteOperationError: typeof RouteOperationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L8)
 
 ### RouteRateLimit
 
@@ -3035,7 +3157,7 @@ declare const RouteOperationError: typeof RouteOperationError;
 declare const RouteRateLimit: RouteRateLimit;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L15)
 
 ### RouteTelemetry
 
@@ -3045,7 +3167,7 @@ declare const RouteRateLimit: RouteRateLimit;
 declare const RouteTelemetry: typeof RouteTelemetry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L9)
 
 ### RouteTelemetryLive
 
@@ -3055,7 +3177,7 @@ declare const RouteTelemetry: typeof RouteTelemetry;
 declare const RouteTelemetryLive: Layer<RouteTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L10)
 
 ### RouteTelemetryService
 
@@ -3065,7 +3187,17 @@ declare const RouteTelemetryLive: Layer<RouteTelemetry, never, never>;
 declare const RouteTelemetryService: RouteTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L12)
+
+### applyRouteResponse
+
+**Signature**
+
+```ts
+declare const applyRouteResponse: (response: Response, init: unknown) => Response;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L5)
 
 ## `route-auth.ts`
 
@@ -3077,71 +3209,7 @@ declare const RouteTelemetryService: RouteTelemetryService;
 declare const BetterAuthRegistration: BetterAuthRegistration;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L6)
-
-### copyProtectedPaths
-
-Validates and copies protected route patterns synchronously.
-
-**Throws**
-
-TypeError for invalid patterns.
-
-**Example**
-
-```ts
-copyProtectedPaths(["/admin/*"]);
-```
-
-**Signature**
-
-```ts
-declare const copyProtectedPaths: (values: readonly string[] | undefined) => readonly string[];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L67)
-
-### copyProtectedPathsEffect
-
-Validates and copies protected paths through Effect.
-
-**Example**
-
-```ts
-Effect.runSync(copyProtectedPathsEffect(["/admin/*"]));
-```
-
-**Signature**
-
-```ts
-declare const copyProtectedPathsEffect: (
-  values: ReadonlyArray<string> | undefined,
-) => Effect.Effect<ReadonlyArray<string>, RouteOperationError, never>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L56)
-
-### copyProtectedValues
-
-Copies protected paths inside an already observed operation.
-
-**Throws**
-
-RouteInputError for an invalid pattern.
-
-**Example**
-
-```ts
-copyProtectedValues(["/admin/*"]);
-```
-
-**Signature**
-
-```ts
-declare const copyProtectedValues: (values: readonly string[] | undefined) => readonly string[];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-auth.ts#L6)
 
 ### readBetterAuthRegistration
 
@@ -3165,7 +3233,7 @@ declare const readBetterAuthRegistration: (
 ) => BetterAuthRegistration | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-auth.ts#L24)
 
 ### readBetterAuthRegistrationEffect
 
@@ -3185,7 +3253,7 @@ declare const readBetterAuthRegistrationEffect: (
 ) => Effect.Effect<BetterAuthRegistration | undefined, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-auth.ts#L13)
 
 ### readRegistrationValue
 
@@ -3205,7 +3273,7 @@ declare const readRegistrationValue: (
 ) => BetterAuthRegistration | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-auth.ts#L35)
 
 ## `route-auth.types.ts`
 
@@ -3242,7 +3310,7 @@ export interface BetterAuthRegistration {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-auth.types.ts#L4)
 
 ## `route-client.ts`
 
@@ -3266,7 +3334,7 @@ copyClient({ operation: "query" });
 declare const copyClient: (value: unknown) => RouteClientPolicy | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-client.ts#L22)
 
 ### copyClientEffect
 
@@ -3286,7 +3354,7 @@ declare const copyClientEffect: (
 ) => Effect.Effect<RouteClientPolicy | undefined, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-client.ts#L12)
 
 ### copyClientValue
 
@@ -3308,7 +3376,7 @@ copyClientValue({ operation: "query" });
 declare const copyClientValue: (value: unknown) => RouteClientPolicy | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-client.ts#L32)
 
 ### copyStream
 
@@ -3333,7 +3401,7 @@ declare const copyStream: (
 ) => { readonly format: NativeStreamFormat } | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-client.ts#L65)
 
 ### copyStreamEffect
 
@@ -3354,7 +3422,7 @@ declare const copyStreamEffect: (
 ) => Effect.Effect<{ readonly format: NativeStreamFormat } | undefined, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-client.ts#L53)
 
 ### copyStreamValue
 
@@ -3379,7 +3447,7 @@ declare const copyStreamValue: (
 ) => { readonly format: NativeStreamFormat } | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-client.ts#L79)
 
 ## `route-definition.ts`
 
@@ -3407,14 +3475,15 @@ declare const prepareRouteValue: (
 ) => (id: string) => RouteDescriptor<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-definition.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-definition.ts#L35)
 
 ## `route-module.types.ts`
 
 ### RouteModuleContract (type alias)
 
 Expected types for a route module's exports, used by generated module validators.
-Rejects untyped exports and requires at least one named HTTP method.
+Rejects untyped exports and requires at least one HTTP method: a named export, or a
+`defineServiceRoutes` map exported as the default.
 
 **Signature**
 
@@ -3422,13 +3491,15 @@ Rejects untyped exports and requires at least one named HTTP method.
 type RouteModuleContract<Module, Parameters extends string = never> = keyof Module extends never
   ? { readonly __relkit_route_method_required: never }
   : {
-      readonly [Method in keyof Module]: Method extends RouteModuleMethod
-        ? CheckedRoute<Module[Method], Method, Parameters>
-        : never;
+      readonly [Method in keyof Module]: Method extends "default"
+        ? CheckedMethods<Module[Method], Parameters>
+        : Method extends RouteModuleMethod
+          ? CheckedRoute<Module[Method], Method, Parameters>
+          : never;
     };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-module.types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-module.types.ts#L49)
 
 ### RouteModuleMethod (type alias)
 
@@ -3440,7 +3511,7 @@ Value exports accepted by a filesystem route module.
 type RouteModuleMethod = ServiceRouteMethod | "ALL";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-module.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-module.types.ts#L9)
 
 ## `route-observability.ts`
 
@@ -3460,7 +3531,7 @@ throw new RouteInputError("Route target is invalid");
 declare class RouteInputError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L12)
 
 ### RouteOperation
 
@@ -3470,7 +3541,7 @@ declare class RouteInputError
 declare const RouteOperation: RouteOperation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L7)
 
 ### RouteOperationError (class)
 
@@ -3492,7 +3563,7 @@ const error = new RouteOperationError({
 declare class RouteOperationError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L17)
 
 ### RouteTelemetry (class)
 
@@ -3510,7 +3581,7 @@ Effect.provide(defineRouteEffect(options), RouteTelemetryLive);
 declare class RouteTelemetry
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L25)
 
 ### RouteTelemetryLive
 
@@ -3528,7 +3599,7 @@ Effect.runSync(Effect.provide(Effect.void, RouteTelemetryLive));
 declare const RouteTelemetryLive: Layer.Layer<RouteTelemetry, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L38)
 
 ### RouteTelemetryService
 
@@ -3538,7 +3609,7 @@ declare const RouteTelemetryLive: Layer.Layer<RouteTelemetry, never, never>;
 declare const RouteTelemetryService: RouteTelemetryService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L7)
 
 ### measureRoute
 
@@ -3559,7 +3630,7 @@ declare const measureRoute: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L59)
 
 ### observeRoute
 
@@ -3580,7 +3651,7 @@ declare const observeRoute: <A, E, R>(
 ) => Effect.Effect<A, E, R>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L46)
 
 ### routeAttempt
 
@@ -3601,7 +3672,7 @@ declare const routeAttempt: <A>(
 ) => Effect.Effect<A, RouteOperationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L107)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L107)
 
 ### routeIdentity
 
@@ -3621,7 +3692,7 @@ declare const routeIdentity: (
 ) => Effect.Effect<string, RouteOperationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L128)
 
 ### routeTry
 
@@ -3642,7 +3713,7 @@ declare const routeTry: <A>(
 ) => Effect.Effect<A, RouteOperationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L94)
 
 ### runRouteSync
 
@@ -3664,7 +3735,7 @@ runRouteSync(Effect.succeed(true));
 declare const runRouteSync: <A, E>(effect: Effect.Effect<A, E>) => A;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.ts#L149)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L149)
 
 ## `route-observability.types.ts`
 
@@ -3701,6 +3772,7 @@ type RouteOperation =
   | "dsl.source"
   | "dsl.whole-body"
   | "dsl.constant"
+  | "dsl.from"
   | "dsl.optional"
   | "dsl.default"
   | "dsl.transform"
@@ -3720,7 +3792,7 @@ type RouteOperation =
   | "validation.is-record";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.types.ts#L6)
 
 ### RouteTelemetryService (interface)
 
@@ -3750,7 +3822,7 @@ export interface RouteTelemetryService {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-observability.types.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.types.ts#L48)
 
 ## `route-options.ts`
 
@@ -3762,7 +3834,7 @@ export interface RouteTelemetryService {
 declare const HttpRateLimitKey: HttpRateLimitKey;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.ts#L8)
 
 ### RouteRateLimit
 
@@ -3772,7 +3844,7 @@ declare const HttpRateLimitKey: HttpRateLimitKey;
 declare const RouteRateLimit: RouteRateLimit;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.ts#L8)
 
 ### copyRateLimit
 
@@ -3794,7 +3866,7 @@ copyRateLimit(undefined);
 declare const copyRateLimit: (value: RouteRateLimit | undefined) => RouteRateLimit | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.ts#L26)
 
 ### copyRateLimitEffect
 
@@ -3814,7 +3886,7 @@ declare const copyRateLimitEffect: (
 ) => Effect.Effect<RouteRateLimit | undefined, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.ts#L15)
 
 ### copyRateLimitValue
 
@@ -3836,7 +3908,7 @@ copyRateLimitValue(undefined);
 declare const copyRateLimitValue: (value: RouteRateLimit | undefined) => RouteRateLimit | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.ts#L36)
 
 ### positive
 
@@ -3858,7 +3930,7 @@ positive(5, "timeoutMs");
 declare const positive: (value: number | undefined, name: string) => number | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.ts#L75)
 
 ### positiveEffect
 
@@ -3879,7 +3951,7 @@ declare const positiveEffect: (
 ) => Effect.Effect<number | undefined, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.ts#L63)
 
 ### positiveValue
 
@@ -3901,7 +3973,7 @@ positiveValue(5, "timeoutMs");
 declare const positiveValue: (value: number | undefined, name: string) => number | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.ts#L86)
 
 ### successStatus
 
@@ -3923,7 +3995,7 @@ successStatus(201);
 declare const successStatus: (value: number | undefined) => number | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.ts#L109)
 
 ### successStatusEffect
 
@@ -3943,7 +4015,7 @@ declare const successStatusEffect: (
 ) => Effect.Effect<number | undefined, RouteOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L98)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.ts#L98)
 
 ### successStatusValue
 
@@ -3965,7 +4037,7 @@ successStatusValue(201);
 declare const successStatusValue: (value: number | undefined) => number | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.ts#L119)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.ts#L119)
 
 ## `route-options.types.ts`
 
@@ -3986,7 +4058,7 @@ type HttpRateLimitKey =
   HttpPathMapping | HttpQueryMapping | HttpHeaderMapping | HttpCookieMapping | HttpConstantMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.types.ts#L13)
 
 ### RouteRateLimit (interface)
 
@@ -4009,9 +4081,110 @@ export interface RouteRateLimit {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-options.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.types.ts#L19)
+
+## `route-response.ts`
+
+Applies a route's `response` settings to a mapped success response, for the runtime and tests.
+
+### applyRouteResponse
+
+Rebuilds a response with a route's status, headers and cookies.
+
+**Signature**
+
+```ts
+declare const applyRouteResponse: (response: Response, init: unknown) => Response;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-response.ts#L10)
+
+## `route-response.types.ts`
+
+### RouteCookie (interface)
+
+One cookie a route sets on its successful response.
+
+**Example**
+
+```ts
+const cookie: RouteCookie = { name: "session", value: "abc", httpOnly: true };
+```
+
+**Signature**
+
+```ts
+export interface RouteCookie {
+  readonly name: string;
+  readonly value: string;
+  readonly path?: string;
+  readonly domain?: string;
+  readonly maxAge?: number;
+  readonly expires?: Date;
+  readonly httpOnly?: boolean;
+  readonly secure?: boolean;
+  readonly sameSite?: "Strict" | "Lax" | "None";
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-response.types.ts#L7)
+
+### RouteResponseFor (type alias)
+
+Computes the response settings from the target function's validated output.
+
+**Example**
+
+```ts
+const response: RouteResponseFor<typeof createOrder> = (order) => ({ status: 201 });
+```
+
+**Signature**
+
+```ts
+type RouteResponseFor<Target extends FunctionRefAny> = (
+  output: InferOutput<Target["output"]>,
+) => RouteResponseInit;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-response.types.ts#L32)
+
+### RouteResponseInit (interface)
+
+Status, headers and cookies a route adds to its successful response.
+
+**Example**
+
+```ts
+const init: RouteResponseInit = { status: 201, headers: { location: "/orders/1" } };
+```
+
+**Signature**
+
+```ts
+export interface RouteResponseInit {
+  /** A 2xx status replacing the route's success status. */
+  readonly status?: number;
+  readonly headers?: Readonly<Record<string, string>>;
+  readonly cookies?: readonly RouteCookie[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-response.types.ts#L22)
 
 ## `route.types.ts`
+
+### "./route-response.types.js" (namespace export)
+
+Re-exports all named exports from the "./route-response.types.js" module.
+
+**Signature**
+
+```ts
+export * from "./route-response.types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L11)
 
 ### FunctionRouteDescriptor (interface)
 
@@ -4044,10 +4217,12 @@ export interface FunctionRouteDescriptor<
   readonly timeoutMs?: number;
   readonly client?: RouteClientPolicy;
   readonly stream?: { readonly format: NativeStreamFormat };
+  readonly response?: RouteResponseFor<Target>;
+  readonly auth?: "required";
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L69)
 
 ### FunctionRouteOptions (interface)
 
@@ -4078,10 +4253,14 @@ export interface FunctionRouteOptions<
   readonly timeoutMs?: number;
   readonly client?: RouteClientPolicy;
   readonly stream?: { readonly format: NativeStreamFormat };
+  /** Sets the success status, headers and cookies from the function's output. */
+  readonly response?: RouteResponseFor<Target>;
+  /** `"required"` rejects a request without a session with 401, before middleware and the target. */
+  readonly auth?: "required";
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L33)
 
 ### NativeStreamFormat (type alias)
 
@@ -4099,7 +4278,7 @@ const format: NativeStreamFormat = "sse";
 type NativeStreamFormat = "sse" | "text" | "bytes";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L24)
 
 ### RawHttpHandler (type alias)
 
@@ -4117,7 +4296,7 @@ const handler: RawHttpHandler = () => new Response("ok");
 type RawHttpHandler = (request: Request) => MaybePromise<Response>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L16)
 
 ### RawRouteDescriptor (interface)
 
@@ -4143,13 +4322,12 @@ export interface RawRouteDescriptor<
   readonly handler: Handler;
   readonly auth?: {
     readonly kind: "better-auth";
-    readonly protected: readonly string[];
     readonly service: { readonly ref: { readonly kind: "service"; readonly id: string } };
   };
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L89)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L94)
 
 ### RawRouteOptions (interface)
 
@@ -4170,13 +4348,10 @@ export interface RawRouteOptions<
 > extends RouteSharedOptions<Id> {
   readonly handler: Handler;
   readonly target?: never;
-  readonly auth?: {
-    readonly protected?: readonly string[];
-  };
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L58)
 
 ### RouteClientPolicy (type alias)
 
@@ -4194,7 +4369,7 @@ const policy: RouteClientPolicy = { operation: "query" };
 type RouteClientPolicy = false | { readonly operation?: "query" | "mutation" };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L20)
 
 ### RouteDescriptor (type alias)
 
@@ -4216,4 +4391,4 @@ type RouteDescriptor<
 > = FunctionRouteDescriptor<Id, Target, Request> | RawRouteDescriptor<Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route.types.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L112)

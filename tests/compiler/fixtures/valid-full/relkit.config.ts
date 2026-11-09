@@ -1,4 +1,4 @@
-import { defineApp, defineEnv, env as envFactory } from "@relkit/app";
+import { defineApp, defineEnv, env as envFactory } from "relkit";
 import { docker } from "@relkit/docker";
 import { redis } from "@relkit/redis";
 import { s3 } from "@relkit/s3";

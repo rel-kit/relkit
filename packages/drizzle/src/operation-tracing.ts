@@ -1,6 +1,6 @@
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { Effect } from "effect";
-import { frameworkTrace } from "@relkit/invocation";
+import { frameworkTrace } from "relkit/invocation";
 import { redactSpecializedTrace } from "./trace-redaction.js";
 
 const operations = new Set([
@@ -32,7 +32,7 @@ const operations = new Set([
  * @example
  * ```ts
  * import { Effect } from "effect";
- * import { observeSpecializedOperation } from "@relkit/drizzle/internal";
+ * import { observeSpecializedOperation } from "@relkit/drizzle/server";
  * await Effect.runPromise(observeSpecializedOperation("auth.session", Effect.succeed(null)));
  * ```
  */

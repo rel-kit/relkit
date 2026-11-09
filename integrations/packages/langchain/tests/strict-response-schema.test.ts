@@ -1,7 +1,7 @@
 /** Keeps authored validation intact while enabling provider enforcement for compatible Responses schemas. */
 import { Effect } from "effect";
 import { ProviderStrategy } from "langchain";
-import { getJsonSchema, z } from "@relkit/schema";
+import { getJsonSchema, z } from "relkit/schema";
 import { expect, test } from "vitest";
 import { responseFormatEffect } from "../src/runtime-native-response-format.js";
 import { strictResponseSchema } from "../src/runtime-strict-response-schema.js";

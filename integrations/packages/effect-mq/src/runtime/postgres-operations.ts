@@ -6,7 +6,7 @@ import type {
   NativeRetryRequest,
   NativeSubmission,
   OperationContext,
-} from "@relkit/jobs/adapter";
+} from "relkit/jobs/adapter";
 import { Effect, Option } from "effect";
 import { JobStore } from "effect-mq";
 import type { EffectMqPostgresState } from "./postgres-state.js";

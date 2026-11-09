@@ -7,7 +7,7 @@ import { CliModules } from "../../src/services/modules.service.js";
 import { cleanupLayer } from "../../src/services/cleanup.service.js";
 import { compilerTestLayer, filesystemTestLayer } from "./test-layers.js";
 import type { CheckResult } from "../../src/commands/check-result.types.js";
-import type { CandidateCompileRequest } from "@relkit/supervisor";
+import type { CandidateCompileRequest } from "../../src/supervisor/index.js";
 
 /** A diagnostic stops before bundling so tests exercise validation selection in isolation. */
 const diagnostic: CheckResult = {

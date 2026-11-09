@@ -22,8 +22,18 @@ import {
 } from "./client-guide-catalog.js";
 import { realtimeGuideGroup, realtimeGuideRelations } from "./realtime-guide-catalog.js";
 import { operationsGuideRelations } from "./operations-guide-catalog.js";
+import { projectPageRelations, projectPages } from "./project-pages-catalog.js";
 import { cliGuideGroup, cliGuideRelations } from "./cli-guide-catalog.js";
 import { deploymentGuideGroup, deploymentGuideRelations } from "./deployment-guide-catalog.js";
+/** Authored pages outside every guide group: the section overviews and the root Docs pages. */
+export const overviewPages = [
+  "docs/index",
+  "docs/why-relkit",
+  "docs/faq",
+  ...projectPages,
+  "docs/modules/index",
+  "guides/index",
+] as const;
 export const guideGroups = [
   group("docs/learn", "Learn", "Rocket", [
     "index",
@@ -43,6 +53,7 @@ export const guideGroups = [
     "schemas",
     "errors",
     "context",
+    "runtime-handle",
     "environment",
   ]),
   serviceGuideGroup,
@@ -60,6 +71,7 @@ export const guideGroups = [
     "index",
     "local-docker",
     "provider-authoring",
+    "provider-kit",
     "local-providers",
   ]),
   deploymentGuideGroup,
@@ -67,6 +79,7 @@ export const guideGroups = [
     "index",
     "observability",
     "inspector",
+    "mcp",
     "realtime-agents-streaming",
     "testing",
     "troubleshooting",
@@ -78,7 +91,9 @@ export const guideGroups = [
     "inngest",
     "trigger",
     "effect-mq",
+    "postgres",
   ]),
+  group("guides/migrate", "Migrate", "ArrowRightLeft", ["from-express-or-hono", "relkit-0-9"]),
   group("guides/cli", "CLI", "Terminal", ["create-and-build-an-api"]),
   frontendGuideGroup,
   group("guides/storage", "Storage", "HardDrive", ["upload-product-images"]),
@@ -92,6 +107,27 @@ const relations = [
   relation("docs/index", ["app", "routes", "testing"], ["templates/default/v1/api/README.md"]),
   relation("docs/learn/index", ["app"], ["templates/default/v1/minimal/README.md"]),
   relation("docs/modules/index", ["app"], []),
+  relation("docs/why-relkit", ["app"], []),
+  ...projectPageRelations,
+  relation(
+    "docs/faq",
+    ["app", "functions"],
+    ["apps/docs/examples/migrate/src/services/orders/functions/create-order.function.ts"],
+  ),
+  relation(
+    "guides/migrate/from-express-or-hono",
+    ["functions", "routes", "testing"],
+    [
+      "apps/docs/examples/migrate/src/routes/legacy/[[...path]]/route.ts",
+      "apps/docs/examples/migrate/src/services/orders/functions/get-order.function.ts",
+      "apps/docs/examples/migrate/tests/orders.route.test.ts",
+    ],
+  ),
+  relation(
+    "guides/migrate/relkit-0-9",
+    ["functions", "routes"],
+    ["apps/docs/tests/migrate-0-9.test.ts"],
+  ),
   relation("guides/index", ["app"], []),
   uploadGuideRelation,
   frontendGuideRelation,
@@ -104,6 +140,15 @@ const relations = [
     "guides/ai/build-an-offline-agent",
     ["agents", "tools", "testing"],
     ["templates/default/v1/agent/src/services/hello/agents/assistant.agent.ts"],
+  ),
+  relation(
+    "docs/modules/jobs/providers/postgres",
+    ["jobs", "integrations/postgres"],
+    [
+      "apps/docs/examples/postgres/config.ts",
+      "apps/docs/examples/postgres/place-order.ts",
+      "integrations/packages/postgres/tests/jobs-conformance.test.ts",
+    ],
   ),
   ...["comparison", "inngest", "trigger", "effect-mq"].map((page) =>
     relation(
@@ -171,7 +216,15 @@ const relations = [
   relation(
     "docs/learn/concepts/context",
     ["functions"],
-    ["examples/commerce/src/services/orders/functions/create-order.function.ts"],
+    ["apps/docs/examples/context/create-order.function.ts"],
+  ),
+  relation(
+    "docs/learn/concepts/runtime-handle",
+    ["functions"],
+    [
+      "examples/commerce/scripts/seed.ts",
+      "examples/commerce/src/routes/middleware/order-auth.middleware.ts",
+    ],
   ),
   relation(
     "docs/learn/concepts/environment",

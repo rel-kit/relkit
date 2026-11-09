@@ -40,6 +40,6 @@ AssertionError: Missing expected exception.
    operator: "throws",
        code: "ERR_ASSERTION"
 
-      at /Users/mustafaelsayed/Workspace/relkit/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/packed.ts:76:14
+      at <repo>/openspec/changes/refine-application-skills-and-generated-projects/evidence/acceptance/packed.ts:76:14
 
 Bun v1.3.10 (macOS arm64)

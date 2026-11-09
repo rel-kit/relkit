@@ -16,7 +16,7 @@ export const ContributorManifest = Schema.StructWithRest(
 /** Normalized generator options admitted by the contributor command callback. */
 export const ContributorCreateOptions = Schema.Struct({
   name: Schema.String,
-  template: Schema.Literals(["minimal", "api", "agent", "fullstack"]),
+  template: Schema.Literals(["minimal", "api", "agent", "fullstack", "tasks"]),
   cloud: Schema.Literals(["aws", "none"]),
   deploy: Schema.Literals(["pulumi", "none"]),
   jobs: Schema.optionalKey(
@@ -27,5 +27,6 @@ export const ContributorCreateOptions = Schema.Struct({
   examples: Schema.Boolean,
   directory: Schema.optionalKey(Schema.String),
   forceEmptyDirectory: Schema.Boolean,
+  strict: Schema.optionalKey(Schema.Boolean),
   json: Schema.Boolean,
 });

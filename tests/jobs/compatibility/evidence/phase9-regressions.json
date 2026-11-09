@@ -38,8 +38,8 @@
       "id": "RG03",
       "status": "passed",
       "evidence": [
-        "packages/jobs/task-wire.test.ts",
-        "packages/jobs/schedule-reconciliation.test.ts",
+        "packages/relkit/task-wire.test.ts",
+        "packages/relkit/schedule-reconciliation.test.ts",
         "tests/integration/http/contracts.test.ts",
         "tests/integration/http/service-contract.test.ts"
       ]
@@ -48,8 +48,8 @@
       "id": "RG04",
       "status": "passed",
       "evidence": [
-        "packages/invocation/dispatcher.test.ts",
-        "packages/engine/materialize-jobs.test.ts",
+        "packages/relkit/dispatcher.test.ts",
+        "packages/relkit/materialize-jobs.test.ts",
         "tests/contracts/jobs.test.ts"
       ]
     },
@@ -57,18 +57,18 @@
       "id": "RG05",
       "status": "passed",
       "evidence": [
-        "packages/jobs/boundary-policy.test.ts",
-        "packages/jobs/task-policy.test.ts",
-        "packages/jobs/trigger-schedule.test.ts"
+        "packages/relkit/boundary-policy.test.ts",
+        "packages/relkit/task-policy.test.ts",
+        "packages/relkit/trigger-schedule.test.ts"
       ]
     },
     {
       "id": "RG06",
       "status": "passed",
       "evidence": [
-        "packages/jobs/identity.test.ts",
-        "packages/providers-local/jobs-idempotency.test.ts",
-        "packages/jobs/schedule-reconciliation.test.ts",
+        "packages/relkit/identity.test.ts",
+        "packages/relkit/jobs-idempotency.test.ts",
+        "packages/relkit/schedule-reconciliation.test.ts",
         "tests/restart/jobs.test.ts"
       ]
     },
@@ -95,9 +95,9 @@
       "id": "RG09",
       "status": "passed",
       "evidence": [
-        "packages/jobs/authorization.test.ts",
-        "packages/jobs/authorization-cursor.test.ts",
-        "packages/runtime-hono/jobs-rpc.test.ts",
+        "packages/relkit/authorization.test.ts",
+        "packages/relkit/authorization-cursor.test.ts",
+        "packages/relkit/jobs-rpc.test.ts",
         "tests/contracts/jobs.test.ts"
       ]
     },
@@ -105,7 +105,7 @@
       "id": "RG10",
       "status": "passed",
       "evidence": [
-        "packages/inspector-api/jobs.test.ts",
+        "packages/relkit/jobs.test.ts",
         "tests/inspector/job-name-filters.test.ts",
         "tests/e2e/inspector.spec.ts"
       ]
@@ -114,8 +114,8 @@
       "id": "RG11",
       "status": "passed",
       "evidence": [
-        "packages/jobs/schedule-reconciliation.test.ts",
-        "packages/providers-local/jobs-scheduler.test.ts",
+        "packages/relkit/schedule-reconciliation.test.ts",
+        "packages/relkit/jobs-scheduler.test.ts",
         "tests/contracts/jobs.test.ts",
         "tests/jobs/compatibility/evidence/phase5-adapters.json"
       ]
@@ -126,7 +126,7 @@
       "evidence": [
         "tests/compiler/normalize.test.ts",
         "tests/compiler/job-names.test.ts",
-        "packages/jobs/migration.test.ts",
+        "packages/relkit/migration.test.ts",
         "tests/types/jobs-names.test-d.ts"
       ],
       "result": "The deprecated profile alias is task-backed and independently gated from legacyJobs; application-wide collisions are asserted in compiler fixtures."

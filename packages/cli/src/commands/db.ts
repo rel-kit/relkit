@@ -8,6 +8,7 @@ import { CLI_EXIT_CODES, fail, type CliCommandContext } from "../main-support.js
 import { CliFileSystem } from "../services/filesystem.service.js";
 import { CliProcess } from "../services/process.service.js";
 import { MigrationResponse } from "../database/migration.schemas.js";
+import { nodeTypeScriptFlags, runtime } from "../runtime/index.js";
 
 /** Captures configuration/tool output and publishes only after worker and temporary cleanup settle. */
 export const runDbEffect = Effect.fn("Cli.db.migrate")(
@@ -33,9 +34,12 @@ export const runDbEffect = Effect.fn("Cli.db.migrate")(
         const worker = fileURLToPath(
           new URL(`../database/migration-worker.${extension}`, import.meta.url),
         );
+        // The worker loads `drizzle.config.ts`, so on Node it runs with the TypeScript hooks.
+        const [command, ...flags] =
+          runtime.name === "bun" ? [process.execPath] : nodeTypeScriptFlags();
         const child = yield* processes.run({
-          command: process.execPath,
-          args: [worker, config, resultPath],
+          command: command!,
+          args: [...flags, worker, config, resultPath],
           cwd: context.cwd ?? process.cwd(),
           maximumOutputBytes: 64 * 1024,
         });

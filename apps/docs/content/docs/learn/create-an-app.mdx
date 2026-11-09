@@ -1,6 +1,6 @@
 ---
 title: Create and run an API
-description: Create a RELKIT application, start its server, and receive your first HTTP response.
+description: Create a RelKit application, start its server, and receive your first HTTP response.
 search:
   keywords: [create app, quickstart, getting started, installation]
   boost: 5
@@ -8,7 +8,7 @@ sidebar:
   icon: rocket
 ---
 
-Start a RELKIT application and send it an HTTP request. You'll use this application throughout the Orders tutorial.
+Start a RelKit application and send it an HTTP request. You'll use this application throughout the Orders tutorial.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
   Before you begin, install **Bun 1.3.10 or later**.
@@ -27,7 +27,7 @@ cd relkit-orders
 cp .env.example .env
 ```
 
-The default is the certified `minimal` template. The generator installs its dependencies and checks the application. Run the remaining commands from `relkit-orders`.
+The default is the `minimal` template. The generator installs its dependencies and checks the application. Run the remaining commands from `relkit-orders`.
 
 </Step>
 <Step icon="terminal">
@@ -48,13 +48,13 @@ Keep this terminal running. The server normally listens on `http://localhost:300
 Open a second terminal and send:
 
 ```sh title="Second terminal"
-curl -i http://localhost:3000/hello\?name=RELKIT
+curl -i http://localhost:3000/hello\?name=RelKit
 ```
 
 You should receive HTTP `200` and this response:
 
 ```json
-{ "message": "Hello, RELKIT!" }
+{ "message": "Hello, RelKit!" }
 ```
 
 Your application is responding to HTTP requests. Next, you'll **[add an endpoint that creates an order](/docs/learn/first-route)**.
@@ -71,7 +71,7 @@ A **route** connects an HTTP method and path to application behavior. The starte
 - `src/services/hello/service.ts` exposes that function through the Hello service.
 - `relkit.config.ts` configures the application.
 
-You edit these TypeScript files. RELKIT writes derived output to `.relkit/generated`.
+You edit these TypeScript files. RelKit writes derived output to `.relkit/generated`.
 
 ## If a step fails
 

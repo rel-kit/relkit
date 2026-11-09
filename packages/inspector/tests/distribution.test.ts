@@ -27,20 +27,13 @@ test("private UI and published launcher have unique names and separate ownership
     bin: { "relkit-inspector": "./dist/bin.js" },
   });
   expect(tool.private).not.toBe(true);
-  expect(tool.dependencies).toHaveProperty("@relkit/observability-local");
   expect(tool.engines).toMatchObject({ bun: ">=1.3.10", node: ">=20.9.0" });
 });
 
 test("the CLI declares no UI/store dependencies or retired generated assets", async () => {
   const cli = await manifest("packages/cli");
   const dependencies = { ...cli.dependencies, ...cli.optionalDependencies };
-  for (const name of [
-    "next",
-    "react",
-    "react-dom",
-    "@relkit/observability-local",
-    "@relkit/inspector",
-  ])
+  for (const name of ["next", "react", "react-dom", "@relkit/inspector"])
     expect(dependencies).not.toHaveProperty(name);
   const files = await readdir(resolve(root, "packages/cli/dist"));
   expect(files).not.toContain("inspector");

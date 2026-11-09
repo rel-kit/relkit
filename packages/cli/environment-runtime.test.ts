@@ -16,7 +16,7 @@ test("the emitted HTTP server supplies decoded dotenv values to application func
   await linkWorkspacePackages(root);
   await writeFile(
     join(root, "relkit.config.ts"),
-    `import { defineApp, defineEnv, env } from "@relkit/app/config";
+    `import { defineApp, defineEnv, env } from "relkit/config";
 export default defineApp({ id: "typed-environment", env: defineEnv({
   EVENT_RETENTION_DAYS: env.number().default(7),
   ENABLED: env.boolean().default(true),

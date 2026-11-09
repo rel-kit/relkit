@@ -1,6 +1,6 @@
 /** Captures command authority for grouped project verification and exposes finite Promise edges to packed acceptance callers. */
 import { Context, Effect, Layer } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 import { ScaffoldProcess, scaffoldProcessLayer } from "./scaffold-process.js";
 import { projectSnapshot, verifyProjectFiles } from "./scaffold-project-files.js";
 import { devSmokeAttempt } from "./pack-and-smoke-create-relkit-dev.js";

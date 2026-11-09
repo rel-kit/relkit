@@ -1,3 +1,4 @@
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { cp, mkdir, writeFile } from "node:fs/promises";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { defaultCatalog, type CatalogManifest } from "./catalog-manifest.js";
@@ -18,7 +19,9 @@ export async function stageReleaseRoot(
   defaultCatalog(manifest);
   const staged = {
     private: true,
-    workspaces: ["packages/*"],
+    // Private tool packages, such as relkit-typescript, resolve published packages' dev workspace
+    // dependencies; they are never packed.
+    workspaces: ["packages/*", "tools/*"],
     packageManager: manifest.packageManager,
     catalog: manifest.catalog,
     catalogs: manifest.catalogs,
@@ -26,6 +29,11 @@ export async function stageReleaseRoot(
     patchedDependencies: manifest.patchedDependencies,
   };
   await writeFile(join(staging, "package.json"), `${JSON.stringify(staged, null, 2)}\n`);
+  if (existsSync(join(source, "tools")))
+    await cp(join(source, "tools"), join(staging, "tools"), {
+      recursive: true,
+      filter: (path) => !/(?:^|\/)node_modules(?:\/|$)/.test(relative(source, path)),
+    });
   const patches = manifest.patchedDependencies ?? {};
   if (patches === null || typeof patches !== "object" || Array.isArray(patches))
     throw new Error("patchedDependencies must be an object.");
@@ -45,4 +53,24 @@ export async function stageReleaseRoot(
     await mkdir(dirname(target), { recursive: true });
     await cp(sourcePath, target);
   }
+}
+
+/**
+ * Lists the private tool packages a release resolves dev workspace dependencies against.
+ * @param source - Repository root.
+ * @returns Package name to version for each `tools/*` package; none are packed.
+ */
+export function toolPackageVersions(source: string): ReadonlyMap<string, string> {
+  const tools = join(source, "tools");
+  if (!existsSync(tools)) return new Map();
+  return new Map(
+    readdirSync(tools, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory() && existsSync(join(tools, entry.name, "package.json")))
+      .map((entry) => {
+        const manifest = JSON.parse(
+          readFileSync(join(tools, entry.name, "package.json"), "utf8"),
+        ) as { readonly name: string; readonly version: string };
+        return [manifest.name, manifest.version] as const;
+      }),
+  );
 }

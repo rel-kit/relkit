@@ -1,5 +1,5 @@
 /** Maps announcement reads and writes to service functions, preserving query/mutation client operations. */
-import { defineRoute } from "@relkit/app/routes";
+import { defineRoute } from "relkit/routes";
 import announcements from "../../services/announcements/service.js";
 
 export const GET = defineRoute({

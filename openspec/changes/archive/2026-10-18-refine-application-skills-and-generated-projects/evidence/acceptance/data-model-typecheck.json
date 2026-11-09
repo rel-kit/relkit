@@ -9,7 +9,7 @@
     "--pretty",
     "false"
   ],
-  "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+  "cwd": "<repo>",
   "before": {
     "at": "2026-10-18T15:10:31.915739+00:00",
     "cpu": 10,

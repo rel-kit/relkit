@@ -6,11 +6,11 @@ sidebar:
   icon: settings
 ---
 
-Use `defineBetterAuthService` to add Better Auth credentials, accounts, and sessions to your application. RELKIT discovers it, activates
+Use `defineBetterAuthService` to add Better Auth credentials, accounts, and sessions to your application. RelKit discovers it, activates
 the application's Drizzle connection first, and passes that native client to Better Auth's Drizzle
 adapter. Better Auth handles credentials, accounts, sessions, and its HTTP protocol.
 
-The current integration requires exactly one Drizzle service, one Better Auth service, and one
+The current integration uses the default Drizzle service, one Better Auth service, and one
 filesystem `ALL` catch-all mount for that auth handler. Do not construct a second connection for auth
 or register the descriptor as a member of an ordinary `defineService`.
 
@@ -38,8 +38,8 @@ Keep existing database tables, patches and overrides when merging these fields.
 bun run relkit add auth --adapter better-auth --database-dialect postgresql
 ```
 
-This creates `src/services/auth/service.ts` and `src/routes/api/auth/[[...auth]]/route.ts`,
-merges auth environment declarations, and installs the selected adapter, native SDKs,
+This creates the Better Auth file `src/services/auth/better-auth.ts` and its service
+`src/services/auth/service.ts`, merges auth environment declarations, and installs the selected adapter, native SDKs,
 declaration peers and repairs. It reuses the existing Drizzle service or creates one when absent.
 `--database-dialect` must match an existing database; when none exists, it chooses the new dialect.
 
@@ -48,7 +48,7 @@ schema index. Review those additions, preserving business tables and applied mig
 Existing auth table names cause a collision instead of being overwritten. The scaffold does not run migrations,
 generate a secret, or protect business routes. Configure those before accepting sign-ins.
 
-Run this once when the app has no auth service. If it already exists, edit its service and mount.
+Run this once when the app has no auth service. If it already exists, edit its Better Auth file.
 With `--no-install`, run `bun install` and `bun run check` before continuing. See the
 [auth command reference](/docs/api/cli#relkit-add-auth) and
 [complete sign-in guide](/guides/auth/email-password-sign-in).
@@ -56,7 +56,7 @@ With `--no-install`, run `bun install` and `bun run check` before continuing. Se
 </Tab>
 <Tab title="Manual" icon="file-code">
 
-Install the following packages before creating the service and mount below:
+Install the following packages before creating the Better Auth file and service below:
 
 <include>/_snippets/generated/installations/auth.mdx</include>
 
@@ -90,9 +90,21 @@ Cloudflare runtime selection. These additions belong only to projects selecting 
 </Step>
 <Step>
 
-## Define the service and environment
+## Write the Better Auth file and the service
 
-Create `src/services/auth/service.ts`:
+Configure Better Auth with its own API in `src/services/auth/better-auth.ts`:
+
+<include
+  source="examples/auth-drizzle/src/services/auth/better-auth.ts"
+  lang="ts"
+  meta='title="src/services/auth/better-auth.ts"'
+>
+  /_snippets/source/examples/auth-drizzle/src/services/auth/better-auth.ts
+</include>
+
+This enables email/password sign-in. Everything Better Auth's documentation shows, such as plugins,
+social providers and additional user fields, goes in this file. Then serve the instance from
+`src/services/auth/service.ts`:
 
 <include
   source="examples/auth-drizzle/src/services/auth/service.ts"
@@ -102,9 +114,11 @@ Create `src/services/auth/service.ts`:
   /_snippets/source/examples/auth-drizzle/src/services/auth/service.ts
 </include>
 
-This enables email/password sign-in. The descriptor exposes a stable `handler`, not a native
-`betterAuth()` instance. It does not expose `auth.api`, an application-owned connection, or a login
-function to call through `context.services`.
+When the server starts, RelKit rebuilds the instance from its options. It adds your Drizzle database
+when the options set no `database`, and mounts the handler at `basePath`, `/api/auth` by default. Set
+your own `database` in the Better Auth file to use another adapter; RelKit then needs no Drizzle service.
+The session type that handlers read comes from this instance. The service exposes a stable `handler`;
+it does not expose `auth.api` or a login function to call through `context.services`.
 
 Add the environment fields to your existing configuration without replacing other settings:
 
@@ -134,33 +148,27 @@ Store a stable, strong secret in your deployment's secret manager; use the same 
 and restarts. Do not regenerate it on every startup. Never put it in a browser bundle, a public
 environment variable, source control, logs, or a copied example configuration.
 
-Auth options are a plain object, not an `({ env })` factory. Declaring a field in `defineEnv` validates
-the RELKIT environment; it does not inject parsed values into that object or replace `process.env`.
-The URL here is read during module evaluation, so supply it before loading the app. The secret uses
-Better Auth's native process-environment lookup. A test harness `env` override alone does not set that
+The Better Auth file is plain Better Auth, not an `({ env })` factory. Declaring a field in `defineEnv`
+validates the RelKit environment, and the server refuses to start without either value; it does not
+inject parsed values into the file or replace `process.env`. The URL fallback in the file only serves
+`relkit check`, which imports the file without your environment. The secret uses Better Auth's native
+process-environment lookup. A test harness `env` override alone does not set that
 process value; see [Testing](/docs/modules/auth/testing).
 
 </Step>
 <Step>
 
-## Mount the native handler
+## Reach the auth endpoints
 
-<include
-  source="examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"
-  lang="ts"
-  meta='title="src/routes/api/auth/[[...auth]]/route.ts"'
->
-  /_snippets/source/examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts
-</include>
+RelKit mounts the handler at `/api/auth` and preserves Better Auth's native responses, including
+cookies; you add no route file. Pass `mount: false` to `defineBetterAuthService` to mount it yourself
+with a raw `ALL` route instead. To require a session on an application route, set `auth: "required"`
+on that route; see [Protect routes](/docs/modules/auth/protect-routes) for the check and authorization
+rules.
 
-RELKIT derives `/api/auth` from this route and preserves Better Auth's native responses, including
-cookies. The `auth.protected` paths are application paths that require a session, not endpoints created
-by Better Auth. See [Protect routes](/docs/modules/auth/protect-routes) for matching and authorization rules.
-
-Do not wrap `auth.handler` in a function or another handler. Mount the recognized handler directly so
-the compiler can associate the auth service and its base path. You do not manually call
-`activateBetterAuthService` in normal application startup. Calling the descriptor handler before
-activation returns HTTP `503`; importing the descriptor is not a standalone auth server.
+You do not call `activateBetterAuthService` in normal application startup. Calling the service's
+handler before the server activates it returns HTTP `503`; importing the service is not a standalone
+auth server.
 
 </Step>
 </Steps>
@@ -169,18 +177,17 @@ activation returns HTTP `503`; importing the descriptor is not a standalone auth
 
 <include>/_frontend/auth.mdx</include>
 
-## Know which settings RELKIT owns
+## Know which settings RelKit owns
 
-| Setting                       | Owner and behavior                                                                                |
-| ----------------------------- | ------------------------------------------------------------------------------------------------- |
-| `database`                    | Reserved: supplied from the single Drizzle service; cannot be passed here                         |
-| `basePath`                    | Reserved: derived from the auth mount; cannot be passed here                                      |
-| `baseURL`                     | Your public backend origin; configure it for each environment                                     |
-| `secret`, native auth options | Better Auth settings; this example uses its environment lookup for the secret                     |
-| `drizzle`                     | Optional adapter settings, including schema mapping; provider is derived from the service dialect |
-| Connection disposal           | The Drizzle service's `dispose` callback                                                          |
+| Setting                       | Owner and behavior                                                            |
+| ----------------------------- | ----------------------------------------------------------------------------- |
+| `database`                    | Yours to set; when unset, RelKit adds the Drizzle service's adapter           |
+| `basePath`                    | Yours to set; RelKit mounts the handler there, `/api/auth` by default         |
+| `baseURL`                     | Your public backend origin; configure it for each environment                 |
+| `secret`, native auth options | Better Auth settings; this example uses its environment lookup for the secret |
+| Connection disposal           | The Drizzle service's `dispose` callback, when RelKit adds the adapter        |
 
-Better Auth writes through the native adapter, bypassing RELKIT portable CRUD, generated Zod parsers,
+Better Auth writes through the native adapter, bypassing RelKit portable CRUD, generated Zod parsers,
 and operation overrides. Do not use a table override as an auth policy or expose credential/session
 tables through generic CRUD routes. See [Database integration](/docs/modules/database/better-auth).
 

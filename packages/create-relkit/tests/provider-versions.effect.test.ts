@@ -33,7 +33,7 @@ it.effect(
       const fixture = yield* memoryFileSystem({
         [root + "/package.json"]: JSON.stringify({
           private: true,
-          dependencies: { "@relkit/app": "0.8.0" },
+          dependencies: { relkit: "0.8.0" },
           scripts: { test: "bun test" },
           custom: "preserved",
         }),
@@ -54,12 +54,13 @@ it.effect(
       expect(saved).toBeDefined();
       const manifest = JSON.parse(saved!.content);
       expect(manifest.dependencies).toEqual({
-        "@relkit/app": "0.8.0",
+        relkit: "0.8.0",
         "@relkit/aws": "1.2.3",
         "@relkit/pulumi": "2.3.4",
         "@relkit/docker": "3.4.5",
         "@relkit/local": "4.5.6",
         "@relkit/inngest": "5.6.7",
+        inngest: "4.20.0",
       });
       expect(manifest.custom).toBe("preserved");
       expect(manifest.scripts.test).toBe("bun test");

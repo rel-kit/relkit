@@ -1,12 +1,12 @@
 # Getting started
 
-RELKIT projects are TypeScript applications managed by Bun. This walkthrough
+RelKit projects are TypeScript applications managed by Bun. This walkthrough
 creates a credential-free API, changes it, tests it, and produces a
 production build. Pulumi and AWS are optional and are not required here.
 
 ## 1. Verify the prerequisite
 
-RELKIT pins Bun `1.3.10`:
+RelKit pins Bun `1.3.10`:
 
 ```sh
 bun --version
@@ -119,7 +119,7 @@ bun run dev
 The backend starts on `http://localhost:3000`. In another terminal:
 
 ```sh
-curl http://localhost:3000/hello\?name=RELKIT
+curl http://localhost:3000/hello\?name=RelKit
 ```
 
 The generated application keeps inspection disabled. To inspect development work,
@@ -132,7 +132,7 @@ and current candidate availability. Stopping the tool leaves the backend running
 Expected response:
 
 ```json
-{ "message": "Hello, RELKIT!" }
+{ "message": "Hello, RelKit!" }
 ```
 
 The same process serves OpenAPI JSON at
@@ -164,11 +164,11 @@ The CLI previews the new file, applies the edit as one transaction, and runs
 existing public hello function. Verify the activated generation:
 
 ```sh
-curl -i http://localhost:3000/status\?name=RELKIT
+curl -i http://localhost:3000/status\?name=RelKit
 bun run check
 ```
 
-Expect HTTP `200`, `{ "message": "Hello, RELKIT!" }`, and a successful check.
+Expect HTTP `200`, `{ "message": "Hello, RelKit!" }`, and a successful check.
 Edit source to change behavior; never hand-edit `.relkit/generated`.
 
 ## 6. Test and build

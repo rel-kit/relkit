@@ -1,5 +1,5 @@
-import * as appExports from "@relkit/app";
-import { defineApp, defineEnv, env } from "@relkit/app/config";
+import * as appExports from "relkit";
+import { defineApp, defineEnv, env } from "relkit/config";
 import { kv, r2 } from "@relkit/cloudflare";
 import { docker } from "@relkit/docker";
 import {
@@ -8,7 +8,7 @@ import {
   defineProviderAdapter,
   defineProviderBehavior,
   defineProviderCapability,
-} from "@relkit/provider";
+} from "relkit/provider";
 import { redis } from "@relkit/redis";
 import { s3 } from "@relkit/s3";
 

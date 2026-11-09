@@ -61,7 +61,7 @@ export const restoreLayoutEdits = Effect.fn("Migration.restore")(function* (
       return yield* Effect.fail(
         fail(
           "RELKIT_LAYOUT_RECOVERY_CONFLICT",
-          `Recovery preserved a later edit at ${edit.before.path} or ${edit.after.path}; receipt: ${path}`,
+          `Recovery preserved a later edit at ${edit.before.path} or ${edit.after.path}; migration record: ${path}`,
         ),
       );
     }
@@ -76,7 +76,7 @@ export const restoreLayoutEdits = Effect.fn("Migration.restore")(function* (
       return yield* Effect.fail(
         fail(
           "RELKIT_LAYOUT_RECOVERY_CONFLICT",
-          `Recovery preserved a concurrent edit at ${edit.before.path}; receipt: ${path}`,
+          `Recovery preserved a concurrent edit at ${edit.before.path}; migration record: ${path}`,
         ),
       );
     }

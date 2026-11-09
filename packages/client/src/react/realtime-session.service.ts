@@ -1,7 +1,6 @@
-import { Context, Effect, Fiber, Layer, Ref, Scope, Stream } from "effect";
-import type { ClientIdentityDocument } from "@relkit/contracts";
-import { observeExecution } from "@relkit/contracts/operation";
-import { nativeStream } from "../native-stream.js";
+import type { ClientIdentityDocument } from "relkit/contracts";
+import { delay, iterateNative } from "../native/iterate.js";
+import { createWorkOwner } from "../native/owner.js";
 import { procedureCall } from "./procedure.js";
 import { realtimeSubscriptionKey } from "./realtime-session-key.js";
 import type {
@@ -11,175 +10,145 @@ import type {
   SharedSubscription,
 } from "./realtime-manager.types.js";
 
-/** One manager's sharing registry, checkpoints and reconnect workers. */
-export class RealtimeSessions extends Context.Service<RealtimeSessions, RealtimeSessionService>()(
-  "relkit/client/RealtimeSessions",
-) {}
-
 /**
- * Acquires one synchronous registry with scoped, lazy native workers.
+ * Creates one manager's sharing registry, checkpoints and owned reconnect workers.
  * @param client - Borrowed transport, replaceable by a deterministic test client.
  * @param identity - Manager-local authorization/session boundary.
- * @returns A Layer whose Scope interrupts and joins every active connection.
+ * @returns Sessions whose close aborts and waits for every active connection.
  * @example
  * ```ts
- * import { ManagedRuntime } from "effect";
- * import { runExecutionSync } from "@relkit/contracts/operation";
- * import { RealtimeSessions, realtimeSessionsLayer } from "./realtime-session.service.js";
+ * import { createRealtimeSessions } from "./realtime-session.service.js";
  * export async function realtimeOwner(): Promise<void> {
- *   const owner = ManagedRuntime.make(realtimeSessionsLayer({}));
- *   try { const sessions = runExecutionSync(owner, RealtimeSessions); }
- *   finally { await owner.dispose(); }
+ *   const sessions = createRealtimeSessions({});
+ *   try { sessions.snapshot(); }
+ *   finally { await sessions.close(); }
  * }
  * ```
- * @see packages/client/tests/transport/examples.test.ts for the checked live Layer example.
+ * @see packages/client/tests/transport/examples.test.ts for the checked example.
  */
-export function realtimeSessionsLayer(
+export function createRealtimeSessions(
   client: unknown,
   identity?: Pick<ClientIdentityDocument, "identityScope" | "sessionEpoch">,
-): Layer.Layer<RealtimeSessions> {
-  return Layer.effect(
-    RealtimeSessions,
-    Effect.gen(function* () {
-      const scope = yield* Scope.Scope;
-      const state = yield* Ref.make<RealtimeStatus>("idle");
-      const feeds = new Map<string, SharedSubscription>();
-      const statusListeners = new Set<() => void>();
-      let stopped = false;
-      /** Publishes manager state only when its frozen status changes.
-       * @param status - The next manager state.
-       * @returns Safe external-store notification. */
-      const setStatus = Effect.fn("RealtimeSessions.status")((status: RealtimeStatus) =>
-        Effect.gen(function* () {
-          if ((yield* Ref.get(state)) === status) return;
-          yield* Ref.set(state, status);
-          for (const listener of statusListeners) safely(listener);
-        }),
-      );
-      /** Publishes connection status to both manager and channel observers.
-       * @param shared - Current scoped connection.
-       * @param status - Its next native lifecycle state.
-       * @returns Observer notifications isolated from the worker. */
-      const report = Effect.fn("RealtimeSessions.report")(
-        (shared: SharedSubscription, status: RealtimeStatus) =>
-          Effect.gen(function* () {
-            yield* setStatus(status);
-            if (shared.status === status) return;
-            shared.status = status;
-            for (const listener of shared.statusListeners) safely(() => listener(status));
-          }),
-      );
-      /** Pulls ordered frames with no intermediate buffer and owns reconnect sleeps.
-       * @param key - Complete manager-local sharing key.
-       * @param channel - Declared channel name.
-       * @param params - Borrowed channel parameters.
-       * @param shared - Current connection, checkpoint and cancellation owner.
-       * @returns Scoped connection work until the final borrower releases it. */
-      const consume = Effect.fn("RealtimeSessions.consume")(
-        (key: string, channel: string, params: unknown, shared: SharedSubscription) =>
-          observeExecution(
-            "client",
-            "realtime.session",
-            Effect.gen(function* () {
-              while (!shared.controller.signal.aborted && feeds.get(key) === shared) {
-                yield* report(shared, "connecting");
-                const source = nativeStream<RealtimeFrame>(
-                  "realtime.frames",
-                  async (signal) => {
-                    const stream = await procedureCall(client, "relkit.realtime.subscribe")(
-                      {
-                        channel,
-                        params,
-                        after: shared.checkpoint,
-                        ...(identity === undefined ? {} : { expectedIdentity: identity }),
-                      },
-                      { signal },
-                    );
-                    return (stream as AsyncIterable<RealtimeFrame>)[Symbol.asyncIterator]();
-                  },
-                  shared.controller.signal,
-                  report(shared, "connected"),
-                );
-                // Zero buffer: process each pull before asking for another frame.
-                yield* Stream.runForEach(source, (frame) =>
-                  Effect.sync(() => {
-                    if (shared.controller.signal.aborted || feeds.get(key) !== shared) return;
-                    if ("checkpoint" in frame) shared.checkpoint = frame.checkpoint;
-                    for (const listener of shared.listeners) safely(() => listener(frame));
-                  }),
-                ).pipe(
-                  Effect.andThen(report(shared, "stale")),
-                  Effect.catch(() =>
-                    shared.controller.signal.aborted ? Effect.void : report(shared, "error"),
-                  ),
-                );
-                if (!shared.controller.signal.aborted) yield* Effect.sleep(250);
-              }
-            }),
-          ),
-      );
-      /** Retires every shared connection before manager scope interruption.
-       * @returns Synchronous cancellation initiation and idle publication. */
-      const stop = Effect.fn("RealtimeSessions.stop")(() =>
-        Effect.gen(function* () {
-          stopped = true;
-          for (const shared of feeds.values()) shared.controller.abort();
-          feeds.clear();
-          yield* setStatus("idle");
-        }),
-      );
-      yield* Effect.addFinalizer(() => stop());
-      return RealtimeSessions.of({
-        feeds,
-        statusListeners,
-        snapshot: () => Ref.get(state),
-        stop,
-        subscribe: Effect.fn("RealtimeSessions.subscribe")(
-          (channel, params, listener, statusListener) =>
-            Effect.gen(function* () {
-              if (stopped) throw new Error("Realtime manager is disposed.");
-              const key = realtimeSubscriptionKey(channel, params);
-              let shared = feeds.get(key);
-              let created = false;
-              if (shared === undefined) {
-                shared = {
-                  controller: new AbortController(),
-                  listeners: new Set(),
-                  statusListeners: new Set(),
-                  status: "connecting",
-                };
-                feeds.set(key, shared);
-                created = true;
-              }
-              const entry = shared;
-              entry.listeners.add(listener);
-              if (statusListener !== undefined) {
-                entry.statusListeners.add(statusListener);
-                safely(() => statusListener(entry.status));
-              }
-              if (created)
-                entry.fiber = yield* consume(key, channel, params, entry).pipe(
-                  Effect.forkIn(scope),
-                );
-              let released = false;
-              return Effect.gen(function* () {
-                if (released) return;
-                released = true;
-                entry.listeners.delete(listener);
-                if (statusListener !== undefined) entry.statusListeners.delete(statusListener);
-                if (entry.listeners.size !== 0) return;
-                entry.controller.abort();
-                feeds.delete(key);
-                // Initiate interruption synchronously; the owner joins this cleanup fiber.
-                if (entry.fiber !== undefined)
-                  yield* Fiber.interrupt(entry.fiber).pipe(Effect.forkIn(scope));
-                if (feeds.size === 0) yield* setStatus("idle");
-              });
-            }),
-        ),
-      });
-    }),
-  );
+): RealtimeSessionService {
+  const owner = createWorkOwner();
+  const feeds = new Map<string, SharedSubscription>();
+  const statusListeners = new Set<() => void>();
+  let state: RealtimeStatus = "idle";
+  let stopped = false;
+  let closing: Promise<void> | undefined;
+  /** Publishes manager state only when it changes.
+   * @param status - The next manager state. */
+  const setStatus = (status: RealtimeStatus): void => {
+    if (state === status) return;
+    state = status;
+    for (const listener of statusListeners) safely(listener);
+  };
+  /** Publishes connection status to both manager and channel observers.
+   * @param shared - Current shared connection.
+   * @param status - Its next native lifecycle state. */
+  const report = (shared: SharedSubscription, status: RealtimeStatus): void => {
+    setStatus(status);
+    if (shared.status === status) return;
+    shared.status = status;
+    for (const listener of shared.statusListeners) safely(() => listener(status));
+  };
+  /** Pulls ordered frames with no intermediate buffer and owns reconnect delays.
+   * @param key - Complete manager-local sharing key.
+   * @param channel - Declared channel name.
+   * @param params - Borrowed channel parameters.
+   * @param shared - Current connection, checkpoint and cancellation owner.
+   * @param signal - Aborted when the final borrower releases or the owner closes.
+   * @returns Connection work until the signal aborts. */
+  const consume = async (
+    key: string,
+    channel: string,
+    params: unknown,
+    shared: SharedSubscription,
+    signal: AbortSignal,
+  ): Promise<void> => {
+    while (!signal.aborted && feeds.get(key) === shared) {
+      report(shared, "connecting");
+      try {
+        const frames = iterateNative<RealtimeFrame>(
+          async (request) => {
+            const stream = await procedureCall(client, "relkit.realtime.subscribe")(
+              {
+                channel,
+                params,
+                after: shared.checkpoint,
+                ...(identity === undefined ? {} : { expectedIdentity: identity }),
+              },
+              { signal: request },
+            );
+            return (stream as AsyncIterable<RealtimeFrame>)[Symbol.asyncIterator]();
+          },
+          { signal, opened: () => report(shared, "connected") },
+        );
+        // Zero buffer: each frame is published before the next pull.
+        for await (const frame of frames) {
+          if (signal.aborted || feeds.get(key) !== shared) break;
+          if ("checkpoint" in frame) shared.checkpoint = frame.checkpoint;
+          for (const listener of shared.listeners) safely(() => listener(frame));
+        }
+        if (!signal.aborted) report(shared, "stale");
+      } catch {
+        if (!signal.aborted) report(shared, "error");
+      }
+      if (!signal.aborted) await delay(250, signal).catch(() => undefined);
+    }
+  };
+  const stop = (): void => {
+    stopped = true;
+    for (const shared of feeds.values()) shared.controller.abort();
+    feeds.clear();
+    setStatus("idle");
+  };
+  return {
+    feeds,
+    statusListeners,
+    snapshot: () => state,
+    stop,
+    close: () => {
+      stop();
+      return (closing ??= owner.close());
+    },
+    subscribe: (channel, params, listener, statusListener) => {
+      if (stopped) throw new Error("Realtime manager is disposed.");
+      const key = realtimeSubscriptionKey(channel, params);
+      let shared = feeds.get(key);
+      const created = shared === undefined;
+      if (shared === undefined) {
+        shared = {
+          controller: new AbortController(),
+          listeners: new Set(),
+          statusListeners: new Set(),
+          status: "connecting",
+        };
+        feeds.set(key, shared);
+      }
+      const entry = shared;
+      entry.listeners.add(listener);
+      if (statusListener !== undefined) {
+        entry.statusListeners.add(statusListener);
+        safely(() => statusListener(entry.status));
+      }
+      if (created)
+        void owner
+          .run((signal) => consume(key, channel, params, entry, signal), entry.controller.signal)
+          .catch(() => undefined);
+      let released = false;
+      return () => {
+        if (released) return;
+        released = true;
+        entry.listeners.delete(listener);
+        if (statusListener !== undefined) entry.statusListeners.delete(statusListener);
+        if (entry.listeners.size !== 0) return;
+        entry.controller.abort();
+        feeds.delete(key);
+        if (feeds.size === 0) setStatus("idle");
+      };
+    },
+  };
 }
 
 /**

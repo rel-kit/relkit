@@ -3,6 +3,7 @@ import { cliAdapterError, cliOriginalError, cliPromise, cliTry } from "../cli-er
 import { observeCli } from "../cli-runtime.js";
 import { CliProcess, processLayer } from "../services/process.service.js";
 import type { PortProbeOperations } from "./port-availability.types.js";
+import { runtime } from "../runtime/index.js";
 
 /** Native listener probing with scoped subprocess authority for occupied-port details. */
 export class CliPortProbe extends Context.Service<CliPortProbe, PortProbeOperations>()(
@@ -29,8 +30,8 @@ export const portProbeLive = Layer.effect(
           return yield* Effect.scoped(
             Effect.gen(function* () {
               yield* Effect.acquireRelease(
-                cliTry("port.bind", () =>
-                  Bun.serve({ hostname, port, fetch: () => new Response() }),
+                cliPromise("port.bind", () =>
+                  runtime.serve({ hostname, port, fetch: () => new Response() }),
                 ),
                 (probe) =>
                   cliPromise("port.close", async () => {

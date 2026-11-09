@@ -1,12 +1,12 @@
 ---
 title: Generated CRUD and schemas
-description: Learn what RELKIT derives from each Drizzle table, how select/insert/update validation differs, and how to customize public contracts safely.
+description: Learn what RelKit derives from each Drizzle table, how select/insert/update validation differs, and how to customize public contracts safely.
 pagination: false
 sidebar:
   icon: braces
 ---
 
-RELKIT derives a typed CRUD client and validation schemas from each table registered with `defineDrizzleService`. `defineDrizzleService` inspects each table in its `schema` map and derives both a typed CRUD client
+RelKit derives a typed CRUD client and validation schemas from each table registered with `defineDrizzleService`. `defineDrizzleService` inspects each table in its `schema` map and derives both a typed CRUD client
 and Zod schemas. This also works for tables without a `defineModel` extension.
 
 <Callout type="note" title="Before you begin" icon="clipboard-check">
@@ -37,7 +37,7 @@ The schema export key `users` determines both `context.database.users` and
 | `zodSchemas.users.insert`                                           | Required `email`; optional `id` and `active` because they have defaults | Validate the `data` of an insert             |
 | `zodSchemas.users.update`                                           | Optional fields for a partial update                                    | Validate the `data` of an update             |
 
-RELKIT uses Drizzle's `createSelectSchema`, `createInsertSchema`, and `createUpdateSchema`
+RelKit uses Drizzle's `createSelectSchema`, `createInsertSchema`, and `createUpdateSchema`
 from `drizzle-orm/zod`. The schemas describe row data, not the complete CRUD argument wrapper.
 Parse the data object, then pass it as `{ data }`; do not parse `{ where, data }` with an update schema.
 
@@ -106,7 +106,7 @@ See [Schemas](/docs/learn/concepts/schemas) for declaring those contracts.
 
 The base CRUD layer does not automatically run these Zod schemas for every operation. TypeScript types
 help during development, but untrusted runtime input still needs explicit validation. Functions validate
-their declared input/output through RELKIT; that is separate from database schema parsing.
+their declared input/output through RelKit; that is separate from database schema parsing.
 
 Generated schemas do not enforce row ownership, tenant access, referential integrity, database
 uniqueness, or transaction isolation. Keep durable constraints in the database and business rules in

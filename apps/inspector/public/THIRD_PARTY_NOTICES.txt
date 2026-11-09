@@ -1,4 +1,4 @@
-RELKIT Inspector includes code adapted from the following projects.
+RelKit Inspector includes code adapted from the following projects.
 
 -------------------------------------------------------------------------------
 Neon UI — https://github.com/neondatabase/ui

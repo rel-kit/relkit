@@ -3,11 +3,11 @@
  * and rate-limit policies. The rate-limit reference addresses the declared cache
  * by its stable identity without importing a private service implementation.
  */
-import { defineServiceRoutes, http } from "@relkit/app/routes";
-import { z } from "@relkit/app/schema";
+import { defineServiceRoutes, http } from "relkit/routes";
+import { z } from "zod";
 import orders from "../../services/orders/service.js";
 
-export const { GET, POST } = defineServiceRoutes(orders, {
+export default defineServiceRoutes(orders, {
   GET: "searchOrders",
   POST: {
     member: "createOrder",
@@ -28,5 +28,6 @@ export const { GET, POST } = defineServiceRoutes(orders, {
       },
     },
     successStatus: 201,
+    response: (order) => ({ headers: { location: `/orders/${order.orderId}` } }),
   },
 });

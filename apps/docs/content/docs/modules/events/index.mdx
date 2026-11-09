@@ -17,17 +17,17 @@ The original operation does not wait for these reactions to finish. Use events f
 </Callout>
 
 An event consumer may submit a [task-first job](/docs/modules/jobs/quickstart) when the follow-up needs durable
-execution. Publishing an event is not an atomic database write plus task admission.
+execution. Publishing an event is not an atomic database write plus task acceptance.
 
 <include>/_setup/events.mdx</include>
 
 ## The Events API
 
-| API                                                           | What you use it for                                                                                             |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| [`defineEvent`](/docs/api/events#defineevent)                 | Name the event and define the data it carries.                                                                  |
-| [`defineFunction`](/docs/api/functions#definefunction)        | Perform an operation, then publish with `context.events[eventId].publish(data)`. List the event in `publishes`. |
-| [`defineEventFunction`](/docs/api/events#defineeventfunction) | Subscribe with `event: "orders.created"` and run your handler when it is published.                             |
+| API                                                           | What you use it for                                                                                                                 |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| [`defineEvent`](/docs/api/events#defineevent)                 | Name the event and define the data it carries.                                                                                      |
+| [`defineFunction`](/docs/api/functions#definefunction)        | Perform an operation, then publish with `context.events.orderCreated.publish(data)`. Declare the event under `dependencies.events`. |
+| [`defineEventFunction`](/docs/api/events#defineeventfunction) | Subscribe with `event: "orders.created"` and run your handler when it is published.                                                 |
 
 ## See your subscribers
 

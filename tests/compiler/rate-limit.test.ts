@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { defineCache } from "../../packages/cache/src/index.ts";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
-import { defineFunction } from "../../packages/functions/src/index.ts";
-import { defineRoute, http } from "../../packages/routes/src/index.ts";
-import { z } from "../../packages/schema/src/index.ts";
+import { defineCache } from "relkit/cache";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
+import { defineFunction } from "relkit/functions";
+import { defineRoute, http } from "relkit/routes";
+import { z } from "relkit/schema";
 
 const target = defineFunction({
   id: "orders.list",

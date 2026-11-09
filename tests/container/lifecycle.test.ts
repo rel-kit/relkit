@@ -136,7 +136,9 @@ test("stops admission, cancels in-flight work, flushes telemetry, and exits on t
     const result = await inFlight;
     const exitCode = await within(started.exited, 1_000);
 
-    expect(await Bun.file(rejectedFile).text()).toBe('503:{"error":"draining"}');
+    expect(await Bun.file(rejectedFile).text()).toBe(
+      '503:{"type":"/errors/draining","title":"Service Unavailable","status":503,"code":"draining","detail":"The server is shutting down."}',
+    );
     expect([200, 499, undefined]).toContain(result.status);
     await waitForFile(cancelledFile);
     await waitForFile(flushedFile);

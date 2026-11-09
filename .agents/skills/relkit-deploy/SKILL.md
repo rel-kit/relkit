@@ -1,11 +1,11 @@
 ---
 name: relkit-deploy
-description: Prepare, preview, and deploy a RELKIT application to AWS with Pulumi. Use for RELKIT cloud stack operations; not for local development.
+description: Prepare, preview, and deploy a RelKit application to AWS with Pulumi. Use for RelKit cloud stack operations; not for local development.
 ---
 
-# Deploy a RELKIT application
+# Deploy a RelKit application
 
-RELKIT's supported application deployment path uses AWS hosting with Pulumi. Work from the
+RelKit's supported application deployment path uses AWS hosting with Pulumi. Work from the
 generated application's root. Check `relkit.config.ts` and the installed CLI help before
 assuming an existing app has AWS and Pulumi integrations. Public creation currently
 certifies only minimal with examples enabled and no jobs/cloud/deployment. AWS/Pulumi

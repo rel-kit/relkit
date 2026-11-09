@@ -1,6 +1,6 @@
 import { Effect, Exit, Fiber, MutableRef, Queue, Ref, Scope } from "effect";
-import { canonicalJson } from "@relkit/contracts";
-import { createLoggerLayer, type LogRecord } from "@relkit/runtime-effect";
+import { canonicalJson } from "relkit/contracts";
+import { createLoggerLayer, type LogRecord } from "relkit/runtime-effect";
 import type { CliIo, CliLogger } from "./main-support-types.js";
 import type { CliLogEvent } from "./cli-logger.types.js";
 

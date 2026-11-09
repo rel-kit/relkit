@@ -1,13 +1,9 @@
 /** Executes actual admitted task envelopes while preserving native build pinning, scope, output validation and run observation. */
 import { expect } from "bun:test";
 import { Effect, Schema } from "effect";
-import {
-  submitJob,
-  type JobDescriptorAny,
-  type JobsRuntime,
-} from "../../../packages/jobs/src/index.js";
-import type { NativeTaskWork } from "../../../packages/jobs/src/adapter.js";
-import { executeTask } from "../../../packages/engine/src/task-executor.js";
+import { submitJob, type JobDescriptorAny, type JobsRuntime } from "relkit/jobs";
+import type { NativeTaskWork } from "../../../packages/relkit/src/jobs/adapter.js";
+import { executeTask } from "../../../packages/relkit/src/engine/task-executor.js";
 import type { TestJobsAdapter } from "../../../packages/testing/src/test-jobs-adapter.types.js";
 import { scaffoldNative } from "../../../scripts/scaffold-native.js";
 

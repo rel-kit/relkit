@@ -10,7 +10,8 @@ const schema = {
     validate: (value: unknown) => ({ value }),
   },
 };
-const contract = { ping: oc.input(schema).output(schema) };
+// Framework procedures (`jobs`, `relkit.*`) keep the RPC protocol; routes use REST.
+const contract = { jobs: { ping: oc.input(schema).output(schema) } };
 const failure = new DOMException("Socket blocked by browser policy.", "SecurityError");
 let constructions = 0;
 
@@ -32,7 +33,7 @@ const server = Bun.serve({
   hostname: "127.0.0.1",
   port: 0,
   fetch: async (request) => {
-    assert.equal(new URL(request.url).pathname, "/rpc/ping");
+    assert.equal(new URL(request.url).pathname, "/_relkit/v1/rpc/jobs/ping");
     assert.equal(request.method, "POST");
     const body = await request.json();
     assert.deepEqual(body, { json: { message: "fallback" } });
@@ -48,7 +49,7 @@ try {
   });
   assert.equal(constructions, 0, "transport selection must stay lazy");
   for (let call = 0; call < 2; call++)
-    assert.equal(await client.ping({ message: "fallback" }), "http-success");
+    assert.equal(await client.jobs.ping({ message: "fallback" }), "http-success");
   assert.equal(constructions, 1, "future calls must reuse the selected HTTP fallback");
   assert.equal(requests, 2, "both calls must reach the real HTTP server");
   await assert.rejects(

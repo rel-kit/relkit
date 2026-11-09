@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
+import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
 
 const source = { file: "src/routes/wait.task.ts", line: 1, column: 1 } as const;
 

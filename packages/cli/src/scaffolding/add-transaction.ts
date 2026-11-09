@@ -2,31 +2,31 @@
 
 import { Context, Effect, Layer } from "effect";
 
-import { observeExecution } from "@relkit/contracts/operation";
+import { observeExecution } from "relkit/contracts/operation";
 
 import {
   ADD_FAILURE_CODES,
   AddScaffoldError,
   type AddResult,
   type ScaffoldPlan,
-} from "create-relkit/internal/add-types";
+} from "create-relkit/add-types";
 
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
 
-import { GeneratorProcess, generatorProcessLayer } from "create-relkit/internal/generator-process";
+import { GeneratorProcess, generatorProcessLayer } from "create-relkit/generator-process";
 
 import {
   domainError,
   errorMessage,
   publicFailure,
   scaffoldErrors,
-} from "create-relkit/internal/generator-errors";
+} from "create-relkit/generator-errors";
 
-import { runGeneratorPromise } from "create-relkit/internal/generator-runtime";
+import { runGeneratorPromise } from "create-relkit/generator-runtime";
 
 import type { ApplyScaffoldContext, ScaffoldTransactionService } from "./add-transaction.types.js";
 
-import { transferCleanupFailures } from "create-relkit/internal/generator-cleanup";
+import { transferCleanupFailures } from "create-relkit/generator-cleanup";
 
 export type { AddCommandResult, ApplyScaffoldContext } from "./add-transaction.types.js";
 

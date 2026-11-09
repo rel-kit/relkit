@@ -3,12 +3,12 @@ import type {
   AgentStateProvider,
   WaitForControlsRequest,
   WaitForJournalRequest,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 import {
   createAgentStateProviderFromStore,
   emptyAgentState,
   LOCAL_AGENT_STATE_VERSION,
-} from "@relkit/providers-local";
+} from "relkit/providers-local";
 import { createRedisAgentStore } from "./state-store.js";
 
 export interface RedisAgentStateProviderOptions {

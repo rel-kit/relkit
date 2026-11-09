@@ -1,4 +1,4 @@
-import type { AgentExecutionSnapshot } from "@relkit/contracts";
+import type { AgentExecutionSnapshot } from "relkit/contracts";
 
 /**
  * Browser agent lifecycle and content projected from authoritative execution state.

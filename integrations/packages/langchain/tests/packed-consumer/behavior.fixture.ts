@@ -1,15 +1,17 @@
 /** Exercises public selected native execution, checkpoint reuse, tool streaming and test-helper cancellation in an external packed installation. */
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
 import { expect, test } from "bun:test";
 import { MemorySaver } from "@langchain/langgraph";
 import { tool } from "langchain";
-import { defineAgent, invokeAgent } from "@relkit/langchain";
+import { invokeAgent } from "@relkit/langchain";
 import { createTestAgent, createTestModel } from "@relkit/langchain/testing";
-import { z } from "@relkit/schema";
+import { z } from "relkit/schema";
 
 const limits = { maxSteps: 4, maxToolCalls: 2, timeoutMs: 5_000 };
 const engine = {
   invoke: async () => {
-    throw new Error("Unexpected RELKIT tool");
+    throw new Error("Unexpected RelKit tool");
   },
 };
 
@@ -36,12 +38,11 @@ function selectedToolFixture() {
   const saver = new MemorySaver();
   const agent = defineAgent({
     id: "packed.double",
+    runtime: langchain({ model: model.languageModel, checkpointer: saver, tools: [nativeTool] }),
     input: z.object({ message: z.string() }),
     output: z.object({ answer: z.string() }),
-    model: model.languageModel,
     instructions: "Use the selected tool.",
-    tools: [nativeTool],
-    checkpointer: saver,
+    tools: [],
     limits,
   });
   return { agent, model, saver, executions: () => executions };
@@ -95,6 +96,7 @@ async function toolAndCheckpoint() {
 async function publicHarness() {
   const agent = defineAgent({
     id: "packed.helper",
+    runtime: langchain(),
     input: z.object({ message: z.string() }),
     output: z.object({ answer: z.string() }),
     instructions: "Reply",

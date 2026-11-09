@@ -2,7 +2,7 @@
 
 import { createAgent, StructuredOutputParsingError, type AnyAgentMiddleware } from "langchain";
 import { Effect, Layer } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import { hasDeepAgentCapabilities } from "./define-agent-deep.js";
 import { createThreadBucketBackendEffect } from "./deepagent-bucket-scope.js";
 import { resolveAgentPersistenceEffect } from "./graph-persistence.js";

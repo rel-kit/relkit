@@ -2,18 +2,14 @@
 
 import { join } from "node:path";
 import { Effect } from "effect";
-import { observeExecution } from "@relkit/contracts/operation";
-import { resolveRelkitExecutableEffect } from "create-relkit/internal/generate-process";
+import { observeExecution } from "relkit/contracts/operation";
+import { resolveRelkitExecutableEffect } from "create-relkit/generate-process";
 
-import {
-  ADD_FAILURE_CODES,
-  AddScaffoldError,
-  type ScaffoldPlan,
-} from "create-relkit/internal/add-types";
+import { ADD_FAILURE_CODES, AddScaffoldError, type ScaffoldPlan } from "create-relkit/add-types";
 
-import { GeneratorFileSystem } from "create-relkit/internal/generator-filesystem";
-import { GeneratorProcess } from "create-relkit/internal/generator-process";
-import { domainError } from "create-relkit/internal/generator-errors";
+import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
+import { GeneratorProcess } from "create-relkit/generator-process";
+import { domainError } from "create-relkit/generator-errors";
 
 import type { ApplyScaffoldContext } from "./add-transaction.types.js";
 

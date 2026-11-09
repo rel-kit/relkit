@@ -1,18 +1,18 @@
 /** Builds the retained selected-native helper matrix with explicit test ownership and cleanup. */
-import type { JsonValue } from "@relkit/contracts";
-import { defineAgent } from "@relkit/langchain";
-import { invokeFunction, type InvocationParent, type InvocationTarget } from "@relkit/engine";
-import { defineError, defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { defineAgent } from "relkit/agents";
+import { langchain } from "@relkit/langchain";
+import type { JsonValue } from "relkit/contracts";
+import { invokeFunction, type InvocationParent, type InvocationTarget } from "relkit/engine";
+import { defineError, defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 import {
   defineTool,
   type ToolDescriptor,
   type ToolEngine,
   type ToolEngineInvocation,
-} from "@relkit/tools";
+} from "relkit/tools";
 import { createTestAgent } from "../fixtures/owned-compatibility.ts";
 import type { TestAgentModelOptions, TestModelTurn } from "@relkit/langchain/testing";
-
 import type { TargetFailure } from "./agent-matrix-helpers.types.ts";
 export type { TargetFailure } from "./agent-matrix-helpers.types.ts";
 
@@ -60,6 +60,7 @@ export function makeFixture(
   });
   const agent = defineAgent({
     id: "support.order",
+    runtime: langchain(),
     input: z.object({ question: z.string() }),
     output: z.object({ answer: z.string() }),
     model: "default",

@@ -4,9 +4,10 @@ description: Configure Effect MQ, prepare an Orders CSV, and inspect the Postgre
 pagination: false
 sidebar:
   icon: database
+labs: true
 ---
 
-Use Effect MQ to run RELKIT jobs through a PostgreSQL-backed queue. You will prepare a validated
+Use Effect MQ to run RelKit jobs through a PostgreSQL-backed queue. You will prepare a validated
 Orders CSV and inspect the native queue row after submitting it. You need Bun 1.3.10 and a
 running Docker daemon. Start where `relkit-effect-mq` does not already exist. This example
 returns CSV text; it does not write a file or query the Orders database.
@@ -16,7 +17,7 @@ returns CSV text; it does not write a file or query the Orders database.
 
 ## Configure an existing app
 
-The `--jobs effect-mq-docker` creation tuple is currently rejected before staging because its native
+The `--jobs effect-mq-docker` creation combination is currently rejected before staging because its native
 and timing evidence is incomplete. Begin with an existing project and install the selected adapter,
 native SDK/ORM, local tooling and application-owned repair before applying the configuration below:
 
@@ -49,11 +50,11 @@ does not apply an application-level repair. Validate manual consumers with `skip
 
 ## Set up the PostgreSQL queue
 
-`effect-mq-docker` starts PostgreSQL and a RELKIT worker; Effect MQ stores its native queue
+`effect-mq-docker` starts PostgreSQL and a RelKit worker; Effect MQ stores its native queue
 in PostgreSQL rather than exposing a separate provider dashboard. You do not need a cloud
 account. `bun run relkit local up --detach` creates the database credentials, starts the
 containers, and supplies the worker connection. Keep those generated credentials in local
-state. The config above binds RELKIT's `default` jobs profile to that queue.
+state. The config above binds RelKit's `default` jobs profile to that queue.
 
 The worker must be healthy before you trigger the job. `bun run relkit local status` should
 show `provider.job.default: healthy`. If you want to inspect the native store, identify this
@@ -157,8 +158,8 @@ bun run dev
 ```
 
 In another terminal, check registration first: `jobs list` must name `exportOrders`, task
-`orders.export-orders`, and profile `default`. Submit the sample input next. Its accepted
-receipt only proves enqueueing; execution needs a separate native check.
+`orders.export-orders`, and profile `default`. Submit the sample input next. Its acceptance
+only proves enqueueing; execution needs a separate native check.
 
 ```sh title="Second terminal — relkit-effect-mq"
 bun run relkit jobs capabilities
@@ -169,7 +170,7 @@ bun run relkit jobs runs get --run-id '<runId>'
 ```
 
 The list command is the easiest way to see the completed output; replace `<runId>` with the
-exact receipt ID, keeping the quotes because Effect MQ IDs contain shell punctuation. To
+exact `runId`, keeping the quotes because Effect MQ IDs contain shell punctuation. To
 inspect Effect MQ itself, find the local
 PostgreSQL container with `docker ps`, then run the query below with its container ID. A
 completed run must have `state = completed` and an `exit` value containing the CSV result;
@@ -184,8 +185,8 @@ PostgreSQL row reached `completed` after one attempt. Its native `exit` containe
 lines and `totalCents: 2100`; `jobs runs list --limit 1` returned the same completed output.
 The screenshot below is PostgreSQL's actual `psql -H` result for that run. It selects the
 task ID from Effect MQ metadata and the order count and total from its stored exit value;
-it is a database query result. This evidence predates the grouped move and does not certify
-a new grouped creation tuple.
+it is a database query result. This evidence predates the grouped move and does not prove that
+a new grouped creation combination works.
 
 ![PostgreSQL query of Effect MQ showing the Orders task completed with two orders and 2100 cents](/jobs-effect-mq-completed.png)
 

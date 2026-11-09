@@ -21,7 +21,92 @@ For a complete workflow, follow [email password sign in](/guides/auth/email-pass
 
 [Sign in from the browser](/docs/modules/auth/clients) shows the client side of this capability.
 
+## Most-used APIs
+
+These entries carry each API's contract and example. The complete reference follows.
+
+### defineBetterAuthService
+
+Defines the authentication service from the application's own Better Auth instance.
+
+**Example**
+
+```ts
+import { betterAuth } from "better-auth";
+import { defineBetterAuthService } from "@relkit/better-auth";
+export const auth = betterAuth({ emailAndPassword: { enabled: true } });
+export default defineBetterAuthService({ auth });
+```
+
+**Signature**
+
+```ts
+declare const defineBetterAuthService: {
+  <const Instance extends BetterAuthInstance>(
+    options: BetterAuthInstanceServiceOptions<Instance>,
+  ): BetterAuthServiceDescriptor<BetterAuthServiceOptions, Instance["$Infer"]["Session"]>;
+  <const Options extends BetterAuthServiceOptions>(
+    options: Options,
+  ): BetterAuthServiceDescriptor<Options>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L65)
+
+Since v0.9.0
+
+#### Backend and frontend example
+
+**Backend** — these maintained files define the operation used by the frontend below.
+
+<include
+  source="examples/auth-drizzle/src/services/auth/better-auth.ts"
+  lang="ts"
+  meta='title="examples/auth-drizzle/src/services/auth/better-auth.ts"'
+>
+  /_snippets/source/examples/auth-drizzle/src/services/auth/better-auth.ts
+</include>
+
+<include
+  source="examples/auth-drizzle/src/services/auth/service.ts"
+  lang="ts"
+  meta='title="examples/auth-drizzle/src/services/auth/service.ts"'
+>
+  /_snippets/source/examples/auth-drizzle/src/services/auth/service.ts
+</include>
+
+**Frontend**
+
+<include>/_frontend/auth.mdx</include>
+
+## Complete reference
+
 <include>/_snippets/generated/exports/better-auth.mdx</include>
+
+## `access.ts`
+
+Reads function access roles and permissions from a Better Auth instance.
+With the organization plugin, roles are the user's member role in the session's active
+organization and permissions are checked against the plugin's access control. Without it,
+roles come from the admin plugin's `user.role` and no permission is granted.
+
+### resolveBetterAuthAccess
+
+Resolves the roles and permissions of a Better Auth session.
+
+**Example**
+
+```ts
+const { roles } = await resolveBetterAuthAccess(auth, session);
+```
+
+**Signature**
+
+```ts
+declare const resolveBetterAuthAccess: (auth: Auth<any>, session: unknown) => Promise<Resolved>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/access.ts#L27)
 
 ## `activation.ts`
 
@@ -53,7 +138,7 @@ async function handleNativeAuth(database: AuthConfiguration["database"]): Promis
 ```ts
 declare const activateBetterAuthService: <Options extends BetterAuthServiceOptions>(
   service: BetterAuthServiceDescriptor<Options>,
-  database: AuthDatabase,
+  database: AuthDatabase | undefined,
   basePath: string,
   options?: BetterAuthActivationOptions,
 ) => Promise<Auth<any>>;
@@ -124,7 +209,7 @@ declare const databaseServiceOf: (
 ) => Parameters<typeof drizzleRuntimeOf>[0];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth-database.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth-database.ts#L18)
 
 ### withAuthWork
 
@@ -134,7 +219,7 @@ Keeps SQLite serialization and owner drain admission around the complete SDK cal
 
 ```ts
 declare const withAuthWork: <A, E, R>(
-  database: AuthDatabase,
+  database: AuthDatabase | undefined,
   effect: Effect.Effect<A, E, R>,
 ) => Effect.Effect<A, DrizzleFailure | E, R>;
 ```
@@ -277,7 +362,7 @@ declare const authLiveLayer: (
 ) => Layer.Layer<AuthService, AuthFailure | DrizzleFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.service.ts#L147)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.service.ts#L169)
 
 ### authServiceLayer
 
@@ -319,8 +404,10 @@ Runtime dependencies captured once when constructing a native auth service.
 
 ```ts
 export interface AuthConfiguration {
-  readonly options: BetterAuthServiceOptions;
-  readonly database: AuthDatabase;
+  /** Native options; an instance's options may carry their own `database` and `basePath`. */
+  readonly options: BetterAuthServiceOptions | BetterAuthOptions;
+  /** The Drizzle service; unused when the options bring their own `database`. */
+  readonly database: AuthDatabase | undefined;
   readonly basePath: string;
 }
 ```
@@ -356,7 +443,7 @@ export interface AuthFactoryInterface {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L40)
 
 ### AuthServiceInterface (interface)
 
@@ -386,7 +473,7 @@ export interface AuthServiceInterface {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L50)
 
 ### BetterAuthHandler
 
@@ -422,21 +509,21 @@ export interface BetterAuthRuntime<Options extends BetterAuthServiceOptions> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L74)
 
 ### BetterAuthServiceDescriptor
 
 **Signature**
 
 ```ts
-declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options>;
+declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options, Session>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L18)
 
 ### BetterAuthServiceOptions (type alias)
 
-Native options; RELKIT supplies database and the route-derived base path.
+Native options; RelKit supplies database and the route-derived base path.
 
 **Signature**
 
@@ -470,13 +557,14 @@ Database-independent state populated by the explicitly selected server bridge.
 
 ```ts
 export interface BetterAuthDeclarationRuntime<Options extends BetterAuthServiceOptions> {
-  readonly options: Options;
+  /** Native options; an instance's options may carry their own `database` and `basePath`. */
+  readonly options: Options | BetterAuthOptions;
   activation: object | undefined;
   handle: ((request: Request) => Promise<Response>) | undefined;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L62)
 
 ### BetterAuthHandler (type alias)
 
@@ -491,7 +579,40 @@ type BetterAuthHandler<Session = unknown> = RawHttpHandler & {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L35)
+
+### BetterAuthInstance (interface)
+
+The application's own Better Auth instance, from `betterAuth({...})` in a Better Auth file.
+
+**Signature**
+
+```ts
+export interface BetterAuthInstance {
+  readonly options: BetterAuthOptions;
+  readonly handler: (request: Request) => Promise<Response>;
+  readonly $Infer: { readonly Session: unknown };
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L14)
+
+### BetterAuthInstanceServiceOptions (interface)
+
+Options for a service built from the application's Better Auth instance.
+
+**Signature**
+
+```ts
+export interface BetterAuthInstanceServiceOptions<Instance extends BetterAuthInstance> {
+  /** The Better Auth instance; RelKit rebuilds it from `auth.options` when the server starts. */
+  readonly auth: Instance;
+  /** `false` keeps RelKit from mounting the handler at the instance's `basePath`. */
+  readonly mount?: false;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L21)
 
 ### BetterAuthRegistration (interface)
 
@@ -506,7 +627,7 @@ export interface BetterAuthRegistration {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L29)
 
 ### BetterAuthServiceDescriptor (interface)
 
@@ -517,13 +638,22 @@ Lazy authoring declaration whose identity survives isolated activation.
 ```ts
 export interface BetterAuthServiceDescriptor<
   Options extends BetterAuthServiceOptions,
+  Session = Auth<Options>["$Infer"]["Session"],
 > extends ReturnType<typeof createDescriptorBase<"service", string>> {
-  readonly capability: { readonly kind: "better-auth" };
-  readonly handler: BetterAuthHandler<Auth<Options>["$Infer"]["Session"]>;
+  readonly capability: {
+    readonly kind: "better-auth";
+    /** Where the handler is mounted when no route mounts it. */
+    readonly basePath?: string;
+    /** `false` when the application mounts the handler itself, or not at all. */
+    readonly mount?: boolean;
+    /** `custom` when the instance brings its own database instead of the Drizzle service. */
+    readonly database?: "drizzle" | "custom";
+  };
+  readonly handler: BetterAuthHandler<Session>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L45)
 
 ### BetterAuthServiceOptions (type alias)
 
@@ -551,7 +681,7 @@ type InferBetterAuthSession<Handler> =
   Handler extends BetterAuthHandler<infer Session> ? Session : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L41)
 
 ## `dependencies.ts`
 
@@ -567,7 +697,7 @@ Resolves peers from this installed adapter, independently of the invoking CLI ca
 declare const checkNativeAuthDependencies: () => Effect.Effect<void, AuthFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/dependencies.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/dependencies.ts#L8)
 
 ## `drizzle.ts`
 
@@ -678,7 +808,7 @@ declare const BetterAuthRegistration: BetterAuthRegistration;
 **Signature**
 
 ```ts
-declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options>;
+declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options, Session>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L14)
@@ -710,7 +840,7 @@ declare const InferBetterAuthSession: InferBetterAuthSession<Handler>;
 ```ts
 declare const activateBetterAuthService: <Options extends BetterAuthServiceOptions>(
   service: BetterAuthServiceDescriptor<Options>,
-  database: AuthDatabase,
+  database: AuthDatabase | undefined,
   basePath: string,
   options?: BetterAuthActivationOptions,
 ) => Promise<Auth<any>>;
@@ -757,9 +887,14 @@ declare const authServiceLayer: (
 **Signature**
 
 ```ts
-declare const defineBetterAuthService: <const Options extends BetterAuthServiceOptions>(
-  options: Options,
-) => BetterAuthServiceDescriptor<Options>;
+declare const defineBetterAuthService: {
+  <const Instance extends BetterAuthInstance>(
+    options: BetterAuthInstanceServiceOptions<Instance>,
+  ): BetterAuthServiceDescriptor<BetterAuthServiceOptions, Instance["$Infer"]["Session"]>;
+  <const Options extends BetterAuthServiceOptions>(
+    options: Options,
+  ): BetterAuthServiceDescriptor<Options>;
+};
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L2)
@@ -769,19 +904,19 @@ declare const defineBetterAuthService: <const Options extends BetterAuthServiceO
 **Backend** — these maintained files define the operation used by the frontend below.
 
 <include
+  source="examples/auth-drizzle/src/services/auth/better-auth.ts"
+  lang="ts"
+  meta='title="examples/auth-drizzle/src/services/auth/better-auth.ts"'
+>
+  /_snippets/source/examples/auth-drizzle/src/services/auth/better-auth.ts
+</include>
+
+<include
   source="examples/auth-drizzle/src/services/auth/service.ts"
   lang="ts"
   meta='title="examples/auth-drizzle/src/services/auth/service.ts"'
 >
   /_snippets/source/examples/auth-drizzle/src/services/auth/service.ts
-</include>
-
-<include
-  source="examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"
-  lang="ts"
-  meta='title="examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"'
->
-  /_snippets/source/examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts
 </include>
 
 **Frontend**
@@ -801,64 +936,22 @@ declare const generateBetterAuthOpenApi: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L4)
 
-## `index.ts`
-
-Lazy authentication authoring; select /drizzle for native database activation. @packageDocumentation
-
-### defineBetterAuthService
-
-Defines lazy authentication using the application's Drizzle database.
-
-**Throws**
-
-TypeError When options is not an object or specifies database/basePath.
-
-**Example**
-
-```ts
-import { defineBetterAuthService } from "@relkit/better-auth";
-const auth = defineBetterAuthService({
-  baseURL: "http://127.0.0.1:3000",
-  emailAndPassword: { enabled: true },
-});
-const handler = auth.handler;
-```
+### resolveBetterAuthAccess
 
 **Signature**
 
 ```ts
-declare const defineBetterAuthService: <const Options extends BetterAuthServiceOptions>(
-  options: Options,
-) => BetterAuthServiceDescriptor<Options>;
+declare const resolveBetterAuthAccess: (
+  auth: Auth<any>,
+  session: unknown,
+) => Promise<Pick<UserPrincipal<unknown>, "roles" | "hasPermission">>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L19)
 
-Since v0.0.5
+## `index.ts`
 
-#### Backend and frontend example
-
-**Backend** — these maintained files define the operation used by the frontend below.
-
-<include
-  source="examples/auth-drizzle/src/services/auth/service.ts"
-  lang="ts"
-  meta='title="examples/auth-drizzle/src/services/auth/service.ts"'
->
-  /_snippets/source/examples/auth-drizzle/src/services/auth/service.ts
-</include>
-
-<include
-  source="examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"
-  lang="ts"
-  meta='title="examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"'
->
-  /_snippets/source/examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts
-</include>
-
-**Frontend**
-
-<include>/_frontend/auth.mdx</include>
+Lazy authentication authoring; select /drizzle for native database activation. @packageDocumentation
 
 ### BETTER_AUTH_HANDLER
 
@@ -868,7 +961,7 @@ Since v0.0.5
 declare const BETTER_AUTH_HANDLER: unique symbol;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L15)
 
 ### BetterAuthHandler
 
@@ -878,7 +971,27 @@ declare const BETTER_AUTH_HANDLER: unique symbol;
 declare const BetterAuthHandler: BetterAuthHandler<Session>;
 ```
 
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L21)
+
+### BetterAuthInstance
+
+**Signature**
+
+```ts
+declare const BetterAuthInstance: BetterAuthInstance;
+```
+
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L17)
+
+### BetterAuthInstanceServiceOptions
+
+**Signature**
+
+```ts
+declare const BetterAuthInstanceServiceOptions: BetterAuthInstanceServiceOptions<Instance>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L18)
 
 ### BetterAuthRegistration
 
@@ -888,17 +1001,17 @@ declare const BetterAuthHandler: BetterAuthHandler<Session>;
 declare const BetterAuthRegistration: BetterAuthRegistration;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L20)
 
 ### BetterAuthServiceDescriptor
 
 **Signature**
 
 ```ts
-declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options>;
+declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options, Session>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L23)
 
 ### BetterAuthServiceOptions
 
@@ -908,7 +1021,7 @@ declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options>;
 declare const BetterAuthServiceOptions: BetterAuthServiceOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L19)
 
 ### InferBetterAuthSession
 
@@ -918,7 +1031,7 @@ declare const BetterAuthServiceOptions: BetterAuthServiceOptions;
 declare const InferBetterAuthSession: InferBetterAuthSession<Handler>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L22)
 
 ## `openapi-projection.ts`
 
@@ -1015,7 +1128,7 @@ declare class AuthOpenApi
 
 ### generateBetterAuthOpenApi
 
-Projects native core and plugin endpoints for RELKIT's shared API reference.
+Projects native core and plugin endpoints for RelKit's shared API reference.
 
 **Example**
 
@@ -1048,7 +1161,7 @@ declare const BetterAuthClientLike: BetterAuthClientLike<Session>;
 
 ### BetterAuthRelkitClientProvider
 
-Remounts the RELKIT client whenever native authentication identity changes.
+Remounts the RelKit client whenever native authentication identity changes.
 
 **Example**
 

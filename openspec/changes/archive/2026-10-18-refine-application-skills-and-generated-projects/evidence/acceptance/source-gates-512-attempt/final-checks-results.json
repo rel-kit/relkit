@@ -84,7 +84,7 @@
         "tests/unit/packed-registry.test.ts",
         "tests/unit/release-check-listing.test.ts"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 1.0413744999968912,
@@ -107,7 +107,7 @@
         "--timeout",
         "30000"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 8.356645374995423,
@@ -125,7 +125,7 @@
         "--timeout",
         "30000"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 23.13946429200587,
@@ -138,7 +138,7 @@
         "--smol",
         "scripts/sync-release.ts"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.048175167001318187,
@@ -151,7 +151,7 @@
         "--smol",
         "scripts/sync-release.ts"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.04517679099808447,
@@ -167,7 +167,7 @@
         "--write-notes",
         "--allow-dirty"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.16957516700495034,
@@ -182,7 +182,7 @@
         "--notes-only",
         "--allow-dirty"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.15640470798825845,
@@ -200,7 +200,7 @@
         "--pretty",
         "false"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit",
+      "cwd": "<repo>",
       "exit": 0,
       "expected": 0,
       "seconds": 0.09895783301908523,
@@ -216,12 +216,12 @@
         "--pretty",
         "false"
       ],
-      "cwd": "/Users/mustafaelsayed/Workspace/relkit/apps/docs",
+      "cwd": "<repo>/apps/docs",
       "exit": 134,
       "expected": 0,
       "seconds": 2.9659405830025207,
       "pid": 24407
     }
   ],
-  "blocker": "final-typecheck-docs failed: n/node]\n77: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n78: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n79: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n80: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n81: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n82: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n83: 0x101468bec Builtins_InterpreterEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n84: 0x1014668cc Builtins_JSEntryTrampoline [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n85: 0x101466570 Builtins_JSEntry [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n86: 0x1009906e4 v8::internal::(anonymous namespace)::Invoke(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n87: 0x100990048 v8::internal::Execution::Call(v8::internal::Isolate*, v8::internal::DirectHandle<v8::internal::Object>, v8::internal::DirectHandle<v8::internal::Object>, v8::base::Vector<v8::internal::DirectHandle<v8::internal::Object> const>) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n88: 0x1008047e0 v8::Function::Call(v8::Isolate*, v8::Local<v8::Context>, v8::Local<v8::Value>, int, v8::Local<v8::Value>*) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n89: 0x1005c574c node::builtins::BuiltinLoader::CompileAndCall(v8::Local<v8::Context>, char const*, node::Realm*) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n90: 0x10068c960 node::Realm::ExecuteBootstrapper(char const*) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n91: 0x1005a2b58 node::StartExecution(node::Environment*, char const*) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n92: 0x1005a2aac node::StartExecution(node::Environment*, std::__1::function<v8::MaybeLocal<v8::Value> (node::StartExecutionCallbackInfo const&)>) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n93: 0x1004f188c node::LoadEnvironment(node::Environment*, std::__1::function<v8::MaybeLocal<v8::Value> (node::StartExecutionCallbackInfo const&)>, std::__1::function<void (node::Environment*, v8::Local<v8::Value>, v8::Local<v8::Value>)>) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n94: 0x10064005c node::NodeMainInstance::Run() [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n95: 0x1005a6344 node::Start(int, char**) [/Users/mustafaelsayed/.nvm/versions/node/v24.12.0/bin/node]\n96: 0x18d706b98 start [/usr/lib/dyld]\n[rtk] node --max-old-space-size=512 ../../node_modules/typescript/bin/tsc --noEmit --pretty false: process terminated by signal 6\n"
+  "blocker": "final-typecheck-docs failed: n/node]\n77: 0x101468bec Builtins_InterpreterEntryTrampoline [<home>/.nvm/versions/node/v24.12.0/bin/node]\n78: 0x101468bec Builtins_InterpreterEntryTrampoline [<home>/.nvm/versions/node/v24.12.0/bin/node]\n79: 0x101468bec Builtins_InterpreterEntryTrampoline [<home>/.nvm/versions/node/v24.12.0/bin/node]\n80: 0x101468bec Builtins_InterpreterEntryTrampoline [<home>/.nvm/versions/node/v24.12.0/bin/node]\n81: 0x101468bec Builtins_InterpreterEntryTrampoline [<home>/.nvm/versions/node/v24.12.0/bin/node]\n82: 0x101468bec Builtins_InterpreterEntryTrampoline [<home>/.nvm/versions/node/v24.12.0/bin/node]\n83: 0x101468bec Builtins_InterpreterEntryTrampoline [<home>/.nvm/versions/node/v24.12.0/bin/node]\n84: 0x1014668cc Builtins_JSEntryTrampoline [<home>/.nvm/versions/node/v24.12.0/bin/node]\n85: 0x101466570 Builtins_JSEntry [<home>/.nvm/versions/node/v24.12.0/bin/node]\n86: 0x1009906e4 v8::internal::(anonymous namespace)::Invoke(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [<home>/.nvm/versions/node/v24.12.0/bin/node]\n87: 0x100990048 v8::internal::Execution::Call(v8::internal::Isolate*, v8::internal::DirectHandle<v8::internal::Object>, v8::internal::DirectHandle<v8::internal::Object>, v8::base::Vector<v8::internal::DirectHandle<v8::internal::Object> const>) [<home>/.nvm/versions/node/v24.12.0/bin/node]\n88: 0x1008047e0 v8::Function::Call(v8::Isolate*, v8::Local<v8::Context>, v8::Local<v8::Value>, int, v8::Local<v8::Value>*) [<home>/.nvm/versions/node/v24.12.0/bin/node]\n89: 0x1005c574c node::builtins::BuiltinLoader::CompileAndCall(v8::Local<v8::Context>, char const*, node::Realm*) [<home>/.nvm/versions/node/v24.12.0/bin/node]\n90: 0x10068c960 node::Realm::ExecuteBootstrapper(char const*) [<home>/.nvm/versions/node/v24.12.0/bin/node]\n91: 0x1005a2b58 node::StartExecution(node::Environment*, char const*) [<home>/.nvm/versions/node/v24.12.0/bin/node]\n92: 0x1005a2aac node::StartExecution(node::Environment*, std::__1::function<v8::MaybeLocal<v8::Value> (node::StartExecutionCallbackInfo const&)>) [<home>/.nvm/versions/node/v24.12.0/bin/node]\n93: 0x1004f188c node::LoadEnvironment(node::Environment*, std::__1::function<v8::MaybeLocal<v8::Value> (node::StartExecutionCallbackInfo const&)>, std::__1::function<void (node::Environment*, v8::Local<v8::Value>, v8::Local<v8::Value>)>) [<home>/.nvm/versions/node/v24.12.0/bin/node]\n94: 0x10064005c node::NodeMainInstance::Run() [<home>/.nvm/versions/node/v24.12.0/bin/node]\n95: 0x1005a6344 node::Start(int, char**) [<home>/.nvm/versions/node/v24.12.0/bin/node]\n96: 0x18d706b98 start [/usr/lib/dyld]\n[rtk] node --max-old-space-size=512 ../../node_modules/typescript/bin/tsc --noEmit --pretty false: process terminated by signal 6\n"
 }

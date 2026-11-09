@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync, rmSync } from "node:fs";
-import { defineEnv, env } from "@relkit/config";
-import { z } from "@relkit/schema";
+import { defineEnv, env } from "relkit/config";
+import { z } from "relkit/schema";
 import { invokeFunction } from "../../src/index.ts";
 import { createTestRuntime } from "../fixtures/owned-compatibility.ts";
 
@@ -59,13 +59,12 @@ describe("testing runtime foundation", () => {
         buckets: {
           assets: { ref: { kind: "bucket", id: "testing.assets" } },
         },
-      },
-      publishes: ["testing.notice"],
-      publications: {
-        "testing.notice": {
-          ref: { kind: "event", id: "testing.notice" },
-          version: 1,
-          input: z.object({ message: z.string() }),
+        events: {
+          notice: {
+            ref: { kind: "event", id: "testing.notice" },
+            version: 1,
+            input: z.object({ message: z.string() }),
+          },
         },
       },
       handler: async (
@@ -77,11 +76,11 @@ describe("testing runtime foundation", () => {
             };
           };
           readonly events: {
-            readonly "testing.notice": { publish(value: unknown): Promise<unknown> };
+            readonly notice: { publish(value: unknown): Promise<unknown> };
           };
         },
       ) => {
-        const result = (await context.events["testing.notice"].publish(input)) as {
+        const result = (await context.events.notice.publish(input)) as {
           readonly accepted: boolean;
         };
         await context.buckets.assets.put(

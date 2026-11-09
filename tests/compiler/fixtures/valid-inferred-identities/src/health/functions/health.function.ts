@@ -1,4 +1,4 @@
-import { defineFunction } from "@relkit/app";
+import { defineFunction } from "relkit";
 import { emptyInput, orderOutput } from "../../platform/schemas.js";
 
 const health = defineFunction({

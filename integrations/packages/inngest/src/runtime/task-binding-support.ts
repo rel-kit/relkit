@@ -1,6 +1,6 @@
-import { parseTracePropagation } from "@relkit/contracts";
-import type { ScheduleDefinition } from "@relkit/jobs";
-import type { TaskExecutionEnvelope } from "@relkit/jobs/adapter";
+import { parseTracePropagation } from "relkit/contracts";
+import type { ScheduleDefinition } from "relkit/jobs";
+import type { TaskExecutionEnvelope } from "relkit/jobs/adapter";
 import type { Context } from "inngest";
 import type { InngestTaskDefinition } from "./task-binding.js";
 

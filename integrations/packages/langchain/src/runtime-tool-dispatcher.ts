@@ -1,14 +1,14 @@
-/** Dispatches native tool calls to the selected RELKIT tool target and carries approval and execution failures back to the native loop. */
+/** Dispatches native tool calls to the selected RelKit tool target and carries approval and execution failures back to the native loop. */
 
 import {
   currentExecutionContext,
   resolveDescriptorIdentity,
   type InvocationDispatchRequest,
   type InvocationDispatcher,
-} from "@relkit/invocation";
-import type { ToolEngine, ToolEngineInvocation } from "@relkit/tools";
+} from "relkit/invocation";
+import type { ToolEngine, ToolEngineInvocation } from "relkit/tools";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
+import { observeAgent } from "relkit/agents/agent-telemetry";
 import type { RuntimeToolOptions } from "./runtime-tool-events.types.js";
 
 /** Creates a nested function dispatcher with stable agent parent context.

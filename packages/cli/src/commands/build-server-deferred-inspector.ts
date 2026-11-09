@@ -19,7 +19,7 @@ export function preparedInspectorSource(configuration: ServerSourceConfiguration
     "module.installInspectorEndpoints(app,",
   );
   return `environment !== "production" && process.env.RELKIT_INSPECTOR_SESSION_TOKEN !== undefined ? async (app) => {
-  const module = await import("@relkit/inspector-api");
+  const module = await import("relkit/inspector-api");
   InspectorQueryError = module.InspectorQueryError;
   try {
     ${registration}

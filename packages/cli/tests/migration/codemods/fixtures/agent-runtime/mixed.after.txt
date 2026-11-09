@@ -1,0 +1,5 @@
+import { langchain } from "@relkit/langchain";
+import { allTools } from "./tools.js";
+import { defineAgent } from "relkit/agents";
+
+export default defineAgent({ id: "a.b", runtime: langchain(), model: "default", tools: [...allTools] });

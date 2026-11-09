@@ -75,7 +75,9 @@ test("the VM records the real compiler with its native inline source map", async
   const root = await consumerProbeFixture();
   let complete = false;
   try {
-    const typescript = dirname(fileURLToPath(import.meta.resolve("typescript/package.json")));
+    const typescript = dirname(
+      fileURLToPath(import.meta.resolve("relkit-typescript/package.json")),
+    );
     await cp(typescript, join(root, "node_modules/typescript"), { recursive: true });
     await writeFile(
       join(root, "package.json"),
@@ -83,7 +85,7 @@ test("the VM records the real compiler with its native inline source map", async
     );
     await writeFile(
       join(root, "entry.ts"),
-      'import ts from "typescript"; console.log(ts.version);',
+      'import ts from "relkit-typescript"; console.log(ts.version);',
     );
     const result = await Effect.runPromise(
       Effect.gen(function* () {

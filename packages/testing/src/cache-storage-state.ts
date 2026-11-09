@@ -4,8 +4,8 @@ import {
   CacheOperationTimeoutError,
   type CacheOperationContext,
   type CacheOperationOptions,
-} from "@relkit/cache";
-import { canonicalJson } from "@relkit/contracts";
+} from "relkit/cache";
+import { canonicalJson } from "relkit/contracts";
 import type { CacheEntry, CacheStorageState, CacheStoragePolicy } from "./cache-storage.types.js";
 
 /**

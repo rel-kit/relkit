@@ -3,13 +3,13 @@ import { expect, test } from "bun:test";
 import { oc } from "@orpc/contract";
 import { createAutoClient, createClient } from "../../src/index.ts";
 import { createServerClient } from "../../src/server.ts";
-import { SpanRuntime, runInExecutionContext, startRootSpan } from "@relkit/invocation";
+import { SpanRuntime, runInExecutionContext, startRootSpan } from "relkit/invocation";
 import {
   AGENT_CAPABILITY_HEADER,
   AGENT_CAPABILITY_VALUE,
   createSpanId,
   createTraceId,
-} from "@relkit/contracts";
+} from "relkit/contracts";
 
 const schema = {
   "~standard": {
@@ -18,7 +18,8 @@ const schema = {
     validate: (value: unknown) => ({ value }),
   },
 };
-const contract = { ping: oc.input(schema).output(schema) } as const;
+// Framework procedures (`jobs`, `relkit.*`) keep the RPC protocol; routes use REST.
+const contract = { jobs: { ping: oc.input(schema).output(schema) } } as const;
 
 test("reads mutable Headers for each future request and includes credentials", async () => {
   const headers = new Headers();
@@ -40,11 +41,11 @@ test("reads mutable Headers for each future request and includes credentials", a
     }),
   });
 
-  await client.ping({}).catch(() => undefined);
+  await client.jobs.ping({}).catch(() => undefined);
   headers.set("authorization", "Bearer current");
-  await client.ping({}).catch(() => undefined);
+  await client.jobs.ping({}).catch(() => undefined);
   headers.delete("authorization");
-  await client.ping({}).catch(() => undefined);
+  await client.jobs.ping({}).catch(() => undefined);
 
   expect(seen).toEqual([
     { authorization: null, capabilities: AGENT_CAPABILITY_VALUE, credentials: "include" },
@@ -77,9 +78,9 @@ test("evaluates async headers for each request and honors credentials overrides"
   });
 
   token = "one";
-  await client.ping({}).catch(() => undefined);
+  await client.jobs.ping({}).catch(() => undefined);
   token = "two";
-  await client.ping({}).catch(() => undefined);
+  await client.jobs.ping({}).catch(() => undefined);
   expect(seen).toEqual([
     { authorization: "Bearer one", capabilities: AGENT_CAPABILITY_VALUE },
     { authorization: "Bearer two", capabilities: AGENT_CAPABILITY_VALUE },
@@ -105,7 +106,7 @@ test("server clients create client spans and inject their active W3C context", a
     }),
   });
 
-  await runInExecutionContext({ span: root, runtime }, () => client.ping({}));
+  await runInExecutionContext({ span: root, runtime }, () => client.jobs.ping({}));
   expect(traceparent).toMatch(new RegExp(`^00-${root.traceId}-[0-9a-f]{16}-01$`));
   expect(lifecycle).toContain("completed:client");
   expect(responseBody).not.toBeNull();
@@ -129,6 +130,6 @@ test("auto transport falls back only when WebSocket establishment fails", async 
       return Response.json({}, { status: 500 });
     }),
   });
-  await client.ping({}).catch(() => undefined);
+  await client.jobs.ping({}).catch(() => undefined);
   expect(fetches).toBe(1);
 });

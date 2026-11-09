@@ -1,0 +1,12 @@
+{
+  "protocol": "relkit.walkthrough-result",
+  "kind": "create-to-first-route",
+  "outcome": "passed",
+  "seconds": 212,
+  "steps": [
+    { "name": "create", "seconds": 150 },
+    { "name": "route-answers", "seconds": 62 }
+  ],
+  "note": "Sample timing.",
+  "createdAt": "2026-11-05T10:00:00.000Z"
+}

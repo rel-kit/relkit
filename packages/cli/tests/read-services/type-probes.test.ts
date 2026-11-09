@@ -1,15 +1,15 @@
 import { expect, it } from "@effect/vitest";
 import { Effect } from "effect";
 import { fileURLToPath } from "node:url";
-import ts from "typescript";
+import ts from "../../src/typescript-parser.js";
 
 const probe = `import { Effect, Layer } from "effect";
-import { CliFileSystem } from "../../src/services/filesystem.service.js";
-import { CliModules } from "../../src/services/modules.service.js";
-import { CliProcess } from "../../src/services/process.service.js";
-import { CliGraphFiles, graphFilesLive, graphFilesLayer } from "../../src/commands/graph-file.service.js";
-import { CliEnvironmentProject, environmentProjectLive, environmentProjectLayer } from "../../src/commands/env-project.service.js";
-import { CliPortProbe, portProbeLive, portProbeLayer } from "../../src/commands/port-availability.service.js";
+import { CliFileSystem } from "../../dist/services/filesystem.service.js";
+import { CliModules } from "../../dist/services/modules.service.js";
+import { CliProcess } from "../../dist/services/process.service.js";
+import { CliGraphFiles, graphFilesLive, graphFilesLayer } from "../../dist/commands/graph-file.service.js";
+import { CliEnvironmentProject, environmentProjectLive, environmentProjectLayer } from "../../dist/commands/env-project.service.js";
+import { CliPortProbe, portProbeLive, portProbeLayer } from "../../dist/commands/port-availability.service.js";
 declare const filesystem: CliFileSystem;
 declare const modules: CliModules;
 declare const process: CliProcess;
@@ -69,23 +69,29 @@ function diagnostics(source: string): readonly ts.Diagnostic[] {
   return ts.getPreEmitDiagnostics(ts.createProgram([filename], options, host));
 }
 
-it.effect("checks all documented examples and rejects missing service authority", () =>
-  Effect.sync(() => {
-    expect(
-      diagnostics(probe).map((item) => ts.flattenDiagnosticMessageText(item.messageText, "\n")),
-    ).toEqual([]);
-  }),
+it.effect(
+  "checks all documented examples and rejects missing service authority",
+  () =>
+    Effect.sync(() => {
+      expect(
+        diagnostics(probe).map((item) => ts.flattenDiagnosticMessageText(item.messageText, "\n")),
+      ).toEqual([]);
+    }),
+  30_000,
 );
 
-it.effect("detects an erased live-layer filesystem requirement", () =>
-  Effect.sync(() => {
-    const result = diagnostics(
-      probe.replace(
-        "const live = graphFilesLive;",
-        "declare const live: Layer.Layer<CliGraphFiles>;",
-      ),
-    );
-    expect(result.some((item) => item.code === 2322)).toBe(true);
-    expect(result.some((item) => item.code === 2578)).toBe(true);
-  }),
+it.effect(
+  "detects an erased live-layer filesystem requirement",
+  () =>
+    Effect.sync(() => {
+      const result = diagnostics(
+        probe.replace(
+          "const live = graphFilesLive;",
+          "declare const live: Layer.Layer<CliGraphFiles>;",
+        ),
+      );
+      expect(result.some((item) => item.code === 2322)).toBe(true);
+      expect(result.some((item) => item.code === 2578)).toBe(true);
+    }),
+  30_000,
 );

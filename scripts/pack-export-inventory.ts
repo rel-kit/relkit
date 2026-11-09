@@ -20,7 +20,7 @@ import type { ExportInventory, ExportCommand } from "./pack-export.types.js";
 export const exportInventory = Effect.fn("ExportSmoke.inventory")(function* (repository: string) {
   const directories = workspacePackageDirectories(repository);
   const manifests: ExportInventory["manifests"] = new Map();
-  const requiredNames = new Set(["@relkit/app", "@relkit/compiler", "create-relkit"]);
+  const requiredNames = new Set(["relkit", "@relkit/cli", "create-relkit"]);
   const integrationNames = new Set<string>();
   for (const directory of directories) {
     const manifest = yield* readExportManifest(directory);

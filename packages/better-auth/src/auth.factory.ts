@@ -5,7 +5,7 @@ import {
   nativeCall,
   observeSpecializedOperation,
   redactSpecializedTrace,
-} from "@relkit/drizzle/internal";
+} from "@relkit/drizzle/server";
 import { Context, Effect, Layer } from "effect";
 import { AuthFailure } from "./auth.errors.js";
 import type { AuthFactoryInterface } from "./auth.types.js";

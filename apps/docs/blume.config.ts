@@ -11,13 +11,17 @@ const mono = { name: "Geist Mono", variants: [{ src: "./public/fonts/geist-mono-
 const site = process.env.RELKIT_DOCS_SITE ?? "https://relkit.dev";
 
 export default defineConfig({
-  title: "RELKIT",
+  title: "RelKit",
   logo: "/logo.svg",
   agents: {
     llmsTxt: true,
   },
   description:
     "Build TypeScript backends with guided examples, module documentation, and API reference.",
+  // `labs: true` marks a Labs feature page: a badge above the article and beside its sidebar row.
+  frontmatter: {
+    extend: { labs: Schema.toStandardSchemaV1(Schema.UndefinedOr(Schema.Boolean)) },
+  },
   content: {
     root: "content",
     exclude: ["generated/**"],

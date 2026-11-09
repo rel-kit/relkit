@@ -1,7 +1,7 @@
 /** Exercises native graph state schema behavior through the integration owner, preserving the original assertions and scoped test fixtures. */
 
 import { StateSchema } from "@langchain/langgraph";
-import { z, type StandardSchemaV1 } from "@relkit/schema";
+import { z, type StandardSchemaV1 } from "relkit/schema";
 import { Effect, Metric, Tracer } from "effect";
 import { expect, test } from "vitest";
 import { selectGraphState, selectGraphStateEffect } from "../src/graph-state-schema.ts";

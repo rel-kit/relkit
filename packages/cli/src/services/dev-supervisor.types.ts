@@ -5,7 +5,7 @@ import type {
   StartedCandidate,
   SupervisorGenerationDrain,
   SupervisorProxy,
-} from "@relkit/supervisor";
+} from "../supervisor/index.js";
 import type { CliAdapterError } from "../cli-errors.js";
 
 /** Native supervisor boundaries; the SDK retains ownership of its private runtimes. */

@@ -1,4 +1,4 @@
-import { normalizeId } from "@relkit/contracts";
+import { normalizeId } from "relkit/contracts";
 import type { TestEventControlState } from "./events-runtime-controls.types.js";
 
 /**

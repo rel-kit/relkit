@@ -4,8 +4,8 @@ import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promi
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { GRAPH_VERSION } from "../../packages/contracts/src/index.js";
-import { hashGraph } from "../../packages/graph/src/index.js";
+import { GRAPH_VERSION } from "relkit/contracts";
+import { hashGraph } from "relkit/graph";
 import { loadTestApplicationArtifacts } from "../../packages/testing/src/application-registry.js";
 import { runtimeCohort } from "./runtime-cohort.js";
 

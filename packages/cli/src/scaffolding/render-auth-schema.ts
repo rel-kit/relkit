@@ -1,6 +1,6 @@
 /** Renders selected auth schema declarations for the supported database dialect while preserving the existing service and migration ownership boundaries. */
 
-import type { DatabaseDialect } from "create-relkit/internal/add-types";
+import type { DatabaseDialect } from "create-relkit/add-types";
 
 /**
  * Dialect-specific Drizzle constructor tokens used to render authentication tables.

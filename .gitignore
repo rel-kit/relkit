@@ -45,6 +45,10 @@ packages/*/CHANGELOG.md
 # Local reference repositories for coding agents
 repos/*
 
+# Local bug-fix reports; link the GitHub issue instead (docs/bug-fix-reports.md)
+bug-fix-reports/
+bug-fix-ui-reports/
+
 # Debug
 npm-debug.log*
 yarn-debug.log*

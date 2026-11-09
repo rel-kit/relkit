@@ -21,13 +21,17 @@ test("the real check pipeline rejects an inferred users path without id input", 
   await mkdir(join(root, "node_modules/@relkit"), { recursive: true });
   await symlink(join(repository, "packages/app"), join(root, "node_modules/@relkit/app"));
   await symlink(join(repository, "packages/testing"), join(root, "node_modules/@relkit/testing"));
+  await symlink(
+    join(repository, "packages/relkit/node_modules/zod"),
+    join(root, "node_modules/zod"),
+  );
   await mkdir(join(root, "src/routes/users/[id]"), { recursive: true });
   await mkdir(join(root, "src/users/functions"), { recursive: true });
   await writeFile(
     join(root, "src/users/functions/example.function.ts"),
     `
-import { defineFunction } from "@relkit/app/functions";
-import { z } from "@relkit/app/schema";
+import { defineFunction } from "relkit/functions";
+import { z } from "relkit/schema";
 const example = defineFunction({ id: "users.example", input: z.object({ value: z.string() }),
   output: z.object({ value: z.string() }), handler: async ({ value }) => ({ value }) });
 export default example;`,
@@ -35,7 +39,7 @@ export default example;`,
   await writeFile(
     join(root, "src/users/service.ts"),
     `
-import { defineService } from "@relkit/app/services";
+import { defineService } from "relkit/services";
 import example from "./functions/example.function.js";
 export default defineService({ id: "users", functions: { example } });`,
   );
@@ -43,7 +47,7 @@ export default defineService({ id: "users", functions: { example } });`,
     join(root, "src/routes/users/[id]/route.ts"),
     `
 import service from "../../../users/service.js";
-import { defineServiceRoutes } from "@relkit/app/routes";
+import { defineServiceRoutes } from "relkit/routes";
 export const { GET } = defineServiceRoutes(service, { GET: "example" });`,
   );
   const command = Bun.spawn(

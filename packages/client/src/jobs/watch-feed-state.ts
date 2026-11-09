@@ -1,5 +1,5 @@
 import type { WatchFeedState } from "./watch-feed-state.types.js";
-import type { RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunWatchFrame } from "relkit/contracts/jobs";
 import { isFrame } from "./watch-feed-support.js";
 export type { WatchFeedState } from "./watch-feed-state.types.js";
 

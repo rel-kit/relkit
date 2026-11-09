@@ -1,4 +1,4 @@
-/** Adapts RELKIT callable tools to native SDK tools while preserving validated input, execution context and typed invocation failures. */
+/** Adapts RelKit callable tools to native SDK tools while preserving validated input, execution context and typed invocation failures. */
 
 import { invokeRegisteredAgentToolEffect } from "./runtime-tool-invocation.js";
 import {
@@ -6,12 +6,12 @@ import {
   runInInvocationScope,
   type InvocationDispatchRequest,
   type InvocationDispatcher,
-} from "@relkit/invocation";
-import { validate } from "@relkit/schema";
-import type { ToolDescriptor, ToolEngine, ToolEngineInvocation } from "@relkit/tools";
+} from "relkit/invocation";
+import { validate } from "relkit/schema";
+import type { ToolDescriptor, ToolEngine, ToolEngineInvocation } from "relkit/tools";
 import { Effect } from "effect";
-import { observeAgent } from "@relkit/agents/internal/agent-telemetry";
-import { ApprovalDeniedError } from "@relkit/agents/internal/approval";
+import { observeAgent } from "relkit/agents/agent-telemetry";
+import { ApprovalDeniedError } from "relkit/agents/approval";
 import { agentInvocationFailure } from "./runtime-effect-error.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import { signalFailure } from "./signal.js";
