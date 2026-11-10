@@ -31,6 +31,20 @@ test("a rerun reuses its completed earlier attempt even with a different executi
   });
 });
 
+test("a pack reused by reruns of failed jobs recovers from its original attempt", async () => {
+  const f = recoveryFixture();
+  f.run.run_attempt = 3;
+  // GitHub lists the reused pack under every attempt with the original timestamps.
+  f.jobs.jobs = [3, 1, 2].map((attempt) => ({ ...f.jobs.jobs[0]!, run_attempt: attempt }));
+  f.jobs.total_count = 3;
+  expect(await recoverRelease("rel-kit/relkit", "42", f.read)).toEqual({
+    sha: f.sha,
+    artifactId: "123",
+    runId: "42",
+  });
+  expect(f.requests).toContain("/repos/rel-kit/relkit/actions/runs/42/attempts/1");
+});
+
 test("run pagination reaches the original and missing ancestry fails closed", async () => {
   const f = recoveryFixture();
   const read = async (path: string) =>
@@ -110,7 +124,13 @@ test("foreign execution, incomplete attempts and truncated or replaced archives 
       f.artifacts.total_count = 2;
     },
     (f: ReturnType<typeof recoveryFixture>) => {
-      f.jobs.jobs.push({ ...f.jobs.jobs[0]!, run_attempt: 2 });
+      // A pack that actually ran again in a later attempt is a second pack.
+      f.jobs.jobs.push({
+        ...f.jobs.jobs[0]!,
+        run_attempt: 2,
+        started_at: "2026-10-26T12:00:00Z",
+        completed_at: "2026-10-26T12:02:00Z",
+      });
       f.jobs.total_count = 2;
     },
   ]) {

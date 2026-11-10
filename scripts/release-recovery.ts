@@ -111,7 +111,21 @@ export async function recoverRelease(
       job,
       sha: job.name === packName ? run.head_sha : job.name.slice(packName.length + 2, -1),
     }))
-    .filter((pack) => expectedSha === undefined || pack.sha === expectedSha);
+    .filter((pack) => expectedSha === undefined || pack.sha === expectedSha)
+    .toSorted((left, right) => left.job.run_attempt - right.job.run_attempt)
+    // Re-running failed jobs lists the reused successful pack again under each later attempt,
+    // with the original timestamps. Only a pack that actually ran again is a second pack.
+    .filter(
+      (pack, index, all) =>
+        !all
+          .slice(0, index)
+          .some(
+            (earlier) =>
+              earlier.sha === pack.sha &&
+              earlier.job.started_at === pack.job.started_at &&
+              earlier.job.completed_at === pack.job.completed_at,
+          ),
+    );
   assert.equal(
     packs.length,
     1,
