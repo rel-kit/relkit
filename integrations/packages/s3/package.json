@@ -1,6 +1,6 @@
 {
   "name": "@relkit/s3",
-  "version": "0.7.13",
+  "version": "0.9.0",
   "description": "S3-compatible storage integration for RelKit.",
   "license": "MIT",
   "repository": {
