@@ -58,6 +58,7 @@ async function prepareNpmBoundary(directory: string, error: string) {
       const args = process.argv.slice(2);
       if (args[0] === "--version") console.log("11.19.0");
       else if (args[0] === "view" && args[1].includes("@>")) process.exit(0);
+      else if (args[0] === "view" && args[1].endsWith("@*")) console.log(JSON.stringify(args[1].slice(0, -2)));
       else if (args[0] === "view" && state.published) console.log(JSON.stringify(artifact.integrity));
       else if (args[0] === "view") { console.error("npm error E404 Not Found"); process.exit(1); }
       else if (args[0] === "publish") {
