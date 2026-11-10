@@ -1,6 +1,6 @@
 /** Builds direct-command syntax as pure metadata without acquiring domain services. */
 import { Effect, Option } from "effect";
-import { Command } from "effect/cli";
+import { Command, Flag } from "effect/cli";
 import {
   booleanArgs,
   booleanFlag,
@@ -104,7 +104,19 @@ function projectCommand(
       {
         projectRoot: optionalString(path, "project-root"),
         ...(port ? { port: optionalInteger(path, "port", true) } : {}),
-        ...(inspectorPort ? { inspectorPort: optionalInteger(path, "inspector-port") } : {}),
+        ...(inspectorPort
+          ? {
+              inspectorPort: Flag.Int("inspector-port").pipe(
+                Flag.filter(
+                  (value) => value >= 1 && value <= 65_535,
+                  () => "inspector-port must be between 1 and 65535",
+                ),
+                // Preserve the retirement diagnostic for callers using the old flag.
+                Flag.withHidden,
+                Flag.optional,
+              ),
+            }
+          : {}),
         ...(name === "build"
           ? { runtime: optionalChoice(path, "runtime"), target: optionalChoice(path, "target") }
           : {}),
