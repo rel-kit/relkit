@@ -56,11 +56,6 @@ const root = command(
           projectRoot,
           option("prepare", "boolean", "Check the project and exit without starting a server"),
           option("port", "integer", "Application port"),
-          option(
-            "inspector-port",
-            "integer",
-            "Retired; configure inspector.connection.port, or run relkit inspector --port",
-          ),
           option("local", "choice", "Start required local services", [], ["on", "off"]),
           ...devLogOptions,
         ],
