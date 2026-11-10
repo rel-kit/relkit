@@ -106,7 +106,7 @@ jobs:
           NPM_CONFIG_FETCH_TIMEOUT: "15000"
           # Packages this change adds whose bootstrap archive the maintainer has not published yet;
           # the release job still needs the bootstrap and trusted publishing before it can publish.
-          BOOTSTRAP_PENDING: "@relkit/postgres"
+          BOOTSTRAP_PENDING: ""
         run: |
           package_names="$(jq -er '.packages[].name' "$RUNNER_TEMP/rehearsal-pack/manifest.json")"
           while IFS= read -r package_name; do

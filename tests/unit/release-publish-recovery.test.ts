@@ -61,6 +61,11 @@ test("publisher resumes exact archives, skips completed packages, and protects l
       const manifest = JSON.parse(readFileSync(process.env.MANIFEST, "utf8"));
       if (args[0] === "--version") console.log("11.19.0");
       else if (args[0] === "view" && args[1].includes("@>")) { if (state.newer !== false) console.log(JSON.stringify("9.0.0")); }
+      else if (args[0] === "view" && args[1].endsWith("@*")) {
+        const name = args[1].slice(0, -2);
+        if ((state.unregistered ?? []).includes(name)) { console.error("npm error E404 Not Found"); process.exit(1); }
+        console.log(JSON.stringify(name));
+      }
       else if (args[0] === "view") {
         const integrity = state.published[args[1]];
         if (state.stale === args[1]) {
@@ -185,6 +190,14 @@ test("publisher resumes exact archives, skips completed packages, and protects l
     const denied = await execute();
     expect(denied.code).not.toBe(0);
     expect(denied.output).toContain("permission denied");
+    // A package npm has never seen cannot use trusted publishing; nothing may publish.
+    state = { published: {}, calls: [], unregistered: ["@relkit/schema"] };
+    await writeFile(statePath, JSON.stringify(state));
+    const unregistered = await execute();
+    expect(unregistered.code).not.toBe(0);
+    expect(unregistered.output).toContain("Not registered on npm: @relkit/schema");
+    state = JSON.parse(await readFile(statePath, "utf8"));
+    expect(state.calls).toHaveLength(0);
     state = { published: {}, calls: [] };
     await writeFile(statePath, JSON.stringify(state));
     const expired = await execute(true);
@@ -192,6 +205,103 @@ test("publisher resumes exact archives, skips completed packages, and protects l
     expect(expired.output).toContain("publication deadline");
     await writeFile(join(temporary, artifacts[1]!.file), "different rebuild bytes");
     expect(() => readManifest(temporary)).toThrow("checksum mismatch");
+  } finally {
+    await rm(temporary, { recursive: true, force: true });
+  }
+}, 30_000);
+
+test("a deprecation CI cannot apply warns instead of withholding the release", async () => {
+  const temporary = await mkdtemp(join(tmpdir(), "relkit-publish-deprecation-"));
+  try {
+    const bytes = Buffer.from("original bytes for @relkit/app");
+    const sha512 = createHash("sha512").update(bytes).digest("hex");
+    await writeFile(join(temporary, "app.tgz"), bytes);
+    const artifact = {
+      name: "@relkit/app",
+      version: "0.9.0",
+      file: "app.tgz",
+      sha256: createHash("sha256").update(bytes).digest("hex"),
+      sha512,
+      integrity: `sha512-${Buffer.from(sha512, "hex").toString("base64")}`,
+      dependencies: {},
+    };
+    const manifest: Manifest = {
+      protocol: "relkit.release-manifest.v2",
+      version: "0.9.0",
+      commit: "a".repeat(40),
+      packageOrder: [artifact.name],
+      packages: [artifact],
+    };
+    await writeFile(join(temporary, "manifest.json"), JSON.stringify(manifest));
+    const statePath = join(temporary, "state.json");
+    const bin = join(temporary, "bin");
+    await mkdir(bin);
+    // The package is published; `npm deprecate` is refused like an OIDC-only CI token.
+    await writeFile(
+      join(bin, "npm"),
+      `#!${process.execPath}\n` +
+        String.raw`
+      import { readFileSync, writeFileSync } from "node:fs";
+      const args = process.argv.slice(2);
+      const state = JSON.parse(readFileSync(process.env.STATE, "utf8"));
+      if (args[0] === "--version") console.log("11.19.0");
+      else if (args[0] === "view" && args[2] === "deprecated") { if (state.deprecated) console.log(state.deprecated); }
+      else if (args[0] === "view" && args[1].endsWith("@*")) console.log(JSON.stringify("@relkit/app"));
+      else if (args[0] === "view") console.log(JSON.stringify(process.env.INTEGRITY));
+      else if (args[0] === "deprecate") {
+        state.deprecations += 1;
+        writeFileSync(process.env.STATE, JSON.stringify(state));
+        console.error("npm error code E404"); process.exit(1);
+      } else process.exit(2);
+    `,
+    );
+    await chmod(join(bin, "npm"), 0o755);
+    const execute = async () => {
+      const child = Bun.spawn(
+        [
+          "node",
+          "--experimental-strip-types",
+          resolve(import.meta.dir, "../../scripts/publish-release.ts"),
+          "--directory",
+          temporary,
+          "--publish",
+        ],
+        {
+          env: {
+            ...process.env,
+            PATH: `${bin}:${process.env.PATH}`,
+            STATE: statePath,
+            INTEGRITY: artifact.integrity,
+            NPM_RELEASES_ENABLED: "true",
+            GITHUB_REPOSITORY_VISIBILITY: "public",
+            GITHUB_REF_NAME: "main",
+            RELEASE_SHA: manifest.commit,
+          },
+          stdout: "pipe",
+          stderr: "pipe",
+        },
+      );
+      const [code, stdout, stderr] = await Promise.all([
+        child.exited,
+        new Response(child.stdout).text(),
+        new Response(child.stderr).text(),
+      ]);
+      return { code, output: stdout + stderr };
+    };
+    await writeFile(statePath, JSON.stringify({ deprecations: 0 }));
+    const refused = await execute();
+    expect(refused.code).toBe(0);
+    expect(refused.output).toContain("::warning::Could not deprecate @relkit/app@0.9.0");
+    expect(JSON.parse(await readFile(statePath, "utf8")).deprecations).toBe(1);
+    const { releaseDeprecations } = await import("../../scripts/release-deprecations.ts");
+    await writeFile(
+      statePath,
+      JSON.stringify({ deprecations: 0, deprecated: releaseDeprecations["@relkit/app"] }),
+    );
+    const applied = await execute();
+    expect(applied.code).toBe(0);
+    expect(applied.output).not.toContain("::warning::");
+    expect(JSON.parse(await readFile(statePath, "utf8")).deprecations).toBe(0);
   } finally {
     await rm(temporary, { recursive: true, force: true });
   }

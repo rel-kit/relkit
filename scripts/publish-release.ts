@@ -121,6 +121,25 @@ async function main(): Promise<void> {
         checkedDependencies.add(key);
       }
     }
+    // Trusted publishing cannot create a package, so an unregistered one would stop the
+    // batch halfway with npm ENEEDAUTH. Refuse before publishing anything instead.
+    const unregistered = manifest.packages.filter(
+      (artifact) =>
+        run(
+          [
+            "view",
+            `${artifact.name}@*`,
+            "name",
+            "--prefer-online",
+            "--registry=https://registry.npmjs.org",
+          ],
+          true,
+        ) === undefined,
+    );
+    if (unregistered.length > 0)
+      throw new Error(
+        `Not registered on npm: ${unregistered.map((artifact) => artifact.name).join(", ")}. Publish a bootstrap archive and configure trusted publishing (docs/maintainers/releasing.md, "Register new npm packages"), then rerun Release.`,
+      );
     for (const artifact of manifest.packages) {
       const existing = publishedIntegrity(artifact);
       if (existing !== undefined) {
@@ -191,7 +210,23 @@ async function main(): Promise<void> {
       `verified all ${manifest.packages.length} published packages for ${manifest.version}`,
     );
     // The final @relkit/app re-exports relkit; npm shows its message on every install.
-    for (const command of deprecationCommands(manifest.packages)) run(command);
+    // Trusted publishing authorizes only `npm publish`, so CI may not be allowed to deprecate.
+    // A missing deprecation must not withhold the GitHub release of an already published batch.
+    for (const command of deprecationCommands(manifest.packages)) {
+      const [, spec, message] = command as [string, string, string];
+      const current = run(
+        ["view", spec, "deprecated", "--prefer-online", "--registry=https://registry.npmjs.org"],
+        true,
+      );
+      if (current === message) continue;
+      try {
+        run(command);
+      } catch {
+        console.log(
+          `::warning::Could not deprecate ${spec} from CI; a maintainer runs: npm deprecate ${spec} ${JSON.stringify(message)}`,
+        );
+      }
+    }
   } else {
     console.log(`verified ${manifest.packages.length} release artifacts for ${manifest.version}`);
   }
