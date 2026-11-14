@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
   Background,
   BackgroundVariant,
@@ -14,9 +14,23 @@ import {
 import type { LayoutDirection, ViewLayout } from "../../lib/graph-view-layout";
 import { type GraphView, labelEdge } from "../../lib/graph-views";
 import { highlightFor } from "../../lib/graph-highlight";
+import { initialViewport, MIN_READABLE_ZOOM } from "../../lib/graph-views-fit";
 import { EdgeMarkers, explorerEdgeTypes, markerId, type RelationEdge } from "./graph-edges";
 import { explorerNodeTypes } from "./graph-nodes";
 import { type CanvasNode, canvasNodes, pickHandles } from "./graph-canvas-elements";
+
+/**
+ * React Flow's own stylesheet is not layered, so it outranks the app's layered rules and drew
+ * the zoom control white in the dark theme (IN-45). Its variables take the app's colours.
+ */
+export const THEMED_CONTROLS = {
+  "--xy-controls-button-background-color": "var(--panel)",
+  "--xy-controls-button-background-color-hover": "var(--panel-muted)",
+  "--xy-controls-button-color": "var(--ink)",
+  "--xy-controls-button-color-hover": "var(--ink)",
+  "--xy-controls-button-border-color": "var(--line)",
+  "--xy-controls-box-shadow": "none",
+} as CSSProperties;
 
 export function GraphCanvas({
   view,
@@ -46,6 +60,10 @@ export function GraphCanvas({
   const container = useRef<HTMLDivElement>(null);
   const instance = useRef<ReactFlowInstance<CanvasNode, RelationEdge> | null>(null);
   const firstFit = useRef(true);
+  const latestLayout = useRef(layout);
+  useEffect(() => {
+    latestLayout.current = layout;
+  }, [layout]);
   useEffect(() => {
     if (firstFit.current) {
       firstFit.current = false;
@@ -54,7 +72,13 @@ export function GraphCanvas({
     // Wait for the grid to settle on its new column widths before fitting.
     const timer = window.setTimeout(() => {
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      void instance.current?.fitView({ padding: 0.1, maxZoom: 1, duration: reduce ? 0 : 200 });
+      const box = container.current;
+      const current = latestLayout.current;
+      if (current === undefined || box === null) return;
+      void instance.current?.setViewport(
+        initialViewport(current, { width: box.clientWidth, height: box.clientHeight }),
+        { duration: reduce ? 0 : 200 },
+      );
     }, 60);
     return () => window.clearTimeout(timer);
   }, [refitKey]);
@@ -154,20 +178,23 @@ export function GraphCanvas({
         <ReactFlow<CanvasNode, RelationEdge>
           nodes={nodes}
           edges={edges}
-          fitView={!(view.mode === "flow" && direction === "right")}
-          fitViewOptions={{ padding: 0.1, maxZoom: 1 }}
           onInit={(flow) => {
             instance.current = flow;
-            // A left-to-right request flow is wide: start at the request, legible, and let the
-            // reader pan instead of shrinking eight stages into the viewport.
-            if (view.mode !== "flow" || direction !== "right") return;
             if (layout === undefined || container.current === null) return;
             const { clientWidth, clientHeight } = container.current;
+            // Fit, but never below a readable scale: a large graph starts at its top-left and
+            // the reader pans (IN-45).
+            if (view.mode !== "flow" || direction !== "right")
+              return void flow.setViewport(
+                initialViewport(layout, { width: clientWidth, height: clientHeight }),
+              );
+            // A left-to-right request flow is wide: start at the request, legible, and let the
+            // reader pan instead of shrinking eight stages into the viewport.
             const fit = Math.min(
               (clientWidth - 48) / layout.width,
               (clientHeight - 48) / layout.height,
             );
-            const zoom = Math.max(0.62, Math.min(1, fit));
+            const zoom = Math.max(MIN_READABLE_ZOOM, Math.min(1, fit));
             void flow.setViewport({
               x: 24,
               y: Math.max(24, (clientHeight - layout.height * zoom) / 2),
@@ -200,7 +227,7 @@ export function GraphCanvas({
           proOptions={{ hideAttribution: true }}
         >
           {toolbar !== undefined && <Panel position="top-center">{toolbar}</Panel>}
-          <Controls showInteractive={false} />
+          <Controls showInteractive={false} style={THEMED_CONTROLS} />
           <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
         </ReactFlow>
       </ReactFlowProvider>

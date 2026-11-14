@@ -6,6 +6,10 @@ import { playwrightSelection } from "../../scripts/playwright-selection.js";
 
 const { backend } = playwrightSelection("inspector");
 
+// The Inspector follows the system colour scheme until a theme is chosen (IN-41); these
+// baselines were taken in dark.
+test.use({ colorScheme: "dark" });
+
 test.beforeEach(async ({ page, request }) => {
   await request.post(`${backend}/__fixture__/reset`);
   await page.setViewportSize({ width: 1280, height: 900 });

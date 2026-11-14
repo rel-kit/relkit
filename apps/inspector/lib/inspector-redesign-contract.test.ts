@@ -14,7 +14,7 @@ describe("inspector redesign contracts", () => {
     expect(shell).toContain("CommandPalette");
     // Dark-first: rendered dark on the server, a stored "light" preference applied before paint.
     expect(layout).toContain('data-theme="dark"');
-    expect(layout).toContain("INSPECTOR_THEME_KEY");
+    expect(layout).toContain("THEME_BOOT_SCRIPT");
     expect(layout).toContain("suppressHydrationWarning");
     expect(shell).toContain("applyInspectorTheme");
     expect(shell).toContain("SidebarProvider");

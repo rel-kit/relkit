@@ -1,7 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+
+const noSubscription = () => () => undefined;
 import { GitCommitHorizontal, Moon, MoreHorizontal, Sun } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Breadcrumbs } from "../components/ui/breadcrumb";
@@ -21,17 +23,30 @@ import { AppSidebar } from "../components/app-sidebar";
 import { CommandPalette } from "./command-palette";
 import { navigation } from "./navigation-data";
 import { DevelopmentFailureBanner } from "./development-failure-banner";
-import { applyInspectorTheme, readInspectorTheme, type InspectorTheme } from "./theme-storage";
+import {
+  applyInspectorTheme,
+  followSystemTheme,
+  readInspectorTheme,
+  type InspectorTheme,
+} from "./theme-storage";
 
 export function InspectorShell({ children }: { readonly children: ReactNode }) {
   const pathname = usePathname() ?? "/";
+  const hydrated = useSyncExternalStore(
+    noSubscription,
+    () => true,
+    () => false,
+  );
   const graph = useInspectorGraph();
   const [searchOpen, setSearchOpen] = useState(false);
   // Dark is rendered on the server and corrected before paint by the script in layout.tsx;
   // this state only mirrors what is already applied.
   const [theme, setTheme] = useState<InspectorTheme>("dark");
 
-  useEffect(() => setTheme(readInspectorTheme()), []);
+  useEffect(() => {
+    setTheme(readInspectorTheme());
+    return followSystemTheme(setTheme);
+  }, []);
   useEffect(() => {
     const openSearch = (event: KeyboardEvent): void => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
@@ -71,7 +86,9 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
         <header className="shell-header">
           <SidebarTrigger aria-label="Toggle navigation" />
           <span aria-hidden="true" className="h-4 w-px bg-border" />
-          <Breadcrumbs items={breadcrumbs(pathname)} />
+          {/* A built 404 is prerendered as `/_not-found`, so the server's pathname differs from
+              the browser's and the trail mismatched on hydration (IN-42). It renders after it. */}
+          <Breadcrumbs items={hydrated ? breadcrumbs(pathname) : []} />
           <div className="header-actions">
             <div className="generation-bar" aria-label="Active generation">
               <GitCommitHorizontal aria-hidden="true" className="size-3.5 text-muted-foreground" />
