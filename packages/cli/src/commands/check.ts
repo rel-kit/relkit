@@ -9,7 +9,7 @@ import { cliOriginalError } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliCompiler } from "../services/compiler.service.js";
 import { projectCapabilitiesLayer } from "../services/project-capabilities.js";
-import { evaluateCheckSources } from "./check-evaluation.js";
+import { evaluateCheckSources, readCheckSources } from "./check-evaluation.js";
 import { finishCheckEvaluation } from "./check-normalization.js";
 import { emitCheckResultEffect } from "./check-result.js";
 import {
@@ -39,7 +39,15 @@ export const checkProjectEffect = Effect.fn("Project.check")(
     const generatedDirectory = join(projectRoot, ".relkit", "generated");
     const generationId = options.generationId ?? `cli-check-${crypto.randomUUID()}`;
     const work = Effect.gen(function* () {
-      const input = yield* evaluateCheckSources(projectRoot, options, generationId);
+      const read = yield* readCheckSources(projectRoot, options, generationId);
+      // On Node, evaluation would fail at the top of the importing file; the import is the cause.
+      if (read.runtimeImports.length > 0)
+        return yield* emitCheckResultEffect(
+          projectRoot,
+          join(projectRoot, read.config.generatedDirectory),
+          read.runtimeImports,
+        );
+      const input = yield* evaluateCheckSources(projectRoot, options, generationId, read);
       if (input.evaluator.status === "ok")
         return yield* finishCheckEvaluation(projectRoot, input, options);
       const compiler = yield* CliCompiler;
@@ -53,7 +61,7 @@ export const checkProjectEffect = Effect.fn("Project.check")(
             );
       return yield* emitCheckResultEffect(projectRoot, input.outputDirectory, [
         ...typeDiagnostics,
-        ...evaluatorDiagnostics(input.evaluator.failures),
+        ...evaluatorDiagnostics(input.evaluator.failures, input.discoverySources),
         ...evaluatorWarningDiagnostics(input.evaluator.warnings),
       ]);
     });

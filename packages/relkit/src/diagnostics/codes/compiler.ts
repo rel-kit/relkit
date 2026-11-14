@@ -173,6 +173,13 @@ export const compilerCodes = [
     fix: "Rename one of them, or give it an explicit `id` if the ID was taken from the file or export name.",
   },
   {
+    code: "RELKIT_EVALUATOR_BUN_RUNTIME_REQUIRED",
+    title: "A source file imports a module that needs Bun",
+    happened:
+      "RelKit loads your source files on the runtime the command runs on. The command runs on Node, and a file imports a module that exists only on Bun, such as `bun:sqlite` or `drizzle-orm/bun-sql`.",
+    fix: "Run the command with Bun, for example `bun --bun run check`, or open the database with a client that selects the driver for the runtime: `openSqliteDatabase` from `@relkit/drizzle/sqlite`, `openPostgresDatabase` from `@relkit/drizzle/pg` or `openMysqlDatabase` from `@relkit/drizzle/mysql`.",
+  },
+  {
     code: "RELKIT_EVALUATOR_IMPORT_FAILED",
     title: "A source file failed to load",
     happened:

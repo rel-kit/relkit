@@ -10,9 +10,11 @@ import { Effect } from "effect";
 import { relative } from "node:path";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.js";
+import { bunRuntimeFailures } from "./check-runtime-imports.js";
 
 /** Projects evaluator evidence into compiler diagnostics with source locations.
  * @param failures - Complete evaluator evidence.
+ * @param sources - Application files, used to locate the import behind a Bun-only module.
  * @returns Compiler diagnostics preserving optional source locations and existing message projection.
  */
 export function evaluatorDiagnostics(
@@ -21,15 +23,22 @@ export function evaluatorDiagnostics(
     readonly message: string;
     readonly module?: string;
   }[],
+  sources: readonly { readonly fileName: string; readonly text: string }[] = [],
 ): readonly Diagnostic[] {
-  return failures.map((failure) =>
-    createDiagnostic({
-      code: failure.code,
-      severity: "error",
-      message: safeMessage(failure.message),
-      ...(failure.module === undefined ? {} : { file: failure.module, line: 1, column: 1 }),
-    }),
-  );
+  const runtimeFailures = bunRuntimeFailures(failures, sources);
+  return failures.flatMap((failure, index) => {
+    const runtimeFailure = runtimeFailures[index];
+    if (runtimeFailure === "covered") return [];
+    return [
+      runtimeFailure ??
+        createDiagnostic({
+          code: failure.code,
+          severity: "error",
+          message: safeMessage(failure.message),
+          ...(failure.module === undefined ? {} : { file: failure.module, line: 1, column: 1 }),
+        }),
+    ];
+  });
 }
 
 /** Projects warnings the application reported while it was imported, such as a deprecation.
