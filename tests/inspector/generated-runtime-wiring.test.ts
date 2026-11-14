@@ -6,6 +6,8 @@ import {
 } from "../../packages/relkit/src/inspector-api/index.ts";
 import { inspectorEndpointsSource } from "../../packages/cli/src/commands/build-server-http-inspector.ts";
 import { SERVER_RUNTIME_SUPPORT_SOURCE } from "../../packages/cli/src/commands/build-server-runtime-support.ts";
+import { SERVER_INVOCATION_SOURCE } from "../../packages/cli/src/commands/build-server-invocation.ts";
+import { invokeEventFunction } from "../../packages/relkit/src/engine/event-invocation.ts";
 
 function application() {
   const app = new Hono();
@@ -78,4 +80,64 @@ test("generated host projects bucket binding features", async () => {
 
 test("generated rich APIs reject direct callers without the private bridge credential", async () => {
   expect((await application().request("/_relkit/v1/runtime/events")).status).toBe(401);
+});
+
+/**
+ * Evaluates the generated `invokeHttp` with a recording engine `invoke`.
+ * @returns The generated function and the engine options it passed.
+ */
+function generatedInvoke() {
+  const seen: Record<string, unknown>[] = [];
+  const invokeHttp = new Function(
+    "invoke",
+    `
+    const providerStartup = Promise.resolve({});
+    const plan = { jobs: [] }, nativeJobsRuntimes = new Map(), registry = {}, values = {};
+    const graph = { nodes: [] }, telemetry = {}, authRuntime = undefined;
+    const shutdownController = new AbortController();
+    const authRequestStorage = { getStore: () => undefined, run: (_auth, run) => run() };
+    const runtimeOwner = { track: (task) => task };
+    const targetFor = () => undefined, createDependencySources = () => ({});
+    ${SERVER_INVOCATION_SOURCE}
+    return invokeHttp;
+  `,
+  )(async (options: Record<string, unknown>) => {
+    seen.push(options);
+    return undefined;
+  }) as (request: Record<string, unknown>) => Promise<unknown>;
+  return { invokeHttp, seen };
+}
+
+test("an event reaction in the generated host continues the publishing request", async () => {
+  const { invokeHttp, seen } = generatedInvoke();
+  const producer = { traceId: "a".repeat(32), spanId: "b".repeat(16), traceFlags: 1 };
+  await invokeEventFunction(
+    "orders.notify",
+    {
+      instanceId: "event-1",
+      eventId: "orders.placed",
+      version: 1,
+      payload: { orderId: "order-1" },
+      occurredAt: "2026-11-14T00:00:00.000Z",
+      publishedAt: "2026-11-14T00:00:00.000Z",
+      attributes: {},
+      propagation: {
+        version: 2,
+        producer,
+        requestId: "request-1",
+        originRequestId: "request-1",
+        correlationId: "correlation-1",
+      },
+    } as never,
+    {},
+    { invoke: invokeHttp } as never,
+  );
+  expect(seen).toHaveLength(1);
+  expect(seen[0]).toMatchObject({
+    functionId: "orders.notify",
+    source: "event-delivery",
+    correlationId: "correlation-1",
+    originRequestId: "request-1",
+    links: [producer],
+  });
 });

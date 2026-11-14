@@ -28,6 +28,9 @@ async function invokeHttp(request) {
         : { signal: AbortSignal.any([request.signal, shutdownController.signal]) }),
       ...(request.traceId === undefined ? {} : { traceId: request.traceId }),
       ...(request.correlationId === undefined ? {} : { correlationId: request.correlationId }),
+      // An event reaction continues the request that published it and links to its span.
+      ...(request.originRequestId === undefined ? {} : { originRequestId: request.originRequestId }),
+      ...(request.links === undefined ? {} : { links: request.links }),
       ...(request.timeoutMs === undefined ? {} : { timeoutMs: request.timeoutMs }),
       clients: createDependencySources(providerRegistry),
       serviceId: graph.nodes.find((node) => node.kind === "function" && node.id === request.functionId)?.domainId,
