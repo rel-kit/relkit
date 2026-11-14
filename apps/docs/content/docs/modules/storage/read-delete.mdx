@@ -40,7 +40,7 @@ const url = await context.buckets.assets.createWriteUrl(key, {
 });
 ```
 
-A type outside the bucket's `allowedContentTypes`, or a size above its `maxObjectBytes`, is refused before a URL is created. The URL then accepts only an upload that sends exactly that `Content-Type` and `Content-Length`; the storage service rejects any other with `403`. Without these options the URL accepts any type and size, so the bucket's limits are not enforced on that upload.
+A type outside the bucket's `allowedContentTypes`, or a size above its `maxObjectBytes`, is refused before a URL is created, whichever provider backs the bucket; `put` checks the same limits. The URL then accepts only an upload that sends exactly that `Content-Type` and `Content-Length`; the storage service rejects any other with `403`. Without these options the URL accepts any type and size, so the bucket's limits are not enforced on that upload.
 
 Check the current user's permission before issuing either URL. Anyone holding the URL can use it until it expires, so do not log it. Configure expiry through your storage provider, not as an argument to these methods.
 

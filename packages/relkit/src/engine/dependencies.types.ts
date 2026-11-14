@@ -21,6 +21,10 @@ export interface DependencyRefLike {
   readonly value?: StandardSchemaV1;
   readonly defaultTtlMs?: number;
   readonly maxTtlMs?: number;
+  /** A bucket descriptor's declared size limit, enforced by its client. */
+  readonly maxObjectBytes?: number;
+  /** A bucket descriptor's declared content types, enforced by its client. */
+  readonly allowedContentTypes?: readonly string[];
   readonly profile?: string;
   readonly errors?: readonly InvocationErrorDefinition[];
   readonly dependencies?: DependencyDeclarations;
