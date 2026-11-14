@@ -142,6 +142,7 @@
 - [x] 14.7 RK-03: take the agent workflow and executions routes off the application port, or put them behind the inspection session token, without closing the development API documentation (`runtime-hono/agent-inspector.ts:30-44` and its callers); verify they answer 404 or 401 without the token.
 - [x] 14.8 IN-48: stop the Inspector printing an error line every second while no connection directory exists, by treating a missing path as absence before the operation is observed (`packages/relkit/src/inspector-api/connection/files-native.ts:103`); verify an Inspector started without a development session prints the waiting line once and no error.
 - [x] 14.9 IN-20, IN-21, IN-18: let the new history filters and count reach the stores over HTTP (`inspector-api/observability-utils.ts` `readObservabilityQuery`: `status`, `method`, `path`, `errorId`, `count`), list the system routes in the routes collection (`inspector-api/graph-projection.ts`, `systemRouteNodes` from `relkit/observability`), and pass the new `exportCapacityRejections` counter (`inspector-api/runtime-metadata.ts`); verify each through the inspection API of a generated runtime.
+- [ ] 14.10 IN-21: carry the message of a rejected history query to the interface: the error body of the history API and of the Inspector's backend keeps the query error's message, which names the parameter (`packages/relkit/src/inspector-api/observability.ts` `safeErrorResponse`, `packages/inspector/src/backend-history.ts` `backendError`), and the interface's transport reads it (`apps/inspector/lib/api-transport.ts`); verify a rejected filter shows the server's message at its field.
 
 ## 15. Telemetry truth
 
@@ -185,6 +186,8 @@
 - [ ] 18.2 IN-43: use one event stream per tab and replace the three-second log poll with the generation event; verify three tabs stay connected and the idle request rate.
 - [ ] 18.3 IN-16, IN-17, IN-18, IN-28: label sampled tiles as sampled or use the match count; show lost records and missed live updates as separate named numbers; hide export failures when no exporter is configured; label generation history entries as session start or reload; verify against the baseline run's numbers.
 - [ ] 18.4 IN-41, IN-42, IN-45: follow the system colour scheme until the user chooses one; add a not-found page without a hydration error; make graph cards legible at the default fit, theme the zoom control and give a bucket its node; verify in the page walk in both themes.
+- [ ] 18.5 IN-35, IN-36: use the shared request label and time formatter on the remaining pages (`lib/overview-model.ts` `pathOf`, `components/neon/history-list.tsx`, `app/trace-waterfall.tsx`, `app/logs/**`), so live and loaded rows read the same and every time shows its zone; verify with unit tests.
+- [ ] 18.6 Make the Inspector application's own `check` script type-check its sources (today its configuration lists no files, so it checks nothing) and fix the errors it then reports; verify `bun run check` in `apps/inspector` fails on an introduced type error and passes on the branch.
 
 ## 19. Node acceptance coverage
 
