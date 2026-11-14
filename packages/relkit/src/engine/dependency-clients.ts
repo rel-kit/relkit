@@ -1,6 +1,7 @@
 import { createBucketClient } from "../buckets/index.js";
 import type { MaybePromise } from "../contracts/index.js";
 import type { GraphEdge, ObservedEdge } from "../graph/index.js";
+import { bucketClientInput } from "./bucket-dependency.js";
 import { createCacheDependencyClient } from "./cache-client.js";
 import type {
   DependencyBridgeOptions,
@@ -14,7 +15,12 @@ import {
   createDatabaseDependencyClient,
   createFunctionDependencyClient,
 } from "./dependency-call-clients.js";
-import { dependencyId, dependencyIdFromClient, edgeKinds } from "./dependency-identity.js";
+import {
+  declaredDependencies,
+  dependencyId,
+  dependencyIdFromClient,
+  edgeKinds,
+} from "./dependency-identity.js";
 import { createEventDependencyClient } from "./event-client.js";
 import { createJobDependencyClient } from "./job-client.js";
 import { createTaskDependencyClient } from "./task-client.js";
@@ -75,17 +81,21 @@ export function createClient(
         options,
         dependencyIdFromClient(options, category, name),
       );
-    case "buckets":
+    case "buckets": {
+      // Declared limits come from the graph-bound source or the authored descriptor.
+      const bucket = bucketClientInput(declaredDependencies(category, options)[name], source);
       return createBucketClient({
         ownerId: options.ownerId,
         bucketId: dependencyIdFromClient(options, category, name),
-        source,
+        source: bucket.source,
+        ...(bucket.policy === undefined ? {} : { policy: bucket.policy }),
         ...(options.bridge === undefined ? {} : { bridge: options.bridge }),
         ...(options.signal === undefined ? {} : { signal: options.signal }),
         ...(options.deadline === undefined ? {} : { deadline: options.deadline }),
         ...(options.onObservedEdge === undefined ? {} : { onObservedEdge: options.onObservedEdge }),
         ...(options.onOperation === undefined ? {} : { onOperation: options.onOperation }),
       });
+    }
     case "cache":
       return createCacheDependencyClient(
         name,

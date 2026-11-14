@@ -20,6 +20,7 @@ export function serverEngineImports(graph: ApplicationGraph) {
   const hasEvents = graph.nodes.some((node) => node.kind === "event");
   const imports = [
     "assertRuntimeIntegrationModules",
+    "bindBucketPolicy",
     "createFunctionRegistry",
     "createProviderRegistry",
     "createRuntimeHandle",

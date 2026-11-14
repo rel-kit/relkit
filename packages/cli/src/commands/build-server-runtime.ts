@@ -37,7 +37,8 @@ function targetFor(functionId) {
 function createDependencySources(providerRegistry) {
   return {
     agents: Object.fromEntries(plan.agents.map((node) => [node.id, registry.get(\`relkit.agent.\${node.id}.invoke\`)])),
-    buckets: Object.fromEntries(plan.buckets.map((node) => [node.id, provider(providerRegistry, "bucket", node.profile)])),
+    // Each bucket node carries its declared limits; every bucket client built from these sources enforces them.
+    buckets: Object.fromEntries(plan.buckets.map((node) => [node.id, bindBucketPolicy(provider(providerRegistry, "bucket", node.profile), node)])),
     cache: Object.fromEntries(plan.caches.map((node) => [node.id, provider(providerRegistry, "cache", node.profile)])),
     jobs: Object.fromEntries((plan.jobs ?? []).map((node) => [node.id, jobTriggerSource(node)])),
     tasks: Object.fromEntries(Object.entries(runtimeManifest.tasks ?? {})),
