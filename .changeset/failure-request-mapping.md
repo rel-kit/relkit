@@ -33,3 +33,8 @@ as "no fields": a `PATCH` succeeded as an empty change and a `POST` reported eac
 JSON and Problem Details responses of function routes now carry an explicit `Content-Length` (so
 `HEAD` reports the length of the `GET` body instead of 0), `X-Content-Type-Options: nosniff`, and
 `Cache-Control: no-store` unless the route's `response` option sets its own `Cache-Control`.
+
+With transport security configured, an `OPTIONS` request is treated as a CORS preflight only when
+it carries `Access-Control-Request-Method`. Any other `OPTIONS`, including one with a same-origin
+`Origin`, is no longer answered 403 `origin-denied`; it gets the application's normal answer with
+the allowed methods in `Allow`.

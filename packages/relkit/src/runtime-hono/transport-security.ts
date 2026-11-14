@@ -22,11 +22,12 @@ export function installTransportSecurity(
   app.use("*", async (context, next) => {
     const request = context.req.raw;
     const origin = request.headers.get("origin");
-    if (request.method === "OPTIONS" && origin !== null) {
-      if (origin !== new URL(request.url).origin && !origins.has(origin)) {
+    // Only an OPTIONS naming its requested method is a preflight; others get the allowed methods.
+    const method =
+      request.method === "OPTIONS" ? request.headers.get("access-control-request-method") : null;
+    if (method !== null && origin !== null) {
+      if (origin !== new URL(request.url).origin && !origins.has(origin))
         return denied(context, "ORIGIN_DENIED");
-      }
-      const method = request.headers.get("access-control-request-method") ?? "";
       const methods = allowedMethods(options.allowedMethods);
       const requestedHeaders = request.headers.get("access-control-request-headers");
       if (
