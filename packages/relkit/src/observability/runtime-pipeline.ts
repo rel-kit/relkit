@@ -3,7 +3,11 @@
  * Append failure remains visible through flush; close attempts every owned release.
  */
 import { Effect } from "effect";
-import { makeDirectExportEffect } from "./direct-export.js";
+import {
+  countDirectExportFailure,
+  directExportTarget,
+  makeDirectExportEffect,
+} from "./direct-export.js";
 import { streamType } from "./runtime-stream-type.js";
 import { telemetryExporterDiagnostic } from "./telemetry-exporter-diagnostic.js";
 import { telemetryExportDecision } from "./telemetry-sampling.js";
@@ -13,12 +17,13 @@ import type { RedactedObservabilityRecord } from "./record-admission.js";
 
 /** @param state - Acquired runtime resources. @returns Completion after exporter setup and diagnostic handler registration. */
 export async function initializeRuntimePipeline(state: RuntimePipelineState): Promise<void> {
-  const exportRecord = state.options.exporter?.exportRecord ?? state.options.exportRecord;
+  state.counters.exportCapacityRejections = 0;
+  const exportRecord = directExportTarget(state.options);
   if (exportRecord !== undefined)
     state.directExport = await Effect.runPromise(
-      makeDirectExportEffect(exportRecord, () => {
-        state.counters.exportFailures += 1;
-      }),
+      makeDirectExportEffect(exportRecord, (error) =>
+        countDirectExportFailure(state.counters, error),
+      ),
     );
   state.options.exporter?.setFailureHandler((failure) =>
     persistRuntimeRecord(

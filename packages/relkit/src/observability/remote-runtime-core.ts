@@ -7,7 +7,11 @@ import { telemetryExporterDiagnostic } from "./telemetry-exporter-diagnostic.js"
 import { createLocalBatchQueue } from "./local/batch-queue.js";
 import { releaseResources } from "./resource-release.js";
 import { remoteFetchLayer, remoteRequestEffect } from "./remote-request-effect.js";
-import { makeDirectExportEffect } from "./direct-export.js";
+import {
+  countDirectExportFailure,
+  directExportTarget,
+  makeDirectExportEffect,
+} from "./direct-export.js";
 import type { ObservabilityRecord } from "./model.js";
 import type { ObservabilityQuery } from "./query-types.js";
 import type { ObservabilityRuntimeOptions } from "./runtime.js";
@@ -86,15 +90,19 @@ async function createRemoteObservabilityRuntime(
     },
   );
   let closePromise: Promise<void> | undefined;
-  const counters = { exportSelected: 0, sampledOut: 0, severityFiltered: 0, exportFailures: 0 };
-  const exportRecord = options.exporter?.exportRecord ?? options.exportRecord;
+  const counters = {
+    exportSelected: 0,
+    sampledOut: 0,
+    severityFiltered: 0,
+    exportFailures: 0,
+    exportCapacityRejections: 0,
+  };
+  const exportRecord = directExportTarget(options);
   const directExport =
     exportRecord === undefined
       ? undefined
       : await Effect.runPromise(
-          makeDirectExportEffect(exportRecord, () => {
-            counters.exportFailures += 1;
-          }),
+          makeDirectExportEffect(exportRecord, (error) => countDirectExportFailure(counters, error)),
         );
   const publish = (record: ReturnType<typeof collector.collect>, external = true) => {
     if (!record) return record;
