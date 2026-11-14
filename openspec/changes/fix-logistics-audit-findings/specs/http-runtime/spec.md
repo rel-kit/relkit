@@ -108,3 +108,58 @@ A realtime subscription whose identity precondition fails SHALL answer with the 
 
 - **WHEN** a subscription request carries an identity scope that does not match the session
 - **THEN** the response status is 409 with the precondition code
+
+## MODIFIED Requirements
+
+### Requirement: Serializable request mapping execution
+
+The runtime SHALL execute the compiled mapping model after route middleware continuation for path, query, header, cookie, JSON body, whole body, multipart, constants, nested objects, optional/default values, Hono validated values, and named transforms, and SHALL enforce content type, body size, parsing, and target input validation before function invocation.
+
+#### Scenario: Valid mapped request arrives
+
+- **WHEN** request values satisfy the route mapping and target function schema
+- **THEN** the target receives exactly the mapped reusable input and no transport request argument
+
+#### Scenario: Middleware supplies validated data
+
+- **WHEN** matching middleware changes Hono validated parameter, query, header, cookie, JSON, or form data before continuing
+- **THEN** route mapping uses the validated value in preference to the corresponding raw request value
+
+#### Scenario: Matching path field is inferred
+
+- **WHEN** `/orders/:orderId` targets a function whose input contains `orderId`
+- **THEN** inference maps the path value into that input field and OpenAPI describes it as a path parameter rather than request-body data
+
+#### Scenario: Path field is not part of business input
+
+- **WHEN** a path parameter has no matching target-input property
+- **THEN** compilation does not require an artificial function input field and request-only behavior may inspect it in route middleware
+
+#### Scenario: Named transform executes
+
+- **WHEN** a mapping references a declared transform ID
+- **THEN** the runtime resolves the hash-matched manifest validator, applies it before target admission, and reports a safe validation failure without calling the target when it fails
+
+#### Scenario: Malformed body arrives
+
+- **WHEN** JSON is malformed, content type is wrong, or mapped values fail validation
+- **THEN** the runtime returns the declared safe validation response, records the failure, and does not call the function
+
+#### Scenario: Body is too large
+
+- **WHEN** the request body is larger than the body limit that applies to the route
+- **THEN** the runtime answers `413` with code `body-too-large`, records the failure, and does not call the function
+
+### Requirement: Route body and file limits
+
+The HTTP runtime SHALL enforce the route-specific body limit or configured server default on the bytes read, with or without a declared `Content-Length`, before unbounded parsing, then SHALL validate individual file byte/media-type constraints and repeated multipart fields before target invocation.
+
+#### Scenario: Body exceeds its route limit
+
+- **WHEN** request bytes exceed `maxBodyBytes`, whether the length is declared or the body is streamed, in development or in production
+- **THEN** the runtime answers `413` with code `body-too-large`, records the failure, and does not parse or invoke the target
+
+#### Scenario: Repeated multipart field is valid
+
+- **WHEN** a repeated multipart mapping receives several valid values
+- **THEN** the target receives them in request order as a validated array

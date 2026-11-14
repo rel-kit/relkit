@@ -49,7 +49,7 @@ export function createFrameworkMiddleware(
 ): readonly FrameworkMiddleware[] {
   options = { ...options, spanRuntime: createHttpSpanRuntime(options) };
   return Object.freeze([
-    { name: "request-id", handler: applicationOnly(requestIdMiddleware(options)) },
+    { name: "request-id", handler: requestIdMiddleware(options) },
     { name: "trace", handler: applicationOnly(traceMiddleware(options)) },
     { name: "limits", handler: limitsMiddleware(options) },
     { name: "request-record", handler: applicationOnly(requestLifecycleMiddleware(options)) },
@@ -60,12 +60,19 @@ export const createHttpMiddleware = createFrameworkMiddleware;
 
 export { limitsMiddleware } from "./middleware-limits.js";
 
-/** Establishes one request identity for downstream middleware and response headers.
+/** Establishes one request identity for downstream middleware and response headers. A
+ * control-plane response carries a request ID too, but the request is not recorded.
  * @param options - Application dependencies and configuration for this domain.
  * @returns A handler retaining the request identity through downstream execution and response headers.
  */
 export function requestIdMiddleware(options: HttpMiddlewareOptions = {}): MiddlewareHandler {
   return async (context, next) => {
+    if (isRelkitControlPlanePath(context.req.path)) {
+      const requestId = readId(undefined, options.requestId, "request", toRequestId);
+      await next();
+      setResponseHeader(context, options.requestIdHeader ?? REQUEST_ID_HEADER, requestId);
+      return;
+    }
     const outer = outerHttpState(context.req.raw);
     if (outer !== undefined) {
       setRequestState(context, outer);

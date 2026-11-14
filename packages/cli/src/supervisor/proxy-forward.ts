@@ -1,9 +1,9 @@
 import type { SupervisorDrainLease } from "./drain.types.js";
 import type { ActiveSupervisorProxyTarget } from "./proxy.types.js";
 
+// `content-length` is kept: the worker then applies its body limit from the header, as in production.
 const HOP_BY_HOP_HEADERS = [
   "connection",
-  "content-length",
   "keep-alive",
   "proxy-authenticate",
   "proxy-authorization",
@@ -39,10 +39,37 @@ export function forwardProxyRequest(
       ...(ownedSignal === undefined ? [] : [ownedSignal]),
     ]),
   };
+  let bodyEnded = true;
   // Re-stream decoded bytes: Bun 1.3.10's native chunked passthrough can produce empty 400s.
-  if (request.method !== "GET" && request.method !== "HEAD")
-    init.body = request.body?.pipeThrough(new TransformStream()) ?? null;
-  return fetcher(url, init);
+  if (request.method !== "GET" && request.method !== "HEAD" && request.body !== null) {
+    bodyEnded = false;
+    const progress = new TransformStream<Uint8Array, Uint8Array>({
+      flush: () => {
+        bodyEnded = true;
+      },
+    });
+    init.body = request.body.pipeThrough(progress);
+    // Node's fetch refuses a streamed body without it; Bun ignores it.
+    Object.assign(init, { duplex: "half" });
+    // When the worker answers before the body was sent, Bun's fetch stops sending it but still
+    // pools the connection, so the worker reads the next request as body and answers a bare 400.
+    // A connection that carried a request body is therefore never reused.
+    init.keepalive = false;
+  }
+  return fetcher(url, init).then((response) => {
+    if (!bodyEnded) earlyAnswers.add(response);
+    return response;
+  });
+}
+
+const earlyAnswers = new WeakSet<Response>();
+
+/** Tells whether the worker answered before the client's request body had ended.
+ * @param response - Upstream response returned by {@link forwardProxyRequest}.
+ * @returns True when the client connection must close after this response, since the rest of
+ * its body was never read. */
+export function answeredBeforeBody(response: Response): boolean {
+  return earlyAnswers.has(response);
 }
 
 /** Builds the established drain rejection. @returns Uncached JSON503 response. */

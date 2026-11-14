@@ -1,7 +1,7 @@
 import { observeExecution } from "relkit/contracts/operation";
 import { Cause, Deferred, Effect, Exit, Fiber, Scope } from "effect";
 import { ownProxyBody } from "./proxy-body.js";
-import { forwardProxyRequest } from "./proxy-forward.js";
+import { answeredBeforeBody, forwardProxyRequest } from "./proxy-forward.js";
 import type { ProxyAdmission } from "./proxy.types.js";
 
 /**
@@ -66,6 +66,7 @@ export const proxyRequest = Effect.fn("SupervisorProxy.request")(function* (
         signal: bodySignal,
         join: () => (worker === undefined ? Effect.void : Fiber.await(worker)),
       });
+      if (answeredBeforeBody(response)) owned.headers.set("connection", "close");
       yield* Deferred.succeed(headers, owned);
       yield* Deferred.await(completed);
     }),
