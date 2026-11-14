@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { forwardRef, type ReactNode } from "react";
-import type { ActionAnswer } from "../lib/action-answer";
-import { issueProblem } from "../lib/request-failure";
+import { issueWords, type ActionAnswer } from "../lib/action-answer";
 
 /**
  * The outcome of an action that did not run, in words, shown beside the control that caused it:
@@ -53,7 +52,7 @@ export const ActionAnswerView = forwardRef<
                 <td className="py-1 pr-3 font-mono break-all">
                   {issue.path === "" ? <span className="font-sans">Whole input</span> : issue.path}
                 </td>
-                <td className="py-1">{issueProblem(issue.code)}</td>
+                <td className="py-1">{issueWords(issue.code)}</td>
               </tr>
             ))}
           </tbody>

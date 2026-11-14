@@ -97,6 +97,7 @@ export function EventDetailClient() {
         <EventActions
           eventId={eventId}
           {...(typeof event.version === "number" ? { eventVersion: event.version } : {})}
+          schema={event.input}
           identity={identity}
           publications={view.publications}
           deliveries={view.deliveries}

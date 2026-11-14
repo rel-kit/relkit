@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { InspectorApiError } from "./api-types";
-import { actionAnswer, actionCause } from "./action-answer";
+import { actionAnswer, actionCause, issueWords } from "./action-answer";
 
 function refused(
   code: string,
@@ -9,6 +9,16 @@ function refused(
 ): InspectorApiError {
   return new InspectorApiError(code, code, status, "http", { error: code, ...body });
 }
+
+describe("plain words for an issue code", () => {
+  test("describes the common schema codes and passes others through", () => {
+    expect(issueWords("missing")).toBe("Missing");
+    expect(issueWords("invalid_type")).toBe("Wrong type");
+    expect(issueWords("too_small")).toBe("Too small or too short");
+    expect(issueWords("unrecognized_keys")).toBe("Not a field of this contract");
+    expect(issueWords("custom_rule")).toBe("custom_rule");
+  });
+});
 
 describe("the application's answer to a refused action", () => {
   test("reads the cause from the rejected body", () => {

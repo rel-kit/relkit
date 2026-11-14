@@ -126,6 +126,10 @@ export interface InspectorEventRuntime extends InspectorIdentity {
   readonly deliveries: readonly InspectorObject[];
   readonly deadLetters: readonly InspectorObject[];
   readonly nextCursor?: string;
+  /** Number of matching deliveries; present only when the provider reports it. */
+  readonly total?: number;
+  /** Deliveries per state; present only when the provider reports them. */
+  readonly counts?: Readonly<Record<string, number>>;
 }
 export interface ObservabilityPage<T = InspectorObject> extends Omit<
   InspectorIdentity,

@@ -1,5 +1,5 @@
 import { InspectorApiError } from "./api-types";
-import type { ValidationIssue } from "./request-failure";
+import { issueProblem, type ValidationIssue } from "./request-failure";
 
 /** The application's answer to a refused action, under `cause` in the rejected action body. */
 export interface ActionCause {
@@ -27,6 +27,22 @@ export type ActionSubject = "function" | "event";
 export interface ActionAnswerOptions {
   /** Sentence for a 501: what this provider cannot do. */
   readonly unsupported?: string;
+}
+
+const ISSUE_WORDS: Readonly<Record<string, string>> = {
+  invalid_type: "Wrong type",
+  too_small: "Too small or too short",
+  too_big: "Too large or too long",
+  invalid_enum_value: "Not one of the allowed values",
+  invalid_literal: "Not the expected value",
+  invalid_string: "Does not match the expected format",
+  invalid_union: "Matches none of the allowed shapes",
+  unrecognized_keys: "Not a field of this contract",
+};
+
+/** Plain words for a schema issue code; the framework's own codes and unknown ones read as recorded. */
+export function issueWords(code: string): string {
+  return ISSUE_WORDS[code] ?? issueProblem(code);
 }
 
 /**
