@@ -7,6 +7,7 @@ import type { CandidateOptions } from "../supervisor/index.js";
 import { cliTry } from "../cli-errors.js";
 import { CliDevSupervisor } from "../services/dev-supervisor.service.js";
 import { cleanupEffect } from "../services/cleanup.service.js";
+import { createHeldOutput, logCandidateEvent } from "./dev-activation-exit.js";
 import type { DevSession } from "./dev-session.js";
 import type { DevActivationAttempt } from "./dev-activation.types.js";
 
@@ -56,6 +57,7 @@ export const acquireActivationAttempt = Effect.fn("Dev.activation.attempt")(func
     startedAt: performance.now(),
     signal: AbortSignal.any([session.abortController.signal, controller.signal]),
     promoted: yield* Ref.make(false),
+    output: createHeldOutput(initial),
   } satisfies DevActivationAttempt;
 });
 
@@ -120,7 +122,7 @@ function candidateOptions(attempt: DevActivationAttempt): CandidateOptions {
       ? {}
       : { stopTimeoutMs: options.candidateStopTimeoutMs }),
     logger: (event) =>
-      session.log({
+      logCandidateEvent(attempt.output, session.log, {
         level: event.level,
         event: event.event,
         fields: {
