@@ -1,6 +1,7 @@
 /** Preserves live request, pause/resume and correlated failure assertions on this invocation's exact backend. */
 import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 import { playwrightSelection } from "../../scripts/playwright-selection.js";
+import { FAILURE_FIXTURE_IDS } from "../inspector/fixture-failures";
 const { backend } = playwrightSelection("inspector");
 test.beforeAll(async ({ request }) => {
   // Compile this flow's cold routes outside the separate interaction deadline.
@@ -207,6 +208,72 @@ test("offers the recorded outcomes and shows a rejected filter at its field", as
   await page.goto("/requests?status=abc");
   await expect(page.getByText("These filters were not accepted.")).toBeVisible();
   await expect(page.getByLabel("Status", { exact: true })).toHaveAccessibleDescription(message);
+});
+
+test("a declared error names its identifier and links to its contract", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${backend}/__fixture__/failures`);
+  await page.goto(`/requests/${FAILURE_FIXTURE_IDS.declared}`);
+  const panel = page.getByRole("region", { name: "Why this request failed" });
+  await expect(panel.getByText("The application ended this request with the error")).toBeVisible();
+  await expect(panel.getByRole("link", { name: "fleet.plate-taken" })).toHaveAttribute(
+    "href",
+    "/errors/fleet.plate-taken",
+  );
+  const record = page.getByRole("region", { name: "Request record" });
+  await expect(record.getByText("Error", { exact: true })).toBeVisible();
+  await expect(record.getByRole("link", { name: "fleet.plate-taken" })).toBeVisible();
+});
+
+test("a validation failure lists the fields and the kind of problem, never values", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${backend}/__fixture__/failures`);
+  await page.goto(`/requests/${FAILURE_FIXTURE_IDS.invalid}`);
+  const panel = page.getByRole("region", { name: "Why this request failed" });
+  await expect(panel.getByRole("columnheader", { name: "Field" })).toBeVisible();
+  await expect(panel.getByRole("columnheader", { name: "Problem" })).toBeVisible();
+  await expect(panel.getByRole("row", { name: /plate\s+Missing/ })).toBeVisible();
+  await expect(panel.getByRole("row", { name: /vehicle\.wheels\.9/ })).toBeVisible();
+  await expect(panel.getByRole("row")).toHaveCount(11);
+  await expect(panel.getByText("and 2 more")).toBeVisible();
+  await expect(panel.getByText(/never the values that were sent/)).toBeVisible();
+});
+
+test("an internal failure shows its recorded cause, with the stack collapsed", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${backend}/__fixture__/failures`);
+  await page.goto(`/requests/${FAILURE_FIXTURE_IDS.defectDev}`);
+  const panel = page.getByRole("region", { name: "Why this request failed" });
+  await expect(panel.getByText("DatabaseError", { exact: true })).toBeVisible();
+  await expect(panel.getByText(/Failed query: insert into vehicles/)).toContainText(
+    "params: [REDACTED]",
+  );
+  await expect(panel.getByText("RELKIT_UNEXPECTED_DEFECT")).toBeVisible();
+  await expect(panel.getByText(/at insertVehicle/)).toBeHidden();
+  await panel.getByText("Stack trace").click();
+  await expect(panel.getByText(/at insertVehicle/)).toBeVisible();
+  await expect(panel.getByText("The cause is recorded only in development.")).toBeHidden();
+});
+
+test("outside development only the error type is recorded, and the page says so", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${backend}/__fixture__/failures`);
+  await page.goto(`/requests/${FAILURE_FIXTURE_IDS.defectTypeOnly}`);
+  const panel = page.getByRole("region", { name: "Why this request failed" });
+  await expect(panel.getByText("UnexpectedDefect", { exact: true })).toBeVisible();
+  await expect(panel.getByText("The cause is recorded only in development.")).toBeVisible();
+
+  await request.post(`${backend}/__fixture__/outcome/defect`);
+  await page.goto("/requests/request-defect");
+  await expect(page.getByText("No cause was recorded for this request.")).toBeVisible();
 });
 
 test("pinpoints failed, timed out, cancelled, and incomplete requests", async ({

@@ -19,6 +19,7 @@ import {
   type InspectorActiveGeneration,
 } from "../../packages/relkit/src/inspector-api/index.ts";
 import { createAgentApplicationFixture } from "./fixture-agent-runtime.ts";
+import { failureFixtures } from "./fixture-failures.ts";
 import { historyCounts, requestsPage, seedHistoryRequests } from "./fixture-history.ts";
 
 export const FIXTURE_GRAPH_HASH = "sha256:commerce-inspector-fixture-v1";
@@ -712,6 +713,19 @@ export function createInspectorFixture(): InspectorFixture {
     for (const record of fixture.records.filter((item) => item.signal === "span"))
       stream.publish({ type: "span.completed", data: record });
     return context.json({ requestId, traceId });
+  });
+  app.post("/__fixture__/failures", (context) => {
+    const added = failureFixtures({
+      generationId: FIXTURE_GENERATION_ID,
+      graphHash: FIXTURE_GRAPH_HASH,
+      routeId: FIXTURE_IDS.route,
+      functionId: FIXTURE_IDS.function,
+      at: now,
+    });
+    requests = [...added.requests, ...requests];
+    traces = [...added.traces, ...traces];
+    logs = [...added.logs, ...logs];
+    return context.json({ requests: added.requests.length });
   });
   app.post("/__fixture__/history", (context) => {
     const seed = seedHistoryRequests({
