@@ -103,7 +103,10 @@ function writeRuntimeLog(record) {
   else consoleHumanSink.write(formatHumanLog(record), record);
 }
 function healthResponse(status, code = 200) {
-  return Response.json({ protocol: "relkit.inspector", version: 1, status, graphHash, activationFingerprint, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, environmentReady: true, providerReady: runtimeState().ready.provider && runtimeState().ready.nativeWorker && !runtimeState().stopping, databaseReady: runtimeState().ready.database && !runtimeState().stopping, authReady: runtimeState().ready.auth && !runtimeState().stopping, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }, { status: code, headers: { "x-relkit-api-version": "1" } });
+  const readiness = { environmentReady: true, providerReady: runtimeState().ready.provider && runtimeState().ready.nativeWorker && !runtimeState().stopping, databaseReady: runtimeState().ready.database && !runtimeState().stopping, authReady: runtimeState().ready.auth && !runtimeState().stopping };
+  // Generation identity is for the development supervisor; production answers status and readiness only.
+  const identity = environment === "production" ? {} : { graphHash, activationFingerprint, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) };
+  return Response.json({ protocol: "relkit.inspector", version: 1, status, ...identity, ...readiness }, { status: code, headers: { "x-relkit-api-version": "1", "cache-control": "no-store" } });
 }
 function problemResponse(status, title, code, detail) {
   return new Response(JSON.stringify({ type: "/errors/" + code, title, status, code, detail }), { status, headers: { "content-type": "application/problem+json" } });

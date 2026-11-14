@@ -75,6 +75,13 @@ The CLI's `--environment` selects the command's provider environment. It does no
 custom application field named `RELKIT_ENV` into business configuration. RelKit owns that
 reserved runtime selector; the application contract continues to describe its own values.
 
+`relkit start` runs the built server in production mode: it sets `RELKIT_ENV=production` unless
+you set `RELKIT_ENV` yourself, so a started build never depends on `NODE_ENV` to hide the
+development-only endpoints such as the API reference and the activation probe. Set
+`RELKIT_ENV=development` to start a build in development mode. A server started directly with
+`bun` or `node` reads `RELKIT_ENV` first and falls back to production only when
+`NODE_ENV=production`; the container, Vercel and Workers targets already set production.
+
 <Callout type="warning" title="Framework-owned variables">
   `PORT` and `RELKIT_ENV` are reserved. Configure the listener through `server.port` and select a
   provider environment with the CLI's `--environment` option. Do not declare either name as a custom

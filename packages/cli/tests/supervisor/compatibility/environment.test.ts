@@ -11,4 +11,13 @@ test("explicit removals drop inherited values while supervisor identity remains 
   expect(environment.PATH).toBeUndefined();
   expect(environment.PORT).toBe("12345");
   expect(environment.RELKIT_SOURCE_TOKEN).toBe("7");
+  expect(environment.RELKIT_HOSTNAME).toBe("127.0.0.1");
+  expect(
+    childEnvironment(
+      { RELKIT_HOSTNAME: "0.0.0.0" },
+      { sourceToken: 7, generationToken: 9 },
+      1,
+      "::1",
+    ).RELKIT_HOSTNAME,
+  ).toBe("::1");
 });

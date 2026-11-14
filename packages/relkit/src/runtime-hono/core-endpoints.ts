@@ -6,7 +6,13 @@
 import { API_BASE_PATH } from "../contracts/index.js";
 import type { Context, Hono } from "hono";
 import type { InternalEndpointOptions } from "./internal-endpoints.types.js";
-import { isAuthorized, jsonResponse, resolveValue } from "./internal-endpoints-utils.js";
+import {
+  graphIdentity,
+  isAuthorized,
+  jsonResponse,
+  protectedProblem,
+  resolveValue,
+} from "./internal-endpoints-utils.js";
 
 /** Installs core probes before optional inspection routes are considered.
  * @param app - Shell whose security and common middleware are already installed.
@@ -15,10 +21,7 @@ import { isAuthorized, jsonResponse, resolveValue } from "./internal-endpoints-u
  */
 export function installCoreEndpoints(app: Hono, options: InternalEndpointOptions): void {
   const guard = (handler: () => Promise<Response>) => async (context: Context) => {
-    if (!(await isAuthorized(context.req.raw, options)))
-      return jsonResponse({ error: "internal-endpoint-protected" }, 401, {
-        "www-authenticate": "Bearer",
-      });
+    if (!(await isAuthorized(context.req.raw, options))) return protectedProblem(context);
     return handler();
   };
   app.get(
@@ -42,6 +45,6 @@ export function installCoreEndpoints(app: Hono, options: InternalEndpointOptions
     return;
   app.get(
     `${API_BASE_PATH}/graph`,
-    guard(async () => jsonResponse(await resolveValue(options.graph ?? { graph: null }))),
+    guard(async () => jsonResponse(graphIdentity(await resolveValue(options.graph ?? {})))),
   );
 }

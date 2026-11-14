@@ -91,13 +91,17 @@ export function formatDevLog(record: LogRecord, options: DevLogFormatOptions = {
   const scopeWidth = width < 80 ? 10 : 16;
   const time = timestamp(record.timestamp);
   const level = record.level.toUpperCase().padEnd(5);
-  const prefix = `${time} ${color(level, record.level, options.color)} ${middle(scope, scopeWidth).padEnd(scopeWidth)}  `;
-  const indent = " ".repeat(time.length + 1 + 5 + 1 + scopeWidth + 2);
+  // A long scope widens its own line rather than losing the middle of its name.
+  const label = scope.padEnd(scopeWidth);
+  const prefix = `${time} ${color(level, record.level, options.color)} ${label}  `;
+  const indent = " ".repeat(time.length + 1 + 5 + 1 + label.length + 2);
   const [first = "", ...continuation] = message.split("\n");
   const contentWidth = Math.max(1, width - indent.length);
   const body = [...continuation, ...details].flatMap((detail) => detail.split("\n"));
-  const lines = [first, ...body].flatMap((line) => {
-    if (event === "dev.ready" || options.verbose) return [line];
+  // The request line stays whole so its status and duration never land on a second line.
+  const requestLine = scope === "http";
+  const lines = [first, ...body].flatMap((line, index) => {
+    if (event === "dev.ready" || options.verbose || (requestLine && index === 0)) return [line];
     return wrap(line, contentWidth);
   });
   return (
@@ -152,17 +156,6 @@ function timestamp(value: string): string {
       .map((part) => String(part).padStart(2, "0"))
       .join(":") + `.${String(date.getMilliseconds()).padStart(3, "0")}`
   );
-}
-
-/** Fits a scope label to its allotted width using middle ellipsis.
- * @param value - Scope label.
- * @param maximum - Available label width.
- * @returns Middle-ellipsized presentation without changing record content.
- */
-function middle(value: string, maximum: number): string {
-  if (value.length <= maximum) return value;
-  const side = Math.floor((maximum - 1) / 2);
-  return `${value.slice(0, side)}…${value.slice(-(maximum - side - 1))}`;
 }
 
 /** Applies the configured terminal severity color to a label.

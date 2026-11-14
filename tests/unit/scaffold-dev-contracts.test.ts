@@ -41,3 +41,26 @@ for (const scalar of [false, true]) {
     }
   });
 }
+
+test("default scaffold rejects a graph probe that carries graph structure", async () => {
+  const root = await mkdtemp(join(tmpdir(), "relkit-default-contract-"));
+  const server = Bun.serve({
+    hostname: "127.0.0.1",
+    port: 0,
+    fetch(request) {
+      const path = new URL(request.url).pathname;
+      if (path === "/hello") return Response.json({ message: "Hello, RelKit!" });
+      if (path === "/_relkit/v1/graph")
+        return Response.json({ graphHash: "fixture", graph: { nodes: [{ id: "hello" }] } });
+      return new Response("Not Found", { status: 404 });
+    },
+  });
+  try {
+    await expect(
+      Effect.runPromise(verifyScaffoldDevContracts(server.port, root, false)),
+    ).rejects.toThrow("/_relkit/v1/graph");
+  } finally {
+    await server.stop(true);
+    await rm(root, { recursive: true, force: true });
+  }
+});
