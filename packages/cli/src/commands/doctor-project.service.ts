@@ -24,6 +24,7 @@ import {
   checkRuntimeImportsEffect,
 } from "./doctor-runtime.js";
 import { projectPackageManager } from "create-relkit/package-manager";
+import { oneShotEnvironment } from "../runtime/one-shot-environment.js";
 
 /** Finite prerequisite domain; every report owns temporary files and child checks. */
 export class CliDoctor extends Context.Service<CliDoctor, DoctorOperations>()(
@@ -130,7 +131,8 @@ const collectDoctorChecks = Effect.fnUntraced(function* (
   checks.push(checkManifestFields(projectPackageManager(root), manifest ?? {}, workspace));
   const enabled = options.deploymentEnabled ?? detectDeployment(manifest, config.config);
   checks.push(yield* checkPulumiEffect(enabled, root, options.commandRunner));
-  checks.push(checkAws(enabled, options.source ?? process.env));
+  // AWS credentials set only in .env count on Node too, as they do under Bun.
+  checks.push(checkAws(enabled, options.source ?? (yield* oneShotEnvironment(root))));
   checks.push(yield* checkRootsEffect(root));
   checks.push(
     options.skipPorts
