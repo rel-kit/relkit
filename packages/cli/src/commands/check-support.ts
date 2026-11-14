@@ -22,11 +22,13 @@ export function evaluatorDiagnostics(
     readonly code: string;
     readonly message: string;
     readonly module?: string;
+    readonly stack?: string;
   }[],
   sources: readonly { readonly fileName: string; readonly text: string }[] = [],
 ): readonly Diagnostic[] {
-  const runtimeFailures = bunRuntimeFailures(failures, sources);
-  return failures.flatMap((failure, index) => {
+  const causes = rootCauses(failures);
+  const runtimeFailures = bunRuntimeFailures(causes, sources);
+  return causes.flatMap((failure, index) => {
     const runtimeFailure = runtimeFailures[index];
     if (runtimeFailure === "covered") return [];
     return [
@@ -38,6 +40,30 @@ export function evaluatorDiagnostics(
           ...(failure.module === undefined ? {} : { file: failure.module, line: 1, column: 1 }),
         }),
     ];
+  });
+}
+
+/**
+ * Keeps one failure per distinct message. A file that imports a failing file fails with the same
+ * error, so the failure kept is the file the message or stack names, else the first one.
+ * @param failures - Evaluator failures in evaluation order.
+ * @returns The failures that are root causes, in their original order.
+ */
+function rootCauses<
+  Failure extends { readonly message: string; readonly module?: string; readonly stack?: string },
+>(failures: readonly Failure[]): readonly Failure[] {
+  const groups = new Map<string, Failure[]>();
+  for (const failure of failures)
+    groups.set(failure.message, [...(groups.get(failure.message) ?? []), failure]);
+  const named = (group: readonly Failure[], text: (failure: Failure) => string | undefined) =>
+    group.find(
+      (failure) => failure.module !== undefined && text(failure)?.includes(failure.module),
+    );
+  return failures.filter((failure) => {
+    const group = groups.get(failure.message)!;
+    const kept =
+      named(group, (entry) => entry.message) ?? named(group, (entry) => entry.stack) ?? group[0];
+    return kept === failure;
   });
 }
 

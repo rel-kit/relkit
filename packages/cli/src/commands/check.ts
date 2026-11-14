@@ -7,7 +7,6 @@ import { join, resolve } from "node:path";
 import { Effect } from "effect";
 import { cliOriginalError } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
-import { CliCompiler } from "../services/compiler.service.js";
 import { projectCapabilitiesLayer } from "../services/project-capabilities.js";
 import { evaluateCheckSources, readCheckSources } from "./check-evaluation.js";
 import { finishCheckEvaluation } from "./check-normalization.js";
@@ -50,17 +49,10 @@ export const checkProjectEffect = Effect.fn("Project.check")(
       const input = yield* evaluateCheckSources(projectRoot, options, generationId, read);
       if (input.evaluator.status === "ok")
         return yield* finishCheckEvaluation(projectRoot, input, options);
-      const compiler = yield* CliCompiler;
-      const typeDiagnostics =
-        options.typecheck === false
-          ? []
-          : yield* compiler.typecheck(
-              projectRoot,
-              input.config.generatedDirectory,
-              input.config.check,
-            );
+      // No type check: its program would see placeholder registries, since normalization did not
+      // run, and report errors that only follow from this failure. Syntax errors are not lost:
+      // a file that does not parse fails to load and is reported by the evaluator.
       return yield* emitCheckResultEffect(projectRoot, input.outputDirectory, [
-        ...typeDiagnostics,
         ...evaluatorDiagnostics(input.evaluator.failures, input.discoverySources),
         ...evaluatorWarningDiagnostics(input.evaluator.warnings),
       ]);

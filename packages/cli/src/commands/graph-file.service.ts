@@ -1,4 +1,4 @@
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { Context, Effect, Layer, Schema } from "effect";
 import { GRAPH_VERSION } from "relkit/contracts";
 import {
@@ -12,6 +12,7 @@ import {
 import { cliAdapterError, cliOriginalError, cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.js";
+import { lastCheckFailure } from "./graph-check-failure.js";
 import { GraphCommandError } from "./graph-error.js";
 import { graphObjectSchema } from "./graph.schemas.js";
 import type { GraphFileOperations, GraphFileOptions } from "./graph.types.js";
@@ -45,17 +46,23 @@ export const graphFilesLive = Layer.effect(
         );
         const value: unknown = yield* files.readText(path).pipe(
           Effect.flatMap((source) => cliTry("graph.json", () => JSON.parse(source))),
-          Effect.mapError((error) => {
-            const cause = cliOriginalError(error);
-            const missing = cause instanceof Error && "code" in cause && cause.code === "ENOENT";
-            return cliAdapterError(
-              "graph.read",
-              new GraphCommandError(
-                missing ? "RELKIT_GRAPH_NOT_FOUND" : "RELKIT_GRAPH_INVALID",
-                `Graph file ${missing ? "was not found" : "is not valid JSON"}: ${path}`,
-              ),
-            );
-          }),
+          Effect.catch((error) =>
+            Effect.gen(function* () {
+              const cause = cliOriginalError(error);
+              const missing = cause instanceof Error && "code" in cause && cause.code === "ENOENT";
+              // Check writes the graph only when it passes; its diagnostics say why it did not.
+              const failed = missing ? yield* lastCheckFailure(files, dirname(path)) : "";
+              return yield* Effect.fail(
+                cliAdapterError(
+                  "graph.read",
+                  new GraphCommandError(
+                    missing ? "RELKIT_GRAPH_NOT_FOUND" : "RELKIT_GRAPH_INVALID",
+                    `Graph file ${missing ? "was not found" : "is not valid JSON"}: ${path}${failed}`,
+                  ),
+                ),
+              );
+            }),
+          ),
         );
         if (!Schema.is(graphObjectSchema)(value))
           return yield* invalid(path, "the root must be an object");
