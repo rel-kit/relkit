@@ -37,6 +37,38 @@ test("a long scope name is never cut in the middle", () => {
   }
 });
 
+test("a recorded exception prints its cause and request, and its stack only with --verbose", () => {
+  const record: LogRecord = {
+    version: 2,
+    signal: "log",
+    timestamp: new Date().toISOString(),
+    level: "error",
+    component: "http",
+    message: "Error: Failed query: select 1 params: [REDACTED]",
+    requestId: "request-1",
+    traceId: "4bf92f3577b34da6a3ce929d0e0e4736",
+    fields: {
+      "exception.type": "Error",
+      "exception.message": "Failed query: select 1 params: [REDACTED]",
+      "exception.stacktrace":
+        "Error: Failed query: select 1 params: [REDACTED]\n    at handler (src/a1.function.ts:8:36)",
+      "relkit.error.code": "RELKIT_UNEXPECTED_DEFECT",
+      "relkit.error.kind": "defect",
+    },
+  };
+  const quiet = formatDevLog(record, { columns: 200 }).split("\n");
+  expect(quiet[0]).toContain("ERROR http");
+  expect(quiet[0]).toContain("Error: Failed query: select 1 params: [REDACTED]");
+  expect(quiet.slice(1).map((line) => line.trim())).toEqual([
+    "request: request-1",
+    "trace: 4bf92f3577b34da6a3ce929d0e0e4736",
+  ]);
+  const verbose = formatDevLog(record, { columns: 200, verbose: true });
+  expect(verbose).toContain("at handler (src/a1.function.ts:8:36)");
+  expect(verbose).toContain("request: request-1");
+  expect(verbose.split("Failed query")).toHaveLength(2);
+});
+
 test("client errors log at info except authentication, authorization and rate limits", () => {
   const level = new Function(`${HTTP_LOG_LEVEL_SOURCE}\nreturn httpLogLevel;`)() as (event: {
     type: string;

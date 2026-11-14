@@ -34,6 +34,12 @@ export interface DevProcess {
    */
   readonly get: (path: string) => Promise<ServedRevision | undefined>;
   /**
+   * Sends a GET request and returns the raw response, whatever its status.
+   * @param path - Route path.
+   * @returns The response.
+   */
+  readonly request: (path: string) => Promise<Response>;
+  /**
    * Polls a route until it serves a message.
    * @param path - Route path.
    * @param message - Expected message.

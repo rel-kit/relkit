@@ -36,6 +36,9 @@ function coreHttpOptionsSource(configuration: ServerSourceConfiguration): string
   },
   observability: telemetry,
   responseMapping: { mode: environment },
+  // Development prints framework logs of a request, such as the redacted cause of a 500, in the
+  // terminal; production keeps them in the observability sink only.
+  ...(environment === "production" ? {} : { effectLogger: { human: { write: (_line, record) => writeHttpLog(record) } } }),
   middlewareContext: routeMiddlewareContext,
   middleware: httpMiddlewareOptions,
   apiDocs: {

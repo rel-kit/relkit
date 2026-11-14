@@ -102,6 +102,18 @@ function writeRuntimeLog(record) {
   else if (process.env.RELKIT_DEV_LOGS === "1") process.stdout.write("\\u001e" + JSON.stringify(record) + "\\n");
   else consoleHumanSink.write(formatHumanLog(record), record);
 }
+// Development error logs of a request wait for its request line, so the cause prints beneath it.
+const heldHttpLogs = new Map();
+function writeHttpLog(record) {
+  const held = record?.signal === "log" && record.level === "error" && typeof record.requestId === "string" && process.env.RELKIT_DEV_LOGS === "1";
+  if (!held || (!heldHttpLogs.has(record.requestId) && heldHttpLogs.size >= 256)) return writeRuntimeLog(record);
+  heldHttpLogs.set(record.requestId, [...(heldHttpLogs.get(record.requestId) ?? []), record]);
+}
+function releaseHttpLogs(requestId) {
+  const records = heldHttpLogs.get(requestId) ?? [];
+  heldHttpLogs.delete(requestId);
+  for (const record of records) writeRuntimeLog(record);
+}
 function healthResponse(status, code = 200) {
   const readiness = { environmentReady: true, providerReady: runtimeState().ready.provider && runtimeState().ready.nativeWorker && !runtimeState().stopping, databaseReady: runtimeState().ready.database && !runtimeState().stopping, authReady: runtimeState().ready.auth && !runtimeState().stopping };
   // Generation identity is for the development supervisor; production answers status and readiness only.

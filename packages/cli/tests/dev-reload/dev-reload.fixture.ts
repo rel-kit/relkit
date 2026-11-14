@@ -115,13 +115,14 @@ export default defineApp({ env, server: { port: 3000, maxBodyBytes: ${maxBodyByt
 /**
  * Starts `relkit dev` on a free port.
  * @param root - Application root.
+ * @param verbose - Whether dev runs with `--verbose`.
  * @returns The running process with output and request helpers.
  */
-export async function startDev(root: string): Promise<DevProcess> {
+export async function startDev(root: string, verbose = true): Promise<DevProcess> {
   const probe = Bun.serve({ port: 0, hostname: "127.0.0.1", fetch: () => new Response() });
   const port = probe.port ?? 0;
   await probe.stop(true);
-  const child = Bun.spawn([process.execPath, cli, "dev", "--verbose"], {
+  const child = Bun.spawn([process.execPath, cli, "dev", ...(verbose ? ["--verbose"] : [])], {
     cwd: root,
     env: { ...process.env, PORT: String(port), NO_COLOR: "1" },
     stdin: "ignore",
@@ -164,7 +165,9 @@ export async function startDev(root: string): Promise<DevProcess> {
       // Already gone.
     }
   };
-  return { get, waitFor, output: () => output, stop };
+  const request = (path: string) =>
+    fetch(`http://127.0.0.1:${port}${path}`, { signal: AbortSignal.timeout(5_000) });
+  return { get, request, waitFor, output: () => output, stop };
 }
 
 const TSCONFIG = `${JSON.stringify(
