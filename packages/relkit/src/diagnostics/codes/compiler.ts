@@ -628,7 +628,7 @@ export const compilerCodes = [
     title: "Provider works only locally",
     happened:
       "A provider binding is set up for local use only, but this build targets a real deployment.",
-    fix: "Configure a connected or infrastructure source for the provider binding named in the error.",
+    fix: 'At the binding the error points at, give the adapter inside `docker(…)` its binding values, for example `docker(s3({ endpoint: env.url("S3_ENDPOINT"), … }))`, so release builds resolve them, or select an infrastructure source such as `aws(s3())` from `@relkit/aws`.',
   },
   {
     code: "RELKIT_PROVIDER_RUNTIME_INVALID",
