@@ -4,7 +4,12 @@ import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve, sep } from "node:path";
 import { loadMigrationConfig } from "./migration-config.js";
 import { migrateServer, migrateSqlite, preflightHistory } from "./migration-execute.js";
-import { MigrationFailure, type MigrationResponse } from "./migration.schemas.js";
+import { serverMigrationCount } from "./migration-server-count.js";
+import {
+  MigrationFailure,
+  type MigrationConfig,
+  type MigrationResponse,
+} from "./migration.schemas.js";
 import { isMainModule } from "../compiler/discovery/evaluator-child-framing.js";
 
 async function execute(): Promise<MigrationResponse> {
@@ -12,10 +17,39 @@ async function execute(): Promise<MigrationResponse> {
   const configPath = resolve(root, process.argv[2] ?? "drizzle.config.ts");
   const config = await loadMigrationConfig(root, configPath);
   const migrationPath = resolve(root, config.out);
-  await preflightHistory(root, migrationPath);
-  if (config.dialect === "sqlite") await migrateSqlite(root, config, migrationPath);
-  else await migrateServer(root, configPath);
-  return { ok: true, command: "db migrate", dialect: config.dialect, configPath, migrationPath };
+  const history = await preflightHistory(root, migrationPath);
+  const applied =
+    config.dialect === "sqlite"
+      ? await migrateSqlite(root, config, migrationPath)
+      : await migrateCounted(root, config, configPath);
+  return {
+    ok: true,
+    command: "db migrate",
+    dialect: config.dialect,
+    configPath,
+    migrationPath,
+    history,
+    ...(applied === undefined ? {} : { applied }),
+  };
+}
+
+/**
+ * Runs drizzle-kit for a server dialect between two reads of the migration log.
+ * @param root - Application root.
+ * @param config - Validated configuration.
+ * @param configPath - Selected configuration file.
+ * @returns Migrations applied, or undefined when the log could not be read both times.
+ */
+async function migrateCounted(
+  root: string,
+  config: MigrationConfig,
+  configPath: string,
+): Promise<number | undefined> {
+  const before = await serverMigrationCount(root, config);
+  await migrateServer(root, configPath);
+  if (before === undefined) return undefined;
+  const after = await serverMigrationCount(root, config);
+  return after === undefined || after < before ? undefined : after - before;
 }
 
 /** Accepts only the fixed result filename in a direct, non-symlink owned temporary directory. */

@@ -76,9 +76,9 @@
 
 **Findings:** RK-06, RK-31. **Owns:** `packages/cli/src/database/**`, `packages/cli/src/commands/{db,env}.ts`, `packages/cli/src/cli-help-db.ts`, new `packages/cli/src/runtime/one-shot-environment.ts`, `examples/data-model/tests/migrations.test.ts`.
 
-- [ ] 8.1 RK-06: on Node, load the application's environment files for `db migrate`, `env check` and `env list`, with process values taking precedence, through one helper; verify `npm run db:migrate` with `DATABASE_URL` only in `.env`, and `env check` reporting it as set.
-- [ ] 8.2 RK-06: show the configuration's own message when the Drizzle configuration throws, and distinguish a missing dependency from a thrown error (`migration-config.ts:24-31`); verify with a configuration that throws.
-- [ ] 8.3 RK-31: report how many migrations were applied, or that the database is up to date (`commands/db.ts:64`, `migration.schemas.ts`); name the project's package manager in the "generate first" message (`migration-execute.ts:37`); state the environment and configuration inputs in `db migrate --help`; verify a first and a repeated run.
+- [x] 8.1 RK-06: on Node, load the application's environment files for `db migrate`, `env check` and `env list`, with process values taking precedence, through one helper; verify `npm run db:migrate` with `DATABASE_URL` only in `.env`, and `env check` reporting it as set.
+- [x] 8.2 RK-06: show the configuration's own message when the Drizzle configuration throws, and distinguish a missing dependency from a thrown error (`migration-config.ts:24-31`); verify with a configuration that throws.
+- [x] 8.3 RK-31: report how many migrations were applied, or that the database is up to date (`commands/db.ts:64`, `migration.schemas.ts`); name the project's package manager in the "generate first" message (`migration-execute.ts:37`); state the environment and configuration inputs in `db migrate --help`; verify a first and a repeated run.
 
 ## 9. Database scaffold for Node
 
