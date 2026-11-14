@@ -1,12 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ArrowRight, CornerDownLeft, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "../components/ui/button";
 import { OverlayDialog } from "../components/ui/dialog";
 import { ComboboxField } from "../components/ui/select";
-import { entityIndex, searchEntities } from "../lib/graph-index";
+import { entityIndex, recognizeIdentifier, searchEntities } from "../lib/graph-index";
 import type { GraphSnapshot } from "../lib/graph-model";
 import { navigation } from "./navigation-data";
 
@@ -31,8 +31,20 @@ export function CommandPalette({
   const router = useRouter();
   const [query, setQuery] = useState("");
   const entities = useMemo(() => entityIndex(graph), [graph]);
+  const identifier = useMemo(() => recognizeIdentifier(query), [query]);
   const results = useMemo<readonly PaletteResult[]>(() => {
     const needle = query.trim().toLowerCase();
+    const opened = identifier
+      ? [
+          {
+            id: `identifier:${identifier.kind}`,
+            href: identifier.href,
+            label: identifier.label,
+            description: identifier.kind === "request" ? "Request" : "Trace",
+            group: "Open",
+          },
+        ]
+      : [];
     const pages = navigation
       .filter((item) => !item.external)
       .filter((item) => `${item.label} ${item.group}`.toLowerCase().includes(needle))
@@ -50,8 +62,8 @@ export function CommandPalette({
       description: entry.detail,
       group: entry.kind,
     }));
-    return [...pages, ...found];
-  }, [entities, query]);
+    return [...opened, ...pages, ...found];
+  }, [entities, identifier, query]);
   const groups = useMemo(() => {
     const map = new Map<string, PaletteResult[]>();
     for (const result of results) map.set(result.group, [...(map.get(result.group) ?? []), result]);
@@ -78,15 +90,23 @@ export function CommandPalette({
         </Button>
       }
       title="Search inspector"
-      description="Jump to a page, route, function, job, event, agent or tool."
+      description="Jump to a page, route, function, job, event, agent or tool. Paste a request or trace ID to open it."
     >
-      <ComboboxField
-        label="Destination"
-        items={results.map(({ id, label, description }) => ({ id, label, description }))}
-        value={query}
-        onChange={setQuery}
-        onSelect={navigate}
-      />
+      <FocusFirstInput
+        onEnterWithoutChoice={() => {
+          if (identifier === undefined) return false;
+          navigate(`identifier:${identifier.kind}`);
+          return true;
+        }}
+      >
+        <ComboboxField
+          label="Destination"
+          items={results.map(({ id, label, description }) => ({ id, label, description }))}
+          value={query}
+          onChange={setQuery}
+          onSelect={navigate}
+        />
+      </FocusFirstInput>
       <div className="neon-scroll-fade mt-3 max-h-[52vh] overflow-y-auto">
         {groups.map(([group, items]) => (
           <section key={group} className="mb-2">
@@ -99,6 +119,9 @@ export function CommandPalette({
                   className="command-result group flex items-center gap-3 rounded-md px-2 py-1.5 text-left outline-none hover:bg-muted focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50"
                   key={item.id}
                   type="button"
+                  // Keep the cursor in the search field: losing focus resets the field and
+                  // replaces the list before the click lands.
+                  onMouseDown={(event) => event.preventDefault()}
                   onClick={() => navigate(item.id)}
                 >
                   <span className="min-w-0 flex-1">
@@ -126,5 +149,34 @@ export function CommandPalette({
         <CornerDownLeft aria-hidden="true" className="size-3" /> to open
       </p>
     </OverlayDialog>
+  );
+}
+
+/**
+ * Puts the cursor in the search field when the dialog opens, so typing works at once, and lets
+ * Enter open a pasted identifier when no listed result has been chosen.
+ */
+function FocusFirstInput({
+  children,
+  onEnterWithoutChoice,
+}: {
+  readonly children: ReactNode;
+  readonly onEnterWithoutChoice: () => boolean;
+}) {
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    box.current?.querySelector("input")?.focus();
+  }, []);
+  return (
+    <div
+      ref={box}
+      onKeyDownCapture={(event) => {
+        if (event.key !== "Enter" || event.nativeEvent.isComposing) return;
+        if ((event.target as HTMLElement).getAttribute("aria-activedescendant")) return;
+        if (onEnterWithoutChoice()) event.preventDefault();
+      }}
+    >
+      {children}
+    </div>
   );
 }

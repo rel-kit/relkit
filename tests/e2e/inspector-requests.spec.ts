@@ -308,6 +308,43 @@ test("system routes show their path with the route id beside it, never unknown",
   await expect(row).not.toContainText("unknown");
 });
 
+test("the command palette takes the cursor on open and opens a pasted request or trace id", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${backend}/__fixture__/failures`);
+  await page.goto("/requests");
+  await expect(page.getByRole("heading", { name: "Requests" })).toBeVisible();
+
+  await page.keyboard.press("Control+k");
+  const search = page.getByRole("dialog").getByRole("combobox", { name: "Destination" });
+  await expect(search).toBeFocused();
+
+  // Typing goes straight into the field, and Enter opens the request.
+  await page.keyboard.type(FAILURE_FIXTURE_IDS.declared);
+  await expect(
+    page.getByRole("dialog").getByText(`Open request ${FAILURE_FIXTURE_IDS.declared}`).first(),
+  ).toBeVisible();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(new RegExp(`/requests/${FAILURE_FIXTURE_IDS.declared}$`));
+  await expect(page.getByRole("heading", { name: "Request detail" })).toBeVisible();
+
+  const traceId = "9".repeat(32);
+  await page.keyboard.press("Control+k");
+  await expect(search).toBeFocused();
+  await page.keyboard.type(traceId);
+  await page.getByRole("button", { name: `Open trace ${traceId}` }).click();
+  await expect(page).toHaveURL(new RegExp(`/traces/${traceId}$`));
+  await expect(page.getByRole("heading", { name: "Trace detail" })).toBeVisible();
+
+  // Text that is not an identifier still searches pages and graph entities.
+  await page.keyboard.press("Control+k");
+  await expect(search).toBeFocused();
+  await page.keyboard.type("Requests");
+  await expect(page.locator(".command-result", { hasText: "Requests" }).first()).toBeVisible();
+  await expect(page.getByRole("dialog").getByText("Open request")).toHaveCount(0);
+});
+
 test("pinpoints failed, timed out, cancelled, and incomplete requests", async ({
   page,
   request,
