@@ -148,7 +148,7 @@ The runtime SHALL execute the compiled mapping model after route middleware cont
 #### Scenario: Body is too large
 
 - **WHEN** the request body is larger than the body limit that applies to the route
-- **THEN** the runtime answers `413` with code `body-too-large`, records the failure, and does not call the function
+- **THEN** the runtime answers `413` with code `payload-too-large`, records the failure, and does not call the function
 
 ### Requirement: Route body and file limits
 
@@ -157,7 +157,7 @@ The HTTP runtime SHALL enforce the route-specific body limit or configured serve
 #### Scenario: Body exceeds its route limit
 
 - **WHEN** request bytes exceed `maxBodyBytes`, whether the length is declared or the body is streamed, in development or in production
-- **THEN** the runtime answers `413` with code `body-too-large`, records the failure, and does not parse or invoke the target
+- **THEN** the runtime answers `413` with code `payload-too-large`, records the failure, and does not parse or invoke the target
 
 #### Scenario: Repeated multipart field is valid
 

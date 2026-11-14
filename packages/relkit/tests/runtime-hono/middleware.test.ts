@@ -208,7 +208,7 @@ test("the body limit applies to the bytes of a chunked body on a mounted Better 
   expect(received).toEqual([10_000]);
 });
 
-test("an oversize body answers 413 body-too-large whether its length is declared or streamed", async () => {
+test("an oversize body answers 413 payload-too-large whether its length is declared or streamed", async () => {
   const app = createApp({
     plan: plan(),
     manifest: manifest(),
@@ -236,9 +236,9 @@ test("an oversize body answers 413 body-too-large whether its length is declared
   for (const response of [declared, streamed]) {
     expect(response.status).toBe(413);
     expect(await response.json()).toMatchObject({
-      type: "/errors/body-too-large",
+      type: "/errors/payload-too-large",
       status: 413,
-      code: "body-too-large",
+      code: "payload-too-large",
     });
   }
 });

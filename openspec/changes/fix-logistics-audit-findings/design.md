@@ -41,7 +41,7 @@ Fix groups are cut so that no two groups edit the same files; each group is impl
 
 ### D6. Oversize bodies answer 413 everywhere
 
-Today an oversize body is 413 when `Content-Length` is declared and 422 when it is streamed, and always 422 in development because the proxy drops the header. One status is required; 413 is what production already sends in the common case and what HTTP defines. Malformed JSON and a wrong content type stay 422 as specified. Alternative rejected: 422 for all three, which would change the common production answer.
+Today an oversize body is 413 when `Content-Length` is declared and 422 when it is streamed, and always 422 in development because the proxy drops the header. One status is required; 413 with the code `payload-too-large` is what production already sends in the common case, what the documentation states, and what HTTP defines, so that answer is kept byte for byte and the streamed path joins it. `body-too-large` remains the name of the validation issue inside request mapping. Malformed JSON and a wrong content type stay 422 as specified. Alternative rejected: 422 for all three, which would change the common production answer.
 
 ### D7. Dotenv precedence under `relkit dev` is unchanged
 

@@ -50,9 +50,9 @@ test("keeps the RelKit control plane out of application telemetry but names each
   expect(oversized.status).toBe(413);
   expect(oversized.headers.get("x-request-id")).toMatch(/^request-/);
   expect(await oversized.json()).toMatchObject({
-    type: "/errors/body-too-large",
+    type: "/errors/payload-too-large",
     status: 413,
-    code: "body-too-large",
+    code: "payload-too-large",
   });
 
   const nestedRequest = new Request("http://localhost/_relkit/v1/graph");

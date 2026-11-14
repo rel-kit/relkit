@@ -1,6 +1,6 @@
 /**
  * RK-21 in development: an oversize body sent through the `relkit dev` proxy gets the same 413
- * `body-too-large` answer as in production, with or without a declared `Content-Length`.
+ * `payload-too-large` answer as in production, with or without a declared `Content-Length`.
  */
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import type { RegistrationPlan } from "relkit/graph";
@@ -108,7 +108,7 @@ function chunked(size: number): ReadableStream<Uint8Array> {
 }
 
 for (const framing of ["declared", "streamed"] as const)
-  test(`a ${framing} oversize body gets 413 body-too-large through the proxy`, async () => {
+  test(`a ${framing} oversize body gets 413 payload-too-large through the proxy`, async () => {
     const size = LIMIT * 4;
     const response = await fetch(`http://127.0.0.1:${port}/echo`, {
       method: "POST",
@@ -116,7 +116,7 @@ for (const framing of ["declared", "streamed"] as const)
       ...(framing === "declared" ? {} : { duplex: "half" }),
     } as RequestInit);
     expect(response.status).toBe(413);
-    expect(await response.json()).toMatchObject({ status: 413, code: "body-too-large" });
+    expect(await response.json()).toMatchObject({ status: 413, code: "payload-too-large" });
     const fits = await fetch(`http://127.0.0.1:${port}/echo`, {
       method: "POST",
       body: framing === "declared" ? "x".repeat(100) : chunked(100),
