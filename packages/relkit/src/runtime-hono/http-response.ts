@@ -51,8 +51,12 @@ export function observeHttpResponse(
     const effective =
       derived === prior ? prior : (state.requestRecord?.setOutcome(derived) ?? derived);
     span.event(`http.${effective}`, BigInt(Date.now()) * 1_000_000n);
+    // Once the handler produced a response its headers carry the status the client received;
+    // cancellation or a body failure after that point is an outcome, never a replacement status.
     const status =
-      response.status >= 400 ? response.status : fallbackStatus(effective, response.status);
+      handlerError === undefined || response.status >= 400
+        ? response.status
+        : fallbackStatus(effective, response.status);
     const record = state.requestRecord?.finish({ status, responseBytes: bytes });
     if (record) options.observability?.collect(record);
     const finalOutcome = record?.outcome ?? effective;
@@ -187,7 +191,8 @@ export function boundaryEvent(
   });
 }
 
-/** Chooses a status consistent with the terminal outcome when no response status is available.
+/** Chooses a status consistent with the terminal outcome when no response reached the client.
+ * Only a handler failure or a cancellation before any response (the synthetic 499) uses it.
  * @param outcome - Terminal classification used for durable state and telemetry.
  * @param status - HTTP status associated with the observed response or lifecycle event.
  * @returns The response status for success, or the status associated with its terminal failure class.
