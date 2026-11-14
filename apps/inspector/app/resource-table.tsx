@@ -30,6 +30,7 @@ export function ResourceTable<Item extends ResourceTableItem>({
   details,
   declare,
   lead,
+  footer,
 }: ResourceTableProps<Item>) {
   const [search, setSearch] = useState("");
   const [kind, setKind] = useState("all");
@@ -173,6 +174,7 @@ export function ResourceTable<Item extends ResourceTableItem>({
           }
         }}
       />
+      {footer}
       <OverlayDialog
         placement="right"
         title={selected?.id ?? noun}

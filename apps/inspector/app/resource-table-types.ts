@@ -26,6 +26,8 @@ export interface ResourceTableProps<Item extends ResourceTableItem> {
   readonly details?: (item: Item) => ReactNode;
   /** Shown between the page header and the filters. */
   readonly lead?: ReactNode;
+  /** Shown under the table and its pagination. */
+  readonly footer?: ReactNode;
   /** One line on what makes this page non-empty, shown when the application declares none. */
   readonly declare?: string;
 }

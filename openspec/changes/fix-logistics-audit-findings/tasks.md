@@ -176,7 +176,7 @@
 - [x] 17.4 IN-27, IN-38: read the response status before the protocol envelope so a 404 means "none declared" (`lib/api-transport.ts:72-86`), and give jobs, middlewares, agents and tools empty states that distinguish "none declared" from "no match"; verify with `lib/api.test.ts` and an application without jobs.
 - [x] 17.5 IN-22: show occurrences per declared error and the internal failures on the Errors page; verify against a seeded history.
 - [x] 17.6 IN-25, IN-31, IN-32, IN-39, IN-40: show object content type and modified time and flag a type that contradicts the key; give the PDF preview a fallback with metadata; word provider provenance as provenance and show reported runtime state; label fields from the input schema; fix the overflow of the environment page at 900 px; verify each in the page walk.
-- [ ] 17.7 IN-20: show the system routes the API now lists (authentication mount, health, RPC) in their own labelled section of the Routes page, each with its requests, without counting them as declared routes and without offering "send request" for a prefix; update the end-to-end specs that count routes; verify against a run with authentication requests.
+- [x] 17.7 IN-20: show the system routes the API now lists (authentication mount, health, RPC) in their own labelled section of the Routes page, each with its requests, without counting them as declared routes and without offering "send request" for a prefix; update the end-to-end specs that count routes; verify against a run with authentication requests.
 
 ## 18. Inspector pages: shell, overview and streams
 

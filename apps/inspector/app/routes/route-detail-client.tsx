@@ -137,16 +137,28 @@ export function RouteDetailClient() {
       }}
       aside={<RouteFacts route={route} target={target} />}
     >
-      <RouteComposer
-        route={route}
-        target={target}
-        invoke={(input) => api.invokeRoute(input)}
-        {...streamInvocation(route, api)}
-        onComplete={(next) => {
-          setResult(next);
-          loadRequests();
-        }}
-      />
+      {route.system === true ? (
+        <Section id="route-send-note">
+          <p className="m-0 text-xs text-muted-foreground">
+            RelKit handles this route itself, so there is no request to compose here.{" "}
+            <Link className="text-link" href={`/requests?routeId=${encodeURIComponent(routeId)}`}>
+              View the requests it handled
+            </Link>
+            .
+          </p>
+        </Section>
+      ) : (
+        <RouteComposer
+          route={route}
+          target={target}
+          invoke={(input) => api.invokeRoute(input)}
+          {...streamInvocation(route, api)}
+          onComplete={(next) => {
+            setResult(next);
+            loadRequests();
+          }}
+        />
+      )}
       {result !== undefined && <InvocationResult result={result} />}
       <RecentRequests requests={requests} />
       <RouteContract route={route} target={target} />
