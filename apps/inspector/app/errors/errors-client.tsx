@@ -6,25 +6,36 @@ import { createInspectorClient } from "../../lib/client";
 import { DetailList } from "../../components/blocks/details";
 import { StatusBadge } from "../../components/neon/status-badge";
 import { Badge } from "../../components/ui/badge";
+import { errorOccurrences, requestsHref } from "../../lib/error-occurrences";
 import { ResourceTable, type ResourceTableItem } from "../resource-table";
+import { UnexpectedFailures } from "./unexpected-failures";
 
 interface ErrorItem extends ResourceTableItem {
   readonly domain: string;
   readonly exposure: string;
   readonly status: string;
   readonly retry: string;
+  /** Retained requests that ended with this error; undefined when the count could not be read. */
+  readonly requests: number | undefined;
 }
 
 export function ErrorsClient() {
   const load = useCallback(async (query: InspectorQuery): Promise<InspectorPage<ErrorItem>> => {
-    const page = await createInspectorClient().list<InspectorObject>("errors", query);
-    return { ...page, items: page.items.map(errorItem) };
+    const api = createInspectorClient();
+    const page = await api.list<InspectorObject>("errors", query);
+    const items = page.items.map(errorItem);
+    const counts = await errorOccurrences(
+      items.map((item) => item.id),
+      async (errorId) => (await api.query("requests", { errorId, limit: 1, count: true })).total,
+    );
+    return { ...page, items: items.map((item) => ({ ...item, requests: counts.get(item.id) })) };
   }, []);
   return (
     <ResourceTable
       title="Errors"
       description="Inspect domain errors and the public contracts that declare them."
       noun="errors"
+      lead={<UnexpectedFailures />}
       declare="Declare an error with `defineError` and it appears here."
       load={load}
       columns={[
@@ -59,6 +70,28 @@ export function ErrorsClient() {
               label={item.status}
             />
           ),
+        },
+        {
+          key: "requests",
+          label: "Occurrences",
+          render: (item) =>
+            item.requests === undefined ? (
+              <span className="text-muted-foreground" title="The history could not be counted">
+                —
+              </span>
+            ) : item.requests === 0 ? (
+              <span className="font-mono text-[11px] whitespace-nowrap text-muted-foreground">
+                none retained
+              </span>
+            ) : (
+              <a
+                className="text-link font-mono text-[11px] whitespace-nowrap"
+                href={requestsHref({ errorId: item.id })}
+              >
+                {item.requests.toLocaleString("en-US")}{" "}
+                {item.requests === 1 ? "request" : "requests"}
+              </a>
+            ),
         },
         {
           key: "retry",
@@ -96,6 +129,7 @@ function errorItem(item: InspectorObject): ErrorItem {
     exposure: text(item.exposure) || "internal",
     status: typeof http?.status === "number" ? String(http.status) : "default",
     retry: text(item.retry) || "never",
+    requests: undefined,
   };
 }
 

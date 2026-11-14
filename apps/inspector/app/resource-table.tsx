@@ -29,6 +29,7 @@ export function ResourceTable<Item extends ResourceTableItem>({
   statusOptions = [],
   details,
   declare,
+  lead,
 }: ResourceTableProps<Item>) {
   const [search, setSearch] = useState("");
   const [kind, setKind] = useState("all");
@@ -123,6 +124,7 @@ export function ResourceTable<Item extends ResourceTableItem>({
           </Button>
         }
       />
+      {lead}
       <ResourceTableFilters
         {...{
           title,
