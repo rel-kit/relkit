@@ -1,7 +1,7 @@
 /** Loads optional modules exclusively from the selected application's dependency graph. */
 import { createRequire } from "node:module";
 import { readFile, stat } from "node:fs/promises";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Schema } from "effect";
 import { MigrationConfig, MigrationFailure } from "./migration.schemas.js";
@@ -70,6 +70,35 @@ export async function consumerPath(root: string, specifier: string): Promise<str
       code: "RELKIT_DB_DEPENDENCY",
       exitCode: 2,
       message: `Install ${name === "drizzle-kit" ? "drizzle-kit" : "drizzle-orm"} in this application with bun add before migrating.`,
+    });
+  }
+}
+
+/**
+ * Finds the installed directory of a declared consumer package. Node enforces `exports`, and
+ * drizzle-kit does not export `./package.json`, so the main entry is resolved and the directory
+ * holding the package's own manifest is taken.
+ * @param root - Application root.
+ * @param name - Declared package name.
+ * @returns The package directory; a missing or undeclared package fails like {@link consumerPath}.
+ */
+export async function consumerPackageDirectory(root: string, name: string): Promise<string> {
+  try {
+    return dirname(await consumerPath(root, `${name}/package.json`));
+  } catch {
+    let directory = dirname(await consumerPath(root, name));
+    while (dirname(directory) !== directory) {
+      const manifest: unknown = await readFile(resolve(directory, "package.json"), "utf8").then(
+        JSON.parse,
+        () => undefined,
+      );
+      if (record(manifest) && manifest.name === name) return directory;
+      directory = dirname(directory);
+    }
+    throw new MigrationFailure({
+      code: "RELKIT_DB_DEPENDENCY",
+      exitCode: 2,
+      message: `Install ${name} in this application before migrating.`,
     });
   }
 }

@@ -9,6 +9,7 @@ import { CliFileSystem } from "../services/filesystem.service.js";
 import { CliProcess } from "../services/process.service.js";
 import { MigrationResponse } from "../database/migration.schemas.js";
 import { nodeTypeScriptFlags, runtime } from "../runtime/index.js";
+import { oneShotEnvironment } from "../runtime/one-shot-environment.js";
 
 /** Captures configuration/tool output and publishes only after worker and temporary cleanup settle. */
 export const runDbEffect = Effect.fn("Cli.db.migrate")(
@@ -34,13 +35,18 @@ export const runDbEffect = Effect.fn("Cli.db.migrate")(
         const worker = fileURLToPath(
           new URL(`../database/migration-worker.${extension}`, import.meta.url),
         );
+        const cwd = context.cwd ?? process.cwd();
+        // Node loads no dotenv file; the configuration and drizzle-kit see the application's files
+        // under the process environment. Under Bun this is the process environment unchanged.
+        const environment = yield* oneShotEnvironment(cwd);
         // The worker loads `drizzle.config.ts`, so on Node it runs with the TypeScript hooks.
         const [command, ...flags] =
           runtime.name === "bun" ? [process.execPath] : nodeTypeScriptFlags();
         const child = yield* processes.run({
           command: command!,
           args: [...flags, worker, config, resultPath],
-          cwd: context.cwd ?? process.cwd(),
+          cwd,
+          environment,
           maximumOutputBytes: 64 * 1024,
         });
         const response = yield* files

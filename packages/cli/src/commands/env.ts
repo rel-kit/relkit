@@ -13,7 +13,10 @@ import {
   type EnvCommandOptions,
 } from "./env-support.js";
 import { projectEnvEffect } from "relkit/config";
+import { resolve } from "node:path";
 import { Effect } from "effect";
+import { oneShotEnvironment } from "../runtime/one-shot-environment.js";
+import { fileSystemLayer } from "../services/filesystem.service.js";
 import { cliAdapterError, cliTry } from "../cli-errors.js";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { environmentProjectLayer } from "./env-project.service.js";
@@ -74,7 +77,6 @@ export const runEnvEffect = Effect.fn("Environment.command")(
     };
     const definition = yield* loadEnvDefinitionEffect(settings);
     const environment = settings.environment ?? process.env.NODE_ENV ?? "development";
-    const source = settings.source ?? process.env;
     const fields = yield* projectEnvEffect(definition).pipe(
       Effect.mapError((error) =>
         cliAdapterError(
@@ -90,6 +92,12 @@ export const runEnvEffect = Effect.fn("Environment.command")(
       return CLI_EXIT_CODES.success;
     }
 
+    // An injected source is authoritative; otherwise Node reads the dotenv files Bun preloads.
+    const source =
+      settings.source ??
+      (yield* oneShotEnvironment(resolve(settings.projectRoot ?? process.cwd())).pipe(
+        Effect.provide(fileSystemLayer),
+      ));
     const resolution = yield* resolveStatusEffect(definition, fields, environment, source);
     if (parsed.command === "check") {
       const result = {

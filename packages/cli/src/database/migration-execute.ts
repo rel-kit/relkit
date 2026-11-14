@@ -2,7 +2,7 @@
 import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { consumerModule, consumerPath, usage } from "./migration-config.js";
+import { consumerModule, consumerPackageDirectory, usage } from "./migration-config.js";
 import { MigrationFailure, type MigrationConfig } from "./migration.schemas.js";
 import { runtime } from "../runtime/index.js";
 
@@ -89,8 +89,7 @@ export async function migrateSqlite(
 
 /** Delegates SQL server dialects to declared consumer tooling; the parent owns the entire group. */
 export async function migrateServer(root: string, configPath: string): Promise<void> {
-  const manifest = await consumerPath(root, "drizzle-kit/package.json");
-  const executable = resolve(dirname(manifest), "bin.cjs");
+  const executable = resolve(await consumerPackageDirectory(root, "drizzle-kit"), "bin.cjs");
   const command =
     runtime.name === "bun"
       ? [process.execPath, "--bun", executable, "migrate", "--config", configPath]
