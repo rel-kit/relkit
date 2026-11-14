@@ -89,9 +89,6 @@
   "packages/drizzle/src/native-leases.ts": {
     "node": 1
   },
-  "packages/inspector/src/ui-native.service.ts": {
-    "bun": 3
-  },
   "packages/relkit/src/app/dev-module-reload.ts": {
     "node": 2
   },

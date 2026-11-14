@@ -5,7 +5,9 @@ import { access } from "node:fs/promises";
 import { createServer } from "node:net";
 import { Context, Effect, Layer } from "effect";
 import { connectionAttempt, InspectionConnectionError } from "relkit/inspector-api/connection";
+import { currentRuntime, type RuntimeSubprocess } from "relkit/runtime";
 import type { InspectorOptions } from "./options.types.js";
+import { resolveNodeExecutable } from "./node-executable.js";
 import { probeInspectorUi, waitInspectorUiReady } from "./ui-readiness.js";
 
 /** Native UI acquisition is separate from all application/session ownership. */
@@ -36,15 +38,17 @@ export const acquireInspectorUi = Effect.fn("Inspector.startUi")(function* (
 ) {
   yield* connectionAttempt("ui.assets", () => access(entry));
   yield* ensureUiPortFree(options);
+  const node = yield* resolveNodeExecutable();
+  const runtime = yield* connectionAttempt("ui.runtime", currentRuntime);
   const child = yield* Effect.acquireRelease(
-    connectionAttempt("ui.spawn", () =>
-      Promise.resolve(
-        Bun.spawn(["node", entry], {
+    connectionAttempt("ui.spawn", async () => {
+      try {
+        return runtime.processes.spawn([node.executable, entry], {
           cwd: dirname(entry),
           stdout: "inherit",
           stderr: "inherit",
           env: {
-            PATH: process.env.PATH,
+            PATH: node.path,
             HOME: process.env.HOME,
             TMPDIR: process.env.TMPDIR,
             NODE_ENV: "production",
@@ -53,9 +57,12 @@ export const acquireInspectorUi = Effect.fn("Inspector.startUi")(function* (
             RELKIT_BACKEND_URL: backend,
             RELKIT_INSPECTOR_API_TOKEN: token,
           },
-        }),
-      ),
-    ),
+        });
+      } catch (cause) {
+        const code = cause instanceof Error && "code" in cause ? ` (${String(cause.code)})` : "";
+        throw new Error(`Could not start ${node.executable}${code}`, { cause });
+      }
+    }),
     (child) => stopUi(child),
   );
   yield* Effect.raceFirst(waitUiReady(options), uiExit(child));
@@ -91,7 +98,7 @@ function ensureUiPortFree(options: InspectorOptions) {
 }
 
 /** Retains the UI's actual terminal outcome independently from readiness polling. */
-function uiExit(child: Bun.Subprocess) {
+function uiExit(child: RuntimeSubprocess) {
   return connectionAttempt("ui.exit", () => child.exited).pipe(
     Effect.flatMap((code) =>
       Effect.fail(
@@ -113,8 +120,8 @@ const waitUiReady = Effect.fn("Inspector.uiReady")(function* (options: Inspector
 });
 
 /** Gives the owned UI four seconds to exit before joining a forced termination. */
-const stopUi = Effect.fn("Inspector.stopUi")(function* (child: Bun.Subprocess) {
-  if (child.exitCode !== null) return;
+const stopUi = Effect.fn("Inspector.stopUi")(function* (child: RuntimeSubprocess) {
+  if (child.exitCode !== null || child.signalCode !== null) return;
   child.kill("SIGTERM");
   yield* connectionAttempt("ui.stop", () => child.exited).pipe(
     Effect.timeout(4000),

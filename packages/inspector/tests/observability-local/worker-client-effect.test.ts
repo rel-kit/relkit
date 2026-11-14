@@ -185,3 +185,12 @@ test("Promise adapter preserves synchronous process start errors", () => {
   });
   expect(() => startLocalWorker()).toThrow("spawn blocked");
 });
+
+test("the history worker starts on the resolved Node, never on whatever `node` PATH names", async () => {
+  fakeWorker();
+  const worker = Effect.runSync(startLocalWorkerEffect());
+  const options = vi.mocked(fork).mock.calls[0]![2]!;
+  expect(options.execPath).toBe(process.execPath);
+  expect(options.env?.PATH).toBe(process.env.PATH);
+  await Effect.runPromise(worker.close());
+});
