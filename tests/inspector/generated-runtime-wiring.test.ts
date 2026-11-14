@@ -88,6 +88,21 @@ test("generated rich APIs reject direct callers without the private bridge crede
   expect((await application().request("/_relkit/v1/runtime/events")).status).toBe(401);
 });
 
+test("the generated inspector puts agent inspection behind the inspection session (RK-03)", () => {
+  const authorize = (application() as unknown as Record<symbol, (request: Request) => boolean>)[
+    Symbol.for("relkit.inspection.authorize")
+  ]!;
+  const path = "http://localhost/_relkit/v1/runtime/agents/review/executions";
+  const request = (token?: string) =>
+    new Request(
+      path,
+      token === undefined ? {} : { headers: { "x-relkit-inspector-session-token": token } },
+    );
+  expect(authorize(request())).toBe(false);
+  expect(authorize(request("wrong"))).toBe(false);
+  expect(authorize(request("fixture-private-token"))).toBe(true);
+});
+
 /**
  * Evaluates the generated `invokeHttp` with a recording engine `invoke`.
  * @returns The generated function and the engine options it passed.
