@@ -2,8 +2,14 @@ import { deepFreeze, type JsonValue } from "relkit/contracts";
 import { isRecord, pick, safeJson, safeSource } from "./shared.js";
 import { projectAppNode, projectProviderNode } from "./topology.js";
 
-/** Public stored graph metadata fields selected before redaction; accessors are skipped. */
+/**
+ * Public stored graph metadata fields selected before redaction; accessors are skipped.
+ * Every declared field an Inspector detail page displays must be listed here, or the page
+ * reports it as undeclared: channel `params`, `replay` and `presence`, and an agent's
+ * `modelSource` and `instructions`.
+ */
 const GRAPH_FIELDS = `
+params replay presence modelSource instructions
 environment providerBindings observability defaults name type requiredIn hasDefault sensitive
 description input output errors dependencies timeoutMs concurrency generated triggerType invocationMode publishes
 targetFunctionId config method path request responses middleware transforms eventId eventVersion
