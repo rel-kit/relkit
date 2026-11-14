@@ -1,6 +1,7 @@
 import { isAccessFailureId, isJsonValue } from "../contracts/index.js";
 import { InvocationValidationError } from "../engine/index.js";
 import type { HttpTriggerRegistration } from "../graph/index.js";
+import { frameworkTrace } from "../invocation/index.js";
 import {
   isInvocationFailure,
   normalizeFailure,
@@ -21,6 +22,7 @@ import {
   jsonResponse,
   responseStatus,
   safeIssue,
+  validationIssueAttributes,
 } from "./response-mapping-utils.js";
 import { responseIsValid } from "./response-mapping-validation.js";
 import type { ResponseMappingOptions } from "./response-mapping.types.js";
@@ -71,6 +73,7 @@ const failure = Effect.fn("ResponseMapping.failure")(function* (
   const failure = normalized.success;
   if (failure.kind !== "application")
     return yield* genericFailureResponse(trigger, failure, options);
+  frameworkTrace.setAttributes({ "relkit.error.id": failure.id });
   if (isAccessFailureId(failure.id))
     return yield* encodeProblem({
       ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
@@ -107,6 +110,7 @@ const validation = Effect.fn("ResponseMapping.validation")(function* (
   issues: readonly (StandardIssue | RequestMappingIssue)[],
   options: ResponseMappingOptions = {},
 ) {
+  frameworkTrace.event("http.validation.failed", validationIssueAttributes(issues));
   const declaration = findValidation(trigger);
   const status = responseStatus(declaration, 422);
   const problem = problemBody({

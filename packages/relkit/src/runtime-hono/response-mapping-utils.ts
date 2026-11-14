@@ -146,6 +146,26 @@ export function safeIssue(issue: StandardIssue | RequestMappingIssue): {
     ),
   };
 }
+/** Most validation issues named on a span event; the count attribute keeps the total. */
+const MAX_TRACED_ISSUES = 10;
+/** Span event attributes naming each validation issue's code and path, never its message or
+ * the rejected value.
+ * @param issues - Validation or mapping issues.
+ * @returns The issue count and, for the first ten issues, code and dotted path.
+ */
+export function validationIssueAttributes(
+  issues: readonly (StandardIssue | RequestMappingIssue)[],
+): Record<string, string | number> {
+  const attributes: Record<string, string | number> = {
+    "relkit.validation.issue_count": issues.length,
+  };
+  issues.slice(0, MAX_TRACED_ISSUES).forEach((issue, index) => {
+    const safe = safeIssue(issue);
+    attributes[`relkit.validation.issues.${index}.code`] = safe.code;
+    attributes[`relkit.validation.issues.${index}.path`] = safe.path.join(".");
+  });
+  return attributes;
+}
 /** Read object response declarations from route configuration.
  * @param trigger - Compiled HTTP trigger registration.
  * @returns Supported response records, or an empty array.

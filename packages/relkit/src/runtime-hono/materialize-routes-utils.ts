@@ -90,7 +90,7 @@ const handleRoute = Effect.fn("HttpRoutes.handle")(function* (
     ),
   );
   if (isRequestMappingFailure(input)) {
-    frameworkTrace.event("http.validation.failed");
+    // The validation response records the issues' codes and paths on `http.validation.failed`.
     builder?.setOutcome("validation-error");
     return mapInputValidationResponse(trigger, input.issues, responseOptions);
   }

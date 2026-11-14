@@ -153,20 +153,25 @@ export function createInvocationExecution<
   });
 }
 
-/** Records the safe identity of a failure on its invocation span: an `exception` event naming
- * the class of a provider or defect failure. The cause's message never reaches the span here;
- * the HTTP layer records the redacted cause in development, where the mode is known.
+/** Records the safe identity of a failure on its invocation span: the declared identifier of an
+ * application failure as `relkit.error.id`, or an `exception` event naming the class of a
+ * provider or defect failure. The cause's message never reaches the span here; the HTTP layer
+ * records the redacted cause in development, where the mode is known.
  * @param span - Invocation span still open for writes.
  * @param error - Validation error or normalized invocation failure.
  * @param time - Event time in epoch nanoseconds.
  */
 function recordFailureIdentity(
   span: {
+    readonly attribute: (key: string, value: unknown) => void;
     readonly event: (name: string, time: bigint, attributes: Record<string, unknown>) => void;
   },
   error: InvocationValidationError | InvocationFailure,
   time: bigint,
 ): void {
-  if (error instanceof Error || (error.kind !== "provider" && error.kind !== "defect")) return;
-  span.event("exception", time, { "exception.type": error._tag });
+  if (error instanceof Error) return;
+  if (error.kind === "application" && error.id !== undefined)
+    span.attribute("relkit.error.id", error.id);
+  if (error.kind === "provider" || error.kind === "defect")
+    span.event("exception", time, { "exception.type": error._tag });
 }

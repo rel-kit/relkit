@@ -10,3 +10,9 @@ instead: in development, one error log record with the redacted cause (`exceptio
 class only (`exception.type`, `relkit.error.code`), without message text. Bound parameters a
 database driver appends to a failed query (`params: …`) are masked. The invocation span gets an
 `exception` event naming the failure's class in every mode.
+
+A declared application failure records its identifier as `relkit.error.id` on the invocation span
+and on the request span. The `http.validation.failed` event carries
+`relkit.validation.issue_count` and, for the first ten issues,
+`relkit.validation.issues.<n>.code` and `relkit.validation.issues.<n>.path`, never messages or
+values; it is now also recorded when the function's own input validation rejects a request.

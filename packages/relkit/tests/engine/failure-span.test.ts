@@ -1,5 +1,5 @@
 /** The invocation span names how an invocation failed without carrying the cause's text. */
-import { defineFunction } from "../../src/app/index.js";
+import { defineError, defineFunction, fail } from "../../src/app/index.js";
 import { createObservabilityCollector } from "../../src/observability/index.js";
 import { z } from "../../src/schema/index.js";
 import { expect, test } from "vitest";
@@ -37,4 +37,25 @@ test("a defect adds an exception event that names only its class", async () => {
   expect(exception?.attributes).toEqual({ "exception.type": "UnexpectedDefect" });
   expect(JSON.stringify(span)).not.toContain("AB-secret-123");
   expect(JSON.stringify(span)).not.toContain("Failed query");
+});
+
+test("a declared error records its identifier on the invocation span", async () => {
+  const taken = defineError({
+    id: "fleet.plate-taken",
+    data: z.object({}),
+    message: () => "The plate is already registered.",
+    http: { status: 409 },
+  });
+  const span = await completedSpan(
+    defineFunction({
+      id: "fleet.register",
+      input: z.object({}),
+      output: z.object({ ok: z.boolean() }),
+      errors: [taken],
+      handler: () => fail(taken, {}),
+    }),
+  );
+
+  expect(span?.attributes).toMatchObject({ "relkit.error.id": "fleet.plate-taken" });
+  expect((span?.events ?? []).some((event) => event.name === "exception")).toBe(false);
 });
