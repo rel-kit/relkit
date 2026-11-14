@@ -83,11 +83,11 @@ test("the route list shows the system routes of a graph", () => {
 function completed(
   collector: ReturnType<typeof createObservabilityCollector>,
   path: string,
-): RequestRecord | undefined {
+): Pick<RequestRecord, "routeId" | "functionId" | "status"> | undefined {
   return collector
     .read()
     .find(
-      (record): record is RequestRecord =>
+      (record): record is Extract<typeof record, { signal: "request" }> =>
         record.signal === "request" && record.phase === "completed" && record.rawPath === path,
     );
 }
