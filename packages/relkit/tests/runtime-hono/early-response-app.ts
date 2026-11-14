@@ -24,6 +24,7 @@ export function earlyResponseHandler(): (request: Request) => Promise<Response> 
     httpTriggers: [
       trigger("ok.read", "GET", "/ok"),
       trigger("write.raw", "POST", "/write"),
+      trigger("echo.raw", "POST", "/echo"),
       {
         ...trigger("private.raw", "POST", "/private"),
         config: {
@@ -54,6 +55,10 @@ export function earlyResponseHandler(): (request: Request) => Promise<Response> 
         "ok.read": { handler: ok },
         "write.raw": { handler: ok },
         "private.raw": { handler: ok },
+        "echo.raw": {
+          handler: async (request: Request) =>
+            Response.json({ bytes: (await request.arrayBuffer()).byteLength }),
+        },
       },
     },
     engine: { invoke: async () => undefined },

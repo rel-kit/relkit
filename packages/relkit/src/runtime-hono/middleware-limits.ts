@@ -1,7 +1,8 @@
 import { Effect } from "effect";
-import type { MiddlewareHandler } from "hono";
+import type { Context, MiddlewareHandler } from "hono";
 import { isRelkitControlPlanePath } from "./control-plane.js";
 import { httpBoundary, runHttp } from "./http-effect.js";
+import { RequestBodyReader, RequestBodyReaderLive } from "./request-body-service.js";
 import {
   createFallbackState,
   emitLifecycle,
@@ -51,6 +52,34 @@ export async function settleUnreadBody(
   }
 }
 
+/** Checks the request body against the limit before any route or mounted handler reads it. A
+ * declared `Content-Length` is checked as declared, since the listener frames the body by it; a
+ * body without one is read up to the limit and handed on as a buffered request.
+ * @param context - Hono context whose raw request is replaced by its buffered copy.
+ * @param maxBodyBytes - Body limit in bytes.
+ * @returns Whether the body fits the limit; on false, the body was left partly unread.
+ */
+async function withinBodyLimit(context: Context, maxBodyBytes: number): Promise<boolean> {
+  const raw = context.req.raw;
+  const length = Number(raw.headers.get("content-length") ?? Number.NaN);
+  if (Number.isSafeInteger(length)) return length <= maxBodyBytes;
+  if (raw.body === null || raw.method === "GET" || raw.method === "HEAD") return true;
+  const read = await runHttp(
+    Effect.gen(function* () {
+      const reader = yield* RequestBodyReader;
+      return yield* reader.read(raw, maxBodyBytes);
+    }).pipe(Effect.provide(RequestBodyReaderLive)),
+    raw.signal,
+  );
+  if (read.bytes === undefined) return false;
+  const headers = new Headers(raw.headers);
+  headers.set("content-length", String(read.bytes.byteLength));
+  // The reader assembles the bytes into a fresh ArrayBuffer.
+  const body = read.bytes as Uint8Array<ArrayBuffer>;
+  context.req.raw = new Request(raw, { body, headers, signal: raw.signal });
+  return true;
+}
+
 /** Enforces declared body and timeout limits while cleaning up request listeners.
  * @param options - Application dependencies and configuration for this domain.
  * @returns A handler rejecting oversized requests and forwarding cancellation with scoped timeout cleanup.
@@ -62,11 +91,9 @@ export function limitsMiddleware(options: HttpMiddlewareOptions = {}): Middlewar
     const controlPlane = isRelkitControlPlanePath(context.req.path);
     const state = getRequestState(context) ?? createFallbackState(context, options);
     const current = controlPlane ? state : ensureRequestRecord(context, state, options);
-    const length = Number(context.req.header("content-length"));
     if (
       options.maxBodyBytes !== undefined &&
-      Number.isSafeInteger(length) &&
-      length > options.maxBodyBytes
+      !(await withinBodyLimit(context, options.maxBodyBytes))
     ) {
       const response = problemResponse({
         traceId: current.traceId,

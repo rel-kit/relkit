@@ -141,6 +141,73 @@ test("the engine receives function input and the public context, never Hono cont
   expect(observedContext?.invocation.traceId).toBe(traceId);
 });
 
+test("the body limit applies to the bytes of a chunked body on a mounted Better Auth handler", async () => {
+  const received: number[] = [];
+  const authPlan = {
+    ...plan(),
+    services: [
+      {
+        kind: "service",
+        id: "auth",
+        source,
+        functions: [],
+        capability: {
+          kind: "better-auth",
+          basePath: "/api/auth",
+          databaseServiceId: "",
+          mount: true,
+        },
+      },
+    ],
+  } as unknown as RegistrationPlan;
+  const app = createApp({
+    plan: authPlan,
+    manifest: {
+      ...manifest(),
+      services: {
+        auth: {
+          handler: async (request: Request) => {
+            received.push((await request.arrayBuffer()).byteLength);
+            return new Response("signed up");
+          },
+        },
+      },
+    } as RuntimeManifest,
+    middleware: { maxBodyBytes: 1024 * 1024 },
+    engine: { invoke: async () => ({ ok: true }) },
+  });
+  /** Streams `size` bytes without a Content-Length header. */
+  const chunked = (size: number) => {
+    let sent = 0;
+    return new ReadableStream<Uint8Array>({
+      pull(controller) {
+        if (sent >= size) return controller.close();
+        const chunk = Math.min(64 * 1024, size - sent);
+        sent += chunk;
+        controller.enqueue(new Uint8Array(chunk).fill(97));
+      },
+    });
+  };
+  const signUp = (path: string, size: number) =>
+    app.fetch(
+      new Request(`http://localhost${path}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: chunked(size),
+        duplex: "half",
+      } as RequestInit),
+    );
+
+  const oversized = await signUp("/api/auth/sign-up/email", 5 * 1024 * 1024);
+  expect(oversized.status).toBe(413);
+  expect(received).toEqual([]);
+  expect((await signUp("/hello", 2 * 1024 * 1024)).status).toBe(413);
+
+  const small = await signUp("/api/auth/sign-up/email", 10_000);
+  expect(await small.text()).toBe("signed up");
+  expect(received).toEqual([10_000]);
+});
+
 function plan(): RegistrationPlan {
   return {
     graphHash: "sha256:middleware",

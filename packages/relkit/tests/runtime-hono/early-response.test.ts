@@ -238,6 +238,28 @@ for (const adapter of ["node", "bun"] as const) {
       expect(rest).toEqual([]);
     });
 
+    test("a chunked body is held to the limit by its bytes", async () => {
+      /** Streams `size` bytes to `/echo` without a Content-Length header. */
+      const send = (size: number) =>
+        fetch(`http://127.0.0.1:${port}/echo`, {
+          method: "POST",
+          headers: { origin: `http://127.0.0.1:${port}` },
+          body: new ReadableStream<Uint8Array>({
+            start(controller) {
+              controller.enqueue(new Uint8Array(size).fill(120));
+              controller.close();
+            },
+          }),
+          duplex: "half",
+        } as RequestInit);
+      const small = await send(EARLY_RESPONSE_LIMIT - 24);
+      expect(await small.json()).toEqual({ bytes: EARLY_RESPONSE_LIMIT - 24 });
+      const oversized = await send(EARLY_RESPONSE_LIMIT * 4);
+      expect(oversized.status).toBe(413);
+      expect(oversized.headers.get("connection")).toBe("close");
+      await oversized.arrayBuffer();
+    });
+
     test("a Node fetch client sees no bare 400 after early answers", async () => {
       for (let attempt = 0; attempt < 30; attempt++) {
         const denied = await fetch(`http://127.0.0.1:${port}/write`, {
