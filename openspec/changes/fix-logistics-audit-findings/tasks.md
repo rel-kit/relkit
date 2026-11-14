@@ -51,6 +51,9 @@
 - [x] 5.6 RK-22, RK-27: set an explicit `Content-Length`, `X-Content-Type-Options: nosniff` and `Cache-Control: no-store` on JSON and Problem Details responses unless the route declares caching (`response-mapping-utils.ts:103-108`); verify `HEAD` reports the `GET` length.
 - [x] 5.7 RK-23: treat `OPTIONS` as a preflight only with `Access-Control-Request-Method` (`transport-security.ts:25-37`); verify the three harness `OPTIONS` rows (`transport-security.test.ts`).
 - [x] 5.8 RK-24: add `requestId` beside `traceId` in Problem Details bodies; verify it equals the `x-request-id` header.
+- [ ] 5.10 RK-04: make the error record of an internal failure reach the development terminal with its request ID, by giving the generated server a log sink for framework error logs (`packages/cli/src/commands/build-server-http-options.ts`, `build-server-runtime-support.ts`); verify a failing handler under `relkit dev` prints one error line with the redacted cause.
+- [ ] 5.11 RK-23: answer an `OPTIONS` request that is not a preflight with 204 and `Allow` for a path that has routes (`runtime-hono/unmatched-route.ts:15-31`); verify the three harness `OPTIONS` rows and that an unknown path still answers 404.
+- [ ] 5.12 RK-24: carry `requestId` in the remaining Problem Details bodies (`runtime-hono/middleware-limits.ts`, `route-response.ts`, `response-mapping.types.ts`) and declare it in the generated Problem schema (`openapi/generate-response.ts`); verify every error response of the HTTP integration suite has `requestId` equal to its header.
 
 ## 6. Realtime, client and signed uploads
 
