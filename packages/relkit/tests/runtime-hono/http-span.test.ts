@@ -82,10 +82,12 @@ test("completes bodyless responses immediately and body cancellation once", asyn
         record.signal === "request",
     );
   expect(requests.filter((record) => record.phase === "completed")).toHaveLength(2);
-  expect(
-    requests.find((record) => record.rawPath === "/cancel" && record.phase === "completed")
-      ?.outcome,
-  ).toBe("cancelled");
+  const cancelled = requests.find(
+    (record) => record.rawPath === "/cancel" && record.phase === "completed",
+  );
+  // The client received 200 and a stream: closing it is an outcome, not a different status.
+  expect(cancelled?.outcome).toBe("cancelled");
+  expect(cancelled?.status).toBe(200);
   const spans = collector
     .read()
     .filter(
@@ -195,6 +197,7 @@ test("observes real Bun response EOF, client abort, HEAD, and runtime shutdown o
         (record) => record.rawPath === "/abort" && record.outcome === "cancelled",
       ),
     );
+    expect((await completed()).find((record) => record.rawPath === "/abort")?.status).toBe(200);
     expect(await spans()).toHaveLength(3);
     const shutdown = await fetch(`${base}/shutdown`);
     await shutdown.body!.getReader().read();

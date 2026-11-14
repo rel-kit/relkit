@@ -1,5 +1,6 @@
 import { Context, Effect, Exit, Layer, Queue, Schema, Scope } from "effect";
 import type { TelemetryExportRecord } from "./telemetry-sampling.types.js";
+import type { TelemetryExporterFanout } from "./telemetry-exporter.types.js";
 import type { DirectExportItem, DirectExportOperations } from "./direct-export.types.js";
 import { observeDirectExport as observe } from "./direct-export-metrics.js";
 const MAX_QUEUED_EXPORTS = 1_024;
@@ -139,6 +140,36 @@ export const makeDirectExportEffect = Effect.fn("ObservabilityDirectExport.creat
   },
   (effect) => Effect.uninterruptible(observe("create", effect)),
 );
+/**
+ * Chooses the record callback the export queue serves, if any.
+ * @param options - Runtime exporter fan-out and direct callback options.
+ * @returns The fan-out callback when it has at least one exporter lane, otherwise the direct
+ *   callback; undefined when nothing can export, so no queue starts and nothing can fail.
+ * @remarks Generated servers always pass a fan-out, which has zero lanes (an empty `stats()`)
+ *   when the application configures no exporter. Queueing for it only produced capacity
+ *   rejections that were reported as export failures.
+ */
+export function directExportTarget(options: {
+  readonly exporter?: TelemetryExporterFanout;
+  readonly exportRecord?: TelemetryExportRecord;
+}): TelemetryExportRecord | undefined {
+  if (options.exporter !== undefined && options.exporter.stats().length > 0)
+    return options.exporter.exportRecord;
+  return options.exportRecord;
+}
+/**
+ * Counts one direct export failure under its reason.
+ * @param counters - Mutable runtime counters.
+ * @param error - Failed export (`export`) or record rejected by the full or closed queue (`capacity`).
+ * @returns Nothing after the matching counter was incremented.
+ */
+export function countDirectExportFailure(
+  counters: { exportFailures: number; exportCapacityRejections?: number },
+  error: DirectExportError,
+): void {
+  if (error.reason === "export") counters.exportFailures += 1;
+  else counters.exportCapacityRejections = (counters.exportCapacityRejections ?? 0) + 1;
+}
 /**
  * Provides an independently acquired direct exporter for an Effect Scope.
  *

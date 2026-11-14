@@ -2,6 +2,7 @@ import type { LocalEventProvider, LocalEventEffects } from "./provider.types.js"
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { Clock, Context, Effect, Exit, Layer, Ref, Schedule, Scope } from "effect";
+import { ExecutionSuccessLogs } from "../../contracts/operation.js";
 import type { EventOperationContext, EventPublishOptions } from "../../events/index.js";
 import {
   localOperation,
@@ -15,6 +16,7 @@ import { createEventLog } from "./log.js";
 import { createEventRouter } from "./router.js";
 import { createEventAdmin } from "./admin.js";
 import type { EventQueryRequest } from "./admin-contracts.js";
+import { housekeeping, withApplicationSuccessLogs } from "./provider-housekeeping.js";
 
 export type { LocalEventProvider, LocalEventEffects } from "./provider.types.js";
 
@@ -94,6 +96,10 @@ export const makeLocalEventService = Effect.fn("Events.open")(
     const inspection = createEventAdmin(router, { mode: "production", enabled: false });
     const failure = yield* Ref.make<LocalOperationError | undefined>(undefined);
     const closed = yield* Ref.make(false);
+    // The poll reads durable trigger ids kept here instead of a full router inspection snapshot.
+    const durableTriggers = yield* Ref.make<readonly string[]>([]);
+    // Delivered handlers keep the opener's success-log policy; only the polling around them is quiet.
+    const applicationSuccessLogs = yield* ExecutionSuccessLogs;
     /**
      * Replays a supervised background failure to foreground provider operations.
      * @returns A lazy effect failing with the retained worker error when present.
@@ -108,14 +114,11 @@ export const makeLocalEventService = Effect.fn("Events.open")(
      */
     const tick = Effect.fn("Events.poll")(function* () {
       if ((yield* Ref.get(closed)) || (yield* Ref.get(failure)) !== undefined) return;
-      const triggers = yield* localSync(() =>
-        router.snapshot().triggers.filter((trigger) => trigger.delivery === "durable"),
-      );
       yield* Effect.forEach(
-        triggers,
-        (trigger) =>
+        yield* Ref.get(durableTriggers),
+        (triggerId) =>
           // Handler callbacks have no cancellation channel. Join their native work before closing stores.
-          localPromise(() => router.runNext(trigger.id)).pipe(
+          localPromise(() => router.runNext(triggerId)).pipe(
             Effect.uninterruptible,
             Effect.catch((error) => Ref.set(failure, error)),
             Effect.forkIn(scope),
@@ -126,6 +129,7 @@ export const makeLocalEventService = Effect.fn("Events.open")(
     yield* tick().pipe(
       Effect.repeat(Schedule.spaced("100 millis")),
       Effect.catch((error) => Ref.set(failure, error)),
+      housekeeping,
       Effect.forkScoped,
     );
     yield* Effect.addFinalizer(() => Ref.set(closed, true));
@@ -165,7 +169,7 @@ export const makeLocalEventService = Effect.fn("Events.open")(
           return yield* localSync(() => {
             throw failed.error ?? new Error("Event delivery could not be persisted");
           });
-        yield* tick();
+        yield* housekeeping(tick());
         return { accepted: true as const, ...record.envelope };
       },
       (effect) => localOperation("Events.publish", effect),
@@ -174,9 +178,11 @@ export const makeLocalEventService = Effect.fn("Events.open")(
       health,
       publish,
       query: (request: EventQueryRequest = {}) =>
-        localOperation(
-          "Events.query",
-          localSync(() => inspection.query(request)),
+        housekeeping(
+          localOperation(
+            "Events.query",
+            localSync(() => inspection.query(request)),
+          ),
         ),
       registerContract: (contract) =>
         localOperation(
@@ -186,7 +192,15 @@ export const makeLocalEventService = Effect.fn("Events.open")(
       registerTrigger: (binding) =>
         localOperation(
           "Events.registerTrigger",
-          localPromise(() => router.registerTrigger(binding)),
+          Effect.gen(function* () {
+            yield* localPromise(() =>
+              router.registerTrigger(withApplicationSuccessLogs(binding, applicationSuccessLogs)),
+            );
+            if (binding.delivery === "durable")
+              yield* Ref.update(durableTriggers, (ids) =>
+                ids.includes(binding.id) ? ids : [...ids, binding.id].sort(),
+              );
+          }),
         ),
     });
   },

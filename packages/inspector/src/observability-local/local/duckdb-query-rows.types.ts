@@ -8,3 +8,8 @@ export type DuckdbReadRows = (
   sql: string,
   values?: DuckDBValue[],
 ) => Effect.Effect<StoredLocalRecord[], DuckdbError>;
+/** Reads the single `total` of a native count query. */
+export type DuckdbReadCount = (
+  sql: string,
+  values?: DuckDBValue[],
+) => Effect.Effect<number, DuckdbError>;

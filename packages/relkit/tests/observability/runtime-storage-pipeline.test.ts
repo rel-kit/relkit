@@ -28,6 +28,7 @@ test("persists and streams captured records before root-consistent export sampli
       sampledOut: 0,
       severityFiltered: 0,
       exportFailures: 0,
+      exportCapacityRejections: 0,
     });
     expect(status.persistedBeforeExport).toBe(true);
     expect(JSON.stringify(runtime.readRecords())).not.toContain("secret-tenant");
