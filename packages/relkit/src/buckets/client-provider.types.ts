@@ -48,6 +48,25 @@ export interface BucketPutOptions extends Readonly<Record<string, unknown>> {
   readonly metadata?: Readonly<Record<string, string>>;
 }
 
+/** A bucket's object limits, as declared with `defineBucket`.
+ * @example const policy: BucketPolicy = { maxObjectBytes: 5_000_000, allowedContentTypes: ["image/*"] };
+ */
+export interface BucketPolicy {
+  readonly maxObjectBytes?: number;
+  readonly allowedContentTypes?: readonly string[];
+}
+
+/** The upload a signed write URL is issued for. A declared type is checked against the bucket's
+ * allowed types and signed, so storage rejects an upload with another type; a declared length is
+ * checked against `maxObjectBytes` and signed as the exact `content-length`. Without them the URL
+ * binds neither, and the bucket's limits are not enforced on the upload.
+ * @example const options: BucketWriteUrlOptions = { contentType: "image/png", contentLength: 1024 };
+ */
+export interface BucketWriteUrlOptions {
+  readonly contentType?: string;
+  readonly contentLength?: number;
+}
+
 /** Provider implementation; omitted operations fail with BucketProviderError.
  * @example const provider: BucketProvider = { get: () => undefined };
  */
@@ -121,8 +140,13 @@ export interface BucketProvider {
   /** Create a signed write URL.
    * @param key - Portable object key.
    * @param context - Cancellation and deadline context.
+   * @param options - Content type and length to check against the policy and bind to the URL.
    * @returns URL text or a provider rejection.
-   * @example await provider.createWriteUrl?.("a");
+   * @example await provider.createWriteUrl?.("a", undefined, { contentType: "image/png" });
    */
-  readonly createWriteUrl?: (key: string, context?: BucketOperationContext) => MaybePromise<string>;
+  readonly createWriteUrl?: (
+    key: string,
+    context?: BucketOperationContext,
+    options?: BucketWriteUrlOptions,
+  ) => MaybePromise<string>;
 }

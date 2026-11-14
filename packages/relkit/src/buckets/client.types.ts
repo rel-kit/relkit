@@ -2,7 +2,9 @@ import type { MaybePromise } from "../contracts/index.js";
 import type {
   BucketObjectMetadata,
   BucketOperation,
+  BucketPolicy,
   BucketPutOptions,
+  BucketWriteUrlOptions,
 } from "./client-provider.types.js";
 
 export type * from "./client-provider.types.js";
@@ -60,10 +62,12 @@ export interface BucketClient {
   createReadUrl(key: string): Promise<string>;
   /** Request a signed upload URL.
    * @param key - Portable key.
+   * @param options - Content type and length the upload must carry; a type or length the bucket
+   * does not allow rejects before a URL is signed.
    * @returns URL or a rejected Promise.
-   * @example await client.createWriteUrl("a");
+   * @example await client.createWriteUrl("a.png", { contentType: "image/png", contentLength: 1024 });
    */
-  createWriteUrl(key: string): Promise<string>;
+  createWriteUrl(key: string, options?: BucketWriteUrlOptions): Promise<string>;
 }
 /** Metadata passed to an optional invocation bridge.
  * @example const name = bridgeOptions.name;
@@ -111,6 +115,9 @@ export interface BucketClientOptions {
   readonly ownerId: string;
   readonly bucketId: string;
   readonly source: unknown;
+  /** The bucket's declared limits; `put` and `createWriteUrl` refuse objects they do not allow
+   * before the provider is called. */
+  readonly policy?: BucketPolicy;
   readonly bridge?: BucketInvocationBridge;
   readonly signal?: () => AbortSignal;
   readonly deadline?: () => number | undefined;

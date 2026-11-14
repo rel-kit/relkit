@@ -9,6 +9,7 @@ import type {
   LocalBucketUnsupportedCapability,
 } from "./buckets.types.js";
 import type { BucketCapabilities } from "../../buckets/index.js";
+import { BucketPolicyError } from "../../buckets/bucket-policy.js";
 
 export type {
   LocalBucketPolicy,
@@ -38,10 +39,9 @@ export class LocalBucketKeyError extends TypeError {
   }
 }
 
-/** Preserves the public local bucket policy error identity and stable error code. */
-export class LocalBucketPolicyError extends TypeError {
-  readonly code = "RELKIT_BUCKET_POLICY_INVALID" as const;
-
+/** Preserves the public local bucket policy error identity; every provider's policy error is a
+ * BucketPolicyError with the same stable code. */
+export class LocalBucketPolicyError extends BucketPolicyError {
   constructor(message: string) {
     super(message);
     this.name = "LocalBucketPolicyError";

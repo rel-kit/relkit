@@ -1,5 +1,5 @@
 /** Inputs of the shared bucket provider conformance suite. */
-import type { BucketProvider } from "relkit/buckets";
+import type { BucketPolicy, BucketProvider } from "relkit/buckets";
 import type { ConformanceCase } from "./conformance.types.js";
 
 /** A bucket provider under test, with the optional lifecycle methods first-party providers have. */
@@ -21,6 +21,18 @@ export interface BucketsConformanceOptions {
    * missing binding, a failing `fetch`). The `backend-failure` case is skipped without it.
    */
   readonly failing?: () => BucketsConformanceProvider;
+  /**
+   * Creates a provider that applies the given bucket limits. The `policy` and
+   * `signed-upload-limits` cases are skipped without it.
+   * @param prefix - Unique key prefix for the case, without a trailing slash.
+   * @param policy - Limits the provider must apply, as a bucket declares them.
+   */
+  readonly limited?: (prefix: string, policy: BucketPolicy) => BucketsConformanceProvider;
+  /**
+   * Sends the uploads of the `signed-upload-limits` case to a signed URL; defaults to the global
+   * `fetch`.
+   */
+  readonly upload?: typeof globalThis.fetch;
 }
 
 /** Case ids of the bucket suite. */
@@ -33,7 +45,9 @@ export type BucketsConformanceCaseId =
   | "signed-urls"
   | "cancellation"
   | "closed"
-  | "backend-failure";
+  | "backend-failure"
+  | "policy"
+  | "signed-upload-limits";
 
 /** One bucket conformance case. */
 export type BucketsConformanceCase = ConformanceCase<BucketsConformanceCaseId>;

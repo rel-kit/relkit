@@ -35,7 +35,8 @@ export async function* iterateNative<A>(
     options.opened?.();
     const read = options.read ?? ((source: AsyncIterator<A>) => source.next());
     while (true) {
-      const next = await read(iterator, signal);
+      // Race the pull: a transport may miss the abort while a read is already pending.
+      const next = await abortable(read(iterator, signal), signal);
       if (next.done) return;
       yield next.value;
     }
@@ -71,6 +72,59 @@ export function abortable<A>(promise: PromiseLike<A>, signal: AbortSignal | unde
       },
     );
   });
+}
+
+/**
+ * Ties an async iterator to a signal: an abort settles a pending `next()` with the signal's
+ * reason and returns the source, so iteration ends even when the source misses the abort.
+ * @typeParam A - Item type.
+ * @param source - Iterator one request owns, such as a subscription's event stream.
+ * @param signal - Abort that ends the iteration and releases the source.
+ * @returns An iterator over the same items; the source is returned at most once.
+ * @example for await (const frame of abortableIterator(stream, signal)) use(frame);
+ */
+export function abortableIterator<A>(
+  source: AsyncIterator<A>,
+  signal: AbortSignal,
+): AsyncIterableIterator<A> {
+  let released: Promise<unknown> | undefined;
+  const release = (): Promise<unknown> =>
+    (released ??= Promise.resolve()
+      .then(() => source.return?.())
+      .catch(() => undefined));
+  const onAbort = (): void => void release();
+  const detach = (): void => signal.removeEventListener("abort", onAbort);
+  if (signal.aborted) onAbort();
+  else signal.addEventListener("abort", onAbort, { once: true });
+  const wrapped: AsyncIterableIterator<A> = {
+    next: async (...args: [] | [unknown]) => {
+      try {
+        const result = await abortable(source.next(...args), signal);
+        if (result.done === true) detach();
+        return result;
+      } catch (error) {
+        detach();
+        throw error;
+      }
+    },
+    return: async (value?: unknown) => {
+      detach();
+      await release();
+      return { done: true, value: value as A };
+    },
+    throw: async (error?: unknown) => {
+      detach();
+      if (source.throw === undefined) {
+        await release();
+        throw error;
+      }
+      // The source's own throw releases it and keeps the caller's error identity.
+      released ??= Promise.resolve();
+      return source.throw(error);
+    },
+    [Symbol.asyncIterator]: () => wrapped,
+  };
+  return wrapped;
 }
 
 /**

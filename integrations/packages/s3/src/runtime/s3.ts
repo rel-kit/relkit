@@ -1,4 +1,15 @@
-import type { BucketOperationContext, BucketProvider, BucketPutOptions } from "relkit/buckets";
+import {
+  assertWriteUrlAllowed,
+  bucketPolicyViolation,
+  BucketPolicyError,
+  normalizeBucketPolicy,
+  signedUploadHeaders,
+  type BucketOperationContext,
+  type BucketPolicy,
+  type BucketProvider,
+  type BucketPutOptions,
+  type BucketWriteUrlOptions,
+} from "relkit/buckets";
 import {
   assertResponse,
   presignS3Url,
@@ -9,7 +20,9 @@ import {
 import { decodeS3Xml, s3XmlValue } from "./s3-xml.js";
 import { endpointFor, objectUrl, requiredText } from "./s3-url.js";
 
-export interface S3BucketOptions {
+/** Endpoint, credentials and the bucket's limits; `put` and `createWriteUrl` apply the limits
+ * the way the local provider does. */
+export interface S3BucketOptions extends BucketPolicy {
   readonly endpoint: string;
   readonly bucketName: string;
   readonly region: string;
@@ -47,6 +60,7 @@ export function createS3BucketProvider(options: S3BucketOptions): S3BucketProvid
   if (!Number.isSafeInteger(expires) || expires < 1 || expires > 604_800) {
     throw new RangeError("S3 signedUrlTtlSeconds must be between 1 and 604800");
   }
+  const policy = normalizeBucketPolicy(options);
   const url = (key = ""): string => objectUrl(endpoint, bucket, key, forcePathStyle);
   const request = (
     key: string,
@@ -117,6 +131,11 @@ export function createS3BucketProvider(options: S3BucketOptions): S3BucketProvid
       putOptions?: BucketPutOptions,
       context?: BucketOperationContext,
     ) => {
+      const violation = bucketPolicyViolation(policy, {
+        size: bytes.byteLength,
+        ...(putOptions?.contentType === undefined ? {} : { contentType: putOptions.contentType }),
+      });
+      if (violation !== undefined) throw new BucketPolicyError(violation);
       const headers = new Headers();
       if (putOptions?.contentType !== undefined)
         headers.set("content-type", putOptions.contentType);
@@ -182,10 +201,15 @@ export function createS3BucketProvider(options: S3BucketOptions): S3BucketProvid
         ...(options.credentials === undefined ? {} : { credentials: options.credentials }),
         ...(options.fetch === undefined ? {} : { fetch: options.fetch }),
       }),
-    createWriteUrl: (key: string) =>
+    createWriteUrl: async (
+      key: string,
+      _context?: BucketOperationContext,
+      writeOptions?: BucketWriteUrlOptions,
+    ) =>
       presignS3Url(url(key), "PUT", region, expires, {
         ...(options.credentials === undefined ? {} : { credentials: options.credentials }),
         ...(options.fetch === undefined ? {} : { fetch: options.fetch }),
+        headers: signedUploadHeaders(assertWriteUrlAllowed(policy, writeOptions)),
       }),
     inspector,
   });
