@@ -57,6 +57,14 @@ test.skipIf(!available)(
       expect(first.code).toBe(0);
       expect(psql(database, "select count(*) from entries")).toBe("0");
       expect(psql(database, 'select count(*) from drizzle."__drizzle_migrations"')).toBe("1");
+      expect(JSON.parse(first.stdout)).toMatchObject({ history: 1, applied: 1 });
+      // A process value wins over the file, which now names a database that does not exist.
+      await write(root, ".env", `DATABASE_URL=postgres://localhost:5432/${database}_absent\n`);
+      const repeat = await nodeCli(root, ["db", "migrate"], {
+        DATABASE_URL: `postgres://localhost:5432/${database}`,
+      });
+      expect(repeat.code).toBe(0);
+      expect(repeat.stdout).toContain("Database is up to date: no migrations were pending.");
     } finally {
       Bun.spawnSync(["dropdb", "-h", "localhost", "--if-exists", database]);
     }

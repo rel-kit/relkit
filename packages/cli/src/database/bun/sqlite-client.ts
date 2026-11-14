@@ -12,6 +12,10 @@ export function openBunSqlite(path: string): MigrationSqlite {
   return {
     client,
     exec: (sql) => void client.exec(sql),
+    scalar: (sql, ...parameters) => {
+      const row = client.query<Record<string, number | string>, string[]>(sql).get(...parameters);
+      return row === null ? undefined : Object.values(row)[0];
+    },
     close: () => client.close(),
   };
 }

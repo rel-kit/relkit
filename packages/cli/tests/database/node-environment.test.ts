@@ -26,6 +26,10 @@ test("db migrate on Node reads DATABASE_PATH from .env, and a process value wins
   const fromFiles = await nodeCli(root, ["--json", "db", "migrate"], { DATABASE_PATH: undefined });
   expect(fromFiles.stderr).toBe("");
   expect(fromFiles.code).toBe(0);
+  expect(JSON.parse(fromFiles.stdout)).toMatchObject({ history: 1, applied: 1 });
+  const repeat = await nodeCli(root, ["db", "migrate"], { DATABASE_PATH: undefined });
+  expect(repeat.code).toBe(0);
+  expect(repeat.stdout).toContain("Database is up to date: no migrations were pending.");
   // `.env.local` has higher precedence than `.env`; examples are never loaded.
   expect(existsSync(join(root, "local.sqlite"))).toBe(true);
   expect(existsSync(join(root, "dotenv.sqlite"))).toBe(false);

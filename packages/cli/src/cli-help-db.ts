@@ -16,7 +16,7 @@ export const dbHelp = command(
             option(
               "config",
               "string",
-              "Application Drizzle config; defaults to drizzle.config.ts. Relative paths use the application root",
+              "Application Drizzle config; defaults to drizzle.config.ts. Relative paths use the application root. The config reads the process environment and the application's .env, .env.<mode>, .env.local and .env.<mode>.local files; a value already in the process environment wins",
             ),
           ],
         },

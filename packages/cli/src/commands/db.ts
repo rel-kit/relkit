@@ -7,6 +7,7 @@ import { cliValidation } from "../cli-errors.js";
 import { CLI_EXIT_CODES, fail, type CliCommandContext } from "../main-support.js";
 import { CliFileSystem } from "../services/filesystem.service.js";
 import { CliProcess } from "../services/process.service.js";
+import { migrationSummary } from "../database/migration-summary.js";
 import { MigrationResponse } from "../database/migration.schemas.js";
 import { nodeTypeScriptFlags, runtime } from "../runtime/index.js";
 import { oneShotEnvironment } from "../runtime/one-shot-environment.js";
@@ -67,7 +68,7 @@ export const runDbEffect = Effect.fn("Cli.db.migrate")(
       context.reporter.error(result.code, result.message);
       return result.exitCode;
     }
-    context.reporter.output(result, "Database migrations applied.");
+    context.reporter.output(result, migrationSummary(result.applied, result.history));
     return CLI_EXIT_CODES.success;
   },
   (effect, _args, context) =>

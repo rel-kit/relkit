@@ -12,6 +12,10 @@ export function openNodeSqlite(path: string): MigrationSqlite {
   return {
     client,
     exec: (sql) => client.exec(sql),
+    scalar: (sql, ...parameters) => {
+      const value = Object.values(client.prepare(sql).get(...parameters) ?? {})[0];
+      return typeof value === "number" || typeof value === "string" ? value : undefined;
+    },
     close: () => client.close(),
   };
 }
