@@ -268,9 +268,18 @@ test("applies a route body limit before invoking its target", async () => {
     body: "12345",
   });
 
-  expect(response.status).toBe(422);
+  // D6: an oversize body is 413 everywhere, with the server limit's code and wording.
+  expect(response.status).toBe(413);
   expect(calls).toBe(0);
-  expect(await response.json()).toMatchObject({ issues: [{ code: "body-too-large" }] });
+  const body = await response.json();
+  expect(body).toMatchObject({
+    type: "/errors/payload-too-large",
+    status: 413,
+    code: "payload-too-large",
+    detail: "The request body exceeds the 3-byte limit.",
+    requestId: response.headers.get("x-request-id"),
+  });
+  expect(body).not.toHaveProperty("issues");
 });
 
 function routePlan(): RegistrationPlan {

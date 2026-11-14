@@ -6,7 +6,7 @@ import { Effect } from "effect";
 import type { Context } from "hono";
 import type { HttpRouteRequest, RouteMaterializationOptions } from "./materialize-routes.js";
 import { decodeInferredInput } from "./request-inference.js";
-import { isRequestMappingFailure, mapRequest } from "./request-mapping.js";
+import { DEFAULT_MAX_BODY_BYTES, isRequestMappingFailure, mapRequest } from "./request-mapping.js";
 
 /** Rejects a caller without a session, or one failing the target's roles or permissions, before
  * the route reads input; rules that read input are left to the engine, after validation.
@@ -66,6 +66,23 @@ export async function routeInput(
         // Only path, query, header and cookie text is decoded; a JSON body is validated as sent.
         trigger.config.request,
       );
+}
+
+/** The byte limit a failed mapping's body exceeded, so the route answers 413 instead of 422.
+ * @param issues - Issues of the failed request mapping.
+ * @param trigger - Route whose own `maxBodyBytes` takes precedence.
+ * @param options - Route options carrying the application's request mapping limit.
+ * @returns The exceeded limit, or undefined when the body was not too large.
+ */
+export function exceededBodyLimit(
+  issues: readonly { readonly code: string }[],
+  trigger: HttpTriggerRegistration,
+  options: RouteMaterializationOptions,
+): number | undefined {
+  if (!issues.some((issue) => issue.code === "body-too-large")) return undefined;
+  return (
+    trigger.config.maxBodyBytes ?? options.requestMapping?.maxBodyBytes ?? DEFAULT_MAX_BODY_BYTES
+  );
 }
 
 /** Looks up an own entry in either a readonly object or map.

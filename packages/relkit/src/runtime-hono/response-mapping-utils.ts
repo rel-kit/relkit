@@ -143,6 +143,19 @@ export function internalErrorResponse(ids?: string | ProblemIds): Response {
     ...problemIds(typeof ids === "string" ? { traceId: ids } : (ids ?? {})),
   });
 }
+/** The 413 problem for a request body over its byte limit, worded as the server limit's (D6).
+ * @param limit - The byte limit the body exceeded.
+ * @param ids - The request's trace and request IDs.
+ * @returns A `payload-too-large` Problem Details response.
+ */
+export function payloadTooLargeResponse(limit: number, ids: ProblemIds): Response {
+  return problemResponse({
+    status: 413,
+    code: "payload-too-large",
+    detail: `The request body exceeds the ${limit}-byte limit.`,
+    ...problemIds(ids),
+  });
+}
 /** The identity fields a Problem Details body carries. */
 type ProblemIds = Pick<ProblemInput, "traceId" | "requestId">;
 /** Picks the trace and request IDs that are set, for a Problem Details body.

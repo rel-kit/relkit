@@ -41,3 +41,7 @@ the allowed methods in `Allow`.
 
 Problem Details bodies now carry `requestId` next to `traceId`; it equals the response's
 `x-request-id` header, so a client can quote the same ID the server logs.
+
+A body over a route's own `maxBodyBytes`, or over the request mapping limit, now answers 413
+Problem Details `payload-too-large` ("The request body exceeds the N-byte limit.") like the server
+limit (D6), instead of 422 `validation` with a `body-too-large` issue.

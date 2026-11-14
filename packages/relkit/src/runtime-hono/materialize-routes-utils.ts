@@ -20,8 +20,8 @@ import {
   mapInputValidationResponse,
   type ResponseMappingOptions,
 } from "./response-mapping.js";
-import { withDefaultHeaders } from "./response-mapping-utils.js";
-import { getEntry, routeAccessFailure, routeInput } from "./route-input.js";
+import { payloadTooLargeResponse, withDefaultHeaders } from "./response-mapping-utils.js";
+import { exceededBodyLimit, getEntry, routeAccessFailure, routeInput } from "./route-input.js";
 import { routeSuccessResponse } from "./route-response.js";
 export { getEntry, isRecord, routeInput } from "./route-input.js";
 
@@ -110,6 +110,9 @@ const handleRoute = Effect.fn("HttpRoutes.handle")(function* (
   if (isRequestMappingFailure(input)) {
     // The validation response records the issues' codes and paths on `http.validation.failed`.
     builder?.setOutcome("validation-error");
+    // D6: an oversize body is 413 `payload-too-large` everywhere, not a 422 validation issue.
+    const limit = exceededBodyLimit(input.issues, trigger, options);
+    if (limit !== undefined) return payloadTooLargeResponse(limit, responseOptions);
     return mapInputValidationResponse(trigger, input.issues, responseOptions);
   }
   frameworkTrace.event("http.validation.completed");
