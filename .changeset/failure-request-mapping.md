@@ -29,3 +29,7 @@ is now a validation error instead of being accepted as `3500`.
 A route that maps JSON body fields rejects a body that is not a JSON object (`null`, an array, a
 string or a number) with one validation issue, code `body-not-object`. Before, such a body counted
 as "no fields": a `PATCH` succeeded as an empty change and a `POST` reported each field missing.
+
+JSON and Problem Details responses of function routes now carry an explicit `Content-Length` (so
+`HEAD` reports the length of the `GET` body instead of 0), `X-Content-Type-Options: nosniff`, and
+`Cache-Control: no-store` unless the route's `response` option sets its own `Cache-Control`.

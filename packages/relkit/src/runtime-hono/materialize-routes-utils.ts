@@ -19,6 +19,7 @@ import {
   mapInputValidationResponse,
   type ResponseMappingOptions,
 } from "./response-mapping.js";
+import { withDefaultHeaders } from "./response-mapping-utils.js";
 import { getEntry, routeAccessFailure, routeInput } from "./route-input.js";
 import { routeSuccessResponse } from "./route-response.js";
 export { getEntry, isRecord, routeInput } from "./route-input.js";
@@ -35,11 +36,13 @@ export function createRouteHandler(
   return async (context) =>
     stripHead(
       trigger,
-      await runHttp(
-        Effect.gen(function* () {
-          const service = yield* HttpRoutes;
-          return yield* service.handle(context, trigger, options);
-        }).pipe(Effect.provide(HttpRoutesLive)),
+      await withDefaultHeaders(
+        await runHttp(
+          Effect.gen(function* () {
+            const service = yield* HttpRoutes;
+            return yield* service.handle(context, trigger, options);
+          }).pipe(Effect.provide(HttpRoutesLive)),
+        ),
       ),
     );
 }

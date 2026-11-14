@@ -3,7 +3,7 @@ import type { StandardIssue, StandardSchemaV1 } from "../schema/index.js";
 import type { RequestMappingIssue } from "./request-mapping.js";
 import type { ResponseDeclaration, ResponseSchemaEntries } from "./response-mapping-utils.types.js";
 import { canCarryStandardSchema } from "../contracts/index.js";
-import { problemResponse } from "./problem-details.js";
+import { PROBLEM_CONTENT_TYPE, problemResponse } from "./problem-details.js";
 export type { ResponseDeclaration, ResponseSchemaEntries } from "./response-mapping-utils.types.js";
 
 /** Select an explicit response ID or the route's default success declaration.
@@ -105,6 +105,23 @@ export function jsonResponse(value: unknown, status: number): Response {
     status,
     headers: { "content-type": "application/json" },
   });
+}
+/** Completes a route's JSON or Problem Details response: an explicit `Content-Length`, so a
+ * `HEAD` reports the `GET` length, `X-Content-Type-Options: nosniff`, and `Cache-Control:
+ * no-store` unless the route set its own. Other responses, such as streams, are unchanged.
+ * @param response - Final route response, after the route's own `response` option.
+ * @returns The response with the default headers; its body is buffered once to measure it.
+ */
+export async function withDefaultHeaders(response: Response): Promise<Response> {
+  const type = response.headers.get("content-type")?.split(";")[0]?.trim();
+  if (type !== "application/json" && type !== PROBLEM_CONTENT_TYPE) return response;
+  const headers = new Headers(response.headers);
+  headers.set("x-content-type-options", "nosniff");
+  if (!headers.has("cache-control")) headers.set("cache-control", "no-store");
+  const body = response.body === null ? null : await response.arrayBuffer();
+  if (body !== null && !headers.has("content-length"))
+    headers.set("content-length", String(body.byteLength));
+  return new Response(body, { status: response.status, statusText: response.statusText, headers });
 }
 /** JSON replacer for REST bodies: a bigint becomes its exact decimal string.
  * @param _key - Property name.
