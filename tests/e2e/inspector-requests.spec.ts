@@ -1,5 +1,5 @@
 /** Preserves live request, pause/resume and correlated failure assertions on this invocation's exact backend. */
-import { expect, test } from "@playwright/test";
+import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 import { playwrightSelection } from "../../scripts/playwright-selection.js";
 const { backend } = playwrightSelection("inspector");
 test.beforeAll(async ({ request }) => {
@@ -95,6 +95,118 @@ test("follows a paused request through completion and linked work", async ({ pag
   ).toHaveCount(1);
   await page.getByRole("link", { name: /222222222222/ }).click();
   await expect(page.getByRole("heading", { name: "Trace detail" })).toBeVisible();
+});
+
+interface HistorySeed {
+  readonly seeded: number;
+  readonly serverErrors: number;
+  readonly declared: number;
+  readonly posts: number;
+  readonly total: number;
+}
+const seedHistory = async (request: APIRequestContext): Promise<HistorySeed> =>
+  (await request.post(`${backend}/__fixture__/history`)).json();
+const rows = (page: Page) =>
+  page.getByRole("list", { name: "Request results" }).getByRole("listitem");
+
+test("lists the newest requests first and pages back to the oldest", async ({ page, request }) => {
+  const seed = await seedHistory(request);
+  const ordered = page.waitForRequest(
+    (sent) => sent.url().includes("/requests?") && sent.url().includes("order=desc"),
+  );
+  await page.goto("/requests");
+  await ordered;
+  await expect(page.getByText("Newest first · 50 per page")).toBeVisible();
+  await expect(page.getByText(`${seed.total} requests`, { exact: true })).toBeVisible();
+  await expect(rows(page)).toHaveCount(50);
+  await expect(rows(page).first()).toContainText("request-history-130");
+  await expect(rows(page).last()).toContainText("request-history-081");
+
+  await page.getByRole("button", { name: "Older requests" }).click();
+  await expect(page).toHaveURL(/cursor=50/);
+  await expect(rows(page).first()).toContainText("request-history-080");
+  await page.getByRole("button", { name: "Older requests" }).click();
+  await expect(rows(page)).toHaveCount(seed.total - 100);
+  await expect(rows(page).last()).toContainText("request-initial");
+  await expect(page.getByRole("button", { name: "Older requests" })).toBeDisabled();
+
+  await page.getByRole("button", { name: "Newer requests" }).click();
+  await expect(rows(page).first()).toContainText("request-history-080");
+  await page.goBack();
+  await expect(rows(page).first()).toContainText("request-history-030");
+});
+
+test("filters by status, method, path and text, keeps them in the URL, and counts the matches", async ({
+  page,
+  request,
+}) => {
+  const seed = await seedHistory(request);
+  await page.goto("/requests");
+  await expect(page.getByText(`${seed.total} requests`, { exact: true })).toBeVisible();
+
+  await page.getByRole("button", { name: "5xx" }).click();
+  await expect(page).toHaveURL(/status=5xx/);
+  await expect(page.getByText(`${seed.serverErrors} requests match`)).toBeVisible();
+  await expect(rows(page)).toHaveCount(seed.serverErrors);
+
+  await page.reload();
+  await expect(page.getByRole("button", { name: "5xx" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText(`${seed.serverErrors} requests match`)).toBeVisible();
+  await expect(rows(page)).toHaveCount(seed.serverErrors);
+
+  await page.getByLabel("Status", { exact: true }).fill("409");
+  await page.getByLabel("Path starts with").fill("/vehicles");
+  await page.getByLabel("Method").selectOption("POST");
+  await page.getByRole("button", { name: "Apply filters" }).click();
+  await expect(page).toHaveURL(/status=409/);
+  await expect(page).toHaveURL(/path=%2Fvehicles/);
+  await expect(page.getByText(`${seed.declared} requests match`)).toBeVisible();
+  await expect(rows(page).first()).toContainText("/vehicles");
+
+  await page.getByLabel("Search", { exact: true }).fill("no-such-text");
+  await page.getByRole("button", { name: "Apply filters" }).click();
+  await expect(page.getByText("No requests match")).toBeVisible();
+  await expect(page.getByText("No retained requests match the active filters.")).toBeVisible();
+
+  await page.goBack();
+  await expect(page.getByText(`${seed.declared} requests match`)).toBeVisible();
+  await page.getByRole("button", { name: "Reset" }).click();
+  await expect(page).toHaveURL(/\/requests$/);
+  await expect(page.getByText(`${seed.total} requests`, { exact: true })).toBeVisible();
+});
+
+test("offers the recorded outcomes and shows a rejected filter at its field", async ({
+  page,
+  request,
+}) => {
+  await seedHistory(request);
+  await page.goto("/requests");
+  const outcome = page.getByLabel("Outcome");
+  await expect(outcome.getByRole("option")).toHaveText([
+    "All outcomes",
+    "Success",
+    "Declared error",
+    "Validation error",
+    "Timeout",
+    "Cancelled",
+    "Unexpected failure",
+  ]);
+  await outcome.selectOption("validation-error");
+  await page.getByRole("button", { name: "Apply filters" }).click();
+  await expect(page).toHaveURL(/outcome=validation-error/);
+
+  await page.goto("/requests");
+  await page.getByLabel("Status", { exact: true }).fill("700");
+  await page.getByRole("button", { name: "Apply filters" }).click();
+  const message = "Status must be a code from 100 to 599, or a class such as 5xx.";
+  await expect(page.getByText(message)).toBeVisible();
+  await expect(page.getByLabel("Status", { exact: true })).toHaveAccessibleDescription(message);
+  await expect(page).toHaveURL(/\/requests$/);
+
+  // A link with a value the page would not send: the Inspector rejects it and the page says so.
+  await page.goto("/requests?status=abc");
+  await expect(page.getByText("These filters were not accepted.")).toBeVisible();
+  await expect(page.getByLabel("Status", { exact: true })).toHaveAccessibleDescription(message);
 });
 
 test("pinpoints failed, timed out, cancelled, and incomplete requests", async ({

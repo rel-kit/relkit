@@ -1,15 +1,16 @@
 import { EMPTY_SIGNAL_FILTERS, type SignalFilters, type SignalKind } from "./observability-model";
 
-export function defaultSignalFilters(kind: SignalKind, now = Date.now()): SignalFilters {
+/**
+ * A list starts with no time range, so it covers every retained record and a request that
+ * arrives while the page is open is never outside the range.
+ */
+export function defaultSignalFilters(kind: SignalKind): SignalFilters {
   void kind;
-  return {
-    ...EMPTY_SIGNAL_FILTERS,
-    from: localDateTime(now - 24 * 60 * 60 * 1_000),
-    to: localDateTime(now),
-  };
+  return EMPTY_SIGNAL_FILTERS;
 }
 
-function localDateTime(value: number): string {
+/** The value of a `datetime-local` input for an instant, in the viewer's time zone. */
+export function localDateTime(value: number): string {
   const date = new Date(value);
   return new Date(value - date.getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
 }

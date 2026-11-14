@@ -158,7 +158,7 @@
 
 **Findings:** IN-01, IN-03, IN-04, IN-05, IN-06, IN-21, IN-23, IN-35, IN-36, IN-37. **Starts after groups 5 and 15 are merged.** **Owns:** `apps/inspector/lib/{observability-model,signal-defaults,graph-index,format,trace-*}.ts`, `apps/inspector/app/{signals-client,signals-filters,command-palette,signal-rows}.tsx`, `apps/inspector/app/signal-detail-*.tsx`.
 
-- [ ] 16.1 IN-01, IN-21: request the list newest first, add status, method, path and text filters, and keep filters and page in the URL (`lib/observability-model.ts:56-68`, `app/signals-client.tsx`); verify with `observability-model.test.ts` and `tests/e2e/inspector-requests.spec.ts` that page 1 holds the newest request and a filtered URL reloads to the same view.
+- [x] 16.1 IN-01, IN-21: request the list newest first, add status, method, path and text filters, and keep filters and page in the URL (`lib/observability-model.ts:56-68`, `app/signals-client.tsx`); verify with `observability-model.test.ts` and `tests/e2e/inspector-requests.spec.ts` that page 1 holds the newest request and a filtered URL reloads to the same view.
 - [ ] 16.2 IN-03, IN-05, IN-06: show on a failed request the declared error with a link to its contract, the validation issue codes and paths, and the recorded cause of an internal failure; verify each against a fixture record.
 - [ ] 16.3 IN-04: replace the headers and bodies panel with the invocation's captured input and result, and state that HTTP headers and bodies are not recorded (`app/signal-detail-sections.tsx:44-57`); verify with `tests/e2e/inspector-payload.spec.ts`.
 - [ ] 16.4 IN-23, IN-35, IN-36: count unique spans, use one time formatter that shows the zone, and one request-label helper for live and loaded rows; verify with `lib/trace-view.test.ts`.

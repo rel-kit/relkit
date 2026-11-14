@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+  matchesQuery,
   mergeLiveItems,
   queryFromFilters,
   traceGroups,
@@ -12,12 +13,51 @@ import { eventData } from "./trace-io";
 import { traceRows } from "./trace-view";
 
 describe("inspector observability model", () => {
-  test("defaults logs to the previous 24 hours", () => {
-    const now = Date.parse("2026-08-19T12:00:00.000Z");
-    const filters = defaultSignalFilters("logs", now);
-    expect(Date.parse(filters.from)).toBe(now - 24 * 60 * 60 * 1_000);
-    expect(Date.parse(filters.to)).toBe(now);
-    expect(Date.parse(defaultSignalFilters("traces", now).from)).toBe(now - 24 * 60 * 60 * 1_000);
+  test("defaults to every retained record, so live requests are never outside the range", () => {
+    expect(defaultSignalFilters("requests")).toEqual(EMPTY_SIGNAL_FILTERS);
+  });
+
+  test("asks for the newest records first and sends the request filters", () => {
+    expect(queryFromFilters(EMPTY_SIGNAL_FILTERS, 50)).toEqual({ limit: 50, order: "desc" });
+    expect(
+      queryFromFilters(
+        {
+          ...EMPTY_SIGNAL_FILTERS,
+          status: "5xx",
+          method: "POST",
+          path: "/orders",
+          search: "plate",
+          errorId: "fleet.plate-taken",
+        },
+        25,
+        "300",
+      ),
+    ).toEqual({
+      limit: 25,
+      order: "desc",
+      cursor: "300",
+      status: "5xx",
+      method: "POST",
+      path: "/orders",
+      search: "plate",
+      errorId: "fleet.plate-taken",
+    });
+  });
+
+  test("a live request goes on top, and an update to a listed request stays where it is", () => {
+    const first = { signal: "request", requestId: "a", phase: "completed" };
+    const second = { signal: "request", requestId: "b", phase: "started" };
+    const fresh = { signal: "request", requestId: "c", phase: "completed" };
+    expect(mergeLiveItems([first, second], { data: fresh })).toEqual([fresh, first, second]);
+    const done = { signal: "request", requestId: "b", phase: "completed" };
+    expect(mergeLiveItems([first, second], { data: done })).toEqual([first, done]);
+  });
+
+  test("keeps a live request out of a filtered list when it does not match", () => {
+    const failed = { signal: "request", requestId: "a", status: 500, method: "GET", rawPath: "/x" };
+    expect(matchesQuery(failed, { status: "5xx" })).toBe(true);
+    expect(matchesQuery(failed, { status: "2xx" })).toBe(false);
+    expect(matchesQuery(failed, { path: "/y" })).toBe(false);
   });
 
   test("bounds query filters and merges a redacted live record once", () => {

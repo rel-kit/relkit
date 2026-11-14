@@ -23,7 +23,7 @@ describe("inspector redesign contracts", () => {
     expect(table).toContain("Pagination");
     expect(table).toContain("OverlayDialog");
     expect(table).toContain("PageHeader");
-    expect(filters).toContain("Filters are applied by the versioned backend");
+    expect(filters).toContain("Filters run on every retained request");
     expect(packageJson).toContain('"react-aria-components"');
     expect(packageJson).toContain('"tailwindcss"');
   });
