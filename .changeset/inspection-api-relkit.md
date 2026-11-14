@@ -15,3 +15,5 @@ Observed edges in the inspection API now keep `count`, `firstSeenAt` and `lastSe
 The agent workflow and executions inspection routes (`/_relkit/v1/agents/:agentId/workflow`, `/_relkit/v1/runtime/agents/:agentId/executions`) no longer answer callers without credentials: they answer the development inspection session that a generated server registers under `Symbol.for("relkit.inspection.authorize")`, or explicitly configured internal credentials, and otherwise answer 404 (401 for a failed check). Other internal endpoints and the development API documentation are unchanged.
 
 An Inspector waiting for a development session no longer logs `connection.path.stat … ENOENT` as a failed operation every second while the project has no `.relkit/connections` directory; a missing path is absence, and other failures are still logged.
+
+The history routes of the inspection API (`/requests`, `/logs`, `/traces`) now pass the `status`, `method`, `path`, `errorId` and `count` filters to the observability store, and the runtime telemetry counters include `exportCapacityRejections`.
