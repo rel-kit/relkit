@@ -3,6 +3,8 @@ import type { MySqlAsyncDatabase } from "drizzle-orm/mysql-core/async/db";
 import { defineModel as defineNativeModel } from "./model.js";
 import type { DefineModel } from "./model.types.js";
 export * from "./index.js";
+export { openMysqlDatabase } from "./mysql-client/index.js";
+export type { MysqlDatabase, MysqlDatabaseConfig } from "./mysql-client/index.js";
 
 /** Native database injected into model extensions for the selected dialect. */
 export type DialectDatabase = Omit<MySqlAsyncDatabase<any, any>, "query">;

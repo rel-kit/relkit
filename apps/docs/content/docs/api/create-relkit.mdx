@@ -3439,6 +3439,8 @@ declare const SCAFFOLD_DEPENDENCIES: Readonly<{
   "@langchain/core": { version: string; section: "dependencies" };
   "@langchain/langgraph": { version: string; section: "dependencies" };
   langsmith: { version: string; section: "dependencies" };
+  mysql2: { version: string; section: "dependencies" };
+  pg: { version: string; section: "dependencies" };
 }>;
 ```
 
@@ -3483,7 +3485,9 @@ declare const ScaffoldDependencyName:
   | "drizzle-kit"
   | "@langchain/core"
   | "@langchain/langgraph"
-  | "langsmith";
+  | "langsmith"
+  | "mysql2"
+  | "pg";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L8)
@@ -3518,7 +3522,7 @@ Selects one supported dependency from the release's portable scaffold catalog.
 declare const scaffoldDependency: (name: ScaffoldDependencyName) => ScaffoldDependency;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L74)
 
 ## `scaffold-catalog.types.ts`
 

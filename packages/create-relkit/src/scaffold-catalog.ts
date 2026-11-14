@@ -62,6 +62,8 @@ export const SCAFFOLD_DEPENDENCIES = Object.freeze({
     section: "dependencies",
   },
   langsmith: { version: buildCatalogDependency("langsmith"), section: "dependencies" },
+  mysql2: { version: buildCatalogDependency("mysql2"), section: "dependencies" },
+  pg: { version: buildCatalogDependency("pg"), section: "dependencies" },
 } satisfies Readonly<Record<string, ScaffoldDependency>>);
 
 /**

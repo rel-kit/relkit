@@ -3,6 +3,8 @@ import type { PgAsyncDatabase } from "drizzle-orm/pg-core/async/db";
 import { defineModel as defineNativeModel } from "./model.js";
 import type { DefineModel } from "./model.types.js";
 export * from "./index.js";
+export { openPostgresDatabase } from "./pg-client/index.js";
+export type { PostgresDatabase, PostgresDatabaseConfig } from "./pg-client/index.js";
 
 /** Native database injected into model extensions for the selected dialect. */
 export type DialectDatabase = Omit<PgAsyncDatabase<any, any>, "query">;

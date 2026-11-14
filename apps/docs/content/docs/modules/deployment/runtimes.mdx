@@ -120,24 +120,38 @@ because it applies the dependency patches RelKit selects, which npm does not sup
   once, never retry a failed command and keep no offline queue.
 - **Sentry** (`@relkit/sentry`) loads `@sentry/node` on Node and `@sentry/bun` on Bun. Install
   both; `relkit add sentry` does.
-- **SQLite** with Drizzle: open the database with `openSqliteDatabase` from
-  `@relkit/drizzle/sqlite`. It uses `node:sqlite` on Node and `bun:sqlite` on Bun:
+- **Databases** with Drizzle: open the database with the client of its dialect from
+  `@relkit/drizzle`. Each one loads only the driver of the runtime it runs on:
+
+  | Dialect    | Function               | Import from              | Bun            | Node          |
+  | ---------- | ---------------------- | ------------------------ | -------------- | ------------- |
+  | SQLite     | `openSqliteDatabase`   | `@relkit/drizzle/sqlite` | `bun:sqlite`   | `node:sqlite` |
+  | PostgreSQL | `openPostgresDatabase` | `@relkit/drizzle/pg`     | Bun SQL client | `pg`          |
+  | MySQL      | `openMysqlDatabase`    | `@relkit/drizzle/mysql`  | Bun SQL client | `mysql2`      |
+
+  `relkit add database` writes a service that uses them and adds `pg` or `mysql2` to the
+  dependencies, so the same service runs on both runtimes:
 
 ```ts title="src/services/database/service.ts"
 import { defineDrizzleService } from "@relkit/drizzle";
-import { openSqliteDatabase } from "@relkit/drizzle/sqlite";
+import { openPostgresDatabase } from "@relkit/drizzle/pg";
 import * as schema from "./schema/index.js";
 
 export default defineDrizzleService({
   schema,
-  client: ({ env }) => openSqliteDatabase(env.DATABASE_PATH ?? ".relkit/state/app.db"),
-  dispose: (database) => database.$client.close(),
+  client: ({ env }) => {
+    const url = env.DATABASE_URL;
+    if (!url) throw new Error("DATABASE_URL is required");
+    return openPostgresDatabase(url);
+  },
+  dispose: (database) => database.$client.end(),
 });
 ```
 
-Node 22 and 24 print an `ExperimentalWarning` the first time `node:sqlite` loads. `relkit add
-database --dialect sqlite` still writes a `bun:sqlite` service; switch it to `openSqliteDatabase`
-before you build for Node.
+A SQLite database is closed with `database.$client.close()` instead. Node 22 and 24 print an
+`ExperimentalWarning` the first time `node:sqlite` loads. A service written by an earlier release
+imports `drizzle-orm/bun-sql` or `bun:sqlite`; replace that import and the `drizzle(...)` call with
+the function above, and on Node install `pg` or `mysql2`.
 
 ## Limits on Node
 

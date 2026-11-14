@@ -52,19 +52,25 @@
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
+    "@types/pg": "catalog:",
     "drizzle-orm": "catalog:",
-    "mysql2": "3.23.1",
+    "mysql2": "catalog:",
+    "pg": "catalog:",
     "vitest": "catalog:"
   },
   "peerDependencies": {
     "drizzle-orm": "catalog:",
-    "mysql2": ">=2.0.0"
+    "mysql2": ">=2.0.0",
+    "pg": ">=8.0.0"
   },
   "peerDependenciesMeta": {
     "drizzle-orm": {
       "optional": true
     },
     "mysql2": {
+      "optional": true
+    },
+    "pg": {
       "optional": true
     }
   },
