@@ -70,7 +70,7 @@
 
 - [ ] 7.1 RK-26: declare 401 and 403 for operations with an access rule, the validation and oversize responses for operations with input, and 500, in the generated document (`generate-response.ts:70-110`); correct the Better Auth operation schemas the harness found wrong or record them as upstream; verify the harness contract group reports no undeclared status for application routes.
 - [ ] 7.2 RK-20: move `@hono/node-server` and the scaffolded `better-auth` version to releases without the advisories found by `npm audit`, or record why a pin must stay; verify `npm audit` on a fresh project attributes nothing to RelKit pins and the package suites pass.
-- [ ] 7.3 Document what is by design: 422 for malformed JSON and wrong content type and 413 `payload-too-large` for oversize (also for a route-level limit); request ID versus trace ID and how to find a request from either; dotenv precedence under `relkit dev` and for one-shot commands; the generated OpenAPI file versus the served document; the release-source rule for local-only bindings; verify the docs build and its link check.
+- [ ] 7.3 Document what is by design: 422 for malformed JSON and wrong content type and 413 `payload-too-large` for oversize (also for a route-level limit); request ID versus trace ID and how to find a request from either; dotenv precedence under `relkit dev` and for one-shot commands; the generated OpenAPI file versus the served document; the release-source rule for local-only bindings; regenerate the generated reference pages and snippets (`bun run --cwd apps/docs generate`) so the CLI reference and the example snippets match the new help and messages; verify the docs build, its freshness check and its link check.
 
 ## 8. Environment files and database commands on Node
 
@@ -96,6 +96,7 @@
 - [ ] 10.3 RK-32: point provider binding diagnostics at the binding's entry and name a valid replacement (`normalize-provider-validation.ts:88-108`, `normalize-pass-support.ts:121-136`); verify the line for a local-only bucket.
 - [ ] 10.4 IN-33: give environment variable and provider binding nodes the location of their own declaration instead of the `defineApp` call (`normalize-graph-app.ts:122-125`, `normalize-graph-providers.ts:36-39`); verify the graph of a fixture with an env module and a bucket binding.
 - [ ] 10.5 RK-17: add doctor checks for imports the current runtime cannot load, environment files the current runtime will not read, and manifest fields the package manager ignores; verify on a Node project with a Bun-only service.
+- [ ] 10.6 RK-06: use the one-shot environment helper (`packages/cli/src/runtime/one-shot-environment.ts`) for the values `start`, `jobs`, `local` and `doctor` read from the environment (`start.service.ts:57`, `jobs-base-url.ts`, `jobs-http.ts`, `local-operations.ts`, `doctor-project.service.ts:123`); verify on Node that `PORT` set only in `.env` is honoured by `relkit start`.
 
 ## 11. Command line messages and help
 

@@ -2,7 +2,7 @@
 
 ### Requirement: Environment files on Node
 
-Commands that run once (`db migrate`, `env check`, `env list`, `check`) SHALL read the same environment files on Node as on Bun, with values already present in the process environment taking precedence.
+Commands that run once and read application environment values (`db migrate`, `env check`, `env list`, `start`, `jobs`, `local`, `doctor`) SHALL read the same environment files on Node as on Bun, with values already present in the process environment taking precedence. `check` evaluates application code with an allow-listed environment on both runtimes and is not affected.
 
 #### Scenario: Migration on Node with a dotenv file
 
