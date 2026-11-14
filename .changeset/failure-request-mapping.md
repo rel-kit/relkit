@@ -21,3 +21,7 @@ An HTTP route whose function has an access rule with `roles` or `permissions` no
 (no session) or 403 (missing role or permission) before it reads or validates the request input,
 so the answer names no input field. Rules with an `allow` predicate, which reads input, still run
 after validation.
+
+JSON bodies are decoded strictly: strings are converted to numbers and booleans only for values
+read from the path, query, headers and cookies. A JSON body value of `"3500"` for an integer field
+is now a validation error instead of being accepted as `3500`.

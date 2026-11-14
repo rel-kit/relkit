@@ -63,6 +63,8 @@ export async function routeInput(
             ? {}
             : { request: trigger.config.request }),
         target,
+        // Only path, query, header and cookie text is decoded; a JSON body is validated as sent.
+        trigger.config.request,
       );
 }
 
