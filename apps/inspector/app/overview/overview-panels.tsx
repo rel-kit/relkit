@@ -17,111 +17,24 @@ import {
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { FailedState, LoadingRows } from "../../components/blocks/block-state";
-import { DetailList } from "../../components/blocks/details";
 import { Stat, StatGroup } from "../../components/blocks/stat";
 import { EmptyState } from "../../components/neon/empty-state";
 import { HistoryList, type HistoryEntry } from "../../components/neon/history-list";
-import { StatusBadge, type StatusTone } from "../../components/neon/status-badge";
 import { Timeline, type TimelineItem } from "../../components/neon/timeline";
 import type { InspectorObject } from "../../lib/api-types";
 import { clockTime, formatDuration } from "../../lib/format";
 import type { GraphSummary } from "../../lib/graph-model";
-import { historyStatusMessage } from "../../lib/history-status";
 import {
   formatRate,
   generationEvents,
   requestSummary,
   requestVolume,
-  storageHealth,
 } from "../../lib/overview-model";
 import { Section } from "../../components/blocks/section";
-import type { ConnectionState } from "../overview-shell";
 import type { SampleState } from "./use-overview-signals";
 
 export const linkButtonClass =
   "inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 text-xs font-medium text-foreground no-underline transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 [&_svg]:size-3.5";
-
-const connectionTone: Record<ConnectionState, StatusTone> = {
-  connecting: "live",
-  connected: "success",
-  reconnecting: "warning",
-  offline: "danger",
-};
-
-/** One dense card answering "is everything wired up": backend, identity, history, drops. */
-export function HealthStrip({
-  connection = "connecting",
-  generationId,
-  graphHash,
-  droppedEvents,
-  storage,
-}: {
-  readonly connection?: ConnectionState;
-  readonly generationId?: string;
-  readonly graphHash?: string;
-  readonly droppedEvents?: number;
-  readonly storage: InspectorObject | undefined;
-}) {
-  const history = storageHealth(storage);
-  const historyMessage =
-    storage === undefined ? "Checking history storage." : historyStatusMessage(storage);
-  const dropped =
-    droppedEvents !== undefined && Number.isSafeInteger(droppedEvents) && droppedEvents > 0
-      ? Math.min(droppedEvents, 999_999)
-      : 0;
-  return (
-    <Section id="overview-health" title="Health">
-      <DetailList
-        columns={3}
-        className="grid-cols-2 xl:grid-cols-5"
-        items={[
-          {
-            label: "Backend",
-            value: <StatusBadge tone={connectionTone[connection]} label={connection} />,
-          },
-          {
-            label: "Active generation",
-            mono: true,
-            value: (
-              <span data-testid="active-generation" className="block truncate">
-                {generationId ?? "Awaiting active generation"}
-              </span>
-            ),
-            ...(generationId === undefined ? {} : { copy: generationId }),
-          },
-          {
-            label: "Graph hash",
-            mono: true,
-            value: (
-              <span data-testid="graph-hash" className="block truncate" title={graphHash}>
-                {graphHash ?? "Graph hash unavailable"}
-              </span>
-            ),
-            ...(graphHash === undefined ? {} : { copy: graphHash }),
-          },
-          {
-            label: "History",
-            value: (
-              <span className="flex min-w-0 items-center gap-2" title={historyMessage}>
-                <StatusBadge tone={history.tone} label={history.label} />
-                <span className="sr-only">{historyMessage}</span>
-              </span>
-            ),
-          },
-          {
-            label: "Dropped events",
-            mono: true,
-            value: (
-              <span className={dropped > 0 ? "text-warning tabular-nums" : "tabular-nums"}>
-                {dropped.toLocaleString("en-US")}
-              </span>
-            ),
-          },
-        ]}
-      />
-    </Section>
-  );
-}
 
 /** Graph and traffic KPIs; each tile opens the page it counts. */
 export function KpiRow({

@@ -170,9 +170,8 @@ export function storageHealth(value: InspectorObject | undefined): StorageHealth
     return { tone: "danger", label: "writer conflict" };
   if (value.state === "degraded") return { tone: "danger", label: "degraded" };
   if (value.incomplete === true) return { tone: "warning", label: "incomplete" };
-  if (value.connection === "disconnected") return { tone: "warning", label: "disconnected" };
-  if (value.connection === "ambiguous") return { tone: "warning", label: "ambiguous" };
-  return { tone: "success", label: text(value.connection) ?? text(value.state) ?? "ready" };
+  // The application session is reported on its own; history stays readable without it.
+  return { tone: "success", label: "ready" };
 }
 
 function pathOf(item: InspectorObject): string {

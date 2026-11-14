@@ -135,7 +135,15 @@ describe("storageHealth", () => {
     expect(storageHealth({ state: "ready", incomplete: true }).tone).toBe("warning");
     expect(storageHealth({ state: "ready", connection: "connected" })).toEqual({
       tone: "success",
-      label: "connected",
+      label: "ready",
     });
+  });
+
+  test("history stays ready while the application is away (IN-09)", () => {
+    expect(storageHealth({ state: "ready", connection: "disconnected" })).toEqual({
+      tone: "success",
+      label: "ready",
+    });
+    expect(storageHealth({ state: "ready", connection: "ambiguous" }).label).toBe("ready");
   });
 });

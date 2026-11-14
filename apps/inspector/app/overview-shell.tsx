@@ -5,11 +5,13 @@ import { PageHeader } from "../components/blocks/page-header";
 import { StatusBadge, type StatusTone } from "../components/neon/status-badge";
 import type { InspectorObject } from "../lib/api-types";
 import type { GraphSummary } from "../lib/graph-model";
+import { INITIAL_INSPECTOR_STATE, type ApplicationSession } from "../lib/stream-application";
+import { applicationLabel } from "../lib/stream-application-text";
 import type { ActivationFingerprint } from "../lib/graph-topology-model";
 import { ActivationCohort } from "./activation-cohort";
+import { APPLICATION_TONES, HealthStrip } from "./overview/overview-health";
 import {
   GenerationHistory,
-  HealthStrip,
   KpiRow,
   linkButtonClass,
   RecentRequests,
@@ -21,7 +23,10 @@ export type ConnectionState = "connecting" | "connected" | "reconnecting" | "off
 export interface OverviewSnapshot {
   readonly generationId?: string;
   readonly graphHash?: string;
+  /** The browser's stream to the Inspector process. */
   readonly connection?: ConnectionState;
+  /** The Inspector's session with the application. */
+  readonly application?: ApplicationSession;
   readonly droppedEvents?: number;
   readonly graphSummary?: GraphSummary;
   readonly activationFingerprint?: ActivationFingerprint;
@@ -104,6 +109,7 @@ export function OverviewShell({
   const generationId = boundedLabel(snapshot.generationId);
   const graphHash = boundedLabel(snapshot.graphHash);
   const appId = snapshot.graphSummary?.appId;
+  const application = snapshot.application ?? INITIAL_INSPECTOR_STATE.application;
 
   return (
     <div className="overview-shell route-page">
@@ -115,7 +121,12 @@ export function OverviewShell({
             : `The active generation of ${appId}, its capabilities and recent traffic.`
         }
         badges={
-          <ConnectionStatus state={snapshot.connection} droppedEvents={snapshot.droppedEvents} />
+          <span role="status" aria-live="polite" className="inline-flex">
+            <StatusBadge
+              tone={APPLICATION_TONES[application.state]}
+              label={`Application ${applicationLabel(application.state)}`}
+            />
+          </span>
         }
         actions={
           <Link href="/graph" className={linkButtonClass}>
@@ -125,7 +136,8 @@ export function OverviewShell({
       />
 
       <HealthStrip
-        {...(snapshot.connection === undefined ? {} : { connection: snapshot.connection })}
+        {...(snapshot.connection === undefined ? {} : { stream: snapshot.connection })}
+        application={application}
         {...(generationId === undefined ? {} : { generationId })}
         {...(graphHash === undefined ? {} : { graphHash })}
         {...(snapshot.droppedEvents === undefined ? {} : { droppedEvents: snapshot.droppedEvents })}

@@ -9,7 +9,9 @@ import { Button } from "../components/ui/button";
 import { DropdownMenu } from "../components/ui/dropdown-menu";
 import { Tooltip } from "../components/ui/tooltip";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
-import { StatusBadge, statusTone } from "../components/neon/status-badge";
+import { useInspectorState } from "../lib/stream-application-store";
+import { applicationLabel } from "../lib/stream-application-text";
+import { ApplicationBanner, InspectorStatus } from "./application-state";
 import { CopyButton } from "../components/blocks/copy-button";
 import { useInspectorGraph } from "../lib/use-graph";
 import { SCALAR_API_REFERENCE_URL } from "../lib/api-reference";
@@ -46,7 +48,16 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
     setTheme(next);
     applyInspectorTheme(next);
   };
-  const status = graph.error ? "offline" : graph.connection;
+  const inspector = useInspectorState();
+  // The sidebar's one word: the stream when it is down, otherwise the application session.
+  const status =
+    inspector.stream !== "connected"
+      ? inspector.stream
+      : inspector.application.state === "connected" || inspector.application.state === "checking"
+        ? graph.error
+          ? "offline"
+          : "connected"
+        : applicationLabel(inspector.application.state);
   const generationId = graph.graph?.generationId;
   const graphHash = graph.graph?.graphHash;
 
@@ -78,13 +89,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
               ) : null}
             </div>
             <CommandPalette isOpen={searchOpen} onOpenChange={setSearchOpen} graph={graph.graph} />
-            <StatusBadge
-              className="health-badge"
-              data-testid="inspector-stream-state"
-              data-state={status}
-              tone={status === "connected" ? "live" : statusTone(status)}
-              label={status}
-            />
+            <InspectorStatus />
             <Tooltip
               trigger={
                 <Button
@@ -113,6 +118,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
             />
           </div>
         </header>
+        <ApplicationBanner />
         <DevelopmentFailureBanner {...(generationId === undefined ? {} : { generationId })} />
         <div id="main-content" className="main-content" tabIndex={-1}>
           {children}

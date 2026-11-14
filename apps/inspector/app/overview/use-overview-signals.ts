@@ -18,8 +18,6 @@ export interface SampleState {
 export interface OverviewSignals {
   readonly requests: SampleState;
   readonly generations: SampleState;
-  /** History storage status from `/_relkit/v1/storage`; `{ state: "unavailable" }` on failure. */
-  readonly storage: InspectorObject | undefined;
 }
 
 const initialSample: SampleState = { items: [], truncated: false, state: "loading" };
@@ -29,13 +27,12 @@ const REFRESH_THROTTLE_MS = 2_000;
 /**
  * Bounded, read-only samples behind the Overview dashboard: the latest requests (refreshed from
  * the live stream, throttled), dev generation logs (refreshed when the active generation or its
- * diagnostics change), and history storage status (polled like the shared history notice).
+ * diagnostics change). History status comes from the shell's shared Inspector state.
  * @param generationId - Active generation; a change reloads the generation history.
  */
 export function useOverviewSignals(generationId: string | undefined): OverviewSignals {
   const [requests, setRequests] = useState<SampleState>(initialSample);
   const [generations, setGenerations] = useState<SampleState>(initialSample);
-  const [storage, setStorage] = useState<InspectorObject>();
   const reloadGenerations = useRef<() => void>(() => undefined);
 
   useEffect(() => {
@@ -112,33 +109,5 @@ export function useOverviewSignals(generationId: string | undefined): OverviewSi
     reloadGenerations.current();
   }, [generationId]);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    const client = createInspectorClient();
-    let pending = false;
-    const read = async (): Promise<void> => {
-      if (pending) return;
-      pending = true;
-      try {
-        const next = await client.request<InspectorObject>("/_relkit/v1/storage", {
-          cache: "no-store",
-          signal: controller.signal,
-          responseProtocols: ["relkit.observability.query"],
-        });
-        if (!controller.signal.aborted) setStorage(next);
-      } catch {
-        if (!controller.signal.aborted) setStorage({ state: "unavailable" });
-      } finally {
-        pending = false;
-      }
-    };
-    void read();
-    const timer = setInterval(() => void read(), 10_000);
-    return () => {
-      controller.abort();
-      clearInterval(timer);
-    };
-  }, []);
-
-  return { requests, generations, storage };
+  return { requests, generations };
 }
