@@ -85,7 +85,10 @@ function requiredValue(args: readonly string[], index: number, option: string): 
  */
 export function formatDoctor(result: DoctorResult): string {
   return [
-    ...result.checks.map((check) => `${check.ok ? "✓" : "✗"} ${check.name}: ${check.message}`),
+    ...result.checks.map(
+      (check) =>
+        `${check.ok ? (check.details?.["severity"] === "warning" ? "!" : "✓") : "✗"} ${check.name}: ${check.message}`,
+    ),
     result.ok ? "Doctor passed." : "Doctor found prerequisite failures.",
   ].join("\n");
 }

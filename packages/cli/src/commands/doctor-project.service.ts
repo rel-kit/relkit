@@ -18,6 +18,12 @@ import {
 } from "./doctor-checks.js";
 import type { DoctorCheck, DoctorOperations, DoctorOptions, DoctorResult } from "./doctor.types.js";
 import { CliDoctorToolchain, doctorToolchainLayer } from "./doctor-toolchain.service.js";
+import {
+  checkEnvironmentFilesEffect,
+  checkManifestFields,
+  checkRuntimeImportsEffect,
+} from "./doctor-runtime.js";
+import { projectPackageManager } from "create-relkit/package-manager";
 
 /** Finite prerequisite domain; every report owns temporary files and child checks. */
 export class CliDoctor extends Context.Service<CliDoctor, DoctorOperations>()(
@@ -118,6 +124,10 @@ const collectDoctorChecks = Effect.fnUntraced(function* (
   const checks: DoctorCheck[] = [...(yield* versionChecksEffect(manifest, root))];
   const config = yield* checkConfigEffect(root);
   checks.push(config.check, yield* checkAppEffect(root, config.config));
+  checks.push(yield* checkRuntimeImportsEffect(root, config.config));
+  checks.push(yield* checkEnvironmentFilesEffect(root));
+  const workspace = yield* (yield* CliFileSystem).exists(join(root, "pnpm-workspace.yaml"));
+  checks.push(checkManifestFields(projectPackageManager(root), manifest ?? {}, workspace));
   const enabled = options.deploymentEnabled ?? detectDeployment(manifest, config.config);
   checks.push(yield* checkPulumiEffect(enabled, root, options.commandRunner));
   checks.push(checkAws(enabled, options.source ?? process.env));
