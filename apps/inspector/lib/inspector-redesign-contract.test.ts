@@ -107,7 +107,8 @@ describe("inspector redesign contracts", () => {
     expect(provider).not.toContain("node.configuration");
     expect(runtime).toContain("APPLICATION EXPORT STATUS");
     expect(runtime).toContain("LiveHistoryStatus");
-    expect(runtime).toContain("Accepted by app capture");
+    // Counter labels live in lib/overview-export.ts, shown only with an exporter (IN-18).
+    expect(runtime).toContain("exportCounters(value)");
     expect(runtime).toContain("External exporters");
     expect(cohort).toContain('role="alert"');
     expect(signals).toContain("Capture and history are bounded");

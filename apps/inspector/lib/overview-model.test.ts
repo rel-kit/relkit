@@ -1,7 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
   formatRate,
-  generationEvents,
   isFailedRequest,
   requestSummary,
   requestVolume,
@@ -82,47 +81,6 @@ describe("formatRate", () => {
     expect(formatRate(0)).toBe("0%");
     expect(formatRate(0.004)).toBe("0.4%");
     expect(formatRate(0.125)).toBe("13%");
-  });
-});
-
-describe("generationEvents", () => {
-  test("orders newest first and tags only the newest activation as current", () => {
-    const events = generationEvents([
-      {
-        message: "dev.generation.active",
-        cursor: "1",
-        timestamp: "2026-10-30T10:00:00.000Z",
-        fields: { version: 0, initial: true, durationMs: 1959, changedFiles: 0 },
-      },
-      {
-        message: "dev.generation.failed",
-        cursor: "3",
-        timestamp: "2026-10-30T12:00:00.000Z",
-        fields: { message: "\nCandidate validation failed.\nmore" },
-      },
-      {
-        message: "dev.generation.active",
-        cursor: "2",
-        timestamp: "2026-10-30T11:00:00.000Z",
-        fields: { version: 1, changedFiles: 1 },
-      },
-      { message: "dev.build.started", cursor: "4", timestamp: "2026-10-30T13:00:00.000Z" },
-    ]);
-    expect(events.map((event) => [event.id, event.state, event.current])).toEqual([
-      ["3", "failed", false],
-      ["2", "active", true],
-      ["1", "active", false],
-    ]);
-    expect(events[0]!.message).toBe("Candidate validation failed.");
-    expect(events[2]).toMatchObject({ version: 0, initial: true, durationMs: 1959 });
-  });
-
-  test("caps the number of events", () => {
-    const items = Array.from({ length: 5 }, (_, index) => ({
-      message: "dev.generation.active",
-      cursor: String(index),
-    }));
-    expect(generationEvents(items, 2)).toHaveLength(2);
   });
 });
 

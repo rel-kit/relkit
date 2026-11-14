@@ -23,6 +23,7 @@ export interface OverviewSignals {
 const initialSample: SampleState = { items: [], truncated: false, state: "loading" };
 const REQUEST_SAMPLE = 100;
 const REFRESH_THROTTLE_MS = 2_000;
+const LOG_REFRESH_MS = 5_000;
 
 /**
  * Bounded, read-only samples behind the Overview dashboard: the latest requests (refreshed from
@@ -39,6 +40,7 @@ export function useOverviewSignals(generationId: string | undefined): OverviewSi
     let disposed = false;
     const client = createInspectorClient();
     let requestTimer: ReturnType<typeof setTimeout> | undefined;
+    let logTimer: ReturnType<typeof setTimeout> | undefined;
     const loadRequests = async (): Promise<void> => {
       try {
         const page = await client.query<InspectorObject>("requests", {
@@ -91,6 +93,12 @@ export function useOverviewSignals(generationId: string | undefined): OverviewSi
       onInvalidate: (tags) => {
         if (tags.includes("requests")) scheduleRequests();
         if (tags.includes("diagnostics")) void loadGenerations();
+        // A failed reload is only a supervisor log; re-read on new logs, at most every 5 s.
+        else if (tags.includes("logs") && logTimer === undefined)
+          logTimer = setTimeout(() => {
+            logTimer = undefined;
+            void loadGenerations();
+          }, LOG_REFRESH_MS);
       },
     });
     void loadRequests();
@@ -100,6 +108,7 @@ export function useOverviewSignals(generationId: string | undefined): OverviewSi
       disposed = true;
       reloadGenerations.current = () => undefined;
       if (requestTimer !== undefined) clearTimeout(requestTimer);
+      if (logTimer !== undefined) clearTimeout(logTimer);
       window.removeEventListener(INSPECTOR_BACKEND_CONNECTED_EVENT, reconnect);
       stream.stop();
     };

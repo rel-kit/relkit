@@ -4,7 +4,6 @@ import {
   AlertTriangle,
   ArrowRight,
   Bot,
-  GitCommitVertical,
   Inbox,
   Layers3,
   MessagesSquare,
@@ -20,16 +19,9 @@ import { FailedState, LoadingRows } from "../../components/blocks/block-state";
 import { Stat, StatGroup } from "../../components/blocks/stat";
 import { EmptyState } from "../../components/neon/empty-state";
 import { HistoryList, type HistoryEntry } from "../../components/neon/history-list";
-import { Timeline, type TimelineItem } from "../../components/neon/timeline";
-import type { InspectorObject } from "../../lib/api-types";
-import { clockTime, formatDuration } from "../../lib/format";
 import type { GraphSummary } from "../../lib/graph-model";
-import {
-  formatRate,
-  generationEvents,
-  requestSummary,
-  requestVolume,
-} from "../../lib/overview-model";
+import { requestTiles, type RequestCounts } from "../../lib/overview-counts";
+import { requestSummary, requestVolume } from "../../lib/overview-model";
 import { Section } from "../../components/blocks/section";
 import type { SampleState } from "./use-overview-signals";
 
@@ -41,38 +33,45 @@ export function KpiRow({
   counts,
   summary,
   requests,
+  requestCounts,
 }: {
   readonly counts: Readonly<Record<string, number>> | undefined;
   readonly summary: GraphSummary | undefined;
   readonly requests: SampleState;
+  /** Retained totals over the whole history; undefined until counted or when not countable. */
+  readonly requestCounts?: RequestCounts | undefined;
 }) {
   const volume = requestVolume(requests.items);
+  const tiles = requestTiles(
+    { total: volume.total, failed: volume.failed, truncated: requests.truncated },
+    requestCounts,
+  );
   const count = (href: string): ReactNode =>
     counts === undefined ? "—" : (counts[href] ?? 0).toLocaleString("en-US");
-  const ready = requests.state === "ready";
+  const ready = requests.state === "ready" || requestCounts !== undefined;
   return (
     <StatGroup>
       <Stat
         label="Requests"
         href="/requests"
         icon={<Inbox />}
-        value={ready ? `${volume.total}${requests.truncated ? "+" : ""}` : "—"}
+        value={ready ? tiles.requests.value : "—"}
         hint={
-          ready && volume.since !== undefined
-            ? `since ${clockTime(volume.since).slice(0, 8)}${requests.truncated ? " · latest 100" : ""}`
+          ready
+            ? tiles.requests.hint
             : requests.state === "error"
               ? "request history unavailable"
-              : "no requests retained"
+              : "counting requests"
         }
         trend={volume.perMinute}
       />
       <Stat
         label="Error rate"
-        href="/requests"
+        href="/requests?status=5xx"
         icon={<AlertTriangle />}
-        tone={!ready || volume.failed === 0 ? "default" : "danger"}
-        value={ready ? formatRate(volume.errorRate) : "—"}
-        hint={ready ? `${volume.failed} of ${volume.total} answered 5xx` : undefined}
+        tone={!ready || tiles.failed === 0 ? "default" : "danger"}
+        value={ready ? tiles.errorRate.value : "—"}
+        hint={ready ? tiles.errorRate.hint : undefined}
       />
       <Stat label="Routes" href="/routes" icon={<Route />} value={count("/routes")} />
       <Stat
@@ -174,74 +173,6 @@ export function RecentRequests({ requests }: { readonly requests: SampleState })
         />
       ) : (
         <HistoryList label="Recent requests" entries={entries} />
-      )}
-    </Section>
-  );
-}
-
-/** Dev supervisor activations and failed reloads, newest first; the newest activation is current. */
-export function GenerationHistory({
-  generations,
-  generationId,
-}: {
-  readonly generations: SampleState;
-  readonly generationId?: string;
-}) {
-  const items: TimelineItem[] = generationEvents(generations.items, 8).map((event) => {
-    const active = event.state === "active";
-    const failed = event.state === "failed";
-    const meta: ReactNode[] = [
-      ...(event.version === undefined ? [] : [`v${event.version}`]),
-      ...(event.current && generationId !== undefined ? [generationId] : []),
-      ...(event.initial ? ["initial build"] : []),
-      ...(event.changedFiles === undefined || event.initial
-        ? []
-        : [`${event.changedFiles} file${event.changedFiles === 1 ? "" : "s"} changed`]),
-      ...(event.durationMs === undefined ? [] : [`built in ${formatDuration(event.durationMs)}`]),
-    ];
-    return {
-      id: event.id,
-      title: active
-        ? "Generation activated"
-        : failed
-          ? "Reload failed"
-          : `Generation ${event.state}`,
-      tone: failed ? "danger" : event.current ? "live" : active ? "success" : "neutral",
-      meta,
-      ...(event.current ? { tag: "current" } : {}),
-      ...(event.at === undefined ? {} : { at: event.at }),
-      ...(failed && event.message !== undefined
-        ? { detail: <span className="line-clamp-2 font-mono">{event.message}</span> }
-        : {}),
-      ...(failed ? { href: "/diagnostics" } : {}),
-    };
-  });
-  return (
-    <Section
-      id="overview-generations"
-      title="Generation history"
-      actions={<GitCommitVertical aria-hidden="true" className="size-3.5 text-muted-foreground" />}
-    >
-      {generations.state === "loading" && generations.items.length === 0 ? (
-        <LoadingRows label="Loading generation history" rows={4} className="p-0" />
-      ) : generations.state === "error" && generations.items.length === 0 ? (
-        <FailedState
-          title="Generation history is unavailable."
-          description="Development logs could not be read."
-        />
-      ) : (
-        <Timeline
-          label="Generation history"
-          items={items}
-          empty={
-            <EmptyState
-              variant="bare"
-              size="sm"
-              title="No reloads recorded"
-              description="Generations appear here when relkit dev activates a build."
-            />
-          }
-        />
       )}
     </Section>
   );

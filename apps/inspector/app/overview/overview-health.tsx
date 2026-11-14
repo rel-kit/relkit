@@ -4,7 +4,12 @@ import { DetailList } from "../../components/blocks/details";
 import { Section } from "../../components/blocks/section";
 import { StatusBadge, type StatusTone } from "../../components/neon/status-badge";
 import type { InspectorObject } from "../../lib/api-types";
-import { historyStatusMessage } from "../../lib/history-status";
+import {
+  historyStatusMessage,
+  missedLiveUpdatesNote,
+  recordsLost,
+  recordsLostSentence,
+} from "../../lib/history-status";
 import { storageHealth } from "../../lib/overview-model";
 import type { ApplicationLink, ApplicationSession } from "../../lib/stream-application";
 import { applicationLabel } from "../../lib/stream-application-text";
@@ -46,10 +51,12 @@ export function HealthStrip({
   const history = storageHealth(storage);
   const historyMessage =
     storage === undefined ? "Checking history storage." : historyStatusMessage(storage);
-  const dropped =
-    droppedEvents !== undefined && Number.isSafeInteger(droppedEvents) && droppedEvents > 0
-      ? Math.min(droppedEvents, 999_999)
-      : 0;
+  const lost = recordsLost(storage);
+  const lostSentence = lost === undefined ? undefined : recordsLostSentence(lost);
+  const toolMissed = storage?.missedLiveUpdates;
+  const missed = missedLiveUpdatesNote(
+    (droppedEvents ?? 0) + (typeof toolMissed === "number" ? toolMissed : 0),
+  );
   const away = application.state !== "connected" && application.state !== "checking";
   return (
     <Section id="overview-health" title="Health">
@@ -102,16 +109,43 @@ export function HealthStrip({
             ),
           },
           {
-            label: "Dropped events",
-            mono: true,
+            label: "Records lost before history",
             value: (
-              <span className={dropped > 0 ? "text-warning tabular-nums" : "tabular-nums"}>
-                {dropped.toLocaleString("en-US")}
+              <span
+                data-testid="records-lost"
+                className="flex min-w-0 flex-col"
+                title={lostSentence ?? "No records were lost before history."}
+              >
+                <span
+                  className={
+                    lost !== undefined && lost.total > 0
+                      ? "font-mono text-warning tabular-nums"
+                      : "font-mono tabular-nums"
+                  }
+                >
+                  {lost === undefined ? "—" : lost.total.toLocaleString("en-US")}
+                </span>
+                {lost !== undefined && lost.total > 0 ? (
+                  <span className="text-[11px] text-muted-foreground">
+                    {lost.byApplicationProducer.toLocaleString("en-US")} by the application ·{" "}
+                    {lost.byInspectionBuffer.toLocaleString("en-US")} by its buffer
+                  </span>
+                ) : null}
               </span>
             ),
           },
         ]}
       />
+      {lostSentence === undefined && missed === undefined ? null : (
+        <div className="mt-3 space-y-0.5 text-xs text-muted-foreground">
+          {lostSentence === undefined ? null : <p className="m-0">{lostSentence}</p>}
+          {missed === undefined ? null : (
+            <p className="m-0" data-testid="missed-live-updates">
+              {missed}
+            </p>
+          )}
+        </div>
+      )}
     </Section>
   );
 }

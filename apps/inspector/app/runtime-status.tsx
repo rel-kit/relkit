@@ -5,6 +5,7 @@ import { FailedState, LoadingRows } from "../components/blocks/block-state";
 import { EmptyState } from "../components/neon/empty-state";
 import { StatusBadge, statusTone } from "../components/neon/status-badge";
 import type { InspectorObject } from "../lib/api-types";
+import { exportCounters } from "../lib/overview-export";
 import { useRuntimeMetadata } from "../lib/use-runtime-metadata";
 import { LiveHistoryStatus } from "./history-status";
 import { HeadedSection } from "./overview/headed-section";
@@ -36,7 +37,7 @@ function RuntimeMetadata({ telemetryOnly }: { readonly telemetryOnly: boolean })
     return (
       <FailedState
         title="Runtime metadata is unavailable."
-        description="Local service and exporter status return when the backend reconnects."
+        description="Local services and exporters are read from the running application; they return when it connects."
       />
     );
   const local = record(state.value.localServices);
@@ -108,9 +109,8 @@ function LocalServices({ value }: { readonly value?: InspectorObject | undefined
 
 function Telemetry({ value }: { readonly value?: InspectorObject | undefined }) {
   const sampling = record(value?.sampling);
-  const counters = record(value?.counters);
   const exporters = records(value?.exporters);
-  const failures = count(counters?.exportFailures);
+  const counters = exportCounters(value);
   return (
     <HeadedSection
       aria-labelledby="telemetry-export-heading"
@@ -123,22 +123,24 @@ function Telemetry({ value }: { readonly value?: InspectorObject | undefined }) 
         </span>
       }
     >
-      <p className="m-0 border-b border-border/60 px-4 py-2 text-xs text-muted-foreground">
-        Local capture is bounded. External traces sample at{" "}
-        <span className="font-mono text-foreground">{percent(sampling?.traceRate)}</span>; logs
-        start at{" "}
-        <span className="font-mono text-foreground">{text(sampling?.minimumLogLevel, "info")}</span>
-        ; errors and diagnostics are always selected.
-      </p>
-      <ul className="m-0 list-none border-b border-border/60 p-0 py-1">
-        <Metric label="Accepted by app capture" value={count(counters?.persisted)} />
-        <Metric label="Sampled out" value={count(counters?.sampledOut)} />
-        <Metric
-          label="Export failures"
-          value={failures}
-          tone={failures === "0" ? undefined : "danger"}
-        />
-      </ul>
+      {counters.length === 0 ? null : (
+        <>
+          <p className="m-0 border-b border-border/60 px-4 py-2 text-xs text-muted-foreground">
+            Local capture is bounded. External traces sample at{" "}
+            <span className="font-mono text-foreground">{percent(sampling?.traceRate)}</span>; logs
+            start at{" "}
+            <span className="font-mono text-foreground">
+              {text(sampling?.minimumLogLevel, "info")}
+            </span>
+            ; errors and diagnostics are always selected.
+          </p>
+          <ul className="m-0 list-none border-b border-border/60 p-0 py-1">
+            {counters.map((item) => (
+              <Metric key={item.label} label={item.label} value={item.value} tone={item.tone} />
+            ))}
+          </ul>
+        </>
+      )}
       {exporters.length === 0 ? (
         <EmptyState
           variant="bare"
@@ -159,7 +161,7 @@ function Telemetry({ value }: { readonly value?: InspectorObject | undefined }) 
                 </code>
                 <span className="truncate font-mono text-[11px] text-muted-foreground tabular-nums">
                   {text(item.integrationId, "integration unavailable")} · exported{" "}
-                  {count(item.exported)} · dropped {count(item.droppedRecords)}
+                  {count(item.exported)} · not exported {count(item.droppedRecords)}
                 </span>
               </span>
               <StatusBadge
