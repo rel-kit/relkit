@@ -14,9 +14,9 @@
 
 ## 2. Report and triage
 
-- [ ] 2.1 Trace every failure to its cause in source and classify it (RelKit, Inspector, application, documentation, by design); verify a sample of each class by re-running it.
+- [x] 2.1 Trace every failure to its cause in source and classify it (RelKit, Inspector, application, documentation, by design); verify a sample of each class by re-running it.
 - [x] 2.2 Write `evidence/baseline-report.md` with the RelKit list and the Inspector list, each finding with id, environment, reproduction, expected and actual result, cause and severity; verify it contains no machine paths.
-- [ ] 2.3 Add one task group per file-ownership area and one spec delta per affected capability, update the proposal's change list; verify `openspec validate fix-logistics-audit-findings --strict` passes.
+- [x] 2.3 Add one task group per file-ownership area and one spec delta per affected capability, update the proposal's change list; verify `openspec validate fix-logistics-audit-findings --strict` passes.
 
 ## 3. Connection safety and body limits
 
@@ -41,10 +41,10 @@
 
 ## 5. Failure and request mapping
 
-**Findings:** RK-04, RK-08, RK-10, RK-11, RK-22, RK-23, RK-24 (body), RK-27, and the recording that IN-03, IN-05, IN-06 need. **Owns:** `packages/relkit/src/runtime-hono/{response-mapping,response-mapping-encode,response-mapping-provider,response-mapping-utils,request-inference,request-mapping,request-mapping-fields,request-mapping-object,request-mapping-body,request-mapping-body.schemas,materialize-routes-utils,transport-security}.ts`, `packages/relkit/src/engine/access.ts`, `packages/relkit/src/contracts/problem-details.ts`.
+**Findings:** RK-04, RK-08, RK-10, RK-11, RK-22, RK-23, RK-24 (body), RK-27, and the recording that IN-03, IN-05, IN-06 need. **Owns:** `packages/relkit/src/runtime-hono/{response-mapping,response-mapping-encode,response-mapping-provider,response-mapping-utils,request-inference,request-mapping,request-mapping-fields,request-mapping-object,request-mapping-body,request-mapping-body.schemas,materialize-routes-utils,transport-security}.ts`, `packages/relkit/src/engine/{access,invocation-execution}.ts`, `packages/relkit/src/contracts/problem-details.ts`.
 
-- [ ] 5.1 RK-04: change the test that expects the cause in the development response (`packages/relkit/tests/runtime-hono/response-mapping.test.ts:221`) to expect a generic detail in every mode; write the redacted cause once to the error log and to the request's span with request ID and trace ID (`response-mapping-encode.ts:76-81`, `response-mapping-provider.ts:14-18`); verify a driver error with a query in its message leaks nothing in the body and appears in the log.
-- [ ] 5.2 IN-05, IN-06: record on the request's span the declared error code of an application failure and, for a validation failure, each issue's code and path (never values); verify with a telemetry test that a 409 and a 422 carry them.
+- [ ] 5.1 RK-04, IN-03: change the test that expects the cause in the development response (`packages/relkit/tests/runtime-hono/response-mapping.test.ts:221`) to expect a generic detail in every mode; write the redacted cause once to the error log and as an `exception` event on the invocation span, with request ID and trace ID (`response-mapping-encode.ts:76-81`, `response-mapping-provider.ts:14-18`, `engine/invocation-execution.ts:139-145`); verify a driver error with a query in its message leaks nothing in the body and appears in the log.
+- [ ] 5.2 IN-05, IN-06: record on the invocation span the declared error identifier of an application failure, and on the `http.validation.failed` event each issue's code and path, never values (`materialize-routes-utils.ts:93-95`); verify with a telemetry test that a 409 and a 422 carry them.
 - [ ] 5.3 RK-08: reject a caller without a session, or failing a rule that does not read input, before input validation (`materialize-routes-utils.ts:85-95`, `engine/access.ts`); verify 401 and 403 name no field, and that rules reading input still run after validation (`packages/relkit/tests/runtime-hono/access.test.ts`).
 - [ ] 5.4 RK-10: coerce strings only for path, query, header and cookie values (`request-inference.ts:18-23,67-73`); verify `"3500"` in a JSON body fails an integer field while `?limit=50` still works (`request-materialization.test.ts`).
 - [ ] 5.5 RK-11: reject a JSON body that is not an object with a new issue code `body-not-object` when the route maps body fields (`request-mapping-fields.ts:19`, `request-mapping-object.ts:70-75`); verify `null`, an array and a string on `POST` and `PATCH` (`request-mapping.test.ts`).
@@ -85,12 +85,13 @@
 
 ## 10. Check diagnostics, provider locations and doctor
 
-**Findings:** RK-14, RK-15, RK-17, RK-32. **Starts after group 8 is merged.** **Owns:** `packages/cli/src/commands/{check,check-support,check-dependencies,check-route-modules,check-result,doctor-*}.ts`, `packages/cli/src/commands/doctor-project.service.ts`, `packages/cli/src/compiler/discovery/evaluator-child-framing.ts`, `packages/cli/src/compiler/normalize-{provider-validation,pass-support}.ts`, `packages/relkit/src/diagnostics/codes/compiler.ts`, the graph entry of `packages/relkit/src/diagnostics/codes/cli.ts`.
+**Findings:** RK-14, RK-15, RK-17, RK-32, IN-33. **Starts after group 8 is merged.** **Owns:** `packages/cli/src/commands/{check,check-support,check-dependencies,check-route-modules,check-result,doctor-*}.ts`, `packages/cli/src/commands/doctor-project.service.ts`, `packages/cli/src/compiler/discovery/evaluator-child-framing.ts`, `packages/cli/src/compiler/normalize-{provider-validation,pass-support,graph-app,graph-providers}.ts`, `packages/relkit/src/diagnostics/codes/compiler.ts`, the graph entry of `packages/relkit/src/diagnostics/codes/cli.ts`.
 
 - [ ] 10.1 RK-14: report a Bun-only import evaluated on Node with a new code at the import line, naming the runtime and the alternatives, from the import preflight (`check-dependencies.ts:34-79`); verify with a fixture importing `bun:sqlite` and one importing `drizzle-orm/bun-sql`.
 - [ ] 10.2 RK-15: skip the type check when evaluation failed, and make `relkit graph` say that the last check failed when diagnostics hold errors (`check.ts:43-58`); verify one error for one failing import.
 - [ ] 10.3 RK-32: point provider binding diagnostics at the binding's entry and name a valid replacement (`normalize-provider-validation.ts:88-108`, `normalize-pass-support.ts:121-136`); verify the line for a local-only bucket.
-- [ ] 10.4 RK-17: add doctor checks for imports the current runtime cannot load, environment files the current runtime will not read, and manifest fields the package manager ignores; verify on a Node project with a Bun-only service.
+- [ ] 10.4 IN-33: give environment variable and provider binding nodes the location of their own declaration instead of the `defineApp` call (`normalize-graph-app.ts:122-125`, `normalize-graph-providers.ts:36-39`); verify the graph of a fixture with an env module and a bucket binding.
+- [ ] 10.5 RK-17: add doctor checks for imports the current runtime cannot load, environment files the current runtime will not read, and manifest fields the package manager ignores; verify on a Node project with a Bun-only service.
 
 ## 11. Command line messages and help
 
@@ -103,6 +104,91 @@
 
 ## 12. Reload after a compile failure
 
-**Findings:** RK-18. **Starts after group 4 is merged.** **Owns:** `packages/cli/src/supervisor/**` except `proxy-*.ts`, `packages/cli/src/commands/dev-{engine,activation,command}*.ts`.
+**Findings:** RK-18, IN-28 (events). **Starts after group 4 is merged.** **Owns:** `packages/cli/src/supervisor/**` except `proxy-*.ts`, `packages/cli/src/commands/dev-{engine,activation,command}*.ts`.
 
 - [ ] 12.1 RK-18: reproduce with a test that saves a syntax error and then a fix two seconds later; report the parse failure with file and line when the candidate fails instead of waiting for the health timeout; start the rebuild for the later change as soon as it arrives; verify the failure is reported and the fix is serving within the reload budget.
+- [ ] 12.2 IN-28: add a session identifier and a reason (`start` or `reload`) to the generation events (`dev-activation.ts:129-137`); verify a restart and a reload produce distinguishable events.
+
+## 13. Inspector launcher and session state
+
+**Findings:** IN-46, IN-47, IN-48, and the tool side of IN-09, IN-17. **Owns:** `packages/inspector/src/{ui-native.service,tool-main,tool-loop,tool.service,live-events,tool-backend,capture-loss,collector}.ts`, new `packages/inspector/src/node-executable.ts`, `packages/inspector/src/observability-local/local/worker-client-effect.ts`, `scripts/portability-baseline.json`, `tests/unit/package-engines.test.ts`, `packages/inspector/tests/**`.
+
+- [ ] 13.1 IN-46, IN-47: resolve a real Node executable (the running one on Node; on Bun, the first `node` on `PATH` that is not Bun's alias) and start the interface and the history worker with it through the runtime adapter's `processes.spawn` (`ui-native.service.ts:42`, `worker-client-effect.ts:38-39`); fail with a coded message naming Node when none is found; verify the Inspector reaches "listening" and serves a page when launched with Node, with `bun run`, and with `bun --bun run`.
+- [ ] 13.2 IN-46: remove the allow-list entry for the launcher (`scripts/portability-baseline.json`) and make the engines test fail when a package that declares Node keeps Bun call sites on the allow-list without a stated reason; verify the test fails on the old baseline and passes on the new one.
+- [ ] 13.3 IN-48, IN-09: log once when no development session is found and on every connect and disconnect, and always publish the current selection to a new stream subscriber (`tool-loop.ts:74-100`, `live-events.ts:21-42`); verify with `packages/inspector/tests/tool-recovery.test.ts`.
+- [ ] 13.4 IN-17: report records lost before history and missed live updates as separate named fields from the tool backend; verify the fields against a forced overflow.
+
+## 14. Inspection API and host wiring
+
+**Findings:** IN-02, IN-07, IN-11, IN-12, IN-13, IN-29 (edges), IN-32, IN-34. **Starts after group 4 is merged.** **Owns:** `packages/relkit/src/inspector-api/{graph-utils,graph,actions-utils,actions.types,actions-dispatch,actions-dispatch-start,actions,shared,events-query}.ts`, `packages/cli/src/commands/{build-server-http-inspector,build-server-inspector-runtime,build-server-invocation,build-server-runtime-support}.ts`, `packages/relkit/src/providers-local/events/admin*.ts`.
+
+- [ ] 14.1 IN-07: pass channel `params`, `replay` and `presence` through the graph projection (`inspector-api/graph-utils.ts:6-18`); verify the channel node of a fixture with parameters and a replay window.
+- [ ] 14.2 IN-02: keep the application's status and safe code in a rejected action's body instead of collapsing them (`actions-utils.ts:207-224`); verify an invoke that the application answers with 401.
+- [ ] 14.3 IN-34: return the number of matching items with every graph and runtime page (`inspector-api/shared.ts:96-102`, `events-query.ts:74`); verify a collection larger than one page.
+- [ ] 14.4 IN-11: forward the originating request and span links through the generated invoke (`build-server-invocation.ts:19-46`); verify with `tests/inspector/generated-runtime-wiring.test.ts` that an event reaction is a continuation of its request.
+- [ ] 14.5 IN-12, IN-13: provide event publish and replay in the generated development server through the application's own event client and the local event log, validating the payload against the event schema; where replay cannot be provided for a provider, report it as unsupported for that provider instead of unavailable; verify publish and replay end to end against the local provider.
+- [ ] 14.6 IN-29, IN-32: report observed dynamic calls of the active generation and each resource's runtime state from the generated server (`build-server-http-inspector.ts:17-49`, `build-server-runtime-support.ts:15-20`); verify a function that writes to a bucket and publishes an event shows both edges.
+
+## 15. Telemetry truth
+
+**Findings:** IN-16 (count), IN-18, IN-19, IN-20, IN-21, IN-22, IN-24, IN-29 (logs). **Starts after groups 3, 4 and 5 are merged.** **Owns:** `packages/relkit/src/runtime-hono/{http-response,request-record-middleware,request-record-utils}.ts`, `packages/relkit/src/providers-local/events/{provider,delivery-utils,delivery-inspection}.ts`, `packages/relkit/src/providers-local/jobs/queue.ts`, `packages/relkit/src/observability/{runtime-pipeline,remote-runtime-core,query.types,query-validation-core,query-page-effect}.ts`, `packages/relkit/src/runtime-effect/logger-record.ts`, `packages/inspector/src/observability-local/local/duckdb-query-*.ts`; after the merges also `runtime-hono/better-auth-mount.ts` and the system endpoint registrations for 15.4.
+
+- [ ] 15.1 IN-24: record the status that was sent when a client ends a streamed response, keeping `cancelled` as the outcome (`http-response.ts:45,55-56,195-204`, `request-record-middleware.ts:58-59,92`); verify a subscription the client closes is recorded as 200.
+- [ ] 15.2 IN-19: stop recording success logs for provider polling and inspection, and read the queue once per inspection query instead of once per stored record (`contracts/operation-observer.ts:29-32` default stays; `providers-local/events/provider.ts:109-127,176-179`, `delivery-utils.ts:116-125`); find what calls the event query while the application is idle and remove or throttle it; verify an idle minute records no such log and the query makes a bounded number of operations.
+- [ ] 15.3 IN-18: do not start the export queue when no exporter is configured, and count export failures by reason (`observability/runtime-pipeline.ts:16-21`, `remote-runtime-core.ts:90-98`); verify the counter stays at zero without exporters.
+- [ ] 15.4 IN-20: record requests handled by the authentication mount, health endpoints and RPC with stable route identifiers and list them as system routes; emit a graph edge from functions with an access rule to the authentication service; verify the harness's authentication requests are attributed and the auth domain lists its users.
+- [ ] 15.5 IN-21, IN-22, IN-16: add status, method, path and declared error identifier filters, text search and a match count to history queries, in the query contract and the DuckDB store; verify each filter and the count against a seeded history.
+- [ ] 15.6 IN-29: carry the function identifier on logs written inside an invocation (`runtime-effect/logger-record.ts:75`); verify provider operation logs of a request are found by function.
+
+## 16. Inspector pages: requests and request detail
+
+**Findings:** IN-01, IN-03, IN-04, IN-05, IN-06, IN-21, IN-23, IN-35, IN-36, IN-37. **Starts after groups 5 and 15 are merged.** **Owns:** `apps/inspector/lib/{observability-model,signal-defaults,graph-index,format,trace-*}.ts`, `apps/inspector/app/{signals-client,signals-filters,command-palette,signal-rows}.tsx`, `apps/inspector/app/signal-detail-*.tsx`.
+
+- [ ] 16.1 IN-01, IN-21: request the list newest first, add status, method, path and text filters, and keep filters and page in the URL (`lib/observability-model.ts:56-68`, `app/signals-client.tsx`); verify with `observability-model.test.ts` and `tests/e2e/inspector-requests.spec.ts` that page 1 holds the newest request and a filtered URL reloads to the same view.
+- [ ] 16.2 IN-03, IN-05, IN-06: show on a failed request the declared error with a link to its contract, the validation issue codes and paths, and the recorded cause of an internal failure; verify each against a fixture record.
+- [ ] 16.3 IN-04: replace the headers and bodies panel with the invocation's captured input and result, and state that HTTP headers and bodies are not recorded (`app/signal-detail-sections.tsx:44-57`); verify with `tests/e2e/inspector-payload.spec.ts`.
+- [ ] 16.4 IN-23, IN-35, IN-36: count unique spans, use one time formatter that shows the zone, and one request-label helper for live and loaded rows; verify with `lib/trace-view.test.ts`.
+- [ ] 16.5 IN-37: focus the command palette's input when it opens and resolve request and trace identifiers; verify by keyboard in the browser.
+
+## 17. Inspector pages: actions and resources
+
+**Findings:** IN-02, IN-08, IN-12, IN-13, IN-14, IN-15, IN-22, IN-25, IN-26, IN-27, IN-31, IN-32, IN-34, IN-38, IN-39, IN-40. **Starts after group 14 is merged.** **Owns:** `apps/inspector/app/{functions,events,channels,routes,jobs,errors}/**`, `apps/inspector/app/{resource-*,provider-list,schema-form,environment-client}.tsx`, `apps/inspector/lib/{inspector-actions,events-model,schema-model,resources-model,api-transport,api-request-utils,api-validation}.ts`.
+
+- [ ] 17.1 IN-02, IN-08, IN-26: show the application's answer and say that Inspector actions run without a user session when it refused; prefill channel parameters from the declared schema; make the route composer's status line reflect the response status; verify invoke, connect and send against a protected fixture.
+- [ ] 17.2 IN-12, IN-13: validate the payload against the event schema, ask for confirmation before publish and replay, and show the outcome beside the control in plain language; verify with `lib/inspector-actions.test.ts` and in the browser.
+- [ ] 17.3 IN-14, IN-15, IN-34: show totals from the API ("20 of 23", "100 of n") and give delivery and publication rows their time, payload preview and trace link; verify on an event with more deliveries than one page.
+- [ ] 17.4 IN-27, IN-38: read the response status before the protocol envelope so a 404 means "none declared" (`lib/api-transport.ts:72-86`), and give jobs, middlewares, agents and tools empty states that distinguish "none declared" from "no match"; verify with `lib/api.test.ts` and an application without jobs.
+- [ ] 17.5 IN-22: show occurrences per declared error and the internal failures on the Errors page; verify against a seeded history.
+- [ ] 17.6 IN-25, IN-31, IN-32, IN-39, IN-40: show object content type and modified time and flag a type that contradicts the key; give the PDF preview a fallback with metadata; word provider provenance as provenance and show reported runtime state; label fields from the input schema; fix the overflow of the environment page at 900 px; verify each in the page walk.
+
+## 18. Inspector pages: shell, overview and streams
+
+**Findings:** IN-09, IN-10, IN-16, IN-17, IN-18, IN-28, IN-41, IN-42, IN-43, IN-45, IN-48. **Starts after groups 12, 13 and 15 are merged.** **Owns:** `apps/inspector/app/{layout,not-found,inspector-shell,overview-shell,runtime-status}.tsx`, `apps/inspector/app/overview/**`, `apps/inspector/app/graph/**`, `apps/inspector/lib/{stream*,client,use-graph,use-development-failure,development-failure,use-signal-page,overview-model}.ts`.
+
+- [ ] 18.1 IN-09, IN-10, IN-48: track the application session state separately from the Inspector stream, show an "application unreachable" banner on every page, and a "waiting for a development session" state with how to start one; verify by stopping and starting a development server while pages are open.
+- [ ] 18.2 IN-43: use one event stream per tab and replace the three-second log poll with the generation event; verify three tabs stay connected and the idle request rate.
+- [ ] 18.3 IN-16, IN-17, IN-18, IN-28: label sampled tiles as sampled or use the match count; show lost records and missed live updates as separate named numbers; hide export failures when no exporter is configured; label generation history entries as session start or reload; verify against the baseline run's numbers.
+- [ ] 18.4 IN-41, IN-42, IN-45: follow the system colour scheme until the user chooses one; add a not-found page without a hydration error; make graph cards legible at the default fit, theme the zoom control and give a bucket its node; verify in the page walk in both themes.
+
+## 19. Node acceptance coverage
+
+**Starts after groups 8, 9 and 13 are merged.** **Owns:** `scripts/node-creation-smoke*.ts`, the Node acceptance job in `.github/workflows/checks.yml`.
+
+- [ ] 19.1 Extend the Node creation acceptance run (npm, no Bun) to add a database, migrate it from `.env`, run `check`, add and start the Inspector until it listens, and run `start` without a build expecting the coded diagnostic; verify the run locally from packed archives.
+
+## 20. The audited application
+
+**Starts after group 9 is merged.** In the application's repository, branch `audit-fixes`.
+
+- [ ] 20.1 Declare `@relkit/client`, commit the request harness and the Inspector walk under `scripts/audit/`, and correct the README (runner per script, npm, the two inexact sentences); verify `typecheck` and the unit suite.
+- [ ] 20.2 Move the database service to the runtime-selecting client so the application runs on Node; verify `npm run check`, `npm run dev` and `npm run db:migrate` against the packed candidates.
+
+## 21. Re-audit and integration
+
+- [ ] 21.1 Merge every group, resolve seams, and run once on the merged branch with nothing else running: the full `packages/relkit` suite, `test:packages`, `test:inspector`, the Inspector end-to-end suite, `typecheck`, `check`, `lint`, `konsistent`, then `prepush`; verify all pass.
+- [ ] 21.2 Pack candidates from the merged branch and install them through the fixture registry with isolated caches into fresh npm and Bun worktrees of the application; verify the installed files come from the candidates.
+- [ ] 21.3 Re-run the request harness and the command surface in both environments, including `npm run dev` on Node; verify every baseline failure passes or is recorded as by design with its diagnostic, and no row regressed.
+- [ ] 21.4 Re-run the Inspector page walk and the interactive checks; verify each `IN` finding with a before and after capture.
+- [ ] 21.5 Have the full diff reviewed without the lead's notes, and run exploratory requests outside the harness matrix; verify every confirmed finding is fixed or recorded.
+- [ ] 21.6 Write `evidence/final-report.md` with the state of every finding per environment, the deferred items and their reasons; verify `openspec validate fix-logistics-audit-findings --strict`.
+

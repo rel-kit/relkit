@@ -63,6 +63,10 @@ The cause is removed from 500 bodies in every mode and recorded, redacted, in th
 
 Invoke, channel connect and "send request" run without a session. This change makes them say so and show the application's real answer. Choosing an identity is a new capability and is recorded as a follow-up.
 
+### D12. Three Inspector findings are deferred as new capabilities
+
+Recording HTTP headers and bodies (IN-04, beyond the invocation's captured input and result), the caller on each request record (IN-30), and choosing a user for Inspector actions (IN-02, IN-08, IN-26, beyond saying why they were refused) each add data collection with redaction and privacy rules of their own. They are recorded as follow-ups; this change makes the interface truthful about their absence. Control-plane requests are not recorded by design (IN-44).
+
 ## Risks / Trade-offs
 
 - The application's database layer is Bun-only, so some Node failures belong to the application. Triage separates them; the Node path of RelKit is still exercised up to the point where application code fails.
