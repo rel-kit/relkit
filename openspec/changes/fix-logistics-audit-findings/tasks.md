@@ -122,7 +122,7 @@
 - [x] 13.1 IN-46, IN-47: resolve a real Node executable (the running one on Node; on Bun, the first `node` on `PATH` that is not Bun's alias) and start the interface and the history worker with it through the runtime adapter's `processes.spawn` (`ui-native.service.ts:42`, `worker-client-effect.ts:38-39`); fail with a coded message naming Node when none is found; verify the Inspector reaches "listening" and serves a page when launched with Node, with `bun run`, and with `bun --bun run`.
 - [x] 13.2 IN-46: remove the allow-list entry for the launcher (`scripts/portability-baseline.json`) and make the engines test fail when a package that declares Node keeps Bun call sites on the allow-list without a stated reason; verify the test fails on the old baseline and passes on the new one.
 - [x] 13.3 IN-48, IN-09: log once when no development session is found and on every connect and disconnect, and always publish the current selection to a new stream subscriber (`tool-loop.ts:74-100`, `live-events.ts:21-42`); verify with `packages/inspector/tests/tool-recovery.test.ts`.
-- [ ] 13.4 IN-17: report records lost before history and missed live updates as separate named fields from the tool backend; verify the fields against a forced overflow.
+- [x] 13.4 IN-17: report records lost before history and missed live updates as separate named fields from the tool backend; verify the fields against a forced overflow.
 
 ## 14. Inspection API and host wiring
 

@@ -97,7 +97,7 @@ const serveBackend = Effect.fn("Inspector.backend")(function* (
     current.history.projectId !== current.selection.connection.descriptor.projectId
   )
     return backendError("history.foreign-project", 503);
-  const status = backendStatus(current, url.pathname);
+  const status = backendStatus(current, url.pathname, stream);
   if (status) return status;
   const history = /^\/_relkit\/v1\/(logs|requests|traces)(?:\/([^/]+))?$/.exec(url.pathname);
   if (history && request.method === "GET") return yield* historyResponse(current, request, history);
@@ -135,7 +135,11 @@ const localStreamResponse = Effect.fn("Inspector.streamResponse")(
 );
 
 /** Projects history readiness without leaking private connection descriptors or credentials. */
-function backendStatus(current: InspectorToolState, path: string): Response | undefined {
+function backendStatus(
+  current: InspectorToolState,
+  path: string,
+  stream: ObservabilityStream,
+): Response | undefined {
   if (path === "/_relkit/v1/storage")
     return Response.json(
       {
@@ -146,8 +150,18 @@ function backendStatus(current: InspectorToolState, path: string): Response | un
         application: applicationStatus(current),
         error: current.error,
         incomplete: current.incomplete,
+        recordsLostBeforeHistory: {
+          // Records the application's producer could not hand to its inspection buffer.
+          byApplicationProducer: current.producerDropped ?? 0,
+          // Records the application's inspection buffer evicted before the Inspector stored them.
+          byInspectionBuffer: current.droppedRecords,
+        },
+        // Invalidations the tool's stream dropped for a slow interface; no record is lost.
+        missedLiveUpdates: stream.counters().subscriberDropped,
+        /** @deprecated Same as `recordsLostBeforeHistory.byInspectionBuffer`. */
         dropped: current.droppedRecords,
         producerFailed: current.producerFailed ?? 0,
+        /** @deprecated Same as `recordsLostBeforeHistory.byApplicationProducer`. */
         producerDropped: current.producerDropped ?? 0,
       },
       { headers: { "x-relkit-api-version": "1" } },
