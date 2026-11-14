@@ -4,6 +4,7 @@ import { readFile, stat } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Schema } from "effect";
+import { configLoadMessage } from "./migration-diagnostics.js";
 import { MigrationConfig, MigrationFailure } from "./migration.schemas.js";
 
 /** Rejects non-app roots before evaluating authored migration configuration. */
@@ -24,10 +25,8 @@ export async function loadMigrationConfig(
   try {
     const module: unknown = await import(pathToFileURL(configPath).href);
     value = record(module) ? module.default : undefined;
-  } catch {
-    throw usage(
-      "Could not load Drizzle configuration. Check its required environment and installed dependencies.",
-    );
+  } catch (error) {
+    throw usage(configLoadMessage(error, root));
   }
   const config = Schema.decodeUnknownOption(MigrationConfig)(value);
   if (config._tag === "None")
@@ -113,7 +112,7 @@ export async function consumerModule(
   return value;
 }
 
-/** Creates a controlled configuration diagnostic without carrying authored error contents. */
+/** Creates a controlled configuration diagnostic; authored text in it is sanitized first. */
 export function usage(message: string): MigrationFailure {
   return new MigrationFailure({ code: "RELKIT_DB_CONFIG", exitCode: 2, message });
 }

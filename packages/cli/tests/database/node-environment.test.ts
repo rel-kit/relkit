@@ -35,6 +35,12 @@ test("db migrate on Node reads DATABASE_PATH from .env, and a process value wins
   expect(fromProcess.code).toBe(0);
   expect(existsSync(join(root, "process.sqlite"))).toBe(true);
   expect(existsSync(join(root, "example.sqlite"))).toBe(false);
+  // Without any value, the configuration's own message reaches the user.
+  await write(root, ".env", "");
+  await write(root, ".env.local", "");
+  const unset = await nodeCli(root, ["db", "migrate"], { DATABASE_PATH: undefined });
+  expect(unset.code).toBe(2);
+  expect(unset.stderr).toContain("Set DATABASE_PATH to the persistent SQLite file");
 }, 30_000);
 
 test("env check and env list on Node report variables set in .env as set", async () => {
