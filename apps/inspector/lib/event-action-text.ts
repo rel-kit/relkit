@@ -77,7 +77,8 @@ export function eventActionSuccess(
     receipt.result !== null && typeof receipt.result === "object"
       ? (receipt.result as InspectorObject)
       : {};
-  const id = typeof result.instanceId === "string" ? result.instanceId : undefined;
+  const named = result.instanceId ?? result.publicationId;
+  const id = typeof named === "string" ? named : undefined;
   const version = typeof result.version === "number" ? ` v${result.version}` : "";
   const created = id === undefined ? {} : { publicationId: id };
   switch (kind) {

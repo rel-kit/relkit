@@ -52,7 +52,7 @@ export function ResourceTableBody<Item extends ResourceTableItem>({
         title={`No ${noun} match the active filters.`}
         action={
           <Button variant="secondary" size="sm" onPress={onClear}>
-            Reset filters
+            Show all {noun}
           </Button>
         }
       />

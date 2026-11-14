@@ -63,6 +63,17 @@ describe("what an event action says afterwards", () => {
     expect(eventActionSuccess("cancel", "d-1", {}).text).toBe("Cancelled delivery d-1.");
   });
 
+  test("a provider that names the publication publicationId is read the same way", () => {
+    expect(
+      eventActionSuccess("publish", "orders.created", {
+        result: { publicationId: "event-instance-2" },
+      }),
+    ).toEqual({
+      text: "Published orders.created as publication event-instance-2.",
+      publicationId: "event-instance-2",
+    });
+  });
+
   test("a receipt without a publication id still reports success", () => {
     expect(eventActionSuccess("publish", "orders.created", {}).text).toBe(
       "Published orders.created.",
