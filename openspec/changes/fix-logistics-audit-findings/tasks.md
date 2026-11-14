@@ -100,6 +100,7 @@
 - [ ] 10.4 IN-33: give environment variable and provider binding nodes the location of their own declaration instead of the `defineApp` call (`normalize-graph-app.ts:122-125`, `normalize-graph-providers.ts:36-39`); verify the graph of a fixture with an env module and a bucket binding.
 - [ ] 10.5 RK-17: add doctor checks for imports the current runtime cannot load, environment files the current runtime will not read, and manifest fields the package manager ignores; verify on a Node project with a Bun-only service.
 - [ ] 10.6 RK-06: use the one-shot environment helper (`packages/cli/src/runtime/one-shot-environment.ts`) for the values `start`, `jobs`, `local` and `doctor` read from the environment (`start.service.ts:57`, `jobs-base-url.ts`, `jobs-http.ts`, `local-operations.ts`, `doctor-project.service.ts:123`); verify on Node that `PORT` set only in `.env` is honoured by `relkit start`.
+- [ ] 10.7 IN-20: emit, for every function with an access rule, a `checks-session` edge to the authentication service and a `depends-on-service` edge from the function's service to it (`packages/cli/src/compiler/normalize-graph-*.ts`); verify the graph of a fixture with a protected function and that the Inspector's domain view lists the users of the auth domain.
 
 ## 11. Command line messages and help
 
@@ -140,6 +141,7 @@
 - [ ] 14.6 IN-29, IN-32: report observed dynamic calls of the active generation and each resource's runtime state from the generated server (`build-server-http-inspector.ts:17-49`, `build-server-runtime-support.ts:15-20`); verify a function that writes to a bucket and publishes an event shows both edges.
 - [ ] 14.7 RK-03: take the agent workflow and executions routes off the application port, or put them behind the inspection session token, without closing the development API documentation (`runtime-hono/agent-inspector.ts:30-44` and its callers); verify they answer 404 or 401 without the token.
 - [ ] 14.8 IN-48: stop the Inspector printing an error line every second while no connection directory exists, by treating a missing path as absence before the operation is observed (`packages/relkit/src/inspector-api/connection/files-native.ts:103`); verify an Inspector started without a development session prints the waiting line once and no error.
+- [ ] 14.9 IN-20, IN-21, IN-18: let the new history filters and count reach the stores over HTTP (`inspector-api/observability-utils.ts` `readObservabilityQuery`: `status`, `method`, `path`, `errorId`, `count`), list the system routes in the routes collection (`inspector-api/graph-projection.ts`, `systemRouteNodes` from `relkit/observability`), and pass the new `exportCapacityRejections` counter (`inspector-api/runtime-metadata.ts`); verify each through the inspection API of a generated runtime.
 
 ## 15. Telemetry truth
 
