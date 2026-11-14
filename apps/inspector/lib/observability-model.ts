@@ -89,6 +89,30 @@ export function queryFromFilters(
   };
 }
 
+export interface RequestLabel {
+  readonly method: string;
+  /** What to show first: the raw path, else the route pattern, else the route id; may be empty. */
+  readonly title: string;
+  /** The route id when the title is a path; empty when it would repeat the title. */
+  readonly secondary: string;
+}
+
+/**
+ * The one way a request is named in a list, loaded or pushed live: method and raw path first,
+ * the route id as secondary text. A request without a path falls back to its route id.
+ * "unknown" is not a name.
+ */
+export function requestLabel(item: InspectorObject): RequestLabel {
+  const known = (value: unknown): string => (text(value) === "unknown" ? "" : text(value));
+  const path = text(item.rawPath) || known(item.normalizedRoute);
+  const routeId = known(item.routeId);
+  return {
+    method: text(item.method) || "HTTP",
+    title: path || routeId,
+    secondary: path !== "" && routeId !== path ? routeId : "",
+  };
+}
+
 export function eventRecord(value: unknown): InspectorObject | undefined {
   const event = record(value);
   const payload = event?.data ?? value;

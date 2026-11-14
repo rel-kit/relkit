@@ -39,6 +39,50 @@ export function clockTime(iso: string | undefined): string {
   });
 }
 
+export interface TimestampOptions {
+  /** IANA zone to show; the viewer's own zone when omitted. */
+  readonly timeZone?: string;
+  /** Set to false for a time of day without the date. */
+  readonly date?: boolean;
+}
+
+/**
+ * "2026-11-14 18:00:36.312 CET": the time in the viewer's zone with the zone's abbreviation, to
+ * the millisecond. The one format for an absolute time; pair it with {@link utcTimestamp} as the
+ * tooltip. Unusable input reads as "—".
+ */
+export function formatTimestamp(iso: string | undefined, options: TimestampOptions = {}): string {
+  const at = iso === undefined ? Number.NaN : Date.parse(iso);
+  if (!Number.isFinite(at)) return "—";
+  const date = new Date(at);
+  const zone = options.timeZone === undefined ? {} : { timeZone: options.timeZone };
+  const parts = new Intl.DateTimeFormat("en-US", {
+    ...zone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    fractionalSecondDigits: 3,
+    hourCycle: "h23",
+  }).formatToParts(date);
+  const part = (type: string): string => parts.find((item) => item.type === type)?.value ?? "";
+  // The zone name comes from the viewer's locale, so it reads as they know it ("CET", "EST").
+  const name =
+    new Intl.DateTimeFormat(undefined, { ...zone, timeZoneName: "short" })
+      .formatToParts(date)
+      .find((item) => item.type === "timeZoneName")?.value ?? "";
+  const time = `${part("hour")}:${part("minute")}:${part("second")}.${part("fractionalSecond")}`;
+  const day = `${part("year")}-${part("month")}-${part("day")}`;
+  return [options.date === false ? undefined : day, time, name].filter(Boolean).join(" ");
+}
+
+/** "2026-11-14 17:00:36.312 UTC": the same instant in UTC, for the tooltip of a local time. */
+export function utcTimestamp(iso: string | undefined): string {
+  return formatTimestamp(iso, { timeZone: "UTC" });
+}
+
 /**
  * Width of a duration bar as a share of the slowest visible item, floored so even the fastest
  * item stays visible. Returns 0 when there is nothing to compare.

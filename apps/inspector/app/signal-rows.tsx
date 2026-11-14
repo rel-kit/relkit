@@ -5,7 +5,7 @@ import "./requests/requests.css";
 import type { StatusTone } from "../components/neon/status-badge";
 import type { InspectorObject } from "../lib/api-types";
 import { middleTruncate } from "../lib/format";
-import { signalKey, text, number } from "../lib/observability-model";
+import { requestLabel, signalKey, text, number } from "../lib/observability-model";
 
 /** Retained HTTP requests as Neon QueryHistory rows; each row opens its request detail. */
 export function SignalRows({ items }: { readonly items: readonly InspectorObject[] }) {
@@ -31,12 +31,13 @@ export function SignalRows({ items }: { readonly items: readonly InspectorObject
 /** One retained request as a history row linking to its detail page. */
 export function requestEntry(item: InspectorObject): HistoryEntry {
   const id = text(item.requestId);
-  const method = text(item.method) || "HTTP";
+  const label = requestLabel(item);
+  const method = label.method;
   const status = number(item.status);
   const outcome = text(item.outcome);
   const tone = requestTone(outcome, status, text(item.phase));
   const traceId = text(item.traceId);
-  const owner = known(text(item.routeId)) || known(text(item.functionId));
+  const owner = label.secondary || known(text(item.functionId));
   const at = text(item.completedAt) || text(item.startedAt);
   const durationMs = number(item.durationMs);
   const statusWord = [outcome || (tone === "live" ? "in progress" : "unknown"), status]
@@ -51,7 +52,7 @@ export function requestEntry(item: InspectorObject): HistoryEntry {
         {method}
       </span>
     ),
-    title: bounded(requestPath(item) || "request"),
+    title: bounded(label.title || "request"),
     meta: [
       ...(status === undefined ? [] : [<span key="status">{status}</span>]),
       <span key="id" title={id || undefined}>
@@ -78,11 +79,6 @@ function requestTone(outcome: string, status: number | undefined, phase: string)
   if (outcome !== "") return "danger";
   if (status !== undefined) return status >= 500 ? "danger" : status >= 400 ? "warning" : "success";
   return phase === "completed" ? "neutral" : "live";
-}
-
-/** The path people recognise: the raw path, else the normalized route when it is known. */
-export function requestPath(item: InspectorObject): string {
-  return text(item.rawPath) || known(text(item.normalizedRoute));
 }
 
 function known(value: string): string {

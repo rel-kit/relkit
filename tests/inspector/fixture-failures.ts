@@ -209,26 +209,44 @@ function build(spec: Spec, options: FailureFixtureOptions, cursor: number) {
     },
   ];
   if (hasFunction)
-    records.push({
-      version: 2,
-      signal: "span",
-      spanId: functionSpanId,
-      invocationId: `${spec.id}:invocation`,
-      traceId,
-      requestId: spec.id,
-      name: `relkit.invoke.${options.functionId}`,
-      functionId: options.functionId,
-      parentSpanId: rootSpanId,
-      kind: "internal",
-      revision: 2,
-      status: "completed",
-      startedAt: at,
-      completedAt: at,
-      durationMs: 12,
-      outcome: spec.outcome,
-      ...(spec.capture?.input === undefined ? {} : { inputCapture: spec.capture.input }),
-      ...(spec.capture?.output === undefined ? {} : { outputCapture: spec.capture.output }),
-    });
+    // A span is reported when it starts and again when it ends: two records, one span.
+    records.push(
+      {
+        version: 2,
+        signal: "span",
+        spanId: functionSpanId,
+        invocationId: `${spec.id}:invocation`,
+        traceId,
+        requestId: spec.id,
+        name: `relkit.invoke.${options.functionId}`,
+        functionId: options.functionId,
+        parentSpanId: rootSpanId,
+        kind: "internal",
+        revision: 0,
+        status: "started",
+        startedAt: at,
+      },
+      {
+        version: 2,
+        signal: "span",
+        spanId: functionSpanId,
+        invocationId: `${spec.id}:invocation`,
+        traceId,
+        requestId: spec.id,
+        name: `relkit.invoke.${options.functionId}`,
+        functionId: options.functionId,
+        parentSpanId: rootSpanId,
+        kind: "internal",
+        revision: 2,
+        status: "completed",
+        startedAt: at,
+        completedAt: at,
+        durationMs: 12,
+        outcome: spec.outcome,
+        ...(spec.capture?.input === undefined ? {} : { inputCapture: spec.capture.input }),
+        ...(spec.capture?.output === undefined ? {} : { outputCapture: spec.capture.output }),
+      },
+    );
   const detail = (spec.rootEvents ?? []).find((event) => event.name === "exception")?.attributes;
   const logs =
     detail === undefined

@@ -3,6 +3,7 @@ import {
   matchesQuery,
   mergeLiveItems,
   queryFromFilters,
+  requestLabel,
   traceGroups,
   waterfall,
   EMPTY_SIGNAL_FILTERS,
@@ -51,6 +52,34 @@ describe("inspector observability model", () => {
     expect(mergeLiveItems([first, second], { data: fresh })).toEqual([fresh, first, second]);
     const done = { signal: "request", requestId: "b", phase: "completed" };
     expect(mergeLiveItems([first, second], { data: done })).toEqual([first, done]);
+  });
+
+  test("labels a request by method and raw path, with the route id as the secondary text", () => {
+    expect(
+      requestLabel({
+        method: "GET",
+        rawPath: "/hello",
+        normalizedRoute: "/hello",
+        routeId: "route.get.hello",
+      }),
+    ).toEqual({ method: "GET", title: "/hello", secondary: "route.get.hello" });
+    // The raw path wins over the pattern: it is what the caller asked for.
+    expect(
+      requestLabel({ method: "GET", rawPath: "/orders/42", normalizedRoute: "/orders/:id" }).title,
+    ).toBe("/orders/42");
+  });
+
+  test("a request without a path is labelled by its route id, once", () => {
+    expect(requestLabel({ method: "POST", routeId: "relkit.auth" })).toEqual({
+      method: "POST",
+      title: "relkit.auth",
+      secondary: "",
+    });
+    expect(requestLabel({ routeId: "unknown", normalizedRoute: "unknown" })).toEqual({
+      method: "HTTP",
+      title: "",
+      secondary: "",
+    });
   });
 
   test("keeps a live request out of a filtered list when it does not match", () => {

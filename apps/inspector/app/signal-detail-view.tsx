@@ -2,9 +2,10 @@ import type { ReactNode } from "react";
 import { StatusBadge, statusTone } from "../components/neon/status-badge";
 import { Badge } from "../components/ui/badge";
 import type { InspectorObject } from "../lib/api-types";
-import { formatDuration, middleTruncate, relativeTime } from "../lib/format";
-import { text, number, type SignalKind } from "../lib/observability-model";
+import { formatDuration, middleTruncate, relativeTime, utcTimestamp } from "../lib/format";
+import { text, number, requestLabel, type SignalKind } from "../lib/observability-model";
 import { requestFailure } from "../lib/request-failure";
+import { uniqueSpanCount } from "../lib/trace-lifecycle";
 import { DetailLayout } from "./detail-layout";
 import {
   ContinuationsPanel,
@@ -17,7 +18,6 @@ import { RequestExchangePanel } from "./signal-detail-exchange";
 import { FailurePanel } from "./signal-detail-failure";
 import { IdentityPanel } from "./signal-detail-identity";
 import { RuntimeStatus } from "./runtime-status";
-import { requestPath } from "./signal-rows";
 
 interface SignalDetailViewProps {
   readonly kind: SignalKind;
@@ -43,7 +43,7 @@ export function SignalDetailView(props: SignalDetailViewProps) {
   const traceId = text(request?.traceId) || text(trace?.traceId);
   const title = isRequest ? "Request detail" : "Trace detail";
   const method = text(identity.method);
-  const route = requestPath(identity);
+  const route = requestLabel(identity).title;
   const name = route || text(trace?.name) || text(props.spans[0]?.name);
   const outcome = text(identity.outcome);
   const status = number(identity.status);
@@ -78,7 +78,7 @@ export function SignalDetailView(props: SignalDetailViewProps) {
             <span title={props.id}>{middleTruncate(props.id, 40)}</span>
             {durationMs !== undefined ? <span>{formatDuration(durationMs)}</span> : null}
             {startedAt ? (
-              <time dateTime={startedAt} title={startedAt}>
+              <time dateTime={startedAt} title={utcTimestamp(startedAt)}>
                 {relativeTime(startedAt)}
               </time>
             ) : null}
@@ -111,7 +111,7 @@ export function SignalDetailView(props: SignalDetailViewProps) {
           id={props.id}
           value={identity}
           traceId={isRequest ? traceId : ""}
-          spanCount={props.spans.length}
+          spanCount={uniqueSpanCount(props.spans)}
           errorId={
             isRequest ? requestFailure(identity, props.spans, props.logs).errorId : undefined
           }

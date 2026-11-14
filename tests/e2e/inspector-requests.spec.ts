@@ -276,6 +276,38 @@ test("outside development only the error type is recorded, and the page says so"
   await expect(page.getByText("No cause was recorded for this request.")).toBeVisible();
 });
 
+test("the record and the timeline agree on the span count and show times with a zone", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${backend}/__fixture__/failures`);
+  await page.goto(`/requests/${FAILURE_FIXTURE_IDS.captured}`);
+  const record = page.getByRole("region", { name: "Request record" });
+  // Three records (the root span, and the function span reported at start and at end) are two spans.
+  await expect(record.getByText("Spans", { exact: true })).toBeVisible();
+  await expect(record.locator("dt:has-text('Spans') + dd")).toHaveText("2");
+  await expect(page.getByText("2 spans", { exact: true })).toBeVisible();
+
+  const started = record.locator("time").first();
+  await expect(started).toHaveText(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \S+$/);
+  await expect(started).toHaveAttribute(
+    "title",
+    /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} UTC$/,
+  );
+});
+
+test("system routes show their path with the route id beside it, never unknown", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${backend}/__fixture__/failures`);
+  await page.goto("/requests?path=%2Fapi%2Fauth");
+  const row = rows(page).first();
+  await expect(row).toContainText("/api/auth/sign-in");
+  await expect(row).toContainText("relkit.auth");
+  await expect(row).not.toContainText("unknown");
+});
+
 test("pinpoints failed, timed out, cancelled, and incomplete requests", async ({
   page,
   request,

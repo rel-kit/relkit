@@ -1,7 +1,9 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { Section } from "../components/blocks/section";
 import { DetailList, type DetailItem } from "../components/blocks/details";
 import type { InspectorObject } from "../lib/api-types";
+import { formatTimestamp, utcTimestamp } from "../lib/format";
 import { text, number, type SignalKind } from "../lib/observability-model";
 
 /** The record panel beside a request or trace: identifiers, outcome, status, times and counts. */
@@ -86,8 +88,8 @@ export function IdentityPanel({
       value: number(value.status) === undefined ? "Unavailable" : String(value.status),
       mono: true,
     },
-    { label: "Started", value: text(value.startedAt) || "Unavailable", mono: true },
-    { label: "Completed", value: text(value.completedAt) || "In progress", mono: true },
+    { label: "Started", value: moment(text(value.startedAt), "Unavailable"), mono: true },
+    { label: "Completed", value: moment(text(value.completedAt), "In progress"), mono: true },
     {
       label: "Duration",
       value: number(value.durationMs) === undefined ? "Unavailable" : `${value.durationMs} ms`,
@@ -114,6 +116,17 @@ export function IdentityPanel({
         </p>
       )}
     </Section>
+  );
+}
+
+/** A time in the viewer's zone with its abbreviation; the title gives the same instant in UTC. */
+function moment(iso: string, missing: string): ReactNode {
+  return iso === "" ? (
+    missing
+  ) : (
+    <time dateTime={iso} title={utcTimestamp(iso)}>
+      {formatTimestamp(iso)}
+    </time>
   );
 }
 

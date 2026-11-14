@@ -1,7 +1,7 @@
-/** Absolute timestamp formatting shared by the trace views. */
+import { formatTimestamp } from "./format";
+
+/** Absolute timestamp formatting shared by the trace views: local time with its zone. */
 export function formatTraceTimestamp(value: string | undefined): string {
-  const parsed = Date.parse(value ?? "");
-  return Number.isFinite(parsed)
-    ? new Date(parsed).toISOString().replace("T", " ").replace("Z", " UTC")
-    : "Time unavailable";
+  const formatted = formatTimestamp(value);
+  return formatted === "—" ? "Time unavailable" : formatted;
 }

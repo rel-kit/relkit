@@ -4,11 +4,11 @@ import { EmptyState } from "../components/neon/empty-state";
 import { HistoryList } from "../components/neon/history-list";
 import { StatusBadge } from "../components/neon/status-badge";
 import type { InspectorObject } from "../lib/api-types";
-import { middleTruncate } from "../lib/format";
+import { formatTimestamp, middleTruncate, utcTimestamp } from "../lib/format";
 import { signalKey, text } from "../lib/observability-model";
 import { cn } from "../lib/utils";
 import { AnsiText, stripAnsi } from "./logs/ansi-text";
-import { levelClass, logClock } from "./logs/log-format";
+import { levelClass } from "./logs/log-format";
 import { requestEntry } from "./signal-rows";
 import { TraceWaterfall } from "./trace-waterfall";
 
@@ -133,16 +133,14 @@ export function LogsPanel({ items }: { readonly items: readonly InspectorObject[
             const cursor = text(item.cursor);
             const level = text(item.level);
             const timestamp = text(item.timestamp);
-            const clock = logClock(timestamp);
             const message = text(item.message);
             const row = (
               <>
                 <span
-                  className="w-[6.5rem] shrink-0 text-muted-foreground/80 tabular-nums"
-                  title={timestamp}
+                  className="w-[8.5rem] shrink-0 text-muted-foreground/80 tabular-nums"
+                  title={utcTimestamp(timestamp)}
                 >
-                  {clock.day ? `${clock.day} ` : ""}
-                  {clock.time}
+                  {formatTimestamp(timestamp, { date: false })}
                 </span>
                 <span
                   className={cn(
