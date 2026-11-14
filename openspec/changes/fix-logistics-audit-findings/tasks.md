@@ -108,6 +108,7 @@
 
 - [ ] 12.1 RK-18: reproduce with a test that saves a syntax error and then a fix two seconds later; report the parse failure with file and line when the candidate fails instead of waiting for the health timeout; start the rebuild for the later change as soon as it arrives; verify the failure is reported and the fix is serving within the reload budget.
 - [ ] 12.2 IN-28: add a session identifier and a reason (`start` or `reload`) to the generation events (`dev-activation.ts:129-137`); verify a restart and a reload produce distinguishable events.
+- [ ] 12.3 RK-07: forward a programmatic candidate host to the child environment (`supervisor/candidate-start.ts:43`), so a custom host is honoured by the generated server; verify with the supervisor environment test.
 
 ## 13. Inspector launcher and session state
 
@@ -120,7 +121,7 @@
 
 ## 14. Inspection API and host wiring
 
-**Findings:** IN-02, IN-07, IN-11, IN-12, IN-13, IN-29 (edges), IN-32, IN-34. **Starts after group 4 is merged.** **Owns:** `packages/relkit/src/inspector-api/{graph-utils,graph,actions-utils,actions.types,actions-dispatch,actions-dispatch-start,actions,shared,events-query}.ts`, `packages/cli/src/commands/{build-server-http-inspector,build-server-inspector-runtime,build-server-invocation,build-server-runtime-support}.ts`, `packages/relkit/src/providers-local/events/admin*.ts`.
+**Findings:** IN-02, IN-07, IN-11, IN-12, IN-13, IN-29 (edges), IN-32, IN-34. **Starts after group 4 is merged.** **Owns:** `packages/relkit/src/inspector-api/{graph-utils,graph,actions-utils,actions.types,actions-dispatch,actions-dispatch-start,actions,shared,events-query}.ts`, `packages/cli/src/commands/{build-server-http-inspector,build-server-inspector-runtime,build-server-invocation,build-server-runtime-support}.ts`, `packages/relkit/src/providers-local/events/admin*.ts`, `packages/relkit/src/runtime-hono/{agent-inspector,create-app,create-inspection-app}.ts`.
 
 - [ ] 14.1 IN-07: pass channel `params`, `replay` and `presence` through the graph projection (`inspector-api/graph-utils.ts:6-18`); verify the channel node of a fixture with parameters and a replay window.
 - [ ] 14.2 IN-02: keep the application's status and safe code in a rejected action's body instead of collapsing them (`actions-utils.ts:207-224`); verify an invoke that the application answers with 401.
@@ -128,6 +129,7 @@
 - [ ] 14.4 IN-11: forward the originating request and span links through the generated invoke (`build-server-invocation.ts:19-46`); verify with `tests/inspector/generated-runtime-wiring.test.ts` that an event reaction is a continuation of its request.
 - [ ] 14.5 IN-12, IN-13: provide event publish and replay in the generated development server through the application's own event client and the local event log, validating the payload against the event schema; where replay cannot be provided for a provider, report it as unsupported for that provider instead of unavailable; verify publish and replay end to end against the local provider.
 - [ ] 14.6 IN-29, IN-32: report observed dynamic calls of the active generation and each resource's runtime state from the generated server (`build-server-http-inspector.ts:17-49`, `build-server-runtime-support.ts:15-20`); verify a function that writes to a bucket and publishes an event shows both edges.
+- [ ] 14.7 RK-03: take the agent workflow and executions routes off the application port, or put them behind the inspection session token, without closing the development API documentation (`runtime-hono/agent-inspector.ts:30-44` and its callers); verify they answer 404 or 401 without the token.
 
 ## 15. Telemetry truth
 
