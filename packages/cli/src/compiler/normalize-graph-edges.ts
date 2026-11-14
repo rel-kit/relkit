@@ -14,6 +14,7 @@ import {
   isTargetingDescriptor,
 } from "./normalize-graph-edge-helpers.js";
 import { serviceEntries } from "./normalize-graph-services.js";
+import { addAccessEdges } from "./normalize-graph-access-edges.js";
 import { graphIdForDescriptor, graphIdForReference } from "./normalize-graph-id.js";
 
 /**
@@ -101,6 +102,7 @@ export const buildGraphEdgesEffect = Effect.fn("Compiler.buildGraphEdges")(
         add("depends-on-service", service.id, database?.id ?? "");
       }
     }
+    addAccessEdges(add, work.nodes, edges);
     return edges;
   },
   (effect, work) =>

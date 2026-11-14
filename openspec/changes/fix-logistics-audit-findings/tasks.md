@@ -100,7 +100,7 @@
 - [x] 10.4 IN-33: give environment variable and provider binding nodes the location of their own declaration instead of the `defineApp` call (`normalize-graph-app.ts:122-125`, `normalize-graph-providers.ts:36-39`); verify the graph of a fixture with an env module and a bucket binding.
 - [x] 10.5 RK-17: add doctor checks for imports the current runtime cannot load, environment files the current runtime will not read, and manifest fields the package manager ignores; verify on a Node project with a Bun-only service.
 - [x] 10.6 RK-06: use the one-shot environment helper (`packages/cli/src/runtime/one-shot-environment.ts`) for the values `start`, `jobs`, `local` and `doctor` read from the environment (`start.service.ts:57`, `jobs-base-url.ts`, `jobs-http.ts`, `local-operations.ts`, `doctor-project.service.ts:123`); verify on Node that `PORT` set only in `.env` is honoured by `relkit start`.
-- [ ] 10.7 IN-20: emit, for every function with an access rule, a `checks-session` edge to the authentication service and a `depends-on-service` edge from the function's service to it (`packages/cli/src/compiler/normalize-graph-*.ts`); verify the graph of a fixture with a protected function and that the Inspector's domain view lists the users of the auth domain.
+- [x] 10.7 IN-20: emit, for every function with an access rule, a `checks-session` edge to the authentication service and a `depends-on-service` edge from the function's service to it (`packages/cli/src/compiler/normalize-graph-*.ts`); verify the graph of a fixture with a protected function and that the Inspector's domain view lists the users of the auth domain.
 
 ## 11. Command line messages and help
 
