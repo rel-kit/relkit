@@ -3,8 +3,7 @@ import { CliFileSystem, fileSystemLayer } from "./filesystem.service.js";
 import { CliHttp, httpLayer } from "./http.service.js";
 import { CliJobsSdk, jobsSdkLiveLayer } from "./jobs-sdk.service.js";
 import { observeCli } from "../cli-runtime.js";
-import { cliTry } from "../cli-errors.js";
-import { jobsBaseUrl } from "../commands/jobs-base-url.js";
+import { jobsBaseUrlEffect } from "../commands/jobs-base-url.js";
 import { jobsIdentityHeadersEffect, fetchJobsJsonEffect } from "../commands/jobs-http.js";
 import { readJobsJsonFileEffect, readJobsManifestEffect } from "../commands/jobs-json.js";
 import { triggerJobEffect, watchJobEffect } from "../commands/jobs-rpc-core.js";
@@ -43,7 +42,7 @@ export const jobsLayer = Layer.effect(
           "jobs.request",
           Effect.scoped(
             Effect.gen(function* () {
-              const baseUrl = yield* cliTry("jobs.base-url", () => jobsBaseUrl());
+              const baseUrl = yield* jobsBaseUrlEffect(parsed.options["project-root"]);
               return yield* fetchJobsJsonEffect(baseUrl, parsed, method, path, options);
             }).pipe(Effect.provideContext(authority), (effect) =>
               withJobsSignal(effect, options.signal),
@@ -55,7 +54,7 @@ export const jobsLayer = Layer.effect(
           "jobs.identity",
           Effect.scoped(
             Effect.gen(function* () {
-              const baseUrl = yield* cliTry("jobs.base-url", () => jobsBaseUrl());
+              const baseUrl = yield* jobsBaseUrlEffect();
               return yield* jobsIdentityHeadersEffect(baseUrl);
             }).pipe(Effect.provideContext(authority)),
           ),
@@ -75,7 +74,7 @@ export const jobsLayer = Layer.effect(
           "jobs.trigger",
           Effect.scoped(
             Effect.gen(function* () {
-              const baseUrl = yield* cliTry("jobs.base-url", () => jobsBaseUrl());
+              const baseUrl = yield* jobsBaseUrlEffect(parsed.options["project-root"]);
               return yield* triggerJobEffect(baseUrl, parsed, signal);
             }).pipe(Effect.provideContext(authority), (effect) => withJobsSignal(effect, signal)),
           ),
@@ -85,7 +84,7 @@ export const jobsLayer = Layer.effect(
           "jobs.watch",
           Effect.scoped(
             Effect.gen(function* () {
-              const baseUrl = yield* cliTry("jobs.base-url", () => jobsBaseUrl());
+              const baseUrl = yield* jobsBaseUrlEffect(parsed.options["project-root"]);
               yield* watchJobEffect(baseUrl, parsed, context);
             }).pipe(Effect.provideContext(authority), (effect) =>
               withJobsSignal(effect, context.signal),
