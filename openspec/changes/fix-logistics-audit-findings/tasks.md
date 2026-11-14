@@ -139,7 +139,7 @@
 - [x] 14.5 IN-12, IN-13: provide event publish and replay in the generated development server through the application's own event client and the local event log, validating the payload against the event schema; where replay cannot be provided for a provider, report it as unsupported for that provider instead of unavailable; verify publish and replay end to end against the local provider.
 - [x] 14.6 IN-29, IN-32: report observed dynamic calls of the active generation and each resource's runtime state from the generated server (`build-server-http-inspector.ts:17-49`, `build-server-runtime-support.ts:15-20`); verify a function that writes to a bucket and publishes an event shows both edges.
 - [x] 14.7 RK-03: take the agent workflow and executions routes off the application port, or put them behind the inspection session token, without closing the development API documentation (`runtime-hono/agent-inspector.ts:30-44` and its callers); verify they answer 404 or 401 without the token.
-- [ ] 14.8 IN-48: stop the Inspector printing an error line every second while no connection directory exists, by treating a missing path as absence before the operation is observed (`packages/relkit/src/inspector-api/connection/files-native.ts:103`); verify an Inspector started without a development session prints the waiting line once and no error.
+- [x] 14.8 IN-48: stop the Inspector printing an error line every second while no connection directory exists, by treating a missing path as absence before the operation is observed (`packages/relkit/src/inspector-api/connection/files-native.ts:103`); verify an Inspector started without a development session prints the waiting line once and no error.
 
 ## 15. Telemetry truth
 

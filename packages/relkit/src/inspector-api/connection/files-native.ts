@@ -98,10 +98,15 @@ export const readInspectionFile = Effect.fn("Inspection.readDescriptor")((path: 
  * Inspects an optional path while preserving errors other than absence.
  * @param path - Native path never supplied by a browser.
  * @returns Lstat evidence or undefined; symlinks remain visible to policy.
+ * @remarks Absence is decided inside the observed call, so a missing path (an Inspector waiting
+ * for a development session polls one every second) is a successful lookup, not a logged failure.
  */
 export function inspectionLstat(path: string) {
-  return connectionAttempt("path.stat", () => lstat(path)).pipe(
-    Effect.catchIf(isMissingInspectionPath, () => Effect.succeed(undefined)),
+  return connectionAttempt("path.stat", () =>
+    lstat(path).catch((error: unknown) => {
+      if (error instanceof Error && "code" in error && error.code === "ENOENT") return undefined;
+      throw error;
+    }),
   );
 }
 
