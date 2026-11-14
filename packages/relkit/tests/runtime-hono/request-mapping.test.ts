@@ -109,6 +109,42 @@ test("rejects missing and duplicate scalar sources with structured issues", asyn
     ]);
 });
 
+test.each([
+  ["POST", "null", null],
+  ["POST", "an array", []],
+  ["POST", "a string", "x"],
+  ["PATCH", "null", null],
+  ["PATCH", "an array", []],
+  ["PATCH", "a string", "x"],
+] as const)(
+  "rejects a %s JSON body that is %s when fields are mapped",
+  async (method, _name, body) => {
+    const field = { kind: "body", name: "plate" };
+    const result = await mapRequest(
+      request(
+        new Request("http://localhost/vehicles/v1", {
+          method,
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(body),
+        }),
+      ),
+      {
+        kind: "input",
+        fields: {
+          id: { kind: "path", name: "id" },
+          plate: method === "PATCH" ? { kind: "optional", value: field } : field,
+        },
+      },
+    );
+
+    expect(result.ok).toBe(false);
+    if (!result.ok)
+      expect(result.issues.map(({ code, path }) => [code, path])).toEqual([
+        ["body-not-object", []],
+      ]);
+  },
+);
+
 test("rejects wrong content type, malformed JSON, and oversized bodies", async () => {
   const mapping = { kind: "input", fields: { body: { kind: "whole-body" } } };
   const wrongType = await mapRequest(

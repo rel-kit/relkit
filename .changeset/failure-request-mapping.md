@@ -25,3 +25,7 @@ after validation.
 JSON bodies are decoded strictly: strings are converted to numbers and booleans only for values
 read from the path, query, headers and cookies. A JSON body value of `"3500"` for an integer field
 is now a validation error instead of being accepted as `3500`.
+
+A route that maps JSON body fields rejects a body that is not a JSON object (`null`, an array, a
+string or a number) with one validation issue, code `body-not-object`. Before, such a body counted
+as "no fields": a `PATCH` succeeded as an empty change and a `POST` reported each field missing.
