@@ -146,6 +146,22 @@ export interface InspectorAuditRecord {
   readonly reason?: string;
 }
 
+/**
+ * The application's answer to a refused action, under `cause` in the rejected action body: the
+ * HTTP status it would have sent and its safe error code (`unauthenticated`, `access-denied`, a
+ * declared error id, `validation`, or a failure class such as `internal-error`). Messages, data and
+ * rejected values are never included.
+ */
+export interface InspectorActionCause {
+  readonly status: number;
+  readonly code: string;
+  /** Invalid input fields by path, with the issue code when the schema reports one. */
+  readonly issues?: readonly {
+    readonly path: readonly (string | number)[];
+    readonly code: string;
+  }[];
+}
+
 /** Native action authorities retained by the active generation, including best-effort audit delivery. */
 export interface InspectorActionServices {
   readonly functions?: InspectorFunctionActionService;

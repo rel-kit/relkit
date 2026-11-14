@@ -1,5 +1,6 @@
 import type { InspectorActionName, InspectorActionEndpointOptions } from "./actions.types.js";
 export type {
+  InspectorActionCause,
   InspectorActionName,
   InspectorFunctionActionRequest,
   InspectorFunctionActionService,

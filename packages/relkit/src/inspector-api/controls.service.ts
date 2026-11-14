@@ -169,6 +169,8 @@ const rejectAction = Effect.fn("InspectorControls.reject")(function* (
       ...identity(generation),
       action: record,
       error: failure.code,
+      // The application's status and safe code, when it was the application that refused.
+      ...(failure.body?.cause === undefined ? {} : { cause: failure.body.cause }),
     }),
   );
 });
