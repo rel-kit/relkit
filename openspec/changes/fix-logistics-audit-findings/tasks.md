@@ -60,7 +60,7 @@
 
 **Findings:** RK-12, RK-13, RK-19. **Owns:** `packages/relkit/src/runtime-hono/{realtime-observation,realtime-rpc,rpc,rpc-handler-options}.ts`, `packages/client/src/**`, `integrations/packages/s3/src/runtime/**`, `packages/relkit/src/buckets/**`, `packages/relkit/src/providers-local/buckets/**`, `packages/testing/src/buckets-conformance.ts`.
 
-- [ ] 6.1 RK-13: run the identity precondition before the stream is returned so the declared 409 applies (`realtime-rpc.ts:18-20`, `realtime-observation.ts:30-41`); verify with `packages/relkit/tests/runtime-hono/rpc-error-status.test.ts`.
+- [x] 6.1 RK-13: run the identity precondition before the stream is returned so the declared 409 applies (`realtime-rpc.ts:18-20`, `realtime-observation.ts:30-41`); verify with `packages/relkit/tests/runtime-hono/rpc-error-status.test.ts`.
 - [ ] 6.2 RK-19: make iteration over a subscription end when the caller's signal aborts, on Node and Bun (`packages/client/src/transport.service.ts:34-39`, `native/iterate.ts:36`); verify with a test that aborts after a replay plus a live event, 50 repetitions on Node.
 - [ ] 6.3 RK-12: let a signed upload URL bind a declared content type and length (optional arguments, existing calls unchanged), refuse types and sizes the bucket does not allow before signing, and sign the content type so storage rejects a different one (`integrations/packages/s3/src/runtime/signing.ts:54-64`, `s3.ts:185-189`, `packages/relkit/src/buckets/client-effects.ts:162-176`); add the cases to the bucket conformance suite; verify against the local provider and MinIO.
 
