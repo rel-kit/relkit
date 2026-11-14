@@ -160,5 +160,7 @@ the function above, and on Node install `pg` or `mysql2`.
 - `relkit dev` on Node starts a new server generation for every change, because Node cannot drop
   an evaluated module the way Bun's in-process reload does. A reload takes about a second.
 - `relkit start` runs the server on the runtime its build records, Bun unless the build says Node.
-- npm ignores `patchedDependencies`, so with npm the Drizzle declaration repair that Bun applies
-  is not installed; it changes type declarations only.
+- npm applies no dependency patches, so RelKit does not declare the Drizzle declaration repair in
+  an npm project and says so when it skips it; the repair changes type declarations only. Bun reads
+  it from `patchedDependencies` in `package.json`, pnpm from `pnpm-workspace.yaml`. An npm project
+  approves esbuild's install script in `allowScripts`, the field `npm approve-scripts` writes.

@@ -126,8 +126,27 @@ const customizePackageManagerEffect = Effect.fn("ProjectFiles.packageManager")(f
   const agent = packageManagerFromUserAgent();
   const version = agent?.name === manager ? agent.version : undefined;
   const field = version === undefined ? "" : `$1"packageManager": "${manager}@${version}",\n`;
-  yield* fs.write(path, content.replace(/^(\s*)"packageManager": "bun@[^"]*",\n/m, field));
+  const next = content.replace(/^(\s*)"packageManager": "bun@[^"]*",\n/m, field);
+  yield* fs.write(path, manager === "npm" ? withNpmAllowScripts(next) : next);
 });
+
+/**
+ * Approves esbuild's install script for npm 11, which lists unapproved install scripts on every
+ * install (and later releases block them); this is the `allowScripts` field `npm approve-scripts`
+ * writes. Like pnpm's settings above it names esbuild only, for any version: `@relkit/cli` and
+ * drizzle-kit depend on different esbuild versions.
+ * @param content - `package.json` text.
+ * @returns The manifest with `allowScripts.esbuild` set.
+ */
+function withNpmAllowScripts(content: string): string {
+  const manifest = JSON.parse(content) as Record<string, unknown>;
+  const allowed = manifest["allowScripts"];
+  manifest["allowScripts"] = {
+    ...(typeof allowed === "object" && allowed !== null ? allowed : {}),
+    esbuild: true,
+  };
+  return `${JSON.stringify(manifest, null, 2)}\n`;
+}
 
 /**
  * Preserves ordered template copy's Promise API.

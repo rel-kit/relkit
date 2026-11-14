@@ -20,4 +20,6 @@ export interface DependencyPatch extends DependencyPatchDescriptor {
 export interface DependencyPatchPlan {
   readonly content: string;
   readonly operation?: ScaffoldFileOperation;
+  /** Present when the project's package manager applies no patches and the repair was skipped. */
+  readonly notice?: string;
 }

@@ -1191,6 +1191,18 @@ declare const dependencyPatchNeedsInstallEffect: (
 
 Loads and plans the canonical selected Drizzle repair, validating conflicts before delivery and preserving its release pin and exact patch bytes.
 
+### SKIPPED_PATCH
+
+Says why skipping the repair for npm is safe.
+
+**Signature**
+
+```ts
+declare const SKIPPED_PATCH: "Skipped the Drizzle declaration repair: npm does not apply patchedDependencies. This is safe; the repair changes only Drizzle's type declarations, never code that runs.";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L101)
+
 ### planDependencyPatch
 
 Preserves patch planning's Promise API and collision constructors.
@@ -1205,7 +1217,7 @@ declare const planDependencyPatch: (
 ) => Promise<DependencyPatchPlan>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L139)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L165)
 
 ### planDependencyPatchEffect
 
@@ -1219,13 +1231,13 @@ declare const planDependencyPatchEffect: (
   source: string,
   patch: DependencyPatch,
 ) => Effect.Effect<
-  { operation?: { path: string; action: "create"; content: string }; content: string },
+  DependencyPatchPlan,
   GeneratorDomainError | GeneratorIoError,
   GeneratorFileSystem
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L52)
 
 ### prepareProjectDependencyPatch
 
@@ -1234,24 +1246,35 @@ Preserves staging repair delivery's Promise API.
 **Signature**
 
 ```ts
-declare const prepareProjectDependencyPatch: (projectRoot: string) => Promise<void>;
+declare const prepareProjectDependencyPatch: (
+  projectRoot: string,
+  manager?: PackageManagerName,
+) => Promise<string | undefined>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L152)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L179)
 
 ### prepareProjectDependencyPatchEffect
 
-Delivers repair assets before the first installation inside a generation-owned stage.
+Delivers repair assets before the first installation inside a generation-owned stage, where the
+selected manager reads them: `package.json` for Bun, `pnpm-workspace.yaml` for pnpm (pnpm 10 and
+11 ignore the `package.json` field). npm applies no patches, so nothing is written for it.
 
 **Signature**
 
 ```ts
 declare const prepareProjectDependencyPatchEffect: (
   projectRoot: string,
-) => Effect.Effect<void, GeneratorDomainError | GeneratorIoError, GeneratorFileSystem>;
+  manager?: PackageManagerName | undefined,
+) => Effect.Effect<
+  | "Skipped the Drizzle declaration repair: npm does not apply patchedDependencies. This is safe; the repair changes only Drizzle's type declarations, never code that runs."
+  | undefined,
+  GeneratorDomainError | GeneratorIoError,
+  GeneratorFileSystem
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L112)
 
 ### readDrizzlePatch
 
@@ -1263,7 +1286,7 @@ Preserves the verified repair Promise API.
 declare const readDrizzlePatch: () => Promise<DependencyPatch>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L154)
 
 ### readDrizzlePatchEffect
 
@@ -1286,7 +1309,7 @@ declare const readDrizzlePatchEffect: () => Effect.Effect<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L27)
 
 ## `generate-output.ts`
 
