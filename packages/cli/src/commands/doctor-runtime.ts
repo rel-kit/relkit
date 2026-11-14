@@ -83,7 +83,7 @@ export const checkEnvironmentFilesEffect = Effect.fn("Doctor.environmentFiles")(
     return {
       name,
       ok: true,
-      message: `Node does not load ${list} by itself. RelKit reads them for ${ONE_SHOT_COMMANDS}; scripts run with node directly do not see them.`,
+      message: `Node does not load ${list} by itself. RelKit reads ${present.length === 1 ? "it" : "them"} for ${ONE_SHOT_COMMANDS}; scripts run with node directly do not see ${present.length === 1 ? "it" : "them"}.`,
       details: { ...details, severity: "warning" },
     } satisfies DoctorCheck;
   },

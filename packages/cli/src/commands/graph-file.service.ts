@@ -57,7 +57,7 @@ export const graphFilesLive = Layer.effect(
                   "graph.read",
                   new GraphCommandError(
                     missing ? "RELKIT_GRAPH_NOT_FOUND" : "RELKIT_GRAPH_INVALID",
-                    `Graph file ${missing ? "was not found" : "is not valid JSON"}: ${path}${failed}`,
+                    `Graph file ${missing ? "was not found" : "is not valid JSON"}: ${path}${failed === "" ? "" : `.${failed}`}`,
                   ),
                 ),
               );
