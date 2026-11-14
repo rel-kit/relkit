@@ -13,6 +13,8 @@ export interface InspectorHistoryOwner {
 /** Collection state contains only one finite batch at a time; no pending write queue. */
 export interface InspectorToolState {
   readonly selection: InspectorSelection;
+  /** When the application session entered its current state (ms); undefined before discovery. */
+  readonly selectionSince?: number | undefined;
   readonly history: InspectorHistoryOwner | undefined;
   readonly sessionId: string | undefined;
   readonly through: number;

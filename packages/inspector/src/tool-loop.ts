@@ -2,13 +2,19 @@
 import { Cause, Clock, Effect, Ref } from "effect";
 import { InspectionConnectionError } from "relkit/inspector-api/connection";
 import type { InspectionFilesOperations } from "relkit/inspector-api/connection";
-import type { InspectorDiscoveryOperations } from "./discovery.types.js";
+import type { InspectorDiscoveryOperations, InspectorSelection } from "./discovery.types.js";
 import type { InspectorRemoteOperations } from "./remote.types.js";
 import type { InspectorOptions } from "./options.types.js";
 import type { InspectorToolStateRef } from "./tool-state.types.js";
 import { collectInspectionBatch } from "./collector.js";
 import type { ObservabilityStream } from "relkit/observability";
-import { publishSelection, publishCollection } from "./live-events.js";
+import {
+  publishCollection,
+  publishSelection,
+  publishSelectionState,
+  selectionKey,
+  selectionNotices,
+} from "./live-events.js";
 import { acquireHistory, historyFailureHint, recoverInspection } from "./tool-history.js";
 
 /** Fast history retries before backing off; a released lock is still picked up later. */
@@ -79,14 +85,13 @@ const selectConnection = Effect.fn("Inspector.selectConnection")(function* (
   options: InspectorOptions,
   stream: ObservabilityStream,
 ) {
-  const selection = yield* discovery.select(options).pipe(
-    Effect.tapError(() =>
-      Ref.update(state, (value) => ({
-        ...value,
-        selection: { state: "disconnected" as const, rejected: 1 },
-      })),
-    ),
-  );
+  const selection = yield* discovery
+    .select(options)
+    .pipe(
+      Effect.tapError(() =>
+        applySelection(state, options, stream, { state: "disconnected", rejected: 1 }),
+      ),
+    );
   const previous = yield* Ref.get(state);
   if (
     previous.history &&
@@ -97,8 +102,32 @@ const selectConnection = Effect.fn("Inspector.selectConnection")(function* (
       operation: "history.foreign-project",
       cause: new Error("Choose a project-specific history directory"),
     });
-  publishSelection(stream, previous.selection, selection);
-  yield* Ref.update(state, (value) => ({ ...value, selection }));
+  yield* applySelection(state, options, stream, selection);
+});
+
+/** Records a discovery result, invalidates the UI and tells the terminal what changed, once. */
+const applySelection = Effect.fn("Inspector.applySelection")(function* (
+  state: InspectorToolStateRef,
+  options: InspectorOptions,
+  stream: ObservabilityStream,
+  selection: InspectorSelection,
+) {
+  const previous = yield* Ref.get(state);
+  const first = previous.selectionSince === undefined;
+  if (first) publishSelectionState(stream, selection);
+  else publishSelection(stream, previous.selection, selection);
+  const project = options.projectRoot ?? options.connectionFile ?? process.cwd();
+  for (const notice of selectionNotices(first ? undefined : previous.selection, selection, project))
+    yield* notice.level === "warn"
+      ? Effect.logWarning(notice.message)
+      : Effect.logInfo(notice.message);
+  const changed = first || selectionKey(previous.selection) !== selectionKey(selection);
+  const now = yield* Clock.currentTimeMillis;
+  yield* Ref.update(state, (value) => ({
+    ...value,
+    selection,
+    selectionSince: changed ? now : value.selectionSince,
+  }));
 });
 
 /** A durable receipt advances state only after collection and acknowledgement complete. */
