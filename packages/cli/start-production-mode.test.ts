@@ -27,9 +27,29 @@ for (const runtime of ["bun", "node"] as const) {
     const started = await startProject({ projectRoot: root, port: 0, healthTimeoutMs: 5_000 });
     try {
       const base = `http://${started.hostname}:${started.port}/_relkit/v1`;
-      expect((await fetch(`${base}/health/live`)).status).toBe(200);
       for (const path of ["graph", "openapi.json", "api-reference"])
         expect((await fetch(`${base}/${path}`)).status).toBe(404);
+      // Production health answers status and readiness only, never the generation identity.
+      for (const [path, status] of [
+        ["health/live", "ok"],
+        ["health/ready", "ready"],
+      ] as const) {
+        const response = await fetch(`${base}/${path}`);
+        expect(response.status).toBe(200);
+        const body = (await response.json()) as Record<string, unknown>;
+        expect(body).toMatchObject({ status });
+        for (const field of [
+          "graphHash",
+          "activationFingerprint",
+          "manifestGraphHash",
+          "graphContractVersion",
+          "manifestContractVersion",
+          "manifestGeneratorVersion",
+          "sourceToken",
+          "generationToken",
+        ])
+          expect(body).not.toHaveProperty(field);
+      }
     } finally {
       await started.stop();
     }
@@ -46,8 +66,17 @@ test("start keeps an operator-selected RELKIT_ENV", async () => {
     environment: { RELKIT_ENV: "development" },
   });
   try {
-    const graph = await fetch(`http://${started.hostname}:${started.port}/_relkit/v1/graph`);
-    expect(graph.status).toBe(200);
+    const base = `http://${started.hostname}:${started.port}/_relkit/v1`;
+    expect((await fetch(`${base}/graph`)).status).toBe(200);
+    // The development supervisor reads the generation identity from the health probes.
+    for (const path of ["health/live", "health/ready"])
+      expect(await (await fetch(`${base}/${path}`)).json()).toMatchObject({
+        graphHash: expect.any(String),
+        activationFingerprint: expect.any(Object),
+        manifestGraphHash: expect.any(String),
+        environmentReady: true,
+        providerReady: true,
+      });
   } finally {
     await started.stop();
   }
