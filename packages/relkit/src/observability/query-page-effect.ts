@@ -6,6 +6,7 @@ import type { ObservabilityIndexPageOptions } from "./storage/index.types.js";
 import type { NormalizedQuery } from "./query-validation.types.js";
 import type { ObservabilityQueryPage, ObservabilityQueryRequest } from "./query-types.js";
 import { QueryIndexService, QueryReadError, safeReadEffect } from "./query-read-effect.js";
+import { countRequested } from "./query-request-filters.js";
 import {
   inQueryTimeRangeEffect,
   matchesQueryEffect,
@@ -66,44 +67,96 @@ export const readPageEffect = Effect.fn("ObservabilityQuery.readPage")(
     observe(
       "readPage",
       Effect.gen(function* () {
-        const index = yield* QueryIndexService;
         const query = yield* validateQueryEffect(input, maxPageSize);
-        const items: T[] = [];
-        let cursor = query.cursor;
-        let lastCursor: string | undefined;
-        while (true) {
-          const page = yield* Effect.try({
-            try: () =>
-              (pageKind === "traces" ? index.tracePage : index.page)(
-                indexOptions(query, cursor, maxPageSize, signal),
-              ),
-            catch: (cause) => new QueryReadError({ reason: "index", cause }),
-          });
-          for (const entry of page.entries) {
-            if (!(yield* inQueryTimeRangeEffect(entry.timestamp, query)) || entry.cursor === cursor)
-              continue;
-            const record = yield* safeReadEffect(entry, redaction);
-            if (
-              record === undefined ||
-              !accept(record) ||
-              !(yield* matchesQueryEffect(record, query))
-            )
-              continue;
-            if (items.length === query.limit) return yield* queryResponseEffect(items, lastCursor);
-            items.push(
-              (record.signal === "log"
-                ? { ...record, cursor: entry.cursor }
-                : record) as unknown as T,
-            );
-            lastCursor = entry.cursor;
-          }
-          if (page.nextCursor === undefined || page.nextCursor === cursor) break;
-          cursor = page.nextCursor;
-        }
-        return yield* queryResponseEffect(items);
+        const scan = { query, maxPageSize, redaction, signal, accept, pageKind };
+        const page = yield* readItems<T>(scan);
+        if (!countRequested(query)) return page;
+        // The total ignores the cursor: it counts every record the filters select.
+        const { cursor: _cursor, ...uncursored } = query;
+        const total = yield* countMatches({ ...scan, query: uncursored });
+        return Object.freeze({ ...page, total });
       }),
     ),
 );
+/** Validated query and the index scan settings shared by a page read and its count. */
+interface PageScan {
+  readonly query: NormalizedQuery;
+  readonly maxPageSize: number;
+  readonly redaction: RedactionPolicy | undefined;
+  readonly signal: ObservabilitySignal | undefined;
+  readonly accept: (record: ObservabilityRecord) => boolean;
+  readonly pageKind: "records" | "traces";
+}
+/**
+ * Visits every admitted record matching a scan in index order until the visitor stops it.
+ * @param scan - Validated query and index settings.
+ * @param visit - Receives each match with its index cursor; returns false to stop.
+ * @returns An Effect completing after the last visited match.
+ */
+const scanMatches = Effect.fn("ObservabilityQuery.scan")(function* (
+  scan: PageScan,
+  visit: (record: ObservabilityRecord, cursor: string) => boolean,
+) {
+  const index = yield* QueryIndexService;
+  const { query } = scan;
+  let cursor = query.cursor;
+  while (true) {
+    const page = yield* Effect.try({
+      try: () =>
+        (scan.pageKind === "traces" ? index.tracePage : index.page)(
+          indexOptions(query, cursor, scan.maxPageSize, scan.signal),
+        ),
+      catch: (cause) => new QueryReadError({ reason: "index", cause }),
+    });
+    for (const entry of page.entries) {
+      if (!(yield* inQueryTimeRangeEffect(entry.timestamp, query)) || entry.cursor === cursor)
+        continue;
+      const record = yield* safeReadEffect(entry, scan.redaction);
+      if (record === undefined || !scan.accept(record) || !(yield* matchesQueryEffect(record, query)))
+        continue;
+      if (!visit(record, entry.cursor)) return;
+    }
+    if (page.nextCursor === undefined || page.nextCursor === cursor) return;
+    cursor = page.nextCursor;
+  }
+});
+/**
+ * Reads one page of matches; a further match makes the last item's cursor the next cursor.
+ * @param scan - Validated query and index settings.
+ * @returns An Effect with the versioned page.
+ */
+function readItems<T>(scan: PageScan) {
+  return Effect.gen(function* () {
+    const items: T[] = [];
+    let lastCursor: string | undefined;
+    let more = false;
+    yield* scanMatches(scan, (record, cursor) => {
+      if (items.length === scan.query.limit) {
+        more = true;
+        return false;
+      }
+      items.push((record.signal === "log" ? { ...record, cursor } : record) as unknown as T);
+      lastCursor = cursor;
+      return true;
+    });
+    return yield* queryResponseEffect(items, more ? lastCursor : undefined);
+  });
+}
+/**
+ * Counts every match of a scan.
+ * @param scan - Validated query and index settings, without a cursor.
+ * @returns An Effect with the number of matching records.
+ */
+function countMatches(scan: PageScan) {
+  return Effect.gen(function* () {
+    let total = 0;
+    yield* scanMatches(scan, () => {
+      total += 1;
+      return true;
+    });
+    return total;
+  });
+}
 /**
  * Collects admitted records for one bounded detail query.
  * @param input - Query filters.

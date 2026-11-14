@@ -37,6 +37,28 @@ export function duckdbQueryPlan(kind: "logs" | "requests" | "traces", query: Nor
     values: [...values, query.limit + 1],
   };
 }
+/**
+ * Builds the SQL counting every record a list query selects, across all pages.
+ * @param kind - Query signal family.
+ * @param query - Validated filter request; its cursor is ignored.
+ * @returns Native SQL returning one `total` row, and its ordered bindings.
+ * @remarks Requests count the latest revision of each request and traces count distinct traces,
+ * the same units the list pages return.
+ */
+export function duckdbCountPlan(kind: "logs" | "requests" | "traces", query: NormalizedQuery) {
+  const { cursor: _cursor, ...uncursored } = query;
+  const { clauses, values } = duckdbQueryFilters(kind, uncursored);
+  const where = clauses.join(" AND ");
+  if (kind === "traces" && query.traceId === undefined)
+    return {
+      sql: `SELECT count(DISTINCT trace_id)::BIGINT AS total FROM records WHERE ${where} AND trace_id IS NOT NULL`,
+      values,
+    };
+  return {
+    sql: `SELECT count(*)::BIGINT AS total FROM (${querySelect(kind)} ${where})`,
+    values,
+  };
+}
 /** @param kind - Signal family. @returns Request revision projection or ordinary record projection. */
 function querySelect(kind: "logs" | "requests" | "traces") {
   return kind === "requests"

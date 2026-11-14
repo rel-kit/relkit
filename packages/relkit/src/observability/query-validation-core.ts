@@ -1,5 +1,6 @@
 import type { ObservabilityRecord } from "./model.js";
 import type { NormalizedQuery } from "./query-validation.types.js";
+import { matchesRequestFilters, validateRequestFilters } from "./query-request-filters.js";
 import {
   DEFAULT_OBSERVABILITY_QUERY_LIMIT,
   MAX_OBSERVABILITY_QUERY_LIMIT,
@@ -87,6 +88,7 @@ function validate(value: ObservabilityQueryRequest, maximum: number): Normalized
         `Observability query ${name} is invalid`,
       );
   }
+  validateRequestFilters(value);
   return {
     ...value,
     limit: Math.min(limit, maximum),
@@ -111,7 +113,8 @@ function matches(record: ObservabilityRecord, query: NormalizedQuery): boolean {
       ("originRequestId" in value && value.originRequestId === query.originRequestId)) &&
     (query.generationId === undefined || value.generationId === query.generationId) &&
     (query.graphHash === undefined || value.graphHash === query.graphHash) &&
-    (query.serviceId === undefined || value.serviceId === query.serviceId)
+    (query.serviceId === undefined || value.serviceId === query.serviceId) &&
+    matchesRequestFilters(record, query)
   );
 }
 function inTimeRange(timestamp: string, query: NormalizedQuery): boolean {

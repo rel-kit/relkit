@@ -24,6 +24,16 @@ export interface ObservabilityQueryRequest {
   readonly serviceId?: string;
   readonly generationId?: string;
   readonly graphHash?: string;
+  /** Request status: exact (`500`) or class (`5xx`). Selects request records only. */
+  readonly status?: string | number;
+  /** Request method, compared case-insensitively. Selects request records only. */
+  readonly method?: string;
+  /** Prefix of the raw request path, starting with `/`. Selects request records only. */
+  readonly path?: string;
+  /** Declared error identifier: a record's `errorId` or a span's `relkit.error.id`. */
+  readonly errorId?: string;
+  /** Adds `total`, the number of records matching the filters, to the page (scans every match). */
+  readonly count?: boolean | "true" | "false";
 }
 /** Protocol identity returned with every query response. */
 export interface ObservabilityQueryVersion {
@@ -34,6 +44,8 @@ export interface ObservabilityQueryVersion {
 export interface ObservabilityQueryPage<T> extends ObservabilityQueryVersion {
   readonly items: readonly T[];
   readonly nextCursor?: string;
+  /** Records matching the filters across all pages, present when the query asked for `count`. */
+  readonly total?: number;
 }
 /** Page of request lifecycle records. */
 export type RequestQueryResponse = ObservabilityQueryPage<RequestRecord>;

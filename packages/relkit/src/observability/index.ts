@@ -21,3 +21,4 @@ export * from "./telemetry-export-queue-effect.js";
 export * from "./telemetry-exporters.js";
 export * from "./telemetry-exporter.types.js";
 export * from "./system-routes.js";
+export * from "./query-request-filters.js";
