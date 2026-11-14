@@ -5,7 +5,7 @@ import {
   InspectorApiError,
   createInspectorApiClient,
 } from "./api";
-import { jobsNotMounted } from "./api-request-utils";
+import { jobsNotMounted, NO_JOBS_HINT, NO_JOBS_MESSAGE } from "./api-request-utils";
 
 const envelope = (value: Record<string, unknown>, status = 200) =>
   new Response(
@@ -146,6 +146,19 @@ describe("inspector API client", () => {
       status: 409,
       body: { cause: { status: 401, code: "unauthenticated" } },
     });
+  });
+
+  test("an application without jobs is told apart from a failing jobs service", async () => {
+    expect(NO_JOBS_MESSAGE).toBe("This application declares no jobs.");
+    expect(NO_JOBS_HINT).toContain("defineJob");
+    // A 5xx or a network failure is an outage, never "none declared".
+    expect(jobsNotMounted(new InspectorApiError("x", "HTTP_500", 500))).toBe(false);
+    expect(
+      jobsNotMounted(
+        new InspectorApiError("x", "RELKIT_INSPECTOR_DISCONNECTED", undefined, "network"),
+      ),
+    ).toBe(false);
+    expect(jobsNotMounted(new InspectorApiError("x", "HTTP_404", 404))).toBe(true);
   });
 
   test("falls back immediately when task-first job APIs are unavailable", async () => {

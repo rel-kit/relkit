@@ -8,13 +8,13 @@ import {
   type InspectorPage,
   type InspectorQuery,
 } from "../../lib/api-types";
-import { jobsNotMounted, NO_JOBS_MESSAGE } from "../../lib/api-request-utils";
+import { jobsNotMounted } from "../../lib/api-request-utils";
+import { JobsNoneDeclared } from "./jobs-none-declared";
 import { createInspectorClient } from "../../lib/client";
 import { itemsForJob, RUN_STATES, runCounts, type JobRunCounts } from "../../lib/jobs-model";
 import { Briefcase, RefreshCw } from "lucide-react";
 import { DetailList } from "../../components/blocks/details";
 import { PageHeader } from "../../components/blocks/page-header";
-import { EmptyState } from "../../components/neon/empty-state";
 import { Button } from "../../components/ui/button";
 import { ResourceTable, type ResourceTableItem } from "../resource-table";
 import { StateCounts } from "./job-format";
@@ -67,12 +67,7 @@ export function JobsClient() {
             </Button>
           }
         />
-        <EmptyState
-          size="lg"
-          icon={<Briefcase />}
-          title={<span role="status">{NO_JOBS_MESSAGE}</span>}
-          description="Jobs run tasks in the background, on a schedule or on demand. Declare a job and its definitions, runs, schedules and services appear here."
-        />
+        <JobsNoneDeclared size="lg" icon={<Briefcase />} />
       </div>
     );
   return (
@@ -80,6 +75,7 @@ export function JobsClient() {
       title="Jobs"
       description="Inspect durable definitions and bounded run summaries without loading full history."
       noun="jobs"
+      declare="Declare a job with `defineJob` and it appears here."
       load={load}
       statusOptions={statusOptions}
       columns={[

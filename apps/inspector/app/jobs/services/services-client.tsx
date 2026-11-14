@@ -2,12 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { InspectorObject } from "../../../lib/api-types";
-import { jobsNotMounted, NO_JOBS_MESSAGE } from "../../../lib/api-request-utils";
+import { jobsNotMounted } from "../../../lib/api-request-utils";
+import { JobsNoneDeclared } from "../jobs-none-declared";
 import { createInspectorClient } from "../../../lib/client";
 import { Server } from "lucide-react";
 import { FailedState, LoadingRows } from "../../../components/blocks/block-state";
 import { PageHeader } from "../../../components/blocks/page-header";
-import { EmptyState } from "../../../components/neon/empty-state";
 import { StatusBadge, statusTone } from "../../../components/neon/status-badge";
 import {
   DataTable,
@@ -45,13 +45,7 @@ export function JobsServicesClient() {
           </div>
         )}
         {state === "error" && <FailedState title="Jobs services are unavailable." />}
-        {state === "absent" && (
-          <EmptyState
-            icon={<Server />}
-            title={<span role="status">{NO_JOBS_MESSAGE}</span>}
-            description="A jobs service is mounted once the application declares a job."
-          />
-        )}
+        {state === "absent" && <JobsNoneDeclared icon={<Server />} />}
         {state === "ready" && <ServiceTable items={items} />}
       </div>
     </>
