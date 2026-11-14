@@ -32,8 +32,8 @@ export const buildGraphNodesEffect = Effect.fn("Compiler.buildGraphNodes")(
           nodes.push(...hookNodes(descriptor));
           if (descriptor.kind === "agent") nodes.push(generatedFunctionNode(descriptor, work));
           if (descriptor.kind === "app") {
-            nodes.push(...environmentNodes(descriptor));
-            nodes.push(...providerNodes(descriptor));
+            nodes.push(...environmentNodes(descriptor, work.input.sources));
+            nodes.push(...providerNodes(descriptor, work.input.sources));
           }
         }),
       { discard: true },

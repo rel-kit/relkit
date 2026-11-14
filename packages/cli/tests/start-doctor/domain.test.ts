@@ -37,6 +37,9 @@ it.effect("collects ordered checks using the same live domain with deterministic
               JSON.stringify({ version: ts.version, dependencies: { effect: "4.0.1" } }),
             ),
           mkdir: () => Effect.void,
+          // No source file and no environment file: the runtime checks pass.
+          files: () => Effect.succeed([]),
+          exists: () => Effect.succeed(false),
           writeText: (path) =>
             Effect.sync(() => {
               mutations.push("write:" + path);
@@ -76,6 +79,9 @@ it.effect("collects ordered checks using the same live domain with deterministic
       "relkit-packages",
       "config",
       "app",
+      "runtime-imports",
+      "environment-files",
+      "package-manager",
       "pulumi",
       "aws-credentials",
       "relkit-roots",

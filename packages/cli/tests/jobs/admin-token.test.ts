@@ -4,6 +4,8 @@ import { Effect } from "effect";
 import { CliHttp } from "../../src/services/http.service.js";
 import { fetchJobsJsonEffect } from "../../src/commands/jobs-http.js";
 import { parse } from "../../src/commands/jobs-support.js";
+import { CliFileSystem } from "../../src/services/filesystem.service.js";
+import { testFiles } from "../read-services/test-files.js";
 
 test.each([undefined, "native-admin"])(
   "native token %s never substitutes an inspector credential",
@@ -19,6 +21,8 @@ test.each([undefined, "native-admin"])(
           "POST",
           "/jobs/runs/one/retry",
         ).pipe(
+          // No environment file: the token comes from the process environment alone.
+          Effect.provideService(CliFileSystem, testFiles({ exists: () => Effect.succeed(false) })),
           Effect.provideService(CliHttp, {
             request: (url, init) =>
               Effect.sync(() => {

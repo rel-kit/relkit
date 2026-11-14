@@ -578,7 +578,7 @@ export const cliCodes = [
     code: "RELKIT_GRAPH_NOT_FOUND",
     title: "Application graph file not found",
     happened: "RelKit could not find the graph file at the path in the message.",
-    fix: "Run `relkit check` to generate the graph, or pass the correct path to `relkit graph`.",
+    fix: "`relkit check` writes the graph only when it passes: run it and fix the errors it reports (when the last check failed, the message names the first one), or pass the correct path to `relkit graph`.",
   },
   {
     code: "RELKIT_GRAPH_USAGE",

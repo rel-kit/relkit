@@ -42,7 +42,10 @@ function testLayer(http: HttpCapabilities, native = sdk, text = "{}") {
       Layer.mergeAll(
         Layer.succeed(CliHttp, http),
         Layer.succeed(CliJobsSdk, native),
-        Layer.succeed(CliFileSystem, testFiles({ readText: () => Effect.succeed(text) })),
+        Layer.succeed(
+          CliFileSystem,
+          testFiles({ readText: () => Effect.succeed(text), exists: () => Effect.succeed(false) }),
+        ),
       ),
     ),
   );

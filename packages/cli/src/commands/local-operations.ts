@@ -22,6 +22,7 @@ import {
   oneMaterializer,
 } from "./local-operation-support.js";
 import { selectPlan } from "./local-plan.js";
+import { oneShotEnvironment } from "../runtime/one-shot-environment.js";
 import type { LocalOperationContext } from "./local.types.js";
 export { localStatus, localStop, localStatusEffect, localStopEffect } from "./local-status-stop.js";
 
@@ -92,8 +93,10 @@ export const localUpEffect = Effect.fn("Local.up")(
         localJobServiceGenerations(project.graph),
       ),
     }));
+    // On Node, PORT set only in .env reaches the local services as it does under Bun.
+    const applicationPort = Number((yield* oneShotEnvironment(project.root)).PORT ?? 3000);
     const runtimeOptions = yield* cliTry("local.runtimeOptions", () =>
-      localServiceRuntimeOptions(localPlan.services, Number(process.env.PORT ?? 3000)),
+      localServiceRuntimeOptions(localPlan.services, applicationPort),
     );
     const initial = yield* ownedNativePromise("local.reconcile", (signal) =>
       owner.reconciler.reconcile({ ...base, ...runtimeOptions, signal }),
@@ -112,7 +115,7 @@ export const localUpEffect = Effect.fn("Local.up")(
         });
       const workerOverridesFile = yield* prepareLocalWorkerOverridesEffect(owner.overrideFile);
       const workers = yield* cliTry("local.workerArtifacts", () => ({
-        ...localServiceRuntimeOptions(localPlan.services, Number(process.env.PORT ?? 3000), true),
+        ...localServiceRuntimeOptions(localPlan.services, applicationPort, true),
         workerArtifacts: localWorkerArtifacts(
           project.localPlan.services,
           workerBindings,
