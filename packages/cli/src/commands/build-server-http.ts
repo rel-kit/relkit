@@ -81,7 +81,8 @@ const relkitFetch = (request, bindings) => instrumentHttpRequest(forwardedReques
       return problemResponse(500, "Internal Server Error", "internal-error", "The request failed unexpectedly.");
     }
   });
+// The development supervisor names its loopback host; built servers and containers keep all interfaces.
 if (relkitMode.functionHost !== true)
-  server = await relkitRuntime.serve({ hostname: "0.0.0.0", port: Number(process.env.PORT ?? 3000), fetch: relkitFetch });
+  server = await relkitRuntime.serve({ hostname: process.env.RELKIT_HOSTNAME || "0.0.0.0", port: Number(process.env.PORT ?? 3000), fetch: relkitFetch });
 runtimeOwner.setReady("server", true);`;
 }
