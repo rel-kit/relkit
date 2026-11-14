@@ -37,7 +37,7 @@
 - [x] 4.3 RK-07: pass the candidate's host to the generated server and bind to it, keeping `0.0.0.0` only for built servers that set no host (`build-server-http.ts:85`, `candidate-process.ts:45-66`); verify no development listener is bound to a non-loopback address (`packages/cli/tests/supervisor/candidate/`).
 - [x] 4.4 RK-28: return only status and readiness from the health endpoints in production, keeping identity fields in development where the supervisor reads them; verify both modes.
 - [x] 4.5 RK-25: answer blocked and unknown internal paths, and internal endpoint errors, as Problem Details with `x-request-id` (`dev-session-native.ts:48-51,68-72`, `internal-endpoints.ts:62,68-69`, `core-endpoints.ts:19-21`); verify the harness's error-shape rows for these paths.
-- [ ] 4.6 RK-29: log 4xx at info except 401, 403 and 429 at warn; keep `→ <status> in <n>ms` on the request line for long paths; never cut a name in the middle (`build-server-http.ts:54`, `dev-log-format.ts:80-110,165`); verify with formatter tests in `packages/cli/tests/commands/`.
+- [x] 4.6 RK-29: log 4xx at info except 401, 403 and 429 at warn; keep `→ <status> in <n>ms` on the request line for long paths; never cut a name in the middle (`build-server-http.ts:54`, `dev-log-format.ts:80-110,165`); verify with formatter tests in `packages/cli/tests/commands/`.
 
 ## 5. Failure and request mapping
 
