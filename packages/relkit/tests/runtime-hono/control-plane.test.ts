@@ -17,7 +17,7 @@ const controlPlanePaths = [
   "/_relkit/v1/stream",
 ] as const;
 
-test("keeps the RelKit control plane out of application telemetry", async () => {
+test("keeps the RelKit control plane out of application telemetry but names each response", async () => {
   const collector = createObservabilityCollector();
   const lifecycle: string[] = [];
   const options = {
@@ -40,7 +40,7 @@ test("keeps the RelKit control plane out of application telemetry", async () => 
       ...(action ? { body: "x", headers: { "content-length": "1" } } : {}),
     });
     expect(await response.text()).toBe("ok");
-    expect(response.headers.has("x-request-id")).toBe(false);
+    expect(response.headers.get("x-request-id")).toMatch(/^request-/);
   }
 
   const oversized = await app.request(
@@ -48,6 +48,7 @@ test("keeps the RelKit control plane out of application telemetry", async () => 
     { method: "POST", body: "{}", headers: { "content-length": "2" } },
   );
   expect(oversized.status).toBe(413);
+  expect(oversized.headers.get("x-request-id")).toMatch(/^request-/);
   expect(await oversized.json()).toMatchObject({
     type: "/errors/body-too-large",
     status: 413,
@@ -59,6 +60,13 @@ test("keeps the RelKit control plane out of application telemetry", async () => 
     app.fetch(request),
   );
   expect(await nested.text()).toBe("ok");
+  expect(nested.headers.get("x-request-id")).toMatch(/^request-/);
+  const direct = await instrumentHttpRequest(
+    new Request("http://localhost/_relkit/v1/health/live"),
+    options,
+    () => new Response("live"),
+  );
+  expect(direct.headers.get("x-request-id")).toMatch(/^request-/);
   expect(collector.read()).toEqual([]);
   expect(lifecycle).toEqual([]);
 

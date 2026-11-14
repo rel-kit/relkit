@@ -89,7 +89,8 @@ export async function instrumentHttpRequest(
   options: HttpMiddlewareOptions,
   handler: (request: Request) => Response | Promise<Response>,
 ): Promise<Response> {
-  if (isRelkitControlPlanePath(new URL(request.url).pathname)) return handler(request);
+  if (isRelkitControlPlanePath(new URL(request.url).pathname))
+    return controlPlaneResponse(request, options, await handler(request));
   const requestId = readId(undefined, options.requestId, "request", toRequestId);
   const remoteParent = parseTraceParent(
     request.headers.get("traceparent"),
@@ -177,6 +178,24 @@ function contentLength(request: Request): number | undefined {
   const value = Number(header);
   return Number.isSafeInteger(value) && value >= 0 ? value : undefined;
 }
+/** Names a control-plane response with a request ID, without recording the request.
+ * @param request - Native control-plane request.
+ * @param options - Request ID configuration and body limit.
+ * @param response - Response of the control-plane handler; an ID it already carries is kept.
+ * @returns The response with a request ID header, closing the connection over an unread body.
+ */
+async function controlPlaneResponse(
+  request: Request,
+  options: HttpMiddlewareOptions,
+  response: Response,
+): Promise<Response> {
+  const keepAlive = await settleUnreadBody(request, response.status, options.maxBodyBytes);
+  const existing = response.headers.get(options.requestIdHeader ?? "x-request-id");
+  if (existing !== null && keepAlive) return response;
+  const requestId = existing ?? readId(undefined, options.requestId, "request", toRequestId);
+  return withRequestId(response, options, requestId, keepAlive);
+}
+
 /** Copies the response while preserving its body and adding the configured request identifier.
  * @param response - Native response whose status, headers and body lifetime are preserved.
  * @param options - Application dependencies and configuration for this domain.

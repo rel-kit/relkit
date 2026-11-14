@@ -26,7 +26,7 @@
 - [x] 3.2 RK-01, development proxy: add the same two-request test through the proxy with real listeners (`packages/cli/tests/supervisor/proxy/`); when the upstream answers before the client body has ended, stop sending, do not return that upstream connection to the pool, and keep the client's `Content-Length` when it sent one (`proxy-forward.ts:6,42-44`, `proxy-request.ts:51-69`); verify 0 bare 400 responses in 300 repetitions of the reproduction in `evidence/baseline-report.md`.
 - [x] 3.3 RK-09: enforce `maxBodyBytes` on the bytes read for every route, including the Better Auth mount and bodies without `Content-Length` (`middleware-limits.ts:28-62`, `better-auth-mount.ts:22-30`); verify a chunked 5 MiB sign-up is rejected and the handler never receives it (`packages/relkit/tests/runtime-hono/middleware.test.ts`).
 - [x] 3.4 RK-21: answer an oversize body with 413 and code `body-too-large` in both the header path and the streamed path, in development and production; change the existing http-runtime requirement with a MODIFIED delta that keeps the rest of its text; verify both paths and `openspec validate --strict`.
-- [ ] 3.5 RK-24: set `x-request-id` on control-plane responses without recording them (`http-span.ts:91`, `control-plane.ts:10-13`); verify every response of the harness's system group carries the header.
+- [x] 3.5 RK-24: set `x-request-id` on control-plane responses without recording them (`http-span.ts:91`, `control-plane.ts:10-13`); verify every response of the harness's system group carries the header.
 
 ## 4. Server shell: mode, exposure, bind address, logs
 
