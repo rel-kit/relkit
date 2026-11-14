@@ -22,10 +22,12 @@ import { ADD_FAILURE_CODES, AddScaffoldError, type AddRequest } from "create-rel
 import { PlanBuilder } from "./plan-builder.js";
 import { ensureEnvironmentEffect } from "./provider-planning.js";
 import { authSchemaSource } from "./render-auth-schema.js";
+import { packageManagerCommands, projectPackageManager } from "create-relkit/package-manager";
 import {
   databaseServiceSource,
   drizzleConfigSource,
   itemsSchemaSource,
+  NODE_DATABASE_DRIVERS,
 } from "./render-database-sources.js";
 
 /**
@@ -61,14 +63,18 @@ export const renderDatabaseEffect = Effect.fn("Scaffold.renderDatabase")(
       "drizzle.config.ts",
       drizzleConfigSource(request.dialect, schemaPath),
     );
+    const driver = NODE_DATABASE_DRIVERS[request.dialect];
     for (const dependency of ["@relkit/drizzle", "drizzle-orm", "drizzle-kit"] as const) {
       yield* builder.dependencyEffect(dependency);
     }
-    yield* builder.scriptEffect("db:generate", "bun --bun drizzle-kit generate");
+    // Bun has its own SQL client; Node loads the driver, which drizzle-kit also connects with.
+    if (driver !== undefined) yield* builder.dependencyEffect(driver);
+    yield* builder.scriptEffect("db:generate", "drizzle-kit generate");
     yield* builder.scriptEffect("db:migrate", "relkit db migrate");
     yield* databaseEnvironmentEffect(builder, request.dialect);
-    yield* builder.nextStepEffect("bun run db:generate");
-    yield* builder.nextStepEffect("bun run db:migrate");
+    const commands = packageManagerCommands(projectPackageManager(builder.discovery.projectRoot));
+    yield* builder.nextStepEffect(commands.run("db:generate"));
+    yield* builder.nextStepEffect(commands.run("db:migrate"));
     yield* builder.registerArtifactEffect("service", {
       domain: "database",
       path: servicePath,

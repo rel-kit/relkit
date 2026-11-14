@@ -84,8 +84,8 @@
 
 **Findings:** RK-05, RK-35. **Owns:** `packages/cli/src/scaffolding/render-database*.ts`, `packages/drizzle/src/**`, `packages/create-relkit/src/dependency-patches.ts`, `apps/docs/content/docs/modules/deployment/runtimes.mdx`, `tests/generator/**` for the database scaffold.
 
-- [ ] 9.1 RK-05: add a runtime-selecting PostgreSQL and MySQL client to `@relkit/drizzle`, mirroring `openSqliteDatabase`, and render the database service with the runtime-selecting client for every dialect (`render-database-sources.ts:18-21`); replace the `bun --bun drizzle-kit generate` script; change the cli-scaffolding requirement that mandates the Bun-native SQLite driver with a MODIFIED delta; verify generated projects pass `check` on Node and on Bun for each dialect.
-- [ ] 9.2 RK-35: write `patchedDependencies` only for package managers that apply it and tell the user when a declaration-only repair is skipped; write the install-script approval npm needs; verify the manifest created with npm, pnpm and Bun.
+- [x] 9.1 RK-05: add a runtime-selecting PostgreSQL and MySQL client to `@relkit/drizzle`, mirroring `openSqliteDatabase`, and render the database service with the runtime-selecting client for every dialect (`render-database-sources.ts:18-21`); replace the `bun --bun drizzle-kit generate` script; change the cli-scaffolding requirement that mandates the Bun-native SQLite driver with a MODIFIED delta; verify generated projects pass `check` on Node and on Bun for each dialect.
+- [x] 9.2 RK-35: write `patchedDependencies` only for package managers that apply it and tell the user when a declaration-only repair is skipped; write the install-script approval npm needs; verify the manifest created with npm, pnpm and Bun.
 
 ## 10. Check diagnostics, provider locations and doctor
 

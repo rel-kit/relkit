@@ -52,7 +52,11 @@ export const materializeGenerationStage = Effect.fn("ProjectGeneration.materiali
       ".env.example",
       ".gitignore",
     ]);
-    yield* prepareProjectDependencyPatchEffect(stage);
+    const notice = yield* prepareProjectDependencyPatchEffect(
+      stage,
+      creationPackageManager(options.packageManager),
+    );
+    if (notice !== undefined) context.onProgress?.(notice);
   },
   (effect) => observeExecution("generator", "generation.materializeStage", effect),
 );

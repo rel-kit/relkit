@@ -16,6 +16,8 @@ import { domainError, domainTry } from "./generator-errors.js";
 import { runGeneratorPromise } from "./generator-runtime.js";
 import { JsonObject, ProjectManifest } from "./project-manifest.schemas.js";
 import type { DependencyPatch, DependencyPatchPlan } from "./dependency-patches.types.js";
+import { pnpmWorkspacePatchEffect } from "./dependency-patch-workspace.js";
+import { projectPackageManager, type PackageManagerName } from "./package-manager.js";
 
 /**
  * Loads verified Drizzle declaration repairs from source or the owning packed release.
@@ -70,6 +72,10 @@ export const planDependencyPatchEffect = Effect.fn("DependencyPatch.plan")(
         ),
       ),
     );
+    if (patchManager(projectRoot) === "npm") {
+      const skipped: DependencyPatchPlan = { content: source, notice: SKIPPED_PATCH };
+      return skipped;
+    }
     const entries = manifest.patchedDependencies ?? {};
     const current = entries[patch.key];
     if (current !== undefined && current !== patch.path)
@@ -91,13 +97,20 @@ export const planDependencyPatchEffect = Effect.fn("DependencyPatch.plan")(
   (effect) => observeExecution("generator", "planning.planDependencyPatch", effect),
 );
 
+/** Says why skipping the repair for npm is safe. */
+export const SKIPPED_PATCH =
+  "Skipped the Drizzle declaration repair: npm does not apply patchedDependencies. This is safe; the repair changes only Drizzle's type declarations, never code that runs.";
+
 /**
- * Delivers repair assets before the first installation inside a generation-owned stage.
+ * Delivers repair assets before the first installation inside a generation-owned stage, where the
+ * selected manager reads them: `package.json` for Bun, `pnpm-workspace.yaml` for pnpm (pnpm 10 and
+ * 11 ignore the `package.json` field). npm applies no patches, so nothing is written for it.
  * @param projectRoot - Disposable staging directory.
- * @returns Completion once the manifest and unchanged patch asset are ready together.
+ * @param manager - Package manager the project is created for; by default the project's own.
+ * @returns The notice to show when the repair was skipped, once the files are ready together.
  */
 export const prepareProjectDependencyPatchEffect = Effect.fn("DependencyPatch.prepare")(
-  function* (projectRoot: string) {
+  function* (projectRoot: string, manager: PackageManagerName = patchManager(projectRoot)) {
     const source = yield* (yield* GeneratorFileSystem).readText(join(projectRoot, "package.json"));
     const manifest = yield* Schema.decodeUnknownEffect(ProjectManifest)(
       yield* domainTry(() => JSON.parse(source) as unknown),
@@ -106,17 +119,30 @@ export const prepareProjectDependencyPatchEffect = Effect.fn("DependencyPatch.pr
       manifest.dependencies?.["drizzle-orm"] === undefined &&
       manifest.devDependencies?.["drizzle-orm"] === undefined
     )
-      return;
-    const result = yield* planDependencyPatchEffect(
-      projectRoot,
-      source,
-      yield* readDrizzlePatchEffect(),
-    );
-    const operations: ScaffoldFileOperation[] = result.operation ? [result.operation] : [];
-    if (result.content !== source)
-      operations.push({ path: "package.json", action: "update", content: result.content });
+      return undefined;
+    if (manager === "npm") return SKIPPED_PATCH;
+    const patch = yield* readDrizzlePatchEffect();
+    const operations: ScaffoldFileOperation[] = [];
+    if (manager === "pnpm") {
+      const existing = yield* projectPatchContentEffect(projectRoot, patch.path);
+      if (existing !== undefined && existing !== patch.content)
+        return yield* collision(`${patch.path} already contains a different dependency patch.`);
+      if (existing === undefined)
+        operations.push({ path: patch.path, action: "create", content: patch.content });
+      operations.push(yield* pnpmWorkspacePatchEffect(projectRoot, patch));
+    } else {
+      const result: DependencyPatchPlan = yield* planDependencyPatchEffect(
+        projectRoot,
+        source,
+        patch,
+      );
+      if (result.operation) operations.push(result.operation);
+      if (result.content !== source)
+        operations.push({ path: "package.json", action: "update", content: result.content });
+    }
     yield* validateOperationActionsEffect(projectRoot, operations);
     yield* applyFileOperationsEffect(projectRoot, operations, new Set());
+    return undefined;
   },
   (effect) => observeExecution("generator", "planning.prepareProjectDependencyPatch", effect),
 );
@@ -147,10 +173,24 @@ export function planDependencyPatch(
 /**
  * Preserves staging repair delivery's Promise API.
  * @param projectRoot - Absolute project root.
- * @returns Completion after the existing contract has been applied.
+ * @param manager - Package manager the project is created for; by default the project's own.
+ * @returns The notice to show when the repair was skipped.
  */
-export function prepareProjectDependencyPatch(projectRoot: string): Promise<void> {
-  return runGeneratorPromise(prepareProjectDependencyPatchEffect(projectRoot));
+export function prepareProjectDependencyPatch(
+  projectRoot: string,
+  manager?: PackageManagerName,
+): Promise<string | undefined> {
+  return runGeneratorPromise(prepareProjectDependencyPatchEffect(projectRoot, manager));
+}
+
+/**
+ * Reads the manager an existing project names in `packageManager` or by its lockfile. A project
+ * that names none keeps the repair, which Bun, the templates' manager, applies.
+ * @param projectRoot - Absolute project root.
+ * @returns The project's package manager.
+ */
+function patchManager(projectRoot: string): PackageManagerName {
+  return projectPackageManager(projectRoot, "bun/0.0.0");
 }
 
 /**

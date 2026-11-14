@@ -7,26 +7,47 @@
 import type { DatabaseDialect } from "create-relkit/add-types";
 import { dirname } from "node:path";
 
+/** Runtime-selecting client of each dialect: its `@relkit/drizzle` entry, opener and variable. */
+const CLIENTS = {
+  sqlite: {
+    entry: "sqlite",
+    open: "openSqliteDatabase",
+    variable: "DATABASE_PATH",
+    close: "close",
+  },
+  postgresql: { entry: "pg", open: "openPostgresDatabase", variable: "DATABASE_URL", close: "end" },
+  mysql: { entry: "mysql", open: "openMysqlDatabase", variable: "DATABASE_URL", close: "end" },
+} as const;
+
+/** Driver package the runtime-selecting client loads on Node, per dialect; Bun needs none. */
+export const NODE_DATABASE_DRIVERS = {
+  sqlite: undefined,
+  postgresql: "pg",
+  mysql: "mysql2",
+} as const;
+
 /**
- * Renders database Service Source as source text without executing user modules.
+ * Renders database Service Source as source text without executing user modules. The service
+ * opens its database through `@relkit/drizzle`'s runtime-selecting client, so it imports nothing
+ * specific to Bun or Node and runs on both.
  * @param dialect - Supported database dialect.
  * @returns TypeScript declaring the selected Drizzle database service and connection factory.
  */
 export function databaseServiceSource(dialect: DatabaseDialect): string {
-  const sqlite = dialect === "sqlite";
-  const client = sqlite
-    ? `const path = env.DATABASE_PATH;\n    if (!path) throw new Error("DATABASE_PATH is required");\n    mkdirSync(dirname(path), { recursive: true });\n    const sqlite = new Database(path);\n    return drizzle({ client: sqlite });`
-    : `const url = env.DATABASE_URL;\n    if (!url) throw new Error("DATABASE_URL is required");\n    return drizzle.${dialect === "postgresql" ? "postgres" : "mysql"}(url);`;
-  return `${sqlite ? `import { Database } from "bun:sqlite";\nimport { mkdirSync } from "node:fs";\nimport { dirname } from "node:path";\n` : ""}import { defineDrizzleService } from "@relkit/drizzle";
-import { drizzle } from "drizzle-orm/${sqlite ? "bun-sqlite" : "bun-sql"}";
+  const client = CLIENTS[dialect];
+  const value = dialect === "sqlite" ? "path" : "url";
+  return `import { defineDrizzleService } from "@relkit/drizzle";
+import { ${client.open} } from "@relkit/drizzle/${client.entry}";
 import * as schema from "./schema/index.js";
 
 export default defineDrizzleService({
   schema,
   client: ({ env }) => {
-    ${client}
+    const ${value} = env.${client.variable};
+    if (!${value}) throw new Error("${client.variable} is required");
+    return ${client.open}(${value});
   },
-  dispose: (database) => database.$client.close(),
+  dispose: (database) => database.$client.${client.close}(),
 });
 `;
 }
@@ -74,7 +95,14 @@ export function drizzleConfigSource(dialect: DatabaseDialect, schemaPath: string
   const variable = dialect === "sqlite" ? "DATABASE_PATH" : "DATABASE_URL";
   const value = dialect === "sqlite" ? "path" : "url";
   const invalid = dialect === "sqlite" ? ` || path === ":memory:"` : "";
-  return `import { defineConfig } from "drizzle-kit";
+  return `import { existsSync } from "node:fs";
+import { defineConfig } from "drizzle-kit";
+
+// Bun and \`relkit db migrate\` load the environment files; drizzle-kit run by npm or pnpm on Node
+// does not. Values already set win, and .env.local comes before .env.
+for (const file of [".env.local", ".env"]) {
+  if (typeof process.loadEnvFile === "function" && existsSync(file)) process.loadEnvFile(file);
+}
 
 const ${value} = process.env.${variable};
 if (${value} === undefined || ${value}.trim() === ""${invalid}) {
