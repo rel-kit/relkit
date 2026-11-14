@@ -50,3 +50,8 @@ An `OPTIONS` request that is not a CORS preflight, on a path that has routes, no
 an empty body and `Allow` listing the path's methods plus `OPTIONS` (and `HEAD` where `GET`
 exists), instead of 405. A path without routes still answers 404, and a route that declares its
 own `OPTIONS` handler is unchanged. The `Allow` header of a 405 now also lists `OPTIONS`.
+
+The remaining Problem Details bodies also carry `requestId`: the 413 `payload-too-large` of the
+server body limit and the 500 sent when a route's `response` option throws.
+`ResponseMappingOptions` gains `requestId`, and the generated OpenAPI Problem schema declares
+`requestId` next to `traceId`.

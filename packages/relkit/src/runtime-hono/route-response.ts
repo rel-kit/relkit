@@ -36,7 +36,7 @@ export async function routeSuccessResponse(
   try {
     return applyRouteResponse(response, (route.response as (output: unknown) => unknown)(value));
   } catch {
-    return internalErrorResponse(options.traceId);
+    return internalErrorResponse(options);
   }
 }
 

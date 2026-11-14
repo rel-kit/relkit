@@ -38,6 +38,7 @@
                       "type": "object"
                     },
                     "detail": { "type": "string" },
+                    "requestId": { "type": "string" },
                     "status": { "const": 404, "type": "integer" },
                     "title": { "type": "string" },
                     "traceId": { "type": "string" },
@@ -72,6 +73,7 @@
                       },
                       "type": "array"
                     },
+                    "requestId": { "type": "string" },
                     "status": { "maximum": 599, "minimum": 100, "type": "integer" },
                     "title": { "type": "string" },
                     "traceId": { "type": "string" },

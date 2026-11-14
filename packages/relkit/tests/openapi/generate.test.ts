@@ -50,6 +50,14 @@ test("generates stable OpenAPI from route, function, error, mapping, and middlew
     properties: { code: { const: "validation" }, issues: { type: "array" } },
     required: ["type", "title", "status", "code", "detail", "issues"],
   });
+  // Every Problem body the runtime sends names its trace and request, so the schema declares both.
+  for (const status of ["404", "422"]) {
+    expect(
+      operation?.responses[status]?.content?.["application/problem+json"]?.schema,
+    ).toMatchObject({
+      properties: { traceId: { type: "string" }, requestId: { type: "string" } },
+    });
+  }
   expect(operation?.["x-relkit"].middleware).toEqual([
     { id: "orders.auth", targetFunctionId: "orders.authorize" },
   ]);

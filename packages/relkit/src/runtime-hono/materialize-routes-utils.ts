@@ -6,7 +6,6 @@ import { httpBoundary, HttpBoundaryError, observeHttp, runHttp } from "./http-ef
 import type { HttpRouteRequest, RouteMaterializationOptions } from "./materialize-routes.js";
 import { getRequestState, type HttpRequestState } from "./middleware.js";
 import { nativeStreamResponse } from "./native-stream.js";
-import type { ProblemInput } from "./problem-details.js";
 import { requestFromContext } from "./request-context.js";
 import { isRequestMappingFailure } from "./request-mapping.js";
 import {
@@ -201,7 +200,7 @@ function stripHead(trigger: HttpTriggerRegistration, response: Response): Respon
 function responseOptionsFor(
   options: RouteMaterializationOptions,
   state: HttpRequestState | undefined,
-): ResponseMappingOptions & Pick<ProblemInput, "requestId"> {
+): ResponseMappingOptions {
   return {
     ...(options.responseMapping ?? {}),
     ...(options.manifest.responseSchemas === undefined
