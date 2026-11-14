@@ -47,6 +47,14 @@ export interface InspectorQuery {
   readonly order?: "asc" | "desc";
   readonly kind?: string;
   readonly status?: string;
+  /** Requests only: HTTP method, any case. */
+  readonly method?: string;
+  /** Requests only: prefix of the raw path; starts with `/`. */
+  readonly path?: string;
+  /** Requests only: a declared error identifier. */
+  readonly errorId?: string;
+  /** Asks the page to carry `total`, the number of matches; scans every match. */
+  readonly count?: boolean;
   readonly from?: string;
   readonly to?: string;
   readonly severity?: string;

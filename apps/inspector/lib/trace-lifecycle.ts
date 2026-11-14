@@ -22,6 +22,15 @@ export function traceLifecycle(
   return nodes;
 }
 
+/**
+ * Number of distinct spans in a set of span records. A span is reported once when it starts,
+ * again on each update and once more when it ends, so the number of records is larger; the
+ * timeline and every count beside it use this number.
+ */
+export function uniqueSpanCount(spans: readonly InspectorObject[]): number {
+  return traceLifecycle(spans).length;
+}
+
 export function traceDuration(value: InspectorObject): number | undefined {
   if (typeof value.durationMs === "number" && Number.isFinite(value.durationMs))
     return Math.max(0, value.durationMs);

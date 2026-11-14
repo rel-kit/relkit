@@ -134,6 +134,8 @@ export interface ObservabilityPage<T = InspectorObject> extends Omit<
   readonly protocol: InspectorResponseProtocol;
   readonly items: readonly T[];
   readonly nextCursor?: string;
+  /** Number of matching records, ignoring the cursor; present when the query set `count`. */
+  readonly total?: number;
 }
 export interface InspectorGraph extends InspectorIdentity {
   readonly graph?: InspectorObject;

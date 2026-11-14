@@ -25,7 +25,7 @@ describe("inspector accessibility contract", () => {
     expect(invocation).toContain("resultHeadingRef");
     expect(invocation).toContain("Invoke locally");
     expect(filters).toContain('aria-describedby="signal-filter-description"');
-    expect(filters).toContain('id="signal-filter-severity"');
+    expect(filters).toContain('id="signal-filter-limit"');
     expect(filters).toContain("Apply filters");
     expect(filters).toContain("Reset");
   });

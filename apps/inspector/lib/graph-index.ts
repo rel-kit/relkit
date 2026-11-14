@@ -61,6 +61,34 @@ export function entityIndex(graph: GraphSnapshot | undefined): readonly EntityEn
   );
 }
 
+/** A request or trace identifier recognised in the palette's query, with where it opens. */
+export interface RecognizedIdentifier {
+  readonly kind: "request" | "trace";
+  readonly id: string;
+  readonly href: string;
+  readonly label: string;
+}
+
+/**
+ * Recognises a pasted request id (`request-` and a unique suffix) or trace id (32 hexadecimal
+ * digits). Other text is left to the search over pages and graph entities.
+ */
+export function recognizeIdentifier(query: string): RecognizedIdentifier | undefined {
+  const value = query.trim();
+  if (/^request-[0-9a-z][0-9a-z-]{3,}$/i.test(value))
+    return {
+      kind: "request",
+      id: value,
+      href: `/requests/${encodeURIComponent(value)}`,
+      label: `Open request ${value}`,
+    };
+  if (/^[0-9a-f]{32}$/i.test(value)) {
+    const id = value.toLowerCase();
+    return { kind: "trace", id, href: `/traces/${id}`, label: `Open trace ${id}` };
+  }
+  return undefined;
+}
+
 /** Case-insensitive match on label, id and detail; every word must match somewhere. */
 export function searchEntities(
   entries: readonly EntityEntry[],
