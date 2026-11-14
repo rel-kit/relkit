@@ -44,6 +44,7 @@ async function invokeHttp(request) {
       ...(request.progressSink === undefined ? {} : { progressSink: request.progressSink }),
       hooks: { observability: telemetry,
         onSpanStart: (span) => { invocationSpanId = span.spanId; },
+        onObservedEdge: recordObservedEdge,
         context: (context) => invocationContext(context, invocationSpanId),
       },
     });

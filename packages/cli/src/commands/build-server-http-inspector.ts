@@ -21,6 +21,7 @@ export function inspectorEndpointsSource(configuration: ServerSourceConfiguratio
     activationFingerprint,
     graph,
     diagnostics: [],
+    observedEdges: () => [...observedEdges.values()],
     integrations: runtimeIntegrationsPlan,
     localServices: localServicesInspector,
     telemetry: () => ({

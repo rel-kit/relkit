@@ -88,14 +88,19 @@ export function projectDescriptors(value: unknown): JsonValue[] {
 }
 
 /**
- * Selects public observed-edge endpoints and relationship fields.
+ * Selects public observed-edge endpoints, relationship fields and how often and when a
+ * development server saw the call.
  * @param value - Candidate metadata value, checked before selecting public fields.
  * @returns Redacted observed edges in source order.
  */
 export function projectObservedEdges(value: unknown): JsonValue[] {
   return toItems(value).flatMap((edge) => {
     if (!isRecord(edge) || typeof edge.from !== "string" || typeof edge.to !== "string") return [];
-    return [safeJson(pick(edge, ["relationship", "kind", "from", "to"]))];
+    return [
+      safeJson(
+        pick(edge, ["relationship", "kind", "from", "to", "count", "firstSeenAt", "lastSeenAt"]),
+      ),
+    ];
   });
 }
 

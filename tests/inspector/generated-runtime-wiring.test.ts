@@ -40,6 +40,7 @@ function application() {
     "module",
     `
     const runtimeManifest = { functions: {}, targets: {}, services: {} };
+    const runtimeState = () => ({ ready: { provider: true }, stopping: false });
     const generationId = "test", graphHash = "sha256:test", activationFingerprint = undefined;
     const graph = { nodes: [], edges: [] }, environment = "test", internalEndpointsEnabled = true;
     const runtimeIntegrationsPlan = {}, localServicesInspector = {};
@@ -103,6 +104,7 @@ function generatedInvoke() {
     const authRequestStorage = { getStore: () => undefined, run: (_auth, run) => run() };
     const runtimeOwner = { track: (task) => task };
     const targetFor = () => undefined, createDependencySources = () => ({});
+    const recordObservedEdge = () => undefined;
     ${SERVER_INVOCATION_SOURCE}
     return invokeHttp;
   `,

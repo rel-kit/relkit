@@ -5,19 +5,44 @@ export const SERVER_RUNTIME_SUPPORT_SOURCE = `
 function provider(providerRegistry, capability, profile) {
   return providerRegistry.resolve(capability, profile).value;
 }
+// Provider state from the readiness the runtime owner tracks: ready, degraded while not (or no
+// longer) ready, unavailable when the provider registry or this resource's provider failed.
 async function resourceRuntimeMetadata(capability, nodes) {
   const providerRegistry = await providerStartup;
-  if (providerRegistry === undefined) return [];
+  if (providerRegistry === undefined) return nodes.map((node) => ({ id: node.id, profile: node.profile, state: "unavailable" }));
+  const state = runtimeState().ready.provider && !runtimeState().stopping ? "ready" : "degraded";
   return nodes.map((node) => {
-    const handle = providerRegistry.resolve(capability, node.profile);
+    let handle;
+    try {
+      handle = providerRegistry.resolve(capability, node.profile);
+    } catch {
+      return { id: node.id, profile: node.profile, state: "unavailable" };
+    }
     const features = handle.binding.adapter.features ?? [];
     const capabilities = Object.fromEntries(features.map((feature) => [feature, true]));
     for (const name of ["signedReadUrl", "signedWriteUrl", "increment"]) {
       const supported = handle.value?.capabilities?.[name];
       if (typeof supported === "boolean") capabilities[name] = supported;
     }
-    return { id: node.id, profile: node.profile, capabilities };
+    return { id: node.id, profile: node.profile, state, capabilities };
   });
+}
+// Distinct dynamic calls of this generation (one entry per relationship, caller and callee, with
+// a count and the last time seen), for the Inspector; production keeps none.
+const observedEdges = new Map();
+function recordObservedEdge(edge) {
+  if (environment === "production" || edge === null || typeof edge !== "object") return;
+  const relationship = edge.relationship ?? edge.kind;
+  if (typeof relationship !== "string" || typeof edge.from !== "string" || typeof edge.to !== "string") return;
+  const key = JSON.stringify([relationship, edge.from, edge.to]);
+  const seenAt = new Date().toISOString();
+  const current = observedEdges.get(key);
+  if (current !== undefined) {
+    current.count += 1;
+    current.lastSeenAt = seenAt;
+  } else if (observedEdges.size < 1024) {
+    observedEdges.set(key, { relationship, from: edge.from, to: edge.to, count: 1, firstSeenAt: seenAt, lastSeenAt: seenAt });
+  }
 }
 async function queryEventRuntime(query) {
   const providerRegistry = await providerStartup;
