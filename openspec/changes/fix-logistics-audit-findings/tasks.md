@@ -118,6 +118,7 @@
 - [x] 12.1 RK-18: reproduce with a test that saves a syntax error and then a fix two seconds later; report the parse failure with file and line when the candidate fails instead of waiting for the health timeout; start the rebuild for the later change as soon as it arrives; verify the failure is reported and the fix is serving within the reload budget.
 - [x] 12.2 IN-28: add a session identifier and a reason (`start` or `reload`) to the generation events (`dev-activation.ts:129-137`); verify a restart and a reload produce distinguishable events.
 - [x] 12.3 RK-07: forward a programmatic candidate host to the child environment (`supervisor/candidate-start.ts:43`), so a custom host is honoured by the generated server; verify with the supervisor environment test.
+- [ ] 12.4 RK-18, RK-14: put the file, line and column of a parse error into the evaluator's import failure, so `relkit dev` and `relkit check` name the syntax error's own location instead of line 1 and "2 errors building <absolute path>" (`packages/cli/src/compiler/discovery/evaluator-child-framing.ts` `importFailure`, the failure type, `packages/cli/src/commands/check-support.ts`); verify with the compile-failure test asserting the line and the message of the syntax error, and that no absolute path is printed.
 
 ## 13. Inspector launcher and session state
 
