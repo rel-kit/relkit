@@ -197,39 +197,28 @@ describe("HTTP response mapping", () => {
     expect(body).not.toContain("secret");
   });
 
-  test("returns redacted provider response details in development", async () => {
-    const failure = providerFailure(
-      new Error("S3 put failed with status 403: InvalidAccessKeyId: password=provider-secret"),
-    );
-    const response = await mapFailureResponse(trigger([]), failure, { mode: "development" });
+  test.each(["development", "test", "production"] as const)(
+    "keeps provider and defect causes out of the %s response",
+    async (mode) => {
+      const provider = await mapFailureResponse(
+        trigger([]),
+        providerFailure(new Error("S3 put failed with status 403: password=provider-secret")),
+        { mode },
+      );
+      expect(provider.status).toBe(502);
+      expect(await provider.json()).toEqual(
+        problem(502, "provider-failure", "A dependency of this request failed."),
+      );
 
-    expect(response.status).toBe(502);
-    expect(await response.json()).toEqual(
-      problem(
-        502,
-        "provider-failure",
-        "S3 put failed with status 403: InvalidAccessKeyId: password=[REDACTED]",
-      ),
-    );
-
-    const production = await mapFailureResponse(trigger([]), failure, { mode: "production" });
-    expect(await production.json()).toEqual(
-      problem(502, "provider-failure", "A dependency of this request failed."),
-    );
-  });
-
-  test("names the redacted defect cause in development only", async () => {
-    const failure = unexpectedDefect(new Error("no such table: user; password=defect-secret"));
-
-    const development = await mapFailureResponse(trigger([]), failure, { mode: "development" });
-    expect(development.status).toBe(500);
-    expect(await development.json()).toEqual(
-      problem(500, "internal-error", "no such table: user; password=[REDACTED]"),
-    );
-
-    const production = await mapFailureResponse(trigger([]), failure, { mode: "production" });
-    expect(await production.json()).toEqual(internalError);
-  });
+      const defect = await mapFailureResponse(
+        trigger([]),
+        unexpectedDefect(new Error("no such table: user; password=defect-secret")),
+        { mode },
+      );
+      expect(defect.status).toBe(500);
+      expect(await defect.json()).toEqual(internalError);
+    },
+  );
 
   // A bundled server and an external runtime-hono each load their own @relkit/invocation.
   test("maps failures created by another package copy to their declared responses", async () => {

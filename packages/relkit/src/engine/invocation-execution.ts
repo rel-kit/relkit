@@ -137,16 +137,36 @@ export function createInvocationExecution<
     captureInput: (value: unknown): void => span.capture("input", value),
     captureOutput: (value: unknown): void => span.capture("output", value),
     complete: (outcome: string, error?: InvocationValidationError | InvocationFailure): void => {
+      const now = BigInt(Date.now()) * 1_000_000n;
       span.attribute("relkit.outcome", outcome);
       if (error) {
         span.attribute("error.type", error instanceof Error ? error.name : error.kind);
         span.attribute("error.message", error.message);
+        recordFailureIdentity(span, error, now);
       }
-      span.end(BigInt(Date.now()) * 1_000_000n, error === undefined ? Exit.void : Exit.fail(error));
+      span.end(now, error === undefined ? Exit.void : Exit.fail(error));
     },
     suspend: (): void => {
       span.attribute("relkit.outcome", "suspended");
       span.end(BigInt(Date.now()) * 1_000_000n, Exit.void);
     },
   });
+}
+
+/** Records the safe identity of a failure on its invocation span: an `exception` event naming
+ * the class of a provider or defect failure. The cause's message never reaches the span here;
+ * the HTTP layer records the redacted cause in development, where the mode is known.
+ * @param span - Invocation span still open for writes.
+ * @param error - Validation error or normalized invocation failure.
+ * @param time - Event time in epoch nanoseconds.
+ */
+function recordFailureIdentity(
+  span: {
+    readonly event: (name: string, time: bigint, attributes: Record<string, unknown>) => void;
+  },
+  error: InvocationValidationError | InvocationFailure,
+  time: bigint,
+): void {
+  if (error instanceof Error || (error.kind !== "provider" && error.kind !== "defect")) return;
+  span.event("exception", time, { "exception.type": error._tag });
 }

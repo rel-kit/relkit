@@ -12,7 +12,6 @@ import { observeHttp, runHttp } from "./http-effect.js";
 import type { RequestMappingIssue } from "./request-mapping.js";
 import { problemBody, problemResponse } from "./problem-details.js";
 import { encodeJson, encodeProblem, genericFailureResponse } from "./response-mapping-encode.js";
-import { developmentFailureMessage } from "./response-mapping-provider.js";
 import {
   findError,
   findResponse,

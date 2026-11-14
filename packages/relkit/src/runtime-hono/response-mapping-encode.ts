@@ -3,7 +3,7 @@ import type { HttpTriggerRegistration } from "../graph/index.js";
 import type { InvocationFailure } from "../runtime-effect/index.js";
 import { Effect } from "effect";
 import { problemBody, problemResponse, type ProblemInput } from "./problem-details.js";
-import { developmentFailureMessage } from "./response-mapping-provider.js";
+import { recordInternalFailure } from "./response-mapping-provider.js";
 import {
   findResponse,
   internalErrorResponse,
@@ -39,7 +39,8 @@ export const encodeJson = Effect.fn("ResponseMapping.encodeJson")(
  * @param trigger - Route declarations used to select an outcome-specific response.
  * @param failure - Normalized provider, cancellation, timeout or defect failure.
  * @param options - Runtime exposure mode and optional response schemas.
- * @returns An effect yielding a validated public failure response without native cause details.
+ * @returns An effect yielding a validated public failure response without native cause details
+ *   in any mode.
  */
 export const genericFailureResponse = Effect.fn("ResponseMapping.genericFailure")(function* (
   trigger: HttpTriggerRegistration,
@@ -73,12 +74,13 @@ export const genericFailureResponse = Effect.fn("ResponseMapping.genericFailure"
       code: "internal-error",
       detail: "The request failed unexpectedly.",
     };
-  const message = developmentFailureMessage(failure, options.mode);
+  // The cause goes to the log and the trace; the response names only the failure class.
+  yield* recordInternalFailure(failure, options.mode);
   const status = responseStatus(declaration, selected.status);
   const problem = problemBody({
     status,
     code: selected.code,
-    detail: message ?? selected.detail,
+    detail: selected.detail,
     ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
   });
   return (yield* responseIsValid(trigger, declaration, problem, options))
