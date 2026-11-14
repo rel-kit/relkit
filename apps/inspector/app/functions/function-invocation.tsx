@@ -11,6 +11,9 @@ import { Section } from "../../components/blocks/section";
 import { StatusBadge } from "../../components/neon/status-badge";
 import { Button } from "../../components/ui/button";
 import { cn } from "../../lib/utils";
+import { ActionAnswerView } from "../action-answer-view";
+import type { ActionAnswer } from "../../lib/action-answer";
+import { actionAnswer } from "../../lib/action-answer";
 import { fieldControlClass, fieldTextareaClass, SchemaForm } from "../schema-form";
 import { schemaFields, schemaInput } from "../../lib/schema-model";
 
@@ -19,6 +22,7 @@ export function FunctionInvocation({
   generationId,
   graphHash,
   inputSchema,
+  hasAccessRule = false,
   invoke,
   onComplete,
 }: {
@@ -26,6 +30,8 @@ export function FunctionInvocation({
   readonly generationId: string;
   readonly graphHash: string;
   readonly inputSchema?: unknown;
+  /** The function declares an access rule, which the Inspector cannot satisfy without a session. */
+  readonly hasAccessRule?: boolean;
   readonly invoke: (input: FunctionInvocationInput) => Promise<FunctionInvocationResult>;
   readonly onComplete: (result: FunctionInvocationResult) => void;
 }) {
@@ -42,13 +48,19 @@ export function FunctionInvocation({
   const [pending, setPending] = useState(false);
   const [result, setResult] = useState<FunctionInvocationResult>();
   const [status, setStatus] = useState("");
+  const [answer, setAnswer] = useState<ActionAnswer>();
   const errorRef = useRef<HTMLParagraphElement>(null);
+  const answerRef = useRef<HTMLDivElement>(null);
   const resultHeadingRef = useRef<HTMLHeadingElement>(null);
   const fields = schemaFields(inputSchema);
 
   useEffect(() => {
     if (error !== "") errorRef.current?.focus();
   }, [error]);
+
+  useEffect(() => {
+    if (answer !== undefined) answerRef.current?.focus();
+  }, [answer]);
 
   useEffect(() => {
     if (result !== undefined) resultHeadingRef.current?.focus();
@@ -78,6 +90,7 @@ export function FunctionInvocation({
     setError("");
     setPending(true);
     setStatus("Invoking function…");
+    setAnswer(undefined);
     try {
       const next = await invoke({
         functionId,
@@ -90,7 +103,8 @@ export function FunctionInvocation({
       onComplete(next);
       setStatus("Function invocation completed.");
     } catch (failure) {
-      setError(failure instanceof Error ? failure.message : "Invocation failed.");
+      setResult(undefined);
+      setAnswer(actionAnswer(failure, "function"));
       setStatus("Function invocation failed.");
     } finally {
       setPending(false);
@@ -159,6 +173,18 @@ export function FunctionInvocation({
           >
             {error}
           </p>
+        )}
+        {hasAccessRule ? (
+          <p
+            id="function-session-note"
+            className="m-0 max-w-none rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground"
+          >
+            This function has an access rule. The Inspector invokes it without a user session, so
+            the application may refuse the call.
+          </p>
+        ) : null}
+        {answer === undefined ? null : (
+          <ActionAnswerView ref={answerRef} id="function-invocation-answer" answer={answer} />
         )}
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {status}

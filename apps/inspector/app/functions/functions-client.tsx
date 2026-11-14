@@ -29,6 +29,7 @@ export function FunctionsClient() {
       title="Functions"
       description="Inspect contracts, dependencies, edges, limits, and local execution."
       noun="functions"
+      declare="Declare a function with `defineFunction` and it appears here."
       load={load}
       columns={[
         {

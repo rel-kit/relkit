@@ -4,7 +4,9 @@ import { useCallback } from "react";
 import type { InspectorObject, InspectorPage, InspectorQuery } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
 import { DetailList } from "../../components/blocks/details";
+import { declaredRoutesPage, systemRoutes, tailCursor } from "../../lib/system-routes";
 import { ResourceTable, type ResourceTableItem } from "../resource-table";
+import { SystemRoutesSection } from "./system-routes-section";
 
 interface RouteItem extends ResourceTableItem {
   readonly method: string;
@@ -20,14 +22,31 @@ const methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].map
 
 export function RoutesClient() {
   const load = useCallback(async (query: InspectorQuery): Promise<InspectorPage<RouteItem>> => {
-    const page = await createInspectorClient().list<InspectorObject>("routes", query);
-    return { ...page, items: page.items.map(routeItem) };
+    const api = createInspectorClient();
+    const page = await api.list<InspectorObject>("routes", query);
+    const offset = Number(query.cursor ?? 0) || 0;
+    let tail = page.items;
+    if (page.total !== undefined && offset + page.items.length < page.total) {
+      // System routes close the collection: read its end to learn how many match these filters.
+      const { cursor: _cursor, limit: _limit, ...filters } = query;
+      tail = (
+        await api.list<InspectorObject>("routes", {
+          ...filters,
+          cursor: tailCursor(page.total),
+          limit: 100,
+        })
+      ).items;
+    }
+    const declared = declaredRoutesPage(page, offset, systemRoutes(tail).length);
+    return { ...declared, items: declared.items.map(routeItem) };
   }, []);
   return (
     <ResourceTable
       title="Routes"
       description="Inspect transport contracts and send a safe request to the active backend."
       noun="routes"
+      declare="Declare a route with `defineRoute` and it appears here."
+      footer={<SystemRoutesSection />}
       load={load}
       kindOptions={methods}
       columns={[

@@ -34,14 +34,12 @@ interface EnvironmentState {
   readonly truncated: boolean;
 }
 
+const LOADING: EnvironmentState = { status: "loading", fields: [], truncated: false };
+
 export function EnvironmentClient() {
   const [revision, setRevision] = useState(0);
   const [liveState, setLiveState] = useState("connecting");
-  const [data, setData] = useState<EnvironmentState>({
-    status: "loading",
-    fields: [],
-    truncated: false,
-  });
+  const [data, setData] = useState<EnvironmentState>(LOADING);
   const [grouping, setGrouping] = useState<EnvironmentGrouping>("prefix");
   const [selected, setSelected] = useState<string>();
 
@@ -152,10 +150,11 @@ export function EnvironmentClient() {
           : {
               meta: (
                 <>
-                  <span>{data.active.generationId}</span>
-                  <span className="truncate" title={data.active.graphHash}>
-                    {data.active.graphHash}
-                  </span>
+                  {[data.active.generationId, data.active.graphHash].map((value) => (
+                    <span key={value} className="max-w-[24rem] truncate" title={value}>
+                      {value}
+                    </span>
+                  ))}
                 </>
               ),
             })}

@@ -8,6 +8,7 @@ import { deliveryCounts, EVENT_DELIVERY_STATES, eventViews } from "../../lib/eve
 import { DetailList } from "../../components/blocks/details";
 import { StatusBadge } from "../../components/neon/status-badge";
 import { Badge } from "../../components/ui/badge";
+import { countLabel } from "../../lib/event-rows";
 import { plural } from "../domains/catalog-kit";
 import { ResourceTable, type ResourceTableItem } from "../resource-table";
 
@@ -18,6 +19,8 @@ interface EventItem extends ResourceTableItem {
   readonly completed: number;
   readonly delayed: number;
   readonly deadLetters: number;
+  /** More deliveries exist than the page that was counted, so the counts are lower bounds. */
+  readonly partial: boolean;
 }
 
 const statusOptions = EVENT_DELIVERY_STATES.map((id) => ({ id, label: id }));
@@ -48,6 +51,7 @@ export function EventsClient() {
           completed: counts.completed,
           delayed: counts.delayed,
           deadLetters: counts["dead-lettered"],
+          partial: runtime.nextCursor !== undefined && runtime.counts === undefined,
         },
       ];
     });
@@ -58,6 +62,7 @@ export function EventsClient() {
       title="Events"
       description="Versioned contracts, publishers, typed callback listeners, and durable delivery state."
       noun="events"
+      declare="Declare an event with `defineEvent` and it appears here."
       load={load}
       statusOptions={statusOptions}
       columns={[
@@ -82,15 +87,15 @@ export function EventsClient() {
             <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
               <StatusBadge
                 tone={item.completed > 0 ? "success" : "neutral"}
-                label={`Completed ${item.completed}`}
+                label={`Completed ${countLabel(item.completed, { hasMore: item.partial })}`}
               />
               <StatusBadge
                 tone={item.delayed > 0 ? "warning" : "neutral"}
-                label={`Delayed ${item.delayed}`}
+                label={`Delayed ${countLabel(item.delayed, { hasMore: item.partial })}`}
               />
               <StatusBadge
                 tone={item.deadLetters > 0 ? "danger" : "neutral"}
-                label={`Dead ${item.deadLetters}`}
+                label={`Dead ${countLabel(item.deadLetters, { hasMore: item.partial })}`}
               />
             </span>
           ),
@@ -106,9 +111,21 @@ export function EventsClient() {
             { label: "Version", value: `v${item.version}`, mono: true },
             { label: "Publishers", value: String(item.publishers), mono: true },
             { label: "Listeners", value: String(item.listeners), mono: true },
-            { label: "Completed", value: String(item.completed), mono: true },
-            { label: "Delayed", value: String(item.delayed), mono: true },
-            { label: "Dead letters", value: String(item.deadLetters), mono: true },
+            {
+              label: "Completed",
+              value: countLabel(item.completed, { hasMore: item.partial }),
+              mono: true,
+            },
+            {
+              label: "Delayed",
+              value: countLabel(item.delayed, { hasMore: item.partial }),
+              mono: true,
+            },
+            {
+              label: "Dead letters",
+              value: countLabel(item.deadLetters, { hasMore: item.partial }),
+              mono: true,
+            },
           ]}
         />
       )}

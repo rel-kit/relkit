@@ -4,7 +4,9 @@ import { Stat, StatGroup } from "../../components/blocks/stat";
 import { HistoryList, type HistoryEntry } from "../../components/neon/history-list";
 import { StatusBadge, statusTone } from "../../components/neon/status-badge";
 import { Badge } from "../../components/ui/badge";
-import { deliveryCounts, type EventView } from "../../lib/events-model";
+import type { EventView } from "../../lib/events-model";
+import { countLabel, stateCounts, type DeliveryPage } from "../../lib/event-rows";
+import { Button } from "../../components/ui/button";
 import { Count, EntityList, Quiet } from "../domains/catalog-kit";
 
 export function EventPublisherPanel({
@@ -85,8 +87,18 @@ export function EventDeliveryPanel({
   deliveries,
   deadLetters,
   publications,
-}: Pick<EventView, "deliveries" | "deadLetters" | "publications">) {
-  const counts = deliveryCounts(deliveries);
+  page,
+  loadingMore,
+  onLoadMore,
+}: Pick<EventView, "deliveries" | "deadLetters" | "publications"> & {
+  readonly page: DeliveryPage;
+  readonly loadingMore: boolean;
+  readonly onLoadMore: () => void;
+}) {
+  const { counts, exact } = stateCounts(deliveries, {
+    reported: page.counts,
+    hasMore: page.hasMore,
+  });
   const entries: HistoryEntry[] = deliveries.map((item, index) => {
     const failure = record(item.failure);
     const state = text(item.state) || "state unavailable";
@@ -113,8 +125,19 @@ export function EventDeliveryPanel({
       id="event-delivery"
       aria-labelledby="event-delivery-heading"
       title={<span id="event-delivery-heading">Deliveries and dead letters</span>}
-      description={`${publications.length} accepted publication(s) recorded · durable listeners are at-least-once`}
-      actions={<Count value={deliveries.length} />}
+      description={`${
+        page.hasMore
+          ? `${publications.length} publications loaded`
+          : `${publications.length} ${publications.length === 1 ? "publication" : "publications"}`
+      } · durable listeners are at-least-once`}
+      actions={
+        <span
+          className="rounded-sm border border-border px-1.5 py-px font-mono text-[11px] text-muted-foreground tabular-nums"
+          aria-label={`${countLabel(deliveries.length, page)} deliveries`}
+        >
+          {countLabel(deliveries.length, page)}
+        </span>
+      }
       flush
     >
       <div className="border-b border-border p-3">
@@ -138,6 +161,12 @@ export function EventDeliveryPanel({
           />
         </StatGroup>
       </div>
+      {exact ? null : (
+        <p className="m-0 max-w-none border-b border-border px-4 py-2 text-xs text-muted-foreground">
+          These counts cover the {deliveries.length} deliveries loaded so far; more exist. Load more
+          to include them.
+        </p>
+      )}
       {deadLetters.length > 0 && (
         <p
           className="m-0 max-w-none border-b border-border bg-danger-soft px-4 py-2 text-xs text-danger"
@@ -153,6 +182,13 @@ export function EventDeliveryPanel({
       ) : (
         <HistoryList label="Delivery attempts" entries={entries} showDurationBars={false} />
       )}
+      {page.hasMore ? (
+        <div className="border-t border-border p-3">
+          <Button variant="secondary" size="sm" isDisabled={loadingMore} onPress={onLoadMore}>
+            {loadingMore ? "Loading…" : "Load more deliveries"}
+          </Button>
+        </div>
+      ) : null}
     </Section>
   );
 }

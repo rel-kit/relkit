@@ -25,6 +25,7 @@ export function ChannelsClient() {
       title="Channels"
       description="Realtime event contracts, client access, replay, and presence declarations."
       noun="channels"
+      declare="Declare a channel with `defineChannel` and it appears here."
       load={load}
       columns={[
         {

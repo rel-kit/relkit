@@ -5,7 +5,7 @@ import {
   InspectorApiError,
   createInspectorApiClient,
 } from "./api";
-import { jobsNotMounted } from "./api-request-utils";
+import { jobsNotMounted, NO_JOBS_HINT, NO_JOBS_MESSAGE } from "./api-request-utils";
 
 const envelope = (value: Record<string, unknown>, status = 200) =>
   new Response(
@@ -87,6 +87,78 @@ describe("inspector API client", () => {
     expect(
       jobsNotMounted(new InspectorApiError("x", "RELKIT_INSPECTOR_JOBS_UNAVAILABLE", 503)),
     ).toBe(false);
+  });
+
+  test("reads the status before the envelope: a Problem Details 404 is HTTP_404", async () => {
+    let attempts = 0;
+    const client = createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () => {
+        attempts += 1;
+        return new Response(
+          JSON.stringify({ type: "about:blank", title: "Not Found", status: 404 }),
+          { status: 404, headers: { "content-type": "application/problem+json" } },
+        );
+      },
+    });
+
+    const error = await client.jobDefinitions().catch((cause: unknown) => cause);
+    expect(error).toMatchObject({ code: "HTTP_404", status: 404, kind: "http" });
+    expect(jobsNotMounted(error)).toBe(true);
+    expect(attempts).toBe(1);
+  });
+
+  test("a 5xx without an envelope keeps its status and is retried", async () => {
+    let attempts = 0;
+    const client = createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () => {
+        attempts += 1;
+        return attempts === 1
+          ? new Response(JSON.stringify({ message: "bad gateway" }), {
+              status: 502,
+              headers: { "content-type": "application/json" },
+            })
+          : envelope({ items: [] });
+      },
+    });
+    await expect(client.list("routes")).resolves.toMatchObject({ items: [] });
+    expect(attempts).toBe(2);
+  });
+
+  test("a rejected action keeps its body so the page can read the application's answer", async () => {
+    const client = createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () =>
+        envelope(
+          {
+            error: "RELKIT_INSPECTOR_ACTION_FAILED",
+            cause: { status: 401, code: "unauthenticated" },
+          },
+          409,
+        ),
+    });
+    const error = await client
+      .request("/_relkit/v1/actions/functions/a/invoke", { method: "POST", body: "{}" })
+      .catch((cause: unknown) => cause);
+    expect(error).toMatchObject({
+      code: "RELKIT_INSPECTOR_ACTION_FAILED",
+      status: 409,
+      body: { cause: { status: 401, code: "unauthenticated" } },
+    });
+  });
+
+  test("an application without jobs is told apart from a failing jobs service", async () => {
+    expect(NO_JOBS_MESSAGE).toBe("This application declares no jobs.");
+    expect(NO_JOBS_HINT).toContain("defineJob");
+    // A 5xx or a network failure is an outage, never "none declared".
+    expect(jobsNotMounted(new InspectorApiError("x", "HTTP_500", 500))).toBe(false);
+    expect(
+      jobsNotMounted(
+        new InspectorApiError("x", "RELKIT_INSPECTOR_DISCONNECTED", undefined, "network"),
+      ),
+    ).toBe(false);
+    expect(jobsNotMounted(new InspectorApiError("x", "HTTP_404", 404))).toBe(true);
   });
 
   test("falls back immediately when task-first job APIs are unavailable", async () => {

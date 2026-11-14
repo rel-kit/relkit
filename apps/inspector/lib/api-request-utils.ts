@@ -35,7 +35,9 @@ export async function readPayload(response: Response): Promise<unknown> {
   }
 }
 
-export const NO_JOBS_MESSAGE = "This application defines no jobs.";
+export const NO_JOBS_MESSAGE = "This application declares no jobs.";
+export const NO_JOBS_HINT =
+  "Declare a job with `defineJob` and its definitions, runs, schedules and services appear here.";
 
 /**
  * Jobs routes are mounted only when the application declares jobs, so a list

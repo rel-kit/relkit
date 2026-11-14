@@ -12,6 +12,7 @@ import { Badge } from "../../components/ui/badge";
 import { DetailLayout } from "../detail-layout";
 import { SchemaPanel } from "../schema-panel";
 import { SourceLink } from "../source-link";
+import { ErrorOccurrences } from "./error-occurrences";
 import {
   Count,
   DetailPending,
@@ -94,6 +95,7 @@ export function ErrorDetailClient() {
         </Section>
       }
     >
+      <ErrorOccurrences errorId={errorId} />
       <SchemaPanel title="Data contract" value={node.data} />
       <Section
         id="error-declarers"

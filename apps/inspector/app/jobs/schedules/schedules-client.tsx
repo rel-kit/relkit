@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { InspectorObject } from "../../../lib/api-types";
-import { jobsNotMounted, NO_JOBS_MESSAGE } from "../../../lib/api-request-utils";
+import { jobsNotMounted } from "../../../lib/api-request-utils";
+import { JobsNoneDeclared } from "../jobs-none-declared";
 import { createInspectorClient } from "../../../lib/client";
 import { CalendarClock, Pause, Play, Trash2 } from "lucide-react";
 import { FailedState, LoadingRows } from "../../../components/blocks/block-state";
 import { PageHeader } from "../../../components/blocks/page-header";
-import { EmptyState } from "../../../components/neon/empty-state";
 import { StatusBadge, statusTone } from "../../../components/neon/status-badge";
 import { Button } from "../../../components/ui/button";
 import {
@@ -81,13 +81,7 @@ export function JobsSchedulesClient() {
         {state === "error" && (
           <FailedState title="Schedules are unavailable." onRetry={() => void load()} />
         )}
-        {state === "absent" && (
-          <EmptyState
-            icon={<CalendarClock />}
-            title={<span role="status">{NO_JOBS_MESSAGE}</span>}
-            description="Schedules belong to job definitions; none are declared."
-          />
-        )}
+        {state === "absent" && <JobsNoneDeclared icon={<CalendarClock />} />}
         {state === "ready" && <ScheduleTable items={items} pending={pending} onAction={action} />}
         {state === "absent" ? null : (
           <RunsPagination
