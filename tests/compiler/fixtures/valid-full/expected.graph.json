@@ -262,9 +262,9 @@
       "requiredIn": [],
       "sensitive": false,
       "source": {
-        "column": 16,
+        "column": 3,
         "file": "relkit.config.ts",
-        "line": 10
+        "line": 7
       },
       "type": "port"
     },
@@ -616,9 +616,9 @@
         "kind": "connected"
       },
       "source": {
-        "column": 16,
+        "column": 5,
         "file": "relkit.config.ts",
-        "line": 10
+        "line": 14
       }
     },
     {
@@ -661,9 +661,9 @@
         "kind": "connected"
       },
       "source": {
-        "column": 16,
+        "column": 12,
         "file": "relkit.config.ts",
-        "line": 10
+        "line": 20
       }
     },
     {

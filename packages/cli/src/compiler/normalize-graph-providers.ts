@@ -12,15 +12,21 @@ import {
   projectNamedValues,
 } from "./normalize-graph-provider-fields.js";
 import { clean } from "./normalize-graph-utils.js";
+import { providerEntryLocation } from "./normalize-source-keys.js";
 import type { GraphNode, NormalizedDescriptor } from "./normalize-types.js";
 import { isRecord } from "./normalize-utils.js";
 
 /**
  * Projects application provider bindings into canonical graph nodes.
  * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param sources - Application files, used to locate each binding's entry; a binding not found
+ * there keeps the app's location.
  * @returns Canonical provider binding graph nodes.
  */
-export function providerNodes(descriptor: NormalizedDescriptor): GraphNode[] {
+export function providerNodes(
+  descriptor: NormalizedDescriptor,
+  sources: readonly { readonly fileName: string; readonly text: string }[] = [],
+): GraphNode[] {
   const value = isRecord(descriptor.value) ? descriptor.value : {};
   return providerMaps(value)
     .sort(([left], [right]) => left.localeCompare(right))
@@ -36,7 +42,13 @@ export function providerNodes(descriptor: NormalizedDescriptor): GraphNode[] {
                     {
                       kind: "provider",
                       id: providerBindingId(capability, profile),
-                      source: descriptor.source,
+                      source:
+                        providerEntryLocation(
+                          sources,
+                          descriptor.source.file,
+                          capability,
+                          profile,
+                        ) ?? descriptor.source,
                       ...projection,
                     },
                   ];

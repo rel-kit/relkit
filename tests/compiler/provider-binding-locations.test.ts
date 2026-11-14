@@ -79,3 +79,15 @@ test("a local-only bucket is reported at its entry with what to write instead", 
   );
   expect(diagnostic?.suggestion).toContain("infrastructure source");
 });
+
+test("binding and environment nodes point at their own declarations", () => {
+  const nodes = compile("development").graph?.nodes ?? [];
+  const source = (id: string) => nodes.find((node) => node.id === id)?.source;
+  expect(source("provider.bucket.local")).toEqual({
+    file: "relkit.config.ts",
+    line: 13,
+    column: 5,
+  });
+  expect(source("DATABASE_URL")).toEqual({ file: "src/platform/env.ts", line: 4, column: 3 });
+  expect(source("SESSION_SECRET")).toEqual({ file: "src/platform/env.ts", line: 5, column: 3 });
+});

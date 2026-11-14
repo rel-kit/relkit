@@ -2,6 +2,7 @@ import type { JsonValue } from "relkit/contracts";
 import type { DeploymentRoleProjection } from "relkit/graph";
 import { clean } from "./normalize-graph-utils.js";
 import type { GraphNode, NormalizedDescriptor } from "./normalize-types.js";
+import { environmentKeyLocations } from "./normalize-source-keys.js";
 import { isRecord } from "./normalize-utils.js";
 
 /**
@@ -112,17 +113,23 @@ export function deploymentRoleProjections(value: unknown): readonly DeploymentRo
 /**
  * Projects named environment declarations into graph nodes.
  * @param descriptor - Normalized descriptor whose identity and metadata are inspected.
+ * @param sources - Application files. Evaluation does not record where `defineEnv` was called, so
+ * a variable's key is found in the source; a variable not found there keeps the app's location.
  * @returns Graph nodes for named environment declarations.
  */
-export function environmentNodes(descriptor: NormalizedDescriptor): GraphNode[] {
+export function environmentNodes(
+  descriptor: NormalizedDescriptor,
+  sources: readonly { readonly fileName: string; readonly text: string }[] = [],
+): GraphNode[] {
   const value = isRecord(descriptor.value) ? descriptor.value : {};
   const env = isRecord(value.env) && isRecord(value.env.metadata) ? value.env.metadata : {};
+  const locations = environmentKeyLocations(sources, descriptor.source.file);
   return Object.entries(env).map(([name, metadata]) => {
     const data = isRecord(metadata) ? metadata : {};
     return {
       kind: "env",
       id: name,
-      source: descriptor.source,
+      source: locations.get(name) ?? descriptor.source,
       name,
       type: typeof data.type === "string" ? data.type : "",
       requiredIn: textList(data.requiredIn),
