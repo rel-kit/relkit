@@ -13,7 +13,7 @@ import {
   type HttpMiddlewareOptions,
 } from "./middleware-utils.js";
 import { ensureRequestRecord, finishRequestRecord } from "./request-record-middleware.js";
-import { problemResponse } from "./problem-details.js";
+import { payloadTooLargeResponse } from "./response-mapping-utils.js";
 
 /** Consumes a request body the handler left unread, so the next request on a kept-alive
  * connection is parsed from its own first byte. A body larger than the limit, of unknown size
@@ -95,12 +95,7 @@ export function limitsMiddleware(options: HttpMiddlewareOptions = {}): Middlewar
       options.maxBodyBytes !== undefined &&
       !(await withinBodyLimit(context, options.maxBodyBytes))
     ) {
-      const response = problemResponse({
-        traceId: current.traceId,
-        status: 413,
-        code: "payload-too-large",
-        detail: `The request body exceeds the ${options.maxBodyBytes}-byte limit.`,
-      });
+      const response = payloadTooLargeResponse(options.maxBodyBytes, current);
       current.requestRecord?.add({
         kind: "mapping",
         status: response.status,

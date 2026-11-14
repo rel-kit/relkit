@@ -45,3 +45,13 @@ Problem Details bodies now carry `requestId` next to `traceId`; it equals the re
 A body over a route's own `maxBodyBytes`, or over the request mapping limit, now answers 413
 Problem Details `payload-too-large` ("The request body exceeds the N-byte limit.") like the server
 limit (D6), instead of 422 `validation` with a `body-too-large` issue.
+
+An `OPTIONS` request that is not a CORS preflight, on a path that has routes, now answers 204 with
+an empty body and `Allow` listing the path's methods plus `OPTIONS` (and `HEAD` where `GET`
+exists), instead of 405. A path without routes still answers 404, and a route that declares its
+own `OPTIONS` handler is unchanged. The `Allow` header of a 405 now also lists `OPTIONS`.
+
+The remaining Problem Details bodies also carry `requestId`: the 413 `payload-too-large` of the
+server body limit and the 500 sent when a route's `response` option throws.
+`ResponseMappingOptions` gains `requestId`, and the generated OpenAPI Problem schema declares
+`requestId` next to `traceId`.

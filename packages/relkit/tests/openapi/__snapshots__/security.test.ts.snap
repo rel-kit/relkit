@@ -41,6 +41,9 @@ exports[`a route with auth required and an access rule declares the session requ
             "detail": {
               "type": "string",
             },
+            "requestId": {
+              "type": "string",
+            },
             "status": {
               "maximum": 599,
               "minimum": 100,

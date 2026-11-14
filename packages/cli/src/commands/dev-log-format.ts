@@ -79,14 +79,18 @@ export function formatDevLog(record: LogRecord, options: DevLogFormatOptions = {
     scope = "http";
     message = `${f.method} ${f.path} → ${f.status ?? "cancelled"}${duration}`;
   }
-  details.push(...devLogDetails(record, options.verbose === true));
+  // A recorded exception's message is the line itself; its stack shows only with --verbose.
+  const fields = typeof f["exception.type"] === "string" ? exceptionFields(f, options) : f;
+  if (fields !== f && options.verbose && typeof f["exception.stacktrace"] === "string")
+    details.push(...stackFrames(f["exception.stacktrace"]));
+  details.push(...devLogDetails({ ...record, fields }, options.verbose === true));
   if (
     options.verbose &&
     message === event &&
     record.component !== "inspector" &&
     typeof f.message !== "string"
   )
-    details.push(JSON.stringify({ ...f, ...correlations(record) }));
+    details.push(JSON.stringify({ ...fields, ...correlations(record) }));
   const width = Math.max(40, options.columns ?? 100);
   const scopeWidth = width < 80 ? 10 : 16;
   const time = timestamp(record.timestamp);
@@ -129,6 +133,35 @@ function wrap(value: string, width: number): string[] {
     line += `${line ? " " : ""}${word}`;
   }
   return [...lines, line];
+}
+
+/** Keeps the fields of a recorded exception that its line does not already show.
+ * @param fields - Record fields with `exception.*` attributes.
+ * @param options - Detail policy; without `verbose` no metadata is shown.
+ * @returns The fields without the message and stack, or none outside verbose mode.
+ */
+function exceptionFields(
+  fields: LogRecord["fields"],
+  options: DevLogFormatOptions,
+): LogRecord["fields"] {
+  if (!options.verbose) return {};
+  const {
+    "exception.message": _message,
+    "exception.stacktrace": _stack,
+    ...rest
+  } = fields as Record<string, LogRecord["fields"][string]>;
+  return rest;
+}
+
+/** Selects the call frames of a stack, trimmed.
+ * @param stack - Stack text whose first line repeats the message.
+ * @returns The `at …` lines.
+ */
+function stackFrames(stack: string): string[] {
+  return stack
+    .split("\n")
+    .filter((line) => /^\s*at /.test(line))
+    .map((line) => line.trim());
 }
 
 /** Renders the nonempty correlation fields of a validated log envelope.

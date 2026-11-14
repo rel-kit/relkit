@@ -67,6 +67,7 @@ const httpMiddlewareOptions = {
       level, component: "runtime.http", message: event.type,
       requestId: event.requestId, originRequestId: event.requestId, traceId: event.traceId, generationId, graphHash,
       fields: { method: event.method, path: event.path, status: event.status, durationMs: event.durationMs } }));
+    releaseHttpLogs(event.requestId);
   } }),
 };
 ${serverHttpOptionsSource(configuration)}${applicationSource}${FORWARDED_REQUEST_SOURCE}

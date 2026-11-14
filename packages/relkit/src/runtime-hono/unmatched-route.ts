@@ -1,6 +1,7 @@
 /**
- * Answers requests that no route matched with a 404 Problem Details response, or a 405 with
- * `Allow` when the path exists under other methods.
+ * Answers requests that no route matched with a 404 Problem Details response, a 405 with `Allow`
+ * when the path exists under other methods, or, for an `OPTIONS` request that is not a CORS
+ * preflight, an empty 204 with `Allow`.
  */
 import type { Context, Hono } from "hono";
 import { TrieRouter } from "hono/router/trie-router";
@@ -16,6 +17,9 @@ export function installUnmatchedRoute(app: Hono): void {
     // Routes are materialized after the shell, so the table is built from the final registry.
     if (table === undefined || table.size !== app.routes.length) table = routeTable(app);
     const allowed = table.allowed(context.req.path, context.req.method);
+    // Preflights are answered by transport security; a plain OPTIONS asks what the path accepts.
+    if (allowed.length > 0 && context.req.method === "OPTIONS")
+      return context.body(null, 204, { allow: allowed.join(", ") });
     if (allowed.length > 0)
       return contextProblem(context, {
         status: 405,
@@ -58,7 +62,9 @@ function routeTable(app: Hono): RouteTable {
       const supported = [...methods].filter(
         (candidate) => router.match(candidate === "HEAD" ? "GET" : candidate, path)[0].length > 0,
       );
-      return supported.some((candidate) => candidate === requested) ? [] : supported;
+      if (supported.length === 0 || supported.includes(requested)) return [];
+      // Every routed path answers OPTIONS, through a declared route or the 204 above, so it is last.
+      return [...supported.filter((candidate) => candidate !== "OPTIONS"), "OPTIONS"];
     },
   };
 }

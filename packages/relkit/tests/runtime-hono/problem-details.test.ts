@@ -188,6 +188,6 @@ test("unmatched routes are 404 and 405 problems", async () => {
     method: "DELETE",
     headers: { origin: "https://app.example" },
   });
-  expect(wrongMethod.headers.get("allow")).toBe("GET, HEAD");
+  expect(wrongMethod.headers.get("allow")).toBe("GET, HEAD, OPTIONS");
   await problem(wrongMethod, 405, "method-not-allowed");
 });

@@ -28,6 +28,7 @@ export function problemSchema(
       code: { type: "string" },
       detail: { type: "string" },
       traceId: { type: "string" },
+      requestId: { type: "string" },
       ...fields,
     },
   };

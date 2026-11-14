@@ -119,19 +119,24 @@ test("OPTIONS is a preflight only when it names the requested method", async () 
     transportSecurity: { allowedOrigins: ["https://app.example"] },
   });
 
-  // Same-origin OPTIONS without Access-Control-Request-Method: the allowed methods, no denial.
+  // Same-origin OPTIONS without Access-Control-Request-Method: 204 with the allowed methods.
   const sameOrigin = await app.request("https://api.example/write", {
     method: "OPTIONS",
     headers: { origin: "https://api.example" },
   });
-  expect(sameOrigin.status).not.toBe(403);
-  expect(sameOrigin.headers.get("allow")).toBe("POST");
-  expect(JSON.stringify(await sameOrigin.json())).not.toContain("origin-denied");
+  expect(sameOrigin.status).toBe(204);
+  expect(sameOrigin.headers.get("allow")).toBe("POST, OPTIONS");
+  expect(await sameOrigin.text()).toBe("");
 
   // OPTIONS without Origin: the same answer.
   const noOrigin = await app.request("https://api.example/write", { method: "OPTIONS" });
-  expect(noOrigin.status).toBe(sameOrigin.status);
-  expect(noOrigin.headers.get("allow")).toBe("POST");
+  expect(noOrigin.status).toBe(204);
+  expect(noOrigin.headers.get("allow")).toBe("POST, OPTIONS");
+  expect(await noOrigin.text()).toBe("");
+
+  // OPTIONS for a path without routes is still not found.
+  const unknown = await app.request("https://api.example/nowhere", { method: "OPTIONS" });
+  expect(unknown.status).toBe(404);
 
   // A real preflight from an allowed origin is still negotiated.
   const preflight = await app.request("https://api.example/write", {
