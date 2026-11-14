@@ -13,6 +13,28 @@ import type { InspectorOptions } from "./options.types.js";
 import { historyResponse, backendError } from "./backend-history.js";
 import { forwardBackend } from "./backend-forward.js";
 import { ExecutionSuccessLogs } from "relkit/contracts/operation";
+import { publishSelectionState } from "./live-events.js";
+
+/**
+ * The Inspector's session with the application, apart from the UI's own stream to the Inspector.
+ * @param current - Tool state.
+ * @returns `state`: `connected` (one live `relkit dev` session), `disconnected` (none found or it
+ * stopped answering) or `ambiguous` (several; pass `--connection-file`); `sessionId` and
+ * `generationId` of the connected session or null; `sessions`: the candidates when ambiguous;
+ * `since`: ISO time the state began, or null before the first discovery.
+ */
+function applicationStatus(current: InspectorToolState) {
+  const selection = current.selection;
+  const handshake = selection.state === "connected" ? selection.handshake : undefined;
+  return {
+    state: selection.state,
+    sessionId: handshake?.sessionId ?? null,
+    generationId: handshake?.generationId ?? null,
+    sessions: selection.state === "ambiguous" ? [...selection.sessions] : [],
+    since:
+      current.selectionSince === undefined ? null : new Date(current.selectionSince).toISOString(),
+  };
+}
 
 /** The packaged Next server alone receives credentials for this local hop. */
 export function inspectorBackend(
@@ -75,12 +97,15 @@ const serveBackend = Effect.fn("Inspector.backend")(function* (
     current.history.projectId !== current.selection.connection.descriptor.projectId
   )
     return backendError("history.foreign-project", 503);
-  const status = backendStatus(current, url.pathname);
+  const status = backendStatus(current, url.pathname, stream);
   if (status) return status;
   const history = /^\/_relkit\/v1\/(logs|requests|traces)(?:\/([^/]+))?$/.exec(url.pathname);
   if (history && request.method === "GET") return yield* historyResponse(current, request, history);
-  if (url.pathname === "/_relkit/v1/stream" && request.method === "GET")
+  if (url.pathname === "/_relkit/v1/stream" && request.method === "GET") {
+    // The subscriber replays it as its newest event, even when the session never changed.
+    publishSelectionState(stream, current.selection);
     return yield* localStreamResponse(stream, request);
+  }
   if (current.selection.state !== "connected")
     return backendError(
       current.selection.state === "ambiguous"
@@ -110,7 +135,11 @@ const localStreamResponse = Effect.fn("Inspector.streamResponse")(
 );
 
 /** Projects history readiness without leaking private connection descriptors or credentials. */
-function backendStatus(current: InspectorToolState, path: string): Response | undefined {
+function backendStatus(
+  current: InspectorToolState,
+  path: string,
+  stream: ObservabilityStream,
+): Response | undefined {
   if (path === "/_relkit/v1/storage")
     return Response.json(
       {
@@ -118,10 +147,21 @@ function backendStatus(current: InspectorToolState, path: string): Response | un
         version: 1,
         state: current.history && current.error === undefined ? "ready" : "degraded",
         connection: current.selection.state,
+        application: applicationStatus(current),
         error: current.error,
         incomplete: current.incomplete,
+        recordsLostBeforeHistory: {
+          // Records the application's producer could not hand to its inspection buffer.
+          byApplicationProducer: current.producerDropped ?? 0,
+          // Records the application's inspection buffer evicted before the Inspector stored them.
+          byInspectionBuffer: current.droppedRecords,
+        },
+        // Invalidations the tool's stream dropped for a slow interface; no record is lost.
+        missedLiveUpdates: stream.counters().subscriberDropped,
+        /** @deprecated Same as `recordsLostBeforeHistory.byInspectionBuffer`. */
         dropped: current.droppedRecords,
         producerFailed: current.producerFailed ?? 0,
+        /** @deprecated Same as `recordsLostBeforeHistory.byApplicationProducer`. */
         producerDropped: current.producerDropped ?? 0,
       },
       { headers: { "x-relkit-api-version": "1" } },

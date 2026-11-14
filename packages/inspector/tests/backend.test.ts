@@ -169,6 +169,13 @@ test("the standalone live stream serves invalidations and releases its subscribe
         expect(response.headers.get("content-type")).toContain("text/event-stream");
         const reader = response.body!.getReader();
         yield* Effect.promise(() => reader.read());
+        // A new subscriber learns the application session state first, even when it never changed.
+        const selection = new TextDecoder().decode(
+          (yield* Effect.promise(() => reader.read())).value,
+        );
+        expect(selection).toContain("event: generation.changed");
+        // The stream's redaction drops `sessionId`; the status endpoint carries it.
+        expect(selection).toContain('"data":{"generationId":"one","state":"connected"}');
         events.publish({ type: "log.emitted", data: {} });
         const next = yield* Effect.promise(() => reader.read());
         expect(new TextDecoder().decode(next.value)).toContain("log.emitted");

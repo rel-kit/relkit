@@ -14,6 +14,7 @@ import type {
 } from "relkit/observability/local/worker-contract";
 import { createWorkerClientState } from "./worker-client-state.js";
 import { sendWorkerCommand, closeWorkerClient } from "./worker-client-send.js";
+import { findNodeExecutable } from "../../node-executable.js";
 
 /**
  * Starts one child without opening a database until the caller sends open.
@@ -35,9 +36,12 @@ function createWorkerEffects(onFailure: (error: Error) => void): LocalWorkerEffe
   const workerPath = existsSync(built)
     ? built
     : new URL("../../../dist/observability-local/local/duckdb-worker.js", import.meta.url);
+  // DuckDB's native binding needs Node; under `bun --bun` the `node` on PATH is Bun.
+  const node = findNodeExecutable();
   const child = fork(fileURLToPath(workerPath), [], {
-    execPath: "node",
+    execPath: node.executable,
     execArgv: [],
+    env: { ...process.env, PATH: node.path },
     stdio: ["ignore", "ignore", "pipe", "ipc"],
   });
   const state = createWorkerClientState(child, onFailure);
