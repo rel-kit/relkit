@@ -88,6 +88,32 @@ export const enforceAccess = Effect.fn("Engine.enforceAccess")(
   (effect) => observeExecution("engine", "enforceAccess", effect),
 );
 
+/** Decides the parts of an access rule that do not read input (roles and permissions), so a
+ * transport can reject an anonymous or unauthorized caller before it reports input errors.
+ * A rule's `allow` predicate is left to {@link enforceAccess}, which runs after validation.
+ * @param rule - The target's rule; a rule without roles or permissions is not decided here.
+ * @param principal - The request's caller.
+ * @returns Nothing when undecided or allowed; fails with `unauthenticated` or `access-denied`.
+ * @example yield* enforceAccessBeforeInput(target.access, principal);
+ */
+export const enforceAccessBeforeInput = Effect.fn("Engine.enforceAccessBeforeInput")(
+  function* (rule: AccessRule<never, unknown> | undefined, principal: AccessPrincipalSource) {
+    if (rule?.roles === undefined && rule?.permissions === undefined) return;
+    const caller = yield* Effect.tryPromise({
+      try: () => principal(),
+      catch: (cause) => cause,
+    }).pipe(Effect.orDie);
+    if (caller.kind === "system") return;
+    const allowed = yield* Effect.tryPromise({
+      try: () => passesWithoutInput(rule as AccessRule<unknown, unknown>, caller),
+      catch: (cause) => cause,
+    }).pipe(Effect.orDie);
+    if (allowed) return;
+    return yield* Effect.fail(accessFailure(caller.kind === "user"));
+  },
+  (effect) => observeExecution("engine", "enforceAccessBeforeInput", effect),
+);
+
 /** Reads the caller from the handler context's session when no principal was supplied. */
 function contextPrincipal(context: unknown): AccessPrincipalSource {
   const auth = (context as { readonly auth?: { readonly getSession?: () => Promise<unknown> } })
@@ -98,19 +124,31 @@ function contextPrincipal(context: unknown): AccessPrincipalSource {
       : principalFromSession(await auth.getSession());
 }
 
+type Caller = Exclude<AccessPrincipal<unknown>, { readonly kind: "system" }>;
+
 async function passes(
   rule: AccessRule<unknown, unknown>,
-  caller: Exclude<AccessPrincipal<unknown>, { readonly kind: "system" }>,
+  caller: Caller,
   input: unknown,
+): Promise<boolean> {
+  const user = caller.kind === "user" ? caller : undefined;
+  if (!(await passesWithoutInput(rule, caller))) return false;
+  return rule.allow === undefined
+    ? true
+    : (await rule.allow({ principal: caller, session: user?.session ?? null, input })) === true;
+}
+
+/** Checks a rule's roles and permissions; an anonymous caller fails either when they are set. */
+async function passesWithoutInput(
+  rule: AccessRule<unknown, unknown>,
+  caller: Caller,
 ): Promise<boolean> {
   const user = caller.kind === "user" ? caller : undefined;
   if (rule.roles !== undefined && !rule.roles.some((role) => user?.roles.includes(role) === true))
     return false;
   for (const permission of rule.permissions ?? [])
     if (user === undefined || !(await user.hasPermission(permission))) return false;
-  return rule.allow === undefined
-    ? true
-    : (await rule.allow({ principal: caller, session: user?.session ?? null, input })) === true;
+  return true;
 }
 
 function accessFailure(signedIn: boolean): InvocationFailure {

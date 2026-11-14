@@ -16,3 +16,8 @@ and on the request span. The `http.validation.failed` event carries
 `relkit.validation.issue_count` and, for the first ten issues,
 `relkit.validation.issues.<n>.code` and `relkit.validation.issues.<n>.path`, never messages or
 values; it is now also recorded when the function's own input validation rejects a request.
+
+An HTTP route whose function has an access rule with `roles` or `permissions` now answers 401
+(no session) or 403 (missing role or permission) before it reads or validates the request input,
+so the answer names no input field. Rules with an `allow` predicate, which reads input, still run
+after validation.
