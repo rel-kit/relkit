@@ -110,6 +110,38 @@ test("preflight rejects undeclared methods and headers", async () => {
   expect(negotiated.headers.get("access-control-allow-headers")).toBe(AGENT_CAPABILITY_HEADER);
 });
 
+test("OPTIONS is a preflight only when it names the requested method", async () => {
+  const plan = rawPlan();
+  const app = createApp({
+    plan,
+    manifest: manifest(plan),
+    engine: { invoke: async () => undefined },
+    transportSecurity: { allowedOrigins: ["https://app.example"] },
+  });
+
+  // Same-origin OPTIONS without Access-Control-Request-Method: the allowed methods, no denial.
+  const sameOrigin = await app.request("https://api.example/write", {
+    method: "OPTIONS",
+    headers: { origin: "https://api.example" },
+  });
+  expect(sameOrigin.status).not.toBe(403);
+  expect(sameOrigin.headers.get("allow")).toBe("POST");
+  expect(JSON.stringify(await sameOrigin.json())).not.toContain("origin-denied");
+
+  // OPTIONS without Origin: the same answer.
+  const noOrigin = await app.request("https://api.example/write", { method: "OPTIONS" });
+  expect(noOrigin.status).toBe(sameOrigin.status);
+  expect(noOrigin.headers.get("allow")).toBe("POST");
+
+  // A real preflight from an allowed origin is still negotiated.
+  const preflight = await app.request("https://api.example/write", {
+    method: "OPTIONS",
+    headers: { origin: "https://app.example", "access-control-request-method": "POST" },
+  });
+  expect(preflight.status).toBe(204);
+  expect(preflight.headers.get("access-control-allow-origin")).toBe("https://app.example");
+});
+
 function rawPlan(): RegistrationPlan {
   return {
     graphHash: "sha256:security",

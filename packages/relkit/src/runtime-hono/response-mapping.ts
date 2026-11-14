@@ -1,6 +1,7 @@
 import { isAccessFailureId, isJsonValue } from "../contracts/index.js";
 import { InvocationValidationError } from "../engine/index.js";
 import type { HttpTriggerRegistration } from "../graph/index.js";
+import { frameworkTrace } from "../invocation/index.js";
 import {
   isInvocationFailure,
   normalizeFailure,
@@ -12,16 +13,17 @@ import { observeHttp, runHttp } from "./http-effect.js";
 import type { RequestMappingIssue } from "./request-mapping.js";
 import { problemBody, problemResponse } from "./problem-details.js";
 import { encodeJson, encodeProblem, genericFailureResponse } from "./response-mapping-encode.js";
-import { developmentFailureMessage } from "./response-mapping-provider.js";
 import {
   findError,
   findResponse,
   findSuccess,
   findValidation,
   internalErrorResponse,
+  problemIds,
   jsonResponse,
   responseStatus,
   safeIssue,
+  validationIssueAttributes,
 } from "./response-mapping-utils.js";
 import { responseIsValid } from "./response-mapping-validation.js";
 import type { ResponseMappingOptions } from "./response-mapping.types.js";
@@ -42,8 +44,8 @@ const success = Effect.fn("ResponseMapping.success")(function* (
   const declaration = findSuccess(trigger, options.responseId);
   if (value instanceof Response) return value;
   if (!(yield* responseIsValid(trigger, declaration, value, options)))
-    return internalErrorResponse(options.traceId);
-  return yield* encodeJson(value, responseStatus(declaration, 200), options.traceId);
+    return internalErrorResponse(options);
+  return yield* encodeJson(value, responseStatus(declaration, 200), options);
 });
 
 /** Maps declared failures to their public envelope without exposing native causes.
@@ -60,7 +62,7 @@ const failure = Effect.fn("ResponseMapping.failure")(function* (
   if (cause instanceof InvocationValidationError && cause.phase === "input")
     return yield* validation(trigger, cause.issues, options);
   if (cause instanceof InvocationValidationError && cause.phase === "output")
-    return internalErrorResponse(options.traceId);
+    return internalErrorResponse(options);
   const normalized = yield* Effect.result(
     Effect.try({
       try: () =>
@@ -68,13 +70,14 @@ const failure = Effect.fn("ResponseMapping.failure")(function* (
       catch: (error) => error,
     }),
   );
-  if (Result.isFailure(normalized)) return internalErrorResponse(options.traceId);
+  if (Result.isFailure(normalized)) return internalErrorResponse(options);
   const failure = normalized.success;
   if (failure.kind !== "application")
     return yield* genericFailureResponse(trigger, failure, options);
+  frameworkTrace.setAttributes({ "relkit.error.id": failure.id });
   if (isAccessFailureId(failure.id))
     return yield* encodeProblem({
-      ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
+      ...problemIds(options),
       status: failure.status ?? 403,
       code: failure.id,
       detail: failure.message,
@@ -84,9 +87,9 @@ const failure = Effect.fn("ResponseMapping.failure")(function* (
     declaration === undefined ||
     !(yield* responseIsValid(trigger, declaration, failure.data, options))
   )
-    return internalErrorResponse(options.traceId);
+    return internalErrorResponse(options);
   return yield* encodeProblem({
-    ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
+    ...problemIds(options),
     status: responseStatus(declaration, 500),
     code: failure.id,
     detail: failure.message,
@@ -108,6 +111,7 @@ const validation = Effect.fn("ResponseMapping.validation")(function* (
   issues: readonly (StandardIssue | RequestMappingIssue)[],
   options: ResponseMappingOptions = {},
 ) {
+  frameworkTrace.event("http.validation.failed", validationIssueAttributes(issues));
   const declaration = findValidation(trigger);
   const status = responseStatus(declaration, 422);
   const problem = problemBody({
@@ -115,11 +119,11 @@ const validation = Effect.fn("ResponseMapping.validation")(function* (
     code: "validation",
     detail: "The request input is invalid.",
     issues: issues.map(safeIssue),
-    ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
+    ...problemIds(options),
   });
   return (yield* responseIsValid(trigger, declaration, problem, options))
     ? problemResponse({ ...problem, status })
-    : internalErrorResponse(options.traceId);
+    : internalErrorResponse(options);
 });
 
 /** Response construction and validation share one replaceable domain contract. */

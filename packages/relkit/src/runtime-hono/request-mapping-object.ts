@@ -72,6 +72,7 @@ const BODY_ISSUES: readonly string[] = [
   "body-too-large",
   "malformed-json",
   "malformed-multipart",
+  "body-not-object",
 ];
 const BODY_SOURCES: readonly string[] = ["body", "whole-body", "multipart", "multipart-all"];
 

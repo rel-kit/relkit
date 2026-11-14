@@ -45,6 +45,7 @@ describe("route rate limiting", () => {
       detail: "Too many requests to this route; retry after the delay in Retry-After.",
       data: { retryAfterMs: expect.any(Number) },
       traceId: expect.stringMatching(/^[0-9a-f]{32}$/),
+      requestId: blocked.headers.get("x-request-id"),
     });
     expect(calls).toEqual(["hello", "hello"]);
   });

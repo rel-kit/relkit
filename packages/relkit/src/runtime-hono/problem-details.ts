@@ -15,14 +15,20 @@ export {
   type ProblemIssue,
 } from "../contracts/problem-details.js";
 
-/** Builds a Problem Details response carrying the request's trace ID.
+/** Builds a Problem Details response carrying the request's trace and request IDs.
  * @param context - Request context holding the framework request state.
  * @param input - Status, stable code, safe detail and optional data, issues or headers.
- * @returns The problem response, with `traceId` when the request has one.
+ * @returns The problem response, with `traceId` and `requestId` when the request has them.
  */
 export function contextProblem(context: Context, input: ProblemInput): Response {
-  const traceId = input.traceId ?? getRequestState(context)?.traceId;
-  return problemResponse(traceId === undefined ? input : { ...input, traceId });
+  const state = getRequestState(context);
+  const traceId = input.traceId ?? state?.traceId;
+  const requestId = input.requestId ?? state?.requestId;
+  return problemResponse({
+    ...input,
+    ...(traceId === undefined ? {} : { traceId }),
+    ...(requestId === undefined ? {} : { requestId }),
+  });
 }
 
 /** Turns an uncaught error into a 500 problem without internal detail.

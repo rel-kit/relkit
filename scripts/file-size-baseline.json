@@ -20,6 +20,5 @@
   "packages/relkit/src/diagnostics/codes/inspector.ts": 471,
   "packages/relkit/src/diagnostics/codes/jobs.ts": 593,
   "packages/relkit/src/diagnostics/codes/runtime.ts": 323,
-  "packages/relkit/src/runtime-hono/materialize-routes-utils.ts": 258,
   "scripts/user-text.ts": 270
 }

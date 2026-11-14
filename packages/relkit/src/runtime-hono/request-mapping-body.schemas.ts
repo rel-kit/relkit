@@ -6,6 +6,7 @@ export const BodyIssueCode = Schema.Literals([
   "body-too-large",
   "malformed-json",
   "malformed-multipart",
+  "body-not-object",
 ]);
 
 /** Public validation issue returned instead of throwing for malformed request bodies. */

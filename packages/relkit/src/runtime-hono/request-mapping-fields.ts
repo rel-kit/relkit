@@ -16,7 +16,13 @@ export async function bodyField(
   const validated = validatedTarget(state, "json");
   if (isRecord(validated) && Object.hasOwn(validated, name)) return validated[name];
   const value = await jsonValue(state, path);
-  return value !== MISSING && isRecord(value) && Object.hasOwn(value, name) ? value[name] : MISSING;
+  if (value === MISSING) return MISSING;
+  // `null`, an array or a string has no fields: one problem with the body, not a missing field.
+  if (!isRecord(value)) {
+    addMappingIssue(state, "body-not-object", "The JSON body must be an object", []);
+    return MISSING;
+  }
+  return Object.hasOwn(value, name) ? value[name] : MISSING;
 }
 
 /** Read validated JSON or parse the request body once and record errors.

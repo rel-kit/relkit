@@ -26,7 +26,7 @@ const TITLES: Readonly<Record<number, string>> = {
 
 /** Builds the Problem Details body for one error.
  * @param input - Status, stable code, safe detail and optional data or issues.
- * @returns The body without a trace ID, which the request middleware adds.
+ * @returns The body, with the trace and request IDs when the input carries them.
  */
 export function problemBody(input: ProblemInput): ProblemDetails {
   return {
@@ -38,6 +38,7 @@ export function problemBody(input: ProblemInput): ProblemDetails {
     ...(input.data === undefined ? {} : { data: input.data }),
     ...(input.issues === undefined ? {} : { issues: input.issues }),
     ...(input.traceId === undefined ? {} : { traceId: input.traceId }),
+    ...(input.requestId === undefined ? {} : { requestId: input.requestId }),
   };
 }
 
