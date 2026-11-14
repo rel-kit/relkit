@@ -10,6 +10,7 @@ import {
   graphIdentity,
   isAuthorized,
   jsonResponse,
+  protectedProblem,
   resolveValue,
 } from "./internal-endpoints-utils.js";
 
@@ -20,10 +21,7 @@ import {
  */
 export function installCoreEndpoints(app: Hono, options: InternalEndpointOptions): void {
   const guard = (handler: () => Promise<Response>) => async (context: Context) => {
-    if (!(await isAuthorized(context.req.raw, options)))
-      return jsonResponse({ error: "internal-endpoint-protected" }, 401, {
-        "www-authenticate": "Bearer",
-      });
+    if (!(await isAuthorized(context.req.raw, options))) return protectedProblem(context);
     return handler();
   };
   app.get(

@@ -1,5 +1,6 @@
 /** Creates session SDK facades and blocks rich inspection on the public proxy. */
 import { Ref } from "effect";
+import { problemResponse } from "relkit/contracts";
 import {
   createSupervisorObservability,
   createSupervisorProxy,
@@ -47,7 +48,7 @@ export function createDevNativeSession(
   const proxy = createSupervisorProxy({
     intercept: (request) => {
       if (isPrivateInspectionPath(new URL(request.url).pathname))
-        return Promise.resolve(new Response("Not found", { status: 404 }));
+        return Promise.resolve(blockedInspectionResponse());
       return contracts.intercept(request) ?? options.intercept?.(request);
     },
     ...(options.hostname === undefined ? {} : { hostname: options.hostname }),
@@ -58,6 +59,18 @@ export function createDevNativeSession(
         ?.track(token),
   });
   return { observability, stateMachine, proxy, contracts };
+}
+
+/** Answers a rich inspection path on the public front the way the application answers an unknown path.
+ * @returns A 404 Problem Details response with a fresh request ID; inspection lives on the bridge.
+ */
+function blockedInspectionResponse(): Response {
+  return problemResponse({
+    status: 404,
+    code: "not-found",
+    detail: "No route matches this request.",
+    headers: { "x-request-id": `request-${crypto.randomUUID()}`, "cache-control": "no-store" },
+  });
 }
 
 /** Keeps core readiness, identity, jobs RPC and selected public transports independent. */

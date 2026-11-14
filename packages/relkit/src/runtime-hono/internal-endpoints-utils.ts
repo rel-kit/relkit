@@ -7,6 +7,8 @@ import {
 } from "../contracts/index.js";
 import type { Context } from "hono";
 import { InternalQueryError, queryPage } from "./internal-endpoint-query.js";
+import { getRequestState, REQUEST_ID_HEADER } from "./middleware-utils.js";
+import { contextProblem } from "./problem-details.js";
 import {
   INTERNAL_ENDPOINT_PROTOCOL,
   INTERNAL_ENDPOINT_VERSION,
@@ -187,6 +189,39 @@ export function jsonResponse(
       ...headers,
     },
   });
+}
+
+/** Answer an internal endpoint failure as Problem Details carrying the request's identity.
+ * Control-plane paths bypass the request-span wrapper, so the request ID is set here.
+ * @param context - Current Hono request context, possibly holding the framework request state.
+ * @param status - HTTP status. @param code - Stable problem code. @param detail - Safe detail.
+ * @param headers - Additional response headers such as `www-authenticate`.
+ * @returns An `application/problem+json` response with `x-request-id` and no caching.
+ */
+export function internalProblem(
+  context: Context,
+  status: number,
+  code: string,
+  detail: string,
+  headers: Record<string, string> = {},
+): Response {
+  const requestId = getRequestState(context)?.requestId ?? `request-${crypto.randomUUID()}`;
+  const version = String(INTERNAL_ENDPOINT_VERSION);
+  const common = { "cache-control": "no-store", "x-relkit-api-version": version };
+  return contextProblem(context, {
+    ...{ status, code, detail },
+    headers: { ...common, [REQUEST_ID_HEADER]: requestId, ...headers },
+  });
+}
+
+/** Answer a request the internal endpoint authorization rejected.
+ * @param context - Current Hono request context.
+ * @returns A 401 Problem Details response asking for a bearer token.
+ */
+export function protectedProblem(context: Context): Response {
+  const detail = "This internal endpoint requires authorization.";
+  const challenge = { "www-authenticate": "Bearer" };
+  return internalProblem(context, 401, "internal-endpoint-protected", detail, challenge);
 }
 
 /** Recognize inspector events with a string cursor, type and JSON payload.

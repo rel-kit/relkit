@@ -78,8 +78,49 @@ test("serves health, graph, bounded query pages, stream, and diagnostics stubs",
   // Diagnostics are inspection data: without a configured source the application port has none.
   expect((await service.request(`${API_BASE_PATH}/diagnostics`)).status).toBe(404);
   const invalid = await service.request(`${API_BASE_PATH}/requests?limit=bad`);
-  expect(invalid.status).toBe(400);
-  expect(await invalid.json()).toMatchObject({ error: "invalid-query" });
+  expectProblem(invalid, 400);
+  expect(await invalid.json()).toMatchObject({
+    type: "/errors/invalid-query",
+    status: 400,
+    code: "invalid-query",
+  });
+});
+
+/** Checks that an internal endpoint error is Problem Details carrying a request ID.
+ * @param response - Endpoint answer. @param status - Expected status.
+ */
+function expectProblem(response: Response, status: number) {
+  expect(response.status).toBe(status);
+  expect(response.headers.get("content-type")).toBe("application/problem+json");
+  expect(response.headers.get("x-request-id")).toMatch(/\S/);
+}
+
+test("internal endpoint errors are Problem Details with a request ID", async () => {
+  const failing = app({
+    mode: "production",
+    enabled: true,
+    bearerToken: "test-token",
+    requests: () => {
+      throw new Error("private failure detail");
+    },
+  });
+  for (const path of ["health/live", "health/ready", "graph"]) {
+    const denied = await failing.request(`${API_BASE_PATH}/${path}`);
+    expectProblem(denied, 401);
+    expect(denied.headers.get("www-authenticate")).toBe("Bearer");
+    expect(await denied.json()).toMatchObject({ status: 401, code: "internal-endpoint-protected" });
+  }
+  const standalone = new Hono();
+  installInternalEndpoints(standalone, {
+    requests: () => {
+      throw new Error("private failure detail");
+    },
+  });
+  const failed = await standalone.request(`${API_BASE_PATH}/requests`);
+  expectProblem(failed, 500);
+  const text = await failed.text();
+  expect(JSON.parse(text)).toMatchObject({ status: 500, code: "internal-error" });
+  expect(text).not.toContain("private failure detail");
 });
 
 /** Checks the unchanged health/readiness/cohort witnesses on the actual core endpoints. */

@@ -7,7 +7,9 @@ import {
 } from "./internal-endpoint-paths.js";
 import {
   graphIdentity,
+  internalProblem,
   isAuthorized,
+  protectedProblem,
   isInvalidQueryError,
   jsonResponse,
   listResponse,
@@ -59,15 +61,18 @@ export function installInternalEndpoints(app: Hono, options: InternalEndpointOpt
   const handle =
     (handler: (context: Context) => Promise<Response>) =>
     async (context: Context): Promise<Response> => {
-      if (!(await isAuthorized(context.req.raw, options)))
-        return jsonResponse({ error: "internal-endpoint-protected" }, 401, {
-          "www-authenticate": "Bearer",
-        });
+      if (!(await isAuthorized(context.req.raw, options))) return protectedProblem(context);
       try {
         return await handler(context);
       } catch (error) {
-        if (isInvalidQueryError(error)) return jsonResponse({ error: "invalid-query" }, 400);
-        return jsonResponse({ error: "internal-error" }, 500);
+        if (isInvalidQueryError(error))
+          return internalProblem(
+            context,
+            400,
+            "invalid-query",
+            "The query parameters are invalid.",
+          );
+        return internalProblem(context, 500, "internal-error", "The request failed unexpectedly.");
       }
     };
 

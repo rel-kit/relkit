@@ -45,6 +45,23 @@ test(
 );
 
 test(
+  "blocked inspection paths on the development front answer Problem Details",
+  async () => {
+    await dev.waitFor("/a1", "a1 v0");
+    const port = /http:\/\/127\.0\.0\.1:(\d+)/.exec(dev.output())?.[1];
+    expect(port).toBeDefined();
+    for (const path of ["/_relkit/v1/requests", "/_relkit/v1/env", "/_relkit/v1"]) {
+      const response = await fetch(`http://127.0.0.1:${port}${path}`);
+      expect(response.status).toBe(404);
+      expect(response.headers.get("content-type")).toBe("application/problem+json");
+      expect(response.headers.get("x-request-id")).toMatch(/\S/);
+      expect(await response.json()).toMatchObject({ status: 404, code: "not-found" });
+    }
+  },
+  { timeout: 300_000 },
+);
+
+test(
   "the development graph probe carries identity only and reloads still activate",
   async () => {
     await dev.waitFor("/a1", "a1 v0");
