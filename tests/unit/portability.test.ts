@@ -71,6 +71,18 @@ test("the baseline only shrinks: grown files fail, shrunk files ask for an updat
   });
 });
 
+test("lowering the baseline keeps the stated reason and guard of a remaining site", () => {
+  const uses = scanPortability(fixtureRoot, ["packages/sample"]);
+  const entry = {
+    bun: 3,
+    reason: "kept for a Bun-only listener",
+    guard: "runtime.name !== 'node'",
+  };
+  expect(shrinkBaseline(uses, { "packages/sample/src/serve.ts": entry })).toEqual({
+    "packages/sample/src/serve.ts": { ...entry, bun: 1 },
+  });
+});
+
 test("the repository matches its baseline", () => {
   const baseline = JSON.parse(
     readFileSync(join(root, "scripts/portability-baseline.json"), "utf8"),
