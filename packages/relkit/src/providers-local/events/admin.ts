@@ -65,8 +65,14 @@ export function createEventAdmin(router: EventRouter, options: EventAdminOptions
     const limit = pageLimit(request.limit);
     const items = all.slice(0, limit);
     const next = all.length > limit ? all[limit - 1] : undefined;
+    // A lookup of one publication returns its stored payload, so a development server can replay it.
     const publications = snapshot.publications
-      .map(toPublication)
+      .filter(
+        (record) =>
+          request.publicationId === undefined ||
+          record.envelope.instanceId === request.publicationId,
+      )
+      .map((record) => toPublication(record, request.publicationId !== undefined))
       .filter(
         (publication) =>
           request.eventId === undefined || publication.eventId === normalizeId(request.eventId),

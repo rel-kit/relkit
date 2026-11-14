@@ -32,6 +32,13 @@ export function readObservabilityQuery(request: Request): ObservabilityQueryRequ
     "serviceId",
     "generationId",
     "graphHash",
+    // Request filters and the opt-in total; after the merge with group 15 this list is
+    // `...OBSERVABILITY_REQUEST_FILTER_PARAMETERS` from `relkit/observability`.
+    "status",
+    "method",
+    "path",
+    "errorId",
+    "count",
   ]) {
     const item = params.get(name);
     if (item !== null) {

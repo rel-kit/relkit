@@ -115,6 +115,7 @@ function numericFields(value: Record<string, unknown>): Record<string, number> {
       "sampledOut",
       "severityFiltered",
       "exportFailures",
+      "exportCapacityRejections",
       "received",
       "selected",
       "exported",

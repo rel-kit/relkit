@@ -144,7 +144,12 @@ function generation(id: string, hash: string) {
     },
     telemetry: () => ({
       sampling: { traceRate: 0.25, minimumLogLevel: "warn", token: "must-not-cross" },
-      counters: { persisted: 5, sampledOut: 2, credential: "must-not-cross" },
+      counters: {
+        persisted: 5,
+        sampledOut: 2,
+        exportCapacityRejections: 4,
+        credential: "must-not-cross",
+      },
       exporters: [
         {
           name: "errors",
@@ -248,7 +253,7 @@ describe("versioned inspector router", () => {
           errors: "always",
           diagnostics: "always",
         },
-        counters: { persisted: 5, sampledOut: 2 },
+        counters: { persisted: 5, sampledOut: 2, exportCapacityRejections: 4 },
         exporters: [{ name: "errors", healthy: true, exported: 3 }],
       },
     });

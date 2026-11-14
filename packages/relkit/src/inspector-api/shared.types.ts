@@ -92,4 +92,6 @@ export interface ResolvedActiveGeneration {
 export interface Page<T extends JsonValue = JsonValue> {
   readonly items: readonly T[];
   readonly nextCursor?: string;
+  /** Records matching the page's filters across all pages, when known without extra work. */
+  readonly total?: number;
 }

@@ -2,6 +2,7 @@ import type { JsonValue, MaybePromise } from "../../contracts/index.js";
 import type { RetryPolicy } from "../../jobs/job.types.js";
 import type { JobFailureMetadata, JobQueueState } from "../jobs/queue-utils.js";
 import type { EVENT_ADMIN_PROTOCOL, EVENT_ADMIN_VERSION } from "./admin-contracts.js";
+import type { UnknownEventEnvelope } from "../../events/index.js";
 
 /** Environment mode controlling event administration mutations. */
 export type EventAdminMode = "development" | "test" | "production";
@@ -64,6 +65,8 @@ export interface EventPublicationContract extends EventVersioned {
   readonly originRequestId?: string;
   readonly producerTraceId?: string;
   readonly attributes: Readonly<Record<string, string | number | boolean>>;
+  /** The stored payload; present only when the query selected this publication by id. */
+  readonly payload?: UnknownEventEnvelope["payload"];
 }
 
 /** Safe delivery state shared by current and dead-lettered attempts. */
@@ -108,6 +111,8 @@ export interface EventQueryRequest {
   readonly eventId?: string;
   readonly eventVersion?: number;
   readonly triggerId?: string;
+  /** Selects one publication by instance id and includes its stored payload. */
+  readonly publicationId?: string;
   readonly state?: Exclude<JobQueueState, "accepted">;
   readonly states?: readonly Exclude<JobQueueState, "accepted">[];
   readonly cursor?: string;
