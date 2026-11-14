@@ -37,7 +37,10 @@ export async function presignS3Url(
   method: "GET" | "PUT",
   region: string,
   expiresSeconds: number,
-  options: Pick<SignedRequestOptions, "credentials" | "fetch"> = {},
+  options: Pick<SignedRequestOptions, "credentials" | "fetch"> & {
+    /** Headers the request must carry with exactly these values, such as `content-type`. */
+    readonly headers?: Readonly<Record<string, string>>;
+  } = {},
 ): Promise<string> {
   const fetcher = options.fetch ?? globalThis.fetch;
   const credentials = options.credentials ?? (await workloadCredentials(fetcher));
@@ -47,11 +50,12 @@ export async function presignS3Url(
   const date = amzDate.slice(0, 8);
   const scope = `${date}/${region}/s3/aws4_request`;
   const parsed = new URL(url);
+  const signed = presignedHeaders(parsed.host, options.headers);
   parsed.searchParams.set("X-Amz-Algorithm", "AWS4-HMAC-SHA256");
   parsed.searchParams.set("X-Amz-Credential", `${credentials.accessKeyId}/${scope}`);
   parsed.searchParams.set("X-Amz-Date", amzDate);
   parsed.searchParams.set("X-Amz-Expires", String(expiresSeconds));
-  parsed.searchParams.set("X-Amz-SignedHeaders", "host");
+  parsed.searchParams.set("X-Amz-SignedHeaders", signed.names);
   if (credentials.sessionToken !== undefined) {
     parsed.searchParams.set("X-Amz-Security-Token", credentials.sessionToken);
   }
@@ -59,8 +63,8 @@ export async function presignS3Url(
     method,
     parsed.pathname || "/",
     canonicalQuery(parsed.searchParams),
-    `host:${parsed.host}\n`,
-    "host",
+    signed.canonical,
+    signed.names,
     "UNSIGNED-PAYLOAD",
   ].join("\n");
   const stringToSign = `AWS4-HMAC-SHA256\n${amzDate}\n${scope}\n${await hash(canonical)}`;
@@ -146,6 +150,23 @@ async function signHeaders(
     "authorization",
     `AWS4-HMAC-SHA256 Credential=${credentials.accessKeyId}/${scope}, SignedHeaders=${signedHeaders}, Signature=${signature}`,
   );
+}
+
+/** Canonical form of the host plus the headers a presigned URL binds, sorted by name. */
+export function presignedHeaders(
+  host: string,
+  headers: Readonly<Record<string, string>> = {},
+): { readonly canonical: string; readonly names: string } {
+  const entries = [
+    ["host", host] as const,
+    ...Object.entries(headers).map(
+      ([name, value]) => [name.toLowerCase(), value.trim().replace(/\s+/g, " ")] as const,
+    ),
+  ].sort(([left], [right]) => left.localeCompare(right));
+  return {
+    canonical: entries.map(([name, value]) => `${name}:${value}\n`).join(""),
+    names: entries.map(([name]) => name).join(";"),
+  };
 }
 
 function canonicalQuery(params: URLSearchParams): string {

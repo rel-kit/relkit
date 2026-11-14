@@ -119,7 +119,8 @@ test("the R2 binding bucket passes the bucket suite across list pages", async ()
     }),
   );
   expect(failures(report)).toEqual([]);
-  expect(skipped(report)).toEqual(["signed-urls", "closed"]);
+  // The binding provider takes no bucket limits yet, so the policy cases are skipped.
+  expect(skipped(report)).toEqual(["signed-urls", "closed", "policy", "signed-upload-limits"]);
 });
 
 /** @param report - Conformance report. @returns The failed cases. */

@@ -29,23 +29,30 @@ export async function presignR2Url(
   method: "GET" | "PUT",
   credentials: R2Credentials,
   expiresSeconds: number,
+  headers: Readonly<Record<string, string>> = {},
 ): Promise<string> {
   const amzDate = timestamp(new Date());
   const date = amzDate.slice(0, 8);
   const scope = `${date}/auto/s3/aws4_request`;
   const parsed = new URL(url);
+  // The host plus any header the upload must carry with exactly this value, sorted by name.
+  const signed = [
+    ["host", parsed.host] as const,
+    ...Object.entries(headers).map(([name, value]) => [name.toLowerCase(), value.trim()] as const),
+  ].sort(([left], [right]) => left.localeCompare(right));
+  const names = signed.map(([name]) => name).join(";");
   parsed.searchParams.set("X-Amz-Algorithm", "AWS4-HMAC-SHA256");
   parsed.searchParams.set("X-Amz-Content-Sha256", "UNSIGNED-PAYLOAD");
   parsed.searchParams.set("X-Amz-Credential", `${credentials.accessKeyId}/${scope}`);
   parsed.searchParams.set("X-Amz-Date", amzDate);
   parsed.searchParams.set("X-Amz-Expires", String(expiresSeconds));
-  parsed.searchParams.set("X-Amz-SignedHeaders", "host");
+  parsed.searchParams.set("X-Amz-SignedHeaders", names);
   const canonical = [
     method,
     parsed.pathname || "/",
     canonicalQuery(parsed.searchParams),
-    `host:${parsed.host}\n`,
-    "host",
+    signed.map(([name, value]) => `${name}:${value}\n`).join(""),
+    names,
     "UNSIGNED-PAYLOAD",
   ].join("\n");
   const stringToSign = `AWS4-HMAC-SHA256\n${amzDate}\n${scope}\n${await hash(canonical)}`;

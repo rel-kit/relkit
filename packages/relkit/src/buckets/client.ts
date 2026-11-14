@@ -22,6 +22,7 @@ import type {
   BucketOperationOutcome,
   BucketProvider,
   BucketPutOptions,
+  BucketWriteUrlOptions,
 } from "./client.types.js";
 
 export {
@@ -185,9 +186,13 @@ function makeClient(options: BucketClientOptions, provider: BucketProvider): Buc
       validateSync("createReadUrl", () => assertKey(key));
       return run("createReadUrl", { key }, createBucketReadUrlEffect(key));
     },
-    createWriteUrl: (key: string) => {
+    createWriteUrl: (key: string, writeOptions?: BucketWriteUrlOptions) => {
       validateSync("createWriteUrl", () => assertKey(key));
-      return run("createWriteUrl", { key }, createBucketWriteUrlEffect(key));
+      return run(
+        "createWriteUrl",
+        writeOptions === undefined ? { key } : { key, options: writeOptions },
+        createBucketWriteUrlEffect(key, writeOptions),
+      );
     },
   });
 }

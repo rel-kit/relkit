@@ -122,7 +122,7 @@ afterAll(async () => {
       "workers runtime adapter": [],
       "redis over HTTP: cache": [],
       "KV binding: cache": ["increment"],
-      "R2 binding: bucket": ["signed-urls", "closed"],
+      "R2 binding: bucket": ["signed-urls", "closed", "policy", "signed-upload-limits"],
       "Durable Object realtime: two providers share one channel": [],
     });
   },

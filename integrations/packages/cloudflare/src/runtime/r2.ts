@@ -1,4 +1,15 @@
-import type { BucketOperationContext, BucketProvider, BucketPutOptions } from "relkit/buckets";
+import {
+  assertWriteUrlAllowed,
+  bucketPolicyViolation,
+  BucketPolicyError,
+  normalizeBucketPolicy,
+  signedUploadHeaders,
+  type BucketOperationContext,
+  type BucketPolicy,
+  type BucketProvider,
+  type BucketPutOptions,
+  type BucketWriteUrlOptions,
+} from "relkit/buckets";
 import {
   assertR2Response,
   presignR2Url,
@@ -8,7 +19,7 @@ import {
 } from "./r2-signing.js";
 
 /** @experimental */
-export interface CloudflareR2BucketOptions extends R2Credentials {
+export interface CloudflareR2BucketOptions extends R2Credentials, BucketPolicy {
   readonly accountId: string;
   readonly bucketName: string;
   readonly signedUrlTtlSeconds?: number;
@@ -28,6 +39,7 @@ export function createCloudflareR2BucketProvider(
   const expires = options.signedUrlTtlSeconds ?? 900;
   if (!Number.isSafeInteger(expires) || expires < 1 || expires > 604_800)
     throw new RangeError("Cloudflare R2 signedUrlTtlSeconds must be between 1 and 604800");
+  const policy = normalizeBucketPolicy(options);
   const root = `https://${accountId}.r2.cloudflarestorage.com/${encodeURIComponent(bucket)}`;
   const url = (key = ""): string => `${root}${key === "" ? "/" : `/${keyPath(key)}`}`;
   const request = (
@@ -49,6 +61,11 @@ export function createCloudflareR2BucketProvider(
       putOptions?: BucketPutOptions,
       context?: BucketOperationContext,
     ) => {
+      const violation = bucketPolicyViolation(policy, {
+        size: bytes.byteLength,
+        ...(putOptions?.contentType === undefined ? {} : { contentType: putOptions.contentType }),
+      });
+      if (violation !== undefined) throw new BucketPolicyError(violation);
       const headers = new Headers();
       if (putOptions?.contentType !== undefined)
         headers.set("content-type", putOptions.contentType);
@@ -113,7 +130,18 @@ export function createCloudflareR2BucketProvider(
       );
     },
     createReadUrl: (key: string) => presignR2Url(url(key), "GET", credentials, expires),
-    createWriteUrl: (key: string) => presignR2Url(url(key), "PUT", credentials, expires),
+    createWriteUrl: async (
+      key: string,
+      _context?: BucketOperationContext,
+      writeOptions?: BucketWriteUrlOptions,
+    ) =>
+      presignR2Url(
+        url(key),
+        "PUT",
+        credentials,
+        expires,
+        signedUploadHeaders(assertWriteUrlAllowed(policy, writeOptions)),
+      ),
   });
 }
 
