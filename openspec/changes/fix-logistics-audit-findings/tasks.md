@@ -134,7 +134,7 @@
 
 - [x] 14.1 IN-07: pass channel `params`, `replay` and `presence` through the graph projection (`inspector-api/graph-utils.ts:6-18`); verify the channel node of a fixture with parameters and a replay window.
 - [x] 14.2 IN-02: keep the application's status and safe code in a rejected action's body instead of collapsing them (`actions-utils.ts:207-224`); verify an invoke that the application answers with 401.
-- [ ] 14.3 IN-34: return the number of matching items with every graph and runtime page (`inspector-api/shared.ts:96-102`, `events-query.ts:74`); verify a collection larger than one page.
+- [x] 14.3 IN-34: return the number of matching items with every graph and runtime page (`inspector-api/shared.ts:96-102`, `events-query.ts:74`); verify a collection larger than one page.
 - [ ] 14.4 IN-11: forward the originating request and span links through the generated invoke (`build-server-invocation.ts:19-46`); verify with `tests/inspector/generated-runtime-wiring.test.ts` that an event reaction is a continuation of its request.
 - [ ] 14.5 IN-12, IN-13: provide event publish and replay in the generated development server through the application's own event client and the local event log, validating the payload against the event schema; where replay cannot be provided for a provider, report it as unsupported for that provider instead of unavailable; verify publish and replay end to end against the local provider.
 - [ ] 14.6 IN-29, IN-32: report observed dynamic calls of the active generation and each resource's runtime state from the generated server (`build-server-http-inspector.ts:17-49`, `build-server-runtime-support.ts:15-20`); verify a function that writes to a bucket and publishes an event shows both edges.

@@ -72,7 +72,34 @@ export function projectQuery(value: unknown, request: Request): Record<string, J
     deliveries,
     deadLetters: filteredDeadLetters,
     ...(typeof value.nextCursor === "string" ? { nextCursor: value.nextCursor } : {}),
+    // Deliveries are paged by the provider, so only a total or counts it reports are known.
+    ...(isCount(value.total) ? { total: value.total } : {}),
+    ...stateCounts(value.counts),
   };
+}
+
+/**
+ * Accepts a non-negative integer count.
+ * @param value - Candidate provider field.
+ * @returns Whether it is a count.
+ */
+function isCount(value: unknown): value is number {
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
+}
+
+/**
+ * Selects the per-state delivery counts a provider reports, dropping anything else.
+ * @param value - Candidate provider `counts` record keyed by delivery state.
+ * @returns `{ counts }` with at most 16 states, or nothing when no count is reported.
+ */
+function stateCounts(value: unknown): { counts?: Record<string, number> } {
+  if (!isRecord(value)) return {};
+  const counts = Object.fromEntries(
+    Object.entries(value)
+      .filter(([state, count]) => /^[a-z][a-z-]{0,31}$/.test(state) && isCount(count))
+      .slice(0, 16),
+  ) as Record<string, number>;
+  return Object.keys(counts).length === 0 ? {} : { counts };
 }
 
 /**
