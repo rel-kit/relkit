@@ -14,6 +14,43 @@ import {
 import { ensureRequestRecord, finishRequestRecord } from "./request-record-middleware.js";
 import { problemResponse } from "./problem-details.js";
 
+/** Consumes a request body the handler left unread, so the next request on a kept-alive
+ * connection is parsed from its own first byte. A body larger than the limit, of unknown size
+ * without a limit, or one that cannot be read is left for the connection to close instead.
+ * @param request - Native request the response answers.
+ * @param status - Status of the response about to be sent; an oversize answer always closes.
+ * @param maxBodyBytes - Body limit in bytes, or undefined when none is configured.
+ * @returns Whether the connection can stay open after the response.
+ */
+export async function settleUnreadBody(
+  request: Request,
+  status: number,
+  maxBodyBytes: number | undefined,
+): Promise<boolean> {
+  if (status === 413) return false;
+  const body = request.body;
+  if (body === null || request.bodyUsed || body.locked) return true;
+  const declared = Number(request.headers.get("content-length") ?? Number.NaN);
+  if (maxBodyBytes === undefined || declared > maxBodyBytes) return false;
+  const reader = body.getReader();
+  let total = 0;
+  try {
+    while (true) {
+      const part = await reader.read();
+      if (part.done) return true;
+      total += part.value.byteLength;
+      if (total > maxBodyBytes) {
+        void reader.cancel().catch(() => undefined);
+        return false;
+      }
+    }
+  } catch {
+    return false;
+  } finally {
+    reader.releaseLock();
+  }
+}
+
 /** Enforces declared body and timeout limits while cleaning up request listeners.
  * @param options - Application dependencies and configuration for this domain.
  * @returns A handler rejecting oversized requests and forwarding cancellation with scoped timeout cleanup.

@@ -5,6 +5,7 @@ import type { MiddlewareHandler } from "hono";
 import { isRelkitControlPlanePath } from "./control-plane.js";
 import { boundaryEvent, observeEarlyHttpAbort, observeHttpResponse } from "./http-response.js";
 import { collectHttpSpan } from "./http-span-record.js";
+import { settleUnreadBody } from "./middleware-limits.js";
 import {
   emitLifecycle,
   getRequestState,
@@ -133,10 +134,12 @@ export async function instrumentHttpRequest(
       { span, runtime, requestId, originRequestId: requestId },
       () => handler(request),
     );
+    const keepAlive = await settleUnreadBody(request, response.status, options.maxBodyBytes);
     return withRequestId(
       observeHttpResponse(request, response, state, options),
       options,
       requestId,
+      keepAlive,
     );
   } catch (error) {
     observeHttpResponse(request, new Response(null, { status: 500 }), state, options, error);
@@ -178,15 +181,18 @@ function contentLength(request: Request): number | undefined {
  * @param response - Native response whose status, headers and body lifetime are preserved.
  * @param options - Application dependencies and configuration for this domain.
  * @param requestId - Stable request identifier propagated to tracing and response headers.
+ * @param keepAlive - False when the request body was left unread and the connection must close.
  * @returns A response sharing the original body and carrying the configured request ID header.
  */
 function withRequestId(
   response: Response,
   options: HttpMiddlewareOptions,
   requestId: string,
+  keepAlive = true,
 ): Response {
   const headers = new Headers(response.headers);
   headers.set(options.requestIdHeader ?? "x-request-id", requestId);
+  if (!keepAlive) headers.set("connection", "close");
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
