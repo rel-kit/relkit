@@ -218,7 +218,11 @@ export function toActionError(error: unknown): InspectorActionError {
       ? 403
       : code.includes("PROTOCOL") || code.includes("REQUEST")
         ? 400
-        : 409;
+        : code.includes("UNSUPPORTED")
+          ? 501
+          : code.includes("VALIDATION")
+            ? 422
+            : 409;
   // The application's own status and safe code travel under `cause`, so a refusal such as a
   // missing session reads as the application's answer rather than an Inspector failure.
   const cause = applicationCause(error);

@@ -1,4 +1,5 @@
 import {
+  EVENT_ACTIONS_INSPECTOR_SOURCE,
   NATIVE_JOBS_INSPECTOR_SOURCE,
   RESOURCE_INSPECTOR_SOURCE,
 } from "./build-server-inspector-runtime.js";
@@ -44,6 +45,7 @@ ${NATIVE_JOBS_INSPECTOR_SOURCE}    actions: {
         retry: (request) => nativeJobControl(request.instanceId, "retry", request.reason),
         cancel: (request) => nativeJobControl(request.instanceId, "cancel", request.reason),
       },
+${EVENT_ACTIONS_INSPECTOR_SOURCE}
     },
 ${RESOURCE_INSPECTOR_SOURCE}
   },

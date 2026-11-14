@@ -11,6 +11,7 @@ export type {
   InspectorEventPublishRequest,
   InspectorEventReplayRequest,
   InspectorEventActionService,
+  InspectorEventActionsOptions,
   InspectorToolApprovalState,
   InspectorToolApprovalRecord,
   InspectorToolApprovalRequest,
@@ -20,6 +21,7 @@ export type {
   InspectorActionEndpointOptions,
   InspectorActionRequest,
 } from "./actions.types.js";
+export { createInspectorEventActions } from "./event-actions.js";
 import { API_BASE_PATH } from "relkit/contracts";
 import { errorResponse, json, negotiate } from "./router-utils.js";
 import { parseInspectorActionEffect } from "./actions-runtime.js";

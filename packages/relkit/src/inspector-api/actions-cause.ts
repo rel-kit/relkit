@@ -43,18 +43,21 @@ export function applicationCause(error: unknown): InspectorActionCause | undefin
 const internalError = { status: 500, code: "internal-error" } as const;
 
 /**
- * Recognises the engine's input validation failure without importing the engine.
+ * Recognises a failed input validation without importing the engine or the event client: the
+ * engine's `InvocationValidationError` of the input phase, or an event client's
+ * `EventPayloadValidationError`.
  * @param error - Candidate failure.
- * @returns Whether it is an `InvocationValidationError` of the input phase.
+ * @returns Whether the application rejected the input with these issues.
  */
 function isInputValidationError(
   error: unknown,
 ): error is { readonly issues: readonly unknown[] } & Error {
+  if (!(error instanceof Error) || !Array.isArray((error as { issues?: unknown }).issues))
+    return false;
+  if (error.name === "EventPayloadValidationError") return true;
   return (
-    error instanceof Error &&
     error.name === "InvocationValidationError" &&
-    (error as { readonly phase?: unknown }).phase === "input" &&
-    Array.isArray((error as { readonly issues?: unknown }).issues)
+    (error as { readonly phase?: unknown }).phase === "input"
   );
 }
 

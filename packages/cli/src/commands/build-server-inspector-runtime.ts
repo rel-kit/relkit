@@ -57,6 +57,22 @@ export const NATIVE_JOBS_INSPECTOR_SOURCE = `    ...((plan.jobs ?? []).length ==
     }),
 `;
 
+/**
+ * Event publish, replay, status, retry and cancel through the application's own event client and
+ * event providers. `module` is the lazily imported `relkit/inspector-api`, so production servers,
+ * which register no inspector, never load it.
+ */
+export const EVENT_ACTIONS_INSPECTOR_SOURCE = `      events: module.createInspectorEventActions({
+        events: plan.events ?? [],
+        provider: async (profile) => {
+          const providerRegistry = await providerStartup;
+          if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
+          return provider(providerRegistry, "event", profile);
+        },
+        descriptors: () => [runtimeManifest.functions, runtimeManifest.targets, runtimeManifest.services]
+          .flatMap((descriptors) => Object.values(descriptors ?? {})),
+      }),`;
+
 /** Fixed bucket/cache callbacks preserve native supports and preview behavior. */
 export const RESOURCE_INSPECTOR_SOURCE = `    resources: {
       buckets: {

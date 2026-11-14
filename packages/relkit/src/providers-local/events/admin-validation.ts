@@ -26,6 +26,11 @@ export function validateQuery(request: EventQueryRequest): void {
   if (request.eventId !== undefined) normalizeId(request.eventId);
   if (request.triggerId !== undefined) normalizeId(request.triggerId);
   if (
+    request.publicationId !== undefined &&
+    (typeof request.publicationId !== "string" || !/^[\w.:-]{1,128}$/.test(request.publicationId))
+  )
+    throw new EventAdminError("RELKIT_EVENT_ADMIN_QUERY_INVALID", "Publication id is invalid");
+  if (
     request.eventVersion !== undefined &&
     (!Number.isSafeInteger(request.eventVersion) || request.eventVersion < 1)
   )

@@ -1,9 +1,6 @@
 import { expect, test } from "bun:test";
 import { Hono } from "../../packages/relkit/node_modules/hono";
-import {
-  installInspectorEndpoints,
-  InspectorQueryError,
-} from "../../packages/relkit/src/inspector-api/index.ts";
+import * as inspectorApi from "../../packages/relkit/src/inspector-api/index.ts";
 import { inspectorEndpointsSource } from "../../packages/cli/src/commands/build-server-http-inspector.ts";
 import { SERVER_RUNTIME_SUPPORT_SOURCE } from "../../packages/cli/src/commands/build-server-runtime-support.ts";
 import { SERVER_INVOCATION_SOURCE } from "../../packages/cli/src/commands/build-server-invocation.ts";
@@ -40,7 +37,9 @@ function application() {
     "plan",
     "InspectorQueryError",
     "process",
+    "module",
     `
+    const runtimeManifest = { functions: {}, targets: {}, services: {} };
     const generationId = "test", graphHash = "sha256:test", activationFingerprint = undefined;
     const graph = { nodes: [], edges: [] }, environment = "test", internalEndpointsEnabled = true;
     const runtimeIntegrationsPlan = {}, localServicesInspector = {};
@@ -48,9 +47,15 @@ function application() {
     ${SERVER_RUNTIME_SUPPORT_SOURCE}
     ${source}
   `,
-  )(app, installInspectorEndpoints, Promise.resolve(registry), plan, InspectorQueryError, {
-    env: { RELKIT_INSPECTOR_SESSION_TOKEN: "fixture-private-token" },
-  });
+  )(
+    app,
+    inspectorApi.installInspectorEndpoints,
+    Promise.resolve(registry),
+    plan,
+    inspectorApi.InspectorQueryError,
+    { env: { RELKIT_INSPECTOR_SESSION_TOKEN: "fixture-private-token" } },
+    inspectorApi,
+  );
   return app;
 }
 

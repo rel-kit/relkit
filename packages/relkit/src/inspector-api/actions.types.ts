@@ -98,6 +98,20 @@ export interface InspectorEventActionService {
   readonly cancel?: (request: InspectorEventActionRequest) => MaybePromise<unknown>;
 }
 
+/** What a development server supplies to {@link InspectorEventActionService} publish and replay. */
+export interface InspectorEventActionsOptions {
+  /** Declared events of the active generation, each with its provider profile. */
+  readonly events: readonly {
+    readonly id: string;
+    readonly version: number;
+    readonly profile: string;
+  }[];
+  /** Resolves the event provider of a profile, waiting for providers to be ready. */
+  readonly provider: (profile: string) => MaybePromise<unknown>;
+  /** Function, target and service descriptors searched for each event's payload schema. */
+  readonly descriptors: () => Iterable<unknown>;
+}
+
 /** Existing authoritative tool decision states. */
 export type InspectorToolApprovalState = "pending" | "approved" | "denied";
 
