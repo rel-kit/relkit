@@ -208,6 +208,41 @@ test("the body limit applies to the bytes of a chunked body on a mounted Better 
   expect(received).toEqual([10_000]);
 });
 
+test("an oversize body answers 413 body-too-large whether its length is declared or streamed", async () => {
+  const app = createApp({
+    plan: plan(),
+    manifest: manifest(),
+    middleware: { maxBodyBytes: 8 },
+    mapInput: () => ({}),
+    engine: { invoke: async () => ({ ok: true }) },
+  });
+  const declared = await app.request("http://localhost/hello", {
+    method: "POST",
+    headers: { "content-length": "16" },
+    body: "x".repeat(16),
+  });
+  const streamed = await app.fetch(
+    new Request("http://localhost/hello", {
+      method: "POST",
+      body: new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(new Uint8Array(16));
+          controller.close();
+        },
+      }),
+      duplex: "half",
+    } as RequestInit),
+  );
+  for (const response of [declared, streamed]) {
+    expect(response.status).toBe(413);
+    expect(await response.json()).toMatchObject({
+      type: "/errors/body-too-large",
+      status: 413,
+      code: "body-too-large",
+    });
+  }
+});
+
 function plan(): RegistrationPlan {
   return {
     graphHash: "sha256:middleware",

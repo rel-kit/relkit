@@ -98,7 +98,7 @@ export function limitsMiddleware(options: HttpMiddlewareOptions = {}): Middlewar
       const response = problemResponse({
         traceId: current.traceId,
         status: 413,
-        code: "payload-too-large",
+        code: "body-too-large",
         detail: `The request body exceeds the ${options.maxBodyBytes}-byte limit.`,
       });
       current.requestRecord?.add({
