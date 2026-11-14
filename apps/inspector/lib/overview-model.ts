@@ -1,5 +1,6 @@
 /** Pure projections behind the Overview dashboard: request volume, generation history, health. */
 import type { InspectorObject } from "./api-types";
+import { requestLabel } from "./observability-model";
 
 /** Same words as the shared StatusBadge tones, kept local so this module stays UI-free. */
 export type OverviewTone = "success" | "warning" | "danger" | "info" | "neutral" | "live";
@@ -122,10 +123,9 @@ export function storageHealth(value: InspectorObject | undefined): StorageHealth
   return { tone: "success", label: "ready" };
 }
 
+/** The requests page's label, so live and loaded rows read the same (IN-36). */
 function pathOf(item: InspectorObject): string {
-  const route = text(item.normalizedRoute);
-  if (route !== undefined && route !== "unknown") return route;
-  return text(item.rawPath) ?? text(item.routeId) ?? "request";
+  return requestLabel(item).title || "request";
 }
 
 function text(value: unknown): string | undefined {

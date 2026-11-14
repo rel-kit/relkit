@@ -4,7 +4,10 @@ import type { InspectorObject } from "../../lib/api-types";
 import { text } from "../../lib/observability-model";
 import { cn } from "../../lib/utils";
 import { AnsiText, stripAnsi } from "./ansi-text";
-import { fieldsPreview, levelClass, logClock, logEntity } from "./log-format";
+import { useSyncExternalStore } from "react";
+import { fieldsPreview, levelClass, logClock, logEntity, logTimeZone } from "./log-format";
+
+const noSubscription = () => () => undefined;
 
 /*
  * Dense mono log rows in the Neon LogsViewer style, kept as a real table so each line stays a
@@ -19,13 +22,15 @@ export function LogTable({
   readonly selected: string;
   readonly onSelect: (cursor: string) => void;
 }) {
+  // The viewer's zone, read in the browser only: the server's zone would mismatch on hydration.
+  const zone = useSyncExternalStore(noSubscription, logTimeZone, () => "");
   return (
     <table className="log-table">
       <caption className="sr-only">Log results. Use arrow keys to inspect adjacent logs.</caption>
       <thead>
         <tr>
           <th scope="col" className="log-col-time">
-            Time
+            Time{zone === "" ? null : <span className="log-day"> {zone}</span>}
           </th>
           <th scope="col" className="log-col-level">
             Level
@@ -57,7 +62,7 @@ export function LogTable({
               data-level={level}
               onClick={() => onSelect(cursor)}
             >
-              <td className="log-col-time" title={timestamp || undefined}>
+              <td className="log-col-time" title={timestamp ? clock.utc : undefined}>
                 {clock.day ? <span className="log-day">{clock.day} </span> : null}
                 {clock.time}
               </td>

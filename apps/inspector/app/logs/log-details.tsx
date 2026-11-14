@@ -111,8 +111,11 @@ export function LogDetails({
           {state === "ready" && (
             <span className={cn("font-semibold uppercase", levelClass(level))}>{level || "—"}</span>
           )}
-          <strong className="truncate font-normal text-muted-foreground" title={timestamp}>
-            {state === "ready" ? `${clock.day ? `${clock.day} ` : ""}${clock.time}` : "Log"}
+          <strong
+            className="truncate font-normal text-muted-foreground"
+            title={timestamp ? clock.utc : undefined}
+          >
+            {state === "ready" ? clock.full : "Log"}
           </strong>
         </div>
         <div className="flex shrink-0 items-center">

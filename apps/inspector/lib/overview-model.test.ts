@@ -8,7 +8,17 @@ import {
 } from "./overview-model";
 
 describe("requestSummary", () => {
-  test("links completed requests and prefers the normalized route", () => {
+  test("labels a request as the requests page does: raw path, then route id (IN-36)", () => {
+    expect(requestSummary({ routeId: "trips.get.http", rawPath: "/trips/42" }).path).toBe(
+      "/trips/42",
+    );
+    expect(requestSummary({ routeId: "trips.get.http", normalizedRoute: "unknown" }).path).toBe(
+      "trips.get.http",
+    );
+    expect(requestSummary({}).path).toBe("request");
+  });
+
+  test("links completed requests", () => {
     const summary = requestSummary({
       requestId: "request-1",
       method: "POST",
@@ -22,7 +32,7 @@ describe("requestSummary", () => {
     expect(summary).toMatchObject({
       id: "request-1",
       method: "POST",
-      path: "/trips/:id",
+      path: "/trips/42",
       status: 201,
       tone: "success",
       statusLabel: "HTTP 201 success",
