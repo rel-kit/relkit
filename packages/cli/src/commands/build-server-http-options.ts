@@ -139,7 +139,6 @@ ${configuration.runtime === "workers" ? STATIC_FILES_FROM_PLATFORM : STATIC_FILE
       graphContractVersion: ${GRAPH_VERSION},
       manifestContractVersion: ${MANIFEST_VERSION},
       manifestGeneratorVersion: ${GENERATOR_VERSION},
-      graph,
     },
     ...(process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN === undefined
       ? {}

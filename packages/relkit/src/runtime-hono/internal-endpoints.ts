@@ -6,6 +6,7 @@ import {
   INTERNAL_ENDPOINT_VERSION,
 } from "./internal-endpoint-paths.js";
 import {
+  graphIdentity,
   isAuthorized,
   isInvalidQueryError,
   jsonResponse,
@@ -88,7 +89,7 @@ export function installInternalEndpoints(app: Hono, options: InternalEndpointOpt
   );
   app.get(
     `${contracts.API_BASE_PATH}/graph`,
-    handle(async () => jsonResponse(await resolveValue(options.graph ?? { graph: null }))),
+    handle(async () => jsonResponse(graphIdentity(await resolveValue(options.graph ?? {})))),
   );
   for (const [name, source] of [
     ["requests", options.requests],
@@ -96,7 +97,7 @@ export function installInternalEndpoints(app: Hono, options: InternalEndpointOpt
     ["traces", options.traces],
     ["diagnostics", options.diagnostics],
   ] as const) {
-    if (source === undefined && name !== "diagnostics") continue;
+    if (source === undefined) continue;
     app.get(
       `${contracts.API_BASE_PATH}/${name}`,
       handle(async (context) => listResponse(source, context)),
@@ -108,9 +109,10 @@ export function installInternalEndpoints(app: Hono, options: InternalEndpointOpt
       handle(async (context) => streamResponse(options.stream, context)),
     );
 }
-/** Builds the structural graph snapshot exposed by internal inspection.
+/** Builds the activation witness served by the core graph probe.
+ * Structure, sources, permissions and environment names are served only by the authenticated bridge.
  * @param plan - Validated application registration plan.
- * @returns Versioned structural graph metadata for the active registration plan.
+ * @returns Versioned graph hashes and contract versions for the active registration plan.
  */
 export function graphSnapshot(plan: RegistrationPlan): contracts.JsonValue {
   return {
@@ -121,19 +123,7 @@ export function graphSnapshot(plan: RegistrationPlan): contracts.JsonValue {
     graphContractVersion: contracts.GRAPH_VERSION,
     manifestContractVersion: contracts.MANIFEST_VERSION,
     manifestGeneratorVersion: contracts.GENERATOR_VERSION,
-    functions: plan.functions,
-    tasks: plan.tasks ?? [],
-    jobs: plan.jobs ?? [],
-    httpTriggers: plan.httpTriggers,
-    queues: plan.queues,
-    schedules: plan.schedules,
-    eventTriggers: plan.eventTriggers,
-    buckets: plan.buckets,
-    caches: plan.caches,
-    tools: plan.tools,
-    agents: plan.agents,
-    services: plan.services ?? [],
-  } as unknown as contracts.JsonValue;
+  };
 }
 
 /** Checks internal endpoint exposure policy before route registration.

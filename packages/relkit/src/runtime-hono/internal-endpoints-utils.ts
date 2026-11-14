@@ -86,6 +86,31 @@ export function readQuery(request: Request): InternalQuery {
   return query as unknown as InternalQuery;
 }
 
+/** Fields of the activation witness; everything else in a graph stays behind the bridge. */
+const GRAPH_IDENTITY_FIELDS = [
+  "generationId",
+  "graphHash",
+  "activationFingerprint",
+  "manifestGraphHash",
+  "graphContractVersion",
+  "manifestContractVersion",
+  "manifestGeneratorVersion",
+  "sourceToken",
+  "generationToken",
+] as const;
+
+/** Keep only the hashes and versions activation needs from a graph probe value.
+ * @param value - Configured graph witness, possibly carrying structural graph data.
+ * @returns The identity fields present in the value; structure, sources and names are dropped.
+ */
+export function graphIdentity(value: unknown): JsonValue {
+  if (!isRecord(value)) return {};
+  const identity: Record<string, JsonValue> = {};
+  for (const field of GRAPH_IDENTITY_FIELDS)
+    if (value[field] !== undefined) identity[field] = value[field];
+  return identity;
+}
+
 /** Resolve a fixed inspector value or a lazy value callback.
  * @typeParam T - Value produced by the source or selected by the predicate.
  * @param source - Fixed data or a callback producing the data.

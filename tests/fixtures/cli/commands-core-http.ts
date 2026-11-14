@@ -22,12 +22,14 @@ export const assertStartedHttp = Effect.fn("CommandFixture.http")(function* (
   expect(live.status).toBe(200);
   expect(graph.status).toBe(200);
   yield* scaffoldNative("command.health.body", () => live.text());
-  expect(yield* scaffoldNative("command.graph.body", () => graph.json())).toMatchObject({
+  const witness = yield* scaffoldNative("command.graph.body", () => graph.json());
+  expect(witness).toMatchObject({
     generationId: "generation.runtime",
     graphHash: built.graphHash,
     activationFingerprint: built.activationFingerprint,
-    graph: { nodes: expect.arrayContaining([expect.objectContaining({ id: "hello" })]) },
   });
+  // The application-port probe is the activation witness only; the graph stays behind the bridge.
+  expect(witness).not.toHaveProperty("graph");
   for (const path of ["routes", "functions", "runtime", "logs", "stream"]) {
     const response = yield* scaffoldRequest(`${base}/_relkit/v1/${path}`);
     expect(response.status).toBe(404);

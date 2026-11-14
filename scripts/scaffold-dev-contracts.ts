@@ -37,10 +37,10 @@ export const verifyScaffoldDevContracts = Effect.fn("ScaffoldDev.contracts")(fun
   for (const [url, expected] of endpoints) {
     const result = yield* scaffoldRequest(url);
     assert.equal(result.ok, true, url);
-    assert.ok(
-      (yield* Effect.promise(() => result.text())).toLowerCase().includes(expected.toLowerCase()),
-      url,
-    );
+    const text = yield* Effect.promise(() => result.text());
+    assert.ok(text.toLowerCase().includes(expected.toLowerCase()), url);
+    // The application-port graph probe carries identity only; structure stays behind the bridge.
+    if (url.endsWith("/graph")) assert.ok(!/"(?:graph|nodes|functions)"\s*:/.test(text), url);
   }
   const reference = yield* scaffoldRequest(`${base}/_relkit/v1/api-reference`);
   assert.equal(reference.status, 200, "Default scaffolds select the Scalar UI");
