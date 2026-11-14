@@ -45,6 +45,8 @@ const evaluate = Effect.fn("Discovery.evaluateWarm")(function* (message: WarmEva
       continue;
     }
     const result = yield* evaluateCandidate(candidate, request);
+    // A failed import leaves what it reached unloadable; drop it so later candidates fail too.
+    if (result.failure !== undefined) reloader.discardFailed();
     results.set(file, result);
     reimported.push(relative(root, file).replaceAll("\\", "/"));
     outcomes.push(result);

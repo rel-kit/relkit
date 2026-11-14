@@ -32,8 +32,9 @@ export function startCompiledCandidate(
   const workflow = Effect.gen(function* () {
     yield* Effect.interruptible(Effect.void);
     yield* checkCandidateAbort(options.signal);
+    const hostname = options.hostname ?? "127.0.0.1";
     const port = yield* Effect.tryPromise({
-      try: () => platform.port(options, options.hostname ?? "127.0.0.1"),
+      try: () => platform.port(options, hostname),
       catch: (error) => error,
     }).pipe(Effect.uninterruptible);
     // The allocator has no cancellation contract. Join its native release first,
@@ -44,6 +45,8 @@ export function startCompiledCandidate(
       { ...options.environment, ...compiled.environment },
       options.token,
       port,
+      // The generated server binds where the port was allocated, not on its own default.
+      hostname,
     );
     emit(options.logger, {
       level: "info",

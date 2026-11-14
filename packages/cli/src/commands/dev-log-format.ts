@@ -48,6 +48,8 @@ export function formatDevLog(record: LogRecord, options: DevLogFormatOptions = {
                 ? String(f.message ?? "Unknown error")
                 : String(f.message ?? "Unknown error").split("\n")[0]!,
             ];
+      // What the failed process wrote, such as the parse error and its location.
+      if (typeof f.cause === "string") details.push(...f.cause.split("\n"));
       if (!options.verbose && (f.error || String(f.message).includes("\n")))
         details.push("Use --verbose for diagnostic details.");
     } else if (event === "dev.ready") {

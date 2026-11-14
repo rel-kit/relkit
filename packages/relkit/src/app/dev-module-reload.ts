@@ -46,6 +46,23 @@ export function createModuleReloader(projectRoot: string, modules: RuntimeModule
   const scans = new Map<string, { readonly stamp: string; readonly imports: readonly string[] }>();
   const loaded = () => loadedProjectModules(root, registry);
   const lookup: ImportLookup = { registry, resolve: modules.resolve, scans };
+  // Files evicted here and the new project files they import, until they load again. An import that
+  // fails leaves the modules it reached unusable: after a parse error Bun keeps them in its loader
+  // without listing them, and the next import of any of them never settles; after a throw at the
+  // top level the next import sees the half-initialized module. Both are dropped by path.
+  const tracked = new Set<string>();
+  const drop = (loadedToo: boolean) => {
+    const present = new Set(loaded());
+    const dropped: string[] = [];
+    for (const file of tracked) {
+      if (!loadedToo && present.has(file)) tracked.delete(file);
+      else {
+        registry.evict(file);
+        dropped.push(file);
+      }
+    }
+    return dropped.sort();
+  };
   return {
     record: (before) => {
       recorded.clear();
@@ -55,17 +72,40 @@ export function createModuleReloader(projectRoot: string, modules: RuntimeModule
     changed: () =>
       loaded().filter((file) => (recorded.get(file) ?? stampOf(file)) !== stampOf(file)),
     loaded,
+    discardFailed: () => drop(true),
     invalidate: (files) => {
+      drop(false);
+      const present = loaded();
       const affected = importersOf(
         new Set(files.map((file) => resolve(root, file))),
-        loaded(),
+        present,
         lookup,
       );
       if (affected.size > 0) advanceEvaluationEpoch();
+      // Imports that are not loaded yet (a new file) load with the evicted files; loaded ones
+      // that did not change keep their instance even when this pass fails.
+      const fresh = (file: string) => isApplicationFile(root, file) && !present.includes(file);
+      for (const file of affected) {
+        tracked.add(file);
+        for (const dependency of importsOf(file, lookup).filter(fresh)) tracked.add(dependency);
+      }
       evict(affected, registry);
       return [...affected].sort();
     },
   };
+}
+
+/**
+ * Tells whether a file is an application module the reloader tracks.
+ * @param root - Absolute project root.
+ * @param file - Absolute path without a query string.
+ * @returns Whether it is below the root and outside `node_modules` and `.relkit`.
+ */
+function isApplicationFile(root: string, file: string): boolean {
+  const prefix = root.endsWith(sep) ? root : `${root}${sep}`;
+  if (!file.startsWith(prefix)) return false;
+  const local = file.slice(prefix.length);
+  return !local.includes(`node_modules${sep}`) && !local.startsWith(`.relkit${sep}`);
 }
 
 /** Registry, resolution and the import scans cached by file stamp. */
@@ -82,14 +122,10 @@ interface ImportLookup {
  * @returns Absolute file paths, without query strings, sorted.
  */
 function loadedProjectModules(root: string, registry: RuntimeModuleRegistry): string[] {
-  const prefix = root.endsWith(sep) ? root : `${root}${sep}`;
   const files = new Set<string>();
   for (const key of registry.keys()) {
     const file = key.split("?", 1)[0] ?? key;
-    if (!file.startsWith(prefix)) continue;
-    const local = file.slice(prefix.length);
-    if (local.includes(`node_modules${sep}`) || local.startsWith(`.relkit${sep}`)) continue;
-    files.add(file);
+    if (isApplicationFile(root, file)) files.add(file);
   }
   return [...files].sort();
 }

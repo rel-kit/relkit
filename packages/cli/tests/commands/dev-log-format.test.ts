@@ -1,4 +1,7 @@
-/** Verifies request-log severity and the request line layout of the development terminal log. */
+/**
+ * Verifies request-log severity and the request line layout of the development terminal log, and
+ * the block of a failed reload.
+ */
 import { expect, test } from "bun:test";
 import type { LogRecord } from "relkit/runtime-effect";
 import { formatDevLog } from "../../src/commands/dev-log-format.js";
@@ -81,4 +84,25 @@ test("client errors log at info except authentication, authorization and rate li
   expect(completed(500)).toBe("error");
   expect(completed(503)).toBe("error");
   expect(level({ type: "request.cancelled", status: 499 })).toBe("debug");
+});
+
+test("a failed reload shows the cause the failed process wrote under its first line", () => {
+  const record: LogRecord = {
+    ...request("/"),
+    level: "error",
+    component: "cli.dev",
+    message: "dev.generation.failed",
+    fields: {
+      message: "The new version exited with code 1 before it was ready.",
+      previousActive: true,
+      cause: "error: boom\n    at src/services/b1.function.ts:13:66",
+    },
+  };
+  const lines = formatDevLog(record, { columns: 120 }).split("\n");
+  expect(lines[0]).toContain("Reload failed; previous version is still serving");
+  expect(lines.slice(1).map((line) => line.trim())).toEqual([
+    "The new version exited with code 1 before it was ready.",
+    "error: boom",
+    "at src/services/b1.function.ts:13:66",
+  ]);
 });
