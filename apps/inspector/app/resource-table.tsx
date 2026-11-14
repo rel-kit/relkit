@@ -10,10 +10,13 @@ import { Pagination } from "../components/ui/pagination";
 import { ContentTabs } from "../components/ui/tabs";
 import type { InspectorQuery } from "../lib/api-types";
 import { INSPECTOR_BACKEND_CONNECTED_EVENT } from "../lib/client";
+import { listTotalLabel } from "../lib/list-total";
 import { ResourceTableBody } from "./resource-table-body";
 import { ResourceTableFilters } from "./resource-table-filters";
 import type { ResourceTableItem, ResourceTableProps } from "./resource-table-types";
 export type { ResourceTableColumn, ResourceTableItem } from "./resource-table-types";
+const PAGE_SIZE = 20;
+
 export function ResourceTable<Item extends ResourceTableItem>({
   title,
   description,
@@ -25,7 +28,7 @@ export function ResourceTable<Item extends ResourceTableItem>({
   kindOptions = [],
   statusOptions = [],
   details,
-  emptyMessage,
+  declare,
 }: ResourceTableProps<Item>) {
   const [search, setSearch] = useState("");
   const [kind, setKind] = useState("all");
@@ -36,13 +39,14 @@ export function ResourceTable<Item extends ResourceTableItem>({
   const [cursors, setCursors] = useState<readonly (string | undefined)[]>([undefined]);
   const [page, setPage] = useState(0);
   const [nextCursor, setNextCursor] = useState<string>();
+  const [total, setTotal] = useState<number>();
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [refresh, setRefresh] = useState(0);
   const [selected, setSelected] = useState<Item>();
   const request = useRef(0);
   const query = useMemo<InspectorQuery>(
     () => ({
-      limit: 20,
+      limit: PAGE_SIZE,
       ...(cursors[page] ? { cursor: cursors[page] } : {}),
       ...(search.trim() ? { search: search.trim() } : {}),
       ...(kind !== "all" ? { kind } : {}),
@@ -67,11 +71,16 @@ export function ResourceTable<Item extends ResourceTableItem>({
         if (current !== request.current) return;
         setItems(result.items);
         setNextCursor(result.nextCursor);
+        setTotal(result.total);
         setState("ready");
       })
       .catch(() => current === request.current && setState("error"));
   }, [load, query, refresh]);
 
+  const filtered =
+    [search, domain, layer].some((value) => value.trim() !== "") ||
+    kind !== "all" ||
+    status !== "all";
   const resetPage = (): void => {
     setCursors([undefined]);
     setPage(0);
@@ -92,7 +101,14 @@ export function ResourceTable<Item extends ResourceTableItem>({
         description={description}
         badges={
           <span className="rounded-sm border border-border px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground tabular-nums">
-            {state === "loading" && items.length === 0 ? "…" : `${items.length} shown`}
+            {state === "loading" && items.length === 0
+              ? "…"
+              : listTotalLabel({
+                  offset: page * PAGE_SIZE,
+                  shown: items.length,
+                  total,
+                  hasMore: nextCursor !== undefined,
+                })}
           </span>
         }
         actions={
@@ -134,7 +150,9 @@ export function ResourceTable<Item extends ResourceTableItem>({
         columns={columns}
         {...(href === undefined ? {} : { href })}
         {...(openLabel === undefined ? {} : { openLabel })}
-        {...(emptyMessage === undefined ? {} : { emptyMessage })}
+        {...(declare === undefined ? {} : { declare })}
+        filtered={filtered}
+        onClear={clear}
         onSelect={setSelected}
       />
       <Pagination

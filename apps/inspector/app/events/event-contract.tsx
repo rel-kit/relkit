@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { InspectorObject } from "../../lib/api-types";
 import { EventDeliveryPanel, EventListenerPanel, EventPublisherPanel } from "./event-state-panels";
 import type { EventView } from "../../lib/events-model";
+import type { DeliveryPage } from "../../lib/event-rows";
 import { DetailList } from "../../components/blocks/details";
 import { Section } from "../../components/blocks/section";
 import { SchemaPanel } from "../schema-panel";
@@ -42,7 +43,17 @@ export function EventFacts({ view }: { readonly view: EventView }) {
   );
 }
 
-export function EventContract({ view }: { readonly view: EventView }) {
+export function EventContract({
+  view,
+  page,
+  loadingMore,
+  onLoadMore,
+}: {
+  readonly view: EventView;
+  readonly page: DeliveryPage;
+  readonly loadingMore: boolean;
+  readonly onLoadMore: () => void;
+}) {
   return (
     <>
       <SchemaPanel title="Input schema" value={view.event.input} />
@@ -54,6 +65,9 @@ export function EventContract({ view }: { readonly view: EventView }) {
         deliveries={view.deliveries}
         deadLetters={view.deadLetters}
         publications={view.publications}
+        page={page}
+        loadingMore={loadingMore}
+        onLoadMore={onLoadMore}
       />
     </>
   );

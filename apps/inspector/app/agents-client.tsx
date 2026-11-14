@@ -51,6 +51,7 @@ export function AgentsClient() {
       title="Agents"
       description="Bounded model selection, inherited tool contracts, limits, and redacted invocation metadata."
       noun="agents"
+      declare="Declare an agent with `defineAgent` and it appears here."
       load={load}
       statusOptions={statuses}
       columns={[

@@ -1,6 +1,16 @@
 import type { InspectorEventRuntime, InspectorObject } from "./api-types";
 import { EVENT_DELIVERY_STATES } from "./events-model";
 
+/** What the API reported about the deliveries of an event beyond the page that is loaded. */
+export interface DeliveryPage {
+  /** Total deliveries, when the provider reports it. */
+  readonly total?: number | undefined;
+  /** Deliveries per state, when the provider reports them. */
+  readonly counts?: Readonly<Record<string, number>> | undefined;
+  /** Another page can be loaded. */
+  readonly hasMore: boolean;
+}
+
 /**
  * A count that says whether it is the whole. A provider that reports a total gives the number; a
  * full page with more behind it is only a lower bound, so it reads "100+".

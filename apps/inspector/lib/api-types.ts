@@ -51,6 +51,8 @@ export interface InspectorIdentity {
 export interface InspectorPage<T = InspectorObject> extends InspectorIdentity {
   readonly items: readonly T[];
   readonly nextCursor?: string;
+  /** Number of matching records, ignoring the cursor; graph and runtime collection pages carry it. */
+  readonly total?: number;
 }
 export interface InspectorRunPage<T = InspectorObject> extends InspectorIdentity {
   readonly items: readonly T[];

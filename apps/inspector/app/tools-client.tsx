@@ -50,6 +50,7 @@ export function ToolsClient() {
       title="Tools"
       description="Function-backed contracts with side-effect policy, approval controls, and safe runtime state."
       noun="tools"
+      declare="Declare a tool with `defineTool` and it appears here."
       load={load}
       statusOptions={statuses}
       columns={[

@@ -25,6 +25,7 @@ export function ErrorsClient() {
       title="Errors"
       description="Inspect domain errors and the public contracts that declare them."
       noun="errors"
+      declare="Declare an error with `defineError` and it appears here."
       load={load}
       columns={[
         {

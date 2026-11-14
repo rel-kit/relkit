@@ -14,29 +14,59 @@ import { DetailPending, ExposureBadge, GraphAction, MetaItem } from "../domains/
 import { EventContract, EventFacts, eventRecord } from "./event-contract";
 import { EventActions } from "./event-actions";
 import type { ActionIdentity } from "../../lib/inspector-actions";
+import { countLabel, mergeEventRuntime } from "../../lib/event-rows";
+
+const PAGE_SIZE = 100;
 
 export function EventDetailClient() {
   const params = useParams<{ id: string }>();
   const id = typeof params?.id === "string" ? params.id : "";
   const [view, setView] = useState<EventView>();
+  const [runtime, setRuntime] = useState<InspectorEventRuntime>();
+  const [graph, setGraph] = useState<InspectorGraph>();
   const [identity, setIdentity] = useState<ActionIdentity>();
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const show = useCallback(
+    (nextGraph: InspectorGraph, nextRuntime: InspectorEventRuntime) => {
+      const next = eventView(nextGraph, nextRuntime, id);
+      if (next === undefined) throw new Error("Event unavailable");
+      setGraph(nextGraph);
+      setRuntime(nextRuntime);
+      setView(next);
+    },
+    [id],
+  );
 
   const load = useCallback(async () => {
     if (id === "") return;
     const api = createInspectorClient();
     api.invalidate(["events", "runtime"]);
-    const [graph, runtime]: [InspectorGraph, InspectorEventRuntime] = await Promise.all([
+    const [nextGraph, nextRuntime]: [InspectorGraph, InspectorEventRuntime] = await Promise.all([
       api.graph(),
-      api.eventRuntime({ eventId: id, limit: 100 }),
+      api.eventRuntime({ eventId: id, limit: PAGE_SIZE }),
     ]);
-    const next = eventView(graph, runtime, id);
-    if (next === undefined) throw new Error("Event unavailable");
-    setView(next);
-    if (graph.generationId !== undefined && graph.graphHash !== undefined)
-      setIdentity({ generationId: graph.generationId, graphHash: graph.graphHash });
+    show(nextGraph, nextRuntime);
+    if (nextGraph.generationId !== undefined && nextGraph.graphHash !== undefined)
+      setIdentity({ generationId: nextGraph.generationId, graphHash: nextGraph.graphHash });
     setState("ready");
-  }, [id]);
+  }, [id, show]);
+
+  const loadMore = useCallback(async () => {
+    if (graph === undefined || runtime?.nextCursor === undefined) return;
+    setLoadingMore(true);
+    try {
+      const next = await createInspectorClient().eventRuntime({
+        eventId: id,
+        limit: PAGE_SIZE,
+        cursor: runtime.nextCursor,
+      });
+      show(graph, mergeEventRuntime(runtime, next));
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [graph, id, runtime, show]);
 
   useEffect(() => {
     void load().catch(() => setState("error"));
@@ -65,7 +95,12 @@ export function EventDetailClient() {
           <>
             <Badge>v{String(event.version ?? "?")}</Badge>
             <ExposureBadge exposure={event.exposure} />
-            {dead > 0 ? <StatusBadge tone="danger" label={`${dead} dead`} /> : null}
+            {dead > 0 ? (
+              <StatusBadge
+                tone="danger"
+                label={`${countLabel(dead, { hasMore: runtime?.nextCursor !== undefined })} dead`}
+              />
+            ) : null}
           </>
         ),
         description:
@@ -92,7 +127,16 @@ export function EventDetailClient() {
       }}
       aside={<EventFacts view={view} />}
     >
-      <EventContract view={view} />
+      <EventContract
+        view={view}
+        page={{
+          total: runtime?.total,
+          counts: runtime?.counts,
+          hasMore: runtime?.nextCursor !== undefined,
+        }}
+        loadingMore={loadingMore}
+        onLoadMore={() => void loadMore().catch(() => undefined)}
+      />
       {identity === undefined ? null : (
         <EventActions
           eventId={eventId}

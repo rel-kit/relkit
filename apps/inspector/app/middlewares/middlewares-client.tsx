@@ -40,6 +40,7 @@ export function MiddlewaresClient() {
       title="Middleware"
       description="Inspect path scope, canonical execution order, and matching routes."
       noun="middleware"
+      declare="Declare middleware with `defineMiddleware` and it appears here."
       load={load}
       columns={[
         {
