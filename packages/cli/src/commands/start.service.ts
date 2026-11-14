@@ -85,6 +85,8 @@ function makeStartLive(defaults: StartOptions) {
               cwd: projectRoot,
               environment: {
                 ...source,
+                // A started build is production unless the operator chose the RelKit environment.
+                RELKIT_ENV: source.RELKIT_ENV ?? "production",
                 PORT: String(port),
                 RELKIT_GRAPH_HASH: artifacts.graphHash,
               },
