@@ -209,7 +209,7 @@ export function internalProblem(
   const version = String(INTERNAL_ENDPOINT_VERSION);
   const common = { "cache-control": "no-store", "x-relkit-api-version": version };
   return contextProblem(context, {
-    ...{ status, code, detail },
+    ...{ status, code, detail, requestId },
     headers: { ...common, [REQUEST_ID_HEADER]: requestId, ...headers },
   });
 }

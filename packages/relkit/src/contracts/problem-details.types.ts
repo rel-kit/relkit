@@ -17,6 +17,8 @@ export interface ProblemDetails {
   readonly data?: unknown;
   readonly issues?: readonly ProblemIssue[];
   readonly traceId?: string;
+  /** The request ID, equal to the response's `x-request-id` header. */
+  readonly requestId?: string;
 }
 
 /** Fields that build one Problem Details response. */
@@ -27,6 +29,7 @@ export interface ProblemInput {
   readonly data?: unknown;
   readonly issues?: readonly ProblemIssue[];
   readonly traceId?: string;
+  readonly requestId?: string;
   readonly retryAfterMs?: number;
   readonly headers?: Readonly<Record<string, string>>;
 }

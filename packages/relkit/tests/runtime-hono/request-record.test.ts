@@ -210,6 +210,7 @@ test("answers unmatched paths with a 404 problem and wrong methods with a 405 pr
     code: "not-found",
     detail: "No route matches this request.",
     traceId: expect.stringMatching(/^[0-9a-f]{32}$/),
+    requestId: missing.headers.get("x-request-id"),
   });
 
   const wrongMethod = await app.request("http://localhost/hello", { method: "DELETE" });

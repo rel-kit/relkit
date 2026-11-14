@@ -3,7 +3,7 @@ import type { StandardIssue, StandardSchemaV1 } from "../schema/index.js";
 import type { RequestMappingIssue } from "./request-mapping.js";
 import type { ResponseDeclaration, ResponseSchemaEntries } from "./response-mapping-utils.types.js";
 import { canCarryStandardSchema } from "../contracts/index.js";
-import { PROBLEM_CONTENT_TYPE, problemResponse } from "./problem-details.js";
+import { PROBLEM_CONTENT_TYPE, problemResponse, type ProblemInput } from "./problem-details.js";
 export type { ResponseDeclaration, ResponseSchemaEntries } from "./response-mapping-utils.types.js";
 
 /** Select an explicit response ID or the route's default success declaration.
@@ -132,16 +132,28 @@ export function jsonWireValue(_key: string, value: unknown): unknown {
   return typeof value === "bigint" ? value.toString() : value;
 }
 /** The 500 problem returned when a response cannot be produced safely.
- * @param traceId - The request's trace ID, when known.
+ * @param ids - The request's trace ID, or its trace and request IDs, when known.
  * @returns A Problem Details response without internal detail.
  */
-export function internalErrorResponse(traceId?: string): Response {
+export function internalErrorResponse(ids?: string | ProblemIds): Response {
   return problemResponse({
     status: 500,
     code: "internal-error",
     detail: "The request failed unexpectedly.",
-    ...(traceId === undefined ? {} : { traceId }),
+    ...problemIds(typeof ids === "string" ? { traceId: ids } : (ids ?? {})),
   });
+}
+/** The identity fields a Problem Details body carries. */
+type ProblemIds = Pick<ProblemInput, "traceId" | "requestId">;
+/** Picks the trace and request IDs that are set, for a Problem Details body.
+ * @param source - Response options or problem input carrying the request's IDs.
+ * @returns Only the defined `traceId` and `requestId`.
+ */
+export function problemIds(source: ProblemIds): ProblemIds {
+  return {
+    ...(source.traceId === undefined ? {} : { traceId: source.traceId }),
+    ...(source.requestId === undefined ? {} : { requestId: source.requestId }),
+  };
 }
 /** Bound issue messages and normalize field paths for public validation errors.
  * @param issue - Validation or mapping issue to sanitize.

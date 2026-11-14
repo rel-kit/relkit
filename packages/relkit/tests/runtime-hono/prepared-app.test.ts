@@ -34,8 +34,10 @@ it.live("real prepared dispatch preserves REST, RPC, MCP and absent agent respon
             identities.push(actual.headers.get("x-request-id") ?? "absent");
           }
           expect(actual.status).toBe(expected.status);
-          // Each app traces its own request, so problem bodies differ only in their trace ID.
-          const withoutTrace = (text: string) => text.replace(/"traceId":"[0-9a-f]{32}"/, "");
+          // Each app traces its own request, so problem bodies differ only in their trace and
+          // request IDs.
+          const withoutTrace = (text: string) =>
+            text.replace(/"traceId":"[0-9a-f]{32}"/, "").replace(/,?"requestId":"[^"]*"/, "");
           expect(withoutTrace(yield* Effect.promise(() => actual.text()))).toBe(
             withoutTrace(yield* Effect.promise(() => expected.text())),
           );

@@ -50,7 +50,7 @@
 - [x] 5.5 RK-11: reject a JSON body that is not an object with a new issue code `body-not-object` when the route maps body fields (`request-mapping-fields.ts:19`, `request-mapping-object.ts:70-75`); verify `null`, an array and a string on `POST` and `PATCH` (`request-mapping.test.ts`).
 - [x] 5.6 RK-22, RK-27: set an explicit `Content-Length`, `X-Content-Type-Options: nosniff` and `Cache-Control: no-store` on JSON and Problem Details responses unless the route declares caching (`response-mapping-utils.ts:103-108`); verify `HEAD` reports the `GET` length.
 - [x] 5.7 RK-23: treat `OPTIONS` as a preflight only with `Access-Control-Request-Method` (`transport-security.ts:25-37`); verify the three harness `OPTIONS` rows (`transport-security.test.ts`).
-- [ ] 5.8 RK-24: add `requestId` beside `traceId` in Problem Details bodies; verify it equals the `x-request-id` header.
+- [x] 5.8 RK-24: add `requestId` beside `traceId` in Problem Details bodies; verify it equals the `x-request-id` header.
 
 ## 6. Realtime, client and signed uploads
 

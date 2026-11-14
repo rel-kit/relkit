@@ -274,6 +274,7 @@ describe("HTTP response mapping", () => {
     expect(body).toEqual({
       ...problem(504, "timeout", "The request timed out."),
       traceId: response.headers.get("x-trace-id") ?? expect.stringMatching(/^[0-9a-f]{32}$/),
+      requestId: response.headers.get("x-request-id"),
     });
   });
 

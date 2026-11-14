@@ -7,6 +7,7 @@ import { recordInternalFailure } from "./response-mapping-provider.js";
 import {
   findResponse,
   internalErrorResponse,
+  problemIds,
   jsonResponse,
   responseStatus,
 } from "./response-mapping-utils.js";
@@ -19,19 +20,20 @@ import type { ResponseMappingOptions } from "./response-mapping.types.js";
  */
 export const encodeProblem = Effect.fn("ResponseMapping.encodeProblem")((input: ProblemInput) =>
   Effect.try({ try: () => problemResponse(input), catch: (cause) => cause }).pipe(
-    Effect.catch(() => Effect.succeed(internalErrorResponse(input.traceId))),
+    Effect.catch(() => Effect.succeed(internalErrorResponse(input))),
   ),
 );
 
 /** Converts a serializable application value; invalid JSON values become safe HTTP failures.
  * @param value - Value inspected, validated or projected by this operation.
  * @param status - HTTP status associated with the observed response or lifecycle event.
+ * @param ids - The request's trace and request IDs for the fallback problem.
  * @returns An effect yielding serialized JSON or a safe HTTP 500 response when serialization fails.
  */
 export const encodeJson = Effect.fn("ResponseMapping.encodeJson")(
-  (value: unknown, status: number, traceId?: string) =>
+  (value: unknown, status: number, ids: Pick<ProblemInput, "traceId" | "requestId"> = {}) =>
     Effect.try({ try: () => jsonResponse(value, status), catch: (cause) => cause }).pipe(
-      Effect.catch(() => Effect.succeed(internalErrorResponse(traceId))),
+      Effect.catch(() => Effect.succeed(internalErrorResponse(ids))),
     ),
 );
 
@@ -81,9 +83,9 @@ export const genericFailureResponse = Effect.fn("ResponseMapping.genericFailure"
     status,
     code: selected.code,
     detail: selected.detail,
-    ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
+    ...problemIds(options),
   });
   return (yield* responseIsValid(trigger, declaration, problem, options))
     ? yield* encodeProblem({ ...problem, status })
-    : internalErrorResponse(options.traceId);
+    : internalErrorResponse(options);
 });

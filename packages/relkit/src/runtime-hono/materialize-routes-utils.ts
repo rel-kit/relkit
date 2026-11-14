@@ -6,6 +6,7 @@ import { httpBoundary, HttpBoundaryError, observeHttp, runHttp } from "./http-ef
 import type { HttpRouteRequest, RouteMaterializationOptions } from "./materialize-routes.js";
 import { getRequestState, type HttpRequestState } from "./middleware.js";
 import { nativeStreamResponse } from "./native-stream.js";
+import type { ProblemInput } from "./problem-details.js";
 import { requestFromContext } from "./request-context.js";
 import { isRequestMappingFailure } from "./request-mapping.js";
 import {
@@ -188,21 +189,24 @@ function stripHead(trigger: HttpTriggerRegistration, response: Response): Respon
   });
 }
 
-/** Combines route response validation options with the request's signal and trace ID.
+/** Combines route response validation options with the request's signal, trace and request IDs.
  * @param options - Application dependencies and configuration for this domain.
- * @param state - Request state supplying the cancellation signal and trace ID.
- * @returns Configured response options with manifest schemas, the signal and the trace ID.
+ * @param state - Request state supplying the cancellation signal and the IDs.
+ * @returns Configured response options with manifest schemas, the signal and both IDs, which
+ *   Problem Details bodies carry.
  */
 function responseOptionsFor(
   options: RouteMaterializationOptions,
   state: HttpRequestState | undefined,
-): ResponseMappingOptions {
+): ResponseMappingOptions & Pick<ProblemInput, "requestId"> {
   return {
     ...(options.responseMapping ?? {}),
     ...(options.manifest.responseSchemas === undefined
       ? {}
       : { responseSchemas: options.manifest.responseSchemas }),
-    ...(state === undefined ? {} : { signal: state.signal, traceId: state.traceId }),
+    ...(state === undefined
+      ? {}
+      : { signal: state.signal, traceId: state.traceId, requestId: state.requestId }),
   };
 }
 

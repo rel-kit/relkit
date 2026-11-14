@@ -38,3 +38,6 @@ With transport security configured, an `OPTIONS` request is treated as a CORS pr
 it carries `Access-Control-Request-Method`. Any other `OPTIONS`, including one with a same-origin
 `Origin`, is no longer answered 403 `origin-denied`; it gets the application's normal answer with
 the allowed methods in `Allow`.
+
+Problem Details bodies now carry `requestId` next to `traceId`; it equals the response's
+`x-request-id` header, so a client can quote the same ID the server logs.
