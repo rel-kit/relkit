@@ -89,6 +89,65 @@ describe("inspector API client", () => {
     ).toBe(false);
   });
 
+  test("reads the status before the envelope: a Problem Details 404 is HTTP_404", async () => {
+    let attempts = 0;
+    const client = createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () => {
+        attempts += 1;
+        return new Response(
+          JSON.stringify({ type: "about:blank", title: "Not Found", status: 404 }),
+          { status: 404, headers: { "content-type": "application/problem+json" } },
+        );
+      },
+    });
+
+    const error = await client.jobDefinitions().catch((cause: unknown) => cause);
+    expect(error).toMatchObject({ code: "HTTP_404", status: 404, kind: "http" });
+    expect(jobsNotMounted(error)).toBe(true);
+    expect(attempts).toBe(1);
+  });
+
+  test("a 5xx without an envelope keeps its status and is retried", async () => {
+    let attempts = 0;
+    const client = createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () => {
+        attempts += 1;
+        return attempts === 1
+          ? new Response(JSON.stringify({ message: "bad gateway" }), {
+              status: 502,
+              headers: { "content-type": "application/json" },
+            })
+          : envelope({ items: [] });
+      },
+    });
+    await expect(client.list("routes")).resolves.toMatchObject({ items: [] });
+    expect(attempts).toBe(2);
+  });
+
+  test("a rejected action keeps its body so the page can read the application's answer", async () => {
+    const client = createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () =>
+        envelope(
+          {
+            error: "RELKIT_INSPECTOR_ACTION_FAILED",
+            cause: { status: 401, code: "unauthenticated" },
+          },
+          409,
+        ),
+    });
+    const error = await client
+      .request("/_relkit/v1/actions/functions/a/invoke", { method: "POST", body: "{}" })
+      .catch((cause: unknown) => cause);
+    expect(error).toMatchObject({
+      code: "RELKIT_INSPECTOR_ACTION_FAILED",
+      status: 409,
+      body: { cause: { status: 401, code: "unauthenticated" } },
+    });
+  });
+
   test("falls back immediately when task-first job APIs are unavailable", async () => {
     let attempts = 0;
     const client = createInspectorApiClient({

@@ -6,6 +6,22 @@ import {
   type InspectorResponseProtocol,
 } from "./api-types";
 
+/**
+ * Whether an error response is an Inspector envelope. A response that is not one (a router's
+ * Problem Details 404, a proxy's 502) is reported by its status alone.
+ */
+export function isEnvelope(
+  payload: unknown,
+  responseProtocols: readonly InspectorResponseProtocol[] = [INSPECTOR_API_PROTOCOL],
+): payload is InspectorObject {
+  try {
+    assertEnvelope(payload, new Headers(), responseProtocols);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function assertEnvelope(
   payload: unknown,
   headers: Headers,

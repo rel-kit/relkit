@@ -81,6 +81,8 @@ export class InspectorApiError extends Error {
     readonly code: string,
     readonly status?: number,
     readonly kind: "network" | "http" | "protocol" = "http",
+    /** The error response's JSON body, when the failure was an Inspector envelope. */
+    readonly body?: { readonly [key: string]: unknown },
   ) {
     super(message);
     this.name = "InspectorApiError";

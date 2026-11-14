@@ -10,7 +10,7 @@ export type SchemaField = {
 };
 
 export function schemaFields(value: unknown): readonly SchemaField[] {
-  const schema = schemaRecord(unwrapSchema(value));
+  const schema = schemaRecord(unwrapSchema(asInputSchema(value)));
   const properties = schemaRecord(schema?.properties);
   if (!properties) return [];
   const required = new Set(schemaStrings(schema?.required));
@@ -49,6 +49,59 @@ export function schemaInput(
     }),
   );
   return { value, errors: [] };
+}
+
+/**
+ * The schema a caller sends. A node carries the decoded type (`jsonSchema`, where a field with a
+ * default is always present) and the input type (`inputJsonSchema`, where it is optional); forms
+ * and input contracts use the second.
+ */
+export function asInputSchema(value: unknown): unknown {
+  const schema = schemaRecord(value);
+  if (schema?.$relkit === "schema" && schema.inputJsonSchema !== undefined)
+    return { ...schema, jsonSchema: schema.inputJsonSchema };
+  return value;
+}
+
+/**
+ * A starting value for a declared schema: an object holding its required properties, each with
+ * a value of the right type (its default or first allowed value when it declares one).
+ * @param value - A schema node or JSON schema.
+ * @returns The template, or `{}` when the schema declares no properties.
+ */
+export function schemaTemplate(value: unknown): unknown {
+  return templateFor(schemaRecord(unwrapSchema(asInputSchema(value))), 0) ?? {};
+}
+
+function templateFor(schema: SchemaRecord | undefined, depth: number): unknown {
+  if (schema === undefined || depth > 4) return null;
+  if (schema.default !== undefined) return schema.default;
+  if (schema.const !== undefined) return schema.const;
+  if (Array.isArray(schema.enum) && schema.enum.length > 0) return schema.enum[0];
+  const branches = Array.isArray(schema.anyOf) ? schema.anyOf : schema.oneOf;
+  if (Array.isArray(branches) && branches.length > 0)
+    return templateFor(schemaRecord(unwrapSchema(branches[0])), depth + 1);
+  const type = schemaType(schema);
+  if (type === "string") return "";
+  if (type === "number" || type === "integer") return 0;
+  if (type === "boolean") return false;
+  if (type === "array") return [];
+  if (type === "object") {
+    const properties = schemaRecord(schema.properties) ?? {};
+    return Object.fromEntries(
+      schemaStrings(schema.required).flatMap((key) =>
+        key in properties
+          ? [[key, templateFor(schemaRecord(unwrapSchema(properties[key])), depth + 1)]]
+          : [],
+      ),
+    );
+  }
+  // A nullable type lists "null" beside the real one: prefer the real one.
+  if (type.includes("|")) {
+    const real = type.split(" | ").find((part) => part !== "null");
+    return real === undefined ? null : templateFor({ ...schema, type: real }, depth + 1);
+  }
+  return null;
 }
 
 export function unwrapSchema(value: unknown): unknown {

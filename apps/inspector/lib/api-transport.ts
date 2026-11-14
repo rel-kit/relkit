@@ -16,7 +16,7 @@ import {
   readPayload,
   shouldRetry,
 } from "./api-request-utils";
-import { assertEnvelope } from "./api-validation";
+import { assertEnvelope, isEnvelope } from "./api-validation";
 import { resolveBackendUrl } from "./backend-url";
 import { invokeInspectorRouteStream } from "./api-methods";
 import { mutationGeneration, observedGeneration } from "./api-generation";
@@ -30,6 +30,24 @@ interface CacheEntry {
   readonly value: unknown;
   readonly expiresAt: number;
   readonly tags: readonly string[];
+}
+
+/** The error for a non-2xx response; the status is read before the envelope is checked. */
+function failure(
+  response: Response,
+  payload: unknown,
+  responseProtocols: InspectorRequestOptions["responseProtocols"],
+): InspectorApiError {
+  const envelope = isEnvelope(payload, ["relkit.inspector", ...(responseProtocols ?? [])]);
+  const code = envelope ? errorCode(payload) : undefined;
+  const named = code ?? `HTTP_${response.status}`;
+  return new InspectorApiError(
+    named,
+    named,
+    response.status,
+    "http",
+    envelope ? payload : undefined,
+  );
 }
 
 export class InspectorApiTransport {
@@ -71,19 +89,8 @@ export class InspectorApiTransport {
         const requestInit = this.prepareRequest(init);
         const response = await this.fetch(url, requestInit);
         const payload = await readPayload(response);
-        assertEnvelope(
-          payload,
-          response.headers,
-          response.ok ? responseProtocols : ["relkit.inspector", ...(responseProtocols ?? [])],
-        );
-        if (!response.ok) {
-          const code = errorCode(payload);
-          throw new InspectorApiError(
-            typeof code === "string" ? code : `HTTP_${response.status}`,
-            typeof code === "string" ? code : `HTTP_${response.status}`,
-            response.status,
-          );
-        }
+        if (!response.ok) throw failure(response, payload, responseProtocols);
+        assertEnvelope(payload, response.headers, responseProtocols);
         if (method === "GET")
           this.generation =
             observedGeneration(payload) ??
