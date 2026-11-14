@@ -1,5 +1,5 @@
 import { completeSpan } from "../invocation/index.js";
-import type { RequestOutcome } from "../observability/index.js";
+import { systemRouteForPath, type RequestOutcome } from "../observability/index.js";
 import {
   emitTerminalLifecycle,
   type HttpMiddlewareOptions,
@@ -46,6 +46,7 @@ export function observeHttpResponse(
     (state.runtimeSignal?.current ?? request.signal).removeEventListener("abort", abort);
     span.attribute("http.response.status_code", response.status);
     span.attribute("http.response.body.size", bytes);
+    attributeSystemRoute(request, state, span);
     const prior = state.requestRecord?.setOutcome(outcome) ?? outcome;
     const derived = responseOutcome(prior, response.status);
     const effective =
@@ -155,6 +156,27 @@ export function observeEarlyHttpAbort(
   signal.addEventListener("abort", abort, { once: true });
   if (signal.aborted) abort();
   return () => signal.removeEventListener("abort", abort);
+}
+
+/** Names the system route of a request the framework answered itself (`/healthz`, RPC).
+ * @param request - Native request whose path identifies the system route.
+ * @param state - Request state holding the record builder.
+ * @param span - Server span receiving the route attributes.
+ * @returns Nothing; requests outside these reserved paths are left unchanged.
+ * @remarks No application route can own these paths: the generated server answers `/healthz`
+ * before routing and the RPC prefix is reserved, so the name never replaces a declared route.
+ */
+function attributeSystemRoute(
+  request: Request,
+  state: HttpRequestState,
+  span: NonNullable<HttpRequestState["serverSpan"]>,
+): void {
+  const route = systemRouteForPath(new URL(request.url).pathname);
+  if (route === undefined) return;
+  // An empty function identifier keeps the record's function `unknown`.
+  state.requestRecord?.setRoute(route.id, "");
+  span.attribute("relkit.route.id", route.id);
+  span.attribute("http.route", route.match === "prefix" ? `${route.path}/*` : route.path);
 }
 
 /** Builds a lifecycle event from native boundary state and terminal metadata.
