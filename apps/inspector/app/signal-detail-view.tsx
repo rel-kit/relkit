@@ -10,10 +10,10 @@ import {
   ContinuationsPanel,
   LogsPanel,
   RequestsPanel,
-  RequestExchangePanel,
   TimelinePanel,
   WaterfallPanel,
 } from "./signal-detail-sections";
+import { RequestExchangePanel } from "./signal-detail-exchange";
 import { FailurePanel } from "./signal-detail-failure";
 import { IdentityPanel } from "./signal-detail-identity";
 import { RuntimeStatus } from "./runtime-status";
@@ -118,7 +118,9 @@ export function SignalDetailView(props: SignalDetailViewProps) {
         />
       }
     >
-      {isRequest && request !== undefined && <RequestExchangePanel request={request} />}
+      {isRequest && request !== undefined && (
+        <RequestExchangePanel request={request} spans={props.spans} />
+      )}
       {isRequest && (
         <ContinuationsPanel items={props.continuations ?? []} incomplete={props.incomplete ?? []} />
       )}

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { CodeBlock } from "../components/blocks/code-block";
 import { Section } from "../components/blocks/section";
 import { EmptyState } from "../components/neon/empty-state";
 import { HistoryList } from "../components/neon/history-list";
@@ -31,67 +30,6 @@ export function WaterfallPanel({
   readonly requests: readonly InspectorObject[];
 }) {
   return <TraceWaterfall spans={spans} requests={requests} />;
-}
-
-export function RequestExchangePanel({ request }: { readonly request: InspectorObject }) {
-  return (
-    <Section
-      id="request-exchange"
-      title="Payload and headers"
-      description="Redaction-first capture"
-    >
-      <div className="grid gap-4 md:grid-cols-2">
-        <CapturePanel title="Request headers" value={first(request, "requestHeaders", "headers")} />
-        <CapturePanel
-          title="Request payload"
-          value={first(request, "requestBody", "requestPayload", "body")}
-        />
-        <CapturePanel title="Response headers" value={first(request, "responseHeaders")} />
-        <CapturePanel
-          title="Response body"
-          value={first(request, "responseBody", "responsePayload")}
-        />
-      </div>
-      <p className="mt-3 text-xs text-muted-foreground">
-        Bodies and protected headers appear only when the active backend explicitly enables bounded,
-        redacted development capture. Otherwise they are intentionally not retained.
-      </p>
-    </Section>
-  );
-}
-
-function CapturePanel({ title, value }: { readonly title: string; readonly value: unknown }) {
-  return (
-    <div className="grid min-w-0 content-start gap-1.5">
-      <h3 className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
-        {title}
-      </h3>
-      {value === undefined ? (
-        <p className="schema-empty m-0 rounded-md border border-dashed border-border px-3 py-2.5 text-xs text-muted-foreground">
-          Not retained by the active backend.
-        </p>
-      ) : value === null || typeof value !== "object" ? (
-        <code className="schema-value rounded-md border border-border bg-muted/40 px-3 py-2 font-mono text-xs break-all">
-          {String(value)}
-        </code>
-      ) : (
-        <CodeBlock value={safeValue(value)} label={title.toLowerCase()} maxHeight="14rem" />
-      )}
-    </div>
-  );
-}
-
-function first(value: InspectorObject, ...keys: readonly string[]): unknown {
-  return keys.map((key) => value[key]).find((item) => item !== undefined);
-}
-
-function safeValue(value: unknown): unknown {
-  try {
-    JSON.stringify(value);
-    return value;
-  } catch {
-    return "Unavailable";
-  }
 }
 
 export function ContinuationsPanel({
