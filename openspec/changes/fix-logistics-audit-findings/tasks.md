@@ -116,7 +116,7 @@
 **Findings:** RK-18, IN-28 (events). **Starts after group 4 is merged.** **Owns:** `packages/cli/src/supervisor/**` except `proxy-*.ts`, `packages/cli/src/commands/dev-{engine,activation,command}*.ts`.
 
 - [x] 12.1 RK-18: reproduce with a test that saves a syntax error and then a fix two seconds later; report the parse failure with file and line when the candidate fails instead of waiting for the health timeout; start the rebuild for the later change as soon as it arrives; verify the failure is reported and the fix is serving within the reload budget.
-- [ ] 12.2 IN-28: add a session identifier and a reason (`start` or `reload`) to the generation events (`dev-activation.ts:129-137`); verify a restart and a reload produce distinguishable events.
+- [x] 12.2 IN-28: add a session identifier and a reason (`start` or `reload`) to the generation events (`dev-activation.ts:129-137`); verify a restart and a reload produce distinguishable events.
 - [x] 12.3 RK-07: forward a programmatic candidate host to the child environment (`supervisor/candidate-start.ts:43`), so a custom host is honoured by the generated server; verify with the supervisor environment test.
 
 ## 13. Inspector launcher and session state

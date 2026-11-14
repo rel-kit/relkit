@@ -12,6 +12,12 @@ export interface HeldCandidateOutput {
   dropped: boolean;
 }
 
+/**
+ * Why a generation changed: `start` for the session's first one, `reload` for handlers swapped
+ * inside the serving process, `restart` for a new process (blue/green) after a change.
+ */
+export type DevGenerationReason = "start" | "reload" | "restart";
+
 /** Admitted source version with cancellation and promotion witnesses. */
 export interface DevActivationAttempt {
   readonly session: DevSession;

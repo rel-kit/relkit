@@ -116,20 +116,28 @@ export default defineApp({ env, server: { port: 3000, maxBodyBytes: ${maxBodyByt
  * Starts `relkit dev` on a free port.
  * @param root - Application root.
  * @param verbose - Whether dev runs with `--verbose`.
+ * @param flags - Further `relkit dev` flags, such as `--json`.
  * @returns The running process with output and request helpers.
  */
-export async function startDev(root: string, verbose = true): Promise<DevProcess> {
+export async function startDev(
+  root: string,
+  verbose = true,
+  flags: readonly string[] = [],
+): Promise<DevProcess> {
   const probe = Bun.serve({ port: 0, hostname: "127.0.0.1", fetch: () => new Response() });
   const port = probe.port ?? 0;
   await probe.stop(true);
-  const child = Bun.spawn([process.execPath, cli, "dev", ...(verbose ? ["--verbose"] : [])], {
-    cwd: root,
-    env: { ...process.env, PORT: String(port), NO_COLOR: "1" },
-    stdin: "ignore",
-    stdout: "pipe",
-    stderr: "pipe",
-    detached: true,
-  });
+  const child = Bun.spawn(
+    [process.execPath, cli, "dev", ...(verbose ? ["--verbose"] : []), ...flags],
+    {
+      cwd: root,
+      env: { ...process.env, PORT: String(port), NO_COLOR: "1" },
+      stdin: "ignore",
+      stdout: "pipe",
+      stderr: "pipe",
+      detached: true,
+    },
+  );
   let output = "";
   const decoder = new TextDecoder();
   for (const stream of [child.stdout, child.stderr])

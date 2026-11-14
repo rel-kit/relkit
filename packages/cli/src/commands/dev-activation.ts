@@ -19,6 +19,7 @@ import {
   failOnCandidateExit,
   releaseHeldOutput,
 } from "./dev-activation-exit.js";
+import { generationIdentity } from "./dev-activation-identity.js";
 import type { DevSession } from "./dev-session.js";
 import type { DevActivationAttempt } from "./dev-activation.types.js";
 export { drainCandidate, drainCandidateEffect } from "./dev-drain.js";
@@ -146,6 +147,7 @@ const runActivation = Effect.fn("Dev.activation.protocol")(function* (
       changedFiles: changedFiles.length,
       initial,
       durationMs: performance.now() - startedAt,
+      ...generationIdentity(session, initial ? "start" : "restart"),
     },
   });
   return true;
@@ -175,6 +177,7 @@ const recoverActivation = Effect.fn("Dev.activation.failure")(function* (
       ...(original instanceof CandidateExitedError && original.output !== ""
         ? { cause: redactFailureDetail(original.output) }
         : {}),
+      ...generationIdentity(session, "restart"),
     },
   });
   return false;
