@@ -80,6 +80,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
             <CommandPalette isOpen={searchOpen} onOpenChange={setSearchOpen} graph={graph.graph} />
             <StatusBadge
               className="health-badge"
+              data-testid="inspector-stream-state"
               data-state={status}
               tone={status === "connected" ? "live" : statusTone(status)}
               label={status}

@@ -1,5 +1,6 @@
 import type { InspectorApiClient } from "./api";
 import type { InspectorObject } from "./api-types";
+import type { StreamEventType } from "./stream-protocol";
 
 export interface DevelopmentFailure {
   readonly cursor: string;
@@ -8,6 +9,17 @@ export interface DevelopmentFailure {
   readonly detailsUnavailable: boolean;
   readonly suggestion: string;
   readonly logsHref: string;
+}
+
+/**
+ * When a live event should re-read the reload status: at once when the generation or its
+ * diagnostics change, later (coalesced) when logs arrive, since the supervisor reports a failed
+ * reload only as a `dev.generation.failed` log and the stream does not say which log arrived.
+ */
+export function failureRefresh(type: StreamEventType): "now" | "later" | undefined {
+  if (type === "generation.changed" || type === "diagnostic.changed") return "now";
+  if (type === "log.emitted") return "later";
+  return undefined;
 }
 
 /** Reads supervisor failures from the retained development logs, including failed startup output. */
