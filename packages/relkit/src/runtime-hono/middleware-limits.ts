@@ -15,9 +15,14 @@ import {
 import { ensureRequestRecord, finishRequestRecord } from "./request-record-middleware.js";
 import { payloadTooLargeResponse } from "./response-mapping-utils.js";
 
+/** Longest time an answer waits for the unread rest of its request body. */
+export const UNREAD_BODY_DRAIN_MS = 500;
+
 /** Consumes a request body the handler left unread, so the next request on a kept-alive
  * connection is parsed from its own first byte. A body larger than the limit, of unknown size
- * without a limit, or one that cannot be read is left for the connection to close instead.
+ * without a limit, one that cannot be read, or one the client has not finished sending within
+ * {@link UNREAD_BODY_DRAIN_MS} is left for the connection to close instead, so a slow or stalled
+ * upload never delays the answer by more than that.
  * @param request - Native request the response answers.
  * @param status - Status of the response about to be sent; an oversize answer always closes.
  * @param maxBodyBytes - Body limit in bytes, or undefined when none is configured.
@@ -35,9 +40,17 @@ export async function settleUnreadBody(
   if (maxBodyBytes === undefined || declared > maxBodyBytes) return false;
   const reader = body.getReader();
   let total = 0;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const expired = new Promise<"expired">((resolve) => {
+    timer = setTimeout(() => resolve("expired"), UNREAD_BODY_DRAIN_MS);
+  });
   try {
     while (true) {
-      const part = await reader.read();
+      const part = await Promise.race([reader.read(), expired]);
+      if (part === "expired") {
+        void reader.cancel().catch(() => undefined);
+        return false;
+      }
       if (part.done) return true;
       total += part.value.byteLength;
       if (total > maxBodyBytes) {
@@ -48,7 +61,12 @@ export async function settleUnreadBody(
   } catch {
     return false;
   } finally {
-    reader.releaseLock();
+    clearTimeout(timer);
+    try {
+      reader.releaseLock();
+    } catch {
+      // A read cancelled at the deadline may still be pending; the stream is already cancelled.
+    }
   }
 }
 

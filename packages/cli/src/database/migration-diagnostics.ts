@@ -21,7 +21,8 @@ export function sanitizeConfigMessage(message: string, root: string): string {
   const masked = firstLine
     .replaceAll(root, ".")
     // scheme://user:password@host → scheme://***@host
-    .replace(/\b([a-z][a-z0-9+.-]*:\/\/)[^\s/@]+@/giu, "$1***@")
+    // Greedy up to the last "@" before the host, so a password containing "@" is masked whole.
+    .replace(/\b([a-z][a-z0-9+.-]*:\/\/)[^\s/]+@/giu, "$1***@")
     // password=…, token: …, secret=… and similar pairs
     .replace(
       /\b([a-z0-9_-]*(?:password|passwd|pwd|secret|token|credential|api[_-]?key)[a-z0-9_-]*)(\s*[=:]\s*)[^\s,;)]+/giu,

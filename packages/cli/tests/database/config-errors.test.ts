@@ -33,6 +33,19 @@ test("credentials in a thrown message are masked", async () => {
   expect(message).not.toContain("owner:");
 });
 
+test("a password containing an at sign is masked whole", async () => {
+  const root = await app();
+  await write(
+    root,
+    "drizzle.config.ts",
+    'throw new Error("Cannot reach postgres://owner:hunt@er2@db.internal:5432/app");\n',
+  );
+  const result = await migrate(root);
+  const message: string = result.result.error.message;
+  expect(message).toContain("postgres://***@db.internal:5432/app");
+  expect(message).not.toContain("er2");
+});
+
 test("a configuration importing a missing package keeps the dependency hint", async () => {
   const root = await app();
   await write(

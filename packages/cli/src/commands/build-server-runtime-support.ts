@@ -148,14 +148,18 @@ function writeRuntimeLog(record) {
 }
 // Development error logs of a request wait for its request line, so the cause prints beneath it.
 const heldHttpLogs = new Map();
+const releasedHttpLogs = new Set();
 function writeHttpLog(record) {
-  const held = record?.signal === "log" && record.level === "error" && typeof record.requestId === "string" && process.env.RELKIT_DEV_LOGS === "1";
+  const held = record?.signal === "log" && record.level === "error" && typeof record.requestId === "string" && process.env.RELKIT_DEV_LOGS === "1" && !releasedHttpLogs.has(record.requestId);
   if (!held || (!heldHttpLogs.has(record.requestId) && heldHttpLogs.size >= 256)) return writeRuntimeLog(record);
   heldHttpLogs.set(record.requestId, [...(heldHttpLogs.get(record.requestId) ?? []), record]);
 }
 function releaseHttpLogs(requestId) {
   const records = heldHttpLogs.get(requestId) ?? [];
   heldHttpLogs.delete(requestId);
+  // An error logged for this request after it completed is printed at once, not held again.
+  releasedHttpLogs.add(requestId);
+  if (releasedHttpLogs.size > 1024) releasedHttpLogs.delete(releasedHttpLogs.values().next().value);
   for (const record of records) writeRuntimeLog(record);
 }
 function healthResponse(status, code = 200) {
