@@ -240,10 +240,12 @@ test("event publish checks the payload, asks first and answers beside the contro
 
   await page.getByRole("button", { name: "Replay publication event-instance-1" }).click();
   const replay = page.getByRole("dialog", { name: "Replay publication event-instance-1?" });
-  await expect(replay).toContainText("Publishes this event's payload again as a new event.");
+  await expect(replay).toContainText("Nothing new is published.");
   await replay.getByRole("button", { name: "Replay" }).click();
   const row = page.locator("#publication-event-instance-1");
-  await expect(row.getByRole("status")).toContainText("Published the payload of event-instance-1");
+  await expect(row.getByRole("status")).toContainText(
+    "Delivered publication event-instance-1 again to its reactions. Nothing new was published.",
+  );
 
   // The row says when it happened and links to its trace.
   await expect(row.locator("time")).toBeVisible();

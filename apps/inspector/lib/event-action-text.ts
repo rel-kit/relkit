@@ -29,7 +29,8 @@ export function confirmation(kind: EventActionKind, target: string): Confirmatio
     case "replay":
       return {
         title: `Replay publication ${target}?`,
-        description: "Publishes this event's payload again as a new event.",
+        description:
+          "Delivers this publication again to the functions that react to it, with its stored payload. Nothing new is published.",
         confirmLabel: "Replay",
       };
     case "retry":
@@ -53,7 +54,7 @@ export function unsupportedText(kind: EventActionKind): string {
     case "publish":
       return "The application has no schema for this event, so the Inspector cannot publish it.";
     case "replay":
-      return "This provider keeps no payload for this publication, so it cannot be published again.";
+      return "This provider keeps no payload for this publication, so it cannot be delivered again.";
     case "retry":
       return "This provider cannot retry a delivery.";
     case "cancel":
@@ -91,12 +92,9 @@ export function eventActionSuccess(
         ...created,
       };
     case "replay":
+      // A replay delivers the same publication again; the receipt repeats its id.
       return {
-        text:
-          id === undefined
-            ? `Published the payload of ${target} again.`
-            : `Published the payload of ${target} again as publication ${id}.`,
-        ...created,
+        text: `Delivered publication ${target} again to its reactions. Nothing new was published.`,
       };
     case "retry":
       return { text: `Retried delivery ${target}.` };
