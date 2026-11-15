@@ -14,6 +14,8 @@ export interface FixtureApplicationState {
     readonly byInspectionBuffer: number;
   };
   readonly missedLiveUpdates?: number;
+  /** Forgets the last session, as a tool that never connected to one in its run. */
+  readonly neverConnected?: boolean;
 }
 
 const CONNECTED: FixtureApplicationState = { state: "connected" };
@@ -30,6 +32,9 @@ export function installApplicationFixture(
 ): void {
   let current = CONNECTED;
   let since = new Date().toISOString();
+  // As the tool keeps them for its run: the last session, and when it stopped answering.
+  let lastSessionId: string | null = "fixture-session";
+  let lastConnectedUntil: string | null = null;
   app.get("/_relkit/v1/storage", (context) => {
     const loss = current.recordsLostBeforeHistory ?? {
       byApplicationProducer: 0,
@@ -47,6 +52,8 @@ export function installApplicationFixture(
           generationId: current.state === "connected" ? generationId : null,
           sessions: current.state === "ambiguous" ? (current.sessions ?? []) : [],
           since,
+          lastSessionId,
+          lastConnectedUntil,
         },
         incomplete: loss.byApplicationProducer + loss.byInspectionBuffer > 0,
         recordsLostBeforeHistory: loss,
@@ -63,6 +70,15 @@ export function installApplicationFixture(
   app.post("/__fixture__/application", async (context) => {
     const next = { ...CONNECTED, ...(await context.req.json<Partial<FixtureApplicationState>>()) };
     if (next.state !== current.state) since = new Date().toISOString();
+    if (next.neverConnected === true) {
+      lastSessionId = null;
+      lastConnectedUntil = null;
+    } else if (next.state === "connected") {
+      lastSessionId = "fixture-session";
+      lastConnectedUntil = null;
+    } else if (current.state === "connected") {
+      lastConnectedUntil = since;
+    }
     current = next;
     stream.publish({
       type: "generation.changed",

@@ -54,12 +54,30 @@ test("a stopped session shows on every page within a second or two", async ({ pa
   await expect(page.getByRole("heading", { name: "Environment", exact: true })).toBeVisible();
 });
 
-test("with no session since the page opened it waits for one (IN-48)", async ({ page }) => {
-  await application(page.request, { state: "disconnected" });
+test("with no session ever connected it waits for one (IN-48)", async ({ page }) => {
+  await application(page.request, { state: "disconnected", neverConnected: true });
   await page.goto("/");
   await expect(banner(page)).toContainText("Waiting for a development session");
   await expect(banner(page)).toContainText("No running relkit dev session was found");
   await expect(page.getByTestId("inspector-application-state")).toHaveText("app no session");
+});
+
+test("a tab opened after the session stopped says it stopped answering (IN-09)", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/");
+  await application(page.request, { state: "disconnected" });
+  await expect(banner(page)).toContainText("stopped answering", { timeout: 3_000 });
+
+  // A new tab has no memory of its own: the Inspector's record tells it which session stopped.
+  const fresh = await context.newPage();
+  await fresh.goto("/");
+  await expect(banner(fresh)).toContainText("The application is not connected");
+  await expect(banner(fresh)).toContainText("fixture-session");
+  await expect(banner(fresh)).toContainText("stopped answering at");
+  await expect(banner(fresh)).not.toContainText("Waiting for a development session");
+  await fresh.close();
 });
 
 test("several sessions name the flag that picks one", async ({ page }) => {

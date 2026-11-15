@@ -123,10 +123,20 @@ const applySelection = Effect.fn("Inspector.applySelection")(function* (
       : Effect.logInfo(notice.message);
   const changed = first || selectionKey(previous.selection) !== selectionKey(selection);
   const now = yield* Clock.currentTimeMillis;
+  const stopped =
+    previous.selection.state === "connected" && selection.state !== "connected"
+      ? previous.selection.handshake.sessionId
+      : undefined;
   yield* Ref.update(state, (value) => ({
     ...value,
     selection,
     selectionSince: changed ? now : value.selectionSince,
+    lastSession:
+      selection.state === "connected"
+        ? { sessionId: selection.handshake.sessionId }
+        : stopped === undefined
+          ? value.lastSession
+          : { sessionId: stopped, stoppedAt: now },
   }));
 });
 

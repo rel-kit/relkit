@@ -15,6 +15,11 @@ export interface InspectorToolState {
   readonly selection: InspectorSelection;
   /** When the application session entered its current state (ms); undefined before discovery. */
   readonly selectionSince?: number | undefined;
+  /**
+   * The last application session this run of the tool connected to, kept after it stops
+   * answering. `stoppedAt` (ms) is undefined while that session is still connected.
+   */
+  readonly lastSession?: { readonly sessionId: string; readonly stoppedAt?: number } | undefined;
   readonly history: InspectorHistoryOwner | undefined;
   readonly sessionId: string | undefined;
   readonly through: number;

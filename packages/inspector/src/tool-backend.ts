@@ -21,7 +21,11 @@ import { publishSelectionState } from "./live-events.js";
  * @returns `state`: `connected` (one live `relkit dev` session), `disconnected` (none found or it
  * stopped answering) or `ambiguous` (several; pass `--connection-file`); `sessionId` and
  * `generationId` of the connected session or null; `sessions`: the candidates when ambiguous;
- * `since`: ISO time the state began, or null before the first discovery.
+ * `since`: ISO time the state began, or null before the first discovery; `lastSessionId`: the
+ * last session this run of the tool connected to, or null when none ever did; and
+ * `lastConnectedUntil`: ISO time that session stopped answering, or null while it is connected
+ * or when none ever connected. Both survive the tool's own UI connections, so every tab tells a
+ * stopped session from one that never started.
  */
 function applicationStatus(current: InspectorToolState) {
   const selection = current.selection;
@@ -33,6 +37,11 @@ function applicationStatus(current: InspectorToolState) {
     sessions: selection.state === "ambiguous" ? [...selection.sessions] : [],
     since:
       current.selectionSince === undefined ? null : new Date(current.selectionSince).toISOString(),
+    lastSessionId: current.lastSession?.sessionId ?? null,
+    lastConnectedUntil:
+      current.lastSession?.stoppedAt === undefined
+        ? null
+        : new Date(current.lastSession.stoppedAt).toISOString(),
   };
 }
 
