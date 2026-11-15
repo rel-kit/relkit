@@ -138,16 +138,17 @@ at live customer accounts.
 
 ## Diagnose common failures
 
-| Symptom                                    | Check first                                                                                    |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------- |
-| Compiler rejects auth registration         | One Drizzle service, one auth service, and one recognized `ALL` catch-all mount                |
-| Auth tables are missing                    | Same database path/schema for app and migrations; migration ran before startup                 |
-| Service handler returns `503`              | Use runtime activation through the app, not the descriptor as a standalone server              |
-| Sign-in succeeds but profile returns `401` | Cookie sent on the next request, consistent hostname, correct public URL and cookie policy     |
-| Auth callback/origin is rejected           | Actual `baseURL`, mounted path, exact trusted origins, and provider callback registration      |
-| `/session` reports signed out              | This is a public optional-session function; inspect whether the request carries a valid cookie |
-| Session type is missing                    | Run `bun run check`, inspect the generated registry, then typecheck                            |
-| A signed-in user sees another user's data  | Add/test business authorization; route protection only checks authentication                   |
+| Symptom                                    | Check first                                                                                                                                             |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Compiler rejects auth registration         | One Drizzle service, one auth service, and one recognized `ALL` catch-all mount                                                                         |
+| Auth tables are missing                    | Same database path/schema for app and migrations; migration ran before startup                                                                          |
+| `RELKIT_AUTH_SCHEMA_MISMATCH` at startup   | The Drizzle schema lists a column Better Auth never writes, such as [`account.issuer`](/docs/modules/auth/better-auth#remove-the-account-issuer-column) |
+| Service handler returns `503`              | Use runtime activation through the app, not the descriptor as a standalone server                                                                       |
+| Sign-in succeeds but profile returns `401` | Cookie sent on the next request, consistent hostname, correct public URL and cookie policy                                                              |
+| Auth callback/origin is rejected           | Actual `baseURL`, mounted path, exact trusted origins, and provider callback registration                                                               |
+| `/session` reports signed out              | This is a public optional-session function; inspect whether the request carries a valid cookie                                                          |
+| Session type is missing                    | Run `bun run check`, inspect the generated registry, then typecheck                                                                                     |
+| A signed-in user sees another user's data  | Add/test business authorization; route protection only checks authentication                                                                            |
 
 Use status codes and redacted diagnostics during investigation. Do not print passwords, auth tokens,
 or entire request headers to troubleshoot a cookie problem.

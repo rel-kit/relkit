@@ -191,6 +191,75 @@ Better Auth writes through the native adapter, bypassing RelKit portable CRUD, g
 and operation overrides. Do not use a table override as an auth policy or expose credential/session
 tables through generic CRUD routes. See [Database integration](/docs/modules/database/better-auth).
 
+## Remove the account issuer column
+
+RelKit installs Better Auth 1.7.7, the first release without the advisories `npm audit` reports for
+1.7.1. Better Auth 1.7.0 to 1.7.2 required an `issuer` column on the `account` table and a unique
+index on `issuer` and `accountId`, and projects created with Better Auth 1.7.1 declare both. From
+1.7.3, Better Auth identifies an account by `providerId` and `accountId` again, never writes
+`issuer`, and checks the Drizzle schema when it starts. With the old column, authentication does
+not start and the server prints:
+
+```txt title="Terminal"
+RELKIT_AUTH_SCHEMA_MISMATCH: The database schema does not match the installed Better Auth release, so every sign-up and sign-in would fail.
+  Column account.issuer is required, but Better Auth 1.7.3 and later never write it: remove it and the index on issuer and accountId.
+  next: Run `relkit migrate --write` (or remove `issuer` and the index on it from the account table by hand), then `db:generate` and `db:migrate`.
+  docs: https://relkit.dev/docs/errors/relkit-auth-schema-mismatch
+```
+
+No account, user or session is lost: Better Auth 1.7.3 and later never read `issuer`, and the other
+columns stay as they are. To upgrade a project:
+
+1. Install `better-auth@1.7.7` together with the RelKit packages that require it. RelKit checks the
+   installed version and names it when it differs.
+2. Check that no two accounts share a provider and account ID, which Better Auth 1.7.3 and later
+   reject. On PostgreSQL:
+
+   ```sql
+   SELECT "providerId", "accountId", count(*) FROM account GROUP BY 1, 2 HAVING count(*) > 1;
+   ```
+
+3. Change the schema file. `relkit migrate` previews the change and `relkit migrate --write` applies
+   it; to edit by hand, remove the column, the index and the imports only the index used. In
+   `src/services/database/schema/auth.ts` of a PostgreSQL project:
+
+   ```diff title="src/services/database/schema/auth.ts"
+   -import { boolean, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+   +import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+   @@
+    export const account = pgTable(
+      "account",
+      {
+        id: text().primaryKey(),
+        accountId: text().notNull(),
+   -    issuer: text().notNull(),
+        providerId: text().notNull(),
+   @@
+        ...timestamps,
+      },
+   -  (table) => [uniqueIndex("account_issuer_account_id").on(table.issuer, table.accountId)],
+    );
+   ```
+
+   Keep `uniqueIndex` imported when other tables, such as the organization plugin's `member`, still
+   use it. SQLite and MySQL schemas change the same way.
+
+4. Generate the migration with `bun run db:generate` (`npm run db:generate` on npm) and review it.
+   Drizzle drops the index before the column:
+
+   ```sql title="migration.sql"
+   DROP INDEX "account_issuer_account_id";--> statement-breakpoint
+   ALTER TABLE "account" DROP COLUMN "issuer";
+   ```
+
+5. Apply it with `bun run db:migrate` (`relkit db migrate`) in every environment before the new
+   release serves requests, then sign up a new user and sign in with an existing one.
+
+To keep the column's values, make it nullable instead (`issuer: text()`) and keep the index:
+Better Auth accepts a nullable column it does not write, and the generated migration only drops
+`NOT NULL`. Setting `advanced.database.validateSchema: false` in the Better Auth file turns the
+startup check off; inserts into a table with a required `issuer` column still fail.
+
 ## Read the authentication operations in the API reference
 
 The served document at `/_relkit/v1/openapi.json` and the API reference include the mounted Better
