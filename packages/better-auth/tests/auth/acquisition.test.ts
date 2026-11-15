@@ -20,6 +20,8 @@ function retryingAuth(
 ) {
   return defineBetterAuthService({
     baseURL: "http://localhost",
+    // The fake Drizzle schema declares no Better Auth tables; these tests exercise acquisition only.
+    advanced: { database: { validateSchema: false } },
     plugins: [
       {
         id: "controlled-test-init",
@@ -136,6 +138,8 @@ it.effect(
       let factories = 0;
       const descriptor = defineBetterAuthService({
         baseURL: "http://localhost",
+        // The fake Drizzle schema declares no Better Auth tables; these tests exercise acquisition only.
+        advanced: { database: { validateSchema: false } },
         plugins: [
           {
             id: "count-init",
