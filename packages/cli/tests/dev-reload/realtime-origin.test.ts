@@ -1,7 +1,8 @@
 /**
  * RK-40 end to end: under a real `relkit dev` run by Node, a browser-like `@relkit/client`
  * WebSocket that announces the server's public origin subscribes to a channel through the
- * development proxy and receives an event that a same-origin `POST` publishes.
+ * development proxy and receives an event that a same-origin `POST` publishes. The channel's
+ * guard calls `getRelkit()`, so it is admitted only when socket messages run in the application.
  */
 import { mkdirSync, realpathSync, symlinkSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -36,14 +37,15 @@ export default defineApp({
 );
 fixture.write(
   "src/services/alpha/channels/feed.channel.ts",
-  `import { defineChannel } from "relkit";
+  `import { defineChannel, getRelkit } from "relkit";
 import { z } from "zod";
 
 export default defineChannel({
   id: "alpha.feed",
   params: z.object({}),
   events: { posted: z.object({ message: z.string() }) },
-  client: { public: true },
+  // As application guards do to read their database: it needs the running application (7a).
+  client: { authorize: () => getRelkit() !== undefined },
 });
 `,
 );
