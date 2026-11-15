@@ -4,9 +4,17 @@
  * reader pans instead.
  */
 
-/** Lowest default scale: 12 px card text stays above 7 px. */
-export const MIN_READABLE_ZOOM = 0.62;
+/** The smallest card text, the subtitle at 0.68rem, in pixels at scale 1. */
+export const SMALLEST_CARD_TEXT_PX = 10.9;
+/** The smallest card text the default view may show, in pixels. */
+export const READABLE_TEXT_PX = 11;
+
+/** Lowest default scale: the smallest card text stays about 11 px, so a large graph is panned. */
+export const MIN_READABLE_ZOOM = Math.min(1, READABLE_TEXT_PX / SMALLEST_CARD_TEXT_PX);
 const PADDING = 24;
+
+/** Room the toolbar floated at the top of the canvas takes, so the first cards start below it. */
+export const TOOLBAR_INSET = 56;
 
 export interface Size {
   readonly width: number;
@@ -23,14 +31,24 @@ export interface Viewport {
  * @param content - The laid-out graph's size in flow units.
  * @param canvas - The canvas's size in pixels.
  * @param maxZoom - The largest scale a fit may use.
+ * @param topInset - Pixels at the top of the canvas the content must stay below.
  */
-export function initialViewport(content: Size, canvas: Size, maxZoom = 1): Viewport {
+export function initialViewport(
+  content: Size,
+  canvas: Size,
+  maxZoom = 1,
+  topInset = TOOLBAR_INSET,
+): Viewport {
   const fit = Math.min(
     (canvas.width - PADDING * 2) / Math.max(1, content.width),
-    (canvas.height - PADDING * 2) / Math.max(1, content.height),
+    (canvas.height - topInset - PADDING * 2) / Math.max(1, content.height),
   );
   const zoom = Math.max(MIN_READABLE_ZOOM, Math.min(maxZoom, fit));
-  const centre = (available: number, size: number) =>
-    Math.max(PADDING, (available - size * zoom) / 2);
-  return { x: centre(canvas.width, content.width), y: centre(canvas.height, content.height), zoom };
+  const centre = (available: number, size: number, start: number) =>
+    Math.max(start + PADDING, start + (available - size * zoom) / 2);
+  return {
+    x: centre(canvas.width, content.width, 0),
+    y: centre(canvas.height - topInset, content.height, topInset),
+    zoom,
+  };
 }

@@ -14,7 +14,7 @@ import {
 import type { LayoutDirection, ViewLayout } from "../../lib/graph-view-layout";
 import { type GraphView, labelEdge } from "../../lib/graph-views";
 import { highlightFor } from "../../lib/graph-highlight";
-import { initialViewport, MIN_READABLE_ZOOM } from "../../lib/graph-views-fit";
+import { initialViewport, MIN_READABLE_ZOOM, TOOLBAR_INSET } from "../../lib/graph-views-fit";
 import { EdgeMarkers, explorerEdgeTypes, markerId, type RelationEdge } from "./graph-edges";
 import { explorerNodeTypes } from "./graph-nodes";
 import { type CanvasNode, canvasNodes, pickHandles } from "./graph-canvas-elements";
@@ -192,12 +192,15 @@ export function GraphCanvas({
             // reader pan instead of shrinking eight stages into the viewport.
             const fit = Math.min(
               (clientWidth - 48) / layout.width,
-              (clientHeight - 48) / layout.height,
+              (clientHeight - TOOLBAR_INSET - 48) / layout.height,
             );
             const zoom = Math.max(MIN_READABLE_ZOOM, Math.min(1, fit));
             void flow.setViewport({
               x: 24,
-              y: Math.max(24, (clientHeight - layout.height * zoom) / 2),
+              y: Math.max(
+                TOOLBAR_INSET + 24,
+                TOOLBAR_INSET + (clientHeight - TOOLBAR_INSET - layout.height * zoom) / 2,
+              ),
               zoom,
             });
           }}

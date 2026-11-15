@@ -181,6 +181,45 @@ describe("graph views", () => {
     });
   });
 
+  test("a bucket a domain owns is a node of its own, linked to the domain (IN-45)", () => {
+    const withBucket = normalizeGraphResponse({
+      ...payload,
+      graph: {
+        ...payload.graph,
+        nodes: [
+          ...payload.graph.nodes,
+          { id: "trips.photos", kind: "bucket", domainId: "trips", label: "photos" },
+        ],
+        edges: [
+          ...payload.graph.edges,
+          { kind: "uses-bucket", from: "trips.create-trip", to: "trips.photos" },
+        ],
+      },
+    } as InspectorGraph);
+    const view = architectureView(buildHierarchy(withBucket));
+    const bucket = view.nodes.find((node) => node.id === "trips.photos");
+    expect(bucket).toMatchObject({ title: "photos", domainId: "trips" });
+    expect(view.edges.find((edge) => edge.id === "trips->trips.photos")).toMatchObject({
+      from: "trips",
+      to: "trips.photos",
+    });
+    // The domain card no longer lists the bucket it now points at.
+    expect(view.nodes.find((node) => node.id === "trips")?.resources).toBeUndefined();
+
+    const unused = normalizeGraphResponse({
+      ...payload,
+      graph: {
+        ...payload.graph,
+        nodes: [
+          ...payload.graph.nodes,
+          { id: "trips.exports", kind: "bucket", domainId: "trips", label: "exports" },
+        ],
+      },
+    } as InspectorGraph);
+    const linked = architectureView(buildHierarchy(unused));
+    expect(linked.edges.some((edge) => edge.id === "trips->trips.exports")).toBe(true);
+  });
+
   test("architecture filters fold detail cards into domain arrows and remove the rest", () => {
     const folded = architectureView(hierarchy, {
       hidden: new Set(["events", "channels", "agents", "tools"]),

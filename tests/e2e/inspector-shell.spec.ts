@@ -56,7 +56,8 @@ test("graph cards stay readable at the default fit", async ({ page }) => {
     return transform === "none" ? 1 : new DOMMatrixReadOnly(transform).a;
   });
   console.log(`graph default scale: ${scale}`);
-  expect(scale).toBeGreaterThanOrEqual(0.6);
+  // The smallest card text is about 11 px at scale 1 (IN-45): a large graph is panned, not shrunk.
+  expect(scale).toBeGreaterThanOrEqual(0.99);
 });
 
 test.describe("dark graph", () => {
